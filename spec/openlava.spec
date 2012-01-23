@@ -1,4 +1,5 @@
 #
+# Copyright (C) 2011-2012 David Bigagli
 # Copyright (C) 2007 Platform Computing Inc.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -16,7 +17,7 @@
 #
 #
 
-%define major 1
+%define major 2
 %define minor 0
 %define release 1
 
@@ -33,7 +34,7 @@
 
 Summary: openlava Distributed Batch Scheduler
 Name: openlava
-Version: 1.0
+Version: 2.0
 Release: 1
 License: GPLv2
 Group: Applications/Productivity
@@ -80,7 +81,7 @@ make
 %install
 
 # Install binaries, daemons
-make install INSTALL_PREFIX=$RPM_BUILD_ROOT
+#make install prefix=$RPM_BUILD_ROOT%{_openlavatop}
 
 # install directories and files
 install -d $RPM_BUILD_ROOT%{_openlavatop}/bin
@@ -228,7 +229,6 @@ install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man8/nios.8  $RPM_BUILD
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man8/pim.8  $RPM_BUILD_ROOT%{_openlavatop}/share/man/man8
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man8/res.8  $RPM_BUILD_ROOT%{_openlavatop}/share/man/man8
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsbatch/man8/sbatchd.8  $RPM_BUILD_ROOT%{_openlavatop}/share/man/man8
-
 #
 # PRE
 #
@@ -247,7 +247,7 @@ install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsbatch/man8/sbatchd.8  $RPM_BU
 #
 # set variables
 #
-_openlavatop=${RPM_INSTALL_PREFIX}/openlava-1.0
+_openlavatop=${RPM_INSTALL_PREFIX}/openlava-%{version}
 # create the symbolic links
 ln -sf ${_openlavatop}/bin/bkill  ${_openlavatop}/bin/bstop
 ln -sf ${_openlavatop}/bin/bkill  ${_openlavatop}/bin/bresume
@@ -273,7 +273,7 @@ cp ${_openlavatop}/etc/openlava %{_sysconfdir}/init.d
 
 
 %postun
-_openlavatop=${RPM_INSTALL_PREFIX}/openlava-1.0
+_openlavatop=${RPM_INSTALL_PREFIX}/openlava-%{version}
 rm -f /etc/init.d/openlava
 rm -f /etc/profile.d/openlava.*
 rm -rf ${_openlavatop}
@@ -425,6 +425,7 @@ rm -rf ${_openlavatop}
 %attr(0755,openlava,openlava) %{_openlavatop}/work/logdir
 
 %changelog
+* Mon Jan 23 Releasing openlava 2.0
 * Sun Oct 30 2011 modified the spec file so that autoconf creates
 - openlava configuration files and use the outptu variables to make
 - the necessary subsititution in the them. Change the post install
