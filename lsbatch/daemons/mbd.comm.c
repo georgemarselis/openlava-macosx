@@ -696,7 +696,7 @@ callSBD(char *toHost,
                       len,
                       reply_buf,
                       replyHdr,
-                      connTimeout,
+                      connTimeout, /* 100 millisec */
                       60 * 30,
                       sockPtr,
                       postSndFunc,
