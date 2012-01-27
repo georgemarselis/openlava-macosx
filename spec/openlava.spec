@@ -1,5 +1,4 @@
 #
-# Copyright (C) 2011-2012 David Bigagli
 # Copyright (C) 2007 Platform Computing Inc.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -31,6 +30,7 @@
 %define _logdir %{_openlavatop}/log
 %define _includedir %{_openlavatop}/include
 %define _etcdir %{_openlavatop}/etc
+%define is_redhat %(test -e /etc/redhat-release && echo 1 || echo 0)
 
 Summary: openlava Distributed Batch Scheduler
 Name: openlava
@@ -45,7 +45,13 @@ Source: %{name}-%{version}.tar.gz
 Buildroot: %{_tmppath}/%{name}-%{version}-buildroot
 BuildRequires: gcc, tcl-devel, ncurses-devel
 Requires: ncurses, tcl
+%if %is_redhat
 Requires(pre): /usr/sbin/useradd
+Requires(pre): /usr/sbin/groupadd
+%else
+Requires(pre): pwdutils
+%endif
+Requires(pre): /usr/bin/getent
 Requires(post): /sbin/chkconfig
 Requires(preun): /sbin/chkconfig
 Prefix: /opt
@@ -233,12 +239,12 @@ install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsbatch/man8/sbatchd.8  $RPM_BU
 # PRE
 #
 %pre
-
 #
 # Add "openlava" user
 #
-/usr/sbin/groupadd -f openlava
-/usr/sbin/useradd -c "openlava Administrator" -g openlava -m -d /home/openlava openlava 2> /dev/null || :
+/usr/bin/getent group openlava >/dev/null || /usr/sbin/groupadd openlava
+/usr/bin/getent passwd openlava >/dev/null || /usr/sbin/useradd -c "openlava Administrator" -g openlava -m -d /home/openlava openlava 2> /dev/null || :
+exit 0
 #
 # POST
 #
@@ -247,7 +253,7 @@ install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsbatch/man8/sbatchd.8  $RPM_BU
 #
 # set variables
 #
-_openlavatop=${RPM_INSTALL_PREFIX}/openlava-%{version}
+_openlavatop=%{_openlavatop}
 # create the symbolic links
 ln -sf ${_openlavatop}/bin/bkill  ${_openlavatop}/bin/bstop
 ln -sf ${_openlavatop}/bin/bkill  ${_openlavatop}/bin/bresume
@@ -263,26 +269,27 @@ cp ${_openlavatop}/etc/openlava.csh %{_sysconfdir}/profile.d
 cp ${_openlavatop}/etc/openlava %{_sysconfdir}/init.d
 
 # Register lava daemons
-/sbin/chkconfig --add openlava
+/sbin/chkconfig --add -f openlava
 /sbin/chkconfig openlava on
 
 %preun
 /sbin/service openlava stop > /dev/null 2>&1
-/sbin/chkconfig openlava off
-/sbin/chkconfig --del openlava
+/sbin/chkconfig -f openlava off
+/sbin/chkconfig --del -f openlava
 
 
 %postun
-_openlavatop=${RPM_INSTALL_PREFIX}/openlava-%{version}
-rm -f /etc/init.d/openlava
-rm -f /etc/profile.d/openlava.*
-rm -rf ${_openlavatop}
+#_openlavatop=%{_openlavatop}
+#rm -f /etc/init.d/openlava
+#rm -f /etc/profile.d/openlava.*
+#rm -rf ${_openlavatop}
 
 #
 # FILES
 #
 %files
 %defattr(-,openlava,openlava)
+
 %attr(0755,openlava,openlava) %{_openlavatop}/etc/openlava
 %{_openlavatop}/etc/openlava.sh
 %{_openlavatop}/etc/openlava.csh
@@ -414,18 +421,23 @@ rm -rf ${_openlavatop}
 %config(noreplace) %{_openlavatop}/etc/lsf.task
 %config(noreplace) %{_openlavatop}/README
 %config(noreplace) %{_openlavatop}/COPYING
-%attr(0755,openlava,openlava) %{_openlavatop}/bin
-%attr(0755,openlava,openlava) %{_openlavatop}/etc
-%attr(0755,openlava,openlava) %{_openlavatop}/include
-%attr(0755,openlava,openlava) %{_openlavatop}/lib
-%attr(0755,openlava,openlava) %{_openlavatop}/log
-%attr(0755,openlava,openlava) %{_openlavatop}/sbin
-%attr(0755,openlava,openlava) %{_openlavatop}/share
-%attr(0755,openlava,openlava) %{_openlavatop}/work
-%attr(0755,openlava,openlava) %{_openlavatop}/work/logdir
+
+%attr(0755,openlava,openlava) %dir %{_openlavatop}
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/bin
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/etc
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/include
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/lib
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/log
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/sbin
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/share
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/share/man
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/share/man/man1
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/share/man/man5
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/share/man/man8
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/work
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/work/logdir
 
 %changelog
-* Mon Jan 23 Releasing openlava 2.0
 * Sun Oct 30 2011 modified the spec file so that autoconf creates
 - openlava configuration files and use the outptu variables to make
 - the necessary subsititution in the them. Change the post install
