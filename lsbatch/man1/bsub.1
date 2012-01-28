@@ -1,10 +1,10 @@
 .ds ]W %
 .ds ]L
 .nh
-.TH bsub 1 "Lava Version 1.0 - Sept 2007"
+.TH bsub 1 "openlava Version 1.0 - Sept 2007"
 .br
 .SH NAME
-\fBbsub\fR - submits a batch job to Lava
+\fBbsub\fR - submits a batch job to openlava
 .SH SYNOPSIS
 \fBbsub \fR[\fIoptions\fR] \fIcommand \fR[\fIarguments\fR]
 .br
@@ -82,14 +82,14 @@ Submits a job for batch execution and assigns it a unique numerical job
 ID.
 .PP
 Runs the job on a host that satisfies all requirements of the job, when 
-all conditions on the job, host, queue, and cluster are satisfied. If Lava 
-cannot run all jobs immediately, Lava scheduling policies determine the 
+all conditions on the job, host, queue, and cluster are satisfied. If openlava 
+cannot run all jobs immediately, openlava scheduling policies determine the 
 order of dispatch. Jobs are started and suspended according to the 
 current system load. 
 .PP
 Sets the user's execution environment for the job, including the current 
 working directory, file creation mask, and all environment variables, 
-and sets Lava environment variables before starting the job. 
+and sets openlava environment variables before starting the job. 
 .PP
 When a job is run, the command line and stdout/stderr buffers are 
 stored in the directory home_directory/.lsbatch on the execution 
@@ -104,7 +104,7 @@ If no command is supplied for \fBbsub\fR, \fBbsub\fR prompts for the command
 from the standard input. On LINUX, the input is terminated by entering 
 CTRL-D on a new line. 
 .PP
-By default, Lava assumes that uniform user names and user ID spaces 
+By default, openlava assumes that uniform user names and user ID spaces 
 exist among all the hosts in the cluster. That is, a job submitted by a 
 given user will run under the same user's account on the execution 
 host. For situations where nonuniform user names and user ID spaces 
@@ -120,10 +120,10 @@ By default, automatically selects an appropriate queue. If you defined
 a default queue list by setting LSB_DEFAULTQUEUE, the queue is 
 selected from your list. If LSB_DEFAULTQUEUE is not defined, the 
 queue is selected from the system default queue list specified by the 
-Lava administrator (see the parameter DEFAULT_QUEUE in 
+openlava administrator (see the parameter DEFAULT_QUEUE in 
 lsb.params(5)).
 .PP
-By default, Lava tries to obtain resource requirement information for the 
+By default, openlava tries to obtain resource requirement information for the 
 job from the remote task list that is maintained by the load sharing 
 library (see \fBlsfintro\fR(1)). If the job is not listed in the remote task list, 
 the default resource requirement is to run the job on a host or hosts 
@@ -144,9 +144,9 @@ includes the job report, the job output (if any), and the error message
 By default, charges the job to the default project. The default project is 
 the project you define by setting the environment variable 
 LSB_DEFAULTPROJECT. If you do not set LSB_DEFAULTPROJECT, the 
-default project is the project specified by the Lava administrator in the 
+default project is the project specified by the openlava administrator in the 
 lsb.params configuration file (see the DEFAULT_PROJECT parameter 
-in lsb.params(5)). If DEFAULT_PROJECT is not defined, then Lava 
+in lsb.params(5)). If DEFAULT_PROJECT is not defined, then openlava 
 uses default as the default project name. 
 .PP
 Use \fB-n\fR to submit a parallel job.
@@ -250,7 +250,7 @@ without any other options, behaves the same as the default.
 
 .IP
 Use only with \fB-o\fR, \fB-I\fR, \fB-Ip\fR, and \fB-Is\fR options, which do not send mail, 
-to force Lava to send you a mail message when the job is done.
+to force openlava to send you a mail message when the job is done.
 
 
 .TP 
@@ -258,7 +258,7 @@ to force Lava to send you a mail message when the job is done.
 \fR
 .IP
 If the execution host becomes unavailable while a job is running, 
-specifies that the job will rerun on another host. Lava requeues the job 
+specifies that the job will rerun on another host. openlava requeues the job 
 in the same job queue with the same job ID. When an available 
 execution host is found, reruns the job as if it were submitted new. You 
 receive a mail message informing you of the host failure and requeuing 
@@ -290,7 +290,7 @@ Puts the host running your job into exclusive execution mode.
 
 .IP
 In exclusive execution mode, your job runs by itself on a host. It is 
-dispatched only to a host with no other jobs running, and Lava does not 
+dispatched only to a host with no other jobs running, and openlava does not 
 send any other jobs to the host until the job completes.
 
 .IP
@@ -364,8 +364,8 @@ the total CPU time for the whole job has reached the limit, a SIGXCPU
 signal is first sent to the job, then SIGINT, SIGTERM, and SIGKILL.
 
 .IP
-If LSB_JOB_CPULIMIT in lsf.conf is set to n, Lava-enforced CPU limit 
-is disabled and Lava passes the limit to the operating system. When one 
+If LSB_JOB_CPULIMIT in lsf.conf is set to n, openlava-enforced CPU limit 
+is disabled and openlava passes the limit to the operating system. When one 
 process in the job exceeds the CPU limit, the limit is enforced by the 
 operating system. 
 
@@ -376,9 +376,9 @@ hours can either be specified as 3:30, or 210.
 
 .IP
 Optionally, you can supply a host name or a host model name defined 
-in Lava. You must insert `/' between the CPU limit and the host name or 
+in openlava. You must insert `/' between the CPU limit and the host name or 
 model name. (See \fBlsinfo\fR(1) to get host model information.) If a host 
-name or model name is not given, Lava uses the default CPU time 
+name or model name is not given, openlava uses the default CPU time 
 normalization host defined at the queue level (DEFAULT_HOST_SPEC 
 in lsb.queues) if it has been configured, otherwise uses the default 
 CPU time normalization host defined at the cluster level 
@@ -421,7 +421,7 @@ replaced by 0 (zero).
 
 .IP
 If the current working directory is not accessible on the execution host 
-after the job starts, Lava writes the standard error output file to /tmp/.
+after the job starts, openlava writes the standard error output file to /tmp/.
 
 
 .TP 
@@ -436,7 +436,7 @@ selected host. Otherwise, the job (including the pre-exec command)
 goes back to PEND status and is rescheduled. 
 
 .IP
-If your job goes back into PEND status, Lava will keep on trying to run 
+If your job goes back into PEND status, openlava will keep on trying to run 
 the pre-exec command and the real job when conditions permit. For 
 this reason, be sure that your pre-exec command can be run many 
 times without having side effects. 
@@ -502,7 +502,7 @@ file.
 .RE
 .IP
 If you use the \fB-i\fR \fIinput_file \fRoption, then you do not have to use the \fB-f\fR 
-option to copy the specified input file to the execution host. Lava does 
+option to copy the specified input file to the execution host. openlava does 
 this for you, and removes the input file from the execution host after 
 the job completes. 
 
@@ -527,13 +527,13 @@ the file is shared between the submission and execution hosts, then no
 file copy is performed. 
 
 .IP
-Lava uses \fBlsrcp\fR to transfer files (see \fBlsrcp\fR(1) command). \fBlsrcp\fR 
+openlava uses \fBlsrcp\fR to transfer files (see \fBlsrcp\fR(1) command). \fBlsrcp\fR 
 contacts RES on the remote host to perform the file transfer. If RES is 
 not available, \fBrcp\fR is used (see \fBrcp\fR(1)). The user must ensure that the 
 \fBrcp\fR binary is in the user's $PATH on the execution host. 
 
 .IP
-Jobs that are submitted from Lava client hosts should specify the \fB-f\fR 
+Jobs that are submitted from openlava client hosts should specify the \fB-f\fR 
 option only if \fBrcp\fR is allowed. Similarly, \fBrcp\fR must be allowed if account 
 mapping is used. 
 
@@ -557,13 +557,13 @@ absolute or relative path. The input file can be any type of file, though
 it is typically a shell script text file.
 
 .IP
-If the file exists on the execution host, Lava uses it. Otherwise, Lava 
+If the file exists on the execution host, openlava uses it. Otherwise, openlava 
 attempts to copy the file from the submission host to the execution 
 host. For the file copy to be successful, you must allow remote copy 
 (\fBrcp\fR) access, or you must submit the job from a server host where RES 
 is running. The file is copied from the submission host to a temporary 
 file in the directory specified by the JOB_SPOOL_DIR parameter, or 
-your $HOME/.lsbatch directory on the execution host. Lava removes 
+your $HOME/.lsbatch directory on the execution host. openlava removes 
 this file when the job completes.
 
 .IP
@@ -572,7 +572,7 @@ JOB_SPOOL_DIR parameter in lsb.params, and uses the spooled file
 as the input file for the job. By default, if JOB_SPOOL_DIR is not 
 specified, the input file is spooled to 
 LSB_SHAREDIR/cluster_name/lsf_indir. If the lsf_indir directory 
-does not exist, Lava creates it before spooling the file. Lava removes the 
+does not exist, openlava creates it before spooling the file. openlava removes the 
 spooled file when the job completes. Use the \fB-is\fR option if you need 
 to modify or remove the input file before the job completes. Removing 
 or modifying the original input file does not affect the submitted job.
@@ -650,7 +650,7 @@ should choose a checkpoint period greater than half an hour.
 
 .IP
 Optionally, specifies a custom checkpoint and restart method to use 
-with the job. Use \fBmethod=default\fR to indicate to use Lava's default 
+with the job. Use \fBmethod=default\fR to indicate to use openlava's default 
 checkpoint and restart programs for the job, echkpnt.default and 
 erestart.default.
 
@@ -668,7 +668,7 @@ method you specify with bsub -k overrides this.
 .IP
 Process checkpointing is not available on all host types, and may 
 require linking programs with a special libraries (see \fBlibckpt.a\fR(3)). 
-Lava invokes \fBechkpnt\fR (see \fBechkpnt\fR(8)) found in LSF_SERVERDIR to 
+openlava invokes \fBechkpnt\fR (see \fBechkpnt\fR(8)) found in LSF_SERVERDIR to 
 checkpoint the job. You can override the default \fBechkpnt\fR for the job 
 by defining as environment variables or in lsf.conf 
 LSB_ECHKPNT_METHOD and LSB_ECHKPNT_METHOD_DIR to point 
@@ -728,8 +728,8 @@ Specify the memory limit, in kilobytes.
 
 .IP
 If LSB_MEMLIMIT_ENFORCE or LSB_JOB_MEMLIMIT are set to y in 
-lsf.conf, Lava kills the job when it exceeds the memory limit. 
-Otherwise, Lava passes the memory limit to the operating system. UNIX 
+lsf.conf, openlava kills the job when it exceeds the memory limit. 
+Otherwise, openlava passes the memory limit to the operating system. UNIX 
 operating systems that support RUSAGE_RSS for \fBsetrlimit()\fR can 
 apply the memory limit to each process. 
 
@@ -745,7 +745,7 @@ processors to use.
 
 .IP
 If the maximum number of processors is greater than the process limit 
-of the queue to which the job is submitted, Lava will reject the job (see 
+of the queue to which the job is submitted, openlava will reject the job (see 
 the PROCLIMIT parameter in lsb.queues(5)). 
 
 .IP
@@ -766,9 +766,9 @@ specified file. Sends the output by mail if the file does not exist, or the
 system has trouble writing to it.
 
 .IP
-If only a file name is specified, Lava writes the output file to the current 
+If only a file name is specified, openlava writes the output file to the current 
 working directory. If the current working directory is not accessible on 
-the execution host after the job starts, Lava writes the standard output 
+the execution host after the job starts, openlava writes the standard output 
 file to /tmp/.
 
 .IP
@@ -816,7 +816,7 @@ Submits the job to one of the specified queues. Quotes are optional for
 a single queue. For a list of available queues, use \fBbqueues\fR. 
 
 .IP
-When a list of queue names is specified, Lava selects the most 
+When a list of queue names is specified, openlava selects the most 
 appropriate queue in the list for your job based on the job's resource 
 limits, and other restrictions, such as the requested hosts, your 
 accessibility to a queue, queue status (closed or open), whether a 
@@ -846,11 +846,11 @@ queue length.
 Specifies user-assigned job priority which allow users to order their 
 jobs in a queue. Valid values for priority are any integers between 1 
 and MAX_USER_PRIORITY (displayed by \fBbparams -l\fR). Incorrect job 
-priorities are rejected. Lava and queue administrators can specify 
+priorities are rejected. openlava and queue administrators can specify 
 priorities beyond MAX_USER_PRIORITY.
 
 .IP
-The job owner can change the priority of their own jobs. Lava and 
+The job owner can change the priority of their own jobs. openlava and 
 queue administrators can change the priority of all jobs in a queue.
 
 .IP
@@ -917,8 +917,8 @@ to terminate.
 \fB-w\fR \fB'\fRdependency_expression\fB'
 \fR
 .IP
-Lava will not place your job unless the dependency expression evaluates 
-to TRUE. If you specify a dependency on a job that Lava cannot find 
+openlava will not place your job unless the dependency expression evaluates 
+to TRUE. If you specify a dependency on a job that openlava cannot find 
 (such as a job that has not yet been submitted), your job submission 
 fails.
 
@@ -947,7 +947,7 @@ use double quotes for quoted items within it, such as job names.
 
 .IP
 In dependency conditions, job names specify only your own jobs, 
-unless you are an Lava administrator. By default, if you use the job name 
+unless you are an openlava administrator. By default, if you use the job name 
 to specify a dependency condition, and more than one of your jobs has 
 the same name, all of your jobs that have that name must satisfy the 
 test. If JOB_DEP_LAST_SUB in lsb.params is set to 1, the test is done 
@@ -1011,7 +1011,7 @@ Use the following conditions to form the dependency expression.
 The job state is DONE.
 
 .IP
-Lava refers to the oldest job of \fIjob_name\fR in memory. 
+openlava refers to the oldest job of \fIjob_name\fR in memory. 
 
 .RE
 
@@ -1061,7 +1061,7 @@ job_ID | \fB"\fRjob_name\fB"\fR
 .RS
 .IP
 If you specify a job without a dependency condition, the test is 
-for the DONE state (Lava assumes the "done" dependency 
+for the DONE state (openlava assumes the "done" dependency 
 condition by default).
 
 .RE
@@ -1197,9 +1197,9 @@ hours can either be specified as 3:30, or 210.
 
 .IP
 Optionally, you can supply a host name or a host model name defined 
-in Lava. You must insert "/" between the run limit and the host name 
+in openlava. You must insert "/" between the run limit and the host name 
 or model name. (See \fBlsinfo\fR(1) to get host model information.) If a 
-host name or model name is not given, Lava uses the default CPU time 
+host name or model name is not given, openlava uses the default CPU time 
 normalization host defined at the queue level (DEFAULT_HOST_SPEC 
 in lsb.queues) if it has been configured, otherwise uses the default 
 CPU time normalization host defined at the cluster level 
@@ -1216,7 +1216,7 @@ divided by the CPU factor of the execution host.
 
 .IP
 If the job also has termination time specified through the \fBbsub -t\fR 
-option, Lava determines whether the job can actually run for the 
+option, openlava determines whether the job can actually run for the 
 specified length of time allowed by the run limit before the termination 
 time. If not, then the job will be aborted. If the IGNORE_DEADLINE 
 parameter is set in lsb.queues(5), this behavior is overridden and the 
@@ -1234,12 +1234,12 @@ as the command file for the job.
 .IP
 By default, if JOB_SPOOL_DIR is not specified, the input file is spooled 
 to LSB_SHAREDIR/\fIcluster_name\fR/lsf_cmddir. If the lsf_cmddir 
-directory does not exist, Lava creates it before spooling the file. Lava 
+directory does not exist, openlava creates it before spooling the file. openlava 
 removes the spooled file when the job completes. 
 
 .IP
 The \fB-Zs\fR option is not supported for embedded job commands because 
-Lava is unable to determine the first command to be spooled in an 
+openlava is unable to determine the first command to be spooled in an 
 embedded job command.
 
 
@@ -1254,7 +1254,7 @@ Prints command usage to stderr and exits.
 \fB-V
 \fR
 .IP
-Prints Lava release version to stderr and exits. 
+Prints openlava release version to stderr and exits. 
 
 
 .TP 

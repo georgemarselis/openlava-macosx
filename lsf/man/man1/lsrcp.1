@@ -1,10 +1,10 @@
 .ds ]W %
 .ds ]L
 .nh
-.TH lsrcp 1 "Lava Version 1.0 - Sept 2007"
+.TH lsrcp 1 "openlava Version 1.0 - Sept 2007"
 .br
 .SH NAME
-\fBlsrcp\fR - remotely copies files using Lava 
+\fBlsrcp\fR - remotely copies files using openlava 
 .SH SYNOPSIS
 .BR
 .PP
@@ -16,11 +16,11 @@
 .BR
 .PP
 .PP
-\fB\fRRemotely copies files using Lava.
+\fB\fRRemotely copies files using openlava.
 .PP
-lsrcp is an Lava-enabled remote copy program that transfers a single 
-file between hosts in an Lava cluster. lsrcp uses RES on an Lava host to 
-transfer files. If Lava is not installed on a host or if RES is not running 
+lsrcp is an openlava-enabled remote copy program that transfers a single 
+file between hosts in an openlava cluster. lsrcp uses RES on an openlava host to 
+transfer files. If openlava is not installed on a host or if RES is not running 
 then lsrcp uses rcp to copy the file.
 .PP
 To use lsrcp, you must have read access to the file being copied. 
@@ -113,7 +113,7 @@ Prints command usage to stderr and exits.
 \fB-V
 \fR
 .IP
-Prints Lava release version to stderr and exits. 
+Prints openlava release version to stderr and exits. 
 
 
 .SH EXAMPLES
@@ -155,10 +155,10 @@ the -a option is specified, or rcp when -a is not specified.
 .PP
 File transfer using lscrp is not supported in the following contexts:
 .PP
-- If Lava account mapping is used; lsrcp fails when running under a 
+- If openlava account mapping is used; lsrcp fails when running under a 
 different user account
 .PP
-- On Lava client hosts. Lava client hosts do not run RES, so lsrcp cannot 
+- On openlava client hosts. openlava client hosts do not run RES, so lsrcp cannot 
 contact RES on the submission host
 .PP
 - Third party copies. lsrcp does not support third party copies, when 

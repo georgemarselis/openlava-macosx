@@ -5,25 +5,25 @@
 .SH NAME
 lsf \- load sharing facility
 .SH DESCRIPTION
-\s-1Lava\s0, or Load Sharing Facility,  is a load sharing and distributed batch
+\s-1openlava\s0, or Load Sharing Facility,  is a load sharing and distributed batch
 queueing software that integrates a heterogeneous network of computers running
 \s-1UNIX\s0 systems.  It consists of the following components:
 .TP 5
-.B \s-1Lava\s0 Base:
+.B \s-1openlava\s0 Base:
 The software upon which all the other components are
 based.  It includes two servers, the Load Information Manager (\s-1LIM\s0) and
 the Remote Execution Server (\s-1RES\s0),  API for accessing services
-provided by the \s-1Lava\s0 Base system,
+provided by the \s-1openlava\s0 Base system,
 Base software services and other load sharing tools.  (see 
 .BR lsfbase (1)).
 
 .TP 5
-.B \s-1Lava\s0 Batch: 
+.B \s-1openlava\s0 Batch: 
 The set of utilities providing  batch
 job scheduling for distributed and heterogeneous environments, ensuring
 optimal resource sharing.  It includes the master and slave batch daemons
 (mbatchd and sbatchd) and API for accessing services provided by
-the \s-1Lava\s0 Batch system (see 
+the \s-1openlava\s0 Batch system (see 
 .BR lsfbatch (1)).
 
 .SH RESOURCE REQUIREMENT STRINGS
@@ -78,7 +78,7 @@ string in the resource requirement.
 The selection string specifies the characteristics a host must have to be returned.
 It is a logical expression built from a set of resource names.
 The resource names  and their descriptions can be obtained by running
-the \s-1Lava\s0 utility program
+the \s-1openlava\s0 utility program
 .BR lsinfo (1).
 The resource names `\fBswap\fR', `\fBidle\fR', `\fBlogin\fR', and
 `\fBcpu\fR' are aliases for `\fBswp\fR', `\fBit\fR', `\fBls\fR' and

@@ -1,10 +1,10 @@
 .ds ]W %
 .ds ]L
 .nh
-.TH badmin 8 "Lava Version 1.0 - Sept 2007"
+.TH badmin 8 "openlava Version 1.0 - Sept 2007"
 .br
 .SH NAME
-\fBbadmin\fR - administrative tool for Lava
+\fBbadmin\fR - administrative tool for openlava
 .SH SYNOPSIS
 .BR
 .PP
@@ -64,9 +64,9 @@
 .BR
 .PP
 .PP
-This command can only be used by Lava administrators.
+This command can only be used by openlava administrators.
 .PP
-badmin provides a set of commands to control and monitor Lava. If no 
+badmin provides a set of commands to control and monitor openlava. If no 
 subcommands are supplied for badmin, badmin prompts for a 
 command from standard input. Commands bqc(8), breconfig(8) and 
 breboot(8) are superceded by badmin(8).
@@ -76,7 +76,7 @@ command.
 .PP
 The badmin commands consist of a set of privileged commands and a 
 set of non\fB-\fRprivileged commands. Privileged commands can only be 
-invoked by root or Lava administrators as defined in the configuration 
+invoked by root or openlava administrators as defined in the configuration 
 file (see lsf.cluster.cluster(5) for ClusterAdmin). Privileged 
 commands are:
 .PP
@@ -103,8 +103,8 @@ hshutdown
 hstartup
 .PP
 All other commands are non\fB-\fRprivileged commands and can be invoked 
-by any Lava user. If the privileged commands are to be executed by an 
-Lava administrator, badmin must be installed setuid root, because it 
+by any openlava user. If the privileged commands are to be executed by an 
+openlava administrator, badmin must be installed setuid root, because it 
 needs to send the request using a privileged port.
 .PP
 For subcommands for which multiple host names or host groups can 
@@ -130,7 +130,7 @@ Prints command usage to stderr and exits.
 \fB-V
 \fR
 .IP
-Prints Lava release version to stderr and exits.
+Prints openlava release version to stderr and exits.
 
 
 .SH USAGE
@@ -140,7 +140,7 @@ Prints Lava release version to stderr and exits.
 \fBckconfig\fR [\fB-v\fR]
 
 .IP
-Checks Lava configuration files. Configuration files are located in the 
+Checks openlava configuration files. Configuration files are located in the 
 LSB_CONFDIR/\fIcluster_name\fR/configdir directory. 
 
 .IP
@@ -167,7 +167,7 @@ file checking to stderr.
 \fBreconfig\fR [\fB-v\fR] [\fB-f\fR]
 
 .IP
-Dynamically reconfigures Lava without restarting MBD. Configuration 
+Dynamically reconfigures openlava without restarting MBD. Configuration 
 files are checked for errors and the results displayed to stderr. If no 
 errors are found in the configuration files, a reconfiguration request is 
 sent to MBD and configuration files are reloaded.
@@ -220,7 +220,7 @@ configuration files contain no fatal errors.
 \fBmbdrestart\fR [\fB-v\fR] [\fB-f\fR]
 
 .IP
-Dynamically reconfigures Lava and restarts MBD. Configuration files are 
+Dynamically reconfigures openlava and restarts MBD. Configuration files are 
 checked for errors and the results printed to stderr. If no errors are 
 found, configuration files are reloaded, MBD is restarted, and events in 
 lsb.events are replayed to recover the running state of the last MBD. 
@@ -328,7 +328,7 @@ below).
 .IP
 Specify the file name of the event log file. Either an absolute or 
 a relative path name may be specified. The default is to use the 
-event log file currently used by the Lava system: 
+event log file currently used by the openlava system: 
 LSB_SHAREDIR/cluster_name/logdir/lsb.events. Option 
 -f is useful for offline analysis.
 
@@ -403,7 +403,7 @@ shutting down SBDs.
 Starts up SBD on the specified hosts, or on all batch server hosts if the 
 reserved word all is specified. Only root 
 can use this option, and those users must be able to 
-use rsh on all Lava hosts. If no host is specified, the local host is 
+use rsh on all openlava hosts. If no host is specified, the local host is 
 assumed.
 
 
@@ -463,7 +463,7 @@ Exits the badmin session.
 
 .IP
 Sets the message log level for SBD to include additional information in 
-log files. You must be root or the Lava administrator to use this 
+log files. You must be root or the openlava administrator to use this 
 command.
 
 .IP
@@ -477,7 +477,7 @@ values are used:
 \fIdebug_level\fR = 0 (LOG_DEBUG level in parameter LSF_LOG_MASK)
 
 .IP
-\fIlogfile_name\fR = current Lava system log file in the directory specified by 
+\fIlogfile_name\fR = current openlava system log file in the directory specified by 
 LSF_LOGDIR in the format \fIdaemon_name\fR.log.\fIhost_name
 \fR
 .IP
@@ -621,7 +621,7 @@ If LSF_LOGDIR is not defined, daemons log to the syslog
 facility.
 
 .IP
-Default: current Lava system log file in the directory specified by 
+Default: current openlava system log file in the directory specified by 
 LSF_LOGDIR in the format \fIdaemon_name\fR.log\fI.host_name\fR.
 
 .RE
@@ -662,7 +662,7 @@ Default: local host (host from which command was submitted)
 
 .IP
 Sets message log level for MBD to include additional information in log 
-files. You must be root or the Lava administrator to use this command.
+files. You must be root or the openlava administrator to use this command.
 
 .IP
 See sbddebug for an explanation of options.
@@ -673,7 +673,7 @@ See sbddebug for an explanation of options.
 
 .IP
 Sets the timing level for SBD to include additional timing information 
-in log files. You must be root or the Lava administrator to use this 
+in log files. You must be root or the openlava administrator to use this 
 command.
 
 .IP
@@ -684,7 +684,7 @@ values are used:
 \fItiming_level\fR = no timing information is recorded
 
 .IP
-\fIlogfile_name\fR = current Lava system log file in the directory specified by 
+\fIlogfile_name\fR = current openlava system log file in the directory specified by 
 LSF_LOGDIR in the format \fIdaemon_name.\fRlog\fI.host_name
 \fR
 .IP
@@ -748,7 +748,7 @@ facility.
 files.
 
 .IP
-Default: current Lava system log file in the directory specified by 
+Default: current openlava system log file in the directory specified by 
 LSF_LOGDIR in the format \fIdaemon_name.\fRlog\fI.host_name\fR.
 
 .RE
@@ -789,7 +789,7 @@ Default: local host (host from which command was submitted)
 
 .IP
 Sets timing level for MBD to include additional timing information in 
-log files. You must be root or the Lava administrator to use this 
+log files. You must be root or the openlava administrator to use this 
 command.
 
 .IP

@@ -1,7 +1,7 @@
 .ds ]W %
 .ds ]L
 .nh
-.TH bmig 1 "Lava Version 1.0 - Sept 2007"
+.TH bmig 1 "openlava Version 1.0 - Sept 2007"
 .br
 .SH NAME
 \fBbmig\fR - migrates checkpointable or rerunnable jobs
@@ -19,7 +19,7 @@
 .BR
 .PP
 .PP
-Migrates one or more of your checkpointable and rerunnable jobs. Lava 
+Migrates one or more of your checkpointable and rerunnable jobs. openlava 
 administrators and root can migrate jobs submitted by other users.
 .PP
 By default, migrates one job, the most recently submitted job, or the 
@@ -28,20 +28,20 @@ most recently submitted job that also satisfies other specified options
 .PP
 To migrate a job, both hosts must be binary compatible, run the same 
 OS version, have access to the executable, have access to all open files 
-(Lava must locate them with an absolute path name), and have access 
+(openlava must locate them with an absolute path name), and have access 
 to the checkpoint directory.
 .PP
 Only started jobs can be migrated (i.e., running or suspended jobs); 
 pending jobs cannot be migrated.
 .PP
-When a checkpointable job is migrated, Lava checkpoints and kills the 
+When a checkpointable job is migrated, openlava checkpoints and kills the 
 job (similar to the -k option of bchkpnt(1)) then restarts it on the next 
 available host. If checkpoint is not successful, the job is not killed and 
 remains on the host. If a job is being checkpointed when bmig is 
 issued, the migration is ignored. This situation may occur if periodic 
 checkpointing is enabled.
 .PP
-When a rerunnable job is migrated, Lava kills the job (similar to 
+When a rerunnable job is migrated, openlava kills the job (similar to 
 bkill(1)) then restarts it from the beggining on the next available host.
 .PP
 The environment variable LSB_RESTART is set to Y when a migrating 
@@ -119,7 +119,7 @@ Prints command usage to stderr and exits.
 \fB-V\fR 
 
 .IP
-Prints Lava release version to stderr and exits.
+Prints openlava release version to stderr and exits.
 
 
 .SH SEE ALSO

@@ -1,7 +1,7 @@
 .ds ]W %
 .ds ]L
 .nh
-.TH lsf.conf 5 "Lava Version 1.0 - Sept 2007"
+.TH lsf.conf 5 "openlava Version 1.0 - Sept 2007"
 .br
 .SH NAME
 \fBlsf.conf\fR
@@ -9,7 +9,7 @@
 .BR
 .PP
 .PP
-Installation of and operation of Lava is controlled by the lsf.conf file. 
+Installation of and operation of openlava is controlled by the lsf.conf file. 
 This chapter explains the contents of the lsf.conf file.
 .SS Contents
 .BR
@@ -24,18 +24,18 @@ This chapter explains the contents of the lsf.conf file.
 .BR
 .PP
 .PP
-The lsf.conf file is created during installation by the Lava setup 
-program, and records all the settings chosen when Lava was installed. 
+The lsf.conf file is created during installation by the openlava setup 
+program, and records all the settings chosen when openlava was installed. 
 The lsf.conf file dictates the location of the specific configuration 
 files and operation of individual servers and applications. 
 .PP
-The lsf.conf file is used by Lava and applications built on top of it. 
-For example, information in lsf.conf is used by Lava daemons and 
+The lsf.conf file is used by openlava and applications built on top of it. 
+For example, information in lsf.conf is used by openlava daemons and 
 commands to locate other configuration files, executables, and 
 network services. lsf.conf is updated, if necessary, when you 
 upgrade to a new version. 
 .PP
-This file can also be expanded to include Lava application-specific 
+This file can also be expanded to include openlava application-specific 
 parameters.
 .SH Location
 .BR
@@ -141,7 +141,7 @@ LSB_API_CONNTIMEOUT
 .BR
 .PP
 .PP
-Specifies the logging level of error messages from Lava Batch 
+Specifies the logging level of error messages from openlava Batch 
 commands. 
 .PP
 For example:
@@ -244,21 +244,21 @@ LSB_CMD_LOG_MASK, LSF_LOGDIR
 .BR
 .PP
 .PP
-Specifies the path to the directory containing the Lava configuration 
+Specifies the path to the directory containing the openlava configuration 
 files.
 .PP
-Lava Batch configuration directories are installed 
+openlava Batch configuration directories are installed 
 under LSB_CONFDIR.
 .PP
-Configuration files for each Lava cluster are stored in a subdirectory of 
-LSB_CONFDIR. This subdirectory contains several files that define Lava 
+Configuration files for each openlava cluster are stored in a subdirectory of 
+LSB_CONFDIR. This subdirectory contains several files that define openlava 
 Batch user and host lists, operation parameters, and queues. 
 .PP
 All files and directories under LSB_CONFDIR must be readable from all 
 hosts in the cluster. LSB_CONFDIR/\fIcluster_name\fR/configdir must 
-be owned by the Lava administrator.
+be owned by the openlava administrator.
 .PP
-Do not redefine this parameter after Lava has been installed. To move 
+Do not redefine this parameter after openlava has been installed. To move 
 these directories to another location, use lsfsetup and choose the 
 Product Install option to install configuration files in another 
 location. 
@@ -289,18 +289,18 @@ LSF_CONFDIR
 .PP
 Sets the Batch system to debug.
 .PP
-If defined, Lava Batch will run in single user mode. In this mode, no 
-security checking is performed; do not run the Lava Batch daemons as 
+If defined, openlava Batch will run in single user mode. In this mode, no 
+security checking is performed; do not run the openlava Batch daemons as 
 root. 
 .PP
-When LSB_DEBUG is defined, Lava will not look in the system services 
+When LSB_DEBUG is defined, openlava will not look in the system services 
 database for port numbers. Instead, it uses the port numbers defined 
 by the parameters LSB_MBD_PORT/LSB_SBD_PORT in lsf.conf. If 
 these parameters are not defined, it uses port number 40000 for MBD 
 and port number 40001 for SBD.
 .PP
 You should always specify 1 for this parameter unless you are testing 
-Lava Batch.
+openlava Batch.
 .PP
 Can also be defined from the command line.
 .SS Valid Values
@@ -311,7 +311,7 @@ Can also be defined from the command line.
 \(bu LSB_DEBUG=1
 .RE
 .IP
-Lava Batch runs in the background with no associated control 
+openlava Batch runs in the background with no associated control 
 terminal. 
 
 .RE
@@ -320,7 +320,7 @@ terminal.
 \(bu LSB_DEBUG=2
 .RE
 .IP
-Lava Batch runs in the foreground and prints error messages to 
+openlava Batch runs in the foreground and prints error messages to 
 tty. 
 
 .RE
@@ -588,17 +588,17 @@ erestart.\fImethod_name\fR. must be in LSF_SERVERDIR or in the
 directory specified by LSB_ECHKPNT_METHOD_DIR.
 .PP
 Do not define LSB_ECHKPNT_METHOD=default as default is a 
-reserved keyword to indicate to use Lava's default echkpnt and 
+reserved keyword to indicate to use openlava's default echkpnt and 
 erestart methods. You can however, specify bsub -k "my_dir 
-method=default" my_job to indicate that you want to use Lava's 
+method=default" my_job to indicate that you want to use openlava's 
 default checkpoint and restart methods.
 .PP
 When this parameter is undefined in lsf.conf or as an environment 
 variable and no custom method is specified at job submission through 
-bsub -k, Lava uses echkpnt.default and erestart.default to 
+bsub -k, openlava uses echkpnt.default and erestart.default to 
 checkpoint and restart jobs. 
 .PP
-When this parameter is defined, Lava uses the custom checkpoint and 
+When this parameter is defined, openlava uses the custom checkpoint and 
 restart methods specified.
 .SS Limitations
 .BR
@@ -616,13 +616,13 @@ and method directory combinations are unique in the cluster.
 .BR
 .PP
 .PP
-Undefined; Lava uses echkpnt.default and erestart.default to 
+Undefined; openlava uses echkpnt.default and erestart.default to 
 checkpoint and restart jobs
 .SS Product
 .BR
 .PP
 .PP
-Lava Base, Lava Batch
+openlava Base, openlava Batch
 .SS See Also
 .BR
 .PP
@@ -648,13 +648,13 @@ Can also be defined as an environment variable.
 .BR
 .PP
 .PP
-Undefined; Lava searches in LSF_SERVERDIR for custom echkpnt and 
+Undefined; openlava searches in LSF_SERVERDIR for custom echkpnt and 
 erestart programs
 .SS Product
 .BR
 .PP
 .PP
-Lava Base, Lava Batch
+openlava Base, openlava Batch
 .SS See Also
 .BR
 .PP
@@ -692,12 +692,12 @@ Can also be defined as an environment variable.
 .PP
 Undefined; standard error and standard output messages from custom 
 echkpnt and erestart programs is directed to /dev/null and 
-discarded by Lava.
+discarded by openlava.
 .SS Product
 .BR
 .PP
 .PP
-Lava Base, Lava Batch
+openlava Base, openlava Batch
 .SS See Also
 .BR
 .PP
@@ -745,7 +745,7 @@ Specifies the update interval in seconds for interactive batch job
 messages. LSB_INTERACT_MSG_INTVAL is ignored if 
 LSB_INTERACT_MSG_ENH is not set.
 .PP
-Because the job information that Lava uses to get the pending or 
+Because the job information that openlava uses to get the pending or 
 suspension reason is updated according to the value of 
 MBD_SLEEP_TIME, there is no advantage to setting 
 LSB_INTERACT_MSG_INTVAL less than MBD_SLEEP_TIME
@@ -774,13 +774,13 @@ lsb.params
 .PP
 .PP
 Determines whether the CPU limit is a per-process limit enforced by 
-the OS or whether it is a per-job limit enforced by Lava:
+the OS or whether it is a per-job limit enforced by openlava:
 .RS
 .HP 2
 \(bu The per-process limit is enforced by the OS when the CPU time of 
 one process of the job exceeds the CPU limit.
 .HP 2
-\(bu The per-job limit is enforced by Lava when the total CPU time of all 
+\(bu The per-job limit is enforced by openlava when the total CPU time of all 
 processes of the job exceed the CPU limit.
 .RE
 .PP
@@ -791,18 +791,18 @@ lsb.queues.
 The setting of LSB_JOB_CPULIMIT has the following effect on how the 
 limit is enforced:
 .PP
-When LSB_JOB_CPULIMIT is Y, the Lava-enforced per-job limit is 
+When LSB_JOB_CPULIMIT is Y, the openlava-enforced per-job limit is 
 enabled, and the OS-enforced per-process limit is disabled.
 .PP
-When LSB_JOB_CPULIMIT is N, the Lava-enforced per-job limit is 
+When LSB_JOB_CPULIMIT is N, the openlava-enforced per-job limit is 
 disabled, and the OS-enforced per-process limit is enabled.
 .PP
-When LSB_JOB_CPULIMIT is undefined, the Lava-enforced per-job limit 
+When LSB_JOB_CPULIMIT is undefined, the openlava-enforced per-job limit 
 is enabled, and the OS-enforced per-process limit is enabled.
 .RS
 .HP 2
-\(bu Lava-enforced per-job limit--When the sum of the CPU time of all 
-processes of a job exceed the CPU limit, Lava sends a SIGXCPU 
+\(bu openlava-enforced per-job limit--When the sum of the CPU time of all 
+processes of a job exceed the CPU limit, openlava sends a SIGXCPU 
 signal (where supported by the operating system) from the 
 operating system to all processes belonging to the job, then 
 SIGINT, SIGTERM and SIGKILL. The interval between signals is 10 
@@ -837,25 +837,25 @@ hrestart all to restart all SBDs in the cluster.
 Changing the default Terminate job control action--You can define a 
 different terminate action in lsb.queues with the parameter 
 JOB_CONTROLS if you do not want the job to be killed. For more 
-details on job controls, see the \fILava Administrator's Guide\fR.
+details on job controls, see the \fIopenlava Administrator's Guide\fR.
 .SS Limitations
 .BR
 .PP
 .PP
-If a job is running and the parameter is changed, Lava is not able to reset 
+If a job is running and the parameter is changed, openlava is not able to reset 
 the type of limit enforcement for running jobs. 
 .RS
 .HP 2
 \(bu If the parameter is changed from per-process limit enforced by the 
-OS to per-job limit enforced by Lava (LSB_JOB_CPULIMIT=n 
+OS to per-job limit enforced by openlava (LSB_JOB_CPULIMIT=n 
 changed to LSB_JOB_CPULIMIT=y), both per-process limit and 
 per-job limit will affect the running job. This means that signals may 
 be sent to the job either when an individual process exceeds the 
 CPU limit or the sum of the CPU time of all processes of the job 
 exceed the limit. A job that is running may be killed by the OS or 
-by Lava.
+by openlava.
 .HP 2
-\(bu If the parameter is changed from per-job limit enforced by Lava to 
+\(bu If the parameter is changed from per-job limit enforced by openlava to 
 per-process limit enforced by the OS (LSB_JOB_CPULIMIT=y 
 changed to LSB_JOB_CPULIMIT=n), the job will be allowed to run 
 without limits because the per-process limit was previously 
@@ -879,13 +879,13 @@ lsb.queues, bsub, JOB_TERMINATE_INTERVAL, LSB_MOD_ALL_JOBS
 .PP
 .PP
 Determines whether the memory limit is a per-process limit enforced 
-by the OS or whether it is a per-job limit enforced by Lava. 
+by the OS or whether it is a per-job limit enforced by openlava. 
 .RS
 .HP 2
 \(bu The per-process limit is enforced by the OS when the memory 
 allocated to one process of the job exceeds the memory limit.
 .HP 2
-\(bu The per-job limit is enforced by Lava when the sum of the memory 
+\(bu The per-job limit is enforced by openlava when the sum of the memory 
 allocated to all processes of the job exceeds the memory limit.
 .RE
 .PP
@@ -896,15 +896,15 @@ MEMLIMIT in lsb.queues.
 The setting of LSB_JOB_MEMLIMIT has the following effect on how the 
 limit is enforced:
 .PP
-When LSB_JOB_MEMLIMIT is Y, the Lava-enforced per-job limit is 
+When LSB_JOB_MEMLIMIT is Y, the openlava-enforced per-job limit is 
 enabled, and the OS-enforced per-process limit is disabled.
 .PP
-When LSB_JOB_MEMLIMIT is N or undefined, the Lava-enforced per-
+When LSB_JOB_MEMLIMIT is N or undefined, the openlava-enforced per-
 job limit is disabled, and the OS-enforced per-process limit is enabled.
 .RS
 .HP 2
-\(bu Lava-enforced per-job limit--When the total memory allocated to all 
-processes in the job exceeds the memory limit, Lava sends the 
+\(bu openlava-enforced per-job limit--When the total memory allocated to all 
+processes in the job exceeds the memory limit, openlava sends the 
 following signals to kill the job: SIGINT, SIGTERM, then SIGKILL. 
 The interval between signals is 10 seconds by default.
 .RE
@@ -919,7 +919,7 @@ in lsb.params.
 .HP 2
 \(bu OS-enforced per process limit--When the memory allocated to one 
 process of the job exceeds the memory limit, the operating system 
-enforces the limit. Lava passes the memory limit to the operating 
+enforces the limit. openlava passes the memory limit to the operating 
 system. Some operating systems apply the memory limit to each 
 process, and some do not enforce the memory limit at all.
 .RE
@@ -933,7 +933,7 @@ support RUSAGE_RSS for setrlimit().
 .PP
 .PP
 Undefined; per-process memory limit enforced by the OS; per-job 
-memory limit enforced by Lava disabled
+memory limit enforced by openlava disabled
 .SS Notes
 .BR
 .PP
@@ -947,34 +947,34 @@ is ignored.
 .PP
 The difference between LSB_JOB_MEMLIMIT set to y and 
 LSB_MEMLIMIT_ENFORCE set to y is that with LSB_JOB_MEMLIMIT, 
-only the per-job memory limit enforced by Lava is enabled. The per-
+only the per-job memory limit enforced by openlava is enabled. The per-
 process memory limit enforced by the OS is disabled. With 
 LSB_MEMLIMIT_ENFORCE set to y, both the per-job memory limit 
-enforced by Lava and the per-process memory limit enforced by the OS 
+enforced by openlava and the per-process memory limit enforced by the OS 
 are enabled.
 .PP
 Changing the default Terminate job control action--You can define a 
 different Terminate action in lsb.queues with the parameter 
 JOB_CONTROLS if you do not want the job to be killed. For more 
-details on job controls, see the \fILava Administrator's Guide\fR.
+details on job controls, see the \fIopenlava Administrator's Guide\fR.
 .SS Limitations
 .BR
 .PP
 .PP
-If a job is running and the parameter is changed, Lava is not able to reset 
+If a job is running and the parameter is changed, openlava is not able to reset 
 the type of limit enforcement for running jobs. 
 .RS
 .HP 2
 \(bu If the parameter is changed from per-process limit enforced by the 
-OS to per-job limit enforced by Lava (LSB_JOB_MEMLIMIT=n or 
+OS to per-job limit enforced by openlava (LSB_JOB_MEMLIMIT=n or 
 undefined changed to LSB_JOB_MEMLIMIT=y), both per-process 
 limit and per-job limit will affect the running job. This means that 
 signals may be sent to the job either when the memory allocated to 
 an individual process exceeds the memory limit or the sum of 
 memory allocated to all processes of the job exceed the limit. A job 
-that is running may be killed by Lava.
+that is running may be killed by openlava.
 .HP 2
-\(bu If the parameter is changed from per-job limit enforced by Lava to 
+\(bu If the parameter is changed from per-job limit enforced by openlava to 
 per-process limit enforced by the OS (LSB_JOB_MEMLIMIT=y 
 changed to LSB_JOB_MEMLIMIT=n or undefined), the job will be 
 allowed to run without limits because the per-process limit was 
@@ -1001,17 +1001,17 @@ JOB_TERMINATE_INTERVAL, LSB_MOD_ALL_JOBS
 Path and file name of the mail program used by the Batch system to 
 send email.
 .PP
-This is the electronic mail program that Lava will use to send system 
+This is the electronic mail program that openlava will use to send system 
 messages to the user. 
 .PP
-When Lava needs to send email to users it invokes the program defined 
+When openlava needs to send email to users it invokes the program defined 
 by LSB_MAILPROG in lsf.conf. You can write your own custom mail 
 program and set LSB_MAILPROG to the path where this program is 
 stored.
 .PP
-The Lava administrator can set the parameter as part of cluster reconfiguration.
+The openlava administrator can set the parameter as part of cluster reconfiguration.
 .PP
-Provide the name of any mail program. For your convenience, Lava 
+Provide the name of any mail program. For your convenience, openlava 
 provides the following mail programs:
 .RS
 .HP 2
@@ -1024,7 +1024,7 @@ be specified.
 
 
 .PP
-If this parameter is modified, the Lava administrator must restart SBD on 
+If this parameter is modified, the openlava administrator must restart SBD on 
 all hosts to retrieve the new value.
 .RS
 .HP 2
@@ -1032,8 +1032,8 @@ all hosts to retrieve the new value.
 .RE
 
 .IP
-Lava Batch normally uses /usr/lib/sendmail as the mail transport 
-agent to send mail to users. Lava Batch calls LSB_MAILPROG with 
+openlava Batch normally uses /usr/lib/sendmail as the mail transport 
+agent to send mail to users. openlava Batch calls LSB_MAILPROG with 
 two arguments; one argument gives the full name of the sender, 
 and the other argument gives the return address for Batch mail. 
 
@@ -1075,7 +1075,7 @@ LSB_MAILSERVER, LSB_MAILTO
 .BR
 .PP
 .PP
-If this parameter is modified, the Lava administrator must restart SBD on 
+If this parameter is modified, the openlava administrator must restart SBD on 
 all hosts to retrieve the new value.
 .SS Examples 
 .BR
@@ -1110,10 +1110,10 @@ LSB_MAILPROG
 .BR
 .PP
 .PP
-Limits the size of the email containing Lava batch job output 
+Limits the size of the email containing openlava batch job output 
 information.
 .PP
-The Lava Batch system sends job information such as CPU, process and 
+The openlava Batch system sends job information such as CPU, process and 
 memory usage, job output, and errors in email to the submitting user 
 account. Some batch jobs can create large amounts of output. To 
 prevent large job output files from interfering with your mail system, 
@@ -1154,14 +1154,14 @@ LSB_MAILPROG, LSB_MAILTO
 .BR
 .PP
 .PP
-Lava Batch sends electronic mail to users when their jobs complete or 
-have errors, and to the Lava administrator in the case of critical errors in 
-the Lava Batch system. The default is to send mail to the user who 
+openlava Batch sends electronic mail to users when their jobs complete or 
+have errors, and to the openlava administrator in the case of critical errors in 
+the openlava Batch system. The default is to send mail to the user who 
 submitted the job, on the host on which the daemon is running; this 
 assumes that your electronic mail system forwards messages to a 
 central mailbox.
 .PP
-The LSB_MAILTO parameter changes the mailing address used by Lava 
+The LSB_MAILTO parameter changes the mailing address used by openlava 
 Batch. LSB_MAILTO is a format string that is used to build the mailing 
 address.
 .PP
@@ -1183,7 +1183,7 @@ substring !H is replaced with the name of the submission host.
 .PP
 All other characters (including any other `!') are copied exactly.
 .PP
-If this parameter is modified, the Lava administrator must restart the SBD 
+If this parameter is modified, the openlava administrator must restart the SBD 
 daemons on all hosts to retrieve the new value.
 .SS Default
 .BR
@@ -1244,13 +1244,13 @@ LSB_SBD_PORT.
 .BR
 .PP
 .PP
-Specify y to enable Lava memory limit enforcement.
+Specify y to enable openlava memory limit enforcement.
 .PP
-If enabled, Lava sends a signal to kill all processes that exceed queue-
+If enabled, openlava sends a signal to kill all processes that exceed queue-
 level memory limits set by MEMLIMIT in lsb.queues or job-level 
 memory limits specified by \fBbsub -M \fR\fImem_limit\fR.
 .PP
-Otherwise, Lava passes memory limit enforcement to the OS. UNIX 
+Otherwise, openlava passes memory limit enforcement to the OS. UNIX 
 operating systems that support RUSAGE_RSS for setrlimit() can 
 apply the memory limit to each process. 
 .RE
@@ -1258,7 +1258,7 @@ apply the memory limit to each process.
 .BR
 .PP
 .PP
-Not defined. Lava passes memory limit enforcement to the OS.
+Not defined. openlava passes memory limit enforcement to the OS.
 .SS See Also
 .BR
 .PP
@@ -1351,7 +1351,7 @@ LSB_SBD_PORT.
 .PP
 \fBLSB_SET_TMPDIR=\fR[\fBy\fR|\fBn\fR]
 .PP
-If y, Lava sets the TMPDIR environment variable, overwriting the current 
+If y, openlava sets the TMPDIR environment variable, overwriting the current 
 value with /\fItmp\fR/\fIjob_ID\fR.
 .SS Default 
 .BR
@@ -1370,14 +1370,14 @@ n
 .BR
 .PP
 .PP
-Directory in which Lava Batch maintains job history 
+Directory in which openlava Batch maintains job history 
 and accounting logs for each cluster. These files are necessary for 
 correct operation of the system. Like the organization under 
 LSB_CONFDIR, there is one subdirectory for each cluster.
 .PP
-The LSB_SHAREDIR directory must be owned by the Lava administrator. 
+The LSB_SHAREDIR directory must be owned by the openlava administrator. 
 It must be accessible from all hosts that can potentially become the 
-master host, and must allow read and write access from the Lava master 
+master host, and must allow read and write access from the openlava master 
 host. 
 .PP
 The LSB_SHAREDIR directory typically resides on a reliable file server.
@@ -1406,13 +1406,13 @@ LSB_LOCALDIR
 .BR
 .PP
 .PP
-Specifies the signal sent by the SUSPEND action in Lava. You can specify 
+Specifies the signal sent by the SUSPEND action in openlava. You can specify 
 a signal name or a number.
 .PP
 If LSB_SIGSTOP is set to anything other than SIGSTOP, the SIGTSTP 
 signal that is normally sent by the SUSPEND action is not sent.
 .PP
-If this parameter is undefined, by default the SUSPEND action in Lava 
+If this parameter is undefined, by default the SUSPEND action in openlava 
 sends the following signals to a job:
 .RS
 .HP 2
@@ -1444,7 +1444,7 @@ seconds apart.
 .BR
 .PP
 .PP
-Undefined. Default SUSPEND action in Lava is sent.
+Undefined. Default SUSPEND action in openlava is sent.
 .SH LSB_SHORT_HOSTLIST
 .BR
 .PP
@@ -1579,9 +1579,9 @@ interactive batch jobs submitted with \fBbsub -Ip\fR or \fBbsub -Is\fR. To
 disable utmp file registration, set LSB_UTMP to any value other than y 
 or Y; for example, LSB_UTMP=N.
 .PP
-Lava registers interactive batch jobs the job by adding a entries to the 
+openlava registers interactive batch jobs the job by adding a entries to the 
 utmp file on the execution host when the job starts. After the job 
-finishes, Lava removes the entries for the job from the utmp file.
+finishes, openlava removes the entries for the job from the utmp file.
 .SS Default
 .BR
 .PP
@@ -1610,24 +1610,24 @@ LSF_SERVERDIR
 Determines the order of file path resolution when setting the user's 
 home directory.
 .PP
-This variable is rarely used but sometimes Lava does not properly 
+This variable is rarely used but sometimes openlava does not properly 
 change the directory to the user's home directory when the user's home 
 directory is automounted. Setting LSF_AM_OPTIONS forces the Batch 
 system to change directory to $HOME before attempting to automount 
 the user's home.
 .PP
-When this parameter is undefined or set to AMFIRST, Lava:
+When this parameter is undefined or set to AMFIRST, openlava:
 .RS
 .HP 2
 \(bu Sets the user's $HOME directory from the automount path. If it 
-cannot do so, Lava sets the user's $HOME directory from the passwd 
+cannot do so, openlava sets the user's $HOME directory from the passwd 
 file. 
 .RE
 .PP
-When this parameter is set to AMNEVER, Lava:
+When this parameter is set to AMNEVER, openlava:
 .RS
 .HP 2
-\(bu Never uses automount to set the path to the user's home. Lava sets 
+\(bu Never uses automount to set the path to the user's home. openlava sets 
 the user's $HOME directory directly from the passwd file.
 .RE
 .SS Valid Values
@@ -1698,19 +1698,19 @@ LSF_API_CONNTIMEOUT
 .BR
 .PP
 .PP
-Optional. Determines the type of authentication used by Lava.
+Optional. Determines the type of authentication used by openlava.
 .PP
 By default, external user authentication is used, and LSF_AUTH is 
 defined to be eauth.
 .PP
-If this parameter is changed, all Lava daemons must be shut down and 
-restarted by running \fBlsf_daemons start\fR on each of the Lava server 
+If this parameter is changed, all openlava daemons must be shut down and 
+restarted by running \fBlsf_daemons start\fR on each of the openlava server 
 hosts so that the daemons will use the new authentication method.
 .PP
 If LSF_AUTH is not defined, RES will only accept requests from 
-privileged ports. When Lava uses privileged ports for user 
-authentication, Lava commands must be installed setuid to root to 
-operate correctly. If the Lava commands are installed in an NFS mounted 
+privileged ports. When openlava uses privileged ports for user 
+authentication, openlava commands must be installed setuid to root to 
+operate correctly. If the openlava commands are installed in an NFS mounted 
 shared file system, the file system must be mounted with setuid 
 execution allowed (that is, without the nosuid option). See the man 
 page for \fBmount\fR for more details. 
@@ -1734,7 +1734,7 @@ For site-specific external authentication.
 
 .IP
 For privileged ports (\fBsetuid\fR) authentication. This is the 
-mechanism most UNIX remote utilities use. The Lava commands 
+mechanism most UNIX remote utilities use. The openlava commands 
 must be installed as \fBsetuid\fR programs and owned by root.
 .SS Default
 .BR
@@ -1772,7 +1772,7 @@ Undefined
 .BR
 .PP
 .PP
-Directory in which all Lava user commands are installed.
+Directory in which all openlava user commands are installed.
 .SS Default
 .BR
 .PP
@@ -1793,7 +1793,7 @@ LSF_MACHDEP/bin
 .BR
 .PP
 .PP
-The path to the log files used for debugging Lava commands.
+The path to the log files used for debugging openlava commands.
 .PP
 This parameter can also be set from the command line.
 .SS Default
@@ -1871,13 +1871,13 @@ LSF_CONF_RETRY_INT
 .BR
 .PP
 .PP
-Directory in which all Lava configuration files are installed. These files 
+Directory in which all openlava configuration files are installed. These files 
 are shared throughout the system and should be readable from any 
 host. This directory can contain configuration files for more than one 
 cluster.
 .PP
 The files in the LSF_CONFDIR directory must be owned by the primary 
-Lava administrator, and readable by all Lava server hosts. 
+openlava administrator, and readable by all openlava server hosts. 
 .SS Default
 .BR
 .PP
@@ -2074,8 +2074,8 @@ LSF_CONFDIR and adding a symbolic link from /etc/lsf.conf to the
 shared copy. If LSF_ENVDIR is set, the symbolic link is installed in 
 LSF_ENVDIR/lsf.conf.
 .PP
-The lsf.conf file is a global environment configuration file for all Lava 
-services and applications. The Lava default installation places the file in 
+The lsf.conf file is a global environment configuration file for all openlava 
+services and applications. The openlava default installation places the file in 
 LSF_CONFDIR.
 .SS Default
 .BR
@@ -2096,7 +2096,7 @@ LSF_CONFDIR.
 .BR
 .PP
 .PP
-Directory under which the Lava API header files lsf.h and lsbatch.h 
+Directory under which the openlava API header files lsf.h and lsbatch.h 
 are installed.
 .SS Default
 .BR
@@ -2124,7 +2124,7 @@ LSF_INDEP
 .PP
 .PP
 Specifies the default top-level directory for all machine-independent 
-Lava files.
+openlava files.
 .PP
 This includes man pages, configuration files, working directories, and 
 examples. For example, defining LSF_INDEP as /usr/share/lsf/mnt 
@@ -2134,7 +2134,7 @@ places man pages in /usr/share/lsf/mnt/man, configuration files in
 The files in LSF_INDEP can be shared by all machines in the cluster. 
 .PP
 As shown in the following list, LSF_INDEP is incorporated into other 
-Lava environment variables. 
+openlava environment variables. 
 .RS
 .HP 2
 \(bu LSB_SHAREDIR=$LSF_INDEP/work
@@ -2197,7 +2197,7 @@ The following are written to stderr on the submission host for
 interactive tasks and interactive batch jobs:
 .RS
 .HP 2
-\(bu Lava messages
+\(bu openlava messages
 .HP 2
 \(bu NIOS standard messages
 .HP 2
@@ -2216,7 +2216,7 @@ The following are written to stderr on the submission host:
 .HP 2
 \(bu Job standard error messages
 .HP 2
-\(bu Lava messages
+\(bu openlava messages
 .HP 2
 \(bu NIOS standard messages
 .HP 2
@@ -2249,7 +2249,7 @@ interactive batch jobs run with the following commands:
 .RS
 .HP 2
 \(bu Pseudo-terminal--Do not use this parameter if your application 
-depends on stderr as a terminal. This is because Lava must use a 
+depends on stderr as a terminal. This is because openlava must use a 
 non-pseudo-terminal connection to separate stderr from stdout.
 .HP 2
 \(bu Synchronization--Do not use this parameter if you depend on 
@@ -2284,7 +2284,7 @@ LSF_NIOS_DEBUG, LSF_CMD_LOGDIR
 .BR
 .PP
 .PP
-Specifies the directory in which the Lava libraries are installed. Library 
+Specifies the directory in which the openlava libraries are installed. Library 
 files are shared by all hosts of the same type. 
 .SS Default
 .BR
@@ -2306,7 +2306,7 @@ LSF_MACHDEP/lib
 .BR
 .PP
 .PP
-Sets Lava to debug mode.
+Sets openlava to debug mode.
 .PP
 If LSF_LIM_DEBUG is defined, LIM operates in single user mode. No 
 security checking is performed, so LIM should not run as root. 
@@ -2315,7 +2315,7 @@ LIM will not look in the services database for the LIM service port
 number. Instead, it uses port number 36000 unless LSF_LIM_PORT has 
 been defined.
 .PP
-Specify 1 for this parameter unless you are testing Lava.
+Specify 1 for this parameter unless you are testing openlava.
 .SS Valid Values
 .BR
 .PP
@@ -2358,16 +2358,16 @@ Example: \fBLSF_LIM_PORT=\fR\fIport_number
 .BR
 .PP
 .PP
-TCP service ports to use for communication with the Lava daemons.
+TCP service ports to use for communication with the openlava daemons.
 .PP
-If port parameters are undefined, Lava obtains the port numbers by 
-looking up the Lava service names in the /etc/services file or the NIS 
+If port parameters are undefined, openlava obtains the port numbers by 
+looking up the openlava service names in the /etc/services file or the NIS 
 (UNIX). If it is not possible to modify the services database, you can 
 define these port parameters to set the port numbers. 
 .PP
 With careful use of these settings along with the LSF_ENVDIR and 
 PATH environment variables, it is possible to run two versions of the 
-Lava software on a host, selecting between the versions by setting the 
+openlava software on a host, selecting between the versions by setting the 
 PATH environment variable to include the correct version of the 
 commands and the LSF_ENVDIR environment variable to point to the 
 directory containing the appropriate lsf.conf file.
@@ -2396,7 +2396,7 @@ Default port number values for Linux are:
 .BR
 .PP
 .PP
-Logging level of messages for Lava daemons.
+Logging level of messages for openlava daemons.
 .PP
 This is similar to syslog. All messages logged at the specified 
 level or higher are recorded; lower level messages are discarded. The 
@@ -2429,7 +2429,7 @@ The log levels in order from highest to lowest are:
 \(bu LOG_DEBUG3
 .RE
 .PP
-The most important Lava log messages are at the LOG_ERR or 
+The most important openlava log messages are at the LOG_ERR or 
 LOG_WARNING level. Messages at the LOG_INFO and LOG_DEBUG 
 level are only useful for debugging. 
 .PP
@@ -2437,7 +2437,7 @@ Although message log level implements similar functionalities to Linux
 syslog, there is no dependency on syslog. It works even if 
 messages are being logged to files instead of syslog.
 .PP
-Lava logs error messages in different levels so that you can choose to 
+openlava logs error messages in different levels so that you can choose to 
 log all messages, or only log messages that are deemed critical. The 
 level specified by LSF_LOG_MASK determines which messages are 
 recorded and which are discarded. All messages logged at the specified 
@@ -2536,7 +2536,7 @@ as LSF_INDEP. The machine dependent files are the user commands,
 daemons, and libraries. You should not need to modify this parameter.
 .PP
 As shown in the following list, LSF_MACHDEP is incorporated into 
-other Lava variables. 
+other openlava variables. 
 .RS
 .HP 2
 \(bu LSF_BINDIR=$LSF_MACHDEP/bin 
@@ -2575,7 +2575,7 @@ LSF_INDEP
 Directory under which all man pages are installed.
 .PP
 The man pages are placed in the man1, man3, man5, and man8 
-subdirectories of the LSF_MANDIR directory. This is created by the Lava 
+subdirectories of the LSF_MANDIR directory. This is created by the openlava 
 installation process, and you should not need to modify this parameter.
 .PP
 Man pages are installed in a format suitable for BSD-style \fBman\fR 
@@ -2635,7 +2635,7 @@ Undefined
 .PP
 .PP
 Directory in which miscellaneous machine independent files, such as 
-Lava example source programs and scripts, are installed.
+openlava example source programs and scripts, are installed.
 .SS Default
 .BR
 .PP
@@ -2735,7 +2735,7 @@ that a job is still pending and this may add load to MBD.
 .BR
 .PP
 .PP
-Lava Batch
+openlava Batch
 .SS See Also
 .BR
 .PP
@@ -2788,7 +2788,7 @@ hours or days. Too low a number may add load to the system.
 .BR
 .PP
 .PP
-Lava Base, Lava Batch
+openlava Base, openlava Batch
 .SH  
 .BR
 .PP
@@ -2870,7 +2870,7 @@ generates a record and appends the record to the task log file
 lsf.acct.\fIhost_name\fR. This file is located in the LSF_RES_ACCTDIR 
 directory. 
 .PP
-If this parameter is not defined, the Lava administrator must use the 
+If this parameter is not defined, the openlava administrator must use the 
 \fBlsadmin\fR command (see \fBlsadmin\fR(8)) to turn task logging on after RES 
 has started up. 
 .SS Default
@@ -3002,7 +3002,7 @@ LSB_SBD_PORT.
 .BR
 .PP
 .PP
-(Lava Base only) By default, RES sets the hard limits for a remote task 
+(openlava Base only) By default, RES sets the hard limits for a remote task 
 to be the same as the hard limits of the local process. This parameter 
 specifies those hard limits which are to be set to unlimited, instead of 
 inheriting those of the local process.
@@ -3059,11 +3059,11 @@ Timeout when communicating with RES.
 .BR
 .PP
 .PP
-Defines one or more Lava server hosts that the application should 
+Defines one or more openlava server hosts that the application should 
 contact to find a Load Information Manager (LIM). This is used on client 
-hosts on which no LIM is running on the local host. The Lava server 
-hosts are hosts that run Lava daemons and provide loading-sharing 
-services. Client hosts are hosts that only run Lava commands or 
+hosts on which no LIM is running on the local host. The openlava server 
+hosts are hosts that run openlava daemons and provide loading-sharing 
+services. Client hosts are hosts that only run openlava commands or 
 applications but do not provide services to any hosts.
 .PP
 If LSF_SERVER_HOSTS is not defined, the application tries to contact 
@@ -3124,7 +3124,7 @@ LSB_ECHKPNT_METHOD_DIR
 .PP
 .PP
 (Optional) If all of the hosts in your cluster can be reached using short 
-host names, you can configure Lava to use the short host names by 
+host names, you can configure openlava to use the short host names by 
 specifying the portion of the domain name to remove. If your hosts are 
 in more than one domain or have more than one domain name, you 
 can specify more than one domain suffix to remove, separated by a 
@@ -3137,7 +3137,7 @@ LSF_STRIP_DOMAIN=.foo.com:.bar.com
 
 
 .PP
-Lava accepts hostA, hostA.foo.com, and hostA.bar.com as names 
+openlava accepts hostA, hostA.foo.com, and hostA.bar.com as names 
 for host hostA, and uses the name hostA in all output. The leading 
 period `.' is required.
 .PP
@@ -3148,11 +3148,11 @@ LSF_STRIP_DOMAIN=.platform.com:.generic.com
 
 
 .PP
-In the above example, Lava accepts hostA, hostA.platform.com, and 
+In the above example, openlava accepts hostA, hostA.platform.com, and 
 hostA.generic.com as names for \fBhostA\fR, and uses the name hostA 
 in all output.
 .PP
-Setting this parameter only affects host names displayed through Lava, 
+Setting this parameter only affects host names displayed through openlava, 
 it does not affect DNS host lookup.
 .SS Default
 .BR
@@ -3171,7 +3171,7 @@ Undefined
 .BR
 .PP
 .PP
-The timing level for checking how long Lava commands run. Time 
+The timing level for checking how long openlava commands run. Time 
 usage is logged in milliseconds; specify a positive integer.
 .SS Default
 .BR
@@ -3248,13 +3248,13 @@ LSB_TIME_CMD, LSB_TIME_MBD, LSB_TIME_SBD, LSF_TIME_LIM
 .PP
 Specifies the path and directory for temporary job output.
 .PP
-When LSF_TMPDIR is defined in lsf.conf, Lava creates a temporary 
+When LSF_TMPDIR is defined in lsf.conf, openlava creates a temporary 
 directory under the directory specified by LSF_TMPDIR on the 
 execution host when a job is started and sets the temporary directory 
 environment variable for the job.
 .PP
 When LSF_TMPDIR is defined as an environment variable, it overrides 
-the LSF_TMPDIR specified in lsf.conf. Lava removes the temporary 
+the LSF_TMPDIR specified in lsf.conf. openlava removes the temporary 
 directory and the files that it contains when the job completes.
 .PP
 The name of the temporary directory has the following format:
@@ -3276,7 +3276,7 @@ This parameter can also be specified from the command line.
 .PP
 Specify any valid path up to a maximum length 
 of 256 characters. The 256 character maximum path length includes the 
-temporary directories and files that Lava Batch creates as jobs run. The 
+temporary directories and files that openlava Batch creates as jobs run. The 
 path that you specify for LSF_TMPDIR should be as short as possible 
 to avoid exceeding this limit.
 .PP

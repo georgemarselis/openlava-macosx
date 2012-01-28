@@ -1,7 +1,7 @@
 .ds ]W %
 .ds ]L
 .nh
-.TH bresume 1 "Lava Version 1.0 - Sept 2007"
+.TH bresume 1 "openlava Version 1.0 - Sept 2007"
 .br
 .SH NAME
 \fBbresume\fR - resumes one or more suspended jobs
@@ -20,7 +20,7 @@
 .PP
 .PP
 \fB\fRSends the SIGCONT signal to resume one or more of your suspended 
-jobs. Only root and Lava administrators can operate on jobs submitted 
+jobs. Only root and openlava administrators can operate on jobs submitted 
 by other users. Using bresume on a job that is not in either the PSUSP 
 or the USUSP state has no effect. 
 .PP
@@ -89,7 +89,7 @@ Prints command usage to stderr and exits.
 \fB-V\fR 
 
 .IP
-Prints Lava release version to stderr and exits. 
+Prints openlava release version to stderr and exits. 
 
 
 .SH EXAMPLES
@@ -99,7 +99,7 @@ Prints Lava release version to stderr and exits.
 % \fBbresume -q night 0\fR 
 .br
 Resumes all of the user's suspended jobs that are in the night queue. 
-If the user is an Lava administrator, resumes all suspended jobs in the 
+If the user is an openlava administrator, resumes all suspended jobs in the 
 night queue.
 .SH SEE ALSO
 .BR

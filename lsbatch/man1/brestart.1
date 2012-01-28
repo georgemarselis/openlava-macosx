@@ -1,7 +1,7 @@
 .ds ]W %
 .ds ]L
 .nh
-.TH brestart 1 "Lava Version 1.0 - Sept 2007"
+.TH brestart 1 "openlava Version 1.0 - Sept 2007"
 .br
 .SH NAME
 \fBbrestart\fR - restarts checkpointed jobs
@@ -73,13 +73,13 @@ and period, and rerun options as the original job.
 .PP
 To restart a job on another host, both hosts must be binary compatible, 
 run the same OS version, have access to the executable, have access to 
-all open files (Lava must locate them with an absolute path name), and 
+all open files (openlava must locate them with an absolute path name), and 
 have access to the checkpoint directory.
 .PP
 The environment variable LSB_RESTART is set to Y when a job is 
 restarted.
 .PP
-Lava invokes the erestart(8) executable found in LSF_SERVERDIR to 
+openlava invokes the erestart(8) executable found in LSF_SERVERDIR to 
 perform the restart.
 .PP
 Only the bsub options listed here can be used with brestart.

@@ -1,7 +1,7 @@
 .ds ]W %
 .ds ]L
 .nh
-.TH lsf.shared 5 "Lava Version 4.2 - June 2001"
+.TH lsf.shared 5 "openlava Version 4.2 - June 2001"
 .br
 .SH NAME
 \fBlsf.shared\fR
@@ -30,7 +30,7 @@ resources available, and external load indices.
 .BR
 .PP
 .PP
-(Required) Lists the cluster names recognized by the Lava system
+(Required) Lists the cluster names recognized by the openlava system
 .SH Cluster Section Structure
 .BR
 .PP
@@ -46,9 +46,9 @@ Each subsequent line defines one cluster.
 .BR
 .PP
 .PP
-(Required) Defines all cluster names recognized by the Lava system 
+(Required) Defines all cluster names recognized by the openlava system 
 .PP
-All cluster names referenced anywhere in the Lava system must be 
+All cluster names referenced anywhere in the openlava system must be 
 defined here. The file names of cluster-specific configuration files must 
 end with the associated cluster name.
 .SH Servers
@@ -101,7 +101,7 @@ Subsequent lines name valid host types.
 .PP
 Host type names are usually based on a combination of the hardware 
 name and operating system. If your site already has a system for 
-naming host types, you can use the same names for Lava.
+naming host types, you can use the same names for openlava.
 .SH HostType Section Example
 .BR
 .PP
@@ -131,7 +131,7 @@ End HostType
 (Required) Lists models of machines and gives the relative CPU scaling 
 factor for each model 
 .PP
-Lava uses the relative CPU scaling factor to normalize the CPU load 
+openlava uses the relative CPU scaling factor to normalize the CPU load 
 indices so that jobs are more likely to be sent to faster hosts. The CPU 
 factor affects the calculation of job execution time limits and 
 accounting. Using large or inaccurate values for the CPU factor can 
@@ -315,7 +315,7 @@ Applies to numeric shared resources only, such as floating licenses.
 .BR
 .PP
 .PP
-Controls whether Lava releases the resource when a job using the 
+Controls whether openlava releases the resource when a job using the 
 resource is suspended. When a job using a shared resource is 
 suspended, the resource is held or released by the job depending on 
 the configuration of this parameter.

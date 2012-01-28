@@ -1,7 +1,7 @@
 .ds ]W %
 .ds ]L
 .nh
-.TH bhosts 1 "Lava Version 1.0 - Sept 2007"
+.TH bhosts 1 "openlava Version 1.0 - Sept 2007"
 .br
 .SH NAME
 \fBbhosts\fR - displays hosts and their static and dynamic resources 
@@ -55,7 +55,7 @@ requirements, see lsfintro(1). The size of the resource requirement
 string is limited to 512 bytes.
 
 .IP
-Lava supports ordering of resource requirements on all load indices, 
+openlava supports ordering of resource requirements on all load indices, 
 including external load indices, either static or dynamic.
 
 
@@ -91,7 +91,7 @@ Prints command usage to stderr and exits.
 \fB-V
 \fR
 .IP
-Prints Lava release version to stderr and exits. 
+Prints openlava release version to stderr and exits. 
 
 
 .SH OUTPUT
@@ -221,7 +221,7 @@ USUSP
 .RS
 .IP
 The number of job slots used by user suspended jobs on the host. 
-Jobs can be suspended by the user or by the Lava administrator.
+Jobs can be suspended by the user or by the openlava administrator.
 
 .RE
 
@@ -260,7 +260,7 @@ closed_Adm
 .BR
 .RS
 .IP
-The host is closed by the Lava administrator or root (see 
+The host is closed by the openlava administrator or root (see 
 badmin(8)). No job can be dispatched to the host, but jobs 
 that are executing on the host will not be affected. 
 
@@ -271,9 +271,9 @@ closed_Lock
 .BR
 .RS
 .IP
-The host is locked by the Lava administrator or root (see 
+The host is locked by the openlava administrator or root (see 
 lsadmin(8)). All batch jobs on the host are suspended by 
-Lava. 
+openlava. 
 
 .RE
 
@@ -284,7 +284,7 @@ closed_Wind
 .IP
 The host is closed by its dispatch windows, which are 
 defined in the configuration file lsb.hosts(5). All batch 
-jobs on the host are suspended by the Lava system. 
+jobs on the host are suspended by the openlava system. 
 
 .RE
 
