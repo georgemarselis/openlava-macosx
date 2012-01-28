@@ -1,7 +1,7 @@
 .ds ]W %
 .ds ]L
 .nh
-.TH lsf.cluster 5 "Lava Version 1.0 - Sept 2007"
+.TH lsf.cluster 5 "openlava Version 1.0 - Sept 2007"
 .br
 .SH NAME
 \fBlsf.cluster\fR
@@ -405,11 +405,11 @@ intervals before assuming that the master is down.
 .BR
 .PP
 .PP
-(Optional) The ClusterAdmins section defines the Lava administrators 
+(Optional) The ClusterAdmins section defines the openlava administrators 
 for the cluster. The only keyword is ADMINISTRATORS.
 .PP
-If the ClusterAdmins section is not present, the default Lava 
-administrator is root. Using root as the primary Lava administrator is 
+If the ClusterAdmins section is not present, the default openlava 
+administrator is root. Using root as the primary openlava administrator is 
 not recommended.
 .SH ADMINISTRATORS
 .BR
@@ -426,18 +426,18 @@ not recommended.
 Specify Linux user and user group names.
 .PP
 The first administrator of the expanded list is considered the primary 
-Lava administrator. The primary administrator is the owner of the Lava 
+openlava administrator. The primary administrator is the owner of the openlava 
 configuration files, as well as the working files under 
 LSB_SHAREDIR/\fIcluster_name\fR. If the primary administrator is 
 changed, make sure the owner of the configuration files and the files 
 under LSB_SHAREDIR/\fIcluster_name\fR are changed as well. 
 .PP
-Administrators other than the primary Lava administrator have the same 
-privileges as the primary Lava administrator except that they do not have 
-permission to change Lava configuration files. They can perform 
+Administrators other than the primary openlava administrator have the same 
+privileges as the primary openlava administrator except that they do not have 
+permission to change openlava configuration files. They can perform 
 clusterwide operations on jobs, queues, or hosts in the system.
 .PP
-For flexibility, each cluster may have its own Lava administrators, 
+For flexibility, each cluster may have its own openlava administrators, 
 identified by a user name, although the same administrators can be 
 responsible for several clusters.
 .PP
@@ -451,7 +451,7 @@ For backwards compatibility, ClusterManager and Manager are
 synonyms for ClusterAdmins and ADMINISTRATORS respectively. It 
 is possible to have both sections present in the same 
 lsf.cluster.\fIcluster_name\fR file to allow daemons from different 
-Lava versions to share the same file.
+openlava versions to share the same file.
 .SS Default
 .BR
 .PP
@@ -461,7 +461,7 @@ lsfadmin
 .BR
 .PP
 .PP
-The following gives an example of a cluster with three Lava 
+The following gives an example of a cluster with three openlava 
 administrators. The user listed first, user2, is the primary administrator. 
 The user group lsfgrp and the user user7 are secondary 
 administrators.
@@ -565,7 +565,7 @@ detected by the LIM running on the host.
 .PP
 Number of local disks
 .PP
-This corresponds to the ndisks static resource. On most host types, Lava 
+This corresponds to the ndisks static resource. On most host types, openlava 
 automatically determines the number of disks, and the nd parameter is 
 ignored.
 .PP
@@ -632,7 +632,7 @@ Dispatch window during this host is accepts remote interactive tasks
 When the host is not available for remote execution, the host status is 
 lockW (locked by run window). LIM does not schedule interactive tasks 
 on hosts locked by dispatch windows. Note that run windows only 
-apply to interactive tasks placed by LIM. Lava Batch uses its own 
+apply to interactive tasks placed by LIM. openlava Batch uses its own 
 (optional) host dispatch windows to control batch job processing on 
 batch server hosts.
 .SS Format
@@ -642,7 +642,7 @@ batch server hosts.
 A dispatch window consists of one or more time windows in the format 
 \fIbegin_time\fR-\fIend_time\fR. No blanks can separate \fIbegin_time\fR and 
 \fIend_time\fR. Time is specified in the form [\fIday\fR:]\fIhour\fR[:\fIminute\fR]. If only one 
-field is specified, Lava assumes it is an \fIhour\fR. Two fields are assumed to 
+field is specified, openlava assumes it is an \fIhour\fR. Two fields are assumed to 
 be \fIhour\fR:\fIminute\fR. Use blanks to separate time windows.
 .SS Default
 .BR
@@ -659,9 +659,9 @@ Always accept remote jobs
 Indicates whether the host can receive jobs from other hosts
 .PP
 Specify 1 if the host can receive jobs from other hosts; specify 0 
-otherwise. If server is set to 0, the host is an Lava client. Client hosts do 
-not run the Lava daemons. Client hosts can submit interactive and batch 
-jobs to an Lava cluster, but they cannot execute jobs sent from other 
+otherwise. If server is set to 0, the host is an openlava client. Client hosts do 
+not run the openlava daemons. Client hosts can submit interactive and batch 
+jobs to an openlava cluster, but they cannot execute jobs sent from other 
 hosts.
 .SS Default
 .BR
@@ -698,7 +698,7 @@ detected by the LIM running on the host.
 .PP
 .PP
 The LIM uses these thresholds in determining whether to place remote 
-jobs on a host. If one or more Lava load indices exceeds the 
+jobs on a host. If one or more openlava load indices exceeds the 
 corresponding threshold (too many users, not enough swap space, 
 etc.), then the host is regarded as busy, and LIM will not recommend 
 jobs to that host.
@@ -715,7 +715,7 @@ case sensitive.
 Thresholds can be set for any of the following:
 .RS
 .HP 2
-\(bu The built-in Lava load indexes (r15s, r1m, r15m, ut, pg, it, io, ls, swp, 
+\(bu The built-in openlava load indexes (r15s, r1m, r15m, ut, pg, it, io, ls, swp, 
 mem, tmp)
 .HP 2
 \(bu External load indexes defined in the Resource section of 

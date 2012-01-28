@@ -1,7 +1,7 @@
 .ds ]W %
 .ds ]L
 .nh
-.TH bchkpnt 1 "Lava Version 1.0 - Sept 2007"
+.TH bchkpnt 1 "openlava Version 1.0 - Sept 2007"
 .br
 .SH NAME
 \fBbchkpnt\fR - checkpoints one or more checkpointable jobs
@@ -21,7 +21,7 @@
 .PP
 .PP
 Checkpoints your running (RUN) or suspended (SSUSP, USUSP, and 
-PSUSP) checkpointable jobs. Lava administrators and root can 
+PSUSP) checkpointable jobs. openlava administrators and root can 
 checkpoint jobs submitted by other users.
 .PP
 By default, checkpoints one job, the most recently submitted job, or the 
@@ -36,7 +36,7 @@ To submit a checkpointable job, use bsub -k or submit the job to a
 checkpoint queue (CHKPNT in lsb.queues(5)). Use brestart(1) to 
 start checkpointed jobs.
 .PP
-Lava invokes the echkpnt(8) executable found in LSF_SERVERDIR to 
+openlava invokes the echkpnt(8) executable found in LSF_SERVERDIR to 
 perform the checkpoint.
 .PP
 
@@ -128,7 +128,7 @@ Prints command usage to stderr and exits.
 \fB-V\fR 
 
 .IP
-Prints Lava release version to stderr and exits.
+Prints openlava release version to stderr and exits.
 
 
 .SH EXAMPLES
@@ -146,7 +146,7 @@ Enables periodic checkpointing or changes the checkpoint period to
 .PP
 % \fBbchkpnt -m hostA -k -u all 0\fR 
 .PP
-When issued by root or an Lava administrator, will checkpoint and kill 
+When issued by root or an openlava administrator, will checkpoint and kill 
 all checkpointable jobs on hostA. This is useful when a host needs to 
 be shut down or rebooted. 
 .SH SEE ALSO

@@ -1,7 +1,7 @@
 .ds ]W %
 .ds ]L
 .nh
-.TH lsb.queues 5 "Lava Version 1.0 - Sept 2007"
+.TH lsb.queues 5 "openlava Version 1.0 - Sept 2007"
 .br
 .SH NAME
 \fBlsb.queues\fR
@@ -9,9 +9,9 @@
 .BR
 .PP
 .PP
-The lsb.queues file defines the batch queues in an Lava cluster.
+The lsb.queues file defines the batch queues in an openlava cluster.
 .PP
-This file is optional; if no queues are configured, Lava creates a queue 
+This file is optional; if no queues are configured, openlava creates a queue 
 named default, with all parameters set to default values.
 .SS Contents
 .BR
@@ -132,7 +132,7 @@ may be greater than 59. Therefore, three and a half hours can be
 specified either as 3:30 or 210. 
 .PP
 You can define whether the CPU limit is a per-process limit enforced 
-by the OS or a per-job limit enforced by Lava with LSB_JOB_CPULIMIT 
+by the OS or a per-job limit enforced by openlava with LSB_JOB_CPULIMIT 
 in lsf.conf.
 .SS Default
 .BR
@@ -245,7 +245,7 @@ Undefined (always open).
 If Y, specifies an exclusive queue.
 .PP
 Jobs submitted to an exclusive queue with \fBbsub -x\fR will only be 
-dispatched to a host that has no other Lava jobs running.
+dispatched to a host that has no other openlava jobs running.
 .SH FILELIMIT
 .BR
 .PP
@@ -499,7 +499,7 @@ deadlock between the signal and the action.
 .PP
 .PP
 Changes the behaviour of the SUSPEND, RESUME, and TERMINATE 
-actions in Lava.
+actions in openlava.
 .PP
 For SUSPEND and RESUME, if the action is a command, the following 
 points should be considered:
@@ -630,7 +630,7 @@ The loadSched and loadStop thresholds permit the specification of
 conditions using simple AND/OR logic. Any load index that does not 
 have a configured threshold has no effect on job scheduling. 
 .PP
-Lava will not suspend a job if the job is the only batch job running on 
+openlava will not suspend a job if the job is the only batch job running on 
 the host and the machine is interactively idle (it>0). 
 .PP
 The r15s, r1m, and r15m CPU run queue length conditions are 
@@ -693,12 +693,12 @@ If you specify only one limit, it is the maximum, or hard, memory limit.
 If you specify two limits, the first one is the default, or soft, memory 
 limit, and the second one is the maximum memory limit.
 .PP
-Lava has two methods of enforcing memory usage:
+openlava has two methods of enforcing memory usage:
 .RS
 .HP 2
 \(bu OS Memory Limit Enforcement
 .HP 2
-\(bu Lava Memory Limit Enforcement
+\(bu openlava Memory Limit Enforcement
 .RE
 .SS OS Memory Limit Enforcement
 .BR
@@ -706,7 +706,7 @@ Lava has two methods of enforcing memory usage:
 .PP
 OS memory limit enforcement is the default MEMLIMIT behavior and 
 does not require further configuration. OS enforcement usually allows 
-the process to eventually run to completion. Lava passes MEMLIMIT to 
+the process to eventually run to completion. openlava passes MEMLIMIT to 
 the OS which uses it as a guide for the system scheduler and memory 
 allocator. The system may allocate more memory to a process if there 
 is a surplus. When memory is low, the system takes memory from and 
@@ -714,25 +714,25 @@ lowers the scheduling priority (re-nice) of a process that has exceeded
 its declared MEMLIMIT. Only available on systems that support 
 \fBRUSAGE_RSS\fR for \fBsetrlimit()\fR. 
 .RE
-.SS Lava Memory Limit Enforcement
+.SS openlava Memory Limit Enforcement
 .BR
 .PP
 .PP
-To enable Lava memory limit enforcement, set 
-LSB_MEMLIMIT_ENFORCE in lsf.conf to y. Lava memory limit 
+To enable openlava memory limit enforcement, set 
+LSB_MEMLIMIT_ENFORCE in lsf.conf to y. openlava memory limit 
 enforcement explicitly sends a signal to kill a running process once it 
 has allocated memory past MEMLIMIT.
 .PP
-You can also enable Lava memory limit enforcement by setting 
+You can also enable openlava memory limit enforcement by setting 
 LSB_JOB_MEMLIMIT in lsf.conf to y. The difference between 
 LSB_JOB_MEMLIMIT set to y and LSB_MEMLIMIT_ENFORCE set to y is 
 that with LSB_JOB_MEMLIMIT, only the per-job memory limit enforced 
-by Lava is enabled. The per-process memory limit enforced by the OS 
+by openlava is enabled. The per-process memory limit enforced by the OS 
 is disabled. With LSB_MEMLIMIT_ENFORCE set to y, both the per-job 
-memory limit enforced by Lava and the per-process memory limit 
+memory limit enforced by openlava and the per-process memory limit 
 enforced by the OS are enabled.
 .PP
-Available for all systems on which Lava collects total memory usage.
+Available for all systems on which openlava collects total memory usage.
 .SS Example
 .BR
 .PP
@@ -805,7 +805,7 @@ specified is longer or shorter than a regular dispatch interval
 .HP 2
 \(bu If less than the dispatch interval, specifies the maximum number of 
 seconds to wait, after a new job is submitted, before starting a new 
-dispatch turn and scheduling the job. Usually, this causes Lava to 
+dispatch turn and scheduling the job. Usually, this causes openlava to 
 schedule dispatch turns more frequently. You might notice 
 performance problems (affecting the entire cluster) if this value is 
 set too low in a busy queue.
@@ -1072,7 +1072,7 @@ cannot specify the reserved name default.
 .PP
 .PP
 You must specify this parameter to define a queue. The default queue 
-automatically created by Lava is named default.
+automatically created by openlava is named default.
 .PP
 \fBREQUEUE_EXIT_VALUES\fR \fB=\fR [\fIexit_code \fR...] [\fBEXCLUDE(\fR\fIexit_code ...\fR\fB)\fR]
 .SS Description
@@ -1088,7 +1088,7 @@ requeue does not work for parallel jobs.
 .PP
 Jobs are requeued to the head of the queue from which they were 
 dispatched. The output from the failed run is not saved, and the user 
-is not notified by Lava.
+is not notified by openlava.
 .PP
 A job terminated by a signal is not requeued.
 .PP
@@ -1098,7 +1098,7 @@ is possible for a job to be dispatched to hosts on which the job has
 previously exited with an exclusive exit code. 
 .PP
 Automatic job requeue and exclusive job requeue are described in the 
-\fILava Administrator's Guide\fR.
+\fIopenlava Administrator's Guide\fR.
 .SS Example 
 .BR
 .PP
@@ -1192,7 +1192,7 @@ load thresholds. All other sections are ignored.
 .BR
 .PP
 .PP
-Lava automatically resumes a suspended (SSUSP) job in this queue if the 
+openlava automatically resumes a suspended (SSUSP) job in this queue if the 
 load on the host satisfies the specified conditions.
 .PP
 If RESUME_COND is not defined, then the loadSched thresholds are 
@@ -1212,8 +1212,8 @@ ignored, when resuming jobs, if RESUME_COND is defined.
 .PP
 Time periods during which jobs in the queue are allowed to run.
 .PP
-When the window closes, Lava suspends jobs running in the queue and 
-stops dispatching jobs from the queue. When the window reopens, Lava 
+When the window closes, openlava suspends jobs running in the queue and 
+stops dispatching jobs from the queue. When the window reopens, openlava 
 resumes the suspended jobs and begins dispatching additional jobs.
 .SS Default
 .BR
@@ -1240,7 +1240,7 @@ The maximum run limit and optionally the default run limit. The name
 of a host or host model specifies the run time normalization host to use.
 .PP
 By default, jobs that are in the RUN state for longer than the specified 
-maximum run limit are killed by Lava. You can optionally provide your 
+maximum run limit are killed by openlava. You can optionally provide your 
 own termination job action to override this default.
 .PP
 Jobs submitted with a job-level run limit (\fBbsub -W\fR) that is less than the 
@@ -1332,16 +1332,16 @@ load thresholds. All other sections are ignored.
 .BR
 .PP
 .PP
-Lava automatically suspends a running job in this queue if the load on 
+openlava automatically suspends a running job in this queue if the load on 
 the host satisfies the specified conditions.
 .RS
 .HP 2
-\(bu Lava will not suspend the only job running on the host if the 
+\(bu openlava will not suspend the only job running on the host if the 
 machine is interactively idle (it > 0). 
 .HP 2
-\(bu Lava will not suspend a forced job (\fBbrun -f\fR). 
+\(bu openlava will not suspend a forced job (\fBbrun -f\fR). 
 .HP 2
-\(bu Lava will not suspend a job because of paging rate if the machine is 
+\(bu openlava will not suspend a job because of paging rate if the machine is 
 interactively idle.
 .RE
 .PP
@@ -1464,9 +1464,9 @@ Unlimited
 .PP
 A list of users or user groups that can submit jobs to this queue 
 .PP
-Use the reserved word all to specify all Lava users. 
+Use the reserved word all to specify all openlava users. 
 .PP
-Lava cluster administrators can submit jobs to this queue 
+openlava cluster administrators can submit jobs to this queue 
 or switch any user's jobs into this queue, even if they are not listed.
 .SS Default
 .BR

@@ -1,7 +1,7 @@
 .ds ]W %
 .ds ]L
 .nh
-.TH lsb.params 5 "Lava Version 1.0 - Sept 2007"
+.TH lsb.params 5 "openlava Version 1.0 - Sept 2007"
 .br
 .SH NAME
 \fBlsb.params\fR
@@ -9,13 +9,13 @@
 .BR
 .PP
 .PP
-The lsb.params file defines general parameters used by Lava Batch. 
+The lsb.params file defines general parameters used by openlava Batch. 
 This file contains only one section, named Parameters. MBD uses 
 lsb.params for initialization. The file is optional. If not present, the 
-Lava-defined defaults are assumed.
+openlava-defined defaults are assumed.
 .PP
 Some of the parameters that can be defined in lsb.params control 
-timing within the Lava Batch system. The default settings provide good 
+timing within the openlava Batch system. The default settings provide good 
 throughput for long-running batch jobs while adding a minimum of 
 processing overhead in the batch daemons.
 .SS Contents
@@ -30,7 +30,7 @@ processing overhead in the batch daemons.
 .PP
 .PP
 This section and all the keywords in this section are optional. If 
-keywords are not present, Lava Batch assumes default values for the 
+keywords are not present, openlava Batch assumes default values for the 
 corresponding keywords. The valid keywords for this section are:
 .SH ACCT_ARCHIVE_AGE 
 .BR
@@ -44,8 +44,8 @@ corresponding keywords. The valid keywords for this section are:
 .BR
 .PP
 .PP
-Enables automatic archiving of Lava accounting log files, and specifies 
-the archive interval. Lava archives the current log file if the length of 
+Enables automatic archiving of openlava accounting log files, and specifies 
+the archive interval. openlava archives the current log file if the length of 
 time from its creation date exceeds the specified number of days.
 .SS See Also 
 .BR
@@ -72,8 +72,8 @@ Undefined (no limit to the age of lsb.acct).
 .BR
 .PP
 .PP
-Enables automatic archiving of Lava accounting log files, and specifies 
-the archive threshold. Lava archives the current log file if its size exceeds 
+Enables automatic archiving of openlava accounting log files, and specifies 
+the archive threshold. openlava archives the current log file if its size exceeds 
 the specified number of kilobytes.
 .SS See Also 
 .BR
@@ -149,7 +149,7 @@ Undefined
 The name of the default project. Specify any string.
 .PP
 When you submit a job without specifying any project name, and the 
-environment variable LSB_DEFAULTPROJECT is not set, Lava 
+environment variable LSB_DEFAULTPROJECT is not set, openlava 
 automatically assigns the job to this project.
 .SS Default
 .BR
@@ -171,18 +171,18 @@ default
 Space-separated list of candidate default queues (candidates must 
 already be defined in lsb.queues).
 .PP
-When you submit a job to Lava without explicitly specifying a queue, 
-and the environment variable LSB_DEFAULTQUEUE is not set, Lava puts 
+When you submit a job to openlava without explicitly specifying a queue, 
+and the environment variable LSB_DEFAULTQUEUE is not set, openlava puts 
 the job in the first queue in this list that satisfies the job's specifications 
 subject to other restrictions, such as requested hosts, queue status, etc.
 .SS Default
 .BR
 .PP
 .PP
-Undefined. When a user submits a job to Lava without explicitly 
+Undefined. When a user submits a job to openlava without explicitly 
 specifying a queue, and there are no candidate default queues defined 
 (by this parameter or by the user's environment variable 
-LSB_DEFAULTQUEUE), Lava automatically creates a new queue named 
+LSB_DEFAULTQUEUE), openlava automatically creates a new queue named 
 default, using the default configuration, and submits the job to that 
 queue.
 .SH DISABLE_UACCT_MAP
@@ -243,7 +243,7 @@ overrides JOB_ACCEPT_INTERVAL set at the cluster level
 Used only with job dependency scheduling.
 .PP
 If set to 1, whenever dependency conditions use a job name that 
-belongs to multiple jobs, Lava evaluates only the most recently 
+belongs to multiple jobs, openlava evaluates only the most recently 
 submitted job.
 .PP
 Otherwise, all the jobs with the specified name must satisfy the 
@@ -335,8 +335,8 @@ master host, the submission host, and the execution host. If the
 specified directory is not accessible or does not exist, \fBbsub -is\fR and 
 \fBbsub -Zs\fR cannot write to the default directory and the job will fail.
 .PP
-As Lava runs jobs, it creates temporary directories and files under 
-JOB_SPOOL_DIR. By default, Lava removes these directories and files 
+As openlava runs jobs, it creates temporary directories and files under 
+JOB_SPOOL_DIR. By default, openlava removes these directories and files 
 after the job is finished. See \fBbsub\fR(\fB1\fR) for information about job 
 submission options that specify the disposition of these files.
 .PP
@@ -348,7 +348,7 @@ JOB_SPOOL_DIR=/home/share/lsf_spool
 .PP
 JOB_SPOOL_DIR can be any valid path up to a 
 maximum length of 256 characters. This maximum path length includes 
-the temporary directories and files that Lava Batch creates as jobs run. 
+the temporary directories and files that openlava Batch creates as jobs run. 
 The path you specify for JOB_SPOOL_DIR should be as short as 
 possible to avoid exceeding this limit.
 .SS Default
@@ -405,7 +405,7 @@ MAX_ACCT_ARCHIVE_FILE=\fIinteger
 .BR
 .PP
 .PP
-Enables automatic deletion of archived Lava accounting log files and 
+Enables automatic deletion of archived openlava accounting log files and 
 specifies the archive limit.
 .SS Compatibility
 .BR
@@ -422,7 +422,7 @@ MAX_ACCT_ARCHIVE_FILE=10
 
 
 .PP
-Lava maintains the current lsb.acct and up to 10 archives. Every time 
+openlava maintains the current lsb.acct and up to 10 archives. Every time 
 the old lsb.acct.9 becomes lsb.acct.10, the old lsb.acct.10 
 gets deleted.
 .SS Default
@@ -469,7 +469,7 @@ Specify an integer value from 1 to 65534.
 .BR
 .PP
 .PP
-The job ID limit. The job ID limit is the highest job ID that Lava will ever 
+The job ID limit. The job ID limit is the highest job ID that openlava will ever 
 assign, and also the maximum number of jobs in the system.
 .PP
 Specify any integer from 999999 to 9999999 (for practical purposes, any 
@@ -581,7 +581,7 @@ The time in seconds the mbatchd has for scheduling pass.
 Enables user-assigned job priority and specifies the maximum job 
 priority a user can assign to a job.
 .PP
-Lava administrators can assign a job priority higher than the specified 
+openlava administrators can assign a job priority higher than the specified 
 value.
 .SS Compatibility
 .BR
@@ -621,7 +621,7 @@ bsub, bmod, btop, bbot, JOB_PRIORITY_OVER_TIME
 .BR
 .PP
 .PP
-The job dispatching interval; how often Lava tries to dispatch pending 
+The job dispatching interval; how often openlava tries to dispatch pending 
 jobs.
 .SS Default
 .BR
@@ -666,7 +666,7 @@ this parameter may be set to 0.
 .BR
 .PP
 .PP
-The interval at which Lava checks the load conditions of each host, to 
+The interval at which openlava checks the load conditions of each host, to 
 decide whether jobs on the host must be suspended or resumed.
 .SS Default
 .BR

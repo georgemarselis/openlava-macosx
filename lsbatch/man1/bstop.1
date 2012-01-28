@@ -1,7 +1,7 @@
 .ds ]W %
 .ds ]L
 .nh
-.TH bstop 1 "Lava Version 1.0 - Sept 2007"
+.TH bstop 1 "openlava Version 1.0 - Sept 2007"
 .br
 .SH NAME
 \fBbstop\fR - suspends unfinished jobs 
@@ -25,7 +25,7 @@ parallel jobs to suspend them.
 .PP
 By default, suspends only one job, your most recently submitted job.
 .PP
-Only root and Lava administrators can operate on jobs submitted by 
+Only root and openlava administrators can operate on jobs submitted by 
 other users. 
 .PP
 Using bstop on a job that is in the USUSP state has no effect. 
@@ -34,8 +34,8 @@ You can also use bkill -s to send the suspend signal to a job, or send
 a resume signal to a job. You can use bresume to resume suspended 
 jobs. You cannot suspend a  job  that  is  already  suspended.
 .PP
-If a signal request fails to reach the job execution host, Lava will retry 
-the operation later when the host becomes reachable. Lava retries the 
+If a signal request fails to reach the job execution host, openlava will retry 
+the operation later when the host becomes reachable. openlava retries the 
 most recent signal request. 
 .SH OPTIONS
 .BR
@@ -109,7 +109,7 @@ Prints command usage to stderr and exits.
 \fB-V\fR 
 
 .IP
-Prints Lava release version to stderr and exits. 
+Prints openlava release version to stderr and exits. 
 
 
 .SH EXAMPLES
@@ -130,11 +130,11 @@ Suspends all the jobs submitted by user smith.
 .PP
 % \fBbstop -u all\fR 
 .br
-Suspends the last submitted job in the Lava system. 
+Suspends the last submitted job in the openlava system. 
 .PP
 % \fBbstop -u all 0\fR 
 .br
-Suspends all the batch jobs in the Lava system. 
+Suspends all the batch jobs in the openlava system. 
 .SH SEE ALSO
 .BR
 .PP

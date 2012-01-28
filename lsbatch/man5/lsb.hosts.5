@@ -1,7 +1,7 @@
 .ds ]W %
 .ds ]L
 .nh
-.TH lsb.hosts 5 "Lava Version 1.0 - Sept 2007"
+.TH lsb.hosts 5 "openlava Version 1.0 - Sept 2007"
 .br
 .SH NAME
 \fBlsb.hosts\fR
@@ -30,7 +30,7 @@ optional.
 .PP
 Optional. Defines the hosts, host types, and host models used as server 
 hosts, and contains per-host configuration information. If this section is 
-not configured, Lava uses all hosts in the cluster as server hosts.
+not configured, openlava uses all hosts in the cluster as server hosts.
 .PP
 Each host, host model or host type can be configured to:
 .RS
@@ -293,7 +293,7 @@ thresholds and such hosts are only available overnight from 23:00 to
 8:00.
 .PP
 The entry with host name default applies to each of the other hosts in 
-the Lava cluster. Each host can run up to two jobs at the same time, with 
+the openlava cluster. Each host can run up to two jobs at the same time, with 
 at most one job from each user. These hosts are available to run jobs 
 at all times. Jobs may be started if the r1m index is below 0.6 and the 
 pg index is below 20, and a job from the lowest priority queue is 

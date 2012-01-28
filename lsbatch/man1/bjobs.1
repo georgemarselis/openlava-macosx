@@ -1,10 +1,10 @@
 .ds ]W %
 .ds ]L
 .nh
-.TH bjobs 1 "Lava Version 1.0 - Sept 2007"
+.TH bjobs 1 "openlava Version 1.0 - Sept 2007"
 .br
 .SH NAME
-\fBbjobs\fR - displays information about Lava jobs
+\fBbjobs\fR - displays information about openlava jobs
 .SH SYNOPSIS
 .BR
 .PP
@@ -213,7 +213,7 @@ Prints command usage to stderr and exits.
 \fB-V
 \fR
 .IP
-Prints Lava release version to stderr and exits. 
+Prints openlava release version to stderr and exits. 
 
 
 .SH OUTPUT
@@ -240,7 +240,7 @@ JOBID
 .BR
 .RS
 .IP
-The job ID that Lava assigned to the job. 
+The job ID that openlava assigned to the job. 
 
 .RE
 
@@ -412,7 +412,7 @@ PSUSP
 .BR
 .RS
 .IP
-The job has been suspended, either by its owner or the Lava 
+The job has been suspended, either by its owner or the openlava 
 administrator, while pending. 
 
 .RE
@@ -431,7 +431,7 @@ USUSP
 .BR
 .RS
 .IP
-The job has been suspended, either by its owner or the Lava 
+The job has been suspended, either by its owner or the openlava 
 administrator, while running. 
 
 .RE
@@ -441,8 +441,8 @@ SSUSP
 .BR
 .RS
 .IP
-The job has been suspended by Lava. The job has been 
-suspended by Lava due to either of the following two causes: 
+The job has been suspended by openlava. The job has been 
+suspended by openlava due to either of the following two causes: 
 
 .IP
 1) The load conditions on the execution host or hosts have 
@@ -471,7 +471,7 @@ EXIT
 .IP
 The job has terminated with a non-zero status - it may have 
 been aborted due to an error in its execution, or killed by its 
-owner or the Lava administrator. 
+owner or the openlava administrator. 
 
 .RE
 
@@ -498,11 +498,11 @@ execution host is unreachable and the job is shown as UNKWN.
 
 .IP
 - The host on which a rerunnable job is running is unavailable 
-and the job has been requeued by Lava with a new job ID, as if 
+and the job has been requeued by openlava with a new job ID, as if 
 the job were submitted as a new job.
 
 .IP
-After the execution host becomes available, Lava will try to kill 
+After the execution host becomes available, openlava will try to kill 
 the ZOMBI job. Upon successful termination of the ZOMBI job, 
 the job's status will be changed to EXIT. 
 
@@ -706,7 +706,7 @@ SSUSP
 .BR
 .RS
 .IP
-Number of Lava system suspended jobs of the job array. 
+Number of openlava system suspended jobs of the job array. 
 
 .RE
 
