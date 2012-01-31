@@ -86,10 +86,9 @@ make
 #
 %install
 
-# Install binaries, daemons
-#make install prefix=$RPM_BUILD_ROOT%{_openlavatop}
-
 # install directories and files
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/profile.d
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/init.d
 install -d $RPM_BUILD_ROOT%{_openlavatop}/bin
 install -d $RPM_BUILD_ROOT%{_openlavatop}/etc
 install -d $RPM_BUILD_ROOT%{_openlavatop}/include
@@ -235,6 +234,16 @@ install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man8/nios.8  $RPM_BUILD
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man8/pim.8  $RPM_BUILD_ROOT%{_openlavatop}/share/man/man8
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man8/res.8  $RPM_BUILD_ROOT%{_openlavatop}/share/man/man8
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsbatch/man8/sbatchd.8  $RPM_BUILD_ROOT%{_openlavatop}/share/man/man8
+
+ln -sf %{_openlavatop}/bin/bkill  $RPM_BUILD_ROOT%{_openlavatop}/bin/bstop
+ln -sf %{_openlavatop}/bin/bkill  $RPM_BUILD_ROOT%{_openlavatop}/bin/bresume
+ln -sf %{_openlavatop}/bin/bkill  $RPM_BUILD_ROOT%{_openlavatop}/bin/bchkpnt
+ln -sf %{_openlavatop}/bin/bmgroup  $RPM_BUILD_ROOT%{_openlavatop}/bin/bugroup
+
+install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/config/openlava.sh $RPM_BUILD_ROOT%{_sysconfdir}/profile.d
+install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/config/openlava.csh $RPM_BUILD_ROOT%{_sysconfdir}/profile.d
+install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/config/openlava $RPM_BUILD_ROOT%{_sysconfdir}/init.d
+
 #
 # PRE
 #
@@ -255,18 +264,6 @@ exit 0
 #
 _openlavatop=%{_openlavatop}
 # create the symbolic links
-ln -sf ${_openlavatop}/bin/bkill  ${_openlavatop}/bin/bstop
-ln -sf ${_openlavatop}/bin/bkill  ${_openlavatop}/bin/bresume
-ln -sf ${_openlavatop}/bin/bkill  ${_openlavatop}/bin/bchkpnt
-ln -sf ${_openlavatop}/bin/bmgroup  ${_openlavatop}/bin/bugroup
-chown -h openlava:openlava ${_openlavatop}/bin/bstop
-chown -h openlava:openlava ${_openlavatop}/bin/bresume
-chown -h openlava:openlava ${_openlavatop}/bin/bchkpnt
-chown -h openlava:openlava ${_openlavatop}/bin/bugroup
-#
-cp ${_openlavatop}/etc/openlava.sh %{_sysconfdir}/profile.d
-cp ${_openlavatop}/etc/openlava.csh %{_sysconfdir}/profile.d
-cp ${_openlavatop}/etc/openlava %{_sysconfdir}/init.d
 
 # Register lava daemons
 /sbin/chkconfig --add -f openlava
@@ -279,16 +276,21 @@ cp ${_openlavatop}/etc/openlava %{_sysconfdir}/init.d
 
 
 %postun
-#_openlavatop=%{_openlavatop}
-#rm -f /etc/init.d/openlava
-#rm -f /etc/profile.d/openlava.*
-#rm -rf ${_openlavatop}
 
 #
 # FILES
 #
 %files
 %defattr(-,openlava,openlava)
+
+%{_sysconfdir}/profile.d/openlava.sh
+%{_sysconfdir}/profile.d/openlava.csh
+%{_sysconfdir}/init.d/openlava
+
+%{_openlavatop}/bin/bstop
+%{_openlavatop}/bin/bresume
+%{_openlavatop}/bin/bchkpnt
+%{_openlavatop}/bin/bugroup
 
 %attr(0755,openlava,openlava) %{_openlavatop}/etc/openlava
 %{_openlavatop}/etc/openlava.sh
