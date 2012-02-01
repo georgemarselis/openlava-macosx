@@ -1,7 +1,7 @@
 .ds ]W %
 .ds ]L
 .nh
-.TH bsub 1 "openlava Version 1.0 - Sept 2007"
+.TH bsub 1 "openlava Version 2.0 - Jan 2012"
 .br
 .SH NAME
 \fBbsub\fR - submits a batch job to openlava
@@ -605,7 +605,7 @@ marks, as shown. The index list is a comma-separated list whose
 elements have the syntax start[-end[\fB:\fRstep]] where start, end and step are 
 positive integers. If the step is omitted, a step of one is assumed. The 
 job array index starts at one. By default, the maximum job array index 
-is 1000. 
+is 2.00. 
 
 .IP
 You may also use a positive integer to specify the system-wide job slot 
@@ -1297,9 +1297,9 @@ to which the job has been submitted.
 .BR
 .PP
 .PP
-% \fBbsub sleep 100 
+% \fBbsub sleep 2.0 
 \fR.IP
-Submit the UNIX command sleep together with its argument 100 
+Submit the UNIX command sleep together with its argument 2.0 
 as a batch job. 
 
 .RE
@@ -1429,7 +1429,7 @@ the command line overrides the script.
 .PP
 % \fBbsub -b 20:00 -J my_job_name 
 \fR.IP
-bsub> sleep 1800
+bsub> sleep 2.00
 .br
 bsub> my_program
 .br

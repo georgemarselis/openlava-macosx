@@ -1,0 +1,11 @@
+#!/bin/sh
+
+files=`ls *.1`
+for f in $files
+do
+  echo $f  
+  ~/bin/manServer $f > $f.html
+done
+#sed  -i -e 's/<B>.PP<\/B>//'g *.html
+#sed  -i -e 's/<B>.RS<\/B>//'g *.html
+
