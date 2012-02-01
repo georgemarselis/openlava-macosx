@@ -30,7 +30,6 @@
 %define _logdir %{_openlavatop}/log
 %define _includedir %{_openlavatop}/include
 %define _etcdir %{_openlavatop}/etc
-%define is_redhat %(test -e /etc/redhat-release && echo 1 || echo 0)
 
 Summary: openlava Distributed Batch Scheduler
 Name: openlava
@@ -45,11 +44,12 @@ Source: %{name}-%{version}.tar.gz
 Buildroot: %{_tmppath}/%{name}-%{version}-buildroot
 BuildRequires: gcc, tcl-devel, ncurses-devel
 Requires: ncurses, tcl
-%if %is_redhat
+%if 0%{?suse_version}
+PreReq: %insserv_prereq
+Requires(pre): pwdutils
+%else
 Requires(pre): /usr/sbin/useradd
 Requires(pre): /usr/sbin/groupadd
-%else
-Requires(pre): pwdutils
 %endif
 Requires(pre): /usr/bin/getent
 Requires(post): /sbin/chkconfig
@@ -258,24 +258,26 @@ exit 0
 # POST
 #
 %post
-
-#
-# set variables
-#
-_openlavatop=%{_openlavatop}
-# create the symbolic links
-
 # Register lava daemons
-/sbin/chkconfig --add -f openlava
-/sbin/chkconfig openlava on
+%if 0%{?suse_version}
+%fillup_and_insserv -f -Y openlava
+%else
+/sbin/chkconfig --add openlava 2>/dev/null
+/sbin/chkconfig openlava on 2>/dev/null
+%endif
 
 %preun
 /sbin/service openlava stop > /dev/null 2>&1
-/sbin/chkconfig -f openlava off
-/sbin/chkconfig --del -f openlava
 
+%if 0%{?suse_version} == 0
+/sbin/chkconfig openlava off
+/sbin/chkconfig --del openlava
+%endif
 
 %postun
+%if 0%{?suse_version}
+%insserv_cleanup
+%endif
 
 #
 # FILES
