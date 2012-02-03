@@ -287,7 +287,7 @@ exit 0
 
 %{_sysconfdir}/profile.d/openlava.sh
 %{_sysconfdir}/profile.d/openlava.csh
-%{_sysconfdir}/init.d/openlava
+%attr(0755,openlava,openlava) %{_sysconfdir}/init.d/openlava
 
 %{_openlavatop}/bin/bstop
 %{_openlavatop}/bin/bresume
