@@ -524,34 +524,35 @@ displayJobs (struct jobInfoEnt *job, struct jobInfoHead *jInfoH,
         if (IS_PEND(job->status)) {
             exec_host = "   -    ";
         } else {
-
-
-            static char *execHostList=NULL;
-            static int execHostListSize=0;
+            static char *execHostList;
+            static int execHostListSize;
             int execHostListUsed;
+            int L;
 
-
+            L = 4;
             if (execHostList == NULL) {
-                if ((execHostList = (char *) calloc(1, MAXLINELEN)) == NULL) {
-                    fprintf(stderr,I18N_FUNC_FAIL, fName, "malloc");
+                if ((execHostList = calloc(1, L)) == NULL) {
+                    perror("calloc");
                     exit(-1);
                 }
-                execHostListSize = MAXLINELEN;
+                execHostListSize = L;
             }
 
-
             strcpy(execHostList, exec_host);
-            execHostListUsed =strlen(exec_host);
+            execHostListUsed = strlen(exec_host);
 
-            if (lsbParams[LSB_SHORT_HOSTLIST].paramValue && job->numExHosts > 1
-                && strcmp(lsbParams[LSB_SHORT_HOSTLIST].paramValue, "1") == 0 ) {
+            if (lsbParams[LSB_SHORT_HOSTLIST].paramValue
+                && job->numExHosts > 1
+                &&
+                strcmp(lsbParams[LSB_SHORT_HOSTLIST].paramValue, "1") == 0) {
                 for (i = 1; i < hostList->listSize; i++) {
-                    execHostListUsed+=(strlen(job->exHosts[i])+1);
+
+                    execHostListUsed += (strlen(job->exHosts[i]) + 1);
                     if (execHostListUsed >= execHostListSize) {
-                        execHostListSize += MAXLINELEN;
-                        if ((execHostList =
-                             realloc(execHostList, execHostListSize)) == NULL) {
-                            fprintf(stderr, I18N_FUNC_FAIL, fName, "realloc");
+                        execHostListSize += L;
+                        if ((execHostList = realloc(execHostList,
+                                                    execHostListSize)) == NULL) {
+                            perror("realloc");
                             exit(-1);
                         }
                     }
@@ -562,12 +563,12 @@ displayJobs (struct jobInfoEnt *job, struct jobInfoHead *jInfoH,
                 }
             } else {
                 for (i = 1; i < job->numExHosts; i++) {
-                    execHostListUsed+=(strlen(job->exHosts[i])+1);
+                    execHostListUsed += (strlen(job->exHosts[i]) + 1);
                     if (execHostListUsed >= execHostListSize) {
-                        execHostListSize += MAXLINELEN;
-                        if ((execHostList =
-                             realloc(execHostList, execHostListSize)) == NULL) {
-                            fprintf(stderr, I18N_FUNC_FAIL, fName, "realloc");
+                        execHostListSize += L;
+                        if ((execHostList = realloc(execHostList,
+                                                    execHostListSize)) == NULL) {
+                            perror("realloc");
                             exit(-1);
                         }
                     }

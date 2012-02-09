@@ -17,6 +17,7 @@ etc_DATA = openlava openlava.sh openlava.csh \
 install-data-local:
 	mkdir -p $(prefix)/work/logdir
 	mkdir -p $(prefix)/log
+	chmod +x openlava
 
 # Tell automake to install during distcheck the
 # configuration and etc files. 
