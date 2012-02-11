@@ -98,18 +98,23 @@ callLim_(enum limReqCode reqCode,
     reqLen = XDR_GETPOS(&xdrs);
     xdr_destroy(&xdrs);
     if (options & _USE_TCP_) {
+
         if (callLimTcp_(sbuf, &repBuf, reqLen, &replyHdr, options) < 0)
             return -1;
+
         if (replyHdr.length != 0)
             xdrmem_create(&xdrs, repBuf, XDR_DECODE_SIZE_(replyHdr.length),
                           XDR_DECODE);
         else
             xdrmem_create(&xdrs, rbuf, MAXMSGLEN, XDR_DECODE);
+
     } else {
+
         if (callLimUdp_(sbuf, rbuf, reqLen, &reqHdr, host, options) < 0)
             return -1;
         if (options & _NON_BLOCK_)
             return 0;
+
         xdrmem_create(&xdrs, rbuf, MAXMSGLEN, XDR_DECODE);
     }
 

@@ -1258,3 +1258,28 @@ xdr_hostName(XDR *xdrs,
 
     return TRUE;
 }
+
+/* xdr_createlock()
+ */
+bool_t
+xdr_createlock(XDR *xdrs,
+               struct lsLock *ls,
+               struct LSFHeader *hdr)
+{
+    return TRUE;
+}
+
+bool_t
+xdr_requestlock(XDR *xdrs,
+                struct lsLockRequest *r,
+                struct LSFHeader *hdr)
+{
+    return TRUE;
+}
+
+bool_t xdr_statuslock(XDR *xdrs,
+                      struct lsLockRequest *r,
+                      struct lsLockStatus *s)
+{
+    return TRUE;
+}

@@ -36,6 +36,30 @@ static void clientReq(XDR *, struct LSFHeader *, int );
 
 static void shutDownChan(int);
 
+/* Server side of the lock functions
+ * library.
+ */
+static int makeLock(XDR *,
+                    struct sockaddr_in *,
+                    struct LSFHeader *,
+                    int);
+static int getLock(XDR *,
+                   struct sockaddr_in *,
+                   struct LSFHeader *,
+                   int);
+static int unLock(XDR *,
+                  struct sockaddr_in *,
+                  struct LSFHeader *,
+                  int);
+static int rmLock(XDR *,
+                  struct sockaddr_in *,
+                  struct LSFHeader *,
+                  int);
+static int
+statusLock(XDR *,
+           struct sockaddr_in *,
+           struct LSFHeader *,
+           int);
 void
 clientIO(struct Masks *chanmasks)
 {
@@ -181,6 +205,36 @@ processMsg(int chanfd)
             shutDownChan(chanfd);
             chanFreeBuf_(buf);
             break;
+        case LIM_MK_LOCK:
+            makeLock(&xdrs, &clientMap[chanfd]->from, &hdr, chanfd);
+            xdr_destroy(&xdrs);
+            shutDownChan(chanfd);
+            chanFreeBuf_(buf);
+            break;
+        case LIM_GET_LOCK:
+            getLock(&xdrs, &clientMap[chanfd]->from, &hdr, chanfd);
+            xdr_destroy(&xdrs);
+            shutDownChan(chanfd);
+            chanFreeBuf_(buf);
+            break;
+        case LIM_UNLOCK:
+            unLock(&xdrs, &clientMap[chanfd]->from, &hdr, chanfd);
+            xdr_destroy(&xdrs);
+            shutDownChan(chanfd);
+            chanFreeBuf_(buf);
+            break;
+        case LIM_DEL_LOCK:
+            rmLock(&xdrs, &clientMap[chanfd]->from, &hdr, chanfd);
+            xdr_destroy(&xdrs);
+            shutDownChan(chanfd);
+            chanFreeBuf_(buf);
+            break;
+        case LIM_LOCK_STATUS:
+            statusLock(&xdrs, &clientMap[chanfd]->from, &hdr, chanfd);
+            xdr_destroy(&xdrs);
+            shutDownChan(chanfd);
+            chanFreeBuf_(buf);
+            break;
         default:
             ls_syslog(LOG_ERR, "\
 %s: Invalid opCode %d from %s", __func__, hdr.opCode,
@@ -291,4 +345,63 @@ shutDownChan(int chanfd)
         FREEUP(clientMap[chanfd]);
     }
 }
+static hTab *locktab;
 
+/* makeLock()
+ */
+static int
+makeLock(XDR *xdrs,
+         struct sockaddr_in *from,
+         struct LSFHeader *hdr,
+         int chan)
+{
+    if (locktab == NULL) {
+        locktab = calloc(1, sizeof(hTab));
+    }
+
+    return 0;
+}
+
+/* getLock()
+ */
+static int
+getLock(XDR *xdrs,
+         struct sockaddr_in *from,
+         struct LSFHeader *hdr,
+         int chan)
+{
+    return 0;
+}
+
+/*
+ */
+static int
+unLock(XDR *xdrs,
+       struct sockaddr_in *from,
+       struct LSFHeader *hdr,
+       int chan)
+{
+    return 0;
+}
+
+/* rmLock()
+ */
+static int
+rmLock(XDR *xdrs,
+         struct sockaddr_in *from,
+         struct LSFHeader *hdr,
+         int chan)
+{
+    return 0;
+}
+
+/* statusLoxk()
+ */
+static int
+statusLock(XDR *xdrs,
+           struct sockaddr_in *from,
+           struct LSFHeader *hdr,
+           int chan)
+{
+    return 0;
+}

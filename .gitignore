@@ -31,3 +31,6 @@ config/openlava.setup
 config/openlava.sh
 config.guess
 config.sub
+examples/gethostbyaddr
+examples/gethostbyname
+

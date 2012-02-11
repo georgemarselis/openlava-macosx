@@ -16,6 +16,11 @@
  *
  */
 
+/* This is a miscelaneous library, till there is a good
+ * reason to create a specific module all small functionalities
+ * like logging, locking and so on should be coded here.
+ */
+
 #include "lib.h"
 #include "lproto.h"
 
@@ -480,7 +485,7 @@ replace1stCmd_(const char* oldCmdArgs, const char* newCmdArgs,
     return 0;
 }
 
-const char*
+const char *
 getLowestDir_(const char* filePath)
 {
     static char dirName[MAXFILENAMELEN];
@@ -586,7 +591,10 @@ ls_strcat(char *trustedBuffer, int bufferLength, char *strToAdd)
     return 0;
 }
 
-/* Every even has a header like that:
+/*
+ * Logging library.
+ *
+ * Every even has a header like that:
  * EVENT_TYPE openlavaversion unixtime
  */
 
@@ -944,6 +952,141 @@ freeHostEntryLog(struct hostEntryLog **hPtr)
     FREEUP((*hPtr)->resList);
     FREEUP((*hPtr)->window);
     FREEUP(*hPtr);
+
+    return 0;
+}
+
+/*
+ * Locking library.
+ */
+
+/* ls_createlock()
+ */
+int
+ls_createlock(struct lsLock *ls)
+{
+    struct LSFHeader hdr;
+
+    if (ls == NULL
+        || ls->name == NULL) {
+        lserrno = LSE_BAD_ARGS;
+        return -1;
+    }
+
+    if (callLim_(LIM_MK_LOCK,
+                 ls,
+                 xdr_createlock,
+                 NULL,
+                 NULL,
+                 NULL,
+                 _USE_TCP_,
+                 &hdr) < 0) {
+        return -1;
+    }
+
+    return 0;
+}
+
+/* ls_getlock()
+ */
+int
+ls_getlock(struct lsLockRequest *r)
+{
+    struct LSFHeader hdr;
+
+    if (r == NULL
+        || r->name == NULL) {
+        lserrno = LSE_BAD_ARGS;
+        return -1;
+    }
+
+    if (callLim_(LIM_GET_LOCK,
+                 r,
+                 xdr_requestlock,
+                 NULL,
+                 NULL,
+                 NULL,
+                 _USE_TCP_,
+                 &hdr) < 0) {
+        return -1;
+    }
+
+    return 0;
+}
+/* ls_unlock()
+ */
+int
+ls_unlock(struct lsLockRequest *r)
+{
+    struct LSFHeader hdr;
+
+    if (r == NULL
+        || r->name == NULL) {
+        lserrno = LSE_BAD_ARGS;
+        return -1;
+    }
+
+    if (callLim_(LIM_UNLOCK,
+                 r,
+                 xdr_requestlock,
+                 NULL,
+                 NULL,
+                 NULL,
+                 _USE_TCP_,
+                 &hdr) < 0) {
+        return -1;
+    }
+
+    return 0;
+}
+
+/* ls_deletelock()
+ */
+int
+ls_deletelock(struct lsLockRequest *r)
+{
+    if (r == NULL
+        || r->name == NULL) {
+        lserrno = LSE_BAD_ARGS;
+        return -1;
+    }
+
+    if (callLim_(LIM_DEL_LOCK,
+                 r,
+                 xdr_requestlock,
+                 NULL,
+                 NULL,
+                 NULL,
+                 _USE_TCP_,
+                 NULL) < 0)
+        return -1;
+
+    return 0;
+}
+
+/* ls_loackstatus()
+ */
+int
+ls_lockstatus(struct lsLockRequest *ls,
+              struct lsLockStatus *s)
+{
+    if (ls == NULL
+        || ls->name == NULL
+        || s == NULL) {
+        lserrno = LSE_BAD_ARGS;
+        return -1;
+    }
+
+    if (callLim_(LIM_LOCK_STATUS,
+                 ls,
+                 xdr_statuslock,
+                 NULL,
+                 NULL,
+                 NULL,
+                 _USE_TCP_,
+                 NULL) < 0) {
+        return -1;
+    }
 
     return 0;
 }

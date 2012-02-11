@@ -566,6 +566,41 @@ struct hostEntryLog {
     char    *window;
 };
 
+/* This API creates a lock managed by LIM
+ * so it can be shared among different
+ * processes that have to agree on a lock name.
+ * A specified lock can have only one creator
+ * and many users. After the lock is created
+ * users have to poll for it to determine
+ * when the lock is free, they have to race
+ * for it.
+ */
+struct lsLock {
+    char *name;        /* lock name given by the creator */
+    char *owner;    /* private key of the lock owner */
+    uint32_t  options;
+    uint32_t  timeout; /* milliseconds */
+};
+
+/* Request an operation on an already
+ * created lock. We use data structure
+ * for future extension and to minimize
+ * function signature changes.
+ */
+struct lsLockRequest {
+    char *name;
+};
+
+/* Request status of a specific lock or
+ * all locks in the system.
+ */
+struct lsLockStatus {
+    char *name;
+    char *owner;
+    uint32_t status;  /* locked or unlock */
+    char *holder;
+};
+
 /* openlava error numbers
  */
 #define LSE_NO_ERR              0
@@ -667,7 +702,9 @@ struct hostEntryLog {
 #define LSE_MLS_RHOST           96
 #define LSE_MLS_DOMINATE        97
 #define LSE_HOST_EXIST          98
-#define LSE_NERR                99
+#define LSE_LOCK_BUSY           99
+#define LSE_LOCK_EEXIST         100
+#define LSE_NERR                101
 
 #define LSE_ISBAD_RESREQ(s)     (((s) == LSE_BAD_EXP)                   \
                                  || ((s) == LSE_UNKWN_RESNAME)          \
@@ -935,6 +972,18 @@ extern int ls_rmhost(const char *);
 extern struct lsEventRec  *ls_readeventrec(FILE *);
 extern int ls_writeeventrec(FILE *, struct lsEventRec *);
 extern int freeHostEntryLog(struct hostEntryLog **);
+
+/* openlava distribute locking system a creator
+ * creates the lock based on an unique arbitrary name,
+ * duplicated locks registrations are rejected.
+ * The lock then be used by other clients who know
+ * the lock name only the owner can destroy the lock.
+ */
+extern int ls_createlock(struct lsLock *);
+extern int ls_getlock(struct lsLockRequest *);
+extern int ls_unlock(struct lsLockRequest *);
+extern int ls_deletelock(struct lsLockRequest *);
+extern int ls_lockstatus(struct lsLockRequest *, struct lsLockStatus *);
 
 struct extResInfo {
     char *name;

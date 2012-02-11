@@ -131,7 +131,14 @@ extern int sharedResConfigured_;
                       }
 #define TRIM_RIGHT(sp)     while (isspace(*(sp+strlen(sp)-1))) *(sp+strlen(sp)-1)='\0';
 
-#define ALIGNWORD_(s)    (((s)&0xfffffffc) + 4)
+/* Align to 4 bytes and add extra 4 for xdr_strlen()
+
+ * gcc should optmize this or change job.
+ *
+ */
+ #define ALIGNWORD_(s)    (((s)&0xfffffffc) + 4 + 4)
+//#define ALIGNWORD_(L) (cc = *L/4; *L = cc * 4 + 4 + 4;)
+
 #define NET_INTADDR_(a) ((char *) (a))
 
 #define NET_INTSIZE_ 4

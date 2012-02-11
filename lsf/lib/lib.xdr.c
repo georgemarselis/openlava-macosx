@@ -422,7 +422,7 @@ xdr_lsffree(bool_t (*xdr_func)(), char *objp, struct LSFHeader *hdr)
 int
 getXdrStrlen(char *s)
 {
-    int cc;
+    size_t cc;
 
     if (s == NULL)
         return 4;

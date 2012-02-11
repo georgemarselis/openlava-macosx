@@ -77,5 +77,15 @@ extern bool_t xdr_hostEntry(XDR *,
 extern bool_t xdr_hostName(XDR *,
                            char *,
                            struct LSFHeader *);
+extern bool_t xdr_createlock(XDR *,
+                             struct lsLock *,
+                             struct LSFHeader *);
+extern bool_t xdr_requestlock(XDR *,
+                              struct lsLockRequest *,
+                              struct LSFHeader *hdr);
+extern bool_t xdr_statuslock(XDR *,
+                             struct lsLockRequest *,
+                             struct lsLockStatus *);
+
 #endif
 

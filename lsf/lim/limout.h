@@ -61,9 +61,16 @@ enum limReqCode {
     LIM_CHK_RESREQ    = 11,
     LIM_DEBUGREQ      = 12,
     LIM_GET_RESOUINFO = 13,
+    /* openlava protocol code
+     */
     LIM_ADD_HOST      = 14,
     LIM_RM_HOST       = 15,
     LIM_GET_MASTINFO2 = 16,
+    LIM_MK_LOCK       = 17,
+    LIM_GET_LOCK      = 18,
+    LIM_UNLOCK        = 19,
+    LIM_DEL_LOCK      = 20,
+    LIM_STATUS_LOCK   = 21,
 
 #define FIRST_LIM_PRIV	LIM_REBOOT
     LIM_REBOOT        = 50,
@@ -109,7 +116,11 @@ enum limReplyCode {
     LIME_BAD_FILTER       = 22,
     LIME_BAD_RESOURCE     = 23,
     LIME_NO_RESOURCE      = 24,
-    LIME_KWN_MIGRANT      = 25
+    LIME_KWN_MIGRANT      = 25,
+    LIME_LOCK_BUSY        = 26,
+    LIME_LOCK_EXIST       = 27,
+    LIM_LOCK_STATUS       = 28,
+    LIME_NOSUCH_LOCK      = 29
 };
 
 struct loadReply {
