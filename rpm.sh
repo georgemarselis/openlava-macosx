@@ -2,10 +2,10 @@
 set -x
 
 #
-# Copyright (c) 2011 openlava foundation 
+# Copyright (c) 2011-2012 David Bigagli
 #
 
-major="1"
+major="2"
 minor="0"
 
 grep 4.6 /etc/redhat-release > /dev/null

@@ -1,10 +1,10 @@
 .ds ]W %
 .ds ]L
 .nh
-.TH lsb.acct 5 "Lava Version 1.0 - Sept 2007"
+.TH lsb.acct 5 "openlava Version 1.0 - Sept 2007"
 .br
 .SH NAME
-\fBlsb.acct\fR - Batch job log file of Lava 
+\fBlsb.acct\fR - Batch job log file of openlava 
 .SH DESCRIPTION
 .BR
 .PP
@@ -13,7 +13,7 @@ The master batch daemon (see mbatchd(8)) generates a record for each
 job completion or failure. The record is appended to the job log file 
 lsb.acct. The file is located in LSB_SHAREDIR/\fI<clustername>\fR/logdir, where 
 LSB_SHAREDIR must be defined in lsf.conf(5) and \fI<clustername>\fR is the 
-name of the Lava cluster, as returned by lsid(1). See mbatchd(8) for the 
+name of the openlava cluster, as returned by lsid(1). See mbatchd(8) for the 
 description of LSB_SHAREDIR. The job log file is an ASCII file with one 
 record per line. The fields of a record are separated by blanks. If the 
 value of some field is unavailable, "" is logged for character string, 0 for 

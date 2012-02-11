@@ -16,7 +16,7 @@
 #
 #
 
-%define major 1
+%define major 2
 %define minor 0
 %define release 1
 
@@ -33,7 +33,7 @@
 
 Summary: openlava Distributed Batch Scheduler
 Name: openlava
-Version: 1.0
+Version: 2.0
 Release: 1
 License: GPLv2
 Group: Applications/Productivity
@@ -44,7 +44,14 @@ Source: %{name}-%{version}.tar.gz
 Buildroot: %{_tmppath}/%{name}-%{version}-buildroot
 BuildRequires: gcc, tcl-devel, ncurses-devel
 Requires: ncurses, tcl
+%if 0%{?suse_version}
+PreReq: %insserv_prereq
+Requires(pre): pwdutils
+%else
 Requires(pre): /usr/sbin/useradd
+Requires(pre): /usr/sbin/groupadd
+%endif
+Requires(pre): /usr/bin/getent
 Requires(post): /sbin/chkconfig
 Requires(preun): /sbin/chkconfig
 Prefix: /opt
@@ -79,10 +86,9 @@ make
 #
 %install
 
-# Install binaries, daemons
-make install INSTALL_PREFIX=$RPM_BUILD_ROOT
-
 # install directories and files
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/profile.d
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/init.d
 install -d $RPM_BUILD_ROOT%{_openlavatop}/bin
 install -d $RPM_BUILD_ROOT%{_openlavatop}/etc
 install -d $RPM_BUILD_ROOT%{_openlavatop}/include
@@ -229,60 +235,65 @@ install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man8/pim.8  $RPM_BUILD_
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man8/res.8  $RPM_BUILD_ROOT%{_openlavatop}/share/man/man8
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsbatch/man8/sbatchd.8  $RPM_BUILD_ROOT%{_openlavatop}/share/man/man8
 
+ln -sf %{_openlavatop}/bin/bkill  $RPM_BUILD_ROOT%{_openlavatop}/bin/bstop
+ln -sf %{_openlavatop}/bin/bkill  $RPM_BUILD_ROOT%{_openlavatop}/bin/bresume
+ln -sf %{_openlavatop}/bin/bkill  $RPM_BUILD_ROOT%{_openlavatop}/bin/bchkpnt
+ln -sf %{_openlavatop}/bin/bmgroup  $RPM_BUILD_ROOT%{_openlavatop}/bin/bugroup
+
+install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/config/openlava.sh $RPM_BUILD_ROOT%{_sysconfdir}/profile.d
+install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/config/openlava.csh $RPM_BUILD_ROOT%{_sysconfdir}/profile.d
+install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/config/openlava $RPM_BUILD_ROOT%{_sysconfdir}/init.d
+
 #
 # PRE
 #
 %pre
-
 #
 # Add "openlava" user
 #
-/usr/sbin/groupadd -f openlava
-/usr/sbin/useradd -c "openlava Administrator" -g openlava -m -d /home/openlava openlava 2> /dev/null || :
+/usr/bin/getent group openlava >/dev/null || /usr/sbin/groupadd openlava
+/usr/bin/getent passwd openlava >/dev/null || /usr/sbin/useradd -c "openlava Administrator" -g openlava -m -d /home/openlava openlava 2> /dev/null || :
+exit 0
 #
 # POST
 #
 %post
-
-#
-# set variables
-#
-_openlavatop=${RPM_INSTALL_PREFIX}/openlava-1.0
-# create the symbolic links
-ln -sf ${_openlavatop}/bin/bkill  ${_openlavatop}/bin/bstop
-ln -sf ${_openlavatop}/bin/bkill  ${_openlavatop}/bin/bresume
-ln -sf ${_openlavatop}/bin/bkill  ${_openlavatop}/bin/bchkpnt
-ln -sf ${_openlavatop}/bin/bmgroup  ${_openlavatop}/bin/bugroup
-chown -h openlava:openlava ${_openlavatop}/bin/bstop
-chown -h openlava:openlava ${_openlavatop}/bin/bresume
-chown -h openlava:openlava ${_openlavatop}/bin/bchkpnt
-chown -h openlava:openlava ${_openlavatop}/bin/bugroup
-#
-cp ${_openlavatop}/etc/openlava.sh %{_sysconfdir}/profile.d
-cp ${_openlavatop}/etc/openlava.csh %{_sysconfdir}/profile.d
-cp ${_openlavatop}/etc/openlava %{_sysconfdir}/init.d
-
 # Register lava daemons
-/sbin/chkconfig --add openlava
-/sbin/chkconfig openlava on
+%if 0%{?suse_version}
+%fillup_and_insserv -f -Y openlava
+%else
+/sbin/chkconfig --add openlava 2>/dev/null
+/sbin/chkconfig openlava on 2>/dev/null
+%endif
 
 %preun
 /sbin/service openlava stop > /dev/null 2>&1
+
+%if 0%{?suse_version} == 0
 /sbin/chkconfig openlava off
 /sbin/chkconfig --del openlava
-
+%endif
 
 %postun
-_openlavatop=${RPM_INSTALL_PREFIX}/openlava-1.0
-rm -f /etc/init.d/openlava
-rm -f /etc/profile.d/openlava.*
-rm -rf ${_openlavatop}
+%if 0%{?suse_version}
+%insserv_cleanup
+%endif
 
 #
 # FILES
 #
 %files
 %defattr(-,openlava,openlava)
+
+%{_sysconfdir}/profile.d/openlava.sh
+%{_sysconfdir}/profile.d/openlava.csh
+%attr(0755,openlava,openlava) %{_sysconfdir}/init.d/openlava
+
+%{_openlavatop}/bin/bstop
+%{_openlavatop}/bin/bresume
+%{_openlavatop}/bin/bchkpnt
+%{_openlavatop}/bin/bugroup
+
 %attr(0755,openlava,openlava) %{_openlavatop}/etc/openlava
 %{_openlavatop}/etc/openlava.sh
 %{_openlavatop}/etc/openlava.csh
@@ -414,15 +425,21 @@ rm -rf ${_openlavatop}
 %config(noreplace) %{_openlavatop}/etc/lsf.task
 %config(noreplace) %{_openlavatop}/README
 %config(noreplace) %{_openlavatop}/COPYING
-%attr(0755,openlava,openlava) %{_openlavatop}/bin
-%attr(0755,openlava,openlava) %{_openlavatop}/etc
-%attr(0755,openlava,openlava) %{_openlavatop}/include
-%attr(0755,openlava,openlava) %{_openlavatop}/lib
-%attr(0755,openlava,openlava) %{_openlavatop}/log
-%attr(0755,openlava,openlava) %{_openlavatop}/sbin
-%attr(0755,openlava,openlava) %{_openlavatop}/share
-%attr(0755,openlava,openlava) %{_openlavatop}/work
-%attr(0755,openlava,openlava) %{_openlavatop}/work/logdir
+
+%attr(0755,openlava,openlava) %dir %{_openlavatop}
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/bin
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/etc
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/include
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/lib
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/log
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/sbin
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/share
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/share/man
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/share/man/man1
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/share/man/man5
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/share/man/man8
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/work
+%attr(0755,openlava,openlava) %dir %{_openlavatop}/work/logdir
 
 %changelog
 * Sun Oct 30 2011 modified the spec file so that autoconf creates

@@ -1,21 +1,21 @@
 .ds ]W %
 .ds ]L
 .nh
-.TH lsb.events 5 "Lava Version 1.0 - Sept 2007"
+.TH lsb.events 5 "openlava Version 1.0 - Sept 2007"
 .br
 .SH NAME
-\fBlsb.events\fR - Lava batch event files  
+\fBlsb.events\fR - openlava batch event files  
 .SH DESCRIPTION
 .BR
 .PP
 .PP
-The Lava batch event log is used to display Lava batch event history and 
+The openlava batch event log is used to display openlava batch event history and 
 for mbatchd failure recovery. 
 .PP
 Whenever a host, job, or queue changes status, a record is appended 
 to the event log file \fBlsb.events\fR. The file is located in 
 LSB_SHAREDIR/\fI<clustername>\fR/logdir\fI,\fR where \fBLSB_SHAREDIR\fR must be 
-defined in  lsf.conf(5) and <\fIclustername\fR> is the name of the Lava cluster, 
+defined in  lsf.conf(5) and <\fIclustername\fR> is the name of the openlava cluster, 
 as returned by \fBlsid\fR(1). See mbatchd(8) for the description of 
 LSB_SHAREDIR. 
 .PP

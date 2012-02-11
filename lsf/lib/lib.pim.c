@@ -274,9 +274,9 @@ readPIMBuf(char *pfile)
    	    return (FALSE);
         }
 	if (fread(pimInfoBuf,sizeof(char),pimInfoLen,fp) <= 0) {
-		ls_syslog(LOG_ERR, I18N_FUNC_FAIL_M, fname, "fread");
-		FREEUP(pimInfoBuf);
-		return(NULL);
+            ls_syslog(LOG_ERR, I18N_FUNC_FAIL_M, fname, "fread");
+            FREEUP(pimInfoBuf);
+            return(NULL);
 	}
 
 	fclose(fp);

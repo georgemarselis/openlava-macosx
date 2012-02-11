@@ -2134,7 +2134,7 @@ putEventRec1(char *fname)
 }
 
 static void
-logFinishedjob(struct jData * job)
+logFinishedjob(struct jData *job)
 {
     static char           fname[] = "logFinishedjob()";
     struct submitReq      *jobBill = &(job->shared->jobBill);

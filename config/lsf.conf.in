@@ -28,3 +28,6 @@ LSF_AUTH=eauth
 
 # Batch mail message handling
 LSB_MAILTO=!U
+#
+LSF_PIM_SLEEPTIME_UPDATE=y
+

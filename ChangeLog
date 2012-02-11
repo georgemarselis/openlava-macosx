@@ -1,3 +1,7 @@
+2012-01-23  David Bigagli  <david@openlava.net>
+
+	* Created 2.0 branch.
+
 2011-11-07  David Bigagli  <david@openlava.net>
 
 	* lib.host.c Rewrote the caching code to read the hosts file only

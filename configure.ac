@@ -41,7 +41,7 @@ AC_PROG_LEX
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 
-#AC_DEFINE(REL_DATE, "Sep 11 2011", "Set the release date.")
+#AC_DEFINE(REL_DATE, "Jan 31 2012", "Set the release date.")
 
 # Force warnings on for gcc
 if test "x$ac_compiler_gnu" = xyes; then

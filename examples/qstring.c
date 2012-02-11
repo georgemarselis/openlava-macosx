@@ -11,7 +11,7 @@ gimmestr(char *s)
     p = buf;
     if (s[0] == '"'
         && s[1] == '"')
-        return NULL;
+        return "";
 
     ++s;
     while (*s != '"')
@@ -29,12 +29,19 @@ main(int argc, char **argv)
     char p0[32];
     char p1[32];
     char *s;
+    char *file;
+
+    if (argc != 2) {
+        fprintf(stderr, "\
+usage: qstring filename\n");
+        return -1;
+    }
 
     memset(p, 0, 32);
     memset(p0, 0, 32);
     memset(p1, 0, 32);
 
-    fp = fopen("myfile", "r");
+    fp = fopen(file, "r");
     while (fscanf(fp, "%s%s%s", p, p0, p1) != EOF)
         printf("%s %s %s\n", p, p0, p1);
     fclose(fp);

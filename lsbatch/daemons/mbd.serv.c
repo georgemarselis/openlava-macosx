@@ -206,14 +206,15 @@ do_jobInfoReq(XDR *xdrs,
             jobInfoHead.jobIds[i] = ((struct jData *)jgrplist[i].info)->jobId;
     }
 
-    jobInfoHead.numHosts = 0;
+    i = jobInfoHead.numHosts = 0;
     if (jobInfoReq.options & HOST_NAME) {
         jobInfoHead.hostNames = my_calloc(numofhosts(),
                                           sizeof(char *), fname);
         for (hPtr = (struct hData *)hostList->back;
              hPtr != (void *)hostList;
              hPtr = (struct hData *)hPtr->back) {
-            jobInfoHead.hostNames[i-1] = hPtr->host;
+            jobInfoHead.hostNames[i] = hPtr->host;
+            ++i;
         }
 
         jobInfoHead.numHosts = numofhosts();
@@ -527,6 +528,7 @@ packJobInfo(struct jData * jobData,
                      hPtr != (void *)hostList;
                      hPtr = (struct hData *)hPtr->back) {
 
+                    ++i;
                     if (jReasonTb[i] == PEND_HOST_USR_SPEC)
                         continue;
 

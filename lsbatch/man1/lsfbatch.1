@@ -3,9 +3,9 @@
 .ds ]L
 .TH LSFBATCH 1 "1 Sept 2007"
 .SH NAME
-lsfbatch \- \s-1Lava\s0 Batch system
+lsfbatch \- \s-1openlava\s0 Batch system
 .SH DESCRIPTION
-\s-1Lava\s0 Batch is a load sharing batch system that uses \s-1LSF\s0 Base 
+\s-1openlava\s0 Batch is a load sharing batch system that uses \s-1LSF\s0 Base 
 and \s-1LSLIB\s0 to provide distributed batch job scheduling services.
 It is supported by master and slave batch daemons that run on hosts
 that act as servers of distributed batch jobs (see
@@ -83,7 +83,7 @@ generate accounting information about batch jobs.
 force a batch job to run.
 .\".TP 15
 .\".BR badmin (1)
-.\"provide a set of sub-commands for \s-1Lava\s0 administrator to control the
+.\"provide a set of sub-commands for \s-1openlava\s0 administrator to control the
 .\"Batch system.
 .SH ENVIRONMENT
 Like other load sharing utilities, Batch needs access to the
@@ -95,7 +95,7 @@ unless the environment variable \fBLSF_ENVDIR\fR is defined. In this case
 commands look to the \fBLSF_ENVDIR\fR directory to find
 .BR lsf.conf (5).
 It is required that all Batch
-commands use the same \fBlsf.conf\fR file as the Lava daemons.
+commands use the same \fBlsf.conf\fR file as the openlava daemons.
 .SH SEE ALSO
 .BR mbatchd (8),
 .BR lsf.conf (5),

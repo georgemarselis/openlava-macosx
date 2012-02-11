@@ -997,6 +997,7 @@ getLsbUsable(void)
          hPtr != (void *)hostList;
          hPtr = hPtr->back) {
 
+        ++i;
         hReason = 0;
         if (hPtr->hStatus & HOST_STAT_REMOTE)
             continue;

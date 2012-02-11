@@ -1,7 +1,7 @@
 .ds ]W %
 .ds ]L
 .nh
-.TH bqueues 1 "Lava Version 1.0 - Sept 2007"
+.TH bqueues 1 "openlava Version 1.0 - Sept 2007"
 .br
 .SH NAME
 \fBbqueues\fR - displays information about queues
@@ -23,7 +23,7 @@ By default, returns the following information about all queues: queue
 name, queue priority, queue status, job slot statistics, and job state 
 statistics.
 .PP
-Batch queue names and characteristics are set up by the Lava 
+Batch queue names and characteristics are set up by the openlava 
 administrator (see lsb.queues(5) and mbatchd(8)).
 .SH OPTIONS
 .BR
@@ -83,7 +83,7 @@ Prints command usage to stderr and exits.
 \fB-V 
 \fR
 .IP
-Prints Lava release version to stdout and exits. 
+Prints openlava release version to stdout and exits. 
 
 
 .SH OUTPUT
@@ -110,7 +110,7 @@ lost_and_found
 .BR
 .RS
 .IP
-If the Lava administrator removes queues from the system, Lava 
+If the openlava administrator removes queues from the system, openlava 
 creates a queue called lost_and_found and places the jobs 
 from the removed queues into the lost_and_found queue. 
 Jobs in the lost_and_found queue will not be started unless 
@@ -185,14 +185,14 @@ Jobs in the queue cannot be started for the time being.
 .IP
 At any moment, each queue is either Open or Closed, and is 
 either Active or Inactive. The queue can be opened, closed, 
-inactivated and re-activated by the Lava administrator using 
+inactivated and re-activated by the openlava administrator using 
 badmin (see badmin(8)). The queue becomes inactive when 
 either its dispatch window is closed or its run window is closed 
 (see DISPATCH_WINDOWS in the "Output for the -l Option" 
 section). In this case, the queue cannot be activated using 
-badmin. The queue is re-activated by Lava when one of its 
+badmin. The queue is re-activated by openlava when one of its 
 dispatch windows and one of its run windows are open again. 
-The initial state of a queue at Lava boot time is set to open, and 
+The initial state of a queue at openlava boot time is set to open, and 
 either active or inactive depending on its windows. 
 
 .RE
@@ -353,7 +353,7 @@ Inact_Adm
 .BR
 .RS
 .IP
-The queue has been inactivated by the Lava administrator.
+The queue has been inactivated by the openlava administrator.
 
 .RE
 
@@ -363,7 +363,7 @@ SSUSP
 .RS
 .IP
 The number of job slots in the queue allocated to jobs that are 
-suspended by Lava.
+suspended by openlava.
 
 .RE
 
@@ -373,7 +373,7 @@ USUSP
 .RS
 .IP
 The number of job slots in the queue allocated to jobs that are 
-suspended by the job submitter or by the Lava administrator.
+suspended by the job submitter or by the openlava administrator.
 
 .RE
 
@@ -382,7 +382,7 @@ RSV
 .BR
 .RS
 .IP
-The numbers of job slots in the queue that are reserved by Lava 
+The numbers of job slots in the queue that are reserved by openlava 
 for pending jobs.
 
 .RE
@@ -393,7 +393,7 @@ Migration threshold
 .RS
 .IP
 \fB\fRThe length of time in seconds that a job dispatched from the queue 
-will remain suspended by the system before Lava attempts to 
+will remain suspended by the system before openlava attempts to 
 migrate the job to another host. See the MIG parameter in 
 lsb.queues and lsb.hosts.
 
@@ -767,7 +767,7 @@ User group names have a slash (/) added at the end of the group
 name. See bugroup(1).
 
 .IP
-Lava cluster administrators can submit jobs to the queue by default 
+openlava cluster administrators can submit jobs to the queue by default 
 
 .RE
 
