@@ -30,7 +30,6 @@
 %define _logdir %{_openlavatop}/log
 %define _includedir %{_openlavatop}/include
 %define _etcdir %{_openlavatop}/etc
-%define is_redhat %(test -e /etc/redhat-release && echo 1 || echo 0)
 
 Summary: openlava Distributed Batch Scheduler
 Name: openlava
@@ -45,11 +44,12 @@ Source: %{name}-%{version}.tar.gz
 Buildroot: %{_tmppath}/%{name}-%{version}-buildroot
 BuildRequires: gcc, tcl-devel, ncurses-devel
 Requires: ncurses, tcl
-%if %is_redhat
+%if 0%{?suse_version}
+PreReq: %insserv_prereq
+Requires(pre): pwdutils
+%else
 Requires(pre): /usr/sbin/useradd
 Requires(pre): /usr/sbin/groupadd
-%else
-Requires(pre): pwdutils
 %endif
 Requires(pre): /usr/bin/getent
 Requires(post): /sbin/chkconfig
@@ -86,10 +86,9 @@ make
 #
 %install
 
-# Install binaries, daemons
-#make install prefix=$RPM_BUILD_ROOT%{_openlavatop}
-
 # install directories and files
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/profile.d
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/init.d
 install -d $RPM_BUILD_ROOT%{_openlavatop}/bin
 install -d $RPM_BUILD_ROOT%{_openlavatop}/etc
 install -d $RPM_BUILD_ROOT%{_openlavatop}/include
@@ -138,6 +137,7 @@ install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/lsf/lstools/lsloadadj  $RPM_BUI
 install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/lsf/lstools/lsmon      $RPM_BUILD_ROOT%{_openlavatop}/bin
 install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/lsf/lstools/lsplace    $RPM_BUILD_ROOT%{_openlavatop}/bin
 install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/lsf/lstools/lsrcp      $RPM_BUILD_ROOT%{_openlavatop}/bin
+install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/lsf/lstools/lsrun      $RPM_BUILD_ROOT%{_openlavatop}/bin
 install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/scripts/mpich2-mpiexec $RPM_BUILD_ROOT%{_openlavatop}/bin
 install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/scripts/mpich-mpirun   $RPM_BUILD_ROOT%{_openlavatop}/bin
 install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/scripts/openmpi-mpirun $RPM_BUILD_ROOT%{_openlavatop}/bin
@@ -209,6 +209,7 @@ install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man1/lsloadadj.1 $RPM_B
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man1/lsmon.1 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man1
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man1/lsplace.1 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man1
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man1/lsrcp.1 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man1
+install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man1/lsrun.1 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man1
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man1/lstools.1 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man1
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsbatch/man5/lsb.acct.5  $RPM_BUILD_ROOT%{_openlavatop}/share/man/man5
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsbatch/man5/lsb.events.5 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man5
@@ -235,6 +236,16 @@ install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man8/nios.8  $RPM_BUILD
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man8/pim.8  $RPM_BUILD_ROOT%{_openlavatop}/share/man/man8
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man8/res.8  $RPM_BUILD_ROOT%{_openlavatop}/share/man/man8
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsbatch/man8/sbatchd.8  $RPM_BUILD_ROOT%{_openlavatop}/share/man/man8
+
+ln -sf %{_openlavatop}/bin/bkill  $RPM_BUILD_ROOT%{_openlavatop}/bin/bstop
+ln -sf %{_openlavatop}/bin/bkill  $RPM_BUILD_ROOT%{_openlavatop}/bin/bresume
+ln -sf %{_openlavatop}/bin/bkill  $RPM_BUILD_ROOT%{_openlavatop}/bin/bchkpnt
+ln -sf %{_openlavatop}/bin/bmgroup  $RPM_BUILD_ROOT%{_openlavatop}/bin/bugroup
+
+install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/config/openlava.sh $RPM_BUILD_ROOT%{_sysconfdir}/profile.d
+install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/config/openlava.csh $RPM_BUILD_ROOT%{_sysconfdir}/profile.d
+install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/config/openlava $RPM_BUILD_ROOT%{_sysconfdir}/init.d
+
 #
 # PRE
 #
@@ -249,46 +260,41 @@ exit 0
 # POST
 #
 %post
-
-#
-# set variables
-#
-_openlavatop=%{_openlavatop}
-# create the symbolic links
-ln -sf ${_openlavatop}/bin/bkill  ${_openlavatop}/bin/bstop
-ln -sf ${_openlavatop}/bin/bkill  ${_openlavatop}/bin/bresume
-ln -sf ${_openlavatop}/bin/bkill  ${_openlavatop}/bin/bchkpnt
-ln -sf ${_openlavatop}/bin/bmgroup  ${_openlavatop}/bin/bugroup
-chown -h openlava:openlava ${_openlavatop}/bin/bstop
-chown -h openlava:openlava ${_openlavatop}/bin/bresume
-chown -h openlava:openlava ${_openlavatop}/bin/bchkpnt
-chown -h openlava:openlava ${_openlavatop}/bin/bugroup
-#
-cp ${_openlavatop}/etc/openlava.sh %{_sysconfdir}/profile.d
-cp ${_openlavatop}/etc/openlava.csh %{_sysconfdir}/profile.d
-cp ${_openlavatop}/etc/openlava %{_sysconfdir}/init.d
-
 # Register lava daemons
-/sbin/chkconfig --add -f openlava
-/sbin/chkconfig openlava on
+%if 0%{?suse_version}
+%fillup_and_insserv -f -Y openlava
+%else
+/sbin/chkconfig --add openlava 2>/dev/null
+/sbin/chkconfig openlava on 2>/dev/null
+%endif
 
 %preun
 /sbin/service openlava stop > /dev/null 2>&1
-/sbin/chkconfig -f openlava off
-/sbin/chkconfig --del -f openlava
 
+%if 0%{?suse_version} == 0
+/sbin/chkconfig openlava off
+/sbin/chkconfig --del openlava
+%endif
 
 %postun
-#_openlavatop=%{_openlavatop}
-#rm -f /etc/init.d/openlava
-#rm -f /etc/profile.d/openlava.*
-#rm -rf ${_openlavatop}
+%if 0%{?suse_version}
+%insserv_cleanup
+%endif
 
 #
 # FILES
 #
 %files
 %defattr(-,openlava,openlava)
+
+%{_sysconfdir}/profile.d/openlava.sh
+%{_sysconfdir}/profile.d/openlava.csh
+%attr(0755,openlava,openlava) %{_sysconfdir}/init.d/openlava
+
+%{_openlavatop}/bin/bstop
+%{_openlavatop}/bin/bresume
+%{_openlavatop}/bin/bchkpnt
+%{_openlavatop}/bin/bugroup
 
 %attr(0755,openlava,openlava) %{_openlavatop}/etc/openlava
 %{_openlavatop}/etc/openlava.sh
@@ -337,6 +343,7 @@ cp ${_openlavatop}/etc/openlava %{_sysconfdir}/init.d
 %{_bindir}/lsmon
 %{_bindir}/lsplace
 %{_bindir}/lsrcp
+%{_bindir}/lsrun
 
 # Man pages
 %{_mandir}/man1/bbot.1
@@ -372,6 +379,7 @@ cp ${_openlavatop}/etc/openlava %{_sysconfdir}/init.d
 %{_mandir}/man1/lsmon.1
 %{_mandir}/man1/lsplace.1
 %{_mandir}/man1/lsrcp.1
+%{_mandir}/man1/lsrun.1
 %{_mandir}/man1/lstools.1
 %{_mandir}/man5/lsb.acct.5
 %{_mandir}/man5/lsb.events.5
