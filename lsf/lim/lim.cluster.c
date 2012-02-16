@@ -229,7 +229,7 @@ processMsg(int chanfd)
             shutDownChan(chanfd);
             chanFreeBuf_(buf);
             break;
-        case LIM_LOCK_STATUS:
+        case LIM_STATUS_LOCK:
             statusLock(&xdrs, &clientMap[chanfd]->from, &hdr, chanfd);
             xdr_destroy(&xdrs);
             shutDownChan(chanfd);
@@ -357,7 +357,10 @@ makeLock(XDR *xdrs,
 {
     if (locktab == NULL) {
         locktab = calloc(1, sizeof(hTab));
+        h_initTab_(locktab, 11);
     }
+
+
 
     return 0;
 }

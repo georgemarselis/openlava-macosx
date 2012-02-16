@@ -576,8 +576,8 @@ struct hostEntryLog {
  * for it.
  */
 struct lsLock {
-    char *name;        /* lock name given by the creator */
-    char *owner;    /* private key of the lock owner */
+    char *name;    /* lock name given by the creator */
+    char *ownerKey; /* private key of the lock owner */
     uint32_t  options;
     uint32_t  timeout; /* milliseconds */
 };
@@ -588,17 +588,17 @@ struct lsLock {
  * function signature changes.
  */
 struct lsLockRequest {
-    char *name;
+    char *name; /* unique lockID */
 };
 
 /* Request status of a specific lock or
  * all locks in the system.
  */
 struct lsLockStatus {
-    char *name;
-    char *owner;
+    char *name;       /* unique lockID */
     uint32_t status;  /* locked or unlock */
-    char *holder;
+    char *holder;     /* IP addr of the lock holder */
+    time_t since;      /* locked since.... */
 };
 
 /* openlava error numbers
@@ -703,7 +703,7 @@ struct lsLockStatus {
 #define LSE_MLS_DOMINATE        97
 #define LSE_HOST_EXIST          98
 #define LSE_LOCK_BUSY           99
-#define LSE_LOCK_EEXIST         100
+#define LSE_NOSUCH_LOCK         100
 #define LSE_NERR                101
 
 #define LSE_ISBAD_RESREQ(s)     (((s) == LSE_BAD_EXP)                   \

@@ -886,6 +886,14 @@ struct jobrequeue {
 #define    MBD_RECONFIG      1
 #define    MBD_CKCONFIG      2
 
+/* Batch tweeter
+ */
+struct tweetJob {
+    LS_LONG_INT jobID;
+    char *key;
+    char *msg;
+};
+
 struct logSwitchLog {
     int lastJobId;
 };
@@ -1513,6 +1521,8 @@ int getTotalSortIntList(struct sortIntList *);
 
 int updateJobIdIndexFile (char *, char *, int);
 
+extern int lsb_tweetwrite(struct tweetJob *);
+extern int lsb_tweetread(struct tweetJob *);
 
 #undef P_
 

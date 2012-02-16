@@ -292,10 +292,7 @@ idletime(int *logins)
                 }
             }
 
-
-            user.ut_line[sizeof(user.ut_line)] = '\0';
-
-
+            user.ut_line[0] = 0;
             if (idleSeconds > 0) {
 
                  itime = getutime(user.ut_line);
@@ -311,8 +308,6 @@ idletime(int *logins)
         }
     }
     close(ufd);
-
-
 
 
     if (idleSeconds > 0 && (itime = getXIdle()) < idleSeconds)
@@ -1023,7 +1018,7 @@ getusr(void)
         i = numIndx * 2;
         while(i) {
 
-            if( i%2 ) {
+            if (i%2) {
                 cc = fscanf (fp, "%4096s", valueString);
                 valueString[MAXEXTRESLEN-1] = '\0';
             } else {
@@ -1032,11 +1027,14 @@ getusr(void)
             }
 
             if (cc == -1) {
+
+                scc = 0;
                 int scanerrno = errno;
                 if (scanerrno == EAGAIN) {
 
-
                     gettimeofday(&t, NULL);
+                    expire.tv_sec = t.tv_sec + ELIMblocktime;
+                    expire.tv_usec = t.tv_usec;
                     timersub(&expire, &t, &timeout);
                     if (timercmp(&timeout, &time0, <)) {
                         timerclear(&timeout);

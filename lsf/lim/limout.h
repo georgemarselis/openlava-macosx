@@ -93,8 +93,8 @@ enum limReqCode {
 };
 
 enum limReplyCode {
-    LIME_NO_ERR           = 1,
-    LIME_WRONG_MASTER     = 2,
+    LIME_NO_ERR           = 1, /* no error */
+    LIME_WRONG_MASTER     = 2, /* or possible errors from LIM */
     LIME_BAD_RESREQ       = 3,
     LIME_NO_OKHOST        = 4,
     LIME_NO_ELHOST        = 5,
@@ -118,9 +118,7 @@ enum limReplyCode {
     LIME_NO_RESOURCE      = 24,
     LIME_KWN_MIGRANT      = 25,
     LIME_LOCK_BUSY        = 26,
-    LIME_LOCK_EXIST       = 27,
-    LIM_LOCK_STATUS       = 28,
-    LIME_NOSUCH_LOCK      = 29
+    LIME_NOSUCH_LOCK      = 27,
 };
 
 struct loadReply {

@@ -16,4 +16,5 @@ lsb.sig.c lsb.switch.c \
 lsb.conf.h  lsb.h  lsb.log.h  lsb.sig.h  lsb.spool.h  lsb.xdr.h
 
 etags :
-	etags *.[hc] ../*.h ../lib/*.[hc] ../../lsf/*.h ../../lsf/intlib/*.[hc]
+	etags *.[hc] ../*.h ../lib/*.[hc] ../../lsf/*.h \
+	../../lsf/intlib/*.[hc] ../../lsf/lib/*.[hc]

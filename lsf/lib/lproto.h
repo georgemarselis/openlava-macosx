@@ -135,9 +135,19 @@ extern int sharedResConfigured_;
 
  * gcc should optmize this or change job.
  *
+ *  int
+ * inline ALIGNWORD_(L)
+ * {
+ *   int cc;
+ *   cc = *L/4;
+ *   *L = cc * 4 + 4 + 4;
+ *   }
+*/
+
+/* Add 5 because ALIGNWORD_ is buggy and align to the lower
+ * multiple of 4, for example aligns 9 to 8.
  */
- #define ALIGNWORD_(s)    (((s)&0xfffffffc) + 4 + 4)
-//#define ALIGNWORD_(L) (cc = *L/4; *L = cc * 4 + 4 + 4;)
+#define ALIGNWORD_(s)    (((s + 5) & 0xfffffffc) + 4 + 4)
 
 #define NET_INTADDR_(a) ((char *) (a))
 

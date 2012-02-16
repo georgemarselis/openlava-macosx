@@ -1,4 +1,5 @@
-/* $Id: lib.misc.c 397 2007-11-26 19:04:00Z mblack $
+/*
+ * Copyright (C) 2011-2012 David Bigagli
  * Copyright (C) 2007 Platform Computing Inc
  *
  * This program is free software; you can redistribute it and/or modify
@@ -973,6 +974,11 @@ ls_createlock(struct lsLock *ls)
         return -1;
     }
 
+    /* Create an empty key
+     */
+    if (ls->ownerKey == NULL)
+        ls->ownerKey = strdup("");
+
     if (callLim_(LIM_MK_LOCK,
                  ls,
                  xdr_createlock,
@@ -1037,6 +1043,10 @@ ls_unlock(struct lsLockRequest *r)
         return -1;
     }
 
+    if (hdr.opCode == LSE_LOCK_BUSY) {
+        return -1;
+    }
+
     return 0;
 }
 
@@ -1067,21 +1077,21 @@ ls_deletelock(struct lsLockRequest *r)
 /* ls_loackstatus()
  */
 int
-ls_lockstatus(struct lsLockRequest *ls,
+ls_lockstatus(struct lsLockRequest *r,
               struct lsLockStatus *s)
 {
-    if (ls == NULL
-        || ls->name == NULL
+    if (s == NULL
+        || s->name == NULL
         || s == NULL) {
         lserrno = LSE_BAD_ARGS;
         return -1;
     }
 
-    if (callLim_(LIM_LOCK_STATUS,
-                 ls,
+    if (callLim_(LIM_STATUS_LOCK,
+                 s,
+                 xdr_requestlock,
+                 s,
                  xdr_statuslock,
-                 NULL,
-                 NULL,
                  NULL,
                  _USE_TCP_,
                  NULL) < 0) {

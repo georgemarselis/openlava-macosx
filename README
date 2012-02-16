@@ -15,8 +15,23 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 #
+#
 
-Please vistus at: wwww.openlava.net 
+openlava Open Source Scheduler
+
+openlava is a load sharing and distributed batch queueing software that integrates a network 
+of computers running UNIX systems. It consists of the following components:
+
+openlava Base:
+The software upon which all the other components are based. It includes two servers, the 
+Load Information Manager (LIM) and the Remote Execution Server (RES).
+
+openlava Batch:
+The set of utilities providing batch job scheduling for distributed environments, 
+ensuring optimal resource sharing. It includes the master and slave batch 
+daemons (mbatchd and sbatchd).
+
+Please vistus at: wwww.openlava.org
 Find the source code at: https://github.com/openlava
 
 Thank you for your interest in openlava.
