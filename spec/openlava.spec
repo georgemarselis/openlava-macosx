@@ -209,8 +209,6 @@ install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man1/lsloadadj.1 $RPM_B
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man1/lsmon.1 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man1
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man1/lsplace.1 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man1
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man1/lsrcp.1 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man1
-install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man1/lsrun.1 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man1
-install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man1/lstools.1 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man1
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsbatch/man5/lsb.acct.5  $RPM_BUILD_ROOT%{_openlavatop}/share/man/man5
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsbatch/man5/lsb.events.5 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man5
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsbatch/man5/lsb.hosts.5 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man5
@@ -222,7 +220,6 @@ install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man5/lsf.acct.5 $RPM_BU
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man5/lsf.cluster.5 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man5
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man5/lsf.conf.5 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man5
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man5/lsf.shared.5 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man5
-install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man5/res.acct.5 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man5
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsbatch/man8/badmin.8  $RPM_BUILD_ROOT%{_openlavatop}/share/man/man8
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsbatch/man8/brun.8  $RPM_BUILD_ROOT%{_openlavatop}/share/man/man8
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man8/eauth.8  $RPM_BUILD_ROOT%{_openlavatop}/share/man/man8
@@ -379,8 +376,6 @@ exit 0
 %{_mandir}/man1/lsmon.1
 %{_mandir}/man1/lsplace.1
 %{_mandir}/man1/lsrcp.1
-%{_mandir}/man1/lsrun.1
-%{_mandir}/man1/lstools.1
 %{_mandir}/man5/lsb.acct.5
 %{_mandir}/man5/lsb.events.5
 %{_mandir}/man5/lsb.hosts.5
@@ -405,7 +400,6 @@ exit 0
 %{_mandir}/man5/lsf.cluster.5
 %{_mandir}/man5/lsf.conf.5
 %{_mandir}/man5/lsf.shared.5
-%{_mandir}/man5/res.acct.5
 
 # libraries
 %{_libdir}/liblsf.a
