@@ -59,6 +59,8 @@ main(int argc, char **argv, char **environ)
     int tid;
     char **hlist;
 
+    putenv("POSIXLY_CORRECT=y");
+
     P = calloc(1, sizeof(struct lsrunParams));
 
     while ((cc = getopt(argc, argv, "hVPvpR:m:")) != EOF) {

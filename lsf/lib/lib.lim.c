@@ -635,7 +635,16 @@ err_return_(enum limReplyCode limReplyCode)
         case LIME_KWN_MIGRANT:
             lserrno = LSE_HOST_EXIST;
             return;
+        case LIME_LOCK_BUSY:
+            lserrno = LSE_LOCK_BUSY;
+            return;
+        case LIME_NOSUCH_LOCK:
+            lserrno = LSE_NOSUCH_LOCK;
+            return;
         default:
+            /* we don't always need LIM
+             * spcific error numbers.
+             */
             lserrno = limReplyCode + NOCODE;
             return;
     }

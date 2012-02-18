@@ -1266,6 +1266,13 @@ xdr_createlock(XDR *xdrs,
                struct lsLock *ls,
                struct LSFHeader *hdr)
 {
+    if (!xdr_var_string(xdrs, &ls->name)
+        || !xdr_var_string(xdrs, &ls->ownerKey)
+        || ! xdr_u_int(xdrs, &ls->options)
+        || ! xdr_u_int(xdrs, &ls->timeout)) {
+        return FALSE;
+    }
+
     return TRUE;
 }
 
@@ -1274,12 +1281,24 @@ xdr_requestlock(XDR *xdrs,
                 struct lsLockRequest *r,
                 struct LSFHeader *hdr)
 {
+    if (!xdr_var_string(xdrs, &r->name))
+        return FALSE;
+
     return TRUE;
 }
 
-bool_t xdr_statuslock(XDR *xdrs,
-                      struct lsLockRequest *r,
-                      struct lsLockStatus *s)
+bool_t
+xdr_statuslock(XDR *xdrs,
+               struct lsLockStatus *s,
+               struct LSFHeader *hdr)
 {
+    if (!xdr_var_string(xdrs, &s->name)
+        || ! xdr_var_string(xdrs, &s->holder)
+        || ! xdr_time_t(xdrs, &s->since)) {
+
+        return FALSE;
+    }
+
+
     return TRUE;
 }

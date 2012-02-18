@@ -84,8 +84,8 @@ extern bool_t xdr_requestlock(XDR *,
                               struct lsLockRequest *,
                               struct LSFHeader *hdr);
 extern bool_t xdr_statuslock(XDR *,
-                             struct lsLockRequest *,
-                             struct lsLockStatus *);
+                             struct lsLockStatus *,
+                             struct LSFHeader *);
 
 #endif
 
