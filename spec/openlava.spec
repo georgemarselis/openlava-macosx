@@ -137,6 +137,7 @@ install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/lsf/lstools/lsloadadj  $RPM_BUI
 install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/lsf/lstools/lsmon      $RPM_BUILD_ROOT%{_openlavatop}/bin
 install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/lsf/lstools/lsplace    $RPM_BUILD_ROOT%{_openlavatop}/bin
 install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/lsf/lstools/lsrcp      $RPM_BUILD_ROOT%{_openlavatop}/bin
+install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/lsf/lstools/lsrun      $RPM_BUILD_ROOT%{_openlavatop}/bin
 install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/scripts/mpich2-mpiexec $RPM_BUILD_ROOT%{_openlavatop}/bin
 install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/scripts/mpich-mpirun   $RPM_BUILD_ROOT%{_openlavatop}/bin
 install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/scripts/openmpi-mpirun $RPM_BUILD_ROOT%{_openlavatop}/bin
@@ -208,7 +209,6 @@ install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man1/lsloadadj.1 $RPM_B
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man1/lsmon.1 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man1
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man1/lsplace.1 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man1
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man1/lsrcp.1 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man1
-install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man1/lstools.1 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man1
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsbatch/man5/lsb.acct.5  $RPM_BUILD_ROOT%{_openlavatop}/share/man/man5
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsbatch/man5/lsb.events.5 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man5
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsbatch/man5/lsb.hosts.5 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man5
@@ -220,7 +220,6 @@ install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man5/lsf.acct.5 $RPM_BU
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man5/lsf.cluster.5 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man5
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man5/lsf.conf.5 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man5
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man5/lsf.shared.5 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man5
-install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man5/res.acct.5 $RPM_BUILD_ROOT%{_openlavatop}/share/man/man5
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsbatch/man8/badmin.8  $RPM_BUILD_ROOT%{_openlavatop}/share/man/man8
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsbatch/man8/brun.8  $RPM_BUILD_ROOT%{_openlavatop}/share/man/man8
 install -m 644 $RPM_BUILD_DIR/%{name}-%{version}/lsf/man/man8/eauth.8  $RPM_BUILD_ROOT%{_openlavatop}/share/man/man8
@@ -341,6 +340,7 @@ exit 0
 %{_bindir}/lsmon
 %{_bindir}/lsplace
 %{_bindir}/lsrcp
+%{_bindir}/lsrun
 
 # Man pages
 %{_mandir}/man1/bbot.1
@@ -376,7 +376,6 @@ exit 0
 %{_mandir}/man1/lsmon.1
 %{_mandir}/man1/lsplace.1
 %{_mandir}/man1/lsrcp.1
-%{_mandir}/man1/lstools.1
 %{_mandir}/man5/lsb.acct.5
 %{_mandir}/man5/lsb.events.5
 %{_mandir}/man5/lsb.hosts.5
@@ -401,7 +400,6 @@ exit 0
 %{_mandir}/man5/lsf.cluster.5
 %{_mandir}/man5/lsf.conf.5
 %{_mandir}/man5/lsf.shared.5
-%{_mandir}/man5/res.acct.5
 
 # libraries
 %{_libdir}/liblsf.a
