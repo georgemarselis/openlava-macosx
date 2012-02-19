@@ -286,6 +286,12 @@ main(int argc, char **argv)
         && strcasecmp(pimParams[LSF_PIM_SLEEPTIME_UPDATE].paramValue, "y") == 0) {
         sleepBeforeUpdateProcs = FALSE;
     }
+    /* Enable this by default as it noticerably speeds
+     * up batch operation. Why to be slow by default?
+     * Until we restructure pim making it single use mode
+     * keep this like this.
+     */
+    sleepBeforeUpdateProcs = FALSE;
 
     if (pimParams[LSF_PIM_CPUTIMECHECK].paramValue != NULL
         && strcasecmp(pimParams[LSF_PIM_CPUTIMECHECK].paramValue, "y") == 0) {
@@ -412,8 +418,8 @@ doServ(void)
                         ls_syslog(LOG_DEBUG, "%s: got opCode = %d", fname,
                                   option);
 
-                    if ((option & PIM_API_UPDATE_NOW) ||
-                        sleptTime >= sleepTime) {
+                    if ((option & PIM_API_UPDATE_NOW)
+                        || sleptTime >= sleepTime) {
                         if ((option & PIM_API_UPDATE_NOW)
                             && sleepBeforeUpdateProcs == TRUE) {
 
@@ -440,9 +446,9 @@ doServ(void)
                         }
 
                         if (logclass & LC_PIM)
-                            ls_syslog(LOG_DEBUG,
-                                      "%s: Got connection, updateProcs",
-                                      fname);
+                            ls_syslog(LOG_DEBUG, "\
+%s: Got connection, updateProcs", fname);
+
                         currentUpdateStartTime = time(0);
                         TIMEIT(0, updateProcs(lastUpdateStartTime), "updateProcs");
                         lastUpdateStartTime = currentUpdateStartTime;
