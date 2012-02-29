@@ -1,6 +1,9 @@
 #
 # Copyright (C) openlava foundation
 #
+
+include $(top_srcdir)/common.mk
+
 INCLUDES = -I../lsf
 
 sbin_PROGRAMS = echkpnt erestart

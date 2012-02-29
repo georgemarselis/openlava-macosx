@@ -2,6 +2,9 @@
 # Copyright (C) David Bigagli
 #
 
+include $(top_srcdir)/common.mk
+
+
 # Install configuration files for openlava base and batch 
 # in the conf directory.
 

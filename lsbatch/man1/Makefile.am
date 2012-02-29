@@ -1,6 +1,9 @@
 #
 # Copyright (C) openlava foundation
 #
+
+include $(top_srcdir)/common.mk
+
 man_MANS = bbot.1 bkill.1 bparams.1 brestart.1 bswitch.1 lsfbatch.1 \
 	bchkpnt.1 bmgroup.1 bpeek.1 bresume.1 btop.1 \
 	bhosts.1 bmig.1 bqueues.1 bstop.1 bugroup.1 \
