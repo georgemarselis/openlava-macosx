@@ -770,7 +770,7 @@ typedef void (*SIGFUNCTYPE)(int);
 typedef struct stat LS_STAT_T;
 #define LSTMPDIR        lsTmpDir_
 #define LSDEVNULL       "/dev/null"
-#define LSETCDIR        "/opt/openlava/etc"
+#define LSETCDIR        SYSCONFDIR
 #define closesocket close
 #define CLOSESOCKET(s) close((s))
 #define SOCK_CALL_FAIL(c) ((c) < 0 )

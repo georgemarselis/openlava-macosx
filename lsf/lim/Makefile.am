@@ -1,8 +1,11 @@
 #
 # Copyright (C) openlava foundation
 #
+
+include $(top_srcdir)/common.mk
+
 INCLUDES = -I$(top_srcdir)/lsf
-AM_CPPFLAGS = -D$(HOSTTYPE) -DHOST_TYPE_STRING=\"$(HOSTTYPE)\"
+AM_CPPFLAGS += -D$(HOSTTYPE) -DHOST_TYPE_STRING=\"$(HOSTTYPE)\"
 
 HOSTTYPE=LINUX64
 

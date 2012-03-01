@@ -1,6 +1,9 @@
 #
 # Copyright (C) 2011 openlava foundation
 #
+
+include $(top_srcdir)/common.mk
+
 INCLUDES = -I$(top_srcdir)/lsf -I$(top_srcdir)/lsf/lib \
            -I$(top_srcdir)/lsbatch -I./
 

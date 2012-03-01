@@ -2,6 +2,8 @@
 # Copyright (C) 2011 openlava foundation
 #
 
+include $(top_srcdir)/common.mk
+
 INCLUDES = -I../
 
 noinst_LIBRARIES = liblsfint.a
