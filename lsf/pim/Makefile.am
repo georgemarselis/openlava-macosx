@@ -1,5 +1,5 @@
 #
-# Copyright (C) openlava foundation
+# Copyright (C) 2011-2012 David Bigagli
 #
 
 INCLUDES = -I$(top_srcdir)/lsf

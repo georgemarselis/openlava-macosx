@@ -1,5 +1,5 @@
 #
-# Copyright (C) David Bigagli
+# Copyright (C) 2011-2012 David Bigagli
 #
 SUBDIRS = lsf lsbatch lsf/res eauth scripts chkpnt config
 

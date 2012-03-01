@@ -1,8 +1,13 @@
-2012-01-23  David Bigagli  <david@openlava.net>
+2012-03-01  David Bigagli  <david@openlava.org>
+
+	* Mekefiles Modified the copyright notices. Updated the
+	address to reflect .org instead of .net.
+
+2012-01-23  David Bigagli  <david@openlava.org>
 
 	* Created 2.0 branch.
 
-2011-11-07  David Bigagli  <david@openlava.net>
+2011-11-07  David Bigagli  <david@openlava.org>
 
 	* lib.host.c Rewrote the caching code to read the hosts file only
 	once and add the host in the cache. Removed the cache timeout
@@ -13,7 +18,7 @@
 	Modified the daemons code to use the new host library
 	implementation.
 
-2011-10-30  David Bigagli  <david@openlava.net>
+2011-10-30  David Bigagli  <david@openlava.org>
 
 	* mbd.policy.c Developed a little round robin scheduler absed on the number of jobs a user has running.
 
@@ -26,34 +31,34 @@
 	in now the lsf.conf has the version in the openlava
 	fundamental variables clearly indicating which version is in use.
 
-2011-09-16  David Bigagli  <david@openlava.net>
+2011-09-16  David Bigagli  <david@openlava.org>
 
 	* README removed obsolete information about the source code directory structure.
 	Added the README and COPYING file to the rmp file.
 
-2011-09-14  David Bigagli  <david@openlava.net>
+2011-09-14  David Bigagli  <david@openlava.org>
 
 	* lsf.h Added the openlava foundation copyright.
 
-2011-09-09  David Bigagli  <david@openlava.net>
+2011-09-09  David Bigagli  <david@openlava.org>
 
 	* openlava.spec Updated the spec file to reflect the changes in teh build system. The ownership of all files changed, no longer root, the entire installation tree is owned by the openlava user. The daemons to run in multi user mode must still be started at root which is guaranteed at boot by init.
 
-2011-08-27  David Bigagli  <david@openlava.net>
+2011-08-27  David Bigagli  <david@openlava.org>
 
 	* openlavaconfig.h Removed it from the top directory and merge its content into lsf.h which is the openlava master header file. In this way the repository is more GNU like as well.
 
-2011-08-23  David Bigagli  <david@openlava.net>
+2011-08-23  David Bigagli  <david@openlava.org>
 
 	* GNU build system. Switched openlava from home made makefiles to the GNU build system.
 
-2011-07-20  David Bigagli  <david@openlava.net>
+2011-07-20  David Bigagli  <david@openlava.org>
 
 	* scripts/Makefile: added the installation
 	of scripts that manage the integration with
 	mpi and openmpi.
 
-2011-07-17  David Bigagli  <david@openlava.net>
+2011-07-17  David Bigagli  <david@openlava.org>
 
 	* lib.table.c: Added getClosestPrime() function to
 	always size and resize tables as primies.
@@ -64,11 +69,11 @@
 	CPUs as provided by openlava base.
 
 
-2011-07-16  David Bigagli  <david@openlava.net>
+2011-07-16  David Bigagli  <david@openlava.org>
 
 	* Added lsb.hosts
 
-2011-06-16  David Bigagli  <david@openlava.net>
+2011-06-16  David Bigagli  <david@openlava.org>
 
 	* Makefiles changed all variables to run install from LAVA
 	to OPENLAVA.
@@ -76,7 +81,7 @@
 	* config/Makefile added a command to install COPYING and README files
 	to the LAVA_ROOT/conf directory
 
-2011-06-07  David Bigagli  <david@openlava.net>
+2011-06-07  David Bigagli  <david@openlava.org>
 
 	* lava startup script was rewritten, simplified and introduce
 	the possibility to run daemons in single user mode.
@@ -90,7 +95,7 @@
 	and changed the make install to also install the lava sturtup script.
 
 
-2011-05-02  David Bigagli  <david@openlava.net>
+2011-05-02  David Bigagli  <david@openlava.org>
 
 	* Makefile(s): Removed PREFIX variable from all make files and
 	introduced Lava specific installation variables in Make.misc.
@@ -101,7 +106,7 @@
 	by default and modified the shared libraries to use standard .so
 	suffix instead of .So.
 
-2011-04-24  David Bigagli  <david@openlava.net>
+2011-04-24  David Bigagli  <david@openlava.org>
 
 	* ChangeLog: Created this file.
 

@@ -566,6 +566,30 @@ struct hostEntryLog {
     char    *window;
 };
 
+/* openlava grid API
+ */
+struct gConnect {
+    char *app;
+    uint32_t mumHosts;
+    char *resReq;
+};
+
+struct gHandle {
+    uint32_t numConn;
+    struct hconns {
+        char *hostNAme;
+        int sr;
+        int sw;
+    };
+};
+
+struct gTask {
+    uint32_t tid;
+    char *data;
+    int len;
+
+};
+
 /* openlava error numbers
  */
 #define LSE_NO_ERR              0
@@ -943,5 +967,10 @@ struct extResInfo {
     char *increasing;
     char *des;
 };
+
+/* openlava grid API
+ */
+extern struct gHandle *ls_gconnect(struct gConnet *);
+extern int ls_gsyncsend(struct
 
 #endif /* _lsf_h_ */

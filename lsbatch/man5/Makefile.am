@@ -1,5 +1,5 @@
 #
-# Copyright (C) openlava foundation
+# Copyright (C) 2011-2012 David Bigagli
 #
 man_MANS = lsb.acct.5 lsb.hosts.5 lsb.queues.5 \
             lsb.events.5 lsb.params.5 lsb.users.5

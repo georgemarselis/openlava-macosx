@@ -1,5 +1,5 @@
 #
-# Copyright (C) openlava foundation
+# Copyright (C) 2011-2012 David Bigagli
 #
 man_MANS = lsf.acct.5 lsf.conf.5 lim.acct.5 lsf.cluster.5 lsf.shared.5
 #

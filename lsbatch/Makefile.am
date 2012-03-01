@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 openlava foundation
+# Copyright (C) 2011-2012 David Bigagli
 #
 
 include_HEADERS = lsbatch.h

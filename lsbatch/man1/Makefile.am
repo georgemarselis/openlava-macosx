@@ -1,5 +1,5 @@
 #
-# Copyright (C) openlava foundation
+# Copyright (C) 2011-2012 David Bigagli
 #
 man_MANS = bbot.1 bkill.1 bparams.1 brestart.1 bswitch.1 lsfbatch.1 \
 	bchkpnt.1 bmgroup.1 bpeek.1 bresume.1 btop.1 \
