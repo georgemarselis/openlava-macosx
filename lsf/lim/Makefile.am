@@ -1,8 +1,11 @@
 #
 # Copyright (C) 2011-2012 David Bigagli
 #
+
+include $(top_srcdir)/common.mk
+
 INCLUDES = -I$(top_srcdir)/lsf
-AM_CPPFLAGS = -D$(HOSTTYPE) -DHOST_TYPE_STRING=\"$(HOSTTYPE)\"
+AM_CPPFLAGS += -D$(HOSTTYPE) -DHOST_TYPE_STRING=\"$(HOSTTYPE)\"
 
 HOSTTYPE=LINUX64
 
