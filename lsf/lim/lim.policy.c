@@ -791,8 +791,6 @@ bsort(int lidx,
         flip = FALSE;
     lidx = abs(lidx) -1;
 
-
-
     if (lidx == R15S || lidx == R1M || lidx == R15M ||
         lidx == LS)
         shrink = 5;
@@ -832,7 +830,7 @@ bsort(int lidx,
     if (! (flags & SORT_FINAL)) {
         float bestload = loadIndexValue(0, lidx, rqlOptions);
 
-        for (i=1; i<ncandidates; i++) {
+        for (i = 1; i < ncandidates; i++) {
             if (NOTORDERED(incr, bestload, loadIndexValue(i, lidx, rqlOptions)))
                 bestload = loadIndexValue(i, lidx, rqlOptions);
         }
@@ -840,17 +838,16 @@ bsort(int lidx,
 
         swap = TRUE;
         i = 0;
-        while (swap && (i<ncandidates-cutoffs)) {
+        while (swap && ( i< ncandidates-cutoffs)) {
             swap = FALSE;
-            for (j=ncandidates-2; j>=i; j--) {
-                order = orderByStatus(j+1, ignore_res);
+            for (j = ncandidates - 2; j >= i; j--) {
+                order = orderByStatus(j + 1, ignore_res);
                 if (order == 0) {
                     swap = TRUE;
                     continue;
                 }
                 if (order == 1)
                     continue;
-
 
                 if (!(flags & SORT_SINDX)) {
                     mkexld(candidates[j], candidates[j+1], lidx,
@@ -860,9 +857,10 @@ bsort(int lidx,
                     exld2 = 0.0;
                 }
 
-                if (NOTORDERED(incr,
-                               loadIndexValue(j, lidx, rqlOptions) + exld1,
-                               loadIndexValue(j+1, lidx, rqlOptions) + exld2)) {
+                if (NOTORDERED(incr, loadIndexValue(j, lidx, rqlOptions)
+                               + exld1,
+                               loadIndexValue(j+1, lidx, rqlOptions)
+                               + exld2)) {
                     swap = TRUE;
                     tmp = candidates[j];
                     candidates[j] = candidates[j+1];
@@ -871,12 +869,11 @@ bsort(int lidx,
             }
             i++;
         }
-        for (i=ncandidates-cutoffs; i<ncandidates; i++)
-            if (fabs(loadIndexValue(i, lidx, rqlOptions) - bestload)
-                >= threshold)
+        for (i = ncandidates-cutoffs; i < ncandidates; i++)
+            if (fabs(loadIndexValue(i, lidx, rqlOptions) - bestload) >= threshold)
                 return i;
 
-        return (ncandidates);
+        return ncandidates;
     }
 
     swap = TRUE;
@@ -1132,7 +1129,7 @@ loadadjReq(XDR *xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr, int s)
 
     getTclHostData (&tclHostData, myHostPtr, myHostPtr, TRUE);
     tclHostData.ignDedicatedResource = ignDedicatedResource;
-    cc=parseResReq(jobXfer.resReq, &resVal, &allInfo, PR_RUSAGE);
+    cc = parseResReq(jobXfer.resReq, &resVal, &allInfo, PR_RUSAGE);
     if ((cc != PARSE_OK) ||
         (returnCode = evalResReq(resVal.selectStr, &tclHostData, FALSE)) < 0) {
         if (cc == PARSE_BAD_VAL)
