@@ -32,7 +32,10 @@
 #include <sys/wait.h>
 
 #include <sys/mount.h>
+
+#if !defined(__FreeBSD__) && (!defined(__APPLE__) && !defined(__MACH__))
 #include <mntent.h>
+#endif
 
 #include "../lsf.h"
 
