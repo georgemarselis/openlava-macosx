@@ -27,8 +27,6 @@
 #include "daemons.h"
 #include "../../lsf/lib/lib.osal.h"
 
-#include <malloc.h>
-
 #ifndef strchr
 #include <string.h>
 #endif

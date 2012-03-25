@@ -16,11 +16,11 @@
  *
  */
 
+#include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <pwd.h>
 #include "lib.h"
-#include <malloc.h>
 #include "../res/nios.h"
 #include "../res/resout.h"
 #include "lproto.h"

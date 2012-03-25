@@ -15,7 +15,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
-#include <malloc.h>
+#include <stdlib.h>
 #include "lib.h"
 #include "lib.queue.h"
 

@@ -28,7 +28,6 @@
 
 #include "../daemons/daemons.h"
 
-#include <malloc.h>
 #define NL_SETN         11
 
 #include "../lib/lsb.spool.h"

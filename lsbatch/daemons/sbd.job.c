@@ -25,7 +25,6 @@
 #include <grp.h>
 #include <pwd.h>
 
-#include <malloc.h>
 #include "../../lsf/intlib/jidx.h"
 #include "../../lsf/lib/lib.rcp.h"
 #include "../../lsf/lib/mls.h"

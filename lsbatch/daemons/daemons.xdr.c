@@ -24,8 +24,6 @@
 #include "daemons.h"
 #include "../../lsf/lib/lib.xdr.h"
 
-#include <malloc.h>
-
 #define NL_SETN		10	
 
 #define MAX_USER_NAME_LEN 64 

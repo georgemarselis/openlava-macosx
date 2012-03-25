@@ -20,9 +20,6 @@
 
 #define NL_SETN		11	
 
-#include <malloc.h>
-
-
 extern int urgentJob;
 static int                replyHdrWithRC(int rc, int s, int jobId);
 static void do_syslogMsg(int s, char *buf);

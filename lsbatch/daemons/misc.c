@@ -29,7 +29,6 @@
 #include "../../lsf/lib/lib.osal.h"
 #include "../../lsf/lib/mls.h"
 
-#include <malloc.h>
 #ifndef strchr
 #include <string.h>
 #endif

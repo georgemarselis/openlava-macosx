@@ -16,12 +16,12 @@
  *
  */
 
+#include <stdlib.h>
 #include <unistd.h>
 #include <limits.h>
 #include <fcntl.h>
 #include "lib.rf.h"
 #include "lib.h"
-#include <malloc.h>
 #include "../res/resout.h"
 #include "lproto.h"
 
