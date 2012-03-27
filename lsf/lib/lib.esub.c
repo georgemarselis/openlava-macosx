@@ -18,11 +18,11 @@
 #include <fcntl.h>      
 #include <termios.h>
 #include <limits.h>
+#include <stdlib.h>
 #include <sys/wait.h>
 #include <pwd.h>
 #include "lib.h"
 #include "mls.h"
-#include <malloc.h>
 #include "../res/nios.h"
 #include "../res/resout.h"
 #include "lproto.h"

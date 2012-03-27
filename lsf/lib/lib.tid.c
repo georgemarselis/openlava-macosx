@@ -16,7 +16,7 @@
  *
  */
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include "lib.h"
 #include "lib.queue.h"
 

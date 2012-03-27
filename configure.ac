@@ -50,17 +50,42 @@ fi
 
 #AC_CHECK_HEADERS(ncurses.h,[cf_cv_ncurses_header="ncurses.h"])
 # Check for tcl, we try tcl and all 8.X versions
-AC_CHECK_HEADERS([tcl.h], [], [AC_CHECK_HEADERS([tcl/tcl.h], [], AC_MSG_ERROR([cannot build openlava without tcl])]))
+AC_CHECK_HEADERS([tcl.h], [], [
+ AC_CHECK_HEADERS([tcl/tcl.h], [], [
+  AC_CHECK_HEADERS([tcl8.6/tcl.h], [], [
+  AC_CHECK_HEADERS([tcl86/tcl.h], [], [
+   AC_CHECK_HEADERS([tcl8.5/tcl.h], [], [
+   AC_CHECK_HEADERS([tcl85/tcl.h], [], [
+    AC_CHECK_HEADERS([tcl8.4/tcl.h], [], [
+    AC_CHECK_HEADERS([tcl84/tcl.h], [], [
+     AC_CHECK_HEADERS([tcl8.3/tcl.h], [], [
+     AC_CHECK_HEADERS([tcl83/tcl.h], [], [
+      AC_CHECK_HEADERS([tcl8.2/tcl.h], [], [
+      AC_CHECK_HEADERS([tcl82/tcl.h], [], [
+       AC_CHECK_HEADERS([tcl8.1/tcl.h], [], [
+       AC_CHECK_HEADERS([tcl81/tcl.h], [], [
+        AC_CHECK_HEADERS([tcl8.0/tcl.h], [], [
+        AC_CHECK_HEADERS([tcl80/tcl.h], [], [
+ AC_MSG_ERROR([cannot build openlava without tcl])
+])])])])])])])])])])])])])])])])
+
 AC_CHECK_LIB([tcl], [Tcl_CreateInterp], [], [
  AC_CHECK_LIB([tcl8.6], [Tcl_CreateInterp], [], [
-    AC_CHECK_LIB([tcl8.5], [Tcl_CreateInterp], [], [
-        AC_CHECK_LIB([tcl8.4], [Tcl_CreateInterp], [], [
-            AC_CHECK_LIB([tcl8.3], [Tcl_CreateInterp], [], [
-                AC_CHECK_LIB([tcl8.2], [Tcl_CreateInterp], [], [
-                    AC_CHECK_LIB([tcl8.1], [Tcl_CreateInterp], [], [
-                        AC_CHECK_LIB([tcl8.0], [Tcl_CreateInterp], [], [
-                            AC_MSG_ERROR([cannot build openlava without tcl8.*])
-])])])])])])])])
+ AC_CHECK_LIB([tcl86], [Tcl_CreateInterp], [], [
+  AC_CHECK_LIB([tcl8.5], [Tcl_CreateInterp], [], [
+  AC_CHECK_LIB([tcl85], [Tcl_CreateInterp], [], [
+   AC_CHECK_LIB([tcl8.4], [Tcl_CreateInterp], [], [
+   AC_CHECK_LIB([tcl84], [Tcl_CreateInterp], [], [
+    AC_CHECK_LIB([tcl8.3], [Tcl_CreateInterp], [], [
+    AC_CHECK_LIB([tcl83], [Tcl_CreateInterp], [], [
+     AC_CHECK_LIB([tcl8.2], [Tcl_CreateInterp], [], [
+     AC_CHECK_LIB([tcl82], [Tcl_CreateInterp], [], [
+      AC_CHECK_LIB([tcl8.1], [Tcl_CreateInterp], [], [
+      AC_CHECK_LIB([tcl81], [Tcl_CreateInterp], [], [
+       AC_CHECK_LIB([tcl8.0], [Tcl_CreateInterp], [], [
+       AC_CHECK_LIB([tcl80], [Tcl_CreateInterp], [], [
+ AC_MSG_ERROR([cannot build openlava without tcl8.*])
+])])])])])])])])])])])])])])])
 
 AC_CONFIG_FILES([
 	Makefile                 \

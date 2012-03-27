@@ -21,8 +21,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <malloc.h>
-
 #include "../../lsf/lsf.h"
 #include "../../lsf/lib/lib.hdr.h"
 #include "../../lsf/lib/lproto.h"

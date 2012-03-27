@@ -22,7 +22,6 @@
 #include <sys/file.h>
 #include <sys/errno.h>
 #include <fcntl.h>
-#include <malloc.h>
 #include <stdlib.h>
 #include "daemons.h"
 

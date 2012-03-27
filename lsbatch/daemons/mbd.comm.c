@@ -21,7 +21,6 @@
 
 
 #include "mbd.h"
-#include <malloc.h>
 #include "../../lsf/lib/lsi18n.h"
 #define NL_SETN         10
 

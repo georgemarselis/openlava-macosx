@@ -49,6 +49,8 @@
 #include <sys/param.h>
 #include <sys/wait.h>
 #include <sys/mman.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <rpc/types.h>
@@ -115,7 +117,10 @@ typedef enum {
     USR2
 } lsindx_t;
 
+#if !defined(MAXFLOAT)
 #define MAXFLOAT        3.40282347e+38F
+#endif
+
 #define INFINIT_LOAD    (float) (0x7fffffff)
 #define INFINIT_FLOAT   (float) (0x7fffffff)
 

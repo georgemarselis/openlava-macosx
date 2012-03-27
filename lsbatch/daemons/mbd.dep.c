@@ -18,7 +18,6 @@
 
 #include "daemons.h" 
 #include "mbd.h"
-#include <malloc.h>
 #include <stdlib.h>
 
 #define NL_SETN		10	

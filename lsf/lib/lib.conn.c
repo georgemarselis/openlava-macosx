@@ -16,9 +16,9 @@
  *
  */
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include "lib.h"
-#include <malloc.h>
 #include "lib.table.h"
 
 hTab   conn_table;

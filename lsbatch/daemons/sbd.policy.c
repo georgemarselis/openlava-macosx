@@ -23,7 +23,6 @@
 
 #define NL_SETN		11	
 
-#include <malloc.h>
 #ifndef ABS
 #define ABS(a) ((a) < 0 ? -(a) : (a))
 #endif

@@ -16,6 +16,7 @@
  *
  */
 
+#include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -23,7 +24,6 @@
 #include "../lsf.h"
 #include "lib.h"
 #include "mls.h"
-#include <malloc.h>
 #include "../res/nios.h"
 #include "../res/resout.h"
 #include "lproto.h"

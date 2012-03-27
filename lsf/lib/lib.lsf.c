@@ -16,9 +16,9 @@
  *
  */
 
+#include <stdlib.h>
 #include <unistd.h>
 #include "lib.h"
-#include <malloc.h>
 #include <ctype.h>
 #include <arpa/inet.h>
 #include <math.h>
