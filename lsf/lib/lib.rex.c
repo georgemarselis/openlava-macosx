@@ -16,10 +16,10 @@
  *
  */
 
+#include <stdlib.h>
 #include <unistd.h>
 #include <pwd.h>
 #include "lib.h"
-#include <malloc.h>
 #include "lproto.h"
 #include "mls.h"
 

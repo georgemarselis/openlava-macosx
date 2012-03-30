@@ -23,7 +23,6 @@
 
 #include "mbd.h"
 #include <dirent.h>
-#include <malloc.h>
 
 #define NL_SETN		10	
 

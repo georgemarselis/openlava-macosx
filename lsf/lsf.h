@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 David Bigagli
+ * Copyright (C) 2011-2012 David Bigagli
  * Copyright (C) 2007 Platform Computing Inc
  *
  * This program is free software; you can redistribute it and/or modify
@@ -49,6 +49,8 @@
 #include <sys/param.h>
 #include <sys/wait.h>
 #include <sys/mman.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <rpc/types.h>
@@ -115,7 +117,10 @@ typedef enum {
     USR2
 } lsindx_t;
 
+#if !defined(MAXFLOAT)
 #define MAXFLOAT        3.40282347e+38F
+#endif
+
 #define INFINIT_LOAD    (float) (0x7fffffff)
 #define INFINIT_FLOAT   (float) (0x7fffffff)
 
@@ -807,7 +812,7 @@ typedef void (*SIGFUNCTYPE)(int);
 typedef struct stat LS_STAT_T;
 #define LSTMPDIR        lsTmpDir_
 #define LSDEVNULL       "/dev/null"
-#define LSETCDIR        "/opt/openlava/etc"
+#define LSETCDIR        SYSCONFDIR
 #define closesocket close
 #define CLOSESOCKET(s) close((s))
 #define SOCK_CALL_FAIL(c) ((c) < 0 )

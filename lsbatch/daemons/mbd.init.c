@@ -562,6 +562,10 @@ defaultUser:
     FREEUP(sharedConf.clusterName);
 }
 
+/* readQueueConf()
+ * Copy the queue configuration as returned from
+ * the library that processed the batch configuration.
+ */
 static void
 readQueueConf(int mbdInitFlags)
 {
@@ -2964,9 +2968,6 @@ updQueueList(void)
     }
 
     checkQWindow();
-
-    return;
-
 }
 
 static void

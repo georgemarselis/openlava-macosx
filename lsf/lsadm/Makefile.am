@@ -1,6 +1,9 @@
 #
-# Copyright (C) openlava foundation
+# Copyright (C) 2011-2012 David Bigagli
 #
+
+include $(top_srcdir)/common.mk
+
 INCLUDES = -I$(top_srcdir)/lsf
 
 bin_PROGRAMS = lsadmin

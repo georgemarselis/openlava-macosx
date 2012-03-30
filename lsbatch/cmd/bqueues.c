@@ -438,7 +438,7 @@ prtQueuesLong(int numQueues, struct queueInfoEnt *queueInfo)
         }
 
         if (qp->qAttrib & Q_ATTRIB_ROUND_ROBIN)
-            printf("ROUN_ROBIN_SCHEDULING:  yes\n");
+            printf("ROUND_ROBIN_SCHEDULING:  yes\n");
 
         printf("\n");
         printFlag = 0;

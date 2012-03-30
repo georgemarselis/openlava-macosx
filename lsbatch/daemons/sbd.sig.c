@@ -26,8 +26,6 @@
 
 #define NL_SETN		11
 
-#include <malloc.h>
-
 int setCmp(int *set1, int len1, int *set2, int len2);
 #define MAX_ARGS        16
 

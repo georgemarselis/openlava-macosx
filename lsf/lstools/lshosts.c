@@ -20,7 +20,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <malloc.h>
 #include <sys/types.h>
 #include <netdb.h>
 #include "../lsf.h"

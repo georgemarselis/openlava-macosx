@@ -18,8 +18,8 @@
 
 #include <unistd.h>
 #include <pwd.h>
+#include <stdlib.h>
 #include "lib.h"
-#include <malloc.h>
 #include "lproto.h"
 #include <sys/utsname.h>
 #define NL_SETN   23   

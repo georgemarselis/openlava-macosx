@@ -34,8 +34,6 @@
 #include "../../lsf/lib/lib.rcp.h"
 #include "../../lsf/lib/mls.h"
 
-#include <malloc.h>
-
 extern char **environ;
 const char *defaultSpoolDir = NULL;
 

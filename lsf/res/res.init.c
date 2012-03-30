@@ -35,7 +35,7 @@
 
 #define NL_SETN		29
 
-#include <malloc.h>
+#include <stdlib.h>
 #include <errno.h>
 
 

@@ -2,6 +2,9 @@
 # Copyright (C) openlava foundation
 #
 
+include $(top_srcdir)/common.mk
+
+
 # Install scripts implementing integration with 
 # mpi and openmpi systems.
  

@@ -18,10 +18,10 @@
 
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/types.h>  
 #include <sys/file.h>  
 #include <string.h>
-#include <malloc.h>
 
 #include <sys/time.h>   
 #include <sys/stat.h>
@@ -32,7 +32,10 @@
 #include <sys/wait.h>
 
 #include <sys/mount.h>
+
+#if !defined(__FreeBSD__) && (!defined(__APPLE__) && !defined(__MACH__))
 #include <mntent.h>
+#endif
 
 #include "../lsf.h"
 

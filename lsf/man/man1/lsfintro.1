@@ -1,11 +1,11 @@
-.\" $Id: lsfintro.1,v 1.2 2007/08/01 20:36:25 bill Exp $
+.\" $Id: lsfintro.1,v 1.2 2012/08/01 20:36:25 bill Exp $
 .ds ]W %
 .ds ]L
-.TH LSFINTRO 1 "1 August 1998"
+.TH LSFINTRO 1 "Version 2.0 Jan 2012"
 .SH NAME
-lsf \- load sharing facility
+openlava
 .SH DESCRIPTION
-\s-1openlava\s0, or Load Sharing Facility,  is a load sharing and distributed batch
+\s-1openlava\s0 is a load sharing and distributed batch
 queueing software that integrates a heterogeneous network of computers running
 \s-1UNIX\s0 systems.  It consists of the following components:
 .TP 5
@@ -114,7 +114,7 @@ For example,
 .LP
  \fB"select[ (swp>50 && mem>=10 && type==MIPS) || (swp>35 && type==ALPHA) ]"\fR
 .LP
- \fB"select[ ((2*r15s + 3*r1m + r15m)/6 < 1.0) && \!fs && (cpuf > 4.0) ]"\fR
+ \fB"select[ ((2*r15s + 3*r1m + r15m)/6 < 2.0) && \!fs && (cpuf > 4.0) ]"\fR
 .LP
  \fB"select[ defined(verilog_license) ]"\fR
 
@@ -224,11 +224,11 @@ The default value for "\fIdecay\fR" is 0.
 
 .PP
 For example, 
-"\fIrusage[mem=50:duration=100:decay=1]\fR" will initially
+"\fIrusage[mem=50:duration=2.0:decay=1]\fR" will initially
 reserve 50 MBytes of memory.  As the job runs, the
 amount reserved amount will decrease
 by 0.5 Mbytes each minute such that the reserved amount is 0 after
-100 minutes.
+2.0 minutes.
 .PP
 The resource usage string is also used in adjusting the load
 and for mapping tasks onto hosts during a placement decision (see
@@ -251,7 +251,7 @@ no more than one task will be assigned to a host regardless of how
 many \s-1CPU\s0s it has. 
 .PP
 The default resource usage for a task is assumed to be 
-"\fBr15s=1.0:r1m=1.0:r15m=1.0\fR" which indicates a \s-1CPU\s0 intensive task
+"\fBr15s=2.0:r1m=2.0:r15m=2.0\fR" which indicates a \s-1CPU\s0 intensive task
 which consumes few other resources.
 .PP
 

@@ -82,7 +82,6 @@ extern struct yysvf yysvec[], *yybgin;
 unsigned char *yysptr, yysbuf[];
 #endif 
 #include <syslog.h>
-#include <malloc.h>
 
 #ifndef  MAXLINELEN
 #include "../lsf.h"

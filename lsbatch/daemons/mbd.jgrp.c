@@ -25,7 +25,6 @@
 #define NL_SETN         10
 
 #include <dirent.h>
-#include <malloc.h>
 
 #define MAX_SPEC_LEN  200
 #define SET_STATUS(x, y) ((x) == (y)) ? 0 : ((x) = (y)) == (y)

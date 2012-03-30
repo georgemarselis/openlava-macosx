@@ -16,10 +16,10 @@
  *
  */
 
+#include <stdlib.h>
 #include <sys/types.h>
 #include <math.h>
 #include "mbd.h"
-#include <malloc.h>
 
 #include "../../lsf/lib/lsi18n.h"
 #define NL_SETN		10

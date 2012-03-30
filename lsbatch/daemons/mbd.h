@@ -30,13 +30,13 @@
 #define  DEF_PRIO             1
 #define  DEF_NICE             0
 #define  DEF_SCHED_DELAY      10
-#define  DEF_Q_SCHED_DELAY    2
+#define  DEF_Q_SCHED_DELAY    0
 #define  MAX_INTERNAL_JOBID   299999999999999LL
 #define  DEF_MAX_JOB_NUM      1000
 #define  DEF_EXCLUSIVE        FALSE
 #define  DEF_EVENT_WATCH_TIME 60
 #define  DEF_COND_CHECK_TIME  600
-#define DEF_MAX_SBD_CONNS 32
+#define DEF_MAX_SBD_CONNS     774
 #define DEF_SCHED_STAY        3
 #define DEF_FRESH_PERIOD     15
 #define DEF_PEND_EXIT       512

@@ -31,7 +31,6 @@
 #include <pwd.h>
 #include "../lib/lproto.h"
 #include "../lsf.h"
-#include <malloc.h>
 
 #include "../lib/lib.rcp.h"
 

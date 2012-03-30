@@ -1,6 +1,9 @@
 #
 # Copyright (C) 2011 David Bigagli
 #
+
+include $(top_srcdir)/common.mk
+
 INCLUDES = -I../
 
 lib_LIBRARIES = liblsf.a

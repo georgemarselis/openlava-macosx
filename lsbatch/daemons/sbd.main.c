@@ -25,9 +25,6 @@
 #include "../../lsf/lib/lsi18n.h"
 #define NL_SETN		11
 
-#include <malloc.h>
-
-#define NL_SETN		11
 extern void do_sbdDebug(XDR *xdrs, int chfd, struct LSFHeader *reqHdr);
 
 void sinit(void);

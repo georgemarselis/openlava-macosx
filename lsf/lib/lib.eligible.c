@@ -18,7 +18,6 @@
 
 #include <unistd.h>
 #include <stdlib.h>
-#include <malloc.h>
 #include "lib.h"
 #include "lproto.h"
 
