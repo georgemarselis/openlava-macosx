@@ -18,18 +18,18 @@
 
 #include "cmd.h"
 
-#define NL_SETN 8 	
+#define NL_SETN 8
 
 extern int do_sub (int, char **, int);
 
-int 
+int
 main (int argc, char **argv)
 {
 
     int rc;
 
-    rc = _i18n_init ( I18N_CAT_MIN );	
+    rc = _i18n_init ( I18N_CAT_MIN );
 
     exit(do_sub(argc, argv, CMD_BSUB));
-    _i18n_end ( ls_catd );			
-} 
+    _i18n_end ( ls_catd );
+}

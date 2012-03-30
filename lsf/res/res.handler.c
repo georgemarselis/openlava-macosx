@@ -347,7 +347,6 @@ doacceptconn(void)
                (int)hostp->h_length);
     }
 
-
     local.sin_addr.s_addr = localSave.sin_addr.s_addr;
 
     hostp = Gethostbyaddr_(&from.sin_addr.s_addr,
@@ -378,39 +377,22 @@ doacceptconn(void)
            (int) hostp->h_length);
 
 
-    putEauthClientEnvVar("user");
-    putEauthServerEnvVar("res");
+    if (0) {
+        /* openlava 20 disable eauth for
+         * performance and security reasons.
+         * Use TLS if we want real authentication.
+         */
+        putEauthClientEnvVar("user");
+        putEauthServerEnvVar("res");
 
-#ifdef INTER_DAEMON_AUTH
-
-    {
-        char *aux_file;
-
-        aux_file = tempnam(NULL, ".auxr");
-        if (aux_file) {
-            putEauthAuxDataEnvVar(aux_file);
-            free(aux_file);
+        if (!userok(s, &from, hostp->h_name, &local, &auth, debug)) {
+            ls_syslog(LOG_ERR, "\
+%s: Permission denied %s(%d)@%s", __func__, auth.lsfUserName,
+                      auth.uid, hostp->h_name);
+            sendReturnCode(s,RESE_DENIED);
+            goto doAcceptFail;
         }
-        else {
-
-            char aux_file_buf[64];
-
-            sprintf(aux_file_buf, "/tmp/.auxres_%lul", time(0));
-            putEauthAuxDataEnvVar(aux_file_buf);
-        }
-        putenv("LSF_RES_REAL_UID=");
-        putenv("LSF_RES_REAL_GID=");
     }
-#endif
-
-    if (!userok(s, &from, hostp->h_name, &local, &auth, debug)) {
-        ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 5113,
-                                         "%s: Permission denied %s(%d)@%s"), /* catgets 5113 */
-                  fname, auth.lsfUserName, auth.uid, hostp->h_name);
-        sendReturnCode(s,RESE_DENIED);
-        goto doAcceptFail;
-    }
-
 
     if ((cc = fork()) == 0) {
 

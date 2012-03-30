@@ -30,12 +30,12 @@
 #include "res.h"
 #include "../lib/lproto.h"
 
-#define NL_SETN		29
+#define NL_SETN         29
 
 extern void child_channel_clear(struct child *, outputChannel *);
 extern char **environ;
 
-int	rexecPriority = 0;
+int     rexecPriority = 0;
 
 struct client  *clients[MAXCLIENTS_HIGHWATER_MARK+1];
 int client_cnt;
@@ -172,19 +172,17 @@ main(int argc, char **argv)
 
     saveDaemonDir_(argv[0]);
 
-
-
-    for (i=1; i<argc; i++) {
-      if (strcmp(argv[i], "-d") == 0 && argv[i+1] != NULL) {
-         pathname = argv[i+1];
-         putEnv("LSF_ENVDIR",pathname);
-         break;
-      }
+    for (i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-d") == 0 && argv[i+1] != NULL) {
+            pathname = argv[i+1];
+            putEnv("LSF_ENVDIR",pathname);
+            break;
+        }
     }
 
     if (pathname == NULL) {
-	if ((pathname = getenv("LSF_ENVDIR")) == NULL)
-	    pathname = LSETCDIR;
+        if ((pathname = getenv("LSF_ENVDIR")) == NULL)
+            pathname = LSETCDIR;
     }
 
 
@@ -204,123 +202,122 @@ main(int argc, char **argv)
         ls_openlog("res", resParams[LSF_LOGDIR].paramValue, (debug > 1),
                    resParams[LSF_LOG_MASK].paramValue);
         ls_syslog(LOG_ERR, I18N_FUNC_S_FAIL_MM, fname, "initenv_",
-            pathname);
+                  pathname);
         ls_syslog(LOG_ERR, I18N_Exiting);
         exit(-1);
     }
 
-
-
     restart_argc = argc;
     restart_argv = argv;
-    for (i=1; i<argc; i++) {
-	if (strcmp(argv[i], "-d") == 0 && argv[i+1] != NULL) {
-	    pathname = argv[i+1];
-	    i++;
-	    continue;
-	}
+    for (i = 1; i < argc; i++) {
 
-	if (strcmp(argv[i], "-1") == 0) {
-	    debug = 1;
-	    continue;
-	}
+        if (strcmp(argv[i], "-d") == 0 && argv[i+1] != NULL) {
+            pathname = argv[i+1];
+            i++;
+            continue;
+        }
 
-	if (strcmp(argv[i], "-2") == 0) {
-	    debug = 2;
-	    continue;
-	}
+        if (strcmp(argv[i], "-1") == 0) {
+            debug = 1;
+            continue;
+        }
 
-
-	if (strcmp(argv[i], "-PTY_FIX") == 0) {
-	    printf("PTY_FIX");
-	    exit(0);
-	}
+        if (strcmp(argv[i], "-2") == 0) {
+            debug = 2;
+            continue;
+        }
 
 
-	if ( (strcmp(argv[i], "-j") == 0) && (argv[i+1] != NULL) ) {
-	    lsbJobStarter = argv[++i];
-	    continue;
-	}
-
-	if (strcmp(argv[i], "-P") == 0) {
-	    sbdPty = TRUE;
-	    continue;
-	}
-
-	if (strcmp(argv[i], "-i") == 0) {
-	    sbdFlags |= SBD_FLAG_STDIN;
-	    continue;
-	}
-
-	if (strcmp(argv[i], "-o") == 0) {
-	    sbdFlags |= SBD_FLAG_STDOUT;
-	    continue;
-	}
-
-	if (strcmp(argv[i], "-e") == 0) {
-	    sbdFlags |= SBD_FLAG_STDERR;
-	    continue;
-	}
-
-	if (strcmp(argv[i], "-m") == 0 && argv[i+1] != NULL) {
-	    sbdClHost = argv[i+1];
-	    i++;
-	    sbdMode = TRUE;
-	    continue;
-	}
-
-	if (strcmp(argv[i], "-p") == 0 && argv[i+1] != NULL) {
-	    sbdClPort = atoi(argv[i+1]);
-	    i++;
-	    sbdMode = TRUE;
-	    continue;
-	}
+        if (strcmp(argv[i], "-PTY_FIX") == 0) {
+            printf("PTY_FIX");
+            exit(0);
+        }
 
 
-	if (argv[i][0] != '-') {
-	    sbdMode = TRUE;
-	    sbdArgv = argv + i;
-	    break;
-	}
+        if ( (strcmp(argv[i], "-j") == 0) && (argv[i+1] != NULL) ) {
+            lsbJobStarter = argv[++i];
+            continue;
+        }
+
+        if (strcmp(argv[i], "-P") == 0) {
+            sbdPty = TRUE;
+            continue;
+        }
+
+        if (strcmp(argv[i], "-i") == 0) {
+            sbdFlags |= SBD_FLAG_STDIN;
+            continue;
+        }
+
+        if (strcmp(argv[i], "-o") == 0) {
+            sbdFlags |= SBD_FLAG_STDOUT;
+            continue;
+        }
+
+        if (strcmp(argv[i], "-e") == 0) {
+            sbdFlags |= SBD_FLAG_STDERR;
+            continue;
+        }
+
+        if (strcmp(argv[i], "-m") == 0 && argv[i+1] != NULL) {
+            sbdClHost = argv[i+1];
+            i++;
+            sbdMode = TRUE;
+            continue;
+        }
+
+        if (strcmp(argv[i], "-p") == 0 && argv[i+1] != NULL) {
+            sbdClPort = atoi(argv[i+1]);
+            i++;
+            sbdMode = TRUE;
+            continue;
+        }
+
+
+        if (argv[i][0] != '-') {
+            sbdMode = TRUE;
+            sbdArgv = argv + i;
+            break;
+        }
 
         usage(argv[0]);
     }
 
     if (sbdMode) {
 
-	if (sbdClHost == NULL || sbdArgv == NULL) {
-	    usage(argv[0]);
-	    exit(-1);
-	}
-	if (sbdClPort) {
-	    sbdFlags |= SBD_FLAG_TERM;
-	} else {
+        if (sbdClHost == NULL || sbdArgv == NULL) {
+            usage(argv[0]);
+            exit(-1);
+        }
+        if (sbdClPort) {
+            sbdFlags |= SBD_FLAG_TERM;
+        } else {
 
-	    sbdFlags |= SBD_FLAG_STDIN | SBD_FLAG_STDOUT | SBD_FLAG_STDERR;
-	}
+            sbdFlags |= SBD_FLAG_STDIN | SBD_FLAG_STDOUT | SBD_FLAG_STDERR;
+        }
     } else {
 
 
-	if (debug < 2)
-	    for (i = sysconf(_SC_OPEN_MAX) ; i >= 0 ; i--)
-		close(i);
+        if (debug < 2)
+            for (i = sysconf(_SC_OPEN_MAX) ; i >= 0 ; i--)
+                close(i);
     }
 
 
     if (resParams[LSF_SERVERDIR].paramValue == NULL) {
-	ls_openlog("res", resParams[LSF_LOGDIR].paramValue, (debug > 1),
-				   resParams[LSF_LOG_MASK].paramValue);
-	ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 5001,
-	    "LSF_SERVERDIR not defined in %s/lsf.conf: %M; res exiting"), /* catgets 5001 */
-	    pathname);
-	resExit_(-1);
+        ls_openlog("res", resParams[LSF_LOGDIR].paramValue, (debug > 1),
+                   resParams[LSF_LOG_MASK].paramValue);
+        ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 5001,
+                                         "LSF_SERVERDIR not defined in %s/lsf.conf: %M; res exiting"), /* catgets 5001 */
+                  pathname);
+        resExit_(-1);
     }
 
 
     if (! debug && resParams[LSF_RES_DEBUG].paramValue != NULL) {
-	debug = atoi(resParams[LSF_RES_DEBUG].paramValue);
-	if (debug <= 0)
-	    debug = 1;
+        debug = atoi(resParams[LSF_RES_DEBUG].paramValue);
+        if (debug <= 0)
+            debug = 1;
     }
 
 
@@ -330,20 +327,20 @@ main(int argc, char **argv)
 
     if (getuid() == 0 && debug) {
         if (sbdMode)  {
-	   debug = 0;
-	} else {
-          ls_openlog("res", resParams[LSF_LOGDIR].paramValue, FALSE,
-		   resParams[LSF_LOG_MASK].paramValue);
-          ls_syslog(LOG_ERR, I18N(5005,"Root cannot run RES in debug mode ... exiting."));/*catgets 5005 */
-	   exit(-1);
-	}
+            debug = 0;
+        } else {
+            ls_openlog("res", resParams[LSF_LOGDIR].paramValue, FALSE,
+                       resParams[LSF_LOG_MASK].paramValue);
+            ls_syslog(LOG_ERR, I18N(5005,"Root cannot run RES in debug mode ... exiting."));/*catgets 5005 */
+            exit(-1);
+        }
     }
 
     if (debug > 1)
-	ls_openlog("res", resParams[LSF_LOGDIR].paramValue, TRUE, "LOG_DEBUG");
+        ls_openlog("res", resParams[LSF_LOGDIR].paramValue, TRUE, "LOG_DEBUG");
     else {
- 	ls_openlog("res", resParams[LSF_LOGDIR].paramValue, FALSE,
-		   resParams[LSF_LOG_MASK].paramValue);
+        ls_openlog("res", resParams[LSF_LOGDIR].paramValue, FALSE,
+                   resParams[LSF_LOG_MASK].paramValue);
     }
     if (logclass & (LC_TRACE | LC_HANG))
         ls_syslog(LOG_DEBUG, "%s: logclass=%x", fname, logclass);
@@ -358,9 +355,8 @@ main(int argc, char **argv)
     periodic(0);
 
 
-
     if (sbdMode) {
-	lsbJobStart(sbdArgv, sbdClPort, sbdClHost, sbdPty);
+        lsbJobStart(sbdArgv, sbdClPort, sbdClHost, sbdPty);
     }
 
     maxfd = FD_SETSIZE;
@@ -369,179 +365,177 @@ main(int argc, char **argv)
     for (;;) {
         struct timeval *timep;
         struct timeval timeout;
-loop:
+    loop:
         didSomething = 0;
 
         for (i = 0; i < child_cnt; i++) {
             if (children[i]->backClnPtr == NULL
-                 && !FD_IS_VALID(conn2NIOS.sock.fd)
-                 && children[i]->running == 0) {
+                && !FD_IS_VALID(conn2NIOS.sock.fd)
+                && children[i]->running == 0) {
                 delete_child (children[i]);
             }
         }
 
-	if (logclass & LC_TRACE) {
-	    ls_syslog(LOG_DEBUG,"\
+        if (logclass & LC_TRACE) {
+            ls_syslog(LOG_DEBUG,"\
 %s: %s Res child_res=<%d> child_go=<%d> child_cnt=<%d> client_cnt=<%d>",
-		      fname, ((child_res) ? "Application" : "Root") ,
-		      child_res, child_go, child_cnt, client_cnt);
+                      fname, ((child_res) ? "Application" : "Root") ,
+                      child_res, child_go, child_cnt, client_cnt);
             if (child_cnt == 1 && children != NULL && children[0] != NULL) {
                 dumpChild(children[0], 1, "in main()");
             }
-	}
+        }
 
         if (child_res && child_go && child_cnt == 0 && client_cnt == 0)  {
 
 
             if (debug > 1)
-		printf (" \n Child <%d> Retired! \n", (int)getpid());
+                printf (" \n Child <%d> Retired! \n", (int)getpid());
 
-	    if (logclass & LC_TRACE) {
-		ls_syslog(LOG_DEBUG,"\
+            if (logclass & LC_TRACE) {
+                ls_syslog(LOG_DEBUG,"\
 %s: Application Res is exiting.....", fname);
-	    }
-
-
-	    millisleep_(5000);
-
-
-	    if (sbdMode) {
-
-		close(1);
-		close(2);
-		exit(lastChildExitStatus);
             }
-	    resExit_(EXIT_NO_ERROR);
+
+            millisleep_(5000);
+
+            if (sbdMode) {
+
+                close(1);
+                close(2);
+                exit(lastChildExitStatus);
+            }
+            resExit_(EXIT_NO_ERROR);
         }
 
-	houseKeeping();
+        houseKeeping();
         getMaskReady(&readmask, &writemask, &exceptmask);
-	if (debug > 1) {
-	    printf("Masks Set: ");
-	    display_masks(&readmask, &writemask, &exceptmask);
-	    fflush(stdout);
+        if (debug > 1) {
+            printf("Masks Set: ");
+            display_masks(&readmask, &writemask, &exceptmask);
+            fflush(stdout);
         }
 
 
-	unblockSignals();
+        unblockSignals();
 
 
 
-	FD_ZERO(&rm);
-	FD_ZERO(&wm);
-	FD_ZERO(&em);
-	memcpy(&rm, &readmask, sizeof(fd_set));
-	memcpy(&wm, &writemask, sizeof(fd_set));
-	memcpy(&em, &exceptmask, sizeof(fd_set));
+        FD_ZERO(&rm);
+        FD_ZERO(&wm);
+        FD_ZERO(&em);
+        memcpy(&rm, &readmask, sizeof(fd_set));
+        memcpy(&wm, &writemask, sizeof(fd_set));
+        memcpy(&em, &exceptmask, sizeof(fd_set));
 
 
-	if (!child_res) {
-	    time(&thisPeriodic);
-	    timeDiff = lastPeriodic + 90 - thisPeriodic;
-	    if (timeDiff <= 0) {
-		periodic(0);
-		time(&lastPeriodic);
-		timeDiff = 90;
-	    }
-	    timep = &timeout;
-	    timep->tv_sec = timeDiff;
-	    timep->tv_usec = 0;
-	} else {
+        if (!child_res) {
+            time(&thisPeriodic);
+            timeDiff = lastPeriodic + 90 - thisPeriodic;
+            if (timeDiff <= 0) {
+                periodic(0);
+                time(&lastPeriodic);
+                timeDiff = 90;
+            }
+            timep = &timeout;
+            timep->tv_sec = timeDiff;
+            timep->tv_usec = 0;
+        } else {
 
 
-	    timep = &timeout;
+            timep = &timeout;
             timep->tv_sec = 20;
             timep->tv_usec = 0;
-	}
+        }
 
-	if (debug > 1) {
-	    printf("\n+++++++++++++++++++++++++++++++++\nselecting ...");
-	    if (!child_res) {
-		printf(" timeval.tv_sec = <%d> timeval.tv_usec = <%d>\n", (int)timep->tv_sec, (int)timep->tv_usec);
-	    } else {
-		printf("\n");
-	    }
-	    fflush(stdout);
-	}
+        if (debug > 1) {
+            printf("\n+++++++++++++++++++++++++++++++++\nselecting ...");
+            if (!child_res) {
+                printf(" timeval.tv_sec = <%d> timeval.tv_usec = <%d>\n", (int)timep->tv_sec, (int)timep->tv_usec);
+            } else {
+                printf("\n");
+            }
+            fflush(stdout);
+        }
 
-	if (res_interrupted > 0) {
-	    blockSignals();
-	    res_interrupted = 0;
-	    continue;
-	} else {
+        if (res_interrupted > 0) {
+            blockSignals();
+            res_interrupted = 0;
+            continue;
+        } else {
             nready = select(maxfd, &readmask, &writemask, &exceptmask,
-                        (struct timeval *)timep);
+                            (struct timeval *)timep);
             selectError = errno;
-	}
+        }
 
 
-	blockSignals();
+        blockSignals();
 
-	if (debug > 1)
-	    printf("selected nready=%d\n",nready);
+        if (debug > 1)
+            printf("selected nready=%d\n",nready);
         if (nready <= 0) {
             if (nready == 0 && !child_res) {
                 periodic(0);
-		time(&lastPeriodic);
+                time(&lastPeriodic);
             } else if (nready < 0) {
-		errno = selectError;
+                errno = selectError;
 
-		if (selectError == EBADF) {
-		    ls_syslog(LOG_ERR, I18N_FUNC_FAIL_MN, fname, "select");
-		    if (child_res) {
-			resExit_(-1);
-		    }
-		} else if (selectError != EINTR) {
-		    ls_syslog(LOG_ERR, I18N_FUNC_FAIL_MN, fname, "select");
-		}
-	    }
+                if (selectError == EBADF) {
+                    ls_syslog(LOG_ERR, I18N_FUNC_FAIL_MN, fname, "select");
+                    if (child_res) {
+                        resExit_(-1);
+                    }
+                } else if (selectError != EINTR) {
+                    ls_syslog(LOG_ERR, I18N_FUNC_FAIL_MN, fname, "select");
+                }
+            }
             continue;
         }
 
-	if (debug > 1) {
-	    printf("Masks Get:  ");
-	    display_masks(&readmask, &writemask, &exceptmask);
+        if (debug > 1) {
+            printf("Masks Get:  ");
+            display_masks(&readmask, &writemask, &exceptmask);
         }
 
         if (FD_IS_VALID(parent_res_port)
-           && FD_ISSET(parent_res_port, &readmask))
+            && FD_ISSET(parent_res_port, &readmask))
         {
 
             if (! allow_accept){
-		for (;;)
+                for (;;)
                     if (write(child_res_port,gobuf,strlen(gobuf)) > 0)
-			break;
+                        break;
                 for (;;)
                     if (read(child_res_port, &exbuf, 1) >= 0)
-			break;
+                        break;
             }
-	    close(parent_res_port);
+            close(parent_res_port);
             parent_res_port = INVALID_FD;
             child_go = 1;
             allow_accept = 0;
             closesocket(child_res_port);
-	    closesocket(accept_sock);
-	    accept_sock = INVALID_FD;
+            closesocket(accept_sock);
+            accept_sock = INVALID_FD;
         }
 
         if (FD_IS_VALID(conn2NIOS.sock.fd)
-               && FD_ISSET(conn2NIOS.sock.fd, &readmask)) {
+            && FD_ISSET(conn2NIOS.sock.fd, &readmask)) {
             donios_sock(children, DOREAD);
             goto loop;
         }
         if (FD_IS_VALID(conn2NIOS.sock.fd)
-               && FD_ISSET(conn2NIOS.sock.fd, &writemask)) {
+            && FD_ISSET(conn2NIOS.sock.fd, &writemask)) {
             donios_sock(children, DOWRITE);
             goto loop;
         }
 
         for (i = 0; i < child_cnt; i++) {
             if (  FD_IS_VALID(children[i]->info)
-               && FD_ISSET(children[i]->info, &readmask))
+                  && FD_ISSET(children[i]->info, &readmask))
             {
-		if (logclass & LC_TRACE) {
-		    dumpChild(children[i], DOREAD, "child info in readmask");
-		}
+                if (logclass & LC_TRACE) {
+                    dumpChild(children[i], DOREAD, "child info in readmask");
+                }
                 dochild_info(children[i], DOREAD);
                 goto loop;
             }
@@ -551,11 +545,11 @@ loop:
 
         for (i = 0; i < client_cnt; i++) {
             if (  FD_IS_VALID(clients[i]->client_sock)
-               && FD_ISSET(clients[i]->client_sock, &readmask))
+                  && FD_ISSET(clients[i]->client_sock, &readmask))
             {
-		if (logclass & LC_TRACE) {
-		    dumpClient(clients[i], "client_sock in readmask");
-		}
+                if (logclass & LC_TRACE) {
+                    dumpClient(clients[i], "client_sock in readmask");
+                }
                 doclient(clients[i]);
                 goto loop;
             }
@@ -563,51 +557,51 @@ loop:
 
         for (i = 0; i < child_cnt; i++)  {
             if (  FD_IS_VALID(children[i]->std_out.fd)
-               && FD_ISSET(children[i]->std_out.fd, &readmask))
+                  && FD_ISSET(children[i]->std_out.fd, &readmask))
             {
-		if (logclass & LC_TRACE) {
-		    dumpChild(children[i], DOREAD,
-			      "child std_out.fd in readmask");
-		}
+                if (logclass & LC_TRACE) {
+                    dumpChild(children[i], DOREAD,
+                              "child std_out.fd in readmask");
+                }
                 dochild_stdio(children[i], DOREAD);
                 didSomething = 1;
             }
-	    if (  FD_IS_VALID(children[i]->std_err.fd)
-               && FD_ISSET(children[i]->std_err.fd, &readmask))
+            if (  FD_IS_VALID(children[i]->std_err.fd)
+                  && FD_ISSET(children[i]->std_err.fd, &readmask))
             {
-		if (logclass & LC_TRACE) {
-		    dumpChild(children[i], DOSTDERR,
-			      "child std_err.fd in readmask");
-		}
+                if (logclass & LC_TRACE) {
+                    dumpChild(children[i], DOSTDERR,
+                              "child std_err.fd in readmask");
+                }
                 dochild_stdio(children[i], DOSTDERR);
                 didSomething = 1;
             }
         }
-	if (didSomething)
-	    goto loop;
+        if (didSomething)
+            goto loop;
 
         for (i = 0; i < child_cnt; i++) {
             if (  FD_IS_VALID(children[i]->stdio)
-               && FD_ISSET(children[i]->stdio, &writemask))
+                  && FD_ISSET(children[i]->stdio, &writemask))
             {
-		if (logclass & LC_TRACE) {
-		    dumpChild(children[i], DOWRITE,
-			      "child stdin in writemask");
-		}
+                if (logclass & LC_TRACE) {
+                    dumpChild(children[i], DOWRITE,
+                              "child stdin in writemask");
+                }
                 dochild_stdio(children[i], DOWRITE);
                 didSomething = 1;
             }
         }
-	if (didSomething)
-	    goto loop;
+        if (didSomething)
+            goto loop;
 
         if (FD_IS_VALID(accept_sock) &&
-	    FD_ISSET(accept_sock, &readmask)) {
+            FD_ISSET(accept_sock, &readmask)) {
             doacceptconn();
         }
 
         if (FD_IS_VALID(ctrlSock) &&
-	    FD_ISSET(ctrlSock, &readmask)) {
+            FD_ISSET(ctrlSock, &readmask)) {
             doResParentCtrl();
         }
 
@@ -619,7 +613,7 @@ loop:
 }
 
 static void
-initSignals()
+initSignals(void)
 {
     Signal_(SIGCHLD, (SIGFUNCTYPE) child_handler);
     Signal_(SIGINT,  (SIGFUNCTYPE) term_handler);
@@ -677,7 +671,7 @@ getMaskReady(fd_set *rm, fd_set *wm, fd_set *em)
     }
 
     if (allow_accept && FD_IS_VALID(ctrlSock)) {
-	FD_SET(ctrlSock, rm);
+        FD_SET(ctrlSock, rm);
     }
 
     if (child_res && !child_go && FD_IS_VALID(parent_res_port)) {
@@ -689,64 +683,64 @@ getMaskReady(fd_set *rm, fd_set *wm, fd_set *em)
         if (FD_IS_VALID(clients[i]->client_sock)) {
             FD_SET(clients[i]->client_sock, rm);
 
-	    if (debug > 2)
-		fprintf(stderr, "RM: client_sock for client <%d>: %d\n",
-		       i, clients[i]->client_sock);
+            if (debug > 2)
+                fprintf(stderr, "RM: client_sock for client <%d>: %d\n",
+                        i, clients[i]->client_sock);
         }
     }
 
     for (i = 0; i < child_cnt; i++) {
-	if (debug > 2) {
-	    printf("child %d:\n", i);
-	    printf("rpid = %d, pid = %d, stdio fd = %d, remscok fd = %d\n",
-		   children[i]->rpid, children[i]->pid, children[i]->stdio,
-		   children[i]->remsock.fd);
+        if (debug > 2) {
+            printf("child %d:\n", i);
+            printf("rpid = %d, pid = %d, stdio fd = %d, remscok fd = %d\n",
+                   children[i]->rpid, children[i]->pid, children[i]->stdio,
+                   children[i]->remsock.fd);
             printf("running = %d, endstdin = %d, endstdout = %d, endstderr = %d\n",
-                children[i]->running, children[i]->endstdin,
-		children[i]->std_out.endFlag,
-		children[i]->std_err.endFlag);
+                   children[i]->running, children[i]->endstdin,
+                   children[i]->std_out.endFlag,
+                   children[i]->std_err.endFlag);
             printf(
-		"stdin buf remains %d chars, stdout buf remains %d chars, stderr buf remains %d chars\n",
-		children[i]->i_buf.bcount,
-		children[i]->std_out.buffer.bcount,
-		children[i]->std_err.buffer.bcount);
-	    printf(
-              "remsock %d chars input pending, %d chars output to be drained\n",
-		children[i]->remsock.rcount, children[i]->remsock.wcount);
-	    fflush(stdout);
+                "stdin buf remains %d chars, stdout buf remains %d chars, stderr buf remains %d chars\n",
+                children[i]->i_buf.bcount,
+                children[i]->std_out.buffer.bcount,
+                children[i]->std_err.buffer.bcount);
+            printf(
+                "remsock %d chars input pending, %d chars output to be drained\n",
+                children[i]->remsock.rcount, children[i]->remsock.wcount);
+            fflush(stdout);
         }
 
 
 
 
         if ((children[i]->rexflag & REXF_USEPTY) &&
-		    FD_IS_VALID(children[i]->std_out.fd)) {
-	    if (children[i]->std_out.buffer.bcount == 0)
-		FD_SET(children[i]->std_out.fd, em);
+            FD_IS_VALID(children[i]->std_out.fd)) {
+            if (children[i]->std_out.buffer.bcount == 0)
+                FD_SET(children[i]->std_out.fd, em);
         }
 
 
         if (FD_IS_VALID(children[i]->stdio)) {
 
-	    if (children[i]->i_buf.bcount > 0 || children[i]->endstdin)
-	        FD_SET(children[i]->stdio, wm);
-	}
+            if (children[i]->i_buf.bcount > 0 || children[i]->endstdin)
+                FD_SET(children[i]->stdio, wm);
+        }
 
 
-	if (FD_IS_VALID(children[i]->std_out.fd)
-	    && (children[i]->std_out.buffer.bcount < LINE_BUFSIZ) ) {
-	    FD_SET(children[i]->std_out.fd, rm);
-	}
+        if (FD_IS_VALID(children[i]->std_out.fd)
+            && (children[i]->std_out.buffer.bcount < LINE_BUFSIZ) ) {
+            FD_SET(children[i]->std_out.fd, rm);
+        }
 
 
-	if (FD_IS_VALID(children[i]->std_err.fd)
-	    && (children[i]->std_err.buffer.bcount < LINE_BUFSIZ) ) {
-	    FD_SET(children[i]->std_err.fd, rm);
-	}
+        if (FD_IS_VALID(children[i]->std_err.fd)
+            && (children[i]->std_err.buffer.bcount < LINE_BUFSIZ) ) {
+            FD_SET(children[i]->std_err.fd, rm);
+        }
 
-	if (FD_IS_VALID(children[i]->info)) {
-	    FD_SET(children[i]->info, rm);
-	}
+        if (FD_IS_VALID(children[i]->info)) {
+            FD_SET(children[i]->info, rm);
+        }
 
     }
 
@@ -795,41 +789,41 @@ periodic(int signum)
         ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
 
     if (!child_res) {
-	time (&now);
+        time (&now);
 
-	if (now - lastPri > 1800) {
-	    struct hostInfo *hInfo;
-	    char *myhostname;
+        if (now - lastPri > 1800) {
+            struct hostInfo *hInfo;
+            char *myhostname;
 
-	    lastPri = now;
-	    if ((myhostname = ls_getmyhostname()) == NULL ) {
-		ls_syslog(LOG_ERR, I18N_FUNC_FAIL_MM, fname,
-		    "ls_getmyhostname");
-		rexecPriority = 0;
-	    } else {
-		hInfo = ls_gethostinfo(NULL, NULL , &myhostname, 1, 0);
-		if (!hInfo) {
-		    ls_syslog(LOG_ERR, I18N_FUNC_FAIL_MM, fname,
-			"ls_gethostinfo");
-		    rexecPriority = 0;
-		} else {
-		    rexecPriority = hInfo->rexPriority;
-		    if (myHostType == NULL)
-			myHostType = putstr_(hInfo->hostType);
-		}
-		getLSFAdmins_();
-	    }
-	}
+            lastPri = now;
+            if ((myhostname = ls_getmyhostname()) == NULL ) {
+                ls_syslog(LOG_ERR, I18N_FUNC_FAIL_MM, fname,
+                          "ls_getmyhostname");
+                rexecPriority = 0;
+            } else {
+                hInfo = ls_gethostinfo(NULL, NULL , &myhostname, 1, 0);
+                if (!hInfo) {
+                    ls_syslog(LOG_ERR, I18N_FUNC_FAIL_MM, fname,
+                              "ls_gethostinfo");
+                    rexecPriority = 0;
+                } else {
+                    rexecPriority = hInfo->rexPriority;
+                    if (myHostType == NULL)
+                        myHostType = putstr_(hInfo->hostType);
+                }
+                getLSFAdmins_();
+            }
+        }
 
-	if (!sbdMode) {
+        if (!sbdMode) {
             count++;
             if (count >=5) {
                 count = 0;
                 ls_syslog(LOG_DEBUG, "periodic: ls_servavail called");
             }
-	    if (ls_servavail(1, 1) < 0)
-		ls_syslog(LOG_ERR, I18N_FUNC_FAIL_MM, fname, "ls_servavail");
-	}
+            if (ls_servavail(1, 1) < 0)
+                ls_syslog(LOG_ERR, I18N_FUNC_FAIL_MM, fname, "ls_servavail");
+        }
     }
 
 }
@@ -845,7 +839,7 @@ houseKeeping(void)
         printf("houseKeeping\n");
 
     if (logclass & LC_TRACE) {
-	ls_syslog(LOG_DEBUG,"\
+        ls_syslog(LOG_DEBUG,"\
 %s: Nothing else to do but housekeeping", fname);
     }
 
@@ -854,7 +848,7 @@ houseKeeping(void)
 
 
         if ( (children[i]->std_out.buffer.bcount == 0)
-	     && FD_IS_VALID(children[i]->std_out.fd) ) {
+             && FD_IS_VALID(children[i]->std_out.fd) ) {
             if (children[i]->std_out.retry) {
                 if (children[i]->running == 1)
                     children[i]->std_out.retry = 0;
@@ -862,14 +856,14 @@ houseKeeping(void)
                 if (logclass & LC_TRACE)
                     ls_syslog(LOG_DEBUG,"\
 %s: Trying to flush child=<%d> stdout, std_out.retry=<%d>",
-                             fname, i, children[i]->std_out.retry);
+                              fname, i, children[i]->std_out.retry);
                 child_channel_clear(children[i], &(children[i]->std_out));
             }
         }
 
 
         if ( (children[i]->std_err.buffer.bcount == 0)
-	     && FD_IS_VALID(children[i]->std_err.fd) ) {
+             && FD_IS_VALID(children[i]->std_err.fd) ) {
             if (children[i]->std_err.retry) {
                 if (children[i]->running == 1)
                     children[i]->std_err.retry = 0;
@@ -877,7 +871,7 @@ houseKeeping(void)
                 if (logclass & LC_TRACE)
                     ls_syslog(LOG_DEBUG,"\
 %s: Trying to flush child=<%d> stderr, std_err.retry=<%d>",
-                             fname, i, children[i]->std_err.retry);
+                              fname, i, children[i]->std_err.retry);
                 child_channel_clear(children[i], &(children[i]->std_err));
             }
         }
@@ -894,12 +888,12 @@ houseKeeping(void)
 
 
     if (conn2NIOS.sock.rbuf->bcount > 0) {
-	if (conn2NIOS.rtag == 0) {
-	    int *rpids;
+        if (conn2NIOS.rtag == 0) {
+            int *rpids;
             rpids = conn2NIOS.task_duped;
             for (i=0; i<child_cnt; i++) {
                 if (FD_NOT_VALID(children[i]->stdio) || !children[i]->running
-			|| !children[i]->stdin_up)
+                    || !children[i]->stdin_up)
                     continue;
 
                 for (j=0; j<conn2NIOS.num_duped; j++)
@@ -909,16 +903,16 @@ houseKeeping(void)
                 if (j >= conn2NIOS.num_duped)
                     break;
             }
-	}
-	else {
+        }
+        else {
             for (i=0; i<child_cnt; i++) {
                 if (FD_NOT_VALID(children[i]->stdio) || !children[i]->running
-			|| !children[i]->stdin_up)
+                    || !children[i]->stdin_up)
                     continue;
                 if (children[i]->rpid == conn2NIOS.rtag)
-		    break;
+                    break;
             }
-	}
+        }
         if (i >= child_cnt) {
             conn2NIOS.sock.rbuf->bcount = 0;
             conn2NIOS.rtag = -1;
@@ -930,15 +924,15 @@ houseKeeping(void)
     if (conn2NIOS.sock.rbuf->bcount > 0) {
         for (i = 0; i < child_cnt; i++) {
             if (FD_NOT_VALID(children[i]->stdio) || !children[i]->running
-                    || !children[i]->stdin_up)
+                || !children[i]->stdin_up)
                 continue;
-	    if (children[i]->i_buf.bcount == 0)
+            if (children[i]->i_buf.bcount == 0)
                 dochild_buffer(children[i], DOREAD);
         }
     }
 
     if (FD_IS_VALID(conn2NIOS.sock.fd)
-          && conn2NIOS.sock.wbuf->bcount == 0 && conn2NIOS.sock.wcount == 0) {
+        && conn2NIOS.sock.wbuf->bcount == 0 && conn2NIOS.sock.wcount == 0) {
 
         if (previousIndex >= child_cnt)
             previousIndex = -1;
@@ -953,19 +947,19 @@ houseKeeping(void)
                 dochild_buffer(children[i], DOWRITE);
 
             } else if ((children[i]->sigchild && !children[i]->server)
-		       || children[i]->std_out.endFlag == 1) {
+                       || children[i]->std_out.endFlag == 1) {
 
                 dochild_buffer(children[i], DOWRITE);
 
-	    } else if (children[i]->std_err.buffer.bcount > 0) {
+            } else if (children[i]->std_err.buffer.bcount > 0) {
 
-		dochild_buffer(children[i], DOSTDERR);
+                dochild_buffer(children[i], DOSTDERR);
 
-	    } else if ((children[i]->sigchild && !children[i]->server)
-		       || children[i]->std_err.endFlag == 1) {
+            } else if ((children[i]->sigchild && !children[i]->server)
+                       || children[i]->std_err.endFlag == 1) {
 
-		dochild_buffer(children[i], DOSTDERR);
-	    }
+                dochild_buffer(children[i], DOSTDERR);
+            }
 
             if (conn2NIOS.sock.wbuf->bcount > 0) {
                 previousIndex = i;
@@ -973,11 +967,11 @@ houseKeeping(void)
             }
 
 
-	    if (child_cnt < ch_cnt) {
-		j--;
-		ch_cnt--;
+            if (child_cnt < ch_cnt) {
+                j--;
+                ch_cnt--;
                 previousIndex = i - 1;
-	    }
+            }
         }
     }
 
@@ -1010,7 +1004,7 @@ resExit_(int exitCode)
 {
 
     if (exitCode != 0) {
-	ls_syslog(LOG_ERR, I18N_Exiting);
+        ls_syslog(LOG_ERR, I18N_Exiting);
     }
 
     exit(exitCode);

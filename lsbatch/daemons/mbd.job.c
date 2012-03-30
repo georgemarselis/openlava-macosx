@@ -207,7 +207,7 @@ newJob (struct submitReq *subReq, struct submitMbdReply *Reply, int chan,
     else if (auth->options == AUTH_HOST_UX)
         subReq->options2 |= SUB2_HOST_UX;
 
-    newjob = initJData((struct jShared *) my_calloc(1, sizeof(struct jShared), "newJob"));
+    newjob = initJData(my_calloc(1, sizeof(struct jShared), "newJob"));
     newjob->jobId = nextId;
     returnErr = checkJobParams (newjob, subReq, Reply, auth);
 
@@ -4854,7 +4854,11 @@ initJData (struct jShared  *shared)
     job->groupCands = NULL;
     job->inEligibleGroups = NULL;
 
-    return (job);
+    /* Job callback channel
+     */
+    job->chfd = -1;
+
+    return job;
 }
 
 

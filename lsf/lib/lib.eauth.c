@@ -48,14 +48,14 @@ getAuth_(struct lsfAuth *auth, char *host)
     auth->gid = getgid();
 
     if (!genParams_[LSF_AUTH].paramValue)
-        auth->kind = CLIENT_SETUID;
+        auth->authtype = CLIENT_SETUID;
     else if (!strcmp(genParams_[LSF_AUTH].paramValue, AUTH_IDENT))
-        auth->kind = CLIENT_IDENT;
+        auth->authtype = CLIENT_IDENT;
     else if (!strcmp(genParams_[LSF_AUTH].paramValue, AUTH_PARAM_EAUTH)) {
-        auth->kind = CLIENT_EAUTH;
+        auth->authtype = CLIENT_EAUTH;
         return getEAuth(&auth->k.eauth, host);
     } else
-        auth->kind = CLIENT_SETUID;
+        auth->authtype = CLIENT_SETUID;
 
     return (0);
 }

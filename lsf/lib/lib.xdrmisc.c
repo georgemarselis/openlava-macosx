@@ -257,28 +257,29 @@ xdr_lsfAuth(XDR *xdrs, struct lsfAuth *auth, struct LSFHeader *hdr)
     if (xdrs->x_op == XDR_DECODE)
         sp[0] = '\0';
 
-    if (!(xdr_int(xdrs, &auth->uid) &&
-          xdr_int(xdrs, &auth->gid) &&
-          xdr_string(xdrs, &sp, MAXLSFNAMELEN)))
+    if (! xdr_int(xdrs, &auth->uid)
+        || ! xdr_int(xdrs, &auth->gid)
+        || ! xdr_string(xdrs, &sp, MAXLSFNAMELEN))
         return (FALSE);
 
-    if (!xdr_enum(xdrs, (int *) &auth->kind))
+    if (!xdr_enum(xdrs, (int *)&auth->authtype))
         return (FALSE);
 
-    switch (auth->kind) {
+    switch (auth->authtype) {
+
         case CLIENT_DCE:
-
             if (!xdr_int(xdrs, &auth->k.authToken.len))
                 return (FALSE);
 
             if (xdrs->x_op == XDR_DECODE) {
-                auth->k.authToken.data = (void *)malloc(auth->k.authToken.len);
+                auth->k.authToken.data = malloc(auth->k.authToken.len);
                 if (auth->k.authToken.data == NULL)
                     return (FALSE);
             }
 
             if (!xdr_bytes(xdrs,(char **)&auth->k.authToken.data,
-                           (u_int *) &auth->k.authToken.len, auth->k.authToken.len))
+                           (u_int *) &auth->k.authToken.len,
+                           auth->k.authToken.len))
                 return (FALSE);
 
             break;
@@ -295,12 +296,13 @@ xdr_lsfAuth(XDR *xdrs, struct lsfAuth *auth, struct LSFHeader *hdr)
 
         default:
 
-            if (!xdr_arrayElement(xdrs, (char *) &auth->k.filler, hdr, xdr_int))
+            if (!xdr_arrayElement(xdrs,
+                                  (char *) &auth->k.filler,
+                                  hdr,
+                                  xdr_int))
                 return (FALSE);
             break;
     }
-
-
 
     if (xdrs->x_op == XDR_ENCODE) {
         auth->options = AUTH_HOST_UX;
@@ -330,10 +332,10 @@ xdr_lsfAuthSize(struct lsfAuth *auth)
 
     sz += ALIGNWORD_(sizeof(auth->uid))
         + ALIGNWORD_(sizeof(auth->gid))
-        + ALIGNWORD_(strlen(auth->lsfUserName))
-        + ALIGNWORD_(sizeof(auth->kind));
+        + ALIGNWORD_(strlen(auth->lsfUserName) + 1)
+        + ALIGNWORD_(sizeof(auth->authtype));
 
-    switch (auth->kind) {
+    switch (auth->authtype) {
 
         case CLIENT_DCE:
             sz += ALIGNWORD_(sizeof(auth->k.authToken.len))

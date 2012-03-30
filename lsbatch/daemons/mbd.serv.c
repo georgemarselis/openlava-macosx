@@ -63,9 +63,7 @@ do_submitReq(XDR *xdrs,
     if (logclass & (LC_TRACE | LC_EXEC | LC_COMM))
         ls_syslog(LOG_DEBUG, "%s: Entering this routine...; host=%s, socket=%d", fname, hostName, chanSock_(chfd));
 
-
     initSubmit(&first, &subReq, &submitReply);
-
 
     if (!xdr_submitReq(xdrs, &subReq, reqHdr)) {
         reply = LSBE_XDR;
@@ -78,8 +76,13 @@ do_submitReq(XDR *xdrs,
         convertRLimit(subReq.rLimits, 1);
     }
 
-    reply = newJob (&subReq, &submitReply, chfd, auth, schedule, dispatch,
-                    jobData);
+    reply = newJob(&subReq,
+                   &submitReply,
+                   chfd,
+                   auth,
+                   schedule,
+                   dispatch,
+                   jobData);
 sendback:
     if (reply != 0 || submitReply.jobId <= 0 ) {
         if (logclass & (LC_TRACE | LC_EXEC )) {
@@ -114,10 +117,18 @@ sendback:
                   subReq.numAskedHosts,subReq.nxf);
     }
 
-    if (sendBack (reply, &subReq, &submitReply, chfd) < 0) {
+    if (sendBack(reply, &subReq, &submitReply, chfd) < 0) {
         return (-1);
     }
-    return (0);
+
+    /* The library is asking to keep the connection
+     * open as it wants to read and write events
+     * back and forth with the job.
+     */
+    if (subReq.options2 & SUB2_KEEP_CONNECT)
+        (*jobData)->chfd = chfd;
+
+    return 0;
 
 }
 
@@ -1982,8 +1993,10 @@ initSubmit(int *first, struct submitReq *subReq,
 }
 
 static int
-sendBack (int reply, struct submitReq *submitReq,
-          struct submitMbdReply *submitReply, int chfd)
+sendBack(int reply,
+         struct submitReq *submitReq,
+         struct submitMbdReply *submitReply,
+         int chfd)
 {
     static char             fname[] = "sendBack()";
     char                    reply_buf[MSGSIZE / 2];

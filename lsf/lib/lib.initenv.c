@@ -192,7 +192,8 @@ readconfenv_(struct config_param *pList1,
     FILE *fp;
     char filename[MAXFILENAMELEN];
     struct config_param *plp;
-    int lineNum = 0, saveErrNo;
+    int lineNum;
+    int saveErrNo;
 
     if (pList1)
         for (plp = pList1; plp->paramName != NULL; plp++) {
@@ -212,12 +213,10 @@ readconfenv_(struct config_param *pList1,
             }
         }
     if (confPath) {
-        {
-            memset(filename,0, sizeof(filename));
-            ls_strcat(filename,sizeof(filename),confPath);
-            ls_strcat(filename,sizeof(filename),"/lsf.conf");
-            fp = fopen(filename, "r");
-        }
+        memset(filename,0, sizeof(filename));
+        ls_strcat(filename,sizeof(filename),confPath);
+        ls_strcat(filename,sizeof(filename),"/lsf.conf");
+        fp = fopen(filename, "r");
     } else {
         char *ep = getenv("LSF_ENVDIR");
         char buf[MAXFILENAMELEN];
@@ -239,7 +238,7 @@ readconfenv_(struct config_param *pList1,
         return(-1);
     }
 
-    lineNum = 0;
+    saveErrNo = lineNum = 0;
     errLineNum_ = 0;
     while ((line = getNextLineC_(fp, &lineNum, TRUE)) != NULL) {
         int cc;

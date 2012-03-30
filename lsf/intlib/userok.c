@@ -297,11 +297,11 @@ userok(int s, struct sockaddr_in *from, char *hostname,
             }
         } else {
             if (!strcmp(authKind, AUTH_PARAM_EAUTH)) {
-                if (auth->kind != CLIENT_EAUTH) {
+                if (auth->authtype != CLIENT_EAUTH) {
                     ls_syslog(LOG_ERR,
                               _i18n_msg_get(ls_catd, NL_SETN, 5817,
                                             "%s: Client %s is not using <%d/eauth> authentication"), /* catgets 5817 */
-                              fname, sockAdd2Str_(from), (int) auth->kind);
+                              fname, sockAdd2Str_(from), (int) auth->authtype);
                     return (FALSE);
                 }
 
@@ -316,7 +316,7 @@ userok(int s, struct sockaddr_in *from, char *hostname,
                 ls_syslog(LOG_ERR,
                           _i18n_msg_get(ls_catd, NL_SETN, 5819,
                                         "%s: Unkown authentication type <%d> from %s/%s; denied"),  /* catgets 5819 */
-                          fname, auth->kind, auth->lsfUserName, sockAdd2Str_(from));
+                          fname, auth->authtype, auth->lsfUserName, sockAdd2Str_(from));
                 return (FALSE);
             }
 

@@ -16,25 +16,18 @@
  *
  */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#include <time.h>
 #include "../../lsf/lsf.h"
 #include "../../lsf/lib/lib.hdr.h"
 #include "../lsbatch.h"
-
 #include "../../lsf/lib/lproto.h"
 #include "../../lsf/lib/lib.table.h"
 #include "../../lsf/lib/mls.h"
 
-#define MIN_CPU_TIME 0.0001 
+#define MIN_CPU_TIME 0.0001
 
 #define SIGCHK   -1
 #define SIGDEL   -2
-#define SIGFORCE -3   
+#define SIGFORCE -3
 
 #define MAX_JOB_IDS  100
 
@@ -56,11 +49,11 @@
 
 #ifndef MIN
 #define MIN(x,y)        ((x) < (y) ? (x) : (y))
-#endif 
+#endif
 
 #ifndef MAX
 #define MAX(x,y)        ((x) > (y) ? (x) : (y))
-#endif 
+#endif
 
 #define TRUNC_STR(s,len) \
 { \
@@ -77,7 +70,7 @@ struct histReq {
     int    opCode;
     char   **names;
     time_t eventTime[2];
-    char   *eventFileName;               
+    char   *eventFileName;
     int    found;
 };
 

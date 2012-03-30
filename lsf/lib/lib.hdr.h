@@ -55,19 +55,26 @@ struct lenData {
 #define AUTH_HOST_NT  0x01
 #define AUTH_HOST_UX  0x02
 
+typedef enum {
+    CLIENT_SETUID,
+    CLIENT_IDENT,
+    CLIENT_DCE,
+    CLIENT_EAUTH
+} auth_t;
+
 struct lsfAuth {
     int uid;
     int gid;
     char lsfUserName[MAXLSFNAMELEN];
-    enum {CLIENT_SETUID, CLIENT_IDENT, CLIENT_DCE, CLIENT_EAUTH} kind;
+    auth_t authtype;
     union authBody {
-	int filler;
+        int filler;
         struct lenData authToken;
-	struct eauth {
+        struct eauth {
 #define EAUTH_SIZE 4096
-	    int len;
-	    char data[EAUTH_SIZE];
-	} eauth;
+            int len;
+            char data[EAUTH_SIZE];
+        } eauth;
     } k;
     int options;
 };
@@ -88,7 +95,7 @@ extern bool_t xdr_encodeMsg(XDR *, char *, struct LSFHeader *,
                             bool_t (*)(), int, struct lsfAuth *);
 
 extern bool_t xdr_arrayElement(XDR *, char *, struct LSFHeader *,
-				bool_t (*)(), ...);
+                                bool_t (*)(), ...);
 extern bool_t xdr_LSFlong(XDR *, long *);
 extern bool_t xdr_stringLen(XDR *, struct stringLen *, struct LSFHeader *);
 extern bool_t xdr_stat(XDR *, struct stat *, struct LSFHeader *);

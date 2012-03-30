@@ -18,6 +18,7 @@
 
 #ifndef LSBATCH_H
 #define LSBATCH_H
+
 #include <lsf.h>
 
 #define _PATH_NULL      "/dev/null"
@@ -500,6 +501,7 @@
 #define  SUB2_USE_DEF_PROCLIMIT  0x400
 #define  SUB2_MODIFY_RUN_JOB 0x800
 #define  SUB2_MODIFY_PEND_JOB 0x1000
+#define  SUB2_KEEP_CONNECT    0x2000
 
 #define  LOST_AND_FOUND  "lost_and_found"
 
@@ -553,10 +555,11 @@ struct submit {
 };
 
 struct submitReply {
-     char    *queue;
-     LS_LONG_INT  badJobId;
-     char    *badJobName;
-     int     badReqIndx;
+    char    *queue;
+    LS_LONG_INT  badJobId;
+    char    *badJobName;
+    int     badReqIndx;
+    int serverSock;
 };
 
 struct submig {
@@ -1426,85 +1429,85 @@ typedef struct nameList {
      int   *counter;
 } NAMELIST;
 
-extern NAMELIST * lsb_parseShortStr(char *, int);
-extern NAMELIST * lsb_parseLongStr(char *);
-extern char * lsb_printNameList(NAMELIST *, int );
-extern NAMELIST * lsb_compressStrList(char **, int );
-extern char * lsb_splitName(char *, unsigned int *);
+extern NAMELIST *lsb_parseShortStr(char *, int);
+extern NAMELIST *lsb_parseLongStr(char *);
+extern char *lsb_printNameList(NAMELIST *, int );
+extern NAMELIST *lsb_compressStrList(char **, int );
+extern char *lsb_splitName(char *, unsigned int *);
 
-
-#if defined(__STDC__)
-#define P_(s) s
-#else
-#define P_(s) ()
-#endif
-
-
-extern struct paramConf *lsb_readparam P_((struct lsConf *));
-extern struct userConf * lsb_readuser  P_((struct lsConf *, int,
-					  struct clusterConf *));
-extern struct userConf * lsb_readuser_ex P_((struct lsConf *, int,
-					     struct clusterConf *,
-					     struct sharedConf *));
-extern struct hostConf *lsb_readhost P_((struct lsConf *, struct lsInfo *, int,
-					 struct clusterConf *));
-extern struct queueConf *lsb_readqueue P_((struct lsConf *, struct lsInfo *,
-					   int, struct sharedConf *));
+extern struct paramConf *lsb_readparam(struct lsConf *);
+extern struct userConf * lsb_readuser(struct lsConf *, int,
+                                      struct clusterConf *);
+extern struct userConf *lsb_readuser_ex(struct lsConf *, int,
+                                        struct clusterConf *,
+                                        struct sharedConf *);
+extern struct hostConf *lsb_readhost(struct lsConf *, struct lsInfo *, int,
+                                      struct clusterConf *);
+extern struct queueConf *lsb_readqueue(struct lsConf *, struct lsInfo *,
+                                       int, struct sharedConf *);
 extern void updateClusterConf(struct clusterConf *);
 
+extern int lsb_init(char *);
+extern int lsb_openjobinfo (LS_LONG_INT, char *, char *, char *, char *,
+			       int);
+extern struct jobInfoHead *lsb_openjobinfo_a (LS_LONG_INT, char *,char *,
+                                              char *, char *, int);
+extern struct jobInfoEnt *lsb_readjobinfo(int *);
+extern LS_LONG_INT lsb_submit(struct submit  *, struct submitReply *);
 
-extern int lsb_init P_((char *appName));
-extern int lsb_openjobinfo P_((LS_LONG_INT, char *, char *, char *, char *,
-			       int));
-extern struct jobInfoHead *lsb_openjobinfo_a P_((LS_LONG_INT, char *,char *,
-						 char *, char *, int));
-extern struct jobInfoEnt *lsb_readjobinfo P_((int *));
-extern LS_LONG_INT lsb_submit P_((struct submit  *, struct submitReply *));
+/* openlava 2.0 asynchronous submit opens a connection with MBD
+ * submits a job and leaves the connection open for further
+ * interaction with the job.
+ */
+extern LS_LONG_INT lsb_submitasync(struct submit  *, struct submitReply *);
 
+extern void lsb_closejobinfo (void);
 
-extern void lsb_closejobinfo P_((void));
+extern int  lsb_hostcontrol (char *, int);
+extern struct queueInfoEnt *lsb_queueinfo(char **,
+                                          int *,
+                                          char *,
+                                          char *,
+                                          int);
+extern int  lsb_reconfig(int);
+extern int  lsb_signaljob(LS_LONG_INT, int);
+extern int  lsb_msgjob(LS_LONG_INT, char *);
+extern int  lsb_chkpntjob(LS_LONG_INT, time_t, int);
+extern int  lsb_deletejob(LS_LONG_INT, int, int);
+extern int  lsb_forcekilljob(LS_LONG_INT);
+extern int  lsb_requeuejob(struct jobrequeue *);
+extern char *lsb_sysmsg(void);
+extern void lsb_perror(char *);
+extern char *lsb_sperror(char *);
+extern char *lsb_peekjob(LS_LONG_INT);
 
-extern int  lsb_hostcontrol P_((char *, int));
-extern struct queueInfoEnt *lsb_queueinfo P_((char **queues, int *numQueues, char *host, char *userName, int options));
-extern int  lsb_reconfig P_((int));
-extern int  lsb_signaljob P_((LS_LONG_INT, int));
-extern int  lsb_msgjob P_((LS_LONG_INT, char *));
-extern int  lsb_chkpntjob P_((LS_LONG_INT, time_t, int));
-extern int  lsb_deletejob P_((LS_LONG_INT, int, int));
-extern int  lsb_forcekilljob P_((LS_LONG_INT));
-extern int  lsb_requeuejob P_((struct jobrequeue *));
-extern char *lsb_sysmsg P_((void));
-extern void lsb_perror P_((char *));
-extern char *lsb_sperror P_((char *));
-extern char *lsb_peekjob P_((LS_LONG_INT));
+extern int lsb_mig (struct submig *, int *badHostIdx);
 
-extern int lsb_mig P_((struct submig *, int *badHostIdx));
+extern struct hostInfoEnt *lsb_hostinfo ( char **, int *);
+extern struct hostInfoEnt *lsb_hostinfo_ex ( char **, int *, char *, int);
+extern int lsb_movejob (LS_LONG_INT jobId, int *, int);
+extern int lsb_switchjob (LS_LONG_INT jobId, char *queue);
+extern int lsb_queuecontrol (char *, int);
+extern struct userInfoEnt *lsb_userinfo ( char **, int *);
+extern struct groupInfoEnt *lsb_hostgrpinfo (char**, int *, int);
+extern struct groupInfoEnt *lsb_usergrpinfo (char **, int *, int);
+extern struct parameterInfo *lsb_parameterinfo (char **, int *, int);
+extern LS_LONG_INT lsb_modify (struct submit *, struct submitReply *, LS_LONG_INT);
+extern float * getCpuFactor (char *, int);
+extern char *lsb_suspreason (int, int, struct loadIndexLog *);
+extern char *lsb_pendreason (int, int *, struct jobInfoHead *,
+                            struct loadIndexLog *);
 
-extern struct hostInfoEnt *lsb_hostinfo P_(( char **, int *));
-extern struct hostInfoEnt *lsb_hostinfo_ex P_(( char **, int *, char *, int));
-extern int lsb_movejob P_((LS_LONG_INT jobId, int *, int));
-extern int lsb_switchjob P_((LS_LONG_INT jobId, char *queue));
-extern int lsb_queuecontrol P_((char *, int));
-extern struct userInfoEnt *lsb_userinfo P_(( char **, int *));
-extern struct groupInfoEnt *lsb_hostgrpinfo P_((char**, int *, int));
-extern struct groupInfoEnt *lsb_usergrpinfo P_((char **, int *, int));
-extern struct parameterInfo *lsb_parameterinfo P_((char **, int *, int));
-extern LS_LONG_INT lsb_modify P_((struct submit *, struct submitReply *, LS_LONG_INT));
-extern float * getCpuFactor P_((char *, int));
-extern char *lsb_suspreason P_((int, int, struct loadIndexLog *));
-extern char *lsb_pendreason P_((int, int *, struct jobInfoHead *,
-                            struct loadIndexLog *));
+extern int lsb_puteventrec(FILE *, struct eventRec *);
+extern struct eventRec *lsb_geteventrec(FILE *, int *);
+extern struct lsbSharedResourceInfo *lsb_sharedresourceinfo(char **, int *, char *, int);
 
-extern int lsb_puteventrec P_((FILE *, struct eventRec *));
-extern struct eventRec *lsb_geteventrec P_((FILE *, int *));
-extern struct lsbSharedResourceInfo *lsb_sharedresourceinfo P_((char **, int *, char *, int));
+extern int lsb_runjob(struct runJobRequest *);
 
-extern int lsb_runjob P_((struct runJobRequest*));
-
-extern char *lsb_jobid2str P_((LS_LONG_INT));
-extern char *lsb_jobidinstr P_((LS_LONG_INT));
-extern void jobId32To64 P_((LS_LONG_INT*, int, int));
-extern void jobId64To32 P_((LS_LONG_INT, int*, int*));
+extern char *lsb_jobid2str(LS_LONG_INT);
+extern char *lsb_jobidinstr(LS_LONG_INT);
+extern void jobId32To64(LS_LONG_INT*, int, int);
+extern void jobId64To32(LS_LONG_INT, int*, int*);
 extern int lsb_setjobattr(int, struct jobAttrInfoEnt *);
 
 extern LS_LONG_INT lsb_rexecv(int, char **, char **, int *, int);
@@ -1521,9 +1524,10 @@ int getTotalSortIntList(struct sortIntList *);
 
 int updateJobIdIndexFile (char *, char *, int);
 
+/* openlava 2.0 tweet to a job by sending it
+ * a message.
+ */
 extern int lsb_tweetwrite(struct tweetJob *);
 extern int lsb_tweetread(struct tweetJob *);
 
-#undef P_
-
-#endif
+#endif /* LSBATCH_H */

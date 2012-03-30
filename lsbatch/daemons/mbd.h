@@ -319,8 +319,6 @@ struct jData {
     int     restartPid;
     time_t  chkpntPeriod;
     u_short port;
-
-
     int     jSubPriority;
     int     jobPriority;
     char    *jobSpoolDir;
@@ -334,7 +332,7 @@ struct jData {
     int*   inEligibleGroups;
     int numSlotsReserve;
     int numAvailSlotsReserve;
-
+    int chfd;
 };
 
 

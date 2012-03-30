@@ -95,6 +95,7 @@ callLim_(enum limReqCode reqCode,
         return -1;
     }
 
+    repBuf = NULL;
     reqLen = XDR_GETPOS(&xdrs);
     xdr_destroy(&xdrs);
     if (options & _USE_TCP_) {
