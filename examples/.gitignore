@@ -1,9 +1,13 @@
-#       examples/client
-#       examples/gethostbyaddr
-#       examples/gethostbyname
-#       examples/hdr
-#       examples/msg
-#       examples/qstring
-#       examples/server
-#       lsf/man/man1/xman
+client
+gethostbyaddr
+gethostbyname
+hdr
+msg
+qstring
+client
+hdr
+msg
+qstring
+server
+sobufsiz
 

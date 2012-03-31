@@ -99,7 +99,6 @@ do_sub(int argc, char **argv, int option)
         free(req.xf);
 
     return(0);
-o
 }
 
 void

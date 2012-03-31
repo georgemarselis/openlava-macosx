@@ -51,6 +51,7 @@
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/epoll.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <rpc/types.h>

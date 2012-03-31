@@ -1,4 +1,5 @@
-/* $Id: lsbatch.h 397 2007-11-26 19:04:00Z mblack $
+/*
+ * Copyright (C) 2011 - 2012 David Bigagli
  * Copyright (C) 2007 Platform Computing Inc
  *
  * This program is free software; you can redistribute it and/or modify
@@ -889,7 +890,8 @@ struct jobrequeue {
 #define    MBD_RECONFIG      1
 #define    MBD_CKCONFIG      2
 
-/* Batch tweeter
+/* openlava 2.0
+ * Batch tweeter
  */
 struct tweetJob {
     LS_LONG_INT jobID;
@@ -1429,6 +1431,16 @@ typedef struct nameList {
      int   *counter;
 } NAMELIST;
 
+struct lsbCores {
+    int num;       /* number of cores in the array */
+    char **cores;  /* machine names */
+};
+typedef enum {
+    EVENT_CORES_ALLOCATE,
+    EVENT_CORES_REMOVED,
+    EVENT_JOB_KILLED
+} aevent_t;
+
 extern NAMELIST *lsb_parseShortStr(char *, int);
 extern NAMELIST *lsb_parseLongStr(char *);
 extern char *lsb_printNameList(NAMELIST *, int );
@@ -1448,22 +1460,16 @@ extern struct queueConf *lsb_readqueue(struct lsConf *, struct lsInfo *,
 extern void updateClusterConf(struct clusterConf *);
 
 extern int lsb_init(char *);
-extern int lsb_openjobinfo (LS_LONG_INT, char *, char *, char *, char *,
-			       int);
+extern int lsb_openjobinfo(LS_LONG_INT, char *, char *, char *, char *,
+                           int);
 extern struct jobInfoHead *lsb_openjobinfo_a (LS_LONG_INT, char *,char *,
                                               char *, char *, int);
 extern struct jobInfoEnt *lsb_readjobinfo(int *);
-extern LS_LONG_INT lsb_submit(struct submit  *, struct submitReply *);
+extern LS_LONG_INT lsb_submit(struct submit *, struct submitReply *);
 
-/* openlava 2.0 asynchronous submit opens a connection with MBD
- * submits a job and leaves the connection open for further
- * interaction with the job.
- */
-extern LS_LONG_INT lsb_submitasync(struct submit  *, struct submitReply *);
+extern void lsb_closejobinfo(void);
 
-extern void lsb_closejobinfo (void);
-
-extern int  lsb_hostcontrol (char *, int);
+extern int  lsb_hostcontrol(char *, int);
 extern struct queueInfoEnt *lsb_queueinfo(char **,
                                           int *,
                                           char *,
@@ -1529,5 +1535,25 @@ int updateJobIdIndexFile (char *, char *, int);
  */
 extern int lsb_tweetwrite(struct tweetJob *);
 extern int lsb_tweetread(struct tweetJob *);
+/* openlava 2.0 asynchronous submit opens a connection with MBD
+ * submits a job and leaves the connection open for further
+ * interaction with the job.
+ */
+extern LS_LONG_INT lsb_syncsubmit(struct submit *,
+                                  struct submitReply *,
+                                  struct lsbCores *);
 
+extern LS_LONG_INT lsb_asyncsubmit(struct submit *,
+                                   struct submitReply *,
+                                   void (*ef)(LS_LONG_INT,
+                                              aevent_t,
+                                              void *),
+                                   void (*er)(LS_LONG_INT, void *));
+extern LS_LONG_INT lsb_wait4event(LS_LONG_INT,
+                                  int,
+                                  aevent_t,
+                                  void *,
+                                  int);
+
+extern int lsb_releasecores(LS_LONG_INT, struct lsbCores *);
 #endif /* LSBATCH_H */

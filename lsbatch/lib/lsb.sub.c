@@ -1,4 +1,5 @@
-/* $Id: lsb.sub.c 397 2007-11-26 19:04:00Z mblack $
+/*
+ * Copyright (C) 2012 David Bigagli
  * Copyright (C) 2007 Platform Computing Inc
  *
  * This program is free software; you can redistribute it and/or modify
@@ -38,7 +39,7 @@
 #include <sys/wait.h>
 #include <stdio.h>
 #include <grp.h>
-
+#include <pthread.h>
 #define exit(a)         _exit(a)
 
 #include <signal.h>
@@ -179,27 +180,6 @@ extern char *extractStringValue(char *line);
 
 char *niosArgv[5];
 char niosPath[MAXFILENAMELEN];
-
-/* lsb_submitaync()
- * Call this function the same way you would
- * lsb_submit() except this function keeps
- * the connection to MBD open for further
- * operations on the submitted job.
- */
-LS_LONG_INT
-lsb_submitasync(struct submit *req, struct submitReply *reply)
-{
-    LS_LONG_INT jobID;
-
-    req->options2 |= SUB2_KEEP_CONNECT;
-
-    TIMEIT(0, (jobID = lsb_submit(req, reply)), "lsb_submit");
-    if (jobID < 0)
-        return -1;
-
-    return 0;
-
-}
 
 LS_LONG_INT
 lsb_submit(struct submit  *jobSubReq, struct submitReply *submitRep)
@@ -5379,4 +5359,98 @@ static void trimSpaces(char *str)
         *ptr = '\0';
         ptr--;
     }
+}
+
+/* openlava 2.0 core allocator API
+ */
+struct connID {
+    LS_LONG_INT jID;
+    int sock;
+    void (*ef)(LS_LONG_INT, aevent_t, void *);
+    void (*er)(LS_LONG_INT, void *);
+};
+
+/* lsb_asyncsubmit()
+ *
+ * Call this function the same way you would
+ * lsb_submit() except this function keeps
+ * the connection to MBD open for further
+ * operations on the submitted job.
+ */
+LS_LONG_INT
+lsb_syncsubmit(struct submit *req,
+               struct submitReply *reply,
+               struct lsbCores *cores)
+{
+    LS_LONG_INT jobID;
+
+    req->options2 |= SUB2_KEEP_CONNECT;
+
+    TIMEIT(0, (jobID = lsb_submit(req, reply)), "lsb_submit");
+    if (jobID < 0)
+        return -1;
+
+    return 0;
+}
+
+/* lsb_wait4event()
+ */
+LS_LONG_INT
+lsb_wait4event(LS_LONG_INT jobID,
+               int s,
+               aevent_t e,
+               void *v,
+               int timeout)
+{
+    struct epoll_event ev;
+    struct epoll_event events[1];
+    int efd;
+    int cc;
+
+    efd = epoll_create(10);
+
+    ev.events = EPOLLIN;
+    ev.data.u64 = jobID;
+
+    epoll_ctl(efd, EPOLL_CTL_ADD, s, &ev);
+
+    cc = epoll_wait(efd, events, 1, timeout);
+    if (cc <= 0) {
+        close(efd);
+        return -1;
+    }
+
+    close(efd);
+
+    return jobID;
+}
+
+/* lsb_asyncsubmit()
+ */
+LS_LONG_INT
+lsb_asyncsubmit(struct submit *req,
+                struct submitReply *reply,
+                void (*ef)(LS_LONG_INT, aevent_t, void *),
+                void (*er)(LS_LONG_INT, void *))
+{
+    LS_LONG_INT jobID;
+    struct connID *cid;
+
+    req->options2 |= SUB2_KEEP_CONNECT;
+
+    TIMEIT(0, (jobID = lsb_submit(req, reply)), "lsb_submit");
+    if (jobID < 0)
+        return -1;
+
+    cid = calloc(1, sizeof(struct connID));
+    cid->jID = jobID;
+    cid->sock = reply->serverSock;
+
+    return jobID;
+}
+
+int
+lsb_releasecores(LS_LONG_INT jobID, struct lsbCores *cores)
+{
+    return 0;
 }
