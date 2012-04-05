@@ -1431,15 +1431,24 @@ typedef struct nameList {
      int   *counter;
 } NAMELIST;
 
+typedef enum {
+    EVENT_ADD_CORES,
+    EVENT_RECALL_CORES,
+    EVENT_JOB_KILLED,
+    EVENT_CONNECTION_ERROR
+} aevent_t;
+
+struct lsbJobEvent {
+    LS_LONG_INT jobID;
+    int sock;
+    aevent_t event;
+    void *e;
+};
+
 struct lsbCores {
     int num;       /* number of cores in the array */
     char **cores;  /* machine names */
 };
-typedef enum {
-    EVENT_CORES_ALLOCATE,
-    EVENT_CORES_REMOVED,
-    EVENT_JOB_KILLED
-} aevent_t;
 
 extern NAMELIST *lsb_parseShortStr(char *, int);
 extern NAMELIST *lsb_parseLongStr(char *);
@@ -1539,21 +1548,16 @@ extern int lsb_tweetread(struct tweetJob *);
  * submits a job and leaves the connection open for further
  * interaction with the job.
  */
-extern LS_LONG_INT lsb_syncsubmit(struct submit *,
-                                  struct submitReply *,
-                                  struct lsbCores *);
-
+extern int lsb_eventwaitcreate(int);
+extern int lsb_addjob2events(LS_LONG_INT,
+                             int,
+                             void (*ef)(struct lsbJobEvent *),
+                             void (*er)(LS_LONG_INT, int));
+extern struct lsbJobEvent *lsb_wait4event(int);
 extern LS_LONG_INT lsb_asyncsubmit(struct submit *,
                                    struct submitReply *,
-                                   void (*ef)(LS_LONG_INT,
-                                              aevent_t,
-                                              void *),
-                                   void (*er)(LS_LONG_INT, void *));
-extern LS_LONG_INT lsb_wait4event(LS_LONG_INT,
-                                  int,
-                                  aevent_t,
-                                  void *,
-                                  int);
+                                   void (*ef)(struct lsbJobEvent *),
+                                   void (*er)(LS_LONG_INT, int));
 
 extern int lsb_releasecores(LS_LONG_INT, struct lsbCores *);
 #endif /* LSBATCH_H */

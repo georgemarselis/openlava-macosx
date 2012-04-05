@@ -14,7 +14,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "proto.h"
+#include <proto.h>
 
 #define MAXCONN 16
 static int    conn[MAXCONN];

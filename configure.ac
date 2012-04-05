@@ -30,7 +30,7 @@ AM_INIT_AUTOMAKE
 AM_CONDITIONAL([SCHED_EXPERIMENTAL], [false])
 
 # Clean output if possible
-m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
+#m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 
 # Check for programs
 AC_PROG_CC
@@ -124,7 +124,8 @@ AC_CONFIG_FILES([
 	config/openlava.csh      \
 	config/openlava          \
 	config/openlava.setup    \
-	config/openlava.sh]
+	config/openlava.sh       \
+	examples/Makefile]
 )
 
 AC_OUTPUT

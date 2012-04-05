@@ -820,12 +820,12 @@ endLoop:
         return 0;
     }
 
-    if ((reqHdr.opCode != PREPARE_FOR_OP
-         && reqHdr.opCode != BATCH_STATUS_JOB
-         && reqHdr.opCode != BATCH_RUSAGE_JOB
-         && reqHdr.opCode != BATCH_STATUS_MSG_ACK
-         && reqHdr.opCode != BATCH_STATUS_CHUNK)
-        || statusReqCC < 0) {
+    if ((reqHdr.opCode != PREPARE_FOR_OP &&
+         reqHdr.opCode != BATCH_STATUS_JOB &&
+         reqHdr.opCode != BATCH_RUSAGE_JOB &&
+         reqHdr.opCode != BATCH_STATUS_MSG_ACK &&
+         reqHdr.opCode != BATCH_STATUS_CHUNK) ||
+        statusReqCC < 0) {
         shutDownClient(client);
         return(-1);
     }

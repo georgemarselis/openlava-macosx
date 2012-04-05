@@ -75,6 +75,11 @@ typedef enum {
     BATCH_TWEET_READ     = 101
 } mbdReqType;
 
+typedef enum {
+    JOB_ADD_CORES,
+    JOB_RECALL_CORES
+} mbdReply_t;
+
 #define SUB_RLIMIT_UNIT_IS_KB 0x80000000
 
 struct submitReq {

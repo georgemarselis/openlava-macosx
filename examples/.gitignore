@@ -11,3 +11,5 @@ qstring
 server
 sobufsiz
 asyncflow
+absub
+readevent

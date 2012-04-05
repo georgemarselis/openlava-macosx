@@ -158,3 +158,6 @@ extern bool_t xdr_jobAttrReq(XDR *,
 extern bool_t xdr_tweetjob(XDR *,
                            struct tweetJob *,
                            struct LSFHeader *);
+extern bool_t xdr_Cores(XDR *,
+                        struct lsbCores *,
+                        struct LSFHeader *);

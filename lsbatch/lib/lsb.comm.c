@@ -231,7 +231,7 @@ call_server (char * host,
         *rep_buf = replybuf.data;
 
     if (connectedSock) {
-        *connectedSock = chanSock_(serverSock);
+        *connectedSock = serverSock;
     } else {
         chanClose_(serverSock);
     }

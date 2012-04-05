@@ -1881,3 +1881,43 @@ xdr_tweetjob(XDR *xdrs,
     return TRUE;
 
 } /* xdr_tweetjob() */
+
+bool_t
+xdr_Cores(XDR *xdrs, struct lsbCores *cores, struct LSFHeader *hdr)
+{
+    int cc;
+
+    if (! xdr_int(xdrs, &cores->num))
+        return FALSE;
+
+    /* Recall only gives us numbers no names
+     * in both decode and encode.
+     */
+    if (xdrs->x_op == XDR_DECODE
+        && hdr->opCode == JOB_RECALL_CORES) {
+        cores->cores = NULL;
+        return TRUE;
+    }
+
+    if (xdrs->x_op == XDR_ENCODE
+        && hdr->opCode == JOB_RECALL_CORES)
+        return TRUE;
+
+    if (xdrs->x_op == XDR_DECODE) {
+        cores->cores = calloc(cores->num, sizeof(char *));
+        if (cores->cores == NULL)
+            return FALSE;
+    }
+
+    /* We are encoding or decoding JOB_ADD_CORES
+     * message.
+     */
+    for (cc = 0; cc < cores->num; cc++) {
+        if (! xdr_var_string(xdrs, &cores->cores[cc])) {
+            FREEUP(cores->cores);
+            return FALSE;
+        }
+    }
+
+    return TRUE;
+}

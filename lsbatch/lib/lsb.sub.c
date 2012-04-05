@@ -737,8 +737,13 @@ send_batch (struct submitReq *submitReqPtr,
     submitReply->queue = reply->queue;
     submitReply->badJobName = reply->badJobName;
 
+    /* serverSocket is a channel, lazy somebody did not
+     * change its name when it should, the async submit
+     * library is interested in the socket not in the
+     * channel index.
+     */
     if (submitReqPtr->options2 & SUB2_KEEP_CONNECT)
-        submitReply->serverSock = *serverSock;
+        submitReply->serverSock = chanSock_(*serverSock);
 
     if (lsberrno == LSBE_NO_ERROR) {
         if (reply->jobId == 0)
@@ -5363,78 +5368,263 @@ static void trimSpaces(char *str)
 
 /* openlava 2.0 core allocator API
  */
-struct connID {
-    LS_LONG_INT jID;
+struct lsbConn2MBD {
+    LS_LONG_INT jobID;
     int sock;
-    void (*ef)(LS_LONG_INT, aevent_t, void *);
-    void (*er)(LS_LONG_INT, void *);
+    void (*ef)(struct lsbJobEvent *);
+    void (*er)(LS_LONG_INT, int);
 };
 
+struct lsbEpoll {
+    int efd;
+    struct epoll_event *events;
+    int maxevents;
+};
+
+static struct lsbEpoll *lsbepoll;
+
+/* lsb_eventwaitcreate()
+ * Create and initialize the job wait
+ * object based on epoll() all async
+ * jobs will be registered with
+ * the waiting object and woke up
+ * when resources are available.
+ */
+int
+lsb_eventwaitcreate(int size)
+{
+    /* singleton
+     */
+    if (lsbepoll)
+        return 0;
+
+    lsbepoll = calloc(1, sizeof(struct lsbEpoll));
+    if (lsbepoll == NULL) {
+        lsberrno = LSBE_NO_MEM;
+        return -1;
+    }
+
+    lsbepoll->efd = epoll_create(size);
+    if (lsbepoll < 0) {
+        lsberrno = LSBE_SYS_CALL;
+        free(lsbepoll);
+        return -1;
+    }
+
+    lsbepoll->maxevents = sysconf(_SC_OPEN_MAX);
+    lsbepoll->events = calloc(lsbepoll->maxevents,
+                              sizeof(struct epoll_event));
+    if (lsbepoll->events == NULL) {
+        lsberrno = LSBE_NO_MEM;
+        close(lsbepoll->efd);
+        free(lsbepoll);
+        return -1;
+    }
+
+    return 0;
+}
+
+/* lsb_addjob2events()
+ * Mostly internal as jobs are registered
+ * automatically when lsb_asyncsub() runs.
+ */
+int
+lsb_addjob2events(LS_LONG_INT jobID,
+                  int s,
+                  void (*ef)(struct lsbJobEvent *),
+                  void (*er)(LS_LONG_INT, int))
+{
+    struct lsbConn2MBD *con;
+    struct epoll_event *ev;
+
+    con = calloc(1, sizeof(struct lsbConn2MBD));
+    con->jobID = jobID;
+    con->sock = s;
+    con->ef = ef;
+    con->er = er;
+
+    ev = calloc(1, sizeof(struct epoll_event));
+    ev->events = EPOLLIN;
+    ev->data.ptr = con;
+
+    epoll_ctl(lsbepoll->efd, EPOLL_CTL_ADD, con->sock, ev);
+
+    return 0;
+}
+
+
+/* lsb_wait4event()
+ * Call this function in a loop till
+ * all the jobs you want to wait for
+ * are returned. This is what you would
+ * do with waitpid(), of course you can
+ * call it once in a while from a thread
+ * to see how resources are being built
+ * up or recalled by MBD.
+ */
+struct lsbJobEvent *
+lsb_wait4event(int timeout)
+{
+    struct lsbConn2MBD *conn;
+    struct lsbJobEvent *je;
+    struct LSFHeader hdr;
+    char buf[sizeof(struct LSFHeader)];
+    struct lsbCores *lsbCores;
+    XDR xdrs;
+    int cc;
+    int i;
+    int nready;
+    char *msg;
+
+    nready = epoll_wait(lsbepoll->efd,
+                        lsbepoll->events,
+                        lsbepoll->maxevents,
+                        timeout);
+    if (nready == 0)
+        return 0;
+    if (nready < 0) {
+        lsberrno = LSBE_SYS_CALL;
+        return NULL;
+    }
+
+    for (i = 0; i < cc; i++) {
+
+        /* Error on the connection with the
+         * job, so report the error to the
+         * caller.
+         */
+        conn = lsbepoll->events[i].data.ptr;
+
+        je = calloc(1, sizeof(struct lsbJobEvent));
+        je->jobID = conn->jobID;
+        je->sock = conn->sock;
+
+        if (lsbepoll->events[i].events == EPOLLERR
+            || lsbepoll->events[i].events == EPOLLHUP) {
+            /* Get the connection description
+             * together with the requested callbacks
+             * if any
+             */
+            je->event = EVENT_CONNECTION_ERROR;
+
+            return je;
+        }
+
+        lsbCores = NULL;
+        if (lsbepoll->events[i].events == EPOLLIN) {
+
+            xdrmem_create(&xdrs,
+                          buf,
+                          sizeof(struct LSFHeader),
+                          XDR_DECODE);
+            /* Read the message header from MBD
+             * and decode it.
+             */
+            if (readDecodeHdr_(je->sock,
+                               buf,
+                               b_read_fix,
+                               &xdrs,
+                               &hdr) < 0) {
+                xdr_destroy(&xdrs);
+                if (conn->er)
+                    (*conn->er)(conn->jobID, lsberrno);
+                return NULL;
+            }
+            xdr_destroy(&xdrs);
+
+            if (hdr.opCode == JOB_ADD_CORES
+                || hdr.opCode == JOB_RECALL_CORES) {
+
+                msg = calloc(hdr.length, sizeof(char));
+                if (msg == NULL) {
+                    lsberrno = LSBE_NO_MEM;
+                    if (conn->er)
+                    (*conn->er)(conn->jobID, lsberrno);
+                    return NULL;
+                }
+
+                /* Read the payload...
+                 */
+                cc = b_read_fix(je->sock, msg, hdr.length);
+                if (cc < 0) {
+                    lsberrno = LSBE_SYS_CALL;
+                    xdr_destroy(&xdrs);
+                    if (conn->er)
+                        (*conn->er)(conn->jobID, lsberrno);
+                    FREEUP(msg);
+                    return NULL;
+                }
+
+                /* Allocate memory to decode the payload
+                 */
+                xdrmem_create(&xdrs, msg, hdr.length, XDR_DECODE);
+                lsbCores = calloc(1, sizeof(struct lsbCores));
+                if (lsbCores == NULL) {
+                    lsberrno = LSBE_NO_MEM;
+                    xdr_destroy(&xdrs);
+                    if (conn->er)
+                        (*conn->er)(conn->jobID, lsberrno);
+                    return NULL;
+                }
+
+                /* Decode the data from MBD.
+                 */
+                if (! xdr_Cores(&xdrs, lsbCores, &hdr)) {
+                    lsberrno = LSBE_XDR;
+                    xdr_destroy(&xdrs);
+                    FREEUP(msg);
+                    if (conn->er)
+                        (*conn->er)(conn->jobID, lsberrno);
+                    return NULL;
+                }
+
+                /* Give the cores to the caller
+                 */
+                je->e = lsbCores;
+                if (hdr.opCode == JOB_ADD_CORES) {
+                    je->event = EVENT_ADD_CORES;
+                    if (conn->ef)
+                        (*conn->ef)(je);
+                }
+                /* The caller has to know that if it is
+                 * being recalled then it only receives
+                 * the number of cores under recall
+                 * not the actual names, this can change
+                 * later.
+                 */
+                if (hdr.opCode == JOB_RECALL_CORES) {
+                    je->event = EVENT_RECALL_CORES;
+                    if (conn->ef)
+                        (*conn->ef)(je);
+                }
+            }
+        }
+
+    } /* for (i = 0; i < cc; i++) */
+
+    return NULL;
+}
+
 /* lsb_asyncsubmit()
- *
  * Call this function the same way you would
  * lsb_submit() except this function keeps
  * the connection to MBD open for further
  * operations on the submitted job.
  */
 LS_LONG_INT
-lsb_syncsubmit(struct submit *req,
-               struct submitReply *reply,
-               struct lsbCores *cores)
-{
-    LS_LONG_INT jobID;
-
-    req->options2 |= SUB2_KEEP_CONNECT;
-
-    TIMEIT(0, (jobID = lsb_submit(req, reply)), "lsb_submit");
-    if (jobID < 0)
-        return -1;
-
-    return 0;
-}
-
-/* lsb_wait4event()
- */
-LS_LONG_INT
-lsb_wait4event(LS_LONG_INT jobID,
-               int s,
-               aevent_t e,
-               void *v,
-               int timeout)
-{
-    struct epoll_event ev;
-    struct epoll_event events[1];
-    int efd;
-    int cc;
-
-    efd = epoll_create(10);
-
-    ev.events = EPOLLIN;
-    ev.data.u64 = jobID;
-
-    epoll_ctl(efd, EPOLL_CTL_ADD, s, &ev);
-
-    cc = epoll_wait(efd, events, 1, timeout);
-    if (cc <= 0) {
-        close(efd);
-        return -1;
-    }
-
-    close(efd);
-
-    return jobID;
-}
-
-/* lsb_asyncsubmit()
- */
-LS_LONG_INT
 lsb_asyncsubmit(struct submit *req,
                 struct submitReply *reply,
-                void (*ef)(LS_LONG_INT, aevent_t, void *),
-                void (*er)(LS_LONG_INT, void *))
+                void (*ef)(struct lsbJobEvent *),
+                void (*er)(LS_LONG_INT, int))
 {
     LS_LONG_INT jobID;
-    struct connID *cid;
+    int cc;
+    /* automagically create the
+     * event wait object
+     */
+    cc = lsb_eventwaitcreate(1019);
+    if (cc < 0)
+        return -1;
 
     req->options2 |= SUB2_KEEP_CONNECT;
 
@@ -5442,9 +5632,9 @@ lsb_asyncsubmit(struct submit *req,
     if (jobID < 0)
         return -1;
 
-    cid = calloc(1, sizeof(struct connID));
-    cid->jID = jobID;
-    cid->sock = reply->serverSock;
+    /* add the job to the waiting object.
+     */
+    lsb_addjob2events(jobID, reply->serverSock, ef, er);
 
     return jobID;
 }
