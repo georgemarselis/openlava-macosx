@@ -17,11 +17,6 @@
  *
  */
 
-/* New experimental scheduling module. It is stripped of all
- * undocumented scheduling code and includes new ideas that should
- * lead to fixed time scheduling algorithm.
- */
-
 #include "mbd.h"
 
 #define NL_SETN         10
@@ -425,7 +420,7 @@ struct jRef {
 static struct _list *jRefList;
 
 static int
-readyToDisp(struct jData *jpbw, int *numAvailSlots)
+readyToDisp (struct jData *jpbw, int *numAvailSlots)
 {
     static char fname[] = "readyToDisp";
     int jReason = 0;
@@ -497,6 +492,7 @@ readyToDisp(struct jData *jpbw, int *numAvailSlots)
         }
         jReason = PEND_QUE_WINDOW_WILL_CLOSE;
     }
+
 
     else if (now_disp < jpbw->shared->jobBill.beginTime) {
         jReason = PEND_JOB_START_TIME;
@@ -633,7 +629,7 @@ getMinGSlots(struct uData *uPtr, struct qData *qPtr, int *numGAvailSlots)
 
 
 static int
-cntUQSlots(struct jData *jpbw, int *numAvailSlots)
+cntUQSlots (struct jData *jpbw, int *numAvailSlots)
 {
     static char          fname[] = "cntUQSlots";
     struct uData         *up = jpbw->uPtr;
@@ -815,7 +811,7 @@ cntUQSlots(struct jData *jpbw, int *numAvailSlots)
 }
 
 static enum candRetCode
-getCandHosts(struct jData *jpbw)
+getCandHosts (struct jData *jpbw)
 {
     static char      fname[] = "getCandHosts";
     int              numJUsable;
@@ -996,11 +992,11 @@ getLsbUsable(void)
     INC_CNT(PROF_CNT_getLsbUsable);
 
     nLsbUsable = numReasons = ldReason = 0;
-    i = 0;
     for (hPtr = (struct hData *)hostList->back;
          hPtr != (void *)hostList;
          hPtr = hPtr->back) {
 
+        i = hPtr->hostId;
         hReason = 0;
         if (hPtr->hStatus & HOST_STAT_REMOTE)
             continue;
@@ -1096,12 +1092,11 @@ getQUsable(struct qData *qp)
         return 0;
     }
 
-    i = 0;
     for (hPtr = (struct hData *)hostList->back;
          hPtr != (void *)hostList;
          hPtr = hPtr->back) {
 
-        ++i;
+        i = hPtr->hostId;
         if (hReasonTb[1][i])
             continue;
 
@@ -1267,13 +1262,11 @@ getJUsable(struct jData *jp, int *numJUsable, int *nProc)
     numHosts = 0;
     numReasons = 0;
 
-    i = 0;
     for (hPtr = (struct hData *)hostList->back;
          hPtr != (void *)hostList;
          hPtr = hPtr->back) {
 
-        ++i;
-
+        i = hPtr->hostId;
         INC_CNT(PROF_CNT_firstLoopgetJUsable);
 
         if (HOST_UNUSABLE_TO_JOB_DUE_TO_H_REASON(hReasonTb[1][i], jp))

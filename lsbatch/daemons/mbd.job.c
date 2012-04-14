@@ -393,7 +393,6 @@ handleNewJob(struct jData *jpbw, int job, int eventTime)
     jpbw->uPtr = getUserData(jpbw->userName);
 
     putOntoTree(jpbw, job);
-    jpbw->jFlags |= JFLAG_READY2;
 
     if (mSchedStage != M_STAGE_REPLAY) {
         updQaccount(jpbw, jpbw->shared->jobBill.maxNumProcessors,
