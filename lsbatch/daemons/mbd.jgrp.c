@@ -1,4 +1,5 @@
-/* $Id: mbd.jgrp.c 397 2007-11-26 19:04:00Z mblack $
+/*
+ * Copyright (C) 2011-2012 David Bigagli
  * Copyright (C) 2007 Platform Computing Inc
  *
  * This program is free software; you can redistribute it and/or modify
@@ -82,12 +83,10 @@ treeInit()
     JGRP_DATA(groupRoot)->numRef = 0;
     sprintf(treeFile, "/tmp/jgrpTree.%d", mbdPid);
 
-
-
     treeObserverList = listCreate("tree observer");
     if (treeObserverList == NULL) {
-        ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 6400,
-                                         "%s: failed to create tree observer list: %s"), /* catgets 6400 */
+        ls_syslog(LOG_ERR, "\
+%s: failed to create tree observer list: %s",
                   fname, listStrError(listerrno));
         mbdDie(MASTER_MEM);
     }
@@ -618,7 +617,7 @@ jgrpNodeParentPath(struct jgTreeNode * jgrpNode)
         jgrpPtr = jgrpPtr->parent;
     }
 
-    return(fullPath);
+    return fullPath;
 }
 
 int
@@ -653,7 +652,8 @@ jgrpNodeParentPath_r(struct jgTreeNode * jgrpNode, char *fullPath)
         }
         jgrpPtr = jgrpPtr->parent;
     }
-    return(0);
+
+    return 0;
 }
 
 
@@ -788,13 +788,17 @@ putOntoTree(struct jData *jp, int jobType)
 
     jp->runCount = 1;
 
-
-
     if (jp->newReason == 0)
         jp->newReason = PEND_JOB_NEW;
     if (jp->shared->dptRoot == NULL) {
+        /* If the job depends on some other
+         * job we cannot declare it ready here
+         * as it has to go thru the checkJgrpDep()
+         * function to determine its readiness.
+         */
         jp->jFlags |= JFLAG_READY2;
     }
+
     if (logclass & LC_JGRP)
         printTreeStruct(treeFile);
 }
@@ -989,9 +993,8 @@ getIndexOfJStatus(int status)
             return(JGRP_COUNT_NDONE);
         default:
 
-            ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 6403,
-                                             "%s: job status <%d> out of bound"), /* catgets 6403 */
-                      fname, MASK_STATUS(status));
+            ls_syslog(LOG_ERR, "\
+%s: job status %d out of bound", __func__, MASK_STATUS(status));
             return(8);
     }
 }
@@ -1158,7 +1161,6 @@ selectJgrps (struct jobInfoReq *jobInfoReq, void **jgList, int *listSize)
         goto ret;
     }
 
-
     parent = groupRoot;
     if ((strlen(jobInfoReq->jobName) == 1) && (jobInfoReq->jobName[0] == '/'))
         strcpy(jobName, "*");
@@ -1315,8 +1317,8 @@ isSelected(struct jobInfoReq *jobInfoReq, struct jData *jpbw,
 
         if (jpbw->hPtr == NULL) {
             if (!(jpbw->jStatus & JOB_STAT_EXIT))
-                ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 6404,
-                                                 "%s: Execution host for job <%s> is null"), /* catgets 6404 */
+                ls_syslog(LOG_ERR, "\
+%s: Execution host for job %s is null",
                           fname, lsb_jobid2str(jpbw->jobId));
             return(FALSE);
         }
