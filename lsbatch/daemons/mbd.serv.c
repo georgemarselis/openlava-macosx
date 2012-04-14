@@ -2077,18 +2077,6 @@ doNewJobReply(struct sbdNode *sbdPtr, int exception)
         goto Leave;
     }
 
-#ifdef INTER_DAEMON_AUTH
-    if (authSbdRequest(sbdPtr, &xdrs, &replyHdr, NULL) != LSBE_NO_ERROR) {
-        ls_syslog(LOG_ERR, I18N_JOB_FAIL_S, fname,
-                  lsb_jobid2str(jData->jobId), "authSbdRequest");
-        if (IS_START(jData->jStatus)) {
-            jData->newReason = PEND_JOB_START_FAIL;
-            jStatusChange(jData, JOB_STAT_PEND, LOG_IT, fname);
-        }
-        goto Leave;
-    }
-#endif
-
     if (replyHdr.opCode != ERR_NO_ERROR) {
         if (IS_START(jData->jStatus)) {
 

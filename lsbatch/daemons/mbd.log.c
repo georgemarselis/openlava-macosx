@@ -1584,6 +1584,8 @@ log_startjob(struct jData * job, int preExecStart)
 
 }
 
+/* log_executejob()
+ */
 void
 log_executejob(struct jData * job)
 {
@@ -1616,7 +1618,12 @@ log_executejob(struct jData * job)
                   "putEventRec");
         mbdDie(MASTER_FATAL);
     }
-
+    /* If async job reply to the client
+     * the allocated core names.
+     */
+    if (job->chfd != -1) {
+        sendCores2Job(job);
+    }
 }
 
 void

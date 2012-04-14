@@ -1,4 +1,5 @@
-/* $Id: mbd.proxy.c 397 2007-11-26 19:04:00Z mblack $
+/*
+ * Copyright (C) 2012 David Bigagli
  * Copyright (C) 2007 Platform Computing Inc
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,7 +19,7 @@
 
 #include "mbd.h"
 
-#define NL_SETN		10
+#define NL_SETN         10
 
 LIST_T *     pxyRsvJL = NULL;
 
@@ -32,39 +33,39 @@ proxyUSJLEnter(LIST_T *list, void *extra, LIST_EVENT_T *event)
     struct uData            *uPtr;
 
     if (logclass & LC_TRACE)
-	ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
+        ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
 
 
     theJob = (struct jData *) event->entry;
     if (theJob == NULL) {
-	ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7400,
-	    "%s: expected a non-NULL job pointer but got a NULL one"), /* catgets 7400 */
-	    fname);
-	return (-1);
+        ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7400,
+                                         "%s: expected a non-NULL job pointer but got a NULL one"), /* catgets 7400 */
+                  fname);
+        return (-1);
     }
 
     uPtr = theJob->uPtr;
     if (uPtr->pxySJL == NULL) {
-	char strBuf[512];
-	sprintf(strBuf, "User %s's Started Job Proxy List", uPtr->user);
-	uPtr->pxySJL = listCreate(strBuf);
+        char strBuf[512];
+        sprintf(strBuf, "User %s's Started Job Proxy List", uPtr->user);
+        uPtr->pxySJL = listCreate(strBuf);
     }
 
 
     pxyPred = (PROXY_LIST_ENTRY_T *)listSearchEntry(uPtr->pxySJL,
-						    (void *)theJob,
-						    (LIST_ENTRY_EQUALITY_OP_T)
-						    startJobPrioEqual,
-						    0);
+                                                    (void *)theJob,
+                                                    (LIST_ENTRY_EQUALITY_OP_T)
+                                                    startJobPrioEqual,
+                                                    0);
 
     newPxy = proxyListEntryCreate((void *)theJob);
 
     if (pxyPred == NULL)
-	listInsertEntryAtBack(uPtr->pxySJL, (LIST_ENTRY_T *) newPxy);
+        listInsertEntryAtBack(uPtr->pxySJL, (LIST_ENTRY_T *) newPxy);
     else
-	listInsertEntryAfter(uPtr->pxySJL,
-			     (LIST_ENTRY_T *)pxyPred,
-			     (LIST_ENTRY_T *)newPxy);
+        listInsertEntryAfter(uPtr->pxySJL,
+                             (LIST_ENTRY_T *)pxyPred,
+                             (LIST_ENTRY_T *)newPxy);
     return(0);
 
 }
@@ -78,29 +79,29 @@ proxyUSJLLeave(LIST_T *list, void *extra, LIST_EVENT_T *event)
     struct uData            *uPtr;
 
     if (logclass & LC_TRACE)
-	ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
+        ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
 
 
     theJob = (struct jData *) event->entry;
     if (theJob == NULL) {
-	ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7400,
-	    "%s: expected a non-NULL job pointer but got a NULL one"),
-	    fname);
-	return (-1);
+        ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7400,
+                                         "%s: expected a non-NULL job pointer but got a NULL one"),
+                  fname);
+        return (-1);
     }
 
     uPtr = theJob->uPtr;
 
     pxy = (PROXY_LIST_ENTRY_T *) listSearchEntry(uPtr->pxySJL,
-						 (void *)theJob,
-						 (LIST_ENTRY_EQUALITY_OP_T)
-						 proxyListEntryEqual,
-						 0);
+                                                 (void *)theJob,
+                                                 (LIST_ENTRY_EQUALITY_OP_T)
+                                                 proxyListEntryEqual,
+                                                 0);
     if (pxy == NULL) {
-	ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7402,
-	    "%s: cannot find the proxy for the job <%s>"), /* catgets 7402 */
-	    fname, lsb_jobid2str(theJob->jobId));
-	return (-1);
+        ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7402,
+                                         "%s: cannot find the proxy for the job <%s>"), /* catgets 7402 */
+                  fname, lsb_jobid2str(theJob->jobId));
+        return (-1);
     }
 
     listRemoveEntry(uPtr->pxySJL, (LIST_ENTRY_T *) pxy);
@@ -118,28 +119,28 @@ proxyUSJLAttachObsvr()
     int                  rc;
 
     if (logclass & LC_TRACE)
-	ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
+        ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
 
     observer = listObserverCreate("User's Started Job Proxy List Observer",
-				  NULL,
-				  (LIST_ENTRY_SELECT_OP_T) NULL,
-				  LIST_EVENT_ENTER, proxyUSJLEnter,
-				  LIST_EVENT_LEAVE, proxyUSJLLeave,
-				  LIST_EVENT_NULL);
+                                  NULL,
+                                  (LIST_ENTRY_SELECT_OP_T) NULL,
+                                  LIST_EVENT_ENTER, proxyUSJLEnter,
+                                  LIST_EVENT_LEAVE, proxyUSJLLeave,
+                                  LIST_EVENT_NULL);
 
     if (observer == NULL) {
-	ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7403,
-	    "%s: failed to create an observer for user's started job proxy list: %s"), /* catgets 7403 */
-	    fname, listStrError(listerrno));
-	mbdDie(MASTER_MEM);
+        ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7403,
+                                         "%s: failed to create an observer for user's started job proxy list: %s"), /* catgets 7403 */
+                  fname, listStrError(listerrno));
+        mbdDie(MASTER_MEM);
     }
 
     rc = listObserverAttach(observer, (LIST_T *)jDataList[SJL]);
     if (rc < 0) {
-	ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7404,
-	    "%s: failed to attach observer to the started job list"), /* catgets 7404 */
-	    fname);
-	mbdDie(MASTER_MEM);
+        ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7404,
+                                         "%s: failed to attach observer to the started job list"), /* catgets 7404 */
+                  fname);
+        mbdDie(MASTER_MEM);
     }
 
 }
@@ -152,7 +153,7 @@ proxyUSJLAddEntry(struct jData *job)
     int               rc;
 
     if (logclass & LC_TRACE)
-	ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
+        ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
 
     memset((void *)&event, 0, sizeof(LIST_EVENT_T));
     event.type = LIST_EVENT_ENTER;
@@ -160,7 +161,7 @@ proxyUSJLAddEntry(struct jData *job)
 
     rc = proxyUSJLEnter((LIST_T *)jDataList[SJL], NULL, &event);
     if (rc < 0)
-	ls_syslog(LOG_ERR, I18N_FUNC_FAIL, fname, "proxyHSJLEnter");
+        ls_syslog(LOG_ERR, I18N_FUNC_FAIL, fname, "proxyHSJLEnter");
 
 }
 
@@ -175,38 +176,38 @@ proxyHSJLEnter(LIST_T *list, void *extra, LIST_EVENT_T *event)
     struct jData            *theJob;
 
     if (logclass & LC_TRACE)
-	ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
+        ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
 
 
     theJob = (struct jData *) event->entry;
     if (theJob == NULL) {
-	ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7400,
-	    "%s: expected a non-NULL job pointer but got a NULL one"),
-	    fname);
-	return (-1);
+        ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7400,
+                                         "%s: expected a non-NULL job pointer but got a NULL one"),
+                  fname);
+        return (-1);
     }
 
     FOR_EACH_JOB_LOCAL_EXECHOST(hPtr, theJob) {
-	if (hPtr->pxySJL == NULL) {
-	    char strBuf[512];
-	    sprintf(strBuf, "Host %s's Started Job Proxy List", hPtr->host);
-	    hPtr->pxySJL = listCreate(strBuf);
-	}
+        if (hPtr->pxySJL == NULL) {
+            char strBuf[512];
+            sprintf(strBuf, "Host %s's Started Job Proxy List", hPtr->host);
+            hPtr->pxySJL = listCreate(strBuf);
+        }
 
-	pxyPred = (PROXY_LIST_ENTRY_T *)listSearchEntry(hPtr->pxySJL,
-						   (void *)theJob,
-						   (LIST_ENTRY_EQUALITY_OP_T)
-						   startJobPrioEqual,
-						   0);
+        pxyPred = (PROXY_LIST_ENTRY_T *)listSearchEntry(hPtr->pxySJL,
+                                                        (void *)theJob,
+                                                        (LIST_ENTRY_EQUALITY_OP_T)
+                                                        startJobPrioEqual,
+                                                        0);
 
-	newPxy = proxyListEntryCreate((void *)theJob);
+        newPxy = proxyListEntryCreate((void *)theJob);
 
-	if (pxyPred == NULL)
-	    listInsertEntryAtBack(hPtr->pxySJL, (LIST_ENTRY_T *) newPxy);
-	else
-	    listInsertEntryAfter(hPtr->pxySJL,
-				 (LIST_ENTRY_T *)pxyPred,
-				 (LIST_ENTRY_T *)newPxy);
+        if (pxyPred == NULL)
+            listInsertEntryAtBack(hPtr->pxySJL, (LIST_ENTRY_T *) newPxy);
+        else
+            listInsertEntryAfter(hPtr->pxySJL,
+                                 (LIST_ENTRY_T *)pxyPred,
+                                 (LIST_ENTRY_T *)newPxy);
 
     } END_FOR_EACH_JOB_LOCAL_EXECHOST;
 
@@ -222,32 +223,32 @@ proxyHSJLLeave(LIST_T *list, void *extra, LIST_EVENT_T *event)
     struct jData            *theJob;
 
     if (logclass & LC_TRACE)
-	ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
+        ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
 
 
     theJob = (struct jData *) event->entry;
     if (theJob == NULL) {
-	ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7400,
-	    "%s: expected a non-NULL job pointer but got a NULL one"),
-	    fname);
-	return (-1);
+        ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7400,
+                                         "%s: expected a non-NULL job pointer but got a NULL one"),
+                  fname);
+        return (-1);
     }
 
     FOR_EACH_JOB_LOCAL_EXECHOST(hPtr, theJob) {
-	pxy = (PROXY_LIST_ENTRY_T *) listSearchEntry(hPtr->pxySJL,
-						     (void *)theJob,
-						     (LIST_ENTRY_EQUALITY_OP_T)
-						     proxyListEntryEqual,
-						     0);
-	if (pxy == NULL) {
-	    ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7408,
-		"%s: cannot find the proxy for the job <%s>"),/* catgets 7408 */
-		fname, lsb_jobid2str(theJob->jobId));
-	    return (-1);
-	}
+        pxy = (PROXY_LIST_ENTRY_T *) listSearchEntry(hPtr->pxySJL,
+                                                     (void *)theJob,
+                                                     (LIST_ENTRY_EQUALITY_OP_T)
+                                                     proxyListEntryEqual,
+                                                     0);
+        if (pxy == NULL) {
+            ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7408,
+                                             "%s: cannot find the proxy for the job <%s>"),/* catgets 7408 */
+                      fname, lsb_jobid2str(theJob->jobId));
+            return (-1);
+        }
 
-	listRemoveEntry(hPtr->pxySJL, (LIST_ENTRY_T *)pxy);
-	proxyListEntryDestroy(pxy);
+        listRemoveEntry(hPtr->pxySJL, (LIST_ENTRY_T *)pxy);
+        proxyListEntryDestroy(pxy);
 
     } END_FOR_EACH_JOB_LOCAL_EXECHOST;
 
@@ -263,28 +264,28 @@ proxyHSJLAttachObsvr()
     int                  rc;
 
     if (logclass & LC_TRACE)
-	ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
+        ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
 
     observer = listObserverCreate("Host's Started Job Proxy List Observer",
-				  NULL,
-				  (LIST_ENTRY_SELECT_OP_T) NULL,
-				  LIST_EVENT_ENTER, proxyHSJLEnter,
-				  LIST_EVENT_LEAVE, proxyHSJLLeave,
-				  LIST_EVENT_NULL);
+                                  NULL,
+                                  (LIST_ENTRY_SELECT_OP_T) NULL,
+                                  LIST_EVENT_ENTER, proxyHSJLEnter,
+                                  LIST_EVENT_LEAVE, proxyHSJLLeave,
+                                  LIST_EVENT_NULL);
 
     if (observer == NULL) {
-	ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7409,
-	    "%s: failed to create an observer for user's started job proxy list: %s"), /* catgets 7409 */
-	    fname, listStrError(listerrno));
-	mbdDie(MASTER_MEM);
+        ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7409,
+                                         "%s: failed to create an observer for user's started job proxy list: %s"), /* catgets 7409 */
+                  fname, listStrError(listerrno));
+        mbdDie(MASTER_MEM);
     }
 
     rc = listObserverAttach(observer, (LIST_T *)jDataList[SJL]);
     if (rc < 0) {
-	ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7410,
-	    "%s: failed to attach observer to the started job list"), /* catgets 7410 */
-	    fname);
-	mbdDie(MASTER_FATAL);
+        ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7410,
+                                         "%s: failed to attach observer to the started job list"), /* catgets 7410 */
+                  fname);
+        mbdDie(MASTER_FATAL);
     }
 
 }
@@ -297,7 +298,7 @@ proxyHSJLAddEntry(struct jData *job)
     int               rc;
 
     if (logclass & LC_TRACE)
-	ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
+        ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
 
     memset((void *)&event, 0, sizeof(LIST_EVENT_T));
     event.type = LIST_EVENT_ENTER;
@@ -305,7 +306,7 @@ proxyHSJLAddEntry(struct jData *job)
 
     rc = proxyHSJLEnter((LIST_T *)jDataList[SJL], NULL, &event);
     if (rc < 0)
-	ls_syslog(LOG_ERR, I18N_FUNC_FAIL, fname, "proxyHSJLEnter");
+        ls_syslog(LOG_ERR, I18N_FUNC_FAIL, fname, "proxyHSJLEnter");
 
 }
 
@@ -317,36 +318,36 @@ proxyHRsvJLAddEntry(struct jData *job)
     PROXY_LIST_ENTRY_T     *pxy;
 
     if (logclass & LC_TRACE)
-	ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
+        ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
 
     if (JOB_RSVSLOT_NONPRMPT(job))
-	return;
+        return;
 
     FOR_EACH_JOB_LOCAL_EXECHOST(hPtr, job) {
-	if (hPtr->pxyRsvJL == NULL) {
-	    char strBuf[216];
+        if (hPtr->pxyRsvJL == NULL) {
+            char strBuf[216];
 
-	    sprintf(strBuf, "Host %s's Reserved Job Proxy List", hPtr->host);
-	    hPtr->pxyRsvJL = listCreate(strBuf);
-	    if (hPtr->pxyRsvJL == NULL) {
-		ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7412,
-		    "%s: failed to create host %s's proxy list: %s"),  /* catgets 7412 */
-		    fname, hPtr->host, listStrError(listerrno));
-		mbdDie(MASTER_MEM);
-	    }
-	}
+            sprintf(strBuf, "Host %s's Reserved Job Proxy List", hPtr->host);
+            hPtr->pxyRsvJL = listCreate(strBuf);
+            if (hPtr->pxyRsvJL == NULL) {
+                ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7412,
+                                                 "%s: failed to create host %s's proxy list: %s"),  /* catgets 7412 */
+                          fname, hPtr->host, listStrError(listerrno));
+                mbdDie(MASTER_MEM);
+            }
+        }
 
 
-	pxy = (PROXY_LIST_ENTRY_T *)listSearchEntry(hPtr->pxyRsvJL,
-						    (LIST_ENTRY_T *)job,
-						    (LIST_ENTRY_EQUALITY_OP_T)
-						    proxyListEntryEqual,
-						    0);
-	if (pxy != NULL)
-	    continue;
+        pxy = (PROXY_LIST_ENTRY_T *)listSearchEntry(hPtr->pxyRsvJL,
+                                                    (LIST_ENTRY_T *)job,
+                                                    (LIST_ENTRY_EQUALITY_OP_T)
+                                                    proxyListEntryEqual,
+                                                    0);
+        if (pxy != NULL)
+            continue;
 
-	pxy = proxyListEntryCreate((void *)job);
-	listInsertEntryAtBack(hPtr->pxyRsvJL, (LIST_ENTRY_T *)pxy);
+        pxy = proxyListEntryCreate((void *)job);
+        listInsertEntryAtBack(hPtr->pxyRsvJL, (LIST_ENTRY_T *)pxy);
 
     } END_FOR_EACH_JOB_LOCAL_EXECHOST;
 
@@ -359,32 +360,32 @@ proxyHRsvJLRemoveEntry(struct jData *job)
     PROXY_LIST_ENTRY_T      *pxy;
 
     if (logclass & LC_TRACE)
-	ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
+        ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
 
     if (JOB_RSVSLOT_NONPRMPT(job))
-	return;
+        return;
 
     FOR_EACH_JOB_LOCAL_EXECHOST(hPtr, job) {
 
-	if (hPtr->pxyRsvJL == NULL)
-	    continue;
+        if (hPtr->pxyRsvJL == NULL)
+            continue;
 
-	pxy = (PROXY_LIST_ENTRY_T *)listSearchEntry(hPtr->pxyRsvJL,
-						    (LIST_ENTRY_T *)job,
-						    (LIST_ENTRY_EQUALITY_OP_T)
-						    proxyListEntryEqual,
-						    0);
+        pxy = (PROXY_LIST_ENTRY_T *)listSearchEntry(hPtr->pxyRsvJL,
+                                                    (LIST_ENTRY_T *)job,
+                                                    (LIST_ENTRY_EQUALITY_OP_T)
+                                                    proxyListEntryEqual,
+                                                    0);
 
-	if (pxy == NULL) {
+        if (pxy == NULL) {
             ls_syslog(LOG_DEBUG3, "\
 %s: cannot find the proxy for the job <%s>",
-		      fname, lsb_jobid2str(job->jobId));
+                      fname, lsb_jobid2str(job->jobId));
 
-	    continue;
-	}
+            continue;
+        }
 
-	listRemoveEntry(hPtr->pxyRsvJL, (LIST_ENTRY_T *)pxy);
-	proxyListEntryDestroy(pxy);
+        listRemoveEntry(hPtr->pxyRsvJL, (LIST_ENTRY_T *)pxy);
+        proxyListEntryDestroy(pxy);
 
     } END_FOR_EACH_JOB_LOCAL_EXECHOST;
 
@@ -399,43 +400,43 @@ proxyRsvJLAddEntry(struct jData *job)
     PROXY_LIST_ENTRY_T     *newPxy;
 
     if (logclass & LC_TRACE)
-	ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
+        ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
 
 
     if (pxyRsvJL == NULL) {
-	pxyRsvJL = listCreate("Proxy List for Slot-reserving Jobs");
-	if (pxyRsvJL == NULL) {
-	    ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7413,
-		"%s: failed to create the system wide proxy list for slot-reserving jobs: %s"),  /* catgets 7413 */
-		fname, listStrError(listerrno));
-	    mbdDie(MASTER_MEM);
-	}
+        pxyRsvJL = listCreate("Proxy List for Slot-reserving Jobs");
+        if (pxyRsvJL == NULL) {
+            ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7413,
+                                             "%s: failed to create the system wide proxy list for slot-reserving jobs: %s"),  /* catgets 7413 */
+                      fname, listStrError(listerrno));
+            mbdDie(MASTER_MEM);
+        }
     }
 
 
     pxyPred = (PROXY_LIST_ENTRY_T *)listSearchEntry(pxyRsvJL,
-						    (void *)job,
-						    (LIST_ENTRY_EQUALITY_OP_T)
-						    pendJobPrioEqual,
-						    0);
+                                                    (void *)job,
+                                                    (LIST_ENTRY_EQUALITY_OP_T)
+                                                    pendJobPrioEqual,
+                                                    0);
 
     newPxy = proxyListEntryCreate((void *)job);
     if (pxyPred == NULL)
-	listInsertEntryAtBack(pxyRsvJL, (LIST_ENTRY_T *) newPxy);
+        listInsertEntryAtBack(pxyRsvJL, (LIST_ENTRY_T *) newPxy);
     else
-	listInsertEntryAfter(pxyRsvJL,
-			     (LIST_ENTRY_T *)pxyPred,
-			     (LIST_ENTRY_T *)newPxy);
+        listInsertEntryAfter(pxyRsvJL,
+                             (LIST_ENTRY_T *)pxyPred,
+                             (LIST_ENTRY_T *)newPxy);
 
     if (logclass & (LC_TRACE)) {
-	char strBuf[1024];
+        char strBuf[1024];
 
-	listCat(pxyRsvJL, LIST_TRAVERSE_FORWARD, strBuf, 1024,
-		(LIST_ENTRY_CAT_FUNC_T)jobProxySprintf,
-		(void *) 0);
-	ls_syslog(LOG_DEBUG, "%s: the current pxyRsvJL contents: <%s>",
-		  fname, strBuf);
-   }
+        listCat(pxyRsvJL, LIST_TRAVERSE_FORWARD, strBuf, 1024,
+                (LIST_ENTRY_CAT_FUNC_T)jobProxySprintf,
+                (void *) 0);
+        ls_syslog(LOG_DEBUG, "%s: the current pxyRsvJL contents: <%s>",
+                  fname, strBuf);
+    }
 
 }
 
@@ -446,33 +447,33 @@ proxyRsvJLRemoveEntry(struct jData *job)
     PROXY_LIST_ENTRY_T      *pxy;
 
     if (logclass & LC_TRACE)
-	ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
+        ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
 
     pxy = (PROXY_LIST_ENTRY_T *)listSearchEntry(pxyRsvJL,
-						(LIST_ENTRY_T *)job,
-						(LIST_ENTRY_EQUALITY_OP_T)
-						proxyListEntryEqual,
-						0);
+                                                (LIST_ENTRY_T *)job,
+                                                (LIST_ENTRY_EQUALITY_OP_T)
+                                                proxyListEntryEqual,
+                                                0);
 
     if (pxy == NULL) {
-	ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7414,
-	    "%s: cannot find the proxy for the job <%s>"), /* catgets 7414 */
-	    fname, lsb_jobid2str(job->jobId));
-	return;
+        ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7414,
+                                         "%s: cannot find the proxy for the job <%s>"), /* catgets 7414 */
+                  fname, lsb_jobid2str(job->jobId));
+        return;
     }
 
     listRemoveEntry(pxyRsvJL, (LIST_ENTRY_T *)pxy);
     proxyListEntryDestroy(pxy);
 
     if (logclass & (LC_TRACE)) {
-	char strBuf[1024];
+        char strBuf[1024];
 
-	listCat(pxyRsvJL, LIST_TRAVERSE_FORWARD, strBuf, 1024,
-		(LIST_ENTRY_CAT_FUNC_T)jobProxySprintf,
-		(void *) 0);
-	ls_syslog(LOG_DEBUG, "%s: the current pxyRsvJL contents: <%s>",
-		  fname, strBuf);
-   }
+        listCat(pxyRsvJL, LIST_TRAVERSE_FORWARD, strBuf, 1024,
+                (LIST_ENTRY_CAT_FUNC_T)jobProxySprintf,
+                (void *) 0);
+        ls_syslog(LOG_DEBUG, "%s: the current pxyRsvJL contents: <%s>",
+                  fname, strBuf);
+    }
 
 }
 
@@ -491,23 +492,23 @@ proxyListEntryCreate(void *subject)
     PROXY_LIST_ENTRY_T     *pxy;
 
     if (proxyEntFreeList == NULL) {
-	proxyEntFreeList = listCreate("Proxy Entry Free List");
+        proxyEntFreeList = listCreate("Proxy Entry Free List");
 
-	if (! proxyEntFreeList) {
-	    ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7415,
-		"%s: failed to create the proxy entry list: %s"), /* catgets 7415 */
-		fname, listStrError(listerrno));
-	    mbdDie(MASTER_MEM);
-	}
+        if (! proxyEntFreeList) {
+            ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 7415,
+                                             "%s: failed to create the proxy entry list: %s"), /* catgets 7415 */
+                      fname, listStrError(listerrno));
+            mbdDie(MASTER_MEM);
+        }
     }
 
     pxy = (PROXY_LIST_ENTRY_T *) listGetFrontEntry(proxyEntFreeList);
     if (pxy == NULL)
-	pxy = (PROXY_LIST_ENTRY_T *)my_calloc(1,
-	  			         sizeof(PROXY_LIST_ENTRY_T),
-					 fname);
+        pxy = (PROXY_LIST_ENTRY_T *)my_calloc(1,
+                                              sizeof(PROXY_LIST_ENTRY_T),
+                                              fname);
     else
-	listRemoveEntry(proxyEntFreeList, (LIST_ENTRY_T *)pxy);
+        listRemoveEntry(proxyEntFreeList, (LIST_ENTRY_T *)pxy);
 
     pxy->subject = subject;
 
@@ -520,10 +521,10 @@ void
 proxyListEntryDestroy(PROXY_LIST_ENTRY_T  *proxy)
 {
     if (proxyEntFreeList->numEnts >= PROXY_FREE_LIST_MAX_ENTRIES)
-	free(proxy);
+        free(proxy);
     else {
-	proxy->subject = NULL;
-	listInsertEntryAtBack(proxyEntFreeList, (LIST_ENTRY_T *)proxy);
+        proxy->subject = NULL;
+        listInsertEntryAtBack(proxyEntFreeList, (LIST_ENTRY_T *)proxy);
     }
 
 }
@@ -543,23 +544,23 @@ pendJobPrioEqual(PROXY_LIST_ENTRY_T *pxy, struct jData *subjectJob, int hint)
     struct jData *jPtr;
 
     if (pxy == NULL)
-	return (FALSE);
+        return (FALSE);
 
     jPtr = (struct jData *)pxy->subject;
     if (jPtr == NULL || subjectJob == NULL)
-	return (FALSE);
+        return (FALSE);
 
     if (subjectJob->qPtr->priority < jPtr->qPtr->priority)
 
-	return (TRUE);
+        return (TRUE);
     else if (subjectJob->qPtr->priority == jPtr->qPtr->priority) {
-	if (JOB_SUBMIT_TIME(subjectJob) > JOB_SUBMIT_TIME(jPtr))
+        if (JOB_SUBMIT_TIME(subjectJob) > JOB_SUBMIT_TIME(jPtr))
 
-	    return(TRUE);
-	else if (   (JOB_SUBMIT_TIME(subjectJob) == JOB_SUBMIT_TIME(jPtr))
-		 && (subjectJob->jobId > jPtr->jobId))
+            return(TRUE);
+        else if (   (JOB_SUBMIT_TIME(subjectJob) == JOB_SUBMIT_TIME(jPtr))
+                    && (subjectJob->jobId > jPtr->jobId))
 
-	    return (TRUE);
+            return (TRUE);
     }
 
     return (FALSE);
@@ -573,24 +574,24 @@ startJobPrioEqual(PROXY_LIST_ENTRY_T *pxy, struct jData *subjectJob, int hint)
     struct jData *jPtr;
 
     if (pxy == NULL)
-	return (FALSE);
+        return (FALSE);
 
     jPtr = (struct jData *)pxy->subject;
     if (jPtr == NULL || subjectJob == NULL)
-	return (FALSE);
+        return (FALSE);
 
     if (subjectJob->qPtr->priority < jPtr->qPtr->priority)
 
-	return (TRUE);
+        return (TRUE);
     else if (subjectJob->qPtr->priority == jPtr->qPtr->priority) {
-	if (subjectJob->startTime > jPtr->startTime)
+        if (subjectJob->startTime > jPtr->startTime)
 
-	    return(TRUE);
-	else if (   (   subjectJob->startTime == jPtr->startTime
-		     || subjectJob->startTime == 0)
-		 && (subjectJob->jobId > jPtr->jobId))
+            return(TRUE);
+        else if (   (   subjectJob->startTime == jPtr->startTime
+                        || subjectJob->startTime == 0)
+                    && (subjectJob->jobId > jPtr->jobId))
 
-	    return (TRUE);
+            return (TRUE);
     }
 
     return (FALSE);
@@ -623,8 +624,87 @@ jobProxyGetPendJob(PROXY_LIST_ENTRY_T *proxy)
     struct jData *job = (struct jData *)proxy->subject;
 
     if (IS_PEND(job->jStatus))
-	return job;
+        return job;
     else
-	return (struct jData *) NULL;
+        return NULL;
 
 }
+
+/* Allocator asynchronous interface
+ */
+int
+sendCores2Job(struct jData *jPtr)
+{
+    struct lsbCores *cores;
+    int i;
+    int L;
+    XDR xdrs;
+    struct LSFHeader hdr;
+    struct Buffer *buf;
+
+    if (jPtr->chfd == -1)
+        return -1;
+
+    cores = my_calloc(1, sizeof(struct lsbCores), __func__);
+    cores->num = jPtr->numHostPtr;
+    cores->cores = calloc(cores->num, sizeof(char **));
+
+    L = sizeof(struct LSFHeader) + sizeof(struct lsbCores);
+    for (i = 0; i < jPtr->numHostPtr; i++) {
+        cores->cores[i] = strdup(jPtr->hPtr[i]->host);
+        L = L + ALIGNWORD_(strlen(cores->cores[i]) + 1) + 4;
+    }
+
+    initLSFHeader_(&hdr);
+    hdr.opCode = JOB_ADD_CORES;
+
+    if (chanAllocBuf_(&buf, L) < 0) {
+        ls_syslog(LOG_ERR, "\
+%s: chanAllocBuf_() failed job %s L %d", __func__,
+                  lsb_jobid2str(jPtr->jobId), L);
+        /* close connection to the job
+         */
+        goto pryc;
+    }
+
+    xdrmem_create(&xdrs, buf->data, L, XDR_ENCODE);
+
+    if (! xdr_encodeMsg(&xdrs,
+                        (char *)cores,
+                        &hdr,
+                        xdr_Cores,
+                        0,
+                        NULL)) {
+        ls_syslog(LOG_ERR, "\
+%s: failed encode data to %s", __func__, lsb_jobid2str(jPtr->jobId));
+        xdr_destroy(&xdrs);
+        goto pryc;
+    }
+
+    buf->len = XDR_GETPOS(&xdrs);
+
+    if (chanEnqueue_(jPtr->chfd, buf) < 0) {
+        ls_syslog(LOG_ERR, "\
+%s: chanEnqueue_() to job %s chan %d failed", __func__,
+                  lsb_jobid2str(jPtr->jobId),
+                  jPtr->chfd);
+        xdr_destroy(&xdrs);
+        goto pryc;
+    }
+
+    xdr_destroy(&xdrs);
+    for (i = 0; i < cores->num; i++)
+        FREEUP(cores->cores[i]);
+    FREEUP(cores);
+
+    return 0;
+
+pryc:
+    xdr_destroy(&xdrs);
+    for (i = 0; i < cores->num; i++)
+        FREEUP(cores->cores[i]);
+    FREEUP(cores);
+
+    return -1;
+}
+

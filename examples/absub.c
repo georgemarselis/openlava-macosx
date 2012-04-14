@@ -12,6 +12,7 @@ main(int argc,
     struct submitReply rep;
     LS_LONG_INT jobID;
     struct lsbJobEvent *je;
+    struct lsbCores *cores;
     int timeout;
     int cc;
     int i;
@@ -40,6 +41,35 @@ main(int argc,
 
     timeout = -1;
     je = lsb_wait4event(timeout);
+    if (je == NULL) {
+        lsb_perror("lsb_wait4event");
+        return -1;
+    }
+
+    switch (je->event) {
+        case EVENT_ADD_CORES:
+            printf("Got EVENT_ADD_CORES:\n");
+            cores = je->e;
+            for (i = 0; i < cores->num; i++) {
+                printf(" %s\n", cores->cores[i]);
+            }
+            break;
+        case EVENT_RECALL_CORES:
+        case EVENT_JOB_KILLED:
+        case EVENT_CONNECTION_ERROR:
+            return -1;
+    }
+
+    for (i = 0; i < 60; i++)
+        sleep(1);
+
+    printf("Done work %d\n", i);
+
+    cc = lsb_signaljob(je->jobID, SIGKILL);
+    if (cc < 0) {
+        lsb_perror("lsb_signaljob()");
+        return -1;
+    }
 
     return 0;
 

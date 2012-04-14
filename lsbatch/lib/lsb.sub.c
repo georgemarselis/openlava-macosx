@@ -5487,7 +5487,7 @@ lsb_wait4event(int timeout)
         return NULL;
     }
 
-    for (i = 0; i < cc; i++) {
+    for (i = 0; i < nready; i++) {
 
         /* Error on the connection with the
          * job, so report the error to the
@@ -5597,6 +5597,7 @@ lsb_wait4event(int timeout)
                     if (conn->ef)
                         (*conn->ef)(je);
                 }
+                return je;
             }
         }
 
