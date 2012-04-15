@@ -4390,13 +4390,20 @@ scheduleAndDispatchJobs(void)
     if (numQUsable <= 0) {
         numQUsable = 0;
         resetSchedulerSession();
-        return(0);
+        return 0;
     }
 
     if (logclass & LC_SCHED) {
         ls_syslog(LOG_DEBUG,"\
 %s M_STAGE_QUE_CAND numQUsable=%d timeGetQUsable %d ms",
                   fname, numQUsable, timeGetQUsable);
+    }
+
+    if (LIST_NUM_ENTRIES(jRefList) == 0) {
+        ls_syslog(LOG_DEBUG, "\
+%s: no pending or migrating to jobs to schedule at the moment.", __func__);
+        resetSchedulerSession();
+        return 0;
     }
 
     loopCount = 0;
@@ -4509,8 +4516,7 @@ again:
     DUMP_CNT();
     RESET_CNT();
 
-    return(0);
-
+    return 0;
 }
 
 static int
