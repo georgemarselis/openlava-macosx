@@ -27,7 +27,8 @@ esac
 AM_INIT_AUTOMAKE
 
 # Expirimental scheduling module
-AM_CONDITIONAL([SCHED_EXPERIMENTAL], [false])
+# Leave for future 
+#AM_CONDITIONAL([SCHED_EXPERIMENTAL], [false])
 
 # Clean output if possible
 #m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])

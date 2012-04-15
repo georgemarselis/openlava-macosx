@@ -538,8 +538,8 @@ packJobInfo(struct jData * jobData,
                      hPtr != (void *)hostList;
                      hPtr = (struct hData *)hPtr->back) {
 
-                    /* Use the hostID as index into the
-                     * array of hosts pending reasons.
+                    /* Use the same index to read the host
+                     * table we used to populate it.
                      */
                     i = hPtr->hostId;
                     if (jReasonTb[i] == PEND_HOST_USR_SPEC)
