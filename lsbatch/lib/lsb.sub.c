@@ -5424,31 +5424,46 @@ lsb_eventwaitcreate(int size)
     return 0;
 }
 
-/* lsb_addjob2events()
+/* lsb_addjobevent()
  * Mostly internal as jobs are registered
  * automatically when lsb_asyncsub() runs.
  */
 int
-lsb_addjob2events(LS_LONG_INT jobID,
-                  int s,
-                  void (*ef)(struct lsbJobEvent *),
-                  void (*er)(LS_LONG_INT, int))
+lsb_addjobevent(LS_LONG_INT jobID,
+                int s,
+                void (*ef)(struct lsbJobEvent *),
+                void (*er)(LS_LONG_INT, int))
 {
     struct lsbConn2MBD *con;
     struct epoll_event *ev;
+    int cc;
 
     con = calloc(1, sizeof(struct lsbConn2MBD));
+    if (con == NULL) {
+        lsberrno = LSBE_NO_MEM;
+        return -1;
+    }
     con->jobID = jobID;
     con->sock = s;
     con->ef = ef;
     con->er = er;
 
     ev = calloc(1, sizeof(struct epoll_event));
+    if (ev == NULL) {
+        lsberrno = LSBE_NO_MEM;
+        return -1;
+    }
     ev->events = EPOLLIN;
     ev->data.ptr = con;
 
-    epoll_ctl(lsbepoll->efd, EPOLL_CTL_ADD, con->sock, ev);
-
+    cc = epoll_ctl(lsbepoll->efd, EPOLL_CTL_ADD, con->sock, ev);
+    if (cc < 0) {
+        lsberrno = LSBE_SYS_CALL;
+        FREEUP(con);
+        FREEUP(ev);
+        close(lsbepoll->efd);
+        return -1;
+    }
     return 0;
 }
 
@@ -5462,11 +5477,10 @@ lsb_addjob2events(LS_LONG_INT jobID,
  * to see how resources are being built
  * up or recalled by MBD.
  */
-struct lsbJobEvent *
-lsb_wait4event(int timeout)
+int
+lsb_wait4event(int timeout, struct lsbJobEvent *je)
 {
     struct lsbConn2MBD *conn;
-    struct lsbJobEvent *je;
     struct LSFHeader hdr;
     char buf[sizeof(struct LSFHeader)];
     struct lsbCores *lsbCores;
@@ -5484,7 +5498,7 @@ lsb_wait4event(int timeout)
         return 0;
     if (nready < 0) {
         lsberrno = LSBE_SYS_CALL;
-        return NULL;
+        return -1;
     }
 
     for (i = 0; i < nready; i++) {
@@ -5507,7 +5521,7 @@ lsb_wait4event(int timeout)
              */
             je->event = EVENT_CONNECTION_ERROR;
 
-            return je;
+            return nready;
         }
 
         lsbCores = NULL;
@@ -5528,7 +5542,7 @@ lsb_wait4event(int timeout)
                 xdr_destroy(&xdrs);
                 if (conn->er)
                     (*conn->er)(conn->jobID, lsberrno);
-                return NULL;
+                return -1;
             }
             xdr_destroy(&xdrs);
 
@@ -5539,8 +5553,8 @@ lsb_wait4event(int timeout)
                 if (msg == NULL) {
                     lsberrno = LSBE_NO_MEM;
                     if (conn->er)
-                    (*conn->er)(conn->jobID, lsberrno);
-                    return NULL;
+                        (*conn->er)(conn->jobID, lsberrno);
+                    return -1;
                 }
 
                 /* Read the payload...
@@ -5552,7 +5566,7 @@ lsb_wait4event(int timeout)
                     if (conn->er)
                         (*conn->er)(conn->jobID, lsberrno);
                     FREEUP(msg);
-                    return NULL;
+                    return -1;
                 }
 
                 /* Allocate memory to decode the payload
@@ -5564,7 +5578,7 @@ lsb_wait4event(int timeout)
                     xdr_destroy(&xdrs);
                     if (conn->er)
                         (*conn->er)(conn->jobID, lsberrno);
-                    return NULL;
+                    return -1;
                 }
 
                 /* Decode the data from MBD.
@@ -5575,7 +5589,7 @@ lsb_wait4event(int timeout)
                     FREEUP(msg);
                     if (conn->er)
                         (*conn->er)(conn->jobID, lsberrno);
-                    return NULL;
+                    return -1;
                 }
 
                 /* Give the cores to the caller
@@ -5597,13 +5611,14 @@ lsb_wait4event(int timeout)
                     if (conn->ef)
                         (*conn->ef)(je);
                 }
-                return je;
+                return nready;
             }
-        }
+
+        } /* EPOLLIN */
 
     } /* for (i = 0; i < cc; i++) */
 
-    return NULL;
+    return nready;
 }
 
 /* lsb_asyncsubmit()
@@ -5635,7 +5650,7 @@ lsb_asyncsubmit(struct submit *req,
 
     /* add the job to the waiting object.
      */
-    lsb_addjob2events(jobID, reply->serverSock, ef, er);
+    lsb_addjobevent(jobID, reply->serverSock, ef, er);
 
     return jobID;
 }

@@ -1438,6 +1438,9 @@ typedef enum {
     EVENT_CONNECTION_ERROR
 } aevent_t;
 
+/* The event data structure returned
+ * upon connected bsub
+ */
 struct lsbJobEvent {
     LS_LONG_INT jobID;
     int sock;
@@ -1549,11 +1552,11 @@ extern int lsb_tweetread(struct tweetJob *);
  * interaction with the job.
  */
 extern int lsb_eventwaitcreate(int);
-extern int lsb_addjob2events(LS_LONG_INT,
-                             int,
-                             void (*ef)(struct lsbJobEvent *),
-                             void (*er)(LS_LONG_INT, int));
-extern struct lsbJobEvent *lsb_wait4event(int);
+extern int lsb_addjobevent(LS_LONG_INT,
+                           int,
+                           void (*ef)(struct lsbJobEvent *),
+                           void (*er)(LS_LONG_INT, int));
+extern int lsb_wait4event(int, struct lsbJobEvent *);
 extern LS_LONG_INT lsb_asyncsubmit(struct submit *,
                                    struct submitReply *,
                                    void (*ef)(struct lsbJobEvent *),
