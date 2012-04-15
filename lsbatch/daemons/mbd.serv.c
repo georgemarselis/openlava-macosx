@@ -523,12 +523,14 @@ packJobInfo(struct jData * jobData,
 
                 /* traverse the list of hosts
                  */
-                i = 0;
                 for (hPtr = (struct hData *)hostList->back;
                      hPtr != (void *)hostList;
                      hPtr = (struct hData *)hPtr->back) {
 
-                    ++i;
+                    /* Use the same index to read the host
+                     * table we used to populate it.
+                     */
+                    i = hPtr->hostId;
                     if (jReasonTb[i] == PEND_HOST_USR_SPEC)
                         continue;
 
