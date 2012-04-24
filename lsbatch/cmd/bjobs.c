@@ -400,7 +400,6 @@ static void
 displayJobs (struct jobInfoEnt *job, struct jobInfoHead *jInfoH,
              int options, int format)
 {
-    char *fName = "displayJobs";
     struct submit *submitInfo;
     static char first = TRUE;
     char *status;
@@ -412,10 +411,7 @@ displayJobs (struct jobInfoEnt *job, struct jobInfoHead *jInfoH,
     NAMELIST  *hostList = NULL;
     char tmpBuf[MAXLINELEN];
     char osUserName[MAXLINELEN];
-
-
-    int                 i = 0;
-
+    int i = 0;
 
     if (getOSUserName_(job->user, osUserName, MAXLINELEN) != 0) {
         strncpy(osUserName, job->user, MAXLINELEN);
@@ -430,7 +426,6 @@ displayJobs (struct jobInfoEnt *job, struct jobInfoHead *jInfoH,
             exit(99);
         }
     }
-
 
     if (loadIndex == NULL)
         loadIndex = initLoadIndex();
@@ -529,7 +524,9 @@ displayJobs (struct jobInfoEnt *job, struct jobInfoHead *jInfoH,
             int execHostListUsed;
             int L;
 
-            L = 4;
+            /* Assume one page is 4K.
+             */
+            L = 8 * MAXLINELEN;
             if (execHostList == NULL) {
                 if ((execHostList = calloc(1, L)) == NULL) {
                     perror("calloc");
@@ -547,7 +544,14 @@ displayJobs (struct jobInfoEnt *job, struct jobInfoHead *jInfoH,
                 strcmp(lsbParams[LSB_SHORT_HOSTLIST].paramValue, "1") == 0) {
                 for (i = 1; i < hostList->listSize; i++) {
 
-                    execHostListUsed += (strlen(job->exHosts[i]) + 1);
+                    /* The +4 is to allow for the extra characters
+                     * that are added to the node name which include
+                     * the number of jobs on a node (e.g., 2* or 4*)
+                     * and the delimiter (:). We use +4 instead of
+                     * +3 to account for the possibility of running
+                     * more than 9 jobs on a node.
+                     */
+                    execHostListUsed += (strlen(job->exHosts[i]) + 4 + 1);
                     if (execHostListUsed >= execHostListSize) {
                         execHostListSize += L;
                         if ((execHostList = realloc(execHostList,
