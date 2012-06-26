@@ -66,53 +66,25 @@ main(int argc, char **argv)
                 fputs(_LS_VERSION_, stderr);
                 return 0;
             case 'm':
-                if ( strcmp(optarg, "-v") == 0) {
-                    usage();
-                    return -1;
-                }
                 strcpy(hPtr->hostModel, optarg);
                 break;
             case 't':
-                if ( strcmp(optarg, "-v") == 0) {
-                    usage();
-                    return -1;
-                }
                 strcpy(hPtr->hostType, optarg);
                 break;
             case 'f':
-                if ( strcmp(optarg, "-v") == 0) {
-                    usage();
-                    return -1;
-                }
                 hPtr->cpuFactor = atof(optarg);
                 break;
             case 'D':
-                if ( strcmp(optarg, "-v") == 0) {
-                    usage();
-                    return -1;
-                }
                 hPtr->nDisks = atoi(optarg);
                 break;
             case 'R':
-                if ( strcmp(optarg, "-v") == 0) {
-                    usage();
-                    return -1;
-                }
                 getResList(hPtr, optarg);
                 break;
             case 'w':
-                if ( strcmp(optarg, "-v") == 0) {
-                    usage();
-                    return -1;
-                }
                 free(hPtr->window);
                 hPtr->window = strdup(optarg);
                 break;
             case 'b':
-                if ( strcmp(optarg, "-v") == 0) {
-                    usage();
-                    return -1;
-                }
                 getBusyThr(hPtr, optarg);
                 break;
             case 'v':
