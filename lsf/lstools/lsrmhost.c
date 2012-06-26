@@ -69,7 +69,7 @@ main(int argc, char **argv)
         return -1;
     }
 
-    printf("Host %s removed.\n", hp->h_name);
+    printf("Host %s removed.\n", hostName);
 
     return 0;
 }

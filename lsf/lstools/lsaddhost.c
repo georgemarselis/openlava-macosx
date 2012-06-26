@@ -45,7 +45,12 @@ main(int argc, char **argv)
     int cc;
     struct hostEntry *hPtr;
     struct hostent *hp;
-
+    
+    if (argc < 2) {
+        usage();
+        return -1;
+    }
+    
     v = 0;
     hPtr = calloc(1, sizeof(struct hostEntry));
     hPtr->rcv = 1;
@@ -61,25 +66,53 @@ main(int argc, char **argv)
                 fputs(_LS_VERSION_, stderr);
                 return 0;
             case 'm':
+                if ( strcmp(optarg, "-v") == 0) {
+                    usage();
+                    return -1;
+                }
                 strcpy(hPtr->hostModel, optarg);
                 break;
             case 't':
+                if ( strcmp(optarg, "-v") == 0) {
+                    usage();
+                    return -1;
+                }
                 strcpy(hPtr->hostType, optarg);
                 break;
             case 'f':
+                if ( strcmp(optarg, "-v") == 0) {
+                    usage();
+                    return -1;
+                }
                 hPtr->cpuFactor = atof(optarg);
                 break;
             case 'D':
+                if ( strcmp(optarg, "-v") == 0) {
+                    usage();
+                    return -1;
+                }
                 hPtr->nDisks = atoi(optarg);
                 break;
             case 'R':
+                if ( strcmp(optarg, "-v") == 0) {
+                    usage();
+                    return -1;
+                }
                 getResList(hPtr, optarg);
                 break;
             case 'w':
+                if ( strcmp(optarg, "-v") == 0) {
+                    usage();
+                    return -1;
+                }
                 free(hPtr->window);
                 hPtr->window = strdup(optarg);
                 break;
             case 'b':
+                if ( strcmp(optarg, "-v") == 0) {
+                    usage();
+                    return -1;
+                }
                 getBusyThr(hPtr, optarg);
                 break;
             case 'v':
@@ -90,6 +123,20 @@ main(int argc, char **argv)
             default:
                 usage();
                 return -1;
+        }
+    }
+    
+    if ( v == 0 ) {
+        if ( argc % 2 != 0 ) { 
+            usage();
+            return -1;
+        }
+    }
+    else
+    {
+        if ( argc % 2 == 0 ) {
+            usage();
+            return -1;
         }
     }
 
@@ -116,6 +163,7 @@ main(int argc, char **argv)
     freeInfo(&hPtr);
 
     return 0;
+
 }
 
 static int

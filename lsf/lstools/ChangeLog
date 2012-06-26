@@ -1,9 +1,16 @@
+2012-06-21  Alberto Falzone  <alberto.falzone@gmail.com>
+
+    * lsrmhost.c: Fixed the "removed hostname" feedback.
+    * lsaddhost.c: Fixed the missing check of argc value at begin of main(),
+      implemented additional checks on arguments to avoid NULL values.
+      
+
 2011-05-08  David Bigagli  <david@davidbigagli.com>
 
-	* Makefile: Changed the install rule to use LAVA_BINDIR.
+    * Makefile: Changed the install rule to use LAVA_BINDIR.
 
 2011-04-24  David Bigagli  <david@davidbigagli.com>
 
-	* Makefile: Introduced static link for the ls* commands in the lstools
-	directory.
+    * Makefile: Introduced static link for the ls* commands in the lstools
+    directory.
 
