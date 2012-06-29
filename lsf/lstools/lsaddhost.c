@@ -94,7 +94,7 @@ main(int argc, char **argv)
     }
     
     if (argv[optind] == NULL) {
-        fprintf(stderr, "missing hostname\n");
+        fprintf(stderr, "Bad host name.\n");
         usage();
         return -1;
     }
