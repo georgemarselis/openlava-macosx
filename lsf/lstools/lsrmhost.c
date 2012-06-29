@@ -36,11 +36,6 @@ main(int argc, char **argv)
     struct hostent *hp;
     char hostName[MAXHOSTNAMELEN];
 
-    if (argc != 2) {
-        usage();
-        return -1;
-    }
-
     while ((cc = getopt(argc, argv, "Vh")) != EOF) {
         switch (cc) {
             case 'V':
@@ -52,6 +47,12 @@ main(int argc, char **argv)
                 usage();
                 return -1;
         }
+    }
+
+    if ( argv[optind] == NULL ) {
+        fprintf(stderr, "missing hostname\n");
+        usage();
+        return -1;
     }
 
     hp = Gethostbyname_(argv[argc - 1]);

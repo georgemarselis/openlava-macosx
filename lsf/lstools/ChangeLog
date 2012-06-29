@@ -1,7 +1,8 @@
-2012-06-21  Alberto Falzone  <alberto.falzone@gmail.com>
+2012-06-29  Alberto Falzone  <alberto.falzone@gmail.com>
 
     * lsrmhost.c: Fixed the "removed hostname" feedback.
-    * lsaddhost.c: Fixed the missing check of argc value at begin of main().      
+    * lsaddhost.c: Added the check of optind value to avoid a gethostbyname_
+      with a (null) argument. Also added to lsrmhost.c .     
 
 2011-05-08  David Bigagli  <david@davidbigagli.com>
 

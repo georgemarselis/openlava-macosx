@@ -46,11 +46,6 @@ main(int argc, char **argv)
     struct hostEntry *hPtr;
     struct hostent *hp;
     
-    if (argc < 2) {
-        usage();
-        return -1;
-    }
-    
     v = 0;
     hPtr = calloc(1, sizeof(struct hostEntry));
     hPtr->rcv = 1;
@@ -98,20 +93,12 @@ main(int argc, char **argv)
         }
     }
     
-    if ( v == 0 ) {
-        if ( argc % 2 != 0 ) { 
-            usage();
-            return -1;
-        }
+    if (argv[optind] == NULL) {
+        fprintf(stderr, "missing hostname\n");
+        usage();
+        return -1;
     }
-    else
-    {
-        if ( argc % 2 == 0 ) {
-            usage();
-            return -1;
-        }
-    }
-
+        
     hp = Gethostbyname_(argv[argc - 1]);
     if (hp == NULL) {
         fprintf(stderr, "\
