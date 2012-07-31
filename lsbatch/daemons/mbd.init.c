@@ -61,8 +61,10 @@ struct userConf *userConf = NULL;
 static struct hostConf *hostConf = NULL;
 static struct queueConf *queueConf = NULL;
 static struct paramConf *paramConf = NULL;
-struct gData *tempUGData[MAX_GROUPS], *tempHGData[MAX_GROUPS];
-int nTempUGroups = 0, nTempHGroups = 0;
+static struct gData *tempUGData[MAX_GROUPS];
+static struct gData *tempHGData[MAX_GROUPS];
+static int nTempUGroups;
+static int nTempHGroups;
 
 static char batchName[MAX_LSB_NAME_LEN] = "root";
 
@@ -112,7 +114,8 @@ static int updCondData (struct lsConf *, int);
 static struct condData * initConfData (void);
 static void createCondNodes (int, char **, char *, int);
 static struct lsConf * getFileConf (char *, int);
-static void copyQData (struct qData *, struct qData *);
+static void copyQData(struct qData *, struct qData *);
+static void copyGroups(int);
 static void addDefaultHost (void);
 static void removeFlags (struct hTab *, int, int);
 static int needPollQHost (struct qData *, struct qData *);
@@ -254,12 +257,10 @@ minit(int mbdInitFlags)
                             "");
     setAllowObservers(allUsersSet);
 
-    uGrpAllSet = setCreate(MAX_GROUPS, getIndexByuData, getuDataByIndex,
-                           "");
+    uGrpAllSet = setCreate(MAX_GROUPS, getIndexByuData, getuDataByIndex, "");
 
     uGrpAllAncestorSet = setCreate(MAX_GROUPS, getIndexByuData,
-                                   getuDataByIndex,
-                                   "");
+                                   getuDataByIndex, "");
 
     TIMEIT(0, readParamConf(mbdInitFlags), "minit_readParamConf");
     TIMEIT(0, readHostConf(mbdInitFlags), "minit_readHostConf");
@@ -270,6 +271,7 @@ minit(int mbdInitFlags)
      */
     getLsbHostLoad();
     updHostList();
+    copyGroups(TRUE);
 
     if ((hPtr = getHostData(masterHost)) == NULL) {
         ls_syslog(LOG_ERR, "\
@@ -288,6 +290,8 @@ minit(int mbdInitFlags)
 
     TIMEIT(0, readUserConf(mbdInitFlags), "minit_readUserConf");
     TIMEIT(0, readQueueConf(mbdInitFlags), "minit_readQueueConf");
+    copyGroups(FALSE);
+
     updUserList(mbdInitFlags);
     updQueueList();
 
@@ -939,9 +943,9 @@ addGroup(struct gData **groups, char *gname, int *ngroups)
     groups[*ngroups]->group = safeSave(gname);
     h_initTab_(&groups[*ngroups]->memberTab, 0);
     groups[*ngroups]->numGroups = 0;
-    *ngroups += 1;
+    (*ngroups)++;
 
-    return (groups[*ngroups -1]);
+    return (groups[*ngroups - 1]);
 
 }
 
@@ -1920,11 +1924,11 @@ addUData (struct userConf *userConf)
 }
 
 static void
-createTmpGData (struct groupInfoEnt *groups,
-                int num,
-                int groupType,
-                struct gData *tempGData[],
-                int *nTempGroups)
+createTmpGData(struct groupInfoEnt *groups,
+               int num,
+               int groupType,
+               struct gData *tempGData[],
+               int *nTempGroups)
 {
     static char fname[] = "createTmpGData";
     struct groupInfoEnt *gPtr;
@@ -2475,6 +2479,41 @@ addQData(struct queueConf *queueConf, int mbdInitFlags )
             qAttributes |= Q_ATTRIB_BACKFILL;
     }
 }
+
+/* copyGroups()
+ */
+static void
+copyGroups(int copyHGroups)
+{
+    int i;
+
+    if (copyHGroups == FALSE) {
+        for (i = 0; i < numofugroups; i++) {
+            if (usergroups[i] == NULL)
+                continue;
+            freeGrp (usergroups[i]);
+        }
+        for (i = 0; i < nTempUGroups; i++) {
+            usergroups[i] = tempUGData[i];
+            tempUGData[i] = NULL;
+        }
+        numofugroups = nTempUGroups;
+        nTempUGroups = 0;
+        return;
+    }
+    for (i = 0; i < numofhgroups; i++) {
+        if (hostgroups[i] == NULL)
+            continue;
+        freeGrp (hostgroups[i]);
+    }
+
+    for (i = 0; i < nTempHGroups; i++)
+        hostgroups[i] = tempHGData[i];
+    numofhgroups = nTempHGroups;
+    nTempHGroups = 0;
+
+} /* copyGroups */
+
 
 static void
 createCondNodes (int numConds, char **conds, char *fileName, int flags)

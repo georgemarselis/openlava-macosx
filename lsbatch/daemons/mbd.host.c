@@ -1021,7 +1021,7 @@ getLsbHostLoad(void)
         errorcnt++;
         if (errorcnt > MAX_FAIL) {
             ls_syslog(LOG_ERR, "\
-%s: %s() failed for %d times: %M", __func__, errorcnt);
+%s: failed for %d times: %M", __func__, errorcnt);
             mbdDie(MASTER_FATAL);
         }
         return -1;
