@@ -45,7 +45,7 @@ main(int argc, char **argv)
     int cc;
     struct hostEntry *hPtr;
     struct hostent *hp;
-
+    
     v = 0;
     hPtr = calloc(1, sizeof(struct hostEntry));
     hPtr->rcv = 1;
@@ -92,8 +92,13 @@ main(int argc, char **argv)
                 return -1;
         }
     }
-
-    hp = Gethostbyname_(argv[argc - 1]);
+    
+    if (argv[optind] == NULL) {
+        fprintf(stderr, "hostname not specified.\n");
+        return -1;
+    }
+    
+    hp = gethostbyname(argv[optind]);
     if (hp == NULL) {
         fprintf(stderr, "\
 %s: invalid hostname %s\n", __func__, argv[optind]);
@@ -116,6 +121,7 @@ main(int argc, char **argv)
     freeInfo(&hPtr);
 
     return 0;
+
 }
 
 static int

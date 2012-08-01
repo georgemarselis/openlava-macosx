@@ -36,11 +36,6 @@ main(int argc, char **argv)
     struct hostent *hp;
     char hostName[MAXHOSTNAMELEN];
 
-    if (argc != 2) {
-        usage();
-        return -1;
-    }
-
     while ((cc = getopt(argc, argv, "Vh")) != EOF) {
         switch (cc) {
             case 'V':
@@ -54,10 +49,15 @@ main(int argc, char **argv)
         }
     }
 
-    hp = Gethostbyname_(argv[argc - 1]);
+    if ( argv[optind] == NULL ) {
+        fprintf(stderr, "hostname not specified.\n");
+        return -1;
+    }
+
+    hp = Gethostbyname_(argv[optind]);
     if (hp == NULL) {
         fprintf(stderr, "\
-%s: invalid hostname %s\n", __func__, argv[argc - 1]);
+%s: invalid hostname %s\n", __func__, argv[optind]);
         return -1;
     }
 
@@ -69,7 +69,7 @@ main(int argc, char **argv)
         return -1;
     }
 
-    printf("Host %s removed.\n", hp->h_name);
+    printf("Host %s removed.\n", hostName);
 
     return 0;
 }
