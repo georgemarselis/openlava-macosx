@@ -49,12 +49,12 @@ main(int argc, char **argv)
         }
     }
 
-    if ( argv[optind] == NULL ) {
+    if (argv[optind] == NULL) {
         fprintf(stderr, "hostname not specified.\n");
         return -1;
     }
 
-    hp = Gethostbyname_(argv[optind]);
+    hp = gethostbyname(argv[optind]);
     if (hp == NULL) {
         fprintf(stderr, "\
 %s: invalid hostname %s\n", __func__, argv[optind]);
