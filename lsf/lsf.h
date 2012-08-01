@@ -515,6 +515,11 @@ struct clusterConf {
     LS_SHARED_RESOURCE_INFO_T *shareRes;
 };
 
+/* Maximum number of processes reported by PIM
+ * and read by the PIM library.
+ */
+#define MAX_PROC_ENT (2 * 1024)
+
 struct pidInfo {
     int pid;
     int ppid;

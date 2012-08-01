@@ -1,4 +1,5 @@
-/* $Id: pim.main.c 397 2007-11-26 19:04:00Z mblack $
+/*
+ * Copyright (C) 2011 - 2012 David Bigagli
  * Copyright (C) 2007 Platform Computing Inc
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,32 +20,12 @@
 #include "../lsf.h"
 #include "../lib/lproto.h"
 #include "../intlib/intlibout.h"
-#include "pim.linux.h"
 
-#define NL_SETN         (28)
+static struct lsPidInfo pbase[MAX_PROC_ENT];
+static int numprocs;
 
-#define MAX_MIN_SLEEPTIME (3)
-
-int bytes;
-int nproc;
-int pagesize;
-struct lsPidInfo *pbase;
-struct lsPidInfo *old_pbase;
-int nr_of_processes = 0;
-int old_nr_of_processes = 0;
-
-static struct lsPidInfo *deadPid;
-static int nDeadPids = 0;
 static int pimPort;
-
-extern void open_kern(void);
-extern void scan_procs(void);
-
-
-#define NPIDS_SIZE 32
-#define NPGIDS_SIZE 300
-#define DEFAULT_UPDATE_PERIOD 15*60
-#define USED_TIME 5*60
+static int gothup;
 
 struct config_param pimParams[] =
 {
@@ -57,128 +38,79 @@ struct config_param pimParams[] =
     {"LSF_PIM_INFODIR", NULL},
     {"LSF_PIM_NPROC", NULL},
     {"LSF_PIM_TRACE", NULL},
-    {"LSF_PIM_NICEOFF", NULL},
-    {"LSF_PIM_SGI_NOSHMEM", NULL},
-    {"LSF_PIM_SLEEPTIME_UPDATE", NULL},
-    {"LSF_PIM_CPUTIMECHECK", NULL},
+    {"LSF_PIM_UPDATE_INTERVAL", NULL},
     {NULL, NULL}
 };
 
-#define LSF_LIM_DEBUG       0
-#define LSF_LOGDIR          1
-#define LSF_DEBUG_PIM       2
-#define LSF_LOG_MASK        3
-#define LSF_TIME_PIM        4
-#define LSF_PIM_SLEEPTIME   5
-#define LSF_PIM_INFODIR     6
-#define LSF_PIM_NPROC       7
-#define LSF_PIM_TRACE       8
-#define LSF_PIM_NICEOFF     9
-#define LSF_PIM_SGI_NOSHMEM 10
-#define LSF_PIM_SLEEPTIME_UPDATE 11
-#define LSF_PIM_CPUTIMECHECK 12
-
-static struct pidLink {
-    int child;
-    int sibling;
-    int sortedIdx;
-    int sorted;
-} *pidLink;
-
-static int sortedIdx = 0;
-
-struct pgidRec {
-    int pgid;
-    int npids;
-    int *pid;
-    int deadUTime, deadSTime;
+enum {
+    LSF_LIM_DEBUG,
+    LSF_LOGDIR,
+    LSF_DEBUG_PIM,
+    LSF_LOG_MASK,
+    LSF_TIME_PIM,
+    LSF_PIM_SLEEPTIME,
+    LSF_PIM_INFODIR,
+    LSF_PIM_NPROC,
+    LSF_PIM_TRACE,
+    LSF_PIM_UPDATE_INTERVAL
 };
 
-struct lspgidEnt {
-    int pgid;
-    int active;
-};
-
-static struct lspgidEnt *pgidList;
-static int nPGidList = 0;
-
-int pidInPGList(int inPid);
-void newPGid(int inPGid);
-int initPGidList(void);
-int cleanPGidList(void);
-
-char *env_dir = NULL;
-int pim_debug = 0;
-int scanIt = FALSE;
-char infoFN[MAXFILENAMELEN];
-int sgiPimNoShmem = FALSE;
+static int pim_debug;
+static char infofile[MAXFILENAMELEN];
 static int sleepTime = PIM_SLEEP_TIME;
-static bool_t sleepBeforeUpdateProcs = TRUE;
-int pimCpuTimeCheck = FALSE;
+static int updInterval = PIM_UPDATE_INTERVAL;
 
-static void usage (char *cmd);
 static void logProcessInfo(void);
-static void addDeadProcesses(void);
-static int pidInGroup(struct lsPidInfo *p, struct pgidRec *pg);
-static struct pgidRec *newPGidList(int *npgids);
-static void newDeadPid(struct lsPidInfo *pinfo);
-static void replayDeadPids(void);
-static void doServ(void);
+static int doServ(void);
+static void hup(int);
+static int scan_procs(void);
 static void updateProcs(const time_t);
-static void cpuTimeCheck(const time_t);
-
-static void sortPids(void);
-static void getChildren(int ppidIdx);
-static void sortIt(int pIdx);
-
-extern char *argvmsg_(int argc, char **argv);
-
+static int parse_stat(char *, struct lsPidInfo *);
+static int ls_pidinfo(int, struct lsPidInfo *);
 
 static void
-usage (char *cmd)
+usage (const char *cmd)
 {
-    fprintf(stderr, I18N_Usage);
-    fprintf(stderr, ": %s [-V] [-h] [-debug_level] [-d env_dir]\n",
-        cmd);
-    exit(-1);
+    fprintf(stderr, "\
+%s: [-V] [-h] [-debug_level] [-d env_dir]\n", cmd);
 }
 
+/* This is PIM process information manager.
+ * This is the interface to the machine /proc and
+ * based on its process table openlava implements
+ * the getJInfo_() API that returns runtime
+ * resource usage.
+ */
 int
 main(int argc, char **argv)
 {
-    static char   fname[] = "main()";
-    char          *sp;
-    char          *traceVal = NULL;
-    int           i;
-    char          *myHost = "localhost";
+    char *sp;
+    char *traceVal;
+    char *myHost;
+    char *env_dir;
+    int cc;
 
+    myHost = "localhost";
+    while ((cc = getopt(argc, argv, "12Vd:")) != EOF) {
 
-    _i18n_init(I18N_CAT_PIM);
-
-    for (i=1; i<argc; i++) {
-
-        if (strcmp(argv[i], "-d") == 0 && argv[i+1] != NULL) {
-            env_dir = argv[i+1];
-            i++;
-            continue;
+        switch (cc) {
+            case 'd':
+                env_dir = optarg;
+                break;
+            case '1':
+                pim_debug = 1;
+                break;
+            case '2':
+                pim_debug = 2;
+                break;
+            case 'V':
+                fputs(_LS_VERSION_, stderr);
+                return 0;
+            case '?':
+            default:
+                usage(argv[0]);
+            return -1;
         }
-
-        if (strcmp(argv[i], "-1") == 0) {
-            pim_debug = 1;
-            continue;
-        }
-
-        if (strcmp(argv[i], "-2") == 0) {
-            pim_debug = 2;
-            continue;
-        }
-
-        if (strcmp(argv[i], "-V") == 0) {
-            fputs(_LS_VERSION_, stderr);
-            exit(0);
-        }
-
-        usage(argv[0]);
     }
 
     if (env_dir == NULL) {
@@ -192,11 +124,11 @@ main(int argc, char **argv)
         sp = getenv("LSF_LOGDIR");
         if (sp != NULL)
             pimParams[LSF_LOGDIR].paramValue = sp;
-        ls_openlog("pim", pimParams[LSF_LOGDIR].paramValue, (pim_debug == 2),
+        ls_openlog("pim",
+                   pimParams[LSF_LOGDIR].paramValue, (pim_debug == 2),
                    pimParams[LSF_LOG_MASK].paramValue);
-        ls_syslog(LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "initenv_", env_dir);
-        ls_syslog(LOG_ERR, I18N_Exiting);
-        exit(-1);
+        ls_syslog(LOG_ERR, "%s: initenv_() failed %s.", __func__, env_dir);
+        return -1;
     }
 
     if (!pim_debug && pimParams[LSF_LIM_DEBUG].paramValue) {
@@ -204,17 +136,6 @@ main(int argc, char **argv)
         if (pim_debug <= 0)
             pim_debug = 1;
     }
-
-
-
-    if (!pimParams[LSF_PIM_NICEOFF].paramValue) {
-        nice(NICE_LEAST);
-
-        if (!pim_debug)
-            nice(NICE_MIDDLE);
-        nice(0);
-    }
-
 
     if (pimParams[LSF_PIM_TRACE].paramValue) {
         traceVal = pimParams[LSF_PIM_TRACE].paramValue;
@@ -227,888 +148,370 @@ main(int argc, char **argv)
         ls_openlog("pim", pimParams[LSF_LOGDIR].paramValue, TRUE, "LOG_DEBUG");
     else
         ls_openlog("pim", pimParams[LSF_LOGDIR].paramValue, FALSE,
-             pimParams[LSF_LOG_MASK].paramValue);
+                   pimParams[LSF_LOG_MASK].paramValue);
 
-    if (logclass & (LC_TRACE | LC_HANG))
-        ls_syslog(LOG_DEBUG, "pim/main: logclass=%x", logclass);
-
-    ls_syslog(LOG_NOTICE, argvmsg_(argc, argv));
-
-    if (pimParams[LSF_PIM_SLEEPTIME].paramValue) {
-        if ((sleepTime = atoi(pimParams[LSF_PIM_SLEEPTIME].paramValue)) < 0) {
-            ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 5001,
-                "LSF_PIM_SLEEPTIME value <%s> must be a positive integer, defaulting to %d"), /* catgets 5001 */
-                pimParams[LSF_PIM_SLEEPTIME].paramValue, PIM_SLEEP_TIME);
+    if ((sp = pimParams[LSF_PIM_SLEEPTIME].paramValue)) {
+        if ((sleepTime = atoi(sp) < 0)) {
+            ls_syslog(LOG_ERR, "\
+%s: LSF_PIM_SLEEPTIME value %s must be a positive integer, set to %d",
+                      __func__, sp, PIM_SLEEP_TIME);
             sleepTime = PIM_SLEEP_TIME;
         }
     }
 
-    if ((myHost = ls_getmyhostname()) == NULL) {
-        ls_syslog(LOG_ERR, I18N_FUNC_FAIL_MM, fname, "ls_getmyhostname");
-        ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 5002,
-            "Using local host")); /* catgets 5002 */
-    }
-
-    if (pimParams[LSF_PIM_INFODIR].paramValue) {
-        sprintf(infoFN, "%s/pim.info.%s",
-                pimParams[LSF_PIM_INFODIR].paramValue, myHost);
-    } else {
-        if (pim_debug) {
-
-            if (pimParams[LSF_LOGDIR].paramValue)
-                sprintf(infoFN, "%s/pim.info.%s",
-                        pimParams[LSF_LOGDIR].paramValue, myHost);
-            else
-                sprintf(infoFN, "/tmp/pim.info.%s.%d",
-                        myHost, (int)getuid());
-        } else {
-            sprintf(infoFN, "/tmp/pim.info.%s", myHost);
+    if ((sp = pimParams[LSF_PIM_UPDATE_INTERVAL].paramValue)) {
+        if ((updInterval = atoi(sp)) < 0) {
+            ls_syslog(LOG_ERR, "\
+%s: LSF_PIM_UPDATE_INTERVAL value %s must be a positive integer, set to %d",
+                      __func__, sp, PIM_UPDATE_INTERVAL);
+            updInterval = PIM_UPDATE_INTERVAL;
         }
     }
 
-    if (pimParams[LSF_PIM_NPROC].paramValue != NULL) {
-        errno = 0;
-        nproc = strtol(pimParams[LSF_PIM_NPROC].paramValue, NULL, 10);
-        if (nproc == 0 || errno != 0) {
-            ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 5003,
-                "pim/main: invalid value for LSF_PIM_NPROC defined: %s"), pimParams[LSF_PIM_NPROC].paramValue); /* catgets 5003 */
-            exit(-1);
-        }
-    } else {
-        nproc = -1;
-    }
-
-    if (pimParams[LSF_PIM_SGI_NOSHMEM].paramValue) {
-        sgiPimNoShmem = TRUE;
-    }
-
-    if (pimParams[LSF_PIM_SLEEPTIME_UPDATE].paramValue != NULL
-        && strcasecmp(pimParams[LSF_PIM_SLEEPTIME_UPDATE].paramValue, "y") == 0) {
-        sleepBeforeUpdateProcs = FALSE;
-    }
-    /* Enable this by default as it noticerably speeds
-     * up batch operation. Why to be slow by default?
-     * Until we restructure pim making it single use mode
-     * keep this like this.
+    myHost = ls_getmyhostname();
+    /* Greet the world!
      */
-    sleepBeforeUpdateProcs = FALSE;
+    ls_syslog(LOG_INFO, "\
+pim: Howdy this is Process Information Manager daemon on host %s.", myHost);
 
-    if (pimParams[LSF_PIM_CPUTIMECHECK].paramValue != NULL
-        && strcasecmp(pimParams[LSF_PIM_CPUTIMECHECK].paramValue, "y") == 0) {
-        pimCpuTimeCheck = TRUE;
+    sprintf(infofile, "/tmp/pim.info.%s", myHost);
+    if (pimParams[LSF_PIM_INFODIR].paramValue) {
+        sprintf(infofile, "\
+%s/pim.info.%s", pimParams[LSF_PIM_INFODIR].paramValue, myHost);
     }
 
-    doServ();
+    /* Like a good old Unix deamon do something
+     * upon receiving SIGHUP.
+     */
+    Signal_(SIGHUP, hup);
+    Signal_(SIGTERM, hup);
+    Signal_(SIGINT, hup);
 
+    cc = doServ();
+    if (cc < 0)
+        return -1;
 
-    return(0);
-
+    return 0;
 }
 
-
-static void
+/* doServ()
+ * Da main loop.
+ */
+static int
 doServ(void)
 {
-    static char          fname[] = "doServ()";
-    int                  ppid;
-    socklen_t            len;
-    struct sockaddr_in   sin;
-    int                  asock;
-    time_t               lastTime;
-    time_t               nextTime;
-    time_t               now;
-    time_t               lastUsedTime;
-    time_t               lastUpdateTime = 0;
-    time_t               lastUpdateStartTime = 0;
-    time_t               currentUpdateStartTime = 0;
+    int ppid;
+    socklen_t len;
+    struct sockaddr_in sin;
+    int asock;
+    int cc;
+    time_t nextTime;
 
+    umask(022);
     if ((asock = TcpCreate_(TRUE, 0)) < 0) {
-        ls_syslog(LOG_ERR, I18N_FUNC_FAIL_M, fname, "TcpCreate_");
-        ls_syslog(LOG_ERR, I18N_Exiting);
-        exit(-1);
+        ls_syslog(LOG_ERR, "%s: TcpCreate_() failed: %m.", __func__);
+        return -1;
     }
 
-    ppid = getppid();
     len = sizeof(sin);
-    if (getsockname (asock, (struct sockaddr *) &sin, &len) < 0) {
-        ls_syslog(LOG_ERR, I18N_FUNC_FAIL_M, fname, "getsockname");
-        ls_syslog(LOG_ERR, I18N_Exiting);
-        exit(-1);
+    if (getsockname (asock, (struct sockaddr *)&sin, &len) < 0) {
+        ls_syslog(LOG_ERR, "s: getsockname() failed: %m.", __func__);
+        return -1;
     }
 
     pimPort = ntohs(sin.sin_port);
 
-    replayDeadPids();
-
-    open_kern();
-
-    currentUpdateStartTime = time(0);
     TIMEIT(0, updateProcs(0), "updateProcs");
-    lastUpdateStartTime = currentUpdateStartTime;
-
-    now = time(0);
-    lastTime = now;
-    nextTime = lastTime + sleepTime;
-    lastUpdateTime = now;
-    lastUsedTime = 0;
+    nextTime = time(NULL) + updInterval;
 
     for (;;) {
         struct timeval timeOut;
         fd_set rmask;
         int nready;
+        int sock;
+        struct LSFHeader hdrBuf;
+        struct LSFHeader hdr;
+        time_t t;
 
-        if (nextTime - lastTime < 0)
-            timeOut.tv_sec = 0;
-        else
-            timeOut.tv_sec = nextTime - lastTime;
+        ppid = getppid();
+        if (ppid <= 1 || (kill(getppid(), 0) == -1)) {
+            ls_syslog(LOG_INFO, "\
+%s: Parent gone, PIM exiting good bye.", __func__);
+            return 0;
+        }
 
+        /* heftago
+         */
+        if (gothup)
+            break;
+
+        t = time(NULL);
+        if (t >= nextTime) {
+            TIMEIT(0, updateProcs(t), "updateProcs");
+            nextTime = t + updInterval;
+        }
+
+        timeOut.tv_sec = sleepTime;
         timeOut.tv_usec = 0;
 
         FD_ZERO(&rmask);
         FD_SET(asock, &rmask);
 
         nready = select(asock + 1, &rmask, NULL, NULL, &timeOut);
-
-        if (logclass & LC_PIM)
-            ls_syslog(LOG_DEBUG, "%s: select nready=%d", fname, nready);
-
-        if (nready < 0) {
-            ls_syslog(LOG_DEBUG, "%s: select(): %m", fname);
-            lastTime = time(0);
+        if (nready <= 0) {
+            if (nready < 0)
+                ls_syslog(LOG_ERR, "%s: select() failed: %m", __func__);
             continue;
         }
 
-        if (ppid <= 1) {
-
-            ppid = getppid();
-        }
-
-        if ((ppid <= 1) || (kill(ppid, 0) == -1)) {
-            ls_syslog(LOG_INFO, (_i18n_msg_get(ls_catd , NL_SETN, 5004, "%s: Parent gone, PIM exiting ...")), fname);  /* catgets 5004 */
-            exit(0);
-        }
-
-        now = time(0);
-
-        if (nready != 0) {
-            int sock;
-
-            if ((sock = b_accept_(asock, (struct sockaddr *) &sin, &len))
-                < 0) {
-                ls_syslog(LOG_ERR, I18N_FUNC_FAIL_M, fname, "accept");
-            } else {
-                int option;
-                struct LSFHeader hdrBuf, hdr;
-                int cc;
-
-                io_nonblock_(sock);
-
-                if ((cc = lsRecvMsg_(sock, (char *) &hdrBuf, sizeof(hdrBuf),
-                                     &hdr, NULL, NULL, nb_read_fix)) < 0) {
-                    ls_syslog(LOG_DEBUG,
-                              "%s: lsRecvMsg_() failed, cc=%d: %M", fname, cc);
-                } else {
-
-                    int sleptTime = now - lastUpdateTime;
-
-                    option = hdr.opCode;
-                    newPGid(hdr.reserved);
-
-                    if (logclass & LC_PIM)
-                        ls_syslog(LOG_DEBUG, "%s: got opCode = %d", fname,
-                                  option);
-
-                    if ((option & PIM_API_UPDATE_NOW)
-                        || sleptTime >= sleepTime) {
-                        if ((option & PIM_API_UPDATE_NOW)
-                            && sleepBeforeUpdateProcs == TRUE) {
-
-                            int moreTime;
-                            int breakTime = sleepTime/10;
-
-                            if(breakTime == 0) {
-                                breakTime = 1;
-                            } else if(breakTime > MAX_MIN_SLEEPTIME) {
-
-                                breakTime = MAX_MIN_SLEEPTIME;
-                            }
-
-                            moreTime = breakTime - sleptTime;
-
-                            if(moreTime > 0) {
-                                if (logclass & LC_PIM)
-                                    ls_syslog(LOG_DEBUG,
-                                        "%s: I need to sleep more = %d",
-                                        fname, moreTime);
-
-                                sleep(moreTime);
-                            }
-                        }
-
-                        if (logclass & LC_PIM)
-                            ls_syslog(LOG_DEBUG, "\
-%s: Got connection, updateProcs", fname);
-
-                        currentUpdateStartTime = time(0);
-                        TIMEIT(0, updateProcs(lastUpdateStartTime), "updateProcs");
-                        lastUpdateStartTime = currentUpdateStartTime;
-
-                        now = time(0);
-                        lastUpdateTime = now;
-                        nextTime = now + sleepTime;
-                    }
-
-                    if ((cc = writeEncodeHdr_(sock, &hdr, nb_write_fix)) < 0)
-                        ls_syslog(LOG_DEBUG,
-                                  "%s: writeEncodeHdr_ failed, cc=%d: %M",
-                                  fname, cc);
-                }
-
-                close(sock);
-            }
-
-            if (logclass & LC_PIM)
-                ls_syslog(LOG_DEBUG, "%s: Got connection", fname);
-
-            lastTime = now;
-            lastUsedTime = now;
+        sock = b_accept_(asock, (struct sockaddr *)&sin, &len);
+        if (sock < 0) {
+            ls_syslog(LOG_ERR, "%s: accept() failed %m.", __func__);
             continue;
         }
 
-        if (logclass & LC_PIM)
-            ls_syslog(LOG_DEBUG, "%s: Timeout ...", fname);
-
-
-        if (now - lastUsedTime < USED_TIME ||
-            now - lastUpdateTime >= DEFAULT_UPDATE_PERIOD) {
-            if (logclass & LC_PIM)
-                ls_syslog(LOG_DEBUG, "%s: Timeout updating", fname);
-
-            currentUpdateStartTime = time(0);
-            TIMEIT(0, updateProcs(lastUpdateStartTime), "updateProcs");
-            lastUpdateStartTime = currentUpdateStartTime;
-            now = time(0);
-            lastUpdateTime = now;
+        if ((cc = lsRecvMsg_(sock,
+                             (char *)&hdrBuf,
+                             sizeof(hdrBuf),
+                             &hdr,
+                             NULL,
+                             NULL,
+                             nb_read_fix)) < 0) {
+            close(sock);
+            ls_syslog(LOG_ERR, "\
+%s: lsRecvMsg_() failed, cc %d: %M", __func__, cc);
+            continue;
         }
 
-        lastTime = now;
-        nextTime = now + sleepTime;
+        ls_syslog(LOG_DEBUG, "\
+%s: got opCode %d PGID %d updating now.", __func__,
+                  hdr.opCode, hdr.reserved);
+
+        /* Update processes and move the time ahead.
+         */
+        TIMEIT(0, updateProcs(t), "updateProcs");
+        nextTime = time(NULL) + updInterval;
+
+        if ((cc = writeEncodeHdr_(sock, &hdr, nb_write_fix)) < 0) {
+            ls_syslog(LOG_ERR, "%s: write() failed %m.", __func__);
+            close(sock);
+            continue;
+        }
+
+        close(sock);
     }
 
+    return 0;
 }
 
-
+/* updateProcs()
+ */
 static void
 updateProcs(const time_t lastUpdate)
 {
-    int temp_nr;
-    struct lsPidInfo *temp_pbase;
+    ls_syslog(LOG_DEBUG, "\
+%s: updating PIM process table.", __func__);
 
-
-
-    temp_nr = old_nr_of_processes;
-    old_nr_of_processes = nr_of_processes;
-    nr_of_processes = temp_nr;
-
-    temp_pbase = old_pbase;
-    old_pbase = pbase;
-    pbase = temp_pbase;
-
-
-
-    if (scanIt) {
-
-        scan_procs();
-        if (pimCpuTimeCheck) {
-            TIMEIT(0, cpuTimeCheck(lastUpdate), "cpuTimeCheck");
-        }
-        addDeadProcesses();
-        logProcessInfo();
-    } else {
-        unlink(infoFN);
-    }
+    scan_procs();
+    logProcessInfo();
 }
 
-
+/* logProcessInfo()
+ */
 static void
 logProcessInfo(void)
 {
-    int i, pIdx;
+    int i;
     FILE *fp;
-    char workFN[MAXFILENAMELEN];
-    static char fname[] = "logProcessInfo";
-    struct stat st;
+    static char wfile[MAXFILENAMELEN];
 
-    umask(022);
+    sprintf(wfile, "%s.%d", infofile, getpid());
 
-    sprintf(workFN, "%s.%d", infoFN, (int)getpid());
-
-
-    pidLink = (struct pidLink *) malloc(nr_of_processes *
-                                        sizeof(struct pidLink));
-
-    if (pidLink == NULL) {
-        ls_syslog(LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
-        exit(-1);
-    }
-    memset((char*)pidLink, 0, nr_of_processes * sizeof(struct pidLink));
-
-    for (i = 0; i < nr_of_processes; i++) {
-        pidLink[i].child = -1;
-        pidLink[i].sortedIdx = -1;
-        pidLink[i].sibling = -2;
-    }
-
-    sortPids();
-
-    if (lstat(workFN, &st) < 0) {
-        if (errno == ENOENT) {
-            if ((fp = fopen(workFN, "w")) == NULL) {
-                ls_syslog(LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "fopen", workFN);
-                return;
-            }
-        } else {
-            ls_syslog(LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "stat", workFN);
-            return;
-        }
-    } else if (S_ISREG(st.st_mode) && st.st_nlink == 1) {
-
-        if ((fp = fopen(workFN, "w")) == NULL) {
-            ls_syslog(LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "fopen", workFN);
-            return;
-        }
-    } else {
-
-        ls_syslog(LOG_ERR, (_i18n_msg_get(ls_catd , NL_SETN, 5005,
-                  "%s: pim info file <%s> is not a regular file, file untouched")), fname, workFN); /* catgets 5004 */
-        ls_syslog(LOG_ERR, I18N_Exiting);
-        exit(-1);
+    fp = fopen(wfile, "w");
+    if (fp == NULL) {
+        ls_syslog(LOG_ERR, "%s: fopen() %s failed %m.", wfile);
+        return;
     }
 
     fprintf(fp, "%d\n", pimPort);
+    for (i = 0; i < numprocs; i++) {
 
-    for (pIdx = 0; pIdx < sortedIdx; pIdx++) {
-        i = pidLink[pIdx].sortedIdx;
-
-        fprintf(fp, "%d %d %d %d %d %d %d %d %d %d %d %d\n",
-            pbase[i].pid, pbase[i].ppid, pbase[i].pgid, pbase[i].jobid,
-            pbase[i].utime, pbase[i].stime, pbase[i].cutime,
-            pbase[i].cstime, pbase[i].proc_size,
-            pbase[i].resident_size, pbase[i].stack_size,
-            (int) pbase[i].status);
+        fprintf(fp, "\
+%d %d %d %d %d %d %d %d %d %d %d %d\n",
+                pbase[i].pid, pbase[i].ppid, pbase[i].pgid, pbase[i].jobid,
+                pbase[i].utime, pbase[i].stime, pbase[i].cutime,
+                pbase[i].cstime, pbase[i].proc_size,
+                pbase[i].resident_size, pbase[i].stack_size,
+                (int) pbase[i].status);
     }
-
-    for (i = 0; i < nDeadPids; i++) {
-        fprintf(fp, "%d %d %d %d %d %d %d %d %d %d %d %d\n",
-            deadPid[i].pid, deadPid[i].ppid, deadPid[i].pgid, deadPid[i].jobid,
-            deadPid[i].utime, deadPid[i].stime, deadPid[i].cutime,
-            deadPid[i].cstime, deadPid[i].proc_size,
-            deadPid[i].resident_size, deadPid[i].stack_size,
-            (int) deadPid[i].status);
-    }
-
     fclose(fp);
 
-    if (unlink(infoFN) < 0 && errno != ENOENT) {
-        ls_syslog(LOG_DEBUG, "%s: unlink(%s) failed: %m", fname, infoFN);
-    }
-    if (rename(workFN, infoFN) < 0) {
-        ls_syslog(LOG_ERR, I18N_FUNC_FAIL_M, fname, "rename");
+    if (unlink(infofile) < 0 && errno != ENOENT) {
+        ls_syslog(LOG_DEBUG, "\
+%s: unlink(%s) failed: %m.", __func__, infofile);
     }
 
-    free(pidLink);
+    if (rename(wfile, infofile) < 0) {
+        ls_syslog(LOG_ERR, "\
+%s: rename() %s to %s failed: %m.", __func__, wfile, infofile);
+    }
+    unlink(wfile);
+
+    ls_syslog(LOG_DEBUG, "\
+%s: process table updated.", __func__);
+
 }
-
 
 static void
-addDeadProcesses(void)
+hup(int sig)
 {
-    static char fname[] = "addDeadProcesses";
-    struct pgidRec *pg;
-    int npgids;
-    int i, j;
-
-
-    pg = newPGidList(&npgids);
-
-
-    for (i = 0; i < old_nr_of_processes; i++) {
-        for (j = 0; j < npgids; j++) {
-            if (pidInGroup(old_pbase + i, pg + j))
-                break;
-        }
-    }
-
-
-    for (i = 0; i < nDeadPids; i++) {
-        for (j = 0; j < npgids; j++) {
-            if (pidInGroup(deadPid + i, pg + j))
-                break;
-        }
-    }
-
-
-
-    FREEUP(deadPid);
-    deadPid = (struct lsPidInfo *) malloc(npgids * sizeof(struct lsPidInfo));
-    if (deadPid == NULL) {
-        ls_syslog(LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
-        ls_syslog(LOG_ERR, I18N_Exiting);
-        exit(-1);
-    }
-
-    nDeadPids = 0;
-    for (i = 0; i < npgids; i++) {
-
-        if (pg[i].deadSTime || pg[i].deadUTime) {
-            memset((char *) &deadPid[nDeadPids], 0, sizeof(struct lsPidInfo));
-            deadPid[nDeadPids].pid = -1;
-            deadPid[nDeadPids].pgid = pg[i].pgid;
-            deadPid[nDeadPids].utime = pg[i].deadUTime;
-            deadPid[nDeadPids].stime = pg[i].deadSTime;
-            nDeadPids++;
-        }
-        FREEUP(pg[i].pid);
-    }
-
-    FREEUP(pg);
-
+    gothup = 1;
 }
-
-
-
-
-static struct pgidRec *
-newPGidList(int *npgids)
-{
-    static char fname[] = "newPGidList";
-    struct pgidRec *pg;
-    int i, j;
-
-    *npgids = 0;
-
-    pg = (struct pgidRec *) malloc(nr_of_processes * sizeof(struct pgidRec));
-    if (pg == NULL) {
-        ls_syslog(LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
-        ls_syslog(LOG_ERR, I18N_Exiting);
-        exit(-1);
-    }
-
-    for (i = 0; i < nr_of_processes; i++) {
-        for (j = 0; j < *npgids; j++) {
-            if (pbase[i].pgid == pg[j].pgid)
-                break;
-        }
-
-        if (j == *npgids) {
-
-            if ((pg[*npgids].pid = (int *) malloc(NPIDS_SIZE * sizeof(int)))
-                == NULL) {
-                ls_syslog(LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
-                ls_syslog(LOG_ERR, I18N_Exiting);
-                exit(-1);
-            }
-            pg[*npgids].npids = 1;
-            pg[*npgids].pid[0] = pbase[i].pid;
-            pg[*npgids].deadSTime = 0;
-            pg[*npgids].deadUTime = 0;
-            pg[*npgids].pgid = pbase[i].pgid;
-            (*npgids)++;
-        } else {
-
-
-            if (pg[j].npids % NPIDS_SIZE == 0) {
-                if ((pg[j].pid = (int *) realloc((char *) pg[j].pid,
-                                                 (pg[j].npids + NPIDS_SIZE) *
-                                                 sizeof(int))) == NULL) {
-                    ls_syslog(LOG_ERR, I18N_FUNC_FAIL_M, fname, "realloc");
-                    ls_syslog(LOG_ERR, I18N_Exiting);
-                    exit(-1);
-                }
-            }
-            pg[j].pid[pg[j].npids] = pbase[i].pid;
-            pg[j].npids++;
-        }
-    }
-
-    return (pg);
-}
-
 
 static int
-pidInGroup(struct lsPidInfo *p, struct pgidRec *pg)
+scan_procs(void)
 {
-    int k;
+    DIR *dir;
+    struct dirent *process;
+    struct lsPidInfo rec;
 
-
-    if (p->pgid != pg->pgid)
-        return FALSE;
-
-    for (k = 0; k < pg->npids; k++) {
-
-        if (p->pid == pg->pid[k])
-            return (TRUE);
+    dir = opendir("/proc");
+    if (dir == NULL) {
+        ls_syslog(LOG_ERR, "\
+%s: opendir(/proc) failed: %m.", __func__);
+        return -1;
     }
 
+    numprocs = 0;
+    while ((process = readdir(dir))) {
 
-    pg->deadUTime += p->utime;
-    pg->deadSTime += p->stime;
-
-    return (TRUE);
-}
-
-
-static void
-replayDeadPids(void)
-{
-    FILE *fp;
-    struct lsPidInfo pinfo;
-    int port;
-    static char fname[] = "replayDeadPids";
-    struct stat st;
-    time_t bootTime;
-
-    if (stat(infoFN, &st) == -1) {
-        ls_syslog(LOG_DEBUG, "%s: stat(%s) failed: %m, not doing replay",
-                  fname, infoFN);
-        return;
-    }
-
-    if (getBootTime(&bootTime) == -1) {
-        ls_syslog(LOG_DEBUG, "%s: getBootTime failed, not doing replay",
-                  fname);
-        return;
-    }
-
-    if (bootTime > st.st_mtime) {
-        ls_syslog(LOG_DEBUG,
-                  "%s: infoFN <%s> is older than boottime <%d>, not doing replay",
-                  fname, infoFN, (int) bootTime);
-        return;
-    }
-
-    if ((fp = fopen(infoFN, "r")) == NULL) {
-        ls_syslog(LOG_DEBUG, "%s: fopen(%s) failed: %m, not doing replay",
-                  fname, infoFN);
-        return;
-    }
-
-    fscanf(fp, "%d", &port);
-
-    while (fscanf(fp, "%d %d %d %d %d %d %d %d %d %d %d %d",
-                  &pinfo.pid, &pinfo.ppid, &pinfo.pgid, &pinfo.jobid,
-                  &pinfo.utime, &pinfo.stime, &pinfo.cutime,
-                  &pinfo.cstime, &pinfo.proc_size,
-                  &pinfo.resident_size, &pinfo.stack_size,
-                  (int *) &pinfo.status) != EOF) {
-        if (pinfo.pid == -1)
-            newDeadPid(&pinfo);
-    }
-
-    fclose(fp);
-}
-
-static void
-newDeadPid(struct lsPidInfo *pinfo)
-{
-    static char fname[] = "newDeadPid";
-
-    if (deadPid == NULL) {
-        deadPid = (struct lsPidInfo *) malloc(NPIDS_SIZE *
-                                              sizeof(struct lsPidInfo));
-        if (deadPid == NULL) {
-            ls_syslog(LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
-            ls_syslog(LOG_ERR, I18N_Exiting);
-            exit(-1);
-        }
-    } else {
-        if (nDeadPids % NPIDS_SIZE == 0) {
-            deadPid = (struct lsPidInfo *) realloc(deadPid,
-                           (nDeadPids + NPIDS_SIZE)*sizeof(struct lsPidInfo));
-            if (deadPid == NULL) {
-                ls_syslog(LOG_ERR, I18N_FUNC_FAIL_M, fname, "realloc");
-                ls_syslog(LOG_ERR, I18N_Exiting);
-                exit(-1);
-            }
-        }
-    }
-
-
-    memcpy((char *) &deadPid[nDeadPids], (char *) pinfo,
-           sizeof(struct lsPidInfo));
-
-    nDeadPids++;
-}
-
-
-void
-newPGid(int inPGid)
-{
-    static char fname[] = "newPGid";
-
-    if (inPGid <= 0) return;
-
-    if (pgidList == NULL) {
-        pgidList = (struct lspgidEnt *) malloc(NPGIDS_SIZE * sizeof(struct lspgidEnt));
-        if (pgidList == NULL) {
-            ls_syslog(LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
-            ls_syslog(LOG_ERR, I18N_Exiting);
-            exit(-1);
-        }
-    } else {
-        if (nPGidList % NPGIDS_SIZE == 0) {
-            pgidList = (struct lspgidEnt *) realloc(pgidList,
-                        (nPGidList + NPGIDS_SIZE)*sizeof(struct lspgidEnt));
-            if (pgidList == NULL) {
-                ls_syslog(LOG_ERR, I18N_FUNC_FAIL_M, fname, "realloc");
-                ls_syslog(LOG_ERR, I18N_Exiting);
-                exit(-1);
-            }
-        }
-    }
-
-
-    pgidList[nPGidList].pgid = inPGid;
-    pgidList[nPGidList].active = TRUE;
-
-    nPGidList++;
-}
-
-
-int
-pidInPGList(int inPGid)
-{
-    int k;
-
-
-    if (inPGid <= 0)
-        return (FALSE);
-
-    for (k = 0; k < nPGidList; k++) {
-
-        if (inPGid == pgidList[k].pgid) {
-            pgidList[k].active = TRUE;
-            return (TRUE);
-        }
-    }
-
-    return (FALSE);
-}
-
-int
-initPGidList(void)
-{
-        int i;
-
-        for (i=0;i<nPGidList;i++)
-                pgidList[i].active = FALSE;
-        return(TRUE);
-}
-
-int
-cleanPGidList(void)
-{
-        struct lspgidEnt *pgidList_p;
-        int nPGidList_p;
-        int i;
-
-        if (nPGidList == 0) {
-                return(TRUE);
-        }
-
-        i=0;
-        while ((i<nPGidList)&&(pgidList[i].active == TRUE))
-                i ++;
-
-        if (i>=nPGidList) {
-                return(TRUE);
-        }
-
-        pgidList_p = pgidList;
-        nPGidList_p= nPGidList;
-
-        pgidList = NULL;
-        nPGidList= 0;
-
-        for (i=0;i<nPGidList_p;i++) {
-                if (pgidList_p[i].active)
-                        newPGid(pgidList_p[i].pgid);
-        }
-
-        FREEUP(pgidList_p)
-
-        return(TRUE);
-}
-
-
-static void
-sortPids(void)
-{
-    static char fname[] = "sortPids";
-    int i, initPidIdx = 0;
-
-    for (i = 0; i < nr_of_processes; i++) {
-        if (pbase[i].pid < pbase[initPidIdx].pid)
-            initPidIdx = i;
-
-        getChildren(i);
-    }
-
-    if (logclass & LC_PIM)
-        ls_syslog(LOG_DEBUG2, "%s: sortIt initPidIdx=%d", fname, initPidIdx);
-
-    sortedIdx = 0;
-    sortIt(initPidIdx);
-
-}
-
-static void
-getChildren(int ppidIdx)
-{
-    static char fname[] = "getChildren";
-    int lastSibling = ppidIdx;
-    int i;
-
-    if (logclass & LC_PIM)
-        ls_syslog(LOG_DEBUG2, "%s: ppidIdx=%d pbase.pid=%d pbase.ppid=%d",
-                  fname, ppidIdx, pbase[ppidIdx].pid, pbase[ppidIdx].ppid);
-
-    for (i = 0; i < nr_of_processes; i++) {
-        if (i == ppidIdx)
+        if (! isdigit(process->d_name[0]))
             continue;
 
-        if (pbase[i].ppid == pbase[ppidIdx].pid) {
-            if (logclass & LC_PIM)
-                ls_syslog(LOG_DEBUG2,
-                          "\ti=%d pid=%d maybe a child, sibling=%d",
-                          i, pbase[i].pid, pidLink[i].sibling);
+        if (ls_pidinfo(atoi(process->d_name), &rec) != 0)
+            continue;
 
-            if (pidLink[i].sibling == -2) {
+        if (rec.pgid == 1)
+            continue;
 
+        pbase[numprocs].pid = rec.pid;
+        pbase[numprocs].ppid = rec.ppid;
+        pbase[numprocs].pgid = rec.pgid;
 
-                if (logclass & LC_PIM)
-                    ls_syslog(LOG_DEBUG2, "\tadding as a child");
+        pbase[numprocs].utime = rec.utime/100;
+        pbase[numprocs].stime = rec.stime/100;
+        pbase[numprocs].cutime = rec.cutime/100;
+        pbase[numprocs].cstime = rec.cstime/100;
 
-                if (lastSibling == ppidIdx)
-                    pidLink[ppidIdx].child = i;
-                else
-                    pidLink[lastSibling].sibling = i;
-                lastSibling = i;
-                pidLink[i].sibling = -1;
-            }
-        }
-    }
-}
+        pbase[numprocs].proc_size = rec.proc_size;
+        pbase[numprocs].resident_size
+            = rec.resident_size * (sysconf(_SC_PAGESIZE)/1024);
+        pbase[numprocs].stack_size = rec.stack_size;
+        if ( pbase[numprocs].stack_size < 0 )
+            pbase[numprocs].stack_size = 0;
+        pbase[numprocs].status = rec.status;
 
-
-static void
-sortIt(int pIdx)
-{
-    int i;
-
-    if (logclass & LC_PIM)
-        ls_syslog(LOG_DEBUG2,
-                  "sortIt: sortedIdx %d pIdx = %d pid %d sorted %d",
-                  sortedIdx, pIdx, pbase[pIdx].pid, pidLink[pIdx].sorted);
-
-
-    if (pidLink[pIdx].sorted)
-        return;
-
-    pidLink[sortedIdx].sortedIdx = pIdx;
-    pidLink[pIdx].sorted = TRUE;
-    sortedIdx++;
-
-    for (i = pidLink[pIdx].child; i != -1; i = pidLink[i].sibling)
-        sortIt(i);
-}
-
-
-
-int
-isNfsDaemon( char *command, char *nfsDaemon )
-{
-    char *cp, *word;
-
-    if (strstr(command, nfsDaemon) != NULL) {
-
-        cp = command;
-        word = getNextWord_(&cp);
-        cp = strrchr(word, '/');
-        if ( cp == NULL )
-            cp = word;
-        if (strcmp(cp, nfsDaemon) == 0) {
-            return(TRUE);
-        }
-    }
-    return(FALSE);
-}
-
-static void
-freePidHT(void*p) {}
-
-static void
-cpuTimeCheck(const time_t lastUpdate)
-{
-    static char   fname[] = "cpuTimeCheck()";
-    int           i;
-    int           j;
-    time_t        clockTime;
-    struct        hTab pidHT;
-    char          pidStr[20];
-
-    if (lastUpdate == 0)
-        return;
-
-    clockTime = time(0) - lastUpdate;
-
-    h_initTab_(&pidHT, 61);
-
-    for (j = 0; j < old_nr_of_processes; j++) {
-        hEnt   *ent;
-
-        sprintf(pidStr, "%d", old_pbase[j].pid);
-        ent = h_addEnt_(&pidHT, pidStr, NULL);
-        ent->hData = &j;
-    }
-
-    for (i = 0; i < nr_of_processes; i++) {
-        hEnt   *ent;
-
-        sprintf(pidStr, "%d", pbase[i].pid);
-
-        if ((ent = h_getEnt_(&pidHT, pidStr))) {
-            int   *jpid = ent->hData;
-
-            if ((pbase[i].utime + pbase[i].stime)
-                - (old_pbase[*jpid].utime + old_pbase[*jpid].stime)
-                > 2 * clockTime) {
-
-                if (logclass & LC_PIM)
-                    ls_syslog(LOG_DEBUG, "\
-%s: pid %d utime %d stime %d old_utime %d old_stime %d clockTime %d",
-                              fname, pbase[i].pid, pbase[i].utime,
-                              pbase[i].stime, old_pbase[*jpid].utime,
-                              old_pbase[*jpid].stime, clockTime);
-                pbase[i].utime = old_pbase[*jpid].utime + clockTime/2;
-                pbase[i].stime = old_pbase[*jpid].stime + clockTime/2;
-            }
-        } else {
-            if ((pbase[i].utime + pbase[i].stime) > 2*clockTime) {
-                if (logclass & LC_PIM)
-                    ls_syslog(LOG_DEBUG, "\
-%s: new pid <%d> utime <%d> stime <%d>, clockTime <%d>",
-                              fname, pbase[i].pid,
-                              pbase[i].utime,
-                              pbase[i].stime,
-                              clockTime);
-                pbase[i].utime = clockTime/2;
-                pbase[i].stime = clockTime/2;
-            }
+        ++numprocs;
+        if (numprocs == MAX_PROC_ENT - 1) {
+            ls_syslog(LOG_INFO, "\
+%s: maximum number of processes %d reached.", __func__, numprocs);
+            break;
         }
     }
 
-    h_freeTab_(&pidHT, freePidHT);
+    closedir(dir);
 
+    return 0;
+}
 
+/* ls_pidinfo()
+ */
+static int
+ls_pidinfo(int pid, struct lsPidInfo *rec)
+{
+    int fd;
+    static char filename[PATH_MAX];
+    static char buffer[BUFSIZ];
+
+    sprintf(filename, "/proc/%d/stat", pid);
+
+    fd = open(filename, O_RDONLY, 0);
+    if (fd == -1) {
+        ls_syslog(LOG_ERR, "\
+%s: open() failed %s %m.", __func__, filename );
+        return -11;
+    }
+
+    if (read(fd, buffer, sizeof(buffer) - 1) <= 0) {
+        ls_syslog(LOG_ERR, "\
+%s: read() failed %s %m.", __func__, filename);
+        close(fd);
+        return -1;
+    }
+    close(fd);
+
+    if (parse_stat(buffer, rec) < 0) {
+        ls_syslog(LOG_ERR, "\
+%s: parse_stat() failed process %d.", __func__, pid);
+        return -1;
+    }
+
+    return 0;
+}
+
+/* parse_stat()
+ */
+static int
+parse_stat(char *buf, struct lsPidInfo *pinfo)
+{
+    unsigned int rss_rlim;
+    unsigned int start_code;
+    unsigned int end_code;
+    unsigned int start_stack;
+    unsigned int end_stack;
+    unsigned char status;
+    unsigned long vsize;
+
+    sscanf(buf, "\
+%d %s %c %d %d %*d %*d %*d %*u %*u %*u %*u %*u %d %d %d "
+           "%d %*d %*d %*u %*u %*d %lu %u %u %u %u %u %u",
+           &pinfo->pid, pinfo->command, &status, &pinfo->ppid, &pinfo->pgid,
+           &pinfo->utime, &pinfo->stime, &pinfo->cutime, &pinfo->cstime,
+           &vsize, &pinfo->resident_size, &rss_rlim, &start_code,
+           &end_code, &start_stack, &end_stack);
+
+    if (pinfo->pid == 0) {
+        ls_syslog(LOG_ERR, "\
+%s: invalid process 0 found: %s", __func__, buf);
+        return -1;
+    }
+
+    pinfo->stack_size = start_stack - end_stack;
+    pinfo->proc_size = vsize/1024;
+
+    switch (status) {
+        case 'R' :
+            pinfo->status = LS_PSTAT_RUNNING;
+            break;
+        case 'S' :
+            pinfo->status = LS_PSTAT_SLEEP;
+            break;
+        case 'D' :
+            pinfo->status = LS_PSTAT_SLEEP;
+            break;
+        case 'T' :
+            pinfo->status = LS_PSTAT_STOPPED;
+            break;
+        case 'Z' :
+            pinfo->status = LS_PSTAT_ZOMBI;
+            break;
+        case 'W' :
+            pinfo->status = LS_PSTAT_SWAPPED;
+            break;
+        default :
+            pinfo->status = LS_PSTAT_RUNNING;
+            break;
+    }
+
+    return 0;
 }

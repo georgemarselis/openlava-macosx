@@ -32,30 +32,28 @@ enum lsPStatType {
     LS_PSTAT_EXITING
 };
 
-
 struct lsPidInfo {
-    int pid;            
-    int ppid;           
-    int pgid;           
-    int jobid;		
-    int utime;          
-                        
-    int stime;          
-    int cutime;         
-    int cstime;         
-    int proc_size;      
-    int resident_size;  
-    int stack_size;     
-    enum lsPStatType status;	
-
-    char *command;	
+    int pid;
+    int ppid;
+    int pgid;
+    int jobid;
+    int utime;
+    int stime;
+    int cutime;
+    int cstime;
+    int proc_size;
+    int resident_size;
+    int stack_size;
+    enum lsPStatType status;
+    char command[PATH_MAX];
 };
 
-#define PIM_API_TREAT_JID_AS_PGID 0x1 
-#define PIM_API_UPDATE_NOW        0x2 
+#define PIM_API_TREAT_JID_AS_PGID 0x1
+#define PIM_API_UPDATE_NOW        0x2
 
-#define PIM_SLEEP_TIME 30
+#define PIM_SLEEP_TIME 3
+#define PIM_UPDATE_INTERVAL 30
 
 extern struct jRusage *getJInfo_(int, int*, int, int);
 
-#endif 
+#endif
