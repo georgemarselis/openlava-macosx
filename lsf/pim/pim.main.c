@@ -137,6 +137,7 @@ main(int argc, char **argv)
             pim_debug = 1;
     }
 
+    traceVal = NULL;
     if (pimParams[LSF_PIM_TRACE].paramValue) {
         traceVal = pimParams[LSF_PIM_TRACE].paramValue;
     } else if (pimParams[LSF_DEBUG_PIM].paramValue) {

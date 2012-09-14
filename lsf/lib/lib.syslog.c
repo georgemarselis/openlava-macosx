@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2011-2012 David Bigagli
  * Copyright (C) 2007 Platform Computing Inc
  *
  * This program is free software; you can redistribute it and/or modify
@@ -394,7 +395,7 @@ Invalid log mask %s defined, default to %s", logMask, DEF_LOG_MASK_NAME);
 }
 
 int
-getLogClass_ (char *lsp, char *tsp)
+getLogClass_(char *lsp, char *tsp)
 {
     char *word;
     int class = 0;
