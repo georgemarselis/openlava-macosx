@@ -138,6 +138,8 @@ install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/lsf/lstools/lsmon      $RPM_BUI
 install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/lsf/lstools/lsplace    $RPM_BUILD_ROOT%{_openlavatop}/bin
 install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/lsf/lstools/lsrcp      $RPM_BUILD_ROOT%{_openlavatop}/bin
 install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/lsf/lstools/lsrun      $RPM_BUILD_ROOT%{_openlavatop}/bin
+install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/lsf/lstools/lsaddhost  $RPM_BUILD_ROOT%{_openlavatop}/bin
+install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/lsf/lstools/lsrmhost   $RPM_BUILD_ROOT%{_openlavatop}/bin
 install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/scripts/mpich2-mpiexec $RPM_BUILD_ROOT%{_openlavatop}/bin
 install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/scripts/mpich-mpirun   $RPM_BUILD_ROOT%{_openlavatop}/bin
 install -m 755 $RPM_BUILD_DIR/%{name}-%{version}/scripts/openmpi-mpirun $RPM_BUILD_ROOT%{_openlavatop}/bin
@@ -341,6 +343,8 @@ exit 0
 %{_bindir}/lsplace
 %{_bindir}/lsrcp
 %{_bindir}/lsrun
+%{_bindir}/lsaddhost
+%{_bindir}/lsrmhost
 
 # Man pages
 %{_mandir}/man1/bbot.1

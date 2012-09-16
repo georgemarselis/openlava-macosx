@@ -33,7 +33,7 @@
 
 # include <stdarg.h>
 
-#define NL_SETN		10
+#define NL_SETN         10
 
 #ifdef NO_MAIL
 void lsb_mperr (char *msg) {}
@@ -52,7 +52,7 @@ lsb_mperr (char *msg)
     char err[MAXLINELEN];
 
     if (lsb_CheckMode)
-	return;
+        return;
 
     p=strchr(msg,'\n');
     if(p != NULL )
@@ -75,7 +75,7 @@ lsb_merr (char *s)
     char *myhostnm;
 
     if (lsb_CheckMode)
-	return;
+        return;
 
     if ((myhostnm = ls_getmyhostname()) == NULL) {
         ls_syslog(LOG_ERR, I18N_FUNC_FAIL_MM, fname, "ls_getmyhostname");
@@ -87,13 +87,13 @@ lsb_merr (char *s)
     if (lsbManager == NULL || (getpwlsfuser_(lsbManager)) == NULL) {
         if (lsbManager == NULL)
             ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 8601,
-		"%s: LSF administrator name is NULL"), /* catgets 8601 */
-		fname);
+                "%s: LSF administrator name is NULL"), /* catgets 8601 */
+                fname);
         else
             ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 8602,
-		"%s: Bad LSF administrator name <%s>"), /* catgets 8602 */
-		fname,
-		lsbManager);
+                "%s: Bad LSF administrator name <%s>"), /* catgets 8602 */
+                fname,
+                lsbManager);
         if (masterme)
             die (MASTER_FATAL);
         else
@@ -103,12 +103,12 @@ lsb_merr (char *s)
 
     if (masterme)
         fprintf(mail, _i18n_msg_get(ls_catd, NL_SETN, 3201,
-	    "Subject: mbatchd on %s: %s\n"), /* catgets 3201 */
-	    myhostnm, s);
+            "Subject: mbatchd on %s: %s\n"), /* catgets 3201 */
+            myhostnm, s);
     else
         fprintf(mail, _i18n_msg_get(ls_catd, NL_SETN, 3202,
-	    "Subject: sbatchd on %s: %s\n"), /* catgets 3202 */
-	    myhostnm, s);
+            "Subject: sbatchd on %s: %s\n"), /* catgets 3202 */
+            myhostnm, s);
 
     mclose(mail);
 }
@@ -122,18 +122,18 @@ merr_user (char *user, char *host, char *msg, char *type)
 
     if ((myhostnm = ls_getmyhostname()) == NULL) {
         ls_syslog(LOG_ERR, I18N_FUNC_FAIL_MM, fname, "ls_getmyhostname");
-	die(MASTER_FATAL);
+        die(MASTER_FATAL);
     }
 
     mail = smail(user, host);
     fprintf(mail, _i18n_msg_get(ls_catd, NL_SETN, 3203,
-	"Subject: job %s report from %s\n"), /* catgets 3203 */
-	type,
-	myhostnm);
+        "Subject: job %s report from %s\n"), /* catgets 3203 */
+        type,
+        myhostnm);
     fprintf(mail, _i18n_msg_get(ls_catd, NL_SETN, 3204,
-	"\n\nDear %s,\n\n%s\n\n"), /* catgets 3204 */
-	user,
-	msg);
+        "\n\nDear %s,\n\n%s\n\n"), /* catgets 3204 */
+        user,
+        msg);
     mclose(mail);
 }
 
@@ -150,24 +150,24 @@ addr_process (char *adbuf, char *user, char *tohost, char *spec)
     bp = adbuf;
     for (sp = spec ; *sp ; sp++)
     {
-	if ((*sp == '^') || (*sp == '!'))
-	{
-	    switch (*++sp)
-	    {
-	    case 'U':
-		for (up = user ; *up ; )
-		    *bp++ = *up++;
-		continue;
-	    case 'H':
-		for (up = tohost ; *up ; )
-		    *bp++ = *up++;
-		continue;
-	    default:
-		sp -= 1;
+        if ((*sp == '^') || (*sp == '!'))
+        {
+            switch (*++sp)
+            {
+            case 'U':
+                for (up = user ; *up ; )
+                    *bp++ = *up++;
+                continue;
+            case 'H':
+                for (up = tohost ; *up ; )
+                    *bp++ = *up++;
+                continue;
+            default:
+                sp -= 1;
 
-	    }
-	}
-	*bp++ = *sp;
+            }
+        }
+        *bp++ = *sp;
     }
     *bp = 0;
 }
@@ -186,7 +186,7 @@ smail (char *to, char *tohost)
     uid_t userid;
 
     if (lsb_CheckMode)
-	return stderr;
+        return stderr;
 
     if ((to == NULL) || (tohost == NULL)) {
         ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 8604,
@@ -202,14 +202,14 @@ smail (char *to, char *tohost)
 
 
     if (debug > 2)
-	return(stderr);
+        return(stderr);
 
     if(pipe(maild) < 0) {
         ls_syslog(LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "pipe", osUserName);
         return stderr;
     }
     addr_process(toaddr, osUserName, tohost,
-			 daemonParams[LSB_MAILTO].paramValue);
+                         daemonParams[LSB_MAILTO].paramValue);
     if (logclass & (LC_TRACE | LC_EXEC))
         ls_syslog(LOG_DEBUG1, "%s: user=%s host=%s toaddr=%s spec=%s", fname,
             osUserName, tohost, toaddr, daemonParams[LSB_MAILTO].paramValue);
@@ -222,7 +222,7 @@ smail (char *to, char *tohost)
         }
         close(maild[1]);
 
-	sendmailp = daemonParams[LSB_MAILPROG].paramValue;
+        sendmailp = daemonParams[LSB_MAILPROG].paramValue;
 
       userid = geteuid();
       chuser(getuid());
@@ -258,7 +258,7 @@ smail (char *to, char *tohost)
     if (ferror(fmail)) {
         fclose(fmail);
         ls_syslog(LOG_ERR, I18N_FUNC_S_S_FAIL_M, fname, "fprintf", "header",
-	    osUserName);
+            osUserName);
         return stderr;
     }
     return fmail;
