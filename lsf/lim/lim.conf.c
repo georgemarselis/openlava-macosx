@@ -134,7 +134,6 @@ readShared(void)
 
     sprintf(lsfile, "%s/lsf.shared", limParams[LSF_CONFDIR].paramValue);
 
-
     if (configCheckSum(lsfile, &lsfSharedCkSum) < 0) {
         ls_syslog(LOG_ERR, I18N_FUNC_FAIL, fname, "configCheckSum");
         return (-1);
@@ -233,7 +232,6 @@ readShared(void)
             doSkipSection(fp, &LineNum, lsfile, word);
         }
     }
-
 }
 
 static char
@@ -4233,14 +4231,13 @@ reCheckClass(void)
 static int
 configCheckSum(char *file, u_short *checkSum)
 {
-    static char fname[] = "configCheckSum()";
     unsigned int sum;
     int i,linesum;
     FILE *fp;
     char *line;
 
     if ((fp = confOpen(file, "r")) == NULL) {
-        ls_syslog(LOG_ERR, I18N_CANNOT_OPEN, fname, file);
+        ls_syslog(LOG_ERR, "%s: open() failed %m", __func__);
         return -1;
     }
 
@@ -4385,12 +4382,11 @@ confOpen(char *filename, char *type)
         fp = fopen(filename, type);
         if (fp != NULL)
             break;
-        if (errno == ENOENT && max >0) {
+        if (errno == ENOENT && max > 0) {
             int sleeptime;
             sleeptime = interval * mykey() * 1000;
-            ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 5369,
-                                             "%s: %m Still trying ..."),  /* catgets 5369 */
-                      filename);
+            ls_syslog(LOG_ERR, "\
+%s: %m still trying ...", filename);
             millisleep_(sleeptime);
             max--;
             continue;

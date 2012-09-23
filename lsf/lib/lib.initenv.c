@@ -116,6 +116,9 @@ getTempDir_(void)
 
 }
 
+/* initenv_()
+ * Read and initialiaze the openlava environment.
+ */
 int
 initenv_(struct config_param *userEnv, char *pathname)
 {
@@ -141,7 +144,7 @@ initenv_(struct config_param *userEnv, char *pathname)
         } else if (doEnvParams_(userEnv) < 0) {
             return (-1);
         }
-        return (0);
+        return 0;
     }
 
     if (readconfenv_(genParams_, userEnv, pathname) < 0)
@@ -154,10 +157,10 @@ initenv_(struct config_param *userEnv, char *pathname)
             Error = 1;
     }
 
-    if (! genParams_[LSF_CONFDIR].paramValue ||
-        ! genParams_[LSF_SERVERDIR].paramValue) {
+    if (! genParams_[LSF_CONFDIR].paramValue
+        || ! genParams_[LSF_SERVERDIR].paramValue) {
         lserrno = LSE_BAD_ENV;
-        return(-1);
+        return -1;
     }
 
     if (genParams_[LSF_SERVER_HOSTS].paramValue != NULL) {

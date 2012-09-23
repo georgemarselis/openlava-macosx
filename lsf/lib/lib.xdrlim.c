@@ -83,38 +83,38 @@ xdr_decisionReq(XDR *xdrs, struct decisionReq *decisionReqPtr,
     char *sp1 = decisionReqPtr->hostType;
     char *sp2 = decisionReqPtr->resReq;
 
-
     if (xdrs->x_op == XDR_DECODE) {
         decisionReqPtr->resReq[0] = '\0';
         decisionReqPtr->hostType[0] = '\0';
     }
 
-    if (!(xdr_enum(xdrs, (int *) &decisionReqPtr->ofWhat) &&
-          xdr_int(xdrs,&decisionReqPtr->options) &&
-          xdr_string(xdrs, &sp1, MAXLSFNAMELEN) &&
-          xdr_int(xdrs, &decisionReqPtr->numHosts) &&
-          xdr_string(xdrs, &sp2, MAXLINELEN) &&
-          xdr_int(xdrs, &decisionReqPtr->numPrefs))) {
-        return (FALSE);
+    if (! xdr_enum(xdrs, (int *)&decisionReqPtr->ofWhat)
+        || !xdr_int(xdrs,&decisionReqPtr->options)
+        || !xdr_string(xdrs, &sp1, MAXLSFNAMELEN)
+        || !xdr_int(xdrs, &decisionReqPtr->numHosts)
+        || !xdr_string(xdrs, &sp2, MAXLINELEN)
+        || !xdr_int(xdrs, &decisionReqPtr->numPrefs)) {
+        return FALSE;
     }
 
 
     if (xdrs->x_op == XDR_DECODE) {
         decisionReqPtr->preferredHosts =
-            (char **) calloc(decisionReqPtr->numPrefs, sizeof (char *));
+            calloc(decisionReqPtr->numPrefs, sizeof (char *));
         if (decisionReqPtr->preferredHosts == NULL)
-            return (FALSE);
+            return FALSE;
     }
 
-    if (! xdr_array_string(xdrs, decisionReqPtr->preferredHosts,
-                           MAXHOSTNAMELEN, decisionReqPtr->numPrefs)) {
+    if (! xdr_array_string(xdrs,
+                           decisionReqPtr->preferredHosts,
+                           MAXHOSTNAMELEN,
+                           decisionReqPtr->numPrefs)) {
         if (xdrs->x_op == XDR_DECODE)
             FREEUP(decisionReqPtr->preferredHosts);
-        return (FALSE);
+        return FALSE;
     }
 
-    return(TRUE);
-
+    return TRUE;
 }
 
 bool_t

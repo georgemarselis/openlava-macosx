@@ -80,7 +80,7 @@ typedef unsigned long long LS_UNS_LONG_INT;
 
 #define LSF_DEFAULT_SOCKS       15
 #define MAXLINELEN              512
-#define MAXLSFNAMELEN           40
+#define MAXLSFNAMELEN           128
 #define MAXSRES                 32
 #define MAXRESDESLEN            256
 #define NBUILTINDEX             11
