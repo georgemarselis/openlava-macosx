@@ -78,7 +78,9 @@ ptymaster(char *line)
         }
         strcpy(line,slave);
 #else
+#if !defined(__sun__)
     if (ioctl(master_fd, TIOCGPTN, &ptyno) != 0) {
+#endif
         ls_syslog(LOG_DEBUG, I18N_FUNC_FAIL_M, fname, "ioctl(TIOCGPTN)");
         slave = ptsname(master_fd);
         if (slave == NULL) {
@@ -87,9 +89,11 @@ ptymaster(char *line)
             return(-1);
         }
         strcpy(line,slave);
+#if !defined(__sun__)
     } else {
         sprintf(line, "/dev/pts/%d", ptyno);
     }
+#endif
 #endif
     return(master_fd);
 }

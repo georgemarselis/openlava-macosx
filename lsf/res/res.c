@@ -777,7 +777,7 @@ put_mask(char *name, fd_set *mask)
 {
     fputs(name, stdout);
     putchar(':');
-#if !defined(__CYGWIN__)
+#if !defined(__CYGWIN__) && !defined(__sun__)
     printf("0x%8.8x ", (int) mask->__fds_bits[0]);
 #endif
     fputs("  ", stdout);
