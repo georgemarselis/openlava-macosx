@@ -22,7 +22,7 @@
 #include "lim.common.h"
 
 #include <sys/sysmacros.h>
-#include <sys/vfs.h>
+#include <sys/statvfs.h>
 #include <sys/mount.h>
 #include <sys/stat.h>
 #include <dirent.h>
@@ -386,8 +386,8 @@ initReadLoad(int checkMode, int *kernelPerm)
     if (checkMode)
         return;
 
-    if (statfs( "/tmp", &fs ) < 0) {
-        ls_syslog(LOG_ERR, "%s: statvfs() failed /tmp: %m", __FUNCTION__);
+    if (statvfs( "/tmp", &fs ) < 0) {
+        ls_syslog(LOG_ERR, "%s: statvfs() failed /tmp: %m", __func__);
         myHostPtr->statInfo.maxTmp = 0;
     } else
         myHostPtr->statInfo.maxTmp =
