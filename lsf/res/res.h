@@ -144,7 +144,7 @@ struct client   {
         ttyStruct       tty;
         char            **env;
         int             ngroups;         
-        GETGROUPS_T	groups[NGROUPS];
+        GETGROUPS_T	groups[NGROUPS_MAX];
 	struct           hostent hostent;   
 	struct lenData   eexec;
 };

@@ -272,13 +272,17 @@ fcp(char *file1, char *file2, struct hostent *hp)
     return (0);
 }
 
+#ifdef __sun__
+#include <dirent.h>
+#else
 #include <sys/dir.h>
+#endif
 
 int
 rmDir(char *dir)
 {
     DIR *dirp;
-    struct direct *dp;
+    struct dirent *dp;
     char path[MAXPATHLEN];
 
     if ((dirp = opendir(dir)) == NULL)

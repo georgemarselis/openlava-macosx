@@ -765,5 +765,5 @@ getToday (char endTime)
         tmPtr->tm_sec = 0;
     }
 
-    return timelocal(tmPtr);
+    return mktime(tmPtr);
 }

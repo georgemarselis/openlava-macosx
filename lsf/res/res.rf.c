@@ -564,8 +564,11 @@ rgetmnthost(int sock, struct LSFHeader *hdr)
 }
 
 
-
+#ifdef __sun__
+#include <dirent.h>
+#else
 #include <sys/dir.h>
+#endif
 
 static int
 runlink(int sock, struct LSFHeader *hdr)
@@ -594,7 +597,7 @@ runlink(int sock, struct LSFHeader *hdr)
 
 
         DIR *dirp;
-        struct direct *dp;
+        struct dirent *dp;
         char path[MAXPATHLEN];
 
         if ((dirp = opendir(fn)) == NULL) {

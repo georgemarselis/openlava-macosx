@@ -22,7 +22,7 @@
 #include "lim.common.h"
 
 #include <sys/sysmacros.h>
-#include <sys/vfs.h>
+#include <sys/statvfs.h>
 #include <sys/mount.h>
 #include <sys/stat.h>
 #include <dirent.h>
@@ -226,7 +226,7 @@ tmpspace(void)
 {
     static float tmps = 0.0;
     static int tmpcnt;
-    struct statfs fs;
+    struct statvfs fs;
 
     if ( tmpcnt >= TMP_INTVL_CNT )
         tmpcnt = 0;
@@ -235,7 +235,7 @@ tmpspace(void)
     if (tmpcnt != 1)
         return tmps;
 
-    if (statfs("/tmp", &fs) < 0) {
+    if (statvfs("/tmp", &fs) < 0) {
         ls_syslog(LOG_ERR, "%s: statfs() /tmp failed: %m", __FUNCTION__);
         return(tmps);
     }
@@ -374,7 +374,7 @@ initReadLoad(int checkMode, int *kernelPerm)
 {
     float  maxmem;
     unsigned long maxSwap;
-    struct statfs fs;
+    struct statvfs fs;
     int stat_fd;
 
     k_hz = (float) sysconf(_SC_CLK_TCK);
@@ -386,8 +386,8 @@ initReadLoad(int checkMode, int *kernelPerm)
     if (checkMode)
         return;
 
-    if (statfs( "/tmp", &fs ) < 0) {
-        ls_syslog(LOG_ERR, "%s: statfs() failed /tmp: %m", __FUNCTION__);
+    if (statvfs( "/tmp", &fs ) < 0) {
+        ls_syslog(LOG_ERR, "%s: statvfs() failed /tmp: %m", __func__);
         myHostPtr->statInfo.maxTmp = 0;
     } else
         myHostPtr->statInfo.maxTmp =

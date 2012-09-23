@@ -34,7 +34,11 @@
 #include <sys/mount.h>
 
 #if !defined(__FreeBSD__) && (!defined(__APPLE__) && !defined(__MACH__))
+#if defined(__sun__)
+#include <sys/mntent.h>
+#else
 #include <mntent.h>
+#endif
 #endif
 
 #include "../lsf.h"

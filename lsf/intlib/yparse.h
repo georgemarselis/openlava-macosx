@@ -50,7 +50,7 @@ struct mallocList {
 
 extern char *token;
 extern char yyerr[];
-#if !defined(__CYGWIN__)
+#if !defined(__CYGWIN__) && !defined(__sun__)
 extern FILE *yyout ;
 #endif
 extern struct mbd_func_type mbd_func;
