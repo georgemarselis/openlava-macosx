@@ -27,7 +27,11 @@
 #include <sys/param.h>
 #include <string.h>
 #include <sys/types.h>
+#ifdef __sun__
+#include <dirent.h>
+#else
 #include <sys/dir.h>
+#endif
 #include <sys/stat.h>
 #include <stdlib.h>
 
