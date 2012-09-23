@@ -39,6 +39,9 @@
 #include "resout.h"
 #include "../lib/lproto.h"
 #include "../lib/mls.h"
+#ifdef __sun__
+#include <sys/ptyvar.h>
+#endif
 
 #define NL_SETN         29
 #define CHILD_DELETED     2
@@ -448,7 +451,7 @@ childAcceptConn(int s, struct passwd *pw, struct lsfAuth *auth,
     char            msg[512];
     int             i;
     int             num;
-    GETGROUPS_T rootgroups[NGROUPS];
+    GETGROUPS_T rootgroups[NGROUPS_MAX];
     int             ngroups;
     int             cc;
 
@@ -612,7 +615,7 @@ childAcceptConn(int s, struct passwd *pw, struct lsfAuth *auth,
         dumpClient(cli_ptr, "new client created");
     }
 
-    ngroups = getgroups(NGROUPS, rootgroups);
+    ngroups = getgroups(NGROUPS_MAX, rootgroups);
 
 
     if ((getuid() == 0) && (initgroups(cli_ptr->username, pw->pw_gid) < 0)) {
@@ -622,7 +625,7 @@ childAcceptConn(int s, struct passwd *pw, struct lsfAuth *auth,
         cli_ptr->ngroups = 0;
     }
     else
-        cli_ptr->ngroups = getgroups(NGROUPS, cli_ptr->groups);
+        cli_ptr->ngroups = getgroups(NGROUPS_MAX, cli_ptr->groups);
 
 
     cli_ptr->gid = pw->pw_gid;
@@ -2389,8 +2392,9 @@ parentPty(int *pty, int *sv, char *pty_name)
         ls_syslog(LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "io_nonblock_",
                   pty[0]);
 
-
+#ifndef __sun__
     if (ioctl(pty[0], TIOCPKT, &on) < 0)
+#endif
         ls_syslog(LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "ioctl",
                   pty[0]);
 
