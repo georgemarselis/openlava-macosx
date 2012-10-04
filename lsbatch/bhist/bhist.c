@@ -215,7 +215,6 @@ static int
 do_options(int argc, char **argv, struct bhistReq *bhistReq)
 {
 
-    extern char *optarg;
     char *envHours;
     struct passwd *pwPtr;
     time_t defaultTime[2];

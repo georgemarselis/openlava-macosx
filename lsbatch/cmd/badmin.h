@@ -37,7 +37,6 @@ extern char *myGetOpt (int nargc, char **nargv, char *ostr);
 extern int getConfirm (char *msg);
 extern int startup(int argc, char **argv, int opCode);
 
-extern int optind;
 
 static int opCodeList[] = {  0, 0, QUEUE_OPEN, QUEUE_CLOSED, QUEUE_ACTIVATE,
                              QUEUE_INACTIVATE, QUEUE_HIST, HOST_OPEN, 

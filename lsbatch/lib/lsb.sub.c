@@ -123,8 +123,6 @@ extern char **environ;
 
 extern char *yyerr;
 
-extern int optind;
-extern char *optarg;
 extern char *my_getopt (int, char**, char*, char **);
 extern char * getNextLine_(FILE *fp, int confFormat);
 extern uid_t getuid(void);

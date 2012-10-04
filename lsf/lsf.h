@@ -954,4 +954,9 @@ struct extResInfo {
     char *des;
 };
 
+extern int optind;
+extern char *optarg;
+extern int  opterr;
+extern int  optopt;
+
 #endif /* _lsf_h_ */

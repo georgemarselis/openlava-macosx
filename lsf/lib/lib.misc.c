@@ -22,10 +22,6 @@
 #define BADCH   ":"
 #define NL_SETN   23
 
-extern int optind;
-extern char *optarg;
-extern int  opterr;
-extern int  optopt;
 
 #define PRINT_ERRMSG(errMsg, fmt, msg1, msg2)   \
     {                                           \
