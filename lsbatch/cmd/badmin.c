@@ -276,7 +276,6 @@ breconfig(int argc, char **argv, int configFlag)
 static int
 badminDebug (int nargc, char *nargv[], int opCode)
 {
-    extern char* optarg;
 
     struct hostInfoEnt *hostInfo;
 

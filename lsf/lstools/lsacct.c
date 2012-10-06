@@ -155,7 +155,6 @@ static void setdefaults(void)
 
 static void getoptions(int argc, char *argv[])
 {
-    extern char *optarg;
 
     int cc;
 

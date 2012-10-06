@@ -45,7 +45,6 @@ main(int argc, char **argv){
 
 	static char fname[] = "main()";
 
-	extern char *optarg; 
    	 
 	char  *pMethodName = NULL;
 	char  *pMethodDir = NULL;

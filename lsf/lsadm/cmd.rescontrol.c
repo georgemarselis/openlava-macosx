@@ -40,7 +40,6 @@ static void resControl (char *host, int opCode, int data, int ask);
 static int exitrc, fFlag;
 static char opStr[MAXLINELEN];
 
-extern char *optarg;
 
 extern char isint_(char *word);
 extern int  getConfirm (char *);
@@ -51,7 +50,6 @@ extern void millisleep_(int);
 int
 resCtrl(int argc, char **argv, int opCode)
 {
-    extern int  optind;
     int  num, data = 0;
     char *optName, *localHost;
 

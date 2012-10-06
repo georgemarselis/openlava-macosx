@@ -272,7 +272,6 @@ static void
 do_options (int argc, char **argv, int *options, char **user, char **queue,
             char **host, char **jobName, float *cpuFactor, int *format, char **projectName)
 {
-    extern char *optarg;
     int cc, Nflag = 0;
     char *norOp = NULL;
 

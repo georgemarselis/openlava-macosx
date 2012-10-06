@@ -24,8 +24,6 @@
 #define NL_SETN      22
 
 extern int errLineNum_;
-extern int optind;
-extern char *optarg;
 
 static int changeUserEUId(void);
 
@@ -35,7 +33,6 @@ parseAndDo (char *cmdBuf, int (*func)() )
 {
 #define MAX_ARG 100
 
-    extern int optind;
     int  argc, i ;
     char *argv[MAX_ARG];
 

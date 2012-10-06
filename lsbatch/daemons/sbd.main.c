@@ -127,8 +127,6 @@ main (int argc, char **argv)
     struct timeval timeout;
     struct Masks sockmask, chanmask;
     int aopt;
-    extern char *optarg;
-    extern int opterr;
 
     char *msg = NULL;
 
