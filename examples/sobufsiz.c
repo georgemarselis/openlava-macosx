@@ -1,15 +1,17 @@
-#include<stdio.h>
-#include <sys/types.h> 
+
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
 #include <sys/socket.h>
 
 int
-main()
+main(int argc, char **argv)
 {
    int val;
    int s;
    int cc;
    socklen_t l;
-   
+
    l = sizeof(int);
    s = socket(AF_INET, SOCK_STREAM, 0);
    cc  = getsockopt(s, SOL_SOCKET, SO_RCVBUF,
@@ -32,4 +34,6 @@ main()
    printf("SO_SNDBUF %d\n" ,val);
 
    close(s);
+
+   return 0;
 }

@@ -374,7 +374,8 @@ getXIdle()
 void
 readLoad(int kernelPerm)
 {
-    int     i, busyBits = 0;
+    int i;
+    int busyBits = 0;
     double  etime;
     double  itime;
     static  int readCount0 = 10000;
@@ -472,13 +473,11 @@ checkExchange:
         return;
     readCount2 = 0;
 
-    if(jobxfer) {
-        extrafactor = (float) jobxfer/(float) keepTime;
+    extrafactor = 0;
+    if (jobxfer) {
+        extrafactor = (float)jobxfer/(float)keepTime;
         jobxfer--;
-    } else {
-        extrafactor = 0;
     }
-
     myHostPtr->loadIndex[R15S] = avrun15  + extraload[R15S] * extrafactor;
     myHostPtr->loadIndex[R1M]  = avrun1m  + extraload[R1M]  * extrafactor;
     myHostPtr->loadIndex[R15M] = avrun15m + extraload[R15M] * extrafactor;
@@ -495,14 +494,14 @@ checkExchange:
     myHostPtr->loadIndex[IT] += extraload[IT] * extrafactor;
     if (myHostPtr->loadIndex[IT] < 0)
         myHostPtr->loadIndex[IT] = 0;
-    myHostPtr->loadIndex[SWP] = swap + extraload[SWP] *extrafactor;
+    myHostPtr->loadIndex[SWP] = swap + extraload[SWP] * extrafactor;
     if (myHostPtr->loadIndex[SWP] < 0)
         myHostPtr->loadIndex[SWP] = 0;
-    myHostPtr->loadIndex[TMP] += extraload[TMP]*extrafactor;
+    myHostPtr->loadIndex[TMP] += extraload[TMP] * extrafactor;
     if (myHostPtr->loadIndex[TMP] < 0)
         myHostPtr->loadIndex[TMP] = 0;
 
-    myHostPtr->loadIndex[MEM] += extraload[MEM]*extrafactor;
+    myHostPtr->loadIndex[MEM] += extraload[MEM] * extrafactor;
     if (myHostPtr->loadIndex[MEM] < 0)
         myHostPtr->loadIndex[MEM] = 0;
 
@@ -552,19 +551,20 @@ checkExchange:
 
     for(i = 0; i < allInfo.numIndx; i++) {
 
-        if (myHostPtr->loadIndex[i] < MIN_FLOAT16 &&
-            i < NBUILTINDEX){
+        if (myHostPtr->loadIndex[i] < MIN_FLOAT16
+            && i < NBUILTINDEX){
             myHostPtr->loadIndex[i] = 0.0;
         }
 
-        if (i==R15S || i==R1M || i==R15M ) {
+        if (i == R15S || i == R1M || i == R15M ) {
             float rawql;
 
-            rawql=myHostPtr->loadIndex[i];
-            myHostPtr->loadIndex[i]  = normalizeRq(rawql,
-                           (myHostPtr->hModelNo >= 0) ?
-                           shortInfo.cpuFactors[myHostPtr->hModelNo] : 1.0,
-                           ncpus);
+            rawql = myHostPtr->loadIndex[i];
+            myHostPtr->loadIndex[i]
+                = normalizeRq(rawql,
+                              (myHostPtr->hModelNo >= 0) ?
+                              shortInfo.cpuFactors[myHostPtr->hModelNo] : 1.0,
+                              ncpus);
             myHostPtr->uloadIndex[i] = rawql;
         } else {
             myHostPtr->uloadIndex[i] = myHostPtr->loadIndex[i];

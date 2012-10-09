@@ -147,7 +147,6 @@ main(int argc, char **argv)
                 break;
             case 'C':
                 putEnv("RECONFIG_CHECK","YES");
-                fputs("\n", stderr);
                 fputs(_LS_VERSION_, stderr);
                 lim_CheckMode = 1;
                 lim_debug = 2;
@@ -912,18 +911,17 @@ getTclLsInfo(void)
     static struct tclLsInfo *tclLsInfo;
     int i;
 
-    if ((tclLsInfo = (struct tclLsInfo *) malloc (sizeof (struct tclLsInfo )))
-        == NULL) {
-        ls_syslog(LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
+    if ((tclLsInfo = calloc(1, sizeof (struct tclLsInfo ))) == NULL) {
+        ls_syslog(LOG_ERR, "%s: %m", __func__);
         return NULL;
     }
 
-    if ((tclLsInfo->indexNames = (char **)malloc (allInfo.numIndx *
-                                                  sizeof (char *))) == NULL) {
-        ls_syslog(LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
+    if ((tclLsInfo->indexNames = calloc(allInfo.numIndx,
+                                        sizeof(char *))) == NULL) {
+        ls_syslog(LOG_ERR, "%s: %s", __func__);
         return NULL;
     }
-    for (i=0; i < allInfo.numIndx; i++) {
+    for (i = 0; i < allInfo.numIndx; i++) {
         tclLsInfo->indexNames[i] = allInfo.resTable[i].name;
     }
     tclLsInfo->numIndx = allInfo.numIndx;
@@ -932,8 +930,7 @@ getTclLsInfo(void)
     tclLsInfo->stringResBitMaps = shortInfo.stringResBitMaps;
     tclLsInfo->numericResBitMaps = shortInfo.numericResBitMaps;
 
-    return (tclLsInfo);
-
+    return tclLsInfo;
 }
 
 
@@ -951,7 +948,7 @@ startPIM(int argc, char **argv)
 
     if ((pimPid = fork())) {
         if (pimPid < 0)
-            ls_syslog(LOG_ERR, I18N_FUNC_FAIL_M, __func__, "fork");
+            ls_syslog(LOG_ERR, "%s: %m", __func__);
         return;
     }
 
@@ -970,7 +967,6 @@ startPIM(int argc, char **argv)
     for (i = 1; i < NSIG; i++)
         Signal_(i, SIG_DFL);
 
-
     for (i = 1; i < argc; i++)
         pargv[i] = argv[i];
 
@@ -978,7 +974,7 @@ startPIM(int argc, char **argv)
     pargv[0] = getDaemonPath_("/pim", limParams[LSF_SERVERDIR].paramValue);
     lsfExecv(pargv[0], pargv);
 
-    ls_syslog(LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "execv", pargv[0]);
+    ls_syslog(LOG_ERR, "%s: failed execv %s %m", __func__, pargv[0]);
 
     exit(-1);
 }

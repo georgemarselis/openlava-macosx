@@ -198,7 +198,6 @@ main (int argc, char **argv)
                 break;
             case 'C':
                 putEnv("RECONFIG_CHECK","YES");
-                fputs("\n", stderr);
                 lsb_CheckMode = 1;
                 break;
             case 'V':

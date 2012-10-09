@@ -1,6 +1,6 @@
 
-#include "../lsf/lsf.h"
-#include "../lsbatch/lsbatch.h"
+#include <lsf.h>
+#include <lsbatch.h>
 
 static void
 usage(void)

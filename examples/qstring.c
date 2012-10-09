@@ -31,6 +31,7 @@ main(int argc, char **argv)
     char *s;
     char *file;
 
+    file = NULL;
     if (argc != 2) {
         fprintf(stderr, "\
 usage: qstring filename\n");
@@ -60,6 +61,7 @@ usage: qstring filename\n");
     }
     fclose(fp);
 
-    printf("%d\n", sizeof(time_t));
+    printf("%lu\n", sizeof(time_t));
+
     return 0;
 }

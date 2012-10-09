@@ -51,7 +51,7 @@ main(int argc, char **argv)
         return -1;
     }
 
-    printf("%d %s\n", msg2.mtype, msg2.mtext);
+    printf("%ld %s\n", msg2.mtype, msg2.mtext);
 
     return 0;
 }
