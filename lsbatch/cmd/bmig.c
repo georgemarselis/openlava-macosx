@@ -35,7 +35,6 @@ usage (char *cmd)
 int
 main (int argc, char **argv)
 {
-    extern char *optarg;
 
     int cc, i, badHostIdx;
     char *user = NULL, *jobName = NULL;

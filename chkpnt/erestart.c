@@ -66,7 +66,6 @@ int
 main(int argc, char **argv){
 	static char fname[] = "main()";
 
-	extern int optind; 
 	 
 	char  *pMethodName = NULL;
 	char  *pMethodDir = NULL;

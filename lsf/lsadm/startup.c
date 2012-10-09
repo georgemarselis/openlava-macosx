@@ -31,7 +31,6 @@
 
 #define NL_SETN 25
 
-extern int  optind;
 extern int  getConfirm(char *);
 static void startupAllHosts(int, int);
 static void startupLocalHost(int);

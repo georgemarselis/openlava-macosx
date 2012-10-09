@@ -408,10 +408,12 @@ FCLOSEUP(FILE** fp)
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef __CYGWIN__
 int     optind = 1;
 char    *optarg = NULL;
 int     opterr = 1;
 int     optopt = 0;
+#endif
 
 int	linux_opterr = 1,
 	linux_optind = 1,

@@ -43,7 +43,6 @@ extern void cmdHelp (int argc, char **argv, char *cmdList[],
 extern char *myGetOpt (int nargc, char **nargv, char *ostr);
 extern int getConfirm (char *msg);
 
-extern int optind;
 
 #define NL_SETN   25   
 

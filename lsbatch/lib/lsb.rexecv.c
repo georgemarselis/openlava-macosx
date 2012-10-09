@@ -26,8 +26,6 @@
 
 #define NL_SETN 	13 	
 
-extern int optind;
-extern char *optarg;
 extern char **environ;
 extern char *loginShell;
 extern int  optionFlag;
@@ -35,7 +33,6 @@ extern char optionFileName[MAXLSFNAMELEN];
 extern int sig_decode (int);
 extern int isatty(int);
 
-extern int optind;
 
 extern  int setOption_ (int argc, char **argv, char *template, 
                       struct submit *req, int mask, char **errMsg);

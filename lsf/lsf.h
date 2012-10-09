@@ -764,7 +764,11 @@ typedef void (*SIGFUNCTYPE)(int);
 #define MSGSIZE   8192
 #endif
 
+#ifdef __CYGWIN__
+#define NICE_LEAST -19
+#else
 #define NICE_LEAST -40
+#endif
 #define NICE_MIDDLE 20
 
 #ifndef WCOREDUMP
@@ -953,5 +957,12 @@ struct extResInfo {
     char *increasing;
     char *des;
 };
+
+#ifndef __CYGWIN__
+extern int optind;
+extern char *optarg;
+extern int  opterr;
+extern int  optopt;
+#endif
 
 #endif /* _lsf_h_ */
