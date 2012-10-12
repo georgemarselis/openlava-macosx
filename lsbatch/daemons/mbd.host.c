@@ -1823,6 +1823,11 @@ znovu:
          jPtr != jDataList[L];
          jPtr = jPtr->back) {
 
+        /* Killed while pending.
+         */
+        if (jPtr->hPtr == NULL)
+            continue;
+
         /* reset the host pointers for
          * FJL and ZJL jobs too
          */
