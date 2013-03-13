@@ -4,7 +4,7 @@
 
 include $(top_srcdir)/common.mk
 
-include_HEADERS = lsf.h 
+include_HEADERS = lsf.h ../config.h
 
 SUBDIRS = intlib lib lim pim lstools lsadm man
 
