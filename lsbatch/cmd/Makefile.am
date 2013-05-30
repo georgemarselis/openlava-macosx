@@ -195,6 +195,6 @@ install-data-local:
 	cd "$(DESTDIR)$(bindir)" && ln -sf bmgroup bugroup
 
 etags :
-	etags *.[hc] ../*.h ../lib/*.[hc] ../../lsf/*.h ../../lib/*.[hc] \
-	../../intlib/*.[hc]
+	etags *.[hc] ../*.h ../lib/*.[hc] ../../lsf/*.h ../../lsf/lib/*.[hc] \
+	../../lsf/intlib/*.[hc]
 
