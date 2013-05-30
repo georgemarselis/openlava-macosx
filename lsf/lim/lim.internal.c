@@ -531,7 +531,7 @@ initNewMaster(void)
     myClusterPtr->prevMasterPtr = myClusterPtr->masterPtr;
     myClusterPtr->masterPtr = myHostPtr;
 
-    announceMaster(myClusterPtr, 1, TRUE);
+    announceMaster(myClusterPtr, 1, FALSE);
     myClusterPtr->masterInactivityCount = 0;
     masterMe = 1;
 
