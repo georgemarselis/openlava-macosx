@@ -10,7 +10,7 @@ include $(top_srcdir)/common.mk
 
 # Install the shell profile scrips and the system startup 
 # script in the etc directory.
-etcdir = $(prefix)/etc
+etcdir = $(DESTDIR)$(prefix)/etc
 etc_DATA = openlava.sh openlava.csh \
 	lsf.conf lsf.cluster.openlava lsf.shared lsf.task \
 	lsb.hosts lsb.params lsb.queues lsb.users 
@@ -20,8 +20,8 @@ etc_SCRIPTS = openlava
 # Create the working directory where the working files are
 # kept.
 install-data-local:
-	mkdir -p $(prefix)/work/logdir
-	mkdir -p $(prefix)/log
+	mkdir -p $(DESTDIR)$(prefix)/work/logdir
+	mkdir -p $(DESTDIR)$(prefix)/log
 
 # Tell automake to install during distcheck the
 # configuration and etc files. 
