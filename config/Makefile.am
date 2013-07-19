@@ -10,7 +10,7 @@ include $(top_srcdir)/common.mk
 
 # Install the shell profile scrips and the system startup 
 # script in the etc directory.
-etcdir = $(DESTDIR)$(prefix)/etc
+etcdir = $(prefix)/etc
 etc_DATA = openlava.sh openlava.csh \
 	lsf.conf lsf.cluster.openlava lsf.shared lsf.task \
 	lsb.hosts lsb.params lsb.queues lsb.users 
