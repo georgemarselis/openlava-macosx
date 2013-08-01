@@ -20,8 +20,8 @@ etc_SCRIPTS = openlava
 # Create the working directory where the working files are
 # kept.
 install-data-local:
-	mkdir -p $(prefix)/work/logdir
-	mkdir -p $(prefix)/log
+	mkdir -p $(DESTDIR)$(prefix)/work/logdir
+	mkdir -p $(DESTDIR)$(prefix)/log
 
 # Tell automake to install during distcheck the
 # configuration and etc files. 
