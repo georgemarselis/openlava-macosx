@@ -31,3 +31,5 @@ config/openlava.setup
 config/openlava.sh
 config.guess
 config.sub
+autoscan.log
+configure.scan
