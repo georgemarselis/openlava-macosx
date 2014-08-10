@@ -6,5 +6,5 @@ include $(top_srcdir)/common.mk
 
 include_HEADERS = lsf.h ../config.h
 
-SUBDIRS = bhist chkpnt daemons eauth include intlib lib lim lsadm lstools man pim res src
+SUBDIRS = bhist chkpnt clitools daemons eauth intlib lib lim lsadm pim res
 
