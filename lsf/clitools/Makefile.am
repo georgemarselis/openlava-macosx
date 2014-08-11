@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011-2012 David Bigagli
+# b* parts
 #
 
 include $(top_srcdir)/common.mk
@@ -8,7 +8,30 @@ INCLUDES = -I$(top_srcdir)/lsf/include
 
 bin_PROGRAMS = badmin bkill bparams brestart btop bbot bmgroup \
 bpeek brun busers bhosts bmig bqueues bsub bjobs bmod \
-brequeue bswitch 
+brequeue bswitch bhist
+
+ifndef CYGWIN
+badmin_LDADD += -lnsl
+bkill_LDADD += -lnsl
+lsrcp_LDADD += -lnsl
+bparams_LDADD += -lnsl
+brestart_LDADD += -lnsl
+btop_LDADD += -lnsl
+bbot_LDADD += -lnsl
+bmgroup_LDADD += -lnsl
+bpeek_LDADD += -lnsl
+brun_LDADD += -lnsl
+busers_LDADD += -lnsl
+bhosts_LDADD += -lnsl
+bmig_LDADD += -lnsl
+bqueues_LDADD += -lnsl
+bsub_LDADD += -lnsl
+bjobs_LDADD += -lnsl
+bmod_LDADD += -lnsl
+bhist_LDADD += -lnsl
+brequeue_LDADD += -lnsl
+bswitch_LDADD += -lnsl
+endif
 
 badmin_SOURCES = badmin.c cmd.bqc.c cmd.hist.c \
 	cmd.bhc.c cmd.misc.c cmd.job.c cmd.prt.c \
@@ -16,176 +39,116 @@ badmin_SOURCES = badmin.c cmd.bqc.c cmd.hist.c \
 badmin_LDADD = ../../lsf/lsadm/startup.o \
 	../lib/liblsbatch.a \
 	../../lsf/lib/liblsf.a \
-	../../lsf/intlib/liblsfint.a -lm
-if !CYGWIN
-badmin_LDADD += -lnsl
-endif
+	../../lsf/intlib/liblsfint.a \
+	-lm
 
 bkill_SOURCES = bkill.c cmd.sig.c cmd.jobid.c cmd.err.c
 bkill_LDADD = \
 	../lib/liblsbatch.a \
 	../../lsf/lib/liblsf.a \
-	../../lsf/intlib/liblsfint.a  -lm
-
-if !CYGWIN
-bkill_LDADD += -lnsl
-endif
+	../../lsf/intlib/liblsfint.a \
+	-lm
 
 bparams_SOURCES = bparams.c cmd.h
-bparams_LDADD =   \
-	../lib/liblsbatch.a \
+bparams_LDADD =  ../lib/liblsbatch.a \
 	../../lsf/lib/liblsf.a \
-	../../lsf/intlib/liblsfint.a  -lm
-if !CYGWIN
-bparams_LDADD += -lnsl
-endif
+	../../lsf/intlib/liblsfint.a \
+	-lm
 
-
-brestart_SOURCES = brestart.c cmd.sub.c cmd.jobid.c \
-	cmd.err.c cmd.h
-brestart_LDADD =   \
-	../lib/liblsbatch.a \
+brestart_SOURCES = brestart.c cmd.sub.c cmd.jobid.c cmd.err.c cmd.h
+brestart_LDADD =  ../lib/liblsbatch.a \
 	../../lsf/lib/liblsf.a \
-	../../lsf/intlib/liblsfint.a  -lm
-if !CYGWIN
-brestart_LDADD += -lnsl
-endif
+	../../lsf/intlib/liblsfint.a \-lm
 
-
-btop_SOURCES = btop.c cmd.move.c cmd.jobid.c cmd.misc.c \
-	 cmd.prt.c cmd.err.c cmd.h
-btop_LDADD =  \
-	../lib/liblsbatch.a \
+btop_SOURCES = btop.c cmd.move.c cmd.jobid.c cmd.misc.c cmd.prt.c cmd.err.c cmd.h
+btop_LDADD = ../lib/liblsbatch.a \
 	../../lsf/lib/liblsf.a \
-	../../lsf/intlib/liblsfint.a  -lm
-if !CYGWIN
-btop_LDADD += -lnsl
-endif
+	../../lsf/intlib/liblsfint.a \
+	-lm
 
-
-bbot_SOURCES = bbot.c cmd.move.c cmd.jobid.c cmd.misc.c \
-	 cmd.prt.c cmd.err.c cmd.h
-bbot_LDADD =   \
-	../lib/liblsbatch.a \
+bbot_SOURCES = bbot.c cmd.move.c cmd.jobid.c cmd.misc.c cmd.prt.c cmd.err.c cmd.h
+bbot_LDADD =  ../lib/liblsbatch.a \
 	../../lsf/lib/liblsf.a \
-	../../lsf/intlib/liblsfint.a  -lm
-if !CYGWIN
-bbot_LDADD += -lnsl
-endif
-
+	../../lsf/intlib/liblsfint.a \
+	-lm
 
 bmgroup_SOURCES = bmgroup.c cmd.misc.c cmd.h
-bmgroup_LDADD =   \
-	../lib/liblsbatch.a \
+bmgroup_LDADD = ../lib/liblsbatch.a \
 	../../lsf/lib/liblsf.a \
-	../../lsf/intlib/liblsfint.a  -lm
-if !CYGWIN
-bmgroup_LDADD += -lnsl
-endif
-
+	../../lsf/intlib/liblsfint.a \
+	-lm
 
 bpeek_SOURCES = bpeek.c cmd.err.c cmd.jobid.c cmd.misc.c cmd.prt.c cmd.h
-bpeek_LDADD =  \
-	../lib/liblsbatch.a \
+bpeek_LDADD =  ../lib/liblsbatch.a \
 	../../lsf/lib/liblsf.a \
 	../../lsf/intlib/liblsfint.a  -lm
-if !CYGWIN
-bpeek_LDADD += -lnsl
-endif
-
 
 brun_SOURCES = brun.c cmd.jobid.c cmd.err.c cmd.h
-brun_LDADD =   \
-	../lib/liblsbatch.a \
+brun_LDADD =  ../lib/liblsbatch.a \
 	../../lsf/lib/liblsf.a \
-	../../lsf/intlib/liblsfint.a  -lm
-if !CYGWIN
-brun_LDADD += -lnsl
-endif
-
+	../../lsf/intlib/liblsfint.a \
+	-lm
 
 busers_SOURCES = busers.c cmd.misc.c
-busers_LDADD =  \
-	../lib/liblsbatch.a \
+busers_LDADD = ../lib/liblsbatch.a \
 	../../lsf/lib/liblsf.a \
-	../../lsf/intlib/liblsfint.a  -lm
-if !CYGWIN
-busers_LDADD += -lnsl
-endif
-
+	../../lsf/intlib/liblsfint.a \
+	-lm
 
 bhosts_SOURCES = bhosts.c cmd.prt.c cmd.misc.c cmd.h
-bhosts_LDADD =  \
-	../lib/liblsbatch.a \
+bhosts_LDADD =  ../lib/liblsbatch.a \
 	../../lsf/lib/liblsf.a \
-	../../lsf/intlib/liblsfint.a  -lm
-if !CYGWIN
-bhosts_LDADD += -lnsl
-endif
+	../../lsf/intlib/liblsfint.a \
+	-lm
 
 bmig_SOURCES = bmig.c cmd.jobid.c cmd.err.c cmd.h
-bmig_LDADD =   \
-	../lib/liblsbatch.a \
+bmig_LDADD =  ../lib/liblsbatch.a \
 	../../lsf/lib/liblsf.a \
-	../../lsf/intlib/liblsfint.a  -lm
-if !CYGWIN
-bmig_LDADD += -lnsl
-endif
+	../../lsf/intlib/liblsfint.a \
+	-lm
 
 bqueues_SOURCES = bqueues.c cmd.prt.c cmd.misc.c cmd.h
-bqueues_LDADD = \
-	../lib/liblsbatch.a \
+bqueues_LDADD = ../lib/liblsbatch.a \
 	../../lsf/lib/liblsf.a \
-	../../lsf/intlib/liblsfint.a  -lm
-if !CYGWIN
-bqueues_LDADD += -lnsl
-endif
+	../../lsf/intlib/liblsfint.a \
+	-lm
 
 bsub_SOURCES = bsub.c cmd.sub.c cmd.jobid.c cmd.err.c cmd.h
-bsub_LDADD =   \
-	../lib/liblsbatch.a \
+bsub_LDADD =  ../lib/liblsbatch.a \
 	../../lsf/lib/liblsf.a \
-	../../lsf/intlib/liblsfint.a  -lm
-if !CYGWIN
-bsub_LDADD += -lnsl
-endif
+	../../lsf/intlib/liblsfint.a \
+	-lm
 
 bjobs_SOURCES = bjobs.c cmd.prt.c cmd.err.c cmd.job.c \
 	cmd.jobid.c cmd.misc.c cmd.h
-bjobs_LDADD =  \
-	../lib/liblsbatch.a \
+bjobs_LDADD =  ../lib/liblsbatch.a \
 	../../lsf/lib/liblsf.a \
-	../../lsf/intlib/liblsfint.a  -lm
-if !CYGWIN
-bjobs_LDADD += -lnsl
-endif
+	../../lsf/intlib/liblsfint.a \
+	-lm
 
 bmod_SOURCES = bmod.c cmd.sub.c cmd.jobid.c cmd.err.c cmd.h
-bmod_LDADD =  \
-	../lib/liblsbatch.a \
+bmod_LDADD = ../lib/liblsbatch.a \
 	../../lsf/lib/liblsf.a \
-	../../lsf/intlib/liblsfint.a  -lm
-if !CYGWIN
-bmod_LDADD += -lnsl
-endif
+	../../lsf/intlib/liblsfint.a  \
+	-lm
 
 brequeue_SOURCES = brequeue.c cmd.jobid.c cmd.err.c cmd.h
-brequeue_LDADD =   \
-	../lib/liblsbatch.a \
+brequeue_LDADD =  ../lib/liblsbatch.a \
 	../../lsf/lib/liblsf.a \
-	../../lsf/intlib/liblsfint.a  -lm
-if !CYGWIN
-brequeue_LDADD += -lnsl
-endif
+	../../lsf/intlib/liblsfint.a  \
+	-lm
 
 bswitch_SOURCES = bswitch.c cmd.jobid.c cmd.err.c cmd.h
-bswitch_LDADD =  \
-	../lib/liblsbatch.a \
+bswitch_LDADD =  ../lib/liblsbatch.a \
 	../../lsf/lib/liblsf.a \
-	../../lsf/intlib/liblsfint.a  -lm
-if !CYGWIN
-bswitch_LDADD += -lnsl
-endif
+	../../lsf/intlib/liblsfint.a \
+	-lm
+
+bhist_SOURCES  = bhist.c read.event.c bhist.h
+bhist_LDADD = cmd.job.o cmd.misc.o cmd.jobid.o cmd.prt.o cmd.err.o cmd.hist.o \
+	lib/liblsbatch.a lib/liblsf.a \
+	intlib/liblsfint.a \
+	-lm
 
 install-data-local:
 	cd "$(DESTDIR)$(bindir)" && ln -sf bkill bstop
@@ -196,16 +159,14 @@ install-data-local:
 etags :
 	etags *.[hc] ../*.h ../lib/*.[hc] ../../lsf/*.h ../../lsf/lib/*.[hc] \
 	../../lsf/intlib/*.[hc]
+etags :
+	etags *.[hc] ../*.h ../lib/*.[hc]
 
 #
-# Copyright (C) 2011-2012 David Bigagli
+# ls* parts
 #
 
-include $(top_srcdir)/common.mk
-
-INCLUDES = -I..
-
-bin_PROGRAMS = lsacct lseligible lshosts lsid lsinfo lsloadadj \
+bin_PROGRAMS += lsacct lseligible lshosts lsid lsinfo lsloadadj \
  		lsload lsmon lsplace lsrcp lsrun lsaddhost lsrmhost
 
 lsacct_SOURCES = lsacct.c  
@@ -237,9 +198,6 @@ lsplace_LDADD = ../lib/liblsf.a ../intlib/liblsfint.a
 
 lsrcp_SOURCES = lsrcp.c
 lsrcp_LDADD = ../lib/liblsf.a ../intlib/liblsfint.a 
-if !CYGWIN
-lsrcp_LDADD += -lnsl
-endif
 
 lsrun_SOURCES = lsrun.c
 lsrun_LDADD = ../lib/liblsf.a 
@@ -248,7 +206,5 @@ lsaddhost_SOURCES = lsaddhost.c
 lsaddhost_LDADD = ../lib/liblsf.a 
 
 lsrmhost_SOURCES = lsrmhost.c
-lsrmhost_LDADD = ../lib/liblsf.a 
+lsrmhost_LDADD = ../lib/liblsf.a
 
-etags :
-	etags *.[hc] ../*.h ../lib/*.[hc] 
