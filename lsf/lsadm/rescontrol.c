@@ -21,11 +21,10 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <string.h>
-#include "../lsf.h"
 
-#include "../lib/lsi18n.h"
-#include "../lib/mls.h"
-
+#include "lib/mls.h"
+#include "lsf.h"
+#include "lsi18n.h"
 
 #define MAX_CONN 20
 #define NUM_TRY 2 

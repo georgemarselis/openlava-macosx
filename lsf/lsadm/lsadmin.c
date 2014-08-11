@@ -20,6 +20,7 @@
 #include <sys/wait.h>
 #include <ctype.h>
 #include <pwd.h>
+
 #include "lsadmin.h"
 
 #define NL_SETN 25
@@ -114,7 +115,7 @@ int
 main (int argc, char **argv)
 {
     int cc,  myIndex;
-    char *prompt = "lsadmin>";
+    char prompt[] = "lsadmin> ";
     char line[MAXLINELEN];
 
     if (ls_initdebug(argv[0]) < 0) {

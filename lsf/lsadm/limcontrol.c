@@ -26,9 +26,10 @@
 #include <netdb.h>
 #include <unistd.h>
 
-#include "../lsf.h"
-#include "../intlib/intlibout.h"
-#include "../lib/lsi18n.h"
+#include "intlib/intlibout.h"
+#include "lsf.h"
+#include "lsi18n.h"
+
 #define NL_SETN 25
 
 

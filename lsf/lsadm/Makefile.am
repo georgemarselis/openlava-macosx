@@ -4,11 +4,10 @@
 
 include $(top_srcdir)/common.mk
 
-INCLUDES = -I$(top_srcdir)/lsf
+INCLUDES = -I$(top_srcdir)/lsf/include
 
 bin_PROGRAMS = lsadmin
 
-lsadmin_SOURCES = lsadmin.c startup.c cmd.limcontrol.c \
-                   cmd.rescontrol.c lsadmin.h
+lsadmin_SOURCES = lsadmin.c startup.c limcontrol.c rescontrol.c lsadmin.h
 lsadmin_LDADD =  ../lib/liblsf.a ../intlib/liblsfint.a
 
