@@ -23,15 +23,14 @@
 #include <time.h>
 #include <sys/time.h>
 #include <pwd.h>
-
-#include "daemons.h"
-#include "../../lsf/lib/lib.osal.h"
-
+# include <stdarg.h>
 #ifndef strchr
 #include <string.h>
 #endif
 
-# include <stdarg.h>
+
+#include "daemons.h"
+#include "lib/osal.h"
 
 #define NL_SETN         10
 
