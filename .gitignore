@@ -33,3 +33,4 @@ config.guess
 config.sub
 autoscan.log
 configure.scan
+compile
