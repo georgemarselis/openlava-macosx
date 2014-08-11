@@ -21,7 +21,7 @@
 #include <errno.h>
 #include <stdlib.h>
 
-#include "lsb.h"
+#include "lsb/lsb.h"
 
 bool_t xdr_var_string(XDR *, char **);
 
