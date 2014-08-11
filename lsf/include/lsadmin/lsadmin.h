@@ -27,25 +27,25 @@
 #include "lsf.h"
 #include "lib/lproto.h"
 
-extern int limCtrl(int argc, char **argv, int opCode);
-extern int limLock(int argc, char **argv);
-extern int limUnlock(int argc, char **argv);
-extern int resCtrl(int argc, char **argv, int opCode);
-extern int checkConf(int verbose, int who);
-extern int oneLimDebug(struct debugReq *p, char *host);
-extern int oneResDebug(struct debugReq *p, char *host);
+extern int limCtrl (int argc, char **argv, int opCode);
+extern int limLock (int argc, char **argv);
+extern int limUnlock (int argc, char **argv);
+extern int resCtrl (int argc, char **argv, int opCode);
+extern int checkConf (int verbose, int who);
+extern int oneLimDebug (struct debugReq *p, char *host);
+extern int oneResDebug (struct debugReq *p, char *host);
 
-extern void parseAndDo (char *cmdBuf, int (*func)());
-extern int  adminCmdIndex(char *cmd, char *cmdList[]);
+extern void parseAndDo (char *cmdBuf, int (*func) ());
+extern int adminCmdIndex (char *cmd, char *cmdList[]);
 extern void cmdsUsage (char *cmd, char *cmdList[], char *cmdInfo[]);
 extern void oneCmdUsage (int i, char *cmdList[], char *cmdSyntax[]);
-extern void cmdHelp (int argc, char **argv, char *cmdList[], 
+extern void cmdHelp (int argc, char **argv, char *cmdList[],
 		     char *cmdInfo[], char *cmdSyntax[]);
 extern char *myGetOpt (int nargc, char **nargv, char *ostr);
-extern int  getConfirm (char *msg);
+extern int getConfirm (char *msg);
 
 
-#define NL_SETN   25   
+#define NL_SETN   25
 
 #define LSADM_RECONFIG    0
 #define LSADM_CKCONFIG    1
@@ -58,11 +58,11 @@ extern int  getConfirm (char *msg);
 #define LSADM_RESSTARTUP  8
 #define LSADM_RESSHUTDOWN 9
 #define LSADM_RESLOGON   10
-#define LSADM_RESLOGOFF  11 
-#define LSADM_LIMDEBUG   12 
-#define LSADM_LIMTIME    13 
-#define LSADM_RESDEBUG   14 
-#define LSADM_RESTIME    15 
+#define LSADM_RESLOGOFF  11
+#define LSADM_LIMDEBUG   12
+#define LSADM_LIMTIME    13
+#define LSADM_RESDEBUG   14
+#define LSADM_RESTIME    15
 #define LSADM_HELP       16
 #define LSADM_QES        17
 #define LSADM_QUIT       18

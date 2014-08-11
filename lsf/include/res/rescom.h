@@ -20,26 +20,25 @@
 #define LSF_RES_RESCOM_H
 
 
-typedef enum {
-    RES2NIOS_CONNECT,         
-    RES2NIOS_STATUS,          
-    RES2NIOS_STDOUT,          
-    RES2NIOS_EOF,             
-    RES2NIOS_REQUEUE,         
-    RES2NIOS_NEWTASK,         
-    RES2NIOS_STDERR           
+typedef enum
+{
+  RES2NIOS_CONNECT,
+  RES2NIOS_STATUS,
+  RES2NIOS_STDOUT,
+  RES2NIOS_EOF,
+  RES2NIOS_REQUEUE,
+  RES2NIOS_NEWTASK,
+  RES2NIOS_STDERR
 } resNiosCmd;
 
-typedef enum {
-    NIOS2RES_SIGNAL,          
-    NIOS2RES_STDIN,           
-    NIOS2RES_EOF,             
-    NIOS2RES_TIMEOUT,         
-    NIOS2RES_SETTTY,          
-    NIOS2RES_HEARTBEAT       
+typedef enum
+{
+  NIOS2RES_SIGNAL,
+  NIOS2RES_STDIN,
+  NIOS2RES_EOF,
+  NIOS2RES_TIMEOUT,
+  NIOS2RES_SETTTY,
+  NIOS2RES_HEARTBEAT
 } niosResCmd;
 
-#endif 
-
-
-
+#endif

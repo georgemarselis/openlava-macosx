@@ -170,220 +170,231 @@ extern char errbuf[MAXLINELEN];
 #define lsb_mperr2(fmt,a1,a2) sprintf(errbuf,fmt,a1,a2), lsb_mperr(errbuf)
 #define lsb_mperr3(fmt,a1,a2,a3) sprintf(errbuf,fmt,a1,a2,a3), lsb_mperr(errbuf)
 
-typedef enum {
-    ERR_NO_ERROR    = 1,
-    ERR_BAD_REQ     = 2,
-    ERR_NO_JOB      = 3,
-    ERR_NO_FILE     = 4,
-    ERR_FORK_FAIL   = 5,
-    ERR_NO_USER     = 6,
-    ERR_LOCK_FAIL   = 7,
-    ERR_NO_LIM      = 8,
-    ERR_MEM         = 9,
-    ERR_NULL        = 10,
-    ERR_FAIL        = 11,
-    ERR_BAD_REPLY   = 12,
-    ERR_JOB_QUOTA   = 13,
-    ERR_JOB_FINISH  = 14,
-    ERR_CHKPNTING   = 15,
-    ERR_ROOT_JOB    = 16,
-    ERR_SYSACT_FAIL = 17,
-    ERR_SIG_RETRY   = 18,
-    ERR_HOST_BOOT   = 20,
-    ERR_PID_FAIL    = 21,
-    ERR_SOCKETPAIR  = 22,
-    ERR_UNREACH_SBD = 23,
-    ERR_JOB_RETURN =  24,
-    ERR_RESTARTING_FILE = 25,
-    ERR_HANDLE     = 26
+typedef enum
+{
+  ERR_NO_ERROR = 1,
+  ERR_BAD_REQ = 2,
+  ERR_NO_JOB = 3,
+  ERR_NO_FILE = 4,
+  ERR_FORK_FAIL = 5,
+  ERR_NO_USER = 6,
+  ERR_LOCK_FAIL = 7,
+  ERR_NO_LIM = 8,
+  ERR_MEM = 9,
+  ERR_NULL = 10,
+  ERR_FAIL = 11,
+  ERR_BAD_REPLY = 12,
+  ERR_JOB_QUOTA = 13,
+  ERR_JOB_FINISH = 14,
+  ERR_CHKPNTING = 15,
+  ERR_ROOT_JOB = 16,
+  ERR_SYSACT_FAIL = 17,
+  ERR_SIG_RETRY = 18,
+  ERR_HOST_BOOT = 20,
+  ERR_PID_FAIL = 21,
+  ERR_SOCKETPAIR = 22,
+  ERR_UNREACH_SBD = 23,
+  ERR_JOB_RETURN = 24,
+  ERR_RESTARTING_FILE = 25,
+  ERR_HANDLE = 26
 } sbdReplyType;
 
 #define LOAD_REASONS   (SUSP_LOAD_REASON | SUSP_QUE_STOP_COND \
 	  | SUSP_QUE_RESUME_COND | SUSP_PG_IT | SUSP_LOAD_UNAVAIL\
           | SUSP_HOST_LOCK | SUSP_HOST_LOCK_MASTER)
 
-struct thresholds {
-    int       nIdx;
-    int       nThresholds;
-    float     **loadStop;
-    float     **loadSched;
+struct thresholds
+{
+  int nIdx;
+  int nThresholds;
+  float **loadStop;
+  float **loadSched;
 };
 
-struct jobSpecs {
-    LS_LONG_INT   jobId;
-    char      jobName[MAXLINELEN];
-    int       jStatus;
-    int	      reasons;
-    int	      subreasons;
-    int       userId;
-    char      userName[MAX_LSB_NAME_LEN];
-    int	      options;
-    int       jobPid;
-    int       jobPGid;
-    char      queue[MAX_LSB_NAME_LEN];
-    int	      priority;
-    short     nice;
-    char      fromHost[MAXHOSTNAMELEN];
-    char      resReq[MAXLINELEN];
-    time_t    startTime;
-    int       runTime;
-    int       numToHosts;
-    char      **toHosts;
-    struct thresholds thresholds;
-    int       jAttrib;
-    int       sigValue;
-    struct    lsfLimit  lsfLimits[LSF_RLIM_NLIMITS];
-    time_t    termTime;
-    char      windows[MAXLINELEN];
-    char      subHomeDir[MAXFILENAMELEN];
-    char      command[MAXLINELEN];
-    char      jobFile[MAXFILENAMELEN];
-    char      inFile[MAXFILENAMELEN];
-    char      outFile[MAXFILENAMELEN];
-    char      errFile[MAXFILENAMELEN];
-    int       umask;
-    char      cwd[MAXFILENAMELEN];
-    int       restartPid;
-    int       nxf;
-    struct    xFile *xf;
-    time_t    submitTime;
-    char      chkpntDir[MAXFILENAMELEN];
-    int       chkSig;
-    int       actPid;
-    time_t    chkPeriod;
-    time_t    migThresh;
-    time_t    lastSSuspTime;
-    char    preExecCmd[MAXLINELEN];
-    float   lastCpuTime;
-    char     mailUser[MAXLINELEN];
-    char     clusterName[MAX_LSB_NAME_LEN];
-    int      numEnv;
-    char     **env;
-    struct   lenData eexec;
-    char     projectName[MAX_LSB_NAME_LEN];
-    char     preCmd[MAXLINELEN];
-    char     postCmd[MAXLINELEN];
-    char     prepostUsername[MAX_LSB_NAME_LEN];
-    char     execCwd[MAXFILENAMELEN];
-    char     execHome[MAXFILENAMELEN];
-    int      execUid;
-    char     requeueEValues[MAXLINELEN];
-    int      niosPort;
-    char     resumeCond[MAXLINELEN];
-    char     stopCond[MAXLINELEN];
-    char   suspendActCmd[MAXLINELEN];
-    char   resumeActCmd[MAXLINELEN];
-    char   terminateActCmd[MAXLINELEN];
-    int    sigMap[LSB_SIG_NUM];
-    int      actValue;
-    char   *loginShell;
-    int    maxNumProcessors;
-    char   *schedHostType;
-    char *   execHosts;
-    int options2;
-    char  jobSpoolDir[MAXPATHLEN];
-    char  inFileSpool[MAXFILENAMELEN];
-    char  commandSpool[MAXFILENAMELEN];
-    int   userPriority;
-    char  execUsername[MAX_LSB_NAME_LEN];
+struct jobSpecs
+{
+  LS_LONG_INT jobId;
+  char jobName[MAXLINELEN];
+  int jStatus;
+  int reasons;
+  int subreasons;
+  int userId;
+  char userName[MAX_LSB_NAME_LEN];
+  int options;
+  int jobPid;
+  int jobPGid;
+  char queue[MAX_LSB_NAME_LEN];
+  int priority;
+  short nice;
+  char fromHost[MAXHOSTNAMELEN];
+  char resReq[MAXLINELEN];
+  time_t startTime;
+  int runTime;
+  int numToHosts;
+  char **toHosts;
+  struct thresholds thresholds;
+  int jAttrib;
+  int sigValue;
+  struct lsfLimit lsfLimits[LSF_RLIM_NLIMITS];
+  time_t termTime;
+  char windows[MAXLINELEN];
+  char subHomeDir[MAXFILENAMELEN];
+  char command[MAXLINELEN];
+  char jobFile[MAXFILENAMELEN];
+  char inFile[MAXFILENAMELEN];
+  char outFile[MAXFILENAMELEN];
+  char errFile[MAXFILENAMELEN];
+  int umask;
+  char cwd[MAXFILENAMELEN];
+  int restartPid;
+  int nxf;
+  struct xFile *xf;
+  time_t submitTime;
+  char chkpntDir[MAXFILENAMELEN];
+  int chkSig;
+  int actPid;
+  time_t chkPeriod;
+  time_t migThresh;
+  time_t lastSSuspTime;
+  char preExecCmd[MAXLINELEN];
+  float lastCpuTime;
+  char mailUser[MAXLINELEN];
+  char clusterName[MAX_LSB_NAME_LEN];
+  int numEnv;
+  char **env;
+  struct lenData eexec;
+  char projectName[MAX_LSB_NAME_LEN];
+  char preCmd[MAXLINELEN];
+  char postCmd[MAXLINELEN];
+  char prepostUsername[MAX_LSB_NAME_LEN];
+  char execCwd[MAXFILENAMELEN];
+  char execHome[MAXFILENAMELEN];
+  int execUid;
+  char requeueEValues[MAXLINELEN];
+  int niosPort;
+  char resumeCond[MAXLINELEN];
+  char stopCond[MAXLINELEN];
+  char suspendActCmd[MAXLINELEN];
+  char resumeActCmd[MAXLINELEN];
+  char terminateActCmd[MAXLINELEN];
+  int sigMap[LSB_SIG_NUM];
+  int actValue;
+  char *loginShell;
+  int maxNumProcessors;
+  char *schedHostType;
+  char *execHosts;
+  int options2;
+  char jobSpoolDir[MAXPATHLEN];
+  char inFileSpool[MAXFILENAMELEN];
+  char commandSpool[MAXFILENAMELEN];
+  int userPriority;
+  char execUsername[MAX_LSB_NAME_LEN];
 };
 
-struct statusReq {
-    LS_LONG_INT jobId;
-    int        jobPid;
-    int        jobPGid;
-    int        newStatus;
-    int        reason;
-    int        subreasons;
-    int        seq;
-    sbdReplyType sbdReply;
-    struct lsfRusage lsfRusage;
-    int        actPid;
-    int        execUid;
-    int        numExecHosts;
-    char       **execHosts;
-    int        exitStatus;
-    char       *execHome;
-    char       *execCwd;
-    char       *execUsername;
-    char       *queuePreCmd;
-    char       *queuePostCmd;
-    int         msgId;
-    struct jRusage runRusage;
-    int         sigValue;
-    int         actStatus;
+struct statusReq
+{
+  LS_LONG_INT jobId;
+  int jobPid;
+  int jobPGid;
+  int newStatus;
+  int reason;
+  int subreasons;
+  int seq;
+  sbdReplyType sbdReply;
+  struct lsfRusage lsfRusage;
+  int actPid;
+  int execUid;
+  int numExecHosts;
+  char **execHosts;
+  int exitStatus;
+  char *execHome;
+  char *execCwd;
+  char *execUsername;
+  char *queuePreCmd;
+  char *queuePostCmd;
+  int msgId;
+  struct jRusage runRusage;
+  int sigValue;
+  int actStatus;
 };
 
-struct chunkStatusReq {
-    int                  numStatusReqs;
-    struct  statusReq    **statusReqs;
-};
-
-
-struct sbdPackage {
-    int    managerId;
-    char   lsbManager[MAX_LSB_NAME_LEN];
-    int    mbdPid;
-    int    sbdSleepTime;
-    int    retryIntvl;
-    int    preemPeriod;
-    int    pgSuspIdleT;
-    int    maxJobs;
-    int    numJobs;
-    struct jobSpecs *jobs;
-    int    uJobLimit;
-    int    rusageUpdateRate;
-    int    rusageUpdatePercent;
-    int    jobTerminateInterval;
-    int    nAdmins;
-    char   **admins;
-};
-
-struct jobSig {
-    LS_LONG_INT jobId;
-    int    sigValue;
-    time_t chkPeriod;
-    int    actFlags;
-    char   *actCmd;
-    int    reasons;
-    int    subReasons;
-    LS_LONG_INT newJobId;
-};
-
-struct jobReply {
-    LS_LONG_INT   jobId;
-    int           jobPid;
-    int           jobPGid;
-    int           jStatus;
-    int           reasons;
-    int           actPid;
-    int           actValue;
-    int           actStatus;
+struct chunkStatusReq
+{
+  int numStatusReqs;
+  struct statusReq **statusReqs;
 };
 
 
-enum _bufstat {
-    MSG_STAT_QUEUED, MSG_STAT_SENT, MSG_STAT_RCVD
+struct sbdPackage
+{
+  int managerId;
+  char lsbManager[MAX_LSB_NAME_LEN];
+  int mbdPid;
+  int sbdSleepTime;
+  int retryIntvl;
+  int preemPeriod;
+  int pgSuspIdleT;
+  int maxJobs;
+  int numJobs;
+  struct jobSpecs *jobs;
+  int uJobLimit;
+  int rusageUpdateRate;
+  int rusageUpdatePercent;
+  int jobTerminateInterval;
+  int nAdmins;
+  char **admins;
+};
+
+struct jobSig
+{
+  LS_LONG_INT jobId;
+  int sigValue;
+  time_t chkPeriod;
+  int actFlags;
+  char *actCmd;
+  int reasons;
+  int subReasons;
+  LS_LONG_INT newJobId;
+};
+
+struct jobReply
+{
+  LS_LONG_INT jobId;
+  int jobPid;
+  int jobPGid;
+  int jStatus;
+  int reasons;
+  int actPid;
+  int actValue;
+  int actStatus;
+};
+
+
+enum _bufstat
+{
+  MSG_STAT_QUEUED, MSG_STAT_SENT, MSG_STAT_RCVD
 };
 
 typedef struct proto proto_t;
-struct proto {
-    int usrId;
-    LS_LONG_INT jobId;
-    int msgId;
-    int type;
-    int instance;
-    int (* sndfnc)(int, char *, int);
-    int (* rcvfnc)(int, char *, int);
+struct proto
+{
+  int usrId;
+  LS_LONG_INT jobId;
+  int msgId;
+  int type;
+  int instance;
+  int (*sndfnc) (int, char *, int);
+  int (*rcvfnc) (int, char *, int);
 };
 
-struct bucket {
-    struct bucket *forw;
-    struct bucket *back;
-    struct Buffer *storage;
-    enum _bufstat  bufstat;
-    proto_t proto;
-    XDR   xdrs;
+struct bucket
+{
+  struct bucket *forw;
+  struct bucket *back;
+  struct Buffer *storage;
+  enum _bufstat bufstat;
+  proto_t proto;
+  XDR xdrs;
 };
 
 #define NEW_BUCKET(BUCKET,chanBuf) \
@@ -470,14 +481,14 @@ extern int numRemoveJobs;
 extern int maxJobId;
 
 
-extern char   *lsbManager;
-extern char   *lsbSys;
-extern int    managerId;
+extern char *lsbManager;
+extern char *lsbSys;
+extern int managerId;
 
-extern uid_t  batchId;
-extern int    debug;
-extern int    lsb_CheckMode;
-extern int    lsb_CheckError;
+extern uid_t batchId;
+extern int debug;
+extern int lsb_CheckMode;
+extern int lsb_CheckError;
 extern ushort mbd_port;
 extern ushort sbd_port;
 extern int batchSock;
@@ -491,7 +502,7 @@ extern int preemPeriod;
 extern int pgSuspIdleT;
 extern char *env_dir;
 extern struct lsInfo *allLsInfo;
-extern struct tclLsInfo  *tclLsInfo;
+extern struct tclLsInfo *tclLsInfo;
 extern int rusageUpdateRate;
 extern int rusageUpdatePrecent;
 extern int jobTerminateInterval;
@@ -503,67 +514,74 @@ extern int lsf_crossUnixNT;
 #define DEFAULT_MAILPROG	"/usr/lib/sendmail"
 #define DEFAULT_CRDIR "/bin"
 
-extern FILE *smail(char *to, char *tohost);
-extern uid_t chuser(uid_t uid);
-extern int get_ports(void);
-extern void die(int sig);
-extern void *my_malloc(int size, const char *);
-extern void *my_calloc(int, int, const char *);
-extern void lsb_merr(char *s);
-extern void merr_user(char *user, char *host, char *msg, char *type);
-extern int portok(struct sockaddr_in *from);
-extern char *safeSave(char *);
-extern void lsb_mperr(char *msg);
-extern void mclose(FILE *file);
-extern void relife(void);
-extern int getElock(void);
-extern int touchElock(void);
-extern void getElogLock(void);
-extern void touchElogLock(void);
-extern void releaseElogLock(void);
+extern FILE *smail (char *to, char *tohost);
+extern uid_t chuser (uid_t uid);
+extern int get_ports (void);
+extern void die (int sig);
+extern void *my_malloc (int size, const char *);
+extern void *my_calloc (int, int, const char *);
+extern void lsb_merr (char *s);
+extern void merr_user (char *user, char *host, char *msg, char *type);
+extern int portok (struct sockaddr_in *from);
+extern char *safeSave (char *);
+extern void lsb_mperr (char *msg);
+extern void mclose (FILE * file);
+extern void relife (void);
+extern int getElock (void);
+extern int touchElock (void);
+extern void getElogLock (void);
+extern void touchElogLock (void);
+extern void releaseElogLock (void);
 extern struct listEntry *tmpListHeader (struct listEntry *listHeader);
-extern struct tclLsInfo * getTclLsInfo(void);
-extern struct resVal * checkThresholdCond (char *);
-extern int * getResMaps(int, char **);
-extern int checkResumeByLoad (LS_LONG_INT, int, struct thresholds, struct hostLoad *, int *, int *, int, struct resVal *, struct tclHostData *);
-extern void closeExceptFD(int);
-extern void freeLsfHostInfo (struct hostInfo  *, int);
+extern struct tclLsInfo *getTclLsInfo (void);
+extern struct resVal *checkThresholdCond (char *);
+extern int *getResMaps (int, char **);
+extern int checkResumeByLoad (LS_LONG_INT, int, struct thresholds,
+			      struct hostLoad *, int *, int *, int,
+			      struct resVal *, struct tclHostData *);
+extern void closeExceptFD (int);
+extern void freeLsfHostInfo (struct hostInfo *, int);
 extern void copyLsfHostInfo (struct hostInfo *, struct hostInfo *);
 extern void freeTclHostData (struct tclHostData *);
 extern void lsbFreeResVal (struct resVal **);
 
 
-int initTcl(struct tclLsInfo *);
+int initTcl (struct tclLsInfo *);
 
 
-extern int fileExist(char *file, int uid, struct hostent *);
+extern int fileExist (char *file, int uid, struct hostent *);
 extern void freeWeek (windows_t **);
-extern void errorBack(int, int, struct sockaddr_in *);
+extern void errorBack (int, int, struct sockaddr_in *);
 
-extern int init_ServSock(u_short port);
-extern int server_reply(int, char *, int);
-extern int rcvJobFile(int, struct lenData *);
-extern int do_readyOp (XDR *xdrs, int , struct sockaddr_in *, struct LSFHeader *);
+extern int init_ServSock (u_short port);
+extern int server_reply (int, char *, int);
+extern int rcvJobFile (int, struct lenData *);
+extern int do_readyOp (XDR * xdrs, int, struct sockaddr_in *,
+		       struct LSFHeader *);
 
 #define FORK_REMOVE_SPOOL_FILE  (0x1)
 #define CALL_RES_IF_NEEDED      (0x2)
-extern void childRemoveSpoolFile(const char*, int, const struct passwd*);
+extern void childRemoveSpoolFile (const char *, int, const struct passwd *);
 
-extern int xdr_statusReq(XDR *, struct statusReq *, struct LSFHeader *);
-extern int xdr_sbdPackage(XDR *, struct sbdPackage *, struct LSFHeader *);
-extern int xdr_jobSpecs(XDR *xdrs, struct jobSpecs *jobSpecs, struct LSFHeader *);
-extern int xdr_sbdPackage1(XDR *xdrs, struct sbdPackage *, struct LSFHeader *);
-extern int xdr_jobReply(XDR *xdrs, struct jobReply *jobReply, struct LSFHeader *);
-extern int xdr_jobSig(XDR *xdrs, struct jobSig *jobSig, struct LSFHeader *);
-extern int xdr_chunkStatusReq(XDR *, struct chunkStatusReq *, struct LSFHeader *);
+extern int xdr_statusReq (XDR *, struct statusReq *, struct LSFHeader *);
+extern int xdr_sbdPackage (XDR *, struct sbdPackage *, struct LSFHeader *);
+extern int xdr_jobSpecs (XDR * xdrs, struct jobSpecs *jobSpecs,
+			 struct LSFHeader *);
+extern int xdr_sbdPackage1 (XDR * xdrs, struct sbdPackage *,
+			    struct LSFHeader *);
+extern int xdr_jobReply (XDR * xdrs, struct jobReply *jobReply,
+			 struct LSFHeader *);
+extern int xdr_jobSig (XDR * xdrs, struct jobSig *jobSig, struct LSFHeader *);
+extern int xdr_chunkStatusReq (XDR *, struct chunkStatusReq *,
+			       struct LSFHeader *);
 
-extern float normalizeRq_(float rawql, float cpuFactor, int nprocs);
+extern float normalizeRq_ (float rawql, float cpuFactor, int nprocs);
 
-extern void daemon_doinit(void);
+extern void daemon_doinit (void);
 
-extern void scaleByFactor(int *, int *, float);
+extern void scaleByFactor (int *, int *, float);
 extern int execNqsi (u_long, int, int, int *, char *, int, char *);
-extern void doDaemonHang(char *);
+extern void doDaemonHang (char *);
 
 
 #endif

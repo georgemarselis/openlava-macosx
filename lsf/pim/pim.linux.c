@@ -23,4 +23,3 @@
 
 static char buffer[1024];
 extern int numprocs;
-

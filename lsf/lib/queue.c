@@ -20,298 +20,327 @@
 #include "lib.queue.h"
 
 int
-lsQueueInit_(struct lsQueue **head,
-	     int (*compareFunc)(char *data1, char *data2, int hint),
-	     void (*destroyFunc)(void *data))
+lsQueueInit_ (struct lsQueue **head,
+	      int (*compareFunc) (char *data1, char *data2, int hint),
+	      void (*destroyFunc) (void *data))
 {
-    struct lsQueueEntry *qPtr;
+  struct lsQueueEntry *qPtr;
 
-    qPtr = (struct lsQueueEntry *)malloc(sizeof(struct lsQueueEntry));
-    if (qPtr == NULL) {
-	*head = NULL;
-	lserrno = LSE_MALLOC;
-	return (-1);
+  qPtr = (struct lsQueueEntry *) malloc (sizeof (struct lsQueueEntry));
+  if (qPtr == NULL)
+    {
+      *head = NULL;
+      lserrno = LSE_MALLOC;
+      return (-1);
     }
 
-    *head = (struct lsQueue *)malloc(sizeof(struct lsQueue));
-    if (*head == NULL)  {
-	lserrno = LSE_MALLOC;
-	return (-1);
+  *head = (struct lsQueue *) malloc (sizeof (struct lsQueue));
+  if (*head == NULL)
+    {
+      lserrno = LSE_MALLOC;
+      return (-1);
     }
 
-    (*head)->compare = compareFunc;
-    if (destroyFunc == NULL) {
-	(*head)->destroy = (lsQueueDestroyFuncType)free;
-    } else {
-	(*head)->destroy = (lsQueueDestroyFuncType)destroyFunc;
+  (*head)->compare = compareFunc;
+  if (destroyFunc == NULL)
+    {
+      (*head)->destroy = (lsQueueDestroyFuncType) free;
     }
-    
-    (*head)->start = qPtr;
-    qPtr->forw = qPtr->back = qPtr;
-    return(0);
-    
-} 
+  else
+    {
+      (*head)->destroy = (lsQueueDestroyFuncType) destroyFunc;
+    }
+
+  (*head)->start = qPtr;
+  qPtr->forw = qPtr->back = qPtr;
+  return (0);
+
+}
 
 int
-lsQueueEntryAppend_(struct lsQueueEntry *entry, struct lsQueue *head)
+lsQueueEntryAppend_ (struct lsQueueEntry *entry, struct lsQueue *head)
 {
-    struct lsQueueEntry *qPtr;
+  struct lsQueueEntry *qPtr;
 
-    if (head->start == NULL) {
-        lserrno = LSE_MSG_SYS;
-	return(-1);
+  if (head->start == NULL)
+    {
+      lserrno = LSE_MSG_SYS;
+      return (-1);
     }
 
-    qPtr = head->start;
-    entry->back = qPtr->back;
-    entry->forw = qPtr;
-    qPtr->back->forw = entry;
-    qPtr->back  = entry; 
+  qPtr = head->start;
+  entry->back = qPtr->back;
+  entry->forw = qPtr;
+  qPtr->back->forw = entry;
+  qPtr->back = entry;
 
-    return(0);
+  return (0);
 
-} 
+}
 
 int
-lsQueueDataAppend_(char *data, struct lsQueue *head)
+lsQueueDataAppend_ (char *data, struct lsQueue *head)
 {
-    struct lsQueueEntry *entry;
-    int rc;
+  struct lsQueueEntry *entry;
+  int rc;
 
-    entry = (struct lsQueueEntry *)malloc(sizeof(struct lsQueueEntry));
-    if (entry == NULL) {
-	lserrno = LSE_MALLOC;
-	return (-1);
+  entry = (struct lsQueueEntry *) malloc (sizeof (struct lsQueueEntry));
+  if (entry == NULL)
+    {
+      lserrno = LSE_MALLOC;
+      return (-1);
     }
-    rc =lsQueueEntryAppend_(entry, head);
-    entry->data = data;
+  rc = lsQueueEntryAppend_ (entry, head);
+  entry->data = data;
 
-    return(rc);
-}     
+  return (rc);
+}
 
 struct lsQueueEntry *
-lsQueueDequeue_(struct lsQueue *head)
+lsQueueDequeue_ (struct lsQueue *head)
 {
-    struct lsQueueEntry *entry, *start;
-    if (! head)
-        return (struct lsQueueEntry *)NULL;
+  struct lsQueueEntry *entry, *start;
+  if (!head)
+    return (struct lsQueueEntry *) NULL;
 
-    if (! LS_QUEUE_EMPTY(head)) {
-	start = head->start;
-	entry = start->forw;
-	lsQueueEntryRemove_(entry);
-	return(entry);
-    } else 
-	return (struct lsQueueEntry *)NULL;
+  if (!LS_QUEUE_EMPTY (head))
+    {
+      start = head->start;
+      entry = start->forw;
+      lsQueueEntryRemove_ (entry);
+      return (entry);
+    }
+  else
+    return (struct lsQueueEntry *) NULL;
 
-}     
+}
 
 int
-lsQueueEntryAddFront_(struct lsQueueEntry *entry, struct lsQueue *head)
+lsQueueEntryAddFront_ (struct lsQueueEntry *entry, struct lsQueue *head)
 {
-    struct lsQueueEntry *qPtr;
+  struct lsQueueEntry *qPtr;
 
-    if (head->start == NULL) {
-        lserrno = LSE_MSG_SYS;
-	return(-1);
+  if (head->start == NULL)
+    {
+      lserrno = LSE_MSG_SYS;
+      return (-1);
     }
 
-    qPtr = head->start;
+  qPtr = head->start;
 
-    entry->forw = qPtr->forw;
-    entry->back = qPtr;
-    qPtr->forw->back = entry;
-    qPtr->forw = entry;
+  entry->forw = qPtr->forw;
+  entry->back = qPtr;
+  qPtr->forw->back = entry;
+  qPtr->forw = entry;
 
-    return(0);
+  return (0);
 
-} 
+}
 
 int
-lsQueueDataAddFront_(char *data, struct lsQueue *head)
+lsQueueDataAddFront_ (char *data, struct lsQueue *head)
 {
-    struct lsQueueEntry *entry;
-    int rc;
+  struct lsQueueEntry *entry;
+  int rc;
 
-    entry = (struct lsQueueEntry *)malloc(sizeof(struct lsQueueEntry));
-    if (entry == NULL) {
-	lserrno = LSE_MALLOC;
-	return (-1);
+  entry = (struct lsQueueEntry *) malloc (sizeof (struct lsQueueEntry));
+  if (entry == NULL)
+    {
+      lserrno = LSE_MALLOC;
+      return (-1);
     }
-    rc =lsQueueEntryAddFront_(entry, head);
-    entry->data = data;
+  rc = lsQueueEntryAddFront_ (entry, head);
+  entry->data = data;
 
-    return(rc);
-} 
-
-void
-lsQueueEntryRemove_(struct lsQueueEntry *entry)
-{
-   entry->back->forw = entry->forw;
-   entry->forw->back = entry->back;
-   entry->forw = entry->back = NULL;
-
-} 
+  return (rc);
+}
 
 void
-lsQueueEntryDestroy_(struct lsQueueEntry *entry, struct lsQueue *head)
+lsQueueEntryRemove_ (struct lsQueueEntry *entry)
 {
-    if (entry->forw != NULL) 
-	lsQueueEntryRemove_(entry);
+  entry->back->forw = entry->forw;
+  entry->forw->back = entry->back;
+  entry->forw = entry->back = NULL;
 
-    if (entry->data) {
-	if (head->destroy) {
-	    (*(head->destroy))(entry->data);
+}
+
+void
+lsQueueEntryDestroy_ (struct lsQueueEntry *entry, struct lsQueue *head)
+{
+  if (entry->forw != NULL)
+    lsQueueEntryRemove_ (entry);
+
+  if (entry->data)
+    {
+      if (head->destroy)
+	{
+	  (*(head->destroy)) (entry->data);
 	}
     }
 
-    free(entry);
-} 
+  free (entry);
+}
 
 void
-lsQueueEntryDestroyAll_(struct lsQueue *head)
+lsQueueEntryDestroyAll_ (struct lsQueue *head)
 {
-    struct lsQueueEntry *start, *qPtr, *nextQPtr;
+  struct lsQueueEntry *start, *qPtr, *nextQPtr;
 
-    start = head->start;
-    for (qPtr = start->forw; qPtr != start; qPtr = nextQPtr) {
-	nextQPtr = qPtr->forw;
+  start = head->start;
+  for (qPtr = start->forw; qPtr != start; qPtr = nextQPtr)
+    {
+      nextQPtr = qPtr->forw;
 
-	lsQueueEntryDestroy_(qPtr, head);
+      lsQueueEntryDestroy_ (qPtr, head);
     }
-} 
+}
 
 void
-lsQueueDestroy_(struct lsQueue *head)
+lsQueueDestroy_ (struct lsQueue *head)
 {
-    struct lsQueueEntry *start, *qPtr, *nextQPtr;
+  struct lsQueueEntry *start, *qPtr, *nextQPtr;
 
-    start = head->start;
-    for (qPtr = start->forw; qPtr != start; qPtr = nextQPtr) {
-	nextQPtr = qPtr->forw;
+  start = head->start;
+  for (qPtr = start->forw; qPtr != start; qPtr = nextQPtr)
+    {
+      nextQPtr = qPtr->forw;
 
-	lsQueueEntryDestroy_(qPtr, head);
+      lsQueueEntryDestroy_ (qPtr, head);
     }
-    free(head->start);
-    free(head);
-} 
+  free (head->start);
+  free (head);
+}
 
 
 char *
-lsQueueDataGet_(int i, struct lsQueue *head)
+lsQueueDataGet_ (int i, struct lsQueue *head)
 {
-    struct lsQueueEntry *start, *qPtr;
-    int n = -1;
+  struct lsQueueEntry *start, *qPtr;
+  int n = -1;
 
-    if (head == NULL || i < 0)
-        return NULL;
+  if (head == NULL || i < 0)
+    return NULL;
 
 
-    start = head->start;
-    for (qPtr = start->forw; qPtr != start; qPtr = qPtr->forw) {
-	n++;
-	if (i == n) 
-            break;
+  start = head->start;
+  for (qPtr = start->forw; qPtr != start; qPtr = qPtr->forw)
+    {
+      n++;
+      if (i == n)
+	break;
     }
 
-    if (n < i) 
-        return NULL;
-    else 
-	
-	return( qPtr->data );
+  if (n < i)
+    return NULL;
+  else
 
-} 
+    return (qPtr->data);
+
+}
 
 struct lsQueueEntry *
-lsQueueSearch_(int hint, char *val, struct lsQueue *head)
+lsQueueSearch_ (int hint, char *val, struct lsQueue *head)
 {
-    struct lsQueueEntry *start, *qPtr, *nextQPtr; 
-    int found;
-    int rc;
+  struct lsQueueEntry *start, *qPtr, *nextQPtr;
+  int found;
+  int rc;
 
-    if (head->compare == NULL) 
-        return (NULL);
+  if (head->compare == NULL)
+    return (NULL);
 
-    start = head->start;
-    found = FALSE;
+  start = head->start;
+  found = FALSE;
 
-    for (qPtr = start->forw; qPtr != start; qPtr = nextQPtr) {
-        nextQPtr = qPtr->forw;
+  for (qPtr = start->forw; qPtr != start; qPtr = nextQPtr)
+    {
+      nextQPtr = qPtr->forw;
 
-        rc = (*(head->compare))(val, qPtr->data, hint);
-        if (rc == 0) {
-            found = TRUE;
-            break;
+      rc = (*(head->compare)) (val, qPtr->data, hint);
+      if (rc == 0)
+	{
+	  found = TRUE;
+	  break;
 	}
     }
 
-    if (found == FALSE) 
-        return (struct lsQueueEntry *)NULL;
+  if (found == FALSE)
+    return (struct lsQueueEntry *) NULL;
 
-    return qPtr;
-} 
+  return qPtr;
+}
 
 void
-lsQueueSetAdd_(struct lsQueue *head1, struct lsQueue *head2,
-	       bool_t (*memberFunc)(struct lsQueueEntry *q, struct lsQueue *head))
+lsQueueSetAdd_ (struct lsQueue *head1, struct lsQueue *head2,
+		bool_t (*memberFunc) (struct lsQueueEntry * q,
+				      struct lsQueue * head))
 {
-    struct lsQueueEntry *start, *qEnt;
-    
-    start = head2->start;
-    for (qEnt = start->forw;  qEnt != start; qEnt = qEnt->forw)
-	if ((*memberFunc)(qEnt, head1) == FALSE)  {
-	    lsQueueEntryRemove_(qEnt);
-	    lsQueueEntryAppend_(qEnt, head1);
-	} else {
-	    lsQueueEntryRemove_(qEnt);
-	}
-	
-}     
+  struct lsQueueEntry *start, *qEnt;
+
+  start = head2->start;
+  for (qEnt = start->forw; qEnt != start; qEnt = qEnt->forw)
+    if ((*memberFunc) (qEnt, head1) == FALSE)
+      {
+	lsQueueEntryRemove_ (qEnt);
+	lsQueueEntryAppend_ (qEnt, head1);
+      }
+    else
+      {
+	lsQueueEntryRemove_ (qEnt);
+      }
+
+}
 
 void
-lsQueueSort_(struct lsQueue *head, int hint)
+lsQueueSort_ (struct lsQueue *head, int hint)
 {
-    struct lsQueueEntry *start;
-    struct lsQueueEntry *q1, *q2;
-    struct lsQueueEntry *nq1;
-    struct lsQueueEntry *selected;
-    int rc;
+  struct lsQueueEntry *start;
+  struct lsQueueEntry *q1, *q2;
+  struct lsQueueEntry *nq1;
+  struct lsQueueEntry *selected;
+  int rc;
 
-    start = head->start;
-    for (q1 = start->forw; q1 != start; q1 = nq1) {
-	selected = q1;
-	for (q2 = q1->forw; q2 != start; q2 = q2->forw) {
-	    rc = (*head->compare)((char *)selected, (char *)q2, hint);
-	    
-	    if (rc > 0) 
-		selected = q2;
+  start = head->start;
+  for (q1 = start->forw; q1 != start; q1 = nq1)
+    {
+      selected = q1;
+      for (q2 = q1->forw; q2 != start; q2 = q2->forw)
+	{
+	  rc = (*head->compare) ((char *) selected, (char *) q2, hint);
+
+	  if (rc > 0)
+	    selected = q2;
 	}
-	
-	lsQueueEntryRemove_(selected);
-	lsQueueEntryAddFront_(selected, head);
 
-	nq1 = selected->forw;
+      lsQueueEntryRemove_ (selected);
+      lsQueueEntryAddFront_ (selected, head);
+
+      nq1 = selected->forw;
     }
-} 
+}
 
-int lsQueueDequeueData_(struct lsQueue *head, char **data)
+int
+lsQueueDequeueData_ (struct lsQueue *head, char **data)
 {
-    struct lsQueueEntry *ent = lsQueueDequeue_(head);
-    if (ent == NULL) {
-	return 0;
+  struct lsQueueEntry *ent = lsQueueDequeue_ (head);
+  if (ent == NULL)
+    {
+      return 0;
     }
-    *data = ent->data;
-    free(ent);
-    return 1;
-} 
+  *data = ent->data;
+  free (ent);
+  return 1;
+}
 
-void lsQueueIter_(struct lsQueue *head, void (*func)(char *, void *), void *hdata)
+void
+lsQueueIter_ (struct lsQueue *head, void (*func) (char *, void *),
+	      void *hdata)
 {
-    struct lsQueueEntry *start, *qPtr;
+  struct lsQueueEntry *start, *qPtr;
 
-    start = head->start;
+  start = head->start;
 
-    for (qPtr = start->forw; qPtr != start; qPtr = qPtr->forw) {
-	(*func)(qPtr->data, hdata);
+  for (qPtr = start->forw; qPtr != start; qPtr = qPtr->forw)
+    {
+      (*func) (qPtr->data, hdata);
     }
-} 
+}

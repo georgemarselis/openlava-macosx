@@ -14,205 +14,209 @@
  */
 #define EULER   1024
 
-static link_t   E;
-static link_t   *euler(void);
+static link_t E;
+static link_t *euler (void);
 
 static link_t *
-euler(void)
+euler (void)
 {
-    int      n;
-    link_t   *e;
+  int n;
+  link_t *e;
 
-    if (LINK_NUM_ENTRIES(&E) > 0)
-        return &E;
+  if (LINK_NUM_ENTRIES (&E) > 0)
+    return &E;
 
-    for (n = 0; n < EULER; n++) {
-        /* populate euler's link
-         */
-        e = calloc(1, sizeof(link_t));
-        if (e == NULL)
-            goto aia;
+  for (n = 0; n < EULER; n++)
+    {
+      /* populate euler's link
+       */
+      e = calloc (1, sizeof (link_t));
+      if (e == NULL)
+	goto aia;
 
-        e->next = E.next;
-        E.next = e;
-        E.num++;
+      e->next = E.next;
+      E.next = e;
+      E.num++;
     }
 
-    return(&E);
+  return (&E);
 
 aia:
 
-    while (E.next) {
-        e = E.next;
-        E.next = e->next;
-        free(e);
+  while (E.next)
+    {
+      e = E.next;
+      E.next = e->next;
+      free (e);
     }
 
-    return NULL;
+  return NULL;
 
-} /* euler() */
+}				/* euler() */
 
 /* calloc() wrapper
  */
 link_t *
-ecalloc(void)
+ecalloc (void)
 {
-    link_t   *e;
+  link_t *e;
 
-    if (!euler()) {
-        return NULL;
+  if (!euler ())
+    {
+      return NULL;
     }
 
-    /* straight outta cache
-     */
-    e = E.next;
-    E.next = e->next;
+  /* straight outta cache
+   */
+  e = E.next;
+  E.next = e->next;
 
-    e->next = NULL; /* like calloc() */
-    e->ptr  = NULL;
-    e->num = 0;
+  e->next = NULL;		/* like calloc() */
+  e->ptr = NULL;
+  e->num = 0;
 
-    /* yes one less in the E cache
-     */
-    E.num--;
+  /* yes one less in the E cache
+   */
+  E.num--;
 
-    return e;
+  return e;
 
-} /* ecalloc() */
+}				/* ecalloc() */
 
 /* and free wrapper...
  */
 void
-efree(link_t *e)
+efree (link_t * e)
 {
-    e->next = E.next;
-    E.next = e;
-    E.num++;
+  e->next = E.next;
+  E.next = e;
+  E.num++;
 
-} /* efree() */
+}				/* efree() */
 
 /* Make a new link
  */
 link_t *
-initLink(void)
+initLink (void)
 {
-    link_t   *link;
+  link_t *link;
 
-    link = ecalloc();
-    if (!link)
-        return NULL;
+  link = ecalloc ();
+  if (!link)
+    return NULL;
 
-    return link;
+  return link;
 
-} /* initLink() */
+}				/* initLink() */
 
 /* Insert in front of the head.
  * This is the stack push operation.
  */
 int
-inLink(link_t *head, void *val)
+inLink (link_t * head, void *val)
 {
-    link_t   *el;
+  link_t *el;
 
-    if (!head)
-        return -1;
+  if (!head)
+    return -1;
 
-    el = ecalloc();
-    if (!el)
-        return -1;
+  el = ecalloc ();
+  if (!el)
+    return -1;
 
-    el->ptr = val;
-    el->next = head->next;
-    head->next = el;
-    head->num++;
+  el->ptr = val;
+  el->next = head->next;
+  head->next = el;
+  head->num++;
 
-    return 0;
+  return 0;
 
-} /* inLink() */
+}				/* inLink() */
 
 void
-finLink(link_t * head)
+finLink (link_t * head)
 {
-    if (!head)
-        return;
+  if (!head)
+    return;
 
-    while (popLink(head))
-        head->num--;
+  while (popLink (head))
+    head->num--;
 
-    efree(head);
+  efree (head);
 
-} /* finLink() */
+}				/* finLink() */
 
 /* Just wrap the inLink() and call it push.
  */
 int
-pushLink(link_t *head, void *val)
+pushLink (link_t * head, void *val)
 {
-    int   cc;
+  int cc;
 
-    if (!head)
-        return -1;
+  if (!head)
+    return -1;
 
-    cc = inLink(head, val);
+  cc = inLink (head, val);
 
-    return cc;
+  return cc;
 
-} /* pushLink() */
+}				/* pushLink() */
 
 /* The stack pop operation.
  */
 void *
-popLink(link_t * head)
+popLink (link_t * head)
 {
-    link_t   *p;
-    void     *t;
+  link_t *p;
+  void *t;
 
-    if (!head)
-        return NULL;
-
-    if (head->next != NULL) {
-        p = head->next;
-        head->next = p->next;
-        t = p->ptr;
-        efree(p);
-        head->num--;
-        return t;
-    }
-
+  if (!head)
     return NULL;
 
-} /* popLink() */
+  if (head->next != NULL)
+    {
+      p = head->next;
+      head->next = p->next;
+      t = p->ptr;
+      efree (p);
+      head->num--;
+      return t;
+    }
+
+  return NULL;
+
+}				/* popLink() */
 
 /* Queue operation. If the link is long
  * this operation is expensive.
  */
 int
-enqueueLink(link_t *head, void *val)
+enqueueLink (link_t * head, void *val)
 {
-    link_t   *p;
-    link_t   *p2;
+  link_t *p;
+  link_t *p2;
 
-    if (!head)
-        return -1;
+  if (!head)
+    return -1;
 
-    p2 = ecalloc();
-    if (!p2)
-        return -1;
+  p2 = ecalloc ();
+  if (!p2)
+    return -1;
 
-    p2->ptr = val;
+  p2->ptr = val;
 
-    /* walk till the end... if long this cost you...
-     */
-    for (p = head; p->next != NULL; p = p->next)
-        ;
+  /* walk till the end... if long this cost you...
+   */
+  for (p = head; p->next != NULL; p = p->next)
+    ;
 
-    p2->next = p->next;
-    p->next = p2;
-    head->num++;
+  p2->next = p->next;
+  p->next = p2;
+  head->num++;
 
-    return 0;
+  return 0;
 
-} /* enqueueLink() */
+}				/* enqueueLink() */
 
 /* The opposite of popLink(), return
  * the first element in the list,
@@ -220,154 +224,153 @@ enqueueLink(link_t *head, void *val)
  * the elements by pushLink()
  */
 void *
-dequeueLink(link_t *head)
+dequeueLink (link_t * head)
 {
-    link_t   *p;
-    link_t   *p2;
-    void     *t;
+  link_t *p;
+  link_t *p2;
+  void *t;
 
-    if (!head
-        || !head->next)
-        return NULL;
+  if (!head || !head->next)
+    return NULL;
 
-    p2 = head;
-    p = head->next;
+  p2 = head;
+  p = head->next;
 
-    while (p->next) {
-        p2 = p;
-        p = p->next;
+  while (p->next)
+    {
+      p2 = p;
+      p = p->next;
     }
 
-    p2->next = p->next;
-    t = p->ptr;
-    efree(p);
-    head->num--;
+  p2->next = p->next;
+  t = p->ptr;
+  efree (p);
+  head->num--;
 
-    return t;
+  return t;
 
-} /* dequeueLink() */
+}				/* dequeueLink() */
 
 /* Insert in the linked list based on some priority defined
  * by the user function int (*cmp). (*cmp) is supposed to
  * behave the compare function of qsort(3).
  */
 int
-priorityLink(link_t *head,
-             void *val,
-             void *extra,
-             int (*cmp)(const void *,
-                        const void *,
-                        const void *))
+priorityLink (link_t * head,
+	      void *val,
+	      void *extra,
+	      int (*cmp) (const void *, const void *, const void *))
 {
-    link_t   *t;
-    link_t   *t2;
-    link_t   *p;
-    int      cc;
+  link_t *t;
+  link_t *t2;
+  link_t *p;
+  int cc;
 
-    if (! head)
-        return -1;
+  if (!head)
+    return -1;
 
-    t = head;
-    t2 = head->next;
+  t = head;
+  t2 = head->next;
 
-    while (t2) {
+  while (t2)
+    {
 
-        /* val is the new element
-         */
-        cc = (*cmp)(val, t2->ptr, extra);
-        if (cc <= 0)
-            break;
+      /* val is the new element
+       */
+      cc = (*cmp) (val, t2->ptr, extra);
+      if (cc <= 0)
+	break;
 
-        t = t2;
-        t2 = t2->next;
+      t = t2;
+      t2 = t2->next;
     }
 
-    p = ecalloc();
-    if (!p)
-        return -1;
+  p = ecalloc ();
+  if (!p)
+    return -1;
 
-    p->next = t2;
-    t->next = p;
-    p->ptr = val;
-    head->num++;
+  p->next = t2;
+  t->next = p;
+  p->ptr = val;
+  head->num++;
 
-    return 0;
+  return 0;
 
-} /* priorityLink() */
+}				/* priorityLink() */
 
 /* Return the address of the first element saved in the
  * in the linked list, the top of the stack. Unlike popLink()
  * this routine does not remove the element from the list.
  */
 void *
-visitLink(link_t *head)
+visitLink (link_t * head)
 {
-    void   *p;
+  void *p;
 
-    if (!head || !head->next)
-        return NULL;
+  if (!head || !head->next)
+    return NULL;
 
-    p = head->next->ptr;
+  p = head->next->ptr;
 
-    return p;
+  return p;
 
-} /* visitLink() */
+}				/* visitLink() */
 
 /* Remove the element val from the link.
  */
 void *
-rmLink(link_t *head, void *val)
+rmLink (link_t * head, void *val)
 {
-    link_t   *p;
-    link_t   *t;
-    void     *v;
+  link_t *p;
+  link_t *t;
+  void *v;
 
-    if (!head)
-        return NULL;
+  if (!head)
+    return NULL;
 
-    /* Since we have only one link
-     * we need to keep track of 2
-     * elements: the current and
-     * the previous.
-     */
+  /* Since we have only one link
+   * we need to keep track of 2
+   * elements: the current and
+   * the previous.
+   */
 
-    t = head;
-    for (p = head->next;
-         p != NULL;
-         p = p->next) {
-        if (p->ptr == val) {
-            t->next = p->next;
-            v = p->ptr;
-            efree(p);
-            head->num--;
-            return v;
-        }
-        t = p;
+  t = head;
+  for (p = head->next; p != NULL; p = p->next)
+    {
+      if (p->ptr == val)
+	{
+	  t->next = p->next;
+	  v = p->ptr;
+	  efree (p);
+	  head->num--;
+	  return v;
+	}
+      t = p;
     }
 
-    return p;
+  return p;
 
-} /* rmlink() */
+}				/* rmlink() */
 
 /* Find an element val, return it, but do not
  * remove from the list.
  */
 void *
-peekLink(link_t *head, void *val)
+peekLink (link_t * head, void *val)
 {
-    link_t   *p;
+  link_t *p;
 
-    for (p = head->next;
-         p != NULL;
-         p = p->next) {
-        if (p->ptr == val) {
-            return p->ptr;
-        }
+  for (p = head->next; p != NULL; p = p->next)
+    {
+      if (p->ptr == val)
+	{
+	  return p->ptr;
+	}
     }
 
-    return NULL;
+  return NULL;
 
-} /* peekLink() */
+}				/* peekLink() */
 
 /* We could this interface as
  * traverseInit(link_t *head, link_t **iter),
@@ -384,78 +387,84 @@ peekLink(link_t *head, void *val)
  *
  */
 void
-traverseInit(const link_t *head, linkiter_t *iter)
+traverseInit (const link_t * head, linkiter_t * iter)
 {
-    if (head == NULL) {
-        memset(iter, 0, sizeof(linkiter_t));
-        return;
+  if (head == NULL)
+    {
+      memset (iter, 0, sizeof (linkiter_t));
+      return;
     }
 
-    iter->pos = head->next;
+  iter->pos = head->next;
 
-} /* traverseInit() */
+}				/* traverseInit() */
 
 void *
-traverseLink(linkiter_t *iter)
+traverseLink (linkiter_t * iter)
 {
-    void   *p;
+  void *p;
 
-    if (!iter)
-        return NULL;
-
-    if (iter->pos != NULL) {
-        p = iter->pos->ptr;
-        iter->pos = iter->pos->next;
-        return p;
-    }
-
+  if (!iter)
     return NULL;
 
-} /* traverseLink() */
+  if (iter->pos != NULL)
+    {
+      p = iter->pos->ptr;
+      iter->pos = iter->pos->next;
+      return p;
+    }
+
+  return NULL;
+
+}				/* traverseLink() */
 
 #if 0
 /* Dybag && test
  */
 static void
-printLink(link_t *h)
+printLink (link_t * h)
 {
-    link_t *p;
+  link_t *p;
 
-    printf("head %p\n", h);
+  printf ("head %p\n", h);
 
-    for (p = h->next; p != NULL; p = p->next) {
-        printf("%p\n", p);
+  for (p = h->next; p != NULL; p = p->next)
+    {
+      printf ("%p\n", p);
     }
 }
+
 #include<stdio.h>
 #include"link.h"
 #include<stdlib.h>
 
 int
-main(void)
+main (void)
 {
-    link_t   *h;
-    int      i;
-    char     *p;
+  link_t *h;
+  int i;
+  char *p;
 
-    h = initLink();
+  h = initLink ();
 
-    for (i = 0; i < 1024 * 2; i++) {
+  for (i = 0; i < 1024 * 2; i++)
+    {
 
-        p = malloc(128);
-        enqueueLink(h, p);
-        printf("%p enqueued\n", p);
+      p = malloc (128);
+      enqueueLink (h, p);
+      printf ("%p enqueued\n", p);
     }
 
-    printLink(h);
+  printLink (h);
 
-    while ((p = dequeueLink(h))) {
-        printf("%p dequeued\n", p);
-        free(p);
+  while ((p = dequeueLink (h)))
+    {
+      printf ("%p dequeued\n", p);
+      free (p);
     }
 
-    finLink(h);
+  finLink (h);
 
-    return 0;
+  return 0;
 }
 #endif

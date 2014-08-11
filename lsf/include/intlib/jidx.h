@@ -25,12 +25,13 @@
 
 extern int idxerrno;
 
-struct idxList {
-    int             start;
-    int             end;
-    int             step;
-    struct idxList *next;
+struct idxList
+{
+  int start;
+  int end;
+  int step;
+  struct idxList *next;
 };
-extern int 	idxparse (struct idxList **, int *);
+extern int idxparse (struct idxList **, int *);
 
 #endif

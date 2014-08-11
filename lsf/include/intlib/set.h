@@ -19,19 +19,20 @@
 #ifndef LSF_INTLIB_SET_H
 #define LSF_INTLIB_SET_H
 
-struct listSet {
-    int elem;             
-    struct listSet *next;  
+struct listSet
+{
+  int elem;
+  struct listSet *next;
 };
 
-extern void listSetFree( struct listSet *);
-extern struct listSet * listSetAlloc(int);
+extern void listSetFree (struct listSet *);
+extern struct listSet *listSetAlloc (int);
 extern int listSetEqual (struct listSet *, struct listSet *);
 extern struct listSet *listSetUnion (struct listSet *, struct listSet *);
 extern struct listSet *listSetIntersect (struct listSet *, struct listSet *);
 extern struct listSet *listSetDuplicate (struct listSet *);
 extern int listSetIn (int, struct listSet *);
 extern struct listSet *listSetInsert (int, struct listSet *);
-extern struct listSet *listSetSub(struct listSet *, struct listSet *);
+extern struct listSet *listSetSub (struct listSet *, struct listSet *);
 
 #endif

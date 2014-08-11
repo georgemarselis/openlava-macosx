@@ -22,22 +22,21 @@
 
 
 SO_HANDLE_T
-soOpen_(const char *libFileName)
+soOpen_ (const char *libFileName)
 {
-    return 0;
-} 
+  return 0;
+}
 
 
 void
-soClose_(SO_HANDLE_T handle)
+soClose_ (SO_HANDLE_T handle)
 {
-    
-} 
+
+}
 
 
 void *
-soSym_(SO_HANDLE_T handle, const char *entryName)
+soSym_ (SO_HANDLE_T handle, const char *entryName)
 {
-    return NULL;
-} 
-
+  return NULL;
+}

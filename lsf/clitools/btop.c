@@ -18,20 +18,20 @@
 
 #include "cmd.h"
 
-#define NL_SETN 8 	
+#define NL_SETN 8
 
 extern void bmove (int, char **, int);
 
-int 
+int
 main (int argc, char **argv)
 {
 
-    int rc;
+  int rc;
 
-    rc = _i18n_init ( I18N_CAT_MIN );	
+  rc = _i18n_init (I18N_CAT_MIN);
 
-    bmove(argc, argv, TO_TOP);
+  bmove (argc, argv, TO_TOP);
 
-    _i18n_end ( ls_catd );			
-    exit(0);
-} 
+  _i18n_end (ls_catd);
+  exit (0);
+}

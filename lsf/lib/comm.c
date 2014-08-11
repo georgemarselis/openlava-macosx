@@ -30,75 +30,86 @@ static int myrpid_ = -1;
 void unsetenv (char *);
 
 int
-ls_minit() 
+ls_minit ()
 {
-    char *c;
+  char *c;
 
-    if ( (c = getenv("LSF_RPID")) == NULL) {
-        fprintf(stderr,"ls_minit: Internal error- don't know my rpid\n");
-	exit(-1);
-    } else {
-	myrpid_ = atoi(c);
-	unsetenv("LSF_RPID");
+  if ((c = getenv ("LSF_RPID")) == NULL)
+    {
+      fprintf (stderr, "ls_minit: Internal error- don't know my rpid\n");
+      exit (-1);
+    }
+  else
+    {
+      myrpid_ = atoi (c);
+      unsetenv ("LSF_RPID");
     }
 
-    if ( (c = getenv("LSF_CALLBACK_SOCK")) == NULL) {
-        fprintf(stderr,"ls_minit: Internal error-no connection to master\n");
-	exit(-1);
-    } else {
-	msock_ = atoi(c);
-	amSlave_ = TRUE;
-	unsetenv("LSF_CALLBACK_SOCK");
+  if ((c = getenv ("LSF_CALLBACK_SOCK")) == NULL)
+    {
+      fprintf (stderr, "ls_minit: Internal error-no connection to master\n");
+      exit (-1);
+    }
+  else
+    {
+      msock_ = atoi (c);
+      amSlave_ = TRUE;
+      unsetenv ("LSF_CALLBACK_SOCK");
     }
 }
 
-int 
-ls_getrpid(void)
+int
+ls_getrpid (void)
 {
-    if (amSlave_ == TRUE)
-        return(myrpid_);
-    else
-	return(0);
+  if (amSlave_ == TRUE)
+    return (myrpid_);
+  else
+    return (0);
 }
 
-int 
-ls_sndmsg(int tid, char *buf, int count, task_sock)
+int
+ls_sndmsg (int tid, char *buf, int count, task_sock)
 {
-    int cc, sock;
-    struct tid *tid;
+  int cc, sock;
+  struct tid *tid;
 
-    if (amSlave_ == TRUE)
-	sock = msock_;
-    else {
-        if ((tid = tid_find(tid, task_sock)) == NULL)
-	    return (-1);
-	sock = tid->sock;
+  if (amSlave_ == TRUE)
+    sock = msock_;
+  else
+    {
+      if ((tid = tid_find (tid, task_sock)) == NULL)
+	return (-1);
+      sock = tid->sock;
     }
 
-    return(b_write_fix( sock, buf, count) );
+  return (b_write_fix (sock, buf, count));
 }
 
 
-int 
-ls_rcvmsg(int tid, char *buf, int count)
+int
+ls_rcvmsg (int tid, char *buf, int count)
 {
-    int cc;
-    int sock;
+  int cc;
+  int sock;
 
-    if (amSlave_ == TRUE)
-	sock = msock_;
-    else {
-	if ( tid < 0) {
+  if (amSlave_ == TRUE)
+    sock = msock_;
+  else
+    {
+      if (tid < 0)
+	{
 
-	} else {
-            if ( (sock = tid_find(tid, task_sock)) < 0) {
-		lserrno = LSE_RES_INVCHILD;
-		return(-1);
+	}
+      else
+	{
+	  if ((sock = tid_find (tid, task_sock)) < 0)
+	    {
+	      lserrno = LSE_RES_INVCHILD;
+	      return (-1);
 	    }
-        }
+	}
     }
 
-    return(b_read_fix( sock, buf, count) );
+  return (b_read_fix (sock, buf, count));
 }
 #endif
-

@@ -22,8 +22,8 @@
 typedef int SO_HANDLE_T;
 
 
-extern SO_HANDLE_T soOpen_(const char *libFileName);
-extern void soClose_(SO_HANDLE_T handle);
-extern void *soSym_(SO_HANDLE_T handle, const char *entryName);
+extern SO_HANDLE_T soOpen_ (const char *libFileName);
+extern void soClose_ (SO_HANDLE_T handle);
+extern void *soSym_ (SO_HANDLE_T handle, const char *entryName);
 
 #endif

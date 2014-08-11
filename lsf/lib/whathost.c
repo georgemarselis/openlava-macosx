@@ -19,14 +19,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>  
-#include <sys/file.h>  
+#include <sys/types.h>
+#include <sys/file.h>
 #include <string.h>
 
-#include <sys/time.h>   
+#include <sys/time.h>
 #include <sys/stat.h>
 #include <sys/param.h>
-#include <netdb.h>      
+#include <netdb.h>
 #include <netinet/in.h>
 #include <errno.h>
 #include <sys/wait.h>
@@ -45,16 +45,16 @@
 
 extern const char *getHostOfficialByName_ (const char *);
 
-char *ls_getmnthost(char *file)
+char *
+ls_getmnthost (char *file)
 {
-    struct stat statb;
+  struct stat statb;
 
-    if (stat(file, &statb) < 0) {
-        return (NULL);
+  if (stat (file, &statb) < 0)
+    {
+      return (NULL);
     }
 
-    return (NULL);
+  return (NULL);
 
-} 
-
-
+}

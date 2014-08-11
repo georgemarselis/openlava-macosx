@@ -21,136 +21,126 @@
 
 #include <unistd.h>
 
-#include "lib/lib.h" 
+#include "lib/lib.h"
 #include "lib/lproto.h"
 #include "lib/xdr.h"
 
 int
-ls_limcontrol(char *hname, int opCode)
+ls_limcontrol (char *hname, int opCode)
 {
-    enum limReqCode limReqCode;
-    struct lsfAuth auth;
+  enum limReqCode limReqCode;
+  struct lsfAuth auth;
 
-    memset(&auth, 0, sizeof(struct lsfAuth));
+  memset (&auth, 0, sizeof (struct lsfAuth));
 
-    switch (opCode) {
-        case LIM_CMD_SHUTDOWN:
-            limReqCode = LIM_SHUTDOWN;
-            break;
-        case LIM_CMD_REBOOT:
-            limReqCode = LIM_REBOOT;
-            break;
-        default:
-            lserrno = LSE_BAD_OPCODE;
-            return -1;
+  switch (opCode)
+    {
+    case LIM_CMD_SHUTDOWN:
+      limReqCode = LIM_SHUTDOWN;
+      break;
+    case LIM_CMD_REBOOT:
+      limReqCode = LIM_REBOOT;
+      break;
+    default:
+      lserrno = LSE_BAD_OPCODE;
+      return -1;
     }
 
-    putEauthClientEnvVar("user");
-    putEauthServerEnvVar("lim");
-    getAuth_(&auth, hname);
+  putEauthClientEnvVar ("user");
+  putEauthServerEnvVar ("lim");
+  getAuth_ (&auth, hname);
 
-    if (callLim_(limReqCode,
-                 &auth,
-                 xdr_lsfAuth,
-                 NULL,
-                 NULL,
-                 hname,
-                 0,
-                 NULL) < 0)
-        return -1;
+  if (callLim_ (limReqCode,
+		&auth, xdr_lsfAuth, NULL, NULL, hname, 0, NULL) < 0)
+    return -1;
 
-    return 0;
+  return 0;
 
 }
 
 int
-ls_lockhost(time_t duration)
+ls_lockhost (time_t duration)
 {
-    return (setLockOnOff_(LIM_LOCK_USER, duration, NULL));
+  return (setLockOnOff_ (LIM_LOCK_USER, duration, NULL));
 
 }
 
 int
-ls_unlockhost(void)
+ls_unlockhost (void)
 {
-    return (setLockOnOff_(LIM_UNLOCK_USER, 0, NULL));
+  return (setLockOnOff_ (LIM_UNLOCK_USER, 0, NULL));
 
 }
 
 int
-lockHost_(time_t duration, char *hname)
+lockHost_ (time_t duration, char *hname)
 {
-    return (setLockOnOff_(LIM_LOCK_USER, duration, hname));
+  return (setLockOnOff_ (LIM_LOCK_USER, duration, hname));
 
 }
 
 int
-unlockHost_(char *hname)
+unlockHost_ (char *hname)
 {
-    return (setLockOnOff_(LIM_UNLOCK_USER, 0, hname));
+  return (setLockOnOff_ (LIM_UNLOCK_USER, 0, hname));
 
 }
 
 int
-setLockOnOff_(int on, time_t duration, char *hname)
+setLockOnOff_ (int on, time_t duration, char *hname)
 {
-    struct limLock lockReq;
-    char *host = hname;
+  struct limLock lockReq;
+  char *host = hname;
 
-    if (initenv_(NULL, NULL) <0)
-        return -1;
+  if (initenv_ (NULL, NULL) < 0)
+    return -1;
 
-    lockReq.on = on;
+  lockReq.on = on;
 
-    lockReq.uid = getuid();
+  lockReq.uid = getuid ();
 
-    if (getLSFUser_(lockReq.lsfUserName, sizeof(lockReq.lsfUserName)) < 0) {
-        return -1;
+  if (getLSFUser_ (lockReq.lsfUserName, sizeof (lockReq.lsfUserName)) < 0)
+    {
+      return -1;
     }
 
-    if (duration == 0)
-        lockReq.time = 77760000;
-    else
-        lockReq.time = duration;
+  if (duration == 0)
+    lockReq.time = 77760000;
+  else
+    lockReq.time = duration;
 
-    if (host == NULL)
-        host = ls_getmyhostname();
+  if (host == NULL)
+    host = ls_getmyhostname ();
 
-    if (callLim_(LIM_LOCK_HOST,
-                 &lockReq,
-                 xdr_limLock,
-                 NULL,
-                 NULL,
-                 host,
-                 0,
-                 NULL) < 0)
-        return -1;
+  if (callLim_ (LIM_LOCK_HOST,
+		&lockReq, xdr_limLock, NULL, NULL, host, 0, NULL) < 0)
+    return -1;
 
-    return 0;
+  return 0;
 
 }
 
 int
-oneLimDebug(struct debugReq *pdebug, char *hostname)
+oneLimDebug (struct debugReq *pdebug, char *hostname)
 {
-    struct debugReq debugData;
-    char *host = hostname;
-    char space[ ]=" ";
-    enum limReqCode limReqCode;
+  struct debugReq debugData;
+  char *host = hostname;
+  char space[] = " ";
+  enum limReqCode limReqCode;
 
-    limReqCode = LIM_DEBUGREQ;
-    debugData.opCode = pdebug->opCode;
-    debugData.logClass = pdebug->logClass;
-    debugData.level    = pdebug->level;
-    debugData.hostName = space;
-    debugData.options  = pdebug->options;
-    strcpy (debugData.logFileName, pdebug->logFileName);
+  limReqCode = LIM_DEBUGREQ;
+  debugData.opCode = pdebug->opCode;
+  debugData.logClass = pdebug->logClass;
+  debugData.level = pdebug->level;
+  debugData.hostName = space;
+  debugData.options = pdebug->options;
+  strcpy (debugData.logFileName, pdebug->logFileName);
 
-    if (callLim_(limReqCode, &debugData, xdr_debugReq, NULL,
-                 NULL, host, 0, NULL) < 0)
-        return (-1);
+  if (callLim_ (limReqCode, &debugData, xdr_debugReq, NULL,
+		NULL, host, 0, NULL) < 0)
+    return (-1);
 
-    return (0);
+  return (0);
 
 }
 
@@ -158,26 +148,21 @@ oneLimDebug(struct debugReq *pdebug, char *hostname)
  * Send alive heartbeat from res to lim.
  */
 int
-ls_servavail(int servId, int nonblock)
+ls_servavail (int servId, int nonblock)
 {
-    int options = 0;
+  int options = 0;
 
-    if (nonblock)
-        options |= _NON_BLOCK_;
+  if (nonblock)
+    options |= _NON_BLOCK_;
 
-    if (initenv_(NULL, NULL) < 0)
-        return -1;
+  if (initenv_ (NULL, NULL) < 0)
+    return -1;
 
-    if (callLim_(LIM_SERV_AVAIL,
-                 &servId,
-                 xdr_int,
-                 NULL,
-                 NULL,
-                 ls_getmyhostname(),
-                 options,
-                 NULL) < 0)
-        return -1;
+  if (callLim_ (LIM_SERV_AVAIL,
+		&servId,
+		xdr_int, NULL, NULL, ls_getmyhostname (), options, NULL) < 0)
+    return -1;
 
-    return 0;
+  return 0;
 
 }

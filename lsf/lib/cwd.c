@@ -19,32 +19,38 @@
 #include "lib.h"
 
 char *
-mygetwd_(char *path)
+mygetwd_ (char *path)
 {
-    char *pwd;
-    struct stat pwdstat, dotstat;
-    static char temp_buff[MAXPATHLEN];
+  char *pwd;
+  struct stat pwdstat, dotstat;
+  static char temp_buff[MAXPATHLEN];
 
-    pwd = getenv("PWD");
-    if (pwd == NULL && (pwd = getenv("CWD")) == NULL) {
-	if(getcwd(temp_buff, sizeof(temp_buff))) {
-	   strncpy(path, temp_buff, MAXFILENAMELEN);
-	   return(path);
-	} else
-	   return(NULL);
+  pwd = getenv ("PWD");
+  if (pwd == NULL && (pwd = getenv ("CWD")) == NULL)
+    {
+      if (getcwd (temp_buff, sizeof (temp_buff)))
+	{
+	  strncpy (path, temp_buff, MAXFILENAMELEN);
+	  return (path);
+	}
+      else
+	return (NULL);
     }
 
-    if (stat(pwd, &pwdstat) == 0 && stat(".", &dotstat) == 0) {
-	if (pwdstat.st_dev == dotstat.st_dev &&
-	    pwdstat.st_ino == dotstat.st_ino) {
-	    strcpy(path, pwd);            
-	    return path;
+  if (stat (pwd, &pwdstat) == 0 && stat (".", &dotstat) == 0)
+    {
+      if (pwdstat.st_dev == dotstat.st_dev &&
+	  pwdstat.st_ino == dotstat.st_ino)
+	{
+	  strcpy (path, pwd);
+	  return path;
 	}
     }
-    if(getcwd(temp_buff, sizeof(temp_buff))) {
-        strncpy(path, temp_buff, MAXFILENAMELEN);
-	return(path);
-    } else
-       return(NULL);
-} 
-
+  if (getcwd (temp_buff, sizeof (temp_buff)))
+    {
+      strncpy (path, temp_buff, MAXFILENAMELEN);
+      return (path);
+    }
+  else
+    return (NULL);
+}

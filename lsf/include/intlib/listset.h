@@ -19,17 +19,19 @@
 #ifndef LSF_INTLIB_LISTSET_H
 #define LSF_INTLIB_LISTSET_H
 
-struct listSet {
-    long            elem;             
-    struct listSet *next;  
+struct listSet
+{
+  long elem;
+  struct listSet *next;
 };
 
-struct listSetIterator {
-    struct listSet   *pos;
+struct listSetIterator
+{
+  struct listSet *pos;
 };
 
-extern void listSetFree( struct listSet *);
-extern struct listSet * listSetAlloc(long);
+extern void listSetFree (struct listSet *);
+extern struct listSet *listSetAlloc (long);
 extern int listSetEqual (struct listSet *, struct listSet *);
 extern struct listSet *listSetUnion (struct listSet *, struct listSet *);
 extern struct listSet *listSetIntersect (struct listSet *, struct listSet *);
@@ -37,20 +39,20 @@ extern struct listSet *listSetDuplicate (struct listSet *);
 extern int listSetIn (int, struct listSet *);
 extern struct listSet *listSetInsert (long, struct listSet *);
 extern struct listSet *listSetDel (long, struct listSet *);
-extern struct listSet *listSetSub(struct listSet *, struct listSet *);
-extern struct listSet *listSetSelect(long , long , struct listSet *);
-extern int    listSetNumEle(struct listSet *);
-extern int    listSetGetEle(int, struct listSet *);
-extern void   collectFreeSet(void);
-extern int    listSetMember(long, struct listSet *);
+extern struct listSet *listSetSub (struct listSet *, struct listSet *);
+extern struct listSet *listSetSelect (long, long, struct listSet *);
+extern int listSetNumEle (struct listSet *);
+extern int listSetGetEle (int, struct listSet *);
+extern void collectFreeSet (void);
+extern int listSetMember (long, struct listSet *);
 
-extern struct listSetIterator *listSetIteratorCreate(void);
-extern void   listSetIteratorAttach(struct  listSet  *, 
-				    struct  listSetIterator *);
-extern long  *listSetIteratorBegin(struct listSetIterator *);
-extern long  *listSetIteratorEnd(struct listSetIterator   *);
-extern long  *listSetIteratorGetNext(struct listSetIterator *);
-extern void  listSetIteratorDestroy(struct listSetIterator *);
-extern void  listSetIteratorDetach(struct listSetIterator *);
+extern struct listSetIterator *listSetIteratorCreate (void);
+extern void listSetIteratorAttach (struct listSet *,
+				   struct listSetIterator *);
+extern long *listSetIteratorBegin (struct listSetIterator *);
+extern long *listSetIteratorEnd (struct listSetIterator *);
+extern long *listSetIteratorGetNext (struct listSetIterator *);
+extern void listSetIteratorDestroy (struct listSetIterator *);
+extern void listSetIteratorDetach (struct listSetIterator *);
 
 #endif

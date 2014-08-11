@@ -35,7 +35,7 @@
 #define  ECHKPNT_DEFAULT_OUTPUT_FILE          "/dev/null"
 
 
-     
+
 #define  ECHKPNT_PROGRAM                      "echeckpoint"
 #define  ERESTART_PROGRAM                     "erestart"
 
@@ -69,13 +69,13 @@
 #define  MAX_ARGS			      16
 #define  MAX_TIME_STRING		      50
 
-char  *getEchkpntMethodDir(char *, const char *, const char *, const char *);
-int   getChkpntDirFile(char *, const char *);
-int   redirectFd(const char *, int );
-int   initLog(char *);
-void  logMesg(const char *);
-void  closeLog();
-void  setMesgHeader(char *);
+char *getEchkpntMethodDir (char *, const char *, const char *, const char *);
+int getChkpntDirFile (char *, const char *);
+int redirectFd (const char *, int);
+int initLog (char *);
+void logMesg (const char *);
+void closeLog ();
+void setMesgHeader (char *);
 
 
-#endif 
+#endif

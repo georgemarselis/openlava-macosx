@@ -22,91 +22,101 @@
 #include <signal.h>
 #include "cmd.h"
 
-#define NL_SETN 8 	
+#define NL_SETN 8
 
-void 
+void
 usage (char *cmd)
 {
-    fprintf(stderr, I18N_Usage);
-    fprintf(stderr, ": %s [-h] [-V] [-f] [-m \"host_name ...\"]\n            [-u user_name |-u all] [-J job_name] [jobId | \"jobId[index_list]\" ...]\n", cmd);
-    exit(-1);
-} 
+  fprintf (stderr, I18N_Usage);
+  fprintf (stderr,
+	   ": %s [-h] [-V] [-f] [-m \"host_name ...\"]\n            [-u user_name |-u all] [-J job_name] [jobId | \"jobId[index_list]\" ...]\n",
+	   cmd);
+  exit (-1);
+}
 
 int
 main (int argc, char **argv)
 {
 
-    int cc, i, badHostIdx;
-    char *user = NULL, *jobName = NULL;
-    LS_LONG_INT *jobIds;
-    int numJobs = 0;
-    struct submig mig;
-    int rc;
+  int cc, i, badHostIdx;
+  char *user = NULL, *jobName = NULL;
+  LS_LONG_INT *jobIds;
+  int numJobs = 0;
+  struct submig mig;
+  int rc;
 
-    rc = _i18n_init ( I18N_CAT_MIN );	
+  rc = _i18n_init (I18N_CAT_MIN);
 
 
-    if (lsb_init(argv[0]) < 0) {
-	lsb_perror("lsb_init");
-	exit(-1);
+  if (lsb_init (argv[0]) < 0)
+    {
+      lsb_perror ("lsb_init");
+      exit (-1);
     }
 
-    mig.options = 0;
-    mig.askedHosts = NULL;
-    mig.numAskedHosts = 0;
-    
-    while ((cc = getopt(argc, argv, "Vhfm:u:J:")) != EOF) {
-        switch (cc) {
-	  case 'm':
-            if (mig.numAskedHosts)        
-                usage(argv[0]);
-            if (getAskedHosts_(optarg, &mig.askedHosts, &mig.numAskedHosts,
-			 &i, FALSE) < 0 && lserrno != LSE_BAD_HOST) {
-		ls_perror(NULL);
-                exit(-1);
-            }
-	    if (mig.numAskedHosts == 0)
-		usage(argv[0]);
-	    break;
-        case 'u':
-            if (user)
-                usage(argv[0]);
-            if (strcmp(optarg, "all") == 0)
-                user = ALL_USERS;
-            else
-                user = optarg;
-            break;
-        case 'J':
-            jobName = optarg;
-            break;
-	  case 'f':
-	    mig.options |= LSB_CHKPNT_FORCE;
-	    break;
-	  case 'V':
-	    fputs(_LS_VERSION_, stderr);
-	    exit(0);
-	  case 'h':
-	  default:
-            usage(argv[0]);
-        }
-    }
+  mig.options = 0;
+  mig.askedHosts = NULL;
+  mig.numAskedHosts = 0;
 
-    numJobs = getJobIds (argc, argv, jobName, user, NULL, NULL, &jobIds, 0);
-
-    
-    for (i = 0; i < numJobs; i++) {
-	mig.jobId = jobIds[i];
-	if (lsb_mig(&mig, &badHostIdx) < 0) {
-	    fprintf(stderr, "%s <%s>: ", I18N_Job, lsb_jobid2str(jobIds[i])); 
-	    if (lsberrno == LSBE_QUEUE_HOST || lsberrno == LSBE_BAD_HOST)
-		lsb_perror(mig.askedHosts[badHostIdx]);
-	    else
-		lsb_perror(NULL);
-	} else {
-	    printf((_i18n_msg_get(ls_catd,NL_SETN,2053, "Job <%s> is being migrated\n")), lsb_jobid2str(jobIds[i])); /* catgets  2053  */
+  while ((cc = getopt (argc, argv, "Vhfm:u:J:")) != EOF)
+    {
+      switch (cc)
+	{
+	case 'm':
+	  if (mig.numAskedHosts)
+	    usage (argv[0]);
+	  if (getAskedHosts_ (optarg, &mig.askedHosts, &mig.numAskedHosts,
+			      &i, FALSE) < 0 && lserrno != LSE_BAD_HOST)
+	    {
+	      ls_perror (NULL);
+	      exit (-1);
+	    }
+	  if (mig.numAskedHosts == 0)
+	    usage (argv[0]);
+	  break;
+	case 'u':
+	  if (user)
+	    usage (argv[0]);
+	  if (strcmp (optarg, "all") == 0)
+	    user = ALL_USERS;
+	  else
+	    user = optarg;
+	  break;
+	case 'J':
+	  jobName = optarg;
+	  break;
+	case 'f':
+	  mig.options |= LSB_CHKPNT_FORCE;
+	  break;
+	case 'V':
+	  fputs (_LS_VERSION_, stderr);
+	  exit (0);
+	case 'h':
+	default:
+	  usage (argv[0]);
 	}
     }
-    
-    _i18n_end ( ls_catd );			
-    exit(0);
-} 
+
+  numJobs = getJobIds (argc, argv, jobName, user, NULL, NULL, &jobIds, 0);
+
+
+  for (i = 0; i < numJobs; i++)
+    {
+      mig.jobId = jobIds[i];
+      if (lsb_mig (&mig, &badHostIdx) < 0)
+	{
+	  fprintf (stderr, "%s <%s>: ", I18N_Job, lsb_jobid2str (jobIds[i]));
+	  if (lsberrno == LSBE_QUEUE_HOST || lsberrno == LSBE_BAD_HOST)
+	    lsb_perror (mig.askedHosts[badHostIdx]);
+	  else
+	    lsb_perror (NULL);
+	}
+      else
+	{
+	  printf ((_i18n_msg_get (ls_catd, NL_SETN, 2053, "Job <%s> is being migrated\n")), lsb_jobid2str (jobIds[i]));	/* catgets  2053  */
+	}
+    }
+
+  _i18n_end (ls_catd);
+  exit (0);
+}

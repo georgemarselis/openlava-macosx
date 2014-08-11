@@ -8,9 +8,10 @@
 
 /* This is our own protocol
  */
-struct header {
-    uint32_t   opCode;
-    uint32_t   len;
+struct header
+{
+  uint32_t opCode;
+  uint32_t len;
 };
 
 /* This is how we encapsulate
@@ -30,15 +31,17 @@ struct header {
  * or 0xFF if no acceptable methods were offered
  *
  */
-struct greetReq {
-    uint8_t   version;
-    uint8_t   authnum;
-    uint8_t   auth;
+struct greetReq
+{
+  uint8_t version;
+  uint8_t authnum;
+  uint8_t auth;
 };
 
-struct greetReply {
-    uint8_t   version;
-    uint8_t   auth;
+struct greetReply
+{
+  uint8_t version;
+  uint8_t auth;
 };
 
 /* The client's connection request 10bytes is
@@ -61,13 +64,14 @@ struct greetReply {
  *
  */
 
-struct connRequest {
-    uint8_t    version;
-    uint8_t    command;
-    uint8_t    reserved;
-    uint8_t    addrtype;
-    uint32_t   addr;      /* later on we unionize this */
-    uint16_t   port;
+struct connRequest
+{
+  uint8_t version;
+  uint8_t command;
+  uint8_t reserved;
+  uint8_t addrtype;
+  uint32_t addr;		/* later on we unionize this */
+  uint16_t port;
 };
 
 /* Server response 10bytes:
@@ -94,13 +98,14 @@ struct connRequest {
  *   o 16 bytes for IPv6 address
  * field 6: network byte order port number, 2 bytes
  */
-struct connReply {
-    uint8_t    version;
-    uint8_t    status;
-    uint8_t    reserved;
-    uint8_t    addrtype;
-    uint32_t   addr;
-    uint16_t   port;
+struct connReply
+{
+  uint8_t version;
+  uint8_t status;
+  uint8_t reserved;
+  uint8_t addrtype;
+  uint32_t addr;
+  uint16_t port;
 };
 
 #endif /* _PROTO_ */

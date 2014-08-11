@@ -23,9 +23,9 @@
 #include <sys/signal.h>
 #include <string.h>
 #include <fcntl.h>
-int grantpt(int);
-int unlockpt(int);
-char *ptsname(int);
+int grantpt (int);
+int unlockpt (int);
+char *ptsname (int);
 
 #include "res.h"
 
@@ -36,112 +36,120 @@ static int letterInd = 0;
 static int digitInd = 0;
 
 void
-ptyreset(void)
+ptyreset (void)
 {
-    letterInd = 0;
-    digitInd  = 0;
+  letterInd = 0;
+  digitInd = 0;
 }
-
 
+
 int
-ptymaster(char *line)
+ptymaster (char *line)
 {
-    static char fname[] = "ptymaster()";
-    int master_fd;
-    int ptyno;
-    char *slave;
+  static char fname[] = "ptymaster()";
+  int master_fd;
+  int ptyno;
+  char *slave;
 
 
-    master_fd = open("/dev/ptmx", O_RDWR);
-    if (master_fd < 0) {
-        ls_syslog(LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "open", "/dev/ptmx");
-        return(-1);
+  master_fd = open ("/dev/ptmx", O_RDWR);
+  if (master_fd < 0)
+    {
+      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "open", "/dev/ptmx");
+      return (-1);
     }
-    if (grantpt(master_fd) < 0) {
-        ls_syslog(LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "grantpt",
-            master_fd);
-        close(master_fd);
-        return(-1);
+  if (grantpt (master_fd) < 0)
+    {
+      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "grantpt", master_fd);
+      close (master_fd);
+      return (-1);
     }
 
-    if (unlockpt(master_fd) < 0) {
-        ls_syslog(LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "unlockpt",
-            master_fd);
-        close(master_fd);
+  if (unlockpt (master_fd) < 0)
+    {
+      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "unlockpt", master_fd);
+      close (master_fd);
     }
 #if defined(__CYGWIN__)
-        slave = ptsname(master_fd);
-        if (slave == NULL) {
-            ls_syslog(LOG_ERR, I18N_FUNC_FAIL_M, fname, "ptsname");
-            close(master_fd);
-            return(-1);
-        }
-        strcpy(line,slave);
+  slave = ptsname (master_fd);
+  if (slave == NULL)
+    {
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "ptsname");
+      close (master_fd);
+      return (-1);
+    }
+  strcpy (line, slave);
 #else
 #if !defined(__sun__)
-    if (ioctl(master_fd, TIOCGPTN, &ptyno) != 0) {
+  if (ioctl (master_fd, TIOCGPTN, &ptyno) != 0)
+    {
 #endif
-        ls_syslog(LOG_DEBUG, I18N_FUNC_FAIL_M, fname, "ioctl(TIOCGPTN)");
-        slave = ptsname(master_fd);
-        if (slave == NULL) {
-            ls_syslog(LOG_ERR, I18N_FUNC_FAIL_M, fname, "ptsname");
-            close(master_fd);
-            return(-1);
-        }
-        strcpy(line,slave);
+      ls_syslog (LOG_DEBUG, I18N_FUNC_FAIL_M, fname, "ioctl(TIOCGPTN)");
+      slave = ptsname (master_fd);
+      if (slave == NULL)
+	{
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "ptsname");
+	  close (master_fd);
+	  return (-1);
+	}
+      strcpy (line, slave);
 #if !defined(__sun__)
-    } else {
-        sprintf(line, "/dev/pts/%d", ptyno);
+    }
+  else
+    {
+      sprintf (line, "/dev/pts/%d", ptyno);
     }
 #endif
 #endif
-    return(master_fd);
+  return (master_fd);
 }
 
 int
-ptyslave(char *tty_name)
+ptyslave (char *tty_name)
 {
-    int slave;
+  int slave;
 
 
-    slave = open(tty_name, O_RDWR);
+  slave = open (tty_name, O_RDWR);
 
-    if (slave < 0) {
-        return(-1);
+  if (slave < 0)
+    {
+      return (-1);
     }
 
-    return(slave);
+  return (slave);
 }
 
 
 
-char *pty_translate(char *pty_name)
+char *
+pty_translate (char *pty_name)
 {
-    static char tmp[11] = "/dev/ttyXX";
-    int n;
+  static char tmp[11] = "/dev/ttyXX";
+  int n;
 
-    n = strlen(pty_name);
+  n = strlen (pty_name);
 
-    tmp[8] = pty_name[n-2];
-    tmp[9] = pty_name[n-1];
+  tmp[8] = pty_name[n - 2];
+  tmp[9] = pty_name[n - 1];
 
-    if (debug > 1)
-	printf("%s -> %s\n", pty_name, tmp);
+  if (debug > 1)
+    printf ("%s -> %s\n", pty_name, tmp);
 
 
-    return tmp;
+  return tmp;
 }
 
 
 
-int check_valid_tty(char *tty_name)
+int
+check_valid_tty (char *tty_name)
 {
-        int i;
-        char valid_name[9] = "/dev/tty";
+  int i;
+  char valid_name[9] = "/dev/tty";
 
-        for (i=0; i<8; i++)
-                if (tty_name[i] != valid_name[i])
-                        return 0;
-        return 1;
+  for (i = 0; i < 8; i++)
+    if (tty_name[i] != valid_name[i])
+      return 0;
+  return 1;
 }
-

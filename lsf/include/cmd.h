@@ -33,11 +33,11 @@
 #include "lsb/lsbatch.h"
 #include "lsf.h"
 
-#define MIN_CPU_TIME 0.0001 
+#define MIN_CPU_TIME 0.0001
 
 #define SIGCHK   -1
 #define SIGDEL   -2
-#define SIGFORCE -3   
+#define SIGFORCE -3
 
 #define MAX_JOB_IDS  100
 
@@ -59,11 +59,11 @@
 
 #ifndef MIN
 #define MIN(x,y)        ((x) < (y) ? (x) : (y))
-#endif 
+#endif
 
 #ifndef MAX
 #define MAX(x,y)        ((x) > (y) ? (x) : (y))
-#endif 
+#endif
 
 #define TRUNC_STR(s,len) \
 { \
@@ -76,57 +76,60 @@
     }\
 }
 
-struct histReq {
-    int    opCode;
-    char   **names;
-    time_t eventTime[2];
-    char   *eventFileName;               
-    int    found;
+struct histReq
+{
+  int opCode;
+  char **names;
+  time_t eventTime[2];
+  char *eventFileName;
+  int found;
 };
 
-extern void prtLine(char *);
-extern char *get_status(struct jobInfoEnt *job);
-extern void prtHeader(struct jobInfoEnt *, int, int);
-extern void prtJobSubmit(struct jobInfoEnt *, int, int);
-extern void prtFileNames(struct jobInfoEnt *, int);
-extern void prtSubDetails(struct jobInfoEnt *, char *, float);
-extern void prtJobStart(struct jobInfoEnt *, int, int, int);
-extern void prtJobFinish(struct jobInfoEnt *, struct jobInfoHead *);
-extern void prtAcctFinish(struct jobInfoEnt *);
-extern struct loadIndexLog *initLoadIndex(void);
+extern void prtLine (char *);
+extern char *get_status (struct jobInfoEnt *job);
+extern void prtHeader (struct jobInfoEnt *, int, int);
+extern void prtJobSubmit (struct jobInfoEnt *, int, int);
+extern void prtFileNames (struct jobInfoEnt *, int);
+extern void prtSubDetails (struct jobInfoEnt *, char *, float);
+extern void prtJobStart (struct jobInfoEnt *, int, int, int);
+extern void prtJobFinish (struct jobInfoEnt *, struct jobInfoHead *);
+extern void prtAcctFinish (struct jobInfoEnt *);
+extern struct loadIndexLog *initLoadIndex (void);
 extern int fillReq (int, char **, int, struct submit *);
 extern void prtErrMsg (struct submit *, struct submitReply *);
-extern void prtBTTime(struct jobInfoEnt *);
-extern void prtJobReserv(struct jobInfoEnt *);
+extern void prtBTTime (struct jobInfoEnt *);
+extern void prtJobReserv (struct jobInfoEnt *);
 extern void displayLong (struct jobInfoEnt *, struct jobInfoHead *, float);
 
 extern int lsbMode_;
 
-extern void prtBETime_(struct submit *);
+extern void prtBETime_ (struct submit *);
 
-extern int supportJobNamePattern(char *);
+extern int supportJobNamePattern (char *);
 
 
-extern int  repeatedName(char *, char **, int);
+extern int repeatedName (char *, char **, int);
 extern void jobInfoErr (LS_LONG_INT, char *, char *, char *, char *, int);
-extern int printThresholds (float *, float *, int *, int *, int, struct lsInfo *);
+extern int printThresholds (float *, float *, int *, int *, int,
+			    struct lsInfo *);
 extern void prtResourceLimit (int *, char *, float, int *);
-extern int  getNames (int, char **, int, char ***, int *, char *);
-extern int  getJobIds (int, char **, char *, char *, char *, char *, LS_LONG_INT **, int);
-extern int  getSpecJobIds (int, char **, LS_LONG_INT **, int *);
-extern int  getSpecIdxs (char *, int **);
-extern int  getOneJobId (char *, LS_LONG_INT *, int);
-extern int  gettimefor (char *toptarg, time_t *tTime);
-extern int  skipJob(int, int *, int);
+extern int getNames (int, char **, int, char ***, int *, char *);
+extern int getJobIds (int, char **, char *, char *, char *, char *,
+		      LS_LONG_INT **, int);
+extern int getSpecJobIds (int, char **, LS_LONG_INT **, int *);
+extern int getSpecIdxs (char *, int **);
+extern int getOneJobId (char *, LS_LONG_INT *, int);
+extern int gettimefor (char *toptarg, time_t * tTime);
+extern int skipJob (int, int *, int);
 
-extern void prtWord(int, const char *, int);
-extern void prtWordL(int, const char *);
-extern char *prtValue(int, int);
-extern char *prtDash(int);
+extern void prtWord (int, const char *, int);
+extern void prtWordL (int, const char *);
+extern char *prtValue (int, int);
+extern char *prtDash (int);
 
 
-extern int searchEventFile(struct histReq *, int *);
-extern int bmsg(int, char **);
+extern int searchEventFile (struct histReq *, int *);
+extern int bmsg (int, char **);
 
 extern void bmove (int, char **, int);
 

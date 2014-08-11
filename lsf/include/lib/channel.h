@@ -23,16 +23,19 @@
 #include "lib/hdr.h"
 
 
-enum chanState {CH_FREE,
-                CH_DISC,
-                CH_PRECONN,
-                CH_CONN,
-                CH_WAIT,
-                CH_INACTIVE    
-               };
+enum chanState
+{ CH_FREE,
+  CH_DISC,
+  CH_PRECONN,
+  CH_CONN,
+  CH_WAIT,
+  CH_INACTIVE
+};
 
-enum chanType {CH_TYPE_UDP, CH_TYPE_TCP, CH_TYPE_LOCAL, CH_TYPE_PASSIVE,
-	       CH_TYPE_NAMEDPIPE};
+enum chanType
+{ CH_TYPE_UDP, CH_TYPE_TCP, CH_TYPE_LOCAL, CH_TYPE_PASSIVE,
+  CH_TYPE_NAMEDPIPE
+};
 
 #define CHAN_OP_PPORT  		0x01
 #define CHAN_OP_CONNECT		0x02
@@ -49,31 +52,34 @@ enum chanType {CH_TYPE_UDP, CH_TYPE_TCP, CH_TYPE_LOCAL, CH_TYPE_PASSIVE,
 
 #define CHAN_INIT_BUF(b)  memset((b), 0, sizeof(struct Buffer));
 
-struct Buffer {
-    struct Buffer  *forw;
-    struct Buffer  *back;
-    char  *data;
-    int    pos;
-    int    len;
-    int stashed;
+struct Buffer
+{
+  struct Buffer *forw;
+  struct Buffer *back;
+  char *data;
+  int pos;
+  int len;
+  int stashed;
 };
 
-struct Masks {
-    fd_set rmask;
-    fd_set wmask;
-    fd_set emask;
+struct Masks
+{
+  fd_set rmask;
+  fd_set wmask;
+  fd_set emask;
 };
 
 
-struct chanData {
-    int  handle;		
-    enum chanType type;
-    enum chanState state;
-    enum chanState prestate;   
-    int chanerr; 
-    struct Buffer *send;
-    struct Buffer *recv;
-    
+struct chanData
+{
+  int handle;
+  enum chanType type;
+  enum chanState state;
+  enum chanState prestate;
+  int chanerr;
+  struct Buffer *send;
+  struct Buffer *recv;
+
 };
 
 #define  CHANE_NOERR      0
@@ -89,42 +95,42 @@ struct chanData {
 #define  CHANE_NOMSG      10
 #define  CHANE_CONNRESET  11
 
-int chanInit_(void);
+int chanInit_ (void);
 
 
 #define chanSend_  chanEnqueue_
 #define chanRecv_  chanDequeue_
 
-int chanOpen_(u_int, u_short, int);
-int chanEnqueue_(int chfd, struct Buffer *buf);
-int chanDequeue_(int chfd, struct Buffer **buf);
+int chanOpen_ (u_int, u_short, int);
+int chanEnqueue_ (int chfd, struct Buffer *buf);
+int chanDequeue_ (int chfd, struct Buffer **buf);
 
-int chanSelect_(struct Masks *, struct Masks *, struct timeval *timeout);
-int chanClose_(int chfd);
-void chanCloseAll_(void);
-int chanSock_(int chfd);
+int chanSelect_ (struct Masks *, struct Masks *, struct timeval *timeout);
+int chanClose_ (int chfd);
+void chanCloseAll_ (void);
+int chanSock_ (int chfd);
 
-int chanServSocket_(int, u_short, int, int);
-int chanAccept_(int, struct sockaddr_in *);
+int chanServSocket_ (int, u_short, int, int);
+int chanAccept_ (int, struct sockaddr_in *);
 
-int chanClientSocket_(int, int, int);
-int chanConnect_(int, struct sockaddr_in *, int , int);
+int chanClientSocket_ (int, int, int);
+int chanConnect_ (int, struct sockaddr_in *, int, int);
 
-int chanSendDgram_(int, char *, int , struct sockaddr_in *);
-int chanRcvDgram_(int , char *, int, struct sockaddr_in *, int);
-int chanRpc_(int , struct Buffer *, struct Buffer *, struct LSFHeader *, int timeout); 
-int chanRead_(int, char *, int);
-int chanReadNonBlock_(int, char *, int, int);
-int chanWrite_(int, char *, int);
+int chanSendDgram_ (int, char *, int, struct sockaddr_in *);
+int chanRcvDgram_ (int, char *, int, struct sockaddr_in *, int);
+int chanRpc_ (int, struct Buffer *, struct Buffer *, struct LSFHeader *,
+	      int timeout);
+int chanRead_ (int, char *, int);
+int chanReadNonBlock_ (int, char *, int, int);
+int chanWrite_ (int, char *, int);
 
-int chanAllocBuf_(struct Buffer **buf, int size);
-int chanFreeBuf_(struct Buffer *buf);
-int chanFreeStashedBuf_(struct Buffer *buf);
-int chanOpenSock_(int , int);
-int chanSetMode_(int, int);
+int chanAllocBuf_ (struct Buffer **buf, int size);
+int chanFreeBuf_ (struct Buffer *buf);
+int chanFreeStashedBuf_ (struct Buffer *buf);
+int chanOpenSock_ (int, int);
+int chanSetMode_ (int, int);
 
 extern int chanIndex;
 extern int cherrno;
 
 #endif
-

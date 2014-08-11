@@ -37,40 +37,43 @@
 #define INFINIT_INT    0x7fffffff
 #define MAXTOKENLEN 302
 
-struct intRegion {
-    int start, end;
+struct intRegion
+{
+  int start, end;
 };
 
-struct listLink {
-    struct intRegion iconList;
-    struct listLink  *next;
+struct listLink
+{
+  struct intRegion iconList;
+  struct listLink *next;
 };
 
-struct mallocList {
-    void               *space;  
-    struct mallocList  *next;   
+struct mallocList
+{
+  void *space;
+  struct mallocList *next;
 };
 
 extern char *token;
 extern char yyerr[];
 #if !defined(__CYGWIN__) && !defined(__sun__)
-extern FILE *yyout ;
+extern FILE *yyout;
 #endif
 extern struct mbd_func_type mbd_func;
-extern struct mallocList  *idxAllocHead;
+extern struct mallocList *idxAllocHead;
 
-extern int     yylex(void);
-extern void    calerror(register char *);
-extern char   *safe_calloc(unsigned, unsigned);
-extern void    timerror(register char *);
-extern void   *yyalloc(struct mallocList **, int);
-extern void    yyfree(struct mallocList **, void *);
-extern void    yparseSucc(struct mallocList **);
-extern void    yparseFail(struct mallocList **);
-extern struct  calendarE * getCalExprNode();
-extern void    idxerror(register char *);
+extern int yylex (void);
+extern void calerror (register char *);
+extern char *safe_calloc (unsigned, unsigned);
+extern void timerror (register char *);
+extern void *yyalloc (struct mallocList **, int);
+extern void yyfree (struct mallocList **, void *);
+extern void yparseSucc (struct mallocList **);
+extern void yparseFail (struct mallocList **);
+extern struct calendarE *getCalExprNode ();
+extern void idxerror (register char *);
 
- 
-extern int     checkNameSpec(char *, char **);
+
+extern int checkNameSpec (char *, char **);
 
 #endif

@@ -21,17 +21,16 @@
 
 
 void
-millisleep_(int msec)
+millisleep_ (int msec)
 {
-    struct timeval dtime;
+  struct timeval dtime;
 
-    if (msec < 1)
-	return;
+  if (msec < 1)
+    return;
 
-    dtime.tv_sec = msec/1000;
-    dtime.tv_usec = (msec - dtime.tv_sec * 1000) * 1000;
+  dtime.tv_sec = msec / 1000;
+  dtime.tv_usec = (msec - dtime.tv_sec * 1000) * 1000;
 
-    select(0,0,0,0,&dtime);
+  select (0, 0, 0, 0, &dtime);
 
-} 
-
+}

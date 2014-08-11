@@ -20,36 +20,40 @@
 
 #define RF_SERVERD "_rf_Server_"
 
-typedef enum {
-    RF_OPEN,
-    RF_READ,
-    RF_WRITE,
-    RF_CLOSE,
-    RF_STAT,
-    RF_GETMNTHOST,
-    RF_LSEEK,
-    RF_FSTAT,
-    RF_UNLINK,
-    RF_TERMINATE
+typedef enum
+{
+  RF_OPEN,
+  RF_READ,
+  RF_WRITE,
+  RF_CLOSE,
+  RF_STAT,
+  RF_GETMNTHOST,
+  RF_LSEEK,
+  RF_FSTAT,
+  RF_UNLINK,
+  RF_TERMINATE
 } rfCmd;
 
 
-struct ropenReq {
-    char *fn;
-    int flags;
-    int mode;
+struct ropenReq
+{
+  char *fn;
+  int flags;
+  int mode;
 };
 
 
-struct rrdwrReq {
-    int fd;
-    int len;
+struct rrdwrReq
+{
+  int fd;
+  int len;
 };
 
-struct rlseekReq {
-    int fd;
-    int whence;
-    int offset;
+struct rlseekReq
+{
+  int fd;
+  int whence;
+  int offset;
 };
 
-#endif 
+#endif

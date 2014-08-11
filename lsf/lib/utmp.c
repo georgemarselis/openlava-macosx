@@ -35,27 +35,29 @@
 
 #ifndef MIN
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
-#endif 
+#endif
 
 #ifndef MAX
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
-#endif 
+#endif
 
 
 int
-createUtmpEntry( char* uname, pid_t job_pid, char* current_tty ) {
+createUtmpEntry (char *uname, pid_t job_pid, char *current_tty)
+{
 
-    int err=0;
+  int err = 0;
 
-    return( err );
+  return (err);
 
-} 
+}
 
 
 
 int
-removeUtmpEntry( pid_t job_pid) {
+removeUtmpEntry (pid_t job_pid)
+{
 
-    return(0);
+  return (0);
 
-} 
+}

@@ -25,12 +25,12 @@
 
 
 extern bool_t xdr_time_t (XDR *, time_t *);
-extern bool_t xdr_lsfRusage(XDR *, struct lsfRusage *);
-extern bool_t xdr_lvector(XDR *, float *, int);
-extern bool_t xdr_array_string(XDR *, char **, int, int);
-extern bool_t xdr_var_string(XDR *, char **);
-extern bool_t xdr_stringLen(XDR *, struct stringLen *, struct LSFHeader *);
-extern bool_t xdr_lenData(XDR *, struct lenData *);
+extern bool_t xdr_lsfRusage (XDR *, struct lsfRusage *);
+extern bool_t xdr_lvector (XDR *, float *, int);
+extern bool_t xdr_array_string (XDR *, char **, int, int);
+extern bool_t xdr_var_string (XDR *, char **);
+extern bool_t xdr_stringLen (XDR *, struct stringLen *, struct LSFHeader *);
+extern bool_t xdr_lenData (XDR *, struct lenData *);
 extern bool_t xdr_lsfLimit (XDR *, struct lsfLimit *, struct LSFHeader *);
 extern bool_t xdr_portno (XDR *, u_short *);
 extern bool_t xdr_address (XDR *, u_int *);

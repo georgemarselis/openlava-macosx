@@ -21,31 +21,33 @@
 
 #include <time.h>
 
-enum lsPStatType {
-    LS_PSTAT_RUNNING,
-    LS_PSTAT_INTERRUPTIBLE,
-    LS_PSTAT_UNINTERRUPTIBLE,
-    LS_PSTAT_ZOMBI,
-    LS_PSTAT_STOPPED,
-    LS_PSTAT_SWAPPED,
-    LS_PSTAT_SLEEP,
-    LS_PSTAT_EXITING
+enum lsPStatType
+{
+  LS_PSTAT_RUNNING,
+  LS_PSTAT_INTERRUPTIBLE,
+  LS_PSTAT_UNINTERRUPTIBLE,
+  LS_PSTAT_ZOMBI,
+  LS_PSTAT_STOPPED,
+  LS_PSTAT_SWAPPED,
+  LS_PSTAT_SLEEP,
+  LS_PSTAT_EXITING
 };
 
-struct lsPidInfo {
-    int pid;
-    int ppid;
-    int pgid;
-    int jobid;
-    int utime;
-    int stime;
-    int cutime;
-    int cstime;
-    int proc_size;
-    int resident_size;
-    int stack_size;
-    enum lsPStatType status;
-    char command[PATH_MAX];
+struct lsPidInfo
+{
+  int pid;
+  int ppid;
+  int pgid;
+  int jobid;
+  int utime;
+  int stime;
+  int cutime;
+  int cstime;
+  int proc_size;
+  int resident_size;
+  int stack_size;
+  enum lsPStatType status;
+  char command[PATH_MAX];
 };
 
 #define PIM_API_TREAT_JID_AS_PGID 0x1
@@ -54,6 +56,6 @@ struct lsPidInfo {
 #define PIM_SLEEP_TIME 3
 #define PIM_UPDATE_INTERVAL 30
 
-extern struct jRusage *getJInfo_(int, int*, int, int);
+extern struct jRusage *getJInfo_ (int, int *, int, int);
 
 #endif

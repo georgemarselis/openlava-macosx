@@ -15,29 +15,30 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
- 
+
 #ifndef LSF_LIB_RCP_H
 #define LSF_LIB_RCP_H
 
-typedef struct rcpXfer {
-    char *szSourceArg;
-    char *szDestArg;
-    char *szHostUser;
-    char *szDestUser;
-    char *szHost;
-    char *szDest;
-    int  iNumFiles;
-    char *ppszHostFnames[1];
-    char *ppszDestFnames[1];
-    struct hostent *pheHost;
-    struct hostent *pheDest;
-    int  iOptions;
+typedef struct rcpXfer
+{
+  char *szSourceArg;
+  char *szDestArg;
+  char *szHostUser;
+  char *szDestUser;
+  char *szHost;
+  char *szDest;
+  int iNumFiles;
+  char *ppszHostFnames[1];
+  char *ppszDestFnames[1];
+  struct hostent *pheHost;
+  struct hostent *pheDest;
+  int iOptions;
 } lsRcpXfer;
 
 #define RSHCMD "rsh"
 
 #define SPOOL_DIR_SEPARATOR "/"
-#define SPOOL_DIR_SEPARATOR_CHAR '/' 
+#define SPOOL_DIR_SEPARATOR_CHAR '/'
 
 #define SPOOL_BY_LSRCP      0x1
 
@@ -51,20 +52,22 @@ typedef struct rcpXfer {
          errno == EISDIR || errno == ENOSPC || errno == ENXIO || \
          errno == EROFS || errno == ETXTBSY)
 
-#define LSRCP_MSGSIZE   1048576 
+#define LSRCP_MSGSIZE   1048576
 
-extern int mystat_(char *, struct stat *, struct hostent *);
-extern int myopen_(char *, int, int, struct hostent *);
-extern char * usePath(char *path);
-extern int parseXferArg(char *arg, char **userName, char **hostName, char **fName);
-extern int createXfer( lsRcpXfer *lsXfer );
-extern int destroyXfer( lsRcpXfer *lsXfer );
-extern int copyFile( lsRcpXfer *lsXfer, char* buf, int option );
-extern int equivalentXferFile(lsRcpXfer *lsXfer, char *szLocalFile, char *szRemoteFile, 
-                    struct stat *psLstat, struct stat *psRstat, char *szRhost);
-extern int doXferRcp(lsRcpXfer *lsXfer, int option);
-extern int rmDirAndFiles(char *dir);
-extern int rmDirAndFilesEx(char *, int);
-extern int createSpoolSubDir( const char * spoolFileFullPath );
+extern int mystat_ (char *, struct stat *, struct hostent *);
+extern int myopen_ (char *, int, int, struct hostent *);
+extern char *usePath (char *path);
+extern int parseXferArg (char *arg, char **userName, char **hostName,
+			 char **fName);
+extern int createXfer (lsRcpXfer * lsXfer);
+extern int destroyXfer (lsRcpXfer * lsXfer);
+extern int copyFile (lsRcpXfer * lsXfer, char *buf, int option);
+extern int equivalentXferFile (lsRcpXfer * lsXfer, char *szLocalFile,
+			       char *szRemoteFile, struct stat *psLstat,
+			       struct stat *psRstat, char *szRhost);
+extern int doXferRcp (lsRcpXfer * lsXfer, int option);
+extern int rmDirAndFiles (char *dir);
+extern int rmDirAndFilesEx (char *, int);
+extern int createSpoolSubDir (const char *spoolFileFullPath);
 
-#endif 
+#endif

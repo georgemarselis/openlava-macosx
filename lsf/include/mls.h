@@ -18,15 +18,16 @@
 #ifndef LSF_MLS_H
 #define LSF_MLS_H
 
-typedef enum {
-    MLS_FATAL,		
-    MLS_INVALID,	
-    MLS_CLEARANCE,	
-    MLS_RHOST,		
-    MLS_DOMINATE	
+typedef enum
+{
+  MLS_FATAL,
+  MLS_INVALID,
+  MLS_CLEARANCE,
+  MLS_RHOST,
+  MLS_DOMINATE
 } mlsErrCode;
 
-extern int mlsSbdMode;			
+extern int mlsSbdMode;
 
 #define lsfSetUid(uid)              lsfSetXUid(0, uid, uid, -1, setuid)
 
@@ -37,8 +38,8 @@ extern int mlsSbdMode;
 #define lsfExecv(path, argv)	    lsfExecX(path, argv, execv)
 #define lsfExecvp(file, argv)	    lsfExecX(file, argv, execvp)
 
-extern int lsfSetXUid(int, int, int, int, int(*)());
-extern void lsfExecLog(const char *);
-extern int lsfExecX(char *, char **argv, int(*)());
+extern int lsfSetXUid (int, int, int, int, int (*)());
+extern void lsfExecLog (const char *);
+extern int lsfExecX (char *, char **argv, int (*)());
 
-#endif 
+#endif

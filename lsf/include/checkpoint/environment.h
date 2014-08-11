@@ -21,21 +21,23 @@
 
 #define LSF_CHECKPOINT_VAR_FILE 		"/echeckpoint.var"
 
-typedef struct varpair{
-	char *m_pVariable; 
-	char *m_pValue;    
-}VAR_PAIR_T;
+typedef struct varpair
+{
+  char *m_pVariable;
+  char *m_pValue;
+} VAR_PAIR_T;
 
-typedef struct varTableItem{
-	VAR_PAIR_T *m_pVarPair;
-	struct varTableItem *m_pNextItem;
-}VAR_TABLE_ITEM_T;
+typedef struct varTableItem
+{
+  VAR_PAIR_T *m_pVarPair;
+  struct varTableItem *m_pNextItem;
+} VAR_TABLE_ITEM_T;
 
 
-char *getCheckpointVar(const char *);
-int  writeCheckpointVar(const char *, const char *);
-int  fileIsExist(const char *);
+char *getCheckpointVar (const char *);
+int writeCheckpointVar (const char *, const char *);
+int fileIsExist (const char *);
 
-void freeTable_();
+void freeTable_ ();
 
 #endif

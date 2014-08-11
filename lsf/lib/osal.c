@@ -23,44 +23,45 @@
 #include "lib/osal.h"
 
 int
-osInit_(void)
+osInit_ (void)
 {
-    static char first=TRUE;
-    if (first) {
-       chanInit_();
-       first=FALSE;
+  static char first = TRUE;
+  if (first)
+    {
+      chanInit_ ();
+      first = FALSE;
     }
-    return(0);
+  return (0);
 }
 
 char *
-osPathName_(char *pathname)
+osPathName_ (char *pathname)
 {
-   return(pathname);
-} 
+  return (pathname);
+}
 
 char *
-osHomeEnvVar_(void)
+osHomeEnvVar_ (void)
 {
-    return(getenv("HOME"));
-} 
+  return (getenv ("HOME"));
+}
 
 void
-osConvertPath_(char *pathname)
+osConvertPath_ (char *pathname)
 {
-   register int i;
-   for(i=0;pathname[i] != '\0' && i < MAXPATHLEN; i++) {
+  register int i;
+  for (i = 0; pathname[i] != '\0' && i < MAXPATHLEN; i++)
+    {
       if (pathname[i] == '\\')
-         pathname[i]='/';
-   }
-   return;
+	pathname[i] = '/';
+    }
+  return;
 
-} 
+}
 
 int
-osProcAlive_(int pid)
+osProcAlive_ (int pid)
 {
-    return(kill(pid, 0));
+  return (kill (pid, 0));
 
-} 
-
+}

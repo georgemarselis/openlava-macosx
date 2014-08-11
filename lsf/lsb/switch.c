@@ -23,64 +23,67 @@
 
 #include "lsb.h"
 
-int 
+int
 lsb_switchjob (LS_LONG_INT jobId, char *queue)
 {
-    struct jobSwitchReq jobSwitchReq;
-    char request_buf[MSGSIZE];
-    char *reply_buf;
-    XDR xdrs;
-    mbdReqType mbdReqtype;
-    int cc;
-    struct LSFHeader hdr;
-    struct lsfAuth auth;
+  struct jobSwitchReq jobSwitchReq;
+  char request_buf[MSGSIZE];
+  char *reply_buf;
+  XDR xdrs;
+  mbdReqType mbdReqtype;
+  int cc;
+  struct LSFHeader hdr;
+  struct lsfAuth auth;
 
 
-    if (jobId <= 0 || queue == 0) {
-	lsberrno = LSBE_BAD_ARG;
-	return(-1);
-    }
-    if (queue && (strlen (queue) >= MAX_LSB_NAME_LEN - 1)) {
-        lsberrno = LSBE_BAD_QUEUE;
-        return(-1);
-    }
-
-
-    if (authTicketTokens_(&auth, NULL) == -1)
-	return (-1);
-    
-    jobSwitchReq.jobId = jobId;
-    strcpy (jobSwitchReq.queue, queue);
-
-
-    
-    
-    mbdReqtype = BATCH_JOB_SWITCH;
-    xdrmem_create(&xdrs, request_buf, MSGSIZE, XDR_ENCODE);
-    initLSFHeader_(&hdr);
-    hdr.opCode = mbdReqtype;
-    if (!xdr_encodeMsg(&xdrs, (char *)&jobSwitchReq, &hdr, xdr_jobSwitchReq,
-		       0, &auth)) {
-        lsberrno = LSBE_XDR;
-        return(-1);
-    }
-
-    
-    if ((cc = callmbd (NULL, request_buf, XDR_GETPOS(&xdrs), &reply_buf, 
-                       &hdr, NULL, NULL, NULL)) == -1)
+  if (jobId <= 0 || queue == 0)
     {
-	xdr_destroy(&xdrs);
-	return (-1);
+      lsberrno = LSBE_BAD_ARG;
+      return (-1);
+    }
+  if (queue && (strlen (queue) >= MAX_LSB_NAME_LEN - 1))
+    {
+      lsberrno = LSBE_BAD_QUEUE;
+      return (-1);
     }
 
-    xdr_destroy(&xdrs);
-    lsberrno = hdr.opCode;
-    if (cc)
-	free(reply_buf);
 
-    if (lsberrno == LSBE_NO_ERROR)
-        return(0);
-    else
-	return(-1);
+  if (authTicketTokens_ (&auth, NULL) == -1)
+    return (-1);
 
-} 
+  jobSwitchReq.jobId = jobId;
+  strcpy (jobSwitchReq.queue, queue);
+
+
+
+
+  mbdReqtype = BATCH_JOB_SWITCH;
+  xdrmem_create (&xdrs, request_buf, MSGSIZE, XDR_ENCODE);
+  initLSFHeader_ (&hdr);
+  hdr.opCode = mbdReqtype;
+  if (!xdr_encodeMsg (&xdrs, (char *) &jobSwitchReq, &hdr, xdr_jobSwitchReq,
+		      0, &auth))
+    {
+      lsberrno = LSBE_XDR;
+      return (-1);
+    }
+
+
+  if ((cc = callmbd (NULL, request_buf, XDR_GETPOS (&xdrs), &reply_buf,
+		     &hdr, NULL, NULL, NULL)) == -1)
+    {
+      xdr_destroy (&xdrs);
+      return (-1);
+    }
+
+  xdr_destroy (&xdrs);
+  lsberrno = hdr.opCode;
+  if (cc)
+    free (reply_buf);
+
+  if (lsberrno == LSBE_NO_ERROR)
+    return (0);
+  else
+    return (-1);
+
+}

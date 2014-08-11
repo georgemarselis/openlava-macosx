@@ -47,25 +47,26 @@
 
 #define IDLETIME 5
 
-struct resVal {
-    char *selectStr;
-    int  nphase;
-    int  order[NBUILTINDEX];
-    int  genClass;
-    float *val;
-    int  nindex;
-    int *indicies;
-    int  *rusgBitMaps;
-    int  duration;
-    float decay;
-    int  numHosts;
-    int  maxNumHosts;
-    int  pTile;
-    int  options;
-    int  selectStrSize;
-    char **xorExprs;
+struct resVal
+{
+  char *selectStr;
+  int nphase;
+  int order[NBUILTINDEX];
+  int genClass;
+  float *val;
+  int nindex;
+  int *indicies;
+  int *rusgBitMaps;
+  int duration;
+  float decay;
+  int numHosts;
+  int maxNumHosts;
+  int pTile;
+  int options;
+  int selectStrSize;
+  char **xorExprs;
 };
 
-extern int getValPair(char **resReq, int *val1, int *val2);
+extern int getValPair (char **resReq, int *val1, int *val2);
 
 #endif

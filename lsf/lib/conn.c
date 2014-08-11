@@ -21,286 +21,301 @@
 #include "lib.h"
 #include "lib.table.h"
 
-hTab   conn_table;
+hTab conn_table;
 
-typedef struct _hostSock {
-    int   socket;
-    char *hostname;
-    struct _hostSock *next;
+typedef struct _hostSock
+{
+  int socket;
+  char *hostname;
+  struct _hostSock *next;
 } HostSock;
 static HostSock *hostSock;
 
 static struct connectEnt connlist[MAXCONNECT];
-static char   *connnamelist[MAXCONNECT+1];
+static char *connnamelist[MAXCONNECT + 1];
 
-int cli_nios_fd[2] = {-1, -1};
+int cli_nios_fd[2] = { -1, -1 };
 
-void hostIndex_(char *hostName, int sock);
-extern int chanSock_(int chfd);
-int delhostbysock_(int sock);
+void hostIndex_ (char *hostName, int sock);
+extern int chanSock_ (int chfd);
+int delhostbysock_ (int sock);
 
 void
-inithostsock_(void)
+inithostsock_ (void)
 {
-    hostSock = NULL;
+  hostSock = NULL;
 }
 
 void
-initconntbl_(void)
+initconntbl_ (void)
 {
-   h_initTab_(&conn_table, 3);
+  h_initTab_ (&conn_table, 3);
 
 }
 
 int
-connected_(char *hostName, int sock1, int sock2, int seqno)
+connected_ (char *hostName, int sock1, int sock2, int seqno)
 {
-    int    new;
-    hEnt   *hEntPtr;
-    int    *sp;
+  int new;
+  hEnt *hEntPtr;
+  int *sp;
 
-    hEntPtr = h_addEnt_(&conn_table, hostName, &new);
-    if (!new) {
-        sp = hEntPtr->hData;
-    } else {
-        sp = calloc(3, sizeof(int));
-        sp[0] = -1;
-        sp[1] = -1;
-	sp[2] = -1;
+  hEntPtr = h_addEnt_ (&conn_table, hostName, &new);
+  if (!new)
+    {
+      sp = hEntPtr->hData;
+    }
+  else
+    {
+      sp = calloc (3, sizeof (int));
+      sp[0] = -1;
+      sp[1] = -1;
+      sp[2] = -1;
     }
 
-    if (sock1 >= 0) {
-        sp[0] = sock1;
-	hostIndex_(hEntPtr->keyname, sock1);
+  if (sock1 >= 0)
+    {
+      sp[0] = sock1;
+      hostIndex_ (hEntPtr->keyname, sock1);
     }
 
-    if (sock2 >= 0)
-        sp[1] = sock2;
+  if (sock2 >= 0)
+    sp[1] = sock2;
 
-    if (seqno >= 0)
-        sp[2] = seqno;
+  if (seqno >= 0)
+    sp[2] = seqno;
 
-    hEntPtr->hData = sp;
+  hEntPtr->hData = sp;
 
-    return (0);
+  return (0);
 
 }
 
 void
-hostIndex_(char *hostName, int sock)
+hostIndex_ (char *hostName, int sock)
 {
-    HostSock   *newSock;
+  HostSock *newSock;
 
-    newSock = malloc(sizeof(HostSock));
-    if (newSock == NULL) {
-        ls_syslog(LOG_ERR, "hostIndex_ : malloc HostSock failed");
-        exit(-1);
+  newSock = malloc (sizeof (HostSock));
+  if (newSock == NULL)
+    {
+      ls_syslog (LOG_ERR, "hostIndex_ : malloc HostSock failed");
+      exit (-1);
     }
-    newSock->socket = sock;
-    newSock->hostname = hostName;
-    newSock->next = hostSock;
-    hostSock = newSock;
+  newSock->socket = sock;
+  newSock->hostname = hostName;
+  newSock->next = hostSock;
+  hostSock = newSock;
 
 }
 
 int
-delhostbysock_(int sock)
+delhostbysock_ (int sock)
 {
-    HostSock *tmpSock;
+  HostSock *tmpSock;
 
-    tmpSock = hostSock;
+  tmpSock = hostSock;
 
-    if (tmpSock->socket == sock) {
+  if (tmpSock->socket == sock)
+    {
       hostSock = hostSock->next;
-      free(tmpSock);
+      free (tmpSock);
       return 0;
     }
 
-    while (tmpSock->next != NULL) {
-      if (tmpSock->next->socket == sock) {
-       HostSock *rmSock = tmpSock->next;
-       tmpSock->next = rmSock->next;
-       free(rmSock);
-       return 0;
-      }
+  while (tmpSock->next != NULL)
+    {
+      if (tmpSock->next->socket == sock)
+	{
+	  HostSock *rmSock = tmpSock->next;
+	  tmpSock->next = rmSock->next;
+	  free (rmSock);
+	  return 0;
+	}
       tmpSock = tmpSock->next;
     }
 
-    return -1;
+  return -1;
 }
 
 int
-gethostbysock_(int sock, char *hostName)
+gethostbysock_ (int sock, char *hostName)
 {
-    HostSock *tmpSock;
+  HostSock *tmpSock;
 
-    if (hostName == NULL) {
-        return -1;
+  if (hostName == NULL)
+    {
+      return -1;
     }
 
-    tmpSock = hostSock;
+  tmpSock = hostSock;
 
-    while (tmpSock != NULL) {
-        if (tmpSock->socket == sock) {
-            if (tmpSock->hostname != NULL) {
-                strcpy(hostName, tmpSock->hostname);
-                return 0;
-			}
-		}
-		tmpSock = tmpSock->next;
+  while (tmpSock != NULL)
+    {
+      if (tmpSock->socket == sock)
+	{
+	  if (tmpSock->hostname != NULL)
+	    {
+	      strcpy (hostName, tmpSock->hostname);
+	      return 0;
+	    }
+	}
+      tmpSock = tmpSock->next;
     }
 
-    strcpy(hostName, "LSF_HOST_NULL");
-    return -1;
+  strcpy (hostName, "LSF_HOST_NULL");
+  return -1;
 
 }
 
 int *
-_gethostdata_(char *hostName)
+_gethostdata_ (char *hostName)
 {
-    hEnt *ent;
-    int  *sp;
-    struct hostent *hp;
+  hEnt *ent;
+  int *sp;
+  struct hostent *hp;
 
-    hp = Gethostbyname_(hostName);
-    if (hp == NULL)
-        return NULL;
+  hp = Gethostbyname_ (hostName);
+  if (hp == NULL)
+    return NULL;
 
-    ent = h_getEnt_(&conn_table, hp->h_name);
-    if (ent == NULL)
-        return NULL;
+  ent = h_getEnt_ (&conn_table, hp->h_name);
+  if (ent == NULL)
+    return NULL;
 
-    if (ent->hData == NULL)
-        return NULL;
+  if (ent->hData == NULL)
+    return NULL;
 
-    sp = ent->hData;
+  sp = ent->hData;
 
-    return sp;
+  return sp;
 }
 
 int
-_isconnected_(char *hostName, int *sock)
+_isconnected_ (char *hostName, int *sock)
 {
-    int   *sp;
+  int *sp;
 
-    sp = _gethostdata_(hostName);
-    if (sp == NULL)
-        return (FALSE);
+  sp = _gethostdata_ (hostName);
+  if (sp == NULL)
+    return (FALSE);
 
-    sock[0] = sp[0];
-    sock[1] = sp[1];
+  sock[0] = sp[0];
+  sock[1] = sp[1];
 
-    return (TRUE);
+  return (TRUE);
 }
 
 int
-_getcurseqno_(char *hostName)
+_getcurseqno_ (char *hostName)
 {
-    int *sp;
+  int *sp;
 
-    sp = _gethostdata_(hostName);
-    if (sp == NULL)
-	return(-1);
+  sp = _gethostdata_ (hostName);
+  if (sp == NULL)
+    return (-1);
 
-    return(sp[2]);
+  return (sp[2]);
 }
 
 void
-_setcurseqno_(char *hostName, int seqno)
+_setcurseqno_ (char *hostName, int seqno)
 {
-    int *sp;
+  int *sp;
 
-    sp = _gethostdata_(hostName);
-    if (sp == NULL)
-        return;
+  sp = _gethostdata_ (hostName);
+  if (sp == NULL)
+    return;
 
-    sp[2] = seqno;
+  sp[2] = seqno;
 }
 
 int
-ls_isconnected(char *hostName)
+ls_isconnected (char *hostName)
 {
-    hEnt *hEntPtr;
-    struct hostent *hp;
+  hEnt *hEntPtr;
+  struct hostent *hp;
 
-    hp = Gethostbyname_(hostName);
-    if (hp == NULL)
-        return FALSE;
+  hp = Gethostbyname_ (hostName);
+  if (hp == NULL)
+    return FALSE;
 
-    hEntPtr = h_getEnt_(&conn_table, hp->h_name);
-    if (hEntPtr == NULL)
-        return FALSE;
+  hEntPtr = h_getEnt_ (&conn_table, hp->h_name);
+  if (hEntPtr == NULL)
+    return FALSE;
 
-    return TRUE;
+  return TRUE;
 }
 
 int
-getConnectionNum_(char *hostName)
+getConnectionNum_ (char *hostName)
 {
-    hEnt *hEntPtr;
-    int *connNum;
-    struct hostent *hp;
+  hEnt *hEntPtr;
+  int *connNum;
+  struct hostent *hp;
 
-    hp = Gethostbyname_(hostName);
-    if (hp == NULL)
-        return -1;
+  hp = Gethostbyname_ (hostName);
+  if (hp == NULL)
+    return -1;
 
-    if ((hEntPtr = h_getEnt_(&conn_table, hp->h_name)) == NULL)
-	return -1;
+  if ((hEntPtr = h_getEnt_ (&conn_table, hp->h_name)) == NULL)
+    return -1;
 
-    connNum = hEntPtr->hData;
-    delhostbysock_(connNum[0]);
-    h_rmEnt_(&conn_table, hEntPtr);
+  connNum = hEntPtr->hData;
+  delhostbysock_ (connNum[0]);
+  h_rmEnt_ (&conn_table, hEntPtr);
 
-    return connNum[0];
+  return connNum[0];
 }
 
 int
-_findmyconnections_(struct connectEnt **connPtr)
+_findmyconnections_ (struct connectEnt **connPtr)
 {
-    int    n;
-    sTab   sTab;
-    hEnt   *ent;
+  int n;
+  sTab sTab;
+  hEnt *ent;
 
-    ent = h_firstEnt_(&conn_table, &sTab);
-    if (ent == NULL) {
-        return (0);
+  ent = h_firstEnt_ (&conn_table, &sTab);
+  if (ent == NULL)
+    {
+      return (0);
     }
 
-    n = 0;
-    while (ent) {
-        int   *pfd;
+  n = 0;
+  while (ent)
+    {
+      int *pfd;
 
-        pfd = ent->hData;
-        connlist[n].hostname = ent->keyname;
-        connlist[n].csock[0] = pfd[0];
-        connlist[n].csock[1] = pfd[1];
-        ent = h_nextEnt_(&sTab);
-        n++;
+      pfd = ent->hData;
+      connlist[n].hostname = ent->keyname;
+      connlist[n].csock[0] = pfd[0];
+      connlist[n].csock[1] = pfd[1];
+      ent = h_nextEnt_ (&sTab);
+      n++;
     }
 
-    *connPtr = connlist;
+  *connPtr = connlist;
 
-    return (n);
+  return (n);
 }
 
 char **
-ls_findmyconnections(void)
+ls_findmyconnections (void)
 {
-    int n = 0;
-    sTab hashSearchPtr;
-    hEnt *hEntPtr;
+  int n = 0;
+  sTab hashSearchPtr;
+  hEnt *hEntPtr;
 
-    hEntPtr = h_firstEnt_(&conn_table, &hashSearchPtr);
+  hEntPtr = h_firstEnt_ (&conn_table, &hashSearchPtr);
 
-    while (hEntPtr) {
-	connnamelist[n] = hEntPtr->keyname;
-	hEntPtr = h_nextEnt_(&hashSearchPtr);
-        n++;
+  while (hEntPtr)
+    {
+      connnamelist[n] = hEntPtr->keyname;
+      hEntPtr = h_nextEnt_ (&hashSearchPtr);
+      n++;
     }
-    connnamelist[n] = NULL;
+  connnamelist[n] = NULL;
 
-    return (connnamelist);
+  return (connnamelist);
 
 }
-

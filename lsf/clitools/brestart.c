@@ -20,16 +20,15 @@
 
 extern int do_sub (int, char **, int);
 
-#define NL_SETN 8 	 
+#define NL_SETN 8
 
-int 
+int
 main (int argc, char **argv)
 {
 
-    int rc;
+  int rc;
 
-    rc = _i18n_init ( I18N_CAT_MIN );	
+  rc = _i18n_init (I18N_CAT_MIN);
 
-    exit(do_sub(argc, argv, CMD_BRESTART));
-} 
-
+  exit (do_sub (argc, argv, CMD_BRESTART));
+}

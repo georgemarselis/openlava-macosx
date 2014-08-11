@@ -15,86 +15,85 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
- 
+
 #ifndef LSF_LSB_SPOOL_H
 #define LSF_LSB_SPOOL_H
 
-typedef enum spoolOptions  {
-    SPOOL_INPUT_FILE,
-    SPOOL_COMMAND 
+typedef enum spoolOptions
+{
+  SPOOL_INPUT_FILE,
+  SPOOL_COMMAND
 } spoolOptions_t;
 
-typedef struct lsbSpoolInfo {
-    char srcFile[MAXFILENAMELEN];    
-    char spoolFile[MAXFILENAMELEN];  
+typedef struct lsbSpoolInfo
+{
+  char srcFile[MAXFILENAMELEN];
+  char spoolFile[MAXFILENAMELEN];
 
 } LSB_SPOOL_INFO_T;
 
-typedef enum spoolCopyStatus {
-    SPOOL_COPY_SUCCESS =  0,       
-    SPOOL_COPY_EXISTS  =  1,       
-    SPOOL_COPY_FAILURE = -1,       
-    SPOOL_COPY_INITREX_FAILED = -2 
+typedef enum spoolCopyStatus
+{
+  SPOOL_COPY_SUCCESS = 0,
+  SPOOL_COPY_EXISTS = 1,
+  SPOOL_COPY_FAILURE = -1,
+  SPOOL_COPY_INITREX_FAILED = -2
 } spoolCopyStatus_t;
 
-typedef struct listElement {
-	char * elementName;
-	struct listElement * nextElement;
+typedef struct listElement
+{
+  char *elementName;
+  struct listElement *nextElement;
 } listElement_t;
 
-typedef struct listElement * listElementPtr_t; 
+typedef struct listElement *listElementPtr_t;
 
-typedef struct listHeader {
-	time_t creationTime;
-	listElementPtr_t firstElement;
-	listElementPtr_t bestElement;
+typedef struct listHeader
+{
+  time_t creationTime;
+  listElementPtr_t firstElement;
+  listElementPtr_t bestElement;
 } listHeader_t;
 
-typedef struct listHeader * listHeaderPtr_t;
+typedef struct listHeader *listHeaderPtr_t;
 
 #define JOB_SPOOLDIR_DELIMITER "|"
 
 #define SPOOL_LSF_INDIR   "lsf_indir"
 #define SPOOL_LSF_CMDDIR  "lsf_cmddir"
-#define SPOOL_FAILED_HOSTS   20 
+#define SPOOL_FAILED_HOSTS   20
 
 #define LSB_OK_HOST_LIST_UPDATE_PERIOD    300
 
 extern listHeaderPtr_t okHostsListPtr_;
 
-extern char *             getLocalHostOfficialName();
-extern LSB_SPOOL_INFO_T * copySpoolFile( const char* srcFilePath
-                                ,spoolOptions_t option );
-extern char* findSpoolDir( const char* spoolHost );
-extern spoolCopyStatus_t copyFileToHost( const char* localSrcFileFullPath
-                                ,const char* hostName
-                                ,const char* destinFileFullDir
-                                ,const char* destinFileName
-                                );
-extern int removeSpoolFile( const char* hostName
-                                ,const char* destinFileFullPath
-                          );
-extern char*                  getSpoolHostBySpoolFile(const char * spoolFile );                    
+extern char *getLocalHostOfficialName ();
+extern LSB_SPOOL_INFO_T *copySpoolFile (const char *srcFilePath,
+					spoolOptions_t option);
+extern char *findSpoolDir (const char *spoolHost);
+extern spoolCopyStatus_t copyFileToHost (const char *localSrcFileFullPath,
+					 const char *hostName,
+					 const char *destinFileFullDir,
+					 const char *destinFileName);
+extern int removeSpoolFile (const char *hostName,
+			    const char *destinFileFullPath);
+extern char *getSpoolHostBySpoolFile (const char *spoolFile);
 
-extern listHeaderPtr_t        createListHeader();
-extern int		      deleteListHeader( 
-                                          const listHeaderPtr_t pListHeader );
-extern int		      deleteList( const listHeaderPtr_t pListHeader );
+extern listHeaderPtr_t createListHeader ();
+extern int deleteListHeader (const listHeaderPtr_t pListHeader);
+extern int deleteList (const listHeaderPtr_t pListHeader);
 
-extern listElementPtr_t       createListElement( const char * elementName );
-extern int		      deleteListElement( 
-                                          const listElementPtr_t pListElement );
+extern listElementPtr_t createListElement (const char *elementName);
+extern int deleteListElement (const listElementPtr_t pListElement);
 
-extern listElementPtr_t       addElementToList( const char * elementName 
-			                 ,const listHeaderPtr_t pListHeader );
-extern int		      removeElementFromList( 
-                                          const listElementPtr_t pListElement
-	                                 ,const listHeaderPtr_t pListHeader);
-extern listElementPtr_t getBestListElement( 
-                                          const listHeaderPtr_t pListHeader );
+extern listElementPtr_t addElementToList (const char *elementName,
+					  const listHeaderPtr_t pListHeader);
+extern int removeElementFromList (const listElementPtr_t pListElement,
+				  const listHeaderPtr_t pListHeader);
+extern listElementPtr_t getBestListElement (const listHeaderPtr_t
+					    pListHeader);
 
-extern int                    setBestListElement( 
-                                          const listElementPtr_t pBestElement
-                                         ,const listHeaderPtr_t  pListHeader );
+extern int setBestListElement (const listElementPtr_t pBestElement,
+			       const listHeaderPtr_t pListHeader);
 
-#endif 
+#endif

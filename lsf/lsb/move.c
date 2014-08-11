@@ -22,80 +22,87 @@
 
 #include "lsb.h"
 
-int 
+int
 lsb_movejob (LS_LONG_INT jobId, int *position, int opCode)
 {
-    struct jobMoveReq jobMoveReq;
-    char request_buf[MSGSIZE];
-    char *reply_buf;
-    XDR xdrs;
-    mbdReqType mbdReqtype;
-    int cc;
-    struct LSFHeader hdr;
-    struct lsfAuth auth;
+  struct jobMoveReq jobMoveReq;
+  char request_buf[MSGSIZE];
+  char *reply_buf;
+  XDR xdrs;
+  mbdReqType mbdReqtype;
+  int cc;
+  struct LSFHeader hdr;
+  struct lsfAuth auth;
 
-    if (opCode != TO_TOP && opCode != TO_BOTTOM) {
-	lsberrno = LSBE_BAD_ARG;
-	return(-1);
+  if (opCode != TO_TOP && opCode != TO_BOTTOM)
+    {
+      lsberrno = LSBE_BAD_ARG;
+      return (-1);
     }
 
-    if (position == NULL ) {
-	lsberrno = LSBE_BAD_ARG;
-	return(-1);
+  if (position == NULL)
+    {
+      lsberrno = LSBE_BAD_ARG;
+      return (-1);
     }
 
-    if (jobId <= 0 || *position <= 0) {
-	lsberrno = LSBE_BAD_ARG;
-	return(-1);
+  if (jobId <= 0 || *position <= 0)
+    {
+      lsberrno = LSBE_BAD_ARG;
+      return (-1);
     }
 
-    if (authTicketTokens_(&auth, NULL) == -1)
-	return (-1);
-	 
-    jobMoveReq.jobId = jobId;
-    jobMoveReq.position = *position;
-    jobMoveReq.opCode = opCode;
+  if (authTicketTokens_ (&auth, NULL) == -1)
+    return (-1);
 
-    
-    mbdReqtype = BATCH_JOB_MOVE;
-    xdrmem_create(&xdrs, request_buf, MSGSIZE, XDR_ENCODE);
+  jobMoveReq.jobId = jobId;
+  jobMoveReq.position = *position;
+  jobMoveReq.opCode = opCode;
 
-    hdr.opCode = mbdReqtype;
-    if (!xdr_encodeMsg(&xdrs, (char *) &jobMoveReq, &hdr, xdr_jobMoveReq, 0, &auth)) {
-	xdr_destroy(&xdrs);
-	lsberrno = LSBE_XDR;
-	return(-1);
-    } 
-    
-    
-    if ((cc = callmbd (NULL, request_buf, XDR_GETPOS(&xdrs), &reply_buf, 
-                       &hdr, NULL, NULL, NULL)) == -1)    {
-	xdr_destroy(&xdrs);
-	return (-1);
-    }
-    xdr_destroy(&xdrs);
 
-    
-    lsberrno = hdr.opCode;
-    if (lsberrno == LSBE_NO_ERROR) {
-        xdrmem_create(&xdrs, reply_buf, XDR_DECODE_SIZE_(cc), XDR_DECODE);
-	if (!xdr_jobMoveReq(&xdrs, &jobMoveReq, &hdr)) {
-	    lsberrno = LSBE_XDR;
-            xdr_destroy(&xdrs);
-	    if (cc)
-		free(reply_buf);
-	    return(-1);
-        }
-        *position = jobMoveReq.position ;
-        xdr_destroy(&xdrs);
-	if (cc)
-	    free(reply_buf);
-        return(0);
+  mbdReqtype = BATCH_JOB_MOVE;
+  xdrmem_create (&xdrs, request_buf, MSGSIZE, XDR_ENCODE);
+
+  hdr.opCode = mbdReqtype;
+  if (!xdr_encodeMsg
+      (&xdrs, (char *) &jobMoveReq, &hdr, xdr_jobMoveReq, 0, &auth))
+    {
+      xdr_destroy (&xdrs);
+      lsberrno = LSBE_XDR;
+      return (-1);
     }
 
-    if (cc)
-	free(reply_buf);
-    return(-1);
 
-} 
+  if ((cc = callmbd (NULL, request_buf, XDR_GETPOS (&xdrs), &reply_buf,
+		     &hdr, NULL, NULL, NULL)) == -1)
+    {
+      xdr_destroy (&xdrs);
+      return (-1);
+    }
+  xdr_destroy (&xdrs);
 
+
+  lsberrno = hdr.opCode;
+  if (lsberrno == LSBE_NO_ERROR)
+    {
+      xdrmem_create (&xdrs, reply_buf, XDR_DECODE_SIZE_ (cc), XDR_DECODE);
+      if (!xdr_jobMoveReq (&xdrs, &jobMoveReq, &hdr))
+	{
+	  lsberrno = LSBE_XDR;
+	  xdr_destroy (&xdrs);
+	  if (cc)
+	    free (reply_buf);
+	  return (-1);
+	}
+      *position = jobMoveReq.position;
+      xdr_destroy (&xdrs);
+      if (cc)
+	free (reply_buf);
+      return (0);
+    }
+
+  if (cc)
+    free (reply_buf);
+  return (-1);
+
+}

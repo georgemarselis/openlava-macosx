@@ -20,7 +20,7 @@
 #define LSF_BADMIN_BADMIN_H
 
 #include <ctype.h>
- 
+
 #include "cmd.h"
 #include "intlib/intlibout.h"
 #include "lsf.h"
@@ -28,140 +28,140 @@
 extern int bhc (int argc, char **argv, int opCode);
 extern int bqc (int argc, char **argv, int opCode);
 extern int breconfig (int argc, char **argv, int configFlag);
-extern int sysHist(int argc, char **argv, int opCode);
+extern int sysHist (int argc, char **argv, int opCode);
 
-extern void parseAndDo (char *cmdBuf, int (*func)());
-extern int adminCmdIndex(char *cmd, char *cmdList[]);
+extern void parseAndDo (char *cmdBuf, int (*func) ());
+extern int adminCmdIndex (char *cmd, char *cmdList[]);
 extern void cmdsUsage (char *cmd, char *cmdList[], char *cmdInfo[]);
 extern void oneCmdUsage (int i, char *cmdList[], char *cmdSyntax[]);
 extern void cmdHelp (int argc, char **argv, char *cmdList[],
-                     char *cmdInfo[], char *cmdSyntax[]);
+		     char *cmdInfo[], char *cmdSyntax[]);
 extern char *myGetOpt (int nargc, char **nargv, char *ostr);
 extern int getConfirm (char *msg);
-extern int startup(int argc, char **argv, int opCode);
+extern int startup (int argc, char **argv, int opCode);
 
 
-static int opCodeList[] = {  0, 0, QUEUE_OPEN, QUEUE_CLOSED, QUEUE_ACTIVATE,
-                             QUEUE_INACTIVATE, QUEUE_HIST, HOST_OPEN, 
-                             HOST_CLOSE, HOST_REBOOT, HOST_SHUTDOWN, 0,  
-                             HOST_HIST, MBD_HIST, SYS_HIST, MBD_DEBUG, 
-			     MBD_TIMING, 0, SBD_DEBUG, SBD_TIMING,  
-			     0, 0, 0 }; 
+static int opCodeList[] = { 0, 0, QUEUE_OPEN, QUEUE_CLOSED, QUEUE_ACTIVATE,
+  QUEUE_INACTIVATE, QUEUE_HIST, HOST_OPEN,
+  HOST_CLOSE, HOST_REBOOT, HOST_SHUTDOWN, 0,
+  HOST_HIST, MBD_HIST, SYS_HIST, MBD_DEBUG,
+  MBD_TIMING, 0, SBD_DEBUG, SBD_TIMING,
+  0, 0, 0
+};
 
-static char *cmdList[] = { 
+static char *cmdList[] = {
 #define BADMIN_RECONFIG  0
-			   "reconfig", 
+  "reconfig",
 #define BADMIN_CKCONFIG  1
-			   "ckconfig", 
+  "ckconfig",
 #define BADMIN_QOPEN     2
-		           "qopen",
+  "qopen",
 #define BADMIN_QCLOSE    3
-		           "qclose",
+  "qclose",
 #define BADMIN_QACT      4
-		           "qact",
+  "qact",
 #define BADMIN_QINACT    5
-		           "qinact",
+  "qinact",
 #define BADMIN_QHIST     6
-		           "qhist",
+  "qhist",
 #define BADMIN_HOPEN     7
-		           "hopen",
+  "hopen",
 #define BADMIN_HCLOSE    8
-		           "hclose",
+  "hclose",
 #define BADMIN_HREBOOT   9
-		           "hrestart",
+  "hrestart",
 #define BADMIN_HSHUT    10
-		           "hshutdown",
+  "hshutdown",
 #define BADMIN_HSTARTUP 11
-		           "hstartup",
+  "hstartup",
 #define BADMIN_HHIST    12
-		           "hhist",
+  "hhist",
 #define BADMIN_MBDHIST  13
-		           "mbdhist",
+  "mbdhist",
 #define BADMIN_HIST     14
-		           "hist",
-#define BADMIN_MBDDEBUG 15 
-			   "mbddebug",
-#define BADMIN_MBDTIME  16 
-			   "mbdtime",
-#define BADMIN_MBDRESTART 17 
-			   "mbdrestart",
-#define BADMIN_SBDDEBUG 18 
-			   "sbddebug",
+  "hist",
+#define BADMIN_MBDDEBUG 15
+  "mbddebug",
+#define BADMIN_MBDTIME  16
+  "mbdtime",
+#define BADMIN_MBDRESTART 17
+  "mbdrestart",
+#define BADMIN_SBDDEBUG 18
+  "sbddebug",
 #define BADMIN_SBDTIME  19
-			   "sbdtime",
-#define BADMIN_HELP     20 
-		           "help",
+  "sbdtime",
+#define BADMIN_HELP     20
+  "help",
 #define BADMIN_QES      21
-		           "?",
+  "?",
 #define BADMIN_QUIT     22
-		           "quit",
-                            NULL
-		         };
+  "quit",
+  NULL
+};
 
-static char *cmdSyntax[] = 
-{
-  "[-v] [-f]",                     
-  "[-v]",                          
-  "[ queue_name ... | all ]",      
-  "[ queue_name ... | all ]",      
-  "[ queue_name ... | all ]",      
-  "[ queue_name ... | all ]",      
-  "[-t time0,time1] [-f logfile_name] [ queue_name ...]", 
-  "[ host_name ... | host_group ... | all ]",            
-  "[ host_name ... | host_group ... | all ]",            
-  "[-f] [ host_name ... | all ]",                        
-  "[-f] [ host_name ... | all ]",                        
-  "[-f] [ host_name ... | all ]",                        
-  "[-t time0,time1] [-f logfile_name] [ host_name ...]", 
-  "[-t time0,time1] [-f logfile_name]",                  
-  "[-t time0,time1] [-f logfile_name]",                  
-  "[-c class_name] [-l debug_level] [-f logfile_name] [-o]", 
-  "[-l timing_level] [-f logfile_name] [-o]",            
-  "[-v] [-f]",                                           
+static char *cmdSyntax[] = {
+  "[-v] [-f]",
+  "[-v]",
+  "[ queue_name ... | all ]",
+  "[ queue_name ... | all ]",
+  "[ queue_name ... | all ]",
+  "[ queue_name ... | all ]",
+  "[-t time0,time1] [-f logfile_name] [ queue_name ...]",
+  "[ host_name ... | host_group ... | all ]",
+  "[ host_name ... | host_group ... | all ]",
+  "[-f] [ host_name ... | all ]",
+  "[-f] [ host_name ... | all ]",
+  "[-f] [ host_name ... | all ]",
+  "[-t time0,time1] [-f logfile_name] [ host_name ...]",
+  "[-t time0,time1] [-f logfile_name]",
+  "[-t time0,time1] [-f logfile_name]",
+  "[-c class_name] [-l debug_level] [-f logfile_name] [-o]",
+  "[-l timing_level] [-f logfile_name] [-o]",
+  "[-v] [-f]",
   "[-c class_name] [-l debug_level] [-f logfile_name] [-o] [ host_name ...]",
-  "[-l timing_level] [-f logfile_name] [-o] [ host_name ...]",  
-  "[ command ...]",                                             
-  "[ command ...]",                                             
-  "",                                                           
+  "[-l timing_level] [-f logfile_name] [-o] [ host_name ...]",
+  "[ command ...]",
+  "[ command ...]",
+  "",
   "[-t time0,time1] [-f logfile_name]",
   NULL
 };
 
 #define NL_SETN  8
 
-static char *cmdInfo[] = { 
-	"Reconfigure the system", 	/* catgets 3101 */
-        "Check configuration files",	/* catgets 3102 */
-        "Open LSF queues",		/* catgets 3103 */
-        "Close LSF queues",		/* catgets 3104 */
-        "Activate LSF queues",	        /* catgets 3105 */
-        "Inactivate LSF queues",	/* catgets 3106 */
-        "Display the history of LSF queues",	/* catgets 3107 */
-        "Open hosts",				/* catgets 3108 */
-        "Close hosts",				/* catgets 3109 */
-        "Restart slave batch daemon on hosts",	/* catgets 3110 */
-        "Shut down slave batch daemon on hosts",	/* catgets 3111 */
-	"Start up slave batch daemon on hosts",	/* catgets 3112 */
-	"Display the history of hosts",		/* catgets 3113 */
-        "Display the history of the master batch daemon",  /* catgets 3114 */
-        "Display the history of queues, hosts and mbatchd",/* catgets 3115 */
-        "Debug master batch daemon",		/* catgets 3116 */
-        "Timing master batch daemon",	/* catgets 3117 */
-	"Restart a new mbatchd",	/* catgets 3122 */
-        "Debug slave batch daemon",	/* catgets 3118 */
-        "Timing slave batch daemon",	/* catgets 3119 */
-        "Get help on commands",		/* catgets 3120 */
-        "Get help on commands",		/* catgets 3120 */
-        "Quit",				/* catgets 3121 */
-        NULL
+static char *cmdInfo[] = {
+  "Reconfigure the system",	/* catgets 3101 */
+  "Check configuration files",	/* catgets 3102 */
+  "Open LSF queues",		/* catgets 3103 */
+  "Close LSF queues",		/* catgets 3104 */
+  "Activate LSF queues",	/* catgets 3105 */
+  "Inactivate LSF queues",	/* catgets 3106 */
+  "Display the history of LSF queues",	/* catgets 3107 */
+  "Open hosts",			/* catgets 3108 */
+  "Close hosts",		/* catgets 3109 */
+  "Restart slave batch daemon on hosts",	/* catgets 3110 */
+  "Shut down slave batch daemon on hosts",	/* catgets 3111 */
+  "Start up slave batch daemon on hosts",	/* catgets 3112 */
+  "Display the history of hosts",	/* catgets 3113 */
+  "Display the history of the master batch daemon",	/* catgets 3114 */
+  "Display the history of queues, hosts and mbatchd",	/* catgets 3115 */
+  "Debug master batch daemon",	/* catgets 3116 */
+  "Timing master batch daemon",	/* catgets 3117 */
+  "Restart a new mbatchd",	/* catgets 3122 */
+  "Debug slave batch daemon",	/* catgets 3118 */
+  "Timing slave batch daemon",	/* catgets 3119 */
+  "Get help on commands",	/* catgets 3120 */
+  "Get help on commands",	/* catgets 3120 */
+  "Quit",			/* catgets 3121 */
+  NULL
 };
 
 #ifdef  I18N_COMPILE
-  static int cmdInfo_ID[] = {
-    3101, 3102, 3103, 3104, 3105, 3106, 3107, 3108, 3109, 3110,
-    3111, 3112, 3113, 3114, 3115, 3116, 3117, 3122,
-    3118, 3119, 3120, 3120, 3121
-  };
+static int cmdInfo_ID[] = {
+  3101, 3102, 3103, 3104, 3105, 3106, 3107, 3108, 3109, 3110,
+  3111, 3112, 3113, 3114, 3115, 3116, 3117, 3122,
+  3118, 3119, 3120, 3120, 3121
+};
 
 #endif /* I18N_COMPILE */
 

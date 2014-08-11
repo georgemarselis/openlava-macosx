@@ -23,24 +23,23 @@
 #include "lib/lproto.h"
 
 int
-expSyntax_(char *resReq)
+expSyntax_ (char *resReq)
 {
-    struct stringLen str;
+  struct stringLen str;
 
-    if (initenv_(NULL, NULL) < 0)
-        return (-1);
+  if (initenv_ (NULL, NULL) < 0)
+    return (-1);
 
-    if (!resReq)
-        resReq = " ";
+  if (!resReq)
+    resReq = " ";
 
-    str.name = resReq;
-    str.len  = MAXLINELEN;
+  str.name = resReq;
+  str.len = MAXLINELEN;
 
-    if (callLim_(LIM_CHK_RESREQ, &str, xdr_stringLen, 
-	NULL, NULL, NULL, 0, NULL) < 0)
-        return(-1);
-    
-   return 0; 
+  if (callLim_ (LIM_CHK_RESREQ, &str, xdr_stringLen,
+		NULL, NULL, NULL, 0, NULL) < 0)
+    return (-1);
 
-} 
+  return 0;
 
+}

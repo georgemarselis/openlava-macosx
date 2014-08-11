@@ -30,23 +30,23 @@
 #define  PAGE_INTVL_CNT 120/exchIntvl
 
 
-extern int 				pipefd[2];
-extern struct limLock 	limLock;
+extern int pipefd[2];
+extern struct limLock limLock;
 
 
-static float 	getIoRate( float );
-static float 	getpaging( float );
-static float 	getswap(   void  );
-static float 	idletime(  int * );
-static float 	tmpspace(  void  );
-static void 	getusr(    void  );
-static void 	smooth(    float *, float, float);
-void 			sendLoad(  void  );
+static float getIoRate (float);
+static float getpaging (float);
+static float getswap (void);
+static float idletime (int *);
+static float tmpspace (void);
+static void getusr (void);
+static void smooth (float *, float, float);
+void sendLoad (void);
 
-static int 		numCpus( void );
+static int numCpus (void);
 
-int  	maxnLbHost 	= 0;
-int  	ncpus 		= 1;
-float 	cpu_usage 	= 0.0;
+int maxnLbHost = 0;
+int ncpus = 1;
+float cpu_usage = 0.0;
 
 #endif

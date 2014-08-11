@@ -24,45 +24,46 @@
 int
 lsb_reconfig (int configFlag)
 {
-    mbdReqType mbdReqtype;
-    XDR xdrs;
-    char request_buf[MSGSIZE];
-    char *reply_buf;
-    int cc;
-    struct LSFHeader hdr;
-    struct lsfAuth auth;
-    int tmp;
+  mbdReqType mbdReqtype;
+  XDR xdrs;
+  char request_buf[MSGSIZE];
+  char *reply_buf;
+  int cc;
+  struct LSFHeader hdr;
+  struct lsfAuth auth;
+  int tmp;
 
-    mbdReqtype = BATCH_RECONFIG;
+  mbdReqtype = BATCH_RECONFIG;
 
-    if (authTicketTokens_(&auth, NULL) == -1)
-	return (-1);
+  if (authTicketTokens_ (&auth, NULL) == -1)
+    return (-1);
 
-    xdrmem_create(&xdrs, request_buf, MSGSIZE, XDR_ENCODE);
+  xdrmem_create (&xdrs, request_buf, MSGSIZE, XDR_ENCODE);
 
-    initLSFHeader_(&hdr);
-    hdr.opCode = mbdReqtype;
-    tmp = (short) configFlag;
-    hdr.reserved = tmp;
+  initLSFHeader_ (&hdr);
+  hdr.opCode = mbdReqtype;
+  tmp = (short) configFlag;
+  hdr.reserved = tmp;
 
-    if (!xdr_encodeMsg(&xdrs, NULL, &hdr, NULL, 0, &auth)) {
-        lsberrno = LSBE_XDR;
-        return(-1);
-    }
-
-    if ((cc = callmbd (NULL, request_buf, XDR_GETPOS(&xdrs), &reply_buf,
-                       &hdr, NULL, NULL, NULL)) == -1)
+  if (!xdr_encodeMsg (&xdrs, NULL, &hdr, NULL, 0, &auth))
     {
-        xdr_destroy(&xdrs);
-	return (-1);
+      lsberrno = LSBE_XDR;
+      return (-1);
     }
-    xdr_destroy(&xdrs);
-    if (cc)
-	free(reply_buf);
 
-    lsberrno = hdr.opCode;
-    if (lsberrno == LSBE_NO_ERROR)
-	return(0);
-    else
-	return(-1);
+  if ((cc = callmbd (NULL, request_buf, XDR_GETPOS (&xdrs), &reply_buf,
+		     &hdr, NULL, NULL, NULL)) == -1)
+    {
+      xdr_destroy (&xdrs);
+      return (-1);
+    }
+  xdr_destroy (&xdrs);
+  if (cc)
+    free (reply_buf);
+
+  lsberrno = hdr.opCode;
+  if (lsberrno == LSBE_NO_ERROR)
+    return (0);
+  else
+    return (-1);
 }

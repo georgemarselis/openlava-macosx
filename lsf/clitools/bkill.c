@@ -22,22 +22,23 @@
 
 #include "../../lsf/lib/lsi18n.h"
 
-#define NL_SETN 8 	
+#define NL_SETN 8
 
 extern int bsignal (int, char **);
 extern int _lsb_recvtimeout;
 
-int 
+int
 main (int argc, char **argv)
 {
-    int rc;
-    
-    _lsb_recvtimeout = 30;
-    rc = _i18n_init ( I18N_CAT_MIN );	
+  int rc;
 
-    if (bsignal(argc, argv) == 0) {
-	exit(-1);
+  _lsb_recvtimeout = 30;
+  rc = _i18n_init (I18N_CAT_MIN);
+
+  if (bsignal (argc, argv) == 0)
+    {
+      exit (-1);
     }
-    _i18n_end ( ls_catd );			
-    exit(0);
+  _i18n_end (ls_catd);
+  exit (0);
 }

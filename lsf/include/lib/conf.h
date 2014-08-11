@@ -27,21 +27,23 @@
 #define TYPE3  RESF_BUILTIN | RESF_GLOBAL | RESF_LIC
 #define DEF_REXPRIORITY 0
 
-struct builtIn {
-    char *name;
-    char *des;
-    enum valueType valueType;
-    enum orderType orderType;
-    int  flags;
-    int  interval;
+struct builtIn
+{
+  char *name;
+  char *des;
+  enum valueType valueType;
+  enum orderType orderType;
+  int flags;
+  int interval;
 };
 
-struct HostsArray {
-    int  size;
-    char** hosts;
+struct HostsArray
+{
+  int size;
+  char **hosts;
 };
 
-void freeSA_(char**, int);
+void freeSA_ (char **, int);
 
 extern int builtInRes_ID[];
 extern struct builtIn builtInRes[];

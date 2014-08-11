@@ -22,11 +22,11 @@
 int
 main (int argc, char **argv)
 {
-    int rc;
+  int rc;
 
-    rc = _i18n_init ( I18N_CAT_MIN );
+  rc = _i18n_init (I18N_CAT_MIN);
 
-    bmove(argc, argv, TO_BOTTOM);
-    _i18n_end ( ls_catd );
-    exit(0);
+  bmove (argc, argv, TO_BOTTOM);
+  _i18n_end (ls_catd);
+  exit (0);
 }

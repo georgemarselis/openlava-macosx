@@ -27,106 +27,117 @@
 
 #define MAXLISTSIZE 256
 
-static void usage(char *);
+static void usage (char *);
 extern int errno;
 
 #define NL_SETN 27
 
 
 int
-main(int argc, char **argv)
+main (int argc, char **argv)
 {
-    static char fname[] = "lsloadadj/main";
-    char *resreq = NULL;
-    struct placeInfo  placeadvice[MAXLISTSIZE];
-    char *p, *hname;
-    int cc = 0;
-    int	achar;
-    int rc;
+  static char fname[] = "lsloadadj/main";
+  char *resreq = NULL;
+  struct placeInfo placeadvice[MAXLISTSIZE];
+  char *p, *hname;
+  int cc = 0;
+  int achar;
+  int rc;
 
-    rc = _i18n_init ( I18N_CAT_MIN );
+  rc = _i18n_init (I18N_CAT_MIN);
 
 
-    if (ls_initdebug(argv[0]) < 0) {
-        ls_perror("ls_initdebug");
-        exit(-1);
-    }
-    if (logclass & (LC_TRACE))
-        ls_syslog(LOG_DEBUG, "%s: Entering this routine...", fname);
-
-    opterr = 0;
-    while ((achar = getopt(argc, argv, "VhR:")) != EOF)
+  if (ls_initdebug (argv[0]) < 0)
     {
-	switch (achar)
+      ls_perror ("ls_initdebug");
+      exit (-1);
+    }
+  if (logclass & (LC_TRACE))
+    ls_syslog (LOG_DEBUG, "%s: Entering this routine...", fname);
+
+  opterr = 0;
+  while ((achar = getopt (argc, argv, "VhR:")) != EOF)
+    {
+      switch (achar)
 	{
 	case 'R':
-	    resreq = optarg;
-	    break;
+	  resreq = optarg;
+	  break;
 	case 'V':
-	    fputs(_LS_VERSION_, stderr);
-	    exit(0);
+	  fputs (_LS_VERSION_, stderr);
+	  exit (0);
 	case 'h':
 	default:
-	    usage(argv[0]);
+	  usage (argv[0]);
 	}
     }
 
-    for ( ; optind < argc ; optind++)
+  for (; optind < argc; optind++)
     {
-        if (cc >= MAXLISTSIZE)
+      if (cc >= MAXLISTSIZE)
 	{
-	    fprintf(stderr,
-		_i18n_msg_get(ls_catd,NL_SETN,1951, "%s: too many hostnames (maximum %d)\n"), /* catgets  1951  */
-		fname, MAXLISTSIZE);
-	    usage(argv[0]);
+	  fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 1951, "%s: too many hostnames (maximum %d)\n"),	/* catgets  1951  */
+		   fname, MAXLISTSIZE);
+	  usage (argv[0]);
 	}
 
-        p = strchr(argv[optind],':');
-        if ( (p != NULL) && (*(p+1) != '\0') )  {
-             *p++ = '\0';
-             placeadvice[cc].numtask = atoi(p);
-             if (errno == ERANGE) {
-                 fprintf(stderr,
-		     _i18n_msg_get(ls_catd,NL_SETN,1952, "%s: invalid format for number of components\n"), /* catgets 1952 */
-		     fname);
-                 usage(argv[0]);
-             }
-        } else {
-             placeadvice[cc].numtask = 1;
-        }
+      p = strchr (argv[optind], ':');
+      if ((p != NULL) && (*(p + 1) != '\0'))
+	{
+	  *p++ = '\0';
+	  placeadvice[cc].numtask = atoi (p);
+	  if (errno == ERANGE)
+	    {
+	      fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 1952, "%s: invalid format for number of components\n"),	/* catgets 1952 */
+		       fname);
+	      usage (argv[0]);
+	    }
+	}
+      else
+	{
+	  placeadvice[cc].numtask = 1;
+	}
 
-        if (!Gethostbyname_(argv[optind])) {
-	    fprintf(stderr, "\
+      if (!Gethostbyname_ (argv[optind]))
+	{
+	  fprintf (stderr, "\
 %s: invalid hostname %s\n", __func__, argv[optind]);
-	    usage(argv[0]);
+	  usage (argv[0]);
 	}
-        strcpy(placeadvice[cc++].hostName, argv[optind]);
+      strcpy (placeadvice[cc++].hostName, argv[optind]);
     }
 
-    if (cc == 0) {
+  if (cc == 0)
+    {
 
-	if ((hname = ls_getmyhostname()) == NULL) {
-	    ls_perror("ls_getmyhostname");
-	    exit(-1);
-        }
-        strcpy(placeadvice[0].hostName, hname);
-        placeadvice[0].numtask = 1;
-        cc = 1;
+      if ((hname = ls_getmyhostname ()) == NULL)
+	{
+	  ls_perror ("ls_getmyhostname");
+	  exit (-1);
+	}
+      strcpy (placeadvice[0].hostName, hname);
+      placeadvice[0].numtask = 1;
+      cc = 1;
     }
 
-    if (ls_loadadj(resreq, placeadvice, cc) < 0) {
-        ls_perror("lsloadadj");
-        exit(-1);
-    } else
+  if (ls_loadadj (resreq, placeadvice, cc) < 0)
+    {
+      ls_perror ("lsloadadj");
+      exit (-1);
+    }
+  else
 
 
-    _i18n_end ( ls_catd );
+    _i18n_end (ls_catd);
 
-    exit(0);
+  exit (0);
 }
 
-static void usage(char *cmd)
+static void
+usage (char *cmd)
 {
-    printf("%s: %s [-h] [-V] [-R res_req] [host_name[:num_task] host_name[:num_task] ...]\n",I18N_Usage, cmd);
-    exit(-1);
+  printf
+    ("%s: %s [-h] [-V] [-R res_req] [host_name[:num_task] host_name[:num_task] ...]\n",
+     I18N_Usage, cmd);
+  exit (-1);
 }

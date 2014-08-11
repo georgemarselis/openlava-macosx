@@ -25,70 +25,71 @@
 extern int currentSN;
 
 int
-lsRecvMsg_(int sock, char *buf, int bufLen, struct LSFHeader *hdr,
-	   char *data, bool_t (*xdrFunc)(), int (*readFunc)())
+lsRecvMsg_ (int sock, char *buf, int bufLen, struct LSFHeader *hdr,
+	    char *data, bool_t (*xdrFunc) (), int (*readFunc) ())
 {
-    XDR xdrs;
-    int cc;
+  XDR xdrs;
+  int cc;
 
-    xdrmem_create(&xdrs, buf, bufLen, XDR_DECODE);
+  xdrmem_create (&xdrs, buf, bufLen, XDR_DECODE);
 
-    if ((cc = readDecodeHdr_(sock, buf, readFunc, &xdrs, hdr)) < 0) {
-	xdr_destroy(&xdrs);
-	return (cc);
+  if ((cc = readDecodeHdr_ (sock, buf, readFunc, &xdrs, hdr)) < 0)
+    {
+      xdr_destroy (&xdrs);
+      return (cc);
     }
 
-    if (hdr->length == 0 || data == NULL) {
-	xdr_destroy(&xdrs);
-	return (0);
+  if (hdr->length == 0 || data == NULL)
+    {
+      xdr_destroy (&xdrs);
+      return (0);
     }
 
-    XDR_SETPOS(&xdrs, 0);
+  XDR_SETPOS (&xdrs, 0);
 
-    if ((cc = readDecodeMsg_(sock, buf, hdr, readFunc, &xdrs, data,
-			      xdrFunc, NULL))	< 0) {
-	xdr_destroy(&xdrs);
-	return (cc);
+  if ((cc = readDecodeMsg_ (sock, buf, hdr, readFunc, &xdrs, data,
+			    xdrFunc, NULL)) < 0)
+    {
+      xdr_destroy (&xdrs);
+      return (cc);
     }
 
-    return (0);
+  return (0);
 }
 
-int lsSendMsg_ (int s, int opCode, int hdrLength, char *data, char *reqBuf,
-		int reqLen, bool_t (*xdrFunc)(), int (*writeFunc)(),
-		struct lsfAuth *auth)
+int
+lsSendMsg_ (int s, int opCode, int hdrLength, char *data, char *reqBuf,
+	    int reqLen, bool_t (*xdrFunc) (), int (*writeFunc) (),
+	    struct lsfAuth *auth)
 {
-    struct LSFHeader hdr;
-    XDR xdrs;
+  struct LSFHeader hdr;
+  XDR xdrs;
 
-    initLSFHeader_(&hdr);
-    hdr.opCode = opCode;
-    hdr.refCode = currentSN;
+  initLSFHeader_ (&hdr);
+  hdr.opCode = opCode;
+  hdr.refCode = currentSN;
 
-    if (!data)
-	hdr.length = hdrLength;
+  if (!data)
+    hdr.length = hdrLength;
 
-    xdrmem_create(&xdrs, reqBuf, reqLen, XDR_ENCODE);
+  xdrmem_create (&xdrs, reqBuf, reqLen, XDR_ENCODE);
 
-    if (!xdr_encodeMsg(&xdrs,
-                       data,
-                       &hdr,
-                       xdrFunc,
-		       0,
-                       auth)) {
-	xdr_destroy(&xdrs);
-	lserrno = LSE_BAD_XDR;
-	return(-1);
+  if (!xdr_encodeMsg (&xdrs, data, &hdr, xdrFunc, 0, auth))
+    {
+      xdr_destroy (&xdrs);
+      lserrno = LSE_BAD_XDR;
+      return (-1);
     }
 
-    if ((*writeFunc)(s, (char *)reqBuf, XDR_GETPOS(&xdrs)) !=
-	XDR_GETPOS(&xdrs)) {
-        xdr_destroy(&xdrs);
-	lserrno = LSE_MSG_SYS;
-        return (-2);
+  if ((*writeFunc) (s, (char *) reqBuf, XDR_GETPOS (&xdrs)) !=
+      XDR_GETPOS (&xdrs))
+    {
+      xdr_destroy (&xdrs);
+      lserrno = LSE_MSG_SYS;
+      return (-2);
     }
 
-    xdr_destroy(&xdrs);
+  xdr_destroy (&xdrs);
 
-    return (0);
+  return (0);
 }
