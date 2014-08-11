@@ -4,8 +4,7 @@
 
 include $(top_srcdir)/common.mk
 
-INCLUDES = -I$(top_srcdir)/lsf  -I$(top_srcdir)/lsf/lib \
-           -I$(top_srcdir)/lsbatch  -I$(top_srcdir)/lsbatch/lib -I./
+INCLUDES = -I$(top_srcdir)/lsf/include
 
 bin_PROGRAMS = bhist
 bhist_SOURCES  = bhist.c read.event.c bhist.h
@@ -15,6 +14,7 @@ bhist_LDADD = ../cmd/cmd.job.o \
 	../lib/liblsbatch.a \
 	../../lsf/lib/liblsf.a \
 	../../lsf/intlib/liblsfint.a -lm
+
 if !CYGWIN
 bhist_LDADD += -lnsl
 endif
