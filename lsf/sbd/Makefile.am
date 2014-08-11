@@ -1,34 +1,16 @@
 #
-# Copyright (C) 2011-2012 David Bigagli
+# Makefile.am: sources for slave batch daemon
 #
 
 include $(top_srcdir)/common.mk
 
 INCLUDES = -I$(top_srcdir)/lsf/include
 
-
-sbin_PROGRAMS = mbatchd sbatchd
-mbatchd_SOURCES  = \
-mbd.comm.c mbd.host.c mbd.jgrp.c mbd.main.c mbd.proxy.c mbd.resource.c \
-mbd.dep.c mbd.init.c mbd.job.c mbd.misc.c mbd.queue.c mbd.serv.c \
-mbd.policy.c mbd.grp.c mbd.jarray.c mbd.log.c mbd.requeue.c mbd.window.c \
-elock.c misc.c mail.c daemons.c daemons.xdr.c \
-mbd.h daemonout.h daemons.h jgrp.h proxy.h mbd.profcnt.def 
-
-# Leave for future reference.
-#if SCHED_EXPERIMENTAL
-#mbatchd_SOURCES += mbd.epolicy.c
-#else
-#mbatchd_SOURCES += mbd.policy.c
-#endif
-
-mbatchd_LDADD = ../lib/liblsbatch.a \
-                ../../lsf/lib/liblsf.a \
-                ../../lsf/intlib/liblsfint.a -lm
 if !CYGWIN
-mbatchd_LDADD += -lnsl
+sbatchd_LDADD += -lnsl
 endif
 
+sbin_PROGRAMS = sbatchd
 sbatchd_SOURCES = sbd.comm.c sbd.file.c sbd.job.c sbd.main.c \
                   sbd.misc.c sbd.policy.c sbd.serv.c sbd.sig.c sbd.xdr.c \
                   elock.c mail.c misc.c daemons.c daemons.xdr.c \
@@ -36,11 +18,8 @@ sbatchd_SOURCES = sbd.comm.c sbd.file.c sbd.job.c sbd.main.c \
 
 sbatchd_LDADD = ../lib/liblsbatch.a \
                 ../../lsf/lib/liblsf.a \
-                ../../lsf/intlib/liblsfint.a -lm
-if !CYGWIN
-sbatchd_LDADD += -lnsl
-endif
-
+                ../../lsf/intlib/liblsfint.a \
+				-lm
 etags :
 	etags *.[hc] ../*.h ../lib/*.[hc] ../../lsf/*.h \
   	../../lsf/lib/*.[hc] ../../lsf/intlib/*.[hc]
