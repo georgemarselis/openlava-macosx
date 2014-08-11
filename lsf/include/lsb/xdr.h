@@ -16,13 +16,17 @@
  *
  */
  
+#ifndef LSF_LSB_XDR_H
+#define LSF_LSB_XDR_H
 
 #include <stdio.h>
+
 #include <rpc/types.h>
 #ifndef __XDR_HEADER__
 #include <rpc/xdr.h>
 #endif
-#include "../../lsf/lib/lproto.h"    
+
+#include "lib/lproto.h"
 
 extern bool_t xdr_submitReq(XDR *, 
 			    struct submitReq *, 
@@ -153,3 +157,5 @@ extern bool_t xdr_runJobReq(XDR *,
 extern bool_t xdr_jobAttrReq(XDR *, 
 			    struct jobAttrInfoEnt *, 
 			    struct LSFHeader *);
+
+#endif

@@ -3,8 +3,9 @@
  * D. Knuth Art of Computer Programming Volume 1. 2.2
  *
  */
-#ifndef __LINK__
-#define __LINK__
+
+#ifndef LSF_INTLIB_LINK_H
+#define LSF_INTLIB_LINK_H
 
 /* Each linked list is made of a head whose ptr is always
  * NULL, a list of following links starting from next and
@@ -45,4 +46,4 @@ void     traverseInit(const link_t *,
 		      linkiter_t *);
 void     *traverseLink(linkiter_t *);
 
-#endif /* __LINK__ */
+#endif /* LSF_INTLIB_LINK_H */

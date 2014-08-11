@@ -16,8 +16,8 @@
  *
  */
 
-#ifndef _RESCOM_H_
-#define _RESCOM_H_
+#ifndef LSF_RES_RESCOM_H
+#define LSF_RES_RESCOM_H
 
 
 typedef enum {

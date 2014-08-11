@@ -16,20 +16,21 @@
  *
  */
 
+#ifndef LSF_LSB_LSB_H
+#define LSF_LSB_LSB_H
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
-#include "../../lsf/lsf.h"
-#include "../../lsf/lib/lib.hdr.h"
-#include "../../lsf/lib/lproto.h"
-
-#include "../lsbatch.h"
-
-#include "../daemons/daemonout.h"
 #include <sys/types.h>
 #include <unistd.h>
+
+#include "daemonout.h"
+#include "lib/hdr.h"
+#include "lib/lproto.h"
+#include "lsb/lsbatch.h"
+#include "lsf.h"
+
 
 #ifndef MIN
 #define MIN(x,y)        ((x) < (y) ? (x) : (y))
@@ -106,3 +107,4 @@ extern int chUserRemoveSpoolFile( const char * hostName,
 extern void prtBETime_(struct submit *);
 extern int runBatchEsub(struct lenData *, struct submit *);
 
+#endif

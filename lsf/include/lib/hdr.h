@@ -16,13 +16,14 @@
  *
  */
 
-#ifndef LIB_HDR_H
-#define LIB_HDR_H
+#ifndef LSF_LIB_HDR_H
+#define LSF_LIB_HDR_H
 
 #include <rpc/types.h>
 #ifndef __XDR_HEADER__
 #include <rpc/xdr.h>
 #endif
+
 #include <sys/stat.h>
 
 /* openlava 2.0 header breaks compatibility with
@@ -95,5 +96,6 @@ extern bool_t xdr_stat(XDR *, struct stat *, struct LSFHeader *);
 extern bool_t xdr_lsfAuth(XDR *, struct lsfAuth *, struct LSFHeader *);
 extern int xdr_lsfAuthSize(struct lsfAuth *);
 extern bool_t xdr_jRusage(XDR *, struct jRusage *, struct LSFHeader *);
+
 #endif
 

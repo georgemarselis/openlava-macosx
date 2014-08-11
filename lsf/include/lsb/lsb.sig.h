@@ -16,10 +16,10 @@
  *
  */
 
-#ifndef LSB_SIG_H
-#define LSB_SIG_H
+#ifndef LSF_LSB_SIG_H
+#define LSF_LSB_SIG_H
 
-#include "../lsbatch.h"
+#include "lsbatch.h"
 
 #define SIG_NULL             -65535  
 #define SIG_CHKPNT               -1  

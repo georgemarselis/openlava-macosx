@@ -16,15 +16,15 @@
  *
  */
 
-#ifndef DAEMONS_H
-#define DAEMONS_H
+#ifndef LSF_DAEMONS_H
+#define LSF_DAEMONS_H
 
-#include "../../lsf/lib/lproto.h"
-#include "../../lsf/intlib/intlibout.h"
-#include "../../lsf/lib/lib.table.h"
-#include "../lsbatch.h"
-#include "../../lsf/lib/lib.queue.h"
 #include "daemonout.h"
+#include "intlib/intlibout.h"
+#include "lib/lproto.h"
+#include "lib/queue.h"
+#include "lib/table.h"
+#include "lsb/lsbatch.h"
 
 #ifndef MIN
 #define MIN(x,y)        ((x) < (y) ? (x) : (y))

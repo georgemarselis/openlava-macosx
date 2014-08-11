@@ -16,10 +16,10 @@
  *
  */
 
-#ifndef _ECHKPNT_ENV_H
-#define _ECHKPNT_ENV_H
+#ifndef LSF_CHECKPOINT_ENVIRONMENT_H
+#define LSF_CHECKPOINT_ENVIRONMENT_H
 
-#define ECHKPNT_VAR_FILE 		"/.echkpnt"
+#define LSF_CHECKPOINT_VAR_FILE 		"/echeckpoint.var"
 
 typedef struct varpair{
 	char *m_pVariable; 
@@ -32,8 +32,8 @@ typedef struct varTableItem{
 }VAR_TABLE_ITEM_T;
 
 
-char *getEchkpntVar(const char *);
-int  writeEchkpntVar(const char *, const char *);
+char *getCheckpointVar(const char *);
+int  writeCheckpointVar(const char *, const char *);
 int  fileIsExist(const char *);
 
 void freeTable_();

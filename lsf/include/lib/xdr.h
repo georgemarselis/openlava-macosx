@@ -16,9 +16,10 @@
  *
  */
 
-#ifndef LIB_XDR_H
-#define LIB_XDR_H
-#include "lib.hdr.h"
+#ifndef LSF_LIB_XDR_H
+#define LSF_LIB_XDR_H
+
+#include "lib/hdr.h"
 
 
 

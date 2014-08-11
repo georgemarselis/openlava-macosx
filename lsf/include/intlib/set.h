@@ -16,6 +16,8 @@
  *
  */
 
+#ifndef LSF_INTLIB_SET_H
+#define LSF_INTLIB_SET_H
 
 struct listSet {
     int elem;             
@@ -32,4 +34,4 @@ extern int listSetIn (int, struct listSet *);
 extern struct listSet *listSetInsert (int, struct listSet *);
 extern struct listSet *listSetSub(struct listSet *, struct listSet *);
 
-
+#endif

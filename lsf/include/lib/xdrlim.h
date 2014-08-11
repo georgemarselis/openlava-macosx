@@ -16,10 +16,10 @@
  *
  */
 
-#ifndef LIB_XDRLIM_H
-#define LIB_XDRLIM_H
+#ifndef LSF_LIB_XDRLIM_H
+#define LSF_LIB_XDRLIM_H
 
-#include "lib.hdr.h"
+#include "lib/hdr.h"
 #include "lproto.h"
 
 
@@ -77,5 +77,6 @@ extern bool_t xdr_hostEntry(XDR *,
 extern bool_t xdr_hostName(XDR *,
                            char *,
                            struct LSFHeader *);
-#endif
 
+
+#endif

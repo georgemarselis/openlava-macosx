@@ -17,26 +17,26 @@
  */
 
 
-#ifndef ECHKPNT_LIB_H
-#define ECHKPNT_LIB_H
+#ifndef LSF_CHECKPOINT_CHECKPOINT_H
+#define LSF_CHECKPOINT_CHECKPOINT_H
 
+#include <ctype.h>
 #include <netdb.h>
 #include <string.h>
-#include <ctype.h>
-#include "../lsf/lsf.h"
-#include "../lsf/lib/lproto.h"
+
+#include "lib/lproto.h"
+#include "lsf.h"
 
 
- 
-#define  ECHKPNT_STDOUT_FILE                  "/echkpnt.out"
-#define  ECHKPNT_STDERR_FILE                  "/echkpnt.err"
+#define  ECHKPNT_STDOUT_FILE                  "/echeckpoint.out"
+#define  ECHKPNT_STDERR_FILE                  "/echeckpoint.err"
 #define  ERESTART_STDOUT_FILE                 "/erestart.out"
 #define  ERESTART_STDERR_FILE                 "/erestart.err"
 #define  ECHKPNT_DEFAULT_OUTPUT_FILE          "/dev/null"
 
 
      
-#define  ECHKPNT_PROGRAM                      "echkpnt"
+#define  ECHKPNT_PROGRAM                      "echeckpoint"
 #define  ERESTART_PROGRAM                     "erestart"
 
 
@@ -47,18 +47,18 @@
 #define  ECHKPNT_RESTART_USRCMD               "LSB_ERESTART_USRCMD"
 
 
-#define  ECHKPNT_JOBID			      "LSB_JOBID"         
+#define  ECHKPNT_JOBID			      		"LSB_JOBID"
 #define  ECHKPNT_CHKPNT_DIR                   "LSB_CHKPNT_DIR"
 #define  ECHKPNT_STDERR_FD                    "LSB_STDERR_FD"
 #define  ECHKPNT_JOBFILENAME                  "LSB_CHKFILENAME"
 
-#define  ECHKPNT_ACCT_FILE		      "LSB_ACCT_FILE" 
+#define  ECHKPNT_ACCT_FILE		      		"LSB_ACCT_FILE"
 
 #define  ECHKPNT_OPEN_OUTPUT                  "Y"
 #define  ECHKPNT_OPEN_OUTPUT_L                "y"
 #define  ECHKPNT_DEFAULT_METHOD               "default"
 #define  ECHKPNT_RESTART_CMD_MARK             "LSB_RESTART_CMD="
-#define  ECHKPNT_RESTART_CMD_FILE             ".restart_cmd"
+#define  ECHKPNT_RESTART_CMD_FILE             "restart_cmd"
 #define  ECHKPNT_LOG_FILENAME                 "chkpnt.log"
 #define  PID_MSG_HEADER                       "pid="
 #define  PGID_MSG_HEADER                      "pgid="

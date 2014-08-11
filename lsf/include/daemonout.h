@@ -16,15 +16,15 @@
  *
  */
 
-#ifndef MBDOUT_H
-#define MBDOUT_H
+#ifndef LSF_DAEMONOUT_H
+#define LSF_DAEMONOUT_H
 
-#include "../../lsf/lsf.h"
-#include "../lsbatch.h"
-
-#include "../../lsf/lib/lib.hdr.h"
-#include "../../lsf/lib/lproto.h"
-#include "../lib/lsb.sig.h"
+#include "lib/hdr.h"
+#include "lib/xdr.h"
+#include "lib/lproto.h"
+#include "lib/sig.h"
+#include "lsb/lsbatch.h"
+#include "lsf.h"
 
 #define BATCH_MASTER_PORT   40000
 #define ALL_HOSTS      "all"                
@@ -334,8 +334,6 @@ extern int call_server(char *, ushort, char *, int, char **,
                int *, int);
 
 extern int sndJobFile_(int, struct lenData *); 
-    
-#include "../lib/lsb.xdr.h"
 
 extern struct group *mygetgrnam(const char *);
 extern void freeUnixGrp(struct group *);

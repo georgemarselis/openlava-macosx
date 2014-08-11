@@ -15,11 +15,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
-#ifndef LS_BITSET_H
-#define LS_BITSET_H
 
-#include"../lib/lproto.h"
-#include "list.h"
+
+#ifndef LSF_INTLIB_BITSET_H
+#define LSF_INTLIB_BITSET_H
+
+#include "intlib/list.h"
+#include "lib/lproto.h"
 
 typedef struct _bitsetEvent         LS_BITSET_EVENT_T;
 

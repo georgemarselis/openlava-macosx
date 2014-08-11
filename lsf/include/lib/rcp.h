@@ -16,8 +16,8 @@
  *
  */
  
-#ifndef LIB_RCP_H
-#define LSB_RCP_H
+#ifndef LSF_LIB_RCP_H
+#define LSF_LIB_RCP_H
 
 typedef struct rcpXfer {
     char *szSourceArg;

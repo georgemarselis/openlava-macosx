@@ -16,8 +16,9 @@
  *
  */
 
-#include "badmin.h"
 #include <unistd.h>
+
+#include "badmin/badmin.h"
 
 extern char *myGetOpt (int nargc, char **nargv, char *ostr);
 extern int checkConf (int, int);
@@ -34,7 +35,7 @@ int
 main (int argc, char **argv)
 {
     int cc,  myIndex;
-    char *prompt = "badmin>";
+    const char prompt[] = "badmin> ";
     static char line[MAXLINELEN];
     int rc;
 

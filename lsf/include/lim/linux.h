@@ -19,15 +19,18 @@
  *
  */
 
-#include "lim.common.h"
+#ifndef LSF_LIM_LINUX_H
+#define LSF_LIM_LINUX_H
 
-#include <sys/sysmacros.h>
-#include <sys/statvfs.h>
+#include <dirent.h>
 #include <sys/mount.h>
 #include <sys/stat.h>
-#include <dirent.h>
+#include <sys/statvfs.h>
+#include <sys/sysmacros.h>
 
-#define  CPUSTATES 4
+#include "lim/common.h"
+
+#define CPUSTATES 4
 #define ut_name   ut_user
 
 static char buffer[MSGSIZE];
@@ -521,3 +524,5 @@ getPage(double *page_in, double *page_out,bool_t isPaging)
 
     return 0 ;
 }
+
+#endif

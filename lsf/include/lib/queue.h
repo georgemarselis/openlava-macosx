@@ -16,10 +16,10 @@
  *
  */
 
-#ifndef INCLUDE_LIB_QUEUE_H
-#define INCLUDE_LIB_QUEUE_H
+#ifndef LSF_LIB_QUEUE_H
+#define LSF_LIB_QUEUE_H
 
-#include "../lsf.h"
+#include "lsf.h"
 
 struct lsQueueEntry {
     struct lsQueueEntry *forw;

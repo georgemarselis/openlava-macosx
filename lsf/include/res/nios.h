@@ -16,7 +16,8 @@
  *
  */
 
- 
+ #ifndef LSF_RES_NIOS_H
+ #define LSF_RES_NIOS_H
 
 typedef enum {
     LIB_NIOS_RTASK,
@@ -124,3 +125,5 @@ extern int jobStatusInterval;
 extern int pendJobTimeout;
 extern int msgInterval; 
 
+
+#endif

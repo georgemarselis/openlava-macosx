@@ -16,16 +16,16 @@
  *
  */
 
-#ifndef LPROTO_
-#define LPROTO_
+#ifndef LSF_LIB_LPROTO_H
+#define LSF_LIB_LPROTO_H
 
-#include "../lsf.h"
-#include "lib.table.h"
-#include "lib.hdr.h"
-#include "lib.channel.h"
-#include "../res/resout.h"
-#include "lib.pim.h"
-#include "lsi18n.h"
+#include "intlib/lsi18n.h"
+#include "lib/channel.h"
+#include "lib/hdr.h"
+#include "lib/pim.h"
+#include "lib/table.h"
+#include "lsf.h"
+#include "res/resout.h"
 
 #define BIND_RETRY_TIMES 100
 

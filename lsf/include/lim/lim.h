@@ -19,19 +19,19 @@
  *
  */
 
-#ifndef _LIM_H_
-#define _LIM_H_
+#ifndef LSF_LIM_LIM_H
+#define LSF_LIM_LIM_H
 
-#include "../lsf.h"
-#include "../intlib/intlibout.h"
-#include "../lib/lproto.h"
-#include "limout.h"
-#include "../lib/lib.table.h"
-#include "../lib/lib.hdr.h"
-#include "../lib/lib.xdr.h"
+#include "intlib/intlibout.h"
+#include "lib/hdr.h"
+#include "lib/lproto.h"
+#include "lib/table.h"
+#include "lib/xdr.h"
+#include "lim/limout.h"
+#include "lsf.h"
 
-#define EXCHINTVL 	    15
-#define SAMPLINTVL           5
+#define EXCHINTVL 	          15
+#define SAMPLINTVL            5
 #define HOSTINACTIVITYLIMIT   5
 #define MASTERINACTIVITYLIMIT 2
 #define RESINACTIVITYLIMIT    9

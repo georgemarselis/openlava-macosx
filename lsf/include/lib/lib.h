@@ -16,12 +16,15 @@
  *
  */
 
-#include "../lsf.h"
-#include "../lim/limout.h"
-#include "../res/resout.h"
-#include "lib.hdr.h"
-#include "lib.xdrlim.h"
-#include "lib.xdr.h"
+#ifndef LSF_LIB_LIB_H
+#define LSF_LIB_LIB_H
+
+#include "lsf.h"
+#include "lim/limout.h"
+#include "res/resout.h"
+#include "lib/hdr.h"
+#include "lib/xdrlim.h"
+#include "lib/xdr.h"
 #include "mls.h"
 
 struct taskMsg {
@@ -316,3 +319,4 @@ extern void ls_verrlog(FILE *fd, const char *fmt, va_list ap);
 
 extern int isPamBlockWait ;
 
+#endif

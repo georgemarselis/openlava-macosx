@@ -17,11 +17,15 @@
  *
  */
 
-#include "../lsbatch.h"
+#ifndef LSF_MBD_MDB_H
+#define LSF_MBD_MBD_H
+
 #include "daemonout.h"
 #include "daemons.h"
-#include "../../lsf/intlib/bitset.h"
+#include "intlib/bitset.h"
 #include "jgrp.h"
+#include "lsbatch.h"
+#include "mbd/proxy.h"
 
 #define  DEF_CLEAN_PERIOD     3600
 #define  DEF_MAX_RETRY        5
@@ -1442,7 +1446,6 @@ extern void                 freeIdxListContext(void);
 #define IS_SIBLING(x,y)  ((PARENT(x) == PARENT(y))? TRUE:FALSE)
 
 extern long   schedSeqNo;
-#include "proxy.h"
 
 #define QUEUE_LIMIT(qPtr, i) \
      ((qPtr)->defLimits[i] > 0 ? \
@@ -1503,3 +1506,5 @@ extern struct timeWindow *newTimeWindow (void);
 extern void freeTimeWindow(struct timeWindow *);
 extern void updateTimeWindow(struct timeWindow *);
 extern inline int numofhosts(void);
+
+#endif

@@ -16,6 +16,9 @@
  *
  */
 
+#ifndef LSF_INTLIB_YPARSE_H
+#define LSF_INTLIB_YPARSE_H
+
 #ifndef MIN
 #define MIN(x, y)  ((x) <= (y)) ? (x):(y)
 #endif
@@ -69,3 +72,5 @@ extern void    idxerror(register char *);
 
  
 extern int     checkNameSpec(char *, char **);
+
+#endif

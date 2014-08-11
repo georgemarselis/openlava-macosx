@@ -17,44 +17,45 @@
  *
  */
 
-#ifndef _LSF_H_
-#define _LSF_H_
+#ifndef LSF_H
+#define LSF_H
 
-#include <config.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <errno.h>
-#include <unistd.h>
-#include <math.h>
+#include <arpa/inet.h>
 #include <assert.h>
-#include <syslog.h>
-#include <stdarg.h>
-#include <string.h>
-#include <stdlib.h>
-#include <signal.h>
-#include <netdb.h>
-#include <fcntl.h>
-#include <grp.h>
+#include <config.h>
 #include <ctype.h>
 #include <dirent.h>
-#include <time.h>
-#include <termios.h>
-#include <pwd.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <grp.h>
 #include <limits.h>
-#include <sys/param.h>
-#include <sys/time.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>
-#include <sys/resource.h>
-#include <sys/param.h>
-#include <sys/wait.h>
-#include <sys/mman.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
+#include <math.h>
+#include <netdb.h>
 #include <netinet/in.h>
+#include <pwd.h>
 #include <rpc/types.h>
 #include <rpc/xdr.h>
+#include <signal.h>
+#include <stdarg.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <sys/mman.h>
+#include <sys/param.h>
+#include <sys/param.h>
+#include <sys/resource.h>
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <syslog.h>
+#include <termios.h>
+#include <time.h>
+#include <unistd.h>
+
 #if !defined(__CYGWIN__)
 #include <rpcsvc/ypclnt.h>
 #endif

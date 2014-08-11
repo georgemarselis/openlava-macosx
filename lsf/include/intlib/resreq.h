@@ -16,6 +16,9 @@
  *
  */
 
+#ifndef LSF_INTLIB_RESREQ_H
+#define LSF_INTLIB_RESREQ_H
+
 #define IS_DIGIT(s)  ( (s) >= '0' && (s) <= '9')
 #define IS_LETTER(s) ( ((s) >= 'a' && (s) <= 'z') || \
 		       ((s) >= 'A' && (s) <= 'Z'))
@@ -64,3 +67,5 @@ struct resVal {
 };
 
 extern int getValPair(char **resReq, int *val1, int *val2);
+
+#endif

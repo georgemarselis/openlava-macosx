@@ -1,6 +1,6 @@
 
-#ifndef _LIST_
-#define _LIST_
+#ifndef LSF_INTLIB_LIST2_H
+#define LSF_INTLIB_LIST2_H
 
 struct list_ {
     struct list_   *forw;
@@ -32,4 +32,4 @@ struct list_ *listpop(struct list_ *);
 extern struct list_ *listdeque(struct list_ *);
 extern void listfree(struct list_ *, void (*f)(void *));
 
-#endif /* _LIST_ */
+#endif /* LSF_INTLIB_LIST2_H */

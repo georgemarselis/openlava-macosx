@@ -16,8 +16,8 @@
  *
  */
 
-#ifndef _LIB_TABLE_H_
-#define _LIB_TABLE_H_
+#ifndef LSF_LIB_TABLE_H
+#define LSF_LIB_TABLE_H
 
 #define RESETFACTOR     2
 #define RESETLIMIT      1.5
@@ -103,6 +103,8 @@ extern hEnt   *h_firstEnt_(hTab *, sTab *);
 extern hEnt   *h_nextEnt_(sTab *);
 extern void   h_freeRefTab_(hTab *);
 extern void   h_delRef_(hTab *, hEnt *);
+
+
 #endif
 
 

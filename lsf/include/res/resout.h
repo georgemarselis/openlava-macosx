@@ -16,14 +16,16 @@
  *
  */
 
-#ifndef _RESOUT_H_
-#define _RESOUT_H_
-
-#include <termios.h>
-#include "../lib/lib.hdr.h"
-
-
+#ifndef LSF_RES_RESOUT_H
+#define LSF_RES_RESOUT_H
+ 
 #include <sys/ioctl.h>
+#include <termios.h>
+
+#include "lib/hdr.h"
+#include "lib/xdrres.h"
+
+
 
 #if !defined(TIOCGWINSZ)
 struct winsize {
@@ -224,6 +226,7 @@ struct resSignal {
 #define LS_WIFSIGNALED(x)       ((int)((*(int *)&x)&0xFF) > 0 && \
                                     (int)((*(int *)&x)&0xFF00) == 0)
 #else
+
 #define SETTERMSIG(x,y) (x).w_termsig = (y)
 #define SETSTOPSIG(x,y) (x).w_stopsig = (y)
 #define LS_WTERMSIG WTERMSIG
@@ -233,7 +236,5 @@ struct resSignal {
 #define LS_WIFSTOPPED WIFSTOPPED
 #define LS_WIFSIGNALED WIFSIGNALED
 #endif
-
-#include "../lib/lib.xdrres.h"
 
 #endif

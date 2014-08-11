@@ -15,10 +15,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
-#ifndef CHANNEL_H
-#define CHANNEL_H
+#ifndef LSF_LIB_CHANNEL_H
+#define LSF_LIB_CHANNEL_H
+
 #include <sys/types.h>
-#include "lib.hdr.h"
+
+#include "lib/hdr.h"
 
 
 enum chanState {CH_FREE,

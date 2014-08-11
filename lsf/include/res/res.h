@@ -16,25 +16,25 @@
  *
  */
 
-#ifndef _RES_H_
-#define _RES_H_
+#ifndef LSF_RES_RES_H
+#define LSF_RES_RES_H
 
-#include <stdio.h>
 #include <rpc/types.h>
 #include <rpc/xdr.h>
+#include <stdio.h>
 
-#include "../lsf.h"
+#include "intlib/intlibout.h"
+#include "lib/lproto.h"
+#include "lib/osal.h"
+#include "lib/xdr.h"
+#include "lsf.h"
+#include "res/rescom.h"
 
-#include "../intlib/intlibout.h"
-#include "../lib/lproto.h"
-#include "../lib/lib.osal.h"
-#include "../lib/lib.xdr.h"
-#include "rescom.h"
+#ifndef _BSD
+#define _BSD
+#endif
 
-# if !defined(_BSD)
-# define _BSD
-# endif
-
+#endif
 
 
 

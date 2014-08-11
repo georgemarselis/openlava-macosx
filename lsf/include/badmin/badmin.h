@@ -16,12 +16,15 @@
  *
  */
 
+#ifndef LSF_BADMIN_BADMIN_H
+#define LSF_BADMIN_BADMIN_H
 
 #include <ctype.h>
-#include "cmd.h"
-#include "../../lsf/lsf.h"
-#include "../../lsf/intlib/intlibout.h"
  
+#include "cmd.h"
+#include "intlib/intlibout.h"
+#include "lsf.h"
+
 extern int bhc (int argc, char **argv, int opCode);
 extern int bqc (int argc, char **argv, int opCode);
 extern int breconfig (int argc, char **argv, int configFlag);
@@ -154,9 +157,12 @@ static char *cmdInfo[] = {
 };
 
 #ifdef  I18N_COMPILE
-static int cmdInfo_ID[] = { 
-	3101, 3102, 3103, 3104, 3105, 3106, 3107, 3108, 3109, 3110, 
-	3111, 3112, 3113, 3114, 3115, 3116, 3117, 3122,
-	3118, 3119, 3120, 3120, 3121
-};
-#endif
+  static int cmdInfo_ID[] = {
+    3101, 3102, 3103, 3104, 3105, 3106, 3107, 3108, 3109, 3110,
+    3111, 3112, 3113, 3114, 3115, 3116, 3117, 3122,
+    3118, 3119, 3120, 3120, 3121
+  };
+
+#endif /* I18N_COMPILE */
+
+#endif /* LSF_BADMIN_BADMIN_H */

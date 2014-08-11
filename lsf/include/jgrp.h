@@ -16,6 +16,9 @@
  *
  */
 
+ #ifndef LSF_JGRP_H
+ #define LSF_JGRP_H
+
 #define DESTROY_REF(x, y) { \
      y(x);\
      x = NULL;\
@@ -140,3 +143,5 @@ extern int    updLocalJData(struct jData *, struct jData *);
 extern int    localizeJobElement(struct jData *);
 extern int    localizeJobArray(struct jData *);
 
+
+#endif

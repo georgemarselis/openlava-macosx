@@ -16,8 +16,8 @@
  *
  */
 
-#ifndef _LIB_PIM_H_
-#define _LIB_PIM_H_
+#ifndef LSF_PIM_PIM_H
+#define LSF_PIM_PIM_H
 
 #include <time.h>
 

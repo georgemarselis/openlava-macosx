@@ -17,10 +17,12 @@
  */
 
 
-#ifndef _LS_I18N_H
-#define _LS_I18N_H
+#ifndef LS_I18N_H
+#define LS_I18N_H
 
 #include <sys/types.h>
+
+
 #define LS_CATD int
 
 #define I18N_CAT_MIN			1

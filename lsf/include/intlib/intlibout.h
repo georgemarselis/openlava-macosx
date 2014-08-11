@@ -16,13 +16,16 @@
  *
  */
 
-#include "../lsf.h"
-#include "resreq.h"
-#include "lsftcl.h"
-#include "bitset.h"
-#include "listset.h"
-#include "list2.h"
-#include "link.h"
+#ifndef LSF_INTLIB_INTLIBOUT_H
+#define LSF_INTLIB_INTLIBOUT_H
+
+#include "intlib/bitset.h"
+#include "intlib/link.h"
+#include "intlib/list2.h"
+#include "intlib/listset.h"
+#include "intlib/lsftcl.h"
+#include "intlib/resreq.h"
+#include "lsf.h"
 
 #define MINPASSWDLEN_LS		(3)
 #define EXIT_NO_ERROR 		(0)
@@ -119,3 +122,5 @@ extern void displayShareResource(int, char **, int, int, int);
 extern int makeShareField(char *, int, char ***, char ***, char ***);
 extern char *getMAC(int *length);
 extern char *mac2hex(char *mac, int len);
+
+#endif

@@ -16,9 +16,10 @@
  *
  */
 
-#ifndef LSBATCH_H
-#define LSBATCH_H
-#include <lsf.h>
+#ifndef LSF_LSB_LSBATCH_H
+#define LSF_LSB_LSBATCH_H
+
+#include "lsf.h"
 
 #define _PATH_NULL      "/dev/null"
 

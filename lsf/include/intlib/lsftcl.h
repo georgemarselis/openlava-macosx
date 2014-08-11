@@ -15,6 +15,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
+
+#ifndef LSF_INTLIB_LSFTCL_H
+#define LSF_INTLIB_LSFTCL_H
+
 typedef struct {
     char   *name;
     int    clientData;
@@ -78,3 +82,5 @@ struct tclLsInfo {
 extern int initTcl(struct tclLsInfo *);
 extern void freeTclLsInfo(struct tclLsInfo *, int);
 extern int evalResReq(char *, struct tclHostData *, char);
+
+#endif

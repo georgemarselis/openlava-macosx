@@ -16,19 +16,22 @@
  *
  */
 
+#ifndef LSF_CMD_H
+#define LSF_CMD_H
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <time.h>
-#include "../../lsf/lsf.h"
-#include "../../lsf/lib/lib.hdr.h"
-#include "../lsbatch.h"
 
-#include "../../lsf/lib/lproto.h"
-#include "../../lsf/lib/lib.table.h"
-#include "../../lsf/lib/mls.h"
+#include "lib/hdr.h"
+#include "lib/lproto.h"
+#include "lib/mls.h"
+#include "lib/table.h"
+#include "lsb/lsbatch.h"
+#include "lsf.h"
 
 #define MIN_CPU_TIME 0.0001 
 
@@ -126,3 +129,5 @@ extern int searchEventFile(struct histReq *, int *);
 extern int bmsg(int, char **);
 
 extern void bmove (int, char **, int);
+
+#endif

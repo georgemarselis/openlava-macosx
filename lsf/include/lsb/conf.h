@@ -15,8 +15,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
-#ifndef LSB_CONF_H
-#define LSB_CONF_H
+
+#ifndef LSF_LSB_CONF_H
+#define LSF_LSB_CONF_H
 
 #define TYPE1  RESF_BUILTIN | RESF_DYNAMIC | RESF_GLOBAL
 #define TYPE2  RESF_BUILTIN | RESF_GLOBAL
@@ -78,4 +79,4 @@ static char parseNqsQueues(struct queueInfoEnt *, char *, char *, int *);
 static int my_atoi(char *, int, int);
 static float my_atof (char *, float, float);
 
-#endif  
+#endif

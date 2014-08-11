@@ -16,10 +16,13 @@
  *
  */
 
+#ifndef LSF_LSB_LOG_H
+#define LSF_LSB_LOG_H
+
 #include <string.h>
 #include <stdlib.h>
 
-#include "lsb.h"
+#include "lsb/lsb.h"
 
 #define MAXFILENAMELEN          256  
 #define MAXVERSIONLEN            12  
@@ -151,3 +154,4 @@ extern int putEventRec(FILE *, struct eventRec *);
 extern struct eventRec *getEventRec(char *);
 extern char *getNextValue0(char **line, char, char);
 
+#endif

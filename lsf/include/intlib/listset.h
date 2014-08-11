@@ -16,6 +16,9 @@
  *
  */
 
+#ifndef LSF_INTLIB_LISTSET_H
+#define LSF_INTLIB_LISTSET_H
+
 struct listSet {
     long            elem;             
     struct listSet *next;  
@@ -49,3 +52,5 @@ extern long  *listSetIteratorEnd(struct listSetIterator   *);
 extern long  *listSetIteratorGetNext(struct listSetIterator *);
 extern void  listSetIteratorDestroy(struct listSetIterator *);
 extern void  listSetIteratorDetach(struct listSetIterator *);
+
+#endif

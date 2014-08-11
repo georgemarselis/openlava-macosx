@@ -16,8 +16,8 @@
  *
  */
  
-#ifndef LSB_SPOOL_H
-#define LSB_SPOOL_H
+#ifndef LSF_LSB_SPOOL_H
+#define LSF_LSB_SPOOL_H
 
 typedef enum spoolOptions  {
     SPOOL_INPUT_FILE,

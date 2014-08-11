@@ -16,21 +16,20 @@
  *
  */
 
-#ifndef _LSF_OSAL_H_
-#define _LSF_OSAL_H_
+#ifndef LSF_LIB_OSAL_H
+#define LSF_LIB_OSAL_H
 
-#include <stdlib.h>
+#include <errno.h>
+#include <pwd.h>
+#include <signal.h>
 #include <stdio.h>
-
-#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/resource.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#include <sys/resource.h>
 #include <sys/wait.h>
-#include <string.h>
-#include <signal.h>
-#include <pwd.h>
-#include <errno.h>
+#include <unistd.h>
 
 typedef int LS_ULONG_T;
 typedef int LS_ID_T;

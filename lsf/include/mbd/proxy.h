@@ -16,8 +16,8 @@
  *
  */
 
-#ifndef _MBD_INCLUDE_PROXY_H_
-#define _MBD_INCLUDE_PROXY_H_
+#ifndef LSF_MBD_PROXY_H
+#define LSF_MBD_PROXY_H
 
 
 typedef struct proxyListEntry      PROXY_LIST_ENTRY_T;

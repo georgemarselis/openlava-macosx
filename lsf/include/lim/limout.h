@@ -17,10 +17,11 @@
  *
  */
 
-#ifndef LIMOUT_H
-#define LIMOUT_H
+#ifndef LSF_LIM_LIMOUT_H
+#define LSF_LIM_LIMOUT_H
 
-#include "../lib/lib.hdr.h"
+#include "lib/hdr.h"
+#include "lib/xdrlim.h"
 
 enum ofWhat {OF_ANY, OF_HOSTS, OF_TYPE};
 
@@ -258,8 +259,5 @@ struct limLock {
     time_t time;
     char lsfUserName[MAXLSFNAMELEN];
 };
-
-
-#include "../lib/lib.xdrlim.h"
 
 #endif

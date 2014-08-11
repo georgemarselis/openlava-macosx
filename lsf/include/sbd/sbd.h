@@ -15,26 +15,29 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
-#include <unistd.h>
-#include <stdio.h>
+
+#ifndef LSF_SBD_SDB_H
+#define LSF_SBD_SDB_H
+
+
+#include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <ctype.h>
 #include <pwd.h>
+#include <stdio.h>
 #include <string.h>
-
 #include <sys/ioctl.h>
-
-#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/wait.h>
 #include <sys/resource.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
-#include "../lib/lsb.h"
 #include "daemonout.h"
 #include "daemons.h"
-#include "../../lsf/lib/lib.rf.h"
-#include "../../lsf/lib/lib.osal.h"
+#include "lib/osal.h"
+#include "lib/rf.h"
+#include "lsb/lsb.h"
 
 #define NULLFILE "/dev/null"
 #define JOBFILEEXT ""
@@ -323,4 +326,4 @@ extern int sbdCheckUnreportedStatus();
 extern void exeActCmd(struct jobCard *jp, char *actCmd, char *exitFile);
 extern void exeChkpnt(struct jobCard *jp, int chkFlags, char *exitFile);
 
-
+#endif

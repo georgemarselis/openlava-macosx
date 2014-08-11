@@ -16,6 +16,9 @@
  *
  */
 
+#ifndef LSF_LIB_OSUX_H
+#define LSF_LIB_OSUX_H
+
 int                                     
 procStart_( char* argv[],               
             char* envp[],               
@@ -306,4 +309,4 @@ getEnvVar_( char* name,
     }
 }
 
-
+#endif

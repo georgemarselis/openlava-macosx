@@ -16,16 +16,15 @@
  *
  */
 
-#ifndef LIB_XDRRES_H
-#define LIB_XDRRES_H
-
-#include "lib.hdr.h"
+#ifndef LSF_LIB_XDRRES_H
+#define LSF_LIB_XDRRES_H
 
 #ifndef __XDR_HEADER__
 #include <rpc/xdr.h>
 #endif
 
-#include "lib.rf.h"
+#include "lib/hdr.h"
+#include "lib/rf.h"
 
 extern int xdr_resConnect(XDR *, struct resConnect *, struct LSFHeader *);
 extern int xdr_resCmdBill(XDR *, struct resCmdBill *, struct LSFHeader *);
@@ -45,4 +44,4 @@ extern bool_t xdr_ropenReq (XDR *, struct ropenReq *, struct LSFHeader *);
 extern bool_t xdr_rrdwrReq (XDR *, struct rrdwrReq *, struct LSFHeader *);
 extern bool_t xdr_rlseekReq (XDR *, struct rlseekReq *, struct LSFHeader *);
 
-#endif 
+#endif
