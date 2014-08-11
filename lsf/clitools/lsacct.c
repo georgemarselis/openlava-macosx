@@ -16,19 +16,19 @@
  *
  */
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <time.h>
 #include <float.h>
 #include <netdb.h>
-#include "../lsf.h"
-#include "../lib/lsi18n.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <time.h>
+#include <unistd.h>
 
-#include "../lib/lproto.h"
+#include "lib/lproto.h"
+#include "lsf.h"
+#include "lsi18n.h"
 
 struct interval {
     time_t begin;

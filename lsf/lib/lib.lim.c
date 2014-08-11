@@ -20,8 +20,9 @@
  */
 
 #include <unistd.h>
-#include "lib.h"
-#include "lproto.h"
+
+#include "lib/lib.h"
+#include "lib/lproto.h"
 
 #define MAXMSGLEN  32*MSGSIZE
 #define CONNECT_TIMEOUT 3

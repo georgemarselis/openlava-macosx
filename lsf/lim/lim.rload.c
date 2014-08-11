@@ -17,16 +17,17 @@
  */
 
 
-#include <sys/types.h>
-#include <sys/wait.h>
-#include "lim.h"
 #include <math.h>
-#include <sys/wait.h>
-#include <sys/types.h>
 #include <signal.h>
+#include <sys/types.h>
+#include <sys/types.h>
 #include <sys/utsname.h>
-#include "../lib/mls.h"
+#include <sys/wait.h>
+#include <sys/wait.h>
 #include <unistd.h>
+
+#include "lib/mls.h"
+#include "lim.h"
 
 #define NL_SETN 24
 

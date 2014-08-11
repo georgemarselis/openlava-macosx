@@ -18,9 +18,11 @@
  */
 
 #include <stdio.h>
-#include "lib.h"
-#include "lproto.h"
-#include "lib.table.h"
+
+
+#include "lib/lib.h"
+#include "lib/lproto.h"
+#include "lib/table.h"
 
 static hEnt           *h_findEnt(const char *, struct hLinks *);
 static unsigned int   getAddr(hTab *, const char *);

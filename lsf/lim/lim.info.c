@@ -16,9 +16,9 @@
  *
  */
 
+#include "lib/lproto.h"
+#include "lib/xdr.h"
 #include "lim.h"
-#include "../lib/lib.xdr.h"
-#include "../lib/lproto.h"
 
 #define NL_SETN 24
 

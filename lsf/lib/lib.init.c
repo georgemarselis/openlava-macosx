@@ -15,15 +15,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
+
+#include <ctype.h>
+#include <fcntl.h>
+#include <pwd.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <ctype.h>
-#include <pwd.h>
 
-#include "lib.h"
-#include "lproto.h"
-#include "lib.queue.h"
+#include "lib/lib.h"
+#include "lib/lproto.h"
+#include "lib/queue.h"
 #include "mls.h"
 
 #define NL_SETN 23

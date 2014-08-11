@@ -16,18 +16,18 @@
  *
  */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <ctype.h>
-#include <sys/types.h>
-#include <netdb.h>
-#include "../lsf.h"
-
-#include "../lib/lproto.h"
-#include "../intlib/intlibout.h"
-
 #include <math.h>
+#include <netdb.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+
+#include "intlib/intlibout.h"
+#include "lib/lproto.h"
+#include "lsf.h"
+
 
 #define NL_SETN 27
 

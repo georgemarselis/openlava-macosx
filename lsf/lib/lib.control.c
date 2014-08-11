@@ -19,10 +19,11 @@
  *
  */
 
-#include "lib.h"
 #include <unistd.h>
-#include "lib.xdr.h"
-#include "lproto.h"
+
+#include "lib/lib.h" 
+#include "lib/lproto.h"
+#include "lib/xdr.h"
 
 int
 ls_limcontrol(char *hname, int opCode)

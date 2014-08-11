@@ -16,23 +16,22 @@
  *
  */
 
-#include <unistd.h>
+#include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <netdb.h>
 #include <string.h>
-#include <errno.h>
-#include <time.h>
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
+#include <sys/types.h>
+#include <time.h>
+#include <unistd.h>
 
-#include <dirent.h>
-
+#include "lib/lproto.h"
+#include "lib/mls.h"
+#include "lib/rcp.h"
 #include "lsb.h"
-#include "lsb.spool.h"
-#include "../../lsf/lib/lproto.h"
-#include "../../lsf/lsf.h"
-#include "../../lsf/lib/lib.rcp.h"
-#include "../../lsf/lib/mls.h"
+#include "lsb/spool.h"
+#include "lsf.h"
 
 extern char **environ;
 const char *defaultSpoolDir = NULL;

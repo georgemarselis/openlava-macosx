@@ -16,20 +16,17 @@
  *
  */
 
-
-#include "../lsf.h"
 #if defined(__CYGWIN__)
-#include <ncurses/curses.h>
+	#include <ncurses/curses.h>
 #else
-#include <curses.h>
+	#include <curses.h>
 #endif
 
-#include "../lib/lsi18n.h"
+#include "lib/lproto.h"
+#include "lib/lsi18n.h"
+#include "lsf.h"
 
 extern void (*Signal_ (int, void (*)(int)))(int);
-
-#include "../lib/lproto.h"
-
 extern int makeFields(struct hostLoad *, char *loadval[], char **);
 extern void *formatHeader(char **, char);
 extern char **filterToNames(char *);

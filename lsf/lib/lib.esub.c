@@ -21,11 +21,12 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <pwd.h>
-#include "lib.h"
+
+#include "lib/lib.h"
+#include "lib/lproto.h"
 #include "mls.h"
-#include "../res/nios.h"
-#include "../res/resout.h"
-#include "lproto.h"
+#include "res/nios.h"
+#include "res/resout.h"
 
 #define exit(a)         _exit(a)
 

@@ -16,9 +16,9 @@
  *
  */
 
-#include "lib.h"
-#include "lproto.h"
-#include "lib.xdr.h"
+#include "lib/lib.h"
+#include "lib/lproto.h"
+#include "lib/xdr.h"
 
 char **
 ls_placereq(char *resreq, int *numhosts, int options, char *fromhost)

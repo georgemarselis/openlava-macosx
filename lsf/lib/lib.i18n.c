@@ -19,9 +19,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../lib/lproto.h" 
-#include "../lsf.h" 
-#include "lsi18n.h" 
+
+#include "lib/lproto.h"
+#include "lsf.h"
+#include "lsi18n.h"
 
 int I18nRunningFlag = 0;
 int I18nInitFlag = 0;

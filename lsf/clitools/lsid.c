@@ -20,10 +20,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "../lsf.h"
 
-#include "../lib/lib.table.h"
-#include "../lib/lproto.h"
+#include "lsf.h"
+#include "lib/table.h"
+#include "lib/lproto.h"
 
 static void usage(char *);
 extern int errLineNum_;

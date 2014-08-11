@@ -16,14 +16,15 @@
  *
  */
  
-#include <stdio.h>    
-#include "../lsf/lib/lproto.h"
-#include "../lsf/lib/lib.h"
-#include "../lsf/intlib/intlibout.h"
-#include "../lsf/lsf.h"
-
+#include <stdio.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
+#include "intlib/intlibout.h"
+#include "lib/lib.h"
+#include "lib/lproto.h"
+#include "lsf.h"
+
 
 #if defined(DEBUG)
 FILE *logfp;

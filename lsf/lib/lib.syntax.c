@@ -17,9 +17,10 @@
  */
 
 #include <string.h>
-#include "lib.h"
-#include "lib.xdr.h"
-#include "lproto.h"
+
+#include "lib/lib.h"
+#include "lib/xdr.h"
+#include "lib/lproto.h"
 
 int
 expSyntax_(char *resReq)

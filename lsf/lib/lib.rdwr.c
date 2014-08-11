@@ -15,11 +15,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
-#include <sys/time.h>
+
 #include <errno.h>
+#include <sys/time.h>
 #include <unistd.h>
-#include "lib.h"
-#include "lproto.h"
+
+#include "lib/lib.h"
+#include "lib/lproto.h"
 
 #define IO_TIMEOUT	2000
 

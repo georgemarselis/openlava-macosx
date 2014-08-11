@@ -16,9 +16,10 @@
  *
  */
 
-#include "lib.h"
-#include "lib.xdr.h"
-#include "lproto.h"
+#include "lib/lib.h"
+#include "lib/lproto.h"
+#include "lib/xdr.h"
+
 #define LOAD_INFO_THRESHOLD 75
 
 struct hostLoad *loadinfo_(char *resReq, struct decisionReq *loadReqPtr, char *fromhost, int *numHosts, char ***outnlist);

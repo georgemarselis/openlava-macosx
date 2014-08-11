@@ -17,9 +17,10 @@
  */
 
 #include <limits.h>
-#include "lib.h"
-#include "lib.xdr.h"
-#include "lproto.h"
+
+#include "lib/lib.h"
+#include "lib/xdr.h"
+#include "lib/lproto.h"
 
 extern int currentSN;
 

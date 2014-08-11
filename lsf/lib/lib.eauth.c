@@ -15,18 +15,20 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
-#include <stdlib.h>
-#include <fcntl.h>
-#include <termios.h>
-#include <limits.h>
-#include <sys/wait.h>
-#include <pwd.h>
-#include "lib.h"
-#include "mls.h"
-#include "../res/nios.h"
-#include "../res/resout.h"
-#include "lproto.h"
+
 #include <arpa/inet.h>
+#include <fcntl.h>
+#include <limits.h>
+#include <pwd.h>
+#include <stdlib.h>
+#include <sys/wait.h>
+#include <termios.h>
+
+#include "lib/lib.h"
+#include "lib/lproto.h"
+#include "mls.h"
+#include "res/nios.h"
+#include "res/resout.h"
 
 #define exit(a)         _exit(a)
 

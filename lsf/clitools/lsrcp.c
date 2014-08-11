@@ -15,29 +15,30 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
+
+#include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <netdb.h>
+#include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <netdb.h>
-#include <time.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <dirent.h>
-#include <unistd.h>
 #include <string.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <pwd.h>
-#include "../lib/lproto.h"
-#include "../lsf.h"
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <time.h>
+#include <unistd.h>
 
-#include "../lib/lib.rcp.h"
+#include "lib/lproto.h"
+#include "lib/rcp.h"
+#include "lsf.h"
 
-extern void usage(char *cmd);
+extern void usage( char *cmd);
 
-extern int mystat_(char *, struct stat *, struct hostent *);
-extern int myopen_(char *, int, int, struct hostent *);
+extern int mystat_( char *, struct stat *, struct hostent * );
+extern int myopen_( char *, int, int, struct hostent * );
 
 extern char **environ;
 
@@ -46,13 +47,12 @@ extern char **environ;
 #define LSRCP_MSGSIZE   1048576
 
 void displayXfer( lsRcpXfer *lsXfer );
-void doXferUsage(void);
+void doXferUsage( void );
 int createXfer( lsRcpXfer *lsXfer );
 int destroyXfer( lsRcpXfer *lsXfer );
 int doXferOptions( lsRcpXfer *lsXfer, int argc, char *argv[] );
 
-int
-main( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
 
     lsRcpXfer lsXfer;

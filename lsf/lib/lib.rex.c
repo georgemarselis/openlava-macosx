@@ -16,15 +16,16 @@
  *
  */
 
+#include <pwd.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <pwd.h>
-#include "lib.h"
-#include "lproto.h"
-#include "mls.h"
+
+#include "lib/lib.h"
+#include "lib/lproto.h"
+#include "lib/mls.h"
 
 extern int currentSN;
-
+
 int
 ls_rexecve(char *host, char **argv, int options, char **envp)
 {

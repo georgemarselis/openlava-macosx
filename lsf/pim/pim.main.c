@@ -17,9 +17,9 @@
  *
  */
 
-#include "../lsf.h"
-#include "../lib/lproto.h"
-#include "../intlib/intlibout.h"
+#include "lsf.h"
+#include "lib/lproto.h"
+#include "intlib/intlibout.h"
 
 static struct lsPidInfo pbase[MAX_PROC_ENT];
 static int numprocs;

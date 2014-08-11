@@ -15,8 +15,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
-#include "lib.h"
-#include "lproto.h"
+
+#include "lib/lib.h"
+#include "lib/lproto.h"
 
 char *
 getNextLine_(FILE *fp, int confFormat)

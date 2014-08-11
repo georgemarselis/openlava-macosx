@@ -17,16 +17,21 @@
  *
  */
 
-#include "../lsf.h"
-#include "resreq.h"
-#if defined(HAVE_TCL_TCL_H)
-#include <tcl/tcl.h>
-#endif
+#include "intlib/lsftcl.h"
+#include "lib/lproto.h"
+#include "lsf.h"
+#include "res/resreq.h"
+
 #if defined(HAVE_TCL_H)
 #include <tcl.h>
 #endif
-#include "lsftcl.h"
-#include "../lib/lproto.h"
+
+#if defined(HAVE_TCL_TCL_H)
+#include <tcl/tcl.h>
+#endif
+
+
+
 
 static struct tclHostData   *hPtr;
 static struct Tcl_Interp    *globinterp;

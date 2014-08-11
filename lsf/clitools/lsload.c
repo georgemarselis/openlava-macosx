@@ -17,10 +17,10 @@
  */
 
 
-#include "../lsf.h"
-#include "../lib/lib.table.h"
-#include "../lib/lproto.h"
-#include "../intlib/intlibout.h"
+#include "intlib/intlibout.h"
+#include "lib/lproto.h"
+#include "lib/table.h"
+#include "lsf.h"
 
 #define MAXLISTSIZE 256
 

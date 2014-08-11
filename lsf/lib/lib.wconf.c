@@ -15,13 +15,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
+
 #include <pwd.h>
 #include <grp.h>
-#include "lib.h"
-#include "lproto.h"
-#include "lib.words.h"
 #include <ctype.h>
 #include <stdio.h>
+
+#include "lib/lib.h"
+#include "lib/lproto.h"
+#include "lib/words.h"
 
 #define NL_SETN   23   
 

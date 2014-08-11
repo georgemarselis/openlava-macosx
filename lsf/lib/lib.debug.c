@@ -16,11 +16,11 @@
  *
  */
 
-#include <unistd.h>
 #include <fcntl.h>
+#include <unistd.h>
 
-#include "lib.h"
-#include "lproto.h"
+#include "lib/lib.h"
+#include "lib/lproto.h"
 
 int
 ls_initdebug (char *appName)

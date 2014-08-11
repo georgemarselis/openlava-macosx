@@ -16,32 +16,33 @@
  *
  */
 
-#include <stdio.h>
-#include <ctype.h>
-#include <sys/types.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
-#include <unistd.h>
+#include <ctype.h>
+#include <errno.h>
 #include <fcntl.h>
-#include <sys/signal.h>
-#include <unistd.h>
+#include <fcntl.h>
+#include <grp.h>
+#include <netinet/in.h>
+#include <pwd.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <stdlib.h>
 #include <string.h>
-#include <fcntl.h>
-#include <pwd.h>
-#include <sys/time.h>
-#include <errno.h>
+#include <sys/signal.h>
 #include <sys/stat.h>
+#include <sys/time.h>
+#include <sys/types.h>
 #include <sys/wait.h>
-#include <grp.h>
-#include <stdlib.h>
-#include "res.h"
-#include "resout.h"
-#include "../lib/lproto.h"
-#include "../lib/mls.h"
+#include <unistd.h>
+#include <unistd.h>
 #ifdef __sun__
 #include <sys/ptyvar.h>
 #endif
+
+#include "lib/lproto.h"
+#include "lib/mls.h"
+#include "res/res.h"
+#include "res/resout.h"
 
 #define NL_SETN         29
 #define CHILD_DELETED     2

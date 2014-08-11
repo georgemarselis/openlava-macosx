@@ -15,14 +15,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
+
+#include <fcntl.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+
 #include "lib.h"
-#include "lib.xdrres.h"
+#include "lib/rf.h"
+#include "lib/xdrres.h"
 #include "lproto.h"
-#include "lib.rf.h"
 
 bool_t 
 xdr_resCmdBill (XDR *xdrs, struct resCmdBill *cmd, struct LSFHeader *hdr)

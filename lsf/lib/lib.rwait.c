@@ -16,14 +16,15 @@
  *
  */
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/wait.h>
 #include <pwd.h>
-#include "lib.h"
-#include "../res/nios.h"
-#include "../res/resout.h"
-#include "lproto.h"
+#include <stdlib.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+#include "lib/lib.h"
+#include "lib/lproto.h"
+#include "res/nios.h"
+#include "res/resout.h"
 
 #define SIGEMT SIGBUS
 

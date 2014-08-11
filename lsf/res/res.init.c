@@ -16,20 +16,20 @@
  *
  */
 
-#include <stdio.h>
-#include <sys/types.h>
+#include <fcntl.h>
 #include <netinet/in.h>
+#include <stdio.h>
+#include <string.h>
 #include <sys/file.h>
 #include <sys/stat.h>
-#include <fcntl.h>
 #include <sys/time.h>
-#include <string.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 
-#include "res.h"
-#include "../lib/lproto.h"
-#include "../lib/mls.h"
+#include "res/res.h"
+#include "lib/lproto.h"
+#include "lib/mls.h"
 
 #define RES_TIMEOUT_DEFAULT 	60
 

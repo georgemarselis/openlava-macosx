@@ -28,14 +28,15 @@
 #include <ctype.h>
 #include <errno.h>
 #include <sys/wait.h>
-#include "../lsf.h"
-#include "../../lsbatch/lsbatch.h"
 #include <setjmp.h>
-#include "../lib/mls.h"
-#include "res.h"
-#include "nios.h"
-#include "resout.h"
-#include "../lib/lproto.h"
+
+#include "lib/lproto.h"
+#include "lib/mls.h"
+#include "lsbatch/lsbatch.h"
+#include "lsf.h"
+#include "res/nios.h"
+#include "res/res.h"
+#include "res/resout.h"
 
 #define NL_SETN         29
 

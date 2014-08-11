@@ -20,9 +20,10 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <netinet/in.h>
-#include "lib.h"
-#include "../res/resout.h"
-#include "lproto.h"
+
+#include "lib/lib.h"
+#include "lib/lproto.h"
+#include "res/resout.h"
 
 #ifndef VREPRINT
 #define VREPRINT VRPRNT

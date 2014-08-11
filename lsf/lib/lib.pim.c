@@ -16,15 +16,16 @@
  *
  */
 
-#include <unistd.h>
+#include <netdb.h>
+#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include "../lsf.h"
-#include "lproto.h"
+#include <unistd.h>
+
+#include "lib/lproto.h"
+#include "lsf.h"
 
 #define NL_SETN   23
 static struct config_param pimParams[] =

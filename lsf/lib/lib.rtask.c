@@ -16,18 +16,19 @@
  *
  */
 
+#include <pwd.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <pwd.h>
-#include "../lsf.h"
-#include "lib.h"
-#include "mls.h"
-#include "../res/nios.h"
-#include "../res/resout.h"
-#include "lproto.h"
-#include "lib.queue.h"
+#include <unistd.h>
+
+#include "lib/lib.h"
+#include "lib/lproto.h"
+#include "lib/mls.h"
+#include "lib/queue.h"
+#include "lsf.h"
+#include "res/nios.h"
+#include "res/resout.h"
 
 static void default_tstp_(int signo);
 static u_short getTaskPort(int s);

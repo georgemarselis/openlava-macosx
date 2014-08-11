@@ -17,9 +17,10 @@
  */
 
 #include <fcntl.h>
-#include "lib.h"
-#include "lproto.h"
-#include "lib.osal.h"
+
+#include "lib/lib.h"
+#include "lib/lproto.h"
+#include "lib/osal.h"
 
 int
 osInit_(void)

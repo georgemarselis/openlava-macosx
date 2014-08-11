@@ -16,10 +16,12 @@
  *
  */
 
-#include "lib.h"
-#include "lproto.h"
 #include <unistd.h>
 #include <fcntl.h>
+
+#include "lib/lib.h"
+#include "lib/lproto.h"
+
 
 extern int totsockets_;
 extern int currentsocket_;

@@ -17,15 +17,15 @@
  */
 
 #include <netdb.h>
-
-#include "../lsf.h"
 #include <sys/wait.h>
-#include "../lsadm/lsadmin.h"
-#include "../lib/lproto.h"
-#include "../lib/mls.h"
-#include "../intlib/intlibout.h"
-#include "../lib/lsi18n.h"
-#include "../lib/mls.h"
+
+#include "intlib/intlibout.h"
+#include "lib/lproto.h"
+#include "lib/mls.h"
+#include "lib/mls.h"
+#include "lsadmin/lsadmin.h"
+#include "lsf.h"
+#include "lsi18n.h"
 
 #define RSHCMD "rsh"
 

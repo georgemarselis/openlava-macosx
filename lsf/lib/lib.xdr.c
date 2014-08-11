@@ -18,9 +18,10 @@
  */
 
 #include <limits.h>
-#include "lib.h"
-#include "lib.xdr.h"
-#include "lproto.h"
+
+#include "lib/lib.h"
+#include "lib/xdr.h"
+#include "lib/lproto.h"
 
 /* encodeHdr()
  * Pack the header into 16 4 unsigned integers,

@@ -16,15 +16,15 @@
  *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <ctype.h>
 #include <netdb.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-#include "../lsf.h"
+#include "lsf.h"
+#include "lib/lproto.h"
 
-#include "../lib/lproto.h"
 #define MAXLISTSIZE 256
 
 

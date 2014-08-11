@@ -16,11 +16,10 @@
  *
  */
 
-
-#include "bhist.h"
-#include "../../lsf/lib/lproto.h"
-#include "../../lsf/lib/lib.table.h"
-#include "../../lsf/lib/lib.h"
+#include "bhist/bhist.h"
+#include "lib/lib.h"
+#include "lib/lproto.h"
+#include "lib/table.h"
 
 extern void initTab (struct hTab *tabPtr);
 extern hEnt *addMemb (struct hTab *tabPtr, LS_LONG_INT member);

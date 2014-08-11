@@ -16,11 +16,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
-#include <unistd.h>
+
 #include <stdlib.h>
-#include "lib.h"
-#include "lproto.h"
-#include "lib.osal.h"
+#include <unistd.h>
+
+#include "lib/lib.h"
+#include "lib/lproto.h"
+#include "lib/osal.h"
 
 struct config_param genParams_[] =
 {

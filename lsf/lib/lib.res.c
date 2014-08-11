@@ -15,15 +15,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
-#include <unistd.h>
+ 
 #include <fcntl.h>
-#include <termios.h>
 #include <limits.h>
-#include <sys/wait.h>
 #include <pwd.h>
-#include "lib.h"
-#include "lib.queue.h"
-#include "lproto.h"
+#include <sys/wait.h>
+#include <termios.h>
+#include <unistd.h>
+
+#include "lib/lib.h"
+#include "lib/lproto.h"
+#include "lib/queue.h"
 
 #define SIGEMT SIGBUS
 

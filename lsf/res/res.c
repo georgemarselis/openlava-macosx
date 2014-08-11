@@ -27,8 +27,8 @@
 
 #include <sys/time.h>
 
-#include "res.h"
-#include "../lib/lproto.h"
+#include "res/res.h"
+#include "lib/lproto.h"
 
 #define NL_SETN		29
 

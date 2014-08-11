@@ -20,10 +20,11 @@
 #include <unistd.h>
 #include <limits.h>
 #include <fcntl.h>
-#include "lib.rf.h"
-#include "lib.h"
-#include "../res/resout.h"
-#include "lproto.h"
+
+#include "lib/lib.h"
+#include "lib/lproto.h"
+#include "lib/rf.h"
+#include "res/resout.h"
 
 #define ABS(i) ((i) < 0 ? -(i) : (i))
 

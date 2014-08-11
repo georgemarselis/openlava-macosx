@@ -17,9 +17,10 @@
  */
 
 #include <limits.h>
-#include "lib.h"
-#include "lib.xdr.h"
-#include "lproto.h"
+
+#include "lib/lib.h"
+#include "lib/lproto.h"
+#include "lib/xdr.h"
 
 bool_t
 xdr_LSFlong (XDR *xdrs, long *l)

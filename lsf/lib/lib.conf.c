@@ -15,12 +15,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
-#include <pwd.h>
-#include <grp.h>
+
 #include <ctype.h>
-#include "lib.h"
-#include "lproto.h"
-#include "lib.conf.h"
+#include <grp.h>
+#include <pwd.h>
+
+#include "lib/conf.h"
+#include "lib/lib.h"
+#include "lib/lproto.h"
 
 static char do_Cluster(FILE *, int *, char *);
 static char do_HostTypes(FILE *, int *, char *);

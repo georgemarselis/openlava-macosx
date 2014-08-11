@@ -16,17 +16,15 @@
  *
  */
 
+#include <netdb.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/errno.h>
-#include <stdlib.h>
-#include <netdb.h>
 
-#include "../lsf.h"
+#include "lib/lproto.h"
+#include "lsf.h"
 
-
-
-#include "../lib/lproto.h"
 #define MAXLISTSIZE 256
 
 static void usage(char *);

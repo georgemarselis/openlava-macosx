@@ -17,8 +17,9 @@
  */
 
 #include <limits.h>
-#include "lproto.h"
-#include "lib.h"
+
+#include "lib/lib.h"
+#include "lib/lproto.h"
 
 #ifndef MIN
 #define MIN(a,b) ((a) < (b) ? (a) : (b))

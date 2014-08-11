@@ -16,7 +16,6 @@
  *
  */
 
-#include "sbd.h"
 #include <sys/stat.h>
 #include <time.h>
 #include <stdlib.h>
@@ -24,15 +23,14 @@
 #include <dirent.h>
 #include <unistd.h>
 
-#include "../../lsf/lib/mls.h"
-
-#include "../daemons/daemons.h"
+#include "daemons.h"
+#include "lib/lproto.h"
+#include "lib/rcp.h"
+#include "lsb/spool.h"
+#include "mls.h"
+#include "sbd/sbd.h"
 
 #define NL_SETN         11
-
-#include "../lib/lsb.spool.h"
-#include "../../lsf/lib/lproto.h"
-#include "../../lsf/lib/lib.rcp.h"
 
 static char *lsbTmp(void);
 static int cwdJob(struct jobCard *, char *, struct hostent *);

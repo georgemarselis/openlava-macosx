@@ -15,25 +15,27 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
-#include <stdio.h>
-#include <sys/types.h>
+
+#include <errno.h>
+#include <fcntl.h>
 #include <netinet/in.h>
-#include <sys/signal.h>
-#include <unistd.h>
+#include <pwd.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <stdlib.h>
 #include <string.h>
-#include <fcntl.h>
-#include <pwd.h>
-#include <sys/time.h>
-#include <errno.h>
+#include <sys/signal.h>
 #include <sys/stat.h>
+#include <sys/time.h>
+#include <sys/types.h>
 #include <sys/wait.h>
-#include <stdlib.h>
-#include "../lib/lib.h"
-#include "../lib/lib.rf.h"
-#include "res.h"
-#include "resout.h"
-#include "../lib/lproto.h"
+#include <unistd.h>
+
+#include "lib/lib.h"
+#include "lib/lproto.h"
+#include "lib/rf.h"
+#include "res/res.h"
+#include "res/resout.h"
 
 #define NL_SETN         29
 

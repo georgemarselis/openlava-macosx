@@ -16,12 +16,14 @@
  *
  */
 
-#include <unistd.h>
 #include <pwd.h>
 #include <stdlib.h>
-#include "lib.h"
-#include "lproto.h"
 #include <sys/utsname.h>
+#include <unistd.h>
+
+#include "lib/lib.h"
+#include "lib/lproto.h"
+
 #define NL_SETN   23   
 static int SHIFT_32 = 32;	
 				

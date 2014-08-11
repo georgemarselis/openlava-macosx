@@ -15,9 +15,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
+ s]
 #include <sys/types.h>
-#include "lib.h"
-#include "lproto.h"
+
+#include "lib/lib.h"
+#include "lib/lproto.h"
 
 bool_t 
 xdr_resConnect (XDR *xdrs, struct resConnect *connectPtr,

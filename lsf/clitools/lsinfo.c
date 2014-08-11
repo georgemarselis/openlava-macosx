@@ -20,9 +20,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pwd.h>
-#include "../lsf.h"
-#include "../lib/lproto.h"
-#include "../lib/lsi18n.h"
+
+#include "lib/lproto.h"
+#include "lib/lsi18n.h"
+#include "lsf.h"
 
 
 static void usage(char *);

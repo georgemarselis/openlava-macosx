@@ -19,8 +19,8 @@
  *
  */
 
-#include "lib.h"
-#include "lproto.h"
+#include "lib/lib.h"
+#include "lib/lproto.h"
 
 int    lserrno = LSE_NO_ERR;
 int    masterLimDown = FALSE;

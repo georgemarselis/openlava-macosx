@@ -17,15 +17,16 @@
  *
  */
 
-#include <unistd.h>
-#include <string.h>
 #include <arpa/inet.h>
-#include <sys/socket.h>
+#include <arpa/inet.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
-#include "lib.h"
-#include "lproto.h"
-#include "lib.table.h"
+#include <string.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
+#include "lib/lib.h"
+#include "lib/lproto.h"
+#include "lib/table.h"
 
 #define MAX_HOSTALIAS 64
 #define MAX_HOSTIPS   32

@@ -18,10 +18,10 @@
 
 #include <unistd.h>
 
-#include "lib.h"
-#include "lib.xdr.h"
-#include "lib.xdrlim.h"
-#include "lproto.h"
+#include "lib/lib.h"
+#include "lib/lproto.h"
+#include "lib/xdr.h"
+#include "lib/xdrlim.h"
 
 struct masterInfo masterInfo_;
 int    masterknown_ = FALSE;

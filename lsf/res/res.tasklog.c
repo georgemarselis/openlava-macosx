@@ -16,13 +16,14 @@
  *
  */
 
-#include "res.h"
-#include "../lib/lib.xdr.h"
-#include "../lib/lproto.h"
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+
+#include "lib/lib.xdr.h"
+#include "lib/lproto.h"
+#include "res/res.h"
 
 extern int flock(int, int);
 

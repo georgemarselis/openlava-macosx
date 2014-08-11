@@ -17,9 +17,9 @@
  *
  */
 
-#include "../lsf.h"
-#include "../lib/lproto.h"
-#include "../intlib/intlibout.h"
+#include "lsf.h"
+#include "lib/lproto.h"
+#include "intlib/intlibout.h"
 
 static char buffer[1024];
 extern int numprocs;

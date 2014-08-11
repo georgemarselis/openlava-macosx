@@ -16,10 +16,11 @@
  *
  */
 
-#include <unistd.h>
 #include <stdlib.h>
-#include "lib.h"
-#include "lproto.h"
+#include <unistd.h>
+
+#include "lib/lib.h"
+#include "lib/lproto.h"
 
 hTab rtask_table;
 hTab ltask_table;
