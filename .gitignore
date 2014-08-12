@@ -34,3 +34,4 @@ config.sub
 autoscan.log
 configure.scan
 compile
+build/lsf
