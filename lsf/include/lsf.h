@@ -1,19 +1,19 @@
 /*
- * Copyright (C) 2011-2012 David Bigagli
- * Copyright (C) 2007 Platform Computing Inc
+ * Copyright (C) 2011-2012 David Bigagli Copyright (C) 2007 Platform
+ * Computing Inc
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of version 2 of the GNU General Public License as published by
+ * the Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
-
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
 
@@ -60,14 +60,22 @@
 #include <rpcsvc/ypclnt.h>
 #endif
 
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
 typedef long LS_LONG_INT;
 typedef unsigned long LS_UNS_LONG_INT;
 
 #define LS_LONG_FORMAT ("%lld")
 #define _OPENLAVA_PROJECT_ "openlava project 2.0"
 
-/* This is our identifier printed out by all daemons
- * and commands.
+/*
+ * This is our identifier printed out by all daemons and commands.
  */
 #ifdef REL_DATE
 #define _LS_VERSION_ (_OPENLAVA_PROJECT_", " REL_DATE"\n")
@@ -75,7 +83,8 @@ typedef unsigned long LS_UNS_LONG_INT;
 #define _LS_VERSION_ (_OPENLAVA_PROJECT_", " __DATE__"\n")
 #endif
 
-/* This is our current version.
+/*
+ * This is our current version.
  */
 #define OPENLAVA_VERSION   20
 
@@ -94,12 +103,12 @@ typedef unsigned long LS_UNS_LONG_INT;
 #define FIRST_RES_SOCK  20
 
 #ifdef HAVE_UNION_WAIT
-# define LS_WAIT_T      union wait
-# define LS_STATUS(s)   ((s).w_status)
+	#define LS_WAIT_T      union wait
+	#define LS_STATUS(s)   ((s).w_status)
 #else
-# define LS_WAIT_INT
-# define LS_WAIT_T      int
-# define LS_STATUS(s)   (s)
+	#define LS_WAIT_INT
+	#define LS_WAIT_T      int
+	#define LS_STATUS(s)   (s)
 #endif
 
 typedef enum
@@ -119,8 +128,8 @@ typedef enum
   USR2
 } lsindx_t;
 
-#if !defined(MAXFLOAT)
-#define MAXFLOAT        3.40282347e+38F
+#ifndef MAXFLOAT
+	#define MAXFLOAT        3.40282347e+38F
 #endif
 
 #define INFINIT_LOAD    (float) (0x7fffffff)
@@ -292,13 +301,17 @@ struct hostLoad
 };
 
 enum valueType
-{ LS_BOOLEAN, LS_NUMERIC, LS_STRING, LS_EXTERNAL };
+{
+  LS_BOOLEAN, LS_NUMERIC, LS_STRING, LS_EXTERNAL
+};
 #define BOOLEAN  LS_BOOLEAN
 #define NUMERIC  LS_NUMERIC
 #define STRING   LS_STRING
 #define EXTERNAL LS_EXTERNAL
 enum orderType
-{ INCR, DECR, NA };
+{
+  INCR, DECR, NA
+};
 
 #define RESF_BUILTIN     0x01
 #define RESF_DYNAMIC     0x02
@@ -376,10 +389,9 @@ struct hostInfo
   int rexPriority;
 };
 
-/* This data structure is built when
- * reading the lsf.cluster file and building
- * the host list, it is also used to add
- * add host at runtime.
+/*
+ * This data structure is built when reading the lsf.cluster file and
+ * building the host list, it is also used to add add host at runtime.
  */
 struct hostEntry
 {
@@ -541,8 +553,8 @@ struct clusterConf
   LS_SHARED_RESOURCE_INFO_T *shareRes;
 };
 
-/* Maximum number of processes reported by PIM
- * and read by the PIM library.
+/*
+ * Maximum number of processes reported by PIM and read by the PIM library.
  */
 #define MAX_PROC_ENT (2 * 1024)
 
@@ -575,7 +587,8 @@ typedef enum
   EV_EVENT_LAST
 } event_t;
 
-/* openlava LIM events
+/*
+ * openlava LIM events
  */
 struct lsEventRec
 {
@@ -585,11 +598,11 @@ struct lsEventRec
   void *record;
 };
 
-/* This is the log of the hostEntry structure. It is
- * another structure because it is used in the context
- * of event logging and it can evolve in different
- * directions then the base configuration structure
- * which is hostEntry.
+/*
+ * This is the log of the hostEntry structure. It is another structure
+ * because it is used in the context of event logging and it can evolve in
+ * different directions then the base configuration structure which is
+ * hostEntry.
  */
 struct hostEntryLog
 {
@@ -607,7 +620,8 @@ struct hostEntryLog
   char *window;
 };
 
-/* openlava error numbers
+/*
+ * openlava error numbers
  */
 #define LSE_NO_ERR              0
 #define LSE_BAD_XDR             1
@@ -867,8 +881,8 @@ extern struct hostLoad *ls_loadoftype (char *resreq, int *numhosts,
 extern struct hostLoad *ls_loadinfo (char *resreq, int *numhosts, int options,
 				     char *fromhost, char **hostlist,
 				     int listsize, char ***indxnamelist);
-extern int ls_loadadj (char *resreq, struct placeInfo *hostlist,
-		       int listsize);
+extern int
+ls_loadadj (char *resreq, struct placeInfo *hostlist, int listsize);
 extern int ls_eligible (char *task, char *resreqstr, char mode);
 extern char *ls_resreq (char *task);
 extern int ls_insertrtask (char *task);
@@ -944,19 +958,19 @@ extern char *ls_rgetmnthost (char *host, char *fn);
 extern int ls_rfcontrol (int command, int arg);
 extern int ls_rfterminate (char *host);
 
-extern void ls_ruunix2lsf (struct rusage *rusage,
-			   struct lsfRusage *lsfRusage);
-extern void ls_rulsf2unix (struct lsfRusage *lsfRusage,
-			   struct rusage *rusage);
+extern void
+ls_ruunix2lsf (struct rusage *rusage, struct lsfRusage *lsfRusage);
+extern void
+ls_rulsf2unix (struct lsfRusage *lsfRusage, struct rusage *rusage);
 extern void cleanLsfRusage (struct lsfRusage *);
 extern void cleanRusage (struct rusage *);
 
 extern struct resLogRecord *ls_readrexlog (FILE *);
 extern int ls_nioinit (int sock);
-extern int ls_nioselect (int,
-			 fd_set *,
-			 fd_set *,
-			 fd_set *, struct nioInfo **, struct timeval *);
+extern int
+ls_nioselect (int,
+	      fd_set *,
+	      fd_set *, fd_set *, struct nioInfo **, struct timeval *);
 extern int ls_nioctl (int, int);
 extern int ls_nionewtask (int, int);
 extern int ls_nioremovetask (int);
@@ -972,12 +986,14 @@ extern struct lsfAcctRec *ls_getacctrec (FILE *, int *);
 extern int ls_putacctrec (FILE *, struct lsfAcctRec *);
 extern int getBEtime (char *, char, time_t *);
 
-/* openlava add host
+/*
+ * openlava add host
  */
 extern int ls_addhost (struct hostEntry *);
 extern int ls_rmhost (const char *);
 
-/* openlava LIM log functions
+/*
+ * openlava LIM log functions
  */
 extern struct lsEventRec *ls_readeventrec (FILE *);
 extern int ls_writeeventrec (FILE *, struct lsEventRec *);
