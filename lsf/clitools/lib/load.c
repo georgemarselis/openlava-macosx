@@ -21,9 +21,10 @@
 #include <errno.h>
 #include <string.h>
 #include <ctype.h>
-#include "../lsf.h"
 
-#include "../intlib/intlibout.h"
+#include "lsf.h"
+#include "intlib/intlibout.h"
+
 #define MAXFIELDSIZE 20
 int num_loadindex;
 
