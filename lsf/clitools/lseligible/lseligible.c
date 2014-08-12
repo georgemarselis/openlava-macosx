@@ -19,8 +19,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../lsf.h"
-#include "../lib/lsi18n.h"
+#include "intlib/lsi18n.h"
+#include "lsf.h"
 
 
 #define NL_SETN 27
