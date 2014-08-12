@@ -37,7 +37,7 @@ struct _list
   LIST_ENTRY_T *back;
   char *name;
   int numEnts;
-  bool_t allowObservers;
+  int allowObservers;
   LIST_T *observers;
 };
 
@@ -65,7 +65,7 @@ extern int listInsertEntryAtFront (LIST_T * list, LIST_ENTRY_T * entry);
 extern int listInsertEntryAtBack (LIST_T * list, LIST_ENTRY_T * entry);
 extern LIST_ENTRY_T *listSearchEntry (LIST_T * list,
 				      void *subject,
-				      bool_t (*equal) (void *, void *, int),
+				      int (*equal) (void *, void *, int),
 				      int hint);
 extern void listRemoveEntry (LIST_T * list, LIST_ENTRY_T * entry);
 extern int listNotifyObservers (LIST_T * list, LIST_EVENT_T * event);
@@ -101,7 +101,7 @@ struct _listEvent
   LIST_ENTRY_T *entry;
 };
 
-typedef bool_t (*LIST_ENTRY_SELECT_OP_T) (void *extra, LIST_EVENT_T *);
+typedef int (*LIST_ENTRY_SELECT_OP_T) (void *extra, LIST_EVENT_T *);
 
 typedef int (*LIST_EVENT_CALLBACK_FUNC_T) (LIST_T * list,
 					   void *extra, LIST_EVENT_T * event);
@@ -149,10 +149,10 @@ extern void listIteratorDetach (LIST_ITERATOR_T * iter);
 extern LIST_T *listIteratorGetList (LIST_ITERATOR_T * iter);
 extern LIST_ENTRY_T *listIteratorGetCurEntry (LIST_ITERATOR_T * iter);
 extern int listIteratorSetCurEntry (LIST_ITERATOR_T * iter,
-				    LIST_ENTRY_T * ent, bool_t validateEnt);
+				    LIST_ENTRY_T * ent, int validateEnt);
 extern void listIteratorNext (LIST_ITERATOR_T * iter, LIST_ENTRY_T ** next);
 extern void listIteratorPrev (LIST_ITERATOR_T * iter, LIST_ENTRY_T ** prev);
-extern bool_t listIteratorIsEndOfList (LIST_ITERATOR_T * iter);
+extern int listIteratorIsEndOfList (LIST_ITERATOR_T * iter);
 
 
 extern int listerrno;
