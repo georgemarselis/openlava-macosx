@@ -26,6 +26,8 @@
 
 #include <sys/stat.h>
 
+#include "lsf.h"
+
 /* openlava 2.0 header breaks compatibility with
  * 1.0 but offers more flexibility and room for growth.
  */
