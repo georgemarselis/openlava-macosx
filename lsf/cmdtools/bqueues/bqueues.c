@@ -16,7 +16,7 @@
  *
  */
 
-#include "cmd.h"
+#include "cmdtools/cmdtools.h"
 
 void load2Str ();
 static void prtQueuesLong (int, struct queueInfoEnt *);

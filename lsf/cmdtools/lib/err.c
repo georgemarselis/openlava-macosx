@@ -17,14 +17,14 @@
  */
 
 #include <pwd.h>
-#include "cmd.h"
-#include "../lib/lsb.h"
-
 #include <netdb.h>
 #include <ctype.h>
 
-#define NL_SETN 8
+#include "lsb/lsb.h"
+#include "cmdtools/cmdtools.h"
 
+
+#define NL_SETN 8
 
 
 void

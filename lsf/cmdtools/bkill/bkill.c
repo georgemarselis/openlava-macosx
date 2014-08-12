@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../../lsf/lib/lsi18n.h"
+#include "intlib/lsi18n.h"
 
 #define NL_SETN 8
 

@@ -17,13 +17,14 @@
  */
 
 #include <unistd.h>
-#include "cmd.h"
-#include "../lib/lsb.h"
-#include "../lsbatch.h"
+#include <errno.h>
+ 
+#include "lsb/lsbatch.h"
+#include "lsb/lsb.h"
+#include "cmdtools/cmdtools.h"
+
 
 #define NL_SETN 8
-
-#include <errno.h>
 
 static char *strXfOptions (int);
 void prtJobRusage (struct jobInfoEnt *);

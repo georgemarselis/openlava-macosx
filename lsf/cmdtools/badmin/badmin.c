@@ -18,7 +18,7 @@
 
 #include <unistd.h>
 
-#include "badmin/badmin.h"
+#include "cmdtools/badmin/badmin.h"
 
 extern char *myGetOpt (int nargc, char **nargv, char *ostr);
 extern int checkConf (int, int);

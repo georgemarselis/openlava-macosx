@@ -17,10 +17,10 @@
  */
 
 #include <unistd.h>
+#include <signal.h>
 #include <pwd.h>
 
-#include <signal.h>
-#include "cmd.h"
+#include "cmdtools/cmdtools.h"
 
 #define NL_SETN 8
 

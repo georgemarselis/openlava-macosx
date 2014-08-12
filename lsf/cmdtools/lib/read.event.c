@@ -16,7 +16,7 @@
  *
  */
 
-#include "bhist/bhist.h"
+#include "cmdtools/bhist/bhist.h"
 #include "lib/lib.h"
 #include "lib/lproto.h"
 #include "lib/table.h"

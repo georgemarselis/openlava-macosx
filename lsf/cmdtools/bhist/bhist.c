@@ -19,9 +19,10 @@
 
 #include <unistd.h>
 #include <ctype.h>
-#include "bhist.h"
 
-#include "../../lsf/intlib/intlibout.h"
+
+#include "cmdtools/bhist/bhist.h"
+#include "intlib/intlibout.h"
 
 #define NegtoZero(x)  ( (x<0)? 0 :x )
 #define topOrBot(x)   ( ((x)==1) ? "top" : "bottom" )

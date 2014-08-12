@@ -15,9 +15,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
-#include "cmd.h"
+
 #include <string.h>
 #include <ctype.h>
+
+#include "cmdtools/cmdtools.h"
 
 #define NL_SETN 8
 

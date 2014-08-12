@@ -16,13 +16,15 @@
  *
  */
 
-#include "sbd.h"
-#include <time.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <dirent.h>
-#include "../../lsf/lib/mls.h"
+
 #include <unistd.h>
+#include <time.h>
+#include <sys/types.h>
+#include <stdlib.h>
+#include <dirent.h>
+
+#include "lib/mls.h"
+#include "sbd.h"
 
 #define NL_SETN		11
 

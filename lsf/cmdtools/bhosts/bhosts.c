@@ -16,10 +16,11 @@
  *
  */
 
-#include "cmd.h"
 
 #include <netdb.h>
-#include "../../lsf/intlib/intlibout.h"
+
+#include "cmdtools/cmdtools.h"
+#include "intlib/intlibout.h"
 
 #define HOST_NAME_LENGTH    18
 #define HOST_STATUS_LENGTH  14

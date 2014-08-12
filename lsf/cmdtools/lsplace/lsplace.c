@@ -22,8 +22,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "lsf.h"
 #include "lib/lproto.h"
+#include "lsf.h"
 
 #define MAXLISTSIZE 256
 

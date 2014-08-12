@@ -16,8 +16,8 @@
  *
  */
 
-#include "../lsf.h"
-#include "../lib/lib.h"
+#include "lib/lib.h"
+#include "lsf.h"
 
 static void
 usage (void)

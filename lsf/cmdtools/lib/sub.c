@@ -16,11 +16,12 @@
  *
  */
 
-#include "cmd.h"
-#include "../lib/lsb.h"
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <ctype.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+
+#include "cmdtools/cmdtools.h"
+#include "lsb/lsb.h"
 
 #define NL_SETN 8
 

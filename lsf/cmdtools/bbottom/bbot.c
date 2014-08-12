@@ -16,7 +16,8 @@
  *
  */
 
-#include "cmd.h"
+#include "cmdtools/cmdtools.h"
+
 #define NL_SETN 8
 
 int

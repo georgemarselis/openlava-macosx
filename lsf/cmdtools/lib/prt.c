@@ -16,12 +16,12 @@
  *
  */
 
-#include <pwd.h>
-#include "cmd.h"
-#include "../lib/lsb.h"
-
 #include <netdb.h>
 #include <ctype.h>
+#include <pwd.h>
+
+#include "cmdtools/cmdtools.h"
+#include "lsb/lsb.h"
 
 #define NL_SETN 8
 #define MINFIELDWIDE  7

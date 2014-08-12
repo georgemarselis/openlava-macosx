@@ -16,8 +16,8 @@
  *
  */
 
-#include "cmd.h"
-#include "../lib/lsb.h"
+#include "cmdtools/cmdtools.h"
+#include "lsb/lsb.h"
 
 #include <netdb.h>
 #include <ctype.h>

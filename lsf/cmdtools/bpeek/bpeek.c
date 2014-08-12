@@ -19,12 +19,12 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <errno.h>
-#include <fcntl.h>
 #include <pwd.h>
-#include "cmd.h"
-
 #include <netdb.h>
+#include <fcntl.h>
+#include <errno.h>
+
+#include "cmdtools/cmdtools.h"
 
 #define NL_SETN 8
 

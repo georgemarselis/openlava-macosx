@@ -16,9 +16,11 @@
  *
  */
 
-#include "cmd.h"
+
 #include <netdb.h>
 #include <ctype.h>
+
+#include "cmdtools/cmdtools.h"
 
 #define NL_SETN 8
 

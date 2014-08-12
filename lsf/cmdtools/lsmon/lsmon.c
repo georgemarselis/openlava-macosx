@@ -16,7 +16,7 @@
  *
  */
 
-#if defined(__CYGWIN__)
+#ifdef __CYGWIN__
 #include <ncurses/curses.h>
 #else
 #include <curses.h>
@@ -26,7 +26,7 @@
 #include "lib/lsi18n.h"
 #include "lsf.h"
 
-extern void (*Signal_ (int, void (*)(int))) (int);
+extern void( *Signal_ (int, void (*)(int))) (int);
 extern int makeFields (struct hostLoad *, char *loadval[], char **);
 extern void *formatHeader (char **, char);
 extern char **filterToNames (char *);

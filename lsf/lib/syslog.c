@@ -17,14 +17,14 @@
  *
  */
 
-#include <fcntl.h>
-#include <sys/types.h>
-#include <syslog.h>
 #include <unistd.h>
+#include <syslog.h>
+#include <sys/types.h>
+#include <fcntl.h>
 
-#include "lib/lib.h"
-#include "lib/lproto.h"
 #include "lib/osal.h"
+#include "lib/lproto.h"
+#include "lib/lib.h"
 
 #define LSF_LOG_MASK   7
 #define DEF_LOG_MASK   LOG_INFO

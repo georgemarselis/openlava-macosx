@@ -16,7 +16,7 @@
  *
  */
 
-#include "cmd.h"
+#include "cmdtools/cmdtools.h"
 
 extern int do_sub (int, char **, int);
 

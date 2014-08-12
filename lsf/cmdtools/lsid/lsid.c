@@ -21,9 +21,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "lsf.h"
-#include "lib/table.h"
 #include "lib/lproto.h"
+#include "lib/table.h"
+#include "lsf.h"
 
 static void usage (char *);
 extern int errLineNum_;

@@ -16,13 +16,15 @@
  *
  */
 
-#include "cmd.h"
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <ctype.h>
-#include "../../lsf/intlib/jidx.h"
-#include "../../lsf/lib/lib.h"
-#include "../../lsf/intlib/intlibout.h"
+
+#include "lib/lib.h"
+#include "intlib/jidx.h"
+#include "intlib/intlibout.h"
+#include "cmdtools/cmdtools.h"
 
 #define NL_SETN 8
 

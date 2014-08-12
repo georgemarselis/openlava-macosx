@@ -16,8 +16,11 @@
  *
  */
 
+#include "intlib/jidx.h"
+
 #ifndef LSF_JGRP_H
 #define LSF_JGRP_H
+
 
 #define DESTROY_REF(x, y) { \
      y(x);\
@@ -25,7 +28,6 @@
 }
 
 #define    JGRP_VOID         -1
-#include "../../lsf/intlib/jidx.h"
 
 typedef void (*FREE_JGARRAY_FUNC_T) (void *);
 

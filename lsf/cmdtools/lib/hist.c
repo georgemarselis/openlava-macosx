@@ -16,10 +16,11 @@
  *
  */
 
+#include <unistd.h>
 #include <time.h>
 #include <sys/types.h>
-#include <unistd.h>
-#include "cmd.h"
+
+#include "cmdtools/cmdtools.h"
 
 #define NL_SETN 8
 

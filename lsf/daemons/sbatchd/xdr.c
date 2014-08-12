@@ -18,8 +18,9 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "sbd.h"
-#include "../../lsf/lib/lib.xdr.h"
+
+#include "lib/xdr.h"
+#include "daemons/sbd/sbd.h"
 
 #define NL_SETN		11
 

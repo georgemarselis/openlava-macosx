@@ -16,11 +16,11 @@
  *
  */
 
-#include "cmd.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <ctype.h>
 
+#include "cmdtools/cmdtools.h"
 
 #define NL_SETN 8
 
