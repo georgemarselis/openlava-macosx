@@ -27,7 +27,7 @@
 #include <unistd.h>
 
 
-#include "res/res.h"
+#include "daemons/res/res.h"
 #include "lib/lproto.h"
 #include "lib/mls.h"
 

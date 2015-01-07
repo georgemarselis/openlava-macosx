@@ -16,9 +16,9 @@
  *
  */
 
-#include "mbd.h"
-#define NL_SETN         10
+#include "daemons/mbatchd/mbatchd.h"
 
+#define NL_SETN         10
 #define SUSP_CAN_PREEMPT_FOR_RSRC(s) !((s)->jStatus & JOB_STAT_USUSP)
 
 #define UNREACHABLE(s) (((s) & HOST_STAT_UNREACH) || ((s) & HOST_STAT_UNAVAIL))

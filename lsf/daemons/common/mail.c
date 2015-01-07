@@ -29,7 +29,7 @@
 #endif
 
 
-#include "daemons.h"
+#include "daemons/daemons.h"
 #include "lib/osal.h"
 
 #define NL_SETN         10

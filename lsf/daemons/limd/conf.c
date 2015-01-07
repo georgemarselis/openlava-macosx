@@ -16,8 +16,8 @@
  *
  */
 
-#include "lim.h"
-#include "../../lsf/lib/lib.conf.h"
+#include "daemons/lim/lim.h"
+#include "lib/conf.h"
 
 #define NL_SETN 24
 

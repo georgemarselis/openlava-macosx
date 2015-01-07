@@ -15,12 +15,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
-#include "../../lsf/lsf.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
+#include "lsf.h"
 
 extern int FCLOSEUP (FILE **);
 

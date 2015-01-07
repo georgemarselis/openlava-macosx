@@ -17,8 +17,9 @@
  */
 #include <stdlib.h>
 #include <time.h>
-#include "daemons.h"
-#include "mbd.h"
+
+#include "daemons/daemons.h"
+#include "daemons/mbatchd/mbatchd.h"
 
 #define NL_SETN		10
 

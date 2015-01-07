@@ -18,8 +18,9 @@
 #include <stdio.h>
 #include <errno.h>
 #include <unistd.h>
-#include "res.h"
-#include "../lim/limout.h"
+
+#include "demons/res/res.h"
+#include "daemons/lim/limout.h"
 
 #define NL_SETN		29
 

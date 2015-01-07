@@ -19,8 +19,8 @@
  *
  */
 
-#include "lim.h"
-#include "../lib/mls.h"
+#include "daemons/lim/lim.h"
+#include "lib/mls.h"
 
 extern char *argvmsg_ (int argc, char **argv);
 

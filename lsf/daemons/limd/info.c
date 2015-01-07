@@ -18,7 +18,8 @@
 
 #include "lib/lproto.h"
 #include "lib/xdr.h"
-#include "lim.h"
+
+#include "daemons/lim/lim.h"
 
 #define NL_SETN 24
 

@@ -16,10 +16,11 @@
  *
  */
 
-#include "sbd.h"
 #include <time.h>
 #include <stdlib.h>
 #include <sys/types.h>
+
+ #include "daemons/sbatchd/sbatchd.h"
 
 #define NL_SETN		11
 

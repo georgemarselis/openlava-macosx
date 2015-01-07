@@ -18,8 +18,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
-#include "lim.h"
+
 #include <math.h>
+#include "daemons/lim/lim.h"
 
 #define NL_SETN 24
 

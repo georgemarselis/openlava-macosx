@@ -18,9 +18,9 @@
 
 #include <stdlib.h>
 
-#include "sbd.h"
+#include "daemons/sbatchd/sbatchd.h"
+#include "intlib/lsi18n.h"
 
-#include "../../lsf/lib/lsi18n.h"
 #define NL_SETN         11
 
 extern short mbdExitVal;

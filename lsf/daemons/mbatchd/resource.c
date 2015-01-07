@@ -19,9 +19,11 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <math.h>
-#include "mbd.h"
 
-#include "../../lsf/lib/lsi18n.h"
+#include "lib/lsi18n.h"
+#include "daemons/mbatchd/mbatchd.h"
+
+
 #define NL_SETN		10
 
 static void addSharedResource (struct lsSharedResourceInfo *);

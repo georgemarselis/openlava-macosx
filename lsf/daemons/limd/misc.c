@@ -17,7 +17,8 @@
  *
  */
 
-#include "lim.h"
+#include "daemons/lim/lim.h"
+
 
 static struct hostNode *findHNbyAddr (in_addr_t);
 static int loadEvents (void);

@@ -34,9 +34,9 @@
 #include "lib/mls.h"
 #include "lsbatch/lsbatch.h"
 #include "lsf.h"
-#include "res/nios.h"
-#include "res/res.h"
-#include "res/resout.h"
+#include "daemons/nios/nios.h"
+#include "daemons/res/res.h"
+#include "daemons/res/resout.h"
 
 #define NL_SETN         29
 

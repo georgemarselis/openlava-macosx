@@ -7,5 +7,5 @@ all:
 
 
 clean:
-	@rm -f *.o
+	@$(RM) -f *.o
 

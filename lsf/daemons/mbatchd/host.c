@@ -17,9 +17,9 @@
  *
  */
 
-#include "mbd.h"
+#include "daemons/mbatchd/mbatchd.h"
+#include "intlib/lsi18n.h"
 
-#include "../../lsf/lib/lsi18n.h"
 #define NL_SETN         10
 
 extern void addHost (struct hostInfo *lsf,

@@ -16,8 +16,9 @@
  *
  */
 
-#include "mbd.h"
-#include "../../lsf/lib/lsi18n.h"
+#include "daemons/mbatchd/mbatchd.h"
+#include "intliblib/lsi18n.h"
+
 #define NL_SETN         10
 
 extern void resetStaticSchedVariables (void);

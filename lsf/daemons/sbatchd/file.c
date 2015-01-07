@@ -23,12 +23,12 @@
 #include <dirent.h>
 #include <unistd.h>
 
-#include "daemons.h"
+#include "daemons/daemons.h"
 #include "lib/lproto.h"
 #include "lib/rcp.h"
 #include "lsb/spool.h"
-#include "mls.h"
-#include "sbd/sbd.h"
+#include "lib/mls.h"
+#include "daemons/sbatchdd/sbatchd.h"
 
 #define NL_SETN         11
 

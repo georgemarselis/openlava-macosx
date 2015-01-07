@@ -16,7 +16,7 @@
  *
  */
 
-#include "mbd.h"
+#include "daemons/mbatchd/mbd.h"
 
 static unsigned int msgcnt = 0;
 extern int numLsbUsable;

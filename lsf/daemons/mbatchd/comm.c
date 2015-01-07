@@ -19,9 +19,9 @@
 
 #include <stdlib.h>
 
+#include "daemons/mbatchd/mbatchd.h"
+#include "intlibib/lsi18n.h"
 
-#include "mbd.h"
-#include "../../lsf/lib/lsi18n.h"
 #define NL_SETN         10
 
 extern int connTimeout;

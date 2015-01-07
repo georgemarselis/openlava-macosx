@@ -20,7 +20,9 @@
  */
 
 #include <math.h>
-#include "lim.h"
+
+#include "daemons/lim/lim.h"
+
 
 extern short hostInactivityLimit;
 static void sndConfInfo (struct sockaddr_in *);

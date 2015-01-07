@@ -23,9 +23,10 @@
 #include <sys/errno.h>
 #include <fcntl.h>
 #include <stdlib.h>
-#include "daemons.h"
 
-#include "../../lsf/lib/lsi18n.h"
+#include "daemons/daemons.h"
+#include "lib/lsi18n.h"
+
 #define NL_SETN		10
 
 struct config_param daemonParams[] = {

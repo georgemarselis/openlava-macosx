@@ -23,17 +23,20 @@
 #include <sys/signal.h>
 #include <string.h>
 #include <fcntl.h>
-int grantpt (int);
-int unlockpt (int);
-char *ptsname (int);
 
-#include "res.h"
+#include "daemons/res/res.h"
+#include "intlib/lsi18n.h"
 
-#include "../../lsf/lib/lsi18n.h"
+
 #define NL_SETN		29
+
 
 static int letterInd = 0;
 static int digitInd = 0;
+
+int grantpt (int);
+int unlockpt (int);
+char *ptsname (int);
 
 void
 ptyreset (void)

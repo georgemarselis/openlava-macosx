@@ -21,9 +21,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "lib/lib.xdr.h"
+#include "lib/xdr.h"
 #include "lib/lproto.h"
-#include "res/res.h"
+#include "daemons/res/res.h"
 
 extern int flock (int, int);
 

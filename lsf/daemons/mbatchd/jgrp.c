@@ -21,11 +21,11 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
-#include "mbd.h"
+#include <dirent.h>
+
+#include "daemons/mbatchd/mbatchd.h"
 
 #define NL_SETN         10
-
-#include <dirent.h>
 
 #define MAX_SPEC_LEN  200
 #define SET_STATUS(x, y) ((x) == (y)) ? 0 : ((x) = (y)) == (y)

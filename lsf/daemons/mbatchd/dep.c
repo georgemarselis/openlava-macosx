@@ -16,9 +16,10 @@
  *
  */
 
-#include "daemons.h"
-#include "mbd.h"
 #include <stdlib.h>
+
+#include "daemons/daemons.h"
+#include "daemons/mbatchd/mbatchd.h"
 
 #define NL_SETN		10
 

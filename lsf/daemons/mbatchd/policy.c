@@ -17,7 +17,7 @@
  *
  */
 
-#include "mbd.h"
+#include "daemons/mbatchd/mbatchd.h"
 
 #define NL_SETN         10
 #define SORT_HOST_NUM   30

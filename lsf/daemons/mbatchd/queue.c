@@ -17,10 +17,11 @@
  */
 
 #include <math.h>
-#include "mbd.h"
 #include <stdlib.h>
 
-#include "../../lsf/lib/lsi18n.h"
+#include "mbatchd/mbatchd/mbd.h"
+#include "lib/lsi18n.h"
+
 #define NL_SETN         10
 
 void fillHostnames ();

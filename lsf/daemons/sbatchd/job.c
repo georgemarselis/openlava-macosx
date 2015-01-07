@@ -15,21 +15,20 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
-#include "sbd.h"
 #include <time.h>
 #include <stdlib.h>
 #include <sys/types.h>
-
 #include <dirent.h>
 #include <stdio.h>
 #include <grp.h>
 #include <pwd.h>
 
-#include "../../lsf/intlib/jidx.h"
-#include "../../lsf/lib/lib.rcp.h"
-#include "../../lsf/lib/mls.h"
+#include "intlib/jidx.h"
+#include "lib/rcp.h"
+#include "lib/mls.h"
+#include "daemons/sbatchdd/sbatchd.h"
+#include "daemons/daemons.h"
 
-#include "../daemons/daemons.h"
 
 #define MAX_PREEXEC_ENVS  ((MAXLINELEN + 1)/3 + 2)
 

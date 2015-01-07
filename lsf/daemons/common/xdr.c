@@ -20,9 +20,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "daemonout.h"
-#include "daemons.h"
-#include "../../lsf/lib/lib.xdr.h"
+#include "daemons/daemonout.h"
+#include "daemons/daemons.h"
+#include "lib/xdr.h"
 
 #define NL_SETN		10
 

@@ -20,9 +20,11 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "sbd.h"
 
-#include "../../lsf/lib/lsi18n.h"
+#include "daemons/sbatchd/sbatchd.h"
+#include "intlib/lsi18n.h"
+
+
 #define NL_SETN		11
 
 extern void do_sbdDebug (XDR * xdrs, int chfd, struct LSFHeader *reqHdr);

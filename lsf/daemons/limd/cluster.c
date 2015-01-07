@@ -15,8 +15,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
-#include "lim.h"
-#include "../../lsf/lib/lsi18n.h"
+
+#include "daemons/lim/lim.h"
+#include "intlib/lsi18n.h"
 
 #define NL_SETN         24
 

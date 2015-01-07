@@ -35,14 +35,15 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <unistd.h>
+
 #ifdef __sun__
 #include <sys/ptyvar.h>
 #endif
 
 #include "lib/lproto.h"
 #include "lib/mls.h"
-#include "res/res.h"
-#include "res/resout.h"
+#include "daemons/res/res.h"
+#include "daemons/res/resout.h"
 
 #define NL_SETN         29
 #define CHILD_DELETED     2

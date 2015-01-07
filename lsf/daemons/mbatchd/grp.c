@@ -17,7 +17,8 @@
  */
 
 #include <stdlib.h>
-#include "mbd.h"
+
+#include "daemons/mbatchd/mbatchd.h"
 
 #define NL_SETN		10
 

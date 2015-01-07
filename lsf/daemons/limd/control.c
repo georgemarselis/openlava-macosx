@@ -17,11 +17,11 @@
  */
 
 #include <unistd.h>
-
-#include "lim.h"
-#include "../lib/lib.xdr.h"
-#include "../lib/mls.h"
 #include <signal.h>
+
+#include "daemons/lim/lim.h"
+#include "lib/xdr.h"
+#include "lib/mls.h"
 
 
 #define NL_SETN 24

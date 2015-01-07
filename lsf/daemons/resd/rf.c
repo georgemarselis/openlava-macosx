@@ -34,8 +34,8 @@
 #include "lib/lib.h"
 #include "lib/lproto.h"
 #include "lib/rf.h"
-#include "res/res.h"
-#include "res/resout.h"
+#include "daemons/res/res.h"
+#include "daemons/res/resout.h"
 
 #define NL_SETN         29
 

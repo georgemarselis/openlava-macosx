@@ -24,7 +24,7 @@
 #include <dirent.h>
 
 #include "lib/mls.h"
-#include "sbd.h"
+#include "daemons/sbatchd/sbatchd.h"
 
 #define NL_SETN		11
 

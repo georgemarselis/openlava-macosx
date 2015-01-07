@@ -24,10 +24,9 @@
 #include <sys/signal.h>
 #include <errno.h>
 #include <ctype.h>
-
 #include <sys/time.h>
 
-#include "res/res.h"
+#include "daemons/res/res.h"
 #include "lib/lproto.h"
 
 #define NL_SETN		29
