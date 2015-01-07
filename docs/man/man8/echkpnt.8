@@ -1,0 +1,290 @@
+.ds ]W %
+.ds ]L
+.nh
+.TH echkpnt  8 "November 2003 - Platform LSF"
+.br
+
+.SH NAME 
+\fBechkpnt \fR  - checkpoints a process or process group of an LSF batch job 
+.SH SYNOPSIS 
+.BR
+.PP
+.PP
+\fBechkpnt\fR [\fB-c\fR] [\fB-f\fR] [\fB-k\fR | \fB-s\fR] [\fB-d\fR \fIcheckpoint_dir\fR] [\fB-x\fR] 
+\fIprocess_group_ID\fR 
+.PP
+\fBechkpnt\fR [\fB-h\fR | \fB-V\fR] 
+.SH DESCRIPTION 
+.BR
+.PP
+.PP
+echkpnt is the interface through which jobs are checkpointed. 
+.PP
+By default, jobs continue to execute after they have been checkpointed. 
+.PP
+Some options in the synopsis are only supported by some operating systems. 
+.SS echkpnt 
+.BR
+.PP
+
+.IP
+echkpnt is located in LSF_SERVERDIR. 
+
+.IP
+echkpnt sends checkpoint instructions provided through job submission 
+or through queue parameters to LSF's checkpoint facility 
+echkpnt.default or to any custom echkpnt methods that you define. 
+Communication is achieved through the common syntax indicated in the 
+synopsis. 
+
+
+.SS echkpnt.default 
+.BR
+.PP
+
+.IP
+echkpnt.default is located in LSF_SERVERDIR. 
+
+.IP
+By default, when a job is checkpointed, echkpnt.default is used. 
+echkpnt.default uses the arguments \fIcheckpoint_dir\fR and 
+process_group_ID to identify where checkpoint files are to be created 
+and which job is to be checkpointed. echkpnt.default then creates 
+checkpoint files in\fI \fR\fIcheckpoint_dir\fR/\fIjob_ID\fR and attempts to checkpoint 
+the job. 
+
+
+.SS echkpnt.method_name 
+.BR
+.PP
+
+.IP
+echkpnt.\fImethod_name\fR is a custom echkpnt that attempts to run a custom 
+checkpoint program or script. 
+
+.IP
+The name of the custom echkpnt method must be 
+echkpnt.\fImethod_name\fR, where \fImethod_name\fR is a name you assign to 
+your custom echkpnt. The method_name must be specified either with 
+LSB_ECHKPNT_METHOD (in lsf.conf, as an environment variable) 
+and/or when the job is submitted with the bsub -k option such as bsub -
+k "mydir 120 method=myapp" job1. 
+
+.IP
+echkpnt.\fImethod_name\fR must support the syntax described in the 
+synopsis. 
+
+.IP
+echkpnt.\fImethod_name\fR is placed in LSF_SERVERDIR, or in the directory 
+specified by LSB_ECHKPNT_METHOD_DIR (set in lsf.conf or as an 
+environment variable). 
+
+.IP
+The method name (LSB_ECHKPNT_METHOD in lsf.conf or as an 
+environment variable) and location (LSB_ECHKPNT_METHOD_DIR) 
+combination must be unique in the cluster. For example, you may have 
+two echkpnt applications with the same name such as 
+echkpnt.mymethod but what differentiates them is the different directories 
+defined with LSB_ECHKPNT_METHOD_DIR. 
+
+.IP
+The checkpoint method directory should be accessible by all users who 
+need to run the custom echkpnt and erestart programs.
+
+.IP
+Do not use default as a method name as this is a reserved keyword to 
+indicate to use LSF's default echkpnt and erestart methods. 
+
+.IP
+If you want to specify to use LSF's echkpnt.default for a specific 
+application, specify method=default at job submission with bsub -k. 
+
+
+.SH OPTIONS 
+.BR
+.PP
+.TP 
+\fB-c\fR 
+
+.IP
+This option is supported on only some operating systems such as Convex. 
+
+.IP
+Copies to the checkpoint directory all files in use by the checkpointed process. 
+
+
+.TP 
+\fB-f\fR 
+
+.IP
+This option is supported on only some operating systems such as Convex. 
+
+.IP
+Forces a job to be checkpointed even if non-checkpointable conditions exist 
+(these conditions are specific to the type of checkpoint facility being used). 
+This option may create checkpoint files that will not restart properly. 
+
+
+.TP 
+\fB-k\fR | \fB-s\fR 
+
+.IP
+Options -k and -s are mutually exclusive. 
+
+
+.RE
+.IP
+\fB-k\fR 
+.BR
+.RS
+
+.IP
+Kills a job after it has been successfully checkpointed. If this option is 
+specified and the checkpoint fails for any reason, the job continues to 
+execute. 
+
+
+
+.RE
+.IP
+\fB-s\fR 
+.BR
+.RS
+
+.IP
+This option is supported on only some operating systems such as SGI 
+systems running IRIX, and Convex. 
+
+.IP
+Stops a job after it has been successfully checkpointed. If this option is 
+specified and the checkpoint fails for any reason, the job continues to 
+execute. 
+
+
+
+.TP 
+\fB-d\fR \fIcheckpoint_dir\fR 
+
+.IP
+Specifies the checkpoint directory. Specify a relative or absolute path name. 
+
+.IP
+When a job is checkpointed, the checkpoint information is stored in 
+\fIcheckpoint_dir\fR/\fIjob_ID\fR/\fIfile_name\fR. Multiple jobs can checkpoint into the 
+same directory. The system can create multiple files. 
+
+.IP
+The checkpoint directory is used for restarting the job (see brestart(1)).
+
+
+.TP 
+\fB-x\fR 
+
+.IP
+This option is supported on only some operating systems such as SGI systems 
+running IRIX. 
+
+.IP
+Identifies the cpr process as type HID (process hierarchy rooted at that PID). 
+
+
+.TP 
+\fIprocess_group_ID\fR 
+
+.IP
+ID of the process or process group to be checkpointed. 
+
+
+.TP 
+\fB-h\fR 
+
+.IP
+Prints command usage to stderr and exits. 
+
+
+.TP 
+\fB-V\fR 
+
+.IP
+Prints LSF release version to stderr and exits. 
+
+
+.SH SEE ALSO 
+.BR
+.PP
+.PP
+bsub(1), bchkpnt(1), brestart(1), erestart(8) 
+.SH DIAGNOSTICS 
+.BR
+.PP
+.SS echkpnt 
+.BR
+.PP
+
+.IP
+Exits with a 0 if the checkpoint operation succeeds. Otherwise, exits with 
+the value of echkpnt.default or echkpnt.\fImethod_name\fR. 
+
+
+.SS echkpnt.default 
+.BR
+.PP
+
+.IP
+If LSF's default checkpoint program echkpnt.default is used and the job 
+is successfully checkpointed, echkpnt.default exits with a 0 and writes 
+nothing to stdout and stderr or the message "Done" or "Success". 
+echkpnt.default returns non-zero values if the checkpoint operation 
+fails. In addition, all messages in stdout or stderr that are returned by 
+echkpnt.default are interpreted by LSF as failure of the checkpoint 
+operation. 
+
+
+.SS echkpnt.method_name 
+.BR
+.PP
+
+.IP
+If a custom checkpoint program is used (LSB_ECHKPNT_METHOD is 
+defined in lsf.conf or as an environment variable, or the checkpoint 
+method specified such as bsub -k "mydir method=myapp" job1), 
+echkpnt.\fImethod_name\fR exits with a 0 if it succeeds in checkpointing the 
+job. Non-zero values indicate job checkpoint failed. All messages written 
+to stdout and stderr are directed to /dev/null and ignored by LSF. 
+
+.IP
+To save standard error and standard out messages for echkpnt. 
+\fImethod_name\fR, set LSB_ECHKPNT_KEEP_OUTPUT=y in lsf.conf or as 
+an environment variable. The stdout and stderr output generated by 
+echkpnt. \fImethod_name\fR will be redirected to: 
+
+.IP
+- \fIcheckpoint_dir\fR/$LSB_JOBID/echkpnt.out 
+
+.IP
+- \fIcheckpoint_dir\fR/$LSB_JOBID/echkpnt.err 
+
+
+.SH LIMITATIONS 
+.BR
+.PP
+.PP
+If you define LSF_ECHKPNTDIR, you cannot use a custom echkpnt method. It 
+is recommended to no longer use LSF_ECHKPNTDIR but use instead 
+LSB_ECHKPNT_METHOD and LSB_ECHKPNT_METHOD_DIR. 
+.PP
+If you use echkpnt.\fImethod_name\fR, once the job has been submitted, the job 
+will be checkpointed with the method that was specified at job submission or 
+with the parameter LSB_ECHKPNT_METHOD. You cannot change the method 
+with the bmod command. 
+.PP
+If you submit a job and do not specify a custom method, and 
+LSB_ECHKPNT_METHOD is not defined, echkpnt.default will be used. You 
+will not be able to change this with bmod. 
+.PP
+It is the cluster administrator's responsibility to ensure that method name and 
+method directory combinations are unique in the cluster.
+
+.\" Generated by Quadralay WebWorks Publisher Professional Edition 6.0.7
+.\" Based on template Portable HTML
+.\" Copyright 1994-2003 Platform Computing Corporation
