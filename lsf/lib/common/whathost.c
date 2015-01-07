@@ -41,7 +41,7 @@
 #endif
 #endif
 
-#include "../lsf.h"
+#include "lsf.h"
 
 extern const char *getHostOfficialByName_ (const char *);
 
