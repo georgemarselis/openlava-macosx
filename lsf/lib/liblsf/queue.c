@@ -16,8 +16,9 @@
  *
  */
 #include <stdlib.h>
+
 #include "lib.h"
-#include "lib.queue.h"
+#include "lib/queue.h"
 
 int
 lsQueueInit_ (struct lsQueue **head,

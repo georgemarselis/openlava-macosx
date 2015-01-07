@@ -18,8 +18,8 @@
 
 #include <termios.h>
 #include <unistd.h>
-#include "lib.h"
 
+#include "lib.h"
 
 #define NL_SETN   23
 

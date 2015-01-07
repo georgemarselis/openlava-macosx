@@ -16,8 +16,8 @@
  *
  */
 
-#include "lib.h"
-#include "lib.so.h"
+#include "lib/lib.h"
+#include "lib/so.h"
 
 #define NL_SETN 23
 

@@ -18,8 +18,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "lib.h"
-#include "lib.table.h"
+
+
+#include "lib/lib.h"
+#include "lib/table.h"
 
 hTab conn_table;
 

@@ -17,8 +17,9 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "lib.h"
-#include "lib.queue.h"
+#include "lib/queue.h"
 
 #define TID_BNUM   23
 #define tid_index(x)   (x%TID_BNUM)

@@ -18,8 +18,8 @@
 
 
 #include <stdio.h>
-#include "lib.so.h"
 
+#include "lib/so.h"
 
 SO_HANDLE_T
 soOpen_ (const char *libFileName)

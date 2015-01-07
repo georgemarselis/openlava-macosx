@@ -20,18 +20,17 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
-
 #include <pwd.h>
 #include <syslog.h>
-
 #include <fcntl.h>
-
 #include <math.h>
 #include <limits.h>
 
-#include "./lsi18n.h"
+#include "lsi18n.h"
 
+#ifndef UTMP_FILENAME
 #define UTMP_FILENAME "/var/adm/utmpx"
+#endif
 
 #ifndef MIN
 #define MIN(a,b) ((a) < (b) ? (a) : (b))

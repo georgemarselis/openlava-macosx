@@ -18,11 +18,12 @@
 
 #include <stdlib.h>
 #include <unistd.h>
-#include "lib.h"
 #include <ctype.h>
 #include <arpa/inet.h>
 #include <math.h>
 #include <limits.h>
+
+#include "lib.h"
 
 #ifndef MIN
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
