@@ -324,31 +324,8 @@ struct niosStatus
 extern taggedConn_t conn2NIOS;
 extern LIST_T *resNotifyList;
 
-
 extern int currentRESSN;
-#define LSF_RES_DEBUG      0
-#define LSF_SERVERDIR      1
-#define LSF_AUTH           2
-#define LSF_LOGDIR         3
-#define LSF_ROOT_REX       4
-#define LSF_LIM_PORT	   5
-#define LSF_RES_PORT	   6
-#define LSF_ID_PORT	   7
-#define LSF_USE_HOSTEQUIV  8
-#define LSF_RES_ACCTDIR    9
-#define LSF_RES_ACCT       10
-#define LSF_DEBUG_RES      11
-#define LSF_TIME_RES       12
-#define LSF_LOG_MASK       13
-#define LSF_RES_RLIMIT_UNLIM 14
-#define LSF_CMD_SHELL      15
-#define LSF_ENABLE_PTY     16
-#define LSF_TMPDIR         17
-#define LSF_BINDIR         18
-#define LSF_LIBDIR         19
-#define LSF_RES_TIMEOUT    20
-#define LSF_RES_NO_LINEBUF 21
-#define LSF_MLS_LOG   	   22
+
 
 #define LSB_UTMP           0
 
