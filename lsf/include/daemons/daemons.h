@@ -127,7 +127,7 @@
 #define LSB_TIME_SBD                    17
 #define LSB_UTMP                        43
 #define LSB_VIRTUAL_SLOT                52
-    
+
 #define LSF_AUTH                        10
 #define LSF_AUTH_DAEMONS                33
 #define LSF_BINDIR                      20
