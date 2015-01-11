@@ -24,13 +24,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "intlib/intlibout.h"
+#include "libint/intlibout.h"
 #include "lib/lproto.h"
 #include "lib/osal.h"
 #include "lib/xdr.h"
 #include "lsf.h"
-#include "res/rescom.h"
-#include "res/resout.h"
+#include "daemons/libresd/rescom.h"
+#include "daemons/libresd/resout.h"
 
 #ifndef _BSD
 #define _BSD
