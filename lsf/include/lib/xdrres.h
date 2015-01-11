@@ -23,8 +23,8 @@
 #include <rpc/xdr.h>
 #endif
 
+#include "daemons/libresd/resd.h"
 #include "lib/hdr.h"
-#include "res/res.h"
 #include "lib/rf.h"
 
 extern int xdr_resConnect (XDR *, struct resConnect *, struct LSFHeader *);

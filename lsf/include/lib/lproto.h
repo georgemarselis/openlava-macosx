@@ -19,13 +19,13 @@
 #ifndef LSF_LIB_LPROTO_H
 #define LSF_LIB_LPROTO_H
 
-#include "intlib/lsi18n.h"
+#include "libint/lsi18n.h"
 #include "lib/channel.h"
 #include "lib/hdr.h"
-#include "pim/pim.h"
 #include "lib/table.h"
 #include "lsf.h"
-#include "res/resout.h"
+#include "daemons/libpimd/pimd.h"
+#include "daemons/libresd/resout.h"
 
 #define BIND_RETRY_TIMES 100
 

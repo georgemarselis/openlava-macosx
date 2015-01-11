@@ -20,8 +20,8 @@
 #define LSF_LIB_LIB_H
 
 #include "lsf.h"
-#include "lim/limout.h"
-#include "res/resout.h"
+#include "daemons/liblimd/limout.h"
+#include "daemons/libresd/resout.h"
 #include "lib/hdr.h"
 #include "lib/xdrlim.h"
 #include "lib/xdr.h"

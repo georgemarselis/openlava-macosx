@@ -19,12 +19,12 @@
 #ifndef LSF_INTLIB_INTLIBOUT_H
 #define LSF_INTLIB_INTLIBOUT_H
 
-#include "intlib/bitset.h"
-#include "intlib/link.h"
-#include "intlib/list2.h"
-#include "intlib/listset.h"
-#include "intlib/lsftcl.h"
-#include "intlib/resreq.h"
+#include "libint/bitset.h"
+#include "libint/link.h"
+#include "libint/list2.h"
+#include "libint/listset.h"
+#include "libint/lsftcl.h"
+#include "libint/resreq.h"
 #include "lsf.h"
 
 #define MINPASSWDLEN_LS		(3)

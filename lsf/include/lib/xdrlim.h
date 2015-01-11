@@ -21,7 +21,7 @@
 
 #include "lib/hdr.h"
 #include "lib/lproto.h"
-#include "lim/limout.h"
+#include "daemons/liblimd/limout.h"
 
 
 extern bool_t xdr_decisionReq (XDR *,

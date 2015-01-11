@@ -17,7 +17,7 @@
  */
 #include <unistd.h>
 
-#include "lib.h"
+#include "lib/lib.h"
 
 char *
 mygetwd_ (char *path)

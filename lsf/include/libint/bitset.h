@@ -20,7 +20,7 @@
 #ifndef LSF_INTLIB_BITSET_H
 #define LSF_INTLIB_BITSET_H
 
-#include "intlib/list.h"
+#include "libint/list.h"
 #include "lib/lproto.h"
 
 typedef struct _bitsetEvent LS_BITSET_EVENT_T;

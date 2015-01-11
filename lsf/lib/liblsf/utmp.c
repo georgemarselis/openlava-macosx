@@ -26,7 +26,7 @@
 #include <math.h>
 #include <limits.h>
 
-#include "lsi18n.h"
+#include "libint/lsi18n.h"
 
 #ifndef UTMP_FILENAME
 #define UTMP_FILENAME "/var/adm/utmpx"

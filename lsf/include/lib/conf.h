@@ -18,6 +18,8 @@
 #ifndef LSF_LIB_CONF_H
 #define LSF_LIB_CONF_H
 
+ #include "lib/lib.h"
+
 #define ILLEGAL_CHARS     ".!-=+*/[]@:&|{}'`\""
 #define M_THEN_A  1
 #define A_THEN_M  2

@@ -26,7 +26,7 @@
 
 #include "lib/lib.h"
 #include "lib/lproto.h"
-#include "mls.h"
+#include "lib/mls.h"
 #include "res/nios.h"
 #include "res/resout.h"
 
