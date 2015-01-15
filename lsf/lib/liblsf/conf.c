@@ -1595,7 +1595,8 @@ do_Hosts (FILE * fp, char *fname, int *lineNum, struct lsInfo *info)
       return FALSE;
     }
 
-#define  HOSTNAME    info->numIndx
+/* FIXME FIXME HOSTNAME_ was supposed to be HOSTNAME, mixes with HOSTNAME FROM lsftcl.h */
+#define  HOSTNAME_   info->numIndx
 #define  MODEL       info->numIndx+1
 #define  TYPE        info->numIndx+2
 #define  ND          info->numIndx+3
@@ -1608,7 +1609,7 @@ do_Hosts (FILE * fp, char *fname, int *lineNum, struct lsInfo *info)
 #define  NUM_ALLOCATED_RESOURCES 64
 
   initkeylist (keyList, HOSTNAME, S + 1, info);
-  keyList[HOSTNAME].key = "HOSTNAME";
+  keyList[HOSTNAME_].key = "HOSTNAME";
   keyList[MODEL].key = "MODEL";
   keyList[TYPE].key = "TYPE";
   keyList[ND].key = "ND";
