@@ -27,7 +27,7 @@
 #include "lib/lproto.h"
 #include "lib/queue.h"
 
-#define SIGEMT SIGBUS
+/* #define SIGEMT SIGBUS */
 
 extern char **environ;
 extern int gethostbysock_ (int, char *);

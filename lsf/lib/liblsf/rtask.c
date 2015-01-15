@@ -35,7 +35,7 @@ static u_short getTaskPort (int s);
 static char rexcwd_[MAXPATHLEN];
 static void initSigHandler (int sig);
 
-#define SIGEMT SIGBUS
+/* #define SIGEMT SIGBUS */
 
 int short nios_ok_;
 extern int currentSN;

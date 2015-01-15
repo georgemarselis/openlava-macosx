@@ -24,7 +24,7 @@
 #include "daemons/libniosd/niosd.h"
 #include "daemons/libresd/resout.h"
 
-#define SIGEMT SIGBUS
+/* #define SIGEMT SIGBUS */
 
 int
 ls_stdinmode (int onoff)
