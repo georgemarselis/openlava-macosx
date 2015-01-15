@@ -16,6 +16,9 @@
  *
  */
 
+#pragma once
+
+ 
 #ifndef LSF_LSB_SPOOL_H
 #define LSF_LSB_SPOOL_H
 

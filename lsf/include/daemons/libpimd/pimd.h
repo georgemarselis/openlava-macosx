@@ -16,6 +16,8 @@
  *
  */
 
+#pragma once
+ 
 #ifndef LSF_PIM_PIM_H
 #define LSF_PIM_PIM_H
 

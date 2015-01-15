@@ -16,6 +16,8 @@
  *
  */
 
+#pragma once
+ 
 #ifndef LSF_INTLIB_LIST_H
 #define LSF_INTLIB_LIST_H
 

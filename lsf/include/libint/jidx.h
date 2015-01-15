@@ -16,6 +16,8 @@
  *
  */
 
+#pragma once
+ 
 #ifndef LSF_INTLIB_JIDX_H
 #define LSF_INTLIB_JIDX_H
 

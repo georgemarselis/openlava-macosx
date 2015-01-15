@@ -17,6 +17,8 @@
  *
  */
 
+#pragma once
+ 
 #ifndef LSF_MBD_MDB_H
 #define LSF_MBD_MBD_H
 

@@ -4,6 +4,8 @@
  *
  */
 
+#pragma once
+ 
 #ifndef LSF_INTLIB_LINK_H
 #define LSF_INTLIB_LINK_H
 

@@ -16,6 +16,8 @@
  *
  */
 
+#pragma once
+ 
 #ifndef LSF_MBD_PROXY_H
 #define LSF_MBD_PROXY_H
 

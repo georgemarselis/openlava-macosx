@@ -16,6 +16,8 @@
  *
  */
 
+#pragma once
+ 
 #ifndef LSF_DAEMONOUT_H
 #define LSF_DAEMONOUT_H
 

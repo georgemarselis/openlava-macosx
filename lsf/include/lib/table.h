@@ -16,6 +16,8 @@
  *
  */
 
+#pragma once
+
 #ifndef LSF_LIB_TABLE_H
 #define LSF_LIB_TABLE_H
 

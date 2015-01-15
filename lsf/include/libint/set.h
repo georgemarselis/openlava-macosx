@@ -16,6 +16,8 @@
  *
  */
 
+#pragma once 
+ 
 #ifndef LSF_INTLIB_SET_H
 #define LSF_INTLIB_SET_H
 

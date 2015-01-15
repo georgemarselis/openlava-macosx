@@ -16,6 +16,8 @@
  *
  */
 
+#pragma once
+ 
 #ifndef LSF_RES_NIOS_H
 #define LSF_RES_NIOS_H
 

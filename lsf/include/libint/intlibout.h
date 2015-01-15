@@ -16,6 +16,8 @@
  *
  */
 
+#pragma once
+ 
 #ifndef LSF_INTLIB_INTLIBOUT_H
 #define LSF_INTLIB_INTLIBOUT_H
 

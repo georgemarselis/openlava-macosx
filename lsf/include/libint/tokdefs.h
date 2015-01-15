@@ -16,6 +16,8 @@
  *
  */
 
+#pragma once 
+ 
 #ifndef LSF_INTLIB_TOKDEFS_H
 #define LSF_INTLIB_TOKDEFS_H
 

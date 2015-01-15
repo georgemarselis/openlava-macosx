@@ -16,6 +16,8 @@
  *
  */
 
+#pragma once
+ 
 #ifndef LSF_CMD_H
 #define LSF_CMD_H
 

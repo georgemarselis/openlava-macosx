@@ -16,7 +16,8 @@
  *
  */
 
-
+#pragma once
+ 
 #ifndef LSF_CHECKPOINT_CHECKPOINT_H
 #define LSF_CHECKPOINT_CHECKPOINT_H
 

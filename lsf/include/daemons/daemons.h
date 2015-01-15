@@ -16,6 +16,8 @@
  *
  */
 
+#pragma once
+
 #ifndef LSF_DAEMONS_H
 #define LSF_DAEMONS_H
 

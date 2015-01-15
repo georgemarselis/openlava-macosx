@@ -16,6 +16,9 @@
  *
  */
 
+#pragma once
+
+ 
 #ifndef LSF_LSB_LSBATCH_H
 #define LSF_LSB_LSBATCH_H
 

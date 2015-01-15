@@ -16,13 +16,12 @@
  *
  */
 
+#pragma once
+
 #ifndef LSF_LIB_XDR_H
 #define LSF_LIB_XDR_H
 
 #include "lib/hdr.h"
-
-
-
 
 extern bool_t xdr_time_t (XDR *, time_t *);
 extern bool_t xdr_lsfRusage (XDR *, struct lsfRusage *);

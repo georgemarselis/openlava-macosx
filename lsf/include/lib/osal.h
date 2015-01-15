@@ -16,6 +16,8 @@
  *
  */
 
+#pragma once
+
 #ifndef LSF_LIB_OSAL_H
 #define LSF_LIB_OSAL_H
 

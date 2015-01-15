@@ -16,6 +16,9 @@
  *
  */
 
+
+#pragma once
+ 
 #ifndef LSF_LIB_LIB_H
 #define LSF_LIB_LIB_H
 

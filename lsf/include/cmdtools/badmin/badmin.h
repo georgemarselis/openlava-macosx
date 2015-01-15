@@ -16,6 +16,8 @@
  *
  */
 
+#pragma once
+ 
 #ifndef LSF_BADMIN_BADMIN_H
 #define LSF_BADMIN_BADMIN_H
 

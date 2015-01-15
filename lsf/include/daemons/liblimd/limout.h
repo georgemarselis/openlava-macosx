@@ -17,6 +17,8 @@
  *
  */
 
+#pragma once
+ 
 #ifndef LSF_LIM_LIMOUT_H
 #define LSF_LIM_LIMOUT_H
 

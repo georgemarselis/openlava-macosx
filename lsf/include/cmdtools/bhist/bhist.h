@@ -17,6 +17,8 @@
  */
 
 
+#pragma once
+ 
 #ifndef BHISTOUT_H
 #define BHISTOUT_H
 

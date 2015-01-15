@@ -16,6 +16,8 @@
  *
  */
 
+#pragma once
+ 
 #ifndef LSF_CHECKPOINT_ENVIRONMENT_H
 #define LSF_CHECKPOINT_ENVIRONMENT_H
 

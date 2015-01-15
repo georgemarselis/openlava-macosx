@@ -16,6 +16,10 @@
  *
  */
 
+ 
+#pragma once
+ 
+
 #ifndef LSF_LSADMIN_LSADMIN_H
 #define LSF_LSADMIN_LSADMIN_H
 

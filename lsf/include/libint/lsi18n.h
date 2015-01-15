@@ -16,7 +16,8 @@
  *
  */
 
-
+#pragma once
+ 
 #ifndef LS_I18N_H
 #define LS_I18N_H
 

@@ -19,6 +19,8 @@
  *
  */
 
+#pragma once
+ 
 #ifndef LSF_LIM_LINUX_H
 #define LSF_LIM_LINUX_H
 

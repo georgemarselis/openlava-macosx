@@ -16,6 +16,8 @@
  *
  */
 
+#pragma once
+
 #include "intlib/jidx.h"
 
 #ifndef LSF_JGRP_H

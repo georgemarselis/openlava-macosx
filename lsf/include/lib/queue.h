@@ -16,6 +16,8 @@
  *
  */
 
+#pragma once
+
 #ifndef LSF_LIB_QUEUE_H
 #define LSF_LIB_QUEUE_H
 
