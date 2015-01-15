@@ -117,27 +117,27 @@ sig.o: sig.c ../include/lsb/sig.h
 
 so.o: so.c
 
-sock.o: sock.c ../include/lib/sock.h
+sock.o: sock.c
 
-syntax.o: syntax.c ../include/lib/syntax.h
+syntax.o: syntax.c
 
-syslog.o: syslog.c ../include/lib/syslog.h
+syslog.o: syslog.c
 
-table.o: table.c ../include/lib/table.h
+table.o: table.c
 
-term.o: term.c ../include/lib/term.h
+term.o: term.c
 
-tid.o: tid.c ../include/lib/tid.h
+tid.o: tid.c
 
-tty.o: tty.c ../include/lib/tty.h
+tty.o: tty.c
 
-usleep.o: usleep.c ../include/lib/usleep.h
+usleep.o: usleep.c
 
-utmp.o: utmp.c ../include/lib/utmp.h
+utmp.o: utmp.c
 
-wconf.o: wconf.c ../include/lib/wconf.h
+wconf.o: wconf.c
 
-whathost.o: whathost.c ../include/lib/whathost.h
+whathost.o: whathost.c
 
 words.o: words.c ../include/lib/words.h
 
@@ -145,9 +145,9 @@ xdr.o: xdr.c ../include/lib/xdr.h
 
 xdrlim.o: xdrlim.c ../include/lib/xdrlim.h
 
-xdrmisc.o: xdrmisc.c ../include/lib/xdrmisc.h
+xdrmisc.o: xdrmisc.c ../include/lsb/xdr.h
 
-xdrnio.o: xdrnio.c ../include/lib/xdrnio.h
+xdrnio.o: xdrnio.c
 
 xdrres.o: xdrres.c ../include/lib/xdrres.h
 
