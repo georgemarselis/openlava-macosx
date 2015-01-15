@@ -25,7 +25,7 @@
 #include <termios.h>
 
 #include "lib/hdr.h"
-#include "lib/xdrres.h"
+/* #include "lib/xdrres.h" */
 #include "daemons/libresd/resd.h"
 
 

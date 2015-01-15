@@ -33,6 +33,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+ #include "lsf.h"
+
 typedef int LS_ULONG_T;
 typedef int LS_ID_T;
 typedef int LS_HANDLE_T;
