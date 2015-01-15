@@ -25,7 +25,7 @@
 #include "lib/hdr.h"
 #include "lib/xdrlim.h"
 #include "lib/xdr.h"
-#include "mls.h"
+#include "lib/mls.h"
 
 struct taskMsg
 {

@@ -19,7 +19,7 @@
 #ifndef LSF_LSB_SIG_H
 #define LSF_LSB_SIG_H
 
-#include "lsbatch.h"
+#include "lsb/lsbatch.h"
 
 #define SIG_NULL             -65535
 #define SIG_CHKPNT               -1

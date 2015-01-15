@@ -16,9 +16,10 @@
  *
  */
 
-#include "lib.h"
+#include "lib/lib.h"
+#include "lsb/sig.h"
 
-#define SIGEMT  SIGBUS
+/* #define SIGEMT  SIGBUS */
 #define SIGLOST SIGIO
 #define SIGIOT  SIGABRT
 

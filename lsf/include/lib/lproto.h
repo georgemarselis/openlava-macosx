@@ -25,6 +25,7 @@
 #include "lib/table.h"
 #include "lsf.h"
 #include "daemons/libpimd/pimd.h"
+#include "daemons/libresd/resd.h"
 #include "daemons/libresd/resout.h"
 
 #define BIND_RETRY_TIMES 100
@@ -174,8 +175,8 @@ extern int sharedResConfigured_;
 #define LSF_LIM_ERESOURCE_VALUE         "lim_vcl_get_eres_val"
 #define LSF_LIM_ERES_TYPE "!"
 
-extern int lsResMsg_ (int, resCmd, char *, char *, int,
-		      bool_t (*)(), int *, struct timeval *);
+/* FIXME FIXME FIXME : int resCmd bellow may be not int! */
+extern int lsResMsg_ (int, int resCmd, char *, char *, int, bool_t (*)(), int *, struct timeval *);
 extern int expectReturnCode_ (int, int, struct LSFHeader *);
 extern int ackAsyncReturnCode_ (int, struct LSFHeader *);
 extern int resRC2LSErr_ (int);
@@ -222,9 +223,8 @@ extern int putEauthServerEnvVar (char *);
 extern void sw_remtty (int);
 extern void sw_loctty (int);
 
-extern int doAcceptResCallback_ (int s, struct niosConnect *connReq);
-extern int niosCallback_ (struct sockaddr_in *from, u_short port,
-			  int rpid, int exitStatus, int terWhiPendStatus);
+extern int doAcceptResCallback_( int s, struct niosConnect *connReq );
+extern int niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus, int terWhiPendStatus);
 
 extern int sig_encode (int);
 extern int sig_decode (int);
@@ -259,8 +259,7 @@ extern char *my_getopt (int nargc, char **nargv, char *ostr, char **errMsg);
 extern int putEnv (char *env, char *val);
 extern int Bind_ (int, struct sockaddr *, int);
 extern const char *getCmdPathName_ (const char *cmdStr, int *cmdLen);
-extern int replace1stCmd_ (const char *oldCmdArgs, const char *newCmdArgs,
-			   char *outCmdArgs, int outLen);
+extern int replace1stCmd_ (const char *oldCmdArgs, const char *newCmdArgs, char *outCmdArgs, int outLen);
 extern const char *getLowestDir_ (const char *filePath);
 extern void getLSFAdmins_ (void);
 extern bool_t isLSFAdmin_ (const char *name);
@@ -315,8 +314,7 @@ extern void doSkipSection (FILE *, int *, char *, char *);
 extern int isSectionEnd (char *, char *, int *, char *);
 extern int keyMatch (struct keymap *keyList, char *line, int exact);
 extern int mapValues (struct keymap *keyList, char *line);
-extern int readHvalues (struct keymap *, char *, FILE *, char *, int *, int,
-			char *);
+extern int readHvalues (struct keymap *, char *, FILE *, char *, int *, int, char *);
 extern char *getNextValue (char **line);
 extern int putValue (struct keymap *keyList, char *key, char *value);
 extern char *getBeginLine (FILE *, int *);
@@ -340,18 +338,13 @@ extern int rd_select_ (int, struct timeval *);
 extern int b_accept_ (int, struct sockaddr *, socklen_t *);
 extern int blockSigs_ (int, sigset_t *, sigset_t *);
 
-extern int readDecodeHdr_ (int s, char *buf, int (*readFunc) (), XDR * xdrs,
-			   struct LSFHeader *hdr);
-extern int readDecodeMsg_ (int s, char *buf, struct LSFHeader *hdr,
-			   int (*readFunc) (), XDR * xdrs, char *data,
+extern int readDecodeHdr_ (int s, char *buf, int (*readFunc) (), XDR * xdrs, struct LSFHeader *hdr);
+extern int readDecodeMsg_ (int s, char *buf, struct LSFHeader *hdr, int (*readFunc) (), XDR * xdrs, char *data,
 			   bool_t (*xdrFunc) (), struct lsfAuth *auth);
-extern int writeEncodeMsg_ (int, char *, int, struct LSFHeader *, char *,
-			    int (*)(), bool_t (*)(), int);
+extern int writeEncodeMsg_ (int, char *, int, struct LSFHeader *, char *, int (*)(), bool_t (*)(), int);
 extern int writeEncodeHdr_ (int, struct LSFHeader *, int (*)());
-extern int lsSendMsg_ (int, int, int, char *, char *, int, bool_t (*)(),
-		       int (*)(), struct lsfAuth *);
-extern int lsRecvMsg_ (int, char *, int, struct LSFHeader *, char *,
-		       bool_t (*)(), int (*)());
+extern int lsSendMsg_ (int, int, int, char *, char *, int, bool_t (*)(), int (*)(), struct lsfAuth *);
+extern int lsRecvMsg_ (int, char *, int, struct LSFHeader *, char *, bool_t (*)(), int (*)());
 
 extern int io_nonblock_ (int);
 extern int io_block_ (int);
@@ -398,14 +391,9 @@ extern struct passwd *getpwlsfuser_ (const char *lsfUserName);
 extern struct passwd *getpwdirlsfuser_ (const char *lsfUserName);
 
 extern int getLSFUser_ (char *lsfUserName, unsigned int lsfUserNameSize);
-extern int getLSFUserByName_ (const char *osUserName,
-			      char *lsfUserName,
-			      unsigned int lsfUserNameSize);
-extern int getLSFUserByUid_ (uid_t uid, char *lsfUserName,
-			     unsigned int lsfUserNameSize);
-
-extern int getOSUserName_ (const char *lsfUserName,
-			   char *osUserName, unsigned int osUserNameSize);
+extern int getLSFUserByName_ (const char *osUserName, char *lsfUserName, unsigned int lsfUserNameSize);
+extern int getLSFUserByUid_ (uid_t uid, char *lsfUserName, unsigned int lsfUserNameSize);
+extern int getOSUserName_ (const char *lsfUserName, char *osUserName, unsigned int osUserNameSize);
 extern int getOSUid_ (const char *lsfUserName, uid_t * uid);
 
 #endif

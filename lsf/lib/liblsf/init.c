@@ -23,9 +23,9 @@
 #include <unistd.h>
 
 #include "lib/lib.h"
+#include "lib/mls.h"
 #include "lib/lproto.h"
 #include "lib/queue.h"
-#include "mls.h"
 
 #define NL_SETN 23
 

@@ -23,8 +23,8 @@
 
 #include "lib/lib.h"
 #include "lib/lproto.h"
-#include "res/nios.h"
-#include "res/resout.h"
+#include "daemons/libniosd/niosd.h"
+#include "daemons/libresd/resout.h"
 
 #define SIGEMT SIGBUS
 

@@ -24,6 +24,7 @@
 #endif
 
 #include "daemons/libresd/resd.h"
+#include "lib/lproto.h"
 #include "lib/hdr.h"
 #include "lib/rf.h"
 
@@ -32,8 +33,7 @@ extern int xdr_resCmdBill (XDR *, struct resCmdBill *, struct LSFHeader *);
 extern int xdr_resSetenv (XDR *, struct resSetenv *, struct LSFHeader *);
 extern int xdr_resRKill (XDR *, struct resRKill *, struct LSFHeader *);
 extern int xdr_resGetpid (XDR *, struct resPid *, struct LSFHeader *);
-extern bool_t xdr_resGetRusage (XDR *, struct resRusage *,
-				struct LSFHeader *);
+extern bool_t xdr_resGetRusage (XDR *, struct resRusage *, struct LSFHeader *);
 extern int xdr_resChdir (XDR *, struct resChdir *, struct LSFHeader *);
 extern int xdr_resControl (XDR *, struct resControl *, struct LSFHeader *);
 

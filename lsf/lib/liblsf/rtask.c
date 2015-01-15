@@ -27,8 +27,8 @@
 #include "lib/mls.h"
 #include "lib/queue.h"
 #include "lsf.h"
-#include "res/nios.h"
-#include "res/resout.h"
+#include "daemons/libniosd/niosd.h"
+#include "daemons/libresd/resout.h"
 
 static void default_tstp_ (int signo);
 static u_short getTaskPort (int s);

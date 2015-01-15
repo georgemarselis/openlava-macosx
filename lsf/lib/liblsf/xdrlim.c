@@ -20,23 +20,19 @@
 
 #include "lib/lib.h"
 #include "lib/lproto.h"
+#include "lib/xdrlim.h"
 
 #ifndef MIN
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 #endif
 
-static bool_t xdr_hostLoad (XDR *, struct hostLoad *, struct LSFHeader *,
-			    char *);
-static bool_t xdr_placeInfo (XDR *, struct placeInfo *, struct LSFHeader *);
-static bool_t xdr_shortLsInfo (XDR *, struct shortLsInfo *,
-			       struct LSFHeader *);
-static bool_t xdr_resItem (XDR *, struct resItem *, struct LSFHeader *);
-static void freeUpMemp (char *, int);
-static bool_t xdr_lsResourceInfo (XDR *, struct lsSharedResourceInfo *,
-				  struct LSFHeader *);
-static bool_t xdr_lsResourceInstance (XDR *,
-				      struct lsSharedResourceInstance *,
-				      struct LSFHeader *);
+static bool_t xdr_hostLoad(				XDR *, struct hostLoad *, 	struct LSFHeader *, char *);
+static bool_t xdr_placeInfo(			XDR *, struct placeInfo *, 	struct LSFHeader *);
+static bool_t xdr_shortLsInfo(			XDR *, struct shortLsInfo *, struct LSFHeader *);
+static bool_t xdr_resItem(				XDR *, struct resItem *, 	struct LSFHeader *);
+static void freeUpMemp(					char *, int);
+static bool_t xdr_lsResourceInfo(		XDR *, struct lsSharedResourceInfo *, struct LSFHeader *);
+static bool_t xdr_lsResourceInstance( 	XDR *, struct lsSharedResourceInstance *, struct LSFHeader *);
 int sharedResConfigured_ = FALSE;
 
 static bool_t

@@ -24,7 +24,7 @@
 #include "lib/lib.h"
 #include "lib/lproto.h"
 #include "lib/rf.h"
-#include "res/resout.h"
+#include "daemons/libresd/resout.h"
 
 #define ABS(i) ((i) < 0 ? -(i) : (i))
 

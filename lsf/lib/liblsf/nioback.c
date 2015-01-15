@@ -22,7 +22,7 @@
 
 #include "lib/lib.h"
 #include "lib/lproto.h"
-#include "res/rescom.h"
+#include "daemons/libresd/rescom.h"
 
 #define NL_SETN 23
 

@@ -24,12 +24,15 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "../lib/lib.h"
-#include "../lib/lib.osal.h"
-#include "../../lsbatch/lsbatch.h"
-#include "../intlib/list.h"
-#include "../res/rescom.h"
-#include "nios.h"
+
+#include "lib/lib.h"
+#include "lib/osal.h"
+#include "lsb/lsbatch.h"
+#include "libint/list.h"
+#include "lib/lproto.h"
+#include "daemons/libresd/resd.h"
+#include "daemons/libresd/rescom.h"
+#include "daemons/libniosd/niosd.h"
 
 #define NL_SETN         29
 typedef struct dead_tid

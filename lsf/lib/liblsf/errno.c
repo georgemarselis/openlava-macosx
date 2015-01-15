@@ -18,7 +18,7 @@
 
 #include <signal.h>
 
-#include "lib.h"
+#include "lib/lib.h"
 
 
 static int errno_map[] = { 0,

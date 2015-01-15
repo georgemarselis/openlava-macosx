@@ -21,7 +21,7 @@
 #define LSF_LIM_LIMOUT_H
 
 #include "lib/hdr.h"
-#include "lib/xdrlim.h"
+/* #include "lib/xdrlim.h" */
 
 enum ofWhat
 { OF_ANY, OF_HOSTS, OF_TYPE };

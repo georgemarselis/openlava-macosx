@@ -23,7 +23,7 @@
 #include <math.h>
 #include <limits.h>
 
-#include "lib.h"
+#include "lib/lib.h"
 
 #ifndef MIN
 #define MIN(a,b) ((a) < (b) ? (a) : (b))

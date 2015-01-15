@@ -24,9 +24,9 @@
 
 #include "lib/lib.h"
 #include "lib/lproto.h"
-#include "mls.h"
-#include "res/nios.h"
-#include "res/resout.h"
+#include "lib/mls.h"
+#include "daemons/libniosd/niosd.h"
+#include "daemons/libresd/resout.h"
 
 #define exit(a)         _exit(a)
 

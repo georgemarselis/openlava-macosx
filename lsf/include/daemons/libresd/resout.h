@@ -24,6 +24,7 @@
 
 #include "lib/hdr.h"
 #include "lib/xdrres.h"
+#include "daemons/libresd/resd.h"
 
 
 
@@ -130,7 +131,25 @@ typedef struct channel
   int wcount;
 } Channel;
 
+/* struct niosConnect {
+    int rpid;
+    int exitStatus;
+    int terWhiPendStatus;
+};
 
+struct niosStatus {
+    resAck ack;
+
+    struct sigStatusUsage {
+  int ss;
+  struct rusage ru;
+    } s;
+};
+
+struct resSignal {
+    int pid;
+    int sigval;
+};
 
 typedef struct outputchannel
 {
@@ -139,7 +158,7 @@ typedef struct outputchannel
   int retry;
   int bytes;
   RelayLineBuf buffer;
-} outputChannel;
+} outputChannel;*/
 
 #ifdef LS_WAIT_INT
 #define SETTERMSIG(x,y) ((x) = ((x) & 0xFFFFFF80) | ( (y) & 0x7F))
