@@ -307,7 +307,7 @@ chanActivate_ (int chfd)
 }
 
 int
-chanConnect_ (int chfd, struct sockaddr_in *peer, int timeout, int options)
+chanConnect_ (int chfd, struct sockaddr_in *peer, int timeout)
 {
   int cc;
 
@@ -318,9 +318,7 @@ chanConnect_ (int chfd, struct sockaddr_in *peer, int timeout, int options)
     }
 
   if (logclass & (LC_COMM | LC_TRACE))
-    ls_syslog (LOG_DEBUG2,
-	       "chanConnect_: Connecting chan=%d to peer %s timeout %d", chfd,
-	       sockAdd2Str_ (peer), timeout);
+    ls_syslog (LOG_DEBUG2, "chanConnect_: Connecting chan=%d to peer %s timeout %d", chfd, sockAdd2Str_ (peer), timeout);
 
   if (channels[chfd].type == CH_TYPE_UDP)
     {

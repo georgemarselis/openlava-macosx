@@ -194,8 +194,7 @@ contact:
       if (limchans_[TCP] < 0)
 	return (-1);
 
-      cc = chanConnect_ (limchans_[TCP],
-			 &sockIds_[TCP], conntimeout_ * 1000, 0);
+      cc = chanConnect_ (limchans_[TCP], &sockIds_[TCP], conntimeout_ * 1000);
       if (cc < 0)
 	{
 	  ls_syslog (LOG_DEBUG, "\
@@ -527,7 +526,7 @@ createLimSock_ (struct sockaddr_in *connaddr)
   else
     chfd = chanClientSocket_ (AF_INET, SOCK_DGRAM, 0);
 
-  if (connaddr && chanConnect_ (chfd, connaddr, -1, 0) < 0)
+  if (connaddr && chanConnect_ (chfd, connaddr, -1) < 0)
     return (-1);
 
   return (chfd);

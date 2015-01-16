@@ -79,7 +79,7 @@ serv_connect (char *serv_host, ushort serv_port, int timeout)
       return (-1);
     }
 
-  cc = chanConnect_ (chfd, &serv_addr, timeout * 1000, 0);
+  cc = chanConnect_ (chfd, &serv_addr, timeout * 1000);
   if (cc < 0)
     {
       switch (lserrno)

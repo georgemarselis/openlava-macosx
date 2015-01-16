@@ -770,7 +770,7 @@ probeMasterTcp (struct clusterNode *clPtr)
       return -2;
     }
 
-  rc = chanConnect_ (ch, &mlim_addr, probeTimeout * 1000, 0);
+  rc = chanConnect_ (ch, &mlim_addr, probeTimeout * 1000);
   if (rc < 0)
     {
       ls_syslog (LOG_ERR, "\
