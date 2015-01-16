@@ -16,18 +16,19 @@
  *
  */
 
-#ifdef APPROVED
-
 #include <stdio.h>
 #include <errno.h>
 #include <unistd.h>
 
-#include "lib.h"
+#include "lib/lib.h"
 
 static char amSlave_ = FALSE;
 static int msock_ = -1;
 static int myrpid_ = -1;
-void unsetenv (char *);
+
+/*FIXME FIXME the following function conflicts with the standard library
+function unsetenv in <stdlib>*/
+/* void unsetenv (char *); */
 
 int
 ls_minit ()
@@ -68,7 +69,7 @@ ls_getrpid (void)
 }
 
 int
-ls_sndmsg (int tid, char *buf, int count, task_sock)
+ls_sndmsg (int tid, char *buf, int count)
 {
   int cc, sock;
   struct tid *tid;
@@ -77,7 +78,7 @@ ls_sndmsg (int tid, char *buf, int count, task_sock)
     sock = msock_;
   else
     {
-      if ((tid = tid_find (tid, task_sock)) == NULL)
+      if ((tid = tid_find (tid) == NULL)
 	return (-1);
       sock = tid->sock;
     }
@@ -102,7 +103,7 @@ ls_rcvmsg (int tid, char *buf, int count)
 	}
       else
 	{
-	  if ((sock = tid_find (tid, task_sock)) < 0)
+	  if ((sock = tid_find (tid) < 0)
 	    {
 	      lserrno = LSE_RES_INVCHILD;
 	      return (-1);
@@ -112,4 +113,4 @@ ls_rcvmsg (int tid, char *buf, int count)
 
   return (b_read_fix (sock, buf, count));
 }
-#endif
+
