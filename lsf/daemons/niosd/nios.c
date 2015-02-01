@@ -625,8 +625,7 @@ serv (char **argv, int asock)
 	}
 
 
-      nready = ls_nioselect (maxfds, &rmask, &wmask, (fd_set *) NULL,
-			     &tasks, (struct timeval *) NULL);
+      nready = ls_nioselect (maxfds, &rmask, &wmask, (fd_set *) NULL, &tasks, (struct timeval *) NULL);
       if (nready < 0)
 	{
 	  if (LSE_SYSCALL (lserrno) && errno == EINTR)

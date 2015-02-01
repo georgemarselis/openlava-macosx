@@ -68,50 +68,41 @@ serv_connect (char *serv_host, ushort serv_port, int timeout)
         options = CHAN_OP_PPORT;
     }
     else {
-        options = 0; }
+        options = 0;
+    }
 
     chfd = chanClientSocket_ (AF_INET, SOCK_STREAM, options);
-    if (chfd < 0)
-        {
+    if (chfd < 0) {
         lsberrno = LSBE_LSLIB;
         return (-1);
-        }
+    }
 
     cc = chanConnect_ (chfd, &serv_addr, timeout * 1000);
-    if (cc < 0)
-        {
-        switch (lserrno)
-            {
-                case LSE_TIME_OUT:
+    if (cc < 0) {
+        switch (lserrno) {
+            case LSE_TIME_OUT:
                 lsberrno = LSBE_CONN_TIMEOUT;
                 break;
-                case LSE_CONN_SYS:
-                if (errno == ECONNREFUSED || errno == EHOSTUNREACH)
+            case LSE_CONN_SYS:
+                if (errno == ECONNREFUSED || errno == EHOSTUNREACH) {
                     lsberrno = LSBE_CONN_REFUSED;
-                else
+                }
+                else {
                     lsberrno = LSBE_SYS_CALL;
+                }
                 break;
-                default:
+            default:
                 lsberrno = LSBE_SYS_CALL;
-            }
+        }
         chanClose_ (chfd);
         return -1;
-        }
+    }
 
     return (chfd);
 }
 
 int
-call_server (char *host,
-             ushort serv_port,
-             char *req_buf,
-             int req_size,
-             char **rep_buf,
-             struct LSFHeader *replyHdr,
-             int conn_timeout,
-             int recv_timeout,
-             int *connectedSock,
-             int (*postSndFunc) (), int *postSndFuncArg, int flags)
+call_server (char *host, ushort serv_port, char *req_buf, int req_size,  char **rep_buf, struct LSFHeader *replyHdr, int conn_timeout, int recv_timeout, int *connectedSock, int (*postSndFunc) (), int *postSndFuncArg, int flags)
 {
     int cc;
     static char fname[] = "call_server";
@@ -120,35 +111,33 @@ call_server (char *host,
     struct Buffer *replyBufPtr;
     int serverSock;
 
-    if (logclass & LC_COMM)
+    if (logclass & LC_COMM) {
         ls_syslog (LOG_DEBUG1, "callserver: Entering this routine...");
+    }
 
     *rep_buf = NULL;
     lsberrno = LSBE_NO_ERROR;
 
-    if (!(flags & CALL_SERVER_USE_SOCKET))
-        {
-        if ((serverSock = serv_connect (host, serv_port, conn_timeout)) < 0)
+    if (!(flags & CALL_SERVER_USE_SOCKET)) {
+        if ((serverSock = serv_connect (host, serv_port, conn_timeout)) < 0) {
             return (-2);
         }
-    else
-        {
-        if (connectedSock == NULL)
-            {
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5000, "%s: CALL_SERVER_USE_SOCKET defined, but %s is NULL"),	/* catgets 5000 */
-                       fname, "connectedSock");
+    }
+    else {
+        if (connectedSock == NULL) {
+            /* catgets 5000 */
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5000, "%s: CALL_SERVER_USE_SOCKET defined, but %s is NULL"), fname, "connectedSock");
             lsberrno = LSBE_BAD_ARG;
             return (-2);
-            }
-        serverSock = *connectedSock;
         }
+        serverSock = *connectedSock;
+    }
 
-    if (logclass & LC_COMM)
-        ls_syslog (LOG_DEBUG1, "%s: serv_connect() get server sock <%d>", fname,
-                   serverSock);
+    if (logclass & LC_COMM) {
+        ls_syslog (LOG_DEBUG1, "%s: serv_connect() get server sock <%d>", fname, serverSock);
+    }
 
-    if (!(flags & CALL_SERVER_NO_HANDSHAKE))
-        {
+    if (!(flags & CALL_SERVER_NO_HANDSHAKE)) {
 
         if (handShake_ (serverSock, TRUE, conn_timeout) < 0)
             {
