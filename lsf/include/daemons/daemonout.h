@@ -24,7 +24,7 @@
 #include "lib/hdr.h"
 #include "lib/xdr.h"
 #include "lib/lproto.h"
-#include "lib/sig.h"
+#include "lsb/sig.h"
 #include "lsb/lsbatch.h"
 #include "lsf.h"
 

@@ -65,7 +65,8 @@ typedef enum
 struct lslibNiosHdr
 {
   int opCode;
-  int len;
+  char padding[4];
+  size_t len;
 };
 
 
@@ -106,7 +107,8 @@ struct lslibNiosStdout
   struct
   {
     int set_on;
-    int len;
+    char padding[4];
+    size_t len;
   } r;
   char *format;
 };
@@ -117,7 +119,8 @@ struct lslibNiosStdin
   struct
   {
     int set_on;
-    int len;
+    char padding[4];
+    size_t len;
   } r;
   int *rpidlist;
 };

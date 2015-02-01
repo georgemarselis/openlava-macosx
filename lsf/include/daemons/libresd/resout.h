@@ -26,7 +26,9 @@
 
 #include "lib/hdr.h"
 /* #include "lib/xdrres.h" */
+/*#include "lib/lproto.h"*/
 #include "daemons/libresd/resd.h"
+
 
 
 
@@ -40,7 +42,7 @@ struct winsize
 };
 #endif
 
-typedef enum
+/*enum resAck
 {
   RESE_OK,
   RESE_SIGCHLD,
@@ -77,42 +79,41 @@ typedef enum
   RESE_MLS_CLEARANCE,
   RESE_MLS_DOMINATE,
   RESE_MLS_RHOST
-} resAck;
-
-typedef enum
+};
+*/
+enum resCmd
 {
-  RES_CONNECT = 1,
-  RES_SERVER = 2,
-  RES_EXEC = 3,
-  RES_SETENV = 4,
-  RES_INITTTY = 5,
-  RES_RKILL = 6,
-  RES_CONTROL = 7,
-  RES_CHDIR = 8,
-  RES_GETPID = 9,
-  RES_RUSAGE = 10,
-  RES_NONRES = 11,
-  RES_DEBUGREQ = 12,
-  RES_ACCT = 13,
-  RES_SETENV_ASYNC = 14,
-  RES_INITTTY_ASYNC = 15,
-  RES_RMI = 99
-} resCmd;
-
+    RES_FAIL          = 0,
+    RES_CONNECT       = 1,
+    RES_SERVER        = 2,
+    RES_EXEC          = 3,
+    RES_SETENV        = 4,
+    RES_INITTTY       = 5,
+    RES_RKILL         = 6,
+    RES_CONTROL       = 7,
+    RES_CHDIR         = 8,
+    RES_GETPID        = 9,
+    RES_RUSAGE        = 10,
+    RES_NONRES        = 11,
+    RES_DEBUGREQ      = 12,
+    RES_ACCT          = 13,
+    RES_SETENV_ASYNC  = 14,
+    RES_INITTTY_ASYNC = 15,
+    RES_RMI           = 99
+};
 
 
 struct resConnect
 {
-  struct lenData eexec;
+    struct lenData eexec;
 };
-
 
 
 typedef struct relaybuf
 {
-  char buf[BUFSIZ + sizeof (struct LSFHeader)];
-  char *bp;
-  int bcount;
+    char buf[BUFSIZ + sizeof (struct LSFHeader)];
+    char *bp;
+    int bcount;
 } RelayBuf;
 
 #define LINE_BUFSIZ 4096

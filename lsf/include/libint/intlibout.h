@@ -21,7 +21,6 @@
 #ifndef LSF_INTLIB_INTLIBOUT_H
 #define LSF_INTLIB_INTLIBOUT_H
 
-#include "libint/bitset.h"
 #include "libint/link.h"
 #include "libint/list2.h"
 #include "libint/listset.h"

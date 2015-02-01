@@ -23,6 +23,7 @@
 
 #include "libint/list.h"
 #include "lib/lproto.h"
+#include "daemons/libresd/resd.h"
 
 typedef struct _bitsetEvent LS_BITSET_EVENT_T;
 

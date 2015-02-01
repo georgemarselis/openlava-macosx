@@ -70,7 +70,7 @@
 #define I18N_CATFILE        "lsf"
 
 #undef  NL_SETN
-#define I18N(msgID, msg) (_i18n_msg_get(ls_catd, NL_SETN, msgID, msg))
+#define I18N(msgID, msg)   (_i18n_msg_get(ls_catd, NL_SETN, msgID, msg))
 
 #define I18N_m(msgID, msg) (_i18n_msg_get(ls_catd, 33, msgID, msg))
 

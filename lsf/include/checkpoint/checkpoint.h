@@ -29,54 +29,54 @@
 #include "lsf.h"
 
 
-#define  ECHKPNT_STDOUT_FILE                  "/echeckpoint.out"
-#define  ECHKPNT_STDERR_FILE                  "/echeckpoint.err"
-#define  ERESTART_STDOUT_FILE                 "/erestart.out"
-#define  ERESTART_STDERR_FILE                 "/erestart.err"
-#define  ECHKPNT_DEFAULT_OUTPUT_FILE          "/dev/null"
+#define  ECHKPNT_STDOUT_FILE            "/echeckpoint.out"
+#define  ECHKPNT_STDERR_FILE            "/echeckpoint.err"
+#define  ERESTART_STDOUT_FILE           "/erestart.out"
+#define  ERESTART_STDERR_FILE           "/erestart.err"
+#define  ECHKPNT_DEFAULT_OUTPUT_FILE    "/dev/null"
 
 
 
-#define  ECHKPNT_PROGRAM                      "echeckpoint"
-#define  ERESTART_PROGRAM                     "erestart"
+#define  ECHKPNT_PROGRAM                "echeckpoint"
+#define  ERESTART_PROGRAM               "erestart"
 
 
-#define  ECHKPNT_METHOD                       "LSB_ECHKPNT_METHOD"
-#define  ECHKPNT_METHOD_DIR                   "LSB_ECHKPNT_METHOD_DIR"
-#define  ECHKPNT_KEEP_OUTPUT                  "LSB_ECHKPNT_KEEP_OUTPUT"
-#define  ECHKPNT_OLD_JOBID                    "LSB_OLD_JOBID"
-#define  ECHKPNT_RESTART_USRCMD               "LSB_ERESTART_USRCMD"
+#define  ECHKPNT_METHOD                 "LSB_ECHKPNT_METHOD"
+#define  ECHKPNT_METHOD_DIR             "LSB_ECHKPNT_METHOD_DIR"
+#define  ECHKPNT_KEEP_OUTPUT            "LSB_ECHKPNT_KEEP_OUTPUT"
+#define  ECHKPNT_OLD_JOBID              "LSB_OLD_JOBID"
+#define  ECHKPNT_RESTART_USRCMD         "LSB_ERESTART_USRCMD"
 
 
-#define  ECHKPNT_JOBID			      		"LSB_JOBID"
-#define  ECHKPNT_CHKPNT_DIR                   "LSB_CHKPNT_DIR"
-#define  ECHKPNT_STDERR_FD                    "LSB_STDERR_FD"
-#define  ECHKPNT_JOBFILENAME                  "LSB_CHKFILENAME"
+#define  ECHKPNT_JOBID                  "LSB_JOBID"
+#define  ECHKPNT_CHKPNT_DIR             "LSB_CHKPNT_DIR"
+#define  ECHKPNT_STDERR_FD              "LSB_STDERR_FD"
+#define  ECHKPNT_JOBFILENAME            "LSB_CHKFILENAME"
 
-#define  ECHKPNT_ACCT_FILE		      		"LSB_ACCT_FILE"
+#define  ECHKPNT_ACCT_FILE              "LSB_ACCT_FILE"
 
-#define  ECHKPNT_OPEN_OUTPUT                  "Y"
-#define  ECHKPNT_OPEN_OUTPUT_L                "y"
-#define  ECHKPNT_DEFAULT_METHOD               "default"
-#define  ECHKPNT_RESTART_CMD_MARK             "LSB_RESTART_CMD="
-#define  ECHKPNT_RESTART_CMD_FILE             "restart_cmd"
-#define  ECHKPNT_LOG_FILENAME                 "chkpnt.log"
-#define  PID_MSG_HEADER                       "pid="
-#define  PGID_MSG_HEADER                      "pgid="
-#define  ECHKPNT_NEWJOBFILE_SUFFIX            ".restart"
+#define  ECHKPNT_OPEN_OUTPUT            "Y"
+#define  ECHKPNT_OPEN_OUTPUT_L          "y"
+#define  ECHKPNT_DEFAULT_METHOD         "default"
+#define  ECHKPNT_RESTART_CMD_MARK       "LSB_RESTART_CMD="
+#define  ECHKPNT_RESTART_CMD_FILE       "restart_cmd"
+#define  ECHKPNT_LOG_FILENAME           "chkpnt.log"
+#define  PID_MSG_HEADER                 "pid="
+#define  PGID_MSG_HEADER                "pgid="
+#define  ECHKPNT_NEWJOBFILE_SUFFIX      ".restart"
 
-#define  ECHKPNT_FILE_MODE                    (S_IRUSR | S_IWUSR)
+#define  ECHKPNT_FILE_MODE              (S_IRUSR | S_IWUSR)
 
-#define  MAX_ARGS			      16
-#define  MAX_TIME_STRING		      50
+#define  MAX_ARGS                 16
+#define  MAX_TIME_STRING              50
 
+int   redirectFd (const char *, int);
+int   initLog    (char *);
+int   getChkpntDirFile (char *, const char *);
 char *getEchkpntMethodDir (char *, const char *, const char *, const char *);
-int getChkpntDirFile (char *, const char *);
-int redirectFd (const char *, int);
-int initLog (char *);
-void logMesg (const char *);
-void closeLog ();
-void setMesgHeader (char *);
+void  logMesg  (const char *);
+void  closeLog (void);
+void  setMesgHeader (char *);
 
 
 #endif

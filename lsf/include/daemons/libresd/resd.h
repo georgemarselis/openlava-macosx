@@ -26,13 +26,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "libint/list.h"
 #include "libint/intlibout.h"
-#include "lib/lproto.h"
+#include "daemons/libresd/resout.h"
 #include "lib/osal.h"
 #include "lib/xdr.h"
 #include "lsf.h"
-#include "daemons/libresd/rescom.h"
-#include "daemons/libresd/resout.h"
 
 #ifndef _BSD
 #define _BSD
@@ -100,8 +99,8 @@ extern int restart_argc;
 extern char **restart_argv;
 extern char *env_dir;
 
-#define MAXCLIENTS_HIGHWATER_MARK	100
-#define MAXCLIENTS_LOWWATER_MARK	1
+#define MAXCLIENTS_HIGHWATER_MARK 100
+#define MAXCLIENTS_LOWWATER_MARK  1
 
 
 #define DOREAD  0
@@ -109,14 +108,14 @@ extern char *env_dir;
 #define DOEXCEPTION 2
 #define DOSTDERR 3
 
-#define PTY_TEMPLATE		"/dev/ptyXX"
+#define PTY_TEMPLATE    "/dev/ptyXX"
 
-#define PTY_SLAVE_INDEX		(sizeof(PTY_TEMPLATE) - 6)
-#define PTY_ALPHA_INDEX		(sizeof(PTY_TEMPLATE) - 3)
-#define PTY_DIGIT_INDEX		(sizeof(PTY_TEMPLATE) - 2)
+#define PTY_SLAVE_INDEX   (sizeof(PTY_TEMPLATE) - 6)
+#define PTY_ALPHA_INDEX   (sizeof(PTY_TEMPLATE) - 3)
+#define PTY_DIGIT_INDEX   (sizeof(PTY_TEMPLATE) - 2)
 
-#define PTY_FIRST_ALPHA		'p'
-# define PTY_LAST_ALPHA		'v'
+#define PTY_FIRST_ALPHA   'p'
+# define PTY_LAST_ALPHA   'v'
 
 #define   BUFSTART(x)    ((char *) ((x)->buf) + sizeof(struct LSFHeader))
 
@@ -136,8 +135,8 @@ typedef struct ttystruct
 struct client
 {
   int client_sock;
-  int ruid;
-  int gid;
+  pid_t ruid;
+  pid_t gid;
   char *username;
   char *clntdir;
   char *homedir;
@@ -152,8 +151,8 @@ struct client
 struct child
 {
   struct client *backClnPtr;
-  int rpid;
-  int pid;
+  pid_t rpid;
+  pid_t pid;
 
   int refcnt;
   int info;
@@ -202,20 +201,55 @@ typedef struct taggedConn
   struct niosChannel *sock;
   int rtag;
   int wtag;
-
-
   int *task_duped;
   int num_duped;
 } taggedConn_t;
 
 typedef struct resNotice
 {
-  struct resNotice *forw, *back;
-  int rpid;
-  int retsock;
-  int opCode;
-  struct resAck *ack;
-  struct sigStatusUsage *sigStatRu;
+    struct resNotice *forw, *back;
+    pid_t rpid;
+    int retsock;
+    int opCode;
+    enum resAck {
+
+        RESE_OK,
+        RESE_SIGCHLD,
+        RESE_NOMORECONN,
+        RESE_BADUSER,
+        RESE_ROOTSECURE,
+        RESE_DENIED,
+        RESE_REQUEST,
+        RESE_CALLBACK,
+        RESE_NOMEM,
+        RESE_FATAL,
+        RESE_PTYMASTER,
+        RESE_PTYSLAVE,
+        RESE_SOCKETPAIR,
+        RESE_FORK,
+        RESE_REUID,
+        RESE_CWD,
+        RESE_INVCHILD,
+        RESE_KILLFAIL,
+        RESE_VERSION,
+        RESE_DIRW,
+        RESE_NOLSF_HOST,
+        RESE_NOCLIENT,
+        RESE_RUSAGEFAIL,
+        RESE_RES_PARENT,
+        RESE_FILE,
+        RESE_NOVCL,
+        RESE_NOSYM,
+        RESE_VCL_INIT,
+        RESE_VCL_SPAWN,
+        RESE_EXEC,
+        RESE_ERROR_LAST,
+        RESE_MLS_INVALID,
+        RESE_MLS_CLEARANCE,
+        RESE_MLS_DOMINATE,
+        RESE_MLS_RHOST
+        } ack;
+    struct sigStatusUsage *sigStatRu;
 } resNotice_t;
 
 
@@ -228,25 +262,27 @@ typedef struct resNotice
 
 struct resSignal
 {
-  int pid;
-  int sigval;
+    pid_t pid;
+    int sigval;
 };
 
 struct resCmdBill
 {
-  u_short retport;
-  int rpid;
-  int filemask;
-  int priority;
-  int options;
-  char cwd[MAXPATHLEN];
-  char **argv;
-  struct lsfLimit lsfLimits[LSF_RLIM_NLIMITS];
+    u_short retport;
+    char padding1[2];
+    pid_t rpid;
+    int filemask;
+    int priority;
+    int options;
+    char cwd[MAXPATHLEN];
+    char padding2[4];
+    char **argv;
+    struct lsfLimit lsfLimits[LSF_RLIM_NLIMITS];
 };
 
 struct resSetenv
 {
-  char **env;
+    char **env;
 };
 
 #define RES_RID_ISTID          0x01
@@ -254,22 +290,22 @@ struct resSetenv
 
 struct resRKill
 {
-  int rid;
+  pid_t rid;
   int whatid;
   int signal;
 };
 
 struct resPid
 {
-  int rpid;
-  int pid;
+  pid_t rpid;
+  pid_t pid;
 };
 
 #define RES_RPID_KEEPPID 0x01
 
 struct resRusage
 {
-  int rid;
+  pid_t rid;
   int whatid;
   int options;
 };
@@ -304,7 +340,7 @@ typedef struct nioschannel
 
 struct niosConnect
 {
-  int rpid;
+  pid_t rpid;
   int exitStatus;
   int terWhiPendStatus;
 };
@@ -312,13 +348,15 @@ struct niosConnect
 struct niosStatus
 {
 
-  struct resAck *ack;
+    enum resAck ack;
+    char padding[4];
 
-  struct sigStatusUsage
-  {
-    int ss;
-    struct rusage *ru;
-  } s;
+    struct sigStatusUsage
+    {
+        int ss;
+        char padding[4];
+        struct rusage *ru;
+    } s;
 };
 
 /*********************************************/
@@ -343,7 +381,7 @@ extern struct config_param resConfParams[];
 
 extern void init_res (void);
 extern void resExit_ (int exitCode);
-extern int nb_write_fix (int, char *, int);
+extern long  nb_write_fix (int s, char *buf, size_t len);
 extern int ptymaster (char *);
 extern int ptyslave (char *);
 extern void doacceptconn (void);
@@ -368,21 +406,21 @@ extern void child_handler_ext (void);
 extern void getMaskReady (fd_set * rm, fd_set * wm, fd_set * em);
 extern void display_masks (fd_set *, fd_set *, fd_set *);
 
-extern int b_read_fix (int, char *, int);
-extern int b_write_fix (int, char *, int);
+extern long b_read_fix   (int s, char *buf, size_t len);
+extern long b_write_fix  (int s, char *buf, size_t len);
 
 extern int lsbJobStart (char **, u_short, char *, int);
 
 extern void childAcceptConn (int, struct passwd *, struct lsfAuth *,
-			     struct resConnect *, struct hostent *);
+           struct resConnect *, struct hostent *);
 
 extern void resChild (char *, char *);
 extern int resParent (int, struct passwd *, struct lsfAuth *,
-		      struct resConnect *, struct hostent *);
+          struct resConnect *, struct hostent *);
 extern bool_t isLSFAdmin (const char *);
 
 extern bool_t xdr_resChildInfo (XDR *, struct resChildInfo *,
-				struct LSFHeader *);
+        struct LSFHeader *);
 
 extern void rfServ_ (int);
 

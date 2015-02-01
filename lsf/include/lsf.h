@@ -24,7 +24,6 @@
 
 #include <arpa/inet.h>
 #include <assert.h>
-/* #include <config.h> */
 #include <ctype.h>
 #include <dirent.h>
 #include <errno.h>
@@ -73,7 +72,7 @@
 typedef long LS_LONG_INT;
 typedef unsigned long LS_UNS_LONG_INT;
 
-#define LS_LONG_FORMAT ("%lld")
+#define LS_LONG_FORMAT ("%ld")
 #define _OPENLAVA_PROJECT_ "openlava project 2.0"
 
 /*
@@ -105,12 +104,12 @@ typedef unsigned long LS_UNS_LONG_INT;
 #define FIRST_RES_SOCK  20
 
 #ifdef HAVE_UNION_WAIT
-	#define LS_WAIT_T      union wait
-	#define LS_STATUS(s)   ((s).w_status)
+  #define LS_WAIT_T      union wait
+  #define LS_STATUS(s)   ((s).w_status)
 #else
-	#define LS_WAIT_INT
-	#define LS_WAIT_T      int
-	#define LS_STATUS(s)   (s)
+  #define LS_WAIT_INT
+  #define LS_WAIT_T      int
+  #define LS_STATUS(s)   (s)
 #endif
 
 typedef enum
@@ -131,7 +130,7 @@ typedef enum
 } lsindx_t;
 
 #ifndef MAXFLOAT
-	#define MAXFLOAT        3.40282347e+38F
+  #define MAXFLOAT        3.40282347e+38F
 #endif
 
 #define INFINIT_LOAD    (float) (0x7fffffff)
@@ -191,17 +190,17 @@ typedef enum
 #define STATUS_REX_MLS_DOMIN  106
 
 #define REX_FATAL_ERROR(s)     (((s) == STATUS_REX_NOVCL)               \
-                                || ((s) == STATUS_REX_NOSYM)            \
-                                || ((s) == STATUS_REX_NOMEM)            \
-                                || ((s) == STATUS_REX_FATAL)            \
-                                || ((s) == STATUS_REX_CWD)              \
-                                || ((s) == STATUS_REX_PTY)              \
-                                || ((s) == STATUS_REX_VCL_INIT)         \
-                                || ((s) == STATUS_REX_VCL_SPAWN)        \
-                                || ((s) == STATUS_REX_MLS_INVAL)        \
-                                || ((s) == STATUS_REX_MLS_CLEAR)        \
-                                || ((s) == STATUS_REX_MLS_RHOST)        \
-                                || ((s) == STATUS_REX_MLS_DOMIN))
+                || ((s) == STATUS_REX_NOSYM)            \
+                || ((s) == STATUS_REX_NOMEM)            \
+                || ((s) == STATUS_REX_FATAL)            \
+                || ((s) == STATUS_REX_CWD)              \
+                || ((s) == STATUS_REX_PTY)              \
+                || ((s) == STATUS_REX_VCL_INIT)         \
+                || ((s) == STATUS_REX_VCL_SPAWN)        \
+                || ((s) == STATUS_REX_MLS_INVAL)        \
+                || ((s) == STATUS_REX_MLS_CLEAR)        \
+                || ((s) == STATUS_REX_MLS_RHOST)        \
+                || ((s) == STATUS_REX_MLS_DOMIN))
 
 #define   REXF_USEPTY   0x00000001
 #define   REXF_CLNTDIR  0x00000002
@@ -268,7 +267,7 @@ struct connectEnt
 #define LS_ISUNAVAIL(status)     (((status[0]) & LIM_UNAVAIL) != 0)
 
 #define LS_ISBUSYON(status, index)                                      \
-    (((status[1 + (index)/INTEGER_BITS]) & (1 << (index)%INTEGER_BITS)) != 0)
+  (((status[1 + (index)/INTEGER_BITS]) & (1 << (index)%INTEGER_BITS)) != 0)
 
 #define LS_ISBUSY(status) (((status[0]) & LIM_BUSY) != 0)
 
@@ -297,19 +296,21 @@ struct placeInfo
 
 struct hostLoad
 {
-  char hostName[MAXHOSTNAMELEN];
-  int *status;
-  float *li;
+    char hostName[MAXHOSTNAMELEN];
+    int *status;
+    float *loadIndex;
 };
 
 enum valueType
 {
   LS_BOOLEAN, LS_NUMERIC, LS_STRING, LS_EXTERNAL
 };
+
 #define BOOLEAN  LS_BOOLEAN
 #define NUMERIC  LS_NUMERIC
 #define STRING   LS_STRING
 #define EXTERNAL LS_EXTERNAL
+
 enum orderType
 {
   INCR, DECR, NA
@@ -325,27 +326,33 @@ enum orderType
 
 struct resItem
 {
-  char name[MAXLSFNAMELEN];
-  char des[MAXRESDESLEN];
   enum valueType valueType;
   enum orderType orderType;
   int flags;
   int interval;
+  char name[MAXLSFNAMELEN];
+  char des[MAXRESDESLEN];
+
 };
 
 struct lsInfo
 {
-  int nRes;
+  char padding1[4];
+  char padding5[4];
   struct resItem *resTable;
+  char padding2[4];
+  int nRes;
   int nTypes;
-  char hostTypes[MAXTYPES][MAXLSFNAMELEN];
-  int nModels;
-  char hostModels[MAXMODELS][MAXLSFNAMELEN];
-  char hostArchs[MAXMODELS][MAXLSFNAMELEN];
-  int modelRefs[MAXMODELS];
-  float cpuFactor[MAXMODELS];
   int numIndx;
   int numUsrIndx;
+  int nModels;
+  int modelRefs[MAXMODELS];
+  char hostTypes[MAXTYPES][MAXLSFNAMELEN];
+  char hostModels[MAXMODELS][MAXLSFNAMELEN];
+  char hostArchs[MAXMODELS][MAXLSFNAMELEN];
+  char padding3[4];
+  char padding4[4];
+  double cpuFactor[MAXMODELS];
 };
 
 #define CLUST_STAT_OK             0x01
@@ -353,43 +360,51 @@ struct lsInfo
 
 struct clusterInfo
 {
-  char clusterName[MAXLSFNAMELEN];
+  int *adminIds;
   int status;
-  char masterName[MAXHOSTNAMELEN];
-  char managerName[MAXLSFNAMELEN];
   int managerId;
   int numServers;
   int numClients;
   int nRes;
-  char **resources;
   int nTypes;
-  char **hostTypes;
   int nModels;
+  unsigned int nAdmins;
+  char **resources;
+  char **hostTypes;
   char **hostModels;
-  int nAdmins;
-  int *adminIds;
   char **admins;
+  char clusterName[MAXLSFNAMELEN];
+  char masterName[MAXHOSTNAMELEN];
+  char managerName[MAXLSFNAMELEN];
+
 };
 
 struct hostInfo
 {
-  char hostName[MAXHOSTNAMELEN];
-  char *hostType;
+  int padding2[4];
   char *hostModel;
-  float cpuFactor;
-  int maxCpus;
-  int maxMem;
-  int maxSwap;
-  int maxTmp;
-  int nDisks;
-  int nRes;
   char **resources;
   char *windows;
-  int numIndx;
+  char *hostType;
+  char hostName[MAXHOSTNAMELEN]; /* FIXME FIXME FIXME this should be converted to char *hostName */
+  float cpuFactor;
+  char padding1[4];
   float *busyThreshold;
   char isServer;
+  char padding3[3];
+  unsigned int maxCpus;
+  unsigned int maxMem;
+  unsigned int maxSwap;
+  unsigned int maxTmp;
+  unsigned int nDisks;
+  int nRes;
+  char padding8[4];
+  unsigned long numIndx;
   int rexPriority;
+  char padding4[4];
 };
+
+  
 
 /*
  * This data structure is built when reading the lsf.cluster file and
@@ -397,18 +412,19 @@ struct hostInfo
  */
 struct hostEntry
 {
+  int numIndx;
+  int rcv;
+  int nDisks;
+  int nRes;
+  int rexPriority;
   char hostName[MAXHOSTNAMELEN];
   char hostModel[MAXLSFNAMELEN];
   char hostType[MAXLSFNAMELEN];
-  int rcv;
-  int nDisks;
   float cpuFactor;
-  int numIndx;
   float *busyThreshold;
-  int nRes;
-  char **resList;
-  int rexPriority;
   char *window;
+  char **resList;
+  
 };
 
 struct config_param
@@ -417,36 +433,41 @@ struct config_param
   char *paramValue;
 };
 
+// FIXME FIXME FIXME FIXME this struct needs to be profiled for issues
+//      with time
 struct lsfRusage
 {
-  double ru_utime;
-  double ru_stime;
-  double ru_maxrss;
-  double ru_ixrss;
+//  struct timeval ru_utime; /* user CPU time used */
+//  struct timeval ru_stime; /* system CPU time used */
+  time_t ru_utime;
+  suseconds_t ru_stime;
+  char   padding[4];
+  long   ru_maxrss;
+  time_t ru_ixrss;
   double ru_ismrss;
-  double ru_idrss;
-  double ru_isrss;
-  double ru_minflt;
-  double ru_majflt;
-  double ru_nswap;
-  double ru_inblock;
-  double ru_oublock;
+  long   ru_idrss;
+  long   ru_isrss;
+  long   ru_minflt;
+  long   ru_majflt;
+  long   ru_nswap;
+  long   ru_inblock;
+  long   ru_oublock;
   double ru_ioch;
-  double ru_msgsnd;
-  double ru_msgrcv;
-  double ru_nsignals;
-  double ru_nvcsw;
-  double ru_nivcsw;
+  long   ru_msgsnd;
+  long   ru_msgrcv;
+  long   ru_nsignals;
+  long   ru_nvcsw;
+  long   ru_nivcsw;
   double ru_exutime;
 };
 
 struct lsfAcctRec
 {
   int pid;
-  char *username;
   int exitStatus;
   time_t dispTime;
   time_t termTime;
+  char *username;
   char *fromHost;
   char *execHost;
   char *cwd;
@@ -490,38 +511,40 @@ struct nioInfo
 
 struct confNode
 {
+  char tag;
+  char padding[7];
+  char *cond;
+  char **lines;
+  unsigned long beginLineNum;
+  unsigned long numLines;
   struct confNode *leftPtr;
   struct confNode *rightPtr;
   struct confNode *fwPtr;
-  char *cond;
-  int beginLineNum;
-  int numLines;
-  char **lines;
-  char tag;
 };
 
 struct pStack
 {
-  int top;
-  int size;
+  ssize_t top;
+  size_t size;
   struct confNode **nodes;
 };
 
 struct confHandle
 {
-  struct confNode *rootNode;
   char *fname;
+  size_t lineCount;
   struct confNode *curNode;
-  int lineCount;
+  struct confNode *rootNode;
   struct pStack *ptrStack;
 };
 
 struct lsConf
 {
-  struct confHandle *confhandle;
-  int numConds;
-  char **conds;
+  size_t numConds;
   int *values;
+  char **conds;
+  struct confHandle *confhandle;
+ 
 };
 
 struct sharedConf
@@ -533,26 +556,29 @@ struct sharedConf
 
 typedef struct lsSharedResourceInstance
 {
-  char *value;
   int nHosts;
+  char padding[4];
+  char *value;
   char **hostList;
 
 } LS_SHARED_RESOURCE_INST_T;
 
 typedef struct lsSharedResourceInfo
 {
-  char *resourceName;
   int nInstances;
+  char padding[4];
+  char *resourceName;
   LS_SHARED_RESOURCE_INST_T *instances;
 } LS_SHARED_RESOURCE_INFO_T;
 
 struct clusterConf
 {
-  struct clusterInfo *clinfo;
+
   int numHosts;
-  struct hostInfo *hosts;
   int numShareRes;
   LS_SHARED_RESOURCE_INFO_T *shareRes;
+  struct hostInfo *hosts;
+  struct clusterInfo *clinfo;
 };
 
 /*
@@ -575,9 +601,9 @@ struct jRusage
   int utime;
   int stime;
   int npids;
-  struct pidInfo *pidInfo;
   int npgids;
   int *pgid;
+  struct pidInfo *pidInfo;
 };
 
 typedef enum
@@ -596,6 +622,7 @@ struct lsEventRec
 {
   event_t event;
   uint16_t version;
+  char padding[2];
   time_t etime;
   void *record;
 };
@@ -608,18 +635,18 @@ struct lsEventRec
  */
 struct hostEntryLog
 {
-  char hostName[MAXHOSTNAMELEN];
-  char hostModel[MAXLSFNAMELEN];
-  char hostType[MAXLSFNAMELEN];
-  int rcv;
-  int nDisks;
+  int   rcv;
+  int   nDisks;
+  int   numIndx;
+  int   nRes;
+  int   rexPriority;
+  char  hostName[MAXHOSTNAMELEN];
+  char  hostModel[MAXLSFNAMELEN];
+  char  hostType[MAXLSFNAMELEN];
   float cpuFactor;
-  int numIndx;
   float *busyThreshold;
-  int nRes;
-  char **resList;
-  int rexPriority;
-  char *window;
+  char  **resList;
+  char  *window;
 };
 
 /*
@@ -727,52 +754,52 @@ struct hostEntryLog
 #define LSE_NERR                99
 
 #define LSE_ISBAD_RESREQ(s)     (((s) == LSE_BAD_EXP)                   \
-                                 || ((s) == LSE_UNKWN_RESNAME)          \
-                                 || ((s) == LSE_UNKWN_RESVALUE))
+                 || ((s) == LSE_UNKWN_RESNAME)          \
+                 || ((s) == LSE_UNKWN_RESVALUE))
 
 #define LSE_SYSCALL(s)          (((s) == LSE_SELECT_SYS)        \
-                                 || ((s) == LSE_CONN_SYS)       \
-                                 || ((s) == LSE_FILE_SYS)       \
-                                 || ((s) == LSE_MSG_SYS)        \
-                                 || ((s) == LSE_SOCK_SYS)       \
-                                 || ((s) == LSE_ACCEPT_SYS)     \
-                                 || ((s) == LSE_SIG_SYS)        \
-                                 || ((s) == LSE_WAIT_SYS)       \
-                                 || ((s) == LSE_EXECV_SYS)      \
-                                 || ((s) == LSE_LIMIT_SYS)      \
-                                 || ((s) == LSE_PIPE)           \
-                                 || ((s) == LSE_ESUB)           \
-                                 || ((s) == LSE_MISC_SYS))
+                 || ((s) == LSE_CONN_SYS)       \
+                 || ((s) == LSE_FILE_SYS)       \
+                 || ((s) == LSE_MSG_SYS)        \
+                 || ((s) == LSE_SOCK_SYS)       \
+                 || ((s) == LSE_ACCEPT_SYS)     \
+                 || ((s) == LSE_SIG_SYS)        \
+                 || ((s) == LSE_WAIT_SYS)       \
+                 || ((s) == LSE_EXECV_SYS)      \
+                 || ((s) == LSE_LIMIT_SYS)      \
+                 || ((s) == LSE_PIPE)           \
+                 || ((s) == LSE_ESUB)           \
+                 || ((s) == LSE_MISC_SYS))
 
 #define TIMEIT(level,func,name)                                         \
-    { if (timinglevel > level) {                                        \
-            struct timeval before, after;                               \
-            struct timezone tz;                                         \
-            gettimeofday(&before, &tz);                                 \
-            func;                                                       \
-            gettimeofday(&after, &tz);                                  \
-            ls_syslog(LOG_INFO,"L%d %s %d ms",level,name,               \
-                      (int)((after.tv_sec - before.tv_sec)*1000 +       \
-                            (after.tv_usec-before.tv_usec)/1000));      \
-        } else                                                          \
-            func;                                                       \
-    }
+  { if (timinglevel > level) {                                        \
+      struct timeval before, after;                               \
+      struct timezone tz;                                         \
+      gettimeofday(&before, &tz);                                 \
+      func;                                                       \
+      gettimeofday(&after, &tz);                                  \
+      ls_syslog(LOG_INFO,"L%d %s %d ms",level,name,               \
+            (int)((after.tv_sec - before.tv_sec)*1000 +       \
+              (after.tv_usec-before.tv_usec)/1000));      \
+    } else                                                          \
+      func;                                                       \
+  }
 
 
 #define TIMEVAL(level,func,val)                                 \
-    { if (timinglevel > level) {                                \
-            struct timeval before, after;                       \
-            struct timezone tz;                                 \
-            gettimeofday(&before, &tz);                         \
-            func;                                               \
-            gettimeofday(&after, &tz);                          \
-            val = (int)((after.tv_sec - before.tv_sec)*1000 +   \
-                        (after.tv_usec-before.tv_usec)/1000);   \
-        } else {                                                \
-            func;                                               \
-            val = 0;                                            \
-        }                                                       \
-    }
+  { if (timinglevel > level) {                                \
+      struct timeval before, after;                       \
+      struct timezone tz;                                 \
+      gettimeofday(&before, &tz);                         \
+      func;                                               \
+      gettimeofday(&after, &tz);                          \
+      val = (int)((after.tv_sec - before.tv_sec)*1000 +   \
+            (after.tv_usec-before.tv_usec)/1000);   \
+    } else {                                                \
+      func;                                               \
+      val = 0;                                            \
+    }                                                       \
+  }
 
 #define LC_SCHED    0x00000001
 #define LC_EXEC     0x00000002
@@ -832,7 +859,7 @@ typedef struct stat LS_STAT_T;
 #define LSTMPDIR        lsTmpDir_
 #define LSDEVNULL       "/dev/null"
 #define LSETCDIR        "/fix/me/no/such/place"
-// #define LSETCDIR        SYSCONFDIR
+/* #define LSETCDIR        SYSCONFDIR */
 #define closesocket close
 #define CLOSESOCKET(s) close((s))
 #define SOCK_CALL_FAIL(c) ((c) < 0 )
@@ -864,47 +891,35 @@ extern int ls_rtask (char *, char **, int);
 extern int ls_rtaske (char *, char **, int, char **);
 extern int ls_rwait (LS_WAIT_T *, int, struct rusage *);
 extern int ls_rwaittid (int, LS_WAIT_T *, int, struct rusage *);
-extern int ls_rkill (int, int);
+extern int lls_rkill (uint rtid, int sig);
 extern int ls_startserver (char *, char **, int);
 extern int ls_conntaskport (int);
-extern char **ls_placereq (char *, int *, int, char *);
-extern char **ls_placeofhosts (char *resreq, int *numhosts,
-			       int options, char *fromhost, char **hostlist,
-			       int listsize);
-extern char **ls_placeoftype (char *resreq, int *numhosts,
-			      int options, char *fromhost, char *hosttype);
-extern struct hostLoad *ls_load (char *resreq, int *numhosts, int options,
-				 char *fromhost);
-extern struct hostLoad *ls_loadofhosts (char *resreq, int *numhosts,
-					int options, char *fromhost,
-					char **hostlist, int listsize);
-extern struct hostLoad *ls_loadoftype (char *resreq, int *numhosts,
-				       int options, char *fromhost,
-				       char *hosttype);
-extern struct hostLoad *ls_loadinfo (char *resreq, int *numhosts, int options,
-				     char *fromhost, char **hostlist,
-				     int listsize, char ***indxnamelist);
-extern int
-ls_loadadj (char *resreq, struct placeInfo *hostlist, int listsize);
+extern char **ls_placereq              (char *resreq, size_t *numhosts, int options, char *fromhost);
+extern char **ls_placeofhosts          (char *resreq, size_t *numhosts, int options, char *fromhost, char **hostlist, size_t listsize);
+extern char **ls_placeoftype           (char *resreq, size_t *numhosts, int options, char *fromhost, char *hosttype);
+extern struct hostLoad *ls_load        (char *resreq, size_t *numhosts, int options, char *fromhost);
+extern struct hostLoad *ls_loadofhosts (char *resreq, size_t *numhosts, int options, char *fromhost, char **hostlist, size_t listsize);
+extern struct hostLoad *ls_loadoftype  (char *resreq, size_t *numhosts, int options, char *fromhost, char *hosttype);
+extern struct hostLoad *ls_loadinfo    (char *resreq, size_t *numhosts, int options, char *fromhost, char **hostlist, size_t listsize, char ***indxnamelist);
+extern int ls_loadadj  (char *resreq, struct placeInfo *hostlist, size_t listsize);
 extern int ls_eligible (char *task, char *resreqstr, char mode);
 extern char *ls_resreq (char *task);
 extern int ls_insertrtask (char *task);
 extern int ls_insertltask (char *task);
 extern int ls_deletertask (char *task);
 extern int ls_deleteltask (char *task);
-extern int ls_listrtask (char ***taskList, int sortflag);
-extern int ls_listltask (char ***taskList, int sortflag);
+extern long ls_listrtask (char ***taskList, int sortflag);
+extern long ls_listltask (char ***taskList, int sortflag);
 extern char **ls_findmyconnections (void);
 extern int ls_isconnected (char *hostName);
 extern int ls_lostconnection (void);
 extern char *ls_getclustername (void);
-extern struct clusterInfo *ls_clusterinfo (char *, int *, char **, int, int);
-extern struct lsSharedResourceInfo *ls_sharedresourceinfo (char **, int *,
-							   char *, int);
+extern struct clusterInfo *ls_clusterinfo (char *resReq, unsigned int *numclusters, char **clusterList, int listsize, int options);
+extern struct lsSharedResourceInfo *ls_sharedresourceinfo (char **, int *, char *, int);
 extern char *ls_getmastername (void);
 extern char *ls_getmastername2 (void);
 extern char *ls_getmyhostname (void);
-extern struct hostInfo *ls_gethostinfo (char *, int *, char **, int, int);
+extern struct hostInfo *ls_gethostinfo (char *resReq, size_t *numhosts, char **hostlist, size_t listsize, int options);
 extern char *ls_getISVmode (void);
 
 extern struct lsInfo *ls_info (void);
@@ -941,8 +956,8 @@ extern int ls_donerex (void);
 extern int ls_rsetenv (char *host, char **env);
 extern int ls_rsetenv_async (char *host, char **env);
 extern int ls_setstdout (int on, char *format);
-extern int ls_niossync (int);
-extern int ls_setstdin (int on, int *rpidlist, int len);
+extern int ls_niossync (long numTasks);
+extern int ls_setstdin (int on, int *rpidlist, size_t len);
 extern int ls_chdir (char *, char *);
 extern int ls_fdbusy (int fd);
 extern char *ls_getmnthost (char *fn);
@@ -951,8 +966,8 @@ extern int ls_setpriority (int newPriority);
 
 extern int ls_ropen (char *host, char *fn, int flags, int mode);
 extern int ls_rclose (int rfd);
-extern int ls_rwrite (int rfd, char *buf, int len);
-extern int ls_rread (int rfd, char *buf, int len);
+extern int ls_rwrite (int rfd, char *buf, size_t len);
+extern int ls_rread (int rfd, char *buf, size_t len);
 extern off_t ls_rlseek (int rfd, off_t offset, int whence);
 extern int ls_runlink (char *host, char *fn);
 extern int ls_rfstat (int rfd, struct stat *buf);
@@ -961,19 +976,14 @@ extern char *ls_rgetmnthost (char *host, char *fn);
 extern int ls_rfcontrol (int command, int arg);
 extern int ls_rfterminate (char *host);
 
-extern void
-ls_ruunix2lsf (struct rusage *rusage, struct lsfRusage *lsfRusage);
-extern void
-ls_rulsf2unix (struct lsfRusage *lsfRusage, struct rusage *rusage);
+extern void ls_ruunix2lsf (struct rusage *rusage, struct lsfRusage *lsfRusage);
+extern void ls_rulsf2unix (struct lsfRusage *lsfRusage, struct rusage *rusage);
 extern void cleanLsfRusage (struct lsfRusage *);
 extern void cleanRusage (struct rusage *);
 
 extern struct resLogRecord *ls_readrexlog (FILE *);
 extern int ls_nioinit (int sock);
-extern int
-ls_nioselect (int,
-	      fd_set *,
-	      fd_set *, fd_set *, struct nioInfo **, struct timeval *);
+extern int ls_nioselect (int, fd_set *, fd_set *, fd_set *, struct nioInfo **, struct timeval *);
 extern int ls_nioctl (int, int);
 extern int ls_nionewtask (int, int);
 extern int ls_nioremovetask (int);
