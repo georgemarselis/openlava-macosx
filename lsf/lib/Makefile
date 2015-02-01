@@ -1,7 +1,7 @@
 
-lsf_bindir := ../../../binary_dir/openlava/2014-01-06/lib/liblsf
-CFLAGS := -I ../include
-INCLUDE_DIR := 
+lsf_bindir :=../../../binary_dir/openlava/2014-01-06/lib/liblsf
+CFLAGS :=-I ../include -arch x86_64 $(CFLAGS)
+INCLUDE_DIR :=
 GCC := /opt/local/bin/gcc
 #CC := $(GCC)
 
@@ -147,15 +147,20 @@ xdrlim.o: xdrlim.c ../include/lib/xdrlim.h
 
 xdrmisc.o: xdrmisc.c ../include/lsb/xdr.h
 
-xdrnio.o: xdrnio.c
+xdrnio.o: xdrnio.c ../include/lib/xdrnio.h
 
 xdrres.o: xdrres.c ../include/lib/xdrres.h
 
-xdrrf.o: xdrrf.c ../include/lib/xdrrf.h
+xdrrf.o: xdrrf.c
 
+vpath %.c checkpoint
+vpath %.h ../include/checkpoint
 
+checkpoint: checkpoint.o
+
+checkpoint.o: checkpoint.c
 
 .PHONY: clean
 
 clean: 
-	@rm -fv channel comm conf confmisc conn control cwd debug dir *.o
+	@rm -fv *.o
