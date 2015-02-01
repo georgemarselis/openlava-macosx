@@ -35,12 +35,14 @@
  */
 struct LSFHeader
 {
-  unsigned short refCode;
-  unsigned short opCode;
-  unsigned int length;
-  unsigned short version;
-  unsigned short reserved;
-  unsigned int reserved0;
+    size_t length;
+    ushort opCode;
+    ushort version;
+    ushort reserved0;
+    char   padding[2];
+    uint   reserved;
+    pid_t  refCode; 
+
 };
 
 /* always use this macro to size up memory buffers
@@ -50,58 +52,56 @@ struct LSFHeader
 
 struct stringLen
 {
-  char *name;
-  int len;
+    char *name;
+    size_t len;
+
 };
 
 struct lenData
 {
-  int len;
+  size_t len;
   char *data;
 };
 
 #define AUTH_HOST_NT  0x01
 #define AUTH_HOST_UX  0x02
 
+#define EAUTH_SIZE 4096
 struct lsfAuth
 {
-  int uid;
-  int gid;
-  char lsfUserName[MAXLSFNAMELEN];
-  enum
-  { CLIENT_SETUID, CLIENT_IDENT, CLIENT_DCE, CLIENT_EAUTH } kind;
-  union authBody
-  {
-    int filler;
-    struct lenData authToken;
-    struct eauth
-    {
-#define EAUTH_SIZE 4096
-      int len;
-      char data[EAUTH_SIZE];
-    } eauth;
-  } k;
-  int options;
+    uid_t uid;
+    uid_t gid;
+    char lsfUserName[MAXLSFNAMELEN];
+    enum { CLIENT_SETUID, CLIENT_IDENT, CLIENT_DCE, CLIENT_EAUTH } kind;
+    int options;
+
+    union authBody {
+        struct eauth {
+            size_t len;
+            char data[EAUTH_SIZE];
+        } eauth;
+        int filler;
+    
+        struct lenData authToken;
+    } k;
 };
 
 
 struct lsfLimit
 {
-  int rlim_curl;
-  int rlim_curh;
-  int rlim_maxl;
-  int rlim_maxh;
+  rlim_t rlim_maxh;
+  rlim_t rlim_curl;
+  rlim_t rlim_curh;
+  rlim_t rlim_maxl;
 };
 
 
 extern bool_t xdr_LSFHeader (XDR *, struct LSFHeader *);
 extern bool_t xdr_packLSFHeader (char *, struct LSFHeader *);
 
-extern bool_t xdr_encodeMsg (XDR *, char *, struct LSFHeader *,
-			     bool_t (*)(), int, struct lsfAuth *);
+extern bool_t xdr_encodeMsg (XDR *, char *, struct LSFHeader *, bool_t (*)(), int, struct lsfAuth *);
 
-extern bool_t xdr_arrayElement (XDR *, char *, struct LSFHeader *,
-				bool_t (*)(), ...);
+extern bool_t xdr_arrayElement (XDR *, char *, struct LSFHeader *, bool_t (*)(), ...);
 extern bool_t xdr_LSFlong (XDR *, long *);
 extern bool_t xdr_stringLen (XDR *, struct stringLen *, struct LSFHeader *);
 extern bool_t xdr_stat (XDR *, struct stat *, struct LSFHeader *);

@@ -20,74 +20,79 @@
 
 #include "lib/lib.h"
 #include "lib/lproto.h"
+#include "daemons/libresd/resout.h"
+
+
+bool_t xdr_resConnect  (XDR * xdrs, struct resConnect  *connectPtr, struct LSFHeader *hdr);
+bool_t xdr_niosConnect (XDR * xdrs, struct niosConnect *conn,       struct LSFHeader *hdr);
+bool_t xdr_niosStatus  (XDR * xdrs, struct niosStatus  *st,         struct LSFHeader *hdr);
+bool_t xdr_resSignal   (XDR * xdrs, struct resSignal   *sig,        struct LSFHeader *hdr);
 
 bool_t
-  xdr_resConnect (XDR * xdrs, struct resConnect *connectPtr,
-		  struct LSFHeader *hdr)
+xdr_resConnect (XDR * xdrs, struct resConnect *connectPtr, struct LSFHeader *hdr)
 {
 
-  if (!xdr_lenData (xdrs, &connectPtr->eexec))
-    {
+    assert( hdr->length );
+
+    if (!xdr_lenData (xdrs, &connectPtr->eexec)) {
+        return (FALSE);
+    }
+
+    return (TRUE);
+}
+
+bool_t
+xdr_niosConnect (XDR * xdrs, struct niosConnect *conn, struct LSFHeader *hdr)
+{
+    assert( hdr->length );
+
+    if (!(xdr_int (xdrs, &conn->rpid))) {
       return (FALSE);
     }
 
-  return (TRUE);
+    return (xdr_int (xdrs, &conn->exitStatus) && xdr_int (xdrs, &conn->terWhiPendStatus));
 }
 
 bool_t
-  xdr_niosConnect (XDR * xdrs, struct niosConnect * conn,
-		   struct LSFHeader * hdr)
+xdr_niosStatus (XDR * xdrs, struct niosStatus *st, struct LSFHeader *hdr)
 {
+    struct lsfRusage lsfRu;
 
+    memset ((char *) &lsfRu, 0, sizeof (lsfRu));
+    if (!xdr_int (xdrs, (int *) &st->ack)) {
+        return (FALSE);
+    }
 
-  if (!(xdr_int (xdrs, &conn->rpid)))
-    return (FALSE);
+    if ( st->ack != RESE_SIGCHLD) {
+        return (TRUE);
+    }
 
+    if (!xdr_int (xdrs, &st->s.ss)) {
+        return (FALSE);
+    }
 
-  return (xdr_int (xdrs, &conn->exitStatus) &&
-	  xdr_int (xdrs, &conn->terWhiPendStatus));
-
-  return (TRUE);
-}
-
-bool_t
-  xdr_niosStatus (XDR * xdrs, struct niosStatus * st, struct LSFHeader * hdr)
-{
-  struct lsfRusage lsfRu;
-
-  memset ((char *) &lsfRu, 0, sizeof (lsfRu));
-  if (!xdr_int (xdrs, (int *) &st->ack))
-    return (FALSE);
-
-  if (st->ack != RESE_SIGCHLD)
-    return (TRUE);
-
-  if (!xdr_int (xdrs, &st->s.ss))
-    return (FALSE);
-
-
-
-  if (xdrs->x_op == XDR_ENCODE)
-    {
-      ls_ruunix2lsf (&(st->s.ru), &lsfRu);
+    if (xdrs->x_op == XDR_ENCODE) {
+        ls_ruunix2lsf ((st->s.ru), &lsfRu);
     };
 
-  if (!xdr_arrayElement (xdrs, (char *) &lsfRu, hdr, xdr_lsfRusage))
-    return (FALSE);
+    if (!xdr_arrayElement (xdrs, (char *) &lsfRu, hdr, xdr_lsfRusage)) {
+        return (FALSE);
+    }
 
-  if (xdrs->x_op == XDR_ENCODE)
+    if (xdrs->x_op == XDR_ENCODE) {
+        return (TRUE);
+    }
+
+    ls_rulsf2unix (&lsfRu, (st->s.ru));
+
     return (TRUE);
-
-
-
-  ls_rulsf2unix (&lsfRu, &(st->s.ru));
-
-  return (TRUE);
 }
 
 
 bool_t
-  xdr_resSignal (XDR * xdrs, struct resSignal * sig, struct LSFHeader * hdr)
+xdr_resSignal (XDR * xdrs, struct resSignal *sig, struct LSFHeader *hdr)
 {
-  return (xdr_int (xdrs, &sig->pid) && xdr_int (xdrs, &sig->sigval));
+    assert( hdr->length );
+
+    return (xdr_int (xdrs, &sig->pid) && xdr_int (xdrs, &sig->sigval));
 }

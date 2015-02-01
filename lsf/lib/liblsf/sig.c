@@ -15,7 +15,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
-
+ 
 #include "lib/lib.h"
 #include "lsb/sig.h"
 
@@ -27,7 +27,7 @@
 #    define SIGWINCH SIGWINDOW
 #endif
 
-int sig_map[] = { 0,
+static int sig_map[] = { 0,
   SIGHUP,
   SIGINT,
   SIGQUIT,
@@ -60,7 +60,7 @@ int sig_map[] = { 0,
   SIGUSR2
 };
 
-char *sigSymbol[] = { "",
+static char *sigSymbol[] = { "",
   "HUP",
   "INT",
   "QUIT",
@@ -93,7 +93,7 @@ char *sigSymbol[] = { "",
   "USR2"
 };
 
-int NSIG_MAP = (sizeof (sig_map) / sizeof (int));
+static int NSIG_MAP = (sizeof (sig_map) / sizeof (int));
 
 int
 sig_encode (int sig)

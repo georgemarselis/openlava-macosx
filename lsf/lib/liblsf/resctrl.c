@@ -21,6 +21,8 @@
 #include "lib/lib.h"
 #include "lib/lproto.h"
 #include "lib/xdr.h"
+#include "lib/xdrnio.h"
+#include "lib/resctrl.h"
 
 int
 ls_rescontrol (char *host, int opCode, int data)
@@ -118,20 +120,25 @@ ls_rescontrol (char *host, int opCode, int data)
 int
 oneResDebug (struct debugReq *pdebug, char *hostname)
 {
-  int s, descriptor[2];
-  char space[] = " ";
-  struct debugReq debugData;
+    int s = 0;
+    int descriptor[2] = { 0, 0 };
+    char space[] = " ";
+    struct debugReq debugData;
 
-  struct
-  {
-    struct LSFHeader hdr;
-    struct debugReq d;
-  } buf;
+    struct {
+      struct LSFHeader hdr;
+      struct debugReq d;
+    } buf;
 
-  if (_isconnected_ (hostname, descriptor))
+  if (_isconnected_ (hostname, descriptor)) {
     s = descriptor[0];
-  else if ((s = ls_connect (hostname)) < 0)
-    return (-1);
+  }
+  else if ((s = ls_connect (hostname)) < 0){
+    return -1;
+  }
+  else {
+    printf( "we have a problem here: oneResDebug()\ns");
+  }
 
   if (!FD_ISSET (s, &connection_ok_))
     {

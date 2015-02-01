@@ -1,5 +1,5 @@
 /*
- * $Id: lib.comm.c 397 2007-11-26 19:04:00Z mblack $ Copyright (C) 2007
+ * $Id: lib.tid.c 397 2007-11-26 19:04:00Z mblack $ Copyright (C) 2007
  * Platform Computing Inc
  * 
  * This program is free software; you can redistribute it and/or modify it under
@@ -16,10 +16,11 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  * 
  */
+ 
+ #pragma once
 
-#pragma once
+struct tid *tid_find (pid_t taskid);
+struct tid *tidFindIgnoreConn_ (pid_t taskid);
+int tid_remove (pid_t taskid);
+int tid_register (pid_t taskid, int socknum, u_short taskPort, char *host, bool_t doTaskInfo);
 
-void ls_minit( void );
-int  ls_getrpid( void );
-long ls_sndmsg (int tid, char *buf, size_t count);
-long ls_rcvmsg (int tid, char *buf, size_t count);

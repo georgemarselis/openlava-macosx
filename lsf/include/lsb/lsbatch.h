@@ -911,7 +911,7 @@ struct logSwitchLog
   int lastJobId;
 };
 
-struct jobNewLog
+/*struct jobNewLog
 {
   int jobId;
   int userId;
@@ -959,6 +959,56 @@ struct jobNewLog
   int idx;
   int userPriority;
 };
+*/
+struct jobNewLog
+{
+  int jobId;
+  int userId;
+  int options;
+  int options2;
+  int numProcessors;
+  int sigValue;
+  int chkpntPeriod;
+  int restartPid;
+  int idx;
+  int numAskedHosts;
+  int nxf;
+  int userPriority;
+  int umask;
+  int niosPort;
+  int maxNumProcessors;
+  int rLimits[LSF_RLIM_NLIMITS];
+  time_t submitTime;
+  time_t beginTime;
+  time_t termTime;
+  float hostFactor;
+  char queue[MAX_LSB_NAME_LEN];
+  char fromHost[MAXHOSTNAMELEN];
+  char cwd[MAXFILENAMELEN];
+  char chkpntDir[MAXFILENAMELEN];
+  char inFile[MAXFILENAMELEN];
+  char outFile[MAXFILENAMELEN];
+  char errFile[MAXFILENAMELEN];
+  char inFileSpool[MAXFILENAMELEN];
+  char commandSpool[MAXFILENAMELEN];
+  char jobSpoolDir[MAXPATHLEN];
+  char subHomeDir[MAXFILENAMELEN];
+  char jobFile[MAXFILENAMELEN];
+  char userName[MAX_LSB_NAME_LEN];
+  char hostSpec[MAXHOSTNAMELEN];
+  char jobName[MAXLINELEN];
+  char command[MAXLINELEN];
+  char padding[4];
+  char *preExecCmd;
+  char *mailUser;
+  char *projectName;
+  char *resReq;
+  char **askedHosts;
+  char *dependCond;
+  char *schedHostType;
+  char *loginShell;
+  struct xFile *xf;
+ };
 
 struct jobModLog
 {

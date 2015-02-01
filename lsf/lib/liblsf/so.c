@@ -18,25 +18,33 @@
 
 
 #include <stdio.h>
+#include <string.h>
+#include <assert.h>
 
 #include "lib/so.h"
 
 SO_HANDLE_T
 soOpen_ (const char *libFileName)
 {
-  return 0;
+    strcmp( libFileName, "");
+    return 0;
 }
 
 
 void
 soClose_ (SO_HANDLE_T handle)
 {
-
+    // SO_HANDLE_T is int, typedef'ed
+    assert( handle );
 }
 
 
 void *
 soSym_ (SO_HANDLE_T handle, const char *entryName)
 {
-  return NULL;
+
+    // SO_HANDLE_T is int, typedef'ed
+    assert( handle );
+    strcmp( entryName, "");
+    return NULL;
 }

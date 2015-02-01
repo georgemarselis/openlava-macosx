@@ -1,4 +1,4 @@
-/* $Id: lib.dir.c 397 2007-11-26 19:04:00Z mblack $
+/* $Id: lib.eauth.c 397 2007-11-26 19:04:00Z mblack $
  * Copyright (C) 2007 Platform Computing Inc
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,13 +16,17 @@
  *
  */
 
- #pragma once
+#pragma once
 
-static struct hTab hashTab;
+#include <unistd.h>
 
-static int putin_ (unsigned long status, char *inkey, int inkeylen, char *inval, int invallen, void *indata);
-static int getMap_ (void);
-static int tryPwd (char *path, char *pwdpath);
-static int netHostChdir (char *, struct hostent *);
-static char *mountNet_ (struct hostent *);
-static char *usePath (char *);
+long 	nb_write_fix (int s, char *buf, size_t len);
+long   	nb_read_fix  (int s, char *buf, size_t len);
+long 	b_read_fix   (int s, char *buf, size_t len);
+long 	b_write_fix  (int s, char *buf, size_t len);
+
+void unblocksig (int sig);
+int  b_connect_ (int s, struct sockaddr *name, socklen_t namelen, unsigned int timeout);
+int  rd_select_ (int rd, struct timeval *timeout);
+int  b_accept_  (int s, struct sockaddr *addr, socklen_t * addrlen);
+long nb_read_timeout (int s, char *buf, size_t len, int timeout);

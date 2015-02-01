@@ -439,8 +439,10 @@ int
 svrsockAccept_ (ls_svrsock_t * svrsock, int timeout)
 {
   socklen_t len;
-  int s;
+  int s = 0;
   struct sockaddr_in from;
+
+  assert( timeout );
 
   if (svrsock == NULL)
     {
@@ -561,14 +563,15 @@ TcpConnect_ (char *hostname, u_short port, struct timeval *timeout)
 
 
 char *
-getMsgBuffer_ (int fd, int *bufferSize)
+getMsgBuffer_ (int fd, size_t *bufferSize)
 {
-  int rc;
+  int rc = 0;
   char hdrbuf[sizeof (struct LSFHeader)];
   struct LSFHeader msgHdr;
   XDR xdrs;
   char *msgBuffer;
-  *bufferSize = -1;
+  *bufferSize = 0;  // SEEME SEEME SEEME *bufferSize = -1; originally
+                    // who calls this function
 
   xdrmem_create (&xdrs, hdrbuf, sizeof (struct LSFHeader), XDR_DECODE);
   rc = readDecodeHdr_ (fd, hdrbuf, b_read_fix, &xdrs, &msgHdr);
@@ -593,7 +596,8 @@ getMsgBuffer_ (int fd, int *bufferSize)
       lserrno = LSE_NO_ERR;
       return (NULL);
     }
-  if (b_read_fix (fd, msgBuffer, msgHdr.length) != msgHdr.length)
+  assert( msgHdr.length <= LONG_MAX);
+  if (b_read_fix (fd, msgBuffer, msgHdr.length) != (long) msgHdr.length)
     {
       lserrno = LSE_MSG_SYS;
       free (msgBuffer);

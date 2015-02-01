@@ -21,216 +21,247 @@
 #include "lib/xdr.h"
 
 char **
-ls_placereq (char *resreq, int *numhosts, int options, char *fromhost)
+ls_placereq (char *resreq, size_t *numhosts, int options, char *fromhost)
 {
-  struct decisionReq placeReq;
-  char **namelist;
-  int i;
-  int j;
-  int *num;
-  int one = 1;
+    unsigned long i    = 0;
+    unsigned long *num = 0;
+    unsigned long *defaultHostNumberValue = 0;
+    char **namelist;
+    struct decisionReq placeReq;
 
-  if (!numhosts)
-    num = &one;
-  else
-    num = numhosts;
-
-  placeReq.ofWhat = OF_ANY;
-  placeReq.options = options;
-  strcpy (placeReq.hostType, " ");
-  placeReq.numHosts = *num;
-
-  if (!*num)
-    {
-      placeReq.numHosts = 9999;
-      placeReq.options &= ~EXACT;
+    *defaultHostNumberValue = 1;
+    
+    if (!numhosts) {
+        num = defaultHostNumberValue;
+    }
+    else {
+        num = numhosts;
     }
 
-  namelist = ls_findmyconnections ();
-  for (i = 0; namelist[i];)
-    i++;
-  i++;
-  placeReq.preferredHosts = (char **) calloc (i, sizeof (char *));
-  if (placeReq.preferredHosts == NULL)
-    {
-      lserrno = LSE_MALLOC;
-      return NULL;
+    placeReq.ofWhat = OF_ANY;
+    placeReq.options = options;
+    strcpy (placeReq.hostType, " ");
+    placeReq.numHosts = *num;
+
+    if (!*num) {
+        placeReq.numHosts = 9999;
+        placeReq.options &= ~EXACT;
     }
 
-  for (i = 1; namelist[i - 1] != NULL; i++)
-    {
-
-      placeReq.preferredHosts[i] = putstr_ (namelist[i - 1]);
-      if (placeReq.preferredHosts[i] == NULL)
-	{
-	  for (j = 1; j < i; j++)
-	    free (placeReq.preferredHosts[j]);
-	  free (placeReq.preferredHosts);
-	  lserrno = LSE_MALLOC;
-	  return NULL;
-	}
+    namelist = ls_findmyconnections ();
+    for ( i = 0; namelist[i];) {    // SEEME SEEME SEEME eh?
+        i++;                            // seriously? size of array? like this?
+    }
+    i++; // SEEME SEEME SEEME eh?
+  
+    // no assert, i >= 0
+    placeReq.preferredHosts = (char **) calloc ( (unsigned long)i, sizeof (char *));
+    
+    if ( NULL == placeReq.preferredHosts && ENOMEM == errno  ) {
+        lserrno = LSE_MALLOC;
+        return NULL;
     }
 
-  placeReq.numPrefs = i;
+    for ( i = 1; namelist[i - 1] != NULL; i++) {
 
-  return placement_ (resreq, &placeReq, fromhost, num);
+        placeReq.preferredHosts[i] = putstr_ (namelist[i - 1]);
+        
+        if (placeReq.preferredHosts[i] == NULL) {
+            
+            for ( unsigned long j = 1; j < i; j++)  {
+                free (placeReq.preferredHosts[j]);
+            }
+            
+            free (placeReq.preferredHosts);
+            lserrno = LSE_MALLOC;
+
+                return NULL;
+        }
+    }
+
+    placeReq.numPrefs = i;
+
+    return placement_ (resreq, &placeReq, fromhost, num);
+}
+
+char **
+ls_placeofhosts (char *resreq, size_t *numhosts, int options, char *fromhost, char **hostlist, size_t listsize)
+{
+    unsigned long i    = 0;
+    unsigned long *num = 0;
+    unsigned long *defaultNumValue = 0;
+    struct decisionReq placeReq;
+    *defaultNumValue   = 1;
+
+    if (!listsize || !hostlist) {
+        lserrno = LSE_BAD_ARGS;
+        return (NULL);
+    }
+
+    if (!numhosts) {
+        num = defaultNumValue;
+    }
+    else {
+        num = numhosts;
+    }
+
+    placeReq.ofWhat = OF_HOSTS;
+    placeReq.options = options;
+    strcpy (placeReq.hostType, " ");
+    placeReq.numHosts = *num;
+
+    if (!*num) {
+        placeReq.numHosts = listsize;
+        placeReq.options &= ~EXACT;
+    }
+
+    placeReq.numPrefs = listsize + 1;
+    assert( placeReq.numPrefs >= 0 );
+    placeReq.preferredHosts = calloc ( (unsigned long)placeReq.numPrefs, sizeof (char *));
+    if ( NULL == placeReq.preferredHosts && ENOMEM == errno ) {
+        lserrno = LSE_MALLOC;
+        return NULL;
+    }
+
+    for (i = 1; i < placeReq.numPrefs; i++)
+    {
+
+        if (ls_isclustername (hostlist[i - 1]) <= 0)
+        {
+            if (Gethostbyname_ (hostlist[i - 1]) == NULL)
+            {
+                lserrno = LSE_BAD_ARGS;
+                break;
+            }
+        
+            placeReq.preferredHosts[i] = putstr_ (hostlist[i - 1]);
+        }
+        else {
+            placeReq.preferredHosts[i] = putstr_ (hostlist[i - 1]);
+        }
+
+        if (placeReq.preferredHosts[i] == NULL) {
+            lserrno = LSE_MALLOC;
+            break;
+        }
+    }
+
+    if (i < placeReq.numPrefs) {
+        for (unsigned long j = 1; j < i; j++) {
+            free (placeReq.preferredHosts[j]);
+        }
+      
+        free (placeReq.preferredHosts);
+        
+        return NULL;
+    }
+
+  return placement_(resreq, &placeReq, fromhost, num);
 
 }
 
 char **
-ls_placeofhosts (char *resreq,
-		 int *numhosts,
-		 int options, char *fromhost, char **hostlist, int listsize)
+placement_ (char *resReq, struct decisionReq *placeReqPtr, char *fromhost, size_t *numhosts)
 {
-  struct decisionReq placeReq;
-  int i;
-  int j;
-  int *num;
-  int one = 1;
+    static struct placeReply placeReply;
+    static char **hostnames;
+    unsigned long numnames = 0;
+/*    int i = 0;
+    int j = 0;
+    int k = 0;*/
+    char *hname;
+    int limReturnStatus = 0;
 
-  if (!listsize || !hostlist)
-    {
-      lserrno = LSE_BAD_ARGS;
-      return (NULL);
+    if (initenv_ (NULL, NULL) < 0) {
+        return NULL;
     }
 
-  if (!numhosts)
-    num = &one;
-  else
-    num = numhosts;
-
-  placeReq.ofWhat = OF_HOSTS;
-  placeReq.options = options;
-  strcpy (placeReq.hostType, " ");
-  placeReq.numHosts = *num;
-
-  if (!*num)
-    {
-      placeReq.numHosts = listsize;
-      placeReq.options &= ~EXACT;
+    if (placeReqPtr->numHosts <= 0) {
+        lserrno = LSE_BAD_ARGS;
+        for (unsigned long i = 0; i < placeReqPtr->numPrefs; i++) {
+            FREEUP (placeReqPtr->preferredHosts[i]);
+        }
+        FREEUP (placeReqPtr->preferredHosts);
+        return NULL;
     }
 
-  placeReq.numPrefs = listsize + 1;
-  placeReq.preferredHosts = calloc (placeReq.numPrefs, sizeof (char *));
-  if (placeReq.preferredHosts == NULL)
+    if (!fromhost)
     {
-      lserrno = LSE_MALLOC;
-      return NULL;
+        hname = ls_getmyhostname ();
+        if ( NULL == hname ) {
+            for (unsigned long i = 0; i < placeReqPtr->numPrefs; i++) {
+                FREEUP (placeReqPtr->preferredHosts[i]);
+            }
+            FREEUP (placeReqPtr->preferredHosts);
+            return NULL;
+        }
+        
+        placeReqPtr->preferredHosts[0] = putstr_ (hname);
+    }
+    else {
+        placeReqPtr->preferredHosts[0] = fromhost;
     }
 
-  for (i = 1; i < placeReq.numPrefs; i++)
-    {
-
-      if (ls_isclustername (hostlist[i - 1]) <= 0)
-	{
-	  if (Gethostbyname_ (hostlist[i - 1]) == NULL)
-	    {
-	      lserrno = LSE_BAD_ARGS;
-	      break;
-	    }
-	  placeReq.preferredHosts[i] = putstr_ (hostlist[i - 1]);
-	}
-      else
-	placeReq.preferredHosts[i] = putstr_ (hostlist[i - 1]);
-
-      if (placeReq.preferredHosts[i] == NULL)
-	{
-	  lserrno = LSE_MALLOC;
-	  break;
-	}
+    if (placeReqPtr->preferredHosts[0] == NULL) {
+        lserrno = LSE_MALLOC;
+        for (unsigned long i = 0; i < placeReqPtr->numPrefs; i++) {
+            FREEUP (placeReqPtr->preferredHosts[i]);
+        }
+        FREEUP (placeReqPtr->preferredHosts);
+        return NULL;
     }
 
-  if (i < placeReq.numPrefs)
-    {
-      for (j = 1; j < i; j++)
-	free (placeReq.preferredHosts[j]);
-      free (placeReq.preferredHosts);
-      return NULL;
+    if (resReq != NULL) {
+        strcpy (placeReqPtr->resReq, resReq);
+    }
+    else {
+        placeReqPtr->resReq[0] = '\0';
     }
 
-  return placement_ (resreq, &placeReq, fromhost, num);
-
-}
-
-char **
-placement_ (char *resReq,
-	    struct decisionReq *placeReqPtr, char *fromhost, int *numhosts)
-{
-  static struct placeReply placeReply;
-  static char **hostnames;
-  int numnames;
-  int i;
-  int j;
-  int k;
-  char *hname;
-
-  if (initenv_ (NULL, NULL) < 0)
-    return NULL;
-
-  if (placeReqPtr->numHosts <= 0)
-    {
-      lserrno = LSE_BAD_ARGS;
-      goto error;
+    limReturnStatus = callLim_ (LIM_PLACEMENT, placeReqPtr,  xdr_decisionReq, &placeReply, xdr_placeReply, NULL, _USE_TCP_, NULL );
+    
+    if( limReturnStatus < 0) {
+        for (unsigned long i = 0; i < placeReqPtr->numPrefs; i++) {
+            FREEUP (placeReqPtr->preferredHosts[i]);
+        }
+        FREEUP (placeReqPtr->preferredHosts);
+        return NULL;
     }
 
-  if (!fromhost)
-    {
-      if ((hname = ls_getmyhostname ()) == NULL)
-	goto error;
-      placeReqPtr->preferredHosts[0] = putstr_ (hname);
-    }
-  else
-    placeReqPtr->preferredHosts[0] = fromhost;
-
-  if (placeReqPtr->preferredHosts[0] == NULL)
-    {
-      lserrno = LSE_MALLOC;
-      goto error;
+    for ( unsigned long i = 0; i < placeReqPtr->numPrefs; i++) {
+        FREEUP (placeReqPtr->preferredHosts[i]);
     }
 
-  if (resReq != NULL)
-    {
-      strcpy (placeReqPtr->resReq, resReq);
-    }
-  else
-    placeReqPtr->resReq[0] = '\0';
+    FREEUP (placeReqPtr->preferredHosts);
+    *numhosts = placeReply.numHosts;
 
-  if (callLim_ (LIM_PLACEMENT,
-		placeReqPtr,
-		xdr_decisionReq,
-		&placeReply, xdr_placeReply, NULL, _USE_TCP_, NULL) < 0)
-    goto error;
-
-  for (i = 0; i < placeReqPtr->numPrefs; i++)
-    FREEUP (placeReqPtr->preferredHosts[i]);
-
-  FREEUP (placeReqPtr->preferredHosts);
-  *numhosts = placeReply.numHosts;
-
-  for (i = 0, numnames = 0; i < *numhosts; i++)
-    numnames += placeReply.placeInfo[i].numtask;
-
-  if (hostnames)
-    free (hostnames);
-  hostnames = calloc (numnames, sizeof (char *));
-  if (hostnames == NULL)
-    {
-      lserrno = LSE_MALLOC;
-      return NULL;
+    // numnames = 0;
+    for (unsigned long i = 0; i < *numhosts; i++) {
+        assert( placeReply.placeInfo[i].numtask >= 0);
+        numnames += (unsigned long) placeReply.placeInfo[i].numtask;
     }
 
-  for (i = 0, j = 0; i < *numhosts; i++)
-    for (k = 0; k < placeReply.placeInfo[i].numtask; k++)
-      hostnames[j++] = placeReply.placeInfo[i].hostName;
+    if (hostnames) {
+        free (hostnames);
+    }
 
-  *numhosts = numnames;
-  return hostnames;
+    assert( numnames >= 0 );
+    hostnames = calloc ( (unsigned long)numnames, sizeof (char *));
+    if ( NULL == hostnames && ENOMEM == errno ) {
+        lserrno = LSE_MALLOC;
+        return NULL;
+    }
 
-error:
-  for (i = 0; i < placeReqPtr->numPrefs; i++)
-    FREEUP (placeReqPtr->preferredHosts[i]);
-  FREEUP (placeReqPtr->preferredHosts);
-  return NULL;
+    for (unsigned long i = 0, j = 0; i < *numhosts; i++) {
+        for (int k = 0; k < placeReply.placeInfo[i].numtask; k++) {
+            hostnames[j++] = placeReply.placeInfo[i].hostName;
+        }
+    }
+
+    *numhosts = numnames;
+    return hostnames;
+
+//error: // FIXME FIXME FIXME the devil
 }
 
 /* ls_addhost()
@@ -254,7 +285,7 @@ ls_addhost (struct hostEntry *hPtr)
     return -1;
 
   if (callLim_ (LIM_ADD_HOST,
-		hPtr, xdr_hostEntry, NULL, NULL, NULL, _USE_TCP_, NULL) < 0)
+    hPtr, xdr_hostEntry, NULL, NULL, NULL, _USE_TCP_, NULL) < 0)
     return -1;
 
   return 0;
@@ -281,8 +312,8 @@ ls_rmhost (const char *host)
     return -1;
 
   if (callLim_ (LIM_RM_HOST,
-		(char *) host,
-		xdr_hostName, NULL, NULL, NULL, _USE_TCP_, NULL) < 0)
+    (char *) host,
+    xdr_hostName, NULL, NULL, NULL, _USE_TCP_, NULL) < 0)
     return -1;
 
   return 0;

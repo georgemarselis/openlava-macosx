@@ -29,18 +29,16 @@
  * into int and we 24 bytes instead of 16. Big deal?
  */
 static void
-encodeHdr (unsigned int *word1,
-	   unsigned int *word2,
-	   unsigned int *word3, unsigned int *word4, struct LSFHeader *header)
+encodeHdr ( pid_t *word1, size_t *word2, unsigned int *word3, unsigned int *word4, struct LSFHeader *header)
 {
-  *word1 = header->refCode;
-  *word1 = *word1 << 16;
-  *word1 = *word1 | (header->opCode & 0x0000FFFF);
-  *word2 = header->length;
-  *word3 = header->version;
-  *word3 = *word3 << 16;
-  *word3 = *word3 | (header->reserved & 0x0000FFFF);
-  *word4 = header->reserved0;
+    *word1 = header->refCode;
+    *word1 <<= 16;
+    *word1 = *word1 | (header->opCode & 0x0000FFFF);
+    *word2 = header->length;
+    *word3 = header->version;
+    *word3 <<= 16;
+    *word3 = *word3 | (header->reserved & 0x0000FFFF);
+    *word4 = header->reserved0;
 }
 
 bool_t
@@ -49,20 +47,19 @@ xdr_LSFHeader (XDR * xdrs, struct LSFHeader *header)
   /* openlava 2.0 header encode and
    * decode operations.
    */
-  unsigned int word1;
-  unsigned int word2;
-  unsigned int word3;
-  unsigned int word4;
+  pid_t  word1 = 0;
+  size_t word2 = 0;
+  unsigned int word3 = 0;
+  unsigned int word4 = 0;
 
   if (xdrs->x_op == XDR_ENCODE)
     {
       encodeHdr (&word1, &word2, &word3, &word4, header);
     }
 
-  if (!xdr_u_int (xdrs, &word1)
-      || !xdr_u_int (xdrs, &word2)
-      || !xdr_u_int (xdrs, &word3) || !xdr_u_int (xdrs, &word4))
+  if (!xdr_u_int (xdrs, (unsigned int *)&word1) || !xdr_u_int (xdrs, (unsigned int *) &word2) || !xdr_u_int (xdrs, &word3) || !xdr_u_int (xdrs, &word4)) {
     return FALSE;
+  }
 
   if (xdrs->x_op == XDR_DECODE)
     {
@@ -71,7 +68,8 @@ xdr_LSFHeader (XDR * xdrs, struct LSFHeader *header)
       header->length = word2;
       header->version = word3 >> 16;
       header->reserved = word3 & 0xFFFF;
-      header->reserved0 = word4;
+      assert( word4 < USHRT_MAX );
+      header->reserved0 = (ushort) word4;
     }
 
   return TRUE;
@@ -100,13 +98,11 @@ xdr_packLSFHeader (char *buf, struct LSFHeader * header)
 }
 
 bool_t
-xdr_encodeMsg (XDR * xdrs,
-	       char *data,
-	       struct LSFHeader * hdr,
-	       bool_t (*xdr_func) (), int options, struct lsfAuth * auth)
+xdr_encodeMsg (XDR * xdrs, char *data, struct LSFHeader *hdr, bool_t (*xdr_func) (), int options, struct lsfAuth *auth)
 {
-  int len;
+  uint len = 0;
 
+  assert( options );
   XDR_SETPOS (xdrs, LSF_HEADER_LEN);
 
   hdr->version = OPENLAVA_VERSION;
@@ -114,13 +110,13 @@ xdr_encodeMsg (XDR * xdrs,
   if (auth)
     {
       if (!xdr_lsfAuth (xdrs, auth, hdr))
-	return FALSE;
+  return FALSE;
     }
 
   if (data)
     {
       if (!(*xdr_func) (xdrs, data, hdr))
-	return FALSE;
+  return FALSE;
     }
 
   len = XDR_GETPOS (xdrs);
@@ -135,12 +131,11 @@ xdr_encodeMsg (XDR * xdrs,
 }
 
 bool_t
-xdr_arrayElement (XDR * xdrs,
-		  char *data,
-		  struct LSFHeader * hdr, bool_t (*xdr_func) (), ...)
+xdr_arrayElement (XDR * xdrs, char *data, struct LSFHeader * hdr, bool_t (*xdr_func) (), ...)
 {
   va_list ap;
-  int nextElementOffset, pos;
+  uint nextElementOffset = 0; 
+  uint pos = 0;
   char *cp;
 
   va_start (ap, xdr_func);
@@ -153,28 +148,30 @@ xdr_arrayElement (XDR * xdrs,
     }
   else
     {
-      if (!xdr_int (xdrs, &nextElementOffset))
-	return (FALSE);
+        assert( nextElementOffset <= INT_MAX );
+      if (!xdr_int (xdrs, (int *)&nextElementOffset))
+  return (FALSE);
     }
 
   cp = va_arg (ap, char *);
   if (cp)
     {
       if (!(*xdr_func) (xdrs, data, hdr, cp))
-	return (FALSE);
+  return (FALSE);
     }
   else
     {
       if (!(*xdr_func) (xdrs, data, hdr))
-	return (FALSE);
+  return (FALSE);
     }
 
   if (xdrs->x_op == XDR_ENCODE)
     {
       nextElementOffset = XDR_GETPOS (xdrs) - pos;
       XDR_SETPOS (xdrs, pos);
-      if (!xdr_int (xdrs, &nextElementOffset))
-	return (FALSE);
+      assert( nextElementOffset <= INT_MAX );
+      if (!xdr_int (xdrs, (int *)&nextElementOffset))
+  return (FALSE);
     }
 
 
@@ -183,7 +180,7 @@ xdr_arrayElement (XDR * xdrs,
 }
 
 bool_t
-xdr_array_string (XDR * xdrs, char **astring, int maxlen, int arraysize)
+xdr_array_string (XDR * xdrs, char **astring, uint maxlen, int arraysize)
 {
   int i, j;
   char line[MAXLINELEN];
@@ -192,24 +189,24 @@ xdr_array_string (XDR * xdrs, char **astring, int maxlen, int arraysize)
   for (i = 0; i < arraysize; i++)
     {
       if (xdrs->x_op == XDR_FREE)
-	{
-	  FREEUP (astring[i]);
-	}
+  {
+    FREEUP (astring[i]);
+  }
       else if (xdrs->x_op == XDR_DECODE)
-	{
-	  if (!xdr_string (xdrs, &sp, maxlen)
-	      || (astring[i] = putstr_ (sp)) == NULL)
-	    {
-	      for (j = 0; j < i; j++)
-		FREEUP (astring[j]);
-	      return (FALSE);
-	    }
-	}
+  {
+    if (!xdr_string (xdrs, &sp, maxlen)
+        || (astring[i] = putstr_ (sp)) == NULL)
+      {
+        for (j = 0; j < i; j++)
+    FREEUP (astring[j]);
+        return (FALSE);
+      }
+  }
       else
-	{
-	  if (!xdr_string (xdrs, &astring[i], maxlen))
-	    return (FALSE);
-	}
+  {
+    if (!xdr_string (xdrs, &astring[i], maxlen))
+      return (FALSE);
+  }
     }
   return (TRUE);
 
@@ -218,15 +215,13 @@ xdr_array_string (XDR * xdrs, char **astring, int maxlen, int arraysize)
 bool_t
 xdr_time_t (XDR * xdrs, time_t * t)
 {
-  return (xdr_u_long (xdrs, (unsigned long *) t));
+  return (xdr_u_long (xdrs, (unsigned int *) t));
 
 
 }
 
 int
-readDecodeHdr_ (int s,
-		char *buf,
-		int (*readFunc) (), XDR * xdrs, struct LSFHeader *hdr)
+readDecodeHdr_ (int s, char *buf, long (*readFunc) (), XDR * xdrs, struct LSFHeader *hdr)
 {
   if ((*readFunc) (s, buf, LSF_HEADER_LEN) != LSF_HEADER_LEN)
     {
@@ -244,14 +239,10 @@ readDecodeHdr_ (int s,
 }
 
 int
-readDecodeMsg_ (int s,
-		char *buf,
-		struct LSFHeader *hdr,
-		int (*readFunc) (),
-		XDR * xdrs,
-		char *data, bool_t (*xdrFunc) (), struct lsfAuth *auth)
+readDecodeMsg_ (int s, char *buf, struct LSFHeader *hdr, long (*readFunc) (),  XDR * xdrs,  char *data, bool_t (*xdrFunc) (), struct lsfAuth *auth)
 {
-  if ((*readFunc) (s, buf, hdr->length) != hdr->length)
+    assert( hdr->length <= LONG_MAX);
+  if ((*readFunc) (s, buf, hdr->length) != (long)hdr->length)
     {
       lserrno = LSE_MSG_SYS;
       return -2;
@@ -260,10 +251,10 @@ readDecodeMsg_ (int s,
   if (auth)
     {
       if (!xdr_lsfAuth (xdrs, auth, hdr))
-	{
-	  lserrno = LSE_BAD_XDR;
-	  return -1;
-	}
+  {
+    lserrno = LSE_BAD_XDR;
+    return -1;
+  }
     }
 
   if (!(*xdrFunc) (xdrs, data, hdr))
@@ -277,12 +268,7 @@ readDecodeMsg_ (int s,
 
 
 int
-writeEncodeMsg_ (int s,
-		 char *buf,
-		 int len,
-		 struct LSFHeader *hdr,
-		 char *data,
-		 int (*writeFunc) (), bool_t (*xdrFunc) (), int options)
+writeEncodeMsg_ (int s, char *buf, uint len, struct LSFHeader *hdr, char *data, long (*writeFunc) (), bool_t (*xdrFunc) (), int options)
 {
   XDR xdrs;
 
@@ -308,7 +294,7 @@ writeEncodeMsg_ (int s,
 }
 
 int
-writeEncodeHdr_ (int s, struct LSFHeader *hdr, int (*writeFunc) ())
+writeEncodeHdr_ (int s, struct LSFHeader *hdr, long (*writeFunc) ())
 {
   XDR xdrs;
   struct LSFHeader buf;
@@ -337,24 +323,28 @@ writeEncodeHdr_ (int s, struct LSFHeader *hdr, int (*writeFunc) ())
 
 
 bool_t
-xdr_stringLen (XDR * xdrs, struct stringLen * str, struct LSFHeader * Hdr)
+xdr_stringLen (XDR * xdrs, struct stringLen * str, struct LSFHeader *hdr)
 {
+    assert( hdr->length);
   if (xdrs->x_op == XDR_DECODE)
     str->name[0] = '\0';
 
-  if (!xdr_string (xdrs, &str->name, str->len))
+    assert( str->len <= UINT_MAX);
+  if (!xdr_string (xdrs, &str->name, (uint)str->len))
     return FALSE;
 
   return TRUE;
 }
 
 bool_t
-xdr_lsfLimit (XDR * xdrs, struct lsfLimit * limits, struct LSFHeader * hdr)
+xdr_lsfLimit (XDR * xdrs, struct lsfLimit * limits, struct LSFHeader *hdr)
 {
+    assert( hdr->length);
+
   if (!(xdr_u_int (xdrs, (unsigned int *) &limits->rlim_curl) &&
-	xdr_u_int (xdrs, (unsigned int *) &limits->rlim_curh) &&
-	xdr_u_int (xdrs, (unsigned int *) &limits->rlim_maxl) &&
-	xdr_u_int (xdrs, (unsigned int *) &limits->rlim_maxh)))
+  xdr_u_int (xdrs, (unsigned int *) &limits->rlim_curh) &&
+  xdr_u_int (xdrs, (unsigned int *) &limits->rlim_maxl) &&
+  xdr_u_int (xdrs, (unsigned int *) &limits->rlim_maxh)))
     return FALSE;
   return (TRUE);
 }
@@ -391,11 +381,12 @@ xdr_address (XDR * xdrs, u_int * addr)
 
 
 bool_t
-xdr_debugReq (XDR * xdrs, struct debugReq * debugReq, struct LSFHeader * hdr)
+xdr_debugReq (XDR * xdrs, struct debugReq * debugReq, struct LSFHeader *hdr)
 {
   static char *sp = NULL;
   static char *phostname = NULL;
 
+    assert( hdr->length);
   sp = debugReq->logFileName;
 
   if (xdrs->x_op == XDR_DECODE)
@@ -403,11 +394,11 @@ xdr_debugReq (XDR * xdrs, struct debugReq * debugReq, struct LSFHeader * hdr)
       debugReq->logFileName[0] = '\0';
 
       if (phostname == NULL)
-	{
-	  phostname = (char *) malloc (MAXHOSTNAMELEN);
-	  if (phostname == NULL)
-	    return (FALSE);
-	}
+  {
+    phostname = (char *) malloc (MAXHOSTNAMELEN);
+    if (phostname == NULL)
+      return (FALSE);
+  }
       debugReq->hostName = phostname;
       phostname[0] = '\0';
     }
@@ -415,11 +406,11 @@ xdr_debugReq (XDR * xdrs, struct debugReq * debugReq, struct LSFHeader * hdr)
     phostname = debugReq->hostName;
 
   if (!(xdr_int (xdrs, &debugReq->opCode)
-	&& xdr_int (xdrs, &debugReq->level)
-	&& xdr_int (xdrs, &debugReq->logClass)
-	&& xdr_int (xdrs, &debugReq->options)
-	&& xdr_string (xdrs, &phostname, MAXHOSTNAMELEN)
-	&& xdr_string (xdrs, &sp, MAXPATHLEN)))
+  && xdr_int (xdrs, &debugReq->level)
+  && xdr_int (xdrs, &debugReq->logClass)
+  && xdr_int (xdrs, &debugReq->options)
+  && xdr_string (xdrs, &phostname, MAXHOSTNAMELEN)
+  && xdr_string (xdrs, &sp, MAXPATHLEN)))
     return FALSE;
 
   return TRUE;
@@ -441,12 +432,12 @@ xdr_lsffree (bool_t (*xdr_func) (), char *objp, struct LSFHeader *hdr)
 int
 getXdrStrlen (char *s)
 {
-  int cc;
+  uint cc = 0;
 
   if (s == NULL)
     return 4;
 
   cc = ALIGNWORD_ (strlen (s) + 1);
 
-  return cc;
+  return (int) cc;
 }

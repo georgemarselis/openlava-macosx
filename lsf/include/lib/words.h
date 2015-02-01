@@ -34,7 +34,7 @@ static struct pStack *ptrStack;
 static struct confNode *newNode (void);
 static void freeNode (struct confNode *);
 static char linkNode (struct confNode *, struct confNode *);
-static char *readNextLine (struct lsConf *, int *);
+static char *readNextLine (struct lsConf *conf, size_t *lineNum);
 
 static char addCond (struct lsConf *, char *);
 static char checkCond (struct lsConf *, char *);

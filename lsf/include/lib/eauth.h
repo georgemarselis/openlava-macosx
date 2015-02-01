@@ -1,4 +1,4 @@
-/* $Id: lib.dir.c 397 2007-11-26 19:04:00Z mblack $
+/* $Id: lib.eauth.c 397 2007-11-26 19:04:00Z mblack $
  * Copyright (C) 2007 Platform Computing Inc
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,13 +16,22 @@
  *
  */
 
- #pragma once
 
-static struct hTab hashTab;
+// FIXME FIXME FIXME
+// WTF is exit() redefined?!
+// must investigate 
+/* #define exit(a)         _exit(a) 
+*/
 
-static int putin_ (unsigned long status, char *inkey, int inkeylen, char *inval, int invallen, void *indata);
-static int getMap_ (void);
-static int tryPwd (char *path, char *pwdpath);
-static int netHostChdir (char *, struct hostent *);
-static char *mountNet_ (struct hostent *);
-static char *usePath (char *);
+/* #define NL_SETN   23 */
+
+
+#define EAUTH_ENV_BUF_LEN       (MAXPATHLEN+32)
+
+int putEauthClientEnvVar( char *client );
+int putEauthServerEnvVar( char *server );
+int verifyEAuth_        ( struct lsfAuth *auth, struct sockaddr_in *from );
+static int getEAuth     ( struct eauth *, char * );
+static int putEnvVar    ( char *buf, const char *envVar, const char *envValue );
+static char *getLSFAdmin( void );
+static char *getLSFAdmin( void );

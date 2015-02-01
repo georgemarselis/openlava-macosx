@@ -25,22 +25,24 @@
 
 hTab conn_table;
 
-typedef struct _hostSock
-{
-  int socket;
-  char *hostname;
-  struct _hostSock *next;
+typedef struct _hostSock {
+    int socket;
+    char padding[4];
+    char *hostname;
+    struct _hostSock *next;
 } HostSock;
-static HostSock *hostSock;
 
+
+int cli_nios_fd[2] = { -1, -1 };
+static HostSock *hostSock;
 static struct connectEnt connlist[MAXCONNECT];
 static char *connnamelist[MAXCONNECT + 1];
 
-int cli_nios_fd[2] = { -1, -1 };
-
 void hostIndex_ (char *hostName, int sock);
-extern int chanSock_ (int chfd);
 int delhostbysock_ (int sock);
+int *_gethostdata_ (char *hostName);
+extern int chanSock_ (int chfd);
+
 
 void
 inithostsock_ (void)
@@ -128,12 +130,12 @@ delhostbysock_ (int sock)
   while (tmpSock->next != NULL)
     {
       if (tmpSock->next->socket == sock)
-	{
-	  HostSock *rmSock = tmpSock->next;
-	  tmpSock->next = rmSock->next;
-	  free (rmSock);
-	  return 0;
-	}
+    {
+      HostSock *rmSock = tmpSock->next;
+      tmpSock->next = rmSock->next;
+      free (rmSock);
+      return 0;
+    }
       tmpSock = tmpSock->next;
     }
 
@@ -155,13 +157,13 @@ gethostbysock_ (int sock, char *hostName)
   while (tmpSock != NULL)
     {
       if (tmpSock->socket == sock)
-	{
-	  if (tmpSock->hostname != NULL)
-	    {
-	      strcpy (hostName, tmpSock->hostname);
-	      return 0;
-	    }
-	}
+    {
+      if (tmpSock->hostname != NULL)
+        {
+          strcpy (hostName, tmpSock->hostname);
+          return 0;
+        }
+    }
       tmpSock = tmpSock->next;
     }
 
@@ -173,24 +175,25 @@ gethostbysock_ (int sock, char *hostName)
 int *
 _gethostdata_ (char *hostName)
 {
-  hEnt *ent;
-  int *sp;
-  struct hostent *hp;
+    hEnt *ent;
+    struct hostent *hp;
 
-  hp = Gethostbyname_ (hostName);
-  if (hp == NULL)
-    return NULL;
+    hp = Gethostbyname_ (hostName);
+    if (hp == NULL) {
+        return NULL;
+    }
 
-  ent = h_getEnt_ (&conn_table, hp->h_name);
-  if (ent == NULL)
-    return NULL;
+    ent = h_getEnt_ (&conn_table, hp->h_name);
+    
+    if (ent == NULL) {
+        return NULL;
+    }
 
-  if (ent->hData == NULL)
-    return NULL;
+    if (ent->hData == NULL) {
+        return NULL;
+    }
 
-  sp = ent->hData;
-
-  return sp;
+    return ent->hData;
 }
 
 int
@@ -211,42 +214,50 @@ _isconnected_ (char *hostName, int *sock)
 int
 _getcurseqno_ (char *hostName)
 {
-  int *sp;
+    int *sp;
 
-  sp = _gethostdata_ (hostName);
-  if (sp == NULL)
-    return (-1);
+    sp = _gethostdata_ (hostName);
+    if (sp == NULL) {
+      return (-1);
+    }
 
-  return (sp[2]);
+    return (sp[2]);
 }
 
 void
-_setcurseqno_ (char *hostName, int seqno)
+_setcurseqno_ (char *hostName, uint seqno)
 {
-  int *sp;
+    uint *sp;
+    int *wtf;   // FIXME wtf does this function do?
+                // 
 
-  sp = _gethostdata_ (hostName);
-  if (sp == NULL)
-    return;
+    wtf = _gethostdata_ (hostName);
+    if (wtf == NULL) {
+      return;
+    }
 
-  sp[2] = seqno;
+    assert( *wtf );
+    sp = (uint *)wtf;
+    sp[2] = seqno; // FIXME not very smart. addressing a semi-random memory location. find alternatives.
 }
 
 int
 ls_isconnected (char *hostName)
 {
-  hEnt *hEntPtr;
-  struct hostent *hp;
+    hEnt *hEntPtr;
+    struct hostent *hp;
 
-  hp = Gethostbyname_ (hostName);
-  if (hp == NULL)
-    return FALSE;
+    hp = Gethostbyname_ (hostName);
+    if (hp == NULL) {
+        return FALSE;
+    }
 
-  hEntPtr = h_getEnt_ (&conn_table, hp->h_name);
-  if (hEntPtr == NULL)
-    return FALSE;
+    hEntPtr = h_getEnt_ (&conn_table, hp->h_name);
+    if (hEntPtr == NULL) {
+        return FALSE;
+    }
 
-  return TRUE;
+    return TRUE;
 }
 
 int

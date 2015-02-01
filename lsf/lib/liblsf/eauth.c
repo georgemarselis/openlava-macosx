@@ -26,15 +26,13 @@
 
 #include "lib/lib.h"
 #include "lib/lproto.h"
-#include "lib/mls.h"
+#include "lib/init.h"
+#include "lib/eauth.h"
+#include "lib/rdwr.h"
 #include "daemons/libniosd/niosd.h"
 #include "daemons/libresd/resout.h"
 
-#define exit(a)         _exit(a)
-
-#define NL_SETN   23
-static int getEAuth (struct eauth *, char *);
-static char *getLSFAdmin (void);
+#define NL_SETN 23
 
 int
 getAuth_ (struct lsfAuth *auth, char *host)
@@ -48,19 +46,21 @@ getAuth_ (struct lsfAuth *auth, char *host)
       return -1;
     }
 
-  auth->gid = getgid ();
+    auth->gid = getgid ();
 
-  if (!genParams_[LSF_AUTH].paramValue)
-    auth->kind = CLIENT_SETUID;
-  else if (!strcmp (genParams_[LSF_AUTH].paramValue, AUTH_IDENT))
-    auth->kind = CLIENT_IDENT;
-  else if (!strcmp (genParams_[LSF_AUTH].paramValue, AUTH_PARAM_EAUTH))
-    {
-      auth->kind = CLIENT_EAUTH;
-      return getEAuth (&auth->k.eauth, host);
+    if (!genParams_[LSF_AUTH].paramValue) {
+        auth->kind = CLIENT_SETUID;
     }
-  else
-    auth->kind = CLIENT_SETUID;
+    else if (!strcmp (genParams_[LSF_AUTH].paramValue, AUTH_IDENT)) {
+        auth->kind = CLIENT_IDENT;
+    }
+    else if (!strcmp (genParams_[LSF_AUTH].paramValue, AUTH_PARAM_EAUTH)) {
+        auth->kind = CLIENT_EAUTH;
+        return getEAuth (&auth->k.eauth, host);
+    }
+    else {
+        auth->kind = CLIENT_SETUID;
+    }
 
   return (0);
 }
@@ -70,58 +70,67 @@ getAuth_ (struct lsfAuth *auth, char *host)
 static int
 getEAuth (struct eauth *eauth, char *host)
 {
-  char *argv[4];
-  char path[MAXPATHLEN];
-  struct lenData ld;
+    char *argv[4];
+    char path[MAXPATHLEN];
+    struct lenData ld;
 
-  memset (path, 0, sizeof (path));
-  ls_strcat (path, sizeof (path), genParams_[LSF_SERVERDIR].paramValue);
-  ls_strcat (path, sizeof (path), "/");
-  ls_strcat (path, sizeof (path), EAUTHNAME);
-  argv[0] = path;
-  argv[1] = "-c";
-  argv[2] = host;
-  argv[3] = NULL;
+    memset (path, 0, sizeof (path));
+    ls_strcat (path, sizeof (path), genParams_[LSF_SERVERDIR].paramValue);
+    ls_strcat (path, sizeof (path), "/");
+    ls_strcat (path, sizeof (path), EAUTHNAME);
+    argv[0] = path;
+    argv[1] = "-c";
+    argv[2] = host;
+    argv[3] = NULL;
 
-  if (logclass & LC_TRACE)
-    ls_syslog (LOG_DEBUG, "runEAuth(): path=<%s>", path);
+    if (logclass & LC_TRACE) {
+        ls_syslog (LOG_DEBUG, "runEAuth(): path=<%s>", path);
+    }
 
-  if (runEClient_ (&ld, argv) == -1)
-    {
-      if (logclass & (LC_AUTH | LC_TRACE))
-	ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, "runEAuth", "runEClient", path);
+    if (runEClient_ (&ld, argv) == -1) {
+
+      if (logclass & (LC_AUTH | LC_TRACE)) {
+        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, "runEAuth", "runEClient", path);
+      }
+
       lserrno = LSE_EAUTH;
       return (-1);
     }
 
-  if (ld.len == 0)
-    {
-      if (logclass & (LC_AUTH | LC_TRACE))
-	ls_syslog (LOG_DEBUG, "runEAuth: <%s> got no data", path);
-      FREEUP (ld.data);
-      lserrno = LSE_EAUTH;
-      return (-1);
+    if (ld.len == 0) {
+
+      if (logclass & (LC_AUTH | LC_TRACE)) {
+            ls_syslog (LOG_DEBUG, "runEAuth: <%s> got no data", path);
+        }
+        FREEUP (ld.data);
+        lserrno = LSE_EAUTH;
+        return (-1);
     }
 
-  if (ld.len > EAUTH_SIZE)
-    {
-      if (logclass & (LC_AUTH | LC_TRACE))
-	ls_syslog (LOG_DEBUG, "runEAuth: <%s> got too much data, size=%d",
-		   path, ld.len);
-      FREEUP (ld.data);
-      lserrno = LSE_EAUTH;
-      return (-1);
+    if (ld.len > EAUTH_SIZE) {
+
+        if (logclass & (LC_AUTH | LC_TRACE)) {
+            ls_syslog (LOG_DEBUG, "runEAuth: <%s> got too much data, size=%d", path, ld.len);
+        }
+
+        FREEUP (ld.data);
+        lserrno = LSE_EAUTH;
+        return (-1);
     }
 
-  memcpy (eauth->data, ld.data, ld.len);
-  eauth->data[ld.len] = '\0';
-  if (logclass & (LC_AUTH | LC_TRACE))
-    ls_syslog (LOG_DEBUG, "runEAuth: <%s> got data=%s", path, ld.data);
-  eauth->len = ld.len;
+    memcpy (eauth->data, ld.data, ld.len);
+    eauth->data[ld.len] = '\0';
+    if (logclass & (LC_AUTH | LC_TRACE)) {
+        ls_syslog (LOG_DEBUG, "runEAuth: <%s> got data=%s", path, ld.data);
+    }
+    
+    eauth->len = ld.len;
 
-  FREEUP (ld.data);
-  if (logclass & (LC_AUTH | LC_TRACE))
-    ls_syslog (LOG_DEBUG, "runEAuth: <%s> got len=%d", path, ld.len);
+    FREEUP (ld.data);
+    
+    if (logclass & (LC_AUTH | LC_TRACE)) {
+        ls_syslog (LOG_DEBUG, "runEAuth: <%s> got len=%d", path, ld.len);
+    }
 
   return (0);
 
@@ -130,213 +139,234 @@ getEAuth (struct eauth *eauth, char *host)
 int
 verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
 {
-  static char fname[] = "verifyEAuth/lib.eauth.c";
-  char path[MAXPATHLEN], uData[256], ok;
-  char *eauth_client, *eauth_server, *eauth_aux_data, *eauth_aux_status;
-  int cc, i;
-  static int connected = FALSE;
-  static int in[2], out[2];
 
-  if (logclass & LC_TRACE)
-    ls_syslog (LOG_DEBUG, "%s ...", fname);
+    char path[MAXPATHLEN] = "";
+    char uData[256] = "";
+    char ok ;
+    char *eauth_client      = NULL;
+    char *eauth_server      = NULL;
+    char *eauth_aux_data    = NULL;
+    char *eauth_aux_status  = NULL;
+    long cc = 0;
+    size_t uData_length = 0;
 
-  if (!(genParams_[LSF_AUTH].paramValue &&
-	!strcmp (genParams_[LSF_AUTH].paramValue, AUTH_PARAM_EAUTH)))
-    return (-1);
+    static int connected = FALSE;
+    static int in[2], out[2];
+    static char fname[] = "verifyEAuth/lib.eauth.c";
 
-  eauth_client = getenv ("LSF_EAUTH_CLIENT");
-  eauth_server = getenv ("LSF_EAUTH_SERVER");
-  eauth_aux_data = getenv ("LSF_EAUTH_AUX_DATA");
-  eauth_aux_status = getenv ("LSF_EAUTH_AUX_STATUS");
+    if (logclass & LC_TRACE) {
+        ls_syslog (LOG_DEBUG, "%s ...", fname);
+    }
 
-  sprintf (uData, "%d %d %s %s %d %d %s %s %s %s\n", auth->uid, auth->gid,
-	   auth->lsfUserName, inet_ntoa (from->sin_addr),
-	   (int) ntohs (from->sin_port), auth->k.eauth.len,
-	   (eauth_client ? eauth_client : "NULL"),
-	   (eauth_server ? eauth_server : "NULL"),
-	   (eauth_aux_data ? eauth_aux_data : "NULL"),
-	   (eauth_aux_status ? eauth_aux_status : "NULL"));
+    if (!(genParams_[LSF_AUTH].paramValue && !strcmp (genParams_[LSF_AUTH].paramValue, AUTH_PARAM_EAUTH))) {
+        return (-1);
+    }
 
-  memset (path, 0, sizeof (path));
-  ls_strcat (path, sizeof (path), genParams_[LSF_SERVERDIR].paramValue);
-  ls_strcat (path, sizeof (path), "/");
-  ls_strcat (path, sizeof (path), EAUTHNAME);
+    // FIXME FIXME 
+    // getting environmental variables has to go.
+    //      get them from a conf file.
+    eauth_client = getenv ("LSF_EAUTH_CLIENT");
+    eauth_server = getenv ("LSF_EAUTH_SERVER");
+    eauth_aux_data = getenv ("LSF_EAUTH_AUX_DATA");
+    eauth_aux_status = getenv ("LSF_EAUTH_AUX_STATUS");
 
-  if (logclass & (LC_AUTH | LC_TRACE))
-    ls_syslog (LOG_DEBUG, "%s: <%s> path <%s> connected=%d", fname, uData,
-	       path, connected);
+    assert( auth->k.eauth.len <= INT_MAX  && auth->k.eauth.len >= 0 );
+    sprintf (uData, "%d %d %s %s %u %ld %s %s %s %s\n", auth->uid, auth->gid,
+        auth->lsfUserName, inet_ntoa (from->sin_addr),
+            ntohs (from->sin_port), auth->k.eauth.len,
+            (eauth_client ? eauth_client : "NULL"),
+            (eauth_server ? eauth_server : "NULL"),
+            (eauth_aux_data ? eauth_aux_data : "NULL"),
+            (eauth_aux_status ? eauth_aux_status : "NULL"));
 
-  if (connected)
+    memset (path, 0, sizeof (path));
+    ls_strcat (path, sizeof (path), genParams_[LSF_SERVERDIR].paramValue);
+    ls_strcat (path, sizeof (path), "/");
+    ls_strcat (path, sizeof (path), EAUTHNAME);
+
+    if (logclass & (LC_AUTH | LC_TRACE)) {
+        ls_syslog (LOG_DEBUG, "%s: <%s> path <%s> connected=%d", fname, uData, path, connected);
+    }
+
+    if (connected)
     {
-      struct timeval tv;
-      fd_set mask;
+        struct timeval tv;
+        fd_set mask;
 
-      FD_ZERO (&mask);
-      FD_SET (out[0], &mask);
+        FD_ZERO (&mask);
+        FD_SET (out[0], &mask);
 
-      tv.tv_sec = 0;
-      tv.tv_usec = 0;
+        tv.tv_sec = 0;
+        tv.tv_usec = 0;
 
-      if ((cc = select (out[0] + 1, &mask, NULL, NULL, &tv)) > 0)
-	{
-	  if (logclass & (LC_AUTH | LC_TRACE))
-	    ls_syslog (LOG_DEBUG, "%s: <%s> got exception", fname, uData);
-	  connected = FALSE;
-	  close (in[1]);
-	  close (out[0]);
-	}
-      else
-	{
-	  if (cc < 0)
-	    ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "select", uData);
-	}
+        if ((cc = select (out[0] + 1, &mask, NULL, NULL, &tv)) > 0) 
+        {
+            if (logclass & (LC_AUTH | LC_TRACE)) {
+               ls_syslog (LOG_DEBUG, "%s: <%s> got exception", fname, uData);
+            }
 
-      if (logclass & (LC_AUTH | LC_TRACE))
-	ls_syslog (LOG_DEBUG, "%s: <%s> select returned cc=%d", fname,
-		   uData, cc);
+            connected = FALSE;
+            close (in[1]);
+            close (out[0]);
+        }
+        else
+       {
+           if (cc < 0) {
+               ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "select", uData);
+           }
+       }
+    
+        if (logclass & (LC_AUTH | LC_TRACE)) {
+           ls_syslog (LOG_DEBUG, "%s: <%s> select returned cc=%d", fname, uData, cc);
+       }
 
     }
 
-  if (!connected)
+    if (!connected)
     {
+        int pid;
+        char *user;
 
-      int pid;
-      char *user;
+        if ((user = getLSFAdmin ()) == NULL)
+        {
+           return (-1);
+        }
+    
+        if (pipe (in) < 0)
+        {
+          ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "pipe(in)", uData);
+          lserrno = LSE_SOCK_SYS;
+          return (-1);
+        }
 
-      {
-	if ((user = getLSFAdmin ()) == NULL)
-	  {
-	    return (-1);
-	  }
-      }
-
-      if (pipe (in) < 0)
-	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "pipe(in)", uData);
-	  lserrno = LSE_SOCK_SYS;
-	  return (-1);
-	}
-
-      if (pipe (out) < 0)
-	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "pipe(out)", uData);
-	  lserrno = LSE_SOCK_SYS;
-	  return (-1);
-	}
+        if (pipe (out) < 0)
+        {
+            ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "pipe(out)", uData);
+            lserrno = LSE_SOCK_SYS;
+            return (-1);
+        }
 
 
-      if ((pid = fork ()) == 0)
-	{
-	  char *myargv[3];
-	  struct passwd *pw;
+        if ((pid = fork ()) == 0)
+        {
+            char *myargv[3];
+            struct passwd *pw;
 
-	  if ((pw = getpwlsfuser_ (user)) == (struct passwd *) NULL)
-	    {
-	      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "getpwlsfuser_",
-			 user);
-	      exit (-1);
-	    }
+            if ((pw = getpwlsfuser_ (user)) == (struct passwd *) NULL)
+            {
+                ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "getpwlsfuser_", user);
+                exit (-1);
+            }
 
-	  if (lsfSetUid (pw->pw_uid) < 0)
-	    {
-	      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "setuid",
-			 (int) pw->pw_uid);
-	      exit (-1);
-	    }
+            // FIXME investigate if the third argument to lsfSetXUid can be set to the appropriate
+            // [s]uid_t type. if yes, try to see if there is an alternative to passing -1.
+            if (lsfSetXUid(0, pw->pw_uid, pw->pw_uid, (int) -1, setuid)  < 0)
+            {
+              ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "setuid", (int) pw->pw_uid);
+              exit (-1);
+            }
 
-	  for (i = 1; i < NSIG; i++)
-	    Signal_ (i, SIG_DFL);
+            for ( int i = 1; i < NSIG; i++) {
+                Signal_ (i, SIG_DFL);
+            }
 
-	  alarm (0);
+            alarm (0);
 
-	  close (in[1]);
-	  if (dup2 (in[0], 0) == -1)
-	    {
-	      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "dup2(in[0])",
-			 uData);
-	    }
+            close (in[1]);
+            if (dup2 (in[0], 0) == -1)
+            {
+                ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "dup2(in[0])", uData);
+            }
 
-	  close (out[0]);
-	  if (dup2 (out[1], 1) == -1)
-	    {
-	      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "dup2(out[1])",
-			 uData);
-	    }
+            close (out[0]);
+            if (dup2 (out[1], 1) == -1)
+            {
+                ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "dup2(out[1])", uData);
+            }
 
-	  for (i = 3; i < sysconf (_SC_OPEN_MAX); i++)
-	    close (i);
+            for ( int i = 3; i < sysconf (_SC_OPEN_MAX); i++){
+                close (i);
+            }
 
-	  myargv[0] = path;
-	  myargv[1] = "-s";
-	  myargv[2] = NULL;
+            myargv[0] = path;
+            myargv[1] = "-s";
+            myargv[2] = NULL;
 
-	  lsfExecvp (myargv[0], myargv);
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "execvp", myargv[0]);
-	  exit (-1);
-	}
+            lsfExecX( myargv[0], myargv, execvp);
+            ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "execvp", myargv[0]);
+            exit (-1);
+        }
 
-      close (in[0]);
-      close (out[1]);
+        close (in[0]);
+        close (out[1]);
 
-      if (pid == -1)
-	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "fork", path);
-	  close (in[1]);
-	  close (out[0]);
-	  lserrno = LSE_FORK;
-	  return (-1);
-	}
+        if (pid == -1)
+        {
+            ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "fork", path);
+            close (in[1]);
+            close (out[0]);
+            lserrno = LSE_FORK;
+            return (-1);
+        }
 
-      connected = TRUE;
+        connected = TRUE;
     }
 
-  i = strlen (uData);
-
-  if ((cc = b_write_fix (in[1], uData, i)) != i)
+    // FIXME refactor till end of function as a separate function
+    uData_length = strlen (uData);
+    // FIXME following cast is ok. b_write_fix returns size_t, which is always 0 or possitive but
+    //        i wanna see if i can turn cc from type long to type size_t
+    //
+    //  that depends on the use of cc, of course. Investigate
+    cc = (long) b_write_fix (in[1], uData, uData_length);
+    // like above: investigate, remove cast
+    if (cc != (long) uData_length)
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5513, "%s: b_write_fix <%s> failed, cc=%d, i=%d: %m"),	/* catgets 5513 */
-		 fname, uData, cc, i);
-      CLOSEHANDLE (in[1]);
-      CLOSEHANDLE (out[0]);
-      connected = FALSE;
-      return (-1);
+        /* catgets 5513 */
+        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5513, "%s: b_write_fix <%s> failed, cc=%d, i=%d: %m"), fname, uData, cc, uData_length);
+        CLOSEHANDLE (in[1]);
+        CLOSEHANDLE (out[0]);
+        connected = FALSE;
+        return (-1);
     }
-  if (logclass & (LC_AUTH | LC_TRACE))
-    ls_syslog (LOG_DEBUG, _i18n_msg_get (ls_catd, NL_SETN, 5514,
-					 "%s: b_write_fix <%s> ok, cc=%d, i=%d"),
-	       fname, uData, cc, i);
-
-  if ((cc = b_write_fix (in[1], auth->k.eauth.data, auth->k.eauth.len))
-      != auth->k.eauth.len)
-    {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5515, "%s: b_write_fix <%s> failed, eauth.len=%d, cc=%d"),	/* catgets 5515 */
-		 fname, uData, auth->k.eauth.len, cc);
-      CLOSEHANDLE (in[1]);
-      CLOSEHANDLE (out[0]);
-      connected = FALSE;
-      return (-1);
-    }
-  if (logclass & (LC_AUTH | LC_TRACE))
-    ls_syslog (LOG_DEBUG, _i18n_msg_get (ls_catd, NL_SETN, 5516,
-					 "%s: b_write_fix <%s> ok, eauth.len=%d, eauth.data=%.*s cc=%d:"),
-	       fname, uData, auth->k.eauth.len,
-	       auth->k.eauth.len, auth->k.eauth.data, cc);
-
-  if ((cc = b_read_fix (out[0], &ok, 1)) != 1)
-    {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5517, "%s: b_read_fix <%s> failed, cc=%d: %m"),	/* catgets 5517 */
-		 fname, uData, cc);
-      CLOSEHANDLE (in[1]);
-      CLOSEHANDLE (out[0]);
-      connected = FALSE;
-      return (-1);
+    
+    if (logclass & (LC_AUTH | LC_TRACE)) {
+        ls_syslog (LOG_DEBUG, _i18n_msg_get (ls_catd, NL_SETN, 5514, "%s: b_write_fix <%s> ok, cc=%d, i=%d"), fname, uData, cc, uData_length);
     }
 
-  if (ok != '1')
+    // FIXME investigate the type of auth->k.eauth.len and figure out if len
+    //    should be a size_t type.
+    //    remove cast after you are done
+    assert( auth->k.eauth.len >= 0);
+    cc = (long) b_write_fix (in[1], auth->k.eauth.data, (size_t) auth->k.eauth.len);
+    if ( cc != (long) auth->k.eauth.len)
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5518, "%s: eauth <%s> len=%d failed, rc=%c"),	/* catgets 5518 */
-		 fname, uData, auth->k.eauth.len, ok);
-      return (-1);
+         /* catgets 5515 */
+        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5515, "%s: b_write_fix <%s> failed, eauth.len=%d, cc=%d"), fname, uData, auth->k.eauth.len, cc);
+        CLOSEHANDLE (in[1]);
+        CLOSEHANDLE (out[0]);
+        connected = FALSE;
+        return (-1);
+    }
+
+    if (logclass & (LC_AUTH | LC_TRACE)) {
+        ls_syslog (LOG_DEBUG, _i18n_msg_get (ls_catd, NL_SETN, 5516, "%s: b_write_fix <%s> ok, eauth.len=%d, eauth.data=%.*s cc=%d:"), fname, uData, auth->k.eauth.len, auth->k.eauth.len, auth->k.eauth.data, cc);
+    }
+
+    cc = (long) b_read_fix (out[0], &ok, 1);
+    if ( cc != 1) {
+        /* catgets 5517 */
+        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5517, "%s: b_read_fix <%s> failed, cc=%d: %m"), fname, uData, cc);
+        CLOSEHANDLE (in[1]);
+        CLOSEHANDLE (out[0]);
+        connected = FALSE;
+        return (-1);
+    }
+
+    if (ok != '1') {
+        /* catgets 5518 */
+        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5518, "%s: eauth <%s> len=%d failed, rc=%c"), fname, uData, auth->k.eauth.len, ok);
+        return (-1);
     }
 
   return (0);
@@ -367,12 +397,12 @@ getLSFAdmin (void)
     }
 
   lsfUserName = (clusterInfo->nAdmins == 0 ? clusterInfo->managerName :
-		 clusterInfo->admins[0]);
+         clusterInfo->admins[0]);
 
   if ((pw = getpwlsfuser_ (lsfUserName)) == NULL)
     {
       ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M,
-		 fname, "getpwlsfuser_", lsfUserName);
+         fname, "getpwlsfuser_", lsfUserName);
       return (NULL);
     }
 
@@ -382,28 +412,28 @@ getLSFAdmin (void)
 }
 
 
-#define EAUTH_ENV_BUF_LEN       (MAXPATHLEN+32)
-
 static int
 putEnvVar (char *buf, const char *envVar, const char *envValue)
 {
-  int rc, str_size;
+    int rc = 0 ;
+    size_t str_size = 0;
 
-  sprintf (buf, "%s=", envVar);
-  if (envValue && strlen (envValue))
-    {
-      str_size = strlen (buf) + strlen (envValue) + 1;
-      if (str_size > EAUTH_ENV_BUF_LEN)
-	{
-	  return -2;
-	}
-      strcat (buf, envValue);
+    sprintf (buf, "%s=", envVar);
+    if (envValue && strlen (envValue)) {
+
+        str_size = strlen (buf) + strlen (envValue) + 1;
+        
+        if (str_size > EAUTH_ENV_BUF_LEN) {
+            return -2;
+        }
+        
+        strcat (buf, envValue);
     }
 
-  rc = putenv (buf);
-  if (rc != 0)
-    {
-      return -1;
+    rc = putenv (buf);
+    
+    if (rc != 0) {
+        return -1;
     }
 
   return 0;

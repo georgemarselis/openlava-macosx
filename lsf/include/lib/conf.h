@@ -18,10 +18,7 @@
 
 #pragma once
  
-#ifndef LSF_LIB_CONF_H
-#define LSF_LIB_CONF_H
-
- #include "lib/lib.h"
+#include "lsf.h"
 
 #define ILLEGAL_CHARS     ".!-=+*/[]@:&|{}'`\""
 #define M_THEN_A  1
@@ -32,25 +29,107 @@
 #define TYPE3  RESF_BUILTIN | RESF_GLOBAL | RESF_LIC
 #define DEF_REXPRIORITY 0
 
+
+#define NL_SETN 42
+
 struct builtIn
 {
-  char *name;
-  char *des;
-  enum valueType valueType;
-  enum orderType orderType;
-  int flags;
-  int interval;
+    char *name;
+    char *des;
+    enum valueType valuetype;
+    enum orderType ordertype;
+    int flags;
+    int interval;
+}; 
+
+static struct builtIn builtInRes[24] = {
+    {"r15s", "15-second CPU run queue length", LS_NUMERIC, INCR, TYPE1 | RESF_RELEASE, 15},
+    {"r1m",  "1-minute CPU run queue length (alias: cpu)", LS_NUMERIC, INCR, TYPE1 | RESF_RELEASE, 15},
+    {"r15m", "15-minute CPU run queue length", LS_NUMERIC, INCR, TYPE1 | RESF_RELEASE, 15},
+    {"ut",   "1-minute CPU utilization (0.0 to 1.0)", LS_NUMERIC, INCR, TYPE1, 15},
+    {"pg",   "Paging rate (pages/second)", LS_NUMERIC, INCR, TYPE1, 15},
+    {"io",   "Disk IO rate (Kbytes/second)", LS_NUMERIC, INCR, TYPE1, 15},
+    {"ls",   "Number of login sessions (alias: login)", LS_NUMERIC, INCR, TYPE1, 30},
+    {"it",   "Idle time (minutes) (alias: idle)", LS_NUMERIC, DECR, TYPE1, 30},
+    {"tmp",  "Disk space in /tmp (Mbytes)", LS_NUMERIC, DECR, TYPE1, 120},
+    {"swp",  "Available swap space (Mbytes) (alias: swap)", LS_NUMERIC, DECR, TYPE1, 15},
+    {"mem",  "Available memory (Mbytes)", LS_NUMERIC, DECR, TYPE1, 15},
+    {"ncpus","Number of CPUs", LS_NUMERIC, DECR, TYPE2, 0},
+    {"ndisks", "Number of local disks", LS_NUMERIC, DECR, TYPE2, 0},
+    {"maxmem", "Maximum memory (Mbytes)", LS_NUMERIC, DECR, TYPE2, 0},
+    {"maxswp", "Maximum swap space (Mbytes)", LS_NUMERIC, DECR, TYPE2, 0},
+    {"maxtmp", "Maximum /tmp space (Mbytes)", LS_NUMERIC, DECR, TYPE2, 0},
+    {"cpuf",   "CPU factor", LS_NUMERIC, DECR, TYPE2, 0},
+    {"type",   "Host type",  LS_STRING, NA, TYPE2, 0},
+    {"model",  "Host model", LS_STRING, NA, TYPE2, 0},
+    {"status", "Host status",LS_STRING, NA, TYPE2, 0},
+    {"rexpri", "Remote execution priority", LS_NUMERIC, NA, TYPE2, 0},
+    {"server", "LSF server host", LS_BOOLEAN, NA, TYPE2, 0},
+    {"hname",  "Host name", LS_STRING, NA, TYPE2, 0},
+    {NULL,     NULL, LS_NUMERIC, INCR, TYPE1, 0}
 };
 
 struct HostsArray
 {
-  int size;
-  char **hosts;
+    int size;
+    char padding[4];
+    char **hosts;
 };
 
+struct keymap {
+    char *key;
+    char *val;
+    long position;
+};
+
+static const int builtInRes_ID[] = {
+  1300, 1301, 1302, 1303, 1304, 1305, 1306, 1307, 1308, 1309,
+  1310, 1311, 1312, 1313, 1314, 1315, 1316, 1317, 1318, 1319,
+  1320, 1321
+};
+
+char do_Cluster (FILE *fp, size_t *lineNum, char *fname);
+char do_HostTypes (FILE *fp, size_t *lineNum, char *fname);
+char do_HostModels (FILE *fp, size_t *lineNum, char *fname);
+char do_Resources (FILE *fp, size_t *lineNum, char *fname);
+char do_Index (FILE * fp, size_t *lineNum, char *fname);
+char do_Manager (FILE *fp, char *fname, size_t *lineNum, char *clustermanager, int lookupAdmins);
+char do_Hosts (FILE *fp, char *fname, size_t *lineNum, struct lsInfo *myInfo);
+char do_Clparams (FILE *fp, char *fname, size_t *lineNum);
+
+char addHostType (char *);
+char addHostModel (char *, char *, double);
+char setIndex (struct keymap *keyList, char *fname, size_t lineNum);
+char addHost (struct hostInfo *host, char *fname, size_t *lineNum);
+
+
+void initClusterInfo (struct clusterInfo *);
+void freeClusterInfo (struct clusterInfo *);
+void initHostInfo (struct hostInfo *);
+void freeHostInfo (struct hostInfo *);
+
+int initResTable (void);
+int resNameDefined (char *);
+void putThreshold (int indx, struct hostInfo *host, long position, char *val, float def);
+int getClusAdmins (char *line, char *fname, size_t *lineNum, char *secName, int lookupAdmins);
+struct admins *getAdmins (char *line, char *fname, size_t *lineNum, char *secName, int lookupAdmins);
+int parse_time (char *, float *, int *);
+int validWindow (char *, char *);
+
+static struct sharedConf *sConf = NULL;
+static struct lsInfo lsinfo;
+static struct clusterConf *cConf = NULL;
+static struct clusterInfo clinfo;
+int setAdmins (struct admins *, int);
+void freeKeyList (struct keymap *keyList);
+int validType (char *type);
+int doResourceMap (FILE *fp, char *lsfile, size_t *lineNum);
+int addResourceMap (char *resName, char *location, char *lsfile, size_t lineNum);
+int parseHostList (char *hostList, char *lsfile, size_t lineNum, char ***hosts);
+struct lsSharedResourceInfo *addResource (char *resName, int nHosts, char **hosts, char *value, char *fileName, size_t lineNum);
+int addHostInstance (struct lsSharedResourceInfo *sharedResource, int nHosts, char **hostNames, char *value);
+
+int convertNegNotation_ (char **, struct HostsArray *);
+int resolveBaseNegHosts (char *, char **, struct HostsArray *);
+
 void freeSA_ (char **, int);
-
-extern int builtInRes_ID[];
-extern struct builtIn builtInRes[];
-
-#endif

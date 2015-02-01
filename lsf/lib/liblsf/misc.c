@@ -1,4 +1,4 @@
-/* $Id: lib.misc.c 397 2007-11-26 19:04:00Z mblack $
+ /* $Id: lib.misc.c 397 2007-11-26 19:04:00Z mblack $
  * Copyright (C) 2007 Platform Computing Inc
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,19 +22,26 @@
 #define BADCH   ":"
 #define NL_SETN   23
 
+#define MAXFLOAT_LOCAL  3.40282347e+38F
 
-#define PRINT_ERRMSG(errMsg, fmt, msg1, msg2)   \
+/*
+#define fprintf(errMsg, fmt, msg1, msg2)   \
     {                                           \
-        if (errMsg == NULL)                     \
+        if (errMsg == NULL) {                   \
             fprintf(stderr, fmt, msg1, msg2);   \
-        else                                    \
-            sprintf(*errMsg, fmt, msg1, msg2);  \
-    }
+        } \
+        else {                                    \
+            sprintf(*errMsg, fmt, msg1, msg2);   \
+        } \
+    }*/
+
 
 static struct LSFAdmins
 {
-  int numAdmins;
-  char **names;
+    unsigned int numAdmins;
+    char padding[4];
+    char **names;
+
 } LSFAdmins;
 
 bool_t isLSFAdmin (const char *);
@@ -42,28 +49,32 @@ bool_t isLSFAdmin (const char *);
 char
 isanumber_ (char *word)
 {
-  char **eptr;
-  double number;
+    char **eptr;
+    double number;
 
-  if (!word || *word == '\0')
+    if (!word || *word == '\0') {
+        return FALSE;
+    }
+
+    if (errno == ERANGE) {
+        errno = 0;
+    }
+
+    eptr = &word;
+    number = strtod (word, eptr);
+    if (**eptr == '\0' && errno != ERANGE) {
+        if (number <= MAXFLOAT_LOCAL && number > -MAXFLOAT_LOCAL ) {
+            return TRUE;
+        }
+    }
+
     return FALSE;
-
-  if (errno == ERANGE)
-    errno = 0;
-
-  eptr = &word;
-  number = strtod (word, eptr);
-  if (**eptr == '\0' && errno != ERANGE)
-    if (number <= MAXFLOAT && number > -MAXFLOAT)
-      return TRUE;
-
-  return FALSE;
 }
 
 char
 islongint_ (char *word)
 {
-  long long int number;
+  long number;
 
   if (!word || *word == '\0')
     return FALSE;
@@ -74,11 +85,11 @@ islongint_ (char *word)
   if (errno == ERANGE)
     errno = 0;
 
-  sscanf (word, "%lld", &number);
+  sscanf (word, "%ld", &number);
   if (errno != ERANGE)
     {
       if (number <= INFINIT_LONG_INT && number > -INFINIT_LONG_INT)
-	return TRUE;
+  return TRUE;
     }
   return FALSE;
 
@@ -87,14 +98,14 @@ islongint_ (char *word)
 int
 isdigitstr_ (char *string)
 {
-  int i;
+  long i;
 
-  for (i = 0; i < strlen (string); i++)
+  for (i = 0; i < (long) strlen (string); i++)
     {
       if (!isdigit (string[i]))
-	{
-	  return FALSE;
-	}
+  {
+    return FALSE;
+  }
     }
   return TRUE;
 }
@@ -102,7 +113,7 @@ isdigitstr_ (char *string)
 LS_LONG_INT
 atoi64_ (char *word)
 {
-  long long int number;
+  long number;
 
   if (!word || *word == '\0')
     return 0;
@@ -110,11 +121,11 @@ atoi64_ (char *word)
   if (errno == ERANGE)
     errno = 0;
 
-  sscanf (word, "%lld", &number);
+  sscanf (word, "%ld", &number);
   if (errno != ERANGE)
     {
       if (number <= INFINIT_LONG_INT && number > -INFINIT_LONG_INT)
-	return number;
+  return number;
     }
   return 0;
 }
@@ -122,24 +133,26 @@ atoi64_ (char *word)
 char
 isint_ (char *word)
 {
-  char **eptr;
+    char **eptr;
+    long number;
 
-  int number;
-
-  if (!word || *word == '\0')
-    return FALSE;
-
-  if (errno == ERANGE)
-    errno = 0;
-  eptr = &word;
-  number = strtol (word, eptr, 10);
-  if (**eptr == '\0' && errno != ERANGE)
-    {
-      if (number <= INFINIT_INT && number > -INFINIT_INT)
-	return TRUE;
+    if (!word || *word == '\0') {
+        return FALSE;
     }
 
-  return FALSE;
+    if (errno == ERANGE) {
+        errno = 0;
+    }
+
+    eptr = &word;
+    number = strtol (word, eptr, 10);
+    if (**eptr == '\0' && errno != ERANGE) {
+        if (number <= INFINIT_INT && number > -INFINIT_INT) {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
 }
 
 char *
@@ -164,47 +177,52 @@ putstr_ (const char *s)
 short
 getRefNum_ (void)
 {
-  static short reqRefNum = MIN_REF_NUM;
+    static short reqRefNum = MIN_REF_NUM;
 
-  reqRefNum++;
-  if (reqRefNum >= MAX_REF_NUM)
-    reqRefNum = MIN_REF_NUM;
+    reqRefNum++;
+    if (reqRefNum >= MAX_REF_NUM) {
+        reqRefNum = MIN_REF_NUM;
+    }
 
-  return reqRefNum;
+    return reqRefNum;
 }
 
 char *
 chDisplay_ (char *disp)
 {
-  char *sp;
-  char *hostName;
-  static char dspbuf[MAXHOSTNAMELEN + 10];
+    char *sp;
+    char *hostName;
+    static char dspbuf[MAXHOSTNAMELEN + 10];
 
-  sp = disp + 8;
-  if (strncmp ("unix:", sp, 5) == 0)
-    sp += 4;
-  else if (strncmp ("localhost:", sp, 10) == 0)
-    sp += 9;
+    sp = disp + 8;
+    if (strncmp ("unix:", sp, 5) == 0) {
+        sp += 4;
+    }
+    else if (strncmp ("localhost:", sp, 10) == 0) {
+        sp += 9;
+    }
 
-  if (sp[0] == ':')
-    {
-      if ((hostName = ls_getmyhostname ()) == NULL)
-	return (disp);
-      sprintf (dspbuf, "%s=%s%s", "DISPLAY", hostName, sp);
-      return dspbuf;
+    if (sp[0] == ':') {
+        
+        if ((hostName = ls_getmyhostname ()) == NULL){
+            return (disp);
+        }
+        
+        sprintf (dspbuf, "%s=%s%s", "DISPLAY", hostName, sp);
+        
+        return dspbuf;
     }
 
   return disp;
-
 }
 
 void
 strToLower_ (char *name)
 {
-  while (*name != '\0')
-    {
-      *name = tolower (*name);
-      name++;
+    while (*name != '\0') {
+        assert( tolower( *name ) > 0 );
+        *name = (char) tolower (*name);
+        name++;
     }
 
 }
@@ -212,71 +230,101 @@ strToLower_ (char *name)
 char *
 getNextToken (char **sp)
 {
-  static char word[MAXLINELEN];
-  char *cp;
+    static char word[MAXLINELEN];
+    char *cp;
 
-  if (!*sp)
-    return NULL;
+    if (!*sp) {
+        return NULL;
+    }
 
-  cp = *sp;
-  if (cp[0] == '\0')
-    return NULL;
+    cp = *sp;
+    if (cp[0] == '\0') {
+        return NULL;
+    }
 
-  if (cp[0] == ':' || cp[0] == '=' || cp[0] == ' ')
-    *sp += 1;
-  cp = *sp;
-  if (cp[0] == '\0')
-    return NULL;
+    if (cp[0] == ':' || cp[0] == '=' || cp[0] == ' ') {
+        *sp += 1;
+    }
 
-  strcpy (word, cp);
-  if ((cp = strchr (word, ':')) != NULL)
-    *cp = '\0';
-  if ((cp = strchr (word, '=')) != NULL)
-    *cp = '\0';
+    cp = *sp;
+    if (cp[0] == '\0') {
+        return NULL;
+    }
 
-  *sp += strlen (word);
-  return word;
+    strcpy (word, cp);
+    if ((cp = strchr (word, ':')) != NULL) {
+        *cp = '\0';
+    }
+
+    if ((cp = strchr (word, '=')) != NULL) {
+        *cp = '\0';
+    }
+
+    *sp += strlen (word);
+    
+    return word;
 
 }
 
 int
 getValPair (char **resReq, int *val1, int *val2)
 {
-  char *token, *cp, *wd1 = NULL, *wd2 = NULL;
-  int len;
+    char *token, *cp, *wd1 = NULL, *wd2 = NULL;
+    size_t len;
 
-  *val1 = INFINIT_INT;
-  *val2 = INFINIT_INT;
+    *val1 = INFINIT_INT;
+    *val2 = INFINIT_INT;
 
-  token = getNextToken (resReq);
-  if (!token)
-    return 0;
-  len = strlen (token);
-  if (len == 0)
-    return 0;
-  cp = token;
-  while (*cp != '\0' && *cp != ',' && *cp != '/')
-    cp++;
-  if (*cp != '\0')
-    {
-      *cp = '\0';
-      if (cp - token > 0)
-	wd1 = token;
-      if (cp - token < len - 1)
-	wd2 = ++cp;
+    token = getNextToken (resReq);
+    if (!token) {
+        return 0;
     }
-  else
-    wd1 = token;
-  if (wd1 && !isint_ (wd1))
-    return -1;
-  if (wd2 && !isint_ (wd2))
-    return -1;
-  if (!wd1 && !wd2)
-    return -1;
-  if (wd1)
-    *val1 = atoi (wd1);
-  if (wd2)
-    *val2 = atoi (wd2);
+    
+    len = strlen (token);
+    if (len == 0) {
+        return 0;
+    }
+    
+    cp = token;
+    while (*cp != '\0' && *cp != ',' && *cp != '/') {
+        cp++;
+    }
+    
+    if (*cp != '\0') {
+        
+        *cp = '\0';        
+        if (cp - token > 0) {
+            wd1 = token;
+        }
+        
+        assert( cp - token >= 0);
+        if ( (size_t)(cp - token) < len - 1) {
+            wd2 = ++cp;
+        }
+    }
+    else {
+        wd1 = token;
+    }
+
+    if (wd1 && !isint_ (wd1)) {
+        return -1;
+    }
+
+    if (wd2 && !isint_ (wd2)) {
+        return -1;
+    }
+
+    if (!wd1 && !wd2) {
+        return -1;
+    }
+
+    if (wd1) {
+        *val1 = atoi (wd1);
+    }
+
+    if (wd2) {
+        *val2 = atoi (wd2);
+    }
 
   return 0;
 }
@@ -285,82 +333,107 @@ getValPair (char **resReq, int *val1, int *val2)
 char *
 my_getopt (int nargc, char **nargv, char *ostr, char **errMsg)
 {
-  char svstr[256];
-  char *cp1 = svstr;
-  char *cp2 = svstr;
-  char *optName;
-  int i, num_arg;
+    char svstr[256];
+    char *cp1 = svstr;
+    char *cp2 = svstr;
+    char *optName;
+    size_t i = 0; 
+    int num_arg = 0;
 
-  if ((optName = nargv[optind]) == NULL)
-    return (NULL);
-  if (optind >= nargc || *optName != '-')
-    return (NULL);
-  if (optName[1] && *++optName == '-')
-    {
-      ++optind;
-      return (NULL);
+    if ((optName = nargv[optind]) == NULL) {
+        return (NULL);
     }
-  if (ostr == NULL)
-    return (NULL);
-  strcpy (svstr, ostr);
-  num_arg = 0;
-  optarg = NULL;
 
-  while (*cp2)
-    {
-      int cp2len = strlen (cp2);
-      for (i = 0; i < cp2len; i++)
-	{
-	  if (cp2[i] == '|')
-	    {
-	      num_arg = 0;
-	      cp2[i] = '\0';
-	      break;
-	    }
-	  else if (cp2[i] == ':')
-	    {
-	      num_arg = 1;
-	      cp2[i] = '\0';
-	      break;
-	    }
-	}
-      if (i >= cp2len)
-	return (BADCH);
-
-      if (!strcmp (optName, cp1))
-	{
-	  if (num_arg)
-	    {
-	      if (nargc <= optind + 1)
-		{
-		  PRINT_ERRMSG (errMsg, (_i18n_msg_get (ls_catd, NL_SETN, 650, "%s: option requires an argument -- %s\n")), nargv[0], optName);	/* catgets 650 */
-		  return (BADCH);
-		}
-	      optarg = nargv[++optind];
-	    }
-	  ++optind;
-	  return (optName);
-	}
-      else if (!strncmp (optName, cp1, strlen (cp1)))
-	{
-	  if (num_arg == 0)
-	    {
-	      PRINT_ERRMSG (errMsg, (_i18n_msg_get (ls_catd, NL_SETN, 651, "%s: option cannot have an argument -- %s\n")),	/* catgets 651 */
-			    nargv[0], cp1);
-	      return (BADCH);
-	    }
-
-	  optarg = optName + strlen (cp1);
-	  ++optind;
-	  return (cp1);
-	}
-
-      cp1 = &cp2[i];
-      cp2 = ++cp1;
+    if (optind >= nargc || *optName != '-') {
+        return (NULL);
     }
-  PRINT_ERRMSG (errMsg, (_i18n_msg_get (ls_catd, NL_SETN, 652, "%s: illegal option -- %s\n")), nargv[0], optName);	/* catgets 652 */
-  return (BADCH);
 
+    if (optName[1] && *++optName == '-') {
+
+        ++optind;
+        return (NULL);
+    }
+
+    if (ostr == NULL) {
+        return (NULL);
+    }
+
+    strcpy (svstr, ostr);
+    num_arg = 0;
+    optarg = NULL;
+    while (*cp2) {
+
+        size_t cp2len = strlen (cp2);
+        for (i = 0; i < cp2len; i++) {
+            if (cp2[i] == '|') {
+                num_arg = 0;
+                cp2[i] = '\0';
+                break;
+            }
+            else if (cp2[i] == ':') {
+                num_arg = 1;
+                cp2[i] = '\0';
+                break;
+            }
+        }
+      
+        if (i >= cp2len) {  // FIXME FIXME refactoring. 'i' should not be seen outside the loop
+            return (BADCH);
+        }
+
+        if (!strcmp (optName, cp1)) {
+
+            if (num_arg) {
+
+                if (nargc <= optind + 1) {
+                    /* catgets 650 */
+                    if (errMsg == NULL) {                   
+                        fprintf(stderr, "catgets 650: %s: option requires an argument -- %s\n", nargv[0], optName);   
+                    } 
+                    else { 
+                        sprintf(*errMsg, "catgets 650: %s: option requires an argument -- %s\n", nargv[0], optName);   
+                    }
+                    return BADCH;
+                }
+
+                optarg = nargv[++optind];
+            }
+
+            ++optind;
+            
+            return (optName);
+        }
+        else if (!strncmp (optName, cp1, strlen (cp1))) {
+        
+            if (num_arg == 0) {
+                     /* catgets 651 */
+                    if (errMsg == NULL) {                   
+                        fprintf(stderr, "catgets 651: %s: option cannot have an argument -- %s\n", nargv[0], cp1);   
+                    } 
+                    else { 
+                        sprintf(*errMsg, "catgets 651: %s: option cannot have an argument -- %s\n", nargv[0], cp1);   
+                    }
+                    return (BADCH);
+            }
+
+            optarg = optName + strlen (cp1);
+            ++optind;
+            
+            return (cp1);
+        }
+
+        cp1 = &cp2[i];
+        cp2 = ++cp1;
+    }
+    /* catgets 652 */
+    if (errMsg == NULL) {                   
+        fprintf(stderr, "catgets 652: %s: illegal option -- %s\n", nargv[0], optName);   
+    } 
+    else { 
+        sprintf(*errMsg, "catgets 652: %s: illegal option -- %s\n", nargv[0], optName);   
+    }
+    
+    return BADCH;
 }
 
 int
@@ -398,53 +471,54 @@ myrealloc (void *ptr, size_t size)
 }
 
 int
-Bind_ (int sockfd, struct sockaddr *myaddr, int addrlen)
+Bind_ (int sockfd, struct sockaddr *myaddr, socklen_t addrlen)
 {
   struct sockaddr_in *cliaddr;
-  ushort port;
+  ushort port = 0;
   int i;
 
-  cliaddr = (struct sockaddr_in *) myaddr;
+  cliaddr = (struct sockaddr_in *) myaddr;  // FIXME FIXME FIXME FIXME
+                                            //    enroll in union, present appropiate part of unon
   if (cliaddr->sin_port != 0)
     return (bind (sockfd, myaddr, addrlen));
   else
     {
       for (i = 1; i <= BIND_RETRY_TIMES; i++)
-	{
-	  if (bind (sockfd, (struct sockaddr *) cliaddr, addrlen) == 0)
-	    return 0;
-	  else
-	    {
-	      if (errno == EADDRINUSE)
-		{
-		  if (i == 1)
-		    {
-		      port = (ushort) (time (0) | getpid ());
-		      port = ((port < 1024) ? (port + 1024) : port);
-		    }
-		  else
-		    {
-		      port++;
-		      port = ((port < 1024) ? (port + 1024) : port);
-		    }
-		  ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5650,
-						      "%s: retry <%d> times, port <%d> will be bound"
-						      /* catgets 5650 */ )),
-			     "Bind_", i, port);
-		  cliaddr->sin_port = htons (port);
-		}
-	      else
-		return (-1);
-	    }
-	}
+  {
+    if (bind (sockfd, (struct sockaddr *) cliaddr, addrlen) == 0)
+      return 0;
+    else
+      {
+        if (errno == EADDRINUSE)
+    {
+      if (i == 1)
+        {
+          port = (ushort) (time (0) | getpid ());
+          port = ((port < 1024) ? (port + 1024) : port);
+        }
+      else
+        {
+          port++;
+          port = ((port < 1024) ? (port + 1024) : port);
+        }
+      ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5650,
+                  "%s: retry <%d> times, port <%d> will be bound"
+                  /* catgets 5650 */ )),
+           "Bind_", i, port);
+      cliaddr->sin_port = htons (port);
+    }
+        else
+    return (-1);
+      }
+  }
       ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "Bind_", "bind",
-		 BIND_RETRY_TIMES);
+     BIND_RETRY_TIMES);
       return (-1);
     }
 }
 
 const char *
-getCmdPathName_ (const char *cmdStr, int *cmdLen)
+getCmdPathName_ (const char *cmdStr, long *cmdLen)
 {
   char *pRealCmd;
   char *sp1;
@@ -464,13 +538,13 @@ getCmdPathName_ (const char *cmdStr, int *cmdLen)
 
       sp1 = pRealCmd;
       for (i = 0; sp1[i] != '\0'; i++)
-	{
-	  if (sp1[i] == ';' || sp1[i] == ' ' ||
-	      sp1[i] == '&' || sp1[i] == '>' ||
-	      sp1[i] == '<' || sp1[i] == '|' ||
-	      sp1[i] == '\t' || sp1[i] == '\n')
-	    break;
-	}
+  {
+    if (sp1[i] == ';' || sp1[i] == ' ' ||
+        sp1[i] == '&' || sp1[i] == '>' ||
+        sp1[i] == '<' || sp1[i] == '|' ||
+        sp1[i] == '\t' || sp1[i] == '\n')
+      break;
+  }
 
       sp2 = &sp1[i];
     }
@@ -481,129 +555,118 @@ getCmdPathName_ (const char *cmdStr, int *cmdLen)
     }
   else
     {
-      *cmdLen = strlen (sp1);
+      *cmdLen = (long) strlen (sp1);
     }
   return sp1;
 }
 
-int
-replace1stCmd_ (const char *oldCmdArgs, const char *newCmdArgs,
-		char *outCmdArgs, int outLen)
+int replace1stCmd_ (const char *oldCmdArgs, const char *newCmdArgs, char *outCmdArgs, int outLen)
 {
-  const char *sp1;
-  const char *sp2;
-  int len2;
-  const char *sp3;
-  char *curSp;
-  const char *newSp;
-  int newLen;
-  int len;
+    const char *sp1;
+    const char *sp2;
+    const char *sp3;
+    const char *newSp;
 
-  newSp = getCmdPathName_ (newCmdArgs, &newLen);
-  sp1 = oldCmdArgs;
-  sp2 = getCmdPathName_ (sp1, &len2);
-  if (newLen - len2 + strlen (sp1) >= outLen)
-    {
-      return -1;
+    char *curSp;
+  
+    long len;
+    long len2;
+    long newLen;
+  
+    newSp = getCmdPathName_ (newCmdArgs, &newLen);
+    sp1 = oldCmdArgs;
+    sp2 = getCmdPathName_ (sp1, &len2);
+
+    if ( newLen - len2 + (long) strlen (sp1) >= outLen) {
+        return -1;
     }
-  sp3 = sp2 + len2;
+    sp3 = sp2 + len2;
 
-  len = sp2 - sp1;
-  curSp = memcpy (outCmdArgs, sp1, len);
-  curSp = memcpy (curSp + len, newSp, newLen);
-  strcpy (curSp + newLen, sp3);
+    len = sp2 - sp1;
+    curSp = memcpy (outCmdArgs, sp1, len);
+    curSp = memcpy (curSp + len, newSp, newLen);
+    strcpy (curSp + newLen, sp3);
 
-  return 0;
+    return 0;
 }
 
 const char *
 getLowestDir_ (const char *filePath)
 {
-  static char dirName[MAXFILENAMELEN];
-  const char *sp1, *sp2;
-  int len;
+    static char dirName[MAXFILENAMELEN];
+    const char *sp1, *sp2;
+    long len;
 
-  sp1 = strrchr (filePath, '/');
-  if (sp1 == NULL)
-    {
-      sp1 = filePath;
+    sp1 = strrchr (filePath, '/');
+    if (sp1 == NULL) {
+        sp1 = filePath;
     }
-  sp2 = strrchr (filePath, '\\');
-  if (sp2 == NULL)
-    {
-      sp2 = filePath;
+    
+    sp2 = strrchr (filePath, '\\');
+    if (sp2 == NULL) {
+        sp2 = filePath;
     }
-  len = (sp2 > sp1) ? sp2 - filePath : sp1 - filePath;
+    
+    len = (sp2 > sp1) ? sp2 - filePath : sp1 - filePath;
 
-  if (len)
-    {
-      memcpy (dirName, filePath, len);
-      dirName[len] = 0;
+    if (len) {
+        memcpy (dirName, filePath, len);
+        dirName[len] = 0;
     }
-  else
-    {
+    else {
       return NULL;
     }
 
-  return dirName;
+    return dirName;
 }
 
 void
 getLSFAdmins_ (void)
 {
   struct clusterInfo *clusterInfo;
-  int i;
 
-  clusterInfo = ls_clusterinfo (NULL, NULL, NULL, 0, 0);
-  if (clusterInfo == NULL)
-    {
+
+    clusterInfo = ls_clusterinfo (NULL, NULL, NULL, 0, 0);
+    if (clusterInfo == NULL) {
       return;
     }
 
-  if (LSFAdmins.numAdmins != 0)
-    {
-      FREEUP (LSFAdmins.names);
+    if (LSFAdmins.numAdmins != 0) {
+        FREEUP (LSFAdmins.names);
     }
 
-  LSFAdmins.numAdmins = clusterInfo->nAdmins;
-
-  LSFAdmins.names = calloc (LSFAdmins.numAdmins, sizeof (char *));
-  if (LSFAdmins.names == NULL)
-    {
-      LSFAdmins.numAdmins = 0;
-      return;
+    LSFAdmins.numAdmins = clusterInfo->nAdmins;
+    LSFAdmins.names = calloc (LSFAdmins.numAdmins, sizeof (char *));
+    if ( NULL == LSFAdmins.names) {
+        LSFAdmins.numAdmins = 0;
+        return;
     }
 
-  for (i = 0; i < LSFAdmins.numAdmins; i++)
-    {
-      LSFAdmins.names[i] = putstr_ (clusterInfo->admins[i]);
-      if (LSFAdmins.names[i] == NULL)
-	{
-	  int j;
+    for ( unsigned int i = 0; i < LSFAdmins.numAdmins; i++) {
+        LSFAdmins.names[i] = putstr_ (clusterInfo->admins[i]);
+        
+        if (LSFAdmins.names[i] == NULL) {
 
-	  for (j = 0; j < i; j++)
-	    {
-	      FREEUP (LSFAdmins.names[j]);
-	    }
-	  FREEUP (LSFAdmins.names);
-	  LSFAdmins.numAdmins = 0;
+            for ( unsigned  int j = 0; j < i; j++) {
+                FREEUP (LSFAdmins.names[j]);
+            }
+            
+            FREEUP (LSFAdmins.names);
+            LSFAdmins.numAdmins = 0;
 
-	  return;
-	}
+            return;
+        }
     }
 }
 
 bool_t
 isLSFAdmin_ (const char *name)
 {
-  int i;
+    for ( unsigned int i = 0; i < LSFAdmins.numAdmins; i++) {
 
-  for (i = 0; i < LSFAdmins.numAdmins; i++)
-    {
-      if (strcmp (name, LSFAdmins.names[i]) == 0)
-	{
-	  return (TRUE);
-	}
+        if (strcmp (name, LSFAdmins.names[i]) == 0) {
+            return (TRUE);
+        }
     }
 
   return (FALSE);
@@ -613,7 +676,7 @@ isLSFAdmin_ (const char *name)
 int
 ls_strcat (char *trustedBuffer, int bufferLength, char *strToAdd)
 {
-  int start = strlen (trustedBuffer);
+  int start = (int) strlen (trustedBuffer);
   int remainder = bufferLength - start;
   int i;
 
@@ -626,9 +689,9 @@ ls_strcat (char *trustedBuffer, int bufferLength, char *strToAdd)
     {
       trustedBuffer[start + i] = strToAdd[i];
       if (strToAdd[i] == '\0')
-	{
-	  break;
-	}
+  {
+    break;
+  }
     }
   if (i == remainder)
     {
@@ -883,12 +946,13 @@ readAddHost (char *buf, struct lsEventRec *ev)
 
   /* load indexes
    */
-  hPtr->busyThreshold = calloc (hPtr->numIndx, sizeof (float));
+
+  hPtr->busyThreshold = calloc ( (unsigned long) hPtr->numIndx, sizeof (float));
   for (i = 0; i < hPtr->numIndx; i++)
     {
       cc = sscanf (p, "%f%n", &hPtr->busyThreshold[i], &n);
       if (cc != 1)
-	goto out;
+  goto out;
       p = p + n;
     }
 
@@ -897,15 +961,17 @@ readAddHost (char *buf, struct lsEventRec *ev)
   cc = sscanf (p, "%d%n", &hPtr->nRes, &n);
   if (cc != 1)
     goto out;
-  if (hPtr->nRes > 0)
-    hPtr->resList = calloc (hPtr->nRes, sizeof (char *));
+  if (hPtr->nRes > 0) {
+    assert( hPtr->nRes >= 0);
+    hPtr->resList = calloc ( (unsigned long) hPtr->nRes, sizeof (char *));
+  }
   p = p + n;
 
   for (i = 0; i < hPtr->nRes; i++)
     {
       cc = sscanf (p, "%s%n", name, &n);
       if (cc != 1)
-	goto out;
+  goto out;
       hPtr->resList[i] = strdup (getstr_ (name));
       p = p + n;
     }

@@ -21,10 +21,13 @@
 
 #include "lib/lib.h"
 #include "lib/lproto.h"
+#include "lib/rdwr.h"
 #include "daemons/libniosd/niosd.h"
 #include "daemons/libresd/resout.h"
 
 /* #define SIGEMT SIGBUS */
+
+long ls_getstdin (int on_, int *rpidlist, long maxlen);
 
 int
 ls_stdinmode (int onoff)
@@ -45,38 +48,36 @@ ls_stdinmode (int onoff)
     return (-1);
 
   SET_LSLIB_NIOS_HDR (reqHdr,
-		      (onoff ? LIB_NIOS_REM_ON : LIB_NIOS_REM_OFF), 0);
+          (onoff ? LIB_NIOS_REM_ON : LIB_NIOS_REM_OFF), 0);
 
   FD_ZERO (&rmask);
   FD_SET (cli_nios_fd[0], &rmask);
   timeout.tv_sec = NIOS_TIMEOUT;
   timeout.tv_usec = 0;
 
-  if (b_write_fix (cli_nios_fd[0], (char *) &reqHdr, sizeof (reqHdr)) !=
-      sizeof (reqHdr))
-    {
+    if (b_write_fix (cli_nios_fd[0], (char *) &reqHdr, sizeof (reqHdr)) != sizeof (reqHdr)) {
       lserrno = LSE_MSG_SYS;
       sigprocmask (SIG_SETMASK, &oldMask, NULL);
       return (-1);
     }
 
+    if ((cc = select (cli_nios_fd[0] + 1, &rmask, 0, 0, &timeout)) <= 0) {
 
-  if ((cc = select (cli_nios_fd[0] + 1, &rmask, 0, 0, &timeout)) <= 0)
-    {
-      if (cc == 0)
-	lserrno = LSE_TIME_OUT;
-      else
-	lserrno = LSE_SELECT_SYS;
+        if (cc == 0) {
+            lserrno = LSE_TIME_OUT;
+        }
+        else {
+            lserrno = LSE_SELECT_SYS; 
+        }
+
       sigprocmask (SIG_SETMASK, &oldMask, NULL);
       return (-1);
     }
 
-  if (b_read_fix (cli_nios_fd[0], (char *) &replyHdr, sizeof (replyHdr))
-      == -1)
-    {
-      lserrno = LSE_MSG_SYS;
-      sigprocmask (SIG_SETMASK, &oldMask, NULL);
-      return (-1);
+    if (b_read_fix (cli_nios_fd[0], (char *) &replyHdr, sizeof (replyHdr)) == -1) {
+        lserrno = LSE_MSG_SYS;
+        sigprocmask (SIG_SETMASK, &oldMask, NULL);
+        return (-1);
     }
 
   if (replyHdr.opCode != REM_ONOFF)
@@ -211,7 +212,7 @@ ls_stoprex (void)
 }
 
 int
-ls_niossync (int numTasks)
+ls_niossync (long numTasks)
 {
   fd_set rmask;
   struct timeval timeout;
@@ -238,7 +239,8 @@ ls_niossync (int numTasks)
   timeout.tv_sec = NIOS_TIMEOUT;
   timeout.tv_usec = 0;
 
-  SET_LSLIB_NIOS_HDR (reqHdr, LIB_NIOS_SYNC, numTasks);
+    // checked above if possitive 
+    SET_LSLIB_NIOS_HDR (reqHdr, LIB_NIOS_SYNC, (size_t) numTasks);
 
   if (b_write_fix (cli_nios_fd[0], (char *) &reqHdr, sizeof (reqHdr))
       != sizeof (reqHdr))
@@ -282,56 +284,51 @@ ls_niossync (int numTasks)
 }
 
 int
-ls_setstdout (int on, char *format)
+ls_setstdout (int on_, char *format)
 {
-  fd_set rmask;
-  struct timeval timeout;
-  struct lslibNiosStdout req;
-  struct lslibNiosHdr replyHdr;
-  sigset_t newMask, oldMask;
+    fd_set rmask;
+    struct timeval timeout;
+    struct lslibNiosStdout req;
+    struct lslibNiosHdr replyHdr;
+    sigset_t newMask, oldMask;
 
-  if (!nios_ok_)
-    {
-      lserrno = LSE_NIOS_DOWN;
-      return (-1);
+    if (!nios_ok_) {
+        lserrno = LSE_NIOS_DOWN;
+        return (-1);
     }
 
-  if (blockALL_SIGS_ (&newMask, &oldMask) < 0)
-    return (-1);
-
-  FD_ZERO (&rmask);
-  FD_SET (cli_nios_fd[0], &rmask);
-  timeout.tv_sec = NIOS_TIMEOUT;
-  timeout.tv_usec = 0;
-
-  req.r.set_on = on;
-  req.r.len = (format == NULL) ? 0 : strlen (format);
-  if (req.r.len > 0)
-    req.r.len++;
-
-  SET_LSLIB_NIOS_HDR (req.hdr, LIB_NIOS_SETSTDOUT, sizeof (req.r) +
-		      req.r.len * sizeof (char));
-
-  if (b_write_fix (cli_nios_fd[0], (char *) &req, sizeof (req.hdr) +
-		   sizeof (req.r)) != sizeof (req.hdr) + sizeof (req.r))
-    {
-      lserrno = LSE_MSG_SYS;
-      sigprocmask (SIG_SETMASK, &oldMask, NULL);
-      return (-1);
+    if (blockALL_SIGS_ (&newMask, &oldMask) < 0) {
+        return (-1);
     }
 
-  if (req.r.len > 0)
-    {
+    FD_ZERO (&rmask);
+    FD_SET (cli_nios_fd[0], &rmask);
+    timeout.tv_sec = NIOS_TIMEOUT;
+    timeout.tv_usec = 0;
 
+    req.r.set_on = on_;
+    req.r.len = (format == NULL) ? 0 : strlen (format);
+    if (req.r.len > 0) {
+        req.r.len++;
+    }
 
-      if (b_write_fix
-	  (cli_nios_fd[0], (char *) format,
-	   req.r.len * sizeof (char)) != req.r.len * sizeof (char))
-	{
-	  lserrno = LSE_MSG_SYS;
-	  sigprocmask (SIG_SETMASK, &oldMask, NULL);
-	  return (-1);
-	}
+    assert( req.r.len >= 0 );
+    SET_LSLIB_NIOS_HDR (req.hdr, LIB_NIOS_SETSTDOUT, sizeof (req.r) + req.r.len * sizeof (char));
+
+    if (b_write_fix (cli_nios_fd[0], (char *) &req, sizeof (req.hdr) + sizeof (req.r)) != sizeof (req.hdr) + sizeof (req.r)) {
+        lserrno = LSE_MSG_SYS;
+        sigprocmask (SIG_SETMASK, &oldMask, NULL);
+        return (-1);
+    }
+
+    if (req.r.len <= LONG_MAX) {
+
+        assert( req.r.len >= 0 ); // FIXME FIXME FIXME Casts have to go.
+        if (b_write_fix(cli_nios_fd[0], (char *) format, req.r.len * sizeof (char)) != (long)(req.r.len * sizeof (char))) {
+            lserrno = LSE_MSG_SYS;
+            sigprocmask (SIG_SETMASK, &oldMask, NULL);
+            return (-1);
+        }
     }
 
 
@@ -368,7 +365,7 @@ ls_setstdout (int on, char *format)
 }
 
 int
-ls_setstdin (int on, int *rpidlist, int len)
+ls_setstdin (int on_, int *rpidlist, size_t len)
 {
   fd_set rmask;
   struct timeval timeout;
@@ -385,7 +382,10 @@ ls_setstdin (int on, int *rpidlist, int len)
   if (blockALL_SIGS_ (&newMask, &oldMask) < 0)
     return (-1);
 
-  if ((rpidlist == NULL && len != 0) || (len < 0) || (len > NOFILE))
+//  FIXME FIXME negative length? 
+//      when does this function get a negative length size?
+//  if ((rpidlist == NULL && len != 0) || (len < 0) || (len > NOFILE))
+    if ((rpidlist == NULL && len != 0) || (len > NOFILE))
     {
       lserrno = LSE_SETPARAM;
       sigprocmask (SIG_SETMASK, &oldMask, NULL);
@@ -397,30 +397,26 @@ ls_setstdin (int on, int *rpidlist, int len)
   timeout.tv_sec = NIOS_TIMEOUT;
   timeout.tv_usec = 0;
 
-  SET_LSLIB_NIOS_HDR (req.hdr, LIB_NIOS_SETSTDIN, sizeof (req.r) +
-		      len * sizeof (int));
-  req.r.set_on = on;
-  req.r.len = len;
+    SET_LSLIB_NIOS_HDR (req.hdr, LIB_NIOS_SETSTDIN, sizeof (req.r) + len * sizeof (int));
+    req.r.set_on = on_;
+    req.r.len = len;
 
   if (b_write_fix (cli_nios_fd[0], (char *) &req, sizeof (req.hdr) +
-		   sizeof (req.r)) != sizeof (req.hdr) + sizeof (req.r))
+       sizeof (req.r)) != sizeof (req.hdr) + sizeof (req.r))
     {
       lserrno = LSE_MSG_SYS;
       sigprocmask (SIG_SETMASK, &oldMask, NULL);
       return (-1);
     }
 
-  if (rpidlist != NULL && len != 0)
-    {
+    if (rpidlist != NULL && len != 0) {
 
-
-      if (b_write_fix (cli_nios_fd[0], (char *) rpidlist, len * sizeof (int))
-	  != len * sizeof (int))
-	{
-	  lserrno = LSE_MSG_SYS;
-	  sigprocmask (SIG_SETMASK, &oldMask, NULL);
-	  return (-1);
-	}
+        assert( len < LONG_MAX );
+        if (b_write_fix (cli_nios_fd[0], (char *) rpidlist, len * sizeof (int)) != (long) (len * sizeof (int)) ) {
+            lserrno = LSE_MSG_SYS;
+            sigprocmask (SIG_SETMASK, &oldMask, NULL);
+            return (-1);
+        }
     }
 
 
@@ -456,85 +452,85 @@ ls_setstdin (int on, int *rpidlist, int len)
   return (0);
 }
 
-int
-ls_getstdin (int on, int *rpidlist, int maxlen)
+long
+ls_getstdin (int on_, int *rpidlist, long maxlen)
 {
-  fd_set rmask;
-  struct timeval timeout;
-  struct lslibNiosStdin req;
-  struct lslibNiosGetStdinReply reply;
-  sigset_t newMask, oldMask;
+    fd_set rmask;
+    struct timeval timeout;
+    struct lslibNiosStdin req;
+    struct lslibNiosGetStdinReply reply;
+    sigset_t newMask, oldMask;
 
-  if (!nios_ok_)
+    if (!nios_ok_)
     {
-      lserrno = LSE_NIOS_DOWN;
-      return (-1);
+        lserrno = LSE_NIOS_DOWN;
+        return (-1);
     }
 
-  if (blockALL_SIGS_ (&newMask, &oldMask) < 0)
-    return (-1);
+    if (blockALL_SIGS_ (&newMask, &oldMask) < 0) {
+        return (-1);
+    }
 
-  FD_ZERO (&rmask);
-  FD_SET (cli_nios_fd[0], &rmask);
-  timeout.tv_sec = NIOS_TIMEOUT;
-  timeout.tv_usec = 0;
+    FD_ZERO (&rmask);
+    FD_SET (cli_nios_fd[0], &rmask);
+    timeout.tv_sec = NIOS_TIMEOUT;
+    timeout.tv_usec = 0;
 
-  SET_LSLIB_NIOS_HDR (req.hdr, LIB_NIOS_GETSTDIN, sizeof (req.r.set_on));
-  req.r.set_on = on;
+    SET_LSLIB_NIOS_HDR (req.hdr, LIB_NIOS_GETSTDIN, sizeof (req.r.set_on));
+    req.r.set_on = on_;
 
-  if (b_write_fix (cli_nios_fd[0], (char *) &req, sizeof (req.hdr) +
-		   sizeof (req.r.set_on)) != sizeof (req.hdr) +
-      sizeof (req.r.set_on))
+    if (b_write_fix (cli_nios_fd[0], (char *) &req, sizeof (req.hdr) + sizeof (req.r.set_on)) != sizeof (req.hdr) + sizeof (req.r.set_on))
     {
-      lserrno = LSE_MSG_SYS;
-      sigprocmask (SIG_SETMASK, &oldMask, NULL);
-      return (-1);
+        lserrno = LSE_MSG_SYS;
+        sigprocmask (SIG_SETMASK, &oldMask, NULL);
+        return (-1);
     }
 
 
-  if (select (cli_nios_fd[0] + 1, &rmask, 0, 0, &timeout) <= 0)
+    if (select (cli_nios_fd[0] + 1, &rmask, 0, 0, &timeout) <= 0)
     {
-      lserrno = LSE_SELECT_SYS;
-      sigprocmask (SIG_SETMASK, &oldMask, NULL);
-      return (-1);
+        lserrno = LSE_SELECT_SYS;
+        sigprocmask (SIG_SETMASK, &oldMask, NULL);
+        return (-1);
     }
 
-  if (b_read_fix (cli_nios_fd[0], (char *) &reply.hdr, sizeof (reply.hdr))
-      == -1)
+    if (b_read_fix (cli_nios_fd[0], (char *) &reply.hdr, sizeof (reply.hdr)) == -1)
     {
-      lserrno = LSE_MSG_SYS;
-      sigprocmask (SIG_SETMASK, &oldMask, NULL);
-      return (-1);
-    }
-  switch (reply.hdr.opCode)
-    {
-    case STDIN_OK:
-      break;
-    default:
-      lserrno = LSE_PROTOC_NIOS;
-      sigprocmask (SIG_SETMASK, &oldMask, NULL);
-      return (-1);
+        lserrno = LSE_MSG_SYS;
+        sigprocmask (SIG_SETMASK, &oldMask, NULL);
+        return (-1);
     }
 
-  if (reply.hdr.len)
-    if (b_read_fix (cli_nios_fd[0], (char *) reply.rpidlist, reply.hdr.len)
-	!= reply.hdr.len)
-      {
-	lserrno = LSE_MSG_SYS;
-	sigprocmask (SIG_SETMASK, &oldMask, NULL);
-	return (-1);
-      }
-
-  if (reply.hdr.len <= maxlen * sizeof (int))
+    switch (reply.hdr.opCode)
     {
-      memcpy ((char *) rpidlist, (char *) reply.rpidlist, reply.hdr.len);
-      sigprocmask (SIG_SETMASK, &oldMask, NULL);
-      return (reply.hdr.len / sizeof (int));
+        case STDIN_OK:
+            break;
+        default:
+            lserrno = LSE_PROTOC_NIOS;
+            sigprocmask (SIG_SETMASK, &oldMask, NULL);
+            return (-1);
     }
-  else
-    {
-      lserrno = LSE_RPIDLISTLEN;
-      sigprocmask (SIG_SETMASK, &oldMask, NULL);
-      return (-1);
+
+    if (reply.hdr.len) {
+        assert( b_read_fix (cli_nios_fd[0], (char *) reply.rpidlist, reply.hdr.len) >= 0 );
+        assert( reply.hdr.len <= LONG_MAX );
+        if (b_read_fix (cli_nios_fd[0], (char *) reply.rpidlist, reply.hdr.len) != (long) reply.hdr.len) {
+            lserrno = LSE_MSG_SYS;
+            sigprocmask (SIG_SETMASK, &oldMask, NULL);
+            return (-1);
+        }
+    }
+
+    assert( maxlen >= 0);
+    if (reply.hdr.len <= (unsigned long) maxlen * sizeof (int)) {
+        memcpy ((char *) rpidlist, (char *) reply.rpidlist, reply.hdr.len);
+        sigprocmask (SIG_SETMASK, &oldMask, NULL);
+        assert( reply.hdr.len <= INT_MAX);
+        return reply.hdr.len / sizeof (int);
+    }
+    else {
+        lserrno = LSE_RPIDLISTLEN;
+        sigprocmask (SIG_SETMASK, &oldMask, NULL);
+        return (-1);
     }
 }

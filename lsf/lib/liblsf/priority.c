@@ -18,37 +18,39 @@
  */
 #include <errno.h>
 #include <unistd.h>
+#include <stdio.h>
 
 
-#define SYSV_NICE_0              20
+// #define SYSV_NICE_0              20
 #define MAX_PRIORITY             20
 #define MIN_PRIORITY            -20
 
-#define LSF_TO_SYSV(x)          ((x) + SYSV_NICE_0)
-#define SYSV_TO_LSF(x)          ((x) - SYSV_NICE_0)
+// #define LSF_TO_SYSV(x)          ((x) + SYSV_NICE_0)
+// #define SYSV_TO_LSF(x)          ((x) - SYSV_NICE_0)
+
+int ls_setpriority (int newPriority);
 
 int
 ls_setpriority (int newPriority)
 {
-  int increment;
+    int increment;
 
-  if (newPriority > MAX_PRIORITY * 2)
-    {
-      newPriority = MAX_PRIORITY * 2;
+    if (newPriority > MAX_PRIORITY * 2) {
+        newPriority = MAX_PRIORITY * 2;
     }
-  else if (newPriority < MIN_PRIORITY * 2)
-    {
-      newPriority = MIN_PRIORITY * 2;
+    else if (newPriority < MIN_PRIORITY * 2) {
+        newPriority = MIN_PRIORITY * 2;
     }
-  increment = newPriority;
-
-  errno = 0;
-
-
-  if (-1 == nice (increment) && (0 != errno))
-    {
-      return 0;
+    else {
+        printf( "wtf am i doing here? ls_setpriority() " );
     }
 
-  return 1;
+    increment = newPriority;
+    errno = 0;
+
+    if (-1 == nice (increment) && (0 != errno)) { // SEEME SEEME SEEME the fuck?
+        return 0;
+    }
+
+    return 1;
 }

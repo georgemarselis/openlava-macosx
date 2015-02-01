@@ -24,6 +24,7 @@
 #include "lib/lib.h"
 #include "lib/lproto.h"
 #include "lib/rf.h"
+#include "lib/xdrres.h"
 #include "daemons/libresd/resout.h"
 
 #define ABS(i) ((i) < 0 ? -(i) : (i))
@@ -32,17 +33,18 @@ static int maxOpen = NOFILE;
 
 static struct rHosts
 {
-  char *hname;
-  int sock;
-  time_t atime;
-  struct rHosts *next;
-  int nopen;
+    int sock;
+    int nopen;
+    time_t atime;
+    char *hname; 
+    struct rHosts *next;
 } *rHosts = NULL;
 
 static struct rfTab
 {
-  struct rHosts *host;
-  int fd;
+    int fd;
+    char padding[4];
+    struct rHosts *host;
 } *ft = NULL;
 
 static int nrh = 0;
@@ -66,8 +68,8 @@ rhConnect (char *host)
 
   if (ft == NULL)
     {
-      if ((ft = (struct rfTab *) calloc (maxOpen, sizeof (struct rfTab)))
-	  == NULL)
+        ft = (struct rfTab *) calloc ( (unsigned long)maxOpen, sizeof (struct rfTab));
+      if ( NULL == ft )
 	{
 	  lserrno = LSE_MALLOC;
 	  return NULL;
@@ -207,9 +209,9 @@ ls_ropen (char *host, char *fn, int flags, int mode)
     {
       struct rfTab *tmpft;
 
-      if ((tmpft = (struct rfTab *) realloc ((char *) ft,
-					     (maxOpen + NOFILE) *
-					     sizeof (struct rfTab))) == NULL)
+      assert( maxOpen >= 0 );
+      tmpft = (struct rfTab *) realloc ((char *) ft, ( (unsigned long) maxOpen + NOFILE) *  sizeof (struct rfTab));
+      if ( NULL == tmpft )
 	{
 	  lserrno = LSE_MALLOC;
 	  return (-1);
@@ -227,15 +229,13 @@ ls_ropen (char *host, char *fn, int flags, int mode)
   req.flags = flags;
   req.mode = mode;
 
-  if (lsSendMsg_ (rh->sock, RF_OPEN, 0, (char *) &req, buf,
-		  sizeof (struct LSFHeader) + MAXFILENAMELEN +
-		  sizeof (req), xdr_ropenReq, SOCK_WRITE_FIX, NULL) < 0)
+  if (lsSendMsg_ (rh->sock, RF_OPEN, 0, (char *) &req, buf, sizeof (struct LSFHeader) + MAXFILENAMELEN + sizeof (req), xdr_ropenReq, b_write_fix, NULL) < 0)
     {
       return (-1);
     }
 
   if (lsRecvMsg_
-      (rh->sock, buf, sizeof (hdr), &hdr, NULL, NULL, SOCK_READ_FIX) < 0)
+      (rh->sock, buf, sizeof (hdr), &hdr, NULL, NULL, b_read_fix) < 0)
     {
       return (-1);
     }
@@ -270,15 +270,13 @@ ls_rclose (int fd)
   rh = ft[fd].host;
   reqfd = ft[fd].fd;
 
-  if (lsSendMsg_ (rh->sock, RF_CLOSE, 0, (char *) &reqfd, buf,
-		  sizeof (struct LSFHeader) + sizeof (reqfd), xdr_int,
-		  SOCK_WRITE_FIX, NULL) < 0)
+  if (lsSendMsg_ (rh->sock, RF_CLOSE, 0, (char *) &reqfd, buf, sizeof (struct LSFHeader) + sizeof (reqfd), xdr_int,
+		  b_write_fix, NULL) < 0)
     {
       return (-1);
     }
 
-  if (lsRecvMsg_
-      (rh->sock, buf, sizeof (hdr), &hdr, NULL, NULL, SOCK_READ_FIX) < 0)
+  if (lsRecvMsg_(rh->sock, buf, sizeof (hdr), &hdr, NULL, NULL, b_read_fix) < 0)
     {
       return (-1);
     }
@@ -300,60 +298,53 @@ ls_rclose (int fd)
 
 
 int
-ls_rwrite (int fd, char *buf, int len)
+ls_rwrite (int fd, char *buf, size_t len)
 {
-  struct rrdwrReq req;
-  struct LSFHeader hdr;
-  struct
-  {
-    struct LSFHeader _;
-    struct rrdwrReq __;
-  } msgBuf;
-  struct rHosts *rh;
+    struct {
+        struct LSFHeader _;
+        struct rrdwrReq __;
+    } msgBuf;
+    struct rrdwrReq req;
+    struct LSFHeader hdr;
+    struct rHosts *rh;
 
-  if (fd < 0 || fd >= maxOpen || ft[fd].host == NULL)
-    {
-      lserrno = LSE_BAD_ARGS;
-      return (-1);
+    if (fd < 0 || fd >= maxOpen || ft[fd].host == NULL) {
+        lserrno = LSE_BAD_ARGS;
+        return (-1);
     }
 
-  rh = ft[fd].host;
+    rh = ft[fd].host;
 
-  req.fd = ft[fd].fd;
-  req.len = len;
+    req.fd = ft[fd].fd;
+    req.len = len;
 
-  if (lsSendMsg_ (rh->sock, RF_WRITE, 0, (char *) &req, (char *) &msgBuf,
-		  sizeof (struct LSFHeader) + sizeof (req),
-		  xdr_rrdwrReq, SOCK_WRITE_FIX, NULL) < 0)
-    {
-      return (-1);
+    if (lsSendMsg_ (rh->sock, RF_WRITE, 0, (char *) &req, (char *) &msgBuf, sizeof (struct LSFHeader) + sizeof (req),  xdr_rrdwrReq, b_write_fix, NULL) < 0) {
+        return -1;
     }
 
-  if (SOCK_WRITE_FIX (rh->sock, buf, len) != len)
-    {
-      lserrno = LSE_MSG_SYS;
-      return (-1);
+    assert( len <= LONG_MAX );
+    if (b_read_fix (rh->sock, buf, len) != (long) len) {
+        lserrno = LSE_MSG_SYS;
+        return -1;
     }
 
-  if (lsRecvMsg_ (rh->sock, (char *) &msgBuf, sizeof (hdr), &hdr, NULL, NULL,
-		  SOCK_READ_FIX) < 0)
-    {
-      return (-1);
+    if (lsRecvMsg_ (rh->sock, (char *) &msgBuf, sizeof (hdr), &hdr, NULL, NULL, b_read_fix) < 0) {
+        return -1;
     }
 
-  if (hdr.opCode < 0)
-    {
-      errno = errnoDecode_ (ABS (hdr.opCode));
-      lserrno = LSE_FILE_SYS;
-      return (-1);
+    if (hdr.opCode < 0) {
+        errno = errnoDecode_ (ABS (hdr.opCode));
+        lserrno = LSE_FILE_SYS;
+        return -1;
     }
 
-  return (hdr.length);
+    assert( hdr.length <= INT_MAX ); // FIXME FIXME FIXME return type must be corrected
+    return (int) hdr.length;
 }
 
 
 int
-ls_rread (int fd, char *buf, int len)
+ls_rread (int fd, char *buf, size_t len)
 {
   struct rrdwrReq req;
   struct LSFHeader hdr;
@@ -375,15 +366,12 @@ ls_rread (int fd, char *buf, int len)
   req.fd = ft[fd].fd;
   req.len = len;
 
-  if (lsSendMsg_ (rh->sock, RF_READ, 0, (char *) &req, (char *) &msgBuf,
-		  sizeof (struct LSFHeader) + sizeof (req),
-		  xdr_rrdwrReq, SOCK_WRITE_FIX, NULL) < 0)
+  if (lsSendMsg_ (rh->sock, RF_READ, 0, (char *) &req, (char *) &msgBuf, sizeof (struct LSFHeader) + sizeof (req), xdr_rrdwrReq, b_write_fix, NULL) < 0)
     {
       return (-1);
     }
 
-  if (lsRecvMsg_ (rh->sock, (char *) &msgBuf, sizeof (hdr), &hdr, NULL, NULL,
-		  SOCK_READ_FIX) < 0)
+  if (lsRecvMsg_ (rh->sock, (char *) &msgBuf, sizeof (hdr), &hdr, NULL, NULL, b_read_fix) < 0)
     {
       return (-1);
     }
@@ -395,47 +383,46 @@ ls_rread (int fd, char *buf, int len)
       return (-1);
     }
 
-  if (SOCK_READ_FIX (rh->sock, buf, hdr.length) != hdr.length)
+    assert( hdr.length <= LONG_MAX );
+  if ( b_read_fix(rh->sock, buf, hdr.length) != (long) hdr.length)
     {
       lserrno = LSE_MSG_SYS;
       return (-1);
     }
-  return (hdr.length);
+  return (int)hdr.length;
 }
 
 
 off_t
 ls_rlseek (int fd, off_t offset, int whence)
 {
-  struct rlseekReq req;
-  struct LSFHeader hdr;
-  struct
-  {
-    struct LSFHeader _;
-    struct rlseekReq __;
-  } msgBuf;
-  struct rHosts *rh;
+    struct {
+        struct LSFHeader _;
+        struct rlseekReq __;
+    } msgBuf;
+    struct rlseekReq req;
+    struct LSFHeader hdr;
+    struct rHosts *rh;
 
-  if (fd < 0 || fd >= maxOpen || ft[fd].host == NULL)
-    {
-      lserrno = LSE_BAD_ARGS;
-      return (-1);
+    if (fd < 0 || fd >= maxOpen || ft[fd].host == NULL) {
+        lserrno = LSE_BAD_ARGS;
+        return -1;
     }
 
-  rh = ft[fd].host;
+    rh = ft[fd].host;
 
-  req.fd = ft[fd].fd;
-  req.offset = offset;
-  req.whence = whence;
+    req.fd      = ft[fd].fd;
+    req.offset  = offset;
+    req.whence  = whence;
 
   if (lsSendMsg_ (rh->sock, RF_LSEEK, 0, (char *) &req, (char *) &msgBuf,
-		  sizeof (msgBuf), xdr_rlseekReq, SOCK_WRITE_FIX, NULL) < 0)
+		  sizeof (msgBuf), xdr_rlseekReq, b_write_fix, NULL) < 0)
     {
       return (-1);
     }
 
   if (lsRecvMsg_ (rh->sock, (char *) &msgBuf, sizeof (hdr), &hdr, NULL, NULL,
-		  SOCK_READ_FIX) < 0)
+		  b_read_fix) < 0)
     {
       return (-1);
     }
@@ -471,13 +458,13 @@ ls_rfstat (int fd, struct stat *st)
 
   if (lsSendMsg_ (rh->sock, RF_FSTAT, 0, (char *) &reqfd, buf,
 		  sizeof (struct LSFHeader) + sizeof (reqfd), xdr_int,
-		  SOCK_WRITE_FIX, NULL) < 0)
+		  b_write_fix, NULL) < 0)
     {
       return (-1);
     }
 
   if (lsRecvMsg_ (rh->sock, buf, MSGSIZE, &hdr,
-		  (char *) st, xdr_stat, SOCK_READ_FIX) < 0)
+		  (char *) st, xdr_stat, b_read_fix) < 0)
     {
       return (-1);
     }
@@ -547,7 +534,7 @@ rhTerminate (char *host)
 	    prev->next = rh->next;
 
 	  lsSendMsg_ (rh->sock, RF_TERMINATE, 0, NULL, (char *) &buf,
-		      sizeof (buf), NULL, SOCK_WRITE_FIX, NULL);
+		      sizeof (buf), NULL, b_write_fix, NULL);
 	  closesocket (rh->sock);
 
 	  for (i = 0; i < maxOpen; i++)
@@ -583,13 +570,13 @@ ls_rstat (char *host, char *fn, struct stat *st)
   fnStr.name = fn;
   if (lsSendMsg_ (rh->sock, RF_STAT, 0, (char *) &fnStr, buf,
 		  sizeof (struct LSFHeader) + MAXFILENAMELEN,
-		  xdr_stringLen, SOCK_WRITE_FIX, NULL) < 0)
+		  xdr_stringLen, b_write_fix, NULL) < 0)
     {
       return (-1);
     }
 
   if (lsRecvMsg_ (rh->sock, buf, MSGSIZE, &hdr,
-		  (char *) st, xdr_stat, SOCK_READ_FIX) < 0)
+		  (char *) st, xdr_stat, b_read_fix) < 0)
     {
       return (-1);
     }
@@ -625,13 +612,13 @@ ls_rgetmnthost (char *host, char *fn)
 
   if (lsSendMsg_ (rh->sock, RF_GETMNTHOST, 0, (char *) &fnStr, buf,
 		  sizeof (struct LSFHeader) + MAXFILENAMELEN,
-		  xdr_stringLen, SOCK_WRITE_FIX, NULL) < 0)
+		  xdr_stringLen, b_write_fix, NULL) < 0)
     {
       return (NULL);
     }
 
   if (lsRecvMsg_ (rh->sock, buf, MSGSIZE, &hdr,
-		  (char *) &hostStr, xdr_stringLen, SOCK_READ_FIX) < 0)
+		  (char *) &hostStr, xdr_stringLen, b_read_fix) < 0)
     {
       return (NULL);
     }
@@ -650,48 +637,46 @@ ls_rgetmnthost (char *host, char *fn)
  */
 int
 ls_conntaskport (int rpid)
-{
-  struct tid *tid;
-  int sock;
-  int cc;
-  struct sockaddr_in sin;
-  int resTimeout;
-  socklen_t sinLen;
+{ 
+    int sock        = 0;
+    int cc          = 0;
+    uint resTimeout = 0;
+    struct tid *tid;
+    struct sockaddr_in sin;
+    socklen_t sinLen;
 
-
-  if (genParams_[LSF_RES_TIMEOUT].paramValue)
-    resTimeout = atoi (genParams_[LSF_RES_TIMEOUT].paramValue);
-  else
-    resTimeout = RES_TIMEOUT;
-
-  if ((tid = tid_find (rpid)) == NULL)
-    {
-      return (-1);
+    if (*genParams_[LSF_RES_TIMEOUT].paramValue) {
+        assert( *genParams_[LSF_RES_TIMEOUT].paramValue >= 0 ); // paranoia
+        resTimeout = (uint) atoi (genParams_[LSF_RES_TIMEOUT].paramValue);
+    }
+    else {
+        resTimeout = RES_TIMEOUT;
     }
 
-  sinLen = sizeof (sin);
-  if (getpeername (tid->sock, (struct sockaddr *) &sin, &sinLen) < 0)
-    {
-      lserrno = LSE_SOCK_SYS;
-      return (-1);
+    if ((tid = tid_find (rpid)) == NULL) {
+        return -1;
     }
 
-  if ((sock = CreateSock_ (SOCK_STREAM)) < 0)
-    {
-      return (-1);
+    sinLen = sizeof (sin);
+    if (getpeername (tid->sock, (struct sockaddr *) &sin, &sinLen) < 0) {
+        lserrno = LSE_SOCK_SYS;
+        return (-1);
     }
 
-  sin.sin_port = tid->taskPort;
-
-  cc = b_connect_ (sock, (struct sockaddr *) &sin, sizeof (sin), resTimeout);
-  if (cc < 0)
-    {
-      closesocket (sock);
-      lserrno = LSE_CONN_SYS;
-      return (-1);
+    if ((sock = CreateSock_ (SOCK_STREAM)) < 0) {
+        return (-1);
     }
 
-  return (sock);
+    sin.sin_port = tid->taskPort;
+
+    cc = b_connect_ (sock, (struct sockaddr *) &sin, sizeof (sin), resTimeout);
+    if (cc < 0) {
+        closesocket (sock);
+        lserrno = LSE_CONN_SYS;
+        return -1;
+    }
+
+  return sock;
 
 }				/* ls_conntaskport()  */
 
@@ -716,13 +701,13 @@ ls_runlink (char *host, char *fn)
 
   if (lsSendMsg_ (rh->sock, RF_UNLINK, 0, (char *) &fnStr, buf,
 		  sizeof (struct LSFHeader) + MAXFILENAMELEN,
-		  xdr_stringLen, SOCK_WRITE_FIX, NULL) < 0)
+		  xdr_stringLen, b_write_fix, NULL) < 0)
     {
       return (-1);
     }
 
   if (lsRecvMsg_ (rh->sock, buf, MSGSIZE, &hdr,
-		  (char *) &hostStr, xdr_stringLen, SOCK_READ_FIX) < 0)
+		  (char *) &hostStr, xdr_stringLen, b_read_fix) < 0)
     {
       return (-1);
     }

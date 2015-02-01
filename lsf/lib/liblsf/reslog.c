@@ -49,10 +49,14 @@ ls_putacctrec (FILE * log_fp, struct lsfAcctRec *acctRec)
 struct lsfAcctRec *
 ls_getacctrec (FILE * log_fp, int *lineNum)
 {
-  int cc, ccount;
-  int len, disp, term;
-  int sar = sizeof (struct lsfAcctRec);
-  char *line;
+  int cc     = 0; 
+  int disp   = 0;
+  int term   = 0;
+  int ccount = 0;
+  size_t len = 0;
+  size_t sar = sizeof (struct lsfAcctRec);
+  char *line = NULL;
+
   static struct lsfAcctRec *acctRec = NULL;
 
   if (acctRec != NULL)

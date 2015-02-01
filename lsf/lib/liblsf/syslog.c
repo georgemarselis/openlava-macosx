@@ -26,17 +26,19 @@
 #include "lib/lproto.h"
 #include "lib/lib.h"
 
-#define LSF_LOG_MASK   7
+// #define LSF_LOG_MASK   7
 #define DEF_LOG_MASK   LOG_INFO
 #define DEF_LOG_MASK_NAME   "LOG_WARNING"
 
-#ifndef HAS_VSNPRINTF
+/*#ifndef HAS_VSNPRINTF
 #define HAS_VSNPRINTF
 #endif
-
+*/
 extern struct config_param genParams_[];
 
 extern const char *err_str_ (int errnum, const char *fmt, char *buf);
+void ls_closelog_ext (void);
+char *argvmsg_ (int argc, char **argv);
 
 int logclass = 0;
 int timinglevel = 0;
@@ -60,20 +62,20 @@ argvmsg_ (int argc, char **argv)
   while ((i < argc) && (bp < (avbuffer + sizeof (avbuffer) - 1)))
     {
       if (!*ap)
-	{
-	  i++;
-	  if ((i < argc) && ((ap = argv[i]) != NULL))
-	    {
-	      *bp = ' ';
-	      bp++;
-	    }
-	}
+    {
+      i++;
+      if ((i < argc) && ((ap = argv[i]) != NULL))
+        {
+          *bp = ' ';
+          bp++;
+        }
+    }
       else
-	{
-	  *bp = *ap;
-	  bp++;
-	  ap++;
-	}
+    {
+      *bp = *ap;
+      bp++;
+      ap++;
+    }
     }
   *bp = '\0';
   return avbuffer;
@@ -81,7 +83,7 @@ argvmsg_ (int argc, char **argv)
 
 void
 ls_openlog (const char *ident,
-	    const char *path, int use_stderr, char *logMask)
+        const char *path, int use_stderr, char *logMask)
 {
   char *msg = NULL;
 
@@ -103,73 +105,73 @@ ls_openlog (const char *ident,
       struct stat st;
 
       if ((myname = ls_getmyhostname ()) == NULL)
-	goto syslog;
+    goto syslog;
 
       sprintf (logfile, "%s/%s.log.%s", path, ident, myname);
 
       if (lstat (logfile, &st) < 0)
-	{
-	  if (errno == ENOENT)
-	    {
-	      if (openLogFile (ident, myname) == 0)
-		{
-		  if (msg != NULL)
-		    ls_syslog (LOG_ERR, "%s", msg);
-		  return;
-		}
-	    }
-	  else
-	    {
-	      sprintf (logfile, "%s/%s.log.%s", lsTmpDir_, ident, myname);
-	      if (lstat (logfile, &st) < 0)
-		{
-		  if (errno == ENOENT)
-		    {
-		      if ((lfp = fopen (logfile, "a")) != NULL)
-			{
-			  fclose (lfp);
-			  if (!strcmp (ident, "res")
-			      || (logmask >= LOG_UPTO (LOG_DEBUG)
-				  && logmask <= LOG_UPTO (LOG_DEBUG3)))
-			    chmod (logfile, 0666);
-			  else
-			    chmod (logfile, 0644);
-			  log_dest = LOGTO_FILE;
-			  if (msg != NULL)
-			    ls_syslog (LOG_ERR, "%s", msg);
-			  return;
-			}
-		    }
-		}
-	      else if (S_ISREG (st.st_mode) && st.st_nlink == 1)
-		{
+    {
+      if (errno == ENOENT)
+        {
+          if (openLogFile (ident, myname) == 0)
+        {
+          if (msg != NULL)
+            ls_syslog (LOG_ERR, "%s", msg);
+          return;
+        }
+        }
+      else
+        {
+          sprintf (logfile, "%s/%s.log.%s", lsTmpDir_, ident, myname);
+          if (lstat (logfile, &st) < 0)
+        {
+          if (errno == ENOENT)
+            {
+              if ((lfp = fopen (logfile, "a")) != NULL)
+            {
+              fclose (lfp);
+              if (!strcmp (ident, "res")
+                  || (logmask >= LOG_UPTO (LOG_DEBUG)
+                  && logmask <= LOG_UPTO (LOG_DEBUG3)))
+                chmod (logfile, 0666);
+              else
+                chmod (logfile, 0644);
+              log_dest = LOGTO_FILE;
+              if (msg != NULL)
+                ls_syslog (LOG_ERR, "%s", msg);
+              return;
+            }
+            }
+        }
+          else if (S_ISREG (st.st_mode) && st.st_nlink == 1)
+        {
 
-		  if ((lfp = fopen (logfile, "a")) != NULL)
-		    {
-		      fclose (lfp);
-		      if (!strcmp (ident, "res")
-			  || (logmask >= LOG_UPTO (LOG_DEBUG)
-			      && logmask <= LOG_UPTO (LOG_DEBUG3)))
-			chmod (logfile, 0666);
-		      else
-			chmod (logfile, 0644);
-		      log_dest = LOGTO_FILE;
-		      if (msg != NULL)
-			ls_syslog (LOG_ERR, "%s", msg);
-		      return;
-		    }
-		}
-	    }
-	}
+          if ((lfp = fopen (logfile, "a")) != NULL)
+            {
+              fclose (lfp);
+              if (!strcmp (ident, "res")
+              || (logmask >= LOG_UPTO (LOG_DEBUG)
+                  && logmask <= LOG_UPTO (LOG_DEBUG3)))
+            chmod (logfile, 0666);
+              else
+            chmod (logfile, 0644);
+              log_dest = LOGTO_FILE;
+              if (msg != NULL)
+            ls_syslog (LOG_ERR, "%s", msg);
+              return;
+            }
+        }
+        }
+    }
       else if (S_ISREG (st.st_mode) && st.st_nlink == 1)
-	{
-	  if (openLogFile (ident, myname) == 0)
-	    {
-	      if (msg != NULL)
-		ls_syslog (LOG_ERR, "%s", msg);
-	      return;
-	    }
-	}
+    {
+      if (openLogFile (ident, myname) == 0)
+        {
+          if (msg != NULL)
+        ls_syslog (LOG_ERR, "%s", msg);
+          return;
+        }
+    }
     }
 
 syslog:
@@ -195,31 +197,31 @@ openLogFile (const char *ident, char *myname)
 
       sprintf (logfile, "%s/%s.log.%s", lsTmpDir_, ident, myname);
       if (lstat (logfile, &st) < 0)
-	{
-	  if (errno == ENOENT)
-	    {
-	      if ((lfp = fopen (logfile, "a")) == NULL)
-		{
-		  return (-1);
-		}
-	    }
-	  else
-	    {
-	      return (-1);
-	    }
-	}
-      else if (S_ISREG (st.st_mode) && st.st_nlink == 1)
-	{
-
-	  if ((lfp = fopen (logfile, "a")) == NULL)
-	    {
-	      return (-1);
-	    }
-	}
+    {
+      if (errno == ENOENT)
+        {
+          if ((lfp = fopen (logfile, "a")) == NULL)
+        {
+          return (-1);
+        }
+        }
       else
-	{
-	  return (-1);
-	}
+        {
+          return (-1);
+        }
+    }
+      else if (S_ISREG (st.st_mode) && st.st_nlink == 1)
+    {
+
+      if ((lfp = fopen (logfile, "a")) == NULL)
+        {
+          return (-1);
+        }
+    }
+      else
+    {
+      return (-1);
+    }
     }
 
   if (lfp != NULL)
@@ -227,15 +229,15 @@ openLogFile (const char *ident, char *myname)
       fclose (lfp);
 
       if (!strcmp (ident, "res")
-	  || (logmask >= LOG_UPTO (LOG_DEBUG)
-	      && logmask <= LOG_UPTO (LOG_DEBUG3)))
-	{
-	  chmod (logfile, 0666);
-	}
+      || (logmask >= LOG_UPTO (LOG_DEBUG)
+          && logmask <= LOG_UPTO (LOG_DEBUG3)))
+    {
+      chmod (logfile, 0666);
+    }
       else
-	{
-	  chmod (logfile, 0644);
-	}
+    {
+      chmod (logfile, 0644);
+    }
       log_dest = LOGTO_FILE;
       return (0);
     }
@@ -243,134 +245,135 @@ openLogFile (const char *ident, char *myname)
 }
 
 void
-ls_syslog (int level, const char *fmt, ...)
+ls_syslog (int level, const char *fmt, ...) // FIXME FIXME convert variable argument list to static
 {
-  int save_errno = errno;
-  va_list ap;
-  static char lastMsg[16384];
-  static int counter = 0;
+    int save_errno = errno;
+    va_list ap;
+    // static char lastMsg[16384];
+    // static int counter = 0;
+    char buf[1024];
 
-  va_start (ap, fmt);
+    va_start (ap, fmt);
 
-  if (log_dest == LOGTO_STDERR)
+    if (log_dest == LOGTO_STDERR)
     {
 
-      if ((logmask & LOG_MASK (level)) != 0)
-	{
-	  errno = save_errno;
-	  verrlog_ (level, stderr, fmt, ap);
-	}
+        if ((logmask & LOG_MASK (level)) != 0)
+       {
+           errno = save_errno;
+           verrlog_ (level, stderr, fmt, ap);
+       }
 
     }
-  else if (logfile[0])
+    else if (logfile[0])
     {
 
-      if ((logmask & LOG_MASK (level)) != 0)
-	{
-	  FILE *lfp;
-	  struct stat st;
+        if ((logmask & LOG_MASK (level)) != 0)
+        {
+           FILE *lfp = NULL;
+           struct stat st;
 
-	  if (lstat (logfile, &st) < 0)
-	    {
-	      if (errno == ENOENT)
-		{
-		  if ((lfp = fopen (logfile, "a")) == NULL)
-		    {
+           if (lstat (logfile, &st) < 0)
+           {
+                if (errno == ENOENT)
+                {
+                    if ((lfp = fopen (logfile, "a")) == NULL)
+                    {
 
-		      if (log_dest == LOGTO_FILE)
-			{
-			  log_dest = LOGTO_SYS;
-			  openlog (logident, LOG_PID, LOG_DAEMON);
-			  setlogmask (logmask);
-			}
-		      goto use_syslog;
-		    }
-		}
-	      else
-		{
-		  if (log_dest == LOGTO_FILE)
-		    {
-		      log_dest = LOGTO_SYS;
-		      openlog (logident, LOG_PID, LOG_DAEMON);
-		      setlogmask (logmask);
-		    }
-		  goto use_syslog;
-		}
-	    }
-	  else if (!(S_ISREG (st.st_mode) && st.st_nlink == 1))
-	    {
+                        if (log_dest == LOGTO_FILE)
+                        {
+                            log_dest = LOGTO_SYS;
+                            openlog (logident, LOG_PID, LOG_DAEMON);
+                            setlogmask (logmask);
+                        }
+                        
+                        if (level > LOG_DEBUG) {
+                            level = LOG_DEBUG;
+                        }
+                        
+                        vsyslog (level, err_str_ (save_errno, fmt, buf), ap);   // FIXME FIXME FIXME FIXME 
+                                                                                //    use debugger, unroll fmt
+                        closelog ();
+                    }
+                }
+                else
+                {
+                    if (log_dest == LOGTO_FILE)
+                    {
+                        log_dest = LOGTO_SYS;
+                        openlog (logident, LOG_PID, LOG_DAEMON);
+                        setlogmask (logmask);
+                    }
+                    
+                    if (level > LOG_DEBUG) {
+                        level = LOG_DEBUG;
+                    }
+                        
+                    vsyslog (level, err_str_ (save_errno, fmt, buf), ap);   // FIXME FIXME FIXME FIXME 
+                                                                            //    use debugger, unroll fmt
+                    closelog ();
+                }
+            }
+            else if (!(S_ISREG (st.st_mode) && st.st_nlink == 1))
+            {
 
-	      if (log_dest == LOGTO_FILE)
-		{
-		  log_dest = LOGTO_SYS;
-		  openlog (logident, LOG_PID, LOG_DAEMON);
-		  setlogmask (logmask);
-		}
-	      goto use_syslog;
-	    }
-	  else
-	    {
-	      if ((lfp = fopen (logfile, "a")) == NULL)
-		{
-		  if (log_dest == LOGTO_FILE)
-		    {
-		      log_dest = LOGTO_SYS;
-		      openlog (logident, LOG_PID, LOG_DAEMON);
-		      setlogmask (logmask);
-		    }
-		  goto use_syslog;
-		}
-	    }
+                if (log_dest == LOGTO_FILE)
+                {
+                    log_dest = LOGTO_SYS;
+                    openlog (logident, LOG_PID, LOG_DAEMON);
+                    setlogmask (logmask);
+                }
+                
+                if (level > LOG_DEBUG) {
+                    level = LOG_DEBUG;
+                }
+                    
+                vsyslog (level, err_str_ (save_errno, fmt, buf), ap);   // FIXME FIXME FIXME FIXME 
+                                                                        //    use debugger, unroll fmt
+                closelog ();
+            }
+            else
+            {
+                if ((lfp = fopen (logfile, "a")) == NULL)
+                {
+                    if (log_dest == LOGTO_FILE)
+                    {
+                        log_dest = LOGTO_SYS;
+                        openlog (logident, LOG_PID, LOG_DAEMON);
+                        setlogmask (logmask);
+                    }
+                    
+                    if (level > LOG_DEBUG) {
+                        level = LOG_DEBUG;
+                    }
+                        
+                    vsyslog (level, err_str_ (save_errno, fmt, buf), ap);   // FIXME FIXME FIXME FIXME 
+                                                                            //    use debugger, unroll fmt
+                    closelog ();
+                }
+            }
 
-	  if (log_dest == LOGTO_SYS)
-	    {
+            if (log_dest == LOGTO_SYS)
+            {
 
-	      closelog ();
-	      log_dest = LOGTO_FILE;
-	    }
-	  errno = save_errno;
-	  verrlog_ (level, lfp, fmt, ap);
-	  fclose (lfp);
-	}
+                closelog ();
+                log_dest = LOGTO_FILE;
+            }
+
+            errno = save_errno;
+            verrlog_ (level, lfp, fmt, ap);
+            fclose (lfp);
+        }
     }
-  else if ((logmask & LOG_MASK (level)) != 0)
+    else if ((logmask & LOG_MASK (level)) != 0)
     {
-      char buf[1024];
-#ifndef HAS_VSYSLOG
-      char otherbuf[16384];
-#endif
-    use_syslog:
 
-      if (level > LOG_DEBUG)
-	level = LOG_DEBUG;
-#ifdef HAS_VSYSLOG
-      vsyslog (level, err_str_ (save_errno, fmt, buf), ap);
-#else
-
-#if defined(HAS_VSNPRINTF)
-      vsnprintf (otherbuf, sizeof (otherbuf), err_str_ (save_errno, fmt, buf),
-		 ap);
-#else
-      vsprintf (otherbuf, err_str_ (save_errno, fmt, buf), ap);
-#endif
-
-      if (!strcmp (otherbuf, lastMsg))
-	{
-	  counter++;
-	  if (counter > 10)
-	    {
-	      syslog (level, otherbuf);
-	      counter = 0;
-	    }
-	}
-      else
-	{
-	  syslog (level, otherbuf);
-	  strcpy (lastMsg, otherbuf);
-	  counter = 0;
-	}
-#endif
-      closelog ();
+        if (level > LOG_DEBUG) {
+            level = LOG_DEBUG;
+        }
+        vsyslog (level, err_str_ (save_errno, fmt, buf), ap);   // FIXME FIXME FIXME FIXME 
+                                                                //    use debugger, unroll fmt
+        closelog ();
     }
 
   va_end (ap);
@@ -470,47 +473,47 @@ getLogClass_ (char *lsp, char *tsp)
   while (lsp != NULL && (word = getNextWord_ (&lsp)))
     {
       if (strcmp (word, "LC_SCHED") == 0)
-	class |= LC_SCHED;
+    class |= LC_SCHED;
       if (strcmp (word, "LC_PEND") == 0)
-	class |= LC_PEND;
+    class |= LC_PEND;
       if (strcmp (word, "LC_JLIMIT") == 0)
-	class |= LC_JLIMIT;
+    class |= LC_JLIMIT;
       if (strcmp (word, "LC_EXEC") == 0)
-	class |= LC_EXEC;
+    class |= LC_EXEC;
       if (strcmp (word, "LC_TRACE") == 0)
-	class |= LC_TRACE;
+    class |= LC_TRACE;
       if (strcmp (word, "LC_COMM") == 0)
-	class |= LC_COMM;
+    class |= LC_COMM;
       if (strcmp (word, "LC_XDR") == 0)
-	class |= LC_XDR;
+    class |= LC_XDR;
       if (strcmp (word, "LC_CHKPNT") == 0)
-	class |= LC_CHKPNT;
+    class |= LC_CHKPNT;
       if (strcmp (word, "LC_FILE") == 0)
-	class |= LC_FILE;
+    class |= LC_FILE;
       if (strcmp (word, "LC_AUTH") == 0)
-	class |= LC_AUTH;
+    class |= LC_AUTH;
       if (strcmp (word, "LC_HANG") == 0)
-	class |= LC_HANG;
+    class |= LC_HANG;
       if (strcmp (word, "LC_SIGNAL") == 0)
-	class |= LC_SIGNAL;
+    class |= LC_SIGNAL;
       if (strcmp (word, "LC_PIM") == 0)
-	class |= LC_PIM;
+    class |= LC_PIM;
       if (strcmp (word, "LC_SYS") == 0)
-	class |= LC_SYS;
+    class |= LC_SYS;
       if (strcmp (word, "LC_LOADINDX") == 0)
-	class |= LC_LOADINDX;
+    class |= LC_LOADINDX;
       if (strcmp (word, "LC_JGRP") == 0)
-	class |= LC_JGRP;
+    class |= LC_JGRP;
       if (strcmp (word, "LC_JARRAY") == 0)
-	class |= LC_JARRAY;
+    class |= LC_JARRAY;
       if (strcmp (word, "LC_MPI") == 0)
-	class |= LC_MPI;
+    class |= LC_MPI;
       if (strcmp (word, "LC_ELIM") == 0)
-	class |= LC_ELIM;
+    class |= LC_ELIM;
       if (strcmp (word, "LC_M_LOG") == 0)
-	class |= LC_M_LOG;
+    class |= LC_M_LOG;
       if (strcmp (word, "LC_PERFM") == 0)
-	class |= LC_PERFM;
+    class |= LC_PERFM;
     }
   logclass = class;
 
@@ -520,5 +523,5 @@ getLogClass_ (char *lsp, char *tsp)
 void
 ls_closelog_ext (void)
 {
-  logfile[0] = '\0';
+    logfile[0] = '\0';
 }

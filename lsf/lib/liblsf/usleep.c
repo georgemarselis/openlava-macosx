@@ -19,18 +19,28 @@
 #include <sys/types.h>
 #include <sys/time.h>
 
+void millisleep_ (int msec);
+
 
 void
 millisleep_ (int msec)
 {
-  struct timeval dtime;
+  	struct timeval dtime;
 
-  if (msec < 1)
-    return;
+  	if (msec < 1)  {
+    	return;
+  	}
 
-  dtime.tv_sec = msec / 1000;
-  dtime.tv_usec = (msec - dtime.tv_sec * 1000) * 1000;
+  	dtime.tv_sec = msec / 1000;
+  	/*
+		liblsf/usleep.c:35:49: error: implicit conversion loses integer precision: 'long' to '__darwin_suseconds_t' (aka 'int')
+      	[-Werror,-Wshorten-64-to-32]
+        dtime.tv_usec = (msec - dtime.tv_sec * 1000) * (long)1000;
 
-  select (0, 0, 0, 0, &dtime);
+        I will have to live with this, cuz i do not know how to fix it in an orderly fashiopn
+  	*/
+  	dtime.tv_usec = (msec - dtime.tv_sec * 1000) * 1000; // FIXME FIXME
+
+  	select (0, 0, 0, 0, &dtime);
 
 }

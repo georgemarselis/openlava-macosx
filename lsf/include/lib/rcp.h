@@ -23,18 +23,18 @@
 
 typedef struct rcpXfer
 {
-  char *szSourceArg;
-  char *szDestArg;
-  char *szHostUser;
-  char *szDestUser;
-  char *szHost;
-  char *szDest;
-  int iNumFiles;
-  char *ppszHostFnames[1];
-  char *ppszDestFnames[1];
-  struct hostent *pheHost;
-  struct hostent *pheDest;
-  int iOptions;
+    int iOptions;
+    int iNumFiles;
+    char *szSourceArg;
+    char *szDestArg;
+    char *szHostUser;
+    char *szDestUser;
+    char *szHost;
+    char *szDest;
+    char *ppszHostFnames[1];
+    char *ppszDestFnames[1];
+    struct hostent *pheHost;
+    struct hostent *pheDest;
 } lsRcpXfer;
 
 #define RSHCMD "rsh"

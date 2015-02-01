@@ -1,4 +1,4 @@
-/* $Id: lib.dir.c 397 2007-11-26 19:04:00Z mblack $
+/* $Id: lib.eligible.c 397 2007-11-26 19:04:00Z mblack $
  * Copyright (C) 2007 Platform Computing Inc
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,13 +16,7 @@
  *
  */
 
- #pragma once
+#pragma once
 
-static struct hTab hashTab;
-
-static int putin_ (unsigned long status, char *inkey, int inkeylen, char *inval, int invallen, void *indata);
-static int getMap_ (void);
-static int tryPwd (char *path, char *pwdpath);
-static int netHostChdir (char *, struct hostent *);
-static char *mountNet_ (struct hostent *);
-static char *usePath (char *);
+static int tcomp_ (const void *tlist1, const void *tlist2);
+static long inittasklists_ (void);

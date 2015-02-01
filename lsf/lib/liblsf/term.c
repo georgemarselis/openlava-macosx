@@ -20,10 +20,11 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <netinet/in.h>
+#include <termios.h>
 
 #include "lib/lib.h"
 #include "lib/lproto.h"
-#include "res/resout.h"
+#include "daemons/libresd/resout.h"
 
 #ifndef VREPRINT
 #define VREPRINT VRPRNT
@@ -39,13 +40,20 @@
 
 #define IN_TABLE_SIZE 13
 static tcflag_t in_table[IN_TABLE_SIZE] =
-  { IGNBRK, BRKINT, IGNPAR, PARMRK, INPCK, ISTRIP, INLCR, IGNCR, ICRNL, IUCLC,
-IXON, IXANY, IXOFF
+  { IGNBRK, BRKINT, IGNPAR, PARMRK, INPCK, ISTRIP, INLCR, IGNCR, ICRNL, 
+#ifndef __MACH__ 
+    IUCLC,
+#endif
+    IXON, IXANY, IXOFF
 };
 
 #define OUT_TABLE_SIZE 30
 static tcflag_t out_table[OUT_TABLE_SIZE] =
-  { OPOST, OLCUC, ONLCR, OCRNL, ONOCR, ONLRET, OFILL, OFDEL, NLDLY, NL0, NL1,
+  { OPOST, 
+#ifndef __MACH__ 
+    OLCUC,
+#endif
+    ONLCR, OCRNL, ONOCR, ONLRET, OFILL, OFDEL, NLDLY, NL0, NL1,
 CRDLY, CR0, CR1, CR2, CR3, TABDLY, TAB0, TAB1, TAB2, TAB3, BSDLY, BS0, BS1, VTDLY, VT0, VT1, FFDLY, FF0, FF1
 };
 
@@ -56,11 +64,13 @@ LOBLK
 };
 
 #define LOC_TABLE_SIZE 10
-static tcflag_t loc_table[LOC_TABLE_SIZE] = { ISIG, ICANON
-#if !defined(__CYGWIN__)
-    , XCASE
+static tcflag_t loc_table[LOC_TABLE_SIZE] = { ISIG, ICANON,
+#ifndef __CYGWIN__ 
+#ifndef __MACH__
+    XCASE,
 #endif
-  , ECHO, ECHOE, ECHOK, ECHONL, NOFLSH, TOSTOP, IEXTEN
+#endif
+    ECHO, ECHOE, ECHOK, ECHONL, NOFLSH, TOSTOP, IEXTEN
 };
 
 #define CHR_TABLE_SIZE 18
@@ -81,7 +91,6 @@ static int encode_mode (XDR * xdrs, tcflag_t mode_set, tcflag_t * attr_table,
 			int table_count);
 static int decode_mode (XDR * xdrs, tcflag_t * attr_table, int table_count,
 			tcflag_t * mode_set);
-
 
 
 int

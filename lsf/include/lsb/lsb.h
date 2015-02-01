@@ -27,7 +27,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "daemonout.h"
+#include "daemons/daemonout.h"
 #include "lib/hdr.h"
 #include "lib/lproto.h"
 #include "lsb/lsbatch.h"

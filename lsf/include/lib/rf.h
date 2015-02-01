@@ -49,14 +49,15 @@ struct ropenReq
 struct rrdwrReq
 {
   int fd;
-  int len;
+  char padding[4];
+  size_t len;
 };
 
 struct rlseekReq
 {
   int fd;
   int whence;
-  int offset;
+  off_t offset;
 };
 
 #endif

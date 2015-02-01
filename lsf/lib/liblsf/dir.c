@@ -16,19 +16,15 @@
  *
  */
 
+#include <limits.h>
+#include <rpcsvc/ypclnt.h>
+
 #include "lib/lib.h"
 #include "lib/lproto.h"
+#include "lib/dir.h"
+
 
 extern struct config_param genParams_[];
-
-static struct hTab hashTab;
-
-static int putin_ (int, char *, int, char *, int, char *);
-static int getMap_ (void);
-static int tryPwd (char *path, char *pwdpath);
-static int netHostChdir (char *, struct hostent *);
-static char *mountNet_ (struct hostent *);
-static char *usePath (char *);
 
 char chosenPath[MAXPATHLEN];
 
@@ -279,36 +275,57 @@ tryPwd (char *path, char *pwdpath)
 static int
 getMap_ (void)
 {
-#if !defined(__CYGWIN__)
+#ifndef __CYGWIN__
+
   char *domain;
   struct ypall_callback incallback;
   int i;
 
-  h_initTab_ (&hashTab, 64);
-  incallback.foreach = putin_;
-  if ((i = yp_get_default_domain (&domain)) != 0)
-    return (i);
-  return (yp_all (domain, "auto.master", &incallback));
+    h_initTab_ (&hashTab, 64);
+    incallback.foreach = &putin_;
+    if ((i = yp_get_default_domain (&domain)) != 0) {
+        return (i);
+    }
+
+    return (yp_all (domain, "auto.master", &incallback));
 #else
-  return 0;
+    return 0;
 #endif
 }
 
+
 static int
-putin_ (int status, char *inkey, int inkeylen, char *inval, int invallen,
-	char *indata)
+putin_ (unsigned long status, char *inkey, int inkeylen, char *inval, int invallen,	void *indata)
 {
-#if !defined(__CYGWIN__)
-  if (ypprot_err (status) != 0)
-    return TRUE;
+
+/* do nothing with this, but gets rid of the compilier complaining 
+   void *indata is mandatory cuz the header must match the
+      incallback.foreach( unsigned long, char *, int, char *, int, void * ) function  
+
+      this is part of NIS/NIS+
+
+      FIXME FIXME
+*/
+  strlen( inval );
+  invallen++;
+  strlen( (char *) indata); 
+
+#ifndef __CYGWIN__
+
+    assert( status < UINT_MAX );
+    if( 0 != ypprot_err( (unsigned int) status ) ) {
+        return TRUE;
+    }
 #endif
-  inkey[inkeylen] = '\0';
-  if (strcmp (inkey, "/-") == 0)
+
+    inkey[inkeylen] = '\0';
+    if (strcmp (inkey, "/-") == 0) {
+        return FALSE;
+    }
+
+    h_addEnt_ (&hashTab, inkey, 0);
+
     return FALSE;
-
-  h_addEnt_ (&hashTab, inkey, 0);
-
-  return FALSE;
 }
 
 static int
@@ -511,38 +528,38 @@ myexecv_ (char *filename, char **argv, struct hostent *hp)
 
   if (!hp || filename[0] != '/' || AM_NEVER)
     {
-      lsfExecv (usePath (filename), argv);
+      lsfExecX( usePath (filename), argv , execv );
       return;
     }
 
   if (AM_LAST)
     {
-      lsfExecv (usePath (filename), argv);
+      lsfExecX( usePath (filename), argv , execv );
       return;
     }
 
   if (strstr (filename, "/net/") == filename)
     {
-      lsfExecv (usePath (filename), argv);
+      lsfExecX( usePath (filename), argv , execv );
       return;
     }
 
   if (strstr (filename, "/tmp_mnt/") == filename)
     {
-      lsfExecv (usePath (filename), argv);
+      lsfExecX( usePath (filename), argv , execv );
       return;
     }
 
   if ((mp = mountNet_ (hp)) == NULL)
     {
-      lsfExecv (usePath (filename), argv);
+      lsfExecX( usePath (filename), argv , execv );
       return;
     }
 
   sprintf (fnamebuf, "%s%s", mp, filename);
-  lsfExecv (usePath (fnamebuf), argv);
+  lsfExecX( usePath (fnamebuf), argv , execv );
 
-  lsfExecv (usePath (filename), argv);
+  lsfExecX( usePath (filename), argv , execv );
 
 }
 

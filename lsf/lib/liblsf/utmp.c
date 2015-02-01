@@ -25,10 +25,12 @@
 #include <fcntl.h>
 #include <math.h>
 #include <limits.h>
+#include <string.h>
+#include <assert.h>
 
 #include "libint/lsi18n.h"
 
-#ifndef UTMP_FILENAME
+/*#ifndef UTMP_FILENAME
 #define UTMP_FILENAME "/var/adm/utmpx"
 #endif
 
@@ -39,15 +41,22 @@
 #ifndef MAX
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 #endif
+*/
 
+
+int createUtmpEntry (char *uname, pid_t job_pid, char *current_tty);
+int removeUtmpEntry (pid_t job_pid);
 
 int
 createUtmpEntry (char *uname, pid_t job_pid, char *current_tty)
 {
 
-  int err = 0;
+  	int err = 0;
+  	strlen( uname );
+  	assert (job_pid);
+  	strlen (current_tty);
 
-  return (err);
+  	return (err);
 
 }
 
@@ -57,6 +66,7 @@ int
 removeUtmpEntry (pid_t job_pid)
 {
 
-  return (0);
+	assert( job_pid );
+  	return (0);
 
 }

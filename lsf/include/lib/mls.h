@@ -32,17 +32,19 @@ typedef enum
 
 extern int mlsSbdMode;
 
-#define lsfSetUid(uid)              lsfSetXUid(0, uid, uid, -1, setuid)
+/*#define lsfSetUid(uid)              lsfSetXUid(0, uid, uid, -1, setuid)
 
 #define lsfSetEUid(uid)             lsfSetXUid(0, -1, uid, -1, seteuid)
 
 #define lsfSetREUid(ruid, euid)	    lsfSetXUid(0, ruid, euid, -1, setreuid)
 
 #define lsfExecv(path, argv)	    lsfExecX(path, argv, execv)
-#define lsfExecvp(file, argv)	    lsfExecX(file, argv, execvp)
+#define lsfExecvp(file, argv)	    lsfExecX(file, argv, execvp)*/
 
-extern int lsfSetXUid (int, int, int, int, int (*)());
+// FIXME investigate if the third argument to lsfSetXUid can be set to the appropriate
+// [s]uid_t type. if yes, try to see if there is an alternative to passing -1.
+extern int lsfSetXUid (int, uid_t uid, gid_t gid, int suid, int (*)());
 extern void lsfExecLog (const char *);
-extern int lsfExecX (char *, char **argv, int (*)());
+extern int lsfExecX (char *path, char **argv, int (*func) ());
 
 #endif

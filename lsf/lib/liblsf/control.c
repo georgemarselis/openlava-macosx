@@ -25,6 +25,9 @@
 #include "lib/lproto.h"
 #include "lib/xdr.h"
 
+// FIXME move function prototype to header file
+int oneLimDebug (struct debugReq *pdebug, char *hostname);
+
 int
 ls_limcontrol (char *hname, int opCode)
 {
@@ -86,8 +89,17 @@ unlockHost_ (char *hname)
 
 }
 
-int
+// FIXME FIXME int on_ was "int on". compiler complained about decleration here 
+//    shadowing a variable in the global scope. remove '_' and investiage
+//    error produced: 
+/*liblsf/control.c:93:20: warning: declaration shadows a variable in the global scope [-Wshadow]
 setLockOnOff_ (int on, time_t duration, char *hname)
+                   ^
+../include/daemons/libresd/resd.h:88:12: note: previous declaration is here
+extern int on;
+*/
+int
+setLockOnOff_ (int on_, time_t duration, char *hname)
 {
   struct limLock lockReq;
   char *host = hname;
@@ -95,7 +107,7 @@ setLockOnOff_ (int on, time_t duration, char *hname)
   if (initenv_ (NULL, NULL) < 0)
     return -1;
 
-  lockReq.on = on;
+  lockReq.on = on_;
 
   lockReq.uid = getuid ();
 

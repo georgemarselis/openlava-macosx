@@ -57,12 +57,13 @@ enum chanType
 
 struct Buffer
 {
+  long pos;
+  size_t len;
+  int stashed;
+  char padding[4];
+  char *data;
   struct Buffer *forw;
   struct Buffer *back;
-  char *data;
-  int pos;
-  int len;
-  int stashed;
 };
 
 struct Masks
@@ -75,14 +76,14 @@ struct Masks
 
 struct chanData
 {
-  int handle;
   enum chanType type;
   enum chanState state;
   enum chanState prestate;
+  int handle;
   int chanerr;
+  char padding[4];
   struct Buffer *send;
   struct Buffer *recv;
-
 };
 
 #define  CHANE_NOERR      0
@@ -117,15 +118,20 @@ int chanServSocket_ (int, u_short, int, int);
 int chanAccept_ (int, struct sockaddr_in *);
 
 int chanClientSocket_ (int, int, int);
-int chanConnect_ (int, struct sockaddr_in *, int, int);
+int chanConnect_ (int chfd, struct sockaddr_in *peer, int timeout);
 
 int chanSendDgram_ (int, char *, int, struct sockaddr_in *);
 int chanRcvDgram_ (int, char *, int, struct sockaddr_in *, int);
-int chanRpc_ (int, struct Buffer *, struct Buffer *, struct LSFHeader *,
-	      int timeout);
-int chanRead_ (int, char *, int);
-int chanReadNonBlock_ (int, char *, int, int);
-int chanWrite_ (int, char *, int);
+int chanRpc_ (int, struct Buffer *, struct Buffer *, struct LSFHeader *, int timeout);
+long chanReadNonBlock_ (int chfd, char *buf, size_t len, int timeout);
+long chanRead_ (int chfd, char *buf, size_t len);
+long chanWrite_ (int, char *, size_t);
+
+
+void chanInactivate_ (int chfd);
+void chanActivate_ (int chfd);
+void chanCloseAllBut_ (int chfd);
+
 
 int chanAllocBuf_ (struct Buffer **buf, int size);
 int chanFreeBuf_ (struct Buffer *buf);
@@ -133,7 +139,7 @@ int chanFreeStashedBuf_ (struct Buffer *buf);
 int chanOpenSock_ (int, int);
 int chanSetMode_ (int, int);
 
-extern int chanIndex;
 extern int cherrno;
+extern long chanIndex;
 
 #endif

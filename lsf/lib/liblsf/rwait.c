@@ -217,4 +217,7 @@ restartRWait (sigset_t oldMask)
 static void
 usr1Handler (int sig)
 {
+  assert( sig );
+
+  return;
 }

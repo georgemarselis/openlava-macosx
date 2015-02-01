@@ -26,6 +26,7 @@
 #include "lib/lproto.h"
 #include "lib/mls.h"
 #include "lib/queue.h"
+#include "lib/xdrres.h"
 #include "lsf.h"
 #include "daemons/libniosd/niosd.h"
 #include "daemons/libresd/resout.h"
@@ -34,6 +35,10 @@ static void default_tstp_ (int signo);
 static u_short getTaskPort (int s);
 static char rexcwd_[MAXPATHLEN];
 static void initSigHandler (int sig);
+
+void setRexWd_ (char *wd);
+int  lsRGetpgrp_ (int sock, int taskid, pid_t pid);
+int  rgetpidCompletionHandler_ (struct lsRequest *request);
 
 /* #define SIGEMT SIGBUS */
 
@@ -47,15 +52,15 @@ ls_rtaske (char *host, char **argv, int options, char **envp)
   static int rpid;
   static int reg_ls_donerex = FALSE;
   struct sockaddr_in sin;
-  int max;
+  long max = 0;
   char c_chfd[8];
   char pathbuf[MAXPATHLEN];
-  int d;
+  int d = 0;
   int niosOptions = 0;
   char *new_argv[5];
-  int pid;
-  int s;
-  int descriptor[2];
+  pid_t pid = 0;
+  int s = 0;
+  int descriptor[2] = { 0, 0 };
   struct resCmdBill cmdmsg;
   struct lslibNiosRTask taskReq;
   u_short taskPort = 0;
@@ -224,7 +229,7 @@ ls_rtaske (char *host, char **argv, int options, char **envp)
 
 
 	  sigprocmask (SIG_SETMASK, &oldMask, NULL);
-	  (void) lsfExecvp (new_argv[0], new_argv);
+	  (void) lsfExecX (new_argv[0], new_argv, execvp);
 	  exit (-1);
 	}
     }
@@ -258,7 +263,7 @@ ls_rtaske (char *host, char **argv, int options, char **envp)
   cmdmsg.argv = argv;
   cmdmsg.priority = 0;
 
-  if (sendCmdBill_ (s, (resCmd) RES_EXEC, &cmdmsg, NULL, NULL) == -1)
+  if (sendCmdBill_ (s, (enum resCmd) RES_EXEC, &cmdmsg, NULL, NULL) == -1)
     {
       closesocket (s);
       _lostconnection_ (host);
@@ -415,12 +420,14 @@ lsRGetpid_ (int taskid, int options)
     struct resPid pidBuf;
   } buf;
   LS_REQUEST_T *request;
-  int pid;
+  pid_t pid = 0;
 
   struct resPid pidReq;
-  int s;
+  int s = 0;
   struct tid *tid;
   char host[MAXHOSTNAMELEN];
+
+  assert( options );
 
   if ((tid = tid_find (taskid)) == NULL)
     {
@@ -475,7 +482,7 @@ lsRGetpid_ (int taskid, int options)
 }
 
 int
-lsRGetpgrp_ (int sock, int taskid, int pid)
+lsRGetpgrp_ (int sock, int taskid, pid_t pid)
 {
   struct _buf_
   {
@@ -555,10 +562,10 @@ int
 ls_rtask (char *host, char **argv, int options)
 {
   char **envp;
-  int numEnv;
-  int ret;
+  unsigned long numEnv = 0;
+  int ret = 0;
 
-  for (numEnv = 0; environ[numEnv]; numEnv++)
+  for (numEnv = 0; environ[numEnv]; numEnv++) // FIXME FIXME there has to be a better way to get the length of the array
     ;
   envp = (char **) calloc (numEnv + 1, sizeof (char *));
   for (numEnv = 0; environ[numEnv]; numEnv++)
@@ -581,6 +588,7 @@ ls_rtask (char *host, char **argv, int options)
 static void
 default_tstp_ (int signo)
 {
+  assert( signo );
   (void) ls_stoprex ();
   kill (getpid (), SIGSTOP);
 }

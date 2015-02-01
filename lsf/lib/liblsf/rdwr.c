@@ -22,222 +22,254 @@
 
 #include "lib/lib.h"
 #include "lib/lproto.h"
+#include "lib/rdwr.h"
 
-#define IO_TIMEOUT	2000
+#define IO_TIMEOUT  2000
 
-#define US_DIFF(t1, t2)	(((t1).tv_sec - (t2).tv_sec) * 1000000 + (t1).tv_usec - (t2).tv_usec)
+#define US_DIFF(t1, t2) (((t1).tv_sec - (t2).tv_sec) * 1000000 + (t1).tv_usec - (t2).tv_usec)
 
 static void alarmer_ (void);
 
-int
-nb_write_fix (int s, char *buf, int len)
+// FIXME FIXME FIXME
+// changed return type from into to size_t
+//      ensure with the debugger/test case that this function
+//      cannot return negative values
+long
+nb_write_fix (int s, char *buf,  size_t len)
 {
-  int cc;
-  int length;
-  struct timeval start, now;
+    ssize_t cc;
+    size_t length = 0;
+    struct timeval start, now;
 
-  struct timezone junk;
+    struct timezone junk;
 
-  gettimeofday (&start, &junk);
+    gettimeofday (&start, &junk);
 
-  for (length = len; len > 0;)
-    {
-      if ((cc = write (s, buf, len)) > 0)
-	{
-	  len -= cc;
-	  buf += cc;
-	}
-      else if (cc < 0 && BAD_IO_ERR (errno))
-	{
-	  if (errno == EPIPE)
-	    lserrno = LSE_LOSTCON;
+    for (length = len; len > 0;) {
+        if ((cc = write (s, buf, len)) > 0) {
+            assert( cc >= 0);
+            assert( len - (size_t)cc >= 0 );
+            len -= (size_t) cc;
+            buf += cc;
+            }
+        else if (cc < 0 && BAD_IO_ERR (errno)) {
+            if (errno == EPIPE) {
+                lserrno = LSE_LOSTCON;
+            }
 
-	  return (-1);
-	}
-      if (len > 0)
-	{
-	  gettimeofday (&now, &junk);
-	  if (US_DIFF (now, start) > IO_TIMEOUT * 1000)
-	    {
-	      errno = ETIMEDOUT;
-	      return (-1);
-	    }
-	  millisleep_ (IO_TIMEOUT / 20);
-	}
+            return (-1);
+        }
+        
+        if (len > 0) {
+            gettimeofday (&now, &junk);
+            
+            if (US_DIFF (now, start) > IO_TIMEOUT * 1000) {
+                errno = ETIMEDOUT;
+                return (-1);
+            }
+        
+            millisleep_ (IO_TIMEOUT / 20);
+        }
     }
-  return (length);
+    
+    return (ssize_t) length;
 }
 
-int
-nb_read_fix (int s, char *buf, int len)
+// FIXME FIXME FIXME
+// changed return type from into to size_t
+//      ensure with the debugger/test case that this function
+//      does return negative values
+long
+nb_read_fix (int s, char *buf, size_t len)
 {
-  int cc;
-  int length;
-  struct timeval start, now;
-  struct timezone junk;
+    long cc = 0;
+    size_t length = 0;
+    struct timeval start, now;
+    struct timezone junk;
 
-  if (logclass & LC_TRACE)
-    ls_syslog (LOG_DEBUG, "nb_read_fix: Entering this routine...");
-
-  gettimeofday (&start, &junk);
-
-  for (length = len; len > 0;)
-    {
-      if ((cc = read (s, buf, len)) > 0)
-	{
-	  len -= cc;
-	  buf += cc;
-	}
-      else if (cc == 0 || BAD_IO_ERR (errno))
-	{
-	  if (cc == 0)
-	    errno = ECONNRESET;
-	  return (-1);
-	}
-
-      if (len > 0)
-	{
-	  gettimeofday (&now, &junk);
-	  if (US_DIFF (now, start) > IO_TIMEOUT * 1000)
-	    {
-	      errno = ETIMEDOUT;
-	      return (-1);
-	    }
-	  millisleep_ (IO_TIMEOUT / 20);
-	}
+    if (logclass & LC_TRACE) {
+        ls_syslog (LOG_DEBUG, "nb_read_fix: Entering this routine...");
     }
 
-  return (length);
+    gettimeofday (&start, &junk);
+
+    for (length = len; len > 0;) {
+        if ((cc = read (s, buf, len)) > 0) {
+            assert( cc >= 0);
+            assert( len - (size_t)cc >= 0 );
+            len -= (size_t) cc;
+        }
+        else if (cc == 0 || BAD_IO_ERR (errno))
+        {
+            if (cc == 0) {
+                errno = ECONNRESET;
+            }
+            return (-1);
+        }
+        else  {
+            printf( " you should not be here: nb_read_fix()\n");
+        }
+
+        if (len > 0)
+        {
+            gettimeofday (&now, &junk);
+            if (US_DIFF (now, start) > IO_TIMEOUT * 1000) {
+            
+                errno = ETIMEDOUT;
+                return (-1);
+            }
+            
+            millisleep_ (IO_TIMEOUT / 20);
+        }
+    }
+
+    assert( length >= 0 );
+    return (long) length;
 }
 
-#define MAXLOOP	3000
+#define MAXLOOP 3000
 
-int
-b_read_fix (int s, char *buf, int len)
+// FIXME FIXME FIXME
+// changed return type from into to size_t
+//      ensure with the debugger/test case that this function
+//      cannot return negative values
+long
+b_read_fix (int s, char *buf, size_t len)
 {
-  int cc;
-  int loop;
-  int length;
-  int numLoop;
-
-  if (len > MAXLOOP * 1024)
-    {
-      numLoop = MAXLOOP * 100;
+    int loop      = 0;
+    int numLoop   = 0;
+    size_t length = 0;
+    ssize_t cc     = 0;
+        
+    if (len > MAXLOOP * 1024) {
+        numLoop = MAXLOOP * 100;
     }
-  else
-    {
+    else {
       numLoop = MAXLOOP;
     }
 
-  for (length = len, loop = 0; len > 0 && loop < numLoop; loop++)
-    {
+    for (length = len, loop = 0; len > 0 && loop < numLoop; loop++) {
 
-      if ((cc = read (s, buf, len)) > 0)
-	{
-	  len -= cc;
-	  buf += cc;
-	}
-      else if (cc == 0 || errno != EINTR)
-	{
-	  if (cc == 0)
-	    errno = ECONNRESET;
-	  return (-1);
-	}
+        if ((cc = read (s, buf, len)) > 0) {
+            assert( cc >= 0);
+            len -= (size_t) cc;
+            buf += cc;
+        }
+        else if (cc == 0 || errno != EINTR) {
+            if (cc == 0) {
+                errno = ECONNRESET;
+            }
+            return (-1);
+        }
+        else {
+            printf( "we fucked up again!\n b_read_fix()");
+        }
     }
 
-  if (len > 0)
-    {
+    // FIXME FIXME FIXME
+    // this loop is highly suspect. wtf len gets down to 0?
+    if (len > 0) {
       return (-1);
     }
 
-  return (length);
+    assert( length >= 0 );
+    return (long)length;
 }
-
-int
-b_write_fix (int s, char *buf, int len)
+
+
+// FIXME FIXME FIXME
+// changed return type from into to size_t
+//      ensure with the debugger/test case that this function
+//      cannot return negative values
+long
+b_write_fix (int s, char *buf, size_t len)
 {
 
-  int cc;
-  int loop;
-  int length;
-  for (length = len, loop = 0; len > 0 && loop < MAXLOOP; loop++)
+    ssize_t cc  = 0;
+    size_t loop = 0;
+    size_t length = 0;
+
+    // for emphasis
+    for ( length = len; len > 0 && loop < MAXLOOP; loop++)
     {
-      if ((cc = write (s, buf, len)) > 0)
-	{
-	  len -= cc;
-	  buf += cc;
-	}
-      else if (cc < 0 && errno != EINTR)
-	{
-	  lserrno = LSE_SOCK_SYS;
-	  return (-1);
-	}
+        if ((cc = write (s, buf, len)) > 0) {
+            assert( cc >= 0);
+            len -= (size_t) cc;
+            buf += cc;
+        }
+        else if (cc < 0 && errno != EINTR) {
+            lserrno = LSE_SOCK_SYS;
+            return (-1);
+        }
     }
 
-  if (len > 0)
-    {
-      lserrno = LSE_SOCK_SYS;
-      return (-1);
+    if (len > 0) {
+        lserrno = LSE_SOCK_SYS;
+        return (-1);
     }
 
-  return (length);
+    assert( length >= 0 );
+    return (long)length;
 }
 
 void
 unblocksig (int sig)
 {
-  sigset_t blockMask, oldMask;
-  sigemptyset (&blockMask);
-  sigaddset (&blockMask, sig);
-  sigprocmask (SIG_UNBLOCK, &blockMask, &oldMask);
+    sigset_t blockMask, oldMask;
+    sigemptyset (&blockMask);
+    sigaddset (&blockMask, sig);
+    sigprocmask (SIG_UNBLOCK, &blockMask, &oldMask);
 }
 
 int
-b_connect_ (int s, struct sockaddr *name, int namelen, int timeout)
+b_connect_ (int s, struct sockaddr *name, socklen_t namelen, unsigned int timeout)
 {
-  struct itimerval old_itimer;
-  unsigned int oldTimer;
-  sigset_t newMask, oldMask;
-  struct sigaction action, old_action;
+
+    unsigned int oldTimer;
+    sigset_t newMask;
+    sigset_t oldMask;
+    struct itimerval old_itimer;
+    struct sigaction action;
+    struct sigaction old_action;
 
 
-  if (getitimer (ITIMER_REAL, &old_itimer) < 0)
-    return -1;
-
-
-  action.sa_flags = 0;
-  action.sa_handler = (SIGFUNCTYPE) alarmer_;
-
-
-  sigfillset (&action.sa_mask);
-  sigaction (SIGALRM, &action, &old_action);
-
-  unblocksig (SIGALRM);
-
-  blockSigs_ (SIGALRM, &newMask, &oldMask);
-
-  oldTimer = alarm (timeout);
-
-  if (connect (s, name, namelen) < 0)
-    {
-      if (errno == EINTR)
-	errno = ETIMEDOUT;
-
-      alarm (oldTimer);
-      setitimer (ITIMER_REAL, &old_itimer, NULL);
-
-      sigaction (SIGALRM, &old_action, NULL);
-      sigprocmask (SIG_SETMASK, &oldMask, NULL);
-      return -1;
+    if (getitimer (ITIMER_REAL, &old_itimer) < 0)  {
+        return -1;
     }
 
-  alarm (oldTimer);
 
-  setitimer (ITIMER_REAL, &old_itimer, NULL);
+    action.sa_flags = 0;
+    action.sa_handler = (SIGFUNCTYPE) alarmer_;
 
-  sigaction (SIGALRM, &old_action, NULL);
-  sigprocmask (SIG_SETMASK, &oldMask, NULL);
-  return 0;
+    sigfillset (&action.sa_mask);
+    sigaction (SIGALRM, &action, &old_action);
+
+    unblocksig (SIGALRM);
+
+    blockSigs_ (SIGALRM, &newMask, &oldMask);
+
+    oldTimer = alarm (timeout);
+
+    if (connect (s, name, namelen) < 0) {
+        if (errno == EINTR) {
+            errno = ETIMEDOUT;
+        }
+
+        alarm (oldTimer);
+        setitimer (ITIMER_REAL, &old_itimer, NULL);
+
+        sigaction (SIGALRM, &old_action, NULL);
+        sigprocmask (SIG_SETMASK, &oldMask, NULL);
+        return -1;
+    }
+
+    alarm (oldTimer);
+
+    setitimer (ITIMER_REAL, &old_itimer, NULL);
+
+    sigaction (SIGALRM, &old_action, NULL);
+    sigprocmask (SIG_SETMASK, &oldMask, NULL);
+    return 0;
 }
 
 int
@@ -253,10 +285,10 @@ rd_select_ (int rd, struct timeval *timeout)
 
       cc = select (rd + 1, &rmask, (fd_set *) 0, (fd_set *) 0, timeout);
       if (cc >= 0)
-	return cc;
+    return cc;
 
       if (errno == EINTR)
-	continue;
+    continue;
       return (-1);
     }
 
@@ -278,7 +310,7 @@ b_accept_ (int s, struct sockaddr *addr, socklen_t * addrlen)
 
   return (cc);
 
-}				/* b_accept_() */
+}               /* b_accept_() */
 
 int
 detectTimeout_ (int s, int recv_timeout)
@@ -336,49 +368,51 @@ blockSigs_ (int sig, sigset_t * blockMask, sigset_t * oldMask)
 
 }
 
-int
-nb_read_timeout (int s, char *buf, int len, int timeout)
+// FIXME timeout should be of type unsigned timeu_t or something
+long
+nb_read_timeout (int s, char *buf, size_t len, int timeout)
 {
-  int cc;
-  int nReady;
-  int length = len;
-  struct timeval timeval;
+    ssize_t cc      = 0 ;
+    int nReady      = 0;
+    size_t length   = len;
+    struct timeval timeval;
 
-  timeval.tv_sec = timeout;
-  timeval.tv_usec = 0;
+    timeval.tv_sec  = timeout;
+    timeval.tv_usec = 0;
 
-  for (;;)
-    {
-      nReady = rd_select_ (s, &timeval);
-      if (nReady < 0)
-	{
-	  lserrno = LSE_SELECT_SYS;
-	  return (-1);
-	}
-      else if (nReady == 0)
-	{
-
-	  lserrno = LSE_TIME_OUT;
-	  return (-1);
-	}
-      else
-	{
-	  if ((cc = recv (s, buf, len, 0)) > 0)
-	    {
-	      len -= cc;
-	      buf += cc;
-	    }
-	  else if (cc == 0 || BAD_IO_ERR (errno))
-	    {
-	      if (cc == 0)
-		errno = ECONNRESET;
-	      return (-1);
-	    }
-	  if (len == 0)
-	    break;
-	}
+    for (;;) {
+        nReady = rd_select_ (s, &timeval);
+        if (nReady < 0) {
+            lserrno = LSE_SELECT_SYS;
+            return (-1);
+        }
+        else if (nReady == 0) {
+            lserrno = LSE_TIME_OUT;
+            return (-1);
+        }
+        else {
+            if ((cc = recv (s, buf, len, 0)) > 0) {
+                assert( cc >= 0 );
+                len -= (size_t) cc;
+                buf += cc;
+            }
+            else if (cc == 0 || BAD_IO_ERR (errno)) {
+                if (cc == 0) {
+                    errno = ECONNRESET;
+                }
+                
+                return (-1);
+            }
+            else {
+                printf( "We done goofed up! nb_read_timeout()\n");
+            }
+            
+            if (len == 0) {
+                break;
+            }
+        }
     }
 
-  return (length);
-
+    assert( length <= LONG_MAX );
+    return (long) length;
 }

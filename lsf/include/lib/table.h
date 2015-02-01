@@ -44,21 +44,21 @@ typedef struct hEnt
   char *keyname;
 } hEnt;
 
-/* This si the hash table itself.
+/* This is the hash table itself.
  */
 typedef struct hTab
 {
   struct hLinks *slotPtr;
-  int numEnts;
-  int size;
+  long numEnts;
+  size_t size;
 } hTab;
 
 
 typedef struct sTab
 {
-  hTab *tabPtr;
-  int nIndex;
+  size_t nIndex;
   hEnt *hEntPtr;
+  hTab *tabPtr;
   struct hLinks *hList;
 } sTab;
 
@@ -97,7 +97,7 @@ typedef void (*HTAB_DATA_DESTROY_FUNC_T) (void *);
 extern void insList_ (struct hLinks *, struct hLinks *);
 extern void remList_ (struct hLinks *);
 extern void initList_ (struct hLinks *);
-extern void h_initTab_ (hTab *, int);
+extern void h_initTab_ (hTab * tabPtr, unsigned long numSlots);
 extern void h_freeTab_ (hTab *, void (*destroy) (void *));
 extern int h_TabEmpty_ (hTab *);
 extern void h_delTab_ (hTab *);

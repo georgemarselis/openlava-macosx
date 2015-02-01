@@ -34,7 +34,7 @@ ls_rexecve (char *host, char **argv, int options, char **envp)
   struct timeval timeout;
   socklen_t len;
   struct sockaddr_in sin;
-  int max;
+  long max;
   char sock_buf[20];
   char *new_argv[5];
   char pathbuf[MAXPATHLEN];
@@ -130,7 +130,7 @@ ls_rexecve (char *host, char **argv, int options, char **envp)
 
   timeout.tv_usec = 0;
   timeout.tv_sec = resTimeout;
-  if (sendCmdBill_ (s, (resCmd) RES_EXEC, &cmdmsg, &retsock, &timeout) == -1)
+  if (sendCmdBill_ (s, (enum resCmd) RES_EXEC, &cmdmsg, &retsock, &timeout) == -1)
     {
       closesocket (retsock);
       closesocket (s);
@@ -167,7 +167,7 @@ ls_rexecve (char *host, char **argv, int options, char **envp)
 	(void) close (d);
     }
 
-  (void) lsfExecvp (new_argv[0], new_argv);
+  (void) lsfExecX(new_argv[0], new_argv, execvp);
   lserrno = LSE_EXECV_SYS;
   close (retsock);
   close (s);
@@ -262,7 +262,7 @@ ls_startserver (char *host, char **server, int options)
   timeout.tv_usec = 0;
   timeout.tv_sec = resTimeout;
 
-  if (sendCmdBill_ (s, (resCmd) RES_SERVER, &cmdmsg, &retsock, &timeout)
+  if (sendCmdBill_ (s, (enum resCmd) RES_SERVER, &cmdmsg, &retsock, &timeout)
       == -1)
     {
       closesocket (retsock);

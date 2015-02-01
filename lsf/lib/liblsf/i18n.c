@@ -24,28 +24,32 @@
 #include "lsf.h"
 #include "libint/lsi18n.h"
 
-int I18nRunningFlag = 0;
-int I18nInitFlag = 0;
-
+/*static int I18nRunningFlag = 0;
+static int I18nInitFlag = 0;
+*/
 LS_CATD ls_catd;
 
 int
 _i18n_init (int modId)
 {
 
-  I18nInitFlag = 1;
+  assert( modId );
+  static int I18nInitFlag = 1;
+
+  assert( I18nInitFlag < 0 );
+  
   return (0);
 
 }
 
 int
-_i18n_end ()
+_i18n_end ( void )
 {
   return (0);
 }
 
 
-int i18n_ct_format_ID[] = {
+/*static int i18n_ct_format_ID[] = {
   1,
   2,
   3,
@@ -53,10 +57,11 @@ int i18n_ct_format_ID[] = {
   5,
   6,
   7
-};
+};*/
 
-#define NL_SETN         35
-char *i18n_ct_format[] = {
+/*#define NL_SETN         35*/
+
+static char *i18n_ct_format[] = {
   "%Ec\n",			/* catgets 1 */
   "%a %b %d %T %Y",		/* catgets 2 */
   "%b %d %T %Y",		/* catgets 3 */
@@ -67,14 +72,15 @@ char *i18n_ct_format[] = {
 };
 
 #undef NL_SETN
-char *i18nCTFormatStr[MAX_CTIME_FORMATID + 1];
+static char *i18nCTFormatStr[MAX_CTIME_FORMATID + 1];
 
 void
 _i18n_ctime_init (LS_CATD catID)
 {
-  int i;
 
-  for (i = 0; i <= MAX_CTIME_FORMATID; i++)
+  assert( catID );
+
+  for ( int i = 0; i <= MAX_CTIME_FORMATID; i++)
     {
       i18nCTFormatStr[i] = i18n_ct_format[i];
     }
@@ -85,6 +91,8 @@ char *
 _i18n_ctime (LS_CATD catID, int formatID, const time_t * timer)
 {
   static char timeStr[MAX_I18N_CTIME_STRING];
+
+  assert( catID );
 
   strcpy (timeStr, ctime (timer));
   switch (formatID)
@@ -124,6 +132,8 @@ _i18n_ctime (LS_CATD catID, int formatID, const time_t * timer)
     }
 }
 
+// FIXME FIXME
+// variable format has to go
 char *
 _i18n_printf (const char *format, ...)
 {
@@ -131,7 +141,8 @@ _i18n_printf (const char *format, ...)
   va_list ap;
 
   va_start (ap, format);
-  vsprintf (i18nPrintBuffer, format, ap);
+  vsprintf (i18nPrintBuffer, format, ap);   // FIXME FIXME FIXME FIXME FIXME 
+                                            //    unroll this shit using the debugger
   va_end (ap);
   return (i18nPrintBuffer);
 }

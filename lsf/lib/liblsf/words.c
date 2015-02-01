@@ -22,8 +22,8 @@
 char *
 getNextLine_ (FILE * fp, int confFormat)
 {
-  int dummy = 0;
-  return (getNextLineC_ (fp, &dummy, confFormat));
+  size_t *dummy = 0;
+  return (getNextLineC_ (fp, dummy, confFormat));
 }
 
 char *
@@ -58,7 +58,7 @@ getNextWord1_ (char **line)
 
 
   while (**line && !isspace (**line) && (**line != ',')
-	 && (**line != ']') && (**line != '['))
+     && (**line != ']') && (**line != '['))
     *wordp++ = *(*line)++;
 
   if (wordp == word)
@@ -77,9 +77,9 @@ charInSet (char c, const char *set)
   while (*set != '\0')
     {
       if (c == *set)
-	{
-	  return TRUE;
-	}
+    {
+      return TRUE;
+    }
       set++;
     }
   return FALSE;
@@ -114,7 +114,7 @@ getNextValueQ_ (char **line, char ch1, char ch2)
 {
   char *sp, str[4];
   static char *value;
-  int valuelen;
+  unsigned long valuelen = 0;
 
   lserrno = LSE_NO_ERR;
   sp = getNextWord_ (line);
@@ -132,10 +132,10 @@ getNextValueQ_ (char **line, char ch1, char ch2)
     {
       sp = getNextWord_ (line);
       if (sp == NULL)
-	{
-	  lserrno = LSE_CONF_SYNTAX;
-	  return (NULL);
-	}
+    {
+      lserrno = LSE_CONF_SYNTAX;
+      return (NULL);
+    }
     }
   else
     sp++;
@@ -145,8 +145,8 @@ getNextValueQ_ (char **line, char ch1, char ch2)
     free (value);
   if (strlen (sp) > MAXLINELEN)
     {
-      valuelen = 2 * strlen (sp);
-      value = malloc (valuelen);
+      valuelen = 2 * strlen (sp); 
+      value = (char *) malloc (valuelen);
     }
   else
     {
@@ -171,26 +171,26 @@ getNextValueQ_ (char **line, char ch1, char ch2)
   while ((sp = getNextWord_ (line)) != NULL)
     {
       if (strcmp (sp, str) == 0)
-	return value;
+    return value;
 
       if (strlen (value) + strlen (sp) + 2 > valuelen - 1)
-	{
-	  char *newvp;
-	  newvp = myrealloc (value, valuelen + strlen (sp) + MAXLINELEN);
-	  if (newvp == NULL)
-	    return value;
-	  value = newvp;
-	  valuelen += MAXLINELEN;
-	}
+    {
+      char *newvp;
+      newvp = myrealloc (value, valuelen + strlen (sp) + MAXLINELEN);
+      if (newvp == NULL)
+        return value;
+      value = newvp;
+      valuelen += MAXLINELEN;
+    }
 
       strcat (value, " ");
       strcat (value, sp);
       sp = strrchr (value, ch2);
       if (sp != NULL)
-	{
-	  *sp = '\0';
-	  return value;
-	}
+    {
+      *sp = '\0';
+      return value;
+    }
     }
 
 
@@ -200,196 +200,224 @@ getNextValueQ_ (char **line, char ch1, char ch2)
 
 }
 
+// i think they are trying to remove all double quotes
 int
-stripQStr (char *q, char *str)
+stripQStr (char *q, char *str) 
 {
   char *fr = q;
 
-  for (; *q != '"' && *q != '\0'; q++);
-  if (*q == '\0')
-    return (-1);
-
-  for (q++; *q != '\0'; q++, str++)
-    {
-      if (*q == '"')
-	{
-	  if (*(q + 1) == '"')
-	    q++;
-	  else
-	    {
-	      *str = '\0';
-	      break;
-	    }
-	}
-      *str = *q;
+    for (; *q != '"' && *q != '\0'; q++) {
+        ;
+    }
+    
+    if (*q == '\0') {
+        return (-1);
     }
 
-  if (*q == '\0')
-    return (-1);
-  return (q - fr + 1);
+    for (q++; *q != '\0'; q++, str++) {
+      
+        if (*q == '"') {
+            if (*(q + 1) == '"'){
+               q++;
+            }
+            else {
+              *str = '\0';
+              break;
+            }
+        }
+        
+        *str = *q;
+    }
+
+    if (*q == '\0') {
+        return -1;
+    }
+
+    return (q - fr + 1); // FIXME FIXME FIXME ascii gymnastics must go
 }
 
 int
 addQStr (FILE * log_fp, char *str)
 {
-  int j = 1;
-  int len;
+    int j = 1;
+    size_t len = strlen (str);
+    assert( len );
 
-  len = strlen (str);
-
-
-
-  if (putc (' ', log_fp) == EOF)
-    return -1;
-  if (putc ('"', log_fp) == EOF)
-    return -1;
-  for (; *str != '\0'; str++, j++)
-    {
-      if (*str == '"')
-	if (putc ('"', log_fp) == EOF)
-	  return -1;
-      if (putc (*str, log_fp) == EOF)
-	return -1;
+    if (putc (' ', log_fp) == EOF) {
+        return -1;
     }
-  if (putc ('"', log_fp) == EOF)
-    return -1;
+    if (putc ('"', log_fp) == EOF) {
+        return -1;
+    }
+  
+    for (; *str != '\0'; str++, j++)
+    {
+        if (*str == '"') {
+            if (putc ('"', log_fp) == EOF) {
+                return -1;
+            }
+        }
+        if (putc (*str, log_fp) == EOF) {
+            return -1;
+        }
+    }
+    if (putc ('"', log_fp) == EOF) {
+        return -1;
+    }
 
-  return 0;
+    return 0;
 }
 
 char *
-getNextLineD_ (FILE * fp, int *LineCount, int confFormat)
+getNextLineD_ (FILE * fp, size_t *LineCount, int confFormat)
 {
-  static char *line = NULL;
-  int cin, lpos, oneChar, cinBslash;
-  int linesize = MAXLINELEN;
-  int quotes = 0;
+    static char *line = NULL;
+    int cin         = 0;
+    int oneChar     = 0;
+    int cinBslash   = 0;
+    int quotes      = 0;
+    size_t lpos     = 0;
+    size_t linesize = MAXLINELEN;
+    
+    lserrno = LSE_NO_ERR;
+    oneChar = -1;
 
-  lserrno = LSE_NO_ERR;
+    if( NULL != line) {
+        FREEUP (line);
+    }
 
-  oneChar = -1;
+    line = calloc (1, MAXLINELEN);
+    if (NULL == line && ENOMEM == errno ) {
+        lserrno = LSE_MALLOC;
+        return NULL;
+    }
 
-  if (line != NULL)
-    FREEUP (line);
+    lpos = 0;
+    while ((cin = getc (fp)) != EOF) {
 
-  line = calloc (1, MAXLINELEN);
-  if (line == NULL)
-    {
-      lserrno = LSE_MALLOC;
-      return (NULL);
+        if (cin == '\n') {
+            *LineCount += 1;
+            break;
+        }
+        
+        if (cin == '"') { 
+
+            if (quotes == 0) {
+                quotes++;
+            }
+            else {
+                quotes--;
+            }
+        }
+        
+        if (confFormat && cin == '#' && quotes == 0)
+        {
+
+            while ((cin = getc (fp)) != EOF)  {
+                
+                if (cin == '\n') {
+                    *LineCount += 1;
+                    break;
+                }
+            }
+            
+            break;
+        }
+
+        if (confFormat && cin == '\\')
+        {
+            cinBslash = cin;
+            if ((cin = getc (fp)) == EOF) {
+                break;
+            }
+
+            if (cin == '\n') {
+                *LineCount += 1;
+            }
+            else if (!isspace (cin))
+            {
+                if (lpos < linesize - 1) {
+                    assert( cinBslash >= 0);
+                    line[lpos++] = (char) cinBslash;
+                }
+                else {
+                    char *sp;
+                    linesize += MAXLINELEN;
+                    sp = myrealloc (line, linesize);
+
+                    if (sp == NULL) {
+                        break;
+                    }
+
+                    line = sp;
+                    assert( cinBslash >= 0);
+                    line[lpos++] = (char) cinBslash;
+                }
+            }
+            else {
+                printf( "i done goofed up! getNextLineD_()\n");
+            }
+        }
+
+        if (isspace (cin)) {
+            cin = ' ';
+        }
+      
+        if (lpos < linesize - 1) {
+            assert( cin >= 0);
+            line[lpos++] = (char) cin;
+        }
+        else
+        {
+            char *sp;
+            linesize += MAXLINELEN;
+            sp = myrealloc (line, linesize);
+            if ( NULL == sp && ENOMEM == errno ) {
+                break;
+            }
+            line = sp;
+            assert( cin >= 0);
+            line[lpos++] = (char)cin;
+        }
+    }
+
+    if ( 1 == lpos ) {
+        oneChar = 1;
     }
 
 
-  lpos = 0;
-  while ((cin = getc (fp)) != EOF)
-    {
-
-      if (cin == '\n')
-	{
-	  *LineCount += 1;
-	  break;
-	}
-      if (cin == '"')
-	{
-	  if (quotes == 0)
-	    quotes++;
-	  else
-	    quotes--;
-	}
-      if (confFormat && cin == '#' && quotes == 0)
-	{
-
-	  while ((cin = getc (fp)) != EOF)
-	    if (cin == '\n')
-	      {
-		*LineCount += 1;
-		break;
-	      }
-	  break;
-	}
-
-
-      if (confFormat && cin == '\\')
-	{
-	  cinBslash = cin;
-	  if ((cin = getc (fp)) == EOF)
-	    break;
-
-	  if (cin == '\n')
-	    *LineCount += 1;
-	  else if (!isspace (cin))
-	    {
-
-	      if (lpos < linesize - 1)
-		line[lpos++] = cinBslash;
-	      else
-		{
-		  char *sp;
-		  linesize += MAXLINELEN;
-		  sp = myrealloc (line, linesize);
-		  if (sp == NULL)
-		    break;
-		  line = sp;
-		  line[lpos++] = cinBslash;
-		}
-	    }
-	}
-
-
-      if (isspace (cin))
-	cin = ' ';
-
-
-      if (lpos < linesize - 1)
-	line[lpos++] = cin;
-      else
-	{
-	  char *sp;
-	  linesize += MAXLINELEN;
-	  sp = myrealloc (line, linesize);
-	  if (sp == NULL)
-	    break;
-	  line = sp;
-	  line[lpos++] = cin;
-	}
+    while (lpos > 0 && (line[--lpos] == ' ')) {
+        ;
     }
 
-  if (lpos == 1)
-    oneChar = 1;
-
-
-  while (lpos > 0 && (line[--lpos] == ' '))
-    ;
-
-  if ((cin != EOF) || (oneChar == 1) || (cin == EOF && lpos > 0))
+    if ((cin != EOF) || (oneChar == 1) || (cin == EOF && lpos > 0))
     {
-
-      line[++lpos] = '\0';
-      return (line);
+        line[++lpos] = '\0';
+        return (line);
     }
 
-  return (NULL);
-}
-
-char *
-getNextLineC_ (FILE * fp, int *LineCount, int confFormat)
-{
-  char *nextLine;
-  char *sp;
-
-  nextLine = getNextLineD_ (fp, LineCount, confFormat);
-
-  if (nextLine == NULL)
     return NULL;
+}
 
+char *
+getNextLineC_ (FILE * fp, size_t *LineCount, int confFormat)
+{
+    char *nextLine;
+    char *sp;
 
+    nextLine = getNextLineD_ (fp, LineCount, confFormat);
 
-  for (sp = nextLine; *sp != '\0'; sp++)
-    if (*sp != ' ')
-      return (nextLine);
+    if (nextLine == NULL) {
+        return NULL;
+    }
 
+    for (sp = nextLine; *sp != '\0'; sp++) {
+        if (*sp != ' ') {
+            return (nextLine);
+        }
+    }
 
-  return (getNextLineC_ (fp, LineCount, confFormat));
+    return (getNextLineC_ (fp, LineCount, confFormat));
 
 }
 
@@ -397,21 +425,18 @@ getNextLineC_ (FILE * fp, int *LineCount, int confFormat)
 void
 subNewLine_ (char *instr)
 {
-  int i, k, strlength;
-
-  if (instr && (strlength = strlen (instr)))
-    {
-      for (i = strlength - 1; i >= 0; i--)
-	{
-	  if (instr[i] == '\n')
-	    {
-	      for (k = i; k < strlength; k++)
-		{
-		  instr[k] = instr[k + 1];
-		}
-	    }
-	}
+    int strlength = (int) strlen (instr);
+    if (instr && strlength > 0) {
+        for ( int i = strlength - 1; i > -1; i--) {
+            if (instr[i] == '\n') {
+                for ( int k = i; k < strlength; k++) {
+                    instr[k] = instr[k + 1];
+                }
+            }
+        }
     }
+
+    return;
 }
 
 /* Get the next meaningful line from the configuration
@@ -429,19 +454,19 @@ nextline_ (FILE * fp)
     {
       p = buf;
       while (isspace (*p))
-	++p;
+    ++p;
       if (*p == '#' || *p == 0)
-	{
-	  /* If this is the last or only
-	   * line do not return the
-	   * previous buffer to the caller.
-	   */
-	  p = NULL;
-	  continue;
-	}
+    {
+      /* If this is the last or only
+       * line do not return the
+       * previous buffer to the caller.
+       */
+      p = NULL;
+      continue;
+    }
       break;
     }
 
   return (p);
 
-}				/* nextline_() */
+}               /* nextline_() */

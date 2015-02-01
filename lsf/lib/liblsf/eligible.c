@@ -21,13 +21,16 @@
 
 #include "lib/lib.h"
 #include "lib/lproto.h"
+#include "lib/table.h"
+#include "lib/eligible.h"
 
-hTab rtask_table;
-hTab ltask_table;
+
+// FIXME FIXME FIXME the task table might need a bit of test cases and
+//    making sure it contains correct values
+static hTab rtask_table;
+static hTab ltask_table;
 
 static char listok;
-
-static int inittasklists_ (void);
 
 char *
 ls_resreq (char *task)
@@ -61,9 +64,9 @@ ls_eligible (char *task, char *resreqstr, char mode)
   if ((p = getenv ("LSF_TRS")) == NULL)
     {
       if ((p = strrchr (task, '/')) == NULL)
-	p = task;
+    p = task;
       else
-	p++;
+    p++;
     }
   else
     p = task;
@@ -76,14 +79,14 @@ ls_eligible (char *task, char *resreqstr, char mode)
   if ((mykey = h_getEnt_ (&rtask_table, (char *) p)) != NULL)
     {
       if (mykey->hData)
-	strcpy (resreqstr, (char *) mykey->hData);
+    strcpy (resreqstr, (char *) mykey->hData);
     }
 
   return (mode == LSF_REMOTE_MODE || mykey != NULL);
 
 }
 
-static int
+static long
 inittasklists_ (void)
 {
   char filename[MAXFILENAMELEN];
@@ -99,20 +102,20 @@ inittasklists_ (void)
   sprintf (filename, "%s/lsf.task", genParams_[LSF_CONFDIR].paramValue);
   if (access (filename, R_OK) == 0)
     if (readtaskfile_ (filename, NULL, NULL, &ltask_table, &rtask_table,
-		       FALSE) >= 0)
+               FALSE) >= 0)
       listok = TRUE;
 
   clName = ls_getclustername ();
   if (clName != NULL)
     {
       sprintf (filename, "%s/lsf.task.%s",
-	       genParams_[LSF_CONFDIR].paramValue, clName);
+           genParams_[LSF_CONFDIR].paramValue, clName);
       if (access (filename, R_OK) == 0)
-	{
-	  if (readtaskfile_ (filename, NULL, NULL, &ltask_table, &rtask_table,
-			     FALSE) >= 0)
-	    listok = TRUE;
-	}
+    {
+      if (readtaskfile_ (filename, NULL, NULL, &ltask_table, &rtask_table,
+                 FALSE) >= 0)
+        listok = TRUE;
+    }
     }
 
   if ((homep = osHomeEnvVar_ ()) != NULL)
@@ -120,11 +123,11 @@ inittasklists_ (void)
       strcpy (filename, homep);
       strcat (filename, "/.lsftask");
       if (access (filename, R_OK) == 0)
-	{
-	  if (readtaskfile_ (filename, NULL, NULL, &ltask_table, &rtask_table,
-			     FALSE) >= 0)
-	    listok = TRUE;
-	}
+    {
+      if (readtaskfile_ (filename, NULL, NULL, &ltask_table, &rtask_table,
+                 FALSE) >= 0)
+        listok = TRUE;
+    }
     }
   if (listok)
     return 0;
@@ -136,7 +139,7 @@ inittasklists_ (void)
 
 int
 readtaskfile_ (char *filename, hTab * minusListl, hTab * minusListr,
-	       hTab * localList, hTab * remoteList, char useMinus)
+           hTab * localList, hTab * remoteList, char useMinus)
 {
   FILE *fp;
   enum phase
@@ -156,129 +159,129 @@ readtaskfile_ (char *filename, hTab * minusListl, hTab * minusListr,
   while ((line = getNextLine_ (fp, TRUE)) != NULL)
     {
       switch (phase)
-	{
-	case ph_begin:
-	  word = getNextWord_ (&line);
-	  if (strcasecmp (word, "begin") != 0)
-	    {
-	      fclose (fp);
-	      lserrno = LSE_BAD_TASKF;
-	      return (-1);
-	    }
-	  word = getNextWord_ (&line);
-	  if (word == NULL)
-	    {
-	      fclose (fp);
-	      lserrno = LSE_BAD_TASKF;
-	      return (-1);
-	    }
-	  if (strcasecmp (word, "remotetasks") == 0)
-	    phase = ph_remote;
-	  else if (strcasecmp (word, "localtasks") == 0)
-	    phase = ph_local;
-	  else
-	    {
-	      fclose (fp);
-	      lserrno = LSE_BAD_TASKF;
-	      return (-1);
-	    }
-	  break;
-	case ph_remote:
-	  word = getNextValueQ_ (&line, '"', '"');
-	  if (strcasecmp (word, "end") == 0)
-	    {
-	      word = getNextWord_ (&line);
-	      if (word == NULL)
-		{
-		  fclose (fp);
-		  lserrno = LSE_BAD_EXP;
-		  return -1;
-		}
-	      if (strcasecmp (word, "remotetasks") == 0)
-		{
-		  phase = ph_begin;
-		  break;
-		}
-	      fclose (fp);
-	      lserrno = LSE_BAD_EXP;
-	      return -1;
-	    }
+    {
+    case ph_begin:
+      word = getNextWord_ (&line);
+      if (strcasecmp (word, "begin") != 0)
+        {
+          fclose (fp);
+          lserrno = LSE_BAD_TASKF;
+          return (-1);
+        }
+      word = getNextWord_ (&line);
+      if (word == NULL)
+        {
+          fclose (fp);
+          lserrno = LSE_BAD_TASKF;
+          return (-1);
+        }
+      if (strcasecmp (word, "remotetasks") == 0)
+        phase = ph_remote;
+      else if (strcasecmp (word, "localtasks") == 0)
+        phase = ph_local;
+      else
+        {
+          fclose (fp);
+          lserrno = LSE_BAD_TASKF;
+          return (-1);
+        }
+      break;
+    case ph_remote:
+      word = getNextValueQ_ (&line, '"', '"');
+      if (strcasecmp (word, "end") == 0)
+        {
+          word = getNextWord_ (&line);
+          if (word == NULL)
+        {
+          fclose (fp);
+          lserrno = LSE_BAD_EXP;
+          return -1;
+        }
+          if (strcasecmp (word, "remotetasks") == 0)
+        {
+          phase = ph_begin;
+          break;
+        }
+          fclose (fp);
+          lserrno = LSE_BAD_EXP;
+          return -1;
+        }
 
-	  minus = FALSE;
-	  if (strcmp (word, "+") == 0 || strcmp (word, "-") == 0)
-	    {
-	      minus = (strcmp (word, "-") == 0);
-	      word = getNextValueQ_ (&line, '"', '"');
-	      if (word == NULL)
-		{
-		  fclose (fp);
-		  lserrno = LSE_BAD_EXP;
-		  return -1;
-		}
-	    }
-	  else if (word[0] == '+' || word[0] == '-')
-	    {
-	      minus = word[0] == '-';
-	      word++;
-	    }
+      minus = FALSE;
+      if (strcmp (word, "+") == 0 || strcmp (word, "-") == 0)
+        {
+          minus = (strcmp (word, "-") == 0);
+          word = getNextValueQ_ (&line, '"', '"');
+          if (word == NULL)
+        {
+          fclose (fp);
+          lserrno = LSE_BAD_EXP;
+          return -1;
+        }
+        }
+      else if (word[0] == '+' || word[0] == '-')
+        {
+          minus = word[0] == '-';
+          word++;
+        }
 
-	  if (minus)
-	    {
-	      if ((deletetask_ (word, remoteList) < 0) && useMinus)
-		(void) inserttask_ (word, minusListr);
-	    }
-	  else
-	    (void) inserttask_ (word, remoteList);
-	  break;
+      if (minus)
+        {
+          if ((deletetask_ (word, remoteList) < 0) && useMinus)
+        (void) inserttask_ (word, minusListr);
+        }
+      else
+        (void) inserttask_ (word, remoteList);
+      break;
 
-	case ph_local:
-	  word = getNextWord_ (&line);
-	  if (strcasecmp (word, "end") == 0)
-	    {
-	      word = getNextWord_ (&line);
-	      if (word == NULL)
-		{
-		  fclose (fp);
-		  lserrno = LSE_BAD_EXP;
-		  return -1;
-		}
-	      if (strcasecmp (word, "localtasks") == 0)
-		{
-		  phase = ph_begin;
-		  break;
-		}
-	      fclose (fp);
-	      lserrno = LSE_BAD_EXP;
-	      return -1;
-	    }
-	  minus = FALSE;
-	  if (strcmp (word, "+") == 0 || strcmp (word, "-") == 0)
-	    {
-	      minus = (strcmp (word, "-") == 0);
-	      word = getNextWord_ (&line);
-	      if (word == NULL)
-		{
-		  fclose (fp);
-		  lserrno = LSE_BAD_EXP;
-		  return -1;
-		}
-	    }
-	  else if (word[0] == '+' || word[0] == '-')
-	    {
-	      minus = word[0] == '-';
-	      word++;
-	    }
+    case ph_local:
+      word = getNextWord_ (&line);
+      if (strcasecmp (word, "end") == 0)
+        {
+          word = getNextWord_ (&line);
+          if (word == NULL)
+        {
+          fclose (fp);
+          lserrno = LSE_BAD_EXP;
+          return -1;
+        }
+          if (strcasecmp (word, "localtasks") == 0)
+        {
+          phase = ph_begin;
+          break;
+        }
+          fclose (fp);
+          lserrno = LSE_BAD_EXP;
+          return -1;
+        }
+      minus = FALSE;
+      if (strcmp (word, "+") == 0 || strcmp (word, "-") == 0)
+        {
+          minus = (strcmp (word, "-") == 0);
+          word = getNextWord_ (&line);
+          if (word == NULL)
+        {
+          fclose (fp);
+          lserrno = LSE_BAD_EXP;
+          return -1;
+        }
+        }
+      else if (word[0] == '+' || word[0] == '-')
+        {
+          minus = word[0] == '-';
+          word++;
+        }
 
-	  if (minus)
-	    {
-	      if ((deletetask_ (word, localList) < 0) && useMinus)
-		(void) inserttask_ (word, minusListl);
+      if (minus)
+        {
+          if ((deletetask_ (word, localList) < 0) && useMinus)
+        (void) inserttask_ (word, minusListl);
 
-	    }
-	  else
-	    (void) inserttask_ (word, localList);
-	  break;
-	}
+        }
+      else
+        (void) inserttask_ (word, localList);
+      break;
+    }
     }
 
   if (phase != ph_begin)
@@ -293,44 +296,48 @@ readtaskfile_ (char *filename, hTab * minusListl, hTab * minusListr,
 }
 
 int
-writetaskfile_ (char *filename, hTab * minusListl, hTab * minusListr,
-		hTab * localList, hTab * remoteList)
+writetaskfile_ (char *filename, hTab * minusListl, hTab * minusListr, hTab * localList, hTab * remoteList)
 {
-  char **tlist;
-  int i, num;
-  FILE *fp;
+    char **tlist;
+    long num = 0;
 
-  if ((fp = fopen (filename, "w")) == NULL)
-    {
-
+    FILE *fp = fopen(filename, "w");
+    if ( NULL == fp ) {
       lserrno = LSE_FILE_SYS;
       return (-1);
     }
 
-  fprintf (fp, "Begin LocalTasks\n");
-  num = listtask_ (&tlist, localList, TRUE);
-  for (i = 0; i < num; i++)
-    fprintf (fp, "+ %s\n", tlist[i]);
+    // FIXME FIXME return values disregarded?
+    fprintf (fp, "Begin LocalTasks\n");
+    num = listtask_ (&tlist, localList, TRUE);
 
-  num = listtask_ (&tlist, minusListl, TRUE);
-  for (i = 0; i < num; i++)
-    fprintf (fp, "- %s\n", tlist[i]);
+    for ( int i = 0; i < num; i++) {
+        fprintf (fp, "+ %s\n", tlist[i]);
+    }
 
-  fprintf (fp, "End LocalTasks\n\n");
+    num = listtask_ (&tlist, minusListl, TRUE);
+    for ( int i = 0; i < num; i++) {
+        fprintf (fp, "- %s\n", tlist[i]);
+    }
 
-  fprintf (fp, "Begin RemoteTasks\n");
-  num = listtask_ (&tlist, remoteList, TRUE);
-  for (i = 0; i < num; i++)
-    fprintf (fp, "+ \"%s\"\n", tlist[i]);
+    fprintf (fp, "End LocalTasks\n\n");
 
-  num = listtask_ (&tlist, minusListr, TRUE);
-  for (i = 0; i < num; i++)
-    fprintf (fp, "- %s\n", tlist[i]);
+    fprintf (fp, "Begin RemoteTasks\n");
+    num = listtask_ (&tlist, remoteList, TRUE);
+    for ( int i = 0; i < num; i++) {
+        fprintf (fp, "+ \"%s\"\n", tlist[i]);
+    }
 
-  fprintf (fp, "End RemoteTasks\n\n");
-  fclose (fp);
-  return (0);
+    num = listtask_ (&tlist, minusListr, TRUE);
+    for ( int i = 0; i < num; i++) {
+        fprintf (fp, "- %s\n", tlist[i]);
+    }
 
+    // FIXME FIXME return values disregarded?
+    fprintf (fp, "End RemoteTasks\n\n");
+    fclose (fp);
+ 
+    return 0;
 }
 
 int
@@ -391,7 +398,7 @@ inserttask_ (char *taskstr, hTab * tasktb)
     {
       *resreq++ = '\0';
       if (*resreq == '\0')
-	resreq = NULL;
+    resreq = NULL;
     }
 
   hEntPtr = h_addEnt_ (tasktb, task, &succ);
@@ -400,9 +407,9 @@ inserttask_ (char *taskstr, hTab * tasktb)
       oldcp = hEntPtr->hData;
       hEntPtr->hData = NULL;
       if (oldcp != NULL)
-	{
-	  free (oldcp);
-	}
+    {
+      free (oldcp);
+    }
     }
 
   hEntPtr->hData = ((resreq == NULL) ? NULL : (putstr_ (resreq)));
@@ -463,88 +470,96 @@ deletetask_ (char *taskstr, hTab * tasktb)
 
 }
 
-int
+long
 ls_listrtask (char ***taskList, int sortflag)
 {
-  if (!listok)
-    if (inittasklists_ () < 0)
+  if (!listok && inittasklists_ () < 0) {
       return -1;
+  }
 
   return (listtask_ (taskList, &rtask_table, sortflag));
 
 }
 
-int
+long
 ls_listltask (char ***taskList, int sortflag)
 {
-  if (!listok)
-    if (inittasklists_ () < 0)
-      return -1;
 
-  return (listtask_ (taskList, &ltask_table, sortflag));
+    // FIXME FIXME FIXME check results here
+    if (!listok && inittasklists_() < 0) {
+        return -1;
+    }
+
+    return listtask_ (taskList, &ltask_table, sortflag) ;
 
 }
 
-static int tcomp_ (const void *tlist1, const void *tlist2);
 
-int
-listtask_ (char ***taskList, hTab * tasktb, int sortflag)
+long
+listtask_ (char ***taskList, hTab *tasktb, int sortflag)
 {
   static char **tlist;
   hEnt *hEntPtr;
   struct hLinks *hashLinks;
-  int nEntry;
-  int index;
-  int listindex;
-  int tasklen;
   char buf[MAXLINELEN];
   char *p;
+  unsigned long index = 0;
+  long nEntry;
+  
 
-  if ((nEntry = tasktb->numEnts) <= 0)
-    {
+    nEntry = tasktb->numEnts;
+    if( nEntry <= 0) {
       return 0;
     }
 
-  if (tlist != (char **) NULL)
-    {
-      for (index = 0; tlist[index]; index++)
-	{
-	  free (tlist[index]);
-	}
-      free (tlist);
+    if (tlist != (char **) NULL) {
+
+        // FIXME i am sure this stops when tlist[infex] == NULL
+        for ( int counter = 0; tlist[counter]; counter++) {
+          free (tlist[counter]);
+        }
+ 
+        free (tlist);
     }
 
-  tlist = (char **) malloc ((nEntry + 1) * sizeof (char *));
+    // FIXME cast. look above, nEntry has already been checked
+    // FIXME FIXME FIXME
+    //      the whole loop needs a look over to ensure the right result is produced
+    //      issues with dangling brackets
+    tlist = (char **) malloc (( ( unsigned long) nEntry + 1) * sizeof (char *));
 
-  for (index = 0, listindex = 0; index < tasktb->size; index++)
+    index = 0;
+    for ( size_t listindex = 0; index < tasktb->size; index++)
     {
-      hashLinks = &(tasktb->slotPtr[index]);
-      for (hEntPtr = (hEnt *) hashLinks->bwPtr;
-	   hEntPtr != (hEnt *) hashLinks;
-	   hEntPtr = (hEnt *) ((struct hLinks *) hEntPtr)->bwPtr)
-	{
-	  strcpy (buf, hEntPtr->keyname);
-	  if (hEntPtr->hData != (int *) NULL)
-	    {
-	      tasklen = strlen (buf);
+        hashLinks = &(tasktb->slotPtr[index]);
+        for (hEntPtr = (hEnt *) hashLinks->bwPtr; hEntPtr != (hEnt *) hashLinks; hEntPtr = (hEnt *) ((struct hLinks *) hEntPtr)->bwPtr)
+        {
+            strcpy (buf, hEntPtr->keyname);
+            if (hEntPtr->hData != (int *) NULL) {
+                size_t tasklen = strlen (buf);
 
-	      if ((p = getenv ("LSF_TRS")) != NULL)
-		buf[tasklen] = *p;
-	      else
-		buf[tasklen] = '/';
-	      strcpy (buf + tasklen + 1, (char *) hEntPtr->hData);
-	    }
+                if ((p = getenv ("LSF_TRS")) != NULL) {
+                    buf[tasklen] = *p;
+                }
+                else {
+                    buf[tasklen] = '/';
+                }
+                strcpy (buf + tasklen + 1, (char *) hEntPtr->hData);
 
-	  tlist[listindex] = putstr_ (buf);
-	  listindex++;
-	}
+                tlist[listindex] = putstr_ (buf);
+                listindex++;
+            }
+        }
+
+        tlist[listindex] = NULL;
+        if (sortflag && listindex != 0) {
+            qsort (tlist, listindex, sizeof (char *), tcomp_);
+        }
     }
-
-  tlist[listindex] = NULL;
-  if (sortflag && listindex != 0)
-    qsort (tlist, listindex, sizeof (char *), tcomp_);
-  *taskList = tlist;
-  return (nEntry);
+    
+    *taskList = tlist;
+    
+    return nEntry;
 
 }
 
