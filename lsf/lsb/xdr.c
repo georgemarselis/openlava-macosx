@@ -26,18 +26,13 @@
 bool_t xdr_var_string (XDR *, char **);
 
 static int allocLoadIdx (float **sched, float **stop, int *outSize, int size);
-
-static bool_t xdr_lsbSharedResourceInfo (XDR *,
-					 struct lsbSharedResourceInfo *,
-					 struct LSFHeader *);
-
-static bool_t xdr_lsbShareResourceInstance (XDR * xdrs,
-					    struct lsbSharedResourceInstance
-					    *, struct LSFHeader *);
+static bool_t xdr_lsbSharedResourceInfo (XDR *, struct lsbSharedResourceInfo *, struct LSFHeader *);
+static bool_t xdr_lsbShareResourceInstance (XDR *xdrs, struct lsbSharedResourceInstance  *, struct LSFHeader *);
 
 int lsbSharedResConfigured_ = FALSE;
 
 extern bool_t xdr_array_string (XDR *, char **, int, int);
+
 bool_t
 xdr_submitReq (XDR * xdrs, struct submitReq *submitReq, struct LSFHeader *hdr)
 {

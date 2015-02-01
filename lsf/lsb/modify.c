@@ -21,9 +21,8 @@
 #include <sys/resource.h>
 #include <string.h>
 
-#include "lsb.h"
-
-#include "lsb.spool.h"
+#include "lsb/lsb.h"
+#include "lsb/spool.h"
 
 #define  NL_SETN   13
 

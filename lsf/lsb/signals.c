@@ -19,7 +19,8 @@
 #include <unistd.h>
 #include <string.h>
 #include <pwd.h>
-#include "lsb.h"
+
+#include "lsb/lsb.h"
 
 static int lsbSig_map[] = {
   SIG_NULL,

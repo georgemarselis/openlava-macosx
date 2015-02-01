@@ -21,7 +21,7 @@
 #include <sys/resource.h>
 #include <string.h>
 
-#include "lsb.h"
+#include "lsb/lsb.h"
 
 struct queueInfoEnt *
 lsb_queueinfo (char **queues, int *numQueues, char *hosts, char *users,

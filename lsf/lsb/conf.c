@@ -22,9 +22,10 @@
 #include <grp.h>
 #include <netdb.h>
 #include <ctype.h>
-#include "lsb.h"
-#include "lsb.sig.h"
-#include "../../lsf/intlib/intlibout.h"
+ 
+#include "lsb/lsb.h"
+#include "lsb/sig.h"
+#include "libint/intlibout.h"
 
 #define   NL_SETN     13
 

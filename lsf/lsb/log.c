@@ -16,14 +16,15 @@
  *
  */
 
-#include "lsb.h"
 #include <errno.h>
+
+#include "lsb/lsb.h"
 
 #define   NL_SETN     13
 
 extern int errno;
 
-#include "../../lsf/lib/lib.queue.h"
+#include "lib/queue.h"
 
 bool_t logMapFileEnable = FALSE;
 

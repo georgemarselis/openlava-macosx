@@ -21,8 +21,8 @@
 #include <sys/resource.h>
 #include <string.h>
 
-#include "../../lsf/lib/lib.h"
-#include "lsb.h"
+#include "lib/lib.h"
+#include "lsb/lsb.h"
 
 
 struct lsbSharedResourceInfo *

@@ -19,7 +19,7 @@
 #include <unistd.h>
 #include <pwd.h>
 
-#include "lsb.h"
+#include "lsb/lsb.h"
 
 int
 lsb_reconfig (int configFlag)

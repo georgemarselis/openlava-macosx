@@ -18,7 +18,8 @@
 
 #include <unistd.h>
 #include <pwd.h>
-#include "lsb.h"
+
+#include "lsb/lsb.h"
 
 #define   NL_SETN     13
 

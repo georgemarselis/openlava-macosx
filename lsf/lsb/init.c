@@ -17,7 +17,8 @@
  */
 
 #include <netdb.h>
-#include "lsb.h"
+
+#include "lsb/lsb.h"
 
 struct config_param lsbParams[] = {
   {"LSB_DEBUG", NULL},

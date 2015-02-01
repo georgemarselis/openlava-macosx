@@ -22,8 +22,8 @@
 #include <unistd.h>
 #include <ctype.h>
 
-#include "lsb.h"
-#include "../../lsf/lib/lib.table.h"
+#include "lsb/lsb.h"
+#include "lib/table.h"
 
 #define NL_SETN     13
 

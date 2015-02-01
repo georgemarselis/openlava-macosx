@@ -21,7 +21,8 @@
 #include <netdb.h>
 #include <stdlib.h>
 #include <string.h>
-#include "lsb.h"
+
+#include "lsb/lsb.h"
 
 extern int errno;
 

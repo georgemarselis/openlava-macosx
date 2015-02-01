@@ -21,8 +21,9 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <ctype.h>
-#include "../cmd/cmd.h"
-#include "../daemons/daemonout.h"
+
+#include "cmdtools/cmd.h"
+#include "daemons/daemonout.h"
 
 #define NL_SETN 	13
 
@@ -34,11 +35,10 @@ extern int sig_decode (int);
 extern int isatty (int);
 
 
-extern int setOption_ (int argc, char **argv, char *template,
-		       struct submit *req, int mask, char **errMsg);
-extern struct submit *parseOptFile_ (char *filename,
-				     struct submit *req, char **errMsg);
+extern int setOption_ (int argc, char **argv, char *template, struct submit *req, int mask, char **errMsg);
+extern struct submit *parseOptFile_ (char *filename, struct submit *req, char **errMsg);
 extern void subUsage_ (int, char **);
+
 int emptyCmd;
 
 void sub_perror (char *);

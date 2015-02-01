@@ -19,7 +19,8 @@
 #include <netdb.h>
 #include <string.h>
 #include <pwd.h>
-#include "lsb.h"
+
+#include "lsb/lsb.h"
 
 int
 lsb_msgjob (LS_LONG_INT jobId, char *msg)

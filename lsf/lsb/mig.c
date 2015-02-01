@@ -20,7 +20,8 @@
 #include <netdb.h>
 #include <string.h>
 #include <pwd.h>
-#include "lsb.h"
+
+#include "lsb/lsb.h"
 
 int
 lsb_mig (struct submig *mig, int *badHostIdx)

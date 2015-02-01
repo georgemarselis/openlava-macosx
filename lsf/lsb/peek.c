@@ -21,7 +21,8 @@
 #include <string.h>
 #include <pwd.h>
 #include <errno.h>
-#include "lsb.h"
+
+#include "lsb/lsb.h"
 char *
 lsb_peekjob (LS_LONG_INT jobid)
 {

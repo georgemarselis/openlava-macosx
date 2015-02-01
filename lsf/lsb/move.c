@@ -20,7 +20,7 @@
 #include <netdb.h>
 #include <pwd.h>
 
-#include "lsb.h"
+#include "lsb/lsb.h"
 
 int
 lsb_movejob (LS_LONG_INT jobId, int *position, int opCode)

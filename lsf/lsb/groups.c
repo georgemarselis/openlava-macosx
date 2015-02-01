@@ -20,7 +20,7 @@
 #include <netdb.h>
 #include <string.h>
 
-#include "lsb.h"
+#include "lsb/lsb.h"
 
 static struct groupInfoEnt *getGrpInfo (char **, int *, int);
 

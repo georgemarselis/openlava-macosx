@@ -22,7 +22,7 @@
 #include <string.h>
 #include <pwd.h>
 
-#include "lsb.h"
+#include "lsb/lsb.h"
 
 int
 lsb_hostcontrol (char *host, int opCode)

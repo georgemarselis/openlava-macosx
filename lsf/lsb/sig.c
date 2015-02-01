@@ -20,7 +20,8 @@
 #include <netdb.h>
 #include <string.h>
 #include <pwd.h>
-#include "lsb.h"
+
+#include "lsb/lsb.h"
 
 static int signalJob_ (int, LS_LONG_INT, time_t, int);
 

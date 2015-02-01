@@ -21,10 +21,9 @@
 #include <netdb.h>
 #include <string.h>
 
-#include "lsb.h"
+#include "lsb/lsb.h"
+
 struct hostInfoEnt *getHostStatus (struct hostDataReply reply);
-
-
 
 struct hostInfoEnt *
 lsb_hostinfo (char **hosts, int *numHosts)

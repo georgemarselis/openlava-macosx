@@ -29,7 +29,7 @@
 #include "lib/lproto.h"
 #include "lib/mls.h"
 #include "lib/rcp.h"
-#include "lsb.h"
+#include "lsb/lsb.h"
 #include "lsb/spool.h"
 #include "lsf.h"
 

@@ -15,6 +15,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
+
 #include <ctype.h>
 #include <sys/file.h>
 
@@ -38,150 +39,34 @@
 #include <sys/wait.h>
 #include <stdio.h>
 #include <grp.h>
+#include <pwd.h>
+#include <dirent.h>
 
-#define exit(a)         _exit(a)
+// #define exit(a)         _exit(a)
 
 #include <signal.h>
 #include <stdio.h>
 
-#include <pwd.h>
-#include "../../lsf/lib/lib.h"
-#include "lsb.h"
-#include "../../lsf/lib/lib.table.h"
-#include "../../lsf/lib/mls.h"
+#include "lib/lib.h"
+#include "lsb/lsb.h"
+#include "lib/table.h"
+#include "lib/mls.h"
+#include "libint/intlibout.h"
+#include "lsb/spool.h"
+#include "lsb/sub.h"
 
-#include "../../lsf/intlib/intlibout.h"
-#include <dirent.h>
-
-#include "lsb.spool.h"
-
-#define SKIPSPACE(sp)      while (isspace(*(sp))) (sp)++;
+// #define SKIPSPACE(sp)      while (isspace(*(sp))) (sp)++;
 
 #define EMBED_INTERACT     0x01
 #define EMBED_OPTION_ONLY  0x02
 #define EMBED_BSUB         0x04
 #define EMBED_RESTART      0x10
 #define EMBED_QSUB         0x20
-
-#define PRINT_ERRMSG0(errMsg, fmt)\
-    {\
-	if (errMsg == NULL)\
-	    fprintf(stderr, fmt);\
-        else\
-	    sprintf(*errMsg, fmt);\
-    }
-#define PRINT_ERRMSG1(errMsg, fmt, msg1)\
-    {\
-	if (errMsg == NULL)\
-	    fprintf(stderr, fmt, msg1);\
-        else\
-	    sprintf(*errMsg, fmt, msg1);\
-    }
-#define PRINT_ERRMSG2(errMsg, fmt, msg1, msg2)\
-    {\
-	if (errMsg == NULL)\
-	    fprintf(stderr, fmt, msg1, msg2);\
-        else\
-	    sprintf(*errMsg, fmt, msg1, msg2);\
-    }
-#define PRINT_ERRMSG3(errMsg, fmt, msg1, msg2, msg3)\
-    {\
-	if (errMsg == NULL)\
-	    fprintf(stderr, fmt, msg1, msg2, msg3);\
-        else\
-	    sprintf(*errMsg, fmt, msg1, msg2, msg3);\
-    }
-
-int optionFlag = FALSE;
-char optionFileName[MAXLSFNAMELEN];
-char *loginShell;
-static char *additionEsubInfo = NULL;
-
-extern const char *defaultSpoolDir;
-static const char *getDefaultSpoolDir ();
-
-extern void sub_perror (char *usrMsg);
-
-static void trimSpaces (char *str);
-static int parseXF (struct submit *, char *, char **);
-void subUsage_ (int, char **);
-static int checkLimit (int limit, int factor);
-
-int mySubUsage_ (void *);
-int bExceptionTabInit (void);
-
-static hTab *bExceptionTab;
-
-typedef int (*bException_handler_t) (void *);
-
-typedef struct bException
-{
-  char *name;
-  bException_handler_t handler;
-} bException_t;
-
-extern char **environ;
-
-extern char *yyerr;
-
-extern char *my_getopt (int, char **, char *, char **);
-extern char *getNextLine_ (FILE * fp, int confFormat);
-extern uid_t getuid (void);
-extern char *lsb_sysmsg (void);
-extern int _lsb_conntimeout;
-
-extern int lsbMode_;
-
-static char *useracctmap = NULL;
-static struct lenData ed = { 0, NULL };
-
-static LS_LONG_INT send_batch (struct submitReq *, struct lenData *,
-			       struct submitReply *, struct lsfAuth *);
-static int dependCondSyntax (char *);
-static int createJobInfoFile (struct submit *, struct lenData *);
-static LS_LONG_INT subRestart (struct submit *jobSubReq,
-			       struct submitReq *submitReq,
-			       struct submitReply *submitRep,
-			       struct lsfAuth *auth);
-static LS_LONG_INT subJob (struct submit *jobSubReq,
-			   struct submitReq *submitReq,
-			   struct submitReply *submitRep,
-			   struct lsfAuth *auth);
-static int getUserInfo (struct submitReq *, struct submit *);
-static char *acctMapGet (int *, char *);
-
-static int xdrSubReqSize (struct submitReq *req);
-static int createNiosSock (struct submitReq *);
-
-int getChkDir (char *, char *);
-static void startNios (struct submitReq *, int, LS_LONG_INT);
-static void postSubMsg (struct submit *, LS_LONG_INT, struct submitReply *);
-static int readOptFile (char *filename, char *childLine);
-
-static const LSB_SPOOL_INFO_T *chUserCopySpoolFile (const char *srcFile,
-						    spoolOptions_t fileType);
-
-extern void makeCleanToRunEsub ();
-extern char *translateString (char *);
-extern void modifyJobInformation (struct submit *);
-extern void compactXFReq (struct submit *);
-extern char *wrapCommandLine (char *);
-extern char *unwrapCommandLine (char *);
-extern int checkEmptyString (char *);
-extern int stringIsToken (char *, char *);
-extern int stringIsDigitNumber (char *s);
-extern int processXFReq (char *key, char *line, struct submit *jobSubReq);
-extern char *extractStringValue (char *line);
-
-
 #define  NL_SETN   13
-
 
 #define ESUBNAME "esub"
 
 
-char *niosArgv[5];
-char niosPath[MAXFILENAMELEN];
 
 
 LS_LONG_INT
