@@ -204,7 +204,7 @@ call_server (char *host, ushort serv_port, char *req_buf, size_t req_size,  char
 
         if (postSndFunc) {
 
-            unsigned int nlen = htonl (((struct lenData *) postSndFuncArg)->len);
+            unsigned int nlen = htonl (((struct lenData *) postSndFuncArg)->len); // FIXME FIXME FIXME run in the debugger, need to trace what is passed on
 
             memcpy ((char *) sndBuf->data + req_size, (char *) NET_INTADDR_ (&nlen), NET_INTSIZE_);
             memcpy ((char *) sndBuf->data + req_size + NET_INTSIZE_, (char *) ((struct lenData *) postSndFuncArg)->data, ((struct lenData *) postSndFuncArg)->len);
