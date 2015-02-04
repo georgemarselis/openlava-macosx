@@ -472,44 +472,59 @@ ls_gethostmodel (char *hostname)
 
 }
 
+
+// ls_gethostfactor:
+//      return the host factor for the specified host
+//
+//  in:  hostname
+//  out: NULL if
+//          hostname is not found
+//          hostinfo for the specified host is not found
+//       float host factor if
+//          hostname and hostinfo are found
 float *
 ls_gethostfactor (char *hostname)
 {
-  struct hostInfo *hostinfo;
-  static float cpufactor;
+    struct hostInfo *hostinfo;
+    static float cpufactor;
 
-  if (hostname == NULL)
-    if ((hostname = ls_getmyhostname ()) == NULL)
-      return (NULL);
+    if (hostname == NULL) {
+        if ((hostname = ls_getmyhostname ()) == NULL) {
+            return (NULL);
+        }
+    }
 
-  hostinfo = ls_gethostinfo ("-", NULL, &hostname, 1, 0);
-  if (hostinfo == NULL)
-    return (NULL);
+    hostinfo = ls_gethostinfo ("-", NULL, &hostname, 1, 0);
+    if (hostinfo == NULL) {
+        return (NULL);
+    }
 
-  cpufactor = hostinfo->cpuFactor;
-  return (&cpufactor);
+    cpufactor = hostinfo->cpuFactor;
+    return (&cpufactor);
 
 }
 
 float *
 ls_getmodelfactor (char *modelname)
 {
-  static float cpuf;
-  struct stringLen str;
+    static float cpuf;
+    struct stringLen str;
 
-  if (!modelname)
-    return (ls_gethostfactor (NULL));
+    if (!modelname) {
+        return (ls_gethostfactor (NULL));
+    }
 
-  if (initenv_ (NULL, NULL) < 0)
-    return (NULL);
+    if (initenv_ (NULL, NULL) < 0) {
+        return (NULL);
+    }
 
-  str.name = modelname;
-  str.len = MAXLSFNAMELEN;
-  if (callLim_ (LIM_GET_CPUF, &str, xdr_stringLen, &cpuf, xdr_float,
-        NULL, 0, NULL) < 0)
-    return (NULL);
-
-  return (&cpuf);
+    str.name = modelname;
+    str.len = MAXLSFNAMELEN;
+    if (callLim_ (LIM_GET_CPUF, &str, xdr_stringLen, &cpuf, xdr_float, NULL, 0, NULL) < 0) {
+        return (NULL);
+    }
+    
+    return (&cpuf);
 
 }
 

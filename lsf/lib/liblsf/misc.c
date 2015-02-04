@@ -130,7 +130,7 @@ atoi64_ (char *word)
   return 0;
 }
 
-char
+unsigned int
 isint_ (char *word)
 {
     char **eptr;

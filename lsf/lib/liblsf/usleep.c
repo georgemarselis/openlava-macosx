@@ -22,9 +22,13 @@
 void millisleep_ (int msec);
 
 
-    // minnum input for this function is 0
-    // what is the max? why doesn't it return the select statement result?
+// minnum input for this function is 0
+// what is the max? why doesn't it return the select statement result?
+//      max is the max time to wait to connect to a server process
+//      in milliseconds
 
+// void millisleep( int waittime )
+//      use select() to wait for msec milliseconds
 void
 millisleep_ (int msec)
 {
@@ -44,6 +48,7 @@ millisleep_ (int msec)
   	*/
   	dtime.tv_usec = (msec - dtime.tv_sec * 1000) * 1000; // FIXME FIXME
 
-  	select (0, 0, 0, 0, &dtime);
+    select (0, 0, 0, 0, &dtime); // select() was? the only way to get millisecond
+                                 // accurassy in Unix
 
 }

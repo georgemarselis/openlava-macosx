@@ -255,7 +255,7 @@ extern struct hostLoad *loadinfo_ (char *resReq, struct decisionReq *loadReqPtr,
 
 extern struct hostent *Gethostbyname_ (char *);
 extern short getRefNum_ (void);
-extern char isint_ (char *);
+extern unsigned int isint_ (char *);
 extern char islongint_ (char *);
 extern int isdigitstr_ (char *);
 extern LS_LONG_INT atoi64_ (char *);

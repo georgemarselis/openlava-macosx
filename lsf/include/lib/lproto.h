@@ -241,7 +241,7 @@ extern int do_rstty_ (int, int, int);
 
 extern char isanumber_ (char *);
 extern char islongint_ (char *);
-extern char isint_ (char *);
+extern unsigned int isint_ (char *);
 extern int isdigitstr_ (char *);
 extern char *putstr_ (const char *);
 extern int ls_strcat (char *, int, char *);
