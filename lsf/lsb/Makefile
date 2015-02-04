@@ -12,186 +12,237 @@ lsb.so: comm.o conf.o debug.o err.o groups.o hc.o hosts.o init.o jobs.o
 lsb.so:	log.o mig.o misc.o modify.o move.o msg.o params.o peek.o qc.o
 lsb.so: queues.o reason.o reconfig.o resource.o rexecv.o sig.o signals.o 
 lsb.so: spool.o sub.o switch.o users.o xdr.o 
+lsb.so: conf_queues.o conf_queuegroups.o conf_users.o conf_usergroups.o conf_hosts.o conf_hostgroups.o conf_misc.o conf_cluster.o
 
 
-comm : comm.c
+comm: comm.o
 
 
-conf : conf.c
+conf: conf_queues conf_queuegroups conf_users conf_usergroups conf_hosts conf_hostgroups conf_cluster conf_misc 
 
 
-debug : debug.c
+conf_queues: conf_queues.o
 
+conf_queuegroups: conf_queuegroups.o
 
-err : err.c
+conf_users: conf_users.o
 
+conf_usergroups: conf_usergroups.o
 
-groups : groups.c
+conf_hosts: conf_hosts.o
 
+conf_hostgroups: conf_hostgroups.o
 
-hc : hc.c
+conf_cluster: conf_cluster.o
 
+conf_misc: conf_misc.o
 
-hosts : hosts.c
 
 
-init : init.c
+debug: debug.o
 
 
-jobs : jobs.c
+err: err.o
 
 
-log : log.c
+groups: groups.o
 
 
-mig : mig.c
+hc: hc.o
 
 
-misc : misc.c
+hosts: hosts.o
 
 
-modify : modify.c
+init: init.o
 
 
-move : move.c
+jobs: jobs.o
 
 
-msg : msg.c
+log: log.o
 
 
-params : params.c
+mig: mig.o
 
 
-peek : peek.c
+misc: misc.o
 
 
-qc : qc.c
+modify: modify.o
 
 
-queues : queues.c
+move: move.o
 
 
-reason : reason.c
+msg: msg.o
 
 
-reconfig : reconfig.c
+params: params.o
 
 
-resource : resource.c
+peek: peek.o
 
 
-rexecv : rexecv.c
+qc: qc.o
 
 
-sig : sig.c
+queues: queues.o
 
 
-signals : signals.c
+reason: reason.o
 
 
-spool : spool.c
+reconfig: reconfig.o
 
 
-sub : sub.c
+resource: resource.o
 
 
-switch : switch.c
+rexecv: rexecv.o
 
 
-users : users.c
+sig: sig.o
 
 
-xdr : xdr.c
+signals: signals.o
 
 
-comm.o : comm.c
+spool: spool.o
 
 
-conf.o : conf.c
+sub: sub.o
 
 
-debug.o : debug.c
+switch: switch.o
 
 
-err.o : err.c
+users: users.o
 
 
-groups.o : groups.c
+xdr: xdr.o
 
 
-hc.o : hc.c
 
 
-hosts.o : hosts.c
 
+comm.o: comm.c
 
-init.o : init.c
 
+conf.o: conf_queues.o conf_queuegroups.o conf_users.o conf_usergroups.o conf_hosts.o conf_hostgroups.o conf_misc.o conf_cluster.o
 
-jobs.o : jobs.c
+conf_queues.o: conf_queues.c
 
 
-log.o : log.c
+conf_queuegroups.o: conf_queuegroups.c
 
 
-mig.o : mig.c
+conf_users.o: conf_users.c
 
 
-misc.o : misc.c
+conf_usergroups.o: conf_usergroups.c
 
 
-modify.o : modify.c
+conf_hosts.o: conf_hosts.c
 
 
-move.o : move.c
+conf_hostgroups.o: conf_hostgroups.c
 
 
-msg.o : msg.c
+conf_cluster.o: conf_cluster.c
 
 
-params.o : params.c
+conf_misc.o: conf_misc.c
 
 
-peek.o : peek.c
 
 
-qc.o : qc.c
+debug.o: debug.c
 
 
-queues.o : queues.c
+err.o: err.c
 
 
-reason.o : reason.c
+groups.o: groups.c
 
 
-reconfig.o : reconfig.c
+hc.o: hc.c
 
 
-resource.o : resource.c
+hosts.o: hosts.c
 
 
-rexecv.o : rexecv.c
+init.o: init.c
 
 
-sig.o : sig.c
+jobs.o: jobs.c
 
 
-signals.o : signals.c
+log.o: log.c
 
 
-spool.o : spool.c
+mig.o: mig.c
 
 
-sub.o : sub.c
+misc.o: misc.c
 
 
-switch.o : switch.c
+modify.o: modify.c
 
 
-users.o : users.c
+move.o: move.c
 
 
-xdr.o : xdr.c
+msg.o: msg.c
+
+
+params.o: params.c
+
+
+peek.o: peek.c
+
+
+qc.o: qc.c
+
+
+queues.o: queues.c
+
+
+reason.o: reason.c
+
+
+reconfig.o: reconfig.c
+
+
+resource.o: resource.c
+
+
+rexecv.o: rexecv.c
+
+
+sig.o: sig.c
+
+
+signals.o: signals.c
+
+
+spool.o: spool.c
+
+
+sub.o: sub.c
+
+
+switch.o: switch.c
+
+
+users.o: users.c
+
+
+xdr.o: xdr.c
+
+
+
+
 
 
 .PHONY: clean
