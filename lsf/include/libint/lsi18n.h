@@ -74,16 +74,18 @@
 
 #define I18N_m(msgID, msg) (_i18n_msg_get(ls_catd, 33, msgID, msg))
 
+// extern int ls_catd;
 extern  LS_CATD ls_catd;
-        int    _i18n_init  ( int );
-extern  int    _i18n_end   ( void );
-        char *_i18n_ctime (LS_CATD, int, const time_t *);
-        char *_i18n_printf (const char *, ...);
-extern  char *_i18n_ctime ( LS_CATD, int, const time_t * );
-// #ifdef  I18N_COMPILE
-extern  char  *_i18n_msg_get( LS_CATD, int, int, char * );
+extern  int    _i18n_end         ( void );
+extern  char  *_i18n_ctime       ( LS_CATD, int, const time_t * );
+extern  char  *_i18n_msg_get     ( LS_CATD, int typeofError, int catgetsNumber, char *errorMessage );
 extern  char **_i18n_msgArray_get( LS_CATD, int, int *, char ** );
-extern  void   _i18n_ctime_init( LS_CATD );
+extern  void   _i18n_ctime_init  ( LS_CATD );
+
+int   _i18n_init   ( int );
+char *_i18n_ctime  (LS_CATD, int, const time_t *);
+char *_i18n_printf (const char *, ...);
+// #ifdef  I18N_COMPILE
 // #else
 // #define  _i18n_msg_get(catd,setID,msgID,msgStr)  (msgStr)
 // #define  _i18n_msgArray_get(catd,setID,msgID_Array,msgArray) (msgArray)

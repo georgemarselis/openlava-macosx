@@ -509,8 +509,8 @@ getMsgByRes (int resource, int reason, char **sp, struct loadIndexLog *ld)
 
       if (reason == PEND_HOST_LOAD)
 	{
-	  sprintf (msgline, _i18n_msg_get (ls_catd, NL_SETN, 700, "\
-The 15s effective CPU queue length (r15s) is beyond threshold"));	/* catgets 700 */
+    /* catgets 700 */
+	  sprintf (msgline, _i18n_msg_get (ls_catd, NL_SETN, 700, "The 15s effective CPU queue length (r15s) is beyond threshold"));	/* catgets 700 */
 	}
       else if (reason == PEND_HOST_QUE_RUSAGE)
 	{

@@ -2810,13 +2810,12 @@ postSubMsg (struct submit *req, LS_LONG_INT jobId, struct submitReply *reply)
   prtBETime_ (req);
 
   if (req->options2 & SUB2_BSUB_BLOCK)
-    fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 402, "<<Waiting for dispatch ...>>\n")));	/* catgets 402 */
+    /* catgets 402 */
+    fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 402, "<<Waiting for dispatch ...>>\n")));
 
   if (req->options & SUB_INTERACTIVE)
-    fprintf (stderr,
-	     (_i18n_msg_get
-	      (ls_catd, NL_SETN, 402, "<<Waiting for dispatch ...>>\n")));
-
+    /* catgets 402 */
+    fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 402, "<<Waiting for dispatch ...>>\n")));
 
 }
 
@@ -3589,9 +3588,7 @@ setOption_ (int argc, char **argv, char *template, struct submit *req,
 	      optarg = cp + 1;
 	      if ((!isint_ (optarg)) || (atoi (optarg) < 0))
 		{
-		  PRINT_ERRMSG1 (errMsg, _i18n_msg_get (ls_catd, NL_SETN, 421,
-							"%s: Bad CPULIMIT specification"),
-				 savearg);
+		  PRINT_ERRMSG1 (errMsg, _i18n_msg_get (ls_catd, NL_SETN, 421, "%s: Bad CPULIMIT specification"), savearg);
 		  return (-1);
 		}
 	      else
@@ -3651,10 +3648,7 @@ setOption_ (int argc, char **argv, char *template, struct submit *req,
 	      req->options |= SUB_HOST_SPEC;
 	      if (req->hostSpec && strcmp (req->hostSpec, sp + 1) != 0)
 		{
-		  PRINT_ERRMSG2 (errMsg,
-				 (_i18n_msg_get
-				  (ls_catd, NL_SETN, 420,
-				   "More than one host_spec is specified: <%s> and <%s>")),
+		  PRINT_ERRMSG2 (errMsg,(_i18n_msg_get (ls_catd, NL_SETN, 420,  "More than one host_spec is specified: <%s> and <%s>")),
 				 req->hostSpec, sp + 1);
 		  return (-1);
 		}
@@ -3676,9 +3670,7 @@ setOption_ (int argc, char **argv, char *template, struct submit *req,
 	      optarg = cp + 1;
 	      if ((!isint_ (optarg)) || (atoi (optarg) < 0))
 		{
-		  PRINT_ERRMSG1 (errMsg, _i18n_msg_get (ls_catd, NL_SETN, 428,
-							"%s: Bad RUNLIMIT specification"),
-				 savearg);
+		  PRINT_ERRMSG1 (errMsg, _i18n_msg_get (ls_catd, NL_SETN, 428, "%s: Bad RUNLIMIT specification"), savearg);
 		  return (-1);
 		}
 	      else
@@ -4162,8 +4154,7 @@ parentErr:
 void
 subUsage_ (int option, char **errMsg)
 {
-#define I18N_ESUB_INFO_USAGE \
-    _i18n_msg_get(ls_catd,NL_SETN,447,"\t\t[-a additional_esub_information]\n")
+#define I18N_ESUB_INFO_USAGE  _i18n_msg_get(ls_catd,NL_SETN,447,"\t\t[-a additional_esub_information]\n")
 
   if (errMsg == NULL)
     {
@@ -4171,23 +4162,17 @@ subUsage_ (int option, char **errMsg)
 	{
 
 	  fprintf (stderr, I18N_Usage);
-	  fprintf (stderr,
-		   ": brestart [-h] [-V] [-x] [-f] [-N] [-B] [-q \"queue_name...\"] \n");
-	  fprintf (stderr,
-		   "\t\t[-m \"host_name[+[pref_level]] | host_group[+[pref_level]]...]\"\n");
+	  fprintf (stderr, ": brestart [-h] [-V] [-x] [-f] [-N] [-B] [-q \"queue_name...\"] \n");
+	  fprintf (stderr, "\t\t[-m \"host_name[+[pref_level]] | host_group[+[pref_level]]...]\"\n");
 
-	  fprintf (stderr,
-		   "\t\t[-w \'dependency_expression\'] [-b begin_time] [-t term_time]\n");
-	  fprintf (stderr,
-		   "\t\t[-c [hour:]minute[/host_name|/host_model]]\n");
+	  fprintf (stderr, "\t\t[-w \'dependency_expression\'] [-b begin_time] [-t term_time]\n");
+	  fprintf (stderr, "\t\t[-c [hour:]minute[/host_name|/host_model]]\n");
 	  fprintf (stderr, "\t\t[-F file_limit] [-D data_limit]\n");
 	  fprintf (stderr, "\t\t[-C core_limit] [-M mem_limit] \n");
 	  fprintf (stderr, "\t\t[-W run_limit[/host_name|/host_model]] \n");
-	  fprintf (stderr,
-		   "\t\t[-S stack_limit] [-E \"pre_exec_command [argument ...]\"]\n");
+	  fprintf (stderr, "\t\t[-S stack_limit] [-E \"pre_exec_command [argument ...]\"]\n");
 
-	  fprintf (stderr,
-		   "\t\tcheckpoint_dir[job_ID | \"job_ID[index]\"]\n");
+	  fprintf (stderr, "\t\tcheckpoint_dir[job_ID | \"job_ID[index]\"]\n");
 	  fprintf (stderr, I18N_ESUB_INFO_USAGE);
 
 	}
@@ -4201,14 +4186,10 @@ subUsage_ (int option, char **errMsg)
 	  if (lsbMode_ & LSB_MODE_BATCH)
 	    {
 	      fprintf (stderr, "\t\t[-r | -rn] [-N | -Nn] [-B | -Bn]\n");
-	      fprintf (stderr,
-		       "\t\t[-c cpu_limit[/host_spec] | -cn] [-F file_limit | -Fn]\n");
-	      fprintf (stderr,
-		       "\t\t[-M mem_limit | -Mn] [-D data_limit | -Dn] [-S stack_limit | -Sn]\n");
-	      fprintf (stderr,
-		       "\t\t[-C core_limit | -Cn] [-W run_limit[/host_spec] | -Wn ]\n");
-	      fprintf (stderr,
-		       "\t\t[-k chkpnt_dir [chkpnt_period] | -kn] [-P project_name | -Pn]\n");
+	      fprintf (stderr, "\t\t[-c cpu_limit[/host_spec] | -cn] [-F file_limit | -Fn]\n");
+	      fprintf (stderr, "\t\t[-M mem_limit | -Mn] [-D data_limit | -Dn] [-S stack_limit | -Sn]\n");
+	      fprintf (stderr, "\t\t[-C core_limit | -Cn] [-W run_limit[/host_spec] | -Wn ]\n");
+	      fprintf (stderr, "\t\t[-k chkpnt_dir [chkpnt_period] | -kn] [-P project_name | -Pn]\n");
 	      fprintf (stderr, "\t\t[-L login_shell | -Ln] \n");
 	    }
 
@@ -4216,21 +4197,15 @@ subUsage_ (int option, char **errMsg)
 	  fprintf (stderr,
 		   "\t\t[-w depend_cond | -wn] [-R res_req| -Rn] [-J job_name | -Jn]\n");
 	  fprintf (stderr, "\t\t[-q queue_name ... | -qn] \n");
-	  fprintf (stderr,
-		   "\t\t[-m host_name[+[pref_level]] | host_group[+[pref_level]]...| -mn]\"\n");
-	  fprintf (stderr,
-		   "\t\t[-n min_processors[,max_processors] | -nn]\n");
-	  fprintf (stderr,
-		   "\t\t[-b begin_time | -bn] [-t term_time | -tn]\n");
+	  fprintf (stderr, "\t\t[-m host_name[+[pref_level]] | host_group[+[pref_level]]...| -mn]\"\n");
+	  fprintf (stderr, "\t\t[-n min_processors[,max_processors] | -nn]\n");
+	  fprintf (stderr, "\t\t[-b begin_time | -bn] [-t term_time | -tn]\n");
 	  fprintf (stderr, "\t\t[-i in_file | -is in_file | -in | -isn]\n");
 	  fprintf (stderr, "\t\t[-o out_file | -on] [-e err_file | -en]\n");
-	  fprintf (stderr,
-		   "\t\t[-u mail_user | -un] [[-f \"lfile op [rfile]\"] ... | -fn] \n");
-	  fprintf (stderr,
-		   "\t\t[-E \"pre_exec_command [argument ...]\" | -En]\n");
+	  fprintf (stderr, "\t\t[-u mail_user | -un] [[-f \"lfile op [rfile]\"] ... | -fn] \n");
+	  fprintf (stderr, "\t\t[-E \"pre_exec_command [argument ...]\" | -En]\n");
 	  fprintf (stderr, "\t\t[-sp job_priority | -spn]\n");
-	  fprintf (stderr,
-		   "\t\t[-Z \"new_command\" | -Zs \"new_command\" | -Zsn] \n");
+	  fprintf (stderr, "\t\t[-Z \"new_command\" | -Zs \"new_command\" | -Zsn] \n");
 	  fprintf (stderr, "\t\t[ jobId | \"jobId[index_list]\" ] \n");
 	  fprintf (stderr, I18N_ESUB_INFO_USAGE);
 	}
@@ -4243,31 +4218,22 @@ subUsage_ (int option, char **errMsg)
 	  if (lsbMode_ & LSB_MODE_BATCH)
 	    {
 	      fprintf (stderr, " [-r] [-N] [-B] [-I | -K | -Ip | -Is]\n");
-	      fprintf (stderr,
-		       "\t\t[-L login_shell] [-c cpu_limit[/host_spec]] [-F file_limit]\n");
-	      fprintf (stderr,
-		       "\t\t[-W run_limit[/host_spec]] [-k chkpnt_dir [chkpnt_period] [method=chkpnt_dir]]\n");
+	      fprintf (stderr, "\t\t[-L login_shell] [-c cpu_limit[/host_spec]] [-F file_limit]\n");
+	      fprintf (stderr, "\t\t[-W run_limit[/host_spec]] [-k chkpnt_dir [chkpnt_period] [method=chkpnt_dir]]\n");
 	      fprintf (stderr, "\t\t[-P project_name] ");
 	    }
 	  fprintf (stderr, "\n");
 
 	  fprintf (stderr, "\t\t[-q queue_name ...]  [-R res_req]\n");
-	  fprintf (stderr,
-		   "\t\t[-m \"host_name[+[pref_level]] | host_group[+[pref_level]]...]\"\n");
-	  fprintf (stderr,
-		   "\t\t[-n min_processors[,max_processors]] [-J job_name]\n");
-	  fprintf (stderr,
-		   "\t\t[-b begin_time] [-t term_time] [-u mail_user]\n");
-	  fprintf (stderr,
-		   "\t\t[-i in_file | -is in_file] [-o out_file] [-e err_file]\n");
-	  fprintf (stderr,
-		   "\t\t[-M mem_limit]  [-D data_limit]  [-S stack_limit]\n");
+	  fprintf (stderr, "\t\t[-m \"host_name[+[pref_level]] | host_group[+[pref_level]]...]\"\n");
+	  fprintf (stderr, "\t\t[-n min_processors[,max_processors]] [-J job_name]\n");
+	  fprintf (stderr, "\t\t[-b begin_time] [-t term_time] [-u mail_user]\n");
+	  fprintf (stderr, "\t\t[-i in_file | -is in_file] [-o out_file] [-e err_file]\n");
+	  fprintf (stderr, "\t\t[-M mem_limit]  [-D data_limit]  [-S stack_limit]\n");
 
-	  fprintf (stderr,
-		   "\t\t[[-f \"lfile op [rfile]\"] ...] [-w depend_cond]\n");
+	  fprintf (stderr, "\t\t[[-f \"lfile op [rfile]\"] ...] [-w depend_cond]\n");
 
-	  fprintf (stderr,
-		   "\t\t[-E \"pre_exec_command [argument ...]\"] [-Zs]\n");
+	  fprintf (stderr, "\t\t[-E \"pre_exec_command [argument ...]\"] [-Zs]\n");
 	  fprintf (stderr, "\t\t[-sp job_priority]\n");
 	  fprintf (stderr, "\t\t[command [argument ...]]\n");
 	  fprintf (stderr, I18N_ESUB_INFO_USAGE);
@@ -4333,8 +4299,8 @@ parseXF (struct submit *req, char *arg, char **errMsg)
   else if ((p = strstr (saveArg, ">>")))
     {
       strcpy (op, ">>");
-      PRINT_ERRMSG2 (errMsg, (_i18n_msg_get (ls_catd, NL_SETN, 487, "Invalid file operation \"%s\" specification in -f \"%s\"")),	/* catgets 487 */
-		     op, saveArg);
+      /* catgets 487 */
+      PRINT_ERRMSG2 (errMsg, (_i18n_msg_get (ls_catd, NL_SETN, 487, "Invalid file operation \"%s\" specification in -f \"%s\"")),	 op, saveArg);
       return (-1);
     }
   else if ((p = strstr (saveArg, "<")))
@@ -4349,8 +4315,8 @@ parseXF (struct submit *req, char *arg, char **errMsg)
     }
   else
     {
-      PRINT_ERRMSG2 (errMsg, (_i18n_msg_get (ls_catd, NL_SETN, 487, "Invalid file operation \"%s\" specification in -f \"%s\"")),	/* catgets 487 */
-		     op, saveArg);
+      /* catgets 487 */
+      PRINT_ERRMSG2 (errMsg, (_i18n_msg_get (ls_catd, NL_SETN, 487, "Invalid file operation \"%s\" specification in -f \"%s\"")),	op, saveArg);
       return (-1);
     }
 
@@ -4415,20 +4381,14 @@ parseXF (struct submit *req, char *arg, char **errMsg)
   if (req->nxf + 1 > maxNxf)
     {
       tmp = xp;
-      if ((xp = (struct xFile *) myrealloc (req->xf,
-					    (maxNxf +
-					     NUMXF) *
-					    sizeof (struct xFile))) == NULL)
+      if ((xp = (struct xFile *) myrealloc (req->xf, (maxNxf + NUMXF) * sizeof (struct xFile))) == NULL)
 	{
 	  if (errMsg != NULL)
 	    {
-	      sprintf (*errMsg, I18N_FUNC_FAIL_S, fname, "myrealloc",
-		       lsb_sysmsg ());
+	      sprintf (*errMsg, I18N_FUNC_FAIL_S, fname, "myrealloc", lsb_sysmsg ());
 	    }
 	  else
-	    sub_perror ((_i18n_msg_get
-			 (ls_catd, NL_SETN, 484,
-			  "Unable to allocate memory for -f option")));
+	    sub_perror ((_i18n_msg_get(ls_catd, NL_SETN, 484, "Unable to allocate memory for -f option")));
 	  xp = tmp;
 	  return (-1);
 	}

@@ -22,6 +22,9 @@
 void millisleep_ (int msec);
 
 
+    // minnum input for this function is 0
+    // what is the max? why doesn't it return the select statement result?
+
 void
 millisleep_ (int msec)
 {

@@ -320,13 +320,9 @@ parseLine2 (char *line, int *embedArgc, char ***embedArgv, int option)
 	    {
 	      char **tmp;
 	      bufSize += INCREASE;
-	      if ((tmp = (char **) realloc (argBuf,
-					    bufSize * sizeof (char *)))
-		  == NULL)
+	      if ((tmp = (char **) realloc (argBuf, bufSize * sizeof (char *))) == NULL)
 		{
-		  fprintf (stderr,
-			   _i18n_msg_get (ls_catd, NL_SETN, 803,
-					  "Unable to allocate memory for options"));
+		  fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 803, "Unable to allocate memory for options"));
 		  return (-1);
 		}
 	      argBuf = tmp;
@@ -371,9 +367,7 @@ parseScript2 (FILE * from, int *embedArgc, char ***embedArgv, int option)
       firstLine[0] = '\0';
       if ((buf = malloc (size)) == NULL)
 	{
-	  fprintf (stderr,
-		   _i18n_msg_get (ls_catd, NL_SETN, 802,
-				  "Unable to allocate memory for commands"));
+	  fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 802, "Unable to allocate memory for commands"));
 	  return (-1);
 	}
       ttyin = isatty (fileno (from));

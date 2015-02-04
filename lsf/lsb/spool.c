@@ -842,8 +842,7 @@ cpRemoteFiles (const char *localSrcFileFullPath, const char *hostName,
 	{
 
 	  ls_donerex ();
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_S, "cpRemoteFiles", "IO_SPOOL",
-		     _i18n_msg_get (ls_catd, NL_SETN, 5700, "try rcp..."));
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_S, "cpRemoteFiles", "IO_SPOOL", _i18n_msg_get (ls_catd, NL_SETN, 5700, "try rcp..."));
 
 	  if (doXferRcp (&lsXfer, SPOOL_BY_LSRCP) < 0)
 	    {

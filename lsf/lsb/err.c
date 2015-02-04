@@ -340,31 +340,23 @@ lsb_sysmsg (void)
     {
 
       if (strerror (errno) != NULL && errno > 0)
-	sprintf (buf, "%s: %s",
-		 _i18n_msg_get (ls_catd, NL_SETN, lsb_errmsg_ID[lsberrno],
-				lsb_errmsg[lsberrno]), strerror (errno));
+	sprintf (buf, "%s: %s", _i18n_msg_get (ls_catd, NL_SETN, lsb_errmsg_ID[lsberrno], lsb_errmsg[lsberrno]), strerror (errno));
       else
 	{
 	  char *temp;
-	  temp = putstr_ (_i18n_msg_get (ls_catd, NL_SETN,
-					 lsb_errmsg_ID[lsberrno],
-					 lsb_errmsg[lsberrno]));
-	  sprintf (buf, "%s:%s %d", temp, _i18n_msg_get (ls_catd, NL_SETN, 98, "unknown system error"),	/* catgets 98 */
-		   errno);
+        temp = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, lsb_errmsg_ID[lsberrno], lsb_errmsg[lsberrno]));
+        /* catgets 98 */
+        sprintf (buf, "%s:%s %d", temp, _i18n_msg_get (ls_catd, NL_SETN, 98, "unknown system error"), errno);
 	  free (temp);
 	}
     }
   else if (lsberrno == LSBE_LSLIB)
     {
-      sprintf (buf, "%s: %s",
-	       _i18n_msg_get (ls_catd, NL_SETN, lsb_errmsg_ID[lsberrno],
-			      lsb_errmsg[lsberrno]), ls_sysmsg ());
+      sprintf (buf, "%s: %s", _i18n_msg_get (ls_catd, NL_SETN, lsb_errmsg_ID[lsberrno], lsb_errmsg[lsberrno]), ls_sysmsg ());
     }
   else
     {
-      return (_i18n_msg_get
-	      (ls_catd, NL_SETN, lsb_errmsg_ID[lsberrno],
-	       lsb_errmsg[lsberrno]));
+      return (_i18n_msg_get(ls_catd, NL_SETN, lsb_errmsg_ID[lsberrno], lsb_errmsg[lsberrno]));
     }
   return buf;
 }
