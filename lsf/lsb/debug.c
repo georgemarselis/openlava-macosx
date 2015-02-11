@@ -25,6 +25,9 @@
 
 #include "lsb/lsb.h"
 
+
+int lsb_debugReq (struct debugReq *pdebug, char *host);
+
 int
 lsb_debugReq (struct debugReq *pdebug, char *host)
 {
@@ -79,7 +82,7 @@ lsb_debugReq (struct debugReq *pdebug, char *host)
   else
     {
 
-      mbdReqtype = CMD_SBD_DEBUG;
+      mbdReqtype = (mbdReqType) CMD_SBD_DEBUG;
       toHost = host;
     }
 
@@ -104,8 +107,8 @@ lsb_debugReq (struct debugReq *pdebug, char *host)
 
   if (debug.opCode == MBD_DEBUG || debug.opCode == MBD_TIMING)
     {
-      if ((cc = callmbd (NULL, request_buf, XDR_GETPOS (&xdrs), &reply_buf,
-			 &hdr, NULL, NULL, NULL)) == -1)
+      assert( XDR_GETPOS (&xdrs) <= INT_MAX );
+      if ((cc = callmbd (NULL, request_buf, (int)XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL)) == -1)
 	{
 	  xdr_destroy (&xdrs);
 	  return (-1);
@@ -113,9 +116,8 @@ lsb_debugReq (struct debugReq *pdebug, char *host)
     }
   else
     {
-      if ((cc = cmdCallSBD_ (debug.hostName, request_buf,
-			     XDR_GETPOS (&xdrs), &reply_buf,
-			     &hdr, NULL)) == -1)
+      assert( XDR_GETPOS( &xdrs) <= INT_MAX );
+      if ((cc = cmdCallSBD_ (debug.hostName, request_buf, (int)XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL)) == -1)
 	{
 	  xdr_destroy (&xdrs);
 	  return (-1);
