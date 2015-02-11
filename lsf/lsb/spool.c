@@ -34,70 +34,24 @@
 #include "lsf.h"
 
 extern char **environ;
-const char *defaultSpoolDir = NULL;
+static const char *defaultSpoolDir = NULL;
 
 #define NL_SETN     13
 
 listHeaderPtr_t okHostsListPtr_ = NULL;
 
-
-
-static char *getTrimmedString (const char *stringToTrim);
-static spoolCopyStatus_t cpLocalFiles (const char *localSrcFileFullPath,
-				       const char *outputFileName);
-static spoolCopyStatus_t cpRemoteFiles (const char *localSrcFileFullPath,
-					const char *hostName,
-					const char *outputDirectory,
-					const char *outputFileName);
-
-static listHeaderPtr_t createSpoolHostsList ();
-static listHeaderPtr_t updateSpoolHostsListIfOld (const listHeaderPtr_t
-						  pListHeader,
-						  time_t
-						  permittedTimeToLiveInSec);
-static listHeaderPtr_t getSpoolHostsList ();
-
-static listHeaderPtr_t
-createOrUpdateSpoolHostsList (time_t permittedTimeToLiveInSec);
-
-char *getLocalHostOfficialName ();
-LSB_SPOOL_INFO_T *copySpoolFile (const char *srcFilePath,
-				 spoolOptions_t option);
-char *findSpoolDir (const char *spoolHost);
-spoolCopyStatus_t copyFileToHost (const char *localSrcFileFullPath,
-				  const char *hostName,
-				  const char *destinFileFullDir,
-				  const char *destinFileName);
-int removeSpoolFile (const char *hostName, const char *destinFileFullPath);
-char *getSpoolHostBySpoolFile (const char *spoolFile);
-listHeaderPtr_t createListHeader ();
-int deleteListHeader (const listHeaderPtr_t pListHeader);
-int deleteList (const listHeaderPtr_t pListHeader);
-
-listElementPtr_t createListElement (const char *elementName);
-int deleteListElement (const listElementPtr_t pListElement);
-
-listElementPtr_t addElementToList (const char *elementName,
-				   const listHeaderPtr_t pListHeader);
-int removeElementFromList (const listElementPtr_t pListElement,
-			   const listHeaderPtr_t pListHeader);
-listElementPtr_t getBestListElement (const listHeaderPtr_t pListHeader);
-int setBestListElement (const listElementPtr_t pBestElement,
-			const listHeaderPtr_t pListHeader);
-
-
 char *
 getLocalHostOfficialName (void)
 {
   static char fname[] = "getLocalHostOfficialName";
-  int localHostLength = 0;
+  size_t localHostLength = 0;
   static char *returnLocalHostPtr = NULL;
   static char localHost[MAXHOSTNAMELEN];
   struct hostent *hp;
 
   if (returnLocalHostPtr)
     {
-      goto Done;
+      return (returnLocalHostPtr);
     }
 
 
@@ -107,7 +61,7 @@ getLocalHostOfficialName (void)
     {
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "gethostname");
       lsberrno = LSBE_SYS_CALL;
-      goto Done;
+      return (returnLocalHostPtr);
     }
 
   if ((hp = Gethostbyname_ (localHost)) != NULL)
@@ -116,16 +70,14 @@ getLocalHostOfficialName (void)
       returnLocalHostPtr = (char *) &localHost;
     }
 
-Done:
   return (returnLocalHostPtr);
-
 }
 
 LSB_SPOOL_INFO_T *
 copySpoolFile (const char *srcFilePath, spoolOptions_t option)
 {
   static char fname[] = "copySpoolFile";
-  listElementPtr_t bestHostFromList;
+  listElementPtr_t bestHostFromList = NULL;
   char dirSeparator[] = SPOOL_DIR_SEPARATOR;
 
   struct stat srcFilePathStat;
@@ -137,7 +89,7 @@ copySpoolFile (const char *srcFilePath, spoolOptions_t option)
   char *startFileName = NULL;
   char destinationDir[MAXFILENAMELEN], destinationFile[MAXFILENAMELEN];
   char spoolDir[MAXFILENAMELEN];
-  const char *spoolDirPtr;
+  const char *spoolDirPtr = NULL;
   char spoolFileFullPath[MAXFILENAMELEN];
   spoolCopyStatus_t spoolCopyStatus = SPOOL_COPY_FAILURE;
   pid_t pid = 0;
@@ -283,8 +235,7 @@ copySpoolFile (const char *srcFilePath, spoolOptions_t option)
 	}
 
 
-      if ((spoolDirPtr =
-	   findSpoolDir (bestHostFromList->elementName)) == NULL)
+      if ((spoolDirPtr =findSpoolDir (bestHostFromList->elementName)) == NULL)
 	{
 	  removeElementFromList (bestHostFromList, getSpoolHostsList ());
 	  continue;
@@ -359,7 +310,7 @@ getTrimmedString (const char *stringToTrim)
 {
   char *advancePtr = NULL;
   char *returnStringPtr = NULL;
-  int i;
+  long i = 0;
 
   if (stringToTrim == NULL)
     {
@@ -372,7 +323,7 @@ getTrimmedString (const char *stringToTrim)
 
   advancePtr = returnStringPtr;
 
-  for (i = 0; i < strlen (returnStringPtr); i++)
+  for (i = 0; (unsigned long)i < strlen (returnStringPtr); i++)
     {
       if ((returnStringPtr[i] != ' ') && (returnStringPtr[i] != '\t'))
 	{
@@ -384,7 +335,7 @@ getTrimmedString (const char *stringToTrim)
 
 
 
-  for (i = strlen (returnStringPtr) - 1; i >= 0; i--)
+  for (i = (long)strlen (returnStringPtr) - 1; i >= 0; i--)
     {
       if ((returnStringPtr[i] != ' ') && (returnStringPtr[i] != '\t'))
 	{
@@ -665,7 +616,7 @@ cpLocalFiles (const char *localSrcFileFullPath, const char *outputFileName)
       goto Close;
     }
 
-  if ((output == -1))
+  if ( -1 == output)
     {
       spoolCopyStatus = SPOOL_COPY_FAILURE;
       if (logclass & (LC_TRACE | LC_EXEC))
@@ -694,7 +645,8 @@ cpLocalFiles (const char *localSrcFileFullPath, const char *outputFileName)
   while ((nItems = read (input, line, MAXLINELEN)))
     {
 
-      if (write (output, line, nItems) == -1)
+      assert( nItems >= 0 );
+      if (write (output, line, (size_t) nItems) == -1)
 	{
 	  spoolCopyStatus = SPOOL_COPY_FAILURE;
 	  if (logclass & (LC_TRACE | LC_EXEC))
@@ -731,15 +683,14 @@ Error:
 
 
 static spoolCopyStatus_t
-cpRemoteFiles (const char *localSrcFileFullPath, const char *hostName,
-	       const char *outputDirectory, const char *outputFileName)
+cpRemoteFiles (const char *localSrcFileFullPath, const char *hostName, const char *outputDirectory, const char *outputFileName)
 {
   static char fname[] = "cpRemoteFiles";
   lsRcpXfer lsXfer;
   spoolCopyStatus_t spoolCopyStatus = SPOOL_COPY_FAILURE;
   char remoteHost[MAXHOSTNAMELEN];
   char remoteFileSpec[1 + MAXHOSTNAMELEN + 1 + MAXFILENAMELEN];
-  char *buf;
+  char *buf = NULL;
   int iCount = 0;
   int output = -1;
   struct stat remoteFileStatusBuf;
@@ -1054,7 +1005,7 @@ removeSpoolFile (const char *hostName, const char *destinFileFullPath)
       sprintf (szRshDest, "rm -rf %s", destinFileFullPath);
       execlp (RSHCMD, RSHCMD, hostName, szRshDest, NULL);
       return (-1);
-      break;
+      //break;
 
     case -1:
 
@@ -1226,7 +1177,7 @@ Error:
 }
 
 listHeaderPtr_t
-createListHeader ()
+createListHeader ( void )
 {
   listHeaderPtr_t returnValue = NULL;
 
