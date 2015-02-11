@@ -236,6 +236,7 @@ struct queueInfoReply
   int badQueue;
   int numQueues;
   int nIdx;
+  char padding[4];
   struct queueInfoEnt *queues;
 };
 

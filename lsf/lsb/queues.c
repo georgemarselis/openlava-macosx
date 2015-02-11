@@ -22,10 +22,10 @@
 #include <string.h>
 
 #include "lsb/lsb.h"
+#include "lsb/xdr.h"
 
 struct queueInfoEnt *
-lsb_queueinfo (char **queues, int *numQueues, char *hosts, char *users,
-	       int options)
+lsb_queueinfo (char **queues, int *numQueues, char *hosts, char *users, int options)
 {
   mbdReqType mbdReqtype;
   static struct infoReq queueInfoReq;
@@ -35,10 +35,12 @@ lsb_queueinfo (char **queues, int *numQueues, char *hosts, char *users,
   XDR xdrs, xdrs2;
   char *request_buf;
   char *reply_buf;
-  int cc, i;
+  int cc = 0;
+  int i = 0;
   static struct LSFHeader hdr;
   char *clusterName = NULL;
 
+  assert( options );
 
   if (qInfo != NULL)
     {
@@ -74,8 +76,8 @@ lsb_queueinfo (char **queues, int *numQueues, char *hosts, char *users,
   if ((queueInfoReq.options & ALL_QUEUE)
       || (queueInfoReq.options & DFT_QUEUE))
     {
-      if ((queueInfoReq.names =
-	   (char **) malloc (3 * sizeof (char *))) == NULL)
+      queueInfoReq.names = (char **) malloc (3 * sizeof (char *));
+      if ( NULL == queueInfoReq.names && ENOMEM == errno )
 	{
 	  lsberrno = LSBE_NO_MEM;
 	  return (NULL);
@@ -86,8 +88,9 @@ lsb_queueinfo (char **queues, int *numQueues, char *hosts, char *users,
     }
   else
     {
-      if ((queueInfoReq.names = (char **) calloc
-	   (*numQueues + 2, sizeof (char *))) == NULL)
+      assert( *numQueues >= 0);
+      queueInfoReq.names = (char **) calloc ((unsigned long )*numQueues + 2, sizeof (char *));
+      if ( NULL == queueInfoReq.names && ENOMEM == errno )
 	{
 	  lsberrno = LSBE_NO_MEM;
 	  return (NULL);
@@ -147,12 +150,11 @@ lsb_queueinfo (char **queues, int *numQueues, char *hosts, char *users,
   queueInfoReq.resReq = "";
 
 
-
-
-
   mbdReqtype = BATCH_QUE_INFO;
-  cc = sizeof (struct infoReq) + cc * MAXHOSTNAMELEN + cc + 100;
-  if ((request_buf = malloc (cc)) == NULL)
+  assert( cc >= 0);
+  cc = (int)(sizeof (struct infoReq) + (unsigned long)cc * MAXHOSTNAMELEN + (unsigned long)cc + 100);
+  request_buf = (char *)malloc ( (unsigned long)cc);
+  if ( NULL == request_buf && ENOMEM == errno )
     {
       lsberrno = LSBE_NO_MEM;
       return (NULL);
@@ -160,8 +162,7 @@ lsb_queueinfo (char **queues, int *numQueues, char *hosts, char *users,
   xdrmem_create (&xdrs, request_buf, MSGSIZE, XDR_ENCODE);
   initLSFHeader_ (&hdr);
   hdr.opCode = mbdReqtype;
-  if (!xdr_encodeMsg (&xdrs, (char *) &queueInfoReq, &hdr, xdr_infoReq,
-		      0, NULL))
+  if (!xdr_encodeMsg (&xdrs, (char *) &queueInfoReq, &hdr, xdr_infoReq, 0, NULL))
     {
       lsberrno = LSBE_XDR;
       xdr_destroy (&xdrs);
@@ -169,9 +170,9 @@ lsb_queueinfo (char **queues, int *numQueues, char *hosts, char *users,
       return (NULL);
     }
 
-
-  if ((cc = callmbd (clusterName, request_buf, XDR_GETPOS (&xdrs), &reply_buf,
-		     &hdr, NULL, NULL, NULL)) == -1)
+    assert( XDR_GETPOS (&xdrs) <= INT_MAX );
+  cc = callmbd (clusterName, request_buf, (int)XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL);
+  if ( -1 == cc)
     {
       xdr_destroy (&xdrs);
       free (request_buf);
@@ -185,7 +186,8 @@ lsb_queueinfo (char **queues, int *numQueues, char *hosts, char *users,
   lsberrno = hdr.opCode;
   if (lsberrno == LSBE_NO_ERROR || lsberrno == LSBE_BAD_QUEUE)
     {
-      xdrmem_create (&xdrs2, reply_buf, XDR_DECODE_SIZE_ (cc), XDR_DECODE);
+      assert( XDR_DECODE_SIZE_ (cc) >=0 );
+      xdrmem_create (&xdrs2, reply_buf, (uint)XDR_DECODE_SIZE_ (cc), XDR_DECODE);
       if (!xdr_queueInfoReply (&xdrs2, &reply, &hdr))
 	{
 	  lsberrno = LSBE_XDR;
@@ -203,11 +205,9 @@ lsb_queueinfo (char **queues, int *numQueues, char *hosts, char *users,
 	  *numQueues = reply.badQueue;
 	  return (NULL);
 	}
-      if ((qTmp = (struct queueInfoEnt **) myrealloc (qInfo,
-						      reply.numQueues *
-						      sizeof (struct
-							      queueInfoEnt
-							      *))) == NULL)
+      assert( reply.numQueues >= 0 );
+      qTmp = (struct queueInfoEnt **) myrealloc (qInfo, (unsigned long)reply.numQueues * sizeof (struct queueInfoEnt *));
+      if ( NULL == qTmp && ENOMEM == errno )
 	{
 	  lsberrno = LSBE_NO_MEM;
 	  return NULL;
