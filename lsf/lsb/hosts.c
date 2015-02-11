@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "lsb/lsb.h"
+#include "lsb/xdr.h"
 
 struct hostInfoEnt *getHostStatus (struct hostDataReply reply);
 
@@ -40,7 +41,7 @@ lsb_hostinfo_ex (char **hosts, int *numHosts, char *resReq, int options)
   struct LSFHeader hdr;
   char *request_buf;
   char *reply_buf;
-  int cc, i, numReq = -1;
+  int cc = 0, i, numReq = -1;
   char *clusterName = NULL;
   static struct infoReq hostInfoReq;
   struct hostDataReply reply;
@@ -97,8 +98,9 @@ lsb_hostinfo_ex (char **hosts, int *numHosts, char *resReq, int options)
     }
   else
     {
-      if ((hostInfoReq.names = (char **) calloc
-	   (numReq, sizeof (char *))) == NULL)
+      assert( numReq >= 0);
+      hostInfoReq.names = (char **) calloc( (unsigned long)numReq, sizeof (char *));
+      if ( NULL == hostInfoReq.names && ENOMEM == errno )
 	{
 	  lsberrno = LSBE_NO_MEM;
 	  return (NULL);
@@ -151,17 +153,19 @@ lsb_hostinfo_ex (char **hosts, int *numHosts, char *resReq, int options)
 
 
   mbdReqtype = BATCH_HOST_INFO;
-  cc = sizeof (struct infoReq) + cc * MAXHOSTNAMELEN + cc + 100;
-  if ((request_buf = malloc (cc)) == NULL)
+  assert( (long)sizeof (struct infoReq) + (long)cc * (long)MAXHOSTNAMELEN + (long)cc + 100 <= INT_MAX );
+  cc = (int)((long)sizeof (struct infoReq) + (long)cc * (long)MAXHOSTNAMELEN + (long)cc + 100);
+  assert( cc >= 0 );
+  request_buf = (char *)malloc( (size_t)cc);
+  if (NULL == request_buf && ENOMEM == errno)
     {
       lsberrno = LSBE_NO_MEM;
       return (NULL);
     }
-  xdrmem_create (&xdrs, request_buf, cc, XDR_ENCODE);
+  xdrmem_create (&xdrs, request_buf, (uint)cc, XDR_ENCODE);
 
   hdr.opCode = mbdReqtype;
-  if (!xdr_encodeMsg (&xdrs, (char *) &hostInfoReq, &hdr, xdr_infoReq,
-		      0, NULL))
+  if (!xdr_encodeMsg (&xdrs, (char *) &hostInfoReq, &hdr, xdr_infoReq, 0, NULL))
     {
       xdr_destroy (&xdrs);
       free (request_buf);
@@ -170,10 +174,8 @@ lsb_hostinfo_ex (char **hosts, int *numHosts, char *resReq, int options)
     }
 
 
-  TIMEIT (0,
-	  (cc =
-	   callmbd (clusterName, request_buf, XDR_GETPOS (&xdrs), &reply_buf,
-		    &hdr, NULL, NULL, NULL)), "callmbd");
+    assert(XDR_GETPOS (&xdrs) <= INT_MAX );
+  TIMEIT (0, (cc = callmbd (clusterName, request_buf, (int)XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL)), "callmbd");
   if (cc == -1)
     {
       xdr_destroy (&xdrs);
@@ -188,7 +190,8 @@ lsb_hostinfo_ex (char **hosts, int *numHosts, char *resReq, int options)
   lsberrno = hdr.opCode;
   if (lsberrno == LSBE_NO_ERROR || lsberrno == LSBE_BAD_HOST)
     {
-      xdrmem_create (&xdrs, reply_buf, XDR_DECODE_SIZE_ (cc), XDR_DECODE);
+      assert( cc >= 0);
+      xdrmem_create (&xdrs, reply_buf, XDR_DECODE_SIZE_ ((uint)cc), XDR_DECODE);
 
       if (!xdr_hostDataReply (&xdrs, &reply, &hdr))
 	{
