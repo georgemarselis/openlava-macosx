@@ -21,6 +21,7 @@
 #include <pwd.h>
 
 #include "lsb/lsb.h"
+#include "lsb/xdr.h"
 
 int
 lsb_movejob (LS_LONG_INT jobId, int *position, int opCode)
@@ -73,8 +74,8 @@ lsb_movejob (LS_LONG_INT jobId, int *position, int opCode)
     }
 
 
-  if ((cc = callmbd (NULL, request_buf, XDR_GETPOS (&xdrs), &reply_buf,
-		     &hdr, NULL, NULL, NULL)) == -1)
+  assert( XDR_GETPOS (&xdrs) <= INT_MAX );
+  if ((cc = callmbd (NULL, request_buf, (int)XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL)) == -1)
     {
       xdr_destroy (&xdrs);
       return (-1);
@@ -85,7 +86,8 @@ lsb_movejob (LS_LONG_INT jobId, int *position, int opCode)
   lsberrno = hdr.opCode;
   if (lsberrno == LSBE_NO_ERROR)
     {
-      xdrmem_create (&xdrs, reply_buf, XDR_DECODE_SIZE_ (cc), XDR_DECODE);
+      assert( XDR_DECODE_SIZE_(cc) >= 0);
+      xdrmem_create (&xdrs, reply_buf, (uint)XDR_DECODE_SIZE_ (cc), XDR_DECODE);
       if (!xdr_jobMoveReq (&xdrs, &jobMoveReq, &hdr))
 	{
 	  lsberrno = LSBE_XDR;

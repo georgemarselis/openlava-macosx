@@ -281,8 +281,8 @@ struct signalReq
 struct jobMoveReq
 {
   int opCode;
-  LS_LONG_INT jobId;
   int position;
+  LS_LONG_INT jobId;
 };
 
 struct jobSwitchReq

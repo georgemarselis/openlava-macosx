@@ -1721,7 +1721,7 @@ int getTotalSortIntList (struct sortIntList *);
 
 int updateJobIdIndexFile (char *, char *, int);
 
-static int readJobNew (char *, struct jobNewLog *);
+/*static int readJobNew (char *, struct jobNewLog *);
 static int readJobMod (char *, struct jobModLog *);
 static int readJobStart (char *, struct jobStartLog *);
 static int readJobStartAccept (char *, struct jobStartAcceptLog *);
@@ -1732,7 +1732,7 @@ static int readJobSwitch (char *, struct jobSwitchLog *);
 static int readJobMove (char *, struct jobMoveLog *);
 static int readJobFinish (char *, struct jobFinishLog *, time_t);
 static int readQueueCtrl (char *, struct queueCtrlLog *);
-static int readHostCtrl (char *, struct hostCtrlLog *);
+static int readHostCtrl (char *, struct hostCtrlLog *);*/
 
 #undef P_
 
