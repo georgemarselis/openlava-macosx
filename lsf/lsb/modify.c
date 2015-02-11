@@ -24,6 +24,7 @@
 #include "lsb/lsb.h"
 #include "lsb/spool.h"
 #include "lsb/xdr.h"
+#include "lsb/modify.h"
 
 // #define  NL_SETN   13
 
@@ -108,8 +109,7 @@ lsb_modify (struct submit *jobSubReq, struct submitReply *submitRep,
     {
       goto cleanup;
     }
-  if (getOtherParams (jobSubReq, &modifyReq.submitReq,
-          submitRep, &auth, &subSpoolFiles) < 0)
+  if (getOtherParams (jobSubReq, &modifyReq.submitReq, submitRep, &auth, &subSpoolFiles) < 0)
     {
       goto cleanup;
     }

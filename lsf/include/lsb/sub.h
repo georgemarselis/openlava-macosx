@@ -49,7 +49,7 @@
 	    sprintf(*errMsg, fmt, msg1, msg2, msg3);\
     }
 
-int optionFlag = FALSE;
+static int optionFlag = FALSE;
 char optionFileName[MAXLSFNAMELEN];
 char *loginShell;
 
@@ -107,8 +107,7 @@ static void startNios (struct submitReq *, int, LS_LONG_INT);
 static void postSubMsg (struct submit *, LS_LONG_INT, struct submitReply *);
 static int readOptFile (char *filename, char *childLine);
 
-static const LSB_SPOOL_INFO_T *chUserCopySpoolFile (const char *srcFile,
-						    spoolOptions_t fileType);
+static const LSB_SPOOL_INFO_T *chUserCopySpoolFile (const char *srcFile, spoolOptions_t fileType);
 
 extern void makeCleanToRunEsub ();
 extern char *translateString (char *);

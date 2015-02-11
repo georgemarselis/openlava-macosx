@@ -22,6 +22,7 @@
 #include <pwd.h>
 
 #include "lsb/lsb.h"
+#include "lsb/xdr.h"
 
 int
 lsb_switchjob (LS_LONG_INT jobId, char *queue)
@@ -48,8 +49,9 @@ lsb_switchjob (LS_LONG_INT jobId, char *queue)
     }
 
 
-  if (authTicketTokens_ (&auth, NULL) == -1)
+  if (authTicketTokens_ (&auth, NULL) == -1) {
     return (-1);
+  }
 
   jobSwitchReq.jobId = jobId;
   strcpy (jobSwitchReq.queue, queue);
@@ -61,16 +63,15 @@ lsb_switchjob (LS_LONG_INT jobId, char *queue)
   xdrmem_create (&xdrs, request_buf, MSGSIZE, XDR_ENCODE);
   initLSFHeader_ (&hdr);
   hdr.opCode = mbdReqtype;
-  if (!xdr_encodeMsg (&xdrs, (char *) &jobSwitchReq, &hdr, xdr_jobSwitchReq,
-		      0, &auth))
+  if (!xdr_encodeMsg (&xdrs, (char *) &jobSwitchReq, &hdr, xdr_jobSwitchReq, 0, &auth))
     {
       lsberrno = LSBE_XDR;
       return (-1);
     }
 
 
-  if ((cc = callmbd (NULL, request_buf, XDR_GETPOS (&xdrs), &reply_buf,
-		     &hdr, NULL, NULL, NULL)) == -1)
+  assert( XDR_GETPOS (&xdrs) <= INT_MAX );
+  if ((cc = callmbd (NULL, request_buf, (int)XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL)) == -1)
     {
       xdr_destroy (&xdrs);
       return (-1);
@@ -81,9 +82,11 @@ lsb_switchjob (LS_LONG_INT jobId, char *queue)
   if (cc)
     free (reply_buf);
 
-  if (lsberrno == LSBE_NO_ERROR)
+  if (lsberrno == LSBE_NO_ERROR) {
     return (0);
-  else
+  }
+  else {
     return (-1);
+  }
 
 }

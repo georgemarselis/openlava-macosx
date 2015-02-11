@@ -22,6 +22,7 @@
 #include <pwd.h>
 
 #include "lsb/lsb.h"
+#include "lsb/xdr.h"
 
 static int signalJob_ (int, LS_LONG_INT, time_t, int);
 
@@ -119,10 +120,8 @@ signalJob_ (int sigValue, LS_LONG_INT jobId, time_t period, int options)
       return -1;
     }
 
-  if ((cc = callmbd (NULL,
-		     request_buf,
-		     XDR_GETPOS (&xdrs),
-		     &reply_buf, &hdr, NULL, NULL, NULL)) < 0)
+    assert( XDR_GETPOS (&xdrs) <= INT_MAX );
+  if ((cc = callmbd (NULL, request_buf, (int)XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL)) < 0)
     {
       xdr_destroy (&xdrs);
       return -1;

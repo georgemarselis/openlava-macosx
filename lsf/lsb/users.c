@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "lsb/lsb.h"
+#include "lsb/xdr.h"
 
 
 struct userInfoEnt *

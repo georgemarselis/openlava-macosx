@@ -77,13 +77,12 @@ typedef struct lsbSubSpoolFile
   char commandSpool[MAXFILENAMELEN];
 } LSB_SUB_SPOOL_FILE_T;
 
+
 extern int creat_p_socket (void);
 extern int serv_connect (char *, ushort, int);
 extern int getServerMsg (int, struct LSFHeader *, char **rep_buf);
-extern int callmbd (char *, char *, int, char **, struct LSFHeader *, int *,
-		    int (*)(), int *);
-extern int cmdCallSBD_ (char *, char *, int, char **, struct LSFHeader *,
-			int *);
+extern int callmbd (char *, char *, int, char **, struct LSFHeader *, int *, int (*)(), int *);
+extern int cmdCallSBD_ (char *, char *, int, char **, struct LSFHeader *, int *);
 
 
 extern int PutQStr (FILE *, char *);
@@ -100,13 +99,8 @@ extern char *getMasterName (void);
 extern ushort get_mbd_port (void);
 extern ushort get_sbd_port (void);
 extern int getAuth (struct lsfAuth *);
-extern int getCommonParams (struct submit *, struct submitReq *,
-			    struct submitReply *);
-extern int getOtherParams (struct submit *, struct submitReq *,
-			   struct submitReply *, struct lsfAuth *,
-			   LSB_SUB_SPOOL_FILE_T *);
-extern int chUserRemoveSpoolFile (const char *hostName,
-				  const char *spoolFile);
+
+extern int chUserRemoveSpoolFile (const char *hostName, const char *spoolFile);
 extern void prtBETime_ (struct submit *);
 extern int runBatchEsub (struct lenData *, struct submit *);
 
