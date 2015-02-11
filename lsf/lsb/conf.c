@@ -30,11 +30,6 @@
 
 #define   NL_SETN     13
 
-struct inNames {
-    char *name;
-    char *prf_level;
-};
-
 static void
 freeSA (char **list, uint num)
 {
@@ -1370,7 +1365,7 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, char *fname, uint 
     char *linep;
     char *wp;
     char *sp;
-    char *HUgroups;
+    char *HUgroups = NULL;
     int type = 0;
     int allFlag = FALSE;
     int nGrpOverFlow = 0;
@@ -2431,13 +2426,13 @@ lsb_readhost (struct lsConf *conf, struct lsInfo *info, int options, struct clus
                     freeHConf (hConf, FALSE);
                     FREEUP (myinfo.resTable);
                     return (NULL);
-
-                    for ( uint i = 0; i < numofhosts; i++) {
-                        initHostInfoEnt ((struct hostInfoEnt *)&hConf->hosts[i]);
-                        hConf->hosts[i] = *hosts[i];
-                    }
-                    hConf->numHosts = numofhosts;
                 }
+
+                for ( uint i = 0; i < numofhosts; i++) {
+                    initHostInfoEnt ((struct hostInfoEnt *)&hConf->hosts[i]);
+                    hConf->hosts[i] = *hosts[i];
+                }
+                hConf->numHosts = numofhosts;
             }
 
             if (numofhgroups) {
@@ -2833,7 +2828,7 @@ do_Hosts_ (struct lsConf *conf, char *fname, uint *lineNum, struct lsInfo *info,
             copyCPUFactor = TRUE;
         }
         else {
-            uint total;
+            uint total = 0;
             for ( uint i = 0; i < cConf->numHosts; i++) {
                 if (equalHost_ (hostname, cConf->hosts[i].hostName)) {
                     hostList[0] = cConf->hosts[i];
@@ -4029,7 +4024,7 @@ do_Queues (struct lsConf *conf, char *fname, uint *lineNum, struct lsInfo *info,
         if (keylist[QKEY_DEFAULT_HOST_SPEC].val != NULL
             && strcmp (keylist[QKEY_DEFAULT_HOST_SPEC].val, ""))
             {
-            float *cpuFactor;
+            float *cpuFactor = NULL;
 
             if (options != CONF_NO_CHECK)
                 {
@@ -4360,11 +4355,9 @@ do_Queues (struct lsConf *conf, char *fname, uint *lineNum, struct lsInfo *info,
                 }
             }
 
-        if (keylist[QKEY_ADMINISTRATORS].val != NULL
-            && strcmp (keylist[QKEY_ADMINISTRATORS].val, ""))
-            {
-            if (options & CONF_NO_CHECK) {
-                queue.admins = parseAdmins (keylist[QKEY_ADMINISTRATORS].val, options, fname, lineNum);
+        if (keylist[QKEY_ADMINISTRATORS].val != NULL && strcmp (keylist[QKEY_ADMINISTRATORS].val, "")) {
+            if (options & CONF_NO_CHECK) { 
+                queue.admins = parseAdmins (keylist[QKEY_ADMINISTRATORS].val, options, fname, lineNum); // FIXME fix above line
             }
             else {
                 queue.admins = putstr_ (keylist[QKEY_ADMINISTRATORS].val);
