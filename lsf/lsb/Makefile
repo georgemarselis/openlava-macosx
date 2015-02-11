@@ -8,34 +8,35 @@ GCC := /opt/local/bin/gcc
 vpath %.c liblsf
 vpath %.h ../include
 
-lsb.so: comm.o conf.o debug.o err.o groups.o hc.o hosts.o init.o jobs.o 
+lsb.so: comm.o conf.o debug.o err.o groups.o hc.o hosts.o init.o jobs.o
 lsb.so:	log.o mig.o misc.o modify.o move.o msg.o params.o peek.o qc.o
-lsb.so: queues.o reason.o reconfig.o resource.o rexecv.o sig.o signals.o 
-lsb.so: spool.o sub.o switch.o users.o xdr.o 
-lsb.so: conf_queues.o conf_queuegroups.o conf_users.o conf_usergroups.o conf_hosts.o conf_hostgroups.o conf_misc.o conf_cluster.o
+lsb.so: queues.o reason.o reconfig.o resource.o rexecv.o sig.o signals.o
+lsb.so: spool.o sub.o switch.o users.o xdr.o
+#lsb.so: conf_queues.o conf_queuegroups.o conf_users.o conf_usergroups.o conf_hosts.o conf_hostgroups.o conf_misc.o conf_cluster.o
 
 
 comm: comm.o
 
 
-conf: conf_queues conf_queuegroups conf_users conf_usergroups conf_hosts conf_hostgroups conf_cluster conf_misc 
+conf: conf.o
 
+# conf_queues conf_queuegroups conf_users conf_usergroups conf_hosts conf_hostgroups conf_cluster conf_misc 
 
-conf_queues: conf_queues.o
+# conf_queues: conf_queues.o
 
-conf_queuegroups: conf_queuegroups.o
+# conf_queuegroups: conf_queuegroups.o
 
-conf_users: conf_users.o
+# conf_users: conf_users.o
 
-conf_usergroups: conf_usergroups.o
+# conf_usergroups: conf_usergroups.o
 
-conf_hosts: conf_hosts.o
+# conf_hosts: conf_hosts.o
 
-conf_hostgroups: conf_hostgroups.o
+# conf_hostgroups: conf_hostgroups.o
 
-conf_cluster: conf_cluster.o
+# conf_cluster: conf_cluster.o
 
-conf_misc: conf_misc.o
+# conf_misc: conf_misc.o
 
 
 
@@ -129,30 +130,33 @@ xdr: xdr.o
 comm.o: comm.c
 
 
-conf.o: conf_queues.o conf_queuegroups.o conf_users.o conf_usergroups.o conf_hosts.o conf_hostgroups.o conf_misc.o conf_cluster.o
-
-conf_queues.o: conf_queues.c
+conf.o: conf.c
 
 
-conf_queuegroups.o: conf_queuegroups.c
+# conf_queues.o conf_queuegroups.o conf_users.o conf_usergroups.o conf_hosts.o conf_hostgroups.o conf_misc.o conf_cluster.o
+
+# conf_queues.o: conf_queues.c
 
 
-conf_users.o: conf_users.c
+# conf_queuegroups.o: conf_queuegroups.c
 
 
-conf_usergroups.o: conf_usergroups.c
+# conf_users.o: conf_users.c
 
 
-conf_hosts.o: conf_hosts.c
+# conf_usergroups.o: conf_usergroups.c
 
 
-conf_hostgroups.o: conf_hostgroups.c
+# conf_hosts.o: conf_hosts.c
 
 
-conf_cluster.o: conf_cluster.c
+# conf_hostgroups.o: conf_hostgroups.c
 
 
-conf_misc.o: conf_misc.c
+# conf_cluster.o: conf_cluster.c
+
+
+# conf_misc.o: conf_misc.c
 
 
 
