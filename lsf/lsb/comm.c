@@ -197,8 +197,6 @@ call_server (char *host, ushort serv_port, char *req_buf, size_t req_size,  char
             return -2;
         }
 
-
-        assert( tsize >= 0 );
         sndBuf->len = (size_t)tsize;
         memcpy ((char *) sndBuf->data, (char *) req_buf, req_size);
 
