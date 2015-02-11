@@ -1572,9 +1572,10 @@ struct hostConf
 
 typedef struct lsbSharedResourceInstance
 {
+  uint nHosts;
+  char padding[4];
   char *totalValue;
   char *rsvValue;
-  uint nHosts;
   char **hostList;
 
 } LSB_SHARED_RESOURCE_INST_T;
@@ -1583,6 +1584,7 @@ typedef struct lsbSharedResourceInfo
 {
   char *resourceName;
   uint nInstances;
+  char padding[4];
   LSB_SHARED_RESOURCE_INST_T *instances;
 } LSB_SHARED_RESOURCE_INFO_T;
 

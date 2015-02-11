@@ -94,9 +94,9 @@ struct resourceInfoReply
 struct lsbShareResourceInfoReply
 {
   int numResources;
-  struct lsbSharedResourceInfo *resources;
   int badResource;
-};
+  struct lsbSharedResourceInfo *resources;
+ };
 
 #define HOST_ATTR_SERVER        (0x00000001)
 #define HOST_ATTR_CLIENT        (0x00000002)
