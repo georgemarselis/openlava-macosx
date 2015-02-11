@@ -23,6 +23,7 @@
 #include <ctype.h>
 
 #include "lsb/lsb.h"
+#include "lsb/misc.h"
 #include "lib/table.h"
 
 #define NL_SETN     13
@@ -52,11 +53,11 @@ addMemb (struct hTab *tabPtr, LS_LONG_INT member)
       sprintf (memberStr, LS_LONG_FORMAT, member);
       ent = h_addEnt_ (tabPtr, memberStr, &new);
       if (!new)
-	{
-	  return (NULL);
-	}
+    {
+      return (NULL);
+    }
       else
-	return (ent);
+    return (ent);
     }
   return (NULL);
 }
@@ -71,13 +72,13 @@ remvMemb (struct hTab *tabPtr, LS_LONG_INT member)
     {
       sprintf (memberStr, LS_LONG_FORMAT, member);
       if ((ent = h_getEnt_ (tabPtr, memberStr)) == NULL)
-	return (FALSE);
+    return (FALSE);
       else
-	{
-	  ent->hData = NULL;
-	  h_delEnt_ (tabPtr, ent);
-	  return (TRUE);
-	}
+    {
+      ent->hData = NULL;
+      h_delEnt_ (tabPtr, ent);
+      return (TRUE);
+    }
     }
   return (FALSE);
 }
@@ -107,11 +108,11 @@ addMembStr (struct hTab * tabPtr, char *memberStr)
     {
       ent = h_addEnt_ (tabPtr, memberStr, &new);
       if (!new)
-	{
-	  return (NULL);
-	}
+    {
+      return (NULL);
+    }
       else
-	return (ent);
+    return (ent);
     }
   return (NULL);
 }
@@ -124,13 +125,13 @@ remvMembStr (struct hTab *tabPtr, char *memberStr)
   if (tabPtr && memberStr)
     {
       if ((ent = h_getEnt_ (tabPtr, memberStr)) == NULL)
-	return (FALSE);
+    return (FALSE);
       else
-	{
-	  ent->hData = NULL;
-	  h_delEnt_ (tabPtr, ent);
-	  return (TRUE);
-	}
+    {
+      ent->hData = NULL;
+      h_delEnt_ (tabPtr, ent);
+      return (TRUE);
+    }
     }
   return (FALSE);
 }
@@ -173,21 +174,21 @@ insertSortIntList (struct sortIntList *header, int value)
     {
 
       if (listPtr->value == value)
-	return (0);
+    return (0);
       if (header->value)
-	{
+    {
 
-	  if (listPtr->value > value)
-	    break;
-	  listPtr = listPtr->forw;
-	}
+      if (listPtr->value > value)
+        break;
+      listPtr = listPtr->forw;
+    }
       else
-	{
+    {
 
-	  if (listPtr->value < value)
-	    break;
-	  listPtr = listPtr->forw;
-	}
+      if (listPtr->value < value)
+        break;
+      listPtr = listPtr->forw;
+    }
     }
   if ((newPtr = (struct sortIntList *) malloc (sizeof (struct sortIntList)))
       == NULL)
@@ -203,7 +204,7 @@ insertSortIntList (struct sortIntList *header, int value)
 
 struct sortIntList *
 getNextSortIntList (struct sortIntList *header,
-		    struct sortIntList *current, int *value)
+            struct sortIntList *current, int *value)
 {
   struct sortIntList *nextPtr;
 
@@ -279,7 +280,7 @@ getTotalSortIntList (struct sortIntList *header)
 int
 sndJobFile_ (int s, struct lenData *jf)
 {
-  int nlen = htonl (jf->len);
+    uint nlen = htonl (jf->len);
 
   if (b_write_fix (s, NET_INTADDR_ (&nlen), NET_INTSIZE_) != NET_INTSIZE_)
     {
@@ -287,7 +288,8 @@ sndJobFile_ (int s, struct lenData *jf)
       return (-1);
     }
 
-  if (b_write_fix (s, jf->data, jf->len) != jf->len)
+  assert( jf->len <= LONG_MAX );
+  if (b_write_fix (s, jf->data, jf->len) != (long)jf->len)
     {
       lsberrno = LSBE_SYS_CALL;
       return (-1);
@@ -300,62 +302,65 @@ sndJobFile_ (int s, struct lenData *jf)
 void
 upperStr (char *in, char *out)
 {
-  for (; *in != '\0'; in++, out++)
-    *out = toupper (*in);
-  *out = '\0';
+    for (; *in != '\0'; in++, out++) {
+      *out = (char) toupper (*in);
+    }
+    *out = '\0';
 }
 
 
 void
 copyJUsage (struct jRusage *to, struct jRusage *from)
 {
-  struct pidInfo *newPidInfo;
-  int *newPgid;
+    struct pidInfo *newPidInfo;
+    int *newPgid;
 
-  to->mem = from->mem;
-  to->swap = from->swap;
-  to->utime = from->utime;
-  to->stime = from->stime;
+    to->mem = from->mem;
+    to->swap = from->swap;
+    to->utime = from->utime;
+    to->stime = from->stime;
 
-
-
-  if (from->npids)
+    if (from->npids)
     {
-      newPidInfo = (struct pidInfo *)
-	calloc (from->npids, sizeof (struct pidInfo));
-      if (newPidInfo != NULL)
-	{
-	  if (to->npids)
-	    FREEUP (to->pidInfo);
-	  to->pidInfo = newPidInfo;
-	  to->npids = from->npids;
-	  memcpy ((char *) to->pidInfo, (char *) from->pidInfo,
-		  from->npids * sizeof (struct pidInfo));
-	}
+        assert( from->npids >= 0 );
+        newPidInfo = (struct pidInfo *) calloc ((unsigned long)from->npids, sizeof (struct pidInfo));
+        if( NULL == newPidInfo && ENOMEM == errno )
+        {
+            if (to->npids) {
+                FREEUP (to->pidInfo);
+            }
+            to->pidInfo = newPidInfo;
+            to->npids = from->npids;
+            assert( from->npids >= 0 );
+            memcpy ((char *) to->pidInfo, (char *) from->pidInfo, (unsigned long)from->npids * sizeof (struct pidInfo));
+        }
     }
-  else if (to->npids)
+    else if (to->npids)
     {
       FREEUP (to->pidInfo);
       to->npids = 0;
     }
 
+    if (from->npgids)
+    {
+        assert( from->npgids >= 0 );
+        newPgid = (int *) calloc ((unsigned long)from->npgids, sizeof (int));
+        if (newPgid && ENOMEM == errno ) {
+            return;
+        }
 
-  if (from->npgids)
-    {
-      newPgid = (int *) calloc (from->npgids, sizeof (int));
-      if (newPgid == NULL)
-	return;
-      if (to->npgids)
-	FREEUP (to->pgid);
-      to->pgid = newPgid;
-      to->npgids = from->npgids;
-      memcpy ((char *) to->pgid, (char *) from->pgid,
-	      from->npgids * sizeof (int));
+        if (to->npgids) {
+            FREEUP (to->pgid);
+        }
+
+        to->pgid = newPgid;
+        to->npgids = from->npgids;
+        assert (from->npgids >= 0);
+        memcpy ((char *) to->pgid, (char *) from->pgid, (unsigned long)from->npgids * sizeof (int));
     }
-  else if (to->npgids)
-    {
-      FREEUP (to->pgid);
-      to->npgids = 0;
+    else if (to->npgids) {
+        FREEUP (to->pgid);
+        to->npgids = 0;
     }
 }
 
@@ -367,26 +372,26 @@ convertRLimit (int *pRLimits, int toKb)
   for (i = 0; i < LSF_RLIM_NLIMITS; i++)
     {
       switch (i)
-	{
-	case LSF_RLIMIT_FSIZE:
-	case LSF_RLIMIT_DATA:
-	case LSF_RLIMIT_STACK:
-	case LSF_RLIMIT_CORE:
-	case LSF_RLIMIT_RSS:
-	case LSF_RLIMIT_VMEM:
-	  if (pRLimits[i] > 0)
-	    {
-	      if (toKb)
-		{
-		  pRLimits[i] /= 1024;
-		}
-	      else
-		{
-		  pRLimits[i] *= 1024;
-		}
-	    }
-	  break;
-	}
+    {
+    case LSF_RLIMIT_FSIZE:
+    case LSF_RLIMIT_DATA:
+    case LSF_RLIMIT_STACK:
+    case LSF_RLIMIT_CORE:
+    case LSF_RLIMIT_RSS:
+    case LSF_RLIMIT_VMEM:
+      if (pRLimits[i] > 0)
+        {
+          if (toKb)
+        {
+          pRLimits[i] /= 1024;
+        }
+          else
+        {
+          pRLimits[i] *= 1024;
+        }
+        }
+      break;
+    }
     }
 }
 
@@ -413,388 +418,359 @@ limitIsOk_ (int *rLimits)
 char *
 lsb_splitName (char *str, unsigned int *number)
 {
-  static char fname[] = "lsb_splitName";
-  static char name[4 * MAXLINELEN];
-  static int nameNum;
-  int twoPartFlag;
-  int i, j;
+    static char fname[] = "lsb_splitName";
+    static char name[4 * MAXLINELEN];
+    static uint nameNum;
+    int twoPartFlag = 0;
+    uint counter = 0;
 
-
-  if (str == NULL || number == NULL)
+    if (str == NULL || number == NULL)
     {
-      ls_syslog (LOG_ERR, I18N (5650, "%s: bad input.\n"), fname);	/* catgets 5650 */
-      return NULL;
+        /* catgets 5650 */
+        ls_syslog (LOG_ERR, I18N (5650, "%s: bad input.\n"), fname);
+        return NULL;
     }
 
 
-  twoPartFlag = 0;
-  j = 0;
-
-
-  for (i = 0; i < strlen (str); i++)
-    {
-      if (str[i] != '*')
-	{
-
-	  name[j] = str[i];
-	  j++;
-	}
-      else
-	{
-
-	  twoPartFlag = 1;
-	  name[j] = '\0';
-	  j = 0;
-
-
-	  sscanf (name, "%d", &nameNum);
-
-
-	  if (nameNum <= 0)
-	    {
-	      nameNum = 1;
-	      ls_syslog (LOG_ERR, I18N (5651, "%s: bad input format.  Assuming 1 host.\n"),	/* catgets 5651 */
-			 fname);
-	    }
-	}
+    twoPartFlag = 0;
+    for ( unsigned long i = 0; i < strlen (str); i++) {
+        if (str[i] != '*') {
+            name[counter] = str[i];
+            counter++;
+        }
+        else {
+            twoPartFlag = 1;
+// #warning FIXME FIXME FIXME FIXME FIXME  what the fuck are you doing putting a null here?
+            name[counter] = '\0';
+            counter = 0;
+            sscanf (name, "%d", &nameNum);
+            if (nameNum <= 0)
+            {
+                nameNum = 1;
+                ls_syslog (LOG_ERR, I18N (5651, "%s: bad input format.  Assuming 1 host.\n"), fname);
+            }
+        }
     }
 
-
-  name[j] = '\0';
-
-
-  if (twoPartFlag == 0 || j == 0)
-    {
-
-
-      nameNum = 1;
+    name[counter] = '\0';
+    if (twoPartFlag == 0 || counter == 0) {
+        nameNum = 1;
     }
 
-  *number = nameNum;
-  return name;
+    *number = nameNum;
+    return name;
 }
 
-NAMELIST *
+struct nameList *
 lsb_compressStrList (char **strList, int numStr)
 {
-  static char fname[] = "lsb_compressStrList";
-  static NAMELIST nameList;
-  int i;
-  int hIndex = 0;
-  int numSameStr;
-  int headPtr;
+    static char fname[] = "lsb_compressStrList";
+    static struct nameList nameList;
+    int headPtr    = 0;
+    unsigned long numSameStr = 0;
+    unsigned long hIndex     = 0;
 
 
-  if (nameList.names != NULL)
+    if (nameList.names != NULL)
     {
-      for (i = 0; i < nameList.listSize; i++)
-	FREEUP (nameList.names[i]);
-      FREEUP (nameList.names);
-      FREEUP (nameList.counter);
+        for ( unsigned long i = 0; i < nameList.listSize; i++) {
+            FREEUP (nameList.names[i]);
+        }
+
+        FREEUP (nameList.names);
+        FREEUP (nameList.counter);
     }
 
-  nameList.listSize = 0;
-  nameList.names = NULL;
-  nameList.counter = NULL;
-
-
-  if (numStr <= 0)
-    {
-      return (NAMELIST *) & nameList;
+    nameList.listSize = 0;
+    nameList.names = NULL;
+    nameList.counter = NULL;
+    if (numStr <= 0) {
+        return (struct nameList *) & nameList;
     }
 
-
-  if (strList == NULL)
-    return NULL;
-
-  nameList.names = (char **) calloc (numStr, sizeof (char *));
-  nameList.counter = (int *) calloc (numStr, sizeof (int));
-
-  if (!nameList.names || !nameList.counter)
-    {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
-      FREEUP (nameList.names);
-      FREEUP (nameList.counter);
-      return (NAMELIST *) NULL;
-    }
-  headPtr = 0;
-  numSameStr = 1;
-  for (i = 1; i < numStr; i++)
-    if (strList[i])
-      {
-
-	if (strcmp (strList[i], strList[headPtr]) == 0)
-	  {
-
-	    numSameStr++;
-	    continue;
-	  }
-	nameList.names[hIndex] = putstr_ (strList[headPtr]);
-	headPtr = i;
-	nameList.counter[hIndex] = numSameStr;
-	hIndex++;
-	numSameStr = 1;
-      }
-
-  nameList.names[hIndex] = putstr_ (strList[headPtr]);
-  nameList.counter[hIndex] = numSameStr;
-  hIndex++;
-  nameList.listSize = hIndex;
-
-
-  nameList.names = (char **) realloc (nameList.names,
-				      nameList.listSize * sizeof (char *));
-  nameList.counter = (int *) realloc (nameList.counter,
-				      nameList.listSize * sizeof (int));
-
-  if (!nameList.names || !nameList.counter)
-    {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "realloc");
-      for (i = 0; i < nameList.listSize; i++)
-	FREEUP (nameList.names[i]);
-      FREEUP (nameList.names);
-      FREEUP (nameList.counter);
-      nameList.listSize = 0;
-      return (NAMELIST *) NULL;
+    if (strList == NULL) {
+        return NULL;
     }
 
-  return (NAMELIST *) & nameList;
+    assert( numStr >= 0 );
+    nameList.names = (char **)calloc( (unsigned long)numStr, sizeof (char *));
+    nameList.counter = (unsigned long *)calloc( (unsigned long)numStr, sizeof (int));
+    if ( ( NULL == nameList.names && ENOMEM == errno ) || 
+         ( NULL == nameList.counter && ENOMEM == errno ) )
+    {
+        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
+        FREEUP (nameList.names);
+        FREEUP (nameList.counter);
+        return (struct nameList *) NULL;
+    }
+
+    headPtr = 0;
+    numSameStr = 1;
+    for (int i = 1; i < numStr; i++) {
+            if (strList[i])
+            {
+                if (strcmp (strList[i], strList[headPtr]) == 0)
+                {
+                    numSameStr++;
+                    continue;
+                }
+
+                nameList.names[hIndex] = putstr_ (strList[headPtr]);
+                headPtr = i;
+                nameList.counter[hIndex] = numSameStr;
+                hIndex++;
+                numSameStr = 1;
+            }
+
+            nameList.names[hIndex] = putstr_ (strList[headPtr]);
+            nameList.counter[hIndex] = numSameStr;
+            hIndex++;
+            nameList.listSize = hIndex;
+
+        nameList.names = (char **) realloc (nameList.names, nameList.listSize * sizeof (char *));
+        nameList.counter = (unsigned long *) realloc (nameList.counter, nameList.listSize * sizeof (int));
+        if ( ( NULL == nameList.names && ENOMEM == errno ) || 
+             ( NULL == nameList.counter && ENOMEM == errno ) )
+        {
+            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "realloc");
+// #warning this may be out of the loop, needs test case and debugger
+            for ( unsigned long j = 0; j < nameList.listSize; j++) {
+                FREEUP (nameList.names[j]);
+            }
+            FREEUP (nameList.names);
+            FREEUP (nameList.counter);
+            nameList.listSize = 0;
+            return (struct nameList *) NULL;
+        }
+    }
+
+    return (struct nameList *) & nameList;
 }
 
 
 char *
-lsb_printNameList (NAMELIST * nameList, int format)
+lsb_printNameList (struct nameList * nameList, int format)
 {
-  static char fname[] = "lsb_printNameList";
-  unsigned long namelen;
-  char *buf = NULL;
-  int buflen;
-  static char *namestr = NULL;
-  unsigned long allocLen = 0;
-  int i, j;
-
-
-  if (nameList == NULL)
-    {
-      ls_syslog (LOG_ERR, I18N (5652, "%s: NULL input.\n"), fname);	/* catgets 5652 */
+    static char fname[]    = "lsb_printNameList";
+    static char *namestr   = NULL;
+    char *buf              = NULL;
+    unsigned long namelen  = 0;
+    unsigned long allocLen = 0;
+    unsigned long buflen   = 0;
+  
+    if (nameList == NULL) {
+      /* catgets 5652 */
+      ls_syslog (LOG_ERR, I18N (5652, "%s: NULL input.\n"), fname);
       return NULL;
     }
 
-  if (namestr != NULL)
-    {
-      FREEUP (namestr);
+    if (namestr != NULL) {
+        FREEUP (namestr);
     }
 
-  allocLen = MAXLINELEN;
-  namestr = (char *) calloc (allocLen, sizeof (char));
-
-  if (!namestr)
-    {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
-      return (char *) NULL;
+    allocLen = MAXLINELEN;
+    namestr = (char *) calloc (allocLen, sizeof (char));
+    if (!namestr) {
+        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
+        return (char *) NULL;
     }
 
-  for (i = 0; i < nameList->listSize; i++)
+    for ( unsigned long i = 0; i < nameList->listSize; i++)
     {
 
-      if (format == PRINT_SHORT_NAMELIST)
-	{
-	  buf = (char *) calloc (MAXLINELEN, sizeof (char));
-	  if (!buf)
-	    {
-	      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
-	      return NULL;
-	    }
-	  sprintf (buf, "%d*%s ", nameList->counter[i], nameList->names[i]);
-	  buflen = strlen (buf);
-	}
-      else if (format == PRINT_MCPU_HOSTS)
-	{
-	  buf = (char *) calloc (MAXLINELEN, sizeof (char));
-	  if (!buf)
-	    {
-	      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
-	      return NULL;
-	    }
-	  sprintf (buf, "%s %d ", nameList->names[i], nameList->counter[i]);
-	  buflen = strlen (buf);
-	}
-      else
-	{
-	  namelen = strlen (nameList->names[i]);
-	  buflen = (namelen + 1) * nameList->counter[i] + 1;
-	  buf = (char *) calloc (buflen, sizeof (char));
-	  if (!buf)
-	    {
-	      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
-	      return NULL;
-	    }
-	  for (j = 0; j < nameList->counter[i]; j++)
-	    sprintf (buf + j * (namelen + 1), "%s ", nameList->names[i]);
-	}
+        if (format == PRINT_SHORT_NAMELIST)
+        {
+            buf = (char *) calloc (MAXLINELEN, sizeof (char));
+            if ( NULL == buf && ENOMEM == errno )
+            {
+               ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
+               return NULL;
+            }
 
+            sprintf (buf, "%ld*%s ", nameList->counter[i], nameList->names[i]);
+            buflen = strlen (buf);
+        }
+        else if (format == PRINT_MCPU_HOSTS)
+        {
+                buf = (char *) calloc (MAXLINELEN, sizeof (char));
+                if ( NULL == buf && ENOMEM == errno )
+                {
+                   ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
+                   return NULL;
+                }
+                sprintf (buf, "%s %ld ", nameList->names[i], nameList->counter[i]);
+                buflen = strlen (buf);
+        }
+        else
+        {
+            namelen = strlen (nameList->names[i]);
+            buflen = (namelen + 1) * nameList->counter[i] + 1;
+            buf = (char *) calloc (buflen, sizeof (char));
+            if ( NULL == buf && ENOMEM == errno )
+            {
+                ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
+                return NULL;
+            }
+            
+            for ( unsigned long j = 0; j < nameList->counter[i]; j++)  {
+                sprintf (buf + (unsigned long)j * (namelen + 1), "%s ", nameList->names[i]);
+            }
+        }
 
-      if (buflen + strlen (namestr) >= allocLen)
-	{
-	  allocLen += buflen + MAXLINELEN;
-	  namestr = (char *) realloc (namestr, allocLen * sizeof (char));
-	  if (!namestr)
-	    {
-	      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "realloc");
-	      return NULL;
-	    }
-	}
-      strcat (namestr, buf);
-      FREEUP (buf);
+        if (buflen + strlen (namestr) >= allocLen)
+        {
+            allocLen += buflen + MAXLINELEN;
+            namestr = (char *) realloc (namestr, allocLen * sizeof (char));
+            if ( NULL == namestr && ENOMEM == errno )
+            {
+                ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "realloc");
+                return NULL;
+            }
+        }
+        strcat (namestr, buf);
+        FREEUP (buf);
     }
-  return namestr;
+
+    return namestr;
 }
 
 
-NAMELIST *
+struct nameList *
 lsb_parseLongStr (char *string)
 {
   static char fname[] = "lsb_parseLongStr";
-  static NAMELIST nameList;
-  unsigned long numStr = strlen (string) / 2 + 1;
-  char *prevStr, *curStr;
-  unsigned long numSameStr;
-  int i;
+  static struct nameList nameList;
+  unsigned long numStr     = strlen (string) / 2 + 1;
+  unsigned long numSameStr = 0;
+  char *prevStr;
+  char *curStr;
 
-
-  if (string == NULL || strlen (string) <= 0)
+    if (string == NULL || strlen (string) <= 0)
     {
-      ls_syslog (LOG_ERR, I18N (5653, "%s: bad input"), fname);	/* catgets 5653 */
-      return (NAMELIST *) NULL;
+        /* catgets 5653 */
+        ls_syslog (LOG_ERR, I18N (5653, "%s: bad input"), fname); 
+        return (struct nameList *) NULL;
     }
 
 
-  if (nameList.names != NULL)
+    if (nameList.names != NULL)
     {
-      for (i = 0; i < nameList.listSize; i++)
-	FREEUP (nameList.names[i]);
-      FREEUP (nameList.names);
-      FREEUP (nameList.counter);
+        for ( unsigned long i = 0; i < nameList.listSize; i++) {
+            FREEUP (nameList.names[i]);
+        }
+        FREEUP (nameList.names);
+        FREEUP (nameList.counter);
     }
 
-  nameList.listSize = 0;
-  nameList.names = (char **) calloc (numStr, sizeof (char *));
-  nameList.counter = (int *) calloc (numStr, sizeof (int));
-
-  if (!nameList.names || !nameList.counter)
+    nameList.listSize = 0;
+    nameList.names = (char **) calloc (numStr, sizeof (char *));
+    nameList.counter = (unsigned long *) calloc (numStr, sizeof (int));
+    if ( ( NULL == nameList.names && ENOMEM == errno ) || 
+         ( NULL == nameList.counter && ENOMEM == errno ) )
     {
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
       FREEUP (nameList.names);
       FREEUP (nameList.counter);
-      return (NAMELIST *) NULL;
+      return (struct nameList *) NULL;
     }
 
-
-  numSameStr = 1;
-  prevStr = putstr_ (getNextWord_ (&string));
-
-
-  if (strlen (prevStr) <= 0)
+    numSameStr = 1;
+    prevStr = putstr_ (getNextWord_ (&string));
+    if (strlen (prevStr) <= 0)
     {
-      ls_syslog (LOG_ERR, I18N (5654, "%s: blank input\n"),	/* catgets 5654 */
-		 fname);
-      FREEUP (prevStr);
-      FREEUP (nameList.names);
-      FREEUP (nameList.counter);
-      return (NAMELIST *) & nameList;
+        /* catgets 5654 */
+        ls_syslog (LOG_ERR, I18N (5654, "%s: blank input\n"), fname);
+        FREEUP (prevStr);
+        FREEUP (nameList.names);
+        FREEUP (nameList.counter);
+
+        return (struct nameList *) & nameList;
     }
 
 
-  while ((curStr = getNextWord_ (&string)) != NULL)
+    while ((curStr = getNextWord_ (&string)) != NULL)
     {
-      if (strcmp (curStr, prevStr))
-	{
+        if (strcmp (curStr, prevStr))
+        {
+            if (nameList.listSize == numStr)
+            {
+                /* catgets 5655 */
+                ls_syslog (LOG_ERR, I18N (5655, "%s: list exceeded allocated memory (shouldn't happen)\n"), fname);
+                return (struct nameList *) NULL;
+            }
 
-
-	  if (nameList.listSize == numStr)
-	    {
-	      ls_syslog (LOG_ERR, I18N (5655, "%s: list exceeded allocated memory (shouldn't happen)\n"),	/* catgets 5655 */
-			 fname);
-	      return (NAMELIST *) NULL;
-	    }
-
-
-	  nameList.names[nameList.listSize] = prevStr;
-	  nameList.counter[nameList.listSize] = numSameStr;
-	  nameList.listSize++;
-	  numSameStr = 1;
-	  prevStr = putstr_ (curStr);
-	}
-      else
-	{
-	  numSameStr++;
-	}
+            nameList.names[nameList.listSize] = prevStr;
+            nameList.counter[nameList.listSize] = numSameStr;
+            nameList.listSize++;
+            numSameStr = 1;
+            prevStr = putstr_ (curStr);
+        }
+        else {
+            numSameStr++;
+        }
     }
 
-
-  nameList.names[nameList.listSize] = prevStr;
-  nameList.counter[nameList.listSize] = numSameStr;
-  nameList.listSize++;
-
-
-  nameList.names = (char **) realloc (nameList.names,
-				      nameList.listSize * sizeof (char *));
-  nameList.counter = (int *) realloc (nameList.counter,
-				      nameList.listSize * sizeof (int));
-
-  if (!nameList.names || !nameList.counter)
+    nameList.names[nameList.listSize] = prevStr;
+    nameList.counter[nameList.listSize] = numSameStr;
+    nameList.listSize++;
+    nameList.names = (char **) realloc (nameList.names, nameList.listSize * sizeof (char *));
+    nameList.counter = (unsigned long *) realloc (nameList.counter, nameList.listSize * sizeof (int));
+    if ( ( NULL == nameList.names && ENOMEM == errno ) || 
+         ( NULL == nameList.counter && ENOMEM == errno ) )
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "realloc");
-      for (i = 0; i < nameList.listSize; i++)
-	FREEUP (nameList.names[i]);
-      FREEUP (nameList.names);
-      FREEUP (nameList.counter);
-      nameList.listSize = 0;
-      return (NAMELIST *) NULL;
+        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "realloc");
+        for ( unsigned long i = 0; i < nameList.listSize; i++) {
+            FREEUP (nameList.names[i]);
+        }
+        FREEUP (nameList.names);
+        FREEUP (nameList.counter);
+        nameList.listSize = 0;
+
+        return (struct nameList *) NULL;
     }
-  return (NAMELIST *) & nameList;
+    return (struct nameList *) & nameList;
 
 }
 
 
-NAMELIST *
+struct nameList *
 lsb_parseShortStr (char *string, int format)
 {
   static char fname[] = "lsb_parseShortStr";
-  static NAMELIST nameList;
+  static struct nameList nameList;
   unsigned long numStr = strlen (string) / 2 + 1;
   unsigned int numSameStr;
   char namestr[4 * MAXLINELEN];
   char *name;
   char *curStr;
-  int i;
-
 
   if (string == NULL || strlen (string) <= 0)
     {
       FREEUP (nameList.names);
       FREEUP (nameList.counter);
-      return (NAMELIST *) NULL;
+      return (struct nameList *) NULL;
     }
 
   if (nameList.names != NULL)
     {
-      for (i = 0; i < nameList.listSize; i++)
-	free (nameList.names[i]);
-      free (nameList.names);
-      free (nameList.counter);
+        for ( unsigned long i = 0; i < nameList.listSize; i++) {
+            free (nameList.names[i]);
+        }
+
+        free (nameList.names);
+        free (nameList.counter);
     }
 
   nameList.listSize = 0;
   nameList.names = (char **) calloc (numStr, sizeof (char *));
-  nameList.counter = (int *) calloc (numStr, sizeof (int));
+  nameList.counter = (unsigned long *) calloc (numStr, sizeof (int));
 
   if (!nameList.names || !nameList.counter)
     {
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
       FREEUP (nameList.names);
       FREEUP (nameList.counter);
-      return (NAMELIST *) NULL;
+      return (struct nameList *) NULL;
     }
 
   curStr = getNextWord_ (&string);
@@ -803,85 +779,88 @@ lsb_parseShortStr (char *string, int format)
     {
 
       if (nameList.listSize >= numStr)
-	{
-	  ls_syslog (LOG_ERR, I18N (5656, "%s: list exceeded allocated memory (shouldn't happen)\n"),	/* catgets 5656 */
-		     fname);
-	  return (NAMELIST *) NULL;
-	}
+    {
+      ls_syslog (LOG_ERR, I18N (5656, "%s: list exceeded allocated memory (shouldn't happen)\n"),   /* catgets 5656 */
+             fname);
+      return (struct nameList *) NULL;
+    }
 
       if (format == PRINT_MCPU_HOSTS)
-	{
-	  sprintf (namestr, "%s", curStr);
-	  name = (char *) namestr;
-	  if ((curStr = getNextWord_ (&string)) == NULL)
-	    {
-	      ls_syslog (LOG_ERR, I18N (5657, "%s: LSB_MCPU_HOSTS format error\n"),	/* catgets 5657 */
-			 fname);
-	      FREEUP (nameList.names);
-	      FREEUP (nameList.counter);
-	      return (NAMELIST *) NULL;
-	    }
-	  numSameStr = atoi (curStr);
-	}
+    {
+      sprintf (namestr, "%s", curStr);
+      name = (char *) namestr;
+      if ((curStr = getNextWord_ (&string)) == NULL)
+        {
+          ls_syslog (LOG_ERR, I18N (5657, "%s: LSB_MCPU_HOSTS format error\n"), /* catgets 5657 */
+             fname);
+          FREEUP (nameList.names);
+          FREEUP (nameList.counter);
+          return (struct nameList *) NULL;
+        }
+      numSameStr = (uint) atoi (curStr);
+    }
       else
-	name = lsb_splitName (curStr, &numSameStr);
+    name = lsb_splitName (curStr, &numSameStr);
       if (name != NULL)
-	{
-	  nameList.names[nameList.listSize] = putstr_ (name);
-	  nameList.counter[nameList.listSize] = numSameStr;
-	  nameList.listSize++;
-	}
+    {
+      nameList.names[nameList.listSize] = putstr_ (name);
+      nameList.counter[nameList.listSize] = numSameStr;
+      nameList.listSize++;
+    }
 
       curStr = getNextWord_ (&string);
     }
 
 
-  nameList.names = (char **) realloc (nameList.names,
-				      nameList.listSize * sizeof (char *));
-  nameList.counter = (int *) realloc (nameList.counter,
-				      nameList.listSize * sizeof (int));
-
-  if (!nameList.names || !nameList.counter)
+    nameList.names = (char **) realloc (nameList.names,   nameList.listSize * sizeof (char *));
+    nameList.counter = (unsigned long *) realloc (nameList.counter, nameList.listSize * sizeof (int));
+    if ( ( NULL == nameList.names  && ENOMEM == errno ) || 
+         ( NULL == nameList.counter && ENOMEM == errno ) 
+       )
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "realloc");
-      for (i = 0; i < nameList.listSize; i++)
-	FREEUP (nameList.names[i]);
-      FREEUP (nameList.names);
-      FREEUP (nameList.counter);
-      nameList.listSize = 0;
-      return (NAMELIST *) NULL;
-    }
+        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "realloc");
+        for ( unsigned long i = 0; i < nameList.listSize; i++) {
+            FREEUP (nameList.names[i]);
+        }
 
-  return (NAMELIST *) & nameList;
+        FREEUP (nameList.names);
+        FREEUP (nameList.counter);
+        nameList.listSize = 0;
+
+        return (struct nameList *) NULL;
+    }
+    return (struct nameList *) & nameList;
 
 }
 
 char *
 getUnixSpoolDir (char *spoolDir)
 {
-  char *pTemp = NULL;
-  if ((pTemp = strchr (spoolDir, '|')) != NULL)
+    char *pTemp = NULL;
+    if ((pTemp = strchr (spoolDir, '|')) != NULL)
     {
-      int i = 0;
-      *pTemp = '\0';
-      while (isspace (*(--pTemp)))
-	i++;
-      if (i != 0)
-	{
-	  *(++pTemp) = '\0';
-	}
-      pTemp = spoolDir;
+
+        int i = 0;
+        *pTemp = '\0';
+        while (isspace (*(--pTemp))) {
+            i++;
+        }
+
+        if (i != 0) {
+            *(++pTemp) = '\0';
+        }
+
+        pTemp = spoolDir;
     }
-  else if (spoolDir[0] == '/')
+    else if (spoolDir[0] == '/')
     {
-      pTemp = spoolDir;
+        pTemp = spoolDir;
     }
-  else
-    {
+    else {
       pTemp = NULL;
     }
-  return pTemp;
 
+    return pTemp;
 }
 
 char *
@@ -893,9 +872,9 @@ getNTSpoolDir (char *spoolDir)
       ++pTemp;
 
       while ((pTemp[0] != '\0') && (pTemp[0] == ' '))
-	{
-	  ++pTemp;
-	}
+    {
+      ++pTemp;
+    }
     }
   else if ((spoolDir[0] == '\\') || (spoolDir[1] == ':'))
     {
@@ -919,9 +898,12 @@ jobId64To32 (LS_LONG_INT interJobId, int *jobId, int *jobArrElemId)
 
 
 void
-jobId32To64 (LS_LONG_INT * interJobId, int jobId, int jobArrElemId)
+jobId32To64 (LS_LONG_INT *interJobId, int jobId, int jobArrElemId)
 {
-  *interJobId = LSB_JOBID (jobId, jobArrElemId);
+    assert( jobId >= 0);
+    unsigned long temp = LSB_JOBID ( (unsigned long)jobId, jobArrElemId);
+    assert( temp <= LONG_MAX );
+    *interJobId = (long)temp;
 }
 
 
@@ -938,7 +920,7 @@ supportJobNamePattern (char *jobname)
 
 
       if (*q == '\0' || *q == '/' || *q == '*')
-	continue;
+    continue;
       return -1;
     }
 

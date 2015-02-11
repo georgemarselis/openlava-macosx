@@ -1615,17 +1615,17 @@ extern int lsb_mbd_version;
 #define PRINT_LONG_NAMELIST   0x02
 #define PRINT_MCPU_HOSTS      0x04
 
-typedef struct nameList
+struct nameList
 {
-  int listSize;
-  char **names;
-  int *counter;
-} NAMELIST;
+	unsigned long listSize;
+	unsigned long *counter;
+	char **names;
+};
 
-extern NAMELIST *lsb_parseShortStr (char *, int);
-extern NAMELIST *lsb_parseLongStr (char *);
-extern char *lsb_printNameList (NAMELIST *, int);
-extern NAMELIST *lsb_compressStrList (char **, int);
+extern struct nameList *lsb_parseShortStr (char *, int);
+extern struct nameList *lsb_parseLongStr (char *);
+extern char *lsb_printNameList (struct nameList *, int);
+extern struct nameList *lsb_compressStrList (char **, int);
 extern char *lsb_splitName (char *, unsigned int *);
 
 
