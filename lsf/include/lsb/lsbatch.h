@@ -1527,11 +1527,12 @@ struct sortIntList
 #define LSB_MAX_SD_LENGTH 128
 struct lsbMsgHdr
 {
-    int usrId;
-    int msgId;
-    int type;
-    char *src;
-    char *dest;
+    uid_t usrId;
+    int   msgId;
+    int   type;
+    char padding[4];
+    char  *src;
+    char  *dest;
     LS_LONG_INT jobId;
 };
 

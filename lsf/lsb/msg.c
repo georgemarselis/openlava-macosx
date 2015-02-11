@@ -21,69 +21,69 @@
 #include <pwd.h>
 
 #include "lsb/lsb.h"
+#include "lsb/xdr.h"
 
 int
 lsb_msgjob (LS_LONG_INT jobId, char *msg)
 {
-  struct lsbMsg jmsg;
-  char src[LSB_MAX_SD_LENGTH];
-  char dest[LSB_MAX_SD_LENGTH];
-  struct lsbMsgHdr header;
-  char request_buf[MSGSIZE];
-  char *reply_buf;
-  XDR xdrs;
-  mbdReqType mbdReqtype;
-  int cc;
-  struct LSFHeader hdr;
+    int cc;
+    char *reply_buf;
+    char request_buf[MSGSIZE];
+    char dest[LSB_MAX_SD_LENGTH];
+    char src[LSB_MAX_SD_LENGTH];
+    struct passwd *pw;
+    struct lsbMsg jmsg;
+    struct LSFHeader hdr;
+    struct lsbMsgHdr header;
+    XDR xdrs;
+    mbdReqType mbdReqtype;
 
-  struct passwd *pw;
+    header.src = src;
+    header.dest = dest;
+    jmsg.header = &header;
 
-  header.src = src;
-  header.dest = dest;
-  jmsg.header = &header;
-
-  TIMEIT (0, (pw = getpwuid (getuid ())), "getpwuid");
-  if (pw == NULL)
-    {
-      lsberrno = LSBE_BAD_USER;
-      return (-1);
+    TIMEIT (0, (pw = getpwuid (getuid ())), "getpwuid");
+    if (pw == NULL) {
+        lsberrno = LSBE_BAD_USER;
+        return (-1);
     }
 
-  jmsg.header->usrId = pw->pw_uid;
-  jmsg.header->jobId = jobId;
-  jmsg.msg = msg;
-  strcpy (jmsg.header->src, "lsbatch");
-  strcpy (jmsg.header->dest, "user job");
-  jmsg.header->msgId = 999;
-  jmsg.header->type = -1;
+    jmsg.header->usrId = pw->pw_uid;
+    jmsg.header->jobId = jobId;
+    jmsg.msg = msg;
+    strcpy (jmsg.header->src, "lsbatch");
+    strcpy (jmsg.header->dest, "user job");
+    jmsg.header->msgId = 999;
+    jmsg.header->type = -1;
 
-  mbdReqtype = BATCH_JOB_MSG;
-  xdrmem_create (&xdrs, request_buf, MSGSIZE, XDR_ENCODE);
+    mbdReqtype = BATCH_JOB_MSG;
+    xdrmem_create (&xdrs, request_buf, MSGSIZE, XDR_ENCODE);
 
-  hdr.opCode = mbdReqtype;
-  if (!xdr_encodeMsg (&xdrs, (char *) &jmsg, &hdr, xdr_lsbMsg, 0, NULL))
-    {
-      lsberrno = LSBE_XDR;
-      xdr_destroy (&xdrs);
-      return (-1);
+    hdr.opCode = mbdReqtype;
+    if (!xdr_encodeMsg (&xdrs, (char *) &jmsg, &hdr, xdr_lsbMsg, 0, NULL)) {
+        lsberrno = LSBE_XDR;
+        xdr_destroy (&xdrs);
+        return (-1);
     }
 
-  cc = callmbd (NULL, request_buf, XDR_GETPOS (&xdrs), &reply_buf,
-		&hdr, NULL, NULL, NULL);
+    assert( XDR_GETPOS (&xdrs) <= INT_MAX );
+    cc = callmbd (NULL, request_buf, (int)XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL);
 
-  if (cc < 0)
-    {
-      xdr_destroy (&xdrs);
-      return (-1);
+    if (cc < 0) {
+        xdr_destroy (&xdrs);
+        return (-1);
     }
 
-  xdr_destroy (&xdrs);
-  if (cc != 0)
-    free (reply_buf);
+    xdr_destroy (&xdrs);
+    if (cc != 0) {
+        free (reply_buf);
+    }
 
-  lsberrno = hdr.opCode;
-  if (lsberrno == LSBE_NO_ERROR)
-    return (0);
-  else
-    return (-1);
+    lsberrno = hdr.opCode;
+    if (lsberrno == LSBE_NO_ERROR) {
+        return (0);
+    }
+    else {
+        return (-1);
+    }
 }
