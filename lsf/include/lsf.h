@@ -573,9 +573,8 @@ typedef struct lsSharedResourceInfo
 
 struct clusterConf
 {
-
-  int numHosts;
   int numShareRes;
+  uint numHosts;
   LS_SHARED_RESOURCE_INFO_T *shareRes;
   struct hostInfo *hosts;
   struct clusterInfo *clinfo;

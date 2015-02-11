@@ -286,7 +286,7 @@ extern int writetaskfile_ (char *, hTab *, hTab *, hTab *, hTab *);
 
 extern int expSyntax_ (char *);
 
-extern char *getNextLineC_ (FILE *fp, size_t *LineCount, int confFormat);
+extern char *getNextLineC_ (FILE *fp, uint *lineNum, int confFormat);
 extern char *getNextLine_ (FILE *, int);
 extern char *getNextWord_ (char **);
 extern char *getNextWord1_ (char **line);
@@ -301,25 +301,25 @@ extern int pushStack (struct pStack *, struct confNode *);
 extern struct confNode *popStack (struct pStack *);
 extern void freeStack (struct pStack *);
 
-extern char *getNextLineD_ (FILE *fp, unsigned long *lineNum, int truefalse);
-extern char *getNextLineC_conf (struct lsConf *conf, size_t *LineCount, int confFormat);
+extern char *getNextLineD_ (FILE *fp, uint *lineNum, int truefalse);
+extern char *getNextLineC_conf (struct lsConf *conf, uint *lineNum, int confFormat);
 extern char *getNextLine_conf (struct lsConf *, int);
 extern char *nextline_ (FILE *);
 extern void subNewLine_ (char *);
 
-extern void doSkipSection (FILE *fp, size_t *lineNum, char *fname, char *unknown);
-extern int isSectionEnd (char *linep, char *fname, size_t *lineNum, char *newindex);
+extern void doSkipSection (FILE *fp, uint *lineNum, char *fname, char *unknown);
+extern int isSectionEnd (char *linep, char *fname, uint *lineNum, char *newindex);
 extern int keyMatch (struct keymap *keyList, char *line, int exact);
 extern int mapValues (struct keymap *keyList, char *line);
-extern int readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *fname, size_t *lineNum, int boolean, char *newindex);
+extern int readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *fname, uint *lineNum, int boolean, char *newindex);
 extern char *getNextValue (char **line);
 extern int putValue (struct keymap *keyList, char *key, char *value);
-extern char *getBeginLine (FILE *fp, size_t *lineNum);
-extern int putInLists (char *word, struct admins *admins, unsigned int *numAds, char *forWhat);
-extern int isInlist (char **adminNames, char *userName, unsigned int actAds);
+extern char *getBeginLine (FILE *fp, uint *lineNum);
+extern int putInLists (char *word, struct admins *admins, uint *numAds, char *forWhat);
+extern int isInlist (char **adminNames, char *userName, uint actAds);
 
-extern void doSkipSection_conf (struct lsConf *conf, size_t *LineNum, char *lsfile, char *sectionName);
-extern char *getBeginLine_conf (struct lsConf *conf, size_t *LineNum);
+extern void doSkipSection_conf (struct lsConf *conf, uint *lineNum, char *lsfile, char *sectionName);
+extern char *getBeginLine_conf (struct lsConf *conf, uint *lineNum);
 
 extern void defaultAllHandlers (void);
 
@@ -363,7 +363,7 @@ extern int ls_setlogmask (int maskpri);
 
 extern void initkeylist (struct keymap *keyList, int, int, struct lsInfo *);
 extern void freekeyval (struct keymap *keyList);
-extern char *parsewindow (char *val, char *fname, size_t *lineNum, char *host);
+extern char *parsewindow (char *val, char *fname, uint *lineNum, char *host);
 
 extern int expandList_ (char ***, int, char **);
 extern int expandList1_ (char ***, int, int *, char **);

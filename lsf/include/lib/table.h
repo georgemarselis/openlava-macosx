@@ -101,7 +101,7 @@ extern void h_initTab_ (hTab * tabPtr, unsigned long numSlots);
 extern void h_freeTab_ (hTab *, void (*destroy) (void *));
 extern int h_TabEmpty_ (hTab *);
 extern void h_delTab_ (hTab *);
-extern hEnt *h_getEnt_ (hTab *, const char *);
+extern hEnt *h_getEnt_ (hTab *tabPtr, const char *key);
 extern hEnt *h_addEnt_ (hTab *, const char *, int *);
 extern void h_delEnt_ (hTab *, hEnt *);
 extern void h_rmEnt_ (hTab *, hEnt *);
