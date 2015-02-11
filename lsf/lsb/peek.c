@@ -23,6 +23,8 @@
 #include <errno.h>
 
 #include "lsb/lsb.h"
+#include "lsb/xdr.h"
+
 char *
 lsb_peekjob (LS_LONG_INT jobid)
 {
@@ -60,17 +62,16 @@ lsb_peekjob (LS_LONG_INT jobid)
   xdrmem_create (&xdrs, request_buf, MSGSIZE, XDR_ENCODE);
 
   hdr.opCode = mbdReqtype;
-  if (!xdr_encodeMsg (&xdrs, (char *) &jobPeekReq, &hdr, xdr_jobPeekReq, 0,
-		      &auth))
+  if (!xdr_encodeMsg (&xdrs, (char *) &jobPeekReq, &hdr, xdr_jobPeekReq, 0, &auth))
     {
       lsberrno = LSBE_XDR;
       xdr_destroy (&xdrs);
       return (NULL);
     }
 
-
-  if ((cc = callmbd (NULL, request_buf, XDR_GETPOS (&xdrs), &reply_buf,
-		     &hdr, NULL, NULL, NULL)) == -1)
+    assert( XDR_GETPOS (&xdrs) <= INT_MAX );
+  cc = callmbd (NULL, request_buf, (int)XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL);
+  if (-1 == cc )
     {
       xdr_destroy (&xdrs);
       return (NULL);
@@ -86,7 +87,8 @@ lsb_peekjob (LS_LONG_INT jobid)
       char fnBuf[MAXPATHLEN];
       struct passwd *pw;
       LS_STAT_T st;
-      xdrmem_create (&xdrs, reply_buf, XDR_DECODE_SIZE_ (cc), XDR_DECODE);
+      assert ( XDR_DECODE_SIZE_ (cc) >= 0 );
+      xdrmem_create (&xdrs, reply_buf, (uint)XDR_DECODE_SIZE_ (cc), XDR_DECODE);
 
       if (!xdr_jobPeekReply (&xdrs, &jobPeekReply, &hdr))
 	{
@@ -117,8 +119,7 @@ lsb_peekjob (LS_LONG_INT jobid)
 
       if (logclass & LC_EXEC)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: the jobReply.outfile is <%s>",
-		     fname, jobPeekReply.outFile);
+	  ls_syslog (LOG_DEBUG, "%s: the jobReply.outfile is <%s>", fname, jobPeekReply.outFile);
 	}
       pSpoolDirUnix = getUnixSpoolDir (jobPeekReply.pSpoolDir);
 
