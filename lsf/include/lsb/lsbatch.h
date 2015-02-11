@@ -525,37 +525,38 @@ struct xFile
 
 struct submit
 {
-  int options;
-  int options2;
-  char *jobName;
-  char *queue;
-  int numAskedHosts;
-  char **askedHosts;
-  char *resReq;
-  int rLimits[LSF_RLIM_NLIMITS];
-  char *hostSpec;
-  int numProcessors;
-  char *dependCond;
-  time_t beginTime;
-  time_t termTime;
-  int sigValue;
-  char *inFile;
-  char *outFile;
-  char *errFile;
-  char *command;
-  char *newCommand;
-  time_t chkpntPeriod;
-  char *chkpntDir;
-  int nxf;
-  struct xFile *xf;
-  char *preExecCmd;
-  char *mailUser;
-  int delOptions;
-  int delOptions2;
-  char *projectName;
-  int maxNumProcessors;
-  char *loginShell;
-  int userPriority;
+    int options;
+    int options2;
+    int numAskedHosts;
+    int numProcessors;
+    int sigValue;
+    int nxf;
+    int delOptions;
+    int delOptions2;
+    int maxNumProcessors;
+    int userPriority;
+    int rLimits[LSF_RLIM_NLIMITS];
+    char padding[4];
+    char *jobName;
+    char *queue;
+    char *resReq;
+    char *hostSpec;
+    char *dependCond;
+    char *inFile;
+    char *outFile;
+    char *errFile;
+    char *command;
+    char *newCommand;
+    char **askedHosts;
+    char *chkpntDir;
+    char *preExecCmd;
+    char *mailUser;
+    char *projectName;
+    char *loginShell;
+    time_t beginTime;
+    time_t termTime;
+    time_t chkpntPeriod;
+    struct xFile *xf;
 };
 
 struct submitReply
@@ -648,51 +649,53 @@ struct jobAttrSetLog
 struct jobInfoHead
 {
   int numJobs;
-  LS_LONG_INT *jobIds;
   int numHosts;
+  LS_LONG_INT *jobIds;
   char **hostNames;
 };
 
 struct jobInfoEnt
 {
-  LS_LONG_INT jobId;
-  char *user;
-  int status;
-  int *reasonTb;
-  int numReasons;
-  int reasons;
-  int subreasons;
-  int jobPid;
-  time_t submitTime;
-  time_t reserveTime;
-  time_t startTime;
-  time_t predictedStartTime;
-  time_t endTime;
-  float cpuTime;
-  int umask;
-  char *cwd;
-  char *subHomeDir;
-  char *fromHost;
-  char **exHosts;
-  int numExHosts;
-  float cpuFactor;
-  int nIdx;
-  float *loadSched;
-  float *loadStop;
-  struct submit submit;
-  int exitStatus;
-  int execUid;
-  char *execHome;
-  char *execCwd;
-  char *execUsername;
-  time_t jRusageUpdateTime;
-  struct jRusage runRusage;
-  int jType;
-  char *parentGroup;
-  char *jName;
-  int counter[NUM_JGRP_COUNTERS];
-  u_short port;
-  int jobPriority;
+    u_short port;
+    char padding[2];
+    int status;
+    int numReasons;
+    int reasons;
+    int subreasons;
+    int jobPid;
+    int numExHosts;
+    int umask;
+    int nIdx;
+    int exitStatus;
+    int execUid;
+    int jType;
+    int jobPriority;
+    char padding2[4];
+    char *user;
+    char *cwd;
+    char *subHomeDir;
+    char *fromHost;
+    char **exHosts;
+    char *execHome;
+    char *execCwd;
+    char *execUsername;
+    char *parentGroup;
+    char *jName;
+    float *loadSched;
+    float *loadStop;
+    float cpuTime;
+    float cpuFactor;
+    time_t submitTime;
+    time_t reserveTime;
+    time_t startTime;
+    time_t predictedStartTime;
+    time_t endTime;
+    time_t jRusageUpdateTime;
+    int *reasonTb;
+    int counter[NUM_JGRP_COUNTERS];
+    struct submit submit;
+    struct jRusage runRusage;
+    LS_LONG_INT jobId;
 };
 
 struct userInfoEnt
@@ -867,16 +870,16 @@ struct groupInfoEnt
   char *memberList;
 };
 
-struct runJobRequest
-{
-  LS_LONG_INT jobId;
-  int numHosts;
-  char **hostname;
 #define RUNJOB_OPT_NORMAL     0x01
 #define RUNJOB_OPT_NOSTOP     0x02
 #define RUNJOB_OPT_PENDONLY   0x04
 #define RUNJOB_OPT_FROM_BEGIN 0x08
+struct runJobRequest
+{
+  int numHosts;
   int options;
+  LS_LONG_INT jobId;
+  char **hostname;
 };
 
 #define REQUEUE_DONE   0x1

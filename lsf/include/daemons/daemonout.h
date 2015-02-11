@@ -86,46 +86,48 @@ typedef enum
 
 struct submitReq
 {
-  int options;
-  int options2;
-  char *jobName;
-  char *queue;
-  int numAskedHosts;
-  char **askedHosts;
-  char *resReq;
-  int rLimits[LSF_RLIM_NLIMITS];
-  char *hostSpec;
-  int numProcessors;
-  char *dependCond;
-  time_t beginTime;
-  time_t termTime;
-  int sigValue;
-  char *subHomeDir;
-  char *inFile;
-  char *outFile;
-  char *errFile;
-  char *command;
-  char *inFileSpool;
-  char *commandSpool;
-  time_t chkpntPeriod;
-  char *chkpntDir;
-  int restartPid;
-  int nxf;
-  struct xFile *xf;
-  char *jobFile;
-  char *fromHost;
-  time_t submitTime;
-  int umask;
-  char *cwd;
-  char *preExecCmd;
-  char *mailUser;
-  char *projectName;
-  int niosPort;
-  int maxNumProcessors;
-  char *loginShell;
-  char *schedHostType;
-  char *userGroup;
-  int userPriority;
+    int options;
+    int options2;
+    int numAskedHosts;
+    int numProcessors;
+    int sigValue;
+    int restartPid;
+    int nxf;
+    int umask;
+    int niosPort;
+    int maxNumProcessors;
+    int userPriority;
+    char padding1[4];
+    char *jobName;
+    char *queue;
+    char *jobFile;
+    char *fromHost;
+    char *resReq;
+    char *hostSpec;
+    char *subHomeDir;
+    char *inFile;
+    char *outFile;
+    char *errFile;
+    char *command;
+    char *inFileSpool;
+    char *commandSpool;
+    char **askedHosts;
+    char *dependCond;
+    char *chkpntDir;
+    char *cwd;
+    char *preExecCmd;
+    char *mailUser;
+    char *projectName;
+    char *loginShell;
+    char *schedHostType;
+    char *userGroup;
+    time_t beginTime;
+    time_t termTime;
+    time_t chkpntPeriod;
+    time_t submitTime;
+    int rLimits[LSF_RLIM_NLIMITS];
+    char padding2[4];
+    struct xFile *xf;
 };
 
 
@@ -164,9 +166,10 @@ struct modifyReq
 
 struct jobInfoReq
 {
-  int options;
-  char *userName;
   LS_LONG_INT jobId;
+  int options;
+  char padding[4];
+  char *userName;
   char *jobName;
   char *queue;
   char *host;
@@ -175,38 +178,40 @@ struct jobInfoReq
 struct jobInfoReply
 {
   LS_LONG_INT jobId;
-  int status;
+  u_short port;
+  char padding1[6];
   int *reasonTb;
+  int status;
   int numReasons;
   int reasons;
   int subreasons;
+  int numToHosts;
+  int nIdx;
+  int userId;
+  int execUid;
+  int exitStatus;
+  int jobPid;
+  int jType;
+  int jobPriority;
   time_t startTime;
   time_t predictedStartTime;
   time_t endTime;
-  float cpuTime;
-  int numToHosts;
-  char **toHosts;
-  int nIdx;
-  float *loadSched;
-  float *loadStop;
-  int userId;
+  time_t reserveTime;
+  time_t jRusageUpdateTime;
   char *userName;
-  int execUid;
-  int exitStatus;
   char *execHome;
   char *execCwd;
   char *execUsername;
+  char **toHosts;
+  float *loadSched;
+  float *loadStop;
   struct submitReq *jobBill;
-  time_t reserveTime;
-  int jobPid;
-  time_t jRusageUpdateTime;
   struct jRusage runRusage;
-  int jType;
   char *parentGroup;
   char *jName;
+  float cpuTime;
   int counter[NUM_JGRP_COUNTERS];
-  u_short port;
-  int jobPriority;
+  char padding3[4];
 };
 
 struct infoReq

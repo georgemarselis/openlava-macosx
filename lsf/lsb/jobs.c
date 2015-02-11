@@ -23,6 +23,7 @@
 #include <string.h>
 
 #include "lsb/lsb.h"
+#include "lsb/xdr.h"
 
 extern int errno;
 
@@ -33,8 +34,7 @@ extern int _lsb_recvtimeout;
 static int mbdSock = -1;
 
 int
-lsb_openjobinfo (LS_LONG_INT jobId, char *jobName, char *userName,
-		 char *queueName, char *hostName, int options)
+lsb_openjobinfo (LS_LONG_INT jobId, char *jobName, char *userName, char *queueName, char *hostName, int options)
 {
   struct jobInfoHead *jobInfoHead;
 
@@ -47,8 +47,7 @@ lsb_openjobinfo (LS_LONG_INT jobId, char *jobName, char *userName,
 }
 
 struct jobInfoHead *
-lsb_openjobinfo_a (LS_LONG_INT jobId, char *jobName, char *userName,
-		   char *queueName, char *hostName, int options)
+lsb_openjobinfo_a (LS_LONG_INT jobId, char *jobName, char *userName, char *queueName, char *hostName, int options)
 {
   static int first = TRUE;
   static struct jobInfoReq jobInfoReq;
@@ -190,10 +189,8 @@ lsb_openjobinfo_a (LS_LONG_INT jobId, char *jobName, char *userName,
     }
 
 
-
-  TIMEIT (0, (cc = callmbd (clusterName, request_buf, XDR_GETPOS (&xdrs),
-			    &reply_buf, &hdr, &mbdSock, NULL, NULL)),
-	  "callmbd");
+  assert( XDR_GETPOS (&xdrs) <= INT_MAX );
+  TIMEIT (0, (cc = callmbd (clusterName, request_buf, (int)XDR_GETPOS (&xdrs), &reply_buf, &hdr, &mbdSock, NULL, NULL)), "callmbd");
   if (cc == -1)
     {
       xdr_destroy (&xdrs);
@@ -208,8 +205,8 @@ lsb_openjobinfo_a (LS_LONG_INT jobId, char *jobName, char *userName,
   if (lsberrno == LSBE_NO_ERROR)
     {
 
-
-      xdrmem_create (&xdrs2, reply_buf, XDR_DECODE_SIZE_ (cc), XDR_DECODE);
+      assert( cc >= 0);
+      xdrmem_create (&xdrs2, reply_buf, XDR_DECODE_SIZE_ ((uint)cc), XDR_DECODE);
       if (!xdr_jobInfoHead (&xdrs2, &jobInfoHead, &hdr))
 	{
 	  lsberrno = LSBE_XDR;
@@ -320,11 +317,9 @@ lsb_readjobinfo (int *more)
   FREEUP (jobInfoReply.parentGroup);
   FREEUP (jobInfoReply.jName);
 
-  TIMEIT (1,
-	  xdrmem_create (&xdrs, buffer, XDR_DECODE_SIZE_ (hdr.length),
-			 XDR_DECODE), "xdrmem_create");
-  TIMEIT (1, (aa = xdr_jobInfoReply (&xdrs, &jobInfoReply, &hdr)),
-	  "xdr_jobInfoReply");
+  assert( XDR_DECODE_SIZE_ (hdr.length) <= UINT_MAX );
+  TIMEIT (1, xdrmem_create (&xdrs, buffer, XDR_DECODE_SIZE_ ( (uint) hdr.length), XDR_DECODE), "xdrmem_create");
+  TIMEIT (1, (aa = xdr_jobInfoReply (&xdrs, &jobInfoReply, &hdr)), "xdr_jobInfoReply");
   if (aa == FALSE)
     {
       lsberrno = LSBE_XDR;
@@ -441,8 +436,10 @@ lsb_readjobinfo (int *more)
       jobInfoReply.runRusage.npgids = 0;
     }
 
-  if (more)
-    *more = hdr.reserved;
+  if (more) {
+    assert( hdr.reserved <= INT_MAX);
+    *more = (int)hdr.reserved;
+  }
 
   return &jobInfo;
 }
@@ -513,11 +510,8 @@ lsb_runjob (struct runJobRequest *runJobRequest)
     }
 
 
-
-  if ((cc = callmbd (NULL,
-		     request_buf,
-		     XDR_GETPOS (&xdrs),
-		     &reply_buf, &lsfHeader, NULL, NULL, NULL)) == -1)
+    assert(XDR_GETPOS (&xdrs) <= INT_MAX );
+  if ((cc = callmbd (NULL, request_buf, (int)XDR_GETPOS (&xdrs), &reply_buf, &lsfHeader, NULL, NULL, NULL)) == -1)
     {
       xdr_destroy (&xdrs);
       return (-1);
