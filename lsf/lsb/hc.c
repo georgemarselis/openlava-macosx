@@ -23,6 +23,7 @@
 #include <pwd.h>
 
 #include "lsb/lsb.h"
+#include "lsb/xdr.h"
 
 int
 lsb_hostcontrol (char *host, int opCode)
@@ -104,16 +105,14 @@ lsb_hostcontrol (char *host, int opCode)
   if (opCode == HOST_REBOOT || opCode == HOST_SHUTDOWN)
     {
 
-      if ((cc = cmdCallSBD_ (hostControlReq.name, request_buf,
-			     XDR_GETPOS (&xdrs), &reply_buf,
-			     &hdr, NULL)) == -1)
+      assert(  XDR_GETPOS (&xdrs) <= INT_MAX );
+      if ((cc = cmdCallSBD_ (hostControlReq.name, request_buf, (int) XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL)) == -1)
 	return (-1);
     }
   else
     {
-
-      if ((cc = callmbd (NULL, request_buf, XDR_GETPOS (&xdrs), &reply_buf,
-			 &hdr, NULL, NULL, NULL)) == -1)
+      assert(  XDR_GETPOS (&xdrs) <= INT_MAX );
+      if ((cc = callmbd (NULL, request_buf, (int) XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL)) == -1)
 	return (-1);
     }
 

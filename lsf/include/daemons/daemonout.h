@@ -246,6 +246,7 @@ struct hostDataReply
 struct groupInfoReply
 {
   int numGroups;
+  char padding[4];
   struct groupInfoEnt *groups;
 };
 
@@ -286,8 +287,9 @@ struct jobSwitchReq
 
 struct controlReq
 {
-  int opCode;
   char *name;
+  int opCode;
+  char padding[4];
 };
 
 

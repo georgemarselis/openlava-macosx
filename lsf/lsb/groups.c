@@ -21,11 +21,10 @@
 #include <string.h>
 
 #include "lsb/lsb.h"
+#include "lsb/xdr.h"
 
 static struct groupInfoEnt *getGrpInfo (char **, int *, int);
-
-static int sendGrpReq (char *, int, struct infoReq *,
-		       struct groupInfoReply *);
+static int sendGrpReq (char *, int, struct infoReq *, struct groupInfoReply *);
 
 struct groupInfoEnt *
 lsb_usergrpinfo (char **groups, int *numGroups, int options)
@@ -123,17 +122,16 @@ getGrpInfo (char **groups, int *numGroups, int options)
 }
 
 static int
-sendGrpReq (char *clusterName, int options, struct infoReq *groupInfo,
-	    struct groupInfoReply *reply)
+sendGrpReq (char *clusterName, int options, struct infoReq *groupInfo, struct groupInfoReply *reply)
 {
   XDR xdrs;
   char request_buf[MSGSIZE];
   char *reply_buf;
   struct LSFHeader hdr;
   mbdReqType mbdReqtype;
-  int cc;
+  int cc = 0;
 
-
+assert( options );
 
   xdr_lsffree (xdr_groupInfoReply, (char *) reply, &hdr);
 
@@ -150,10 +148,8 @@ sendGrpReq (char *clusterName, int options, struct infoReq *groupInfo,
     }
 
 
-  if ((cc = callmbd (clusterName,
-		     request_buf,
-		     XDR_GETPOS (&xdrs),
-		     &reply_buf, &hdr, NULL, NULL, NULL)) == -1)
+    assert( XDR_GETPOS (&xdrs) >= 0);
+  if ((cc = callmbd (clusterName, request_buf, (int) XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL)) == -1)
     {
       xdr_destroy (&xdrs);
       return (-1);
@@ -166,7 +162,8 @@ sendGrpReq (char *clusterName, int options, struct infoReq *groupInfo,
   lsberrno = hdr.opCode;
   if (lsberrno == LSBE_NO_ERROR || lsberrno == LSBE_BAD_GROUP)
     {
-      xdrmem_create (&xdrs, reply_buf, XDR_DECODE_SIZE_ (cc), XDR_DECODE);
+      assert( cc >= 0 );
+      xdrmem_create (&xdrs, reply_buf, XDR_DECODE_SIZE_ ((uint)cc), XDR_DECODE);
 
       if (!xdr_groupInfoReply (&xdrs, reply, &hdr))
 	{
