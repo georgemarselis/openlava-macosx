@@ -28,10 +28,10 @@ lsb_reconfig (int configFlag)
   XDR xdrs;
   char request_buf[MSGSIZE];
   char *reply_buf;
-  int cc;
+  int cc = 0;
   struct LSFHeader hdr;
   struct lsfAuth auth;
-  int tmp;
+  uint tmp = 0;
 
   mbdReqtype = BATCH_RECONFIG;
 
@@ -42,7 +42,8 @@ lsb_reconfig (int configFlag)
 
   initLSFHeader_ (&hdr);
   hdr.opCode = mbdReqtype;
-  tmp = (short) configFlag;
+  assert( configFlag >= 0 );
+  tmp = (uint)configFlag;
   hdr.reserved = tmp;
 
   if (!xdr_encodeMsg (&xdrs, NULL, &hdr, NULL, 0, &auth))
@@ -51,7 +52,8 @@ lsb_reconfig (int configFlag)
       return (-1);
     }
 
-  if ((cc = callmbd (NULL, request_buf, XDR_GETPOS (&xdrs), &reply_buf,
+    assert( XDR_GETPOS (&xdrs) <= INT_MAX );
+  if ((cc = callmbd (NULL, request_buf, (int)XDR_GETPOS (&xdrs), &reply_buf,
 		     &hdr, NULL, NULL, NULL)) == -1)
     {
       xdr_destroy (&xdrs);
