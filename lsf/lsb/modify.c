@@ -23,18 +23,19 @@
 
 #include "lsb/lsb.h"
 #include "lsb/spool.h"
+#include "lsb/xdr.h"
 
-#define  NL_SETN   13
+// #define  NL_SETN   13
 
 static LS_LONG_INT sendModifyReq (struct modifyReq *, struct submitReply *,
-				  struct lsfAuth *);
+          struct lsfAuth *);
 static int esubValModify (struct submit *);
 extern void makeCleanToRunEsub ();
 extern void modifyJobInformation (struct submit *);
 
 LS_LONG_INT
 lsb_modify (struct submit *jobSubReq, struct submitReply *submitRep,
-	    LS_LONG_INT job)
+      LS_LONG_INT job)
 {
   struct modifyReq modifyReq;
   int i;
@@ -108,7 +109,7 @@ lsb_modify (struct submit *jobSubReq, struct submitReply *submitRep,
       goto cleanup;
     }
   if (getOtherParams (jobSubReq, &modifyReq.submitReq,
-		      submitRep, &auth, &subSpoolFiles) < 0)
+          submitRep, &auth, &subSpoolFiles) < 0)
     {
       goto cleanup;
     }
@@ -119,27 +120,27 @@ lsb_modify (struct submit *jobSubReq, struct submitReply *submitRep,
     {
 
       if ((jobSubReq->termTime != 0 && jobSubReq->termTime != DELETE_NUMBER)
-	  && jobSubReq->beginTime == 0
-	  && jInfo->submit.beginTime > jobSubReq->termTime)
-	{
-	  lsberrno = LSBE_START_TIME;
-	  goto cleanup;
-	}
+    && jobSubReq->beginTime == 0
+    && jInfo->submit.beginTime > jobSubReq->termTime)
+  {
+    lsberrno = LSBE_START_TIME;
+    goto cleanup;
+  }
       if (jobSubReq->beginTime != 0
-	  && jobSubReq->termTime == 0
-	  && jInfo->submit.termTime > 0
-	  && jInfo->submit.termTime < jobSubReq->beginTime)
-	{
-	  lsberrno = LSBE_START_TIME;
-	  goto cleanup;
-	}
+    && jobSubReq->termTime == 0
+    && jInfo->submit.termTime > 0
+    && jInfo->submit.termTime < jobSubReq->beginTime)
+  {
+    lsberrno = LSBE_START_TIME;
+    goto cleanup;
+  }
     }
   lsb_closejobinfo ();
 
   for (i = 0; i < LSF_RLIM_NLIMITS; i++)
     {
       if (jobSubReq->rLimits[i] == DELETE_NUMBER)
-	modifyReq.submitReq.rLimits[i] = DELETE_NUMBER;
+  modifyReq.submitReq.rLimits[i] = DELETE_NUMBER;
     }
 
   jobId = sendModifyReq (&modifyReq, submitRep, &auth);
@@ -154,27 +155,27 @@ cleanup:
 
 
       if (subSpoolFiles.inFileSpool[0])
-	{
-	  spoolHost = getSpoolHostBySpoolFile (subSpoolFiles.inFileSpool);
-	  err = chUserRemoveSpoolFile (spoolHost, subSpoolFiles.inFileSpool);
-	  if (err)
-	    {
-	      fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 850, "Modification failed, and the spooled file <%s> can not be removed on host <%s>, please manually remove it")),	/* catgets  850 */
-		       subSpoolFiles.inFileSpool, spoolHost);
-	    }
-	}
+  {
+    spoolHost = getSpoolHostBySpoolFile (subSpoolFiles.inFileSpool);
+    err = chUserRemoveSpoolFile (spoolHost, subSpoolFiles.inFileSpool);
+    if (err)
+      {
+        /* catgets  850 */
+        fprintf (stderr, "catgets 850: Modification failed, and the spooled file <%s> can not be removed on host <%s>, please manually remove it", subSpoolFiles.inFileSpool, spoolHost);
+      }
+  }
 
 
       if (subSpoolFiles.commandSpool[0])
-	{
-	  spoolHost = getSpoolHostBySpoolFile (subSpoolFiles.commandSpool);
-	  err = chUserRemoveSpoolFile (spoolHost, subSpoolFiles.commandSpool);
-	  if (err)
-	    {
-	      fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 850, "Modification failed, and the spooled file <%s> can not be removed on host <%s>, please manually remove it")),	/* catgets  850 */
-		       subSpoolFiles.commandSpool, spoolHost);
-	    }
-	}
+  {
+    spoolHost = getSpoolHostBySpoolFile (subSpoolFiles.commandSpool);
+    err = chUserRemoveSpoolFile (spoolHost, subSpoolFiles.commandSpool);
+    if (err)
+      {
+        /* catgets  850 */
+        fprintf (stderr, "catgets 850: Modification failed, and the spooled file <%s> can not be removed on host <%s>, please manually remove it", subSpoolFiles.commandSpool, spoolHost);
+      }
+  }
     }
 
   return (jobId);
@@ -183,7 +184,7 @@ cleanup:
 
 static LS_LONG_INT
 sendModifyReq (struct modifyReq *modifyReq, struct submitReply *submitReply,
-	       struct lsfAuth *auth)
+         struct lsfAuth *auth)
 {
   mbdReqType mbdReqtype;
   XDR xdrs;
@@ -199,14 +200,15 @@ sendModifyReq (struct modifyReq *modifyReq, struct submitReply *submitReply,
   xdrmem_create (&xdrs, request_buf, 2 * MSGSIZE, XDR_ENCODE);
   hdr.opCode = mbdReqtype;
   if (!xdr_encodeMsg (&xdrs, (char *) modifyReq, &hdr, xdr_modifyReq, 0,
-		      auth))
+          auth))
     {
       xdr_destroy (&xdrs);
       lsberrno = LSBE_XDR;
       return (-1);
     }
-  if ((cc = callmbd (NULL, request_buf, XDR_GETPOS (&xdrs), &reply_buf,
-		     &hdr, NULL, NULL, NULL)) < 0)
+
+    assert( XDR_GETPOS (&xdrs) <= INT_MAX );
+    if ((cc = callmbd (NULL, request_buf, (int)XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL)) < 0)
     {
       xdr_destroy (&xdrs);
       return (-1);
@@ -233,7 +235,8 @@ sendModifyReq (struct modifyReq *modifyReq, struct submitReply *submitReply,
     }
 
 
-  xdrmem_create (&xdrs, reply_buf, XDR_DECODE_SIZE_ (cc), XDR_DECODE);
+assert( XDR_DECODE_SIZE_ (cc) >= 0 );
+  xdrmem_create (&xdrs, reply_buf, (uint) XDR_DECODE_SIZE_ (cc), XDR_DECODE);
 
   if (!xdr_submitMbdReply (&xdrs, reply, &hdr))
     {
@@ -259,7 +262,7 @@ sendModifyReq (struct modifyReq *modifyReq, struct submitReply *submitReply,
   if (lsberrno == LSBE_NO_ERROR)
     {
       if (reply->jobId == 0)
-	lsberrno = LSBE_PROTOCOL;
+  lsberrno = LSBE_PROTOCOL;
       jobId = reply->jobId;
       free (reply);
       return (jobId);
@@ -314,15 +317,14 @@ lsb_setjobattr (int jobId, struct jobAttrInfoEnt *jobAttr)
   mbdReqtype = BATCH_SET_JOB_ATTR;
   xdrmem_create (&xdrs, request_buf, MSGSIZE, XDR_ENCODE);
   hdr.opCode = mbdReqtype;
-  if (!xdr_encodeMsg
-      (&xdrs, (char *) jobAttr, &hdr, xdr_jobAttrReq, 0, &auth))
+  if (!xdr_encodeMsg(&xdrs, (char *) jobAttr, &hdr, xdr_jobAttrReq, 0, &auth))
     {
       xdr_destroy (&xdrs);
       lsberrno = LSBE_XDR;
       return (-1);
     }
-  if (callmbd (NULL, request_buf, XDR_GETPOS (&xdrs), &reply_buf,
-	       &hdr, NULL, NULL, NULL) < 0)
+     assert( XDR_GETPOS (&xdrs) <= INT_MAX );
+  if (callmbd (NULL, request_buf, (int) XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL) < 0)
     {
       xdr_destroy (&xdrs);
       return (-1);

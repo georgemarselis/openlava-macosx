@@ -568,9 +568,10 @@ struct submit
 struct submitReply
 {
   char *queue;
-  LS_LONG_INT badJobId;
   char *badJobName;
   int badReqIndx;
+  char padding[4];
+  LS_LONG_INT badJobId;
 };
 
 struct submig
@@ -638,9 +639,10 @@ struct submig
 
 struct jobAttrInfoEnt
 {
-  LS_LONG_INT jobId;
-  u_short port;
-  char hostname[MAXHOSTNAMELEN];
+    u_short port;
+    char hostname[MAXHOSTNAMELEN];
+    char padding[6];
+    LS_LONG_INT jobId;
 };
 
 struct jobAttrSetLog
