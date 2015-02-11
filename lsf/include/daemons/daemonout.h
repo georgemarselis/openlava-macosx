@@ -273,9 +273,9 @@ struct jobPeekReply
 struct signalReq
 {
   int sigValue;
-  LS_LONG_INT jobId;
-  time_t chkPeriod;
   int actFlags;
+  time_t chkPeriod;
+  LS_LONG_INT jobId;
 };
 
 
