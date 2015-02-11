@@ -23,85 +23,91 @@
 #include <pwd.h>
 
 #include "lsb/lsb.h"
+#include "lsb/xdr.h"
 
 
 struct parameterInfo *
 lsb_parameterinfo (char **names, int *numUsers, int options)
 {
-  mbdReqType mbdReqtype;
-  XDR xdrs;
-  struct LSFHeader hdr;
-  char *request_buf;
-  char *reply_buf;
-  static struct parameterInfo paramInfo;
-  struct parameterInfo *reply;
-  static struct infoReq infoReq;
-  static int alloc = FALSE;
-  int cc = 0;
+    static struct parameterInfo paramInfo;
+    static struct infoReq infoReq;
+    static int alloc = FALSE;
+    mbdReqType mbdReqtype;
+    XDR xdrs;
+    struct parameterInfo *reply;
+    struct LSFHeader hdr;
+    char *request_buf;
+    char *reply_buf;
+    int cc = 0;
 
-
-  infoReq.options = options;
-
-
-  if (alloc == TRUE)
-    {
-      alloc = FALSE;
-      FREEUP (infoReq.names);
+    infoReq.options = options;
+    if (alloc == TRUE) {
+        alloc = FALSE;
+        FREEUP (infoReq.names);
     }
 
-  if (numUsers)
-    infoReq.numNames = *numUsers;
-  else
-    infoReq.numNames = 0;
-  if (names)
-    infoReq.names = names;
-  else
-    {
-      if ((infoReq.names = (char **) malloc (sizeof (char *))) == NULL)
-	{
-	  lsberrno = LSBE_NO_MEM;
-	  return (NULL);
-	}
-      alloc = TRUE;
-      infoReq.names[0] = "";
-      cc = 1;
+    if (numUsers) {
+        infoReq.numNames = *numUsers;
     }
-  infoReq.resReq = "";
+    else {
+        infoReq.numNames = 0;
+    }
+    
+    if (names) {
+        infoReq.names = names;
+    }
+    else {
+        infoReq.names = (char **) malloc (sizeof (char *));
+        if ( NULL == infoReq.names && ENOMEM == errno ) {
+	       lsberrno = LSBE_NO_MEM;
+	       return (NULL);
+	    }
 
+        alloc = TRUE;
+        infoReq.names[0] = "";
+        cc = 1;
+    }
 
-  mbdReqtype = BATCH_PARAM_INFO;
-  cc = sizeof (struct infoReq) + cc * MAXHOSTNAMELEN + cc + 100;
-  if ((request_buf = malloc (cc)) == NULL)
+    infoReq.resReq = "";
+    mbdReqtype = BATCH_PARAM_INFO;
+    assert( cc >= 0 );
+    assert( ( sizeof (struct infoReq) + (unsigned long)cc * MAXHOSTNAMELEN + (unsigned long)cc + 100 ) < INT_MAX );
+    cc =  (int)( sizeof (struct infoReq) + (unsigned long)cc * MAXHOSTNAMELEN + (unsigned long)cc + 100 );
+    request_buf = (char *)malloc( (unsigned long)cc);
+    if ( NULL == request_buf && ENOMEM == errno )
     {
       lsberrno = LSBE_NO_MEM;
       return (NULL);
     }
-  xdrmem_create (&xdrs, request_buf, cc, XDR_ENCODE);
 
-  hdr.opCode = mbdReqtype;
-  if (!xdr_encodeMsg (&xdrs, (char *) &infoReq, &hdr, xdr_infoReq, 0, NULL))
+    assert( cc >= 0 );
+    xdrmem_create (&xdrs, request_buf, (uint) cc, XDR_ENCODE);
+
+    hdr.opCode = mbdReqtype;
+    if (!xdr_encodeMsg (&xdrs, (char *) &infoReq, &hdr, xdr_infoReq, 0, NULL))
     {
-      xdr_destroy (&xdrs);
-      free (request_buf);
-      lsberrno = LSBE_XDR;
-      return (NULL);
+        xdr_destroy (&xdrs);
+        free (request_buf);
+        lsberrno = LSBE_XDR;
+        return (NULL);
     }
 
-
-  if ((cc = callmbd (NULL, request_buf, XDR_GETPOS (&xdrs), &reply_buf, &hdr,
-		     NULL, NULL, NULL)) == -1)
-    {
-      xdr_destroy (&xdrs);
-      free (request_buf);
-      return (NULL);
+    assert( XDR_GETPOS (&xdrs) <= INT_MAX );
+    cc = callmbd (NULL, request_buf, (int) XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL);
+    if ( -1 == cc ) {
+        xdr_destroy (&xdrs);
+        free (request_buf);
+        return (NULL);
     }
-  xdr_destroy (&xdrs);
-  free (request_buf);
 
-  lsberrno = hdr.opCode;
-  if (lsberrno == LSBE_NO_ERROR || lsberrno == LSBE_BAD_USER)
+    xdr_destroy (&xdrs);
+    free (request_buf);
+
+    lsberrno = hdr.opCode;
+    if (lsberrno == LSBE_NO_ERROR || lsberrno == LSBE_BAD_USER)
     {
-      xdrmem_create (&xdrs, reply_buf, XDR_DECODE_SIZE_ (cc), XDR_DECODE);
+      assert( XDR_DECODE_SIZE_ (cc) >= 0);
+      xdrmem_create (&xdrs, reply_buf, (uint)XDR_DECODE_SIZE_ (cc), XDR_DECODE);
       reply = &paramInfo;
       if (!xdr_parameterInfo (&xdrs, reply, &hdr))
 	{
@@ -117,8 +123,9 @@ lsb_parameterinfo (char **names, int *numUsers, int options)
       return (reply);
     }
 
-  if (cc)
-    free (reply_buf);
-  return (NULL);
+    if (cc)  {
+        free (reply_buf);
+    }
 
+    return (NULL);
 }
