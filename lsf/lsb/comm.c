@@ -38,7 +38,6 @@
 
 extern int _lsb_conntimeout;
 extern int _lsb_recvtimeout;
-extern int _lsb_fakesetuid;
 
 static int mbdTries (void);
 

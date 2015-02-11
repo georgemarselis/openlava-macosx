@@ -25,124 +25,22 @@
 #include <stdlib.h>
 
 #include "lsb/lsb.h"
+#include "lsb/lsbatch.h"
 
-#define MAXFILENAMELEN          256
-#define MAXVERSIONLEN            12
-#define MAXEVENTNAMELEN          12
+//#define MAXFILENAMELEN    1024
+
+#define MAXEVENTNAMELEN   128
 
 
-struct newJobLog
-{
-  LS_LONG_INT jobId;
-  int userId;
-  int flags;
-  int nproc;
-  time_t submitTime;
-  time_t startTime;
-  time_t termTime;
-  int sigval;
-  int chkperiod;
-  int restartpid;
-  LS_LONG_INT rjobId;
-  int limits[MAX_NRLIMITS];
-  int mailUserId;
-  int umask;
-  char queue[MAXQUEUENAMELEN];
-  char resReq[MAXLINELEN];
-  char fromHost[MAXHOSTNAMELEN];
-  char cwd[MAXPATHLEN];
-  char chkdir[MAXFILENAMELEN];
-  char inFile[MAXFILENAMELEN];
-  char outFile[MAXFILENAMELEN];
-  char errFile[MAXFILENAMELEN];
-  char jobFile[MAXFILENAMELEN];
-  int numUsHosts;
-  char **usHosts;
-  char jobName[MAXJOBDESPLEN];
-  char command[MAXJOBDESPLEN];
-};
 
-struct startJobLog
-{
-  LS_LONG_INT jobId;
-  int status;
-  int jobPid;
-  int jobPGid;
-  int numExHosts;
-  char **execHosts;
-};
-
-struct newStatusLog
-{
-  int jobId;
-  int status;
-  int reasons;
-  float cpuTime;
-  time_t doneTime;
-  time_t delayTime;
-};
-
-struct qControlLog
-{
-  int opCode;
-  char queue[MAXQUEUENAMELEN];
-};
-
-struct switchJobLog
-{
-  int userId;
-  LS_LONG_INT jobId;
-  char queue[MAXQUEUENAMELEN];
-};
-
-struct moveJobLog
-{
-  int userId;
-  LS_LONG_INT jobId;
-  int pos;
-  int top;
-};
-
-struct paramsLog
-{
-  int nextId;
-  int job_count;
-};
-
-struct chkpntLog
+/*struct chkpntLog
 {
   LS_LONG_INT jobId;
   int chkperiod;
 };
+*/
 
-struct finishJobLog
-{
-  LS_LONG_INT jobId;
-  int userId;
-  int flags;
-  int nproc;
-  int status;
-  time_t submitTime;
-  time_t startTime;
-  time_t termTime;
-  time_t dispatchTime;
-  time_t doneTime;
-  char queue[MAXQUEUENAMELEN];
-  char resReq[MAXLINELEN];
-  char fromHost[MAXHOSTNAMELEN];
-  char cwd[MAXPATHLEN];
-  char inFile[MAXFILENAMELEN];
-  char outFile[MAXFILENAMELEN];
-  char errFile[MAXFILENAMELEN];
-  char jobFile[MAXFILENAMELEN];
-  int numUsHosts;
-  char **usHosts;
-  float cpuTime;
-  char jobName[MAXJOBDESPLEN];
-  char command[MAXJOBDESPLEN];
-};
-
-union eventLog
+/*union eventLog
 {
   struct newJobLog newJobLog;
   struct startJobLog startJobLog;
@@ -153,15 +51,126 @@ union eventLog
   struct paramsLog paramsLog;
   struct chkpntLog chkpntLog;
   struct finishJobLog finishJobLog;
-};
+};*/
 
-struct eventRec
-{
-  char version[MAXVERSIONLEN];
-  int type;
-  time_t eventTime;
-  union eventLog eventLog;
-};
+
+
+static int readMbdStart (char *, struct mbdStartLog *);
+static int readMbdDie (char *, struct mbdDieLog *);
+static int readChkpnt (char *, struct chkpntLog *);
+static int readJobSigAct (char *, struct sigactLog *);
+static int readMig (char *, struct migLog *);
+static int readUnfulfill (char *, struct unfulfillLog *);
+static int readLoadIndex (char *, struct loadIndexLog *);
+
+static int readJobRequeue (char *, struct jobRequeueLog *);
+
+static int readJobSignal (char *, struct signalLog *);
+static int readJobMsg (char *, struct jobMsgLog *);
+static int readJobMsgAck (char *, struct jobMsgAckLog *);
+static int readJobClean (char *, struct jobCleanLog *);
+static int readLogSwitch (char *, struct logSwitchLog *);
+
+static int writeJobNew (FILE *, struct jobNewLog *);
+static int writeJobMod (FILE *, struct jobModLog *);
+static int writeJobStart (FILE *, struct jobStartLog *);
+static int writeJobStartAccept (FILE *, struct jobStartAcceptLog *);
+static int writeJobExecute (FILE *, struct jobExecuteLog *);
+static int writeJobStatus (FILE *, struct jobStatusLog *);
+static int writeSbdJobStatus (FILE *, struct sbdJobStatusLog *);
+static int writeJobSwitch (FILE *, struct jobSwitchLog *);
+static int writeJobMove (FILE *, struct jobMoveLog *);
+
+static int writeQueueCtrl (FILE *, struct queueCtrlLog *);
+static int writeHostCtrl (FILE *, struct hostCtrlLog *);
+static int writeMbdStart (FILE *, struct mbdStartLog *);
+static int writeMbdDie (FILE *, struct mbdDieLog *);
+static int writeUnfulfill (FILE *, struct unfulfillLog *);
+static int writeMig (FILE *, struct migLog *);
+static int writeChkpnt (FILE *, struct chkpntLog *);
+static int writeJobSigAct (FILE *, struct sigactLog *);
+static int writeJobFinish (FILE *, struct jobFinishLog *);
+static int writeLoadIndex (FILE *, struct loadIndexLog *);
+
+static int writeJobSignal (FILE * log_fp, struct signalLog *);
+static int writeJobMsg (FILE * log_fp, struct jobMsgLog *);
+static int writeJobMsgAck (FILE * log_fp, struct jobMsgLog *);
+static int writeJobRqueue (FILE * log_fp, struct jobRequeueLog *);
+static int writeJobClean (FILE * log_fp, struct jobCleanLog *);
+
+static int writeLogSwitch (FILE *, struct logSwitchLog *);
+static int writeJobForce (FILE *, struct jobForceRequestLog *);
+static int readJobForce (char *, struct jobForceRequestLog *);
+
+static int writeJobAttrSet (FILE *, struct jobAttrSetLog *);
+static int readJobAttrSet (char *, struct jobAttrSetLog *);
+
+static void freeLogRec (struct eventRec *);
+
+struct eventRec *lsbGetNextJobEvent (struct eventLogHandle *, int *, int, LS_LONG_INT *, struct jobIdIndexS *);
+static struct eventRec *lsbGetNextJobRecFromFile (FILE *, int *, int, LS_LONG_INT *);
+static int checkJobEventAndJobId (char *, int, int, LS_LONG_INT *);
+static int getEventTypeAndKind (char *, int *);
+static void readEventRecord (char *, struct eventRec *);
+int lsb_readeventrecord (char *, struct eventRec *);
+int getJobIdIndexFromEventFile (char *, struct sortIntList *, time_t *);
+int getJobIdFromEvent (char *, int);
+int writeJobIdIndexToIndexFile (FILE *, struct sortIntList *, time_t);
+int updateJobIdIndexFile (char *, char *, int);
+int getNextFileNumFromIndexS (struct jobIdIndexS *, int, LS_LONG_INT *);
+
+
+struct eventLogHandle *lsb_openelog (struct eventLogFile *, int *);
+struct eventRec *lsb_getelogrec (struct eventLogHandle *, int *);
+void lsb_closeelog (struct eventLogHandle *);
+void countLineNum (FILE *, long, int *);
+
+struct eventRec *lsb_geteventrec_ex (FILE * log_fp, int *LineNum, char *usedLine);
+time_t lsb_getAcctFileTime (char *fileName);
+
+#define   EVENT_JOB_RELATED     1
+#define   EVENT_NON_JOB_RELATED 0
+
+
+uint copyQStr(char *line, uint maxLen, int nonNil, char *destStr);
+uint saveQStr( char *line, char *destStr);
+
+/*#define copyQStr(line, maxLen, nonNil, destStr)    {            \
+        char *tmpLine=0;                                        \
+        int ccounter=0;                                           \
+        if ((tmpLine = (char *) malloc (strlen(line))) == NULL) \
+            return (LSBE_NO_MEM);                               \
+        if ((ccounter = stripQStr(line, tmpLine)) < 0) {          \
+            FREEUP (tmpLine);                                   \
+            return (LSBE_EVENT_FORMAT);                         \
+        }                                                       \
+        line += ccounter + 1;                                     \
+        if (strlen(tmpLine) >= maxLen                           \
+            || (nonNil && strlen(tmpLine)==0)) {                \
+            FREEUP (tmpLine);                                   \
+            return (LSBE_EVENT_FORMAT);                         \
+        }                                                       \
+        strcpy(destStr, tmpLine);                               \
+        FREEUP (tmpLine);                                       \
+    }
+
+#define saveQStr(line, destStr)  {                              \
+        char *tmpLine;                                          \
+        int ccounter;                                             \
+        if ((tmpLine = (char *) malloc (strlen(line))) == NULL) \
+            return (LSBE_NO_MEM);                               \
+        if ((ccounter = stripQStr(line, tmpLine)) < 0)  {         \
+            FREEUP (tmpLine);                                   \
+            return (LSBE_EVENT_FORMAT);                         \
+        }                                                       \
+        line += ccounter + 1;                                     \
+        if ((destStr = putstr_(tmpLine)) == NULL)     {         \
+            FREEUP (tmpLine);                                   \
+            return (LSBE_NO_MEM);                               \
+        }                                                       \
+        FREEUP (tmpLine);                                       \
+    }
+*/
 
 extern int putEventRec (FILE *, struct eventRec *);
 extern struct eventRec *getEventRec (char *);

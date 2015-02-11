@@ -46,11 +46,11 @@ struct config_param lsbParams[] = {
 #endif
 #define LSF_LOG_MASK   8
 
-int _lsb_conntimeout = DEFAULT_API_CONNTIMEOUT;
-int _lsb_recvtimeout = DEFAULT_API_RECVTIMEOUT;
-int _lsb_fakesetuid = 0;
+static int _lsb_conntimeout = DEFAULT_API_CONNTIMEOUT;
+static int _lsb_recvtimeout = DEFAULT_API_RECVTIMEOUT;
+// static int _lsb_fakesetuid = 0;
 
-int lsbMode_ = LSB_MODE_BATCH;
+
 
 extern int bExceptionTabInit (void);
 extern int mySubUsage_ (void *);

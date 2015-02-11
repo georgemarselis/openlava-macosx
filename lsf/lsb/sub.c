@@ -66,7 +66,7 @@
 
 #define ESUBNAME "esub"
 
-
+static int lsbMode_ = LSB_MODE_BATCH;
 
 
 LS_LONG_INT

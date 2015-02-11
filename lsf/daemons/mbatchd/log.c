@@ -27,7 +27,7 @@
 
 time_t eventTime;
 
-extern bool_t logMapFileEnable;
+static bool_t logMapFileEnable = TRUE;
 
 extern int sigNameToValue_ (char *sigString);
 extern char *getLsbSigSymbol (int);

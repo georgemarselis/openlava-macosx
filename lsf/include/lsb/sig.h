@@ -21,7 +21,7 @@
 #ifndef LSF_LSB_SIG_H
 #define LSF_LSB_SIG_H
 
-#include "lsb/lsbatch.h"
+#include "lsb/lsb.h"
 
 #define SIG_NULL             -65535
 #define SIG_CHKPNT               -1
