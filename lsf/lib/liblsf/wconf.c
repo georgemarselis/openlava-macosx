@@ -38,7 +38,7 @@ struct lsConf *
 ls_getconf (char *fname)
 {
     unsigned long oldLineNum = 0; 
-    unsigned long lineNum = 0;
+    uint lineNum = 0;
     unsigned long beginLineNum = 0;
     unsigned long i = 0;
     unsigned long numDefs = 0;
@@ -56,7 +56,8 @@ ls_getconf (char *fname)
   lserrno = LSE_NO_ERR;
   if (fname == NULL)
     {
-      ls_syslog (LOG_ERR, "%s: %s.", "ls_getconf", I18N (6000, "Null filename"));   /* catgets 6000 */
+      /* catgets 6000 */
+      ls_syslog (LOG_ERR, "%s: %s.", "ls_getconf", I18N (6000, "Null filename"));
       lserrno = LSE_NO_FILE;
       return (NULL);
     }
@@ -64,8 +65,7 @@ ls_getconf (char *fname)
   conf = (struct lsConf *) malloc (sizeof (struct lsConf));
   if (conf == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "ls_getconf",
-         "malloc", sizeof (struct lsConf));
+      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "ls_getconf", "malloc", sizeof (struct lsConf));
       lserrno = LSE_MALLOC;
       return (NULL);
     }
@@ -472,7 +472,8 @@ ls_getconf (char *fname)
           || strcasecmp (cp, "endif") == 0)
         {
           fseek (fp, offset, SEEK_SET);
-          lineNum = oldLineNum;
+          assert( oldLineNum <= UINT_MAX );
+          lineNum = (uint) oldLineNum;
 
 
           if ((node = newNode ()) == NULL)
@@ -806,12 +807,12 @@ freeNode (struct confNode *node)
 char *
 getNextLine_conf (struct lsConf *conf, int confFormat)
 {
-  size_t *dummy = 0;
+  uint *dummy = 0;
   return (getNextLineC_conf (conf, dummy, confFormat));
 }
 
 char *
-getNextLineC_conf (struct lsConf *conf, size_t *LineCount, int confFormat)
+getNextLineC_conf (struct lsConf *conf, uint *LineCount, int confFormat)
 {
   static char *longLine = NULL;
   static char *myLine = NULL;
@@ -949,7 +950,7 @@ getNextLineC_conf (struct lsConf *conf, size_t *LineCount, int confFormat)
 }
 
 static char *
-readNextLine (struct lsConf *conf, size_t *lineNum)
+readNextLine (struct lsConf *conf, uint *lineNum)
 {
   struct confNode *node, *prev;
   char *line;

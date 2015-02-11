@@ -22,7 +22,7 @@
 char *
 getNextLine_ (FILE * fp, int confFormat)
 {
-  size_t *dummy = 0;
+  uint *dummy = 0;
   return (getNextLineC_ (fp, dummy, confFormat));
 }
 
@@ -32,14 +32,17 @@ getNextWord_ (char **line)
   static char word[4 * MAXLINELEN];
   char *wordp = word;
 
-  while (isspace (**line))
+  while (isspace (**line)) {
     (*line)++;
+  }
 
-  while (**line && !isspace (**line))
+  while (**line && !isspace (**line)) {
     *wordp++ = *(*line)++;
+  }
 
-  if (wordp == word)
+  if (wordp == word) {
     return (NULL);
+  }
 
   *wordp = '\0';
   return (word);
@@ -51,19 +54,18 @@ getNextWord1_ (char **line)
   static char word[4 * MAXLINELEN];
   char *wordp = word;
 
-
-
-  while (isspace (**line))
+  while (isspace (**line)) {
     (*line)++;
+  }
 
 
-  while (**line && !isspace (**line) && (**line != ',')
-     && (**line != ']') && (**line != '['))
+  while (**line && !isspace (**line) && (**line != ',') && (**line != ']') && (**line != '[')) {
     *wordp++ = *(*line)++;
+  }
 
-  if (wordp == word)
-
+  if (wordp == word) {
     return (NULL);
+  }
 
 
   *wordp = '\0';
@@ -240,8 +242,6 @@ int
 addQStr (FILE * log_fp, char *str)
 {
     int j = 1;
-    size_t len = strlen (str);
-    assert( len );
 
     if (putc (' ', log_fp) == EOF) {
         return -1;
@@ -269,7 +269,7 @@ addQStr (FILE * log_fp, char *str)
 }
 
 char *
-getNextLineD_ (FILE * fp, size_t *LineCount, int confFormat)
+getNextLineD_ (FILE * fp, uint *LineCount, int confFormat)
 {
     static char *line = NULL;
     int cin         = 0;
@@ -400,7 +400,7 @@ getNextLineD_ (FILE * fp, size_t *LineCount, int confFormat)
 }
 
 char *
-getNextLineC_ (FILE * fp, size_t *LineCount, int confFormat)
+getNextLineC_ (FILE * fp, uint *LineCount, int confFormat)
 {
     char *nextLine;
     char *sp;

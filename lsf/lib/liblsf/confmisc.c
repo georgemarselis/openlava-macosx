@@ -83,30 +83,33 @@ keyMatch (struct keymap *keyList, char *line, int exact)
 }
 
 int
-isSectionEnd (char *linep, char *lsfile, size_t *LineNum, char *sectionName)
+isSectionEnd (char *linep, char *lsfile, uint *lineNum, char *sectionName)
 {
   char *word;
 
   word = getNextWord_ (&linep);
-  if (strcasecmp (word, "end") != 0)
+  if (strcasecmp (word, "end") != 0) {
     return FALSE;
+  }
 
   word = getNextWord_ (&linep);
-  if (!word)
-    {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5400, "%s(%d): section %s ended without section name, ignored"), lsfile, *LineNum, sectionName); /* catgets 5400 */
+  if (!word) {
+      /* catgets 5400 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5400, "%s(%d): section %s ended without section name, ignored"), lsfile, *lineNum, sectionName);
       return TRUE;
     }
 
-  if (strcasecmp (word, sectionName) != 0)
-    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5401, "%s(%d): section %s ended with wrong section name %s,ignored"), lsfile, *LineNum, sectionName, word);    /* catgets 5401 */
+  if (strcasecmp (word, sectionName) != 0) {
+    /* catgets 5401 */
+    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5401, "%s(%d): section %s ended with wrong section name %s,ignored"), lsfile, *lineNum, sectionName, word);    
+  }
 
   return TRUE;
 
 }
 
 char *
-getBeginLine (FILE * fp, size_t *lineNum)
+getBeginLine (FILE * fp, uint *lineNum)
 {
   char *sp;
   char *wp;
@@ -125,7 +128,7 @@ getBeginLine (FILE * fp, size_t *lineNum)
 }
 
 int
-readHvalues (struct keymap *keyList, char *linep, FILE * fp, char *lsfile, size_t *LineNum, int exact, char *section)
+readHvalues (struct keymap *keyList, char *linep, FILE * fp, char *lsfile, uint *lineNum, int exact, char *section)
 {
   static char fname[] = "readHvalues";
   char *key;
@@ -142,7 +145,7 @@ readHvalues (struct keymap *keyList, char *linep, FILE * fp, char *lsfile, size_
   value = strchr (sp, '=');
   if (!value)
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5402, "%s: %s(%d): missing '=' after keyword %s, section %s ignoring the line"), fname, lsfile, *LineNum, key, section); /* catgets 5402 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5402, "%s: %s(%d): missing '=' after keyword %s, section %s ignoring the line"), fname, lsfile, *lineNum, key, section); /* catgets 5402 */
     }
   else
     {
@@ -152,7 +155,7 @@ readHvalues (struct keymap *keyList, char *linep, FILE * fp, char *lsfile, size_
 
       if (value[0] == '\0')
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5403, "%s: %s(%d): null value after keyword %s, section %s ignoring the line"), fname, lsfile, *LineNum, key, section);  /* catgets 5403 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5403, "%s: %s(%d): null value after keyword %s, section %s ignoring the line"), fname, lsfile, *lineNum, key, section);  /* catgets 5403 */
     }
 
       if (value[0] == '(')
@@ -163,12 +166,12 @@ readHvalues (struct keymap *keyList, char *linep, FILE * fp, char *lsfile, size_
     }
       if (putValue (keyList, key, value) < 0)
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5404, "%s: %s(%d): bad keyword %s in section %s, ignoring the line"), fname, lsfile, *LineNum, key, section);    /* catgets 5404 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5404, "%s: %s(%d): bad keyword %s in section %s, ignoring the line"), fname, lsfile, *lineNum, key, section);    /* catgets 5404 */
     }
     }
-  if ((linep = getNextLineC_ (fp, LineNum, TRUE)) != NULL)
+  if ((linep = getNextLineC_ (fp, lineNum, TRUE)) != NULL)
     {
-      if (isSectionEnd (linep, lsfile, LineNum, section))
+      if (isSectionEnd (linep, lsfile, lineNum, section))
     {
       if (!exact)
         return 0;
@@ -178,7 +181,7 @@ readHvalues (struct keymap *keyList, char *linep, FILE * fp, char *lsfile, size_
         {
           if (keyList[i].val == NULL)
         {
-          ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5405, "%s: %s(%d): required keyword %s is missing in section %s, ignoring the section"), fname, lsfile, *LineNum, keyList[i].key, section);  /* catgets 5405 */
+          ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5405, "%s: %s(%d): required keyword %s is missing in section %s, ignoring the section"), fname, lsfile, *lineNum, keyList[i].key, section);  /* catgets 5405 */
           error = TRUE;
         }
           i++;
@@ -196,11 +199,11 @@ readHvalues (struct keymap *keyList, char *linep, FILE * fp, char *lsfile, size_
       return 0;
     }
 
-      return readHvalues (keyList, linep, fp, lsfile, LineNum, exact,
+      return readHvalues (keyList, linep, fp, lsfile, lineNum, exact,
               section);
     }
 
-  ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, fname, lsfile, *LineNum, section);
+  ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, fname, lsfile, *lineNum, section);
   return -1;
 
 }
@@ -208,33 +211,34 @@ readHvalues (struct keymap *keyList, char *linep, FILE * fp, char *lsfile, size_
 int
 putValue (struct keymap *keyList, char *key, char *value)
 {
-  int i;
+    int i;
 
-  i = 0;
-  while (keyList[i].key != NULL)
-    {
-      if (strcasecmp (keyList[i].key, key) == 0)
-    {
-      FREEUP (keyList[i].val);
-      if (strcmp (value, "-") == 0)
-        keyList[i].val = putstr_ ("");
-      else
-        keyList[i].val = putstr_ (value);
-      return 0;
-    }
-      i++;
+    i = 0;
+    while (keyList[i].key != NULL) {
+
+        if (strcasecmp (keyList[i].key, key) == 0) {
+            FREEUP (keyList[i].val);
+            if (strcmp (value, "-") == 0) {
+                keyList[i].val = putstr_ ("");
+            }
+            else {
+                keyList[i].val = putstr_ (value);
+            }
+            return 0;
+        }
+        i++;
     }
 
   return -1;
 }
 
 void
-doSkipSection (FILE * fp, size_t *LineNum, char *lsfile, char *sectionName)
+doSkipSection (FILE * fp, uint *lineNum, char *lsfile, char *sectionName)
 {
   char *word;
   char *cp;
 
-  while ((cp = getNextLineC_ (fp, LineNum, TRUE)) != NULL)
+  while ((cp = getNextLineC_ (fp, lineNum, TRUE)) != NULL)
     {
       word = getNextWord_ (&cp);
       if (strcasecmp (word, "end") == 0)
@@ -242,19 +246,19 @@ doSkipSection (FILE * fp, size_t *LineNum, char *lsfile, char *sectionName)
       word = getNextWord_ (&cp);
       if (!word)
         {
-          ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5407, "%s(%d): Section ended without section name, ignored"), lsfile, *LineNum); /* catgets 5407 */
+          ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5407, "%s(%d): Section ended without section name, ignored"), lsfile, *lineNum); /* catgets 5407 */
         }
       else
         {
           if (strcasecmp (word, sectionName) != 0)
-        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5408, "%s(%d): Section %s ended with wrong section name: %s, ignored"), lsfile, *LineNum, sectionName, word);  /* catgets 5408 */
+        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5408, "%s(%d): Section %s ended with wrong section name: %s, ignored"), lsfile, *lineNum, sectionName, word);  /* catgets 5408 */
         }
       return;
     }
     }
 
   ls_syslog (LOG_ERR, I18N_PREMATURE_EOF,
-         "doSkipSection", lsfile, *LineNum, sectionName);
+         "doSkipSection", lsfile, *lineNum, sectionName);
 
 }
 
@@ -410,7 +414,7 @@ isInlist (char **adminNames, char *userName, unsigned int actAds)
 }
 
 char *
-getBeginLine_conf (struct lsConf *conf, size_t *LineNum)
+getBeginLine_conf (struct lsConf *conf, uint *lineNum)
 {
   char *sp;
   char *wp;
@@ -420,7 +424,7 @@ getBeginLine_conf (struct lsConf *conf, size_t *LineNum)
 
   for (;;)
     {
-      sp = getNextLineC_conf (conf, LineNum, TRUE);
+      sp = getNextLineC_conf (conf, lineNum, TRUE);
       if (sp == NULL)
     return (NULL);
 
@@ -432,7 +436,7 @@ getBeginLine_conf (struct lsConf *conf, size_t *LineNum)
 }
 
 void
-doSkipSection_conf (struct lsConf *conf, size_t *LineNum, char *lsfile, char *sectionName)
+doSkipSection_conf (struct lsConf *conf, uint *lineNum, char *lsfile, char *sectionName)
 {
   char *word;
   char *cp;
@@ -440,7 +444,7 @@ doSkipSection_conf (struct lsConf *conf, size_t *LineNum, char *lsfile, char *se
   if (conf == NULL)
     return;
 
-  while ((cp = getNextLineC_conf (conf, LineNum, TRUE)) != NULL)
+  while ((cp = getNextLineC_conf (conf, lineNum, TRUE)) != NULL)
     {
       word = getNextWord_ (&cp);
       if (strcasecmp (word, "end") == 0)
@@ -448,18 +452,18 @@ doSkipSection_conf (struct lsConf *conf, size_t *LineNum, char *lsfile, char *se
       word = getNextWord_ (&cp);
       if (!word)
         {
-          ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5419, "%s(%d): Section ended without section name, ignored"), lsfile, *LineNum); /* catgets 5419 */
+          ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5419, "%s(%d): Section ended without section name, ignored"), lsfile, *lineNum); /* catgets 5419 */
         }
       else
         {
           if (strcasecmp (word, sectionName) != 0)
-        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5420, "%s(%d): Section %s ended with wrong section name: %s, ignored"), lsfile, *LineNum, sectionName, word);  /* catgets 5420 */
+        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5420, "%s(%d): Section %s ended with wrong section name: %s, ignored"), lsfile, *lineNum, sectionName, word);  /* catgets 5420 */
         }
       return;
     }
     }
 
   ls_syslog (LOG_ERR, I18N_PREMATURE_EOF,
-         "doSkipSection_conf", lsfile, *LineNum, sectionName);
+         "doSkipSection_conf", lsfile, *lineNum, sectionName);
 
 }

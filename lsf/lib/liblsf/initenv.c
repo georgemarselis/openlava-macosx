@@ -179,7 +179,7 @@ readconfenv_ (struct config_param *pList1, struct config_param *pList2, char *co
     FILE *fp;
     char filename[MAXFILENAMELEN];
     struct config_param *plp;
-    size_t lineNum = 0;
+    uint lineNum = 0;
     int saveErrNo = 0;
 
     if (pList1)

@@ -131,13 +131,13 @@ h_freeTab_ (hTab * tabPtr, void (*freeFunc) (void *))
 }
 
 int
-h_TabEmpty_ (hTab * tabPtr)
+h_TabEmpty_ (hTab *tabPtr)
 {
     return tabPtr->numEnts == 0;
 }
 
 void
-h_delTab_ (hTab * tabPtr)
+h_delTab_ (hTab *tabPtr)
 {
     h_freeTab_ (tabPtr, (HTAB_DATA_DESTROY_FUNC_T) NULL);
 }
@@ -147,7 +147,7 @@ h_delTab_ (hTab * tabPtr)
  * a given key.
  */
 hEnt *
-h_getEnt_ (hTab * tabPtr, const char *key)
+h_getEnt_ (hTab *tabPtr, const char *key)
 {
     if (tabPtr->numEnts == 0) {
         return NULL;
@@ -161,7 +161,7 @@ h_getEnt_ (hTab * tabPtr, const char *key)
  * Add an entry to a previously created hash table.
  */
 hEnt *
-h_addEnt_ (hTab * tabPtr, const char *key, int *newPtr)
+h_addEnt_ (hTab *tabPtr, const char *key, int *newPtr)
 {
     hEnt *hEntPtr;
     char *keyPtr = (char *)key;
@@ -175,11 +175,10 @@ h_addEnt_ (hTab * tabPtr, const char *key, int *newPtr)
         return hEntPtr;
     }
 
-    if (tabPtr->numEnts >= RESETLIMIT * tabPtr->size)
-        {
-            resetTab (tabPtr);
-            hList = &(tabPtr->slotPtr[getAddr (tabPtr, (char *) keyPtr)]);
-        }
+    if (tabPtr->numEnts >= RESETLIMIT * tabPtr->size) {
+        resetTab (tabPtr);
+        hList = &(tabPtr->slotPtr[getAddr (tabPtr, (char *) keyPtr)]);
+    }
 
     /* Create a new entry and increase the counter
      * of entries.
