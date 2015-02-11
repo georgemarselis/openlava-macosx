@@ -81,7 +81,7 @@ keyMatch (struct keymap *keyList, char *line, int exact)
 }
 
 int
-isSectionEnd (char *linep, char *lsfile, int *LineNum, char *sectionName)
+isSectionEnd (char *linep, char *lsfile, uint *lineNum, char *sectionName)
 {
   char *word;
 
