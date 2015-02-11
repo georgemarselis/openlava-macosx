@@ -23,11 +23,10 @@
 
 #include "lib/lib.h"
 #include "lsb/lsb.h"
-
+#include "lsb/xdr.h"
 
 struct lsbSharedResourceInfo *
-lsb_sharedresourceinfo (char **resources, int *numResources, char *hostName,
-			int options)
+lsb_sharedresourceinfo (char **resources, int *numResources, char *hostName, int options)
 {
   static char fname[] = "lsb_sharedresourceinfo";
   static struct lsbShareResourceInfoReply lsbResourceInfoReply;
@@ -39,6 +38,8 @@ lsb_sharedresourceinfo (char **resources, int *numResources, char *hostName,
   char *reply_buf;
   mbdReqType mbdReqtype;
   XDR xdrs, xdrs2;
+
+  assert( options );
 
 #define FREE_MEMORY \
     { \
@@ -73,8 +74,8 @@ lsb_sharedresourceinfo (char **resources, int *numResources, char *hostName,
   if (*numResources == 0)
     {
 
-      if ((resourceInfoReq.resourceNames =
-	   (char **) malloc (sizeof (char *))) == NULL)
+      resourceInfoReq.resourceNames =(char **) malloc (sizeof (char *));
+      if (NULL == resourceInfoReq.resourceNames && ENOMEM == errno )
 	{
 	  lsberrno = LSBE_NO_MEM;
 	  return (NULL);
@@ -85,8 +86,9 @@ lsb_sharedresourceinfo (char **resources, int *numResources, char *hostName,
     }
   else
     {
-      if ((resourceInfoReq.resourceNames =
-	   (char **) malloc (*numResources * sizeof (char *))) == NULL)
+      assert( *numResources >= 0 );
+      resourceInfoReq.resourceNames = (char **) malloc ((unsigned long)*numResources * sizeof (char *));
+      if ( NULL == resourceInfoReq.resourceNames && ENOMEM == errno )
 	{
 	  lsberrno = LSBE_NO_MEM;
 	  return (NULL);
@@ -133,8 +135,10 @@ lsb_sharedresourceinfo (char **resources, int *numResources, char *hostName,
 
 
   mbdReqtype = BATCH_RESOURCE_INFO;
-  cc = sizeof (struct resourceInfoReq) + cc + 100;
-  if ((request_buf = malloc (cc)) == NULL)
+  assert ( cc >= 0 && cc <= INT_MAX);
+  cc = (int)(sizeof (struct resourceInfoReq) + (unsigned long)cc + 100);
+  request_buf = (char *)malloc ((unsigned long)cc);
+  if ( NULL == request_buf && ENOMEM == errno )
     {
       lsberrno = LSBE_NO_MEM;
       return (NULL);
@@ -151,9 +155,9 @@ lsb_sharedresourceinfo (char **resources, int *numResources, char *hostName,
       return (NULL);
     }
 
-
-  if ((cc = callmbd (clusterName, request_buf, XDR_GETPOS (&xdrs), &reply_buf,
-		     &hdr, NULL, NULL, NULL)) == -1)
+    assert( XDR_GETPOS (&xdrs) <= INT_MAX);
+  cc = callmbd (clusterName, request_buf, (int) XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL);
+  if (-1 == cc )
     {
       xdr_destroy (&xdrs);
       FREE_MEMORY;
@@ -165,7 +169,8 @@ lsb_sharedresourceinfo (char **resources, int *numResources, char *hostName,
   lsberrno = hdr.opCode;
   if (lsberrno == LSBE_NO_ERROR)
     {
-      xdrmem_create (&xdrs2, reply_buf, XDR_DECODE_SIZE_ (cc), XDR_DECODE);
+      assert( XDR_DECODE_SIZE_ (cc) >= 0 );
+      xdrmem_create (&xdrs2, reply_buf, (uint)XDR_DECODE_SIZE_ (cc), XDR_DECODE);
       if (!xdr_lsbShareResourceInfoReply
 	  (&xdrs2, &lsbResourceInfoReply, &hdr))
 	{
