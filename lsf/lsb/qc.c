@@ -21,6 +21,7 @@
 #include <pwd.h>
 
 #include "lsb/lsb.h"
+#include "lsb/xdr.h"
 
 int
 lsb_queuecontrol (char *queue, int opCode)
@@ -97,7 +98,8 @@ lsb_queuecontrol (char *queue, int opCode)
     }
 
 
-  if ((cc = callmbd (NULL, request_buf, XDR_GETPOS (&xdrs), &reply_buf,
+    assert( XDR_GETPOS (&xdrs) <= INT_MAX );
+  if ((cc = callmbd (NULL, request_buf, (int)XDR_GETPOS (&xdrs), &reply_buf,
 		     &hdr, NULL, NULL, NULL)) == -1)
     {
       xdr_destroy (&xdrs);
