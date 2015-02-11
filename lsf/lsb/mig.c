@@ -22,6 +22,7 @@
 #include <pwd.h>
 
 #include "lsb/lsb.h"
+#include "lsb/xdr.h"
 
 int
 lsb_mig (struct submig *mig, int *badHostIdx)
@@ -81,8 +82,8 @@ lsb_mig (struct submig *mig, int *badHostIdx)
     }
 
 
-  if ((cc = callmbd (NULL, request_buf, XDR_GETPOS (&xdrs), &reply_buf,
-		     &hdr, NULL, NULL, NULL)) == -1)
+  assert( XDR_GETPOS (&xdrs) <= INT_MAX );
+  if ((cc = callmbd (NULL, request_buf, (int) XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL)) == -1)
     {
       xdr_destroy (&xdrs);
       return (-1);
@@ -101,7 +102,8 @@ lsb_mig (struct submig *mig, int *badHostIdx)
 	  return (-1);
 	}
 
-      xdrmem_create (&xdrs, reply_buf, XDR_DECODE_SIZE_ (cc), XDR_DECODE);
+      assert( XDR_DECODE_SIZE_ (cc) >= 0 );
+      xdrmem_create (&xdrs, reply_buf, (uint) XDR_DECODE_SIZE_ (cc), XDR_DECODE);
       if (!xdr_submitMbdReply (&xdrs, &reply, &hdr))
 	{
 	  lsberrno = LSBE_XDR;

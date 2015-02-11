@@ -149,10 +149,11 @@ struct submitReq
 
 struct submitMbdReply
 {
-  LS_LONG_INT jobId;
-  char *queue;
-  int badReqIndx;
-  char *badJobName;
+    char *queue;
+    char *badJobName;
+    int badReqIndx;
+    char padding[4];
+    LS_LONG_INT jobId;
 };
 
 struct modifyReq
