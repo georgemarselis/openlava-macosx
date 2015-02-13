@@ -533,13 +533,13 @@ struct submit
 {
     int options;
     int options2;
-    int numAskedHosts;
-    int numProcessors;
+    uint numAskedHosts;
+    uint numProcessors;
     int sigValue;
-    int nxf;
+    uint nxf;
     int delOptions;
     int delOptions2;
-    int maxNumProcessors;
+    uint maxNumProcessors;
     int userPriority;
     int rLimits[LSF_RLIM_NLIMITS];
     char padding[4];
@@ -927,25 +927,27 @@ struct logSwitchLog
 
 struct jobNewLog
 {
-  int jobId;
-  int userId;
   int options;
   int options2;
-  int numProcessors;
   int sigValue;
-  int chkpntPeriod;
   int restartPid;
   int idx;
-  int numAskedHosts;
-  int nxf;
   int userPriority;
   int umask;
   int niosPort;
-  int maxNumProcessors;
   int rLimits[LSF_RLIM_NLIMITS];
+  uint nxf;
+  uint numProcessors;
+  uint numAskedHosts;
+  uint maxNumProcessors;
+  char padding1[4];
+  time_t chkpntPeriod;
   time_t submitTime;
   time_t beginTime;
   time_t termTime;
+  pid_t userId;
+  char padding3[4];
+  unsigned long jobId;
   float hostFactor;
   char queue[MAX_LSB_NAME_LEN];
   char fromHost[MAXHOSTNAMELEN];
@@ -963,7 +965,7 @@ struct jobNewLog
   char hostSpec[MAXHOSTNAMELEN];
   char jobName[MAXLINELEN];
   char command[MAXLINELEN];
-  char padding[4];
+  char padding2[4];
   char *preExecCmd;
   char *mailUser;
   char *projectName;

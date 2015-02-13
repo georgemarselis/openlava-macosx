@@ -380,7 +380,7 @@ addHost2Tab (const char *hname, in_addr_t ** addrs, char **aliases)
 // *optarg_ was originally named optarg, but there is a variable named optarg in lsf.h
 //      so, rename.
 int
-getAskedHosts_ (char *optarg_, char ***askedHosts, unsigned long *numAskedHosts, unsigned long *badIdx, int checkHost)
+getAskedHosts_ (char *optarg_, char ***askedHosts, uint *numAskedHosts, unsigned long *badIdx, int checkHost)
 {
     unsigned long  num = 64;
     char *word;
@@ -457,7 +457,8 @@ getAskedHosts_ (char *optarg_, char ***askedHosts, unsigned long *numAskedHosts,
         }
         }
 
-    *numAskedHosts = nhlist;
+        assert( nhlist <= UINT_MAX );
+    *numAskedHosts = (uint)nhlist;
     *askedHosts = hlist;
 
     if (foundBadHost)

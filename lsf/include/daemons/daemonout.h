@@ -86,18 +86,19 @@ typedef enum
 
 struct submitReq
 {
+    char padding1[2];
+    ushort niosPort;
     int options;
     int options2;
-    int numAskedHosts;
-    int numProcessors;
     int sigValue;
     int restartPid;
-    int nxf;
-    int umask;
-    int niosPort;
-    int maxNumProcessors;
     int userPriority;
-    char padding1[4];
+    int umask;
+    uint nxf;
+    uint maxNumProcessors;
+    uint numAskedHosts;
+    uint numProcessors;
+    char padding3[4];
     char *jobName;
     char *queue;
     char *jobFile;

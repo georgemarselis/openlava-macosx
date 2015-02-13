@@ -19,39 +19,9 @@
 
 #pragma once
 
-
-#define PRINT_ERRMSG0(errMsg, fmt)\
-    {\
-	if (errMsg == NULL)\
-	    fprintf(stderr, fmt);\
-        else\
-	    sprintf(*errMsg, fmt);\
-    }
-#define PRINT_ERRMSG1(errMsg, fmt, msg1)\
-    {\
-	if (errMsg == NULL)\
-	    fprintf(stderr, fmt, msg1);\
-        else\
-	    sprintf(*errMsg, fmt, msg1);\
-    }
-#define PRINT_ERRMSG2(errMsg, fmt, msg1, msg2)\
-    {\
-	if (errMsg == NULL)\
-	    fprintf(stderr, fmt, msg1, msg2);\
-        else\
-	    sprintf(*errMsg, fmt, msg1, msg2);\
-    }
-#define PRINT_ERRMSG3(errMsg, fmt, msg1, msg2, msg3)\
-    {\
-	if (errMsg == NULL)\
-	    fprintf(stderr, fmt, msg1, msg2, msg3);\
-        else\
-	    sprintf(*errMsg, fmt, msg1, msg2, msg3);\
-    }
-
 static int optionFlag = FALSE;
-char optionFileName[MAXLSFNAMELEN];
-char *loginShell;
+static char optionFileName[MAXLSFNAMELEN];
+//char *loginShell;
 
 static char *additionEsubInfo = NULL;
 static hTab *bExceptionTab;
@@ -59,8 +29,8 @@ static hTab *bExceptionTab;
 int mySubUsage_ (void *);
 int bExceptionTabInit (void);
 void subUsage_ (int, char **);
-char *niosArgv[5];
-char niosPath[MAXFILENAMELEN];
+static char *niosArgv[5];
+static char niosPath[MAXFILENAMELEN];
 
 extern const char *defaultSpoolDir;
 extern void sub_perror (char *usrMsg);
@@ -87,7 +57,7 @@ typedef struct bException
 extern char **environ;
 extern char *yyerr;
 extern int _lsb_conntimeout;
-extern int lsbMode_;
+//extern int lsbMode_;
 static char *useracctmap = NULL;
 static struct lenData ed = { 0, NULL };
 
@@ -103,13 +73,13 @@ static int xdrSubReqSize (struct submitReq *req);
 static int createNiosSock (struct submitReq *);
 
 int getChkDir (char *, char *);
-static void startNios (struct submitReq *, int, LS_LONG_INT);
+static void startNios (struct submitReq *, int, LS_LONG_INT) __attribute__ ((noreturn));
 static void postSubMsg (struct submit *, LS_LONG_INT, struct submitReply *);
 static int readOptFile (char *filename, char *childLine);
 
 static const LSB_SPOOL_INFO_T *chUserCopySpoolFile (const char *srcFile, spoolOptions_t fileType);
 
-extern void makeCleanToRunEsub ();
+extern void makeCleanToRunEsub( void );
 extern char *translateString (char *);
 extern void modifyJobInformation (struct submit *);
 extern void compactXFReq (struct submit *);
@@ -120,5 +90,21 @@ extern int stringIsToken (char *, char *);
 extern int stringIsDigitNumber (char *s);
 extern int processXFReq (char *key, char *line, struct submit *jobSubReq);
 extern char *extractStringValue (char *line);
+
+void PRINT_ERRMSG0( char **errMsg, char *fmt);
+void PRINT_ERRMSG1( char **errMsg, char *fmt, char *msg1);
+void PRINT_ERRMSG2( char **errMsg, char *fmt, char *msg1, char *msg2);
+void PRINT_ERRMSG3( char **errMsg, char *fmt, char *msg1, char *msg2, char *msg3);
+
+
+int checkSubDelOption ( struct submit *req, int option );
+int checkSubDelOption2( struct submit *req, int option2 );
+int checkRLDelOption( struct submit *req, int rLimit );
+
+int getCommonParams (struct submit *jobSubReq, struct submitReq *submitReq, struct submitReply *submitRep);
+int getOtherParams (struct submit *jobSubReq, struct submitReq *submitReq, struct submitReply *submitRep, struct lsfAuth *auth, LSB_SUB_SPOOL_FILE_T * subSpoolFiles);
+int gettimefor (char *toptarg, time_t * tTime);
+int setOption_ (int argc, char **argv, char *template, struct submit *req, int mask, int mask2, char **errMsg);
+struct submit *parseOptFile_ (char *filename, struct submit *req, char **errMsg);
 
 

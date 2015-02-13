@@ -390,7 +390,6 @@ lsb_geteventrec_ex (FILE * log_fp, int *LineNum, char *usedLine)
 static void
 freeLogRec (struct eventRec *logRec)
 {
-  int i;
 
   switch (logRec->type)
     {
@@ -398,7 +397,7 @@ freeLogRec (struct eventRec *logRec)
     case EVENT_JOB_MODIFY:
       if (logRec->eventLog.jobNewLog.numAskedHosts)
     {
-      for (i = 0; i < logRec->eventLog.jobNewLog.numAskedHosts; i++)
+      for (uint i = 0; i < logRec->eventLog.jobNewLog.numAskedHosts; i++)
         free (logRec->eventLog.jobNewLog.askedHosts[i]);
     }
       if (logRec->eventLog.jobNewLog.askedHosts)
@@ -427,7 +426,7 @@ freeLogRec (struct eventRec *logRec)
       FREEUP (logRec->eventLog.jobModLog.queue);
       if (logRec->eventLog.jobModLog.numAskedHosts)
     {
-      for (i = 0; i < logRec->eventLog.jobModLog.numAskedHosts; i++)
+      for (int i = 0; i < logRec->eventLog.jobModLog.numAskedHosts; i++)
         FREEUP (logRec->eventLog.jobModLog.askedHosts[i]);
     }
       FREEUP (logRec->eventLog.jobModLog.askedHosts);
@@ -458,7 +457,7 @@ freeLogRec (struct eventRec *logRec)
     case EVENT_PRE_EXEC_START:
       if (logRec->eventLog.jobStartLog.numExHosts)
     {
-      for (i = 0; i < logRec->eventLog.jobStartLog.numExHosts; i++)
+      for (int i = 0; i < logRec->eventLog.jobStartLog.numExHosts; i++)
         free (logRec->eventLog.jobStartLog.execHosts[i]);
     }
       if (logRec->eventLog.jobStartLog.execHosts)
@@ -472,14 +471,14 @@ freeLogRec (struct eventRec *logRec)
       return;
 
     case EVENT_LOAD_INDEX:
-      for (i = 0; i < logRec->eventLog.loadIndexLog.nIdx; i++)
+      for (int i = 0; i < logRec->eventLog.loadIndexLog.nIdx; i++)
     free (logRec->eventLog.loadIndexLog.name[i]);
       if (logRec->eventLog.loadIndexLog.nIdx)
     free (logRec->eventLog.loadIndexLog.name);
       return;
 
     case EVENT_MIG:
-      for (i = 0; i < logRec->eventLog.migLog.numAskedHosts; i++)
+      for (int i = 0; i < logRec->eventLog.migLog.numAskedHosts; i++)
     free (logRec->eventLog.migLog.askedHosts[i]);
       if (logRec->eventLog.migLog.numAskedHosts)
     free (logRec->eventLog.migLog.askedHosts);
@@ -495,7 +494,7 @@ freeLogRec (struct eventRec *logRec)
 
       if (logRec->eventLog.jobFinishLog.numAskedHosts)
     {
-      for (i = 0; i < logRec->eventLog.jobFinishLog.numAskedHosts; i++)
+      for (int i = 0; i < logRec->eventLog.jobFinishLog.numAskedHosts; i++)
         free (logRec->eventLog.jobFinishLog.askedHosts[i]);
     }
       if (logRec->eventLog.jobFinishLog.askedHosts)
@@ -503,7 +502,7 @@ freeLogRec (struct eventRec *logRec)
 
       if (logRec->eventLog.jobFinishLog.numExHosts)
     {
-      for (i = 0; i < logRec->eventLog.jobFinishLog.numExHosts; i++)
+      for (int i = 0; i < logRec->eventLog.jobFinishLog.numExHosts; i++)
         free (logRec->eventLog.jobFinishLog.execHosts[i]);
     }
       if (logRec->eventLog.jobFinishLog.execHosts)
@@ -532,7 +531,7 @@ freeLogRec (struct eventRec *logRec)
       free (logRec->eventLog.jobMsgLog.msg);
       return;
     case EVENT_JOB_FORCE:
-      for (i = 0; i < logRec->eventLog.jobForceRequestLog.numExecHosts; i++)
+      for (int i = 0; i < logRec->eventLog.jobForceRequestLog.numExecHosts; i++)
     {
       if (logRec->eventLog.jobForceRequestLog.execHosts[i])
         free (logRec->eventLog.jobForceRequestLog.execHosts[i]);
@@ -551,13 +550,16 @@ freeLogRec (struct eventRec *logRec)
 static int
 readJobNew (char *line, struct jobNewLog *jobNewLog)
 {
-  int i, cc, ccount;
-  int tmpSubmit, tmpBegin, tmpTerm;
+  int cc        = 0;
+  int ccount    = 0;
+  int tmpSubmit = 0;
+  int tmpBegin  = 0;
+  int tmpTerm   = 0;
 
 
 
 
-  cc = sscanf (line, "%d%d%d%d%d%d%d%d%d%d%n",
+  cc = sscanf (line, "%ld%d%d%d%d%d%d%d%ld%d%n",
            &(jobNewLog->jobId),
            &(jobNewLog->userId),
            &(jobNewLog->options),
@@ -578,7 +580,7 @@ readJobNew (char *line, struct jobNewLog *jobNewLog)
 
   copyQStr (line, MAX_LSB_NAME_LEN, 1, jobNewLog->userName);
 
-  for (i = 0; i < LSF_RLIM_NLIMITS; i++)
+  for ( uint i = 0; i < LSF_RLIM_NLIMITS; i++)
     {
       cc = sscanf (line, "%d%n", &(jobNewLog->rLimits[i]), &ccount);
       if (cc != 1)
@@ -588,10 +590,10 @@ readJobNew (char *line, struct jobNewLog *jobNewLog)
 
   copyQStr (line, MAXHOSTNAMELEN, 0, jobNewLog->hostSpec);
 
-  cc = sscanf (line, "%f%d%n", &jobNewLog->hostFactor,
-           &jobNewLog->umask, &ccount);
-  if (cc != 2)
+  cc = sscanf (line, "%f%d%n", &jobNewLog->hostFactor, &jobNewLog->umask, &ccount);
+  if (cc != 2) {
     return (LSBE_EVENT_FORMAT);
+  }
   line += ccount + 1;
 
   copyQStr (line, MAX_LSB_NAME_LEN, 1, jobNewLog->queue);
@@ -620,7 +622,7 @@ readJobNew (char *line, struct jobNewLog *jobNewLog)
       return (LSBE_NO_MEM);
     }
 
-      for (i = 0; i < jobNewLog->numAskedHosts; i++)
+      for (uint i = 0; i < jobNewLog->numAskedHosts; i++)
     {
       char hName[MAXLINELEN];
       if ((ccount = stripQStr (line, hName)) < 0)
@@ -661,7 +663,7 @@ readJobNew (char *line, struct jobNewLog *jobNewLog)
         }
     }
 
-  for (i = 0; i < jobNewLog->nxf; i++)
+  for (uint i = 0; i < jobNewLog->nxf; i++)
     {
       copyQStr (line, MAXFILENAMELEN, 0, jobNewLog->xf[i].subFn);
       copyQStr (line, MAXFILENAMELEN, 0, jobNewLog->xf[i].execFn);
@@ -1730,14 +1732,12 @@ lsb_puteventrec (FILE * log_fp, struct eventRec *logPtr)
 static int
 writeJobNew (FILE * log_fp, struct jobNewLog *jobNewLog)
 {
-    int i;
-
     assert( jobNewLog->options >= 0);
     if (!((uint)jobNewLog->options & SUB_RLIMIT_UNIT_IS_KB)) {
         convertRLimit (jobNewLog->rLimits, 0);
     }
 
-  if (fprintf (log_fp, " %d %d %d %d %d %d %d %d %d %d",
+  if (fprintf (log_fp, " %ld %d %d %d %d %d %d %d %d %d",
            jobNewLog->jobId,
            jobNewLog->userId,
            jobNewLog->options,
@@ -1751,7 +1751,7 @@ writeJobNew (FILE * log_fp, struct jobNewLog *jobNewLog)
 
   if (addQStr (log_fp, jobNewLog->userName) < 0)
     return (LSBE_SYS_CALL);
-  for (i = 0; i < LSF_RLIM_NLIMITS; i++)
+  for (uint i = 0; i < LSF_RLIM_NLIMITS; i++)
     if (fprintf (log_fp, " %d", jobNewLog->rLimits[i]) < 0)
       return (LSBE_SYS_CALL);
   if (addQStr (log_fp, jobNewLog->hostSpec) < 0)
@@ -1785,7 +1785,7 @@ writeJobNew (FILE * log_fp, struct jobNewLog *jobNewLog)
   if (fprintf (log_fp, " %d", jobNewLog->numAskedHosts) < 0)
     return (LSBE_SYS_CALL);
   if (jobNewLog->numAskedHosts)
-    for (i = 0; i < jobNewLog->numAskedHosts; i++)
+    for (uint i = 0; i < jobNewLog->numAskedHosts; i++)
       {
     if (addQStr (log_fp, jobNewLog->askedHosts[i]) < 0)
       return (LSBE_SYS_CALL);
@@ -1805,10 +1805,9 @@ writeJobNew (FILE * log_fp, struct jobNewLog *jobNewLog)
 
   if (fprintf (log_fp, " %d", jobNewLog->nxf) < 0)
     return (LSBE_SYS_CALL);
-  for (i = 0; i < jobNewLog->nxf; i++)
+  for (uint i = 0; i < jobNewLog->nxf; i++)
     {
-      if (fprintf (log_fp, " \"%s\" \"%s\" %d", jobNewLog->xf[i].subFn,
-           jobNewLog->xf[i].execFn, jobNewLog->xf[i].options) < 0)
+      if (fprintf (log_fp, " \"%s\" \"%s\" %d", jobNewLog->xf[i].subFn, jobNewLog->xf[i].execFn, jobNewLog->xf[i].options) < 0)
     return (LSBE_SYS_CALL);
     }
   subNewLine_ (jobNewLog->mailUser);

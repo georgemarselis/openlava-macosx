@@ -270,7 +270,7 @@ extern char *sockAdd2Str_ (struct sockaddr_in *);
 
 extern struct hostent *Gethostbyname_ (char *);
 extern struct hostent *Gethostbyaddr_ (in_addr_t *, socklen_t, int);
-extern int getAskedHosts_ (char *optarg_, char ***askedHosts, unsigned long *numAskedHosts, unsigned long *badIdx, int checkHost);
+extern int getAskedHosts_ (char *optarg_, char ***askedHosts, uint *numAskedHosts, unsigned long *badIdx, int checkHost);
 extern int lockHost_ (time_t, char *);
 extern int unlockHost_ (char *);
 
