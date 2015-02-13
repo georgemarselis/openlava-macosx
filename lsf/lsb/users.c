@@ -26,7 +26,7 @@
 
 
 struct userInfoEnt *
-lsb_userinfo (char **users, int *numUsers)
+lsb_userinfo (char **users, uint *numUsers)
 {
   mbdReqType mbdReqtype;
   XDR xdrs;
@@ -35,19 +35,22 @@ lsb_userinfo (char **users, int *numUsers)
   char *request_buf;
   struct userInfoReply userInfoReply, *reply;
   static struct infoReq userInfoReq;
-  int i, cc = 0, numReq = -1;
+  uint i = 0;
+  unsigned long cc = 0;
+  unsigned long numReq = 0;
   char lsfUserName[MAXLINELEN];
+  int returnValue = 0;
 
   if (numUsers)
     {
       numReq = *numUsers;
       *numUsers = 0;
     }
-  if (numReq < 0)
+/*  if (numReq < 0)
     {
       lsberrno = LSBE_BAD_ARG;
       return (NULL);
-    }
+    }*/
 
   if (userInfoReq.names)
     free (userInfoReq.names);
@@ -56,49 +59,50 @@ lsb_userinfo (char **users, int *numUsers)
     {
       userInfoReq.numNames = 0;
       if ((userInfoReq.names = (char **) malloc (sizeof (char *))) == NULL)
-	{
-	  lsberrno = LSBE_NO_MEM;
-	  return (NULL);
-	}
+  {
+    lsberrno = LSBE_NO_MEM;
+    return (NULL);
+  }
       userInfoReq.names[0] = "";
       cc = 1;
     }
   else if (numReq == 1 && users == NULL)
     {
       if (getLSFUser_ (lsfUserName, MAXLINELEN) != 0)
-	{
-	  return (NULL);
-	}
+  {
+    return (NULL);
+  }
       userInfoReq.numNames = 1;
       if ((userInfoReq.names = (char **) malloc (sizeof (char *))) == NULL)
-	{
-	  lsberrno = LSBE_NO_MEM;
-	  return (NULL);
-	}
+  {
+    lsberrno = LSBE_NO_MEM;
+    return (NULL);
+  }
       userInfoReq.names[0] = lsfUserName;
       cc = 1;
     }
   else
     {
-      if ((userInfoReq.names = (char **) calloc
-	   (numReq, sizeof (char *))) == NULL)
-	{
-	  lsberrno = LSBE_NO_MEM;
-	  return (NULL);
-	}
-      userInfoReq.numNames = numReq;
+      userInfoReq.names = (char **) calloc(numReq, sizeof (char *));
+      if ( NULL == userInfoReq.names && ENOMEM == errno )
+  {
+    lsberrno = LSBE_NO_MEM;
+    return (NULL);
+  }
+      assert( numReq <= INT_MAX );
+      userInfoReq.numNames = (int)numReq;
       for (i = 0; i < numReq; i++)
-	{
-	  if (users[i] && strlen (users[i]) + 1 < MAXHOSTNAMELEN)
-	    userInfoReq.names[i] = users[i];
-	  else
-	    {
-	      free (userInfoReq.names);
-	      lsberrno = LSBE_BAD_USER;
-	      *numUsers = i;
-	      return (NULL);
-	    }
-	}
+  {
+    if (users[i] && strlen (users[i]) + 1 < MAXHOSTNAMELEN)
+      userInfoReq.names[i] = users[i];
+    else
+      {
+        free (userInfoReq.names);
+        lsberrno = LSBE_BAD_USER;
+        *numUsers = i;
+        return (NULL);
+      }
+  }
       cc = numReq;
     }
   userInfoReq.resReq = "";
@@ -111,12 +115,13 @@ lsb_userinfo (char **users, int *numUsers)
       lsberrno = LSBE_NO_MEM;
       return (NULL);
     }
-  xdrmem_create (&xdrs, request_buf, cc, XDR_ENCODE);
+  assert( cc <= INT_MAX );
+  xdrmem_create (&xdrs, request_buf, (uint)cc, XDR_ENCODE);
 
   initLSFHeader_ (&hdr);
   hdr.opCode = mbdReqtype;
   if (!xdr_encodeMsg (&xdrs, (char *) &userInfoReq, &hdr, xdr_infoReq,
-		      0, NULL))
+          0, NULL))
     {
       xdr_destroy (&xdrs);
       free (request_buf);
@@ -124,9 +129,9 @@ lsb_userinfo (char **users, int *numUsers)
       return (NULL);
     }
 
-
-  if ((cc = callmbd (NULL, request_buf, XDR_GETPOS (&xdrs),
-		     &reply_buf, &hdr, NULL, NULL, NULL)) == -1)
+    assert( XDR_GETPOS (&xdrs) <= INT_MAX );
+    returnValue = callmbd (NULL, request_buf, (int)XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL);
+  if (-1 == returnValue )
     {
       xdr_destroy (&xdrs);
       free (request_buf);
@@ -138,25 +143,28 @@ lsb_userinfo (char **users, int *numUsers)
   lsberrno = hdr.opCode;
   if (lsberrno == LSBE_NO_ERROR || lsberrno == LSBE_BAD_USER)
     {
-      xdrmem_create (&xdrs, reply_buf, XDR_DECODE_SIZE_ (cc), XDR_DECODE);
+      assert( cc <= UINT_MAX );
+      xdrmem_create (&xdrs, reply_buf, XDR_DECODE_SIZE_ ((uint)cc), XDR_DECODE);
       reply = &userInfoReply;
       if (!xdr_userInfoReply (&xdrs, reply, &hdr))
-	{
-	  lsberrno = LSBE_XDR;
-	  xdr_destroy (&xdrs);
-	  if (cc)
-	    free (reply_buf);
-	  return (NULL);
-	}
+  {
+    lsberrno = LSBE_XDR;
+    xdr_destroy (&xdrs);
+    if (cc)
+      free (reply_buf);
+    return (NULL);
+  }
       xdr_destroy (&xdrs);
       if (cc)
-	free (reply_buf);
+  free (reply_buf);
       if (lsberrno == LSBE_BAD_USER)
-	{
-	  *numUsers = reply->badUser;
-	  return (NULL);
-	}
-      *numUsers = reply->numUsers;
+  {
+    assert( reply->badUser >= 0);
+    *numUsers = (uint)reply->badUser;
+    return (NULL);
+  }
+  assert( reply->numUsers >=0 );
+      *numUsers = (uint) reply->numUsers;
       return (reply->users);
     }
 

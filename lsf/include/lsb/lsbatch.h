@@ -1687,7 +1687,7 @@ extern struct hostInfoEnt *lsb_hostinfo_ex P_ ((char **, int *, char *, int));
 extern int lsb_movejob P_ ((LS_LONG_INT jobId, int *, int));
 extern int lsb_switchjob P_ ((LS_LONG_INT jobId, char *queue));
 extern int lsb_queuecontrol P_ ((char *, int));
-extern struct userInfoEnt *lsb_userinfo P_ ((char **, int *));
+extern struct userInfoEnt *lsb_userinfo P_ ((char **, uint *));
 extern struct groupInfoEnt *lsb_hostgrpinfo P_ ((char **, int *, int));
 extern struct groupInfoEnt *lsb_usergrpinfo P_ ((char **, int *, int));
 extern struct parameterInfo *lsb_parameterinfo P_ ((char **, int *, int));
