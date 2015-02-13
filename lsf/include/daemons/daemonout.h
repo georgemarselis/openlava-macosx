@@ -289,8 +289,10 @@ struct jobMoveReq
 
 struct jobSwitchReq
 {
-  LS_LONG_INT jobId;
   char queue[MAX_LSB_NAME_LEN];
+  char padding[4];
+  LS_LONG_INT jobId;
+
 };
 
 struct controlReq
