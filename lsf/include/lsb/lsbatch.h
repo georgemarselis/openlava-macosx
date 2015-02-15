@@ -656,9 +656,10 @@ struct jobAttrSetLog
 
 struct jobInfoHead
 {
-  int numJobs;
-  int numHosts;
+  uint numHosts;
+  char padding[4];
   LS_LONG_INT *jobIds;
+  unsigned long numJobs;
   char **hostNames;
 };
 
@@ -670,15 +671,14 @@ struct jobInfoEnt
     int numReasons;
     int reasons;
     int subreasons;
-    int jobPid;
-    int numExHosts;
     int umask;
     int nIdx;
     int exitStatus;
     int execUid;
     int jType;
     int jobPriority;
-    char padding2[4];
+    uint numExHosts;
+    int *reasonTb;
     char *user;
     char *cwd;
     char *subHomeDir;
@@ -691,6 +691,7 @@ struct jobInfoEnt
     char *jName;
     float *loadSched;
     float *loadStop;
+    unsigned long jobPid;
     float cpuTime;
     float cpuFactor;
     time_t submitTime;
@@ -699,7 +700,6 @@ struct jobInfoEnt
     time_t predictedStartTime;
     time_t endTime;
     time_t jRusageUpdateTime;
-    int *reasonTb;
     int counter[NUM_JGRP_COUNTERS];
     struct submit submit;
     struct jRusage runRusage;

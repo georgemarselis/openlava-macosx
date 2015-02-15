@@ -179,22 +179,20 @@ struct jobInfoReq
 
 struct jobInfoReply
 {
-  LS_LONG_INT jobId;
   u_short port;
-  char padding1[6];
-  int *reasonTb;
+  char padding1[2];
   int status;
   int numReasons;
   int reasons;
   int subreasons;
-  int numToHosts;
   int nIdx;
-  int userId;
   int execUid;
   int exitStatus;
-  int jobPid;
   int jType;
   int jobPriority;
+  uint numToHosts;
+  uid_t userId;
+  int *reasonTb;
   time_t startTime;
   time_t predictedStartTime;
   time_t endTime;
@@ -204,16 +202,18 @@ struct jobInfoReply
   char *execHome;
   char *execCwd;
   char *execUsername;
-  char **toHosts;
-  float *loadSched;
-  float *loadStop;
-  struct submitReq *jobBill;
-  struct jRusage runRusage;
   char *parentGroup;
   char *jName;
+  float *loadSched;
+  float *loadStop;
   float cpuTime;
+  char padding2[4];
+  unsigned long jobPid;
+  struct submitReq *jobBill;
+  struct jRusage runRusage;
   int counter[NUM_JGRP_COUNTERS];
-  char padding3[4];
+  LS_LONG_INT jobId;
+  char **toHosts;
 };
 
 struct infoReq

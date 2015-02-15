@@ -38,12 +38,13 @@ lsb_openjobinfo (LS_LONG_INT jobId, char *jobName, char *userName, char *queueNa
 {
   struct jobInfoHead *jobInfoHead;
 
-  jobInfoHead = lsb_openjobinfo_a (jobId, jobName, userName, queueName,
-				   hostName, options);
-  if (!jobInfoHead)
+  jobInfoHead = lsb_openjobinfo_a (jobId, jobName, userName, queueName,  hostName, options);
+  if (!jobInfoHead) {
     return (-1);
-  return (jobInfoHead->numJobs);
+  }
 
+  assert (jobInfoHead->numJobs <= INT_MAX );
+  return (int)(jobInfoHead->numJobs);
 }
 
 struct jobInfoHead *
@@ -231,7 +232,8 @@ struct jobInfoEnt *
 lsb_readjobinfo (int *more)
 {
   XDR xdrs;
-  int num, i, aa;
+  int num = 0;
+  int aa  = 0;
   struct LSFHeader hdr;
   char *buffer = NULL;
   static struct jobInfoReply jobInfoReply;
@@ -244,8 +246,7 @@ lsb_readjobinfo (int *more)
   static int *pgid = NULL;
 
 
-  TIMEIT (0, (num = readNextPacket (&buffer, _lsb_recvtimeout, &hdr,
-				    mbdSock)), "readNextPacket");
+  TIMEIT (0, (num = readNextPacket (&buffer, _lsb_recvtimeout, &hdr,  mbdSock)), "readNextPacket");
   if (num < 0)
     {
       closeSession (mbdSock);
@@ -297,7 +298,7 @@ lsb_readjobinfo (int *more)
 
   if (jobInfoReply.numToHosts > 0)
     {
-      for (i = 0; i < jobInfoReply.numToHosts; i++)
+      for (uint i = 0; i < jobInfoReply.numToHosts; i++)
 	FREEUP (jobInfoReply.toHosts[i]);
       FREEUP (jobInfoReply.toHosts);
       jobInfoReply.numToHosts = 0;
@@ -364,8 +365,9 @@ lsb_readjobinfo (int *more)
   jobInfo.jType = jobInfoReply.jType;
   jobInfo.parentGroup = jobInfoReply.parentGroup;
   jobInfo.jName = jobInfoReply.jName;
-  for (i = 0; i < NUM_JGRP_COUNTERS; i++)
+  for (uint i = 0; i < NUM_JGRP_COUNTERS; i++) {
     jobInfo.counter[i] = jobInfoReply.counter[i];
+  }
 
   jobInfo.submitTime = jobInfoReply.jobBill->submitTime;
   jobInfo.umask = jobInfoReply.jobBill->umask;
@@ -388,7 +390,7 @@ lsb_readjobinfo (int *more)
   jobInfo.submit.userPriority = jobInfoReply.jobBill->userPriority;
 
 
-  for (i = 0; i < LSF_RLIM_NLIMITS; i++)
+  for (uint i = 0; i < LSF_RLIM_NLIMITS; i++)
     {
       jobInfo.submit.rLimits[i] = jobInfoReply.jobBill->rLimits[i];
     }
