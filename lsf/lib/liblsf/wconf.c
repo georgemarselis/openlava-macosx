@@ -1009,7 +1009,8 @@ readNextLine (struct lsConf *conf, uint *lineNum)
       if (conf->confhandle->lineCount <= node->numLines - 1)
     {
       line = node->lines[conf->confhandle->lineCount];
-      *lineNum = node->beginLineNum + conf->confhandle->lineCount;
+      assert( node->beginLineNum + conf->confhandle->lineCount <= UINT_MAX);
+      *lineNum = (uint)(node->beginLineNum + conf->confhandle->lineCount);
       conf->confhandle->lineCount++;
       return (line);
     }

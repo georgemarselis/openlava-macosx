@@ -180,36 +180,32 @@ xdr_arrayElement (XDR * xdrs, char *data, struct LSFHeader * hdr, bool_t (*xdr_f
 }
 
 bool_t
-xdr_array_string (XDR * xdrs, char **astring, uint maxlen, int arraysize)
+xdr_array_string (XDR * xdrs, char **astring, uint maxlen, uint arraysize)
 {
-  int i, j;
+
   char line[MAXLINELEN];
   char *sp = line;
 
-  for (i = 0; i < arraysize; i++)
-    {
-      if (xdrs->x_op == XDR_FREE)
-  {
-    FREEUP (astring[i]);
-  }
-      else if (xdrs->x_op == XDR_DECODE)
-  {
-    if (!xdr_string (xdrs, &sp, maxlen)
-        || (astring[i] = putstr_ (sp)) == NULL)
-      {
-        for (j = 0; j < i; j++)
-    FREEUP (astring[j]);
+  for (uint i = 0; i < arraysize; i++) {
+    if (xdrs->x_op == XDR_FREE) {
+      FREEUP (astring[i]);
+    }
+    else if (xdrs->x_op == XDR_DECODE) {
+      if (!xdr_string (xdrs, &sp, maxlen) || (astring[i] = putstr_ (sp)) == NULL) {
+        for (uint j = 0; j < i; j++) {
+          FREEUP (astring[j]);
+        }
         return (FALSE);
       }
-  }
-      else
-  {
-    if (!xdr_string (xdrs, &astring[i], maxlen))
-      return (FALSE);
-  }
     }
-  return (TRUE);
+    else {
+      if (!xdr_string (xdrs, &astring[i], maxlen)) {
+        return (FALSE);
+      }
+    }
+  }
 
+  return (TRUE);
 }
 
 bool_t

@@ -120,8 +120,8 @@ xdr_decisionReq (XDR * xdrs, struct decisionReq * decisionReqPtr, struct LSFHead
         }
     }
     
-    assert( decisionReqPtr->numPrefs <= INT_MAX );
-    if (!xdr_array_string (xdrs, decisionReqPtr->preferredHosts, MAXHOSTNAMELEN, (int) decisionReqPtr->numPrefs)) {
+    assert( decisionReqPtr->numPrefs <= UINT_MAX );
+    if (!xdr_array_string (xdrs, decisionReqPtr->preferredHosts, MAXHOSTNAMELEN, (uint)decisionReqPtr->numPrefs)) {
         if (xdrs->x_op == XDR_DECODE) {
             FREEUP (decisionReqPtr->preferredHosts);
         }
@@ -826,7 +826,8 @@ xdr_clusterInfoReq (XDR *xdrs, struct clusterInfoReq *clusterInfoReq, struct LSF
         }
     }
     
-    if (!xdr_array_string (xdrs, clusterInfoReq->clusters, MAXLSFNAMELEN, clusterInfoReq->listsize))
+    assert( clusterInfoReq->listsize >= 0);
+    if (!xdr_array_string (xdrs, clusterInfoReq->clusters, MAXLSFNAMELEN, (uint)clusterInfoReq->listsize))
     {
         if (xdrs->x_op == XDR_DECODE) {
             FREEUP (clusterInfoReq->resReq);
@@ -1147,7 +1148,7 @@ xdr_cInfo (XDR *xdrs, struct cInfo *cInfo, struct LSFHeader *hdr)
     }
     
     if (cInfo->numIndx > 0) {
-        if (!xdr_array_string (xdrs, cInfo->loadIndxNames, MAXLSFNAMELEN, cInfo->numIndx)) {
+        if (!xdr_array_string (xdrs, cInfo->loadIndxNames, MAXLSFNAMELEN, (uint)cInfo->numIndx)) {
             FREEUP (cInfo->loadIndxNames);
             return (FALSE);
         }
@@ -1348,7 +1349,8 @@ xdr_lsResourceInstance (XDR * xdrs, struct lsSharedResourceInstance *instance, s
         }
     }
     
-    if (!xdr_array_string (xdrs, instance->hostList, MAXHOSTNAMELEN, instance->nHosts)) {
+    assert( instance->nHosts >= 0 );
+    if (!xdr_array_string (xdrs, instance->hostList, MAXHOSTNAMELEN, (uint)instance->nHosts)) {
         if (xdrs->x_op == XDR_DECODE) {
             FREEUP (instance->hostList);
             instance->nHosts = 0;

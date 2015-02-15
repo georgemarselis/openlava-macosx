@@ -539,8 +539,7 @@ xdr_parameterInfo (XDR *xdrs, struct parameterInfo * paramInfo,
 }
 
 bool_t
-xdr_jobInfoHead (XDR *xdrs, struct jobInfoHead * jobInfoHead,
-     struct LSFHeader *hdr)
+xdr_jobInfoHead (XDR *xdrs, struct jobInfoHead * jobInfoHead, struct LSFHeader *hdr)
 {
   static char **hostNames = NULL;
   static int numJobs = 0, numHosts = 0;
@@ -556,14 +555,12 @@ xdr_jobInfoHead (XDR *xdrs, struct jobInfoHead * jobInfoHead,
     }
   if (jobInfoHead->numJobs > 0)
     {
-      if ((jobArrIds = (int *) calloc (jobInfoHead->numJobs,
-               sizeof (int))) == NULL)
+      if ((jobArrIds = (int *) calloc (jobInfoHead->numJobs, sizeof (int))) == NULL)
   {
     lsberrno = LSBE_NO_MEM;
     return (FALSE);
   }
-      if ((jobArrElemIds = (int *) calloc (jobInfoHead->numJobs,
-             sizeof (int))) == NULL)
+      if ((jobArrElemIds = (int *) calloc (jobInfoHead->numJobs, sizeof (int))) == NULL)
   {
     lsberrno = LSBE_NO_MEM;
     FREEUP (jobArrIds);
@@ -576,8 +573,7 @@ xdr_jobInfoHead (XDR *xdrs, struct jobInfoHead * jobInfoHead,
   {
     FREEUP (jobIds);
     numJobs = 0;
-    if ((jobIds = (LS_LONG_INT *) calloc (jobInfoHead->numJobs,
-            sizeof (LS_LONG_INT))) ==
+    if ((jobIds = (LS_LONG_INT *) calloc (jobInfoHead->numJobs, sizeof (LS_LONG_INT))) ==
         NULL)
       {
         lsberrno = LSBE_NO_MEM;
@@ -592,8 +588,7 @@ xdr_jobInfoHead (XDR *xdrs, struct jobInfoHead * jobInfoHead,
       FREEUP (hostNames[i]);
     numHosts = 0;
     FREEUP (hostNames);
-    if ((hostNames = (char **) calloc (jobInfoHead->numHosts,
-               sizeof (char *))) == NULL)
+    if ((hostNames = (char **) calloc (jobInfoHead->numHosts, sizeof (char *))) == NULL)
       {
         lsberrno = LSBE_NO_MEM;
         return (FALSE);
