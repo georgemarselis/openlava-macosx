@@ -19,6 +19,9 @@
 
 #pragma once
 
+#include "lsb/spool.h"
+
+
 static int optionFlag = FALSE;
 static char optionFileName[MAXLSFNAMELEN];
 //char *loginShell;

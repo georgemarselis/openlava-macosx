@@ -22,21 +22,14 @@
 #include <string.h>
 
 #include "lsb/lsb.h"
-#include "lsb/spool.h"
+// #include "lsb/spool.h"
 #include "lsb/xdr.h"
 #include "lsb/modify.h"
 
 // #define  NL_SETN   13
 
-static LS_LONG_INT sendModifyReq (struct modifyReq *, struct submitReply *,
-          struct lsfAuth *);
-static int esubValModify (struct submit *);
-extern void makeCleanToRunEsub ();
-extern void modifyJobInformation (struct submit *);
-
 LS_LONG_INT
-lsb_modify (struct submit *jobSubReq, struct submitReply *submitRep,
-      LS_LONG_INT job)
+lsb_modify (struct submit *jobSubReq, struct submitReply *submitRep, LS_LONG_INT job)
 {
   struct modifyReq modifyReq;
   int i;
@@ -46,7 +39,6 @@ lsb_modify (struct submit *jobSubReq, struct submitReply *submitRep,
   struct jobInfoEnt *jInfo;
   LSB_SUB_SPOOL_FILE_T subSpoolFiles;
   LS_LONG_INT jobId = -1;
-  int loop;
 
   subSpoolFiles.inFileSpool[0] = 0;
   subSpoolFiles.commandSpool[0] = 0;
@@ -71,7 +63,7 @@ lsb_modify (struct submit *jobSubReq, struct submitReply *submitRep,
   subNewLine_ (jobSubReq->errFile);
   subNewLine_ (jobSubReq->chkpntDir);
   subNewLine_ (jobSubReq->projectName);
-  for (loop = 0; loop < jobSubReq->numAskedHosts; loop++)
+  for ( uint loop = 0; loop < jobSubReq->numAskedHosts; loop++)
     {
       subNewLine_ (jobSubReq->askedHosts[loop]);
     }
@@ -81,10 +73,12 @@ lsb_modify (struct submit *jobSubReq, struct submitReply *submitRep,
   modifyReq.jobIdStr = jobSubReq->command;
   modifyReq.delOptions = jobSubReq->delOptions;
   modifyReq.delOptions2 = jobSubReq->delOptions2;
-  if (jobSubReq->numProcessors == 0)
+  if (jobSubReq->numProcessors == 0) {
     jobSubReq->numProcessors = DEFAULT_NUMPRO;
-  if (jobSubReq->maxNumProcessors == 0)
+  }
+  if (jobSubReq->maxNumProcessors == 0) {
     jobSubReq->maxNumProcessors = DEFAULT_NUMPRO;
+  }
   cwd[0] = '\0';
   modifyReq.submitReq.subHomeDir = homeDir;
   modifyReq.submitReq.cwd = cwd;
@@ -115,21 +109,15 @@ lsb_modify (struct submit *jobSubReq, struct submitReply *submitRep,
     }
 
 
-  if (lsb_openjobinfo (job, NULL, NULL, NULL, NULL, 0) >= 0
-      && (jInfo = lsb_readjobinfo (NULL)) != NULL)
+  if (lsb_openjobinfo (job, NULL, NULL, NULL, NULL, 0) >= 0 && (jInfo = lsb_readjobinfo (NULL)) != NULL)
     {
 
-      if ((jobSubReq->termTime != 0 && jobSubReq->termTime != DELETE_NUMBER)
-    && jobSubReq->beginTime == 0
-    && jInfo->submit.beginTime > jobSubReq->termTime)
+      if ((jobSubReq->termTime != 0 && jobSubReq->termTime != DELETE_NUMBER) && jobSubReq->beginTime == 0 && jInfo->submit.beginTime > jobSubReq->termTime)
   {
     lsberrno = LSBE_START_TIME;
     goto cleanup;
   }
-      if (jobSubReq->beginTime != 0
-    && jobSubReq->termTime == 0
-    && jInfo->submit.termTime > 0
-    && jInfo->submit.termTime < jobSubReq->beginTime)
+      if (jobSubReq->beginTime != 0 && jobSubReq->termTime == 0 && jInfo->submit.termTime > 0 && jInfo->submit.termTime < jobSubReq->beginTime)
   {
     lsberrno = LSBE_START_TIME;
     goto cleanup;
@@ -139,8 +127,9 @@ lsb_modify (struct submit *jobSubReq, struct submitReply *submitRep,
 
   for (i = 0; i < LSF_RLIM_NLIMITS; i++)
     {
-      if (jobSubReq->rLimits[i] == DELETE_NUMBER)
-  modifyReq.submitReq.rLimits[i] = DELETE_NUMBER;
+      if (jobSubReq->rLimits[i] == DELETE_NUMBER) {
+        modifyReq.submitReq.rLimits[i] = DELETE_NUMBER;
+      }
     }
 
   jobId = sendModifyReq (&modifyReq, submitRep, &auth);

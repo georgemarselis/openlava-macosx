@@ -53,7 +53,7 @@
 #include "lib/table.h"
 #include "lib/mls.h"
 #include "libint/intlibout.h"
-#include "lsb/spool.h"
+// #include "lsb/spool.h"
 #include "lsb/sub.h"
 #include "lsb/xdr.h"
 
