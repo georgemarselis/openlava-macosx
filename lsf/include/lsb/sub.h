@@ -19,8 +19,24 @@
 
 #pragma once
 
-#include "lsb/spool.h"
+//#include "lsb/spool.h"
 
+extern char *getSpoolHostBySpoolFile (const char *spoolFile);
+typedef struct lsbSpoolInfo
+{
+  char srcFile[MAXFILENAMELEN];
+  char spoolFile[MAXFILENAMELEN];
+
+} LSB_SPOOL_INFO_T;
+
+typedef enum spoolOptions
+{
+  SPOOL_INPUT_FILE,
+  SPOOL_COMMAND
+} spoolOptions_t;
+
+extern LSB_SPOOL_INFO_T *copySpoolFile (const char *srcFilePath, spoolOptions_t option);
+extern int removeSpoolFile (const char *hostName, const char *destinFileFullPath);
 
 static int optionFlag = FALSE;
 static char optionFileName[MAXLSFNAMELEN];
