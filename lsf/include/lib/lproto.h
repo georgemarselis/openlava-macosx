@@ -72,13 +72,13 @@ struct resPair
 struct sharedResource
 {
   char *resourceName;
-  int numInstances;
+  uint numInstances;
   struct resourceInstance **instances;
 };
 
 struct resourceInfoReq
 {
-  int numResourceNames;
+  uint numResourceNames;
   int options;
   char *hostName;
   char **resourceNames;
@@ -86,15 +86,15 @@ struct resourceInfoReq
 
 struct resourceInfoReply
 {
-    int numResources;
-    int badResource;
+    uint numResources;
+    uint badResource;
     struct lsSharedResourceInfo *resources;
 };
 
 struct lsbShareResourceInfoReply
 {
-  int numResources;
-  int badResource;
+  uint numResources;
+  uint badResource;
   struct lsbSharedResourceInfo *resources;
  };
 

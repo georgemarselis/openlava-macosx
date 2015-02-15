@@ -53,8 +53,7 @@ lsb_mig (struct submig *mig, int *badHostIdx)
 
   if (mig->numAskedHosts > 0)
     {
-      for (migReq.numAskedHosts = 0;
-	   migReq.numAskedHosts < mig->numAskedHosts; migReq.numAskedHosts++)
+      for (migReq.numAskedHosts = 0; migReq.numAskedHosts < mig->numAskedHosts; migReq.numAskedHosts++)
 	{
 	  if (strlen (mig->askedHosts[migReq.numAskedHosts])
 	      >= MAXHOSTNAMELEN - 1)

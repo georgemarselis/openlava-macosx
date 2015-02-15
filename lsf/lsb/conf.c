@@ -2541,7 +2541,9 @@ do_Hosts_ (struct lsConf *conf, char *fname, uint *lineNum, struct lsInfo *info,
         return (FALSE);
     }
 
-    initkeylist (keylist, HKEY_HNAME + 1, HKEY_DISPATCH_WINDOW + 2, info);
+    assert( HKEY_HNAME + 1 <= INT_MAX );
+    assert( HKEY_DISPATCH_WINDOW + 2 <= INT_MAX );
+    initkeylist (keylist, (int)HKEY_HNAME + 1, (int)(HKEY_DISPATCH_WINDOW + 2), info);
     keylist[HKEY_HNAME].key               = "HOST_NAME";
     keylist[HKEY_MXJ].key                 = "MXJ";
     keylist[HKEY_RUN_WINDOW].key          = "RUN_WINDOW";
@@ -2704,13 +2706,14 @@ do_Hosts_ (struct lsConf *conf, char *fname, uint *lineNum, struct lsInfo *info,
         }
 
         if (keylist[HKEY_MXJ].val != NULL && strcmp (keylist[HKEY_MXJ].val, "!") == 0) {
-            host.maxJobs = -1;
+            host.maxJobs = 0;
         }
         else if( keylist[HKEY_MXJ].position >= 0 && 
                  keylist[HKEY_MXJ].val != NULL   && 
                  strcmp (keylist[HKEY_MXJ].val, "") ) 
         {
-            host.maxJobs = my_atoi (keylist[HKEY_MXJ].val, INFINIT_INT, -1);
+            assert( my_atoi (keylist[HKEY_MXJ].val, INFINIT_INT, -1) >= 0);
+            host.maxJobs = (unsigned long) my_atoi (keylist[HKEY_MXJ].val, INFINIT_INT, -1);
             if ( fabs( INFINIT_INT - host.maxJobs) < 0.00001 ) {
                 /* catgets 5183 */
                 ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5183, "%s: File %s at line %d: Invalid value <%s> for key <%s>; %d is assumed"), pname, fname, *lineNum, keylist[HKEY_MXJ].val, keylist[HKEY_MXJ].key, INFINIT_INT);
@@ -2720,7 +2723,8 @@ do_Hosts_ (struct lsConf *conf, char *fname, uint *lineNum, struct lsInfo *info,
 
         if( keylist[HKEY_UJOB_LIMIT].position >= 0 && keylist[HKEY_UJOB_LIMIT].val != NULL && strcmp (keylist[HKEY_UJOB_LIMIT].val, "")) {
 
-            host.userJobLimit = my_atoi( keylist[HKEY_UJOB_LIMIT].val, INFINIT_INT, -1 );
+            assert( my_atoi( keylist[HKEY_UJOB_LIMIT].val, INFINIT_INT, -1 ) >=0 );
+            host.userJobLimit = (unsigned long) my_atoi( keylist[HKEY_UJOB_LIMIT].val, INFINIT_INT, -1 );
             if ( fabs( INFINIT_INT - host.userJobLimit ) < 0.00001 ) {
                 /* catgets 5183 */
                 ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5183, "%s: File %s at line %d: Invalid value <%s> for key <%s>; %d is assumed"), pname, fname, *lineNum, keylist[HKEY_UJOB_LIMIT].val, keylist[HKEY_UJOB_LIMIT].key, INFINIT_INT);
@@ -2913,7 +2917,7 @@ getThresh (struct lsInfo *info, struct keymap *keylist, float loadSched[], float
 
     initThresholds (info, loadSched, loadStop);
 
-    for ( int i = 0; i < info->numIndx; i++) {
+    for ( uint i = 0; i < info->numIndx; i++) {
         if (keylist[i].position < 0) {
             continue;
         }
@@ -3102,12 +3106,12 @@ copyHostInfo (struct hostInfoEnt *toHost, struct hostInfoEnt *fromHost)
         }
     }
     if (fromHost->loadSched != NULL) {
-        for ( int i = 0; i < fromHost->nIdx; i++) {
+        for ( uint i = 0; i < fromHost->nIdx; i++) {
             toHost->loadSched[i] = fromHost->loadSched[i];
         }
     }
     if (fromHost->loadStop != NULL) {
-        for ( int i = 0; i < fromHost->nIdx; i++) {
+        for ( uint i = 0; i < fromHost->nIdx; i++) {
             toHost->loadStop[i] = fromHost->loadStop[i];
         }
     }
@@ -3118,24 +3122,20 @@ copyHostInfo (struct hostInfoEnt *toHost, struct hostInfoEnt *fromHost)
 static void
 initThresholds (struct lsInfo *info, float loadSched[], float loadStop[])
 {
-    int i;
-
-    if (info == NULL)
+    if (info == NULL) {
         return;
+    }
 
-    for (i = 0; i < info->numIndx; i++)
-        {
-        if (info->resTable[i].orderType == INCR)
-            {
+    for ( uint i = 0; i < info->numIndx; i++) {
+        if (info->resTable[i].orderType == INCR) {
             loadSched[i] = INFINIT_LOAD;
             loadStop[i] = INFINIT_LOAD;
-            }
-        else
-            {
+        }
+        else {
             loadSched[i] = -INFINIT_LOAD;
             loadStop[i] = -INFINIT_LOAD;
-            }
         }
+    }
 }
 
 
@@ -3816,7 +3816,9 @@ do_Queues (struct lsConf *conf, char *fname, uint *lineNum, struct lsInfo *info,
         return FALSE;
     }
 
-    initkeylist (keylist, QKEY_NAME + 1, KEYMAP_SIZE, info);
+    assert( QKEY_NAME + 1 <= INT_MAX );
+    assert( KEYMAP_SIZE <= INT_MAX );
+    initkeylist (keylist, (int)(QKEY_NAME + 1), (int)KEYMAP_SIZE, info);
 
     keylist[QKEY_NAME].key                    = "QUEUE_NAME";
     keylist[QKEY_PRIORITY].key                = "PRIORITY";

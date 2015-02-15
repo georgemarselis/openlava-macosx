@@ -27,7 +27,7 @@
 
 
 struct parameterInfo *
-lsb_parameterinfo (char **names, int *numUsers, int options)
+lsb_parameterinfo (char **names, uint *numUsers, int options)
 {
     static struct parameterInfo paramInfo;
     static struct infoReq infoReq;

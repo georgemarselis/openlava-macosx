@@ -23,11 +23,11 @@
 #include "lsb/lsb.h"
 #include "lsb/xdr.h"
 
-static struct groupInfoEnt *getGrpInfo (char **, int *, int);
-static int sendGrpReq (char *, int, struct infoReq *, struct groupInfoReply *);
+static struct groupInfoEnt *getGrpInfo (char **groups, uint *numGroups, int options);
+static int sendGrpReq (char *clusterName, int options, struct infoReq *groupInfo, struct groupInfoReply *reply);
 
 struct groupInfoEnt *
-lsb_usergrpinfo (char **groups, int *numGroups, int options)
+lsb_usergrpinfo (char **groups, uint *numGroups, int options)
 {
   options |= USER_GRP;
   return (getGrpInfo (groups, numGroups, options));
@@ -35,7 +35,7 @@ lsb_usergrpinfo (char **groups, int *numGroups, int options)
 }
 
 struct groupInfoEnt *
-lsb_hostgrpinfo (char **groups, int *numGroups, int options)
+lsb_hostgrpinfo (char **groups, uint *numGroups, int options)
 {
   options |= HOST_GRP;
   return (getGrpInfo (groups, numGroups, options));
@@ -43,22 +43,22 @@ lsb_hostgrpinfo (char **groups, int *numGroups, int options)
 }
 
 static struct groupInfoEnt *
-getGrpInfo (char **groups, int *numGroups, int options)
+getGrpInfo (char **groups, uint *numGroups, int options)
 {
-  int i;
+
   char *clusterName = NULL;
   static struct groupInfoReply reply;
   struct infoReq groupInfo;
 
   memset ((struct infoReq *) &groupInfo, '\0', sizeof (struct infoReq));
 
-  if (numGroups != NULL && *numGroups < 0)
+    if (numGroups == NULL )
     {
       lsberrno = LSBE_BAD_ARG;
       return (NULL);
     }
 
-  if (*numGroups < 0 || *numGroups > MAX_GROUPS)
+  if ( *numGroups > MAX_GROUPS)
     {
       lsberrno = LSBE_BAD_ARG;
       return (NULL);
@@ -79,7 +79,7 @@ getGrpInfo (char **groups, int *numGroups, int options)
     {
 
 
-      for (i = 0; i < *numGroups; i++)
+      for ( uint i = 0; i < *numGroups; i++)
 	{
 	  if (ls_isclustername (groups[i]) <= 0 || (options & USER_GRP))
 	    continue;
@@ -188,12 +188,12 @@ assert( options );
 void
 freeGroupInfoReply (struct groupInfoReply *reply)
 {
-  int i;
 
-  if (reply == NULL)
+  if (reply == NULL) {
     return;
+  }
 
-  for (i = 0; i < reply->numGroups; i++)
+  for (uint i = 0; i < reply->numGroups; i++)
     {
       FREEUP (reply->groups[i].memberList);
 

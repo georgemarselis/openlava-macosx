@@ -1644,16 +1644,18 @@ do_Hosts (FILE * fp, char *fname, uint *lineNum, struct lsInfo *info)
         putThreshold( SWP, &host, keyList[SWP].position, keyList[SWP].val, -INFINIT_LOAD );
         putThreshold( MEM, &host, keyList[MEM].position, keyList[MEM].val, -INFINIT_LOAD );
 
-        for (int i = NBUILTINDEX; i < NBUILTINDEX + info->numUsrIndx; i++) {
+        for (uint i = NBUILTINDEX; i < NBUILTINDEX + info->numUsrIndx; i++) {
             if (info->resTable[i].orderType == INCR) {
-                putThreshold (i, &host, keyList[i].position, keyList[i].val, INFINIT_LOAD);
+                assert( i <= INT_MAX );
+                putThreshold ((int)i, &host, keyList[i].position, keyList[i].val, INFINIT_LOAD);
             }
             else {
-                putThreshold (i, &host, keyList[i].position, keyList[i].val, -INFINIT_LOAD);
+                assert( i <= INT_MAX );
+                putThreshold ((int)i, &host, keyList[i].position, keyList[i].val, -INFINIT_LOAD);
             }
         }
 
-        for (int i = NBUILTINDEX + info->numUsrIndx; i < info->numIndx; i++) {
+        for (uint i = NBUILTINDEX + info->numUsrIndx; i < info->numIndx; i++) {
             
             host.busyThreshold[i] = INFINIT_LOAD;
             assert( info->numIndx >= 0 );
@@ -1671,17 +1673,17 @@ do_Hosts (FILE * fp, char *fname, uint *lineNum, struct lsInfo *info)
 
                 // FIXME FIXME FIXME 
                 // WARNING DANGER WARNING DANGER
-                // SHITTY CODE ASSIGNS TO LOOP VARIABLE
+                // (WAS A) SHITTY CODE ASSIGNS TO LOOP VARIABLE
                 // FIXME FIXME FIXME
                 // MUST INVESTIGATE WHY
-                for ( i = 0; i < (int) n; i++) {
-                    if (!strcmp (word, resList[i])) {
+                for ( uint j = 0; j < n; j++) {
+                    if (!strcmp (word, resList[j])) {
                         break;
                     }
                 }
                 
                 // casts of n to int must be thrown out, for all instanses in this function 
-                if (i < (int) n) {
+                if (i < n) {
                     /* catgets 5146 */
                     ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5146, "%s: %s(%d): Resource <%s> multiply specified for host %s in section host. Ignored.")), "do_Hosts", fname, *lineNum, word, host.hostName);
                     continue;
@@ -1955,7 +1957,7 @@ initkeylist (struct keymap keyList[], int m, int n, struct lsInfo *info)
 
     if (NULL == info) {
         int i = 0;
-        int index = 0;
+        uint index = 0;
 
         while ( NULL != builtInRes[i].name ) {
 
@@ -1967,7 +1969,7 @@ initkeylist (struct keymap keyList[], int m, int n, struct lsInfo *info)
     }
     else
     {
-        int index = 0;
+        uint index = 0;
         for (int i = 0; i < info->nRes; i++) {
             if ((info->resTable[i].flags & RESF_DYNAMIC) && index < info->numIndx) {
                 keyList[index++].key = info->resTable[i].name;

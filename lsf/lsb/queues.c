@@ -25,7 +25,7 @@
 #include "lsb/xdr.h"
 
 struct queueInfoEnt *
-lsb_queueinfo (char **queues, int *numQueues, char *hosts, char *users, int options)
+lsb_queueinfo (char **queues, uint *numQueues, char *hosts, char *users, int options)
 {
   mbdReqType mbdReqtype;
   static struct infoReq queueInfoReq;
@@ -36,7 +36,7 @@ lsb_queueinfo (char **queues, int *numQueues, char *hosts, char *users, int opti
   char *request_buf;
   char *reply_buf;
   int cc = 0;
-  int i = 0;
+
   static struct LSFHeader hdr;
   char *clusterName = NULL;
 
@@ -44,7 +44,7 @@ lsb_queueinfo (char **queues, int *numQueues, char *hosts, char *users, int opti
 
   if (qInfo != NULL)
     {
-      for (i = 0; i < reply.numQueues; i++)
+      for ( uint i = 0; i < reply.numQueues; i++)
 	{
 	  xdr_lsffree (xdr_queueInfoEnt, (char *) qInfo[i], &hdr);
 	}
@@ -55,7 +55,7 @@ lsb_queueinfo (char **queues, int *numQueues, char *hosts, char *users, int opti
       lsberrno = LSBE_BAD_ARG;
       return NULL;
     }
-  if ((queues == NULL && *numQueues > 1) || (*numQueues < 0))
+  if ((queues == NULL && *numQueues > 1) )
     {
       lsberrno = LSBE_BAD_ARG;
       return NULL;
@@ -96,7 +96,7 @@ lsb_queueinfo (char **queues, int *numQueues, char *hosts, char *users, int opti
 	  return (NULL);
 	}
       queueInfoReq.numNames = *numQueues;
-      for (i = 0; i < *numQueues; i++)
+      for (uint i = 0; i < *numQueues; i++)
 	{
 	  if (queues[i] && strlen (queues[i]) + 1 < MAXHOSTNAMELEN)
 	    queueInfoReq.names[i] = queues[i];
@@ -109,7 +109,8 @@ lsb_queueinfo (char **queues, int *numQueues, char *hosts, char *users, int opti
 	      return (NULL);
 	    }
 	}
-      cc = queueInfoReq.numNames;
+      assert( queueInfoReq.numNames <= INT_MAX );
+      cc = (int) queueInfoReq.numNames;
     }
   if (users != NULL)
     {
@@ -213,7 +214,7 @@ lsb_queueinfo (char **queues, int *numQueues, char *hosts, char *users, int opti
 	  return NULL;
 	}
       qInfo = qTmp;
-      for (i = 0; i < reply.numQueues; i++)
+      for (uint i = 0; i < reply.numQueues; i++)
 	qInfo[i] = &(reply.queues[i]);
 
       *numQueues = reply.numQueues;

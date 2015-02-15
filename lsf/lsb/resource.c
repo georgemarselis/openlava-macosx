@@ -26,12 +26,12 @@
 #include "lsb/xdr.h"
 
 struct lsbSharedResourceInfo *
-lsb_sharedresourceinfo (char **resources, int *numResources, char *hostName, int options)
+lsb_sharedresourceinfo (char **resources, uint *numResources, char *hostName, int options)
 {
   static char fname[] = "lsb_sharedresourceinfo";
   static struct lsbShareResourceInfoReply lsbResourceInfoReply;
   struct resourceInfoReq resourceInfoReq;
-  int cc = 0, i;
+  int cc = 0;
   char *clusterName = NULL;
   static struct LSFHeader hdr;
   char *request_buf;
@@ -62,7 +62,6 @@ lsb_sharedresourceinfo (char **resources, int *numResources, char *hostName, int
 		 (char *) &lsbResourceInfoReply, &hdr);
 
   if (numResources == NULL ||
-      *numResources < 0 ||
       (resources == NULL && *numResources != 0) ||
       (resources != NULL && *numResources == 0))
     {
@@ -93,7 +92,7 @@ lsb_sharedresourceinfo (char **resources, int *numResources, char *hostName, int
 	  lsberrno = LSBE_NO_MEM;
 	  return (NULL);
 	}
-      for (i = 0; i < *numResources; i++)
+      for ( uint i = 0; i < *numResources; i++)
 	{
 	  if (resources[i] && strlen (resources[i]) + 1 < MAXLSFNAMELEN)
 	    {

@@ -89,8 +89,8 @@ lsb_userinfo (char **users, uint *numUsers)
     lsberrno = LSBE_NO_MEM;
     return (NULL);
   }
-      assert( numReq <= INT_MAX );
-      userInfoReq.numNames = (int)numReq;
+      assert( numReq <= UINT_MAX );
+      userInfoReq.numNames = (uint)numReq;
       for (i = 0; i < numReq; i++)
   {
     if (users[i] && strlen (users[i]) + 1 < MAXHOSTNAMELEN)

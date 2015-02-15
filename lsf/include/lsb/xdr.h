@@ -42,9 +42,9 @@ extern bool_t xdr_infoReq       (XDR *, struct infoReq *,       struct LSFHeader
 extern bool_t xdr_parameterInfo (XDR *, struct parameterInfo *, struct LSFHeader *);
 extern bool_t xdr_userInfoEnt   (XDR *, struct userInfoEnt *,   struct LSFHeader *);
 extern bool_t xdr_userInfoReply (XDR *, struct userInfoReply *, struct LSFHeader *);
-extern bool_t xdr_hostInfoEnt   (XDR *, struct hostInfoEnt *,   struct LSFHeader *, int *);
+extern bool_t xdr_hostInfoEnt   (XDR *, struct hostInfoEnt *,   struct LSFHeader *, uint *);
 extern bool_t xdr_hostDataReply (XDR *, struct hostDataReply *, struct LSFHeader *);
-extern bool_t xdr_queueInfoEnt  (XDR *, struct queueInfoEnt *,  struct LSFHeader *, int *);
+extern bool_t xdr_queueInfoEnt (XDR *xdrs, struct queueInfoEnt * qInfo, struct LSFHeader *hdr, uint *nIdx);
 extern bool_t xdr_queueInfoReply(XDR *, struct queueInfoReply *,struct LSFHeader *);
 extern bool_t xdr_jobInfoHead   (XDR *, struct jobInfoHead *,   struct LSFHeader *);
 extern bool_t xdr_jobInfoReply  (XDR *, struct jobInfoReply *,  struct LSFHeader *);
@@ -63,5 +63,17 @@ extern bool_t xdr_var_string    (XDR *, char **);
 extern bool_t xdr_lsbShareResourceInfoReply (XDR *, struct lsbShareResourceInfoReply *, struct LSFHeader *hdr);
 extern bool_t xdr_runJobReq     (XDR *,             struct runJobRequest *,             struct LSFHeader *);
 extern bool_t xdr_jobAttrReq    (XDR *,             struct jobAttrInfoEnt *,            struct LSFHeader *);
+
+bool_t xdr_xFile (XDR *xdrs, struct xFile * xf, struct LSFHeader *hdr);
+
+bool_t xdr_var_string (XDR *, char **);
+
+static int lsbSharedResConfigured_ = FALSE;
+
+bool_t xdr_submitReq (XDR *xdrs, struct submitReq *submitReq, struct LSFHeader *hdr);
+bool_t xdr_jgrpInfoReply (XDR *xdrs, struct jobInfoReply * jobInfoReply, struct LSFHeader *hdr);
+
+extern bool_t xdr_array_string (XDR * xdrs, char **astring, uint maxlen, uint arraysize);
+
 
 #endif

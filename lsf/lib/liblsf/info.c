@@ -792,14 +792,14 @@ ls_isclustername (char *name)
 }
 
 struct lsSharedResourceInfo *
-ls_sharedresourceinfo (char **resources, int *numResources, char *hostName, int options)
+ls_sharedresourceinfo (char **resources, uint *numResources, char *hostName, int options)
 {
     static char fname[] = "ls_sharedresourceinfo";
     static struct resourceInfoReq resourceInfoReq;
     static struct resourceInfoReply resourceInfoReply;
     static struct LSFHeader replyHdr;
     static int first = TRUE;
-    int cc, i;
+    int cc = 0;
 
     // busywork
     assert( options >= 0 );
@@ -822,8 +822,7 @@ ls_sharedresourceinfo (char **resources, int *numResources, char *hostName, int 
   FREEUP (resourceInfoReq.resourceNames);
   FREEUP (resourceInfoReq.hostName);
 
-  if (numResources == NULL || *numResources < 0
-      || (resources == NULL && *numResources > 0))
+  if (numResources == NULL || (resources == NULL && *numResources > 0))
     {
       lserrno = LSE_BAD_ARGS;
       return (NULL);
@@ -847,7 +846,7 @@ ls_sharedresourceinfo (char **resources, int *numResources, char *hostName, int 
             lserrno = LSE_MALLOC;
             return (NULL);
         }
-      for (i = 0; i < *numResources; i++)
+      for ( uint i = 0; i < *numResources; i++)
     {
       if (resources[i] && strlen (resources[i]) + 1 < MAXLSFNAMELEN)
         resourceInfoReq.resourceNames[i] = resources[i];

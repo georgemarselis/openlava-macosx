@@ -27,21 +27,22 @@
 struct hostInfoEnt *getHostStatus (struct hostDataReply reply);
 
 struct hostInfoEnt *
-lsb_hostinfo (char **hosts, int *numHosts)
+lsb_hostinfo (char **hosts, uint *numHosts)
 {
   return (lsb_hostinfo_ex (hosts, numHosts, NULL, 0));
 }
 
 
 struct hostInfoEnt *
-lsb_hostinfo_ex (char **hosts, int *numHosts, char *resReq, int options)
+lsb_hostinfo_ex (char **hosts, uint *numHosts, char *resReq, int options)
 {
   mbdReqType mbdReqtype;
   XDR xdrs;
   struct LSFHeader hdr;
   char *request_buf;
   char *reply_buf;
-  int cc = 0, i, numReq = -1;
+  int cc = 0;
+  uint numReq = 0;
   char *clusterName = NULL;
   static struct infoReq hostInfoReq;
   struct hostDataReply reply;
@@ -50,11 +51,6 @@ lsb_hostinfo_ex (char **hosts, int *numHosts, char *resReq, int options)
     {
       numReq = *numHosts;
       *numHosts = 0;
-    }
-  if (numReq < 0)
-    {
-      lsberrno = LSBE_BAD_ARG;
-      return (NULL);
     }
 
   FREEUP (hostInfoReq.names);
@@ -105,7 +101,7 @@ lsb_hostinfo_ex (char **hosts, int *numHosts, char *resReq, int options)
 	  lsberrno = LSBE_NO_MEM;
 	  return (NULL);
 	}
-      for (i = 0; i < numReq; i++)
+      for (uint i = 0; i < numReq; i++)
 	{
 	  if (ls_isclustername (hosts[i]) <= 0)
 	    continue;
@@ -117,7 +113,7 @@ lsb_hostinfo_ex (char **hosts, int *numHosts, char *resReq, int options)
 	}
       if (clusterName == NULL)
 	{
-	  for (i = 0; i < numReq; i++)
+	  for (uint i = 0; i < numReq; i++)
 	    {
 	      if (hosts[i] && strlen (hosts[i]) + 1 < MAXHOSTNAMELEN)
 		hostInfoReq.names[i] = hosts[i];
@@ -129,7 +125,8 @@ lsb_hostinfo_ex (char **hosts, int *numHosts, char *resReq, int options)
 		  return (NULL);
 		}
 	    }
-	  cc = numReq;
+	  assert( numReq <= INT_MAX );
+    cc = (int) numReq;
 	  hostInfoReq.numNames = numReq;
 	}
     }

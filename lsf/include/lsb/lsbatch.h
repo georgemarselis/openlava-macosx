@@ -578,7 +578,7 @@ struct submig
 {
   LS_LONG_INT jobId;
   int options;
-  int numAskedHosts;
+  uint numAskedHosts;
   char **askedHosts;
 };
 
@@ -668,15 +668,15 @@ struct jobInfoEnt
     u_short port;
     char padding[2];
     int status;
-    int numReasons;
     int reasons;
     int subreasons;
     int umask;
-    int nIdx;
     int exitStatus;
     int execUid;
     int jType;
     int jobPriority;
+    uint numReasons;
+    uint nIdx;
     uint numExHosts;
     int *reasonTb;
     char *user;
@@ -735,7 +735,6 @@ struct queueInfoEnt
 {
     int nice;
     int priority;
-    int nIdx;
     int userJobLimit;
     int qAttrib;
     int qStatus;
@@ -755,6 +754,7 @@ struct queueInfoEnt
     int chkpntPeriod;
     int minProcLimit;
     int defProcLimit;
+    uint nIdx;
     int rLimits[LSF_RLIM_NLIMITS];
     int sigMap[LSB_SIG_NUM];
     int defLimits[LSF_RLIM_NLIMITS];
@@ -793,20 +793,19 @@ struct queueInfoEnt
 struct hostInfoEnt
 {
     int hStatus;
-
-    int nIdx;
-    int userJobLimit;
-    int maxJobs;
-    int numJobs;
-    int numRUN;
-    int numSSUSP;
-    int numUSUSP;
     int mig;
     int attr;
     int numRESERVE;
     int chkSig;
+    uint nIdx;
     int *busySched;
     int *busyStop;
+    unsigned long userJobLimit;
+    unsigned long maxJobs;
+    unsigned long numJobs;
+    unsigned long numRUN;
+    unsigned long numSSUSP;
+    unsigned long numUSUSP;
     float *load;
     float *loadSched;
     float *loadStop;
@@ -885,8 +884,8 @@ struct groupInfoEnt
 #define RUNJOB_OPT_FROM_BEGIN 0x08
 struct runJobRequest
 {
-  int numHosts;
   int options;
+  uint numHosts;
   LS_LONG_INT jobId;
   char **hostname;
 };
@@ -1642,23 +1641,16 @@ extern char *lsb_splitName (char *, unsigned int *);
 
 
 extern struct paramConf *lsb_readparam P_ ((struct lsConf *));
-extern struct userConf *lsb_readuser P_ ((struct lsConf *, int,
-                      struct clusterConf *));
-extern struct userConf *lsb_readuser_ex P_ ((struct lsConf *, int,
-                         struct clusterConf *,
-                         struct sharedConf *));
-extern struct hostConf *lsb_readhost
-P_ ((struct lsConf *, struct lsInfo *, int, struct clusterConf *));
-extern struct queueConf *lsb_readqueue
-P_ ((struct lsConf *, struct lsInfo *, int, struct sharedConf *));
+extern struct userConf *lsb_readuser P_ ((struct lsConf *, int, struct clusterConf *));
+extern struct userConf *lsb_readuser_ex P_ ((struct lsConf *, int, struct clusterConf *, struct sharedConf *));
+extern struct hostConf *lsb_readhost P_ ((struct lsConf *, struct lsInfo *, int, struct clusterConf *));
+extern struct queueConf *lsb_readqueue P_ ((struct lsConf *, struct lsInfo *, int, struct sharedConf *));
 extern void updateClusterConf (struct clusterConf *);
 
 
 extern int lsb_init P_ ((char *appName));
-extern int lsb_openjobinfo P_ ((LS_LONG_INT, char *, char *, char *, char *,
-                int));
-extern struct jobInfoHead *lsb_openjobinfo_a P_ ((LS_LONG_INT, char *, char *,
-                          char *, char *, int));
+extern int lsb_openjobinfo P_ ((LS_LONG_INT, char *, char *, char *, char *, int));
+extern struct jobInfoHead *lsb_openjobinfo_a P_ ((LS_LONG_INT, char *, char *, char *, char *, int));
 extern struct jobInfoEnt *lsb_readjobinfo P_ ((int *));
 extern LS_LONG_INT lsb_submit P_ ((struct submit *, struct submitReply *));
 
@@ -1666,8 +1658,7 @@ extern LS_LONG_INT lsb_submit P_ ((struct submit *, struct submitReply *));
 extern void lsb_closejobinfo P_ ((void));
 
 extern int lsb_hostcontrol P_ ((char *, int));
-extern struct queueInfoEnt *lsb_queueinfo
-P_ ((char **queues, int *numQueues, char *host, char *userName, int options));
+extern struct queueInfoEnt *lsb_queueinfo P_ ((char **queues, uint *numQueues, char *host, char *userName, int options));
 extern int lsb_reconfig P_ ((int));
 extern int lsb_signaljob P_ ((LS_LONG_INT, int));
 extern int lsb_msgjob P_ ((LS_LONG_INT, char *));
@@ -1682,26 +1673,24 @@ extern char *lsb_peekjob P_ ((LS_LONG_INT));
 
 extern int lsb_mig P_ ((struct submig *, int *badHostIdx));
 
-extern struct hostInfoEnt *lsb_hostinfo P_ ((char **, int *));
-extern struct hostInfoEnt *lsb_hostinfo_ex P_ ((char **, int *, char *, int));
+extern struct hostInfoEnt *lsb_hostinfo P_ ((char **, uint *));
+extern struct hostInfoEnt *lsb_hostinfo_ex P_ ((char **, uint *, char *, int));
 extern int lsb_movejob P_ ((LS_LONG_INT jobId, int *, int));
 extern int lsb_switchjob P_ ((LS_LONG_INT jobId, char *queue));
 extern int lsb_queuecontrol P_ ((char *, int));
 extern struct userInfoEnt *lsb_userinfo P_ ((char **, uint *));
-extern struct groupInfoEnt *lsb_hostgrpinfo P_ ((char **, int *, int));
-extern struct groupInfoEnt *lsb_usergrpinfo P_ ((char **, int *, int));
-extern struct parameterInfo *lsb_parameterinfo P_ ((char **, int *, int));
+extern struct groupInfoEnt *lsb_hostgrpinfo P_ ((char **groups, uint *numGroups, int options));
+extern struct groupInfoEnt *lsb_usergrpinfo P_ ((char **groups, uint *numGroups, int options));
+extern struct parameterInfo *lsb_parameterinfo P_ ((char **, uint *, int));
 extern LS_LONG_INT lsb_modify
 P_ ((struct submit *, struct submitReply *, LS_LONG_INT));
 extern float *getCpuFactor P_ ((char *, int));
 extern char *lsb_suspreason P_ ((int, int, struct loadIndexLog *));
-extern char *lsb_pendreason P_ ((int, int *, struct jobInfoHead *,
-                 struct loadIndexLog *));
+extern char *lsb_pendreason P_ ((int, int *, struct jobInfoHead *, struct loadIndexLog *));
 
 extern int lsb_puteventrec P_ ((FILE *, struct eventRec *));
 extern struct eventRec *lsb_geteventrec P_ ((FILE *, int *));
-extern struct lsbSharedResourceInfo *lsb_sharedresourceinfo
-P_ ((char **, int *, char *, int));
+extern struct lsbSharedResourceInfo *lsb_sharedresourceinfo P_ ((char **, uint *, char *, int));
 
 extern int lsb_runjob P_ ((struct runJobRequest *));
 

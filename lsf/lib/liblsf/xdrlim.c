@@ -16,6 +16,8 @@
  *
  */
 
+#undef __LP64__ 
+
 #include <limits.h>
 
 #include "lib/lib.h"
@@ -715,7 +717,7 @@ xdr_lsInfo (XDR * xdrs, struct lsInfo * lsInfoPtr, struct LSFHeader *hdr)
         }
     }
     
-    if (!xdr_int (xdrs, &lsInfoPtr->numUsrIndx) || !xdr_int (xdrs, &lsInfoPtr->numIndx)) {
+    if (!xdr_u_int (xdrs, &lsInfoPtr->numUsrIndx) || !xdr_u_int (xdrs, &lsInfoPtr->numIndx)) {
         if (xdrs->x_op == XDR_DECODE) {
             FREEUP (memp);
         }
@@ -1209,7 +1211,7 @@ xdr_resourceInfoReq (XDR * xdrs, struct resourceInfoReq * resourceInfoReq, struc
         resourceInfoReq->numResourceNames = 0;
     }
 
-    if (!(xdr_int (xdrs, &resourceInfoReq->numResourceNames) && xdr_int (xdrs, &resourceInfoReq->options))) {
+    if (!(xdr_u_int (xdrs, &resourceInfoReq->numResourceNames) && xdr_int (xdrs, &resourceInfoReq->options))) {
         return FALSE;
     }
     
@@ -1224,7 +1226,7 @@ xdr_resourceInfoReq (XDR * xdrs, struct resourceInfoReq * resourceInfoReq, struc
 
     }
     
-    for ( int i = 0; i < resourceInfoReq->numResourceNames; i++) {
+    for ( uint i = 0; i < resourceInfoReq->numResourceNames; i++) {
         if (!xdr_var_string (xdrs, &resourceInfoReq->resourceNames[i])) {
             resourceInfoReq->numResourceNames = i;
             return FALSE;
@@ -1254,7 +1256,7 @@ xdr_resourceInfoReply (XDR * xdrs, struct resourceInfoReply * resourceInfoReply,
         resourceInfoReply->numResources = 0;
         resourceInfoReply->resources = NULL;
     }
-    if (!(xdr_int (xdrs, &resourceInfoReply->numResources) && xdr_int (xdrs, &resourceInfoReply->badResource))) {
+    if (!(xdr_u_int (xdrs, &resourceInfoReply->numResources) && xdr_u_int (xdrs, &resourceInfoReply->badResource))) {
         return FALSE;
     }
     
@@ -1268,7 +1270,7 @@ xdr_resourceInfoReply (XDR * xdrs, struct resourceInfoReply * resourceInfoReply,
         }
     }
     
-    for ( int i = 0; i < resourceInfoReply->numResources; i++) {
+    for ( uint i = 0; i < resourceInfoReply->numResources; i++) {
         status = xdr_arrayElement (xdrs, (char *) &resourceInfoReply->resources[i], hdr, xdr_lsResourceInfo);
         if (!status) {
             resourceInfoReply->numResources = i;

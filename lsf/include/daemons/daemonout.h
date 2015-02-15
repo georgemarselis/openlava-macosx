@@ -182,17 +182,17 @@ struct jobInfoReply
   u_short port;
   char padding1[2];
   int status;
-  int numReasons;
   int reasons;
   int subreasons;
-  int nIdx;
   int execUid;
   int exitStatus;
   int jType;
   int jobPriority;
-  uint numToHosts;
-  uid_t userId;
   int *reasonTb;
+  uint numReasons;
+  uint numToHosts;
+  uint nIdx;
+  char padding2[4];
   time_t startTime;
   time_t predictedStartTime;
   time_t endTime;
@@ -207,7 +207,7 @@ struct jobInfoReply
   float *loadSched;
   float *loadStop;
   float cpuTime;
-  char padding2[4];
+  uid_t userId;
   unsigned long jobPid;
   struct submitReq *jobBill;
   struct jRusage runRusage;
@@ -219,7 +219,7 @@ struct jobInfoReply
 struct infoReq
 {
   int options;
-  int numNames;
+  uint numNames;
   char **names;
   char *resReq;
 };
@@ -227,25 +227,25 @@ struct infoReq
 
 struct userInfoReply
 {
-  int badUser;
-  int numUsers;
+  uint badUser;
+  uint numUsers;
   struct userInfoEnt *users;
 };
 
 struct queueInfoReply
 {
-  int badQueue;
-  int numQueues;
-  int nIdx;
+  uint badQueue;
+  uint numQueues;
+  uint nIdx;
   char padding[4];
   struct queueInfoEnt *queues;
 };
 
 struct hostDataReply
 {
-  int badHost;
-  int numHosts;
-  int nIdx;
+  uint badHost;
+  uint numHosts;
+  uint nIdx;
   int flag;
 #define LOAD_REPLY_SHARED_RESOURCE 0x1
   struct hostInfoEnt *hosts;
@@ -253,7 +253,7 @@ struct hostDataReply
 
 struct groupInfoReply
 {
-  int numGroups;
+  uint numGroups;
   char padding[4];
   struct groupInfoEnt *groups;
 };
@@ -307,7 +307,7 @@ struct migReq
 {
   LS_LONG_INT jobId;
   int options;
-  int numAskedHosts;
+  uint numAskedHosts;
   char **askedHosts;
 };
 

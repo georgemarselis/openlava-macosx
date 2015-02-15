@@ -113,16 +113,16 @@ copySpoolFile (const char *srcFilePath, spoolOptions_t option)
 
   if ((srcFilePath == NULL) || (strlen (srcFilePath) == 0))
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5702, "%s: srcFilePath is NULL or empty"),	/* catgets 5702 */
-		 fname);
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5702, "%s: srcFilePath is NULL or empty"),   /* catgets 5702 */
+         fname);
       lsberrno = LSBE_BAD_ARG;
       goto Error;
     }
 
   if ((option != SPOOL_INPUT_FILE) && (option != SPOOL_COMMAND))
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5706, "%s: option parameter is wrong"),	/* catgets 5706 */
-		 fname);
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5706, "%s: option parameter is wrong"),  /* catgets 5706 */
+         fname);
       lsberrno = LSBE_BAD_ARG;
       goto Error;
     }
@@ -148,16 +148,16 @@ copySpoolFile (const char *srcFilePath, spoolOptions_t option)
 
 
       if (getcwd (srcFileFullPath, size) == NULL)
-	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "getcwd");
-	  lsberrno = LSBE_SYS_CALL;
-	  goto Error;
-	}
+    {
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "getcwd");
+      lsberrno = LSBE_SYS_CALL;
+      goto Error;
+    }
 
       if (srcFileFullPath[strlen (srcFileFullPath) - 1] != dirSeparator[0])
-	{
-	  strcat (srcFileFullPath, dirSeparator);
-	}
+    {
+      strcat (srcFileFullPath, dirSeparator);
+    }
 
       strcat (srcFileFullPath, srcFilePath);
     }
@@ -166,8 +166,8 @@ copySpoolFile (const char *srcFilePath, spoolOptions_t option)
 
   if ((stat (srcFileFullPath, &srcFilePathStat) == -1) && (errno == ENOENT))
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5704, "%s: source file \'%s\' does not exist"),	/* catgets 5704 */
-		 fname, srcFileFullPath);
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5704, "%s: source file \'%s\' does not exist"),  /* catgets 5704 */
+         fname, srcFileFullPath);
       lsberrno = LSBE_SP_SRC_NOT_SEEN;
       goto Error;
     }
@@ -178,11 +178,11 @@ copySpoolFile (const char *srcFilePath, spoolOptions_t option)
 
     if ((pEnd1 = strrchr (srcFileFullPath, '/')) == NULL)
       {
-	pEnd1 = (char *) srcFileFullPath;
+    pEnd1 = (char *) srcFileFullPath;
       }
     if ((pEnd2 = strrchr (srcFileFullPath, '\\')) == NULL)
       {
-	pEnd2 = (char *) srcFileFullPath;
+    pEnd2 = (char *) srcFileFullPath;
       }
 
     startFileName = (pEnd2 > pEnd1) ? pEnd2 : pEnd1;
@@ -216,30 +216,30 @@ copySpoolFile (const char *srcFilePath, spoolOptions_t option)
     {
 
       if (spoolCopyStatus == SPOOL_COPY_EXISTS)
-	{
-	  goto RepeatAttempt;
-	}
+    {
+      goto RepeatAttempt;
+    }
 
 
       bestHostFromList = getBestListElement (spoolHostsList);
 
       if (bestHostFromList == NULL)
-	{
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5705, "%s: Unable to copy file <%s>. $JOB_SPOOLDIR <%s> doesn't exist or permission denied."),	/* catgets 5705 */
-		     fname, srcFilePath, spoolDirPtr);
-	  goto Error;
-	}
+    {
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5705, "%s: Unable to copy file <%s>. $JOB_SPOOLDIR <%s> doesn't exist or permission denied."),   /* catgets 5705 */
+             fname, srcFilePath, spoolDirPtr);
+      goto Error;
+    }
       else
-	{
-	  strcpy (spoolHost, bestHostFromList->elementName);
-	}
+    {
+      strcpy (spoolHost, bestHostFromList->elementName);
+    }
 
 
       if ((spoolDirPtr =findSpoolDir (bestHostFromList->elementName)) == NULL)
-	{
-	  removeElementFromList (bestHostFromList, getSpoolHostsList ());
-	  continue;
-	}
+    {
+      removeElementFromList (bestHostFromList, getSpoolHostsList ());
+      continue;
+    }
 
       strcpy (spoolDir, spoolDirPtr);
 
@@ -248,47 +248,47 @@ copySpoolFile (const char *srcFilePath, spoolOptions_t option)
       now = time (NULL);
 
       switch (option)
-	{
-	case SPOOL_INPUT_FILE:
+    {
+    case SPOOL_INPUT_FILE:
 
-	  sprintf (destinationDir, "%s%s%s%s%s.%s.%ld.%s",
-		   spoolDir, dirSeparator, SPOOL_LSF_INDIR, dirSeparator,
-		   localHost, spoolHost, now, pidString);
-	  break;
-	case SPOOL_COMMAND:
+      sprintf (destinationDir, "%s%s%s%s%s.%s.%ld.%s",
+           spoolDir, dirSeparator, SPOOL_LSF_INDIR, dirSeparator,
+           localHost, spoolHost, now, pidString);
+      break;
+    case SPOOL_COMMAND:
 
-	  sprintf (destinationDir, "%s%s%s%s%s.%s.%ld.%s",
-		   spoolDir, dirSeparator, SPOOL_LSF_CMDDIR, dirSeparator,
-		   localHost, spoolHost, now, pidString);
-	  break;
-	}
+      sprintf (destinationDir, "%s%s%s%s%s.%s.%ld.%s",
+           spoolDir, dirSeparator, SPOOL_LSF_CMDDIR, dirSeparator,
+           localHost, spoolHost, now, pidString);
+      break;
+    }
 
       sprintf (destinationFile, "%s", srcFileName);
       spoolCopyStatus =
-	copyFileToHost (srcFileFullPath, spoolHost, destinationDir,
-			destinationFile);
+    copyFileToHost (srcFileFullPath, spoolHost, destinationDir,
+            destinationFile);
 
       if (spoolCopyStatus == SPOOL_COPY_SUCCESS)
-	{
-	  break;
-	}
+    {
+      break;
+    }
 
       if (spoolCopyStatus == SPOOL_COPY_EXISTS)
-	{
-	  sleep (1);
-	  continue;
-	}
+    {
+      sleep (1);
+      continue;
+    }
 
       if (spoolCopyStatus == SPOOL_COPY_FAILURE)
-	{
-	  removeElementFromList (bestHostFromList, getSpoolHostsList ());
-	  continue;
-	}
+    {
+      removeElementFromList (bestHostFromList, getSpoolHostsList ());
+      continue;
+    }
     }
 
 
   sprintf (spoolFileFullPath, "%s%s%s", destinationDir, dirSeparator,
-	   destinationFile);
+       destinationFile);
 
   sprintf (spoolFileInfoStruct.srcFile, "%s", srcFileFullPath);
   sprintf (spoolFileInfoStruct.spoolFile, "%s", spoolFileFullPath);
@@ -326,9 +326,9 @@ getTrimmedString (const char *stringToTrim)
   for (i = 0; (unsigned long)i < strlen (returnStringPtr); i++)
     {
       if ((returnStringPtr[i] != ' ') && (returnStringPtr[i] != '\t'))
-	{
-	  break;
-	}
+    {
+      break;
+    }
       advancePtr++;
     }
   returnStringPtr = advancePtr;
@@ -338,9 +338,9 @@ getTrimmedString (const char *stringToTrim)
   for (i = (long)strlen (returnStringPtr) - 1; i >= 0; i--)
     {
       if ((returnStringPtr[i] != ' ') && (returnStringPtr[i] != '\t'))
-	{
-	  break;
-	}
+    {
+      break;
+    }
       returnStringPtr[i] = '\0';
     }
 
@@ -374,9 +374,9 @@ findSpoolDir (const char *spoolHost)
   if (parameterInfoPtr != NULL)
     {
       if (parameterInfoPtr->pjobSpoolDir != NULL)
-	{
-	  returnStringPtr = parameterInfoPtr->pjobSpoolDir;
-	}
+    {
+      returnStringPtr = parameterInfoPtr->pjobSpoolDir;
+    }
     }
 
   if (returnStringPtr == NULL || returnStringPtr[0] == 0)
@@ -384,13 +384,13 @@ findSpoolDir (const char *spoolHost)
 
 
       if (defaultSpoolDir == NULL)
-	{
-	  strcpy (spoolDir, lsTmpDir_);
-	}
+    {
+      strcpy (spoolDir, lsTmpDir_);
+    }
       else
-	{
-	  strcpy (spoolDir, defaultSpoolDir);
-	}
+    {
+      strcpy (spoolDir, defaultSpoolDir);
+    }
     }
   else
     {
@@ -398,14 +398,14 @@ findSpoolDir (const char *spoolHost)
       delimiterPtr = strstr (returnStringPtr, JOB_SPOOLDIR_DELIMITER);
 
       if (delimiterPtr == NULL)
-	{
-	  strcpy (spoolDir, returnStringPtr);
-	}
+    {
+      strcpy (spoolDir, returnStringPtr);
+    }
       else
-	{
-	  strncpy (spoolDir, returnStringPtr, delimiterPtr - returnStringPtr);
-	  spoolDir[delimiterPtr - returnStringPtr] = '\0';
-	}
+    {
+      strncpy (spoolDir, returnStringPtr, delimiterPtr - returnStringPtr);
+      spoolDir[delimiterPtr - returnStringPtr] = '\0';
+    }
     }
 
   returnStringPtr = (char *) &spoolDir;
@@ -418,13 +418,13 @@ Error:
   if (logclass & (LC_TRACE | LC_EXEC))
     {
       if (returnStringPtr == NULL)
-	{
-	  ls_syslog (LOG_DEBUG, "%s: completed with failure", fname);
-	}
+    {
+      ls_syslog (LOG_DEBUG, "%s: completed with failure", fname);
+    }
       else
-	{
-	  ls_syslog (LOG_DEBUG, "%s: completed successfuly", fname);
-	}
+    {
+      ls_syslog (LOG_DEBUG, "%s: completed successfuly", fname);
+    }
     }
 
   return (returnStringPtr);
@@ -434,80 +434,69 @@ Error:
 static listHeaderPtr_t
 createSpoolHostsList ()
 {
-  listHeaderPtr_t returnValueList = NULL;
-  listElementPtr_t addElement = NULL;
-  listElementPtr_t bestElement = NULL;
-  struct hostInfoEnt *hInfo;
-  struct hostInfoEnt *hPtr;
-  char **hostPoint, *resReq = NULL;
-  char localHost[MAXHOSTNAMELEN];
-  char returnHost[MAXHOSTNAMELEN];
-  int numHosts = 0;
-  int i;
-  struct hostent *hp;
-
-  if ((returnValueList = createListHeader ()) == NULL)
-    {
-      goto Done;
+    listHeaderPtr_t returnValueList = NULL;
+    listElementPtr_t addElement     = NULL;
+    listElementPtr_t bestElement    = NULL;
+    struct hostInfoEnt *hInfo       = NULL;
+    struct hostInfoEnt *hPtr        = NULL;
+    struct hostent     *hp          = NULL;
+    char **hostPoint                = NULL;
+    char *resReq                    = NULL;
+    char localHost[MAXHOSTNAMELEN];
+    char returnHost[MAXHOSTNAMELEN];
+    uint numHosts = 0;
+    
+    if ((returnValueList = createListHeader ()) == NULL) {
+        okHostsListPtr_ = returnValueList;
+        return (returnValueList);
     }
 
+    gethostname (localHost, MAXHOSTNAMELEN);
 
-  gethostname (localHost, MAXHOSTNAMELEN);
+    // {
+    if ((bestElement = addElementToList (localHost, returnValueList)) == NULL) {
+        okHostsListPtr_ = returnValueList;
+        return (returnValueList);
+    }
+/*    setBestListElement (bestElement, returnValueList);
+      okHostsListPtr_ = returnValueList;
+    return (returnValueList);
+    }
+*/ 
+    hInfo = lsb_hostinfo_ex (hostPoint, &numHosts, resReq, 0);
 
-  {
-    if ((bestElement = addElementToList (localHost, returnValueList)) == NULL)
-      {
-	goto Done;
-      }
-    setBestListElement (bestElement, returnValueList);
-    goto Done;
-  }
-
-
-  TIMEIT (0, (hInfo = lsb_hostinfo_ex (hostPoint, &numHosts, resReq, 0)),
-	  "lsb_hostinfo");
-
-  if (!hInfo)
-    {
-      lsberrno = LSBE_LSBLIB;
-      goto Done;
+    if (!hInfo) {
+        lsberrno = LSBE_LSBLIB;
+        okHostsListPtr_ = returnValueList;
+        return (returnValueList);
     }
 
-  for (i = 0; i < numHosts; i++)
-    {
+    for ( uint i = 0; i < numHosts; i++) {
 
-      hPtr = &(hInfo[i]);
+        hPtr = &(hInfo[i]);
+        if (hPtr->hStatus == HOST_STAT_OK) {
+            strcpy (returnHost, hPtr->host);
+            if ((hp = Gethostbyname_ (returnHost)) != NULL) {
+                strcpy (returnHost, hp->h_name);
+            }
+            else {
+                okHostsListPtr_ = returnValueList;
+                return (returnValueList);
+            }
 
-      if (hPtr->hStatus == HOST_STAT_OK)
-	{
-	  strcpy (returnHost, hPtr->host);
+            if ((addElement = addElementToList (returnHost, returnValueList)) == NULL) {
+                okHostsListPtr_ = returnValueList;
+                return (returnValueList);
+            }
 
-	  if ((hp = Gethostbyname_ (returnHost)) != NULL)
-	    {
-	      strcpy (returnHost, hp->h_name);
-	    }
-	  else
-	    {
-	      goto Done;
-	    }
-
-	  if ((addElement =
-	       addElementToList (returnHost, returnValueList)) == NULL)
-	    {
-	      goto Done;
-	    }
-
-	  if (strcmp (returnHost, localHost) == 0)
-	    {
-	      returnValueList->bestElement = addElement;
-	    }
-	}
+            if (strcmp (returnHost, localHost) == 0) {
+                returnValueList->bestElement = addElement;
+            }
+        }
     }
 
-Done:
-  okHostsListPtr_ = returnValueList;
-  return (returnValueList);
-
+    okHostsListPtr_ = returnValueList;
+    return (returnValueList);
 }
 
 
@@ -520,7 +509,7 @@ getSpoolHostsList ()
 
 static listHeaderPtr_t
 updateSpoolHostsListIfOld (const listHeaderPtr_t pListHeader,
-			   time_t lifePeriod)
+               time_t lifePeriod)
 {
   listHeaderPtr_t returnValue = NULL;
 
@@ -561,7 +550,7 @@ createOrUpdateSpoolHostsList (time_t permittedTimeToLiveInSec)
   else
     {
       spoolHostsList =
-	updateSpoolHostsListIfOld (spoolHostsList, permittedTimeToLiveInSec);
+    updateSpoolHostsListIfOld (spoolHostsList, permittedTimeToLiveInSec);
     }
 
   return (spoolHostsList);
@@ -594,9 +583,9 @@ cpLocalFiles (const char *localSrcFileFullPath, const char *outputFileName)
     {
       spoolCopyStatus = SPOOL_COPY_FAILURE;
       if (logclass & (LC_TRACE | LC_EXEC))
-	{
-	  ls_syslog (LOG_ERR, "%s: %s, spoolCopyStatus = SPOOL_COPY_FAILURE\n", fname, I18N (5709, "Unable to open source file "));	/*catgets 5709 */
-	}
+    {
+      ls_syslog (LOG_ERR, "%s: %s, spoolCopyStatus = SPOOL_COPY_FAILURE\n", fname, I18N (5709, "Unable to open source file ")); /*catgets 5709 */
+    }
       close (input);
       goto Error;
     }
@@ -609,10 +598,10 @@ cpLocalFiles (const char *localSrcFileFullPath, const char *outputFileName)
       spoolCopyStatus = SPOOL_COPY_EXISTS;
 
       if (logclass & (LC_TRACE | LC_EXEC))
-	{
-	  ls_syslog (LOG_ERR, "%s: spoolCopyStatus = SPOOL_COPY_EXISTS\n",
-		     fname);
-	}
+    {
+      ls_syslog (LOG_ERR, "%s: spoolCopyStatus = SPOOL_COPY_EXISTS\n",
+             fname);
+    }
       goto Close;
     }
 
@@ -620,23 +609,23 @@ cpLocalFiles (const char *localSrcFileFullPath, const char *outputFileName)
     {
       spoolCopyStatus = SPOOL_COPY_FAILURE;
       if (logclass & (LC_TRACE | LC_EXEC))
-	{
-	  ls_syslog (LOG_ERR, "%s: %s \'%s\', spoolCopyStatus = SPOOL_COPY_FAILURE\n", fname, I18N (5707, "Unable to create outputfile ")	/*catgets 5707 */
-		     , outputFileName);
-	}
+    {
+      ls_syslog (LOG_ERR, "%s: %s \'%s\', spoolCopyStatus = SPOOL_COPY_FAILURE\n", fname, I18N (5707, "Unable to create outputfile ")   /*catgets 5707 */
+             , outputFileName);
+    }
 
       if (createSpoolSubDir (outputFileName) != 0)
-	{
-	  goto Close;
-	}
+    {
+      goto Close;
+    }
 
 
       output = open (outputFileName, O_CREAT | O_EXCL | O_RDWR, 0700);
       if (output == -1)
-	{
-	  lsberrno = LSBE_SYS_CALL;
-	  goto Close;
-	}
+    {
+      lsberrno = LSBE_SYS_CALL;
+      goto Close;
+    }
     }
 
 
@@ -647,14 +636,14 @@ cpLocalFiles (const char *localSrcFileFullPath, const char *outputFileName)
 
       assert( nItems >= 0 );
       if (write (output, line, (size_t) nItems) == -1)
-	{
-	  spoolCopyStatus = SPOOL_COPY_FAILURE;
-	  if (logclass & (LC_TRACE | LC_EXEC))
-	    {
-	      ls_syslog (LOG_ERR, "%s: spoolCopyStatus = SPOOL_COPY_FAILURE\n", fname, I18N (5708, "write operation failure"));	/*catgets 5708 */
-	    }
-	  goto Close;
-	}
+    {
+      spoolCopyStatus = SPOOL_COPY_FAILURE;
+      if (logclass & (LC_TRACE | LC_EXEC))
+        {
+          ls_syslog (LOG_ERR, "%s: spoolCopyStatus = SPOOL_COPY_FAILURE\n", fname, I18N (5708, "write operation failure")); /*catgets 5708 */
+        }
+      goto Close;
+    }
     }
 
 
@@ -668,13 +657,13 @@ Error:
   if (logclass & (LC_TRACE | LC_EXEC))
     {
       if (spoolCopyStatus == SPOOL_COPY_FAILURE)
-	{
-	  ls_syslog (LOG_DEBUG, "%s: completed with failure", fname);
-	}
+    {
+      ls_syslog (LOG_DEBUG, "%s: completed with failure", fname);
+    }
       else
-	{
-	  ls_syslog (LOG_DEBUG, "%s: completed successfuly", fname);
-	}
+    {
+      ls_syslog (LOG_DEBUG, "%s: completed successfuly", fname);
+    }
     }
 
   return (spoolCopyStatus);
@@ -732,17 +721,17 @@ cpRemoteFiles (const char *localSrcFileFullPath, const char *hostName, const cha
 
   output =
     ls_rstat ((char *) remoteHost, (char *) outputFileName,
-	      &remoteFileStatusBuf);
+          &remoteFileStatusBuf);
 
   if ((output == 0) && (remoteFileStatusBuf.st_size != -1))
     {
       spoolCopyStatus = SPOOL_COPY_EXISTS;
 
       if (logclass & (LC_TRACE | LC_EXEC))
-	{
-	  ls_syslog (LOG_ERR, "%s: spoolCopyStatus = SPOOL_COPY_EXISTS\n",
-		     fname);
-	}
+    {
+      ls_syslog (LOG_ERR, "%s: spoolCopyStatus = SPOOL_COPY_EXISTS\n",
+             fname);
+    }
       goto Done;
     }
 
@@ -767,10 +756,10 @@ cpRemoteFiles (const char *localSrcFileFullPath, const char *hostName, const cha
     }
   lsXfer.szHostUser = putstr_ (lsfUserName);
   parseXferArg ((char *) localSrcFileFullPath, &(lsXfer.szHostUser),
-		&(lsXfer.szHost), &(lsXfer.ppszHostFnames[0]));
+        &(lsXfer.szHost), &(lsXfer.ppszHostFnames[0]));
   lsXfer.szDestArg = putstr_ (remoteFileSpec);
   parseXferArg ((char *) remoteFileSpec, &(lsXfer.szDestUser),
-		&(lsXfer.szDest), &(lsXfer.ppszDestFnames[0]));
+        &(lsXfer.szDest), &(lsXfer.ppszDestFnames[0]));
 
   buf = (char *) malloc (LSRCP_MSGSIZE);
 
@@ -778,11 +767,11 @@ cpRemoteFiles (const char *localSrcFileFullPath, const char *hostName, const cha
     {
 
       ls_donerex ();
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_S, "cpRemoteFiles", "IO_SPOOL", _i18n_msg_get (ls_catd, NL_SETN, 5700, "try rcp..."));	/* catgets 5700 */
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_S, "cpRemoteFiles", "IO_SPOOL", _i18n_msg_get (ls_catd, NL_SETN, 5700, "try rcp...")); /* catgets 5700 */
       if (doXferRcp (&lsXfer, SPOOL_BY_LSRCP) < 0)
-	{
-	  goto Destroy;
-	}
+    {
+      goto Destroy;
+    }
       spoolCopyStatus = SPOOL_COPY_SUCCESS;
       goto Destroy;
     }
@@ -790,25 +779,25 @@ cpRemoteFiles (const char *localSrcFileFullPath, const char *hostName, const cha
   for (iCount = 0; iCount < lsXfer.iNumFiles; iCount++)
     {
       if (copyFile (&lsXfer, buf, SPOOL_BY_LSRCP))
-	{
+    {
 
-	  ls_donerex ();
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_S, "cpRemoteFiles", "IO_SPOOL", _i18n_msg_get (ls_catd, NL_SETN, 5700, "try rcp..."));
+      ls_donerex ();
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_S, "cpRemoteFiles", "IO_SPOOL", _i18n_msg_get (ls_catd, NL_SETN, 5700, "try rcp..."));
 
-	  if (doXferRcp (&lsXfer, SPOOL_BY_LSRCP) < 0)
-	    {
-	      goto Destroy;
-	    }
-	  spoolCopyStatus = SPOOL_COPY_SUCCESS;
-	  goto Destroy;
-	}
+      if (doXferRcp (&lsXfer, SPOOL_BY_LSRCP) < 0)
+        {
+          goto Destroy;
+        }
+      spoolCopyStatus = SPOOL_COPY_SUCCESS;
+      goto Destroy;
+    }
 
       spoolCopyStatus = SPOOL_COPY_SUCCESS;
 
       if (logclass & (LC_FILE))
-	{
-	  ls_syslog (LOG_DEBUG, "cpRemoteFiles(), copy file succeeded.");
-	}
+    {
+      ls_syslog (LOG_DEBUG, "cpRemoteFiles(), copy file succeeded.");
+    }
     }
 
 Destroy:
@@ -839,7 +828,7 @@ Error:
 
 spoolCopyStatus_t
 copyFileToHost (const char *localSrcFileFullPath, const char *hostName,
-		const char *destinFullDir, const char *destinFileName)
+        const char *destinFullDir, const char *destinFileName)
 {
   static char fname[] = "copyFileToHost";
   spoolCopyStatus_t spoolCopyStatus = SPOOL_COPY_FAILURE;
@@ -871,7 +860,7 @@ copyFileToHost (const char *localSrcFileFullPath, const char *hostName,
     }
 
   sprintf (outputFileName, "%s%s%s", destinFullDir, SPOOL_DIR_SEPARATOR,
-	   destinFileName);
+       destinFileName);
 
 
 
@@ -884,8 +873,8 @@ copyFileToHost (const char *localSrcFileFullPath, const char *hostName,
     {
 
       spoolCopyStatus =
-	cpRemoteFiles (localSrcFileFullPath, hostName, destinFullDir,
-		       outputFileName);
+    cpRemoteFiles (localSrcFileFullPath, hostName, destinFullDir,
+               outputFileName);
     }
 
   if (spoolCopyStatus == SPOOL_COPY_FAILURE)
@@ -896,13 +885,13 @@ Error:
   if (logclass & (LC_TRACE | LC_EXEC))
     {
       if (spoolCopyStatus == SPOOL_COPY_FAILURE)
-	{
-	  ls_syslog (LOG_DEBUG, "%s: completed with failure", fname);
-	}
+    {
+      ls_syslog (LOG_DEBUG, "%s: completed with failure", fname);
+    }
       else
-	{
-	  ls_syslog (LOG_DEBUG, "%s: completed successfuly", fname);
-	}
+    {
+      ls_syslog (LOG_DEBUG, "%s: completed successfuly", fname);
+    }
     }
 
   return (spoolCopyStatus);
@@ -961,23 +950,23 @@ removeSpoolFile (const char *hostName, const char *destinFileFullPath)
       dirPtr = opendir (destinFileFullPath);
 
       if (dirPtr != NULL)
-	{
-	  closedir (dirPtr);
+    {
+      closedir (dirPtr);
 
-	  returnValue = rmDirAndFiles ((char *) destinFileFullPath);
-	  goto Done;
-	}
+      returnValue = rmDirAndFiles ((char *) destinFileFullPath);
+      goto Done;
+    }
 
       if (unlink (destinFileFullPath) == 0)
-	{
-	  returnValue = 0;
-	  goto Done;
-	}
+    {
+      returnValue = 0;
+      goto Done;
+    }
       else
-	{
-	  lsberrno = LSBE_SP_DELETE_FAILED;
-	  goto Done;
-	}
+    {
+      lsberrno = LSBE_SP_DELETE_FAILED;
+      goto Done;
+    }
     }
 
 
@@ -1010,17 +999,17 @@ removeSpoolFile (const char *hostName, const char *destinFileFullPath)
     case -1:
 
       if (logclass & (LC_FILE))
-	ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "fork");
+    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "fork");
       lsberrno = LSBE_SP_FORK_FAILED;
       goto Done;
 
     default:
 
       if (waitpid (pid, 0, 0) < 0 && errno != ECHILD)
-	{
-	  lsberrno = LSBE_SP_CHILD_DIES;
-	  goto Done;
-	}
+    {
+      lsberrno = LSBE_SP_CHILD_DIES;
+      goto Done;
+    }
 
       returnValue = 0;
     }
@@ -1029,13 +1018,13 @@ Done:
   if (logclass & (LC_TRACE | LC_EXEC))
     {
       if (returnValue != 0)
-	{
-	  ls_syslog (LOG_DEBUG, "%s: completed with failure", fname);
-	}
+    {
+      ls_syslog (LOG_DEBUG, "%s: completed with failure", fname);
+    }
       else
-	{
-	  ls_syslog (LOG_DEBUG, "%s: completed successfuly", fname);
-	}
+    {
+      ls_syslog (LOG_DEBUG, "%s: completed successfuly", fname);
+    }
     }
 
   return (returnValue);
@@ -1135,9 +1124,9 @@ getSpoolHostBySpoolFile (const char *spoolFile)
   while (buf[pEnd - buf] != SPOOL_DIR_SEPARATOR_CHAR)
     {
       if (buf[pEnd - buf] == '.')
-	{
-	  numOfDot++;
-	}
+    {
+      numOfDot++;
+    }
       pEnd--;
     }
 
@@ -1148,9 +1137,9 @@ getSpoolHostBySpoolFile (const char *spoolFile)
   while (numOfDot > 0)
     {
       while (pEnd[0] != '.')
-	{
-	  pEnd++;
-	}
+    {
+      pEnd++;
+    }
       numOfDot--;
       pEnd++;
     }
@@ -1163,13 +1152,13 @@ Error:
   if (logclass & (LC_TRACE | LC_EXEC))
     {
       if (returnValue == NULL)
-	{
-	  ls_syslog (LOG_DEBUG, "%s: completed with failure", fname);
-	}
+    {
+      ls_syslog (LOG_DEBUG, "%s: completed with failure", fname);
+    }
       else
-	{
-	  ls_syslog (LOG_DEBUG, "%s: completed successfuly", fname);
-	}
+    {
+      ls_syslog (LOG_DEBUG, "%s: completed successfuly", fname);
+    }
     }
 
   return (returnValue);
@@ -1240,9 +1229,9 @@ deleteList (const listHeaderPtr_t pListHeader)
       pListElement = pListElement->nextElement;
       returnValue = deleteListElement (pFreeElement);
       if (returnValue == -1)
-	{
-	  goto Done;
-	}
+    {
+      goto Done;
+    }
     }
 
   pListHeader->firstElement = NULL;
@@ -1334,7 +1323,7 @@ Done:
 
 int
 removeElementFromList (const listElementPtr_t pListElement,
-		       const listHeaderPtr_t pListHeader)
+               const listHeaderPtr_t pListHeader)
 {
   int returnValue = -1;
   listElementPtr_t pNextElement = NULL;
@@ -1374,12 +1363,12 @@ removeElementFromList (const listElementPtr_t pListElement,
   while (pNextElement)
     {
       if (pListElement == pNextElement)
-	{
-	  pPrevElement->nextElement = pNextElement->nextElement;
-	  deleteListElement (pNextElement);
-	  returnValue = 0;
-	  goto Done;
-	}
+    {
+      pPrevElement->nextElement = pNextElement->nextElement;
+      deleteListElement (pNextElement);
+      returnValue = 0;
+      goto Done;
+    }
       pPrevElement = pNextElement;
       pNextElement = pNextElement->nextElement;
     }
@@ -1391,7 +1380,7 @@ Done:
 
 int
 setBestListElement (const listElementPtr_t pBestElement,
-		    const listHeaderPtr_t pListHeader)
+            const listHeaderPtr_t pListHeader)
 {
   int returnValue = -1;
 

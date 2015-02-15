@@ -31,6 +31,9 @@
 #include "lsb/lsb.h"
 #include "lsb/xdr.h"
 
+static int allocLoadIdx (float **sched, float **stop, uint *outSize, uint size);
+static bool_t xdr_lsbSharedResourceInfo (XDR *, struct lsbSharedResourceInfo *, struct LSFHeader *);
+static bool_t xdr_lsbShareResourceInstance (XDR *xdrs, struct lsbSharedResourceInstance  *, struct LSFHeader *);
 
 
 bool_t
@@ -1061,7 +1064,7 @@ xdr_queueInfoReply (XDR *xdrs, struct queueInfoReply * qInfoReply, struct LSFHea
 }
 
 bool_t
-xdr_queueInfoEnt (XDR *xdrs, struct queueInfoEnt * qInfo, struct LSFHeader *hdr, int *nIdx)
+xdr_queueInfoEnt (XDR *xdrs, struct queueInfoEnt * qInfo, struct LSFHeader *hdr, uint *nIdx)
 {
     char *sp = NULL;
 
@@ -1115,7 +1118,7 @@ xdr_queueInfoEnt (XDR *xdrs, struct queueInfoEnt * qInfo, struct LSFHeader *hdr,
     }
 
     qInfo->nIdx = *nIdx;
-    for ( int i = 0; i < *nIdx; i++)
+    for ( uint i = 0; i < *nIdx; i++)
     {
         if (!(xdr_float (xdrs, &(qInfo->loadSched[i]))) || !(xdr_float (xdrs, &(qInfo->loadStop[i]))))
             return (FALSE);
