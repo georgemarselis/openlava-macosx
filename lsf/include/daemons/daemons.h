@@ -21,8 +21,8 @@
 #ifndef LSF_DAEMONS_H
 #define LSF_DAEMONS_H
 
-#include "daemonout.h"
-#include "intlib/intlibout.h"
+#include "daemons/daemonout.h"
+#include "libint/intlibout.h"
 #include "lib/lproto.h"
 #include "lib/queue.h"
 #include "lib/table.h"
@@ -106,7 +106,7 @@
 #define LSB_MBD_CONNTIMEOUT             21
 #define LSB_MBD_MAILREPLAY              24
 #define LSB_MBD_MIGTOPEND               25
-#define LSB_MBD_PORT                    8
+// #define LSB_MBD_PORT                    8
 #define LSB_MEMLIMIT_ENFORCE            29
 #define LSB_MIG2PEND                    42
 #define LSB_MOD_ALL_JOBS                48
@@ -117,23 +117,23 @@
 #define LSB_REQUEUE_TO_BOTTOM           38
 #define LSB_SBD_CONNTIMEOUT             22
 #define LSB_SBD_FINISH_SLEEP            51
-#define LSB_SBD_PORT                    7
+// #define LSB_SBD_PORT                    7
 #define LSB_SBD_READTIMEOUT             26
 #define LSB_SET_TMPDIR                  49
-#define LSB_SHAREDIR                    4
+// #define LSB_SHAREDIR                    4
 #define LSB_SIGSTOP                     18
 #define LSB_SMTP_SERVER                 35
 #define LSB_STDOUT_DIRECT               53
 #define LSB_STOP_IGNORE_IT              31
 #define LSB_TIME_MBD                    16
 #define LSB_TIME_SBD                    17
-#define LSB_UTMP                        43
+// #define LSB_UTMP                        43
 #define LSB_VIRTUAL_SLOT                52
 
 #define LSF_AUTH                        10
 #define LSF_AUTH_DAEMONS                33
 #define LSF_BINDIR                      20
-#define LSF_BINDIR                      18
+// #define LSF_BINDIR                      18
 #define LSF_CMD_SHELL                   15
 #define LSF_CONFDIR                     23
 #define LSF_DEBUG_RES                   11
@@ -488,7 +488,6 @@ extern int maxJobId;
 
 extern char *lsbManager;
 extern char *lsbSys;
-extern int managerId;
 
 extern uid_t batchId;
 extern int debug;

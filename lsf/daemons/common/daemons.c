@@ -23,69 +23,70 @@
 #include <sys/errno.h>
 #include <fcntl.h>
 #include <stdlib.h>
-#include "daemons.h"
 
-#include "../../lsf/lib/lsi18n.h"
-#define NL_SETN		10
+#include "daemons/daemons.h"
+#include "libint/lsi18n.h"
+
+// #define NL_SETN   10
 
 struct config_param daemonParams[] = {
-  {"LSB_DEBUG", NULL},
-  {"LSB_CONFDIR", NULL},
-  {"LSF_SERVERDIR", NULL},
-  {"LSF_LOGDIR", NULL},
-  {"LSB_SHAREDIR", NULL},
-  {"LSB_MAILTO", NULL},
-  {"LSB_MAILPROG", NULL},
-  {"LSB_SBD_PORT", NULL},
-  {"LSB_MBD_PORT", NULL},
-  {"LSF_ID_PORT", NULL},
-  {"LSF_AUTH", NULL},
-  {"LSB_CRDIR", NULL},
-  {"LSF_USE_HOSTEQUIV", NULL},
-  {"LSF_ROOT_REX", NULL},
-  {"LSB_DEBUG_MBD", NULL},
-  {"LSB_DEBUG_SBD", NULL},
-  {"LSB_TIME_MBD", NULL},
-  {"LSB_TIME_SBD", NULL},
-  {"LSB_SIGSTOP", NULL},
-  {"LSF_LOG_MASK", NULL},
-  {"LSF_BINDIR", NULL},
-  {"LSB_MBD_CONNTIMEOUT", NULL},
-  {"LSB_SBD_CONNTIMEOUT", NULL},
-  {"LSF_CONFDIR", NULL},
-  {"LSB_MBD_MAILREPLAY", NULL},
-  {"LSB_MBD_MIGTOPEND", NULL},
-  {"LSB_SBD_READTIMEOUT", NULL},
-  {"LSB_MBD_BLOCK_SEND", NULL},
-  {"LSF_GETPWNAM_RETRY", NULL},
-  {"LSB_MEMLIMIT_ENFORCE", NULL},
-  {"LSB_BSUBI_OLD", NULL},
-  {"LSB_STOP_IGNORE_IT", NULL},
-  {"LSB_HJOB_PER_SESSION", NULL},
-  {"LSF_AUTH_DAEMONS", NULL},
-  {"LSB_REQUEUE_HOLD", NULL},
-  {"LSB_SMTP_SERVER", NULL},
-  {"LSB_MAILSERVER", NULL},
-  {"LSB_MAILSIZE_LIMIT", NULL},
-  {"LSB_REQUEUE_TO_BOTTOM", NULL},
-  {"LSB_ARRAY_SCHED_ORDER", NULL},
-  {"LSF_LIBDIR", NULL},
-  {"LSB_QPOST_EXEC_ENFORCE", NULL},
-  {"LSB_MIG2PEND", NULL},
-  {"LSB_UTMP", NULL},
-  {"LSB_JOB_CPULIMIT", NULL},
-  {"LSB_RENICE_NEVER_AT_RESTART", NULL},
-  {"LSF_MLS_LOG", NULL},
-  {"LSB_JOB_MEMLIMIT", NULL},
-  {"LSB_MOD_ALL_JOBS", NULL},
-  {"LSB_SET_TMPDIR", NULL},
-  {"LSB_PTILE_PACK", NULL},
-  {"LSB_SBD_FINISH_SLEEP", NULL},
-  {"LSB_VIRTUAL_SLOT", NULL},
-  {"LSB_STDOUT_DIRECT", NULL},
-  {"MBD_DONT_FORK", NULL},
-  {"LIM_NO_MIGRANT_HOSTS", NULL},
-  {NULL, NULL}
+    { "LSB_DEBUG",                    NULL },
+    { "LSB_CONFDIR",                  NULL },
+    { "LSF_SERVERDIR",                NULL },
+    { "LSF_LOGDIR",                   NULL },
+    { "LSB_SHAREDIR",                 NULL },
+    { "LSB_MAILTO",                   NULL },
+    { "LSB_MAILPROG",                 NULL },
+    { "LSB_SBD_PORT",                 NULL },
+    { "LSB_MBD_PORT",                 NULL },
+    { "LSF_ID_PORT",                  NULL },
+    { "LSF_AUTH",                     NULL },
+    { "LSB_CRDIR",                    NULL },
+    { "LSF_USE_HOSTEQUIV",            NULL },
+    { "LSF_ROOT_REX",                 NULL },
+    { "LSB_DEBUG_MBD",                NULL },
+    { "LSB_DEBUG_SBD",                NULL },
+    { "LSB_TIME_MBD",                 NULL },
+    { "LSB_TIME_SBD",                 NULL },
+    { "LSB_SIGSTOP",                  NULL },
+    { "LSF_LOG_MASK",                 NULL },
+    { "LSF_BINDIR",                   NULL },
+    { "LSB_MBD_CONNTIMEOUT",          NULL },
+    { "LSB_SBD_CONNTIMEOUT",          NULL },
+    { "LSF_CONFDIR",                  NULL },
+    { "LSB_MBD_MAILREPLAY",           NULL },
+    { "LSB_MBD_MIGTOPEND",            NULL },
+    { "LSB_SBD_READTIMEOUT",          NULL },
+    { "LSB_MBD_BLOCK_SEND",           NULL },
+    { "LSF_GETPWNAM_RETRY",           NULL },
+    { "LSB_MEMLIMIT_ENFORCE",         NULL },
+    { "LSB_BSUBI_OLD",                NULL },
+    { "LSB_STOP_IGNORE_IT",           NULL },
+    { "LSB_HJOB_PER_SESSION",         NULL },
+    { "LSF_AUTH_DAEMONS",             NULL },
+    { "LSB_REQUEUE_HOLD",             NULL },
+    { "LSB_SMTP_SERVER",              NULL },
+    { "LSB_MAILSERVER",               NULL },
+    { "LSB_MAILSIZE_LIMIT",           NULL },
+    { "LSB_REQUEUE_TO_BOTTOM",        NULL },
+    { "LSB_ARRAY_SCHED_ORDER",        NULL },
+    { "LSF_LIBDIR",                   NULL },
+    { "LSB_QPOST_EXEC_ENFORCE",       NULL },
+    { "LSB_MIG2PEND",                 NULL },
+    { "LSB_UTMP",                     NULL },
+    { "LSB_JOB_CPULIMIT",             NULL },
+    { "LSB_RENICE_NEVER_AT_RESTART",  NULL },
+    { "LSF_MLS_LOG",                  NULL },
+    { "LSB_JOB_MEMLIMIT",             NULL },
+    { "LSB_MOD_ALL_JOBS",             NULL },
+    { "LSB_SET_TMPDIR",               NULL },
+    { "LSB_PTILE_PACK",               NULL },
+    { "LSB_SBD_FINISH_SLEEP",         NULL },
+    { "LSB_VIRTUAL_SLOT",             NULL },
+    { "LSB_STDOUT_DIRECT",            NULL },
+    { "MBD_DONT_FORK",                NULL },
+    { "LIM_NO_MIGRANT_HOSTS",         NULL },
+    { NULL,                           NULL }
 };
 
 
@@ -112,22 +113,27 @@ int
 rcvJobFile (int chfd, struct lenData *jf)
 {
   static char fname[] = "rcvJobFile";
-  int cc;
+  long cc = 0;
+  unsigned long returnValue = 0;
+
 
   jf->data = NULL;
   jf->len = 0;
 
-  if ((cc = chanRead_ (chfd, NET_INTADDR_ (&jf->len), NET_INTSIZE_)) !=
-      NET_INTSIZE_)
+  if ((cc = chanRead_ (chfd, NET_INTADDR_ (&jf->len), NET_INTSIZE_)) != NET_INTSIZE_)
     {
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "chanRead_");
       return -1;
     }
 
   jf->len = ntohl (jf->len);
-  jf->data = my_malloc (jf->len, "rcvJobFile");
+  assert( jf->len <= INT_MAX );
+  jf->data = my_malloc ( (int)jf->len, "rcvJobFile");
 
-  if ((cc = chanRead_ (chfd, jf->data, jf->len)) != jf->len)
+  cc = chanRead_ (chfd, jf->data, jf->len);
+  assert( cc >= 0);
+  returnValue = (unsigned long) cc;
+  if ( returnValue != jf->len)
     {
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "chanRead_");
       free (jf->data);
@@ -138,13 +144,16 @@ rcvJobFile (int chfd, struct lenData *jf)
 }
 
 int
-do_readyOp (XDR * xdrs, int chanfd, struct sockaddr_in *from,
-	    struct LSFHeader *reqHdr)
+do_readyOp (XDR *xdrs, int chanfd, struct sockaddr_in *from, struct LSFHeader *reqHdr)
 {
-  static char fname[] = "do_readyOp";
-  XDR xdrs2;
-  struct Buffer *buf;
-  struct LSFHeader replyHdr;
+    static char fname[] = "do_readyOp";
+    XDR xdrs2;
+    struct Buffer *buf;
+    struct LSFHeader replyHdr;
+
+    assert( reqHdr->length );
+    assert( from->sin_port );
+    assert( xdrs->x_handy );
 
 
   if (chanAllocBuf_ (&buf, sizeof (struct LSFHeader)) < 0)
@@ -181,7 +190,7 @@ do_readyOp (XDR * xdrs, int chanfd, struct sockaddr_in *from,
 
 void
 childRemoveSpoolFile (const char *spoolFile, int options,
-		      const struct passwd *pwUser)
+          const struct passwd *pwUser)
 {
   char fname[] = "childRemoveSpoolFile";
   char apiName[] = "ls_initrex";
@@ -201,15 +210,15 @@ childRemoveSpoolFile (const char *spoolFile, int options,
     }
   else
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 8000, "Unable to get spool host from the string \'%s\'")	/* catgets 8000 */
-		 , (spoolFile ? spoolFile : "NULL"));
+      /* catgets 8000 */
+      ls_syslog (LOG_ERR, "catgets 8000: Unable to get spool host from the string \'%s\'", (spoolFile ? spoolFile : "NULL"));
       goto Done;
     }
 
   if (pwUser == NULL)
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 8001, "%s: Parameter const struct passwd * pwUser is NULL")	/* catgets 8001 */
-		 , fname);
+      /* catgets 8001 */
+      ls_syslog (LOG_ERR, "catgets 8001: %s: Parameter const struct passwd * pwUser is NULL", fname);
       goto Done;
     }
 
@@ -224,22 +233,22 @@ childRemoveSpoolFile (const char *spoolFile, int options,
       strcpy (dirName, spoolFile);
     }
 
-  sprintf (errMsg, _i18n_msg_get (ls_catd, NL_SETN, 3000, "%s: Unable to remove spool file:\n,\'%s\'\n on host %s\n"),	/* catgets 3000 */
-	   fname, dirName, fromHost);
+  /* catgets 3000 */
+  sprintf (errMsg, "catgets 3000: %s: Unable to remove spool file:\n,\'%s\'\n on host %s\n", fname, dirName, fromHost);
 
   if (!(options & FORK_REMOVE_SPOOL_FILE))
     {
 
       if ((options & CALL_RES_IF_NEEDED))
-	{
-	  if (ls_initrex (1, 0) < 0)
-	    {
-	      status = -1;
-	      sprintf (errMsg, _i18n_msg_get (ls_catd, NL_SETN, 3001, "%s: %s failed when trying to delete %s from %s\n"),	/* catgets 3001 */
-		       fname, apiName, dirName, fromHost);
-	      goto Error;
-	    }
-	}
+  {
+    if (ls_initrex (1, 0) < 0)
+      {
+        status = -1;
+        /* catgets 3001 */
+        sprintf (errMsg, "catgets 3001: %s: %s failed when trying to delete %s from %s\n",  fname, apiName, dirName, fromHost);
+        goto Error;
+      }
+  }
 
       chuser (pwUser->pw_uid);
 
@@ -248,9 +257,9 @@ childRemoveSpoolFile (const char *spoolFile, int options,
       chuser (batchId);
 
       if (status != 0)
-	{
-	  goto Error;
-	}
+  {
+    goto Error;
+  }
       goto Done;
     }
 
@@ -259,43 +268,43 @@ childRemoveSpoolFile (const char *spoolFile, int options,
     case 0:
 
       if (debug < 2)
-	{
-	  closeExceptFD (-1);
-	}
+  {
+    closeExceptFD (-1);
+  }
 
       if ((options & CALL_RES_IF_NEEDED))
-	{
-	  if (ls_initrex (1, 0) < 0)
-	    {
-	      status = -1;
-	      sprintf (errMsg, _i18n_msg_get (ls_catd, NL_SETN, 3001, "%s: %s failed when trying to delete %s from %s\n"),	/* catgets 3001 */
-		       fname, apiName, dirName, fromHost);
-	      goto Error;
-	    }
-	}
+  {
+    if (ls_initrex (1, 0) < 0)
+      {
+        status = -1;
+        /* catgets 3001 */
+        sprintf (errMsg, "3001: %s: %s failed when trying to delete %s from %s\n", fname, apiName, dirName, fromHost);
+        goto Error;
+      }
+  }
 
       chuser (pwUser->pw_uid);
       status = 0;
       if (removeSpoolFile (hostName, dirName) == 0)
-	{
-	  exit (0);
-	}
+  {
+    exit (0);
+  }
       else
-	{
-	  exit (-1);
-	}
-      goto Done;
-      break;
+  {
+    exit (-1);
+  }
+      //goto Done;
+      //break;
 
     case -1:
 
       if (logclass & (LC_FILE))
-	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "fork");
-	}
+  {
+    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "fork");
+  }
       status = -1;
-      sprintf (errMsg, _i18n_msg_get (ls_catd, NL_SETN, 3002, "%s: Unable to fork to remove spool file:\n,\'%s\'\n on host %s\n"),	/* catgets 3002 */
-	       fname, dirName, fromHost);
+      /* catgets 3002 */
+      sprintf (errMsg, "catgets 3002: %s: Unable to fork to remove spool file:\n,\'%s\'\n on host %s\n", fname, dirName, fromHost);
       goto Error;
     default:
       status = 0;
