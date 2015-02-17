@@ -128,7 +128,7 @@ rcvJobFile (int chfd, struct lenData *jf)
 
   jf->len = ntohl (jf->len);
   assert( jf->len <= INT_MAX );
-  jf->data = my_malloc ( (int)jf->len, "rcvJobFile");
+  jf->data = my_malloc ( jf->len, "rcvJobFile");
 
   cc = chanRead_ (chfd, jf->data, jf->len);
   assert( cc >= 0);

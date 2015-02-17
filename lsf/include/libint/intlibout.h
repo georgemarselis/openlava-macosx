@@ -28,9 +28,9 @@
 #include "libint/resreq.h"
 #include "lsf.h"
 
-#define MINPASSWDLEN_LS		 (3)
-#define EXIT_NO_ERROR 		 (0)
-#define EXIT_FATAL_ERROR 	 (-1)
+#define MINPASSWDLEN_LS      (3)
+#define EXIT_NO_ERROR        (0)
+#define EXIT_FATAL_ERROR     (-1)
 #define EXIT_WARNING_ERROR (-2)
 #define EXIT_RUN_ERROR     (-8)
 
@@ -53,9 +53,11 @@ struct dayhour
 
 struct listEntry
 {
-  struct listEntry *forw;
-  struct listEntry *back;
-  int entryData;
+    int entryData;
+    char padding[4];
+    struct listEntry *forw;
+    struct listEntry *back;
+
 };
 
 

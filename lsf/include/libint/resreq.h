@@ -22,8 +22,7 @@
 #define LSF_INTLIB_RESREQ_H
 
 #define IS_DIGIT(s)  ( (s) >= '0' && (s) <= '9')
-#define IS_LETTER(s) ( ((s) >= 'a' && (s) <= 'z') || \
-		       ((s) >= 'A' && (s) <= 'Z'))
+#define IS_LETTER(s) ( ((s) >= 'a' && (s) <= 'z') || ((s) >= 'A' && (s) <= 'Z'))
 #define IS_VALID_OTHER(s) ((s) == '_'|| (s) == '~')
 
 #define WILDCARD_STR  "any"
@@ -51,22 +50,23 @@
 
 struct resVal
 {
-  char *selectStr;
-  int nphase;
-  int order[NBUILTINDEX];
-  int genClass;
-  float *val;
-  int nindex;
-  int *indicies;
-  int *rusgBitMaps;
-  int duration;
-  float decay;
-  int numHosts;
-  int maxNumHosts;
-  int pTile;
-  int options;
-  int selectStrSize;
-  char **xorExprs;
+    char *selectStr;
+    int nphase;
+    int genClass;
+    int duration;
+    int pTile;
+    int options;
+    int selectStrSize;
+    uint nindex;
+    uint numHosts;
+    uint maxNumHosts;
+    int order[NBUILTINDEX];
+    int *indicies;
+    int *rusgBitMaps;
+    float *val;
+    float decay;
+    char padding[4];
+    char **xorExprs;
 };
 
 extern int getValPair (char **resReq, int *val1, int *val2);

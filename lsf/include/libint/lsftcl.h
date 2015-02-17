@@ -45,43 +45,45 @@ typedef struct
 #define   LAST_STRING (HOSTNAME + 1)
 #define   DEFINEDFUNCTION 5
 
-#define   TCL_CHECK_SYNTAX  0
-#define   TCL_CHECK_EXPRESSION 1
+#define   TCL_CHECK_SYNTAX      0
+#define   TCL_CHECK_EXPRESSION  1
 
 struct tclHostData
 {
-  char *hostName;
   int maxCpus;
   int maxMem;
   int maxSwap;
   int maxTmp;
   int nDisks;
-  short hostInactivityCount;
-  int *status;
-  float *loadIndex;
   int rexPriority;
+  int ignDedicatedResource;
+  int numResPairs;
+  int flag;
+  int overRideFromType;
+  int *status;
+  int *resBitMaps;
+  int *DResBitMaps;
+  short hostInactivityCount;
+  char padding1[6];
+  char *hostName;
   char *hostType;
   char *hostModel;
   char *fromHostType;
   char *fromHostModel;
   float cpuFactor;
-  int ignDedicatedResource;
-  int *resBitMaps;
-  int *DResBitMaps;
-  int numResPairs;
+  char padding2[4];
+  float *loadIndex;
   struct resPair *resPairs;
-  int flag;
-  int overRideFromType;
 };
 
 struct tclLsInfo
 {
-  int numIndx;
-  char **indexNames;
-  int nRes;
-  char **resName;
+  uint numIndx;
+  uint nRes;
   int *stringResBitMaps;
   int *numericResBitMaps;
+  char **resName;
+  char **indexNames;
 };
 
 extern int initTcl (struct tclLsInfo *);

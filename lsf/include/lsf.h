@@ -266,8 +266,7 @@ struct connectEnt
 
 #define LS_ISUNAVAIL(status)     (((status[0]) & LIM_UNAVAIL) != 0)
 
-#define LS_ISBUSYON(status, index)                                      \
-  (((status[1 + (index)/INTEGER_BITS]) & (1 << (index)%INTEGER_BITS)) != 0)
+#define LS_ISBUSYON(status, index) (((status[1 + (index)/INTEGER_BITS]) & (1 << (index)%INTEGER_BITS)) != 0)
 
 #define LS_ISBUSY(status) (((status[0]) & LIM_BUSY) != 0)
 
@@ -341,7 +340,7 @@ struct lsInfo
   char padding5[4];
   struct resItem *resTable;
   char padding2[4];
-  int nRes;
+  uint nRes;
   int nTypes;
   int nModels;
   uint numIndx;
@@ -381,27 +380,25 @@ struct clusterInfo
 
 struct hostInfo
 {
-  int padding2[4];
-  char *hostModel;
-  char **resources;
-  char *windows;
-  char *hostType;
-  char hostName[MAXHOSTNAMELEN]; /* FIXME FIXME FIXME this should be converted to char *hostName */
-  float cpuFactor;
-  char padding1[4];
-  float *busyThreshold;
-  char isServer;
-  char padding3[3];
-  unsigned int maxCpus;
-  unsigned int maxMem;
-  unsigned int maxSwap;
-  unsigned int maxTmp;
-  unsigned int nDisks;
-  int nRes;
-  char padding8[4];
-  unsigned long numIndx;
-  int rexPriority;
-  char padding4[4];
+    int rexPriority;
+    uint maxCpus;
+    uint maxMem;
+    uint maxSwap;
+    uint maxTmp;
+    uint nDisks;
+    uint nRes;
+    char isServer;
+    char padding1[3];
+    char *hostModel;
+    char *windows;
+    char *hostType;
+    float cpuFactor;
+    char padding2[4];
+    float *busyThreshold;
+    unsigned long numIndx;
+    char **resources;
+    char hostName[MAXHOSTNAMELEN]; /* FIXME FIXME FIXME this should be converted to char *hostName */
+
 };
 
   
