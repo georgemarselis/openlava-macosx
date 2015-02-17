@@ -136,20 +136,20 @@ struct loadReply
 struct shortHInfo
 {
     char hostName[MAXHOSTNAMELEN];
-    unsigned int hTypeIndx;
-    unsigned int hModelIndx;
-    unsigned int maxCpus;
-    unsigned int maxMem;
-    unsigned int maxSwap;
-    unsigned int maxTmp;
-    unsigned int nDisks;
-    int resClass;
+    uint hTypeIndx;
+    uint hModelIndx;
+    uint maxCpus;
+    uint maxMem;
+    uint maxSwap;
+    uint maxTmp;
+    uint nDisks;
+    uint resClass;
     int flags;
     int rexPriority;
     int nRInt;
     char padding[4];
     char *windows;
-    int *resBitMaps;
+    uint *resBitMaps;
     float *busyThreshold;
 
 };
@@ -158,10 +158,11 @@ struct shortLsInfo
 {
     int *stringResBitMaps;
     int *numericResBitMaps;
+    uint nTypes;
+    uint nRes;
+    uint nModels;
     float cpuFactors[MAXMODELS];
-    unsigned long nTypes;
-    unsigned long nRes;
-    unsigned long nModels;
+    char padding[4];
     char *hostModels[MAXMODELS];
     char *hostTypes[MAXTYPES];
     char **resName;
@@ -189,24 +190,24 @@ struct shortCInfo
     char clName[MAXLSFNAMELEN];
     char masterName[MAXHOSTNAMELEN];
     char managerName[MAXLSFNAMELEN];
-    int managerId;
-    int status;
-    int resClass;
-    int typeClass;
-    int modelClass;
-    int numIndx;
-    int numUsrIndx;
-    int usrIndxClass;
-    int numServers;
-    int numClients;
-    unsigned int nAdmins;
-    int nRes;
-    int nTypes;
-    int nModels;
-    int *hostTypeBitMaps;
-    int *hostModelBitMaps;
-    int *resBitMaps;
-    int *adminIds;
+    pid_t managerId;
+    uint status;
+    uint resClass;
+    uint typeClass;
+    uint modelClass;
+    uint numIndx;
+    uint numUsrIndx;
+    uint usrIndxClass;
+    uint numServers;
+    uint numClients;
+    uint nAdmins;
+    uint nRes;
+    uint nTypes;
+    uint nModels;
+    uint *hostTypeBitMaps;
+    uint *hostModelBitMaps;
+    uint *resBitMaps;
+    pid_t *adminIds;
     char **admins;
     
 };
@@ -216,24 +217,24 @@ struct cInfo
     char clName[MAXLSFNAMELEN];
     char masterName[MAXHOSTNAMELEN];
     char managerName[MAXLSFNAMELEN];
-    int managerId;
-    int status;
-    int resClass;
-    int typeClass;
-    int modelClass;
-    int numIndx;
-    int numUsrIndx;
-    int usrIndxClass;
-    int numServers;
-    int numClients;
-    int nRes;
-    int nTypes;
-    int nModels;
+    pid_t managerId;
+    uint status;
+    uint resClass;
+    uint typeClass;
+    uint modelClass;
+    uint numIndx;
+    uint numUsrIndx;
+    uint usrIndxClass;
+    uint numServers;
+    uint numClients;
+    uint nRes;
+    uint nTypes;
+    uint nModels;
     unsigned int nAdmins;
-    int *adminIds;
-    int *resBitMaps;
-    int *hostTypeBitMaps;
-    int *hostModelBitMaps;
+    pid_t *adminIds;
+    uint *resBitMaps;
+    uint *hostTypeBitMaps;
+    uint *hostModelBitMaps;
     char **admins;
     char **loadIndxNames;
     struct shortLsInfo shortInfo;
@@ -241,7 +242,7 @@ struct cInfo
 
 struct clusterInfoReply
 {
-    unsigned int nClus;
+    uint nClusters;
     char paddding[4];
     struct shortLsInfo *shortLsInfo;
     struct shortCInfo *clusterMatrix;
@@ -258,7 +259,7 @@ struct masterInfo
 
 struct clusterList
 {
-    int nClusters;
+    uint nClusters;
     char **clNames;
 };
 

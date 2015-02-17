@@ -175,7 +175,7 @@ int
 initResTable (void)
 {
   struct resItem *resTable;
-  int i;
+  uint i;
 
   resTable = (struct resItem *) malloc (1000 * sizeof (struct resItem));
   if (!resTable)
@@ -266,64 +266,51 @@ do_Index (FILE * fp, uint *lineNum, char *fname)
     }
   else
     {
-      if (readHvalues (keyList, linep, fp, fname, lineNum, TRUE, "newindex") < 0)
-    return (FALSE);
+      if (readHvalues (keyList, linep, fp, fname, lineNum, TRUE, "newindex") < 0) {
+        return (FALSE);
+      }
       setIndex (keyList, fname, *lineNum);
       return (TRUE);
     }
 
-  ls_syslog (LOG_ERR, I18N_PREMATURE_EOF,
-         "do_Index", fname, *lineNum, "newindex");
+  ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, "do_Index", fname, *lineNum, "newindex");
   return (TRUE);
 }
 
 char
 setIndex (struct keymap *keyList, char *fname, uint lineNum)
 {
-  int resIdx;
+    uint resIdx = 0;
 
-  if (keyList == NULL)
-    return (FALSE);
-
-  if (strlen (keyList[3].val) >= MAXLSFNAMELEN)
-    {
-      ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5065, "%s: %s(%d): Name %s is too long (maximum is %d chars); ignoring index")),    /* catgets 5065 */
-         "setIndex", fname, lineNum, keyList[3].val,
-         MAXLSFNAMELEN - 1);
-      return (FALSE);
+    if (keyList == NULL) {
+        return (FALSE);
     }
 
-  if (strpbrk (keyList[3].val, ILLEGAL_CHARS) != NULL)
-    {
-      ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5066, "%s: %s(%d): illegal character (one of %s), ignoring index %s")), /* catgets 5066 */
-         "setIndex", fname, lineNum, ILLEGAL_CHARS, keyList[3].val);
-      return (FALSE);
+    if (strlen (keyList[3].val) >= MAXLSFNAMELEN) {
+        /* catgets 5065 */
+        ls_syslog (LOG_ERR, "catgets 5065: %s: %s(%d): Name %s is too long (maximum is %d chars); ignoring index", "setIndex", fname, lineNum, keyList[3].val, MAXLSFNAMELEN - 1);
+        return (FALSE);
     }
 
-  if ((resIdx = resNameDefined (keyList[3].val)) >= 0)
-    {
-      if (!(lsinfo.resTable[resIdx].flags & RESF_DYNAMIC))
-    {
-      ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5067, "%s: %s(%d): Name %s is not a dynamic resource; ignored")),   /* catgets 5067 */
-             "setIndex", fname, lineNum, keyList[3].val);   /* catgets 5067 */
-      return (FALSE);
+    if (strpbrk (keyList[3].val, ILLEGAL_CHARS) != NULL) {
+        /* catgets 5066 */
+        ls_syslog (LOG_ERR, "catgets 5066 %s: %s(%d): illegal character (one of %s), ignoring index %s", "setIndex", fname, lineNum, ILLEGAL_CHARS, keyList[3].val);
+        return (FALSE);
     }
 
-      ls_syslog (LOG_ERR,
-         (_i18n_msg_get
-          (ls_catd, NL_SETN, 5068,
-           "%s: %s(%d): Name %s reserved or previously defined; overriding previous index definition"))
-         /* catgets 5068 */ ,
-         "setIndex", fname, lineNum, keyList[3].val);
+    assert( resNameDefined (keyList[3].val) > 0 );
+    resIdx = (uint)resNameDefined (keyList[3].val);
+    if (!(lsinfo.resTable[resIdx].flags & RESF_DYNAMIC)) {
+        /* catgets 5067 */
+        ls_syslog (LOG_ERR, "catgets 5067: %s: %s(%d): Name %s is not a dynamic resource; ignored", "setIndex", fname, lineNum, keyList[3].val);
+        return (FALSE);
     }
-  else
-    {
+    else {
       resIdx = lsinfo.nRes;
     }
 
   lsinfo.resTable[resIdx].interval = atoi (keyList[0].val);
-  lsinfo.resTable[resIdx].orderType =
-    (strcasecmp (keyList[1].val, "y") == 0) ? INCR : DECR;
+  lsinfo.resTable[resIdx].orderType =(strcasecmp (keyList[1].val, "y") == 0) ? INCR : DECR;
 
   strcpy (lsinfo.resTable[resIdx].des, keyList[2].val);
   strcpy (lsinfo.resTable[resIdx].name, keyList[3].val);
@@ -796,15 +783,14 @@ do_Resources (FILE * fp, uint *lineNum, char *fname)
 
 int
 resNameDefined (char *name) {
-    int i;
 
     if (name == NULL) {
         return (-1);
     }
 
-    for (i = 0; i < lsinfo.nRes; i++) {
+    for (uint i = 0; i < lsinfo.nRes; i++) {
         if (strcmp (name, lsinfo.resTable[i].name) == 0) {
-            return (i);
+            return (int)(i);
         }
     }
 
@@ -891,7 +877,7 @@ ls_readcluster_ex (char *fname, struct lsInfo *info, int lookupAdmins)
 
     myinfo = *info;
     assert( info->nRes > 0 );
-    myinfo.resTable = (struct resItem *) malloc( (unsigned int) info->nRes * sizeof (struct resItem));
+    myinfo.resTable = (struct resItem *) malloc( info->nRes * sizeof (struct resItem));
 
     if (info->nRes && (myinfo.resTable == NULL) ) {
         ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "ls_readcluster", "malloc");
@@ -900,7 +886,7 @@ ls_readcluster_ex (char *fname, struct lsInfo *info, int lookupAdmins)
     }
 
     counter = 0;
-    for ( int i = 0; i < info->nRes; i++)
+    for ( uint i = 0; i < info->nRes; i++)
     {
         if (info->resTable[i].flags & RESF_DYNAMIC) {
             memcpy (&myinfo.resTable[counter], &info->resTable[i], sizeof (struct resItem));
@@ -908,7 +894,7 @@ ls_readcluster_ex (char *fname, struct lsInfo *info, int lookupAdmins)
         }
     }
 
-    for ( int i = 0; i < info->nRes; i++)
+    for ( uint i = 0; i < info->nRes; i++)
     {
         if (!(info->resTable[i].flags & RESF_DYNAMIC)) {
             memcpy (&myinfo.resTable[counter], &info->resTable[i], sizeof (struct resItem));
@@ -1036,16 +1022,16 @@ freeClusterInfo (struct clusterInfo *cls)
 {
 
     if (cls != NULL) {
-        for ( int i = 0; i < cls->nRes; i++) {
+        for ( uint i = 0; i < cls->nRes; i++) {
             FREEUP (cls->resources[i]);
         }
-        for ( int i = 0; i < cls->nTypes; i++) {
+        for ( uint i = 0; i < cls->nTypes; i++) {
             FREEUP (cls->hostTypes[i]);
         }
-        for ( int i = 0; i < cls->nModels; i++) {
+        for ( uint i = 0; i < cls->nModels; i++) {
             FREEUP (cls->hostModels[i]);
         }
-        for ( unsigned int i = 0; i < cls->nAdmins; i++) {
+        for ( uint i = 0; i < cls->nAdmins; i++) {
             FREEUP (cls->admins[i]);
         }
       
@@ -1081,12 +1067,10 @@ initClusterInfo (struct clusterInfo *cls)
 void
 freeHostInfo (struct hostInfo *host)
 {
-    int i;
-
     if (host != NULL) {
         FREEUP (host->hostType);
         FREEUP (host->hostModel);
-        for (i = 0; i < host->nRes; i++) {
+        for ( uint i = 0; i < host->nRes; i++) {
             FREEUP (host->resources[i]);
         }
         FREEUP (host->resources);
@@ -1446,7 +1430,7 @@ do_Hosts (FILE * fp, char *fname, uint *lineNum, struct lsInfo *info)
     char *linep     = NULL;
     int ignoreR     = FALSE;
     unsigned int n = 0 ;/*FIXME FIXME 
-                         * WARNIGN DANGER WARNING SHITTY CODE
+                         * WARNING DANGER WARNING SHITTY CODE
                          * n is shared among many blocks of code.
                          * MUST MUST MUST disentagle 
                         */
@@ -1762,7 +1746,7 @@ do_Hosts (FILE * fp, char *fname, uint *lineNum, struct lsInfo *info)
          *      - gmarselis
          * 
         */
-        host.nRes = (int) n;
+        host.nRes = n;
 
         assert( n >= 0 );
         host.resources = (char **) malloc( (unsigned int) n * sizeof (char *));
@@ -1970,7 +1954,7 @@ initkeylist (struct keymap keyList[], int m, int n, struct lsInfo *info)
     else
     {
         uint index = 0;
-        for (int i = 0; i < info->nRes; i++) {
+        for (uint i = 0; i < info->nRes; i++) {
             if ((info->resTable[i].flags & RESF_DYNAMIC) && index < info->numIndx) {
                 keyList[index++].key = info->resTable[i].name;
             }

@@ -52,12 +52,14 @@ ls_getclustername (void)
 
 }
 
-int
-expandList1_ (char ***tolist, int num, int *bitmMaps, char **keys)
+uint
+expandList1_ (char ***tolist, uint num, uint *bitmMaps, char **keys)
 {
 
-  int ii, jj, isSet;
-  char **temp;
+  uint ii = 0;
+  uint jj = 0;
+  int isSet = 0;
+  char **temp = NULL;
 
     if (num <= 0) {
         return 0;
@@ -67,7 +69,7 @@ expandList1_ (char ***tolist, int num, int *bitmMaps, char **keys)
     temp = (char **) calloc ( (unsigned long) num, sizeof (char *));
     if (  NULL == temp && ENOMEM == errno ) {
         lserrno = LSE_MALLOC;
-        return (-1);
+        return (0);
     }
 
     for (ii = 0, jj = 0; ii < num; ii++) {
@@ -89,28 +91,29 @@ expandList1_ (char ***tolist, int num, int *bitmMaps, char **keys)
     return (jj);
 }
 
-int
-expandList_ (char ***tolist, int mask, char **keys)
+uint
+expandList_ (char ***tolist, uint mask, char **keys)
 {
-    int i, j;
+    uint lastElementCounter = 0;
     char *temp[32];
 
-    for (i = 0, j = 0; i < 32; i++) {
+    for ( uint i = 0, j = 0; i < 32; i++) {
         if (mask & (1 << i)) {
             temp[j++] = keys[i];
+            lastElementCounter = j;
         }
     }
     
-    if (j > 0) { // FIXME checked already
-        *tolist = calloc ( (unsigned long) j, sizeof (char *));
+    if (lastElementCounter > 0) {
+        *tolist = calloc ( lastElementCounter, sizeof (char *));
         
         if (!*tolist) {
 
             lserrno = LSE_MALLOC;
-            return (-1);
+            return (0);
         }
         
-        for (i = 0; i < j; i++) {
+        for ( uint i = 0; i < lastElementCounter; i++) {
             (*tolist)[i] = temp[i];
         }
     }
@@ -118,7 +121,7 @@ expandList_ (char ***tolist, int mask, char **keys)
         *tolist = NULL;
     }
     
-    return (j);
+    return (lastElementCounter);
 }
 
 static int
@@ -166,14 +169,14 @@ errReturn:
 static struct clusterInfo *
 expandSCinfo (struct clusterInfoReply *clusterInfoReply)
 {
-    static unsigned int nClus = 0;
+    static unsigned int nClusters = 0;
     static struct clusterInfo *clusterInfoPtr = NULL;
     struct shortLsInfo *lsInfoPtr;
     // int i, j, k;
 
     if (clusterInfoPtr) {
       
-        for ( unsigned int i = 0; i < nClus; i++) {
+        for ( unsigned int i = 0; i < nClusters; i++) {
             free (clusterInfoPtr[i].resources);
             free (clusterInfoPtr[i].hostModels);
             free (clusterInfoPtr[i].hostTypes);
@@ -190,19 +193,19 @@ expandSCinfo (struct clusterInfoReply *clusterInfoReply)
         FREEUP (clusterInfoPtr);
     }
 
-    assert( clusterInfoReply->nClus >= 0);
-    clusterInfoPtr = calloc ( (unsigned long) clusterInfoReply->nClus, sizeof (struct clusterInfo));
+    assert( clusterInfoReply->nClusters >= 0);
+    clusterInfoPtr = calloc ( (unsigned long) clusterInfoReply->nClusters, sizeof (struct clusterInfo));
  
     if (!clusterInfoPtr) {
-        nClus = 0;
+        nClusters = 0;
         lserrno = LSE_MALLOC;
         return (NULL);
     }
 
-        nClus = clusterInfoReply->nClus;
+        nClusters = clusterInfoReply->nClusters;
         lsInfoPtr = clusterInfoReply->shortLsInfo;
 
-    for ( unsigned int i = 0; i < clusterInfoReply->nClus; i++) {
+    for ( unsigned int i = 0; i < clusterInfoReply->nClusters; i++) {
 
         strcpy (clusterInfoPtr[i].clusterName, clusterInfoReply->clusterMatrix[i].clName);
         strcpy (clusterInfoPtr[i].masterName,  clusterInfoReply->clusterMatrix[i].masterName);
@@ -223,56 +226,27 @@ expandSCinfo (struct clusterInfoReply *clusterInfoReply)
         clusterInfoPtr[i].hostModels = NULL;
 
         if (clusterInfoReply->clusterMatrix[i].nRes == 0) {
-            clusterInfoPtr[i].nRes = expandList_ (&clusterInfoPtr[i].resources, 
-                                            clusterInfoReply->clusterMatrix[i].resClass, 
-                                            lsInfoPtr->resName);
+            clusterInfoPtr[i].nRes = expandList_ (&clusterInfoPtr[i].resources, clusterInfoReply->clusterMatrix[i].resClass, lsInfoPtr->resName);
         }
         else {
-            clusterInfoPtr[i].nRes = expandList1_ (&clusterInfoPtr[i].resources,
-                                        clusterInfoReply->
-                                        clusterMatrix[i].nRes,
-                                        clusterInfoReply->
-                                        clusterMatrix[i].resBitMaps,
-                                        lsInfoPtr->resName);
-        }
-        
-        if (clusterInfoPtr[i].nRes < 0) {
-            break;
+            clusterInfoPtr[i].nRes = expandList1_ (&clusterInfoPtr[i].resources, clusterInfoReply->clusterMatrix[i].nRes, clusterInfoReply->clusterMatrix[i].resBitMaps, lsInfoPtr->resName);
         }
 
         if (clusterInfoReply->clusterMatrix[i].nTypes == 0) {
-            clusterInfoPtr[i].nTypes = expandList_ (&clusterInfoPtr[i].hostTypes,
-                                            clusterInfoReply->clusterMatrix[i].typeClass,
-                                            lsInfoPtr->hostTypes);
+            clusterInfoPtr[i].nTypes = expandList_ (&clusterInfoPtr[i].hostTypes, clusterInfoReply->clusterMatrix[i].typeClass, lsInfoPtr->hostTypes);
         }
         else {
-            clusterInfoPtr[i].nTypes = expandList1_ (&clusterInfoPtr[i].hostTypes,
-                                            clusterInfoReply->clusterMatrix[i].nTypes,
-                                            clusterInfoReply->clusterMatrix[i].hostTypeBitMaps,
-                                            lsInfoPtr->hostTypes);
-        }
-        
-        if (clusterInfoPtr[i].nTypes < 0) {
-            break;
+            clusterInfoPtr[i].nTypes = expandList1_ (&clusterInfoPtr[i].hostTypes, clusterInfoReply->clusterMatrix[i].nTypes, clusterInfoReply->clusterMatrix[i].hostTypeBitMaps, lsInfoPtr->hostTypes);
         }
 
         if (clusterInfoReply->clusterMatrix[i].nModels == 0) {
-            clusterInfoPtr[i].nModels = expandList_ (&clusterInfoPtr[i].hostModels,
-                                            clusterInfoReply->clusterMatrix[i].modelClass,
-                                            lsInfoPtr->hostModels);
+            clusterInfoPtr[i].nModels = expandList_ (&clusterInfoPtr[i].hostModels, clusterInfoReply->clusterMatrix[i].modelClass, lsInfoPtr->hostModels);
         }
         else {
-            clusterInfoPtr[i].nModels = expandList1_ (&clusterInfoPtr[i].hostModels,
-                                              clusterInfoReply->clusterMatrix[i].nModels,
-                                              clusterInfoReply->clusterMatrix[i].hostModelBitMaps,
-                                              lsInfoPtr->hostModels);
-        }
-
-        if (clusterInfoPtr[i].nModels < 0) {
-            break;
+            clusterInfoPtr[i].nModels = expandList1_ (&clusterInfoPtr[i].hostModels, clusterInfoReply->clusterMatrix[i].nModels, clusterInfoReply->clusterMatrix[i].hostModelBitMaps, lsInfoPtr->hostModels);
         }
   
-        if (i != clusterInfoReply->nClus) {
+        if (i != clusterInfoReply->nClusters) {
             for ( unsigned int j = 0; j < i; j++) {
                 FREEUP (clusterInfoPtr[j].resources);
                 FREEUP (clusterInfoPtr[j].hostTypes);
@@ -346,7 +320,7 @@ ls_clusterinfo (char *resReq, unsigned int *numclusters, char **clusterList, int
     }
 
     if (numclusters != NULL) {
-        *numclusters = clusterInfoReply.nClus;
+        *numclusters = clusterInfoReply.nClusters;
     }
     
     return (expandSCinfo (&clusterInfoReply));
@@ -583,11 +557,7 @@ expandSHinfo (struct hostInfoReply *hostInfoReply)
         }
         else {
             assert( lsInfoPtr->nRes <= INT_MAX);
-            hostInfoPtr[i].nRes = expandList1_ (&hostInfoPtr[i].resources, (int) lsInfoPtr->nRes, hostInfoReply->hostMatrix[i].resBitMaps, lsInfoPtr->resName);
-        }
-
-        if (hostInfoPtr[i].nRes < 0) {
-            break;
+            hostInfoPtr[i].nRes = expandList1_ (&hostInfoPtr[i].resources, lsInfoPtr->nRes, hostInfoReply->hostMatrix[i].resBitMaps, lsInfoPtr->resName);
         }
 
         final_counter = i;
@@ -739,43 +709,39 @@ ls_info (void)
 char **
 ls_indexnames (struct lsInfo *lsInfo)
 {
-  static char **indicies = NULL;
-  int i, j;
+    static char **indicies = NULL;
+    unsigned long lastElement = 0;
 
-  if (!lsInfo)
-    {
-      lsInfo = ls_info ();
-      if (!lsInfo)
-    return NULL;
-    }
-
-  FREEUP (indicies);
-
-  for (i = 0, j = 0; i < lsInfo->nRes; i++)
-    {
-      if ((lsInfo->resTable[i].flags & RESF_DYNAMIC)
-      && (lsInfo->resTable[i].flags & RESF_GLOBAL))
-    {
-      j++;
-    }
-    }
-        // FIXME FIXME cast is ok, still put it through a check
-        indicies = (char **) malloc( ( (unsigned long) j + 1) * sizeof (char *) );
-        if( NULL != indicies && ENOMEM != errno ) {
-            lserrno = LSE_MALLOC;
-            return NULL;
+    if (!lsInfo) {
+        lsInfo = ls_info ();
+        if (!lsInfo) {
+            return NULL; 
         }
+    }
 
-  for (i = 0, j = 0; i < lsInfo->nRes; i++)
-    {
-      if ((lsInfo->resTable[i].flags & RESF_DYNAMIC)
-      && (lsInfo->resTable[i].flags & RESF_GLOBAL))
-    {
-      indicies[j] = lsInfo->resTable[i].name;
-      j++;
+    FREEUP (indicies);
+
+    for ( uint i = 0, j = 0; i < lsInfo->nRes; i++) {
+        if ((lsInfo->resTable[i].flags & RESF_DYNAMIC) && (lsInfo->resTable[i].flags & RESF_GLOBAL)) {
+            j++;
+            lastElement = j;
+        }
     }
+    // FIXME FIXME cast is ok, still put it through a check
+    indicies = (char **) malloc( (lastElement + 1) * sizeof (char *) );
+    if( NULL != indicies && ENOMEM != errno ) {
+        lserrno = LSE_MALLOC;
+        return NULL;
     }
-  indicies[j] = NULL;
+
+    for ( uint i = 0, j = 0; i < lsInfo->nRes; i++) {
+        if ((lsInfo->resTable[i].flags & RESF_DYNAMIC) && (lsInfo->resTable[i].flags & RESF_GLOBAL)) {
+            indicies[j] = lsInfo->resTable[i].name;
+            j++;
+            lastElement = j;
+        }
+    }
+  indicies[lastElement] = NULL;
   return (indicies);
 
 }

@@ -16,6 +16,10 @@
  *
  */
 
+#ifdef __APPLE__
+#undef __LP64__ 
+#endif
+
 #include <limits.h>
 
 #include "lib/lib.h"
@@ -202,24 +206,24 @@ bool_t
 xdr_lsfRusage (XDR *xdrs, struct lsfRusage *lsfRu)
 {
     assert( lsfRu->ru_utime <= __DBL_MAX__ && lsfRu->ru_utime >= __DBL_MIN__ );
-    if( !(xdr_double (xdrs, (double *) &lsfRu->ru_utime)    &&
-          xdr_double (xdrs, (double *)&lsfRu->ru_stime)     &&  // FIXME FIXME FIXME  read up about allignment
-          xdr_double (xdrs, (double *)&lsfRu->ru_maxrss)    &&
-          xdr_double (xdrs, (double *)&lsfRu->ru_ixrss)     &&
-          xdr_double (xdrs, &lsfRu->ru_ismrss)              &&
-          xdr_double (xdrs, (double *)&lsfRu->ru_idrss)     &&
-          xdr_double (xdrs, (double *)&lsfRu->ru_isrss)     &&
-          xdr_double (xdrs, (double *)&lsfRu->ru_minflt)    &&
-          xdr_double (xdrs, (double *)&lsfRu->ru_majflt)    &&
-          xdr_double (xdrs, (double *)&lsfRu->ru_nswap)     &&
-          xdr_double (xdrs, (double *)&lsfRu->ru_inblock)   &&
-          xdr_double (xdrs, (double *)&lsfRu->ru_oublock)   &&
-          xdr_double (xdrs, &lsfRu->ru_ioch)                &&
-          xdr_double (xdrs, (double *)&lsfRu->ru_msgsnd)    &&
-          xdr_double (xdrs, (double *)&lsfRu->ru_msgrcv)    &&
-          xdr_double (xdrs, (double *)&lsfRu->ru_nsignals)            &&
-          xdr_double (xdrs, (double *)&lsfRu->ru_nvcsw)               &&
-          xdr_double (xdrs, (double *)&lsfRu->ru_nivcsw)              &&
+    if( !(xdr_long   (xdrs, &lsfRu->ru_utime)     &&
+          xdr_int    (xdrs, &lsfRu->ru_stime)     &&
+          xdr_long   (xdrs, &lsfRu->ru_maxrss)    &&
+          xdr_long   (xdrs, &lsfRu->ru_ixrss)     &&
+          xdr_double (xdrs, &lsfRu->ru_ismrss)    &&
+          xdr_long   (xdrs, &lsfRu->ru_idrss)     &&
+          xdr_long   (xdrs, &lsfRu->ru_isrss)     &&
+          xdr_long   (xdrs, &lsfRu->ru_minflt)    &&
+          xdr_long   (xdrs, &lsfRu->ru_majflt)    &&
+          xdr_long   (xdrs, &lsfRu->ru_nswap)     &&
+          xdr_long   (xdrs, &lsfRu->ru_inblock)   &&
+          xdr_long   (xdrs, &lsfRu->ru_oublock)   &&
+          xdr_double (xdrs, &lsfRu->ru_ioch)      &&
+          xdr_long   (xdrs, &lsfRu->ru_msgsnd)    &&
+          xdr_long   (xdrs, &lsfRu->ru_msgrcv)    &&
+          xdr_long   (xdrs, &lsfRu->ru_nsignals)  &&
+          xdr_long   (xdrs, &lsfRu->ru_nvcsw)     &&
+          xdr_long   (xdrs, &lsfRu->ru_nivcsw)    &&
           xdr_double (xdrs, &lsfRu->ru_exutime)))
     {
         return (FALSE);

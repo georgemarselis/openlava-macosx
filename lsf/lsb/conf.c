@@ -2374,13 +2374,13 @@ lsb_readhost (struct lsConf *conf, struct lsInfo *info, int options, struct clus
         lsberrno = LSBE_CONF_FATAL;
         return (NULL);
     }
-    for ( int k = 0, l = 0; k < info->nRes; k++) {
+    for ( uint k = 0, l = 0; k < info->nRes; k++) {
         if (info->resTable[k].flags & RESF_DYNAMIC) {
             memcpy (&myinfo.resTable[l], &info->resTable[k], sizeof (struct resItem));
             l++;
         }
     }
-    for ( int i = 0, j = 0; i < info->nRes; i++) {
+    for ( uint i = 0, j = 0; i < info->nRes; i++) {
         if (!(info->resTable[i].flags & RESF_DYNAMIC)) {
             memcpy (&myinfo.resTable[j], &info->resTable[i], sizeof (struct resItem));
             j++;
@@ -3630,7 +3630,7 @@ lsb_readqueue (struct lsConf *conf, struct lsInfo *info, int options, struct sha
     }
 
     j = 0;
-    for ( int i = 0; i < info->nRes; i++) {
+    for ( uint i = 0; i < info->nRes; i++) {
 
         if (info->resTable[i].flags & RESF_DYNAMIC) {
             memcpy (&myinfo.resTable[j], &info->resTable[i], sizeof (struct resItem));
@@ -3638,7 +3638,7 @@ lsb_readqueue (struct lsConf *conf, struct lsInfo *info, int options, struct sha
         }
     }
 
-    for ( int i = 0; i < info->nRes; i++) {
+    for ( uint i = 0; i < info->nRes; i++) {
         if (!(info->resTable[i].flags & RESF_DYNAMIC)) {
             memcpy (&myinfo.resTable[j], &info->resTable[i], sizeof (struct resItem));
             j++;

@@ -365,8 +365,8 @@ extern void initkeylist (struct keymap *keyList, int, int, struct lsInfo *);
 extern void freekeyval (struct keymap *keyList);
 extern char *parsewindow (char *val, char *fname, uint *lineNum, char *host);
 
-extern int expandList_ (char ***, int, char **);
-extern int expandList1_ (char ***, int, int *, char **);
+extern uint expandList_ (char ***tolist, uint mask, char **keys);
+extern uint expandList1_ (char ***tolist, uint num, uint *bitmMaps, char **keys);
 
 extern int osInit_ (void);
 extern char *osPathName_ (char *);

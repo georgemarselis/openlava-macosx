@@ -16,8 +16,9 @@
  *
  */
 
-
-#undef __LP64__ 
+#ifdef __APPLE__
+#undef __LP64__
+#endif
 
 
 #include <sys/types.h>

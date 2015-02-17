@@ -359,15 +359,15 @@ struct lsInfo
 
 struct clusterInfo
 {
-  int *adminIds;
-  int status;
-  int managerId;
-  int numServers;
-  int numClients;
-  int nRes;
-  int nTypes;
-  int nModels;
-  unsigned int nAdmins;
+  pid_t *adminIds;
+  pid_t managerId;
+  uint status;
+  uint nTypes;
+  uint nModels;
+  uint numServers;
+  uint numClients;
+  uint nRes;
+  uint nAdmins;
   char **resources;
   char **hostTypes;
   char **hostModels;
