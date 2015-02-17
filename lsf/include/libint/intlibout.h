@@ -80,7 +80,7 @@ extern void insertW (windows_t ** window, float ohour, float chour);
 extern void checkWindow (struct dayhour *dayhour, char *active, time_t * wind_edge, windows_t * wp, time_t now);
 extern void getDayHour (struct dayhour *dayPtr, time_t nowtime);
 extern void delWindow (windows_t * wp);
-extern int userok (int, struct sockaddr_in *, char *, struct sockaddr_in *, struct lsfAuth *, int);
+
 extern int hostOk (char *, int);
 extern int hostIsLocal (char *);
 extern int getHostAttribNonLim (char *hname, int updateIntvl);

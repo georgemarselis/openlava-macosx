@@ -78,8 +78,8 @@ struct tclHostData
 
 struct tclLsInfo
 {
-  uint numIndx;
-  uint nRes;
+  unsigned int numIndx;
+  unsigned int nRes;
   int *stringResBitMaps;
   int *numericResBitMaps;
   char **resName;

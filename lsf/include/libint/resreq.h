@@ -21,6 +21,8 @@
 #ifndef LSF_INTLIB_RESREQ_H
 #define LSF_INTLIB_RESREQ_H
 
+#include "lsf.h"
+
 #define IS_DIGIT(s)  ( (s) >= '0' && (s) <= '9')
 #define IS_LETTER(s) ( ((s) >= 'a' && (s) <= 'z') || ((s) >= 'A' && (s) <= 'Z'))
 #define IS_VALID_OTHER(s) ((s) == '_'|| (s) == '~')
@@ -57,9 +59,9 @@ struct resVal
     int pTile;
     int options;
     int selectStrSize;
-    uint nindex;
-    uint numHosts;
-    uint maxNumHosts;
+    unsigned int nindex;
+    unsigned int numHosts;
+    unsigned int maxNumHosts;
     int order[NBUILTINDEX];
     int *indicies;
     int *rusgBitMaps;

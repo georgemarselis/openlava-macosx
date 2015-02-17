@@ -20,11 +20,13 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "intlib/intlibout.h"
+#include "libint/intlibout.h"
 #include "lib/lib.h"
 #include "lib/lproto.h"
 #include "lsf.h"
 
+
+extern int userok (int, struct sockaddr_in *, char *, struct sockaddr_in *, struct lsfAuth *, int);
 
 #if defined(DEBUG)
 FILE *logfp;
@@ -87,7 +89,11 @@ main (int argc, char **argv)
       char client_addr[64];
       char lsfUserNameTmp[1024];
       char client_addrTmp[1024];
-      int uid, gid, client_port, datLen, cc;
+      uid_t uid = 0;
+      gid_t gid = 0;
+      ushort client_port = 0;
+      unsigned long datLen = 0;
+      unsigned long cc = 0;
 
       for (;;)
 	{
@@ -99,8 +105,7 @@ main (int argc, char **argv)
 	  memset (lsfUserNameTmp, 0, sizeof (lsfUserNameTmp));
 	  memset (client_addrTmp, 0, sizeof (client_addrTmp));
 	  fgets (datBuf, sizeof (datBuf), stdin);
-	  sscanf (datBuf, "%d %d %s %s %d %d", &uid, &gid,
-		  lsfUserNameTmp, client_addrTmp, &client_port, &datLen);
+	  sscanf (datBuf, "%d %d %s %s %hd %ld", &uid, &gid, lsfUserNameTmp, client_addrTmp, &client_port, &datLen);
 
 	  ls_strcat (lsfUserName, sizeof (lsfUserName), lsfUserNameTmp);
 	  ls_strcat (client_addr, sizeof (client_addr), client_addrTmp);
@@ -110,16 +115,14 @@ main (int argc, char **argv)
 	    {
 #if defined(DEBUG)
 	      fprintf (logfp, "fread (%d) failed\n", datLen);
-	      fprintf (logfp,
-		       "uid=%d, gid=%d, username=%s, client_addr=%s, client_port=%d, datLen=%d, cc=%d, dataBuf=%s\n",
-		       uid, gid, lsfUserName, client_addr, client_port,
-		       datLen, cc, datBuf);
+	      fprintf (logfp, "uid=%d, gid=%d, username=%s, client_addr=%s, client_port=%d, datLen=%d, cc=%d, dataBuf=%s\n", uid, gid, lsfUserName, client_addr, client_port, datLen, cc, datBuf);
 	      fclose (logfp);
 #endif
 	      exit (-1);
 	    }
 
-	  if (vauth (lsfUserName, datBuf, datLen) == -1)
+      assert( datLen <= INT_MAX );
+	  if (vauth (lsfUserName, datBuf, (int)datLen) == -1)
 	    {
 	      putchar ('0');
 	    }
@@ -141,6 +144,8 @@ main (int argc, char **argv)
 static int
 getAuth (char *inst)
 {
+
+assert( *inst );
 #if defined(DEBUG)
   fprintf (logfp, "======Call by client=====\n");
   fprintf (logfp, "LSF_EAUTH_KEY=NULL\n");
@@ -193,6 +198,8 @@ vauth (char *lsfUserName, char *datBuf, int datLen)
   char *authName;
   char *authPass;
   char *deUserName;
+
+  assert( datLen );
 
 
 #if defined(DEBUG)

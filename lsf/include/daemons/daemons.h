@@ -41,30 +41,28 @@
 #define  FATAL_ERR          -1
 #define  WARNING_ERR        -2
 
-#define MBATCHD_SERV	"mbatchd"
-#define MBATCHD_QUERY	"mbatchd_query"
-#define SBATCHD_SERV	"sbatchd"
+#define MBATCHD_SERV    "mbatchd"
+#define MBATCHD_QUERY   "mbatchd_query"
+#define SBATCHD_SERV    "sbatchd"
 
-#define MASK_INT_JOB_STAT       0x000FFFFF
+#define MASK_INT_JOB_STAT          0x000FFFFF
 #define MASK_STATUS(s) ((s) & MASK_INT_JOB_STAT)
 
-#define JOB_STAT_CHKPNTED_ONCE 	0x10000000
-#define JOB_STAT_RESERVE         0x20000000
-#define JOB_STAT_MIG            0x40000000
-#define JOB_STAT_MODIFY_ONCE    0x01000000
-#define JOB_STAT_ZOMBIE         0x02000000
-#define JOB_STAT_PRE_EXEC       0x04000000
-#define JOB_STAT_SIGNAL         0x08000000
-#define JOB_STAT_KILL           0x00800000
+#define JOB_STAT_CHKPNTED_ONCE     0x10000000
+#define JOB_STAT_RESERVE           0x20000000
+#define JOB_STAT_MIG               0x40000000
+#define JOB_STAT_MODIFY_ONCE       0x01000000
+#define JOB_STAT_ZOMBIE            0x02000000
+#define JOB_STAT_PRE_EXEC          0x04000000
+#define JOB_STAT_SIGNAL            0x08000000
+#define JOB_STAT_KILL              0x00800000
 #define JOB_STAT_RSRC_PREEMPT_WAIT 0x00400000
-#define JOB_STAT_VOID           0x00100000
+#define JOB_STAT_VOID              0x00100000
 
 #define SET_STATE(s ,n) ((s) = ((s) & ~(MASK_INT_JOB_STAT)) | (n))
 
 
-#define SBD_SET_STATE(jp, n) { \
-    (jp->jobSpecs.jStatus) = ((jp->jobSpecs.jStatus) & ~(MASK_INT_JOB_STAT)) | (n); \
-    sbdlog_newstatus(jp);}
+#define SBD_SET_STATE(jp, n) { (jp->jobSpecs.jStatus) = ((jp->jobSpecs.jStatus) & ~(MASK_INT_JOB_STAT)) | (n); sbdlog_newstatus(jp);}
 
 
 #define IS_RUN_JOB_CMD(s) (((s) & JOB_STAT_RUN) && !((s) & JOB_STAT_PRE_EXEC))
@@ -83,82 +81,82 @@
 #define  DEF_JTERMINATE_INTERVAL      10
 #define SLAVE_FATAL                   101
 #define SLAVE_MEM                     102
-#define SLAVE_RESTART	                103
-#define SLAVE_SHUTDOWN	              104
+#define SLAVE_RESTART                 103
+#define SLAVE_SHUTDOWN                104
 
-#define LIM_NO_MIGRANT_HOSTS            55
+#define LIM_NO_MIGRANT_HOSTS          55
 
-#define LSB_ARRAY_SCHED_ORDER           39
-#define LSB_BSUBI_OLD                   30
-#define LSB_CONFDIR                     1
-#define LSB_CRDIR                       11
-#define LSB_DEBUG                       0
-#define LSB_DEBUG_MBD                   14
-#define LSB_DEBUG_SBD                   15
-#define LSB_HJOB_PER_SESSION            32
-#define LSB_JOB_CPULIMIT                44
-#define LSB_JOB_MEMLIMIT                47
-#define LSB_MAILPROG                    6
-#define LSB_MAILSERVER                  36
-#define LSB_MAILSIZE_LIMIT              37
-#define LSB_MAILTO                      5
-#define LSB_MBD_BLOCK_SEND              27
-#define LSB_MBD_CONNTIMEOUT             21
-#define LSB_MBD_MAILREPLAY              24
-#define LSB_MBD_MIGTOPEND               25
-// #define LSB_MBD_PORT                    8
-#define LSB_MEMLIMIT_ENFORCE            29
-#define LSB_MIG2PEND                    42
-#define LSB_MOD_ALL_JOBS                48
-#define LSB_PTILE_PACK                  50
-#define LSB_QPOST_EXEC_ENFORCE          41
-#define LSB_RENICE_NEVER_AT_RESTART     45
-#define LSB_REQUEUE_HOLD                34
-#define LSB_REQUEUE_TO_BOTTOM           38
-#define LSB_SBD_CONNTIMEOUT             22
-#define LSB_SBD_FINISH_SLEEP            51
-// #define LSB_SBD_PORT                    7
-#define LSB_SBD_READTIMEOUT             26
-#define LSB_SET_TMPDIR                  49
-// #define LSB_SHAREDIR                    4
-#define LSB_SIGSTOP                     18
-#define LSB_SMTP_SERVER                 35
-#define LSB_STDOUT_DIRECT               53
-#define LSB_STOP_IGNORE_IT              31
-#define LSB_TIME_MBD                    16
-#define LSB_TIME_SBD                    17
-// #define LSB_UTMP                        43
-#define LSB_VIRTUAL_SLOT                52
+#define LSB_ARRAY_SCHED_ORDER         39
+#define LSB_BSUBI_OLD                 30
+#define LSB_CONFDIR                   1
+#define LSB_CRDIR                     11
+#define LSB_DEBUG                     0
+#define LSB_DEBUG_MBD                 14
+#define LSB_DEBUG_SBD                 15
+#define LSB_HJOB_PER_SESSION          32
+#define LSB_JOB_CPULIMIT              44
+#define LSB_JOB_MEMLIMIT              47
+#define LSB_MAILPROG                  6
+#define LSB_MAILSERVER                36
+#define LSB_MAILSIZE_LIMIT            37
+#define LSB_MAILTO                    5
+#define LSB_MBD_BLOCK_SEND            27
+#define LSB_MBD_CONNTIMEOUT           21
+#define LSB_MBD_MAILREPLAY            24
+#define LSB_MBD_MIGTOPEND             25
+// #define LSB_MBD_PORT               8
+#define LSB_MEMLIMIT_ENFORCE          29
+#define LSB_MIG2PEND                  42
+#define LSB_MOD_ALL_JOBS              48
+#define LSB_PTILE_PACK                50
+#define LSB_QPOST_EXEC_ENFORCE        41
+#define LSB_RENICE_NEVER_AT_RESTART   45
+#define LSB_REQUEUE_HOLD              34
+#define LSB_REQUEUE_TO_BOTTOM         38
+#define LSB_SBD_CONNTIMEOUT           22
+#define LSB_SBD_FINISH_SLEEP          51
+// #define LSB_SBD_PORT               7
+#define LSB_SBD_READTIMEOUT           26
+#define LSB_SET_TMPDIR                49
+// #define LSB_SHAREDIR               4
+#define LSB_SIGSTOP                   18
+#define LSB_SMTP_SERVER               35
+#define LSB_STDOUT_DIRECT             53
+#define LSB_STOP_IGNORE_IT            31
+#define LSB_TIME_MBD                  16
+#define LSB_TIME_SBD                  17
+// #define LSB_UTMP                   43
+#define LSB_VIRTUAL_SLOT              52
 
-#define LSF_AUTH                        10
-#define LSF_AUTH_DAEMONS                33
-#define LSF_BINDIR                      20
-// #define LSF_BINDIR                      18
-#define LSF_CMD_SHELL                   15
-#define LSF_CONFDIR                     23
-#define LSF_DEBUG_RES                   11
-#define LSF_ENABLE_PTY                  16
-#define LSF_GETPWNAM_RETRY              28
-#define LSF_ID_PORT                     9
-#define LSF_LIBDIR                      40
-#define LSF_LIM_PORT                    5
-#define LSF_LOGDIR                      3
-#define LSF_LOG_MASK                    19
-#define LSF_MLS_LOG                     46
-#define LSF_RES_ACCT                    10
-#define LSF_RES_ACCTDIR                 9
-#define LSF_RES_DEBUG                   0
-#define LSF_RES_NO_LINEBUF              21
-#define LSF_RES_PORT                    6
-#define LSF_RES_RLIMIT_UNLIM            14
-#define LSF_RES_TIMEOUT                 20
-#define LSF_ROOT_REX                    13
-#define LSF_SERVERDIR                   1
-#define LSF_TIME_RES                    12
-#define LSF_TMPDIR                      17
-#define LSF_USE_HOSTEQUIV               12
-#define MBD_DONT_FORK                   54
-#define NOT_LOG                         INFINIT_INT
+#define LSF_AUTH                      10
+#define LSF_AUTH_DAEMONS              33
+#define LSF_BINDIR                    20
+// #define LSF_BINDIR                 18
+#define LSF_CMD_SHELL                 15
+#define LSF_CONFDIR                   23
+#define LSF_DEBUG_RES                 11
+#define LSF_ENABLE_PTY                16
+#define LSF_GETPWNAM_RETRY            28
+#define LSF_ID_PORT                   9
+#define LSF_LIBDIR                    40
+#define LSF_LIM_PORT                  5
+#define LSF_LOGDIR                    3
+#define LSF_LOG_MASK                  19
+#define LSF_MLS_LOG                   46
+#define LSF_RES_ACCT                  10
+#define LSF_RES_ACCTDIR               9
+#define LSF_RES_DEBUG                 0
+#define LSF_RES_NO_LINEBUF            21
+#define LSF_RES_PORT                  6
+#define LSF_RES_RLIMIT_UNLIM          14
+#define LSF_RES_TIMEOUT               20
+#define LSF_ROOT_REX                  13
+#define LSF_SERVERDIR                 1
+#define LSF_TIME_RES                  12
+#define LSF_TMPDIR                    17
+#define LSF_USE_HOSTEQUIV             12
+#define MBD_DONT_FORK                 54
+#define NOT_LOG                       INFINIT_INT
 
 #define JOB_SAVE_OUTPUT   0x10000000
 #define JOB_FORCE_KILL    0x20000000
@@ -168,47 +166,47 @@
 
 extern char errbuf[MAXLINELEN];
 
-#define lsb_merr1(fmt,a1)     sprintf(errbuf,fmt,a1),lsb_merr(errbuf)
-#define lsb_merr2(fmt,a1,a2)  sprintf(errbuf,fmt,a1,a2),lsb_merr(errbuf)
+#define lsb_merr1(fmt,a1)        sprintf(errbuf,fmt,a1),lsb_merr(errbuf)
+#define lsb_merr2(fmt,a1,a2)     sprintf(errbuf,fmt,a1,a2),lsb_merr(errbuf)
 #define lsb_merr3(fmt,a1,a2,a3)  sprintf(errbuf,fmt,a1,a2,a3),lsb_merr(errbuf)
-#define lsb_mperr1(fmt,a1)    sprintf(errbuf,fmt,a1), lsb_mperr(errbuf)
-#define lsb_mperr2(fmt,a1,a2) sprintf(errbuf,fmt,a1,a2), lsb_mperr(errbuf)
+#define lsb_mperr1(fmt,a1)       sprintf(errbuf,fmt,a1), lsb_mperr(errbuf)
+#define lsb_mperr2(fmt,a1,a2)    sprintf(errbuf,fmt,a1,a2), lsb_mperr(errbuf)
 #define lsb_mperr3(fmt,a1,a2,a3) sprintf(errbuf,fmt,a1,a2,a3), lsb_mperr(errbuf)
 
 typedef enum
 {
-  ERR_NO_ERROR = 1,
-  ERR_BAD_REQ = 2,
-  ERR_NO_JOB = 3,
-  ERR_NO_FILE = 4,
-  ERR_FORK_FAIL = 5,
-  ERR_NO_USER = 6,
-  ERR_LOCK_FAIL = 7,
-  ERR_NO_LIM = 8,
-  ERR_MEM = 9,
-  ERR_NULL = 10,
-  ERR_FAIL = 11,
-  ERR_BAD_REPLY = 12,
-  ERR_JOB_QUOTA = 13,
-  ERR_JOB_FINISH = 14,
-  ERR_CHKPNTING = 15,
-  ERR_ROOT_JOB = 16,
-  ERR_SYSACT_FAIL = 17,
-  ERR_SIG_RETRY = 18,
-  ERR_HOST_BOOT = 20,
-  ERR_PID_FAIL = 21,
-  ERR_SOCKETPAIR = 22,
-  ERR_UNREACH_SBD = 23,
-  ERR_JOB_RETURN = 24,
-  ERR_RESTARTING_FILE = 25,
-  ERR_HANDLE = 26
+    ERR_NO_ERROR        = 1,
+    ERR_BAD_REQ         = 2,
+    ERR_NO_JOB          = 3,
+    ERR_NO_FILE         = 4,
+    ERR_FORK_FAIL       = 5,
+    ERR_NO_USER         = 6,
+    ERR_LOCK_FAIL       = 7,
+    ERR_NO_LIM          = 8,
+    ERR_MEM             = 9,
+    ERR_NULL            = 10,
+    ERR_FAIL            = 11,
+    ERR_BAD_REPLY       = 12,
+    ERR_JOB_QUOTA       = 13,
+    ERR_JOB_FINISH      = 14,
+    ERR_CHKPNTING       = 15,
+    ERR_ROOT_JOB        = 16,
+    ERR_SYSACT_FAIL     = 17,
+    ERR_SIG_RETRY       = 18,
+    ERR_HOST_BOOT       = 20,
+    ERR_PID_FAIL        = 21,
+    ERR_SOCKETPAIR      = 22,
+    ERR_UNREACH_SBD     = 23,
+    ERR_JOB_RETURN      = 24,
+    ERR_RESTARTING_FILE = 25,
+    ERR_HANDLE          = 26
 } sbdReplyType;
 
 #define LOAD_REASONS (SUSP_LOAD_REASON | SUSP_QUE_STOP_COND | SUSP_QUE_RESUME_COND | SUSP_PG_IT | SUSP_LOAD_UNAVAIL | SUSP_HOST_LOCK | SUSP_HOST_LOCK_MASTER)
 
 struct thresholds
 {
-    int nThresholds;
+    uint nThresholds;
     uint nIdx;
     float **loadStop;
     float **loadSched;
@@ -216,176 +214,184 @@ struct thresholds
 
 struct jobSpecs
 {
-  LS_LONG_INT jobId;
-  char jobName[MAXLINELEN];
-  int jStatus;
-  int reasons;
-  int subreasons;
-  int userId;
-  char userName[MAX_LSB_NAME_LEN];
-  int options;
-  int jobPid;
-  int jobPGid;
-  char queue[MAX_LSB_NAME_LEN];
-  int priority;
-  short nice;
-  char fromHost[MAXHOSTNAMELEN];
-  char resReq[MAXLINELEN];
-  time_t startTime;
-  int runTime;
-  int numToHosts;
-  char **toHosts;
-  struct thresholds thresholds;
-  int jAttrib;
-  int sigValue;
-  struct lsfLimit lsfLimits[LSF_RLIM_NLIMITS];
-  time_t termTime;
-  char windows[MAXLINELEN];
-  char subHomeDir[MAXFILENAMELEN];
-  char command[MAXLINELEN];
-  char jobFile[MAXFILENAMELEN];
-  char inFile[MAXFILENAMELEN];
-  char outFile[MAXFILENAMELEN];
-  char errFile[MAXFILENAMELEN];
-  int umask;
-  char cwd[MAXFILENAMELEN];
-  int restartPid;
-  int nxf;
-  struct xFile *xf;
-  time_t submitTime;
-  char chkpntDir[MAXFILENAMELEN];
-  int chkSig;
-  int actPid;
-  time_t chkPeriod;
-  time_t migThresh;
-  time_t lastSSuspTime;
-  char preExecCmd[MAXLINELEN];
-  float lastCpuTime;
-  char mailUser[MAXLINELEN];
-  char clusterName[MAX_LSB_NAME_LEN];
-  int numEnv;
-  char **env;
-  struct lenData eexec;
-  char projectName[MAX_LSB_NAME_LEN];
-  char preCmd[MAXLINELEN];
-  char postCmd[MAXLINELEN];
-  char prepostUsername[MAX_LSB_NAME_LEN];
-  char execCwd[MAXFILENAMELEN];
-  char execHome[MAXFILENAMELEN];
-  int execUid;
-  char requeueEValues[MAXLINELEN];
-  int niosPort;
-  char resumeCond[MAXLINELEN];
-  char stopCond[MAXLINELEN];
-  char suspendActCmd[MAXLINELEN];
-  char resumeActCmd[MAXLINELEN];
-  char terminateActCmd[MAXLINELEN];
-  int sigMap[LSB_SIG_NUM];
-  int actValue;
-  char *loginShell;
-  int maxNumProcessors;
-  char *schedHostType;
-  char *execHosts;
-  int options2;
-  char jobSpoolDir[MAXPATHLEN];
-  char inFileSpool[MAXFILENAMELEN];
-  char commandSpool[MAXFILENAMELEN];
-  int userPriority;
-  char execUsername[MAX_LSB_NAME_LEN];
+    short nice;
+    ushort niosPort;
+    int jStatus;
+    int options;
+    int priority;
+    int jAttrib;
+    int sigValue;
+    int chkSig;
+    int actValue;
+    int options2;
+    int userPriority;
+    pid_t actPid;
+    pid_t userId;
+    pid_t jobPid;
+    pid_t jobPGid;
+    pid_t restartPid;
+    pid_t execUid;
+    uint numEnv;
+    uint reasons;
+    uint subreasons;
+    uint numToHosts;
+    uint umask;
+    uint nxf;
+    uint maxNumProcessors;
+    int sigMap     [LSB_SIG_NUM];
+    char jobName   [MAXLINELEN];
+    char userName  [MAX_LSB_NAME_LEN];
+    char queue     [MAX_LSB_NAME_LEN];
+    char fromHost  [MAXHOSTNAMELEN];
+    char resReq    [MAXLINELEN];
+    char windows   [MAXLINELEN];
+    char subHomeDir[MAXFILENAMELEN];
+    char command   [MAXLINELEN];
+    char jobFile   [MAXFILENAMELEN];
+    char inFile    [MAXFILENAMELEN];
+    char outFile   [MAXFILENAMELEN];
+    char errFile   [MAXFILENAMELEN];
+    char cwd       [MAXFILENAMELEN];
+    char preExecCmd[MAXLINELEN];
+    time_t runTime;
+    time_t startTime;
+    time_t termTime;
+    time_t submitTime;
+    time_t chkPeriod;
+    time_t migThresh;
+    time_t lastSSuspTime;
+    char *loginShell;
+    char *schedHostType;
+    char *execHosts;
+    char chkpntDir      [MAXFILENAMELEN];
+    char mailUser       [MAXLINELEN];
+    char clusterName    [MAX_LSB_NAME_LEN];
+    char projectName    [MAX_LSB_NAME_LEN];
+    char preCmd         [MAXLINELEN];
+    char postCmd        [MAXLINELEN];
+    char prepostUsername[MAX_LSB_NAME_LEN];
+    char execCwd        [MAXFILENAMELEN];
+    char execHome       [MAXFILENAMELEN];
+    char requeueEValues [MAXLINELEN];
+    char resumeCond     [MAXLINELEN];
+    char stopCond       [MAXLINELEN];
+    char suspendActCmd  [MAXLINELEN];
+    char resumeActCmd   [MAXLINELEN];
+    char terminateActCmd[MAXLINELEN];
+    char jobSpoolDir    [MAXPATHLEN];
+    char inFileSpool    [MAXFILENAMELEN];
+    char commandSpool   [MAXFILENAMELEN];
+    char execUsername   [MAX_LSB_NAME_LEN];
+    float lastCpuTime;
+    char padding1[4];
+    LS_LONG_INT jobId;
+    char **env;
+    char **toHosts;
+    struct thresholds thresholds;
+    struct lsfLimit   lsfLimits[LSF_RLIM_NLIMITS];
+    struct lenData    eexec;
+    struct xFile      *xf;
 };
 
 struct statusReq
 {
-  LS_LONG_INT jobId;
-  int jobPid;
-  int jobPGid;
-  int newStatus;
-  int reason;
-  int subreasons;
-  int seq;
-  sbdReplyType sbdReply;
-  struct lsfRusage lsfRusage;
-  int actPid;
-  int execUid;
-  int numExecHosts;
-  char **execHosts;
-  int exitStatus;
-  char *execHome;
-  char *execCwd;
-  char *execUsername;
-  char *queuePreCmd;
-  char *queuePostCmd;
-  int msgId;
-  struct jRusage runRusage;
-  int sigValue;
-  int actStatus;
+    int newStatus;
+    int reason;
+    int subreasons;
+    int seq;
+    int sigValue;
+    int actStatus;
+    int exitStatus;
+    uint numExecHosts;
+    uint msgId;
+    pid_t jobPid;
+    pid_t jobPGid;
+    pid_t actPid;
+    uid_t execUid;
+    char padding1[4];
+    char *execHome;
+    char *execCwd;
+    char *execUsername;
+    char *queuePreCmd;
+    char *queuePostCmd;
+    char **execHosts;
+    LS_LONG_INT jobId;
+    struct lsfRusage lsfRusage;
+    struct jRusage runRusage;
+    sbdReplyType sbdReply;
+    char padding2[4];
 };
 
 struct chunkStatusReq
 {
-  int numStatusReqs;
-  struct statusReq **statusReqs;
+    uint numStatusReqs;
+    char padding1[4];
+    struct statusReq **statusReqs;
 };
 
 
 struct sbdPackage
 {
-  int managerId;
-  char lsbManager[MAX_LSB_NAME_LEN];
-  int mbdPid;
-  int sbdSleepTime;
-  int retryIntvl;
-  int preemPeriod;
-  int pgSuspIdleT;
-  int maxJobs;
-  int numJobs;
-  struct jobSpecs *jobs;
-  int uJobLimit;
-  int rusageUpdateRate;
-  int rusageUpdatePercent;
-  int jobTerminateInterval;
-  int nAdmins;
-  char **admins;
+    int retryIntvl;
+    int preemPeriod;
+    int pgSuspIdleT;
+    uint maxJobs;
+    uint numJobs;
+    uint uJobLimit;
+    uint rusageUpdateRate;
+    uint rusageUpdatePercent;
+    uint jobTerminateInterval;
+    uint nAdmins;
+    pid_t managerId;
+    pid_t mbdPid;
+    time_t sbdSleepTime;
+    char lsbManager[MAX_LSB_NAME_LEN];
+    char padding1[4];
+    char **admins;
+    struct jobSpecs *jobs;
 };
 
 struct jobSig
 {
-  LS_LONG_INT jobId;
   int sigValue;
-  time_t chkPeriod;
   int actFlags;
-  char *actCmd;
   int reasons;
   int subReasons;
+  char *actCmd;
+  time_t chkPeriod;
+  LS_LONG_INT jobId;
   LS_LONG_INT newJobId;
 };
 
 struct jobReply
 {
-  LS_LONG_INT jobId;
-  int jobPid;
-  int jobPGid;
-  int jStatus;
-  int reasons;
-  int actPid;
-  int actValue;
-  int actStatus;
+    int jStatus;
+    int reasons;
+    pid_t jobPid;
+    pid_t jobPGid;
+    pid_t actPid;
+    int actValue;
+    int actStatus;
+    char padding1[4];
+    LS_LONG_INT jobId;
 };
 
 
 enum _bufstat
 {
-  MSG_STAT_QUEUED, MSG_STAT_SENT, MSG_STAT_RCVD
+    MSG_STAT_QUEUED, 
+    MSG_STAT_SENT, 
+    MSG_STAT_RCVD
 };
 
 typedef struct proto proto_t;
 struct proto
 {
   int usrId;
-  LS_LONG_INT jobId;
   int msgId;
   int type;
   int instance;
+  LS_LONG_INT jobId;
   int (*sndfnc) (int, char *, int);
   int (*rcvfnc) (int, char *, int);
 };
@@ -511,9 +517,9 @@ extern int jobTerminateInterval;
 extern int lsf_crossUnixNT;
 
 
-#define DEFAULT_MAILTO	"^U"
+#define DEFAULT_MAILTO  "^U"
 
-#define DEFAULT_MAILPROG	"/usr/lib/sendmail"
+#define DEFAULT_MAILPROG    "/usr/lib/sendmail"
 #define DEFAULT_CRDIR "/bin"
 
 extern FILE *smail (char *to, char *tohost);
@@ -557,7 +563,7 @@ extern int init_ServSock (u_short port);
 extern int server_reply (int, char *, int);
 extern int rcvJobFile (int, struct lenData *);
 extern int do_readyOp (XDR * xdrs, int, struct sockaddr_in *,
-		       struct LSFHeader *);
+               struct LSFHeader *);
 
 #define FORK_REMOVE_SPOOL_FILE  (0x1)
 #define CALL_RES_IF_NEEDED      (0x2)
