@@ -2,6 +2,7 @@ TAGS
 *.o
 *.a
 *~
+.*.swp
 *Makefile.in
 *.deps
 aclocal.m4

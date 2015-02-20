@@ -41,7 +41,7 @@ static char *connnamelist[MAXCONNECT + 1];
 void hostIndex_ (char *hostName, int sock);
 int delhostbysock_ (int sock);
 int *_gethostdata_ (char *hostName);
-extern int chanSock_ (int chfd);
+extern uint chanSock_ (uint chfd);
 
 
 void

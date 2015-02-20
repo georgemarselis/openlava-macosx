@@ -39,8 +39,7 @@ struct hostNode *fromHostPtr;
 
 #define P_(s) s
 
-static int findBestHost
-P_ ((register struct resVal *, int, int, char **, int, char, int, int));
+static int findBestHost P_ ((register struct resVal *, int, int, char **, int, char, int, int));
 static void jackup P_ ((int, struct hostNode *, float));
 static void loadAdj P_ ((struct jobXfer *, struct hostNode **, int, char));
 static void potentialOfCandidates P_ ((int, struct resVal *));
@@ -50,11 +49,9 @@ static int getNumInstances P_ ((int));
 static int getOkSites (int, int, int);
 static int findNPref (int, int, char **);
 static int bsort (int, int, int, int, float, char, int, int);
-static void mkexld (struct hostNode *, struct hostNode *, int, float *,
-		    float *, float);
+static void mkexld (struct hostNode *, struct hostNode *, int, float *, float *, float);
 static int orderByStatus (int, int);
-static int grabHosts (struct hostNode *, struct resVal *,
-		      struct decisionReq *, int, char *, int);
+static int grabHosts (struct hostNode *, struct resVal *, struct decisionReq *, int, char *, int);
 
 static int addCandList (struct hostNode *, int);
 static int initCandList (void);
@@ -65,8 +62,7 @@ static float loadIndexValue (int, int, int);
 #define effectiveRq(nrq, factor) ((nrq) * (factor) -1)
 
 void
-placeReq (XDR * xdrs,
-	  struct sockaddr_in *from, struct LSFHeader *reqHdr, int s)
+placeReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr, int s)
 {
   struct tclHostData tclHostData;
   struct placeReply placeReply;
@@ -89,8 +85,9 @@ placeReq (XDR * xdrs,
   char *replyStruct;
   char buf[MSGSIZE];
 
-  if (logclass & (LC_TRACE | LC_HANG | LC_COMM))
+  if (logclass & (LC_TRACE | LC_HANG | LC_COMM)) {
     ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", __func__);
+  }
 
   initResVal (&resVal);
 
@@ -98,25 +95,23 @@ placeReq (XDR * xdrs,
 
   if (!xdr_decisionReq (xdrs, &plReq, reqHdr))
     {
-      ls_syslog (LOG_ERR, "\
-%s: xdr_decisionReq() from %s failed %m", __func__, sockAdd2Str_ (from));
+      ls_syslog (LOG_ERR, "%s: xdr_decisionReq() from %s failed %m", __func__, sockAdd2Str_ (from));
       limReplyCode = LIME_BAD_DATA;
       goto Reply1;
     }
 
-  if (!(plReq.ofWhat == OF_HOSTS && plReq.numPrefs == 2
-	&& plReq.numHosts == 1
-	&& equalHost_ (plReq.preferredHosts[1], myHostPtr->hostName)))
+  if (!(plReq.ofWhat == OF_HOSTS && plReq.numPrefs == 2 && plReq.numHosts == 1 s&& equalHost_ (plReq.preferredHosts[1], myHostPtr->hostName)))
     {
 
       if (!masterMe)
-	{
-	  wrongMaster (from, buf, reqHdr, -1);
-	  for (i = 0; i < plReq.numPrefs; i++)
-	    free (plReq.preferredHosts[i]);
-	  free (plReq.preferredHosts);
-	  return;
-	}
+  {
+    wrongMaster (from, buf, reqHdr, -1);
+    for (i = 0; i < plReq.numPrefs; i++){
+      free (plReq.preferredHosts[i]);
+    }
+    free (plReq.preferredHosts);
+    return;
+  }
     }
 
   if (!validHosts
@@ -124,8 +119,7 @@ placeReq (XDR * xdrs,
        plReq.options | SEND_TO_CLUSTERS))
     {
       limReplyCode = LIME_UNKWN_HOST;
-      ls_syslog (LOG_INFO, "\
-%s: failed for bad cluster/host name from %s", __func__, sockAdd2Str_ (from));
+      ls_syslog (LOG_INFO, "%s: failed for bad cluster/host name from %s", __func__, sockAdd2Str_ (from));
       goto Reply;
     }
 
@@ -135,17 +129,17 @@ placeReq (XDR * xdrs,
 
   getTclHostData (&tclHostData, myHostPtr, myHostPtr, TRUE);
   cc = parseResReq (plReq.resReq, &resVal, &allInfo, propt);
-  if (cc != PARSE_OK ||
-      (returnCode = evalResReq (resVal.selectStr,
-				&tclHostData,
-				plReq.options & DFT_FROMTYPE)) < 0)
+  if (cc != PARSE_OK || (returnCode = evalResReq (resVal.selectStr, &tclHostData, plReq.options & DFT_FROMTYPE)) < 0)
     {
-      if (cc == PARSE_BAD_VAL)
-	limReplyCode = LIME_UNKWN_RVAL;
-      else if (cc == PARSE_BAD_NAME)
-	limReplyCode = LIME_UNKWN_RNAME;
-      else
-	limReplyCode = LIME_BAD_RESREQ;
+      if (cc == PARSE_BAD_VAL) {
+         limReplyCode = LIME_UNKWN_RVAL;
+      }
+      else if (cc == PARSE_BAD_NAME) {
+        limReplyCode = LIME_UNKWN_RNAME;
+      }
+      else {
+         limReplyCode = LIME_BAD_RESREQ;
+      }
       goto Reply;
     }
 
@@ -157,8 +151,8 @@ placeReq (XDR * xdrs,
     }
   if (strcmp (plReq.hostType, " ") == 0)
     strcpy (plReq.hostType,
-	    (fromHostPtr->hTypeNo >= 0) ?
-	    shortInfo.hostTypes[fromHostPtr->hTypeNo] : "unknown");
+      (fromHostPtr->hTypeNo >= 0) ?
+      shortInfo.hostTypes[fromHostPtr->hTypeNo] : "unknown");
 
   fromEligible = FALSE;
   ncandidates = getEligibleSites (&resVal, &plReq, 0, &fromEligible);
@@ -173,17 +167,15 @@ placeReq (XDR * xdrs,
 
   ignore_res = (plReq.options & IGNORE_RES);
 
-
   ncandidates = getOkSites (ncandidates, 0, ignore_res);
 
-
   potentialOfCandidates (ncandidates, &resVal);
-  if (fromHostPtr)
+  if (fromHostPtr) {
     potentialOfHost (fromHostPtr, &resVal);
+  }
   ncandidateInst = getNumInstances (ncandidates);
 
-  if ((ncandidates == 0)
-      || (ncandidateInst < plReq.numHosts && (plReq.options & EXACT)))
+  if ((ncandidates == 0) || (ncandidateInst < plReq.numHosts && (plReq.options & EXACT)))
     {
       limReplyCode = LIME_NO_OKHOST;
       goto Reply;
@@ -192,44 +184,42 @@ placeReq (XDR * xdrs,
   if (ncandidates > plReq.numHosts)
     {
       ncandidates = findBestHost (&resVal,
-				  plReq.numHosts,
-				  plReq.numPrefs,
-				  plReq.preferredHosts,
-				  ncandidates,
-				  TRUE, ignore_res, plReq.options);
+          plReq.numHosts,
+          plReq.numPrefs,
+          plReq.preferredHosts,
+          ncandidates,
+          TRUE, ignore_res, plReq.options);
     }
   else
     {
       ncandidates = findBestHost (&resVal,
-				  ncandidates,
-				  plReq.numPrefs,
-				  plReq.preferredHosts,
-				  ncandidates,
-				  TRUE, ignore_res, plReq.options);
+          ncandidates,
+          plReq.numPrefs,
+          plReq.preferredHosts,
+          ncandidates,
+          TRUE, ignore_res, plReq.options);
     }
 
-  if ((getNumInstances (ncandidates) < plReq.numHosts)
-      && (plReq.options & EXACT))
+  if ((getNumInstances (ncandidates) < plReq.numHosts) && (plReq.options & EXACT))
     {
       limReplyCode = LIME_NO_OKHOST;
       goto Reply;
     }
 
   selectBestInstances (ncandidates,
-		       plReq.numHosts, plReq.options & LOCALITY, ignore_res);
+           plReq.numHosts, plReq.options & LOCALITY, ignore_res);
   limReplyCode = LIME_NO_ERR;
 
   placeReply.numHosts = 0;
   for (i = 0; i < ncandidates; i++)
     {
       if (candidates[i]->use > 0)
-	{
-	  placeReply.numHosts++;
-	}
+  {
+    placeReply.numHosts++;
+  }
     }
 
-  placeReply.placeInfo = calloc (placeReply.numHosts,
-				 sizeof (struct placeInfo));
+  placeReply.placeInfo = calloc (placeReply.numHosts, sizeof (struct placeInfo));
   if (placeReply.placeInfo == NULL)
     {
       limReplyCode = LIME_NO_MEM;
@@ -240,17 +230,18 @@ placeReq (XDR * xdrs,
   for (i = 0, j = 0; i < ncandidates; i++)
     {
       if (candidates[i]->use > 0)
-	{
-	  strcpy (placeReply.placeInfo[j].hostName, candidates[i]->hostName);
-	  placeReply.placeInfo[j].numtask = candidates[i]->use;
-	  j++;
-	}
+  {
+    strcpy (placeReply.placeInfo[j].hostName, candidates[i]->hostName);
+    placeReply.placeInfo[j].numtask = candidates[i]->use;
+    j++;
+  }
     }
 
 Reply:
 
-  for (i = 0; i < plReq.numPrefs; i++)
+  for (i = 0; i < plReq.numPrefs; i++) {
     free (plReq.preferredHosts[i]);
+  }
   free (plReq.preferredHosts);
 
 Reply1:
@@ -259,42 +250,47 @@ Reply1:
   initLSFHeader_ (&replyHdr);
   replyHdr.opCode = (short) limReplyCode;
   replyHdr.refCode = reqHdr->refCode;
-  if (limReplyCode == LIME_NO_ERR)
+  if (limReplyCode == LIME_NO_ERR) {
     replyStruct = (char *) &placeReply;
-  else
+  }
+  else {
     replyStruct = NULL;
+  }
 
   xdrmem_create (&xdrs2, buf, MSGSIZE, XDR_ENCODE);
 
-  if (!xdr_encodeMsg (&xdrs2,
-		      replyStruct, &replyHdr, xdr_placeReply, 0, NULL))
+  if (!xdr_encodeMsg (&xdrs2, replyStruct, &replyHdr, xdr_placeReply, 0, NULL))
     {
       ls_syslog (LOG_ERR, "%s: xdr_encodeMsg() %m", __func__);
       xdr_destroy (&xdrs2);
-      if (limReplyCode == LIME_NO_ERR)
-	free (placeReply.placeInfo);
+      if (limReplyCode == LIME_NO_ERR) {
+        free (placeReply.placeInfo);
+      }
       return;
     }
 
-  if (s < 0)
+  if (s < 0) {
     cc = chanSendDgram_ (limSock, buf, XDR_GETPOS (&xdrs2), from);
-  else
+  }
+  else {
     cc = chanWrite_ (s, buf, XDR_GETPOS (&xdrs2));
+  }
 
   if (cc < 0)
     {
-      ls_syslog (LOG_ERR, "\
-%s: chanSendDgram()/chanWrite() failed to %m", __func__, sockAdd2Str_ (from));
+      ls_syslog (LOG_ERR, "%s: chanSendDgram()/chanWrite() failed to %m", __func__, sockAdd2Str_ (from));
       xdr_destroy (&xdrs2);
-      if (limReplyCode == LIME_NO_ERR)
-	free (placeReply.placeInfo);
+      if (limReplyCode == LIME_NO_ERR) {
+        free (placeReply.placeInfo);
+      }
       return;
     }
 
   xdr_destroy (&xdrs2);
 
-  if (limReplyCode != LIME_NO_ERR)
+  if (limReplyCode != LIME_NO_ERR) {
     return;
+  }
 
   jobXfer.numHosts = placeReply.numHosts;
   jobXfer.placeInfo = placeReply.placeInfo;
@@ -315,105 +311,100 @@ getOkSites (int num, int retain, int ignore_res)
   int left;
   int tempstatus[2];
 
-  if (retain >= num)
-    return num;
+    if (retain >= num)
+        return num;
 
-  left = num;
-  for (i = 0; i < num; i++)
-    {
+    left = num;
+    for (i = 0; i < num; i++) {
 
-      tempstatus[0] = candidates[i]->status[0];
-      tempstatus[1] = candidates[i]->status[1];
+        tempstatus[0] = candidates[i]->status[0];
+        tempstatus[1] = candidates[i]->status[1];
 
-      if (LS_ISOK (tempstatus))
-	continue;
+        if (LS_ISOK (tempstatus)) {
+            continue;
+        }
 
-      tempstatus[1] = candidates[i]->status[1] & ~(1 << IT);
-      if ((candidates[i] == fromHostPtr) && (LS_ISOK (tempstatus)))
-	continue;
+        tempstatus[1] = candidates[i]->status[1] & ~(1 << IT);
+        if ((candidates[i] == fromHostPtr) && (LS_ISOK (tempstatus))) {
+            continue;
+        }
 
-      if (ignore_res && (LS_ISOKNRES (candidates[i]->status)))
-	continue;
+        if (ignore_res && (LS_ISOKNRES (candidates[i]->status))) {
+            continue;
+        }
 
-      if ((candidates[i] == fromHostPtr) && (LS_ISOKNRES (tempstatus)))
-	continue;
+        if ((candidates[i] == fromHostPtr) && (LS_ISOKNRES (tempstatus))) {
+            continue;
+        }
 
-      if (fromHostPtr && (candidates[i] == fromHostPtr))
-	fromHostPtr = NULL;
-      candidates[i] = NULL;
-      left--;
+        if (fromHostPtr && (candidates[i] == fromHostPtr)) {
+            fromHostPtr = NULL;
+        }
+        candidates[i] = NULL;
+        left--;
 
-      if (left <= retain)
-	break;
+        if (left <= retain) {
+            break;
+        }
     }
 
-  for (i = 0, j = 0; i < num; i++)
-    {
-      if (candidates[i])
-	{
-	  candidates[j] = candidates[i];
-	  j++;
-	}
+    for (i = 0, j = 0; i < num; i++) {
+        if (candidates[i]) {
+            candidates[j] = candidates[i];
+            j++;
+        }
     }
 
   return j;
-
 }
 
 int
-getEligibleSites (struct resVal *resValPtr,
-		  struct decisionReq *reqPtr, char all, char *fromEligible)
+getEligibleSites (struct resVal *resValPtr, struct decisionReq *reqPtr, char all, char *fromEligible)
 {
-  struct clusterNode *clPtr;
-  int ncand;
-  int flags;
-  int j;
+    struct clusterNode *clPtr;
+    int ncand;
+    int flags;
+    int j;
 
-  ncand = flags = 0;
+    ncand = flags = 0;
 
-  if (initCandList () < 0)
-    return (-1);
+    if (initCandList () < 0)
+        return (-1);
 
-  if (!fromHostPtr)
+    if (!fromHostPtr)
     {
-      fromHostPtr = findHost (reqPtr->preferredHosts[0]);
-      if (!fromHostPtr)
-	return (0);
+        fromHostPtr = findHost (reqPtr->preferredHosts[0]);
+        if (!fromHostPtr)
+            return (0);
     }
 
-  for (j = 1; j < reqPtr->numPrefs; j++)
-    {
+    for (j = 1; j < reqPtr->numPrefs; j++) {
 
-      if (strcmp (myClusterPtr->clName, reqPtr->preferredHosts[j]) == 0)
-	{
-	  flags |= ELIG_NOLIMIT;
-	  break;
-	}
+        if (strcmp (myClusterPtr->clName, reqPtr->preferredHosts[j]) == 0) {
+            flags |= ELIG_NOLIMIT;
+            break;
+        }
     }
 
-  clPtr = myClusterPtr;
+    clPtr = myClusterPtr;
 
-  if (clPtr->status & CLUST_ALL_ELIGIBLE)
-    flags |= ELIG_ALL;
-  else
-    flags &= ~ELIG_ALL;
-
-  ncand = grabHosts (clPtr->hostList,
-		     resValPtr, reqPtr, ncand, fromEligible, flags);
-  if (all)
-    {
-      ncand = grabHosts (clPtr->clientList,
-			 resValPtr, reqPtr, ncand, fromEligible, flags);
+    if (clPtr->status & CLUST_ALL_ELIGIBLE) {
+        flags |= ELIG_ALL;
+    }
+    else {
+        flags &= ~ELIG_ALL;
     }
 
-  return ncand;
+    ncand = grabHosts (clPtr->hostList, resValPtr, reqPtr, ncand, fromEligible, flags);
+    if (all) {
+        ncand = grabHosts (clPtr->clientList, resValPtr, reqPtr, ncand, fromEligible, flags);
+    }
+
+    return ncand;
 }
 
 static int
-grabHosts (struct hostNode *hList,
-	   struct resVal *resValPtr,
-	   struct decisionReq *reqPtr,
-	   int ncand, char *fromEligible, int flags)
+grabHosts (struct hostNode *hList, struct resVal *resValPtr, struct decisionReq *reqPtr, int ncand, char *fromEligible, int flags)
 {
   struct hostNode *hPtr;
   int j;
@@ -423,42 +414,42 @@ grabHosts (struct hostNode *hList,
     {
 
       if ((fabs (resValPtr->val[MEM]) < INFINIT_LOAD) &&
-	  (resValPtr->val[MEM] > hPtr->statInfo.maxMem))
-	continue;
+    (resValPtr->val[MEM] > hPtr->statInfo.maxMem))
+  continue;
 
       if ((fabs (resValPtr->val[SWP]) < INFINIT_LOAD) &&
-	  (resValPtr->val[SWP] > hPtr->statInfo.maxSwap))
-	continue;
+    (resValPtr->val[SWP] > hPtr->statInfo.maxSwap))
+  continue;
 
       if ((fabs (resValPtr->val[TMP]) < INFINIT_LOAD)
-	  && (resValPtr->val[TMP] > hPtr->statInfo.maxTmp))
-	continue;
+    && (resValPtr->val[TMP] > hPtr->statInfo.maxTmp))
+  continue;
 
       if (reqPtr->ofWhat == OF_HOSTS && !(flags & ELIG_ALL))
-	{
-	  for (j = 1; j < reqPtr->numPrefs; j++)
-	    {
-	      if (equalHost_ (hPtr->hostName, reqPtr->preferredHosts[j]))
-		break;
-	    }
-	  if (j == reqPtr->numPrefs)
-	    continue;
-	}
+  {
+    for (j = 1; j < reqPtr->numPrefs; j++)
+      {
+        if (equalHost_ (hPtr->hostName, reqPtr->preferredHosts[j]))
+    break;
+      }
+    if (j == reqPtr->numPrefs)
+      continue;
+  }
 
       getTclHostData (&tclHostData, hPtr, fromHostPtr, FALSE);
       if (evalResReq (resValPtr->selectStr,
-		      &tclHostData, reqPtr->options & DFT_FROMTYPE) != 1)
-	continue;
+          &tclHostData, reqPtr->options & DFT_FROMTYPE) != 1)
+  continue;
 
       if (equalHost_ (hPtr->hostName, reqPtr->preferredHosts[0]))
-	*fromEligible = TRUE;
+  *fromEligible = TRUE;
 
       if (addCandList (hPtr, ncand++) < 0)
-	return -1;
+  return -1;
 
       if ((reqPtr->ofWhat == OF_HOSTS) && !(flags & ELIG_NOLIMIT)
-	  && (ncand >= reqPtr->numPrefs))
-	break;
+    && (ncand >= reqPtr->numPrefs))
+  break;
     }
 
   return ncand;
@@ -473,7 +464,7 @@ getNumInstances (int ncandidates)
   for (i = 0, numInst = 0; i < ncandidates; i++)
     {
       if (candidates[i] != NULL)
-	numInst += candidates[i]->availHigh;
+  numInst += candidates[i]->availHigh;
     }
 
   return numInst;
@@ -504,46 +495,46 @@ potentialOfHost (struct hostNode *hPtr, struct resVal *resValPtr)
   for (i = 0; i < NBUILTINDEX; i++)
     {
       if (!(i == R15S || i == R1M || i == R15M ||
-	    i == MEM || i == SWP || i == TMP))
-	continue;
+      i == MEM || i == SWP || i == TMP))
+  continue;
 
       if (!(resValPtr->genClass & (1 << i)))
-	continue;
+  continue;
 
       if (resValPtr->val[i] >= INFINIT_LOAD)
-	{
-	  hPtr->availLow = 1;
-	  hPtr->availHigh = 1;
-	  return;
-	}
+  {
+    hPtr->availLow = 1;
+    hPtr->availHigh = 1;
+    return;
+  }
 
       if (resValPtr->val[i] < 0.01)
-	continue;
+  continue;
 
       if (i == R15S || i == R1M || i == R15M)
-	{
+  {
 
-	  indexpot =
-	    (int) (maxCpus -
-		   ((int) (hPtr->uloadIndex[i] + 0.5) % maxCpus)) /
-	    resValPtr->val[i];
-	  if (indexpot < 1)
-	    indexpot = 1;
-	  hPtr->availLow = MIN (hPtr->availLow, indexpot);
+    indexpot =
+      (int) (maxCpus -
+       ((int) (hPtr->uloadIndex[i] + 0.5) % maxCpus)) /
+      resValPtr->val[i];
+    if (indexpot < 1)
+      indexpot = 1;
+    hPtr->availLow = MIN (hPtr->availLow, indexpot);
 
-	  indexpot = (int) (maxCpus / resValPtr->val[i]);
-	  if (indexpot < 1)
-	    indexpot = 1;
-	  hPtr->availHigh = MIN (hPtr->availHigh, indexpot);
+    indexpot = (int) (maxCpus / resValPtr->val[i]);
+    if (indexpot < 1)
+      indexpot = 1;
+    hPtr->availHigh = MIN (hPtr->availHigh, indexpot);
 
-	}
+  }
       else
-	{
+  {
 
-	  indexpot = (int) hPtr->loadIndex[i] / resValPtr->val[i];
-	  hPtr->availLow = MIN (hPtr->availLow, indexpot);
-	  hPtr->availHigh = MIN (hPtr->availHigh, indexpot);
-	}
+    indexpot = (int) hPtr->loadIndex[i] / resValPtr->val[i];
+    hPtr->availLow = MIN (hPtr->availLow, indexpot);
+    hPtr->availHigh = MIN (hPtr->availHigh, indexpot);
+  }
     }
 }
 
@@ -556,14 +547,14 @@ potentialOfCandidates (int ncandidates, struct resVal *resValPtr)
   for (i = 0; i < ncandidates; i++)
     {
       if (candidates[i] == NULL)
-	continue;
+  continue;
       potentialOfHost (candidates[i], resValPtr);
     }
 }
 
 static void
 selectBestInstances (int ncandidates,
-		     int needed, char locality, int ignore_res)
+         int needed, char locality, int ignore_res)
 {
   int avail;
   int additional;
@@ -579,34 +570,34 @@ selectBestInstances (int ncandidates,
       int cand;
 
       for (i = 0; i < ncandidates; i++)
-	{
+  {
 
-	  if (candidates[i]->availHigh > needed)
-	    {
-	      candidates[i]->use = needed;
-	      return;
-	    }
+    if (candidates[i]->availHigh > needed)
+      {
+        candidates[i]->use = needed;
+        return;
+      }
 
-	  candidates[i]->loadIndex[allInfo.numIndx] =
-	    candidates[i]->availHigh;
+    candidates[i]->loadIndex[allInfo.numIndx] =
+      candidates[i]->availHigh;
 
-	  candidates[i]->loadIndex[allInfo.numIndx] +=
-	    (float) (ncandidates - i) / ncandidates;
-	}
+    candidates[i]->loadIndex[allInfo.numIndx] +=
+      (float) (ncandidates - i) / ncandidates;
+  }
 
       cand = bsort (allInfo.numIndx,
-		    ncandidates,
-		    0, ncandidates, 0, flags, ignore_res, NORMALIZE);
+        ncandidates,
+        0, ncandidates, 0, flags, ignore_res, NORMALIZE);
       if (cand != ncandidates)
-	ls_syslog (LOG_ERR, "\
+  ls_syslog (LOG_ERR, "\
 %s: Internal scheduling error(1) cand %d ncandidates %d", __func__, cand, ncandidates);
 
       for (i = 0; (i < ncandidates) && (needed > 0); i++)
-	{
-	  avail = candidates[i]->availHigh;
-	  candidates[i]->use = MIN (needed, avail);
-	  needed -= candidates[i]->use;
-	}
+  {
+    avail = candidates[i]->availHigh;
+    candidates[i]->use = MIN (needed, avail);
+    needed -= candidates[i]->use;
+  }
 
       return;
     }
@@ -616,7 +607,7 @@ selectBestInstances (int ncandidates,
       avail = candidates[i]->availLow;
 
       if ((needed <= candidates[i]->availHigh) && (i < ncandidates / 2))
-	avail = candidates[i]->availHigh;
+  avail = candidates[i]->availHigh;
 
       candidates[i]->use += MIN (needed, avail);
       needed -= candidates[i]->use;
@@ -626,25 +617,21 @@ selectBestInstances (int ncandidates,
     {
 
       for (i = 0; (i < ncandidates) && (needed > 0); i++)
-	{
+  {
 
-	  avail = candidates[i]->availHigh - candidates[i]->availLow;
-	  if (avail == 0)
-	    continue;
-	  additional = MIN (needed, avail);
-	  candidates[i]->use += additional;
-	  candidates[i]->availHigh -= additional;
-	  needed -= additional;
-	}
+    avail = candidates[i]->availHigh - candidates[i]->availLow;
+    if (avail == 0)
+      continue;
+    additional = MIN (needed, avail);
+    candidates[i]->use += additional;
+    candidates[i]->availHigh -= additional;
+    needed -= additional;
+  }
     }
 }
 
 static int
-findBestHost (struct resVal *resValPtr,
-	      int num,
-	      int numPrefs,
-	      char **preferredHosts,
-	      int ncandidates, char iflag, int ignore_res, int rqlOptions)
+findBestHost (struct resVal *resValPtr, int num, int numPrefs, char **preferredHosts, int ncandidates, char iflag, int ignore_res, int rqlOptions)
 {
   int i;
   int cc;
@@ -662,37 +649,37 @@ findBestHost (struct resVal *resValPtr,
     {
 
       if (i == 0)
-	flags |= SORT_FINAL;
+  flags |= SORT_FINAL;
 
       if (iflag)
-	{
+  {
 
-	  if (flags & SORT_FINAL)
-	    flags = SORT_FINAL;
-	  prevncandidates = ncandidates;
-	}
+    if (flags & SORT_FINAL)
+      flags = SORT_FINAL;
+    prevncandidates = ncandidates;
+  }
 
       ncandidates = bsort (resValPtr->order[i],
-			   ncandidates,
-			   nec,
-			   num,
-			   li[abs (resValPtr->order[i]) - 1].sigdiff,
-			   flags, ignore_res, rqlOptions);
+         ncandidates,
+         nec,
+         num,
+         li[abs (resValPtr->order[i]) - 1].sigdiff,
+         flags, ignore_res, rqlOptions);
       if (ncandidates == num)
 
-	if (i > 1)
-	  i = 1;
+  if (i > 1)
+    i = 1;
 
       if (iflag)
-	{
-	  ninst = getNumInstances (ncandidates);
-	  if (ninst <= num)
-	    {
-	      ncandidates = prevncandidates;
-	      if (i > 1)
-		i = 1;
-	    }
-	}
+  {
+    ninst = getNumInstances (ncandidates);
+    if (ninst <= num)
+      {
+        ncandidates = prevncandidates;
+        if (i > 1)
+    i = 1;
+      }
+  }
     }
 
   if (!fromHostPtr)
@@ -709,43 +696,43 @@ findBestHost (struct resVal *resValPtr,
 
       lidx = resValPtr->order[i];
       if (candidates[ncandidates - 1]->conStatus == TRUE)
-	{
-	  cc = 1;
-	  exld = 0;
-	}
+  {
+    cc = 1;
+    exld = 0;
+  }
       else
-	{
+  {
 
-	  cc = 0;
-	  exld = candidates[ncandidates - 1]->loadIndex[lidx]
-	    * nec / (ncandidates * 25.0);
-	  if (!li[lidx].increasing)
-	    exld = -exld;
-	}
+    cc = 0;
+    exld = candidates[ncandidates - 1]->loadIndex[lidx]
+      * nec / (ncandidates * 25.0);
+    if (!li[lidx].increasing)
+      exld = -exld;
+  }
       a = fromHostPtr->loadIndex[lidx];
       b = candidates[ncandidates - 1]->loadIndex[lidx] + exld;
 
       if (lidx == R15S || lidx == R1M || lidx == R15M)
-	{
-	  float cpuf;
+  {
+    float cpuf;
 
 
-	  cpuf = (candidates[ncandidates - 1]->hModelNo >= 0) ?
-	    shortInfo.cpuFactors[candidates[ncandidates - 1]->hModelNo] : 1.0;
-	  if (fromHostPtr->hModelNo >= 0)
-	    f = shortInfo.cpuFactors[fromHostPtr->hModelNo] / cpuf;
-	  else
-	    f = 1.0 / cpuf;
+    cpuf = (candidates[ncandidates - 1]->hModelNo >= 0) ?
+      shortInfo.cpuFactors[candidates[ncandidates - 1]->hModelNo] : 1.0;
+    if (fromHostPtr->hModelNo >= 0)
+      f = shortInfo.cpuFactors[fromHostPtr->hModelNo] / cpuf;
+    else
+      f = 1.0 / cpuf;
 
-	  f = f * li[lidx].delta[cc] / cpuf;
-	}
+    f = f * li[lidx].delta[cc] / cpuf;
+  }
       else
-	{
-	  f = li[lidx].delta[cc];
-	}
+  {
+    f = li[lidx].delta[cc];
+  }
 
       if (li[lidx].increasing ? (a - b > f) : (b - a > f))
-	break;
+  break;
     }
   if (i < 0)
     {
@@ -767,20 +754,20 @@ findNPref (int ncandidates, int numPrefs, char **preferredHosts)
   if (numPrefs > 0)
     {
       for (j = 0; j < ncandidates; j++)
-	{
+  {
 
-	  for (i = 0; i < numPrefs; i++)
-	    {
+    for (i = 0; i < numPrefs; i++)
+      {
 
-	      candidates[j]->conStatus = FALSE;
-	      if (equalHost_ (preferredHosts[i], candidates[j]->hostName))
-		{
-		  candidates[j]->conStatus = TRUE;
-		  nec++;
-		  break;
-		}
-	    }
-	}
+        candidates[j]->conStatus = FALSE;
+        if (equalHost_ (preferredHosts[i], candidates[j]->hostName))
+    {
+      candidates[j]->conStatus = TRUE;
+      nec++;
+      break;
+    }
+      }
+  }
     }
 
   return nec;
@@ -789,11 +776,7 @@ findNPref (int ncandidates, int numPrefs, char **preferredHosts)
 #define NOTORDERED(inc,a,b)   ((inc) ? ((a) > (b)) : ((a) < (b)))
 
 static int
-bsort (int lidx,
-       int ncandidates,
-       int nec,
-       int numHosts,
-       float threshold, char flags, int ignore_res, int rqlOptions)
+bsort (int lidx, int ncandidates, int nec, int numHosts,float threshold, char flags, int ignore_res, int rqlOptions)
 {
   char swap;
   register int i, j;
@@ -822,16 +805,16 @@ bsort (int lidx,
     {
       residual = ncandidates - numHosts;
       if (residual < 1)
-	cutoffs = 0;
+  cutoffs = 0;
       else
-	cutoffs = (residual - 1) / shrink + 1;
+  cutoffs = (residual - 1) / shrink + 1;
     }
   else
     {
       if (ncandidates >= numHosts)
-	cutoffs = numHosts;
+  cutoffs = numHosts;
       else
-	cutoffs = ncandidates;
+  cutoffs = ncandidates;
     }
 
   if (!(flags & SORT_CUT))
@@ -846,7 +829,7 @@ bsort (int lidx,
     {
       incr = li[lidx].increasing;
       if (flip)
-	incr = !incr;
+  incr = !incr;
     }
 
 
@@ -857,57 +840,57 @@ bsort (int lidx,
       float bestload = loadIndexValue (0, lidx, rqlOptions);
 
       for (i = 1; i < ncandidates; i++)
-	{
-	  if (NOTORDERED
-	      (incr, bestload, loadIndexValue (i, lidx, rqlOptions)))
-	    bestload = loadIndexValue (i, lidx, rqlOptions);
-	}
+  {
+    if (NOTORDERED
+        (incr, bestload, loadIndexValue (i, lidx, rqlOptions)))
+      bestload = loadIndexValue (i, lidx, rqlOptions);
+  }
 
 
       swap = TRUE;
       i = 0;
       while (swap && (i < ncandidates - cutoffs))
-	{
-	  swap = FALSE;
-	  for (j = ncandidates - 2; j >= i; j--)
-	    {
-	      order = orderByStatus (j + 1, ignore_res);
-	      if (order == 0)
-		{
-		  swap = TRUE;
-		  continue;
-		}
-	      if (order == 1)
-		continue;
+  {
+    swap = FALSE;
+    for (j = ncandidates - 2; j >= i; j--)
+      {
+        order = orderByStatus (j + 1, ignore_res);
+        if (order == 0)
+    {
+      swap = TRUE;
+      continue;
+    }
+        if (order == 1)
+    continue;
 
-	      if (!(flags & SORT_SINDX))
-		{
-		  mkexld (candidates[j], candidates[j + 1], lidx,
-			  &exld1, &exld2, coef);
-		}
-	      else
-		{
-		  exld1 = 0.0;
-		  exld2 = 0.0;
-		}
+        if (!(flags & SORT_SINDX))
+    {
+      mkexld (candidates[j], candidates[j + 1], lidx,
+        &exld1, &exld2, coef);
+    }
+        else
+    {
+      exld1 = 0.0;
+      exld2 = 0.0;
+    }
 
-	      if (NOTORDERED (incr, loadIndexValue (j, lidx, rqlOptions)
-			      + exld1,
-			      loadIndexValue (j + 1, lidx, rqlOptions)
-			      + exld2))
-		{
-		  swap = TRUE;
-		  tmp = candidates[j];
-		  candidates[j] = candidates[j + 1];
-		  candidates[j + 1] = tmp;
-		}
-	    }
-	  i++;
-	}
+        if (NOTORDERED (incr, loadIndexValue (j, lidx, rqlOptions)
+            + exld1,
+            loadIndexValue (j + 1, lidx, rqlOptions)
+            + exld2))
+    {
+      swap = TRUE;
+      tmp = candidates[j];
+      candidates[j] = candidates[j + 1];
+      candidates[j + 1] = tmp;
+    }
+      }
+    i++;
+  }
       for (i = ncandidates - cutoffs; i < ncandidates; i++)
-	if (fabs (loadIndexValue (i, lidx, rqlOptions) - bestload) >=
-	    threshold)
-	  return i;
+  if (fabs (loadIndexValue (i, lidx, rqlOptions) - bestload) >=
+      threshold)
+    return i;
 
       return ncandidates;
     }
@@ -918,37 +901,37 @@ bsort (int lidx,
     {
       swap = FALSE;
       for (j = ncandidates - 2; j >= i; j--)
-	{
-	  order = orderByStatus (j + 1, ignore_res);
-	  if (order == 0)
-	    {
-	      swap = TRUE;
-	      continue;
-	    }
-	  if (order == 1)
-	    continue;
+  {
+    order = orderByStatus (j + 1, ignore_res);
+    if (order == 0)
+      {
+        swap = TRUE;
+        continue;
+      }
+    if (order == 1)
+      continue;
 
-	  if (!(flags & SORT_SINDX))
-	    {
-	      mkexld (candidates[j], candidates[j + 1], lidx, &exld1, &exld2,
-		      coef);
-	    }
-	  else
-	    {
-	      exld1 = 0.0;
-	      exld2 = 0.0;
-	    }
+    if (!(flags & SORT_SINDX))
+      {
+        mkexld (candidates[j], candidates[j + 1], lidx, &exld1, &exld2,
+          coef);
+      }
+    else
+      {
+        exld1 = 0.0;
+        exld2 = 0.0;
+      }
 
-	  if (NOTORDERED (incr,
-			  loadIndexValue (j, lidx, rqlOptions) + exld1,
-			  loadIndexValue (j + 1, lidx, rqlOptions) + exld2))
-	    {
-	      swap = TRUE;
-	      tmp = candidates[j];
-	      candidates[j] = candidates[j + 1];
-	      candidates[j + 1] = tmp;
-	    }
-	}
+    if (NOTORDERED (incr,
+        loadIndexValue (j, lidx, rqlOptions) + exld1,
+        loadIndexValue (j + 1, lidx, rqlOptions) + exld2))
+      {
+        swap = TRUE;
+        tmp = candidates[j];
+        candidates[j] = candidates[j + 1];
+        candidates[j + 1] = tmp;
+      }
+  }
       i++;
     }
   return (cutoffs);
@@ -1016,13 +999,13 @@ orderByStatus (int j, int ignore_res)
 
 static void
 mkexld (struct hostNode *hn1, struct hostNode *hn2, int lidx, float *exld1,
-	float *exld2, float coef)
+  float *exld2, float coef)
 {
   if (hn1->conStatus == FALSE)
     {
       *exld1 = hn1->loadIndex[lidx] * coef;
       if (!li[lidx].increasing)
-	*exld1 = -*exld1;
+  *exld1 = -*exld1;
     }
   else
     *exld1 = 0;
@@ -1031,7 +1014,7 @@ mkexld (struct hostNode *hn1, struct hostNode *hn2, int lidx, float *exld1,
     {
       *exld2 = hn2->loadIndex[lidx] * coef;
       if (!li[lidx].increasing)
-	*exld2 = -*exld2;
+  *exld2 = -*exld2;
     }
   else
     *exld2 = 0;
@@ -1039,8 +1022,7 @@ mkexld (struct hostNode *hn1, struct hostNode *hn2, int lidx, float *exld1,
 }
 
 static void
-loadAdj (struct jobXfer *jobXferPtr,
-	 struct hostNode **destHostPtr, int num, char child)
+loadAdj (struct jobXfer *jobXferPtr, struct hostNode **destHostPtr, int num, char child)
 {
   static char fname[] = "loadAdj()";
   static char buf[MSGSIZE];
@@ -1065,33 +1047,33 @@ loadAdj (struct jobXfer *jobXferPtr,
     {
 
       memcpy (&addr.sin_addr,
-	      &myClusterPtr->masterPtr->addr[0], sizeof (struct in_addr));
+        &myClusterPtr->masterPtr->addr[0], sizeof (struct in_addr));
       xdrmem_create (&xdrs, buf, MSGSIZE, XDR_ENCODE);
       initLSFHeader_ (&reqHdr);
       reqHdr.opCode = limReqCode;
       reqHdr.refCode = 0;
 
       if (!(xdr_LSFHeader (&xdrs, &reqHdr)
-	    && xdr_jobXfer (&xdrs, jobXferPtr, &reqHdr)))
-	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname,
-		     "xdr_LSFHeader/xdr_jobXfer");
-	  xdr_destroy (&xdrs);
-	  return;
-	}
+      && xdr_jobXfer (&xdrs, jobXferPtr, &reqHdr)))
+  {
+    ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname,
+         "xdr_LSFHeader/xdr_jobXfer");
+    xdr_destroy (&xdrs);
+    return;
+  }
       len = XDR_GETPOS (&xdrs);
 
       if (logclass & LC_COMM)
-	ls_syslog (LOG_DEBUG, "\
+  ls_syslog (LOG_DEBUG, "\
 loadAdj: tell master(%s) of job xfer (len=%d)", sockAdd2Str_ (&addr), len);
 
       if (chanSendDgram_ (limSock, buf, len, &addr) < 0)
-	{
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5809, "%s: Failed to tell master(%s) of job xfer (len=%d): %m"),	/* catgets 5809 */
-		     fname, sockAdd2Str_ (&addr), len);
-	  xdr_destroy (&xdrs);
-	  return;
-	}
+  {
+    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5809, "%s: Failed to tell master(%s) of job xfer (len=%d): %m"), /* catgets 5809 */
+         fname, sockAdd2Str_ (&addr), len);
+    xdr_destroy (&xdrs);
+    return;
+  }
       xdr_destroy (&xdrs);
       return;
     }
@@ -1104,17 +1086,17 @@ loadAdj: tell master(%s) of job xfer (len=%d)", sockAdd2Str_ (&addr), len);
     {
 
       if (myClusterPtr->masterKnown
-	  && destHostPtr[i] == myClusterPtr->masterPtr)
-	continue;
+    && destHostPtr[i] == myClusterPtr->masterPtr)
+  continue;
 
       if (destHostPtr[i] == myHostPtr)
-	{
-	  updExtraLoad (destHostPtr, jobXferPtr->resReq, num);
-	  continue;
-	}
+  {
+    updExtraLoad (destHostPtr, jobXferPtr->resReq, num);
+    continue;
+  }
 
       if (!destHostPtr[i]->addr)
-	continue;
+  continue;
 
       memcpy (&addr.sin_addr, destHostPtr[i]->addr, sizeof (struct in_addr));
       xdrmem_create (&xdrs, buf, MSGSIZE, XDR_ENCODE);
@@ -1122,26 +1104,26 @@ loadAdj: tell master(%s) of job xfer (len=%d)", sockAdd2Str_ (&addr), len);
       reqHdr.refCode = 0;
 
       if (!(xdr_LSFHeader (&xdrs, &reqHdr) &&
-	    xdr_jobXfer (&xdrs, jobXferPtr, &reqHdr)))
-	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname,
-		     "xdr_LSFHeader/xdr_jobXfer");
-	  xdr_destroy (&xdrs);
-	  return;
-	}
+      xdr_jobXfer (&xdrs, jobXferPtr, &reqHdr)))
+  {
+    ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname,
+         "xdr_LSFHeader/xdr_jobXfer");
+    xdr_destroy (&xdrs);
+    return;
+  }
       len = XDR_GETPOS (&xdrs);
 
       if (logclass & LC_COMM)
-	ls_syslog (LOG_DEBUG,
-		   "loadAdj: inform destination host %s (len=%d) of job xfer",
-		   sockAdd2Str_ (&addr), len);
+  ls_syslog (LOG_DEBUG,
+       "loadAdj: inform destination host %s (len=%d) of job xfer",
+       sockAdd2Str_ (&addr), len);
 
       if (chanSendDgram_ (limSock, buf, len, &addr) < 0)
-	{
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5811, "%s: Failed to inform destination host %s (len=%d) of job xfer: %m"), fname, sockAdd2Str_ (&addr), len);	/* catgets 5811 */
-	  xdr_destroy (&xdrs);
-	  return;
-	}
+  {
+    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5811, "%s: Failed to inform destination host %s (len=%d) of job xfer: %m"), fname, sockAdd2Str_ (&addr), len); /* catgets 5811 */
+    xdr_destroy (&xdrs);
+    return;
+  }
       xdr_destroy (&xdrs);
     }
 
@@ -1149,8 +1131,7 @@ loadAdj: tell master(%s) of job xfer (len=%d)", sockAdd2Str_ (&addr), len);
 }
 
 void
-loadadjReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr,
-	    int s)
+loadadjReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr, unsigned long s)
 {
   static char fname[] = "loadadjReq";
   XDR xdrs2;
@@ -1197,11 +1178,11 @@ loadadjReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr,
       (returnCode = evalResReq (resVal.selectStr, &tclHostData, FALSE)) < 0)
     {
       if (cc == PARSE_BAD_VAL)
-	limReplyCode = LIME_UNKWN_RVAL;
+  limReplyCode = LIME_UNKWN_RVAL;
       else if (cc == PARSE_BAD_NAME)
-	limReplyCode = LIME_UNKWN_RNAME;
+  limReplyCode = LIME_UNKWN_RNAME;
       else
-	limReplyCode = LIME_BAD_RESREQ;
+  limReplyCode = LIME_BAD_RESREQ;
       goto reply;
     }
 
@@ -1209,28 +1190,28 @@ loadadjReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr,
   for (i = 0; i < jobXfer.numHosts; i++)
     {
       candidate = findHostbyList (myClusterPtr->hostList,
-				  jobXfer.placeInfo[i].hostName);
+          jobXfer.placeInfo[i].hostName);
       if (candidate == NULL)
-	continue;
+  continue;
 
       for (k = 0; k < j; k++)
-	{
-	  if (candidate == candidates[j])
-	    break;
-	}
+  {
+    if (candidate == candidates[j])
+      break;
+  }
 
       if (k == j)
-	{
-	  if (addCandList (candidate, j) < 0)
-	    {
-	      limReplyCode = LIME_NO_MEM;
-	      goto reply;
-	    }
-	  candidates[j]->use = jobXfer.placeInfo[i].numtask;
-	  j++;
-	}
+  {
+    if (addCandList (candidate, j) < 0)
+      {
+        limReplyCode = LIME_NO_MEM;
+        goto reply;
+      }
+    candidates[j]->use = jobXfer.placeInfo[i].numtask;
+    j++;
+  }
       else
-	candidates[k]->use += jobXfer.placeInfo[i].numtask;
+  candidates[k]->use += jobXfer.placeInfo[i].numtask;
     }
 
   loadAdj (&jobXfer, candidates, j, FALSE);
@@ -1253,7 +1234,7 @@ reply:
 
   if (chanWrite_ (s, buf, XDR_GETPOS (&xdrs2)) < 0)
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5814, "%s: Failed to send load adjustment decision to %s (len=%d): %m"), fname, sockAdd2Str_ (from), XDR_GETPOS (&xdrs2));	/* catgets 5814 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5814, "%s: Failed to send load adjustment decision to %s (len=%d): %m"), fname, sockAdd2Str_ (from), XDR_GETPOS (&xdrs2)); /* catgets 5814 */
       xdr_destroy (&xdrs2);
       return;
     }
@@ -1273,7 +1254,7 @@ updExtraLoad (struct hostNode **destHostPtr, char *resReq, int numHosts)
 
   if (!destHostPtr)
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5815, "%s: Null host pointer"), fname);	/* catgets 5815 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5815, "%s: Null host pointer"), fname);  /* catgets 5815 */
       return;
     }
   initResVal (&resVal);
@@ -1291,52 +1272,52 @@ updExtraLoad (struct hostNode **destHostPtr, char *resReq, int numHosts)
 
 
       dupfactor = MIN ((float) destHostPtr[j]->use,
-		       (float) destHostPtr[j]->statInfo.maxCpus);
+           (float) destHostPtr[j]->statInfo.maxCpus);
 
       if (dupfactor < 0)
-	dupfactor = 1.0;
+  dupfactor = 1.0;
 
       if (jtime < destHostPtr[j]->lastJackTime + keepTime * exchIntvl)
-	dupfactor *= 0.2;
+  dupfactor *= 0.2;
 
       destHostPtr[j]->lastJackTime = jtime;
       for (lidx = 0; lidx < NBUILTINDEX; lidx++)
-	{
-	  if (lidx == R15M)
-	    continue;
+  {
+    if (lidx == R15M)
+      continue;
 
 
-	  if (resVal.genClass & (1 << lidx))
-	    {
-	      exval = fabs (resVal.val[lidx]);
-	      if (exval < INFINIT_LOAD)
-		{
-		  if (li[lidx].increasing)
-		    {
-		      exval = MIN (exval, li[lidx].extraload[1]);
-		    }
-		  else
-		    {
-		      exval = -exval;
-		      exval = MAX (exval, li[lidx].extraload[1]);
-		    }
-		}
-	      else
-		exval = li[lidx].extraload[1];
+    if (resVal.genClass & (1 << lidx))
+      {
+        exval = fabs (resVal.val[lidx]);
+        if (exval < INFINIT_LOAD)
+    {
+      if (li[lidx].increasing)
+        {
+          exval = MIN (exval, li[lidx].extraload[1]);
+        }
+      else
+        {
+          exval = -exval;
+          exval = MAX (exval, li[lidx].extraload[1]);
+        }
+    }
+        else
+    exval = li[lidx].extraload[1];
 
-	    }
-	  else
-	    {
-	      exval = li[lidx].extraload[0];
-	    }
-	  jackup (lidx, destHostPtr[j], exval * dupfactor);
+      }
+    else
+      {
+        exval = li[lidx].extraload[0];
+      }
+    jackup (lidx, destHostPtr[j], exval * dupfactor);
 
 
-	  if (limParams[LSF_LIM_JACKUP_BUSY].paramValue != NULL)
-	    {
-	      setBusyIndex (lidx, destHostPtr[j]);
-	    }
-	}
+    if (limParams[LSF_LIM_JACKUP_BUSY].paramValue != NULL)
+      {
+        setBusyIndex (lidx, destHostPtr[j]);
+      }
+  }
     }
 
   freeResVal (&resVal);
@@ -1357,15 +1338,15 @@ jackup (int lidx, struct hostNode *hostPtr, float exval)
 
 
       hostPtr->loadIndex[lidx] = normalizeRq (hostPtr->uloadIndex[lidx],
-					      (hostPtr->hModelNo >= 0) ?
-					      shortInfo.cpuFactors[hostPtr->
-								   hModelNo] :
-					      1.0, hostPtr->statInfo.maxCpus);
+                (hostPtr->hModelNo >= 0) ?
+                shortInfo.cpuFactors[hostPtr->
+                   hModelNo] :
+                1.0, hostPtr->statInfo.maxCpus);
       if (hostPtr == myHostPtr)
-	{
-	  jobxfer = keepTime;
-	  extraload[lidx] = exval;
-	}
+  {
+    jobxfer = keepTime;
+    extraload[lidx] = exval;
+  }
       return;
     }
 
@@ -1386,7 +1367,7 @@ jackup (int lidx, struct hostNode *hostPtr, float exval)
 
 void
 loadReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr,
-	 int s)
+   int s)
 {
   static char fname[] = "loadReq";
   struct loadReply reply;
@@ -1420,27 +1401,27 @@ loadReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr,
     }
 
   if (!(ldReq.ofWhat == OF_HOSTS && ldReq.numPrefs == 2
-	&& ldReq.numHosts == 1
-	&& equalHost_ (ldReq.preferredHosts[1], myHostPtr->hostName)))
+  && ldReq.numHosts == 1
+  && equalHost_ (ldReq.preferredHosts[1], myHostPtr->hostName)))
     {
 
       if (!masterMe)
-	{
-	  char tmpBuf[MSGSIZE];
+  {
+    char tmpBuf[MSGSIZE];
 
-	  wrongMaster (from, tmpBuf, reqHdr, s);
-	  for (i = 0; i < ldReq.numPrefs; i++)
-	    free (ldReq.preferredHosts[i]);
-	  free (ldReq.preferredHosts);
-	  return;
-	}
+    wrongMaster (from, tmpBuf, reqHdr, s);
+    for (i = 0; i < ldReq.numPrefs; i++)
+      free (ldReq.preferredHosts[i]);
+    free (ldReq.preferredHosts);
+    return;
+  }
     }
 
   if (!validHosts (ldReq.preferredHosts,
-		   ldReq.numPrefs, &clName, ldReq.options))
+       ldReq.numPrefs, &clName, ldReq.options))
     {
       limReplyCode = LIME_UNKWN_HOST;
-      ls_syslog (LOG_INFO, (_i18n_msg_get (ls_catd, NL_SETN, 5823, "%s: validHosts() failed for bad cluster/host name requested from <%s>")), fname, sockAdd2Str_ (from));	/* catgets 5823 */
+      ls_syslog (LOG_INFO, (_i18n_msg_get (ls_catd, NL_SETN, 5823, "%s: validHosts() failed for bad cluster/host name requested from <%s>")), fname, sockAdd2Str_ (from));  /* catgets 5823 */
       goto Reply;
     }
 
@@ -1453,17 +1434,17 @@ loadReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr,
   cc = parseResReq (ldReq.resReq, &resVal, &allInfo, propt);
   if ((cc != PARSE_OK) ||
       (returnCode = evalResReq (resVal.selectStr,
-				&tclHostData,
-				ldReq.options & DFT_FROMTYPE)) < 0)
+        &tclHostData,
+        ldReq.options & DFT_FROMTYPE)) < 0)
     {
       if (cc == PARSE_BAD_VAL)
-	limReplyCode = LIME_UNKWN_RVAL;
+  limReplyCode = LIME_UNKWN_RVAL;
       else if (cc == PARSE_BAD_NAME)
-	limReplyCode = LIME_UNKWN_RNAME;
+  limReplyCode = LIME_UNKWN_RNAME;
       else if (cc == PARSE_BAD_FILTER)
-	limReplyCode = LIME_BAD_FILTER;
+  limReplyCode = LIME_BAD_FILTER;
       else
-	limReplyCode = LIME_BAD_RESREQ;
+  limReplyCode = LIME_BAD_RESREQ;
       goto Reply;
     }
 
@@ -1475,8 +1456,8 @@ loadReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr,
     }
   if (strcmp (ldReq.hostType, " ") == 0)
     strcpy (ldReq.hostType,
-	    (fromHostPtr->hTypeNo >= 0) ?
-	    shortInfo.hostTypes[fromHostPtr->hTypeNo] : "unknown");
+      (fromHostPtr->hTypeNo >= 0) ?
+      shortInfo.hostTypes[fromHostPtr->hTypeNo] : "unknown");
 
   fromEligible = FALSE;
   ncandidates = getEligibleSites (&resVal, &ldReq, 0, &fromEligible);
@@ -1501,11 +1482,11 @@ loadReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr,
     {
       ncandidates = getOkSites (ncandidates, 0, ignore_res);
       if ((ncandidates == 0) || ((ncandidates < ldReq.numHosts)
-				 && (ldReq.options & EXACT)))
-	{
-	  limReplyCode = LIME_NO_OKHOST;
-	  goto Reply;
-	}
+         && (ldReq.options & EXACT)))
+  {
+    limReplyCode = LIME_NO_OKHOST;
+    goto Reply;
+  }
     }
   else
     {
@@ -1514,20 +1495,20 @@ loadReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr,
 
   if (logclass & LC_SCHED)
     ls_syslog (LOG_DEBUG2,
-	       "ldReq: ncandidates=%d ldReq.numHosts=%d clName=%d",
-	       ncandidates, ldReq.numHosts, clName);
+         "ldReq: ncandidates=%d ldReq.numHosts=%d clName=%d",
+         ncandidates, ldReq.numHosts, clName);
   if (ncandidates > ldReq.numHosts)
     {
       findBestHost (&resVal, ldReq.numHosts, ldReq.numPrefs,
-		    ldReq.preferredHosts, ncandidates, FALSE, ignore_res,
-		    ldReq.options);
+        ldReq.preferredHosts, ncandidates, FALSE, ignore_res,
+        ldReq.options);
       reply.nEntry = ldReq.numHosts;
     }
   else
     {
       findBestHost (&resVal, ncandidates, ldReq.numPrefs,
-		    ldReq.preferredHosts, ncandidates, FALSE, ignore_res,
-		    ldReq.options);
+        ldReq.preferredHosts, ncandidates, FALSE, ignore_res,
+        ldReq.options);
       reply.nEntry = ncandidates;
     }
 
@@ -1572,51 +1553,51 @@ loadReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr,
     {
       strcpy (reply.loadMatrix[i].hostName, candidates[i]->hostName);
       if (definedSharedResource (candidates[i], &allInfo) == TRUE)
-	{
-	  reply.flags |= LOAD_REPLY_SHARED_RESOURCE;
-	}
+  {
+    reply.flags |= LOAD_REPLY_SHARED_RESOURCE;
+  }
       reply.loadMatrix[i].status[0] = candidates[i]->status[0];
       if (LS_ISUNAVAIL (candidates[i]->status))
-	{
-	  for (j = 0; j < resVal.nindex; j++)
-	    reply.loadMatrix[i].li[j] = INFINIT_LOAD;
-	  for (j = 0; j < GET_INTNUM (resVal.nindex); j++)
-	    reply.loadMatrix[i].status[j + 1] = 0;
-	  continue;
-	}
+  {
+    for (j = 0; j < resVal.nindex; j++)
+      reply.loadMatrix[i].li[j] = INFINIT_LOAD;
+    for (j = 0; j < GET_INTNUM (resVal.nindex); j++)
+      reply.loadMatrix[i].status[j + 1] = 0;
+    continue;
+  }
 
 
       for (j = 0; j < GET_INTNUM (reply.nIndex); j++)
-	reply.loadMatrix[i].status[j + 1] = 0;
+  reply.loadMatrix[i].status[j + 1] = 0;
       for (j = 0; j < reply.nIndex; j++)
-	{
-	  int indx;
-	  indx = resVal.indicies[j];
-	  if (LS_ISBUSYON (candidates[i]->status, indx))
-	    SET_BIT (INTEGER_BITS + j, reply.loadMatrix[i].status);
-	  if (indx == R15S || indx == R1M || indx == R15M)
-	    {
-	      if (ldReq.options & NORMALIZE)
-		reply.loadMatrix[i].li[j] = candidates[i]->loadIndex[indx];
-	      else if (ldReq.options & EFFECTIVE)
-		{
-		  float factor;
-		  factor = (candidates[i]->hModelNo >= 0) ?
-		    shortInfo.cpuFactors[candidates[i]->hModelNo] : 1.0;
-		  reply.loadMatrix[i].li[j]
-		    = effectiveRq (candidates[i]->loadIndex[indx], factor);
+  {
+    int indx;
+    indx = resVal.indicies[j];
+    if (LS_ISBUSYON (candidates[i]->status, indx))
+      SET_BIT (INTEGER_BITS + j, reply.loadMatrix[i].status);
+    if (indx == R15S || indx == R1M || indx == R15M)
+      {
+        if (ldReq.options & NORMALIZE)
+    reply.loadMatrix[i].li[j] = candidates[i]->loadIndex[indx];
+        else if (ldReq.options & EFFECTIVE)
+    {
+      float factor;
+      factor = (candidates[i]->hModelNo >= 0) ?
+        shortInfo.cpuFactors[candidates[i]->hModelNo] : 1.0;
+      reply.loadMatrix[i].li[j]
+        = effectiveRq (candidates[i]->loadIndex[indx], factor);
 
-		  if (reply.loadMatrix[i].li[j] < 0.0)
-		    reply.loadMatrix[i].li[j] = 0.0;
-		}
-	      else
-		reply.loadMatrix[i].li[j] = candidates[i]->uloadIndex[indx];
-	    }
-	  else
-	    {
-	      reply.loadMatrix[i].li[j] = candidates[i]->loadIndex[indx];
-	    }
-	}
+      if (reply.loadMatrix[i].li[j] < 0.0)
+        reply.loadMatrix[i].li[j] = 0.0;
+    }
+        else
+    reply.loadMatrix[i].li[j] = candidates[i]->uloadIndex[indx];
+      }
+    else
+      {
+        reply.loadMatrix[i].li[j] = candidates[i]->loadIndex[indx];
+      }
+  }
     }
 
 Reply:
@@ -1634,7 +1615,7 @@ Reply1:
     {
       replyStruct = (char *) &reply;
       bufSize = ALIGNWORD_ (MAXLSFNAMELEN * allInfo.numIndx
-			    + hlSize + reply.nEntry * (lvecSize + staSize));
+          + hlSize + reply.nEntry * (lvecSize + staSize));
     }
   else
     {
@@ -1647,7 +1628,7 @@ Reply1:
     {
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
       if (limReplyCode == LIME_NO_ERR)
-	FREEUP (reply.loadMatrix);
+  FREEUP (reply.loadMatrix);
       FREEUP (reply.indicies);
       return;
     }
@@ -1658,7 +1639,7 @@ Reply1:
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_encodeMsg");
       xdr_destroy (&xdrs2);
       if (limReplyCode == LIME_NO_ERR)
-	FREEUP (reply.loadMatrix);
+  FREEUP (reply.loadMatrix);
       FREEUP (buf);
       FREEUP (reply.indicies);
       return;
@@ -1676,7 +1657,7 @@ Reply1:
 
   if (cc < 0)
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5821, "%s: Failed in sending lsload reply to %s (len=%d): %m"), fname, sockAdd2Str_ (from), XDR_GETPOS (&xdrs2));	/* catgets 5821 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5821, "%s: Failed in sending lsload reply to %s (len=%d): %m"), fname, sockAdd2Str_ (from), XDR_GETPOS (&xdrs2));  /* catgets 5821 */
       xdr_destroy (&xdrs2);
       return;
     }
@@ -1715,12 +1696,12 @@ addCandList (struct hostNode *hPtr, int pos)
       candListSize *= 2;
       memp = realloc (candidates, candListSize * sizeof (struct hostNode *));
       if (!memp)
-	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "addCandList", "realloc");
-	  FREEUP (candidates);
-	  candListSize = 0;
-	  return (-1);
-	}
+  {
+    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "addCandList", "realloc");
+    FREEUP (candidates);
+    candListSize = 0;
+    return (-1);
+  }
       candidates = (struct hostNode **) memp;
     }
   candidates[pos] = hPtr;
@@ -1759,11 +1740,11 @@ chkResReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr)
       evalResReq (resVal.selectStr, &tclHostData, FALSE) < 0)
     {
       if (cc == PARSE_BAD_VAL)
-	limReplyCode = LIME_UNKWN_RVAL;
+  limReplyCode = LIME_UNKWN_RVAL;
       else if (cc == PARSE_BAD_NAME)
-	limReplyCode = LIME_UNKWN_RNAME;
+  limReplyCode = LIME_UNKWN_RNAME;
       else
-	limReplyCode = LIME_BAD_RESREQ;
+  limReplyCode = LIME_BAD_RESREQ;
     }
 
 Reply:
@@ -1772,7 +1753,7 @@ Reply:
   replyHdr.refCode = reqHdr->refCode;
 
   xdrmem_create (&xdrs2, (char *) &replyBuf, sizeof (struct LSFHeader),
-		 XDR_ENCODE);
+     XDR_ENCODE);
   if (!xdr_LSFHeader (&xdrs2, &replyHdr))
     {
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_LSFHeader");
@@ -1784,7 +1765,7 @@ Reply:
       < 0)
     {
       ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "chanSendDgram_",
-		 sockAdd2Str_ (from));
+     sockAdd2Str_ (from));
       xdr_destroy (&xdrs2);
       return;
     }
@@ -1795,7 +1776,7 @@ Reply:
 
 void
 getTclHostData (struct tclHostData *tclHostData, struct hostNode *hostNode,
-		struct hostNode *fromHostNode, int checkSyntax)
+    struct hostNode *fromHostNode, int checkSyntax)
 {
 
   tclHostData->hostName = hostNode->hostName;
@@ -1863,24 +1844,24 @@ loadIndexValue (int hostIdx, int loadIdx, int rqlOptions)
   if (loadIdx == R15S || loadIdx == R1M || loadIdx == R15M)
     {
       if (rqlOptions & NORMALIZE)
-	{
-	  loadIndex = candidates[hostIdx]->loadIndex[loadIdx];
-	}
+  {
+    loadIndex = candidates[hostIdx]->loadIndex[loadIdx];
+  }
       else if (rqlOptions & EFFECTIVE)
-	{
-	  float factor;
-	  factor = (candidates[hostIdx]->hModelNo >= 0) ?
-	    shortInfo.cpuFactors[candidates[hostIdx]->hModelNo] : 1.0;
-	  loadIndex = effectiveRq (candidates[hostIdx]->loadIndex[loadIdx],
-				   factor);
+  {
+    float factor;
+    factor = (candidates[hostIdx]->hModelNo >= 0) ?
+      shortInfo.cpuFactors[candidates[hostIdx]->hModelNo] : 1.0;
+    loadIndex = effectiveRq (candidates[hostIdx]->loadIndex[loadIdx],
+           factor);
 
-	  if (loadIndex < 0.0)
-	    loadIndex = 0.0;
-	}
+    if (loadIndex < 0.0)
+      loadIndex = 0.0;
+  }
       else
-	{
-	  loadIndex = candidates[hostIdx]->uloadIndex[loadIdx];
-	}
+  {
+    loadIndex = candidates[hostIdx]->uloadIndex[loadIdx];
+  }
     }
   else
     {

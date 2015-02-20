@@ -24,12 +24,12 @@
 #ifndef LSF_LIM_LIM_H
 #define LSF_LIM_LIM_H
 
-#include "intlib/intlibout.h"
+#include "libint/intlibout.h"
+#include "daemons/liblimd/limout.h"
 #include "lib/hdr.h"
 #include "lib/lproto.h"
 #include "lib/table.h"
 #include "lib/xdr.h"
-#include "lim/limout.h"
 #include "lsf.h"
 
 #define EXCHINTVL 	          15
@@ -205,8 +205,9 @@ struct liStruct
   float satvalue;
   float value;
 };
-int li_len;
-struct liStruct *li;
+
+static int li_len;
+static struct liStruct *li;
 
 #define  SEND_NO_INFO       0x00
 #define  SEND_CONF_INFO     0x01
@@ -409,8 +410,7 @@ extern int reCheckClass (void);
 extern void setMyClusterName (void);
 extern int resNameDefined (char *);
 extern struct sharedResource *inHostResourcs (char *);
-extern struct resourceInstance *isInHostList (struct sharedResource *,
-					      char *);
+extern struct resourceInstance *isInHostList (struct sharedResource *, char *);
 extern struct hostNode *initHostNode (void);
 extern void freeHostNodes (struct hostNode *, int);
 extern int validResource (const char *);
@@ -434,34 +434,28 @@ extern void shutdownReq (XDR *, struct sockaddr_in *, struct LSFHeader *);
 extern void limDebugReq (XDR *, struct sockaddr_in *, struct LSFHeader *);
 extern void lockReq (XDR *, struct sockaddr_in *, struct LSFHeader *);
 extern int limPortOk (struct sockaddr_in *);
-extern void servAvailReq (XDR *, struct hostNode *, struct sockaddr_in *,
-			  struct LSFHeader *);
+extern void servAvailReq (XDR *, struct hostNode *, struct sockaddr_in *, struct LSFHeader *);
 
 extern void pingReq (XDR *, struct sockaddr_in *, struct LSFHeader *);
 extern void clusNameReq (XDR *, struct sockaddr_in *, struct LSFHeader *);
 extern void masterInfoReq (XDR *, struct sockaddr_in *, struct LSFHeader *);
-extern void hostInfoReq (XDR *, struct hostNode *, struct sockaddr_in *,
-			 struct LSFHeader *, int);
-extern void infoReq (XDR *, struct sockaddr_in *, struct LSFHeader *, int);
+extern void hostInfoReq (XDR * xdrs, struct hostNode *fromHostP, struct sockaddr_in *from, struct LSFHeader *reqHdr, unsigned int chfd);
+extern void infoReq (XDR *xdr, struct sockaddr_in *clientMap, struct LSFHeader *hdr, unsigned int chfd);
 extern void cpufReq (XDR *, struct sockaddr_in *, struct LSFHeader *);
 extern void clusInfoReq (XDR *, struct sockaddr_in *, struct LSFHeader *);
-extern void resourceInfoReq (XDR *, struct sockaddr_in *, struct LSFHeader *,
-			     int);
+extern void resourceInfoReq (XDR *xdr, struct sockaddr_in *clientMap, struct LSFHeader *hdr, unsigned int chfd);
 extern void masterRegister (XDR *, struct sockaddr_in *, struct LSFHeader *);
 extern void jobxferReq (XDR *, struct sockaddr_in *, struct LSFHeader *);
 extern void rcvConfInfo (XDR *, struct sockaddr_in *, struct LSFHeader *);
 extern void tellMasterWho (XDR *, struct sockaddr_in *, struct LSFHeader *);
 extern void whoIsMaster (struct clusterNode *);
 extern void announceMaster (struct clusterNode *, char, char);
-extern void wrongMaster (struct sockaddr_in *, char *, struct LSFHeader *,
-			 int);
+extern void wrongMaster (struct sockaddr_in *, char *, struct LSFHeader *, int);
 extern void checkHostWd (void);
 extern void announceMasterToHost (struct hostNode *, int);
 extern int probeMasterTcp (struct clusterNode *);
 extern void initNewMaster (void);
-extern int callMasterTcp (enum limReqCode, struct hostNode *, void *,
-			  bool_t (*)(), void *, bool_t (*)(), int, int,
-			  struct LSFHeader *);
+extern int callMasterTcp (enum limReqCode, struct hostNode *, void *, bool_t (*)(), void *, bool_t (*)(), int, int, struct LSFHeader *);
 extern int validateHost (char *, int);
 extern int validateHostbyAddr (struct sockaddr_in *, int);
 extern void checkAfterHourWindow ();
@@ -493,37 +487,30 @@ extern bool_t findHostInCluster (char *);
 extern int definedSharedResource (struct hostNode *, struct lsInfo *);
 extern struct shortLsInfo *shortLsInfoDup (struct shortLsInfo *);
 extern void shortLsInfoDestroy (struct shortLsInfo *);
-extern void errorBack (struct sockaddr_in *, struct LSFHeader *,
-		       enum limReplyCode, int);
+extern void errorBack (struct sockaddr_in *, struct LSFHeader *, enum limReplyCode, int);
 extern int initSock (int);
 extern void initLiStruct (void);
-extern void placeReq (XDR *, struct sockaddr_in *, struct LSFHeader *, int);
+extern void placeReq (XDR *xdr, struct sockaddr_in *clientMap, struct LSFHeader *hdr, unsigned int chfd);
 extern void loadadjReq (XDR *, struct sockaddr_in *, struct LSFHeader *, int);
 extern void updExtraLoad (struct hostNode **, char *, int);
-extern void loadReq (XDR *, struct sockaddr_in *, struct LSFHeader *, int);
-extern int getEligibleSites (register struct resVal *, struct decisionReq *,
-			     char, char *);
+extern void loadReq (XDR *xdr, struct sockaddr_in *clientMap, struct LSFHeader *hdr, unsigned int chfd);
+extern int getEligibleSites (register struct resVal *, struct decisionReq *, char, char *);
 extern int validHosts (char **, int, char *, int);
 extern int checkValues (struct resVal *, int);
 extern void chkResReq (XDR *, struct sockaddr_in *, struct LSFHeader *);
-extern void getTclHostData (struct tclHostData *, struct hostNode *,
-			    struct hostNode *, int);
+extern void getTclHostData (struct tclHostData *, struct hostNode *, struct hostNode *, int);
 extern void reconfig (void);
 extern void shutdownLim (void);
-extern int xdr_loadvector (XDR *, struct loadVectorStruct *,
-			   struct LSFHeader *);
-extern int xdr_loadmatrix (XDR *, int, struct loadVectorStruct *,
-			   struct LSFHeader *);
-extern int xdr_masterReg (XDR *, struct masterReg *, struct LSFHeader *);
-extern int xdr_statInfo (XDR *, struct statInfo *, struct LSFHeader *);
+extern int xdr_loadvector (XDR *, struct loadVectorStruct *, struct LSFHeader *);
+extern int xdr_loadmatrix (XDR *, int, struct loadVectorStruct *, struct LSFHeader *);
+extern int xdr_masterReg  (XDR *, struct masterReg *, struct LSFHeader *);
+extern int xdr_statInfo   (XDR *, struct statInfo *, struct LSFHeader *);
 extern void clientIO (struct Masks *);
 
 /* openlava floating host management
  */
-extern void addMigrantHost (XDR *,
-			    struct sockaddr_in *, struct LSFHeader *, int);
-extern void rmMigrantHost (XDR *,
-			   struct sockaddr_in *, struct LSFHeader *, int);
+extern void addMigrantHost (XDR *, struct sockaddr_in *, struct LSFHeader *, unsigned long );
+extern void rmMigrantHost (XDR *,  struct sockaddr_in *, struct LSFHeader *, unsigned long );
 extern int logInit (void);
 extern int logLIMStart (void);
 extern int logLIMDown (void);

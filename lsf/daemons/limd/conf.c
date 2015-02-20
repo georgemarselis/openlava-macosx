@@ -5355,8 +5355,7 @@ addHostByTab (hTab * tab)
 /* rmMigrantHost()
  */
 void
-rmMigrantHost (XDR * xdrs,
-	       struct sockaddr_in *from, struct LSFHeader *reqHdr, int chan)
+rmMigrantHost (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr, unsigned long chan)
 {
   static char buf[MSGSIZE];
   struct LSFHeader hdr;

@@ -25,206 +25,186 @@
 struct shortLsInfo oldShortInfo;
 
 static struct shortLsInfo *getCShortInfo (struct LSFHeader *);
-static int checkResources (struct resourceInfoReq *,
-			   struct resourceInfoReply *, int *);
-static int copyResource (struct resourceInfoReply *, struct sharedResource *,
-			 int *, char *);
+static int checkResources (struct resourceInfoReq *, struct resourceInfoReply *, int *);
+static int copyResource (struct resourceInfoReply *, struct sharedResource *, int *, char *);
 static void freeResourceInfoReply (struct resourceInfoReply *);
 
 
 void
 pingReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr)
 {
-  static char fname[] = "pingReq()";
-  char buf[MSGSIZE / 4];
-  XDR xdrs2;
-  enum limReplyCode limReplyCode;
-  struct LSFHeader replyHdr;
+    static char fname[] = "pingReq()";
+    char buf[MSGSIZE / 4];
+    enum limReplyCode limReplyCode;
+    struct LSFHeader replyHdr;
+    XDR xdrs2;
 
-  limReplyCode = LIME_NO_ERR;
-  replyHdr.opCode = (short) limReplyCode;
-  replyHdr.refCode = reqHdr->refCode;
-  xdrmem_create (&xdrs2, buf, MSGSIZE / 4, XDR_ENCODE);
-  if (!xdr_LSFHeader (&xdrs2, &replyHdr) ||
-      !xdr_string (&xdrs2, &myHostPtr->hostName, MAXHOSTNAMELEN))
+    limReplyCode     = LIME_NO_ERR;
+    replyHdr.opCode  = (short) limReplyCode;
+    replyHdr.refCode = reqHdr->refCode;
+    xdrmem_create (&xdrs2, buf, MSGSIZE / 4, XDR_ENCODE);
+    if (!xdr_LSFHeader (&xdrs2, &replyHdr) || !xdr_string (&xdrs2, &myHostPtr->hostName, MAXHOSTNAMELEN))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_string");
-      xdr_destroy (&xdrs2);
-      return;
+        ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_string");
+        xdr_destroy (&xdrs2);
+        return;
     }
 
-  if (chanSendDgram_ (limSock, buf, XDR_GETPOS (&xdrs2), from) < 0)
+    if (chanSendDgram_ (limSock, buf, XDR_GETPOS (&xdrs2), from) < 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "chanSendDgram_",
-		 sockAdd2Str_ (from));
-      xdr_destroy (&xdrs2);
-      return;
+        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "chanSendDgram_", sockAdd2Str_ (from));
+        xdr_destroy (&xdrs2);
+        return;
     }
-  xdr_destroy (&xdrs2);
-  return;
 
+    xdr_destroy (&xdrs2);
+    return;
 }
 
 void
 clusInfoReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr)
 {
-  static char fname[] = "clusInfoReq()";
-  XDR xdrs2;
-  char buf[MSGSIZE * 2];
-  enum limReplyCode limReplyCode;
-  struct LSFHeader replyHdr;
-  struct clusterInfoReply clusterInfoReply;
-  struct clusterInfoReq clusterInfoReq;
+    static char fname[] = "clusInfoReq()";
+    XDR xdrs2;
+    char buf[MSGSIZE * 2];
+    enum limReplyCode limReplyCode;
+    struct LSFHeader replyHdr;
+    struct clusterInfoReply clusterInfoReply;
+    struct clusterInfoReq clusterInfoReq;
 
-  limReplyCode = LIME_NO_ERR;
-  clusterInfoReply.clusterMatrix = NULL;
+    limReplyCode = LIME_NO_ERR;
+    clusterInfoReply.clusterMatrix = NULL;
 
-  memset (&clusterInfoReq, 0, sizeof (clusterInfoReq));
-  if (!xdr_clusterInfoReq (xdrs, &clusterInfoReq, reqHdr))
+    memset (&clusterInfoReq, 0, sizeof (clusterInfoReq));
+    if (!xdr_clusterInfoReq (xdrs, &clusterInfoReq, reqHdr))
     {
-      ls_syslog (LOG_WARNING, I18N_FUNC_FAIL, fname, "xdr_clusterInfoReq");
-      limReplyCode = LIME_BAD_DATA;
-      goto Reply1;
+        ls_syslog (LOG_WARNING, I18N_FUNC_FAIL, fname, "xdr_clusterInfoReq");
+        limReplyCode = LIME_BAD_DATA;
+        goto Reply1;
     }
 
-  if (!masterMe && clusterInfoReq.options == FROM_MASTER)
+    if (!masterMe && clusterInfoReq.options == FROM_MASTER)
     {
-      wrongMaster (from, buf, reqHdr, -1);
-      if (clusterInfoReq.resReq)
-	FREEUP (clusterInfoReq.resReq);
-      return;
+        wrongMaster (from, buf, reqHdr, -1);
+        if (clusterInfoReq.resReq) {
+            FREEUP (clusterInfoReq.resReq);
+        }
+        return;
     }
 
-  clusterInfoReply.shortLsInfo = getCShortInfo (reqHdr);
+    clusterInfoReply.shortLsInfo = getCShortInfo (reqHdr);
 
-  clusterInfoReply.nClus = 1;
-  clusterInfoReply.clusterMatrix = malloc (sizeof (struct shortCInfo));
-  if (clusterInfoReply.clusterMatrix == NULL)
+    clusterInfoReply.nClus = 1;
+    clusterInfoReply.clusterMatrix = malloc (sizeof (struct shortCInfo));
+    if (clusterInfoReply.clusterMatrix == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
-      limReplyCode = LIME_NO_MEM;
-      goto Reply;
+        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
+        limReplyCode = LIME_NO_MEM;
+        goto Reply;
     }
 
-  {
     strcpy (clusterInfoReply.clusterMatrix[0].clName, myClusterPtr->clName);
-    if ((myClusterPtr->status & CLUST_INFO_AVAIL) &&
-	(masterMe || (!masterMe && myClusterPtr->masterPtr != NULL)))
-      {
-	clusterInfoReply.clusterMatrix[0].status = CLUST_STAT_OK;
-	strcpy (clusterInfoReply.clusterMatrix[0].masterName,
-		myClusterPtr->masterPtr->hostName);
+    if ((myClusterPtr->status & CLUST_INFO_AVAIL) && (masterMe || (!masterMe && myClusterPtr->masterPtr != NULL)))
+    {
+        clusterInfoReply.clusterMatrix[0].status = CLUST_STAT_OK;
+        strcpy (clusterInfoReply.clusterMatrix[0].masterName,  myClusterPtr->masterPtr->hostName);
+        strcpy (clusterInfoReply.clusterMatrix[0].managerName, myClusterPtr->managerName);
 
-	strcpy (clusterInfoReply.clusterMatrix[0].managerName,
-		myClusterPtr->managerName);
+        clusterInfoReply.clusterMatrix[0].managerId    = myClusterPtr->managerId;
+        clusterInfoReply.clusterMatrix[0].numServers   = myClusterPtr->numHosts;
+        clusterInfoReply.clusterMatrix[0].numClients   = myClusterPtr->numClients;
+        clusterInfoReply.clusterMatrix[0].resClass     = myClusterPtr->resClass;
+        clusterInfoReply.clusterMatrix[0].typeClass    = myClusterPtr->typeClass;
+        clusterInfoReply.clusterMatrix[0].modelClass   = myClusterPtr->modelClass;
+        clusterInfoReply.clusterMatrix[0].numIndx      = myClusterPtr->numIndx;
+        clusterInfoReply.clusterMatrix[0].numUsrIndx   = myClusterPtr->numUsrIndx;
+        clusterInfoReply.clusterMatrix[0].usrIndxClass = myClusterPtr->usrIndxClass;
+        clusterInfoReply.clusterMatrix[0].nAdmins      = myClusterPtr->nAdmins;
+        clusterInfoReply.clusterMatrix[0].adminIds     = myClusterPtr->adminIds;
+        clusterInfoReply.clusterMatrix[0].admins       = myClusterPtr->admins;
+        if (reqHdr->version < 4) {
+            clusterInfoReply.clusterMatrix[0].nRes     = 0;
+        }
+        else {
+            clusterInfoReply.clusterMatrix[0].nRes       = allInfo.nRes;
+            clusterInfoReply.clusterMatrix[0].resBitMaps = myClusterPtr->resBitMaps;
+        }
+        clusterInfoReply.clusterMatrix[0].nTypes           = allInfo.nTypes;
+        clusterInfoReply.clusterMatrix[0].hostTypeBitMaps  = myClusterPtr->hostTypeBitMaps;
+        clusterInfoReply.clusterMatrix[0].nModels          = allInfo.nModels;
+        clusterInfoReply.clusterMatrix[0].hostModelBitMaps = myClusterPtr->hostModelBitMaps;
 
-	clusterInfoReply.clusterMatrix[0].managerId = myClusterPtr->managerId;
-	clusterInfoReply.clusterMatrix[0].numServers = myClusterPtr->numHosts;
-	clusterInfoReply.clusterMatrix[0].numClients
-	  = myClusterPtr->numClients;
-	clusterInfoReply.clusterMatrix[0].resClass = myClusterPtr->resClass;
-	clusterInfoReply.clusterMatrix[0].typeClass = myClusterPtr->typeClass;
-	clusterInfoReply.clusterMatrix[0].modelClass
-	  = myClusterPtr->modelClass;
-	clusterInfoReply.clusterMatrix[0].numIndx = myClusterPtr->numIndx;
-	clusterInfoReply.clusterMatrix[0].numUsrIndx
-	  = myClusterPtr->numUsrIndx;
-	clusterInfoReply.clusterMatrix[0].usrIndxClass
-	  = myClusterPtr->usrIndxClass;
-	clusterInfoReply.clusterMatrix[0].nAdmins = myClusterPtr->nAdmins;
-	clusterInfoReply.clusterMatrix[0].adminIds = myClusterPtr->adminIds;
-	clusterInfoReply.clusterMatrix[0].admins = myClusterPtr->admins;
-	if (reqHdr->version < 4)
-	  {
-	    clusterInfoReply.clusterMatrix[0].nRes = 0;
-	  }
-	else
-	  {
-	    clusterInfoReply.clusterMatrix[0].nRes = allInfo.nRes;
-	    clusterInfoReply.clusterMatrix[0].resBitMaps
-	      = myClusterPtr->resBitMaps;
-	  }
-	clusterInfoReply.clusterMatrix[0].nTypes = allInfo.nTypes;
-	clusterInfoReply.clusterMatrix[0].hostTypeBitMaps =
-	  myClusterPtr->hostTypeBitMaps;
-	clusterInfoReply.clusterMatrix[0].nModels = allInfo.nModels;
-	clusterInfoReply.clusterMatrix[0].hostModelBitMaps =
-	  myClusterPtr->hostModelBitMaps;
-
-	if (logclass & (LC_TRACE | LC_COMM))
-	  ls_syslog (LOG_DEBUG1,
-		     "clusterInfo:clusterInfoReply.clusterMatrix[%d].nRes=%d, name=%s",
-		     0, clusterInfoReply.clusterMatrix[0].nRes,
-		     clusterInfoReply.clusterMatrix[0].masterName);
-      }
-    else
-      {
-	clusterInfoReply.clusterMatrix[0].status = CLUST_STAT_UNAVAIL;
-	clusterInfoReply.clusterMatrix[0].masterName[0] = '\0';
-	clusterInfoReply.clusterMatrix[0].managerName[0] = '\0';
-	clusterInfoReply.clusterMatrix[0].managerId = 0;
-	clusterInfoReply.clusterMatrix[0].numServers = 0;
-	clusterInfoReply.clusterMatrix[0].numClients = 0;
-	clusterInfoReply.clusterMatrix[0].resClass = 0;
-	clusterInfoReply.clusterMatrix[0].typeClass = 0;
-	clusterInfoReply.clusterMatrix[0].modelClass = 0;
-	clusterInfoReply.clusterMatrix[0].numIndx = 0;
-	clusterInfoReply.clusterMatrix[0].numUsrIndx = 0;
-	clusterInfoReply.clusterMatrix[0].usrIndxClass = 0;
-	clusterInfoReply.clusterMatrix[0].nAdmins = 0;
-	clusterInfoReply.clusterMatrix[0].nRes = 0;
-	clusterInfoReply.clusterMatrix[0].nTypes = 0;
-	clusterInfoReply.clusterMatrix[0].nModels = 0;
-      }
-  }
+        if (logclass & (LC_TRACE | LC_COMM)) {
+            ls_syslog (LOG_DEBUG1, "clusterInfo:clusterInfoReply.clusterMatrix[%d].nRes=%d, name=%s", 0, clusterInfoReply.clusterMatrix[0].nRes, clusterInfoReply.clusterMatrix[0].masterName);
+        }
+        else {
+            clusterInfoReply.clusterMatrix[0].status         = CLUST_STAT_UNAVAIL;
+            clusterInfoReply.clusterMatrix[0].masterName[0]  = '\0';
+            clusterInfoReply.clusterMatrix[0].managerName[0] = '\0';
+            clusterInfoReply.clusterMatrix[0].managerId      = 0;
+            clusterInfoReply.clusterMatrix[0].numServers     = 0;
+            clusterInfoReply.clusterMatrix[0].numClients     = 0;
+            clusterInfoReply.clusterMatrix[0].resClass       = 0;
+            clusterInfoReply.clusterMatrix[0].typeClass      = 0;
+            clusterInfoReply.clusterMatrix[0].modelClass     = 0;
+            clusterInfoReply.clusterMatrix[0].numIndx        = 0;
+            clusterInfoReply.clusterMatrix[0].numUsrIndx     = 0;
+            clusterInfoReply.clusterMatrix[0].usrIndxClass   = 0;
+            clusterInfoReply.clusterMatrix[0].nAdmins        = 0;
+            clusterInfoReply.clusterMatrix[0].nRes           = 0;
+            clusterInfoReply.clusterMatrix[0].nTypes         = 0;
+            clusterInfoReply.clusterMatrix[0].nModels        = 0;
+        }
+    }
 
 Reply:
-  free (clusterInfoReq.resReq);
+    free (clusterInfoReq.resReq);
 
 Reply1:
-  initLSFHeader_ (&replyHdr);
-  replyHdr.opCode = (short) limReplyCode;
-  replyHdr.refCode = reqHdr->refCode;
+    initLSFHeader_ (&replyHdr);
+    replyHdr.opCode = (short) limReplyCode;
+    replyHdr.refCode = reqHdr->refCode;
 
-  xdrmem_create (&xdrs2, buf, MSGSIZE * 2, XDR_ENCODE);
-  if (!xdr_LSFHeader (&xdrs2, &replyHdr))
+    xdrmem_create (&xdrs2, buf, MSGSIZE * 2, XDR_ENCODE);
+    if (!xdr_LSFHeader (&xdrs2, &replyHdr))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_LSFHeader");
-      if (clusterInfoReply.clusterMatrix != NULL)
-	free (clusterInfoReply.clusterMatrix);
-      xdr_destroy (&xdrs2);
-      return;
+        ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_LSFHeader");
+        if (clusterInfoReply.clusterMatrix != NULL) {
+            free (clusterInfoReply.clusterMatrix);
+        }
+        xdr_destroy (&xdrs2);
+        return;
     }
 
-  if (limReplyCode == LIME_NO_ERR)
+    if (limReplyCode == LIME_NO_ERR)
     {
-      if (!xdr_clusterInfoReply (&xdrs2, &clusterInfoReply, &replyHdr))
-	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, fname,
-		     "xdr_clusterInfoReply");
-	  xdr_destroy (&xdrs2);
-	  if (clusterInfoReply.clusterMatrix != NULL)
-	    free (clusterInfoReply.clusterMatrix);
-	  return;
-	}
+        if (!xdr_clusterInfoReply (&xdrs2, &clusterInfoReply, &replyHdr))
+        {
+            ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, fname, "xdr_clusterInfoReply");
+            xdr_destroy (&xdrs2);
+            if (clusterInfoReply.clusterMatrix != NULL) {
+                free (clusterInfoReply.clusterMatrix);
+            }
+            return;
+        }
     }
 
-  if (chanSendDgram_ (limSock, buf, XDR_GETPOS (&xdrs2), from) < 0)
-    {
-      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "chanSendDgram_",
-		 sockAdd2Str_ (from));
-      xdr_destroy (&xdrs2);
-      if (clusterInfoReply.clusterMatrix != NULL)
-	free (clusterInfoReply.clusterMatrix);
-      return;
+    if (chanSendDgram_ (limSock, buf, XDR_GETPOS (&xdrs2), from) < 0) {
+
+        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "chanSendDgram_", sockAdd2Str_ (from));
+        xdr_destroy (&xdrs2);
+        if (clusterInfoReply.clusterMatrix != NULL) {
+            free (clusterInfoReply.clusterMatrix);
+        }
+        return;
     }
 
-  if (clusterInfoReply.clusterMatrix != NULL)
-    free (clusterInfoReply.clusterMatrix);
+    if (clusterInfoReply.clusterMatrix != NULL) {
+        free (clusterInfoReply.clusterMatrix);
+    }
 
-  xdr_destroy (&xdrs2);
-  return;
-
+    xdr_destroy (&xdrs2);
+    return;
 }
 
 void
@@ -304,19 +284,19 @@ masterInfoReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr)
   if (limReplyCode == LIME_NO_ERR)
     {
       masterPtr =
-	myClusterPtr->masterKnown ? myClusterPtr->masterPtr : myClusterPtr->
-	prevMasterPtr;
+  myClusterPtr->masterKnown ? myClusterPtr->masterPtr : myClusterPtr->
+  prevMasterPtr;
       strcpy (masterInfo.hostName, masterPtr->hostName);
       masterInfo.addr = masterPtr->addr[0];
       masterInfo.portno = masterPtr->statInfo.portno;
 
       if (!xdr_masterInfo (&xdrs2, &masterInfo, &replyHdr))
-	{
-	  ls_syslog (LOG_ERR, "\
+  {
+    ls_syslog (LOG_ERR, "\
 %s: failed encode xdr_masterInfo() to %s", __func__, sockAdd2Str_ (from));
-	  xdr_destroy (&xdrs2);
-	  return;
-	}
+    xdr_destroy (&xdrs2);
+    return;
+  }
     }
 
   if (chanSendDgram_ (limSock, buf, XDR_GETPOS (&xdrs2), from) < 0)
@@ -331,224 +311,208 @@ masterInfoReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr)
 }
 
 void
-hostInfoReq (XDR * xdrs,
-	     struct hostNode *fromHostP,
-	     struct sockaddr_in *from, struct LSFHeader *reqHdr, int s)
+hostInfoReq (XDR * xdrs, struct hostNode *fromHostP, struct sockaddr_in *from, struct LSFHeader *reqHdr, unsigned long chfd)
 {
-  static char fname[] = "hostInfoReq";
-  char *buf;
-  XDR xdrs2;
-  enum limReplyCode limReplyCode;
-  struct hostInfoReply hostInfoReply;
-  struct decisionReq hostInfoRequest;
-  struct resVal resVal;
-  int i, ncandidates, cc, propt, bufSize;
-  struct LSFHeader replyHdr;
-  char *replyStruct;
-  char fromEligible, clName;
-  struct tclHostData tclHostData;
+    static char fname[] = "hostInfoReq";
+    char *buf;
+    XDR xdrs2;
+    enum limReplyCode limReplyCode;
+    struct hostInfoReply hostInfoReply;
+    struct decisionReq hostInfoRequest;
+    struct resVal resVal;
+    int ncandidates = 0 ;
+    int cc = 0;
+    int propt = 0;
+    uint bufSize = 0;
+    struct LSFHeader replyHdr;
+    char *replyStruct;
+    char fromEligible = 'a';
+    char clName = 'a';
+    struct tclHostData tclHostData;
 
-  if (logclass & (LC_TRACE | LC_HANG | LC_COMM))
-    ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", fname);
-
-  initResVal (&resVal);
-
-  ignDedicatedResource = TRUE;
-
-  if (!xdr_decisionReq (xdrs, &hostInfoRequest, reqHdr))
-    {
-      limReplyCode = LIME_BAD_DATA;
-      goto Reply1;
+    if (logclass & (LC_TRACE | LC_HANG | LC_COMM)) {
+        ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", fname);
     }
 
-  if (!(hostInfoRequest.ofWhat == OF_HOSTS
-	&& hostInfoRequest.numPrefs == 2
-	&& equalHost_ (hostInfoRequest.preferredHosts[1],
-		       myHostPtr->hostName)))
-    {
-
-      if (!masterMe)
-	{
-	  char tmpBuf[MSGSIZE];
-
-	  wrongMaster (from, tmpBuf, reqHdr, s);
-	  for (i = 0; i < hostInfoRequest.numPrefs; i++)
-	    free (hostInfoRequest.preferredHosts[i]);
-	  free (hostInfoRequest.preferredHosts);
-	  return;
-	}
+    initResVal (&resVal);
+    ignDedicatedResource = TRUE;
+    if (!xdr_decisionReq (xdrs, &hostInfoRequest, reqHdr)) {
+        limReplyCode = LIME_BAD_DATA;
+        goto Reply1;
     }
 
-  if (!validHosts (hostInfoRequest.preferredHosts,
-		   hostInfoRequest.numPrefs,
-		   &clName, hostInfoRequest.options))
-    {
-      limReplyCode = LIME_UNKWN_HOST;
-      ls_syslog (LOG_INFO, "\
-%s: validHosts() failed for bad cluster/host name requested for <%s>", __func__, sockAdd2Str_ (from));
-      goto Reply;
+    if (!(hostInfoRequest.ofWhat == OF_HOSTS && hostInfoRequest.numPrefs == 2 && equalHost_ (hostInfoRequest.preferredHosts[1], myHostPtr->hostName))) {
+        if (!masterMe) {
+            char tmpBuf[MSGSIZE];
+            wrongMaster (from, tmpBuf, reqHdr, s);
+            for (i = 0; i < hostInfoRequest.numPrefs; i++) {
+                free (hostInfoRequest.preferredHosts[i]);
+            }
+            free (hostInfoRequest.preferredHosts);
+
+            return;
+        }
     }
 
-  propt = PR_SELECT;
-  if (hostInfoRequest.options & DFT_FROMTYPE)
-    propt |= PR_DEFFROMTYPE;
-
-  getTclHostData (&tclHostData, myHostPtr, myHostPtr, TRUE);
-  tclHostData.ignDedicatedResource = ignDedicatedResource;
-  cc = parseResReq (hostInfoRequest.resReq, &resVal, &allInfo, propt);
-  if (cc != PARSE_OK
-      || evalResReq (resVal.selectStr,
-		     &tclHostData,
-		     hostInfoRequest.options & DFT_FROMTYPE) < 0)
-    {
-      if (cc == PARSE_BAD_VAL)
-	limReplyCode = LIME_UNKWN_RVAL;
-      else if (cc == PARSE_BAD_NAME)
-	limReplyCode = LIME_UNKWN_RNAME;
-      else
-	limReplyCode = LIME_BAD_RESREQ;
-      goto Reply;
+    if (!validHosts (hostInfoRequest.preferredHosts, hostInfoRequest.numPrefs, &clName, hostInfoRequest.options)) {
+        limReplyCode = LIME_UNKWN_HOST;
+        ls_syslog (LOG_INFO, "%s: validHosts() failed for bad cluster/host name requested for <%s>", __func__, sockAdd2Str_ (from));
+        goto Reply;
     }
 
-  strcpy (hostInfoRequest.hostType,
-	  (fromHostP->hTypeNo >= 0) ?
-	  shortInfo.hostTypes[fromHostP->hTypeNo] : "unknown");
-
-  fromHostPtr = fromHostP;
-
-  ncandidates = getEligibleSites (&resVal,
-				  &hostInfoRequest, 1, &fromEligible);
-  if (ncandidates <= 0)
-    {
-      limReplyCode = ncandidates ? LIME_NO_MEM : LIME_NO_OKHOST;
-      goto Reply;
-    }
-  hostInfoReply.shortLsInfo = getCShortInfo (reqHdr);
-  hostInfoReply.nHost = ncandidates;
-  hostInfoReply.nIndex = allInfo.numIndx;
-  hostInfoReply.hostMatrix = calloc (ncandidates, sizeof (struct shortHInfo));
-  if (hostInfoReply.hostMatrix == NULL)
-    {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "malloc");
-      limReplyCode = LIME_NO_MEM;
-      goto Reply;
+    propt = PR_SELECT;
+    if (hostInfoRequest.options & DFT_FROMTYPE) {
+        propt |= PR_DEFFROMTYPE;
     }
 
-  for (i = 0; i < ncandidates; i++)
+    getTclHostData (&tclHostData, myHostPtr, myHostPtr, TRUE);
+    tclHostData.ignDedicatedResource = ignDedicatedResource;
+    cc = parseResReq (hostInfoRequest.resReq, &resVal, &allInfo, propt);
+    if (cc != PARSE_OK || evalResReq (resVal.selectStr, &tclHostData, hostInfoRequest.options & DFT_FROMTYPE) < 0)
     {
-      struct shortHInfo *infoPtr;
-      infoPtr = &hostInfoReply.hostMatrix[i];
-      if (candidates[i]->infoValid)
-	{
-	  infoPtr->maxCpus = candidates[i]->statInfo.maxCpus;
-	  infoPtr->maxMem = candidates[i]->statInfo.maxMem;
-	  infoPtr->maxSwap = candidates[i]->statInfo.maxSwap;
-	  infoPtr->maxTmp = candidates[i]->statInfo.maxTmp;
-	  infoPtr->nDisks = candidates[i]->statInfo.nDisks;
-	  infoPtr->resBitMaps = candidates[i]->resBitMaps;
-	  infoPtr->nRInt = GET_INTNUM (allInfo.nRes);
-	}
-      else
-	{
-	  infoPtr->maxCpus = 0;
-	  infoPtr->maxMem = 0;
-	  infoPtr->maxSwap = 0;
-	  infoPtr->maxTmp = 0;
-	  infoPtr->nDisks = 0;
-	  infoPtr->resBitMaps = candidates[i]->resBitMaps;
-	  infoPtr->nRInt = GET_INTNUM (allInfo.nRes);
-	}
-      infoPtr->hTypeIndx = candidates[i]->hTypeNo;
-      infoPtr->hModelIndx = candidates[i]->hModelNo;
-      infoPtr->resClass = candidates[i]->resClass;
-      infoPtr->windows = candidates[i]->windows;
-      strcpy (infoPtr->hostName, candidates[i]->hostName);
-      infoPtr->busyThreshold = candidates[i]->busyThreshold;
-      if (candidates[i]->hostInactivityCount == -1)
-	infoPtr->flags = 0;
-      else
-	infoPtr->flags = HINFO_SERVER;
-      if (definedSharedResource (candidates[i], &allInfo) == TRUE)
-	{
-	  infoPtr->flags |= HINFO_SHARED_RESOURCE;
-	}
-      infoPtr->rexPriority = candidates[i]->rexPriority;
+        if (cc == PARSE_BAD_VAL) {
+            limReplyCode = LIME_UNKWN_RVAL;
+        }
+        else if (cc == PARSE_BAD_NAME) {
+            limReplyCode = LIME_UNKWN_RNAME;
+        }
+        else {
+            limReplyCode = LIME_BAD_RESREQ;
+        }
+        goto Reply;
     }
-  limReplyCode = LIME_NO_ERR;
+
+    strcpy (hostInfoRequest.hostType, (fromHostP->hTypeNo >= 0) ? shortInfo.hostTypes[fromHostP->hTypeNo] : "unknown");
+    fromHostPtr = fromHostP;
+    ncandidates = getEligibleSites (&resVal, &hostInfoRequest, 1, &fromEligible);
+    if (ncandidates <= 0) {
+        limReplyCode = ncandidates ? LIME_NO_MEM : LIME_NO_OKHOST;
+        goto Reply;
+    }
+
+    hostInfoReply.shortLsInfo = getCShortInfo (reqHdr);
+    hostInfoReply.nHost = ncandidates;
+    hostInfoReply.nIndex = allInfo.numIndx;
+    hostInfoReply.hostMatrix = calloc (ncandidates, sizeof (struct shortHInfo));
+    if (hostInfoReply.hostMatrix == NULL) {
+        ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "malloc");
+        limReplyCode = LIME_NO_MEM;
+        goto Reply;
+    }
+
+    for (i = 0; i < ncandidates; i++) {
+        struct shortHInfo *infoPtr;
+        infoPtr = &hostInfoReply.hostMatrix[i];
+        if (candidates[i]->infoValid) {
+
+            infoPtr->maxCpus = candidates[i]->statInfo.maxCpus;
+            infoPtr->maxMem = candidates[i]->statInfo.maxMem;
+            infoPtr->maxSwap = candidates[i]->statInfo.maxSwap;
+            infoPtr->maxTmp = candidates[i]->statInfo.maxTmp;
+            infoPtr->nDisks = candidates[i]->statInfo.nDisks;
+            infoPtr->resBitMaps = candidates[i]->resBitMaps;
+            infoPtr->nRInt = GET_INTNUM (allInfo.nRes);
+        }
+        else {
+            infoPtr->maxCpus = 0;
+            infoPtr->maxMem = 0;
+            infoPtr->maxSwap = 0;
+            infoPtr->maxTmp = 0;
+            infoPtr->nDisks = 0;
+            infoPtr->resBitMaps = candidates[i]->resBitMaps;
+            infoPtr->nRInt = GET_INTNUM (allInfo.nRes);
+        }
+        infoPtr->hTypeIndx = candidates[i]->hTypeNo;
+        infoPtr->hModelIndx = candidates[i]->hModelNo;
+        infoPtr->resClass = candidates[i]->resClass;
+        infoPtr->windows = candidates[i]->windows;
+        strcpy (infoPtr->hostName, candidates[i]->hostName);
+        infoPtr->busyThreshold = candidates[i]->busyThreshold;
+
+        if (candidates[i]->hostInactivityCount == -1) {
+            infoPtr->flags = 0;
+        }
+        else {
+            infoPtr->flags = HINFO_SERVER;
+        }
+
+        if (definedSharedResource (candidates[i], &allInfo) == TRUE) {
+            infoPtr->flags |= HINFO_SHARED_RESOURCE;
+        }
+        infoPtr->rexPriority = candidates[i]->rexPriority;
+    }
+    limReplyCode = LIME_NO_ERR;
 
 Reply:
-  for (i = 0; i < hostInfoRequest.numPrefs; i++)
-    free (hostInfoRequest.preferredHosts[i]);
-  free (hostInfoRequest.preferredHosts);
+    for (i = 0; i < hostInfoRequest.numPrefs; i++) {
+        free (hostInfoRequest.preferredHosts[i]);
+    }
+    free (hostInfoRequest.preferredHosts);
 
 Reply1:
-  freeResVal (&resVal);
-  initLSFHeader_ (&replyHdr);
-  replyHdr.opCode = (short) limReplyCode;
-  replyHdr.refCode = reqHdr->refCode;
+    freeResVal (&resVal);
+    initLSFHeader_ (&replyHdr);
+    replyHdr.opCode = (short) limReplyCode;
+    replyHdr.refCode = reqHdr->refCode;
 
-  if (limReplyCode == LIME_NO_ERR)
-    {
-      replyStruct = (char *) &hostInfoReply;
-      bufSize = ALIGNWORD_ (MSGSIZE
-			    + hostInfoReply.nHost * (128 +
-						     hostInfoReply.nIndex *
-						     4));
-      bufSize = MAX (bufSize, 4 * MSGSIZE);
+    if (limReplyCode == LIME_NO_ERR) {
+        replyStruct = (char *) &hostInfoReply;
+        bufSize = ALIGNWORD_ (MSGSIZE + hostInfoReply.nHost * (128 + hostInfoReply.nIndex * 4));
+        bufSize = MAX (bufSize, 4 * MSGSIZE);
     }
-  else
-    {
+    else {
       replyStruct = NULL;
       bufSize = 512;
     }
 
-  buf = malloc (bufSize);
-  if (!buf)
+    buf = malloc (bufSize);
+    if (!buf)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "malloc");
-      if (limReplyCode == LIME_NO_ERR)
-	free (hostInfoReply.hostMatrix);
-      return;
+        ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "malloc");
+        if (limReplyCode == LIME_NO_ERR) {
+            free (hostInfoReply.hostMatrix);
+        }
+        return;
     }
 
-  xdrmem_create (&xdrs2, buf, bufSize, XDR_ENCODE);
+    xdrmem_create (&xdrs2, buf, bufSize, XDR_ENCODE);
 
-  if (!xdr_encodeMsg (&xdrs2,
-		      replyStruct, &replyHdr, xdr_hostInfoReply, 0, NULL))
+    if (!xdr_encodeMsg (&xdrs2, replyStruct, &replyHdr, xdr_hostInfoReply, 0, NULL))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_encodeMsg");
-      xdr_destroy (&xdrs2);
-      if (limReplyCode == LIME_NO_ERR)
-	free (hostInfoReply.hostMatrix);
-      return;
+        ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_encodeMsg");
+        xdr_destroy (&xdrs2);
+        if (limReplyCode == LIME_NO_ERR)
+            free (hostInfoReply.hostMatrix);
+        return;
     }
 
-  if (limReplyCode == LIME_NO_ERR)
-    free (hostInfoReply.hostMatrix);
-
-  if (s < 0)
-    cc = chanSendDgram_ (limSock, buf, XDR_GETPOS (&xdrs2), from);
-  else
-    cc = chanWrite_ (s, buf, XDR_GETPOS (&xdrs2));
-
-  free (buf);
-
-  if (cc < 0)
-    {
-      ls_syslog (LOG_ERR, "\
-%s: Failed in sending lshosts reply to %s len %d: %m", __func__, sockAdd2Str_ (from), XDR_GETPOS (&xdrs2));
-      xdr_destroy (&xdrs2);
-      return;
+    if (limReplyCode == LIME_NO_ERR) {
+        free (hostInfoReply.hostMatrix);
     }
 
-  xdr_destroy (&xdrs2);
-  return;
+    if (s < 0) {
+        cc = chanSendDgram_ (limSock, buf, XDR_GETPOS (&xdrs2), from);
+    }
+    else {
+        cc = chanWrite_ (s, buf, XDR_GETPOS (&xdrs2));
+    }
+
+    free (buf);
+
+    if (cc < 0)
+    {
+        ls_syslog (LOG_ERR, "%s: Failed in sending lshosts reply to %s len %d: %m", __func__, sockAdd2Str_ (from), XDR_GETPOS (&xdrs2));
+        xdr_destroy (&xdrs2);
+        return;
+    }
+
+    xdr_destroy (&xdrs2);
+    return;
 
 }
 
 void
-infoReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr,
-	 int s)
+infoReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr, unsigned long s)
 {
   static char fname[] = "infoReq";
   static char *buf;
@@ -561,12 +525,12 @@ infoReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr,
   if (buf == NULL)
     {
       len = sizeof (struct lsInfo) + allInfo.nRes * sizeof (struct resItem)
-	+ 10000;
+  + 10000;
       if (!(buf = (char *) malloc (len)))
-	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "malloc");
-	  return;
-	}
+  {
+    ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "malloc");
+    return;
+  }
     }
   if (logclass & (LC_TRACE | LC_HANG | LC_COMM))
     ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", fname);
@@ -581,7 +545,7 @@ infoReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr,
   replyHdr.refCode = reqHdr->refCode;
 
   if (!xdr_encodeMsg (&xdrs2, (char *) &allInfo, &replyHdr, xdr_lsInfo, 0,
-		      NULL))
+          NULL))
     {
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_encodeMsg");
       xdr_destroy (&xdrs2);
@@ -596,8 +560,8 @@ infoReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr,
 
   if (cc < 0)
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7401, "%s: Failed in sending lsinfo back to %s (len=%d) %m"),	/* catgets 7401 */
-		 fname, sockAdd2Str_ (from), XDR_GETPOS (&xdrs2));
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7401, "%s: Failed in sending lsinfo back to %s (len=%d) %m"),  /* catgets 7401 */
+     fname, sockAdd2Str_ (from), XDR_GETPOS (&xdrs2));
       xdr_destroy (&xdrs2);
       return;
     }
@@ -654,17 +618,17 @@ Reply:
   if (limReplyCode == LIME_NO_ERR)
     {
       if (!xdr_float (&xdrs2, (float *) hashEntPtr->hData))
-	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_float");
-	  xdr_destroy (&xdrs2);
-	  return;
-	}
+  {
+    ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_float");
+    xdr_destroy (&xdrs2);
+    return;
+  }
     }
 
   if (chanSendDgram_ (limSock, buf, XDR_GETPOS (&xdrs2), from) < 0)
     {
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "chanSendDgram_",
-		 sockAdd2Str_ (from));
+     sockAdd2Str_ (from));
       xdr_destroy (&xdrs2);
       return;
     }
@@ -688,11 +652,11 @@ validHosts (char **hostList, int num, char *clName, int options)
     {
 
       if (findHostbyList (clPtr->hostList, hostList[cc]) == NULL)
-	{
-	  ls_syslog (LOG_WARNING, "\
+  {
+    ls_syslog (LOG_WARNING, "\
 %s: Unknown host %s in request", __func__, hostList[cc]);
-	  return FALSE;
-	}
+    return FALSE;
+  }
     }
 
   return TRUE;
@@ -739,13 +703,13 @@ getCShortInfo (struct LSFHeader *reqHdr)
   if (reqHdr->version < 4)
     {
       if (shortInfo.nRes > MAXSRES)
-	{
-	  oldShortInfo.nRes = MAXSRES;
-	}
+  {
+    oldShortInfo.nRes = MAXSRES;
+  }
       else
-	{
-	  oldShortInfo.nRes = shortInfo.nRes;
-	}
+  {
+    oldShortInfo.nRes = shortInfo.nRes;
+  }
       oldShortInfo.resName = shortInfo.resName;
     }
 
@@ -754,7 +718,7 @@ getCShortInfo (struct LSFHeader *reqHdr)
 
 void
 resourceInfoReq (XDR * xdrs, struct sockaddr_in *from,
-		 struct LSFHeader *reqHdr, int s)
+     struct LSFHeader *reqHdr, int s)
 {
   static char fname[] = "resourceInfoReq";
   char buf1[MSGSIZE];
@@ -788,11 +752,11 @@ resourceInfoReq (XDR * xdrs, struct sockaddr_in *from,
     {
 
       limReplyCode =
-	checkResources (&resourceInfoReq, &resourceInfoReply, &cc);
+  checkResources (&resourceInfoReq, &resourceInfoReply, &cc);
       if (limReplyCode != LIME_NO_ERR)
-	cc = MSGSIZE;
+  cc = MSGSIZE;
       else
-	cc += 4 * MSGSIZE;
+  cc += 4 * MSGSIZE;
     }
 
   xdr_lsffree (xdr_resourceInfoReq, (char *) &resourceInfoReq, reqHdr);
@@ -831,8 +795,8 @@ resourceInfoReq (XDR * xdrs, struct sockaddr_in *from,
 
   if (cc < 0)
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7402, "%s: Failed in sending lsresources reply to %s (len=%d): %m"),	/* catgets 7402 */
-		 fname, sockAdd2Str_ (from), XDR_GETPOS (&xdrs2));
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7402, "%s: Failed in sending lsresources reply to %s (len=%d): %m"), /* catgets 7402 */
+     fname, sockAdd2Str_ (from), XDR_GETPOS (&xdrs2));
       FREEUP (buf);
       xdr_destroy (&xdrs2);
       freeResourceInfoReply (&resourceInfoReply);
@@ -848,7 +812,7 @@ resourceInfoReq (XDR * xdrs, struct sockaddr_in *from,
 
 static int
 checkResources (struct resourceInfoReq *resourceInfoReq,
-		struct resourceInfoReply *reply, int *len)
+    struct resourceInfoReply *reply, int *len)
 {
   static char fname[] = "checkResources";
   int i, j, allResources = FALSE, found = FALSE;
@@ -868,18 +832,18 @@ checkResources (struct resourceInfoReq *resourceInfoReq,
 
   if (resourceInfoReq->hostName == NULL
       || (resourceInfoReq->hostName
-	  && !strcmp (resourceInfoReq->hostName, " ")))
+    && !strcmp (resourceInfoReq->hostName, " ")))
     host = NULL;
   else
     {
 
       if (findHostbyList (myClusterPtr->hostList,
-			  resourceInfoReq->hostName) == NULL)
-	{
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7403, "%s: Host <%s>  is not used by cluster <%s>"),	/* catgets 7403 */
-		     fname, resourceInfoReq->hostName, myClusterName);
-	  return LIME_UNKWN_HOST;
-	}
+        resourceInfoReq->hostName) == NULL)
+  {
+    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7403, "%s: Host <%s>  is not used by cluster <%s>"), /* catgets 7403 */
+         fname, resourceInfoReq->hostName, myClusterName);
+    return LIME_UNKWN_HOST;
+  }
       host = resourceInfoReq->hostName;
     }
 
@@ -898,30 +862,30 @@ checkResources (struct resourceInfoReq *resourceInfoReq,
     {
       found = FALSE;
       for (j = 0; j < numHostResources; j++)
-	{
-	  if (allResources == FALSE
-	      && (strcmp (resourceInfoReq->resourceNames[i],
-			  hostResources[j]->resourceName)))
-	    continue;
-	  found = TRUE;
-	  if ((limReplyCode =
-	       copyResource (reply, hostResources[j], len,
-			     host)) != LIME_NO_ERR)
-	    {
-	      return limReplyCode;
-	    }
-	  reply->numResources++;
-	  if (allResources == FALSE)
-	    break;
-	}
+  {
+    if (allResources == FALSE
+        && (strcmp (resourceInfoReq->resourceNames[i],
+        hostResources[j]->resourceName)))
+      continue;
+    found = TRUE;
+    if ((limReplyCode =
+         copyResource (reply, hostResources[j], len,
+           host)) != LIME_NO_ERR)
+      {
+        return limReplyCode;
+      }
+    reply->numResources++;
+    if (allResources == FALSE)
+      break;
+  }
       if (allResources == FALSE && found == FALSE)
-	{
+  {
 
-	  return LIME_UNKWN_RNAME;
-	}
+    return LIME_UNKWN_RNAME;
+  }
       found = FALSE;
       if (allResources == TRUE)
-	break;
+  break;
     }
   return LIME_NO_ERR;
 
@@ -929,7 +893,7 @@ checkResources (struct resourceInfoReq *resourceInfoReq,
 
 static int
 copyResource (struct resourceInfoReply *reply,
-	      struct sharedResource *resource, int *len, char *hostName)
+        struct sharedResource *resource, int *len, char *hostName)
 {
   static char fname[] = "copyResource";
   int i, j, num, cc = 0, found = FALSE, numInstances;
@@ -941,7 +905,7 @@ copyResource (struct resourceInfoReply *reply,
 
   if ((reply->resources[num].instances = (struct lsSharedResourceInstance *)
        malloc (resource->numInstances
-	       * sizeof (struct lsSharedResourceInstance))) == NULL)
+         * sizeof (struct lsSharedResourceInstance))) == NULL)
     {
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
       return (LIME_NO_MEM);
@@ -954,42 +918,42 @@ copyResource (struct resourceInfoReply *reply,
   for (i = 0; i < resource->numInstances; i++)
     {
       if (hostName)
-	{
-	  for (j = 0; j < resource->instances[i]->nHosts; j++)
-	    {
-	      if (equalHost_
-		  (hostName, resource->instances[i]->hosts[j]->hostName))
-		{
-		  found = TRUE;
-		  break;
-		}
-	      else
-		continue;
-	    }
-	}
+  {
+    for (j = 0; j < resource->instances[i]->nHosts; j++)
+      {
+        if (equalHost_
+      (hostName, resource->instances[i]->hosts[j]->hostName))
+    {
+      found = TRUE;
+      break;
+    }
+        else
+    continue;
+      }
+  }
       if (hostName && found == FALSE)
-	continue;
+  continue;
 
       found = FALSE;
       reply->resources[num].instances[numInstances].value =
-	resource->instances[i]->value;
+  resource->instances[i]->value;
       reply->resources[num].instances[numInstances].nHosts = 0;
       if ((reply->resources[num].instances[numInstances].hostList =
-	   (char **) malloc (resource->instances[i]->nHosts
-			     * sizeof (char *))) == NULL)
-	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
-	  return (LIME_NO_MEM);
-	}
+     (char **) malloc (resource->instances[i]->nHosts
+           * sizeof (char *))) == NULL)
+  {
+    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
+    return (LIME_NO_MEM);
+  }
       cc += strlen (resource->instances[i]->value) + 1;
       for (j = 0; j < resource->instances[i]->nHosts; j++)
-	{
-	  reply->resources[num].instances[numInstances].hostList[j] =
-	    resource->instances[i]->hosts[j]->hostName;
-	  cc += MAXHOSTNAMELEN;
-	}
+  {
+    reply->resources[num].instances[numInstances].hostList[j] =
+      resource->instances[i]->hosts[j]->hostName;
+    cc += MAXHOSTNAMELEN;
+  }
       reply->resources[num].instances[numInstances].nHosts =
-	resource->instances[i]->nHosts;
+  resource->instances[i]->nHosts;
       numInstances++;
     }
   reply->resources[num].nInstances = numInstances;
@@ -1008,7 +972,7 @@ freeResourceInfoReply (struct resourceInfoReply *reply)
   for (i = 0; i < reply->numResources; i++)
     {
       for (j = 0; j < reply->resources[i].nInstances; j++)
-	FREEUP (reply->resources[i].instances[j].hostList);
+  FREEUP (reply->resources[i].instances[j].hostList);
       FREEUP (reply->resources[i].instances);
     }
   FREEUP (reply->resources);

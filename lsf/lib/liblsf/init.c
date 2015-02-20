@@ -191,33 +191,44 @@ opensocks_ (int num)
 /* ls_fdbusy()
  */
 int
-ls_fdbusy (int fd)
+ls_fdbusy (uint fd)
 {
     sTab hashSearchPtr;
     hEnt *hEntPtr;
 
-    if (fd == chanSock_ (limchans_[PRIMARY])
-            || fd == chanSock_ (limchans_[MASTER])
-            || fd == chanSock_ (limchans_[UNBOUND]))
+    assert (limchans_[PRIMARY] >= 0 );
+    assert (limchans_[MASTER] >= 0 );
+    assert (limchans_[UNBOUND] >= 0 );
+    if (    fd == chanSock_ ((uint)limchans_[PRIMARY]) ||
+            fd == chanSock_ ((uint)limchans_[MASTER])  ||
+            fd == chanSock_ ((uint)limchans_[UNBOUND])
+        )
+    {
         return TRUE;
+    }
 
-    if (fd == cli_nios_fd[0])
+    if ((int)fd == cli_nios_fd[0]) {
         return TRUE;
+    }
 
     hEntPtr = h_firstEnt_ (&conn_table, &hashSearchPtr);
-    while (hEntPtr)
-        {
-            int *pfd;
+    while (hEntPtr)  {
+        int *pfd;
 
-            pfd = hEntPtr->hData;
-            if (fd == pfd[0] || fd == pfd[1])
-    return (TRUE);
-
-            hEntPtr = h_nextEnt_ (&hashSearchPtr);
+        pfd = hEntPtr->hData;
+        assert( pfd[0] >= 0);
+        assert( pfd[1] >= 0 );
+        if (fd == (uint)pfd[0] || fd == (uint)pfd[1])  {
+            return (TRUE);
         }
 
-    if (rootuid_ && fd >= currentsocket_ && fd < FIRST_RES_SOCK + totsockets_)
+        hEntPtr = h_nextEnt_ (&hashSearchPtr);
+    }
+
+    assert( currentsocket_ >= 0 );
+    if (rootuid_ && fd >= (uint)currentsocket_ && fd < FIRST_RES_SOCK +  (uint)totsockets_) {
         return TRUE;
+    }
 
     return FALSE;
 }

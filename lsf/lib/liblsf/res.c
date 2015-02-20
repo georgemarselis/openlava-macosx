@@ -97,7 +97,7 @@ ls_connect (char *host)
     memcpy ((char *) &res_addr_.sin_addr, (char *) hp->h_addr, (int) hp->h_length);
     if ((rootuid_) && (genParams_[LSF_AUTH].paramValue == NULL))
     {
-        if (currentsocket_ > (FIRST_RES_SOCK + totsockets_ - 1))
+        if (currentsocket_ > (int)(FIRST_RES_SOCK + (uint)totsockets_ - 1))
         {
             lserrno = LSE_NOMORE_SOCK;
             return (-1);

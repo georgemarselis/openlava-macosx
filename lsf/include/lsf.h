@@ -101,7 +101,8 @@ typedef unsigned long LS_UNS_LONG_INT;
 #define MAXMODELS_31            30
 #define MAXFILENAMELEN          256
 
-#define FIRST_RES_SOCK  20
+// #define FIRST_RES_SOCK  20
+static const uint FIRST_RES_SOCK = 20;
 
 #ifdef HAVE_UNION_WAIT
   #define LS_WAIT_T      union wait
@@ -955,7 +956,7 @@ extern int ls_setstdout (int on, char *format);
 extern int ls_niossync (long numTasks);
 extern int ls_setstdin (int on, int *rpidlist, size_t len);
 extern int ls_chdir (char *, char *);
-extern int ls_fdbusy (int fd);
+extern int ls_fdbusy (uint fd);
 extern char *ls_getmnthost (char *fn);
 extern int ls_servavail (int, int);
 extern int ls_setpriority (int newPriority);

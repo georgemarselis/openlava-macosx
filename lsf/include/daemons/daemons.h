@@ -557,7 +557,7 @@ int initTcl (struct tclLsInfo *);
 
 extern int fileExist (char *file, uid_t uid, struct hostent *);
 extern void freeWeek (windows_t **);
-extern void errorBack (int chan, ushort replyCode, struct sockaddr_in *from);
+extern void errorBack (uint chan, ushort replyCode, struct sockaddr_in *from);
 
 extern int init_ServSock (u_short port);
 extern int server_reply (int, char *, int);

@@ -122,7 +122,8 @@ die (int sig)
             }
         }
 
-    shutdown (chanSock_ (batchSock), 2);
+    assert( batchSock <= INT_MAX );
+    shutdown ((int)chanSock_ ( (uint)batchSock), 2);
 
     exit (sig);
 
@@ -503,7 +504,7 @@ freeWeek (windows_t * week[])
 }
 
 void
-errorBack (int chan, ushort replyCode, struct sockaddr_in *from)
+errorBack (uint chan, ushort replyCode, struct sockaddr_in *from)
 {
     static char fname[] = "errorBack";
     struct LSFHeader replyHdr;
@@ -513,12 +514,13 @@ errorBack (int chan, ushort replyCode, struct sockaddr_in *from)
     xdrmem_create (&xdrs, errBuf, MSGSIZE / 8, XDR_ENCODE);
     initLSFHeader_ (&replyHdr);
     replyHdr.opCode = replyCode;
-    io_block_ (chanSock_ (chan));
-    if (xdr_encodeMsg (&xdrs, NULL, &replyHdr, NULL, 0, NULL))
-        {
-        if (chanWrite_ (chan, errBuf, XDR_GETPOS (&xdrs)) < 0)
+    io_block_ ((int)chanSock_ (chan));
+    if (xdr_encodeMsg (&xdrs, NULL, &replyHdr, NULL, 0, NULL)) {
+        assert( chan <= INT_MAX );
+        if (chanWrite_ ((int)chan, errBuf, XDR_GETPOS (&xdrs)) < 0) {
             ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "chanWrite_", sockAdd2Str_ (from));
         }
+    }
     else {
         ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "xdr_encodeMsg", sockAdd2Str_ (from));
     }
