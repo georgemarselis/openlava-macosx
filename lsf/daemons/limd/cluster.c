@@ -29,7 +29,7 @@
 
 struct clientNode *clientMap[MAXCLIENTS];
 
-extern unsigned long chanIndex;
+extern unsigned int chanIndex;
 
 static void processMsg (unsigned int chfd);
 static void clientReq (XDR *xdrs, struct LSFHeader *hdr, unsigned int chfd);
@@ -51,14 +51,14 @@ clientIO (struct Masks *chanmasks)
             if (clientMap[i]) {
                 ls_syslog (LOG_ERR, "%s: Lost connection with client %s IO or decode error", __func__, sockAdd2Str_ (&clientMap[i]->from));
             }
-            assert( i <= INT_MAX );
-            shutDownChan ( i);
+            assert( i <= UINT_MAX );
+            shutDownChan ((uint)i);
             continue;
         }
 
         if (FD_ISSET (i, &chanmasks->rmask)) {
-            assert( i <= INT_MAX );
-            processMsg (i);
+            assert( i <= UINT_MAX );
+            processMsg ((uint)i);
         }
     }
 }
@@ -77,13 +77,15 @@ processMsg (unsigned int chfd)
         return;
     }
 
-    if (chanDequeue_ (chfd, &buf) < 0) {
+    assert( chfd <= INT_MAX );
+    if (chanDequeue_ ((int)chfd, &buf) < 0) {
         ls_syslog (LOG_ERR, "%s: failed to dequeue from channel %d %M", __func__, chfd);
         shutDownChan (chfd);
         return;
     }
 
-    xdrmem_create (&xdrs, buf->data, XDR_DECODE_SIZE_ (buf->len), XDR_DECODE);
+    assert( buf->len <= UINT_MAX );
+    xdrmem_create (&xdrs, buf->data, XDR_DECODE_SIZE_ ((uint)buf->len), XDR_DECODE);
 
     if (!xdr_LSFHeader (&xdrs, &hdr)) {
         ls_syslog (LOG_ERR, "%s: Bad header received chfd %d from %s", __func__, chfd, sockAdd2Str_ (&from));
@@ -114,7 +116,8 @@ processMsg (unsigned int chfd)
         if (hdr.opCode != LIM_CLUST_INFO) {
             socklen_t L = sizeof (struct sockaddr_in);
 
-            if (getpeername (chanSock_ (chfd), (struct sockaddr *) &from, &L) < 0) {
+            assert( chfd <= INT_MAX );
+            if (getpeername ((int)chanSock_ (chfd), (struct sockaddr *) &from, &L) < 0) {
                 ls_syslog (LOG_ERR, "%s: getpeername() on socket %d failed %M", __func__, chanSock_ (chfd));
             }
 
@@ -140,7 +143,8 @@ processMsg (unsigned int chfd)
             clientReq (&xdrs, &hdr, chfd);
         break;
         case LIM_LOAD_ADJ:
-            loadadjReq (&xdrs, &clientMap[chfd]->from, &hdr, chfd);
+            assert( chfd <= INT_MAX );
+            loadadjReq (&xdrs, &clientMap[chfd]->from, &hdr, (int)chfd);
             xdr_destroy (&xdrs);
             shutDownChan (chfd);
             chanFreeBuf_ (buf);
@@ -210,11 +214,11 @@ Reply1:
 
         if (!limParams[LIM_NO_FORK].paramValue) {
             assert( limSock >= 0);
-            chanClose_ ( (unsigned long)limSock);
+            chanClose_ (limSock);
         }
 
         XDR_SETPOS (xdrs, oldpos);
-        io_block_ (chanSock_ (chfd));
+        io_block_ ((int)chanSock_ (chfd));
 
         switch (hdr->opCode){
             case LIM_GET_HOSTINFO:
@@ -258,7 +262,7 @@ Reply1:
 static void
 shutDownChan (unsigned int chfd)
 {
-    chanClose_ (chfd);
+    chanClose_ ((int)chfd);
     if (clientMap[chfd]) {
         chanFreeBuf_ (clientMap[chfd]->reqbuf);
         FREEUP (clientMap[chfd]);

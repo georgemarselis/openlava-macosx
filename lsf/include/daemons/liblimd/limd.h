@@ -32,7 +32,7 @@
 #include "lib/xdr.h"
 #include "lsf.h"
 
-#define EXCHINTVL 	          15
+#define EXCHINTVL             15
 #define SAMPLINTVL            5
 #define HOSTINACTIVITYLIMIT   5
 #define MASTERINACTIVITYLIMIT 2
@@ -72,6 +72,7 @@ struct timewindow
 struct statInfo
 {
   short hostNo;
+  char padding1[2];
   int maxCpus;
   int maxMem;
   int maxSwap;
@@ -80,6 +81,7 @@ struct statInfo
   u_short portno;
   char hostType[MAXLSFNAMELEN];
   char hostArch[MAXLSFNAMELEN];
+  char padding2[2];
 };
 
 #define HF_INFO_VALID   0x01
@@ -88,54 +90,58 @@ struct statInfo
 
 struct hostNode
 {
-  char *hostName;
-  short hModelNo;
-  short hTypeNo;
-  short hostNo;
-  u_short naddr;
-  in_addr_t *addr;
-  struct statInfo statInfo;
-  char infoValid;
-  unsigned char protoVersion;
-  short availHigh;
-  short availLow;
-  short use;
-  int resClass;
-  int DResClass;
-  u_short nRes;
-  char *windows;
-  windows_t *week[8];
-  time_t wind_edge;
-  time_t lastJackTime;
-  short hostInactivityCount;
-  int *status;
-  float *busyThreshold;
-  float *loadIndex;
-  float *uloadIndex;
-  char conStatus;
-  u_int lastSeqNo;
-  int rexPriority;
-  int infoMask;
-  int loadMask;
-  int *resBitMaps;
-  int *DResBitMaps;
-  int numInstances;
-  struct resourceInstance **instances;
-  int callElim;
-  int maxResIndex;
-  int *resBitArray;
-  struct hostNode *nextPtr;
-  time_t expireTime;
-  uint8_t migrant;
+    short hModelNo;
+    short hTypeNo;
+    short hostNo;
+    short availHigh;
+    short availLow;
+    short use;
+    short hostInactivityCount;
+    u_short naddr;
+    u_short nRes;
+    char padding1[2];
+    int infoMask;
+    int loadMask;
+    int numInstances;
+    int callElim;
+    int maxResIndex;
+    int resClass;
+    int DResClass;
+    int rexPriority;
+    uint8_t migrant;
+    char padding2[3];
+    int *resBitMaps;
+    int *DResBitMaps;
+    int *resBitArray;
+    int *status;
+    in_addr_t *addr;
+    u_int lastSeqNo;
+    char infoValid;
+    char conStatus;
+    unsigned char protoVersion;
+    char padding3[1];
+    char *hostName;
+    char *windows;
+    windows_t *week[8];
+    float *busyThreshold;
+    float *loadIndex;
+    float *uloadIndex;
+    time_t wind_edge;
+    time_t lastJackTime;
+    time_t expireTime;
+    struct hostNode *nextPtr;
+    struct statInfo statInfo;
+    char padding4[4];
+    struct resourceInstance **instances;
 };
 
-#define CLUST_ACTIVE		0x00010000
-#define CLUST_MASTKNWN    	0x00020000
-#define CLUST_CONNECT     	0x00040000
-#define CLUST_INFO_AVAIL  	0x00080000
-#define CLUST_HINFO_AVAIL  	0x00100000
-#define CLUST_ELIGIBLE    	0x00200000
-#define CLUST_ALL_ELIGIBLE 	0x00400000
+#define CLUST_ACTIVE    0x00010000
+#define CLUST_MASTKNWN      0x00020000
+#define CLUST_CONNECT       0x00040000
+#define CLUST_INFO_AVAIL    0x00080000
+#define CLUST_HINFO_AVAIL   0x00100000
+#define CLUST_ELIGIBLE      0x00200000
+#define CLUST_ALL_ELIGIBLE  0x00400000
 
 
 struct clusterNode
@@ -185,9 +191,10 @@ struct clusterNode
 struct clientNode
 {
   char inprogress;
-  enum limReqCode limReqCode;
+  char padding1[3];
   int clientMasks;
   int chanfd;
+  enum limReqCode limReqCode;
   struct hostNode *fromHost;
   struct sockaddr_in from;
   struct Buffer *reqbuf;
@@ -234,7 +241,7 @@ struct loadVectorStruct
 
 #define DETECTMODELTYPE 0
 
-#define MAX_SRES_INDEX	2
+#define MAX_SRES_INDEX  2
 
 struct masterReg
 {
@@ -252,13 +259,15 @@ struct masterReg
 struct resourceInstance
 {
   char *resName;
-  int nHosts;
-  struct hostNode **hosts;
   char *orignalValue;
   char *value;
+  int nHosts;
+  char padding1[4];
   time_t updateTime;
   struct hostNode *updHost;
+  struct hostNode **hosts;
 };
+  
 
 
 typedef struct sharedResourceInstance

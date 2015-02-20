@@ -16,8 +16,8 @@
  *
  */
 
-#include "lim.h"
-#include "../../lsf/lib/lib.conf.h"
+#include "daemons/liblimd/limd.h"
+#include "lib/conf.h"
 
 #define NL_SETN 24
 
@@ -28,7 +28,7 @@ struct shortLsInfo shortInfo;
 hTab hostModelTbl;
 int sizeOfResTable = 0;
 static int numofhosts = 0;
-char mcServersSet = FALSE;
+static char mcServersSet = FALSE;
 
 extern int ELIMdebug, ELIMrestarts, ELIMblocktime;
 
