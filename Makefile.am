@@ -2,10 +2,19 @@
 # Copyright (C) 2011-2012 David Bigagli
 #
 
-include $(top_srcdir)/common.mk
+#include $(top_srcdir)/common.mk
 
-SUBDIRS = lsf lsbatch lsf/res eauth scripts chkpnt config examples
+#
+# Copyright (C) 2012 Claudio Luck
+#
+# contencts of common.mk
+AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\"
 
-MISSING_FILES = aclocal.m4
 
-MAINTAINERCLEANFILES = $(MISSING_FILES) 
+SUBDIRS = lsf docs scripts
+
+# MISSING_FILES = aclocal.m4
+ACLOCAL_AMFLAGS=-I m4
+
+# MAINTAINERCLEANFILES = $(MISSING_FILES) 
+

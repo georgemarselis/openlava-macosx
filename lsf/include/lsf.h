@@ -337,22 +337,18 @@ struct resItem
 
 struct lsInfo
 {
-  char padding1[4];
-  char padding5[4];
-  struct resItem *resTable;
-  char padding2[4];
-  uint nRes;
-  int nTypes;
-  int nModels;
-  uint numIndx;
-  uint numUsrIndx;
-  int modelRefs[MAXMODELS];
-  char hostTypes[MAXTYPES][MAXLSFNAMELEN];
-  char hostModels[MAXMODELS][MAXLSFNAMELEN];
-  char hostArchs[MAXMODELS][MAXLSFNAMELEN];
-  char padding3[4];
-  char padding4[4];
-  double cpuFactor[MAXMODELS];
+    uint nTypes;
+    uint nModels;
+    uint modelRefs[MAXMODELS];
+    uint nRes;
+    uint numIndx;
+    uint numUsrIndx;
+    char hostTypes[MAXTYPES][MAXLSFNAMELEN];
+    char hostModels[MAXMODELS][MAXLSFNAMELEN];
+    char hostArchs[MAXMODELS][MAXLSFNAMELEN];
+    char paddin1[4];
+    double cpuFactor[MAXMODELS];
+    struct resItem *resTable;
 };
 
 #define CLUST_STAT_OK             0x01
@@ -360,8 +356,8 @@ struct lsInfo
 
 struct clusterInfo
 {
-  pid_t *adminIds;
-  pid_t managerId;
+  uid_t *adminIds;
+  uid_t managerId;
   uint status;
   uint nTypes;
   uint nModels;

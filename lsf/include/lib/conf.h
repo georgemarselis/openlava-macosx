@@ -59,7 +59,7 @@ static struct builtIn builtInRes[24] = {
     {"ls",     "Number of login sessions (alias: login)",    LS_NUMERIC, INCR, TYPE1, 30},
     {"it",     "Idle time (minutes) (alias: idle)",          LS_NUMERIC, DECR, TYPE1, 30},
     {"tmp",    "Disk space in /tmp (Mbytes)",                LS_NUMERIC, DECR, TYPE1, 120},
-    {"swp",    "Available swap space (Mbytes) (alias: swap)", LS_NUMERIC, DECR, TYPE1, 15},
+    {"swp",    "Available swap space (Mbytes) (alias: swap)",LS_NUMERIC, DECR, TYPE1, 15},
     {"mem",    "Available memory (Mbytes)",                  LS_NUMERIC, DECR, TYPE1, 15},
     {"ncpus",  "Number of CPUs",                             LS_NUMERIC, DECR, TYPE2, 0},
     {"ndisks", "Number of local disks",                      LS_NUMERIC, DECR, TYPE2, 0},
@@ -84,9 +84,10 @@ struct HostsArray
 };
 
 struct keymap {
+    int position;
+    char padding1[4];
     char *key;
     char *val;
-    long position;
 };
 
 static const int builtInRes_ID[] = {
@@ -104,33 +105,44 @@ char do_Manager     (FILE *fp, char *fname,   uint *lineNum, char *clustermanage
 char do_Hosts       (FILE *fp, char *fname,   uint *lineNum, struct lsInfo *myInfo);
 char do_Clparams    (FILE *fp, char *fname,   uint *lineNum);
 
-char addHostType (char *);
-char addHostModel(char *, char *, double);
-char setIndex    (struct keymap *keyList, char *fname, uint lineNum);
+static char addHostType (char *);
+static char addHostModel (char *model, char *arch, double factor);
+static char setIndex    (struct keymap *keyList, char *fname, uint lineNum);
 char addHost     (struct hostInfo *host,  char *fname, uint *lineNum);
 
+int resNameDefined (char *);
 
 void initClusterInfo (struct clusterInfo *);
 void freeClusterInfo (struct clusterInfo *);
 void initHostInfo (struct hostInfo *);
 void freeHostInfo (struct hostInfo *);
+static void initResTable (void);
+static void putThreshold (int indx, struct hostEntry *hostEntryPtr, int position, char *val, float def);
+void liblsf_putThreshold (int indx, struct hostInfo *host, long position, char *val, float def);
 
-int initResTable (void);
-int resNameDefined (char *);
-void putThreshold (int indx, struct hostInfo *host, long position, char *val, float def);
-int getClusAdmins (char *line, char *fname, uint *lineNum, char *secName, int lookupAdmins);
-struct admins *getAdmins (char *line, char *fname, uint *lineNum, char *secName, int lookupAdmins);
+
+static int wgetClusAdmins (char *line, char *lsfile, uint *lineNum, char *secName);
+static struct admins *getAdmins_ (char *line, char *fname, uint *lineNum, char *secName, int lookupAdmins);
+struct admins *liblsf_getAdmins (char *line, char *fname, uint *lineNum, char *secName, int lookupAdmins);
+
 int parse_time (char *, float *, int *);
 int validWindow (char *, char *);
 
-int setAdmins (struct admins *, int);
-void freeKeyList (struct keymap *keyList);
-int validType (char *type);
+static int setAdmins (struct admins *, int);
+static void freeKeyList (struct keymap *keyList);
+static int validType (char *type);
 int doResourceMap (FILE *fp, char *lsfile, uint *lineNum);
-int addResourceMap (char *resName, char *location, char *lsfile, uint lineNum);
-int parseHostList (char *hostList, char *lsfile, uint lineNum, char ***hosts);
-struct lsSharedResourceInfo *addResource (char *resName, int nHosts, char **hosts, char *value, char *fileName, uint lineNum);
-int addHostInstance (struct lsSharedResourceInfo *sharedResource, int nHosts, char **hostNames, char *value);
+static int addResourceMap (char *resName, char *location, char *lsfile, uint lineNum, int *isDefault);
+int liblsf_addResourceMap (char *resName, char *location, char *lsfile, uint lineNum);
+
+static uint parseHostList (char *hostList, char *lsfile, uint lineNum, char ***hosts, int *isDefault);
+int liblsf_parseHostList (char *hostList, char *lsfile, uint lineNum, char ***hosts);
+//  was : 
+// static struct lsSharedResourceInfo *addResource (char *resName, int nHosts, char **hosts, char *value, char *fileName, uint lineNum);
+struct lsSharedResourceInfo *liblsf_addResource (char *resName, int nHosts, char **hosts, char *value, char *fileName, uint lineNum);
+static struct sharedResource *addResource (char *resName, uint nHosts, char **hosts, char *value, char *fileName, uint lineNum, int resourceMap);
+int liblsf_addHostInstance(struct lsSharedResourceInfo *sharedResource, int nHosts, char **hostNames, char *value);
+static int addHostInstance (struct sharedResource *sharedResource, uint nHosts, char **hostNames, char *value, int resourceMap);
 
 int convertNegNotation_ (char **, struct HostsArray *);
 int resolveBaseNegHosts (char *, char **, struct HostsArray *);

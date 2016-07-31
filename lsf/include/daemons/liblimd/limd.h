@@ -90,32 +90,32 @@ struct statInfo
 
 struct hostNode
 {
-    short hModelNo;
-    short hTypeNo;
     short hostNo;
     short availHigh;
     short availLow;
     short use;
     short hostInactivityCount;
-    u_short naddr;
-    u_short nRes;
+    ushort naddr;
+    ushort nRes;
     char padding1[2];
+    int hModelNo;
+    int hTypeNo;
     int infoMask;
     int loadMask;
-    int numInstances;
+    uint numInstances;
     int callElim;
     int maxResIndex;
     int resClass;
     int DResClass;
     int rexPriority;
     uint8_t migrant;
-    char padding2[3];
+    char padding2[7];
     int *resBitMaps;
     int *DResBitMaps;
     int *resBitArray;
     int *status;
     in_addr_t *addr;
-    u_int lastSeqNo;
+    uint lastSeqNo;
     char infoValid;
     char conStatus;
     unsigned char protoVersion;
@@ -146,46 +146,49 @@ struct hostNode
 
 struct clusterNode
 {
-  short clusterNo;
-  char *clName;
-  int status;
-  in_addr_t candAddrList[MAXCANDHOSTS];
-  int currentAddr;
-  char *masterName;
-  u_int masterAddr;
-  u_short masterPort;
-  int resClass;
-  int typeClass;
-  int modelClass;
-  char masterKnown;
-  int masterInactivityCount;
-  struct hostNode *masterPtr;
-  struct hostNode *prevMasterPtr;
-  u_short checkSum;
-  int numHosts;
-  int numClients;
-  int managerId;
-  char *managerName;
-  struct hostNode *hostList;
-  struct hostNode *clientList;
-  struct clusterNode *nextPtr;
-  char *eLimArgs;
-  char **eLimArgv;
-  int chanfd;
-  int numIndx;
-  int numUsrIndx;
-  int usrIndxClass;
-  char **loadIndxNames;
-  int nAdmins;
-  int *adminIds;
-  char **admins;
-  int nRes;
-  int *resBitMaps;
-  int *hostTypeBitMaps;
-  int *hostModelBitMaps;
-  int numSharedRes;
-  char **sharedResource;
-  struct shortLsInfo *shortInfo;
+    ushort masterPort;
+    ushort checkSum;
+    char masterKnown;
+    char padding1[3];
+    int status;
+    int currentAddr;
+    int resClass;
+    int typeClass;
+    int modelClass;
+    int masterInactivityCount;
+    int chanfd;
+    int numIndx;
+    int numUsrIndx;
+    int usrIndxClass;
+    int *resBitMaps;
+    int *hostTypeBitMaps;
+    int *hostModelBitMaps;
+    uint clusterNo;
+    uint masterAddr;
+    uint numHosts;
+    uint numClients;
+    uint nAdmins;
+    uint nRes;
+    uint numSharedRes;
+    char padding3[4];
+    uint *adminIds;
+    uid_t managerId;
+    char padding2[4];
+    char *masterName;
+    char *clName;
+    char *managerName;
+    char *eLimArgs;
+    char **eLimArgv;
+    char **loadIndxNames;
+    char **admins;
+    char **sharedResource;
+    in_addr_t candAddrList[MAXCANDHOSTS];
+    struct hostNode *masterPtr;
+    struct hostNode *prevMasterPtr;
+    struct hostNode *hostList;
+    struct hostNode *clientList;
+    struct clusterNode *nextPtr;
+    struct shortLsInfo *shortInfo;
 };
 
 struct clientNode
@@ -204,6 +207,7 @@ struct liStruct
 {
   char *name;
   char increasing;
+  char padding1[3];
   float delta[2];
   float extraload[2];
   float valuesent;
@@ -213,7 +217,7 @@ struct liStruct
   float value;
 };
 
-static int li_len;
+static uint li_len;
 static struct liStruct *li;
 
 #define  SEND_NO_INFO       0x00
@@ -248,9 +252,9 @@ struct masterReg
   char clName[MAXLSFNAMELEN];
   char hostName[MAXHOSTNAMELEN];
   int flags;
-  u_int seqNo;
+  uint seqNo;
   int checkSum;
-  u_short portno;
+  ushort portno;
   int licFlag;
   int maxResIndex;
   int *resBitArray;
@@ -261,7 +265,7 @@ struct resourceInstance
   char *resName;
   char *orignalValue;
   char *value;
-  int nHosts;
+  uint nHosts;
   char padding1[4];
   time_t updateTime;
   struct hostNode *updHost;
@@ -273,7 +277,8 @@ struct resourceInstance
 typedef struct sharedResourceInstance
 {
   char *resName;
-  int nHosts;
+  uint nHosts;
+  char padding[4];
   struct hostNode **hosts;
   struct sharedResourceInstance *nextPtr;
 } sharedResourceInstance;
@@ -281,8 +286,8 @@ typedef struct sharedResourceInstance
 struct minSLimConfData
 {
   int defaultRunElim;
-  int nClusAdmins;
-  int *clusAdminIds;
+  uint nClusAdmins;
+  uid_t *clusAdminIds;
   char **clusAdminNames;
   float exchIntvl;
   float sampleIntvl;
@@ -371,12 +376,12 @@ extern short resInactivityCount;
 extern char jobxfer;
 extern short satper;
 extern float *extraload;
-extern int nClusAdmins;
-extern int *clusAdminIds;
-extern int *clusAdminGids;
+extern uint nClusAdmins;
+extern uid_t *clusAdminIds;
+extern gid_t *clusAdminGids;
 extern char **clusAdminNames;
 extern struct liStruct *li;
-extern int li_len;
+extern uint li_len;
 extern int defaultRunElim;
 extern time_t lastSbdActiveTime;
 
@@ -400,7 +405,7 @@ extern pid_t pimPid;
 
 extern char ignDedicatedResource;
 extern struct limLock limLock;
-extern int numHostResources;
+extern uint numHostResources;
 extern struct sharedResource **hostResources;
 
 extern u_short lsfSharedCkSum;
@@ -518,8 +523,8 @@ extern void clientIO (struct Masks *);
 
 /* openlava floating host management
  */
-extern void addMigrantHost (XDR *, struct sockaddr_in *, struct LSFHeader *, unsigned long );
-extern void rmMigrantHost (XDR *,  struct sockaddr_in *, struct LSFHeader *, unsigned long );
+extern void addMigrantHost (XDR *, struct sockaddr_in *, struct LSFHeader *, uint chan );
+extern void rmMigrantHost (XDR *,  struct sockaddr_in *, struct LSFHeader *, uint chan );
 extern int logInit (void);
 extern int logLIMStart (void);
 extern int logLIMDown (void);

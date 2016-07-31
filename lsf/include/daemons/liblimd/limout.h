@@ -161,8 +161,8 @@ struct shortLsInfo
     uint nTypes;
     uint nRes;
     uint nModels;
-    float cpuFactors[MAXMODELS];
     char padding[4];
+    double cpuFactors[MAXMODELS];
     char *hostModels[MAXMODELS];
     char *hostTypes[MAXTYPES];
     char **resName;

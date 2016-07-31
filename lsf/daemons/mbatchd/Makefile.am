@@ -2,13 +2,15 @@
 # Makefile.am: automake file for the master batch daemon
 #
 
-include $(top_srcdir)/common.mk
+#include $(top_srcdir)/common.mk
+# contencts of common.mk
+AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -I$(top_srcdir)/lsf/include
 
-INCLUDES = -I$(top_srcdir)/lsf/include
+# INCLUDES = -I$(top_srcdir)/lsf/include
 
-if !CYGWIN
-mbatchd_LDADD += -lnsl
-endif
+# if !CYGWIN
+# mbatchd_LDADD += -lnsl
+# endif
 
 sbin_PROGRAMS = mbatchd 
 mbatchd_SOURCES  = \
@@ -27,5 +29,5 @@ h daemonout.h daemons.h jgrp.h proxy.h profcnt.def
 
 mbatchd_LDADD = ../lib/liblsbatch.a \
                 ../../lsf/lib/liblsf.a \
-                ../../lsf/intlib/liblsfint.a -lm
+                ../../lsf/intlib/liblsfint.a -lm -lnsl
 

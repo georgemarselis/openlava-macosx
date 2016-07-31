@@ -2,14 +2,16 @@
 # Copyright (C) openlava foundation
 #
 
-include $(top_srcdir)/common.mk
+#include $(top_srcdir)/common.mk
+# contencts of common.mk
+AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\"
 
-INCLUDES = -I$(top_srcdir)/include/chkpnt
+#INCLUDES = -I$(top_srcdir)/include/chkpnt
 
-sbin_PROGRAMS = lchkpnt lrestart
+sbin_PROGRAMS  = lchkpnt lrestart
 
-echkpnt_SOURCES = echkpnt.c echkpnt.env.c echkpnt.lib.c
-echkpnt_LDADD = ../lsf/lib/liblsf.a
+lchkpnt_SOURCES = echkpnt.c echkpnt.env.c echkpnt.lib.c
+lchkpnt_LDADD = ../lsf/lib/liblsf.a
 
-erestart_SOURCES = erestart.c echkpnt.env.c echkpnt.lib.c
-erestart_LDADD = ../lsf/lib/liblsf.a
+lrestart_SOURCES = erestart.c echkpnt.env.c echkpnt.lib.c
+lrestart_LDADD = ../lsf/lib/liblsf.a

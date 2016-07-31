@@ -37,8 +37,8 @@ struct admins
 {
   char padding[4];
   unsigned int nAdmins;
-  int *adminIds;
-  int *adminGIds;
+  uid_t *adminIds;
+  gid_t *adminGIds;
   char **adminNames;
 };
 
@@ -73,6 +73,7 @@ struct sharedResource
 {
   char *resourceName;
   uint numInstances;
+  char padding1[4];
   struct resourceInstance **instances;
 };
 

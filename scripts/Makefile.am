@@ -2,7 +2,9 @@
 # Copyright (C) openlava foundation
 #
 
-include $(top_srcdir)/common.mk
+# include $(top_srcdir)/common.mk
+# contencts of common.mk
+AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\"
 
 
 # Install scripts implementing integration with 

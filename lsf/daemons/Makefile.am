@@ -2,9 +2,11 @@
 # Copyright (C) 2011-2012 David Bigagli
 #
 
-include $(top_srcdir)/common.mk
+#include $(top_srcdir)/common.mk
+# contencts of common.mk
+AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -I$(top_srcdir)/lsf/include
 
-INCLUDES = -I$(top_srcdir)/lsf/include
+#INCLUDES = -I$(top_srcdir)/lsf/include
 
 
 sbin_PROGRAMS = mbatchd sbatchd
@@ -25,9 +27,9 @@ mbd.h daemonout.h daemons.h jgrp.h proxy.h mbd.profcnt.def
 mbatchd_LDADD = ../lib/liblsbatch.a \
                 ../../lsf/lib/liblsf.a \
                 ../../lsf/intlib/liblsfint.a -lm
-if !CYGWIN
+#if !CYGWIN
 mbatchd_LDADD += -lnsl
-endif
+#endif
 
 sbatchd_SOURCES = sbd.comm.c sbd.file.c sbd.job.c sbd.main.c \
                   sbd.misc.c sbd.policy.c sbd.serv.c sbd.sig.c sbd.xdr.c \
@@ -37,9 +39,9 @@ sbatchd_SOURCES = sbd.comm.c sbd.file.c sbd.job.c sbd.main.c \
 sbatchd_LDADD = ../lib/liblsbatch.a \
                 ../../lsf/lib/liblsf.a \
                 ../../lsf/intlib/liblsfint.a -lm
-if !CYGWIN
+#if !CYGWIN
 sbatchd_LDADD += -lnsl
-endif
+#endif
 
 etags :
 	etags *.[hc] ../*.h ../lib/*.[hc] ../../lsf/*.h \

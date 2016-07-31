@@ -35,8 +35,8 @@ struct clusterNode *myClusterPtr;
 struct hostNode *myHostPtr;
 int masterMe;
 int nClusAdmins = 0;
-int *clusAdminIds = NULL;
-int *clusAdminGids = NULL;
+uid_t *clusAdminIds = NULL;
+gid_t *clusAdminGids = NULL;
 char **clusAdminNames = NULL;
 
 int kernelPerm;
@@ -51,7 +51,7 @@ int lim_CheckError = 0;
 char *env_dir = NULL;
 static int alarmed;
 char ignDedicatedResource = FALSE;
-int numHostResources;
+uint numHostResources;
 struct sharedResource **hostResources = NULL;
 u_short lsfSharedCkSum = 0;
 

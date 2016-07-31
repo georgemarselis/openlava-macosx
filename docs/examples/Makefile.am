@@ -1,5 +1,6 @@
 
-INCLUDES = -I$(top_srcdir)/lsf -I$(top_srcdir)/lsbatch
+AM_CPPFLAGS = -I$(top_srcdir)/lsf -I$(top_srcdir)/lsbatch
+# INCLUDES = -I$(top_srcdir)/lsf -I$(top_srcdir)/lsbatch
 
 noinst_PROGRAMS = client gethostbyaddr gethostbyname \
                   hdr msg pimme qstring readevent server sobufsiz

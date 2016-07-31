@@ -2,9 +2,11 @@
 # Copyright (C) 2011-2012 David Bigagli
 #
 
-include $(top_srcdir)/common.mk
+#include $(top_srcdir)/common.mk
+# contencts of common.mk
+AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -I$(top_srcdir)/lsf/include
 
-INCLUDES = -I$(top_srcdir)/lsf/include
+#INCLUDES = -I$(top_srcdir)/lsf/include
 
 bin_PROGRAMS = lsadmin
 
