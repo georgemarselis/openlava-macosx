@@ -14,7 +14,7 @@ AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\"
 SUBDIRS = lsf docs scripts
 
 # MISSING_FILES = aclocal.m4
-ACLOCAL_AMFLAGS=-I m4
+ACLOCAL_AMFLAGS=-I m4 --install
 
 # MAINTAINERCLEANFILES = $(MISSING_FILES) 
 
