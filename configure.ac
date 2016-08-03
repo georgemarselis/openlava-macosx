@@ -18,6 +18,8 @@ AC_PROG_CC
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 
+AM_PROG_AR
+
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lm':
 AC_CHECK_LIB([m], [main])
@@ -122,6 +124,6 @@ AC_CONFIG_FILES([Makefile
                  lsf/lib/liblsf/Makefile
                  lsf/lsb/Makefile
                  scripts/Makefile])
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([subdir-objects -Wall -Werror])
 LT_INIT
 AC_OUTPUT
