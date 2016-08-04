@@ -5,7 +5,7 @@ AC_PREREQ([2.69])
 AC_INIT([openlava-macosx], [0], [george@marsel.is], [openlava], [https://marsel.is/openlava-macosx])
 
 # Checks for programs.
-AC_CONFIG_SRCDIR([lsf])
+AC_CONFIG_SRCDIR([lsf/include/lsf.h])
 AC_CONFIG_HEADERS([config.h])
 
 # Init configure aux dir
