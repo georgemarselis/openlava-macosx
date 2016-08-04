@@ -8,7 +8,7 @@ AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -I$(top_srcdir)/lsf/include
 
 # INCLUDES = -I$(top_srcdir)/lsf/include
 
-#if !CYGWIN
+# if !CYGWIN
 # sbatchd_LDADD += -lnsl
 # endif
 
@@ -22,6 +22,7 @@ sbatchd_LDADD = ../lib/liblsbatch.a \
                 ../../lsf/lib/liblsf.a \
                 ../../lsf/intlib/liblsfint.a \
 				-lm -lnsl
-etags :
-	etags *.[hc] ../*.h ../lib/*.[hc] ../../lsf/*.h \
-  	../../lsf/lib/*.[hc] ../../lsf/intlib/*.[hc]
+#etags :
+#	etags *.[hc] ../*.h ../lib/*.[hc] ../../lsf/*.h \
+# 	../../lsf/lib/*.[hc] ../../lsf/intlib/*.[hc]
+
