@@ -16,7 +16,7 @@
  *
  */
 
-#include "intlibout.h"
+#include "libint/intlibout.h"
 
 #define NL_SETN      22
 char *

@@ -15,7 +15,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
-#include"bitset.h"
+#include"libint/bitset.h"
 
 static void setObserverDestroy (LS_BITSET_T *);
 static void observerDestroy (LS_BITSET_OBSERVER_T *);
@@ -772,7 +772,7 @@ static char *bitSetErrList[] = {
   "Last Error (no error)"	/* catgets 5319 */
 };
 
-#ifdef  I18N_COMPILE
+//#ifdef  I18N_COMPILE
 static int bitSetErrListID[] = {
   5311,
   5312,
@@ -784,22 +784,23 @@ static int bitSetErrListID[] = {
   5318,
   5319
 };
-#endif
+//#endif
 
 char *
 setPerror (int errorNumber)
 {
-  static char buf[216];
+  static char buf[216] = {};
 
   if (errorNumber < 0 || errorNumber > (int) LS_BITSET_ERR_LAST)
     {
-      sprintf (buf, _i18n_msg_get (ls_catd, NL_SETN, 5320, " Unknown error number %d"), errorNumber);	/* catgets 5320 */
+      /* catgets 5320 */
+      sprintf( buf, _i18n_msg_get( ls_catd, NL_SETN, 5320, " Unknown error number %d"), errorNumber );
       return (buf);
     }
 
-  return (_i18n_msg_get
-	  (ls_catd, NL_SETN, bitSetErrListID[errorNumber],
-	   bitSetErrList[errorNumber]));
+  sprintf( buf, _i18n_msg_get( ls_catd, NL_SETN, bitSetErrListID[errorNumber], bitSetErrList[ errorNumber ] ) );
+
+  return buf; 
 }
 
 

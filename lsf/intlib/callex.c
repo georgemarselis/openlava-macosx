@@ -16,6 +16,7 @@
  *
  */
 # include "stdio.h"
+
 #if (defined(__STDC__))
 extern int yyreject ();
 extern int yywrap ();
@@ -86,11 +87,11 @@ unsigned char *yysptr, yysbuf[];
 #include <syslog.h>
 
 #ifndef  MAXLINELEN
-#include "../lsf.h"
+#include "lsf.h"
 #endif
-#include "tokdefs.h"
-#include "yparse.h"
-#include "../lib/lsi18n.h"
+#include "libint/tokdefs.h"
+#include "libint/yparse.h"
+#include "libint/lsi18n.h"
 
 #define MAXTOKENLEN 302
 #define NL_SETN      22

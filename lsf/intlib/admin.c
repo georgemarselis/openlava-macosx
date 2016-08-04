@@ -17,9 +17,9 @@
  */
 
 
-#include "intlibout.h"
-#include "../lib/lsi18n.h"
-#include "../lib/mls.h"
+#include "libint/intlibout.h"
+#include "libint/lsi18n.h"
+#include "lib/mls.h"
 #define BADCH   ":"
 #define NL_SETN      22
 

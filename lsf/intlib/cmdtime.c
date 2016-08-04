@@ -16,7 +16,7 @@
  *
  */
 
-#include "intlibout.h"
+#include "libint/intlibout.h"
 
 static int getPtime (char *, char, time_t, char, time_t *);
 static time_t mkTime (struct tm *, int, time_t);
