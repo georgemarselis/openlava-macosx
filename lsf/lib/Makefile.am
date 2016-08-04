@@ -3,7 +3,7 @@
 # contencts of common.mk
 AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\"
 
-include_HEADERS = $(top_srcdir)/include/lsf.h $(trop_srcdir)/config.h
+include_HEADERS = $(srcdir)/include/lsf.h $(srcdir)/config.h
 
 SUBDIRS = liblsf daemons cmdtools checkpoint
 

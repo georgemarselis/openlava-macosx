@@ -5,7 +5,7 @@
 #include $(top_srcdir)/common.mk
 # contencts of common.mk
 HOSTTYPE = LINUX64
-AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -I$(top_srcdir)/lsf/include -D$(HOSTTYPE) -DHOST_TYPE_STRING=\"$(HOSTTYPE)\"
+AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -I$(srcdir)/lsf/include -D$(HOSTTYPE) -DHOST_TYPE_STRING=\"$(HOSTTYPE)\"
 
 # INCLUDES = -I$(top_srcdir)/lsf/include
 

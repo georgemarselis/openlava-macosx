@@ -10,6 +10,6 @@ liblsf_a_SOURCES = comm.c conf.c debug.c err.c groups.c hc.c \
 	resource.c rexecv.c sig.c signals.c spool.c sub.c switch.c \
 	users.c xdr.c
 
-etags:
-	etags ../*.h *.[hc] ../intlib/*.[hc] ../lim/*.[hc] \
-	../res/*.[hc] ../lstools/*.[hc]
+#etags:
+#	etags ../*.h *.[hc] ../intlib/*.[hc] ../lim/*.[hc] \
+#	../res/*.[hc] ../lstools/*.[hc]

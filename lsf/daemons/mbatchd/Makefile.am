@@ -4,7 +4,7 @@
 
 #include $(top_srcdir)/common.mk
 # contencts of common.mk
-AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -I$(top_srcdir)/lsf/include
+AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -I$(srcdir)/lsf/include
 
 # INCLUDES = -I$(top_srcdir)/lsf/include
 

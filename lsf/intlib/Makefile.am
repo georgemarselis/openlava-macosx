@@ -4,9 +4,8 @@
 
 # include $(top_srcdir)/common.mk
 # contencts of common.mk
-AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -I../
+AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -I$(srcdir)
 
-#INCLUDES = -I../
 
 noinst_LIBRARIES = liblsfint.a
 
