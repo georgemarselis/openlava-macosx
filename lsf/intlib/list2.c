@@ -1,9 +1,10 @@
 
-#include "list2.h"
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <assert.h>
+
+#include "libint/list2.h"
 
 struct list_ *
 listmake (const char *name)

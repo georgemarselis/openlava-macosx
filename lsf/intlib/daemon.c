@@ -16,7 +16,8 @@
  *
  */
 
-#include "intlibout.h"
+#include "libint/intlibout.h"
+#include "lib/syslog.h"
 
 void
 daemonize_ (void)

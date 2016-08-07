@@ -516,7 +516,7 @@ xdr_shortLsInfo (XDR * xdrs, struct shortLsInfo *shortLInfo, struct LSFHeader *h
     
     assert( hdr->length );
     
-    assert( shortLInfo->nRes    >= 0);
+    assert( shortLInfo->nRes    >= 0 );
     assert( shortLInfo->nTypes  >= 0 );
     assert( shortLInfo->nModels >= 0 );
     if (!xdr_int (xdrs, (int *)&shortLInfo->nRes) ||
@@ -536,7 +536,7 @@ xdr_shortLsInfo (XDR * xdrs, struct shortLsInfo *shortLInfo, struct LSFHeader *h
             return FALSE;
         }
         
-        currp = (float *)memp;                           // FIXME FIXME FIXME FIXME FIXME lookup in debugger
+        currp = (float *)memp; // FIXME FIXME FIXME FIXME FIXME lookup in debugger
         shortLInfo->resName = (char **) currp;  // FIXME FIXME FIXME FIXME FIXME lookup in debugger
         currp += shortLInfo->nRes * sizeof (char *);
         
@@ -590,7 +590,7 @@ xdr_shortLsInfo (XDR * xdrs, struct shortLsInfo *shortLInfo, struct LSFHeader *h
     }
     
     for (unsigned long i = 0; i < shortLInfo->nModels; i++) {
-        if (!xdr_float (xdrs, &shortLInfo->cpuFactors[i])) {
+        if (!xdr_double( xdrs, &shortLInfo->cpuFactors[i] ) ) {
             return FALSE;
         }
     }
@@ -679,7 +679,7 @@ xdr_lsInfo (XDR * xdrs, struct lsInfo * lsInfoPtr, struct LSFHeader *hdr)
         }
     }
     
-    if (!xdr_int (xdrs, &lsInfoPtr->nTypes)) {
+    if( !xdr_u_int( xdrs, &lsInfoPtr->nTypes ) ) {
         if (xdrs->x_op == XDR_DECODE) {
             FREEUP (memp);
         }
@@ -699,7 +699,7 @@ xdr_lsInfo (XDR * xdrs, struct lsInfo * lsInfoPtr, struct LSFHeader *hdr)
         }
     }
     
-    if (!xdr_int (xdrs, &lsInfoPtr->nModels)) {
+    if (!xdr_u_int( xdrs, &lsInfoPtr->nModels ) ) {
         if (xdrs->x_op == XDR_DECODE) {
             FREEUP (memp);
         }
@@ -749,7 +749,7 @@ xdr_lsInfo (XDR * xdrs, struct lsInfo * lsInfoPtr, struct LSFHeader *hdr)
     }
     
     for (int i = 0; i < lsInfoPtr->nModels; ++i) {
-        if (!xdr_int (xdrs, &lsInfoPtr->modelRefs[i])) {
+        if (!xdr_u_int( xdrs, &lsInfoPtr->modelRefs[ i ] ) ) {
             if (xdrs->x_op == XDR_DECODE) {
                 FREEUP (memp);
             }

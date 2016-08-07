@@ -1,6 +1,4 @@
-/* $Id: lib.conf.h 397 2007-11-26 19:04:00Z mblack $
- * Copyright (C) 2007 Platform Computing Inc
- *
+/* 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of version 2 of the GNU General Public License as
  * published by the Free Software Foundation.
@@ -17,5 +15,14 @@
  */
 
 #pragma once
- 
-char *putstr_( const char *s );
+
+char *argvmsg_( int argc, char **argv);
+void ls_openlog( const char *ident, const char *path, int use_stderr, char *logMask);
+static int openLogFile( const char *ident, char *myname );
+void ls_syslog( int level, const char *fmt, ... );
+void ls_closelog( void);
+int ls_setlogmask( int maskpri );
+int getLogMask (char **msg, char *logMask);
+int getLogClass_ (char *lsp, char *tsp);
+void ls_closelog_ext (void);
+

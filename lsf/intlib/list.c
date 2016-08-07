@@ -17,7 +17,10 @@
  */
 
 
-#include "intlibout.h"
+#include "libint/intlibout.h"
+#include "libint/list.h"
+#include "lib/misc.h"
+#include "lib/lproto.h"
 
 LIST_T *
 listCreate (char *name)

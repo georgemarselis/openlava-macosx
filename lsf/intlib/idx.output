@@ -1,0 +1,258 @@
+Terminals unused in grammar
+
+   SZZZZ
+   '!'
+   '='
+   OR
+   '+'
+   '/'
+   '*'
+   AND
+
+
+Grammar
+
+    0 $accept: arrayIndSpec $end
+
+    1 arrayIndSpec: arrayInd
+    2             | arrayInd '%' icon
+
+    3 arrayInd: '[' indicies ']'
+
+    4 indicies: index
+    5         | index ',' indicies
+
+    6 index: region
+    7      | region ':' icon
+
+    8 region: icon
+    9       | '-' icon
+   10       | icon '-'
+   11       | icon '-' icon
+
+   12 icon: ICON
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+ICON (1) 12
+'!' (33)
+'%' (37) 2
+SZZZZ (40)
+'*' (42)
+'+' (43)
+',' (44) 5
+'-' (45) 9 10 11
+'/' (47)
+':' (58) 7
+'=' (61)
+'[' (91) 3
+']' (93) 3
+error (256)
+OR (258)
+AND (259)
+
+
+Nonterminals, with rules where they appear
+
+$accept (18)
+    on left: 0
+arrayIndSpec (19)
+    on left: 1 2, on right: 0
+arrayInd (20)
+    on left: 3, on right: 1 2
+indicies (21)
+    on left: 4 5, on right: 3 5
+index (22)
+    on left: 6 7, on right: 4 5
+region (23)
+    on left: 8 9 10 11, on right: 6 7
+icon (24)
+    on left: 12, on right: 2 7 8 9 10 11
+
+
+State 0
+
+    0 $accept: . arrayIndSpec $end
+
+    '['  shift, and go to state 1
+
+    arrayIndSpec  go to state 2
+    arrayInd      go to state 3
+
+
+State 1
+
+    3 arrayInd: '[' . indicies ']'
+
+    ICON  shift, and go to state 4
+    '-'   shift, and go to state 5
+
+    indicies  go to state 6
+    index     go to state 7
+    region    go to state 8
+    icon      go to state 9
+
+
+State 2
+
+    0 $accept: arrayIndSpec . $end
+
+    $end  shift, and go to state 10
+
+
+State 3
+
+    1 arrayIndSpec: arrayInd .
+    2             | arrayInd . '%' icon
+
+    '%'  shift, and go to state 11
+
+    $default  reduce using rule 1 (arrayIndSpec)
+
+
+State 4
+
+   12 icon: ICON .
+
+    $default  reduce using rule 12 (icon)
+
+
+State 5
+
+    9 region: '-' . icon
+
+    ICON  shift, and go to state 4
+
+    icon  go to state 12
+
+
+State 6
+
+    3 arrayInd: '[' indicies . ']'
+
+    ']'  shift, and go to state 13
+
+
+State 7
+
+    4 indicies: index .
+    5         | index . ',' indicies
+
+    ','  shift, and go to state 14
+
+    $default  reduce using rule 4 (indicies)
+
+
+State 8
+
+    6 index: region .
+    7      | region . ':' icon
+
+    ':'  shift, and go to state 15
+
+    $default  reduce using rule 6 (index)
+
+
+State 9
+
+    8 region: icon .
+   10       | icon . '-'
+   11       | icon . '-' icon
+
+    '-'  shift, and go to state 16
+
+    $default  reduce using rule 8 (region)
+
+
+State 10
+
+    0 $accept: arrayIndSpec $end .
+
+    $default  accept
+
+
+State 11
+
+    2 arrayIndSpec: arrayInd '%' . icon
+
+    ICON  shift, and go to state 4
+
+    icon  go to state 17
+
+
+State 12
+
+    9 region: '-' icon .
+
+    $default  reduce using rule 9 (region)
+
+
+State 13
+
+    3 arrayInd: '[' indicies ']' .
+
+    $default  reduce using rule 3 (arrayInd)
+
+
+State 14
+
+    5 indicies: index ',' . indicies
+
+    ICON  shift, and go to state 4
+    '-'   shift, and go to state 5
+
+    indicies  go to state 18
+    index     go to state 7
+    region    go to state 8
+    icon      go to state 9
+
+
+State 15
+
+    7 index: region ':' . icon
+
+    ICON  shift, and go to state 4
+
+    icon  go to state 19
+
+
+State 16
+
+   10 region: icon '-' .
+   11       | icon '-' . icon
+
+    ICON  shift, and go to state 4
+
+    $default  reduce using rule 10 (region)
+
+    icon  go to state 20
+
+
+State 17
+
+    2 arrayIndSpec: arrayInd '%' icon .
+
+    $default  reduce using rule 2 (arrayIndSpec)
+
+
+State 18
+
+    5 indicies: index ',' indicies .
+
+    $default  reduce using rule 5 (indicies)
+
+
+State 19
+
+    7 index: region ':' icon .
+
+    $default  reduce using rule 7 (index)
+
+
+State 20
+
+   11 region: icon '-' icon .
+
+    $default  reduce using rule 11 (region)

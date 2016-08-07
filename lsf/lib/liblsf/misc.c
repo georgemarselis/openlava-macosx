@@ -18,6 +18,7 @@
 
 #include "lib/lib.h"
 #include "lib/lproto.h"
+#include "lib/misc.h"
 
 #define BADCH   ":"
 #define NL_SETN   23

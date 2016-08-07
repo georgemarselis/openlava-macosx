@@ -148,3 +148,5 @@ int convertNegNotation_ (char **, struct HostsArray *);
 int resolveBaseNegHosts (char *, char **, struct HostsArray *);
 
 void freeSA_ (char **list, uint num);
+
+void doSkipSection(FILE *fp, uint *lineNum, char *lsfile, char *sectionName);

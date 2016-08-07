@@ -43,7 +43,7 @@ extern int mlsSbdMode;
 
 // FIXME investigate if the third argument to lsfSetXUid can be set to the appropriate
 // [s]uid_t type. if yes, try to see if there is an alternative to passing -1.
-extern int lsfSetXUid (int, uid_t uid, gid_t gid, int suid, int (*)());
+extern int lsfSetXUid (int, uid_t uid, gid_t gid, uid_t suid, int (*)());
 extern void lsfExecLog (const char *);
 extern int lsfExecX (char *path, char **argv, int (*func) ());
 

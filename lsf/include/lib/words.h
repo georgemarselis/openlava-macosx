@@ -20,13 +20,18 @@
 
 #ifndef LSF_LIB_WORDS_H
 #define LSF_LIB_WORDS_H
+#endif
 
 #define NODE_LEFT_DONE  1
 #define NODE_ALL_DONE   2
 #define NODE_PASED      3
 
-#define PUSH_STACK(s, n) \
-    {if (pushStack(s, n) < 0) {goto Error;}}
+char *getNextValueQ_( char **line, char ch1, char ch2 );
+char *getNextValueQ_( char **line, char ch1, char ch2 );
+char *getNextWord_( char **line );
+char *getNextLineC_( FILE * p, uint *LineCount, int confFormat );
+
+#define PUSH_STACK(s, n) { if( pushStack( s, n ) < 0 ) { goto Error; } }
 
 static struct pStack *blockStack;
 static struct pStack *ptrStack;
@@ -38,5 +43,3 @@ static char *readNextLine (struct lsConf *conf, uint *lineNum);
 
 static char addCond (struct lsConf *, char *);
 static char checkCond (struct lsConf *, char *);
-
-#endif

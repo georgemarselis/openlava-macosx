@@ -17,7 +17,7 @@
  */
 
 
-#include "intlibout.h"
+#include "libint/intlibout.h"
 
 void listSetFree (struct listSet *);
 struct listSet *listSetAlloc (long);

@@ -6,6 +6,12 @@
  */
 %token ICON     1
 %token SZZZZ    40
+%define parse.error verbose
+
+%{
+int yylex();
+int yyerror(const char *);
+%}
 
 %{
 # include <stdio.h>
@@ -13,12 +19,15 @@
 #   include "libint/yparse.h"
 # include "libint/jidx.h"
 # include "libint/lsi18n.h"
-// MOD_LSF_INTLIB  22  MsgId 550-599 
-# define NL_SETN 22      
+// MOD_LSF_INTLIB  22  MsgId 550-599
+# define NL_SETN 22
 
 #define YYALLOC(x) yyalloc(&idxAllocHead, (x))
 struct mallocList  *idxAllocHead = NULL;
 int idxerrno = IDX_NOERR;
+
+struct idxList **idxList = NULL;
+int *maxJLimit = 0;
 
 %}
 
@@ -28,13 +37,13 @@ int idxerrno = IDX_NOERR;
 		struct idxList  *idxPtr;
 		}
 
-
-%left ','
-%nonassoc '!'
-%right '='
-%left  OR
-%left '+' '-' '/' '*'
-%right AND
+// /opt/local/bin/bison --warnings=all --feature=all --verbose --locations --token-table
+%left ','         // FIXME FIXME FIXME FIXME bison warning here
+%nonassoc '!'     // FIXME FIXME FIXME FIXME bison warning here
+%right '='        // FIXME FIXME FIXME FIXME bison warning here
+%left  OR         // FIXME FIXME FIXME FIXME bison warning here
+%left '+' '-' '/' '*'  // FIXME FIXME FIXME FIXME bison warning here
+%right AND        // FIXME FIXME FIXME FIXME bison warning here
 
 %type <idxType> index region
 %type <idxPtr> indicies arrayInd
@@ -70,10 +79,9 @@ indicies     : index
 				   $$->step = $1.step;
 				   $$->next = NULL;
 				}
-				| index ',' indicies  
+				| index ',' indicies
 				{
-				   if (($$ = (struct idxList *) 
-							 YYALLOC(sizeof(struct idxList))) == NULL) {
+				   if (($$ = (struct idxList *) YYALLOC(sizeof(struct idxList))) == NULL) {
 					   idxerror(_i18n_msg_get(ls_catd, NL_SETN, 550, "No Memory"));
 					   idxerrno = IDX_MEM;
 					   YYABORT;
@@ -89,11 +97,11 @@ index           : region
 					$$.end   = $1.end;
 					$$.step  = 1;
 					if ($$.start < 1 || $$.start > $$.end || $$.step <= 0) {
-						/* catgets 551 */ 
-						idxerror( "551: boundary error" ); 
+						/* catgets 551 */
+						idxerror( "551: boundary error" );
 						idxerrno = IDX_BOUND;
 						YYABORT;
-					} 
+					}
 				}
 				| region ':' icon
 				{
@@ -101,8 +109,7 @@ index           : region
 					$$.end   = $1.end;
 					$$.step  = $3;
 					if ($$.start < 1 || $$.start > $$.end || $$.step <= 0) {
-						idxerror(_i18n_msg_get(ls_catd, NL_SETN, 551,
-						   "boundary error")); 
+						idxerror( "551: boundary error" );
 						idxerrno = IDX_BOUND;
 						YYABORT;
 					}

@@ -17,8 +17,18 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_CC
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-
+                
+AC_PROG_LEX
+# turn on full diagnostics for bison/yacc
+AC_PROG_YACC 
 AM_PROG_AR
+AX_PROG_TCL
+
+HAVE_TCL_TCL_H = no
+HAVE_TCL_H = no
+# Checks for headers
+AC_CHECK_HEADERS([tcl.h])
+AC_CHECK_HEADERS([tcl.h], [HAVE_TCL_TCL_H=yes], [HAVE_TCL_H=y]) # FIXME FIXME FIXME FIXME FIXME 
 
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lm':

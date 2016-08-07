@@ -234,7 +234,7 @@ ls_fdbusy (uint fd)
 }
 
 int
-lsfSetXUid (int flag, uid_t ruid, uid_t euid, int suid, int (*func) ())
+lsfSetXUid (int flag, uid_t ruid, uid_t euid, uid_t suid, int (*func) ())
 {
 
     int rtrn = -1;

@@ -2,11 +2,13 @@
  *
  * Elementary single linked list in C.
  */
-#include "link.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <assert.h>
+
+#include "libint/link.h"
 
 /* Euler's cache keeps link_t entries on a list
  * and use them as cache to avoid malloc()/free()

@@ -21,7 +21,7 @@
 # line 11 "idx.y"
 #       include <stdio.h>
 #       include <stdlib.h>
-#       include "jidx.h"
+#       include "libint/jidx.h"
 #	include "yparse.h"
 #       include "../lib/lsi18n.h"
 #define NL_SETN      22

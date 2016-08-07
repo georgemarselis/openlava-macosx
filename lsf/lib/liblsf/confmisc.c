@@ -26,7 +26,7 @@
 char *
 getNextValue (char **line)
 {
-  return (getNextValueQ_ (line, '(', ')'));
+	return (getNextValueQ_ (line, '(', ')'));
 }
 
 int
@@ -208,29 +208,29 @@ readHvalues (struct keymap *keyList, char *linep, FILE * fp, char *lsfile, uint 
 
 }
 
-int
-putValue (struct keymap *keyList, char *key, char *value)
-{
-    int i;
+// int
+// putValue (struct keymap *keyList, char *key, char *value)
+// {
+//     int i;
 
-    i = 0;
-    while (keyList[i].key != NULL) {
+//     i = 0;
+//     while (keyList[i].key != NULL) {
 
-        if (strcasecmp (keyList[i].key, key) == 0) {
-            FREEUP (keyList[i].val);
-            if (strcmp (value, "-") == 0) {
-                keyList[i].val = putstr_ ("");
-            }
-            else {
-                keyList[i].val = putstr_ (value);
-            }
-            return 0;
-        }
-        i++;
-    }
+//         if (strcasecmp (keyList[i].key, key) == 0) {
+//             FREEUP (keyList[i].val);
+//             if (strcmp (value, "-") == 0) {
+//                 keyList[i].val = putstr_ ("");
+//             }
+//             else {
+//                 keyList[i].val = putstr_ (value);
+//             }
+//             return 0;
+//         }
+//         i++;
+//     }
 
-  return -1;
-}
+//   return -1;
+// }
 
 void
 doSkipSection (FILE * fp, uint *lineNum, char *lsfile, char *sectionName)
@@ -333,7 +333,8 @@ putInLists (char *word, struct admins *admins, unsigned int *numAds, char *forWh
   static char fname[] = "putInLists";
   struct passwd *pw;
   char **tempNames; 
-  int *tempIds, *tempGids;
+  uid_t *tempIds;
+  gid_t *tempGids;
 
     if ((pw = getpwlsfuser_ (word)) == NULL) {
        
@@ -355,8 +356,8 @@ putInLists (char *word, struct admins *admins, unsigned int *numAds, char *forWh
     // is it a standard thing to do? is there any other way of representing not finding
     // a specific UID?
     assert( pw->pw_uid >= 0 ); assert( pw->pw_gid >= 0);
-    admins->adminIds[admins->nAdmins] = (pw == NULL) ? -1 : (int) pw->pw_uid;
-    admins->adminGIds[admins->nAdmins] = (pw == NULL) ? -1 : (int) pw->pw_gid;
+    admins->adminIds[admins->nAdmins] = (pw == NULL) ? -1 : pw->pw_uid;
+    admins->adminGIds[admins->nAdmins] = (pw == NULL) ? -1 : pw->pw_gid;
     admins->adminNames[admins->nAdmins] = putstr_ (word);
     admins->nAdmins += 1;
 
@@ -364,8 +365,8 @@ putInLists (char *word, struct admins *admins, unsigned int *numAds, char *forWh
     {
         *numAds *= 2;
         assert( *numAds >= 0 );
-        tempIds     = (int *)   realloc (admins->adminIds,   (unsigned long) *numAds * sizeof (int));
-        tempGids    = (int *)   realloc (admins->adminGIds,  (unsigned long) *numAds * sizeof (int));
+        tempIds     = realloc (admins->adminIds,   (unsigned long) *numAds * sizeof (int));
+        tempGids    = realloc (admins->adminGIds,  (unsigned long) *numAds * sizeof (int));
         tempNames   = (char **) realloc (admins->adminNames, (unsigned long) *numAds * sizeof (char *));
         
         if (tempIds == NULL || tempGids == NULL || tempNames == NULL) {
