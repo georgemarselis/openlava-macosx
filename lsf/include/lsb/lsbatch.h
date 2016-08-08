@@ -708,16 +708,16 @@ struct jobInfoEnt
 
 struct userInfoEnt
 {
-    char *user;
+    char *user;					// FIXME FIXME FIXME this oughta get larger
     float procJobLimit;
-    int maxJobs;
-    int numStartJobs;
-    int numJobs;
-    int numPEND;
-    int numRUN;
-    int numSSUSP;
-    int numUSUSP;
-    int numRESERVE;
+    uint maxJobs;
+    uint numStartJobs;
+    uint numJobs;
+    uint numPEND;
+    uint numRUN;
+    uint numSSUSP;
+    uint numUSUSP;
+    uint numRESERVE;
     char padding[4];
 };
 
@@ -1487,7 +1487,8 @@ struct eventRec
 struct eventLogFile
 {
   char eventDir[MAXFILENAMELEN];
-  time_t beginTime, endTime;
+  time_t beginTime;
+  time_t endTime;
 };
 
 struct eventLogHandle
@@ -1529,7 +1530,7 @@ struct sortIntList
 struct lsbMsgHdr
 {
     uid_t usrId;
-    int   msgId;
+    uint   msgId;
     int   type;
     char padding[4];
     char  *src;

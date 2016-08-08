@@ -91,9 +91,9 @@ struct submitReq
     int options;
     int options2;
     int sigValue;
-    int restartPid;
+    pid_t restartPid;
     int userPriority;
-    int umask;
+    mode_t umask;
     uint nxf;
     uint maxNumProcessors;
     uint numAskedHosts;
@@ -282,7 +282,7 @@ struct signalReq
 
 struct jobMoveReq
 {
-  int opCode;
+  uint opCode;
   int position;
   LS_LONG_INT jobId;
 };

@@ -48,7 +48,7 @@ fillCell_ (struct inNames **table, char *name, char *level)
 {
     uint size = 0;
 
-    table[0] = (struct inNames * )malloc (sizeof (struct inNames));
+    table[0] = malloc (sizeof (struct inNames));
     if ( NULL == table[0] && ENOMEM == errno ) {
         ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "fillCell_()", "malloc");
         lserrno = LSE_MALLOC;
@@ -56,11 +56,11 @@ fillCell_ (struct inNames **table, char *name, char *level)
     }
 
     assert( strlen( name + 1 ) <= UINT_MAX );
-    size = (uint) strlen (name) + 1;
+    size = strlen (name) + 1;
     if (level) {
         size += strlen (level) + 1;
     }
-    table[0]->name = (char *)malloc( size );
+    table[0]->name = malloc( size );
     if ( NULL == table[0]->name && ENOMEM == errno ) {
         FREEUP (table[0]);
         ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "fillCell_()", "malloc");
@@ -344,45 +344,44 @@ do_Param (struct lsConf *conf, char *fname, uint *lineNum)
     int value = 0;
 
     struct keymap keylist[] = {
-        {"LSB_MANAGER",           NULL, 0},
-        {"DEFAULT_QUEUE",         NULL, 0},
-        {"DEFAULT_HOST_SPEC",     NULL, 0},
-        {"DEFAULT_PROJECT",       NULL, 0},
-        {"JOB_ACCEPT_INTERVAL",   NULL, 0},
-        {"PG_SUSP_IT",            NULL, 0},
-        {"MBD_SLEEP_TIME",        NULL, 0},
-        {"CLEAN_PERIOD",          NULL, 0},
-        {"MAX_RETRY",             NULL, 0},
-        {"SBD_SLEEP_TIME",        NULL, 0},
-        {"MAX_JOB_NUM",           NULL, 0},
-        {"RETRY_INTERVAL",        NULL, 0},
-        {"MAX_SBD_FAIL",          NULL, 0},
-        {"RUSAGE_UPDATE_RATE",    NULL, 0},      /* control how often sbatchd */
-        {"RUSAGE_UPDATE_PERCENT", NULL, 0},   /* report job rusage to mbd */
-        {"COND_CHECK_TIME",       NULL, 0},   /* time to check conditions  */
-        {"MAX_SBD_CONNS",         NULL, 0},   /* Undocumented parameter for
-                                               * specifying how many sbd
-                                               * connections to keep around
-                                               */
-        {"MAX_SCHED_STAY",         NULL, 0},
-        {"FRESH_PERIOD",           NULL, 0},
-        {"MAX_JOB_ARRAY_SIZE",     NULL, 0},
-        {"DISABLE_UACCT_MAP",      NULL, 0},
-        {"JOB_TERMINATE_INTERVAL", NULL, 0},
-        {"JOB_RUN_TIMES",          NULL, 0},
-        {"JOB_DEP_LAST_SUB",       NULL, 0},
-        {"JOB_SPOOL_DIR",          NULL, 0},
-        {"MAX_USER_PRIORITY",      NULL, 0},
-        {"JOB_PRIORITY_OVER_TIME", NULL, 0},
-        {"SHARED_RESOURCE_UPDATE_FACTOR", NULL, 0},
-        {"SCHE_RAW_LOAD",          NULL, 0},
-        {"PRE_EXEC_DELAY",         NULL, 0},
-        {"SLOT_RESOURCE_RESERVE",  NULL, 0},
-        {"MAX_JOBID",              NULL, 0},
-        {"MAX_ACCT_ARCHIVE_FILE",  NULL, 0},
-        {"ACCT_ARCHIVE_SIZE",      NULL, 0},
-        {"ACCT_ARCHIVE_AGE",       NULL, 0},
-        {NULL,                     NULL, 0}
+        {"LSB_MANAGER",           "    ", NULL, 0},
+        {"DEFAULT_QUEUE",         "    ", NULL, 0},
+        {"DEFAULT_HOST_SPEC",     "    ", NULL, 0},
+        {"DEFAULT_PROJECT",       "    ", NULL, 0},
+        {"JOB_ACCEPT_INTERVAL",   "    ", NULL, 0},
+        {"PG_SUSP_IT",            "    ", NULL, 0},
+        {"MBD_SLEEP_TIME",        "    ", NULL, 0},
+        {"CLEAN_PERIOD",          "    ", NULL, 0},
+        {"MAX_RETRY",             "    ", NULL, 0},
+        {"SBD_SLEEP_TIME",        "    ", NULL, 0},
+        {"MAX_JOB_NUM",           "    ", NULL, 0},
+        {"RETRY_INTERVAL",        "    ", NULL, 0},
+        {"MAX_SBD_FAIL",          "    ", NULL, 0},
+        {"RUSAGE_UPDATE_RATE",    "    ", NULL, 0},    //* control how often sbatchd
+        {"RUSAGE_UPDATE_PERCENT", "    ", NULL, 0},    //* report job rusage to mbd
+        {"COND_CHECK_TIME",       "    ", NULL, 0},    //* time to check conditions
+        {"MAX_SBD_CONNS",         "    ", NULL, 0},    //* Undocumented parameter for
+                                                       //* specifying how many sbd
+                                                        //* connections to keep around
+        {"MAX_SCHED_STAY",         "    ", NULL, 0},
+        {"FRESH_PERIOD",           "    ", NULL, 0},
+        {"MAX_JOB_ARRAY_SIZE",     "    ", NULL, 0},
+        {"DISABLE_UACCT_MAP",      "    ", NULL, 0},
+        {"JOB_TERMINATE_INTERVAL", "    ", NULL, 0},
+        {"JOB_RUN_TIMES",          "    ", NULL, 0},
+        {"JOB_DEP_LAST_SUB",       "    ", NULL, 0},
+        {"JOB_SPOOL_DIR",          "    ", NULL, 0},
+        {"MAX_USER_PRIORITY",      "    ", NULL, 0},
+        {"JOB_PRIORITY_OVER_TIME", "    ", NULL, 0},
+        {"SHARED_RESOURCE_UPDATE_FACTOR", "    ", NULL, 0},
+        {"SCHE_RAW_LOAD",          "    ", NULL, 0},
+        {"PRE_EXEC_DELAY",         "    ", NULL, 0},
+        {"SLOT_RESOURCE_RESERVE",  "    ", NULL, 0},
+        {"MAX_JOBID",              "    ", NULL, 0},
+        {"MAX_ACCT_ARCHIVE_FILE",  "    ", NULL, 0},
+        {"ACCT_ARCHIVE_SIZE",      "    ", NULL, 0},
+        {"ACCT_ARCHIVE_AGE",       "    ", NULL, 0},
+        {NULL,                     "    ", NULL, 0}
 
     };
 
@@ -1104,10 +1103,10 @@ do_Users (struct lsConf *conf, char *fname, uint *lineNum, int options)
     struct hTab *tmpUsers;
     struct hTab *nonOverridableUsers;
     struct keymap keylist[] = {
-        {"USER_NAME", NULL, 0},
-        {"MAX_JOBS", NULL, 0},
-        {"JL/P", NULL, 0},
-        {NULL, NULL, 0}
+        {"USER_NAME", "    ", NULL, 0},
+        {"MAX_JOBS",  "    ", NULL, 0},
+        {"JL/P",      "    ", NULL, 0},
+        {NULL,        "    ", NULL, 0}
     };
 
     if (conf == NULL) {
@@ -1358,9 +1357,9 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, char *fname, uint 
 {
     static char pname[] = "do_Groups";
     struct keymap keylist[] = {
-        {"GROUP_NAME",   NULL, 0},
-        {"GROUP_MEMBER", NULL, 0},
-        {NULL,           NULL, 0}
+        {"GROUP_NAME",   "    ", NULL, 0},
+        {"GROUP_MEMBER", "    ", NULL, 0},
+        {NULL,           "    ", NULL, 0}
     };
     char *linep;
     char *wp;
@@ -2713,8 +2712,9 @@ do_Hosts_ (struct lsConf *conf, char *fname, uint *lineNum, struct lsInfo *info,
                  strcmp (keylist[HKEY_MXJ].val, "") ) 
         {
             assert( my_atoi (keylist[HKEY_MXJ].val, INFINIT_INT, -1) >= 0);
-            host.maxJobs = (unsigned long) my_atoi (keylist[HKEY_MXJ].val, INFINIT_INT, -1);
-            if ( fabs( INFINIT_INT - host.maxJobs) < 0.00001 ) {
+            host.maxJobs = my_atoi (keylist[HKEY_MXJ].val, INFINIT_INT, -1);
+            // if ( fabs( INFINIT_INT - host.maxJobs) < 0.00001 ) {
+            if ( ( INFINIT_INT - host.maxJobs) < 0.00001 ) {
                 /* catgets 5183 */
                 ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5183, "%s: File %s at line %d: Invalid value <%s> for key <%s>; %d is assumed"), pname, fname, *lineNum, keylist[HKEY_MXJ].val, keylist[HKEY_MXJ].key, INFINIT_INT);
                 lsberrno = LSBE_CONF_WARNING;
@@ -2724,8 +2724,9 @@ do_Hosts_ (struct lsConf *conf, char *fname, uint *lineNum, struct lsInfo *info,
         if( keylist[HKEY_UJOB_LIMIT].position >= 0 && keylist[HKEY_UJOB_LIMIT].val != NULL && strcmp (keylist[HKEY_UJOB_LIMIT].val, "")) {
 
             assert( my_atoi( keylist[HKEY_UJOB_LIMIT].val, INFINIT_INT, -1 ) >=0 );
-            host.userJobLimit = (unsigned long) my_atoi( keylist[HKEY_UJOB_LIMIT].val, INFINIT_INT, -1 );
-            if ( fabs( INFINIT_INT - host.userJobLimit ) < 0.00001 ) {
+            host.userJobLimit = my_atoi( keylist[HKEY_UJOB_LIMIT].val, INFINIT_INT, -1 );
+            // if ( fabs( INFINIT_INT - host.userJobLimit ) < 0.00001 ) {
+            if ( ( INFINIT_INT - host.userJobLimit ) < 0.00001 ) {
                 /* catgets 5183 */
                 ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5183, "%s: File %s at line %d: Invalid value <%s> for key <%s>; %d is assumed"), pname, fname, *lineNum, keylist[HKEY_UJOB_LIMIT].val, keylist[HKEY_UJOB_LIMIT].key, INFINIT_INT);
                 lsberrno = LSBE_CONF_WARNING;
@@ -2760,7 +2761,8 @@ do_Hosts_ (struct lsConf *conf, char *fname, uint *lineNum, struct lsInfo *info,
         if (keylist[HKEY_MIG].position >= 0 && keylist[HKEY_MIG].val != NULL && strcmp (keylist[HKEY_MIG].val, "")) {
 
             host.mig = my_atoi (keylist[HKEY_MIG].val, INFINIT_INT / 60, -1);
-            if ( fabs( INFINIT_INT - host.mig ) < 0.00001 ) {
+            // if ( fabs( INFINIT_INT - host.mig ) < 0.00001 ) {
+            if ( ( INFINIT_INT - host.mig ) < 0.00001 ) {
                 /* catgets 5186 */
                 ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5186, "%s: File %s at line %d: Invalid value <%s> for key <%s>; no MIG threshold is assumed"), pname, fname, *lineNum, keylist[HKEY_MIG].val, keylist[HKEY_MIG].key);
                 lsberrno = LSBE_CONF_WARNING;

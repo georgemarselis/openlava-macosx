@@ -83,8 +83,14 @@ struct HostsArray
     char **hosts;
 };
 
+// struct keymap {
+//     int position;
+//     char padding1[4];
+//     char *key;
+//     char *val;
+// };
 struct keymap {
-    int position;
+    char *position;
     char padding1[4];
     char *key;
     char *val;

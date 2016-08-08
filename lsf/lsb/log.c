@@ -33,16 +33,20 @@ lsb_openelog (struct eventLogFile *ePtr, uint *lineNum)
 {
 	static char fname[] = "lsb_openelog";
 	static struct eventLogHandle *eLogHandle = NULL;
-	int lastOpenFile, curOpenFile;
-	char ch, eventFile[MAXFILENAMELEN];
+	int lastOpenFile = 0;
+	int curOpenFile = 0;
+	char ch = '!'; 
+	char eventFile[MAXFILENAMELEN] = "";
 	FILE *elog_fp;
-	int i, oldFormat, findLast;
+	int i = 0;
+	int oldFormat = 0;
+	int findLast = 0;
 	time_t eventTime;
 	struct stat st;
 
-	eLogHandle = (struct eventLogHandle *) calloc (1, sizeof (struct eventLogHandle));
+	eLogHandle = malloc( sizeof (struct eventLogHandle) * 1 );
 
-	if ( NULL == eLogHandle && ENOMEM == errno )
+	if( NULL == eLogHandle && ENOMEM == errno )
 		{
 			lsberrno = LSBE_NO_MEM;
 			return NULL;
@@ -50,7 +54,7 @@ lsb_openelog (struct eventLogFile *ePtr, uint *lineNum)
 
 		// eventDir is an array. So, must find another way of comparing it to empty
 		// maybe take the adress or something.
-	if (ePtr->eventDir == NULL)
+	if( 0 == strlen( ePtr->eventDir ) )
 		{
 			 /* catgets 5500 */
 			ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5500, "%s: event directory is NULL"), fname);   
@@ -76,8 +80,7 @@ lsb_openelog (struct eventLogFile *ePtr, uint *lineNum)
 				}
 			else
 				{
-					if (fscanf (elog_fp, "%c%ld", &ch, &eventTime) != 2
-					|| ch != '#')
+					if (fscanf (elog_fp, "%c%ld", &ch, &eventTime) != 2 || ch != '#')
 				{
 					ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5501, "%s: fscanf(%s) failed: old event file format"),   /* catgets 5501 */
 								 fname, eventFile);
