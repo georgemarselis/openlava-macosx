@@ -17,13 +17,24 @@
  */
 
 
+#include "libint/intlibout.h"
+#include "lib/lproto.h"
 
-#include "intlibout.h"
+// FIXME FIXME FIXME might want to use the GNU datetime library here
 
 #define NL_SETN      22
+
+static int parse_time( char *word, float *hour, int *day );
+static windows_t *new_wind( void );
+static int mergeW( windows_t * wp, float ohour, float chour );
+
+int addWindow( char *wordpair, windows_t * week[], char *context );
+void insertW( windows_t ** window, float ohour, float chour );
+void checkWindow( struct dayhour *dayhour, char *active, time_t *wind_edge, windows_t *wp, time_t now);
+void delWindow( windows_t* wp );
 static int parse_time (char *word, float *hour, int *day);
-static windows_t *new_wind (void);
-static int mergeW (windows_t * wp, float ohour, float chour);
+void getDayHour (struct dayhour *dayPtr, time_t nowtime);
+
 
 int
 addWindow (char *wordpair, windows_t * week[], char *context)

@@ -19,8 +19,7 @@
 #include <stdlib.h>
 
 #include "sbd.h"
-
-#include "../../lsf/lib/lsi18n.h"
+#include "lsi18n.h"
 
 #define LOG_MASK(pri)   (1 << (pri))
 

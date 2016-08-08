@@ -17,7 +17,8 @@
  */
 
 
-#include "intlibout.h"
+#include "libint/intlibout.h"
+#include "lib/lproto.h"
 #define NL_SETN      22
 
 
@@ -85,7 +86,7 @@ getBootTime (time_t * bootTime)
       envIFS = (char *) malloc (len + 8);
       if (envIFS == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
+	  ls_syslog (LOG_ERR, "malloc failed at %s", fname );
 	  return (-1);
 	}
       sprintf (envIFS, "IFS=%s", oldIFS);
@@ -515,8 +516,9 @@ linux_getopt (nargc, nargv, ostr)
 	    p = *nargv;
 	  else
 	    ++p;
-	  (void) fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 653, "%s: illegal option -- %c\n")),	/* catgets 653 */
-			  p, linux_optopt);
+
+    /* catgets 653 */
+	  (void) fprintf (stderr, (_i18n_msg_get ( ls_catd, NL_SETN, 653, "%s: illegal option -- %c\n")), p, linux_optopt);
 	}
       opterr = linux_opterr;
       optopt = linux_optopt;
@@ -542,9 +544,11 @@ linux_getopt (nargc, nargv, ostr)
 	    p = *nargv;
 	  else
 	    ++p;
-	  if (linux_opterr)
-	    (void) fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 654, "%s: option requires an argument -- %c\n")),	/* catgets 654 */
-			    p, linux_optopt);
+	  if (linux_opterr) {
+        /* catgets 654 */
+	    // (void) FIXME FIXME (void) was on the line below. Why?
+      fprintf (stderr, (_i18n_msg_get ( ls_catd, NL_SETN, 654, "%s: option requires an argument -- %c\n")), p, linux_optopt);
+    }
 	  opterr = linux_opterr;
 	  optopt = linux_optopt;
 	  optind = linux_optind;

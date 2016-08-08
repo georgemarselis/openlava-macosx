@@ -24,7 +24,9 @@ AC_PROG_YACC
 AM_PROG_AR
 AX_PROG_TCL
 
-HAVE_TCL_TCL_H = no
+# must also check to see if specific data structures are available, and un/set
+# TCL_NO_DEPRECATED, USE_INTERP_RESULT, USE_INTERP_ERRORLINE
+HAVE_TCL_TCL_H = no 
 HAVE_TCL_H = no
 # Checks for headers
 AC_CHECK_HEADERS([tcl.h])

@@ -107,8 +107,8 @@ static int readJobAttrSet (char *, struct jobAttrSetLog *);
 
 static void freeLogRec (struct eventRec *);
 
-struct eventRec *lsbGetNextJobEvent (struct eventLogHandle *, int *, int, LS_LONG_INT *, struct jobIdIndexS *);
-static struct eventRec *lsbGetNextJobRecFromFile (FILE *, int *, int, LS_LONG_INT *);
+struct eventRec *lsbGetNextJobEvent (struct eventLogHandle *ePtr, uint *lineNum, uint numJobIds, LS_LONG_INT *jobIds, struct jobIdIndexS *indexS);
+static struct eventRec *lsbGetNextJobRecFromFile( FILE *logFp, uint *lineNum, uint numJobIds, LS_LONG_INT *jobIds );
 static int checkJobEventAndJobId (char *, int, int, LS_LONG_INT *);
 static int getEventTypeAndKind (char *, int *);
 static void readEventRecord (char *, struct eventRec *);
@@ -120,12 +120,12 @@ int updateJobIdIndexFile (char *, char *, int);
 int getNextFileNumFromIndexS (struct jobIdIndexS *, int, LS_LONG_INT *);
 
 
-struct eventLogHandle *lsb_openelog (struct eventLogFile *, int *);
-struct eventRec *lsb_getelogrec (struct eventLogHandle *, int *);
+struct eventLogHandle *lsb_openelog (struct eventLogFile *, uint *lineNum);
+struct eventRec *lsb_getelogrec (struct eventLogHandle *, uint *lineNum);
 void lsb_closeelog (struct eventLogHandle *);
-void countLineNum (FILE *, long, int *);
+void countLineNum (FILE *, long, uint *lineNum);
 
-struct eventRec *lsb_geteventrec_ex (FILE * log_fp, int *LineNum, char *usedLine);
+struct eventRec *lsb_geteventrec_ex (FILE * log_fp, uint *LineNum, char *usedLine);
 time_t lsb_getAcctFileTime (char *fileName);
 
 #define   EVENT_JOB_RELATED     1

@@ -22,10 +22,23 @@
 #include "lsf.h"
 #include "libint/resreq.h"
 
-#if defined(HAVE_TCL_TCL_H) // FIXME FIXME FIXME FIXME FIXME this must be set by configure.ac
-#include <tcl/tcl.h>
-#elif defined(HAVE_TCL_H)
+#ifdef TCL_NO_DEPRECATED 
+#undef TCL_NO_DEPRECATED
+#endif
+
+#ifndef USE_INTERP_RESULT
+#define USE_INTERP_RESULT
+#endif
+
+#ifndef USE_INTERP_ERRORLINE
+#define USE_INTERP_ERRORLINE
+#endif
+
+// #if defined(HAVE_TCL_TCL_H) // FIXME FIXME FIXME FIXME FIXME this must be set by configure.ac
+// #include <tcl/tcl.h>
+// #elif defined(HAVE_TCL_H)
 #include <tcl.h>
+// #endif
 
 
 static struct tclHostData *hPtr;
@@ -44,7 +57,8 @@ static int *ar4;
 
 int numericValue( ClientData, Tcl_Interp *, Tcl_Value *, Tcl_Value * );
 int booleanValue( ClientData, Tcl_Interp *, Tcl_Value *, Tcl_Value * );
-int stringValue(  ClientData, Tcl_Interp *, int, const char ** );
+int stringValue( ClientData clientData, Tcl_Interp *interp, uint argc, const char *argv[] );
+// int stringValue(  ClientData, Tcl_Interp *, int, const char ** );
 static int copyTclLsInfo( struct tclLsInfo * );
 static char *getResValue( int );
 static int definedCmd( ClientData, Tcl_Interp *, int, const char ** );

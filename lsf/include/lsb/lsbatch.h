@@ -1689,7 +1689,7 @@ extern char *lsb_suspreason P_ ((int, int, struct loadIndexLog *));
 extern char *lsb_pendreason P_ ((int, int *, struct jobInfoHead *, struct loadIndexLog *));
 
 extern int lsb_puteventrec P_ ((FILE *, struct eventRec *));
-extern struct eventRec *lsb_geteventrec P_ ((FILE *, int *));
+extern struct eventRec *lsb_geteventrec P_ ((FILE *log_fp, uint *lineNum));
 extern struct lsbSharedResourceInfo *lsb_sharedresourceinfo P_ ((char **, uint *, char *, int));
 
 extern int lsb_runjob P_ ((struct runJobRequest *));

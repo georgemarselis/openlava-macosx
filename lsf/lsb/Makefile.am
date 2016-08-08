@@ -2,6 +2,8 @@
 # Copyright (C) 2011 David Bigagli
 #
 
+AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -I$(top_srcdir)/lsf/include -I$(top_srcdir)/config.h
+
 lib_LIBRARIES = liblsf.a
 
 liblsf_a_SOURCES = comm.c conf.c debug.c err.c groups.c hc.c \

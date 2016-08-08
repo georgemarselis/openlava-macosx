@@ -16,7 +16,9 @@
  *
  */
 
-#include "intlibout.h"
+#include "libint/intlibout.h"
+#include "lib/lproto.h"
+#include "lib/table.h"
 
 struct sections
 {

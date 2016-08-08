@@ -125,7 +125,7 @@ static int wgetClusAdmins (char *line, char *lsfile, uint *lineNum, char *secNam
 static struct admins *getAdmins_ (char *line, char *fname, uint *lineNum, char *secName, int lookupAdmins);
 struct admins *liblsf_getAdmins (char *line, char *fname, uint *lineNum, char *secName, int lookupAdmins);
 
-int parse_time (char *, float *, int *);
+static int parse_time (char *, float *, int *);
 int validWindow (char *, char *);
 
 static int setAdmins (struct admins *, int);

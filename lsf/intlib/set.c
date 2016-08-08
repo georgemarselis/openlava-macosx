@@ -17,28 +17,44 @@
  */
 
 #include <stdlib.h>
-#include "set.h"
+#include "libint/set.h"
 
-#define FALSE	0
-#define TRUE	1
+#define FALSE   0
+#define TRUE    1
 
-void listSetFree (struct listSet *);
-struct listSet *listSetAlloc (int);
+void listSetFree( struct listSet * );
+struct listSet *listSetAlloc( int );
+void collectFreeSet( void );
+int listSetEqual( struct listSet *set1, struct listSet *set2 );
+struct listSet *listSetUnion( struct listSet *set1, struct listSet *set2 );
+struct listSet *listSetIntersect( struct listSet *set1, struct listSet *set2 );
+struct listSet *listSetDuplicate( struct listSet *set );
+int listSetIn( int elem, struct listSet *set );
+struct listSet *listSetInsert( int elem, struct listSet *set );
+struct listSet *listSetSub( struct listSet *set1, struct listSet *set2 );
+struct listSet *listSetAlloc( int elem );
+void listSetFree( struct listSet *set );
+unsigned int listSetk( unsigned int k, struct listSet *set );
+unsigned int listSetLen (struct listSet *set);
+
 
 struct listSet *FreeSet = NULL;
 
-collectFreeSet ()
+void
+collectFreeSet( void )
 {
-  struct listSet *ptr, *tmp;
+	struct listSet *ptr = NULL;
+	struct listSet *tmp = NULL;
 
-  ptr = FreeSet;
-  while (ptr)
-    {
-      tmp = ptr;
-      ptr = ptr->next;
-      free (tmp);
-    }
-  FreeSet = NULL;
+	ptr = FreeSet;
+	while( ptr )
+	{
+		tmp = ptr;
+		ptr = ptr->next;
+		free( tmp );
+	}
+
+	FreeSet = NULL;
 }
 
 
@@ -47,14 +63,14 @@ listSetEqual (struct listSet *set1, struct listSet *set2)
 {
 
   while (set1 && set2 && (set1->elem == set2->elem))
-    {
-      set1 = set1->next;
-      set2 = set2->next;
-    }
+	{
+	  set1 = set1->next;
+	  set2 = set2->next;
+	}
   if (!set1 && !set2)
-    return (TRUE);
+	return (TRUE);
   else
-    return (FALSE);
+	return (FALSE);
 }
 
 struct listSet *
@@ -65,25 +81,25 @@ listSetUnion (struct listSet *set1, struct listSet *set2)
   setHead = listSetAlloc (-1);
   setPtr = setHead;
   while (set1 && set2)
-    {
-      if (set1->elem <= set2->elem)
+	{
+	  if (set1->elem <= set2->elem)
 	{
 	  setPtr->next = set1;
 	  set1 = set1->next;
 	  setPtr = setPtr->next;
 	}
-      else
+	  else
 	{
 	  setPtr->next = set2;
 	  set2 = set2->next;
 	  setPtr = setPtr->next;
 	}
-    }
+	}
   setPtr->next = NULL;
   if (set1)
-    setPtr->next = set1;
+	setPtr->next = set1;
   else
-    setPtr->next = set2;
+	setPtr->next = set2;
 
   setPtr = setHead;
   setHead = setHead->next;
@@ -103,8 +119,8 @@ listSetIntersect (struct listSet *set1, struct listSet *set2)
   setHead = listSetAlloc (-1);
   setPtr = setHead;
   while (set1 && set2)
-    {
-      if (set1->elem == set2->elem)
+	{
+	  if (set1->elem == set2->elem)
 	{
 	  setPtr->next = set1;
 	  set1 = set1->next;
@@ -114,27 +130,27 @@ listSetIntersect (struct listSet *set1, struct listSet *set2)
 	  listSetFree (setTmp);
 	  setPtr = setPtr->next;
 	}
-      else if (set1->elem < set2->elem)
+	  else if (set1->elem < set2->elem)
 	{
 	  setTmp = set1;
 	  set1 = set1->next;
 	  setTmp->next = NULL;
 	  listSetFree (setTmp);
 	}
-      else
+	  else
 	{
 	  setTmp = set2;
 	  set2 = set2->next;
 	  setTmp->next = NULL;
 	  listSetFree (setTmp);
 	}
-    }
+	}
 
   setPtr->next = NULL;
   if (!set1)
-    listSetFree (set1);
+	listSetFree (set1);
   else
-    listSetFree (set2);
+	listSetFree (set2);
 
   setPtr = setHead;
   setHead = setHead->next;
@@ -151,11 +167,11 @@ listSetDuplicate (struct listSet *set)
   setHead = listSetAlloc (-1);
   setPtr = setHead;
   while (set)
-    {
-      setPtr->next = listSetAlloc (set->elem);
-      setPtr = setPtr->next;
-      set = set->next;
-    }
+	{
+	  setPtr->next = listSetAlloc (set->elem);
+	  setPtr = setPtr->next;
+	  set = set->next;
+	}
   setPtr = setHead;
   setHead = setHead->next;
   setPtr->next = NULL;
@@ -168,11 +184,11 @@ listSetIn (int elem, struct listSet *set)
 {
 
   while (set)
-    {
-      if (set->elem == elem)
+	{
+	  if (set->elem == elem)
 	return (TRUE);
-      set = set->next;
-    }
+	  set = set->next;
+	}
   return (FALSE);
 }
 
@@ -183,23 +199,23 @@ listSetInsert (int elem, struct listSet *set)
 
 
   if (listSetIn (elem, set))
-    return (set);
+	return (set);
 
   if (!set)
-    {
-      ptr = listSetAlloc (elem);
-      return (ptr);
-    }
+	{
+	  ptr = listSetAlloc (elem);
+	  return (ptr);
+	}
   else if (set->elem > elem)
-    {
-      ptr = listSetAlloc (elem);
-      ptr->next = set;
-      return (ptr);
-    }
+	{
+	  ptr = listSetAlloc (elem);
+	  ptr->next = set;
+	  return (ptr);
+	}
 
   ptr = set;
   while (ptr && ptr->next && ptr->next->elem < elem)
-    ptr = ptr->next;
+	ptr = ptr->next;
 
   ptmp = ptr->next;
   ptr->next = listSetAlloc (elem);
@@ -214,51 +230,51 @@ listSetSub (struct listSet *set1, struct listSet *set2)
   struct listSet *ptr, *tmp;
 
   if (!set1)
-    {
-      listSetFree (set2);
-      return (NULL);
-    }
+	{
+	  listSetFree (set2);
+	  return (NULL);
+	}
 
   if (!set2)
-    return (set1);
+	return (set1);
 
   ptr = set1;
   while (ptr && set2)
-    {
-      if (ptr->elem == set2->elem)
+	{
+	  if (ptr->elem == set2->elem)
 	{
 	  ptr->elem = -1;
 	  ptr = ptr->next;
 	  set2 = set2->next;
 	}
-      else if (ptr->elem > set2->elem)
+	  else if (ptr->elem > set2->elem)
 	set2 = set2->next;
-      else
+	  else
 	ptr = ptr->next;
-    }
+	}
 
   listSetFree (set2);
   ptr = set1;
   while (ptr->next)
-    {
-      if (ptr->next->elem < 0)
+	{
+	  if (ptr->next->elem < 0)
 	{
 	  tmp = ptr->next;
 	  ptr->next = tmp->next;
 	  tmp->next = NULL;
 	  listSetFree (tmp);
 	}
-      else
+	  else
 	ptr = ptr->next;
-    }
+	}
 
   if (set1->elem < 0)
-    {
-      tmp = set1;
-      set1 = set1->next;
-      tmp->next = NULL;
-      listSetFree (tmp);
-    }
+	{
+	  tmp = set1;
+	  set1 = set1->next;
+	  tmp->next = NULL;
+	  listSetFree (tmp);
+	}
 
   return (set1);
 }
@@ -269,14 +285,14 @@ listSetAlloc (int elem)
   struct listSet *ptr;
 
   if (FreeSet)
-    {
-      ptr = FreeSet;
-      FreeSet = FreeSet->next;
-    }
+	{
+	  ptr = FreeSet;
+	  FreeSet = FreeSet->next;
+	}
   else
-    {
-      ptr = (struct listSet *) malloc (sizeof (struct listSet));
-    }
+	{
+	  ptr = (struct listSet *) malloc (sizeof (struct listSet));
+	}
   ptr->elem = elem;
   ptr->next = NULL;
   return (ptr);
@@ -285,40 +301,52 @@ listSetAlloc (int elem)
 void
 listSetFree (struct listSet *set)
 {
-  struct listSet *ptr;
+	struct listSet *ptr = NULL;
 
-  if (!set)
-    return;
-  for (ptr = set; ptr->next; ptr = ptr->next);
-  ptr->next = FreeSet;
-  FreeSet = set;
+	if (!set) {
+		return;
+	}
+  
+	for(ptr = set; ptr->next; ptr = ptr->next ) { }; // THIS JUST WALKS THE LIST
+
+	ptr->next = FreeSet;
+	FreeSet = set;
+
+  return;
 }
 
-int
-listSetk (int k, struct listSet *set)
+unsigned int
+listSetk (unsigned int k, struct listSet *set)
 {
-  int i = 0;
 
-  for (i = 1; i < k; i++)
-    {
-      if (set)
-	set = set->next;
-      else
-	return (0);
-    }
+	for( unsigned int i = 1; i < k; i++)
+	{
+		if( set ) {
+			set = set->next;
+		}
+		else {
+			return 0;
+		}
+	}
 
-  if (set)
-    return (set->elem);
-  else
-    return (0);
+	if( set ) {
+		return set->elem;
+	}
+	else {
+		return 0;
+	}
+
+	return -1; // control is never supposed to reach here
 }
 
-int
+unsigned int
 listSetLen (struct listSet *set)
 {
-  int len = 0;
+  unsigned int len = 0;
 
-  for (; set; set = set->next)
-    len++;
-  return (len);
+	for( ; set; set = set->next ) {
+		len++;
+	}
+
+	return len ;
 }

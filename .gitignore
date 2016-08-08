@@ -39,3 +39,4 @@ compile
 build/lsf
 build-aux
 m4
+.Tpo
