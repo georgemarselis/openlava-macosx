@@ -185,7 +185,7 @@ long
 b_write_fix (int s, char *buf, size_t len)
 {
 
-    ssize_t cc  = 0;
+    int cc  = 0;
     size_t loop = 0;
     size_t length = 0;
 
@@ -194,7 +194,7 @@ b_write_fix (int s, char *buf, size_t len)
     {
         if ((cc = write (s, buf, len)) > 0) {
             assert( cc >= 0);
-            len -= (size_t) cc;
+            len -= cc;
             buf += cc;
         }
         else if (cc < 0 && errno != EINTR) {

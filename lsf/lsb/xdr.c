@@ -209,7 +209,9 @@ xdr_submitReq (XDR *xdrs, struct submitReq *submitReq, struct LSFHeader *hdr)
 
     for ( uint i = 0; i < submitReq->nxf; i++)
     {
-        if (!xdr_arrayElement (xdrs, &(submitReq->xf[i]), hdr, xdr_xFile)) {
+        // FIXME FIXME FIXME FIXME FIXME
+        // .execFn is wrong, must throw compiler on it 
+        if (!xdr_arrayElement (xdrs, submitReq->xf[i].execFn, hdr, xdr_xFile)) {
             goto Error1;   // FIXME FIXME FIXME FIXME remove goto
         }
     }
@@ -746,7 +748,7 @@ xdr_jgrpInfoReply (XDR *xdrs, struct jobInfoReply * jobInfoReply, struct LSFHead
     {
       jobId64To32 (jobInfoReply->jobId, &jobArrId, &jobArrElemId);
     }
-  if (!(xdr_int (xdrs, &jobArrId) &&
+  if (!(xdr_u_int (xdrs, &jobArrId) &&
   xdr_int (xdrs, &(jobInfoReply->status)) &&
   xdr_int (xdrs, &(jobInfoReply->reasons)) &&
   xdr_int (xdrs, &(jobInfoReply->subreasons)) &&
@@ -771,7 +773,7 @@ xdr_jgrpInfoReply (XDR *xdrs, struct jobInfoReply * jobInfoReply, struct LSFHead
       return FALSE;
     }
 
-  if (!xdr_int (xdrs, &jobArrElemId))
+  if (!xdr_u_int (xdrs, &jobArrElemId))
     {
       return FALSE;
     }
@@ -792,8 +794,8 @@ xdr_jobInfoReply (XDR *xdrs, struct jobInfoReply *jobInfoReply, struct LSFHeader
   static uint nIdx = 0;
   static int *reasonTb = NULL;
   static uint nReasons = 0;
-  int jobArrId = 0;
-  int jobArrElemId = 0;
+  uint jobArrId = 0;
+  uint jobArrElemId = 0;
 
 
   if (!(xdr_int (xdrs, &jobInfoReply->jType) &&
@@ -828,7 +830,7 @@ xdr_jobInfoReply (XDR *xdrs, struct jobInfoReply *jobInfoReply, struct LSFHeader
     {
       jobId64To32 (jobInfoReply->jobId, &jobArrId, &jobArrElemId);
     }
-  if (!(xdr_int (xdrs, &jobArrId) &&
+  if (!(xdr_u_int (xdrs, &jobArrId) &&
   xdr_int (xdrs, &(jobInfoReply->status)) &&
   xdr_int (xdrs, &(jobInfoReply->reasons)) &&
   xdr_int (xdrs, &(jobInfoReply->subreasons)) &&
@@ -935,11 +937,11 @@ xdr_jobInfoReply (XDR *xdrs, struct jobInfoReply *jobInfoReply, struct LSFHeader
       return FALSE;
     }
 
-  if (!(xdr_u_int (xdrs,  &jobInfoReply->exitStatus) &&
-  xdr_u_int (xdrs, &jobInfoReply->execUid) &&
-  xdr_var_string (xdrs, &jobInfoReply->execHome) &&
-  xdr_var_string (xdrs, &jobInfoReply->execCwd) &&
-  xdr_var_string (xdrs, &jobInfoReply->execUsername)))
+    if (!(xdr_int (xdrs,  &jobInfoReply->exitStatus) &&
+            xdr_int (xdrs, &jobInfoReply->execUid) &&
+            xdr_var_string (xdrs, &jobInfoReply->execHome) &&
+            xdr_var_string (xdrs, &jobInfoReply->execCwd) &&
+            xdr_var_string (xdrs, &jobInfoReply->execUsername)))
     {
       FREEUP (jobInfoReply->execHome);
       FREEUP (jobInfoReply->execCwd);
@@ -976,7 +978,7 @@ xdr_jobInfoReply (XDR *xdrs, struct jobInfoReply *jobInfoReply, struct LSFHeader
       return FALSE;
     }
 
-  if (!xdr_int (xdrs, &jobArrElemId))
+  if (!xdr_u_int (xdrs, &jobArrElemId))
     {
       return FALSE;
     }
@@ -1484,7 +1486,7 @@ xdr_userInfoReply (XDR *xdrs, struct userInfoReply *userInfoReply, struct LSFHea
     *numUsers = userInfoReply->numUsers;
     assert( userInfoReply->badUser  <= INT_MAX );
     *badUser  = userInfoReply->badUser;
-    if ( !xdr_u_int (xdrs, numUsers) && !xdr_uint (xdrs, badUser ) ) {
+    if ( !xdr_u_int (xdrs, numUsers) && !xdr_u_int (xdrs, badUser ) ) {
         return FALSE;
     }
     assert( *badUser >= 0 );
@@ -1549,16 +1551,16 @@ xdr_userInfoEnt (XDR *xdrs, struct userInfoEnt *userInfoEnt, struct LSFHeader *h
         sp = NULL;
     }
 
-    if (!(xdr_string (xdrs, &sp, MAX_LSB_NAME_LEN) && xdr_float (xdrs, &userInfoEnt->procJobLimit) && xdr_int (xdrs, &userInfoEnt->maxJobs) && xdr_int (xdrs, &userInfoEnt->numStartJobs))) {
+    if (!(xdr_string (xdrs, &sp, MAX_LSB_NAME_LEN) && xdr_float (xdrs, &userInfoEnt->procJobLimit) && xdr_u_int (xdrs, &userInfoEnt->maxJobs) && xdr_u_int (xdrs, &userInfoEnt->numStartJobs))) {
         return FALSE;
     }
 
 
-    if (!(xdr_int (xdrs, &userInfoEnt->numJobs) && xdr_int (xdrs, &userInfoEnt->numPEND) && xdr_int (xdrs, &userInfoEnt->numRUN) && xdr_int (xdrs, &userInfoEnt->numSSUSP) && xdr_int (xdrs, &userInfoEnt->numUSUSP))) {
+    if (!(xdr_u_int (xdrs, &userInfoEnt->numJobs) && xdr_u_int (xdrs, &userInfoEnt->numPEND) && xdr_u_int (xdrs, &userInfoEnt->numRUN) && xdr_u_int (xdrs, &userInfoEnt->numSSUSP) && xdr_u_int (xdrs, &userInfoEnt->numUSUSP))) {
         return FALSE;
     }
 
-    if (!xdr_int (xdrs, &userInfoEnt->numRESERVE)) {
+    if (!xdr_u_int (xdrs, &userInfoEnt->numRESERVE)) {
         return FALSE;
     }
 

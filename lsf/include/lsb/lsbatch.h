@@ -519,9 +519,9 @@
 
 struct xFile
 {
-  char subFn[MAXFILENAMELEN];
-  char execFn[MAXFILENAMELEN];
-  int options;
+	char *subFn;
+	char *execFn;
+	int options;
 #define  XF_OP_SUB2EXEC         0x1
 #define  XF_OP_EXEC2SUB         0x2
 #define  XF_OP_SUB2EXEC_APPEND  0x4
@@ -948,22 +948,22 @@ struct jobNewLog
   char padding3[4];
   unsigned long jobId;
   float hostFactor;
-  char queue[MAX_LSB_NAME_LEN];
-  char fromHost[MAXHOSTNAMELEN];
-  char cwd[MAXFILENAMELEN];
-  char chkpntDir[MAXFILENAMELEN];
-  char inFile[MAXFILENAMELEN];
-  char outFile[MAXFILENAMELEN];
-  char errFile[MAXFILENAMELEN];
-  char inFileSpool[MAXFILENAMELEN];
-  char commandSpool[MAXFILENAMELEN];
-  char jobSpoolDir[MAXPATHLEN];
-  char subHomeDir[MAXFILENAMELEN];
-  char jobFile[MAXFILENAMELEN];
-  char userName[MAX_LSB_NAME_LEN];
-  char hostSpec[MAXHOSTNAMELEN];
-  char jobName[MAXLINELEN];
-  char command[MAXLINELEN];
+  char *queue;
+  char *fromHost;
+  char *cwd;
+  char *chkpntDir;
+  char *inFile;
+  char *outFile;
+  char *errFile;
+  char *inFileSpool;
+  char *commandSpool;
+  char *jobSpoolDir;
+  char *subHomeDir;
+  char *jobFile;
+  char *userName;
+  char *hostSpec;
+  char *jobName;
+  char *command;
   char padding2[4];
   char *preExecCmd;
   char *mailUser;
@@ -1697,8 +1697,8 @@ extern int lsb_runjob P_ ((struct runJobRequest *));
 
 extern char *lsb_jobid2str P_ ((LS_LONG_INT));
 extern char *lsb_jobidinstr P_ ((LS_LONG_INT));
-extern void jobId32To64 P_ ((LS_LONG_INT *, int, int));
-extern void jobId64To32 P_ ((LS_LONG_INT, int *, int *));
+extern void jobId32To64 P_ ((LS_LONG_INT *, uint jobId, uint jobArrElemId ) );
+extern void jobId64To32 P_ ((LS_LONG_INT, uint *jobId, uint *jobArrElemId ) );
 extern int lsb_setjobattr (int, struct jobAttrInfoEnt *);
 
 extern LS_LONG_INT lsb_rexecv (int, char **, char **, int *, int);

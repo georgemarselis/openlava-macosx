@@ -343,45 +343,55 @@ do_Param (struct lsConf *conf, char *fname, uint *lineNum)
     char *linep;
     int value = 0;
 
+    enum state {
+        LSB_MANAGER, DEFAULT_QUEUE, DEFAULT_HOST_SPEC, DEFAULT_PROJECT, JOB_ACCEPT_INTERVAL,
+        PG_SUSP_IT, MBD_SLEEP_TIME, CLEAN_PERIOD, MAX_RETRY, SBD_SLEEP_TIME, MAX_JOB_NUM,
+        RETRY_INTERVAL, MAX_SBD_FAIL, RUSAGE_UPDATE_RATE, RUSAGE_UPDATE_PERCENT, COND_CHECK_TIME,
+        MAX_SBD_CONNS, MAX_SCHED_STAY, FRESH_PERIOD, MAX_JOB_ARRAY_SIZE, DISABLE_UACCT_MAP,
+        JOB_TERMINATE_INTERVAL, JOB_RUN_TIMES, JOB_DEP_LAST_SUB, JOB_SPOOL_DIR, MAX_USER_PRIORITY,
+        JOB_PRIORITY_OVER_TIME, SHARED_RESOURCE_UPDATE_FACTOR, SCHE_RAW_LOAD, PRE_EXEC_DELAY,
+        SLOT_RESOURCE_RESERVE, MAX_JOBID, MAX_ACCT_ARCHIVE_FILE, ACCT_ARCHIVE_SIZE, ACCT_ARCHIVE_AGE 
+    };
+
     struct keymap keylist[] = {
-        {"LSB_MANAGER",           "    ", NULL, 0},
-        {"DEFAULT_QUEUE",         "    ", NULL, 0},
-        {"DEFAULT_HOST_SPEC",     "    ", NULL, 0},
-        {"DEFAULT_PROJECT",       "    ", NULL, 0},
-        {"JOB_ACCEPT_INTERVAL",   "    ", NULL, 0},
-        {"PG_SUSP_IT",            "    ", NULL, 0},
-        {"MBD_SLEEP_TIME",        "    ", NULL, 0},
-        {"CLEAN_PERIOD",          "    ", NULL, 0},
-        {"MAX_RETRY",             "    ", NULL, 0},
-        {"SBD_SLEEP_TIME",        "    ", NULL, 0},
-        {"MAX_JOB_NUM",           "    ", NULL, 0},
-        {"RETRY_INTERVAL",        "    ", NULL, 0},
-        {"MAX_SBD_FAIL",          "    ", NULL, 0},
-        {"RUSAGE_UPDATE_RATE",    "    ", NULL, 0},    //* control how often sbatchd
-        {"RUSAGE_UPDATE_PERCENT", "    ", NULL, 0},    //* report job rusage to mbd
-        {"COND_CHECK_TIME",       "    ", NULL, 0},    //* time to check conditions
-        {"MAX_SBD_CONNS",         "    ", NULL, 0},    //* Undocumented parameter for
-                                                       //* specifying how many sbd
+        { LSB_MANAGER,           "    ", NULL, 0 },
+        { DEFAULT_QUEUE,         "    ", NULL, 0 },
+        { DEFAULT_HOST_SPEC,     "    ", NULL, 0 },
+        { DEFAULT_PROJECT,       "    ", NULL, 0 },
+        { JOB_ACCEPT_INTERVAL,   "    ", NULL, 0 },
+        { PG_SUSP_IT,            "    ", NULL, 0 },
+        { MBD_SLEEP_TIME,        "    ", NULL, 0 },
+        { CLEAN_PERIOD,          "    ", NULL, 0 },
+        { MAX_RETRY,             "    ", NULL, 0 },
+        { SBD_SLEEP_TIME,        "    ", NULL, 0 },
+        { MAX_JOB_NUM,           "    ", NULL, 0 },
+        { RETRY_INTERVAL,        "    ", NULL, 0 },
+        { MAX_SBD_FAIL,          "    ", NULL, 0 },
+        { RUSAGE_UPDATE_RATE,    "    ", NULL, 0 },     //* control how often sbatchd
+        { RUSAGE_UPDATE_PERCENT, "    ", NULL, 0 },     //* report job rusage to mbd
+        { COND_CHECK_TIME,       "    ", NULL, 0 },     //* time to check conditions
+        { MAX_SBD_CONNS,         "    ", NULL, 0 },     //* Undocumented parameter for
+                                                        //* specifying how many sbd
                                                         //* connections to keep around
-        {"MAX_SCHED_STAY",         "    ", NULL, 0},
-        {"FRESH_PERIOD",           "    ", NULL, 0},
-        {"MAX_JOB_ARRAY_SIZE",     "    ", NULL, 0},
-        {"DISABLE_UACCT_MAP",      "    ", NULL, 0},
-        {"JOB_TERMINATE_INTERVAL", "    ", NULL, 0},
-        {"JOB_RUN_TIMES",          "    ", NULL, 0},
-        {"JOB_DEP_LAST_SUB",       "    ", NULL, 0},
-        {"JOB_SPOOL_DIR",          "    ", NULL, 0},
-        {"MAX_USER_PRIORITY",      "    ", NULL, 0},
-        {"JOB_PRIORITY_OVER_TIME", "    ", NULL, 0},
-        {"SHARED_RESOURCE_UPDATE_FACTOR", "    ", NULL, 0},
-        {"SCHE_RAW_LOAD",          "    ", NULL, 0},
-        {"PRE_EXEC_DELAY",         "    ", NULL, 0},
-        {"SLOT_RESOURCE_RESERVE",  "    ", NULL, 0},
-        {"MAX_JOBID",              "    ", NULL, 0},
-        {"MAX_ACCT_ARCHIVE_FILE",  "    ", NULL, 0},
-        {"ACCT_ARCHIVE_SIZE",      "    ", NULL, 0},
-        {"ACCT_ARCHIVE_AGE",       "    ", NULL, 0},
-        {NULL,                     "    ", NULL, 0}
+        { MAX_SCHED_STAY,         "    ", NULL, 0 },
+        { FRESH_PERIOD,           "    ", NULL, 0 },
+        { MAX_JOB_ARRAY_SIZE,     "    ", NULL, 0 },
+        { DISABLE_UACCT_MAP,      "    ", NULL, 0 },
+        { JOB_TERMINATE_INTERVAL, "    ", NULL, 0 },
+        { JOB_RUN_TIMES,          "    ", NULL, 0 },
+        { JOB_DEP_LAST_SUB,       "    ", NULL, 0 },
+        { JOB_SPOOL_DIR,          "    ", NULL, 0 },
+        { MAX_USER_PRIORITY,      "    ", NULL, 0 },
+        { JOB_PRIORITY_OVER_TIME, "    ", NULL, 0 },
+        { SHARED_RESOURCE_UPDATE_FACTOR, "    ", NULL, 0 },
+        { SCHE_RAW_LOAD,          "    ", NULL, 0 },
+        { PRE_EXEC_DELAY,         "    ", NULL, 0 },
+        { SLOT_RESOURCE_RESERVE,  "    ", NULL, 0 },
+        { MAX_JOBID,              "    ", NULL, 0 },
+        { MAX_ACCT_ARCHIVE_FILE,  "    ", NULL, 0 },
+        { ACCT_ARCHIVE_SIZE,      "    ", NULL, 0 },
+        { ACCT_ARCHIVE_AGE,       "    ", NULL, 0 },
+        { 0,                      "    ", NULL, 0 }
 
     };
 
@@ -1102,11 +1112,16 @@ do_Users (struct lsConf *conf, char *fname, uint *lineNum, int options)
     struct passwd *pw;
     struct hTab *tmpUsers;
     struct hTab *nonOverridableUsers;
+    
+    enum state {
+        USER_NAME, MAX_JOBS, JL_P
+    };
+
     struct keymap keylist[] = {
-        {"USER_NAME", "    ", NULL, 0},
-        {"MAX_JOBS",  "    ", NULL, 0},
-        {"JL/P",      "    ", NULL, 0},
-        {NULL,        "    ", NULL, 0}
+        {USER_NAME, "    ", NULL, 0},
+        {MAX_JOBS,  "    ", NULL, 0},
+        {JL_P,      "    ", NULL, 0},
+        {0,         "    ", NULL, 0}
     };
 
     if (conf == NULL) {
@@ -1356,10 +1371,13 @@ static char
 do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, char *fname, uint *lineNum, uint *ngroups, int options)
 {
     static char pname[] = "do_Groups";
+
+    enum state { GROUP_NAME, GROUP_MEMBER };
+
     struct keymap keylist[] = {
-        {"GROUP_NAME",   "    ", NULL, 0},
-        {"GROUP_MEMBER", "    ", NULL, 0},
-        {NULL,           "    ", NULL, 0}
+        {GROUP_NAME,   "    ", NULL, 0},
+        {GROUP_MEMBER, "    ", NULL, 0},
+        {0,            "    ", NULL, 0}
     };
     char *linep;
     char *wp;

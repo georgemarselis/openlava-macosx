@@ -131,13 +131,13 @@ lsb_submit (struct submit *jobSubReq, struct submitReply *submitRep)
 	struct group *grpEntry;
 	char *queue = NULL;
 	struct submitReq submitReq = {
-		0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0,
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // 23 NULL
+		"  ", 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0,
+		"  ", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // 23 NULL
 		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 		NULL, NULL, NULL,
-		0, 0, 0, 0, // 4 zeros
-		"",
-		{ NULL, NULL, 0}
+		0, 0, 0, 0, 0, // 5 zeros
+		0,
+		0
 	};
 
 	if (logclass & (LC_TRACE | LC_EXEC)) {
@@ -822,6 +822,8 @@ send_batch (struct submitReq *submitReqPtr, struct lenData *jf, struct submitRep
 	return -1;
 }
 
+
+// FIXME figure out if this function is needed
 static int
 dependCondSyntax (char *dependCond)
 {
@@ -834,13 +836,13 @@ subRestart (struct submit *jobSubReq, struct submitReq *submitReq, struct submit
 {
 	static char fname[] = "subRestart";
 	
-	char resReq[ MAXLINELEN ];
-	char fromHost[ MAXFILENAMELEN ];
-	char chkPath[ MAXFILENAMELEN ];
-	char mailUser[ MAX_LSB_NAME_LEN ];
-	char projectName[ MAX_LSB_NAME_LEN ];
-	char loginShell[ MAX_LSB_NAME_LEN ];
-	char schedHostType[ MAX_LSB_NAME_LEN ];
+	char *resReq        = NULL;
+	char *fromHost      = NULL;
+	char *chkPath       = NULL;
+	char *mailUser      = NULL;
+	char *projectName   = NULL;
+	char *loginShell    = NULL;
+	char *schedHostType = NULL;
 
 	struct lenData jf = { 0, NULL }; 
   
@@ -859,12 +861,11 @@ subRestart (struct submit *jobSubReq, struct submitReq *submitReq, struct submit
 		int eno;
 		int lserrno;
 		int lsberrno;
-	} err;
+	} err = { 0, 0, 0, 0 } ;
 	struct linger linstr = { 1, 5 };
 
-	memset (chkPath, 0, MAXFILENAMELEN);
-	err.error = err.eno = err.lserrno = err.lsberrno = 0;
-
+	chkPath = malloc( sizeof( char ) * MAXFILENAMELEN + 1);
+	
 	if (logclass & (LC_TRACE | LC_EXEC)) {
 		ls_syslog (LOG_DEBUG, "%s: Entering this routine...", fname);
 	}
@@ -887,7 +888,7 @@ subRestart (struct submit *jobSubReq, struct submitReq *submitReq, struct submit
 		FILE *fp = 0 ;
 		uid_t uid = 0;
 		struct eventRec *logPtr = NULL;
-		char chklog[MAXFILENAMELEN] = "";
+		char *chklog = malloc( sizeof( char ) * MAXFILENAMELEN + 1 );
 		int exitVal = -1;
 
 		close (childIoFd[0]);
@@ -957,10 +958,15 @@ subRestart (struct submit *jobSubReq, struct submitReq *submitReq, struct submit
 			}
 
 
-		if (b_write_fix(childIoFd[1], jobLog, sizeof (struct jobNewLog)) != sizeof (struct jobNewLog))
-			{
+		// FIXME FIXME FIXME FIXME FIXME 
+		// jobLog->errFile is DEFINATELLY WRONG
+		// THIS MUST BE ADDRESSED BY ATTACHING THE DEBUGGER
+		// ... or figuring out wtf does this code is supposed to do.
+		if( b_write_fix( childIoFd[1], jobLog->errFile, sizeof( struct jobNewLog ) ) != sizeof( struct jobNewLog ) )
+		{
 			goto childExit;
-			}
+		}
+
 		assert( strlen(jobLog->resReq) + 1 <= UINT_MAX );
 		if ((length = strlen (jobLog->resReq) + 1) >= MAXLINELEN)
 			{

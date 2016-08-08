@@ -889,7 +889,7 @@ getNTSpoolDir (char *spoolDir)
 }
 
 void
-jobId64To32 (LS_LONG_INT interJobId, int *jobId, int *jobArrElemId)
+jobId64To32 (LS_LONG_INT interJobId, uint *jobId, uint *jobArrElemId)
 {
   *jobArrElemId = LSB_ARRAY_IDX (interJobId);
   *jobId = LSB_ARRAY_JOBID (interJobId);
@@ -898,7 +898,7 @@ jobId64To32 (LS_LONG_INT interJobId, int *jobId, int *jobArrElemId)
 
 
 void
-jobId32To64 (LS_LONG_INT *interJobId, int jobId, int jobArrElemId)
+jobId32To64 (LS_LONG_INT *interJobId, uint jobId, uint jobArrElemId)
 {
     assert( jobId >= 0);
     unsigned long temp = LSB_JOBID ( (unsigned long)jobId, jobArrElemId);
