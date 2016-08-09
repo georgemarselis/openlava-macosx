@@ -124,6 +124,7 @@ AC_CONFIG_FILES([Makefile
                  lsf/cmdtools/lsrmhost/Makefile
                  lsf/cmdtools/lsrun/Makefile
                  lsf/daemons/Makefile
+				 lsf/daemons/common/Makefile
                  lsf/daemons/eauthd/Makefile
                  lsf/daemons/limd/Makefile
                  lsf/daemons/mbatchd/Makefile
@@ -134,7 +135,7 @@ AC_CONFIG_FILES([Makefile
                  lsf/intlib/Makefile
                  lsf/lib/Makefile
                  lsf/lib/liblsf/Makefile
-                 lsf/lsb/Makefile
+                 lsf/lib/liblsbatch/Makefile
                  scripts/Makefile])
 AM_INIT_AUTOMAKE([subdir-objects -Wall -Werror])
 LT_INIT

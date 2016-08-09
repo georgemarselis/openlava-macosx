@@ -1,0 +1,9 @@
+AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -I$(top_srcdir)/include/chkpnt
+
+sbin_PROGRAMS  = lchkpnt lrestart
+
+lchkpnt_SOURCES = echkpnt.c echkpnt.env.c echkpnt.lib.c
+lchkpnt_LDADD = $(top_builddir)/lib/liblsf/liblsf.a
+
+lrestart_SOURCES = erestart.c echkpnt.env.c echkpnt.lib.c
+lrestart_LDADD = $(top_builddir)/lsf/lib/liblsf.a

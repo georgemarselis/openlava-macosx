@@ -80,17 +80,6 @@ xdr_submitReq (XDR *xdrs, struct submitReq *submitReq, struct LSFHeader *hdr)
 
     if (xdrs->x_op == XDR_DECODE)
     {
-        submitReq->fromHost[0]     = '\0';
-        submitReq->jobFile[0]      = '\0';
-        submitReq->inFile[0]       = '\0';
-        submitReq->outFile[0]      = '\0';
-        submitReq->errFile[0]      = '\0';
-        submitReq->inFileSpool[0]  = '\0';
-        submitReq->commandSpool[0] = '\0';
-        submitReq->chkpntDir[0]    = '\0';
-        submitReq->hostSpec[0]     = '\0';
-        submitReq->cwd[0]          = '\0';
-        submitReq->subHomeDir[0]   = '\0';
         FREEUP( submitReq->queue);
         FREEUP( submitReq->command);
         FREEUP( submitReq->jobName);

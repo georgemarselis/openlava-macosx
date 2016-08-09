@@ -6,6 +6,6 @@ AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -I$(top_srcdir)/include -I$(top_src
 
 
 # SUBDIRS = liblsf daemons cmdtools checkpoint
-SUBDIRS = liblsf 
+SUBDIRS = liblsf liblsbatch
 
 

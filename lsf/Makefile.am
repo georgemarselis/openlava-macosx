@@ -5,6 +5,6 @@ AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -I$(top_srcdir)/lsf/include -I$(top
 
 # include_HEADERS = $(srcdir)/include/lsf.h $(srcdir)/config.h
 
-SUBDIRS = lib intlib lsb daemons cmdtools 
+SUBDIRS = lib intlib daemons cmdtools 
 
 
