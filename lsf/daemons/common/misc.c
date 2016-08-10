@@ -569,17 +569,17 @@ getTclLsInfo (void)
         freeTclLsInfo (tclLsInfo, 0);
     }
 
-    tclLsInfo = (struct tclLsInfo *) my_malloc (sizeof (struct tclLsInfo), fname);
+    tclLsInfo = my_malloc (sizeof (struct tclLsInfo), fname);
     tclLsInfo->numIndx = allLsInfo->numIndx;
-    tclLsInfo->indexNames = (char **) my_malloc (allLsInfo->numIndx * sizeof (char *), fname);
+    tclLsInfo->indexNames = my_malloc (allLsInfo->numIndx * sizeof (char *), fname);
     for ( uint resNo = 0; resNo < allLsInfo->numIndx; resNo++) {
         tclLsInfo->indexNames[resNo] = allLsInfo->resTable[resNo].name;
     }
 
     tclLsInfo->nRes = 0;
-    tclLsInfo->resName           = (char **) my_malloc (allLsInfo->nRes * sizeof (char *), fname);
-    tclLsInfo->stringResBitMaps  = (int *) my_malloc (GET_INTNUM (allLsInfo->nRes) * sizeof (int), fname);
-    tclLsInfo->numericResBitMaps = (int *) my_malloc (GET_INTNUM (allLsInfo->nRes) * sizeof (int), fname);
+    tclLsInfo->resName           = my_malloc (allLsInfo->nRes * sizeof (char *), fname);
+    tclLsInfo->stringResBitMaps  = my_malloc (GET_INTNUM (allLsInfo->nRes) * sizeof (int), fname);
+    tclLsInfo->numericResBitMaps = my_malloc (GET_INTNUM (allLsInfo->nRes) * sizeof (int), fname);
 
     for ( uint i = 0; i < GET_INTNUM (allLsInfo->nRes); i++)
         {
