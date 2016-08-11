@@ -86,8 +86,8 @@ struct tclLsInfo
   char **indexNames;
 };
 
-extern int initTcl (struct tclLsInfo *);
-extern void freeTclLsInfo (struct tclLsInfo *, int);
-extern int evalResReq (char *, struct tclHostData *, char);
+int initTcl (struct tclLsInfo *);
+void freeTclLsInfo (struct tclLsInfo *tclLsInfo, int mode);
+int evalResReq (char *resReq, struct tclHostData *hPtr2, char useFromType);
 
 #endif
