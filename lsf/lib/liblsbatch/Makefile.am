@@ -1,7 +1,3 @@
-#
-# Copyright (C) 2011 David Bigagli
-#
-
 AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -I$(top_srcdir)/lsf/include -I$(top_srcdir)/config.h
 
 lib_LIBRARIES = liblsbatch.a

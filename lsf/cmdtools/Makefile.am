@@ -2,7 +2,7 @@
 # b* and l* tools
 #
 
-AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -I$(top_srcdir)/lsf/include
+AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -I$(top_srcdir)/lsf/include -I$(top_srcdir)/config.h
 
 #INCLUDES = -I$(top_srcdir)/lsf/include
 

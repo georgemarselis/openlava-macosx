@@ -1,24 +1,11 @@
-#
-# Copyright (C) 2011-2012 David Bigagli
-#
+AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -I$(top_srcdir)/lsf/include -I$(top_srcdir)/config.h
 
-# include $(top_srcdir)/common.mk
-# contencts of common.mk
-AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -I$(srcdir)/lsf/include
-
-#INCLUDES = -I$(top_srcdir)/lsf/include
-
-#ifndef CYGWIN
-#nios_LDADD += -lnsl
-#endif
-
-sbin_PROGRAMS = nios
-nios_SOURCES = nios.c nios.handler.c nios.h
+sbin_PROGRAMS = niosd
+niosd_SOURCES = nios.c nios.handler.c nios.h
 #
 # yep.. true
 #
-nios_LDADD = ../../lsbatch/lib/liblsbatch.a \
-	../lib/liblsf.a ../intlib/liblsfint.a -lm -lnsl
+nios_LDADD = $(top_builddir)/lsf/liblsbatch/liblsbatch.a $(top_builddir)/lsf/lib/liblsf/liblsf.a $(top_builddir)/lsf//intlib/liblsfint.a -lm -lnsl
 
 #etags:
 #	etags *.[hc] ../*.h ../lib/*.[hc] ../intlib/*.[hc]

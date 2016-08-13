@@ -169,8 +169,8 @@ numericValue( ClientData clientData, Tcl_Interp *interp, Tcl_Value * args, Tcl_V
 int
 booleanValue (ClientData clientData, Tcl_Interp *interp, Tcl_Value *args, Tcl_Value *resultPtr)
 {
-	int *idx   = NULL ;
 	char *value = NULL;
+	int  *idx   = NULL ;
 	int isSet   = 0;
   
 	assert( NULL != clientData );
@@ -180,7 +180,7 @@ booleanValue (ClientData clientData, Tcl_Interp *interp, Tcl_Value *args, Tcl_Va
 		ls_syslog (LOG_DEBUG3, "booleanValue: *idx = %d", *idx);
 	}
 	if (*idx < 0) {
-		return (TCL_ERROR);
+		return TCL_ERROR;
 	}
 
   overRideFromType = TRUE;
@@ -189,7 +189,7 @@ booleanValue (ClientData clientData, Tcl_Interp *interp, Tcl_Value *args, Tcl_Va
   if (hPtr->resBitMaps == NULL)
 	{
 	  resultPtr->intValue = 0;
-	  return (TCL_OK);
+	  return TCL_OK;
 	}
 
   /* Is a host based resource.
@@ -242,7 +242,7 @@ stringValue( ClientData clientData, Tcl_Interp *interp, int argc, const char *ar
 	assert( NULL != interp );
 	if (argc != 3)
 	{
-		Tcl_WrongNumArgs(interp, 3, objv, "Wrong number of arguments; should be exactly 3");
+		Tcl_WrongNumArgs(interp, 3, objv, "Wrong number of arguments; should be exactly 3"); // FIXME FIXME must see if 3 is the correct number to enter
 		//Tcl_SetResult( interp, "wrong number of arguments; should be exactly 3", TCL_VOLATILE );
 		return TCL_ERROR;
 	}
@@ -446,7 +446,7 @@ definedCmd (ClientData clientData, Tcl_Interp *interp, int argc, const char *arg
 
 	if (argc != 2)
 	{
-		Tcl_WrongNumArgs(interp, 2, objv, "Wrong number of arguments; should be exactly 2");
+		Tcl_WrongNumArgs(interp, 2, objv, "Wrong number of arguments; should be exactly 2"); // FIXME FIXME is 2 the right number here?
 		//Tcl_SetResult( interp, "Wrong number of args; Should be 2", TCL_VOLATILE );
 		return TCL_ERROR;
 	}
@@ -508,7 +508,7 @@ int
 initTcl( struct tclLsInfo *tclLsInfo )
 {
 	uint i    = 0;
-	int isSet = 0;
+	int isSet = 0; 	// FIXME int or uint?
 	static int ar3[5] = { 0, 0, 0, 0, 0 }; // FIXME FIXME initialise values
 	attribFunc *funcPtr = NULL;
 
@@ -601,7 +601,7 @@ initTcl( struct tclLsInfo *tclLsInfo )
 
 	i = 0;
 	ar2 = calloc (tclLsInfo->nRes, sizeof (int));
-	for( uint resNo = 0; resNo < tclLsInfo->nRes; resNo++)
+	for( uint resNo = 0; resNo < tclLsInfo->nRes; resNo++, i++)
 	{
 		TEST_BIT (resNo, tclLsInfo->numericResBitMaps, isSet);
 		if (isSet == TRUE) {
@@ -613,7 +613,9 @@ initTcl( struct tclLsInfo *tclLsInfo )
 			continue;
 		}
 
-		ar2[i] = resNo;
+		ar2[i] = resNo; // FIXME FIXME possible array subscript over-run. check with debugger, to see the 
+						// 		values i takes; remove from global and substitute with a for loop declaring
+						// 		multiple local variables
 		Tcl_CreateMathFunc (globinterp, tclLsInfo->resName[resNo], 0, NULL, booleanValue, (ClientData) & ar2[i]);
 		++i;
 	}
@@ -631,7 +633,7 @@ initTcl( struct tclLsInfo *tclLsInfo )
 	Tcl_CreateCommand (globinterp, "defined", definedCmd, (ClientData) & ar3[4], NULL);
 
 	i = 0;
-	ar4 = calloc (tclLsInfo->nRes, sizeof (int));
+	ar4 = calloc (tclLsInfo->nRes, sizeof( int ) );  // suspect for overflow
 
 	for ( uint resNo = 0; resNo < tclLsInfo->nRes; resNo++)
 	{
@@ -670,7 +672,7 @@ evalResReq (char *resReq, struct tclHostData *hPtr2, char useFromType)
 		ls_syslog (LOG_DEBUG3, "evalResReq: resReq=%s, host = %s", resReq, hPtr->hostName);
 	}
 
-	code   = Tcl_Eval( globinterp, resReq );
+	code = Tcl_Eval( globinterp, resReq );
 	sscanfResult = sscanf( 
 		(const char *)Tcl_GetObjResult( globinterp ), "%d", &result ); // FIXME is cast here correct?
 
@@ -713,10 +715,7 @@ evalResReq (char *resReq, struct tclHostData *hPtr2, char useFromType)
 		return 0;
 	}
 
-	sscanfResult = sscanf(
-		(const char *)Tcl_GetObjResult( globinterp ), 
-		"%d", &result 
-	); 	// FIXME is cast here correct?
+	sscanfResult = sscanf( (const char *)Tcl_GetObjResult( globinterp ), "%d", &result ); // FIXME is cast here correct?
 
 	if( !sscanfResult || !result ) {
 	// if( strcmp( itoa( result ), "0" ) == 0 ) { // cute
