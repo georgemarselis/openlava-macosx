@@ -122,6 +122,62 @@ extern char *env_dir;
 #define CLOSE_IT(fd)     if (fd>=0) {close(fd); fd = INVALID_FD;}
 
 
+typedef struct relaylinebuf
+{
+#ifndef LINE_BUFSIZ       // this is not supposed to be here, but once removed
+#define LINE_BUFSIZ 4096  // compiler throws error
+#endif
+  char buf[LINE_BUFSIZ + sizeof (struct LSFHeader) + 1];
+  char *bp;
+  int bcount;
+} RelayLineBuf ;
+
+// typedef struct relaylinebuf RelayLineBuf;
+
+struct relaybuf
+{
+    char buf[BUFSIZ + sizeof (struct LSFHeader)];
+    char *bp;
+    int bcount;
+};
+
+typedef struct relaybuf RelayBuf;
+
+struct channel
+{
+    int fd;
+    RelayBuf *rbuf;
+    int rcount;
+    RelayBuf *wbuf;
+    int wcount;
+};
+
+typedef struct channel Channel;
+
+struct outputchannel
+{
+  int fd;
+  int endFlag;
+  int retry;
+  int bytes;
+  RelayLineBuf buffer;
+};
+
+typedef struct outputchannel outputChannel;
+
+struct niosChannel
+{
+    int fd;
+    struct RelayBuf *rbuf;
+    int rcount;
+    struct RelayLineBuf *wbuf;
+    int wcount;
+    int opCode;
+};
+
+// struct nioschannel niosChannel; 	// FIXME FIXME FIXME remove typedef from struct
+
+
 typedef struct ttystruct
 {
   struct termios attr;
@@ -129,7 +185,7 @@ typedef struct ttystruct
 #    if defined(hpux) || defined(__hpux)
   struct ltchars hp_ltchars;
 #    endif
-} ttyStruct;
+} ttyStruct; 	// FIXME FIXME FIXME remove typedef from struct
 
 
 struct client
@@ -196,14 +252,15 @@ struct resChildInfo
 
 
 
-typedef struct taggedConn
+// typedef 
+struct taggedConn
 {
-  struct niosChannel *sock;
-  int rtag;
-  int wtag;
-  int *task_duped;
-  int num_duped;
-} taggedConn_t;
+    struct niosChannel *sock;
+    int rtag;
+    int wtag;
+    int *task_duped;
+    int num_duped;
+}; //taggedConn_t;
 
 typedef struct resNotice
 {
@@ -277,7 +334,7 @@ struct resCmdBill
     char cwd[MAXPATHLEN];
     char padding2[4];
     char **argv;
-    struct lsfLimit lsfLimits[LSF_RLIM_NLIMITS];
+    struct lsfLimit lsfLimits[LSF_RLIM_NLIMITS];  // this should be changed to a pointer
 };
 
 struct resSetenv
@@ -328,15 +385,15 @@ struct resStty
   struct winsize ws;
 };
 
-typedef struct nioschannel
-{
-  int fd;
-  struct RelayBuf *rbuf;
-  int rcount;
-  struct RelayLineBuf *wbuf;
-  int wcount;
-  int opCode;
-} niosChannel;
+// typedef struct nioschannel
+// {
+//   int fd;
+//   struct RelayBuf *rbuf;
+//   int rcount;
+//   struct RelayLineBuf *wbuf;
+//   int wcount;
+//   int opCode;
+// } niosChannel;
 
 struct niosConnect
 {
@@ -361,10 +418,13 @@ struct niosStatus
 
 /*********************************************/
 
-extern taggedConn_t conn2NIOS;
-extern LIST_T *resNotifyList;
+// extern
+struct taggedConn conn2NIOS;
+// extern
+LIST_T *resNotifyList;
 
-extern int currentRESSN;
+// extern
+int currentRESSN;
 
 
 #define LSB_UTMP           0
@@ -411,16 +471,13 @@ extern long b_write_fix  (int s, char *buf, size_t len);
 
 extern int lsbJobStart (char **, u_short, char *, int);
 
-extern void childAcceptConn (int, struct passwd *, struct lsfAuth *,
-           struct resConnect *, struct hostent *);
+extern void childAcceptConn (int, struct passwd *, struct lsfAuth *, struct resConnect *, struct hostent *);
 
 extern void resChild (char *, char *);
-extern int resParent (int, struct passwd *, struct lsfAuth *,
-          struct resConnect *, struct hostent *);
+extern int resParent (int, struct passwd *, struct lsfAuth *, struct resConnect *, struct hostent *);
 extern bool_t isLSFAdmin (const char *);
 
-extern bool_t xdr_resChildInfo (XDR *, struct resChildInfo *,
-        struct LSFHeader *);
+extern bool_t xdr_resChildInfo (XDR *, struct resChildInfo *, struct LSFHeader *);
 
 extern void rfServ_ (int);
 

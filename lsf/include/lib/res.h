@@ -18,6 +18,8 @@
 
 #pragma once 
 
+#include "daemons/libresd/resd.h"
+
 int lsRSig_ (char *host, pid_t rid, int sig, int options);
 int ls_rkill (pid_t rtid, int sig);
 

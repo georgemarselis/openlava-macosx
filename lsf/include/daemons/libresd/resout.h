@@ -25,7 +25,7 @@
 #include <termios.h>
 
 #include "lib/hdr.h"
-/* #include "lib/xdrres.h" */
+/* #include "lib/xdrres.h" */ // FIXME FIXME remove after making sure we don't need any more
 /*#include "lib/lproto.h"*/
 #include "daemons/libresd/resd.h"
 
@@ -109,30 +109,34 @@ struct resConnect
 };
 
 
-typedef struct relaybuf
-{
-    char buf[BUFSIZ + sizeof (struct LSFHeader)];
-    char *bp;
-    int bcount;
-} RelayBuf;
+// typedef struct relaybuf
+// {
+//     char buf[BUFSIZ + sizeof (struct LSFHeader)];
+//     char *bp;
+//     int bcount;
+// };
+
+// typedef struct relaybuf RelayBuf;
 
 #define LINE_BUFSIZ 4096
 
-typedef struct relaylinebuf
-{
-  char buf[LINE_BUFSIZ + sizeof (struct LSFHeader)];
-  char *bp;
-  int bcount;
-} RelayLineBuf;
+// struct relaylinebuf
+// {
+//   char buf[LINE_BUFSIZ + sizeof (struct LSFHeader) + 1];
+//   char *bp;
+//   int bcount;
+// };
 
-typedef struct channel
-{
-  int fd;
-  RelayBuf *rbuf;
-  int rcount;
-  RelayBuf *wbuf;
-  int wcount;
-} Channel;
+// typedef struct relaylinebuf RelayLineBuf;
+
+// typedef struct channel
+// {
+//   int fd;
+//   RelayBuf *rbuf;
+//   int rcount;
+//   RelayBuf *wbuf;
+//   int wcount;
+// } Channel;
 
 /* struct niosConnect {
     int rpid;
@@ -154,14 +158,7 @@ struct resSignal {
     int sigval;
 };
 
-typedef struct outputchannel
-{
-  int fd;
-  int endFlag;
-  int retry;
-  int bytes;
-  RelayLineBuf buffer;
-} outputChannel;*/
+*/
 
 #ifdef LS_WAIT_INT
 #define SETTERMSIG(x,y) ((x) = ((x) & 0xFFFFFF80) | ( (y) & 0x7F))
