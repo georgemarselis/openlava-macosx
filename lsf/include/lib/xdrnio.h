@@ -27,4 +27,6 @@ bool_t xdr_resStty(     XDR *xdrs, struct resStty     *tty,        struct LSFHea
 bool_t xdr_resGetRusage(XDR *xdrs, struct resRusage   *rusageReq,  struct LSFHeader *hdr );
 bool_t xdr_resRKill(    XDR *xdrs, struct resRKill    *rkill,      struct LSFHeader *hdr );
 bool_t xdr_resControl(  XDR *xdrs, struct resControl  *ctrl,       struct LSFHeader *hdr );
+bool_t xdr_niosStatus  (XDR * xdrs, struct niosStatus  *st,         struct LSFHeader *hdr);
+bool_t xdr_resSignal   (XDR * xdrs, struct resSignal   *sig,        struct LSFHeader *hdr);
 

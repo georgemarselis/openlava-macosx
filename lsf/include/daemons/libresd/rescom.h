@@ -18,9 +18,6 @@
 
 #pragma once
  
-#ifndef LSF_RES_RESCOM_H
-#define LSF_RES_RESCOM_H
-
 
 typedef enum
 {
@@ -43,4 +40,3 @@ typedef enum
   NIOS2RES_HEARTBEAT
 } niosResCmd;
 
-#endif

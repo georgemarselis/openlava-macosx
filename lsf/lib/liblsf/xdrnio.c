@@ -21,12 +21,10 @@
 #include "lib/lib.h"
 #include "lib/lproto.h"
 #include "daemons/libresd/resout.h"
+#include "lib/xdrnio.h"
 
 
-bool_t xdr_resConnect  (XDR * xdrs, struct resConnect  *connectPtr, struct LSFHeader *hdr);
-bool_t xdr_niosConnect (XDR * xdrs, struct niosConnect *conn,       struct LSFHeader *hdr);
-bool_t xdr_niosStatus  (XDR * xdrs, struct niosStatus  *st,         struct LSFHeader *hdr);
-bool_t xdr_resSignal   (XDR * xdrs, struct resSignal   *sig,        struct LSFHeader *hdr);
+
 
 bool_t
 xdr_resConnect (XDR * xdrs, struct resConnect *connectPtr, struct LSFHeader *hdr)

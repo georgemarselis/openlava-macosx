@@ -140,8 +140,27 @@ enum
     // LSF_MLS_LOG,
     LSF_INTERACTIVE_STDERR,
     NO_HOSTS_FILE,
-    LSB_SHAREDIR            // dup with lsbatch, must remove
+    LSB_SHAREDIR           // dup with lsbatch, must remove
 } status;
+
+enum { 
+    NIOS2RES_EOF,
+    NIOS2RES_HEARTBEAT,
+    NIOS2RES_SETTTY,
+    NIOS2RES_SIGNAL,
+    NIOS2RES_STDIN,
+    NIOS2RES_TIMEOUT
+} niosResCmd;
+
+enum {
+    RES2NIOS_CONNECT,
+    RES2NIOS_EOF,
+    RES2NIOS_NEWTASK,
+    RES2NIOS_REQUEUE,
+    RES2NIOS_STATUS,
+    RES2NIOS_STDERR,
+    RES2NIOS_STDOUT
+} resNiosCmd;
 
 typedef enum status genparams_t;
 
