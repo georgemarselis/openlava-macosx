@@ -34,6 +34,7 @@
 #include "daemons/libresd/resout.h"
 #include "lib/res.h"
 #include "lib/lproto.h"
+#include "lib/lib.h"
 
 #define NL_SETN     29
 
@@ -91,42 +92,6 @@ int restart_argc    = 0;
 char **restart_argv = NULL;
 
 char *env_dir = NULL;
-
-enum { LSF_RES_DEBUG, LSF_SERVERDIR, LSF_AUTH, LSF_LOGDIR,
-	LSF_ROOT_REX, LSF_LIM_PORT, LSF_RES_PORT, LSF_ID_PORT,
-	LSF_USE_HOSTEQUIV, LSF_RES_ACCTDIR, LSF_RES_ACCT, LSF_DEBUG_RES, // FIXME FIXME FIXME LSF_RES_DEBUG and LSF_DEBUG_RES , replace with single tag
-	LSF_TIME_RES, LSF_LOG_MASK, LSF_RES_RLIMIT_UNLIM, LSF_CMD_SHELL,
-	LSF_ENABLE_PTY, LSF_TMPDIR, LSF_BINDIR, LSF_LIBDIR, LSF_RES_TIMEOUT,
-	LSF_RES_NO_LINEBUF, LSF_MLS_LOG
-} status;
-
-struct config_param resParams[] = {  // FIXME FIXME FIXME FIXME replace this struct  
-	{"LSF_RES_DEBUG",        NULL},  // 	and above with something more sane
-	{"LSF_SERVERDIR",        NULL},
-	{"LSF_AUTH",             NULL},
-	{"LSF_LOGDIR",           NULL},
-	{"LSF_ROOT_REX",         NULL},
-	{"LSF_LIM_PORT",         NULL},
-	{"LSF_RES_PORT",         NULL},
-	{"LSF_ID_PORT",          NULL},
-	{"LSF_USE_HOSTEQUIV",    NULL},
-	{"LSF_RES_ACCTDIR",      NULL},
-	{"LSF_RES_ACCT",         NULL},
-	{"LSF_DEBUG_RES",        NULL},
-	{"LSF_TIME_RES",         NULL},
-	{"LSF_LOG_MASK",         NULL},
-	{"LSF_RES_RLIMIT_UNLIM", NULL},
-	{"LSF_CMD_SHELL",        NULL},
-	{"LSF_ENABLE_PTY",       NULL},
-	{"LSF_TMPDIR",           NULL},
-	{"LSF_BINDIR",           NULL},
-	{"LSF_LIBDIR",           NULL},
-	{"LSF_RES_TIMEOUT",      NULL},
-	{"LSF_RES_NO_LINEBUF",   NULL},
-	{"LSF_MLS_LOG",          NULL},
-	{NULL,                   NULL}
-
-};
 
 struct config_param resConfParams[] = {
 	{"LSB_UTMP", NULL},

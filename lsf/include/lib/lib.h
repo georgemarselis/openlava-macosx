@@ -16,7 +16,6 @@
  *
  */
 
-
 #pragma once
  
 #ifndef LSF_LIB_LIB_H
@@ -86,37 +85,65 @@ struct tid
 #define MIN_REF_NUM          1000
 #define MAX_REF_NUM          32760
 
+// FIXME FIXME FIXME FIXM FIXME remove (char *)
 #define packshort_(buf, x)       memcpy(buf, (char *)&(x), sizeof(short))
 #define packint_(buf, x)         memcpy(buf, (char *)&(x), sizeof(int))
 #define pack_lsf_rlim_t_(buf, x) memcpy(buf, (char *)&(x), sizeof(lsf_rlim_t))
 
-typedef enum
+enum
 {
-    LSF_CONFDIR,
-    LSF_SERVERDIR,
-    LSF_LIM_DEBUG,
+// start inclusion from resd.h
     LSF_RES_DEBUG,
-    LSF_STRIP_DOMAIN,
+    LSF_SERVERDIR,
+    LSF_AUTH,
+    LSF_LOGDIR,
+    LSF_ROOT_REX,
     LSF_LIM_PORT,
     LSF_RES_PORT,
-    LSF_LOG_MASK,
-    LSF_SERVER_HOSTS,
-    LSF_AUTH,
-    LSF_USE_HOSTEQUIV,
     LSF_ID_PORT,
+    LSF_USE_HOSTEQUIV,
+    LSF_RES_ACCTDIR,
+    LSF_RES_ACCT,
+    LSF_DEBUG_RES, // FIXME FIXME FIXME LSF_RES_DEBUG and LSF_DEBUG_RES , replace with single tag
+    LSF_TIME_RES,
+    LSF_LOG_MASK,
+    LSF_RES_RLIMIT_UNLIM,
+    LSF_CMD_SHELL,
+    LSF_ENABLE_PTY,
+    LSF_TMPDIR,
+    LSF_BINDIR,
+    LSF_LIBDIR,
     LSF_RES_TIMEOUT,
+    LSF_RES_NO_LINEBUF,
+    LSF_MLS_LOG,
+//////////////////////// end inclusion from resd.h
+    LSF_CONFDIR,
+    // LSF_SERVERDIR,
+    LSF_LIM_DEBUG,
+    // LSF_RES_DEBUG,
+    LSF_STRIP_DOMAIN,
+    // LSF_LIM_PORT,
+    // LSF_RES_PORT,
+    // LSF_LOG_MASK,
+    LSF_SERVER_HOSTS,
+    // LSF_AUTH,
+    // LSF_USE_HOSTEQUIV,
+    // LSF_ID_PORT,
+    // LSF_RES_TIMEOUT,
     LSF_API_CONNTIMEOUT,
     LSF_API_RECVTIMEOUT,
     LSF_AM_OPTIONS,
-    LSF_TMPDIR,
-    LSF_LOGDIR,
+    // LSF_TMPDIR,
+    // LSF_LOGDIR,
     LSF_SYMBOLIC_LINK,
     LSF_MASTER_LIST,
-    LSF_MLS_LOG,
+    // LSF_MLS_LOG,
     LSF_INTERACTIVE_STDERR,
     NO_HOSTS_FILE,
-    LSB_SHAREDIR            /* we share this with batch system */
-} genparams_t;
+    LSB_SHAREDIR            // dup with lsbatch, must remove
+} status;
+
+typedef enum status genparams_t;
 
 #define AM_LAST  (!(genParams_[LSF_AM_OPTIONS].paramValue && \
                                     strstr(genParams_[LSF_AM_OPTIONS].paramValue, \

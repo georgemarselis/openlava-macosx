@@ -121,6 +121,86 @@ extern char *env_dir;
 
 #define CLOSE_IT(fd)     if (fd>=0) {close(fd); fd = INVALID_FD;}
 
+// moved to $(include_dir)/lib.h
+// enum {
+// 	LSF_RES_DEBUG,
+// 	LSF_SERVERDIR,
+// 	LSF_AUTH,
+// 	LSF_LOGDIR,
+// 	LSF_ROOT_REX,
+// 	LSF_LIM_PORT,
+// 	LSF_RES_PORT,
+// 	LSF_ID_PORT,
+// 	LSF_USE_HOSTEQUIV,
+// 	LSF_RES_ACCTDIR,
+// 	LSF_RES_ACCT,
+// 	LSF_DEBUG_RES, // FIXME FIXME FIXME LSF_RES_DEBUG and LSF_DEBUG_RES , replace with single tag
+// 	LSF_TIME_RES,
+// 	LSF_LOG_MASK,
+// 	LSF_RES_RLIMIT_UNLIM,
+// 	LSF_CMD_SHELL,
+// 	LSF_ENABLE_PTY,
+// 	LSF_TMPDIR,
+// 	LSF_BINDIR,
+// 	LSF_LIBDIR,
+// 	LSF_RES_TIMEOUT,
+// 	LSF_RES_NO_LINEBUF,
+// 	LSF_MLS_LOG,
+// } status;
+
+struct config_param resParams[] = {
+    { "LSF_RES_DEBUG",          NULL },
+    { "LSF_SERVERDIR",          NULL },
+    { "LSF_AUTH",               NULL },
+    { "LSF_LOGDIR",             NULL },
+    { "LSF_ROOT_REX",           NULL },
+    { "LSF_LIM_PORT",           NULL },
+    { "LSF_RES_PORT",           NULL },
+    { "LSF_ID_PORT",            NULL },
+    { "LSF_USE_HOSTEQUIV",      NULL },
+    { "LSF_RES_ACCTDIR",        NULL },
+    { "LSF_RES_ACCT",           NULL },
+    { "LSF_DEBUG_RES",          NULL }, // FIXME FIXME FIXME LSF_RES_DEBUG and LSF_DEBUG_RES , replace with single tag
+    { "LSF_TIME_RES",           NULL },
+    { "LSF_LOG_MASK",           NULL },
+    { "LSF_RES_RLIMIT_UNLIM",   NULL },
+    { "LSF_CMD_SHELL",          NULL },
+    { "LSF_ENABLE_PTY",         NULL },
+    { "LSF_TMPDIR",             NULL },
+    { "LSF_BINDIR",             NULL },
+    { "LSF_LIBDIR",             NULL },
+    { "LSF_RES_TIMEOUT",        NULL },
+    { "LSF_RES_NO_LINEBUF",     NULL },
+    { "LSF_MLS_LOG",            NULL },
+    //////////////////////// end inclusion from resd.h
+    { "LSF_CONFDIR",            NULL },
+    // { "LSF_SERVERDIR" ,      NULL },
+    { "LSF_LIM_DEBUG",          NULL },
+    // { "LSF_RES_DEBUG",       NULL },
+    { "LSF_STRIP_DOMAIN",       NULL },
+    // { "LSF_LIM_PORT",        NULL },
+    // { "LSF_RES_PORT",        NULL },
+    // { "LSF_LOG_MASK",        NULL },
+    { "LSF_SERVER_HOSTS",       NULL },
+    // { "LSF_AUTH",            NULL },
+    // { "LSF_USE_HOSTEQUIV",   NULL },
+    // { "LSF_ID_PORT",         NULL },
+    // { "LSF_RES_TIMEOUT",     NULL },
+    { "LSF_API_CONNTIMEOUT",    NULL },
+    { "LSF_API_RECVTIMEOUT",    NULL },
+    { "LSF_AM_OPTIONS",         NULL },
+    // { "LSF_TMPDIR",          NULL },
+    // { "LSF_LOGDIR",          NULL },
+    { "LSF_SYMBOLIC_LINK",      NULL },
+    { "LSF_MASTER_LIST",        NULL },
+    // { "LSF_MLS_LOG",         NULL },
+    { "LSF_INTERACTIVE_STDERR", NULL },
+    { "NO_HOSTS_FILE",          NULL },
+    { "LSB_SHAREDIR",           NULL },
+    {NULL,                      NULL}  
+};
+
+
 
 struct relaylinebuf
 {
@@ -453,7 +533,7 @@ extern void doclient (struct client *);
 extern void ptyreset (void);
 extern void stdout_flush (struct child *chld);
 extern void doResParentCtrl (void);
-extern struct esAck sendResParent (struct LSFHeader *, char *, bool_t (*)());
+extern enum resAck sendResParent (struct LSFHeader * msgHdr, char *msgBuf, bool_t (*xdrFunc) ());
 extern int sendReturnCode (int, int);
 
 extern void donios_sock (struct child **, int);

@@ -16,9 +16,10 @@
  *
  */
 
-#ifdef __APPLE__
-#undef __LP64__
-#endif
+// FIXME FIXME FIXME disabled: just in case undef __LP64__ disables 64bit long pointers
+// #ifdef __APPLE__
+// #undef __LP64__
+// #endif
 
 
 #include <sys/types.h>

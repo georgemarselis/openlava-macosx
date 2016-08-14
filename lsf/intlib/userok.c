@@ -21,9 +21,9 @@
 
 #define NL_SETN      22
 
-#define LSF_AUTH            9
-#define LSF_USE_HOSTEQUIV   10
-#define LSF_ID_PORT         11
+#define LSF_AUTH            9     // FIXME FIXME replace defines with include resd.h
+#define LSF_USE_HOSTEQUIV   10    // 	FIXME FIXME but also re-adjust the entries from resdh.
+#define LSF_ID_PORT         11    // 		with the numbers from here
 #define _USE_TCP_           0x04
 extern struct config_param genParams_[];
 #define LOOP_ADDR       0x7F000001

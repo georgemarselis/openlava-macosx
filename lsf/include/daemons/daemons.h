@@ -70,6 +70,8 @@
 #define MAX_FAIL             5
 #define MAX_SEQ_NUM          INFINIT_INT
 
+// FIXME FIXME these have to be set in an enum
+
 #define  DEF_MSLEEPTIME               2
 #define  DEF_SSLEEPTIME               2
 #define  DEF_RETRY_INTVL              2
@@ -150,7 +152,7 @@
 #define LSF_RES_PORT                  6
 #define LSF_RES_RLIMIT_UNLIM          14
 #define LSF_RES_TIMEOUT               20
-#define LSF_ROOT_REX                  13
+// #define LSF_ROOT_REX                  13
 #define LSF_SERVERDIR                 1
 #define LSF_TIME_RES                  12
 #define LSF_TMPDIR                    17
