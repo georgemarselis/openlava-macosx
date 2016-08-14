@@ -122,7 +122,7 @@ extern char *env_dir;
 #define CLOSE_IT(fd)     if (fd>=0) {close(fd); fd = INVALID_FD;}
 
 
-typedef struct relaylinebuf
+struct relaylinebuf
 {
 #ifndef LINE_BUFSIZ       // this is not supposed to be here, but once removed
 #define LINE_BUFSIZ 4096  // compiler throws error
@@ -130,52 +130,52 @@ typedef struct relaylinebuf
   char buf[LINE_BUFSIZ + sizeof (struct LSFHeader) + 1];
   char *bp;
   int bcount;
-} RelayLineBuf ;
+};
 
 // typedef struct relaylinebuf RelayLineBuf;
 
 struct relaybuf
 {
-    char buf[BUFSIZ + sizeof (struct LSFHeader)];
-    char *bp;
-    int bcount;
+	char buf[BUFSIZ + sizeof (struct LSFHeader)];
+	char *bp;
+	int bcount;
 };
 
-typedef struct relaybuf RelayBuf;
+// typedef struct relaybuf RelayBuf;
 
 struct channel
 {
-    int fd;
-    RelayBuf *rbuf;
-    int rcount;
-    RelayBuf *wbuf;
-    int wcount;
+	int fd;
+	struct relaybuf *rbuf;
+	int rcount;
+	struct relaybuf *wbuf;
+	int wcount;
 };
 
-typedef struct channel Channel;
+// typedef struct channel Channel;
 
 struct outputchannel
 {
-  int fd;
-  int endFlag;
-  int retry;
-  int bytes;
-  RelayLineBuf buffer;
+	int fd;
+	int endFlag;
+	int retry;
+	int bytes;
+	struct relaylinebuf buffer;
 };
 
-typedef struct outputchannel outputChannel;
+//typedef struct outputchannel outputChannel;
 
 struct niosChannel
 {
-    int fd;
-    struct RelayBuf *rbuf;
-    int rcount;
-    struct RelayLineBuf *wbuf;
-    int wcount;
-    int opCode;
+	int fd;
+	struct relaybuf *rbuf;
+	int rcount;
+	struct relaylinebuf *wbuf;
+	int wcount;
+	int opCode;
 };
 
-// struct nioschannel niosChannel; 	// FIXME FIXME FIXME remove typedef from struct
+// struct nioschannel niosChannel;  // FIXME FIXME FIXME remove typedef from struct
 
 
 typedef struct ttystruct
@@ -185,7 +185,7 @@ typedef struct ttystruct
 #    if defined(hpux) || defined(__hpux)
   struct ltchars hp_ltchars;
 #    endif
-} ttyStruct; 	// FIXME FIXME FIXME remove typedef from struct
+} ttyStruct;    // FIXME FIXME FIXME remove typedef from struct
 
 
 struct client
@@ -206,37 +206,37 @@ struct client
 
 struct child
 {
-  struct client *backClnPtr;
-  pid_t rpid;
-  pid_t pid;
+	struct client *backClnPtr;
+	pid_t rpid;
+	pid_t pid;
 
-  int refcnt;
-  int info;
-  int stdio;
-  struct outputChannel *std_out;
-  struct outputChannel *std_err;
+	int refcnt;
+	int info;
+	int stdio;
+	struct outputchannel *std_out;
+	struct outputchannel *std_err;
 
-  struct niosChannel *remsock;
-  int rexflag;
-  char server;
-  char c_eof;
-  char running;
-  char sigchild;
-  LS_WAIT_T wait;
-  struct sigStatusUsage *sigStatRu;
-  int endstdin;
-  struct RelayBuf *i_buf;
-  int stdin_up;
+	struct niosChannel *remsock;
+	int rexflag;
+	char server;
+	char c_eof;
+	char running;
+	char sigchild;
+	LS_WAIT_T wait;
+	struct sigStatusUsage *sigStatRu;
+	int endstdin;
+	struct relaybuf *i_buf;
+	int stdin_up;
 
-  char slavepty[sizeof (PTY_TEMPLATE)];
+	char slavepty[sizeof (PTY_TEMPLATE)];
 
-  char **cmdln;
-  time_t dpTime;
-  char *cwd;
-  char username[MAXLSFNAMELEN];
-  char fromhost[MAXHOSTNAMELEN];
-  int sent_eof;
-  int sent_status;
+	char **cmdln;
+	time_t dpTime;
+	char *cwd;
+	char username[MAXLSFNAMELEN];
+	char fromhost[MAXHOSTNAMELEN];
+	int sent_eof;
+	int sent_status;
 };
 
 struct resChildInfo
@@ -255,58 +255,58 @@ struct resChildInfo
 // typedef 
 struct taggedConn
 {
-    struct niosChannel *sock;
-    int rtag;
-    int wtag;
-    int *task_duped;
-    int num_duped;
+	struct niosChannel *sock;
+	int rtag;
+	int wtag;
+	int *task_duped;
+	int num_duped;
 }; //taggedConn_t;
 
 typedef struct resNotice
 {
-    struct resNotice *forw, *back;
-    pid_t rpid;
-    int retsock;
-    int opCode;
-    enum resAck {
+	struct resNotice *forw, *back;
+	pid_t rpid;
+	int retsock;
+	int opCode;
+	enum resAck {
 
-        RESE_OK,
-        RESE_SIGCHLD,
-        RESE_NOMORECONN,
-        RESE_BADUSER,
-        RESE_ROOTSECURE,
-        RESE_DENIED,
-        RESE_REQUEST,
-        RESE_CALLBACK,
-        RESE_NOMEM,
-        RESE_FATAL,
-        RESE_PTYMASTER,
-        RESE_PTYSLAVE,
-        RESE_SOCKETPAIR,
-        RESE_FORK,
-        RESE_REUID,
-        RESE_CWD,
-        RESE_INVCHILD,
-        RESE_KILLFAIL,
-        RESE_VERSION,
-        RESE_DIRW,
-        RESE_NOLSF_HOST,
-        RESE_NOCLIENT,
-        RESE_RUSAGEFAIL,
-        RESE_RES_PARENT,
-        RESE_FILE,
-        RESE_NOVCL,
-        RESE_NOSYM,
-        RESE_VCL_INIT,
-        RESE_VCL_SPAWN,
-        RESE_EXEC,
-        RESE_ERROR_LAST,
-        RESE_MLS_INVALID,
-        RESE_MLS_CLEARANCE,
-        RESE_MLS_DOMINATE,
-        RESE_MLS_RHOST
-        } ack;
-    struct sigStatusUsage *sigStatRu;
+		RESE_OK,
+		RESE_SIGCHLD,
+		RESE_NOMORECONN,
+		RESE_BADUSER,
+		RESE_ROOTSECURE,
+		RESE_DENIED,
+		RESE_REQUEST,
+		RESE_CALLBACK,
+		RESE_NOMEM,
+		RESE_FATAL,
+		RESE_PTYMASTER,
+		RESE_PTYSLAVE,
+		RESE_SOCKETPAIR,
+		RESE_FORK,
+		RESE_REUID,
+		RESE_CWD,
+		RESE_INVCHILD,
+		RESE_KILLFAIL,
+		RESE_VERSION,
+		RESE_DIRW,
+		RESE_NOLSF_HOST,
+		RESE_NOCLIENT,
+		RESE_RUSAGEFAIL,
+		RESE_RES_PARENT,
+		RESE_FILE,
+		RESE_NOVCL,
+		RESE_NOSYM,
+		RESE_VCL_INIT,
+		RESE_VCL_SPAWN,
+		RESE_EXEC,
+		RESE_ERROR_LAST,
+		RESE_MLS_INVALID,
+		RESE_MLS_CLEARANCE,
+		RESE_MLS_DOMINATE,
+		RESE_MLS_RHOST
+		} ack;
+	struct sigStatusUsage *sigStatRu;
 } resNotice_t;
 
 
@@ -319,27 +319,27 @@ typedef struct resNotice
 
 struct resSignal
 {
-    pid_t pid;
-    int sigval;
+	pid_t pid;
+	int sigval;
 };
 
 struct resCmdBill
 {
-    u_short retport;
-    char padding1[2];
-    pid_t rpid;
-    int filemask;
-    int priority;
-    int options;
-    char cwd[MAXPATHLEN];
-    char padding2[4];
-    char **argv;
-    struct lsfLimit lsfLimits[LSF_RLIM_NLIMITS];  // this should be changed to a pointer
+	u_short retport;
+	char padding1[2];
+	pid_t rpid;
+	int filemask;
+	int priority;
+	int options;
+	char cwd[MAXPATHLEN];
+	char padding2[4];
+	char **argv;
+	struct lsfLimit lsfLimits[LSF_RLIM_NLIMITS];  // this should be changed to a pointer
 };
 
 struct resSetenv
 {
-    char **env;
+	char **env;
 };
 
 #define RES_RID_ISTID          0x01
@@ -405,15 +405,15 @@ struct niosConnect
 struct niosStatus
 {
 
-    enum resAck ack;
-    char padding[4];
+	enum resAck ack;
+	char padding[4];
 
-    struct sigStatusUsage
-    {
-        int ss;
-        char padding[4];
-        struct rusage *ru;
-    } s;
+	struct sigStatusUsage
+	{
+		int ss;
+		char padding[4];
+		struct rusage *ru;
+	} s;
 };
 
 /*********************************************/

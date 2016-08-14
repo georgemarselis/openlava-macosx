@@ -16,6 +16,8 @@
  *
  */
 
+// FIXME FIXME FIXME this file needs some serious refactoring
+
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -35,15 +37,15 @@
 
 #define NL_SETN     29
 
-extern void child_channel_clear (struct child *, struct outputChannel *);
+extern void child_channel_clear (struct child *, struct outputchannel *);
 extern char **environ;
 
 int rexecPriority = 0;
 
 struct client *clients[MAXCLIENTS_HIGHWATER_MARK + 1] = { };
 
+struct child **children; // FIXME FIXME FIXME remove from global; accessor, mutator;
 
-struct child **children = NULL;
 int child_cnt    = 0;
 int client_cnt   = 0;
 char *Myhost     = NULL;
@@ -87,7 +89,6 @@ int res_logop;
 
 int restart_argc    = 0;
 char **restart_argv = NULL;
-
 
 char *env_dir = NULL;
 
@@ -181,6 +182,8 @@ main (int argc, char **argv)
 	ushort sbdClPort = 0;
 	char **sbdArgv = NULL;
 	int selectError = 0;
+
+	children = NULL;
 
 
 	_i18n_init (I18N_CAT_RES);
@@ -647,6 +650,7 @@ main (int argc, char **argv)
 
 	  for (uint i = 0; i < child_cnt; i++)
 	{
+
 	  if (FD_IS_VALID (children[i]->std_out->fd) && FD_ISSET (children[i]->std_out->fd, &readmask))
 		{
 		  if (logclass & LC_TRACE)

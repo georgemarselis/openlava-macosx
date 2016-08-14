@@ -60,22 +60,16 @@ static void resGetpid (struct client *, struct LSFHeader *, XDR *);
 static void resRusage (struct client *, struct LSFHeader *, XDR *);
 static void resControl (struct client *, struct LSFHeader *, XDR *, int);
 static void resRexec (struct client *, struct LSFHeader *, XDR *);
-static void resTaskMsg (struct client *, struct LSFHeader *, char *, char *,
-			XDR *);
-static int forwardTaskMsg (int, int, struct LSFHeader *, char *, char *,
-			   bool_t, int);
-static struct child *doRexec (struct client *, struct resCmdBill *, int, int,
-			      int, resAck *);
-static void rexecChild (struct client *, struct resCmdBill *, int, int, int *,
-			int *, int *, int *, int, int *);
+static void resTaskMsg (struct client *, struct LSFHeader *, char *, char *, XDR *);
+static int forwardTaskMsg (int, int, struct LSFHeader *, char *, char *,  bool_t, int);
+static struct child *doRexec (struct client *, struct resCmdBill *, int, int, int, resAck *);
+static void rexecChild (struct client *, struct resCmdBill *, int, int, int *, int *, int *, int *, int, int *);
 static resAck childPty (struct client *, int *, int *, char *, int);
 static resAck parentPty (int *pty, int *sv, char *);
-static int forkPty (struct client *, int *, int *, int *, int *, char *,
-		    resAck *, int, int);
+static int forkPty (struct client *, int *, int *, int *, int *, char *, resAck *, int, int);
 static int forkSV (struct client *, int *, int *, int *, resAck *);
 static void execit (char **uargv, char *, int *, int, int, int);
-static void lsbExecChild (struct resCmdBill *cmdmsg, int *pty, int *sv,
-			  int *err, int *info, int *pid);
+static void lsbExecChild (struct resCmdBill *cmdmsg, int *pty, int *sv, int *err, int *info, int *pid);
 
 static void delete_client (struct client *);
 static int unlink_child (struct child *);
@@ -102,8 +96,7 @@ static uid_t setEUid (uid_t uid);
 static int changeEUid (uid_t uid);
 
 static int notify_nios (int, int, int);
-static int addResNotifyList (LIST_T *, int, int, resAck,
-			     struct sigStatusUsage *);
+static int addResNotifyList (LIST_T *, int, int, resAck, struct sigStatusUsage *);
 
 int matchExitVal (int, char *);
 
@@ -497,7 +490,7 @@ childAcceptConn (int s, struct passwd *pw, struct lsfAuth *auth,
   child_res = TRUE;
   child_go = TRUE;
 
-  cli_ptr = (struct client *) malloc (sizeof (struct client));
+  cli_ptr = malloc (sizeof (struct client));
   if (cli_ptr == NULL)
     {
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
@@ -1888,7 +1881,7 @@ checkPermResCtrl (struct client *cli_ptr)
 
 
       nAdmins = (clusterInfo->nAdmins) ? clusterInfo->nAdmins : 1;
-      admins = (char **) malloc (nAdmins * sizeof (char *));
+      admins = malloc (nAdmins * sizeof (char *));
       if (admins == NULL)
 	{
 	  nAdmins = -1;
@@ -2192,12 +2185,11 @@ doRexec (struct client *cli_ptr, struct resCmdBill *cmdmsg, int retsock,
     ls_syslog (LOG_DEBUG, "%s: Parent ...", fname);
 
 
-  child_ptr = (struct child *) malloc (sizeof (struct child));
+  child_ptr = malloc (sizeof (struct child));
 
-  sigStatRu =
-    (struct sigStatusUsage *) malloc (sizeof (struct sigStatusUsage));
-  if (child_ptr == (struct child *) NULL
-      || sigStatRu == (struct sigStatusUsage *) NULL)
+  sigStatRu = malloc (sizeof (struct sigStatusUsage));
+  if (child_ptr == NULL
+      || sigStatRu == NULL)
     {
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname,
 		 "malloc(child or sigStatusUsage)");
@@ -3444,7 +3436,7 @@ execit (char **uargv,
 	  for (i = 0; uargv[i]; i++)
 	    ;
 	  if ((real_argv =
-	       (char **) malloc (sizeof (char *) * (i + 2))) == NULL)
+	       malloc (sizeof (char *) * (i + 2))) == NULL)
 	    {
 	      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
 	      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5222, "Not enough memory, job not executed"));	/* catgets 5222 */
@@ -3467,7 +3459,7 @@ execit (char **uargv,
 	      cmdSize += strlen (uargv[i]) + 1;
 	    }
 
-	  cmd = (char *) malloc (cmdSize);
+	  cmd = malloc (cmdSize);
 
 	  if (cmd == NULL)
 	    {
@@ -4119,7 +4111,7 @@ copyArray (char **from)
   for (size = 0; from[size]; size++)
     ;
 
-  if ((p = (char **) malloc ((size + 1) * sizeof (char *))) == NULL)
+  if ((p = malloc ((size + 1) * sizeof (char *))) == NULL)
     return (NULL);
 
   for (i = 0; i < size; i++)
@@ -6402,7 +6394,7 @@ addResNotifyList (LIST_T * list, int rpid, int opCode, resAck ack,
       return (-1);
     }
 
-  if ((notice = (resNotice_t *) malloc (sizeof (resNotice_t))) == NULL)
+  if ((notice = malloc (sizeof (resNotice_t))) == NULL)
     {
       lserrno = LSE_MALLOC;
       return (-1);
