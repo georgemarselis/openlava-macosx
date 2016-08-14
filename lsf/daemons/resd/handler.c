@@ -43,6 +43,8 @@
 #include "lib/res.h"
 #include "lib/lib.h"
 #include "lib/xdrnio.h"
+#include "lib/xdrres.h"
+#include "libint/userok.h"
 
 
 #define NL_SETN         29
@@ -69,8 +71,8 @@ static enum resAck childPty (struct client *, int *, int *, char *, int);
 static enum resAck parentPty (int *pty, int *sv, char *);
 static int forkPty (struct client *, int *, int *, int *, int *, char *, enum resAck *, int, int);
 static int forkSV (struct client *, int *, int *, int *, enum resAck *);
-static void execit (char **uargv, char *, int *, int, int, int);
-static void lsbExecChild (struct resCmdBill *cmdmsg, int *pty, int *sv, int *err, int *info, int *pid);
+static void execit (char **uargv, char *jobStarter, pid_t *pid, int stdio, int taskSock, int loseRoot);
+static void lsbExecChild (struct resCmdBill *cmdmsg, int *pty, int *sv, int *err, int *info, pid_t *pid);
 
 static void delete_client (struct client *);
 static int unlink_child (struct child *);
@@ -298,7 +300,7 @@ doacceptconn (void)
   if (io_nonblock_ (s) < 0)
 	ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "io_nonblock_");
 
-  if (recvConnect (s, &connReq, NB_SOCK_READ_FIX, &auth) == -1)
+  if (recvConnect (s, &connReq, nb_read_fix, &auth) == -1)
 	{
 	  shutdown (s, 2);
 	  closesocket (s);
@@ -737,14 +739,15 @@ setClUid (struct client *cli_ptr)
 	ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, fname, "setgid", cli_ptr->username, cli_ptr->gid);
   }
 
+  	// FIXME setEUid() is never negative
+  	// FIXME insert something here to display username
+	// if ( setEUid (cli_ptr->ruid) < 0) {
+	// 	ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, fname, "setEUid", cli_ptr->username, cli_ptr->ruid);
+	// }
 
-  if (setEUid (cli_ptr->ruid) < 0) {
-	ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, fname, "setEUid", cli_ptr->username, cli_ptr->ruid);
-  }
-
-  if (setsid () == -1) {
-	ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "setsid", cli_ptr->username);
-  }
+	if (setsid () == -1) {
+		ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "setsid", cli_ptr->username);
+	}
 
   return (0);
 }
@@ -781,7 +784,7 @@ recvConnect (int s, struct resConnect *connReq, size_t (*readFunc) (), struct ls
 
   xdrmem_create (&xdrs, buf, XDR_DECODE_SIZE_ (reqHdr.length), XDR_DECODE);
 
-  if (readDecodeMsg_ (s, buf, &reqHdr, readFunc, &xdrs, connReq, xdr_resConnect, auth) < 0)
+  if (readDecodeMsg_ (s, buf, &reqHdr, readFunc, &xdrs, (char *)connReq, xdr_resConnect, auth) < 0) // FIXME FIXME FIXME FIXME FIXME thow in debugger
 	{
 	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "readDecodeMsg_");
 	  sendReturnCode (s, RESE_REQUEST);
@@ -3281,8 +3284,7 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 }
 
 static void
-lsbExecChild (struct resCmdBill *cmdmsg, int *pty,
-		  int *sv, int *err, int *info, int *pid)
+lsbExecChild (struct resCmdBill *cmdmsg, int *pty, int *sv, int *err, int *info, pid_t *pid)
 {
   static char fname[] = "lsbExecChild";
   sigset_t sigMask;
@@ -3325,11 +3327,10 @@ lsbExecChild (struct resCmdBill *cmdmsg, int *pty,
 	  if (setsockopt (err[1],
 			  SOL_SOCKET,
 			  SO_LINGER,
-			  (char *) &linger, sizeof (struct linger)) < 0)
+			  &linger, sizeof (struct linger)) < 0)
 		{
-		  ls_syslog (LOG_ERR, I18N (5292, "\
-%s: setsockopt on socket=<%d> option SO_LINGER failed: %m"),    /*catgets 5292 */
-			 fname, err[1]);
+			/*catgets 5292 */
+			ls_syslog (LOG_ERR, I18N (5292, "%s: setsockopt on socket=<%d> option SO_LINGER failed: %m"), fname, err[1]);
 		}
 	}
 	  if (cmdmsg->options & REXF_TASKINFO)
@@ -3337,11 +3338,10 @@ lsbExecChild (struct resCmdBill *cmdmsg, int *pty,
 	  if (setsockopt (info[1],
 			  SOL_SOCKET,
 			  SO_LINGER,
-			  (char *) &linger, sizeof (struct linger)) < 0)
+			  &linger, sizeof (struct linger)) < 0)
 		{
-		  ls_syslog (LOG_ERR, I18N (5292, "\
-%s: setsockopt on socket=<%d> option SO_LINGER failed: %m"),    /*catgets 5292 */
-			 fname, info[1]);
+			/*catgets 5292 */
+			ls_syslog (LOG_ERR, I18N (5292, "%s: setsockopt on socket=<%d> option SO_LINGER failed: %m"), fname, info[1]);
 		}
 	}
 	}
@@ -3407,16 +3407,15 @@ lsbExecChild (struct resCmdBill *cmdmsg, int *pty,
 }
 
 static void
-execit (char **uargv, char *jobStarter, int *pid, int stdio, int taskSock, int loseRoot)
+execit (char **uargv, char *jobStarter, pid_t *pid, int stdio, int taskSock, int loseRoot)
 {
 	static char fname[] = "execit()";
 	char *cmd = NULL;
 	int i = 0;
 	int num = 0;
-	int cmdSize = 0;
+	size_t cmdSize = 0;
 	char **real_argv = NULL;
-	int uid = 0;
-	const char *RF_SERVERD = "INVALID"; // FIXME FIXME FIXME FIXME FIXME delete after usage
+	uid_t uid = 0;
 
 	if (loseRoot)
 	{
@@ -3429,7 +3428,7 @@ execit (char **uargv, char *jobStarter, int *pid, int stdio, int taskSock, int l
 		}
 	}
 
-	if (!strcmp (uargv[0], RF_SERVERD)) // FIXME FIXME FIXME FIXME FIXME throw at debugger, see what uargv[0] is supposed to be
+	if (!strcmp (uargv[0], RF_SERVERD)) // FIXME FIXME FIXME FIXME FIXME throw at debugger, see what uargv[0] and R_SERVERD is supposed to be
 	{
 		rfServ_ (taskSock);
 		_exit (127);
@@ -3630,78 +3629,83 @@ delete_client (struct client *cli_ptr)
 void
 delete_child (struct child *cp)
 {
-  static char fname[] = "delete_child";
-  int i, j;
+	static char fname[] = "delete_child";
+	int i = 0;
+	int j = 0;
 
-  if (debug > 1)
+	if (debug > 1)
 	{
-	  printf ("delete_child(%d)\n", cp->rpid);
-	  fflush (stdout);
+		printf ("delete_child(%d)\n", cp->rpid);
+		fflush (stdout);
 	}
 
-  if (logclass & LC_TRACE)
-	ls_syslog (LOG_DEBUG, "%s: entering the routine...", fname);
-
-  for (i = 0; i < child_cnt; i++)
-	{
-	  if (children[i] == cp)
-	break;
+	if (logclass & LC_TRACE) {
+		ls_syslog (LOG_DEBUG, "%s: entering the routine...", fname);
 	}
 
-  if (i == child_cnt)
+	for (i = 0; i < child_cnt; i++)
 	{
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5227, "%s: Deleting nonexistent child"), fname); /* catgets 5227 */
-	  return;
+		if (children[i] == cp) {
+			break;
+		}
 	}
 
-  for (j = i; j < child_cnt - 1; j++)
-	children[j] = children[j + 1];
-  child_cnt--;
-
-  if (FD_IS_VALID (cp->stdio))
+	if (i == child_cnt)
 	{
-	  FD_CLR (cp->stdio, &readmask);
-	  FD_CLR (cp->stdio, &writemask);
-	  FD_CLR (cp->stdio, &exceptmask);
-
-	  CLOSE_IT (cp->stdio);
-	  cp->std_out->fd = INVALID_FD;
-
-	  if (check_valid_tty (cp->slavepty))
-	{
-	  uid_t euid = setEUid (0);
-	  chown (cp->slavepty, 0, 0);
-	  chmod (cp->slavepty, 0666);
-	  setEUid (euid);
-	}
+		ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5227, "%s: Deleting nonexistent child"), fname); /* catgets 5227 */
+		return;
 	}
 
+	for (j = i; j < child_cnt - 1; j++) {
+		children[j] = children[j + 1];
+	}
+	child_cnt--;
+
+	if (FD_IS_VALID (cp->stdio))
+	{
+		FD_CLR (cp->stdio, &readmask);
+		FD_CLR (cp->stdio, &writemask);
+		FD_CLR (cp->stdio, &exceptmask);
+
+		CLOSE_IT (cp->stdio);
+		cp->std_out->fd = INVALID_FD;
+
+		if (check_valid_tty (cp->slavepty))
+		{
+			uid_t euid = setEUid (0);
+			chown (cp->slavepty, 0, 0);
+			chmod (cp->slavepty, 0666);
+			setEUid (euid);
+		}
+	}
 
 
-  if (FD_IS_VALID (cp->std_err->fd))
+	if (FD_IS_VALID (cp->std_err->fd))
 	{
 	  FD_CLR (cp->std_err->fd, &readmask);
 	  CLOSE_IT (cp->std_err->fd);
 	}
 
-  if (cp->cwd)
-	free (cp->cwd);
-
-  if (cp->cmdln)
-	freeblk (cp->cmdln);
-
-  if (cp->sigStatRu)
-	free (cp->sigStatRu);
-
-  if (logclass & LC_TRACE)
-	{
-	  ls_syslog (LOG_DEBUG, "\
-%s: Res has destroyed the child=<%x> current number of child is=<%d>", fname, cp, child_cnt);
+	if (cp->cwd) {
+		free (cp->cwd);
 	}
 
-  free (cp);
+	if (cp->cmdln) {
+		freeblk (cp->cmdln);
+	}
 
-  return;
+	if (cp->sigStatRu) {
+		free (cp->sigStatRu);
+	}
+
+	if (logclass & LC_TRACE)
+	{
+		ls_syslog (LOG_DEBUG, "%s: Res has destroyed the child=<%x> current number of child is=<%d>", fname, cp, child_cnt);
+	}
+
+	free (cp);
+
+	return;
 }
 
 static void
@@ -3831,7 +3835,7 @@ notify_client (int s, int rpid, enum resAck ack, struct sigStatusUsage *sigStatR
   reqHdr.reserved = rpid;
 
   if ((rc = writeEncodeMsg_ (s, reqBuf, reqBufSize, &reqHdr,
-				 &st, NB_SOCK_WRITE_FIX, xdr_niosStatus,
+				 ( char * )&st, NB_SOCK_WRITE_FIX, xdr_niosStatus, // FIXME FIXME FIXME FIXME make sure this is the right way to pass data
 				 0)) < 0)
 	{
 	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "writeEncodeMsg_");
@@ -5001,33 +5005,27 @@ child_channel_clear (struct child *chld, struct outputchannel *channel)
 
   channel->bytes += cc;
 
-  if (logclass & LC_TRACE)
+	if (logclass & LC_TRACE)
 	{
-	  ls_syslog (LOG_DEBUG, "\
-%s: Res read=<%d> bytes from child=<%x> bytes=<%d> buffer->bcount=<%d>", fname, cc, chld, channel->bytes, buffer->bcount);
+		ls_syslog (LOG_DEBUG, "%s: Res read=<%d> bytes from child=<%x> bytes=<%d> buffer->bcount=<%d>", fname, cc, chld, channel->bytes, buffer->bcount);
 	}
 
-
-  if ((chld->rexflag & REXF_USEPTY) && (channel != &(chld->std_err)))
+	if( ( chld->rexflag & REXF_USEPTY ) && ( channel != chld->std_err ) )
 	{
-	  int i;
-
-
-	  cvalue = *(buffer->bp);
-
-	  buffer->bcount--;
-	  for (i = 0; i < cc - 1; ++i)
-	buffer->bp[i] = buffer->bp[i + 1];
-
-	  if (cvalue != TIOCPKT_DATA)
-	{
-	  if (debug > 1)
-		{
-		  printf ("received PTY packet mode control char (%x)\n", cvalue);
+		cvalue = *(buffer->bp);
+		buffer->bcount--;
+		for( uint i = 0; i < cc - 1; ++i ) {
+			buffer->bp[i] = buffer->bp[i + 1];
 		}
 
-	  return;
-	}
+		if (cvalue != TIOCPKT_DATA)
+		{
+			if (debug > 1)
+			{
+				printf ("received PTY packet mode control char (%x)\n", cvalue);
+			}
+			return;
+		}
 	}
 
   return;
@@ -5178,44 +5176,44 @@ addCliEnv (struct client *cl, char *envName, char *value)
 int
 lsbJobStart (char **jargv, u_short retPort, char *host, int usePty)
 {
-  static char fname[] = "lsbJobStart()";
-  struct resCmdBill cmdBill = { };
-  char *pwd = NULL;
-  struct client cli = { };
-  enum resAck ack;
-  int retsock = 0;
-  struct child *child = NULL;
-  struct sockaddr_in from = { };
-  struct hostent *hp = NULL;
-  char *jf = NULL;
-  char *jfn = NULL;
-  char *jidStr = NULL;
-  int jobId = 0; // FIXME pid_t instead of int
-  int i = 0;
-  sigset_t sigMask = 0;
-  sigset_t oldSigMask = 0;
-  int exitStatus = 0;
-  int terWhiPendStatus = 0;
-  char *stderrSupport = NULL;
+	static char fname[] = "lsbJobStart()";
+	struct resCmdBill cmdBill = { };
+	char *Ω = NULL;
+	struct client cli = { };
+	enum resAck ack;
+	int retsock = 0;
+	struct child *child = NULL;
+	struct sockaddr_in from = { };
+	struct hostent *hp = NULL;
+	char *jf = NULL;
+	char *jfn = NULL;
+	char *jidStr = NULL;
+	int jobId = 0; // FIXME pid_t instead of int
+	int i = 0;
+	sigset_t sigMask = 0;
+	sigset_t oldSigMask = 0;
+	int exitStatus = 0;
+	int terWhiPendStatus = 0;
+	char *stderrSupport = NULL;
 
-  if (logclass & LC_TRACE)
+	if (logclass & LC_TRACE)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Starting a batch job", fname);
+		ls_syslog (LOG_DEBUG, "%s: Starting a batch job", fname);
 	}
 
 
-  sigemptyset (&sigMask);
-  sigaddset (&sigMask, SIGCHLD);
-  sigaddset (&sigMask, SIGINT);
-  sigaddset (&sigMask, SIGHUP);
-  sigaddset (&sigMask, SIGPIPE);
-  sigaddset (&sigMask, SIGTTIN);
-  sigaddset (&sigMask, SIGTTOU);
-  sigaddset (&sigMask, SIGTSTP);
+	sigemptyset (&sigMask);
+	sigaddset (&sigMask, SIGCHLD);
+	sigaddset (&sigMask, SIGINT);
+	sigaddset (&sigMask, SIGHUP);
+	sigaddset (&sigMask, SIGPIPE);
+	sigaddset (&sigMask, SIGTTIN);
+	sigaddset (&sigMask, SIGTTOU);
+	sigaddset (&sigMask, SIGTSTP);
 #ifdef SIGDANGER
-  sigaddset (&sigMask, SIGDANGER);
+	sigaddset (&sigMask, SIGDANGER);
 #endif
-  sigaddset (&sigMask, SIGTERM);
+	sigaddset (&sigMask, SIGTERM);
 #ifdef SIGXCPU
   sigaddset (&sigMask, SIGXCPU);
 #endif
@@ -5233,57 +5231,61 @@ lsbJobStart (char **jargv, u_short retPort, char *host, int usePty)
 #ifdef SIGABRT
   sigaddset (&sigMask, SIGABRT);
 #endif
-  sigprocmask (SIG_BLOCK, &sigMask, &oldSigMask);
+	sigprocmask (SIG_BLOCK, &sigMask, &oldSigMask);
 
-  jf = getenv ("LSB_JOBFILENAME");
-  if (jf == NULL)
+	jf = getenv ("LSB_JOBFILENAME");
+	if (jf == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, fname, "getenv",
-		 "LSB_JOBFILENAME");
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, fname, "getenv", "LSB_JOBFILENAME");
 	}
-  else
+	else
 	{
-	  resLogOn = 1;
-	  resLogcpuTime = 0;
-	  jfn = strrchr (jf, '/');
-	  if (jfn)
-	{
-	  sprintf (resAcctFN, "%s/.%s.acct", LSTMPDIR, jfn + 1);
-	}
-	}
-
-  if (resParams[LSF_ENABLE_PTY].paramValue &&
-	  !strcasecmp (resParams[LSF_ENABLE_PTY].paramValue, "n"))
-	usePty = 0;
-
-  if (usePty)
-	cmdBill.options = REXF_USEPTY;
-  else
-	cmdBill.options = 0;
-
-
-  cmdBill.retport = htons (retPort);
-  cmdBill.rpid = 0;
-
-  if (sbdFlags & SBD_FLAG_TERM)
-	{
-	  cmdBill.rpid = 1;
-	  if (getenv ("LSB_SHMODE"))
-	cmdBill.options |= REXF_SHMODE;
+		resLogOn = 1;
+		resLogcpuTime = 0;
+		jfn = strrchr (jf, '/');
+		if (jfn)
+		{
+			sprintf (resAcctFN, "%s/.%s.acct", LSTMPDIR, jfn + 1);
+		}
 	}
 
-  if ((pwd = getenv ("PWD")))
-	strcpy (cmdBill.cwd, pwd);
-  else
-	cmdBill.cwd[0] = '\0';
+	if (resParams[LSF_ENABLE_PTY].paramValue && !strcasecmp (resParams[LSF_ENABLE_PTY].paramValue, "n")) {
+		usePty = 0;
+	}
 
-  cmdBill.argv = jargv;
+	if (usePty) {
+		cmdBill.options = REXF_USEPTY;
+	}
+	else {
+		cmdBill.options = 0;
+	}
 
-  jidStr = getenv ("LSB_REMOTEJID");
-  if (jidStr != NULL)
+	cmdBill.retport = htons (retPort);
+	cmdBill.rpid = 0;
 
-	jobId = atoi (jidStr);
-  else
+	if (sbdFlags & SBD_FLAG_TERM)
+	{
+		cmdBill.rpid = 1;
+		if( getenv( "LSB_SHMODE" ) ) {
+			cmdBill.options |= REXF_SHMODE;
+		}
+	}
+
+	if( ( getenv( "PWD" ) ) ) {
+		cmdBill.cwd = malloc( sizeof( char ) * strlen( getenv( "PWD" ) ) ); 
+		strcpy( cmdBill.cwd, getenv( "PWD" ) ); // FIXME FIXME FIXME getenv( "PWD" ) must be sanitized.
+	}
+	else {
+		cmdBill.cwd = NULL;
+	}
+
+	cmdBill.argv = jargv;
+
+	jidStr = getenv ("LSB_REMOTEJID");
+	if (jidStr != NULL) {
+		jobId = atoi (jidStr);
+	}
+	else
 	{
 	  jidStr = getenv ("LSB_JOBID");
 	  if (jidStr == NULL)
@@ -5349,15 +5351,13 @@ lsbJobStart (char **jargv, u_short retPort, char *host, int usePty)
 	  resExit_ (-1);
 	}
 
-	  memcpy ((char *) &from.sin_addr,
-		  (char *) hp->h_addr, (int) hp->h_length);
+	  memcpy ( &from.sin_addr, hp->h_addr, hp->h_length); // FIXME FIXME is this for real? is that the way you copy net
 
 	  from.sin_family = AF_INET;
 
 	  if (logclass & LC_TRACE)
 	{
-	  ls_syslog (LOG_DEBUG, "\
-%s: Calling back to Nios retport=<%d> rpid=<%d>", fname, cmdBill.retport, jobId);
+	  ls_syslog (LOG_DEBUG, "%s: Calling back to Nios retport=<%d> rpid=<%d>", fname, cmdBill.retport, jobId);
 	}
 
 	  if ((retsock = niosCallback_ (&from, cmdBill.retport, jobId, exitStatus, terWhiPendStatus)) < 0)
@@ -5370,11 +5370,12 @@ lsbJobStart (char **jargv, u_short retPort, char *host, int usePty)
 
 	  if (usePty)
 	{
-	  if (setEUid (cli.ruid) < 0)
-		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, fname, "setEUid", cli.ruid);
-		  resExit_ (-1);
-		}
+		// setEUid cannot return a negative number
+		// if (setEUid (cli.ruid) < 0)
+		// {
+		// 	ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, fname, "setEUid", cli.ruid);
+		// 	resExit_ (-1);
+		// }
 
 	  if (ttyCallback (retsock, &cli.tty) < 0)
 		{
@@ -5685,21 +5686,33 @@ doReopen (void)
 static uid_t
 setEUid (uid_t uid)
 {
-  uid_t myuid;
-  int errnoSv = errno;
+	char *currentFunction = "setEUid";
+	uid_t myuid = 0;
+	int errnoSv = errno;
 
-  if (debug)
-	return (geteuid ());
+	if( debug ) {
+		return geteuid ();
+	}
 
-  if ((myuid = geteuid ()) == uid)
-	return (myuid);
+  if( ( myuid = geteuid( ) ) == uid ) {
+		return myuid;
+  }
 
 
-  if (myuid != 0 && uid != 0)
-	changeEUid (0);
-  changeEUid (uid);
-  errno = errnoSv;
-  return (myuid);
+	if (myuid != 0 && uid != 0) {
+		int value = changeEUid (0);
+		if( value < 0 ) {
+			fprintf( stderr, "%s returned a negative value: %d\n", currentFunction, value );
+			ls_syslog (LOG_DEBUG, "doReopen: logclass=%x", logclass);
+			exit( 127 ); 	// FIXME FIXME FIXME test case to make this fail
+							// {set,get}euid( ) does not return an error condition
+		}
+	}
+
+	changeEUid( uid );
+	errno = errnoSv;
+
+	return myuid;
 }
 
 static void

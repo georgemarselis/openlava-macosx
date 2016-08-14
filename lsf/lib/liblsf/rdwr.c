@@ -76,10 +76,10 @@ nb_write_fix (int s, char *buf,  size_t len)
 }
 
 // FIXME FIXME FIXME
-// changed return type from into to size_t
+// changed return type from long into to size_t
 //      ensure with the debugger/test case that this function
 //      does return negative values
-long
+size_t
 nb_read_fix (int s, char *buf, size_t len)
 {
     long cc = 0;
@@ -123,8 +123,7 @@ nb_read_fix (int s, char *buf, size_t len)
         }
     }
 
-    assert( length >= 0 );
-    return (long) length;
+    return length;
 }
 
 #define MAXLOOP 3000

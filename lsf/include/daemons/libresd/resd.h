@@ -411,7 +411,8 @@ struct resCmdBill
 	int filemask;
 	int priority;
 	int options;
-	char cwd[MAXPATHLEN];
+	// char cwd[MAXPATHLEN];
+	char *cwd;
 	char padding2[4];
 	char **argv;
 	struct lsfLimit lsfLimits[LSF_RLIM_NLIMITS];  // this should be changed to a pointer

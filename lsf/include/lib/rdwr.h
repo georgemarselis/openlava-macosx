@@ -21,7 +21,7 @@
 #include <unistd.h>
 
 long 	nb_write_fix (int s, char *buf, size_t len);
-long   	nb_read_fix  (int s, char *buf, size_t len);
+size_t 	nb_read_fix  (int s, char *buf, size_t len);
 long 	b_read_fix   (int s, char *buf, size_t len);
 long 	b_write_fix  (int s, char *buf, size_t len);
 

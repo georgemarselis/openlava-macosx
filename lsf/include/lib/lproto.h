@@ -325,7 +325,7 @@ extern char *getBeginLine_conf (struct lsConf *conf, uint *lineNum);
 
 extern void defaultAllHandlers (void);
 
-extern long  nb_read_fix  (int s, char *buf, size_t len);
+extern size_t  nb_read_fix  (int s, char *buf, size_t len);
 extern long  nb_write_fix (int s, char *buf, size_t len);
 extern long  nb_read_timeout (int s, char *buf, size_t len, int timeout);
 extern int   b_write_timeout (int, char *, int, int);

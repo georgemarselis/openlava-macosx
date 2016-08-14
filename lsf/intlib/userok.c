@@ -18,6 +18,7 @@
 
 #include "libint/intlibout.h"
 #include "lib/lproto.h"
+#include "libint/userok.h"
 
 #define NL_SETN      22
 
@@ -32,7 +33,7 @@ extern struct config_param genParams_[];
 char *
 auth_user (u_long in, u_short local, u_short remote)
 {
-#if 0
+// #if 0
   static char fname[] = "auth_user";
   static char ruser[SIZE];
   char rbuf[SIZE];
@@ -199,8 +200,8 @@ auth_user (u_long in, u_short local, u_short remote)
     }
 
   return ruser;
-#endif
-  return NULL;
+// #endif
+//   return NULL;
 }
 
 

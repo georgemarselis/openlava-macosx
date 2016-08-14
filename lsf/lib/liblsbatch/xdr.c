@@ -16,10 +16,11 @@
  *
  */
 
-// FIXME FIXME FIXME disabled: just in case undef __LP64__ disables 64bit long pointers
-// #ifdef __APPLE__
-// #undef __LP64__
-// #endif
+// FIXME FIXME FIXME FIXME FIXME DO NOT DISABLE! leaving __LP64__ set creates isses with xdr!
+// FIXME FIXME FIXME FIXME FIXME investigate why
+#ifdef __APPLE__
+#undef __LP64__
+#endif
 
 
 #include <sys/types.h>
@@ -289,7 +290,7 @@ xdr_modifyReq (XDR *xdrs, struct modifyReq * modifyReq, struct LSFHeader *hdr)
         return FALSE;
     }
 
-    if (!xdr_arrayElement (xdrs, &modifyReq->submitReq, hdr, xdr_submitReq)) {
+    if (!xdr_arrayElement (xdrs, (char *) &modifyReq->submitReq, hdr, xdr_submitReq)) { // FIXME FIXME FIXME FIXME FIXME struct passed as char * . is this correct?
         return FALSE;
     }
 
@@ -611,7 +612,7 @@ xdr_jobInfoHead (XDR *xdrs, struct jobInfoHead *jobInfoHead, struct LSFHeader *h
 
   assert( hdr->length );
 
-  if (!(xdr_u_long (xdrs, &(jobInfoHead->numJobs)) && xdr_u_int (xdrs, &(jobInfoHead->numHosts))))
+  if (!(xdr_u_long (xdrs, &(jobInfoHead->numJobs)) && xdr_u_int (xdrs, &(jobInfoHead->numHosts)))) 
     {
       return FALSE;
     }
@@ -913,7 +914,7 @@ xdr_jobInfoReply (XDR *xdrs, struct jobInfoReply *jobInfoReply, struct LSFHeader
   }
     }
 
-  if (!xdr_arrayElement (xdrs, (jobInfoReply->jobBill), hdr, xdr_submitReq))
+  if (!xdr_arrayElement (xdrs, (char *) jobInfoReply->jobBill, hdr, xdr_submitReq)) // FIXME FIXME FIXME FIXME FIXME passing a struct as char *?
     {
       if (xdrs->x_op == XDR_DECODE)
   {
@@ -1061,7 +1062,7 @@ xdr_queueInfoReply (XDR *xdrs, struct queueInfoReply * qInfoReply, struct LSFHea
     qInfoReply->queues[i].loadStop = loadStop + (i * qInfoReply->nIdx);
   }
 
-      if (!xdr_arrayElement (xdrs, &(qInfoReply->queues[i]), hdr, xdr_queueInfoEnt, &qInfoReply->nIdx)) {
+      if (!xdr_arrayElement (xdrs, (char *)&(qInfoReply->queues[i]), hdr, xdr_queueInfoEnt, &qInfoReply->nIdx)) { // FIXME FIXME FIXME FIXME FIXME passing a struct as char *?
             return FALSE;
       }
     }
@@ -1382,7 +1383,7 @@ xdr_hostDataReply (XDR *xdrs, struct hostDataReply *hostDataReply, struct LSFHea
             hostDataReply->hosts[i].busyStop  = busyStop + (i * GET_INTNUM (hostDataReply->nIdx));
         }
 
-        if (!xdr_arrayElement (xdrs, &(hostDataReply->hosts[i]), hdr, xdr_hostInfoEnt, (char *) &hostDataReply->nIdx)) {
+        if (!xdr_arrayElement (xdrs, (char *) &(hostDataReply->hosts[i]), hdr, xdr_hostInfoEnt, (char *) &hostDataReply->nIdx)) { // FIXME FIXME FIXME FIXME FIXME passing a struct as char *? debugger
             return FALSE;
         }
     }
@@ -1656,7 +1657,7 @@ xdr_groupInfoReply (XDR *xdrs, struct groupInfoReply *groupInfoReply, struct LSF
 
     for ( uint i = 0; i < groupInfoReply->numGroups; i++)
     {
-        if (!xdr_arrayElement (xdrs, &(groupInfoReply->groups[i]), hdr, xdr_groupInfoEnt)) {
+        if (!xdr_arrayElement (xdrs, (char *)&(groupInfoReply->groups[i]), hdr, xdr_groupInfoEnt)) {  // FIXME FIXME FIXME FIXME FIXME is this correct? passing a struct as char *?
             return FALSE;
         }
     }
@@ -1919,7 +1920,7 @@ xdr_lsbShareResourceInfoReply (XDR *xdrs, struct lsbShareResourceInfoReply *lsbS
     }
 
     for ( uint i = 0; i < lsbShareResourceInfoReply->numResources; i++) {
-        status = xdr_arrayElement (xdrs, &lsbShareResourceInfoReply->resources[i], hdr, xdr_lsbSharedResourceInfo);
+        status = xdr_arrayElement (xdrs, (char *)&lsbShareResourceInfoReply->resources[i], hdr, xdr_lsbSharedResourceInfo); // FIXME FIXME FIXME FIXME FIXME is this correct? passing a struct as char *?
         if (!status) {
             lsbShareResourceInfoReply->numResources = i;
             return FALSE;
@@ -1966,7 +1967,7 @@ xdr_lsbSharedResourceInfo (XDR *xdrs, struct lsbSharedResourceInfo *lsbSharedRes
 
     for ( uint i = 0; i < lsbSharedResourceInfo->nInstances; i++)
     {
-        status = xdr_arrayElement (xdrs, &lsbSharedResourceInfo->instances[i], hdr, xdr_lsbShareResourceInstance);
+        status = xdr_arrayElement (xdrs, (char *)&lsbSharedResourceInfo->instances[i], hdr, xdr_lsbShareResourceInstance);
         if (!status)
         {
             lsbSharedResourceInfo->nInstances = i;
