@@ -335,14 +335,14 @@ extern int   rd_select_ (int, struct timeval *);
 extern int   b_accept_ (int, struct sockaddr *, socklen_t *);
 extern int   blockSigs_ (int, sigset_t *, sigset_t *);
 extern long  b_write_fix  (int s, char *buf, size_t len);
-extern long  b_read_fix   (int s, char *buf, size_t len);
+extern size_t b_read_fix   (int s, char *buf, size_t len);
 
-extern int readDecodeHdr_ (int s, char *buf, long (*readFunc) (), XDR * xdrs, struct LSFHeader *hdr);
-extern int readDecodeMsg_ (int s, char *buf, struct LSFHeader *hdr, long (*readFunc) (), XDR * xdrs, char *data, bool_t (*xdrFunc) (), struct lsfAuth *auth);
+extern int readDecodeHdr_ (int s, char *buf, size_t (*readFunc) (), XDR * xdrs, struct LSFHeader *hdr);
+extern int readDecodeMsg_ (int s, char *buf, struct LSFHeader *hdr, size_t (*readFunc) (), XDR * xdrs, char *data, bool_t (*xdrFunc) (), struct lsfAuth *auth);
 extern int writeEncodeMsg_ (int s, char *buf, uint len, struct LSFHeader *hdr, char *data, long (*writeFunc) (), bool_t (*xdrFunc) (), int options);
 extern int writeEncodeHdr_ (int s, struct LSFHeader *sendHdr, long (*)());
 extern int lsSendMsg_ (int s, unsigned short opCode, size_t hdrLength, char *data, char *reqBuf, size_t reqLen, bool_t (*xdrFunc) (), long (*writeFunc) (),  struct lsfAuth *auth);
-extern int lsRecvMsg_ (int sock, char *buf, unsigned int bufLen, struct LSFHeader *hdr, char *data, bool_t (*xdrFunc) (), long (*readFunc) ());
+extern int lsRecvMsg_ (int sock, char *buf, unsigned int bufLen, struct LSFHeader *hdr, char *data, bool_t (*xdrFunc) (), size_t (*readFunc) ());
 
 extern int io_nonblock_ (int);
 extern int io_block_ (int);

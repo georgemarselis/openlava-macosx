@@ -347,8 +347,7 @@ getManagerId (struct sbdPackage *sbdPackage)
 
   if (sbdPackage->nAdmins <= 0)
     {
-      ls_syslog (LOG_ERR, "\
-%s: No LSF administrator defined in sbdPackage from MBD.", __func__);
+      ls_syslog (LOG_ERR, "%s: No LSF administrator defined in sbdPackage from MBD.", __func__);
       die (FATAL_ERR);
     }
 
@@ -364,9 +363,7 @@ getManagerId (struct sbdPackage *sbdPackage)
 
   if (lsbManager == NULL)
     {
-      ls_syslog (LOG_ERR, "\
-%s: getpwlsfuser_() failed for LSF administrator defined in sbdPackage.\
- Non uniform userid space?", __func__);
+      ls_syslog (LOG_ERR, "%s: getpwlsfuser_() failed for LSF administrator defined in sbdPackage. Non uniform userid space?", __func__);
       die (FATAL_ERR);
     }
 }

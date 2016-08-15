@@ -1046,12 +1046,12 @@ chanRpc_ (int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *out
         // FIXME FIME the cast has to go, as is suspect for bad arithmetic 
 
         timeval.tv_sec = timeout / 1000;
-        timeval.tv_usec = (int)(timeout - timeval.tv_sec * 1000);
+        timeval.tv_usec = (timeout - timeval.tv_sec * 1000);
         /* timeval.tv_usec *= 1000 maybe here? */
         timep = &timeval;
     }
 
-    if ((cc = rd_select_ ((int)channels[chfd].handle, timep)) <= 0)
+    if ((cc = rd_select_ (channels[chfd].handle, timep)) <= 0)
     {
         if (cc == 0) {
             lserrno = LSE_TIME_OUT;
@@ -1066,8 +1066,8 @@ chanRpc_ (int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *out
         ls_syslog (LOG_DEBUG2, "%s: reading reply header", fname);
     }
 
-    xdrmem_create (&xdrs, (char *) &hdrBuf, sizeof (struct LSFHeader), XDR_DECODE);
-    cc = readDecodeHdr_ (chfd, (char *) &hdrBuf, (long (*)()) chanRead_, &xdrs, outhdr);
+    xdrmem_create (&xdrs, (char *) &hdrBuf, sizeof (struct LSFHeader), XDR_DECODE);      // FIXME FIXME FIXME FIXME FIXME (char *) &hdrBuf ; does the char need to be there?
+    cc = readDecodeHdr_ (chfd, (char *) &hdrBuf, (size_t (*)()) chanRead_, &xdrs, outhdr); // FIXME FIXME FIXME FIXME FIXME (char *) &hdrBuf ; does the char need to be there?
     
     if (cc < 0)
     {

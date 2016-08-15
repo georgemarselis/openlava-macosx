@@ -547,7 +547,7 @@ extern void child_handler_ext (void);
 extern void getMaskReady (fd_set * rm, fd_set * wm, fd_set * em);
 extern void display_masks (fd_set *, fd_set *, fd_set *);
 
-extern long b_read_fix   (int s, char *buf, size_t len);
+extern size_t b_read_fix   (int s, char *buf, size_t len);
 extern long b_write_fix  (int s, char *buf, size_t len);
 
 extern int lsbJobStart (char **, u_short, char *, int);

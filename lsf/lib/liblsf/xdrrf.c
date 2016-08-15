@@ -26,7 +26,7 @@
 extern int currentSN;
 
 int
-lsRecvMsg_ (int sock, char *buf, unsigned int bufLen, struct LSFHeader *hdr, char *data, bool_t (*xdrFunc) (), long (*readFunc) ())
+lsRecvMsg_ (int sock, char *buf, unsigned int bufLen, struct LSFHeader *hdr, char *data, bool_t (*xdrFunc) (), size_t (*readFunc) ())
 {
     XDR xdrs;
     int cc = 0;
@@ -51,6 +51,7 @@ lsRecvMsg_ (int sock, char *buf, unsigned int bufLen, struct LSFHeader *hdr, cha
     return 0;
 }
 
+// FIXME FIXME FIXME FIXME replace long (*writeFunc) with size_t (*writeFunc)
 int
 lsSendMsg_ (int s, unsigned short opCode, size_t hdrLength, char *data, char *reqBuf, size_t reqLen, bool_t (*xdrFunc) (), long (*writeFunc) (),  struct lsfAuth *auth)
 {

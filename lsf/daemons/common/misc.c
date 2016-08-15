@@ -449,12 +449,13 @@ fileExist (char *file, uid_t uid, struct hostent *hp)
 
     if (pid > 0)
         {
-        close (fds[1]);
-        if (b_read_fix (fds[0], (char *) &answer, sizeof (int)) < 0)
-            {
-            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "read");
-            answer = TRUE;
-            }
+        close (fds[1]); // FIXME FIXME replace subscript 0 or 1 with appropriate const int
+        // FIXME FIXME FIXME find altenrative mechanism to notify user of b_read_fix failing
+        // if (b_read_fix (fds[0], &answer, sizeof (int)) < 0)
+        //     {
+        //     ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "read");
+        //     answer = TRUE;
+        //     }
         close (fds[0]);
         return answer;
         }

@@ -33,41 +33,35 @@ extern int getQUsable (struct qData *);
 extern int schedule;
 extern int dispatch;
 
-static void updUAcct (struct jData *, struct uData *,
-		      struct hTab **, int,
-		      int, int, int, int, struct hData *,
-		      void (*)(struct userAcct *, void *), void *);
-static void updHAcct (struct jData *, struct qData *,
-		      struct uData *, struct hTab **,
-		      int, int, int, int,
-		      void (*)(struct hostAcct *, void *), void *);
+static void updUAcct (struct jData *, struct uData *, struct hTab **, int, int, int, int, int, struct hData *, void (*)(struct userAcct *, void *), void *);
+static void updHAcct (struct jData *, struct qData *, struct uData *, struct hTab **, int, int, int, int, void (*)(struct hostAcct *, void *), void *);
 static void updHostData (char, struct jData *, int, int, int, int, int);
-static void updUserData1 (struct jData *, struct uData *,
-			  int, int, int, int, int, int);
-static void addValue (int *currentValue, int num,
-		      struct jData *jp, char *fname, char *counter);
+static void updUserData1 (struct jData *, struct uData *, int, int, int, int, int, int);
+static void addValue (int *currentValue, int num, struct jData *jp, char *fname, char *counter);
 static void initUData (struct uData *);
 static void addOneAbs (int *, int, int);
-static struct userAcct *addUAcct (struct hTab **, struct uData *, int,
-				  int, int, int, int);
+static struct userAcct *addUAcct (struct hTab **, struct uData *, int, int, int, int, int);
 extern char *lsfDefaultProject;
 extern int getQUsable (struct qData *);
 
 void
 updCounters (struct jData *jData, int oldStatus, time_t eventTime)
 {
-  static char fname[] = "updCounters";
-  int num, numReq;
+	static char fname[] = "updCounters";
+	int num    = 0;
+	int numReq = 0;
 
-  if (IS_FINISH (oldStatus))
-    return;
+	if (IS_FINISH (oldStatus)) {
+		return;
+	}
 
-  if (MASK_STATUS (jData->jStatus & ~JOB_STAT_UNKWN)
-      == MASK_STATUS (oldStatus & ~JOB_STAT_UNKWN))
-    return;
+	if (MASK_STATUS (jData->jStatus & ~JOB_STAT_UNKWN) == MASK_STATUS (oldStatus & ~JOB_STAT_UNKWN)) {
+    	return;
+	}
 
-  if (IS_PEND (jData->jStatus) && IS_PEND (oldStatus))
-    return;
+	if (IS_PEND (jData->jStatus) && IS_PEND (oldStatus)) {
+		return;
+	}
 
   num = jData->numHostPtr;
   numReq = jData->shared->jobBill.maxNumProcessors;

@@ -647,7 +647,7 @@ ls_conntaskport (int rpid)
 
     if (*genParams_[LSF_RES_TIMEOUT].paramValue) {
         assert( *genParams_[LSF_RES_TIMEOUT].paramValue >= 0 ); // paranoia
-        resTimeout = (uint) atoi (genParams_[LSF_RES_TIMEOUT].paramValue);
+        resTimeout = atoi (genParams_[LSF_RES_TIMEOUT].paramValue);
     }
     else {
         resTimeout = RES_TIMEOUT;

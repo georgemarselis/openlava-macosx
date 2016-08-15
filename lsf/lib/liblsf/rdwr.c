@@ -28,7 +28,7 @@
 
 #define US_DIFF(t1, t2) (((t1).tv_sec - (t2).tv_sec) * 1000000 + (t1).tv_usec - (t2).tv_usec)
 
-static void alarmer_ (void);
+void alarmer_ (void);
 
 // FIXME FIXME FIXME
 // changed return type from into to size_t
@@ -132,7 +132,7 @@ nb_read_fix (int s, char *buf, size_t len)
 // changed return type from into to size_t
 //      ensure with the debugger/test case that this function
 //      cannot return negative values
-long
+size_t
 b_read_fix (int s, char *buf, size_t len)
 {
     int loop      = 0;
@@ -338,32 +338,34 @@ detectTimeout_ (int s, int recv_timeout)
   return (0);
 }
 
-static void
+void
 alarmer_ (void)
 {
+    return;     // empty
 }
 
 
 int
 blockSigs_ (int sig, sigset_t * blockMask, sigset_t * oldMask)
 {
-  sigfillset (blockMask);
+    sigfillset (blockMask);
 
-  if (sig)
-    sigdelset (blockMask, sig);
+    if (sig)  {
+        sigdelset (blockMask, sig);
+    }
 
-  sigdelset (blockMask, SIGHUP);
-  sigdelset (blockMask, SIGINT);
-  sigdelset (blockMask, SIGQUIT);
-  sigdelset (blockMask, SIGILL);
-  sigdelset (blockMask, SIGTRAP);
-  sigdelset (blockMask, SIGFPE);
-  sigdelset (blockMask, SIGBUS);
-  sigdelset (blockMask, SIGSEGV);
-  sigdelset (blockMask, SIGPIPE);
-  sigdelset (blockMask, SIGTERM);
+    sigdelset (blockMask, SIGHUP);
+    sigdelset (blockMask, SIGINT);
+    sigdelset (blockMask, SIGQUIT);
+    sigdelset (blockMask, SIGILL);
+    sigdelset (blockMask, SIGTRAP);
+    sigdelset (blockMask, SIGFPE);
+    sigdelset (blockMask, SIGBUS);
+    sigdelset (blockMask, SIGSEGV);
+    sigdelset (blockMask, SIGPIPE);
+    sigdelset (blockMask, SIGTERM);
 
-  return (sigprocmask (SIG_BLOCK, blockMask, oldMask));
+  return sigprocmask (SIG_BLOCK, blockMask, oldMask);
 
 }
 

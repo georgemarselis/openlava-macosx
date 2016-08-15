@@ -1943,18 +1943,18 @@ checkPermResCtrl (struct client *cli_ptr)
 static void
 resRexec (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 {
-	static char fname[] = "resRexec()";
-	struct resCmdBill cmdmsg = { } ;
-	struct sockaddr_in addr = { };
-	struct sockaddr_in from = { };
-	socklen_t addrLen = sizeof (addr); // FIXME FIXME FIXME FIXME FIXME this code might be legit, due to network stuff i don't know but check just in case
-	socklen_t fromLen = sizeof (from); // FIXME FIXME FIXME FIXME FIXME this code might be legit, due to network stuff i don't know but check just in case
-	int taskSock = -1;
+	static char fname[]      = "resRexec()";
+	struct resCmdBill cmdmsg = { };
+	struct sockaddr_in addr  = { };
+	struct sockaddr_in from  = { };
+	socklen_t addrLen        = sizeof (addr); // FIXME FIXME FIXME FIXME FIXME this code might be legit, due to network stuff i don't know but check just in case
+	socklen_t fromLen        = sizeof (from); // FIXME FIXME FIXME FIXME FIXME this code might be legit, due to network stuff i don't know but check just in case
+	int taskSock             = -1;
 	enum resAck ack;
-	struct child *child_ptr = NULL;
-	int exitStatus = 0;
-	int terWhiPendStatus = 0;
-	struct linger linstr = { 1, 5 };
+	struct child *child_ptr  = NULL;
+	int exitStatus           = 0;
+	int terWhiPendStatus     = 0;
+	struct linger linstr     = { 1, 5 };
 
 	if (logclass & LC_TRACE)
 	{
@@ -1989,12 +1989,12 @@ resRexec (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 				addr.sin_port = 0;
 			}
 		}
-		sendReturnCode (cli_ptr->client_sock, (int) ntohs (addr.sin_port));
+		sendReturnCode (cli_ptr->client_sock, ntohs (addr.sin_port));
 	}
 
 	memset (&from, 0, fromLen);
 
-	if (getpeername (cli_ptr->client_sock, &from, &fromLen) < 0)
+	if (getpeername (cli_ptr->client_sock, (struct sockaddr *)&from, &fromLen) < 0) // FIXME FIXME FIXME FIXME FIXME is this the right way of passing address data?
 	{
 		ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "getpeername", cli_ptr->client_sock);
 		if (msgHdr->opCode == RES_SERVER) {
@@ -6069,7 +6069,7 @@ donios_sock (struct child **children, int op)
 
 			xdrmem_create (&xdrs, (char *) &bufHdr, sizeof (struct LSFHeader), XDR_DECODE);  // FIXME FIXME FIXME FIXME FIXME FIXME this needs to be thrown in the debugger
 
-			if (readDecodeHdr_ (conn2NIOS.sock->fd, (char *) &bufHdr, NB_SOCK_READ_FIX, &xdrs, &msgHdr) < 0) // FIXME FIXME FIXME FIXME FIXME FIXME this needs to be thrown in the debugger
+			if (readDecodeHdr_ (conn2NIOS.sock->fd, (char *) &bufHdr, nb_read_fix, &xdrs, &msgHdr) < 0) // FIXME FIXME FIXME FIXME FIXME FIXME this needs to be thrown in the debugger
 			{
 
 				conn2NIOS.sock->fd = INVALID_FD;
@@ -6117,7 +6117,7 @@ donios_sock (struct child **children, int op)
 
 				xdrmem_create (&xdrs, buf, MSGSIZE, XDR_DECODE);
 				rc = readDecodeMsg_ (conn2NIOS.sock->fd, buf, &msgHdr,
-									NB_SOCK_READ_FIX, &xdrs, (char *) &sig, // FIXME FIXME FIXME FIXME FIXME this needs to be thrown in the debugger
+									nb_read_fix, &xdrs, (char *) &sig, // FIXME FIXME FIXME FIXME FIXME this needs to be thrown in the debugger
 									// xdr_resSignal, NULL);
 									resSignal, NULL);
 				xdr_destroy (&xdrs);

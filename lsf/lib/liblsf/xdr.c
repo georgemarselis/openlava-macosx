@@ -17,6 +17,10 @@
  *
  */
 
+#ifdef __APPLE__
+#undef __LP64__
+#endif
+
 #include <limits.h>
 
 #include "lib/lib.h"
@@ -205,19 +209,17 @@ xdr_array_string (XDR * xdrs, char **astring, uint maxlen, uint arraysize)
 	}
   }
 
-  return (TRUE);
+  return TRUE;
 }
 
 bool_t
 xdr_time_t (XDR * xdrs, time_t * t)
 {
-  return (xdr_u_long (xdrs, (unsigned int *) t));
-
-
+	return xdr_long( xdrs, t );
 }
 
 int
-readDecodeHdr_ (int s, char *buf, long (*readFunc) (), XDR * xdrs, struct LSFHeader *hdr)
+readDecodeHdr_ (int s, char *buf, size_t (*readFunc) (), XDR * xdrs, struct LSFHeader *hdr)
 {
   if ((*readFunc) (s, buf, LSF_HEADER_LEN) != LSF_HEADER_LEN)
 	{
@@ -235,10 +237,10 @@ readDecodeHdr_ (int s, char *buf, long (*readFunc) (), XDR * xdrs, struct LSFHea
 }
 
 int
-readDecodeMsg_ (int s, char *buf, struct LSFHeader *hdr, long (*readFunc) (),  XDR * xdrs,  char *data, bool_t (*xdrFunc) (), struct lsfAuth *auth)
+readDecodeMsg_ (int s, char *buf, struct LSFHeader *hdr, size_t (*readFunc) (),  XDR * xdrs,  char *data, bool_t (*xdrFunc) (), struct lsfAuth *auth)
 {
 	assert( hdr->length <= LONG_MAX);
-	if ((*readFunc) (s, buf, hdr->length) != (long)hdr->length)
+	if ((*readFunc) (s, buf, hdr->length) != hdr->length)
 	{
 		lserrno = LSE_MSG_SYS;
 		return -2;
@@ -263,6 +265,7 @@ readDecodeMsg_ (int s, char *buf, struct LSFHeader *hdr, long (*readFunc) (),  X
 }
 
 
+// FIXME FIXME size_t len , size_t (*writeFunc)
 int
 writeEncodeMsg_ (int s, char *buf, uint len, struct LSFHeader *hdr, char *data, long (*writeFunc) (), bool_t (*xdrFunc) (), int options)
 {

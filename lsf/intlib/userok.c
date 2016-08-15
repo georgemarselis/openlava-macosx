@@ -34,21 +34,29 @@ char *
 auth_user (u_long in, u_short local, u_short remote)
 {
 // #if 0
-  static char fname[] = "auth_user";
-  static char ruser[SIZE];
-  char rbuf[SIZE];
-  char readBuf[SIZE];
-  char *bp;
-  int s, n, bufsize;
-  struct sockaddr_in saddr;
-  struct servent *svp;
-  u_short rlocal, rremote;
-  static u_short id_port;
-  char *authd_port;
-  struct itimerval old_itimer;
-  unsigned int oldTimer;
-  sigset_t newMask, oldMask;
-  struct sigaction action, old_action;
+	const uint TIMEOUT     = 60;
+	const uint SIZE        = 2048;
+	static char fname[]    = "auth_user";
+	static char *ruser     = NULL;
+	static u_short id_port = 0;
+	char *readBuf    = NULL;
+	char *authd_port = NULL;
+	char *rbuf       = NULL;
+	char *bp         = NULL;
+	u_short rlocal   = 0;
+	u_short rremote  = 0;
+	int s            = 0;
+	int n            = 0;
+	uint oldTimer    = 0;
+	sigset_t newMask = 0;
+	sigset_t oldMask = 0;
+	size_t bufsize   = 0;
+	struct sockaddr_in saddr    = { };
+	struct itimerval old_itimer = { };
+	struct sigaction action     = { };
+	struct sigaction old_action = { };
+	struct servent *svp         = NULL;
+
 
   if (id_port == 0)
     {
@@ -57,9 +65,9 @@ auth_user (u_long in, u_short local, u_short remote)
 	{
 	  if ((id_port = atoi (authd_port)) == 0)
 	    {
-	      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5801, "%s: LSF_ID_PORT in lsf.conf must be positive number"),	/* catgets 5801 */
-			 fname);
-	      return (NULL);
+    		/* catgets 5801 */
+			ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5801, "%s: LSF_ID_PORT in lsf.conf must be positive number"), fname);
+			return NULL;
 	    }
 	  id_port = htons (id_port);
 	}
@@ -70,32 +78,30 @@ auth_user (u_long in, u_short local, u_short remote)
 	    {
 	      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5802, "%s: %s(%s/tcp) failed: %m"),	/* catgets 5802 */
 			 fname, "getservbyname", "ident");
-	      return (NULL);
+	      return NULL;
 	    }
 	  id_port = svp->s_port;
 	}
     }
 
-  if ((s = socket (AF_INET, SOCK_STREAM, 0)) == -1)
-    return 0;
-  saddr.sin_family = AF_INET;
+	if ((s = socket (AF_INET, SOCK_STREAM, 0)) == -1) {
+		return 0;
+	}
 
-  saddr.sin_port = id_port;
+	saddr.sin_family = AF_INET;
+	saddr.sin_port = id_port;
+	saddr.sin_addr.s_addr = in;
 
-  saddr.sin_addr.s_addr = in;
+	ls_syslog (LOG_DEBUG, "%s: Calling for authentication at <%s>, port:<%d>",
+		fname, inet_ntoa (saddr.sin_addr), id_port);
 
-  ls_syslog (LOG_DEBUG, "%s: Calling for authentication at <%s>, port:<%d>",
-	     fname, inet_ntoa (saddr.sin_addr), id_port);
-
-  if (b_connect_ (s, (struct sockaddr *) &saddr,
-		  sizeof (struct sockaddr_in), TIMEOUT) == -1)
+	if (b_connect_ (s, (struct sockaddr *) &saddr, sizeof (struct sockaddr_in), TIMEOUT) == -1)
     {
-      int realerrno = errno;
-      close (s);
-      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "b_connetc_",
-		 sockAdd2Str_ (&saddr));
-      errno = realerrno;
-      return 0;
+		int realerrno = errno;
+		close (s);
+		ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "b_connetc_", sockAdd2Str_ (&saddr));
+		errno = realerrno;
+		return 0;
     }
 
   if (getitimer (ITIMER_REAL, &old_itimer) < 0)
@@ -143,7 +149,7 @@ auth_user (u_long in, u_short local, u_short remote)
 
   alarm (TIMEOUT);
   bp = rbuf;
-  n = read (s, readBuf, SIZE);
+  n = read (s, readBuf, SIZE);  // FIXME FIXME FIXME FIXME the size set might not be the optimal one
   if (n > 0)
     {
       int i;
