@@ -8,7 +8,7 @@ AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -I$(top_srcdir)/lsf/include
 
 #INCLUDES = -I$(top_srcdir)/lsf/include
 
-SUBDIRS = common resd limd pimd sbatchd mbatchd eauthd pimd niosd
+SUBDIRS = common limd resd pimd sbatchd mbatchd eauthd pimd niosd
 
 #sbin_PROGRAMS = mbatchd sbatchd
 #mbatchd_SOURCES  = \

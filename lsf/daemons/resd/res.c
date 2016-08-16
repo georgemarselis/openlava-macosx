@@ -30,6 +30,7 @@
 
 #include <sys/time.h>
 
+#include "daemons/liblimd/limd.h"
 #include "daemons/libresd/resd.h" // FIXME FIXME one header, not multiple
 #include "daemons/libresd/resout.h"
 #include "lib/res.h"

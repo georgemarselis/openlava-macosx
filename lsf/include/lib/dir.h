@@ -20,6 +20,10 @@
 
 static struct hTab hashTab;
 
+char chosenPath[MAXPATHLEN];
+
+extern struct config_param genParams_[];
+
 static int putin_ (unsigned long status, char *inkey, int inkeylen, char *inval, int invallen, void *indata);
 static int getMap_ (void);
 static int tryPwd (char *path, char *pwdpath);

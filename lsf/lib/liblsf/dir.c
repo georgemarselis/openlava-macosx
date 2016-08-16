@@ -16,260 +16,308 @@
  *
  */
 
-#include <limits.h>
 #include <rpcsvc/ypclnt.h>
+#include <sys/ioctl.h>
+#include <limits.h>
 
 #include "lib/lib.h"
 #include "lib/lproto.h"
 #include "lib/dir.h"
 
 
-extern struct config_param genParams_[];
-
-char chosenPath[MAXPATHLEN];
 
 static char *
-usePath (char *path)
+usePath(char *path)
 {
-  strcpy (chosenPath, path);
-  return chosenPath;
+	strcpy( chosenPath, path );
+	return chosenPath;
 }
 
 int
-mychdir_ (char *path, struct hostent *hp)
+mychdir_( char *path, struct hostent *hp )
 {
-  char *goodpath = path;
-  char *sp = NULL;
-  sTab hashSearchPtr;
-  hEnt *hashEntryPtr;
-  static char first = TRUE;
-  char filename[MAXPATHLEN];
+	sTab hashSearchPtr = { };
+	hEnt *hashEntryPtr = NULL;
+	static char first = TRUE;
+	char *goodpath = path;
+	char *sp = NULL;
+	char *filename = malloc( sizeof( char ) * MAXPATHLEN + 1);
 
-  if (path == NULL || strlen (path) == 0 || path[0] != '/' || AM_NEVER)
-    return (chdir (usePath (path)));
+	if (path == NULL || strlen (path) == 0 || path[0] != '/' || AM_NEVER) {
+		return (chdir (usePath (path)));
+	}
 
-  if (hp != NULL)
-    if (netHostChdir (path, hp) == 0)
-      return 0;
+	if (hp != NULL) {
+		if (netHostChdir (path, hp) == 0) {
+			return 0;
+		}
+	}
 
-  if (strstr (path, "/tmp_mnt") == path)
-    {
-      sp = path + strlen ("/tmp_mnt");
-      if (chdir (usePath (sp)) == 0)
-	return 0;
-    }
-  else
-    {
-      if (chdir (usePath (path)) == 0)
-	return 0;
-    }
+	if (strstr (path, "/tmp_mnt") == path)		// FIXME FIXME FIXME FIXME replace fixed strings with autoconf settings
+	{
+		sp = path + strlen ("/tmp_mnt");		// FIXME FIXME FIXME FIXME replace fixed strings with autoconf settings
+		if (chdir (usePath (sp)) == 0) {
+			return 0;
+		}
+	}
+	else
+	{
+		if (chdir (usePath (path)) == 0) {
+			return 0;
+		}
+	}
 
-  if (errno != ENOENT && errno != ENOTDIR)
-    return -1;
+	if (errno != ENOENT && errno != ENOTDIR) {
+		return -1;
+	}
 
-  if (getcwd (filename, sizeof (filename)) == NULL)
-    goto try;
+	if (getcwd (filename, sizeof (filename)) == NULL) {
+		goto try;
+	}
 
-  sp = getenv ("HOME");
-  if (sp != NULL)
-    chdir (sp);
+	sp = getenv ("HOME"); // FIXME FIXME FIXME FIXME replace fixed strings with autoconf settings
+	if (sp != NULL) {
+		chdir (sp);
+	}
 
-  chdir (filename);
+	chdir (filename);
 
-try:
-  if (path[0] != '/')
-    return -1;
+try:  // FIXME FIXME FIXME FIXME FIXME remove label:
+	if (path[0] != '/') {
+		return -1;
+	}
 
-  if ((goodpath = strstr (path, "/exp/lsf")) != NULL)
-    {
-      if (chdir (usePath (goodpath)) == 0)
-	return 0;
-    }
+	if ((goodpath = strstr (path, "/exp/lsf")) != NULL) // FIXME FIXME FIXME FIXME replace fixed strings with autoconf settings
+	{
+		if (chdir (usePath (goodpath)) == 0) {
+			return 0;
+		}
+	}
 
-  if (strstr (path, "/tmp_mnt") == path)
-    {
-      goodpath = path + strlen ("/tmp_mnt");
-    }
-  else
-    {
-      if (chdir (usePath (path)) == 0)
-	return 0;
-      sp = getenv ("PWD");
-      if (tryPwd (path, sp) == 0)
-	return 0;
-    }
+	if (strstr (path, "/tmp_mnt") == path) // FIXME FIXME FIXME FIXME replace fixed strings with autoconf settings
+	{
+		goodpath = path + strlen ("/tmp_mnt"); // FIXME FIXME FIXME FIXME replace fixed strings with autoconf settings
+	}
+	else
+	{
+		if (chdir (usePath (path)) == 0) {
+			return 0;
+		}
+		sp = getenv ("PWD"); 
+		if (tryPwd (path, sp) == 0) { // FIXME FIXME FIXME FIXME replace fixed strings with autoconf settings
+			return 0;
+		}
+	}
 
-  if (goodpath == NULL)
-    goodpath = strchr (path + 1, '/');
-  else
-    goodpath = strchr (goodpath + 1, '/');
-  if (goodpath != NULL)
-    {
-      if (chdir (usePath (goodpath)) == 0)
-	return 0;
-    }
-  else
-    {
-      return -1;
-    }
+	if (goodpath == NULL)
+		goodpath = strchr (path + 1, '/');
+	else
+		goodpath = strchr (goodpath + 1, '/');
+	if (goodpath != NULL)
+	{
+		if (chdir (usePath (goodpath)) == 0) {
+			return 0;
+		}
+	}
+	else
+	{
+		return -1;
+	}
 
-  if (first)
-    {
-      first = FALSE;
-      if (getMap_ () != 0)
-	return -1;
-    }
+	if (first)
+	{
+	  first = FALSE;
+		if (getMap_ () != 0) {
+			return -1;
+		}
+	}
 
   hashEntryPtr = h_firstEnt_ (&hashTab, &hashSearchPtr);
   if (hashEntryPtr == NULL)
-    {
-
-      errno = ENOENT;
-      return -1;
-    }
+	{
+	  errno = ENOENT;
+	  return -1;
+	}
 
   while (hashEntryPtr != NULL)
-    {
-      sprintf (filename, "%s%s", hashEntryPtr->keyname, goodpath);
-      if (chdir (usePath (filename)) == 0)
-	return 0;
-      hashEntryPtr = h_nextEnt_ (&hashSearchPtr);
-    }
+	{
+		sprintf (filename, "%s%s", hashEntryPtr->keyname, goodpath);
+		if (chdir (usePath (filename)) == 0) {
+			return 0;
+		}
+	  hashEntryPtr = h_nextEnt_ (&hashSearchPtr);
+	}
 
   goodpath = strchr (goodpath + 1, '/');
   if (goodpath == NULL)
-    {
-      return -1;
-    }
+	{
+	  return -1;
+	}
 
   hashEntryPtr = h_firstEnt_ (&hashTab, &hashSearchPtr);
   while (hashEntryPtr != NULL)
-    {
-      sprintf (filename, "%s%s", hashEntryPtr->keyname, goodpath);
-      if (chdir (usePath (filename)) == 0)
-	return 0;
-      hashEntryPtr = h_nextEnt_ (&hashSearchPtr);
-    }
+	{
+	  sprintf (filename, "%s%s", hashEntryPtr->keyname, goodpath);
+	  if (chdir (usePath (filename)) == 0) {
+			return 0;
+	  }
+	  hashEntryPtr = h_nextEnt_ (&hashSearchPtr);
+	}
 
-  if (chdir (usePath (goodpath)) == 0)
-    return 0;
+	if (chdir (usePath (goodpath)) == 0)  {
+		return 0;
+	}
 
-  if (strstr (path, "/tmp_mnt") != path)
-    return -1;
+	if (strstr (path, "/tmp_mnt") != path) { // FIXME FIXME FIXME FIXME replace fixed strings with autoconf settings
+		return -1;
+	}
 
-  goodpath = path + strlen ("/tmp_mnt");
-  if (*goodpath == '\0')
-    return -1;
+	goodpath = path + strlen ("/tmp_mnt"); // FIXME FIXME FIXME FIXME replace fixed strings with autoconf settings
+	if (*goodpath == '\0') {
+		return -1;
+	}
 
-  strcpy (filename, goodpath);
+	strcpy (filename, goodpath);
+	sp = strchr (filename + 1, '/');
+	if (sp == NULL) {
+		return -1;
+	}
 
-  sp = strchr (filename + 1, '/');
-  if (sp == NULL)
-    return -1;
+	goodpath = strchr (sp + 1, '/');
+	if (goodpath == NULL) {
+		return -1;
+	}
 
-  goodpath = strchr (sp + 1, '/');
-  if (goodpath == NULL)
-    return -1;
+	if ((sp = strchr (goodpath + 1, '/')) == NULL) {
+		return -1;
+	}
 
-  if ((sp = strchr (goodpath + 1, '/')) == NULL)
-    return -1;
+	*goodpath = '\0'; // FIXME FIXME FIXME FIXME FIXME this outa be a free or something.
+	strcat (filename, sp);
 
-  *goodpath = '\0';
-  strcat (filename, sp);
+	if (chdir (usePath (filename)) == 0) {
+		return 0;
+	}
 
-  if (chdir (usePath (filename)) == 0)
-    return 0;
+	if ((sp = strchr (goodpath + 1, '/')) == NULL) {
+		return (-1);
+	}
 
-  if ((sp = strchr (goodpath + 1, '/')) == NULL)
-    return (-1);
+	*goodpath = '\0'; // FIXME FIXME FIXME FIXME FIXME this outa be a free or something.
+	strcat (filename, sp);
 
-  *goodpath = '\0';
-  strcat (filename, sp);
+	if (chdir (usePath (filename)) == 0) {
+		return 0;
+	}
 
-  if (chdir (usePath (filename)) == 0)
-    return 0;
+	if (chdir (usePath (path)) == 0) {
+		return 0;
+	}
 
-  if (chdir (usePath (path)) == 0)
-    return 0;
-
-
-  return -1;
+// FIXME FIXME FIXME FIXME FIXME fix memor management
+	return -1;
 }
 
 static int
 tryPwd (char *path, char *pwdpath)
 {
-  char *PA, *PAPB, *pa, *pb, *pc, *sp1;
-  char filename[MAXFILENAMELEN];
+	char *PA   = NULL;
+	char *PAPB = NULL;
+	char *pa   = NULL;
+	char *pb   = NULL;
+	char *pc   = NULL;
+	char *sp   = NULL;
+	char *filename = malloc( sizeof( char) * MAXFILENAMELEN + 1 ); // FIXME FIXME FIXME FIXME replace  with OS dependent settings @ configure.ac
 
-  if (pwdpath == NULL)
-    return -1;
+	if (pwdpath == NULL) {
+		return -1;
+	}
 
-  if (strcmp (pwdpath, "/") == 0)
-    return -1;
+	if (strcmp (pwdpath, "/") == 0) {
+		return -1;
+	}
 
-  strcpy (filename, pwdpath);
-  sp1 = strchr (filename + 1, '/');
-  if (sp1 != NULL)
-    *sp1 = '\0';
-  PA = putstr_ (filename);
-  strcpy (filename, pwdpath);
-  if (sp1 != NULL)
-    {
-      sp1 = strchr (sp1 + 1, '/');
-      if (sp1 != NULL)
-	*sp1 = '\0';
-    }
-  PAPB = putstr_ (filename);
+	strcpy (filename, pwdpath);
+	sp = strchr (filename + 1, '/');
+	if (sp != NULL)
+		*sp = '\0';// FIXME FIXME FIXME FIXME FIXME this outa be a free or something.
+	PA = putstr_ (filename);
+	strcpy (filename, pwdpath);
+	if (sp != NULL)
+	{
+		sp = strchr (sp + 1, '/');
+		if (sp != NULL) {
+			*sp = '\0';  // FIXME FIXME FIXME FIXME FIXME this outa be a free or something.
+		}
+	}
+	PAPB = putstr_ (filename);
 
-  pa = path;
-  pb = strchr (path + 1, '/');
-  if (pb == NULL)
-    pb = pa;
-  pc = strchr (pb + 1, '/');
-  if (pc == NULL)
-    pc = pb;
+	pa = path;
+	pb = strchr (path + 1, '/');
+  	if (pb == NULL) {
+		pb = pa;
+	}
+	pc = strchr (pb + 1, '/');
+	if (pc == NULL) {
+		pc = pb;
+	}
 
-  strcpy (filename, PA);
-  strcat (filename, pa);
-  if (chdir (usePath (filename)) == 0)
-    {
-      free (PA);
-      free (PAPB);
-      return 0;
-    }
+	strcpy (filename, PA);
+	strcat (filename, pa);
+	if (chdir (usePath (filename)) == 0)
+	{
+		free (PA);
+		free (PAPB);
+		return 0;
+	}
 
-  strcpy (filename, PA);
-  strcat (filename, pb);
-  if (chdir (usePath (filename)) == 0)
-    {
-      free (PA);
-      free (PAPB);
-      return 0;
-    }
+	strcpy (filename, PA);
+	strcat (filename, pb);
+	if (chdir (usePath (filename)) == 0)
+	{
+		free (PA);
+		free (PAPB);
+		return 0;
+	}
+
+	  strcpy (filename, PAPB);
+	  strcat (filename, pc);
+	if (chdir (usePath (filename)) == 0)
+	{
+		free( PA );
+		free( PAPB );
+		free( pa );
+		free( pb );
+		free( pc );
+		free( pc );
+		free( sp );
+		return 0;
+	}
 
   strcpy (filename, PAPB);
-  strcat (filename, pc);
-  if (chdir (usePath (filename)) == 0)
-    {
-      free (PA);
-      free (PAPB);
-      return 0;
-    }
-
-  strcpy (filename, PAPB);
   strcat (filename, pb);
   if (chdir (usePath (filename)) == 0)
-    {
-      free (PA);
-      free (PAPB);
-      return 0;
-    }
+	{
+		free( PA );
+		free( PAPB );
+		free( pa );
+		free( pb );
+		free( pc );
+		free( pc );
+		free( sp );
+	  return 0;
+	}
 
-  free (PA);
-  free (PAPB);
-  return -1;
+	// FIXME FIXME FIXME FIXME FIXME mem management in this function is nto complete
+	free( PA );
+	free( PAPB );
+	free( pa );
+	free( pb );
+	free( pc );
+	free( pc );
+	free( sp );
 
+	return -1;
 }
 
 static int
@@ -277,148 +325,175 @@ getMap_ (void)
 {
 #ifndef __CYGWIN__
 
-  char *domain;
-  struct ypall_callback incallback;
-  int i;
+	char *domain = NULL;
+	struct ypall_callback incallback = { };
+	int i = 0;
 
-    h_initTab_ (&hashTab, 64);
-    incallback.foreach = &putin_;
-    if ((i = yp_get_default_domain (&domain)) != 0) {
-        return (i);
-    }
+	h_initTab_ (&hashTab, 64);		// FIXME FIXME FIXME FIXME wtf is hashTab from?
+									// FIXME FIXME FIXME FIXME also the value of 64 is important here!
+	incallback.foreach = &putin_;
+	if ((i = yp_get_default_domain (&domain)) != 0) {
+		return i;
+	}
 
-    return (yp_all (domain, "auto.master", &incallback));
+	return yp_all( domain, "auto.master", &incallback );
 #else
-    return 0;
+	return 0;
 #endif
 }
 
 
 static int
-putin_ (unsigned long status, char *inkey, int inkeylen, char *inval, int invallen,	void *indata)
+putin_ (unsigned long status, char *inkey, int inkeylen, char *inval, int invallen, void *indata)
 {
 
 /* do nothing with this, but gets rid of the compilier complaining 
    void *indata is mandatory cuz the header must match the
-      incallback.foreach( unsigned long, char *, int, char *, int, void * ) function  
+	  incallback.foreach( unsigned long, char *, int, char *, int, void * ) function  
 
-      this is part of NIS/NIS+
+	  this is part of NIS/NIS+
 
-      FIXME FIXME
+	  FIXME FIXME
 */
-  strlen( inval );
-  invallen++;
-  strlen( (char *) indata); 
+	assert( inval != NULL );
+	assert( invallen != 0);
+	assert( indata != NULL); 
 
 #ifndef __CYGWIN__
 
-    assert( status < UINT_MAX );
-    if( 0 != ypprot_err( (unsigned int) status ) ) {
-        return TRUE;
-    }
+	if( 0 != ypprot_err( status ) ) {
+		return TRUE;
+	}
 #endif
+	// FIXME FIXME FIXME FIXME FIXME string comes in non-null teriminated
+	assert( inkey != NULL );
+	assert( inkey[inkeylen] == '\0'); // Recommended comp.lang.c F.A.Q. way of null-ternimating a string.
+	if( NULL == inkey ) {
+		return FALSE;
+	}
 
-    inkey[inkeylen] = '\0';
-    if (strcmp (inkey, "/-") == 0) {
-        return FALSE;
-    }
+	h_addEnt_( &hashTab, inkey, 0 );
 
-    h_addEnt_ (&hashTab, inkey, 0);
-
-    return FALSE;
+	return FALSE;
 }
 
 static int
 netHostChdir (char *path, struct hostent *hp)
 {
-  char filename[MAXFILENAMELEN];
-  char *mp;
+	char *filename = malloc( sizeof( char ) * MAXFILENAMELEN + 1 ); // FIXME FIXME FIXME FIXME FIXME FIXME replace MAXFILENAMELEN to OS equivallent.
+	char *mp       = NULL;
 
-  if (AM_LAST || AM_NEVER)
-    {
-      if (chdir (usePath (path)) == 0)
-	return (0);
-    }
+	if (AM_LAST || AM_NEVER)
+	{
+		if ( chdir( usePath( path ) ) == 0 ) {
+			return 0;
+		}
+	}
 
-  if (strstr (path, "/net/") == path)
-    return -1;
+	if (strstr (path, "/net/") == path) { // FIXME FIXME FIXME FIXME replace fixed strings with autoconf constants, if needed.
+		return -1;
+	}
 
-  if (strstr (path, "/tmp_mnt/") == path)
-    return -1;
+	if (strstr (path, "/tmp_mnt/") == path) { // FIXME FIXME FIXME FIXME replace fixed strings with autoconf constants, if needed.
+		return -1;
+	}
 
-  if (hp == NULL)
-    return -1;
+	if (hp == NULL) {
+		return -1;
+	}
 
-  if ((mp = mountNet_ (hp)) == NULL)
-    return -1;
-  sprintf (filename, "%s%s", mp, path);
-  return (chdir (usePath (filename)));
+	if ((mp = mountNet_ (hp)) == NULL) {
+		return -1;
+	}
 
+	sprintf( filename, "%s%s", mp, path);
+	
+	free( mp );
+	free( filename );
+	return chdir( usePath( filename ) );
 }
 
 static char *
 mountNet_ (struct hostent *hp)
 {
-  char hostnamebuf[MAXHOSTNAMELEN];
-  static char filename[MAXFILENAMELEN];
-  char *sp;
-  char cwd[MAXPATHLEN];
+	static char *filename = NULL;
+	char *hostnamebuf     = malloc( sizeof( char ) * MAXHOSTNAMELEN + 1 ); // FIXME FIXME FIXME FIXME replace MAXFILENAMELEN with appropriate OS constant
+	char *cwd             = malloc( sizeof( char ) * MAXPATHLEN + 1 );     // FIXME FIXME FIXME FIXME replace MAXFILENAMELEN with appropriate OS constant
+	char *sp              = NULL;
+	filename = malloc( sizeof( char ) * MAXFILENAMELEN + 1);  // FIXME FIXME FIXME FIXME replace MAXFILENAMELEN with appropriate OS constant
 
-  if (getcwd (cwd, sizeof (cwd)) == NULL)
-    return NULL;
-
-  strcpy (hostnamebuf, hp->h_name);
-  sp = hostnamebuf;
-  if ((sp = strchr (sp, '.')) != NULL)
-    {
-      *sp = '\0';
-      sprintf (filename, "/net/%s", hostnamebuf);
-      if (chdir (filename) == 0)
-	{
-	  chdir (cwd);
-	  return filename;
+	if (getcwd (cwd, sizeof (cwd)) == NULL) {
+		return NULL;
 	}
-      *sp = '.';
-    }
 
-  sprintf (filename, "/net/%s", hostnamebuf);
-  if (chdir (filename) == 0)
-    {
-      chdir (cwd);
-      return filename;
-    }
+  	strcpy (hostnamebuf, hp->h_name);
+  	sp = hostnamebuf;
+  	if ((sp = strchr (sp, '.')) != NULL)
+	{
+		sp = NULL;   // FIXME FIXME FIXME FIXME sp and its value needs debugging
+		sprintf (filename, "/net/%s", hostnamebuf);// FIXME FIXME FIXME FIXME replace fixed string with appropriate const char *
+		if (chdir( filename ) == 0)
+		{
+			chdir (cwd);
+			return filename;
+		}
+		strcpy( sp, ".");
+	}
 
-  return NULL;
+	sprintf (filename, "/net/%s", hostnamebuf);
+	if (chdir (filename) == 0)
+	{
+		chdir (cwd);
+		free (cwd );
+		free( hostnamebuf ); 
+		free( sp );
 
+		return filename;
+	}
+
+	free( hostnamebuf ); 
+	free( filename );
+	free( cwd );
+	free( sp );
+	return NULL;
 }
 
 int
 myopen_ (char *filename, int flags, int mode, struct hostent *hp)
 {
-  char fnamebuf[MAXFILENAMELEN];
-  int i;
-  char *mp;
+	char *fnamebuf = malloc( sizeof( char ) * MAXFILENAMELEN + 1 );
+	char *mp = NULL;
+	int i = 0;
 
-  if (!hp || filename[0] != '/' || AM_NEVER)
-    return (open (usePath (filename), flags, mode));
+	// if we do not have a host entity struct not a path starting with a /
+	if ( NULL == hp || filename[0] != '/' || AM_NEVER) {
+		assert( NULL != filename );
+		return open( usePath( filename ), flags, mode );
+	}
 
-  if (AM_LAST)
-    if ((i = open (usePath (filename), flags, mode)) != -1)
-      return i;
+	if (AM_LAST) {
+		if ((i = open (usePath (filename), flags, mode)) != -1) {
+			return i;
+		}
+	}
 
-  if (strstr (filename, "/net/") == filename)
-    return (open (usePath (filename), flags, mode));
+	if (strstr (filename, "/net/") == filename) { 
+		return (open (usePath (filename), flags, mode));
+	}
 
-  if (strstr (filename, "/tmp_mnt/") == filename)
-    return (open (usePath (filename), flags, mode));
+	if (strstr (filename, "/tmp_mnt/") == filename) {
+		return (open (usePath (filename), flags, mode));
+	}
 
-  if ((mp = mountNet_ (hp)) == NULL)
-    return (open (usePath (filename), flags, mode));
+	if ((mp = mountNet_ (hp)) == NULL) {
+		return (open (usePath (filename), flags, mode));
+	}
 
-  sprintf (fnamebuf, "%s%s", mp, filename);
-  i = open (usePath (fnamebuf), flags, mode);
-  if (i >= 0)
-    return i;
+	sprintf (fnamebuf, "%s%s", mp, filename);			/// FIXME FIXME FIXME FIXME FIXME this neeeds to go under the debugger and see what is the difference with the return at the end of the function
+	i = open (usePath (fnamebuf), flags, mode);
+	if (i >= 0) {
+		return i;
+	}
 
   return (open (usePath (filename), flags, mode));
 
@@ -432,25 +507,25 @@ myfopen_ (char *filename, char *type, struct hostent * hp)
   char *mp;
 
   if (!hp || filename[0] != '/' || AM_NEVER)
-    return (fopen (usePath (filename), type));
+	return (fopen (usePath (filename), type));
 
   if (AM_LAST)
-    if ((fp = fopen (usePath (filename), type)) != NULL)
-      return fp;
+	if ((fp = fopen (usePath (filename), type)) != NULL)
+	  return fp;
 
   if (strstr (filename, "/net/") == filename)
-    return (fopen (usePath (filename), type));
+	return (fopen (usePath (filename), type));
 
   if (strstr (filename, "/tmp_mnt/") == filename)
-    return (fopen (usePath (filename), type));
+	return (fopen (usePath (filename), type));
 
   if ((mp = mountNet_ (hp)) == NULL)
-    return (fopen (usePath (filename), type));
+	return (fopen (usePath (filename), type));
 
   sprintf (fnamebuf, "%s%s", mp, filename);
   fp = fopen (usePath (fnamebuf), type);
   if (fp != NULL)
-    return fp;
+	return fp;
 
   return (fopen (usePath (filename), type));
 
@@ -464,25 +539,25 @@ mystat_ (char *filename, struct stat *sbuf, struct hostent *hp)
   char *mp;
 
   if (!hp || filename[0] != '/' || AM_NEVER)
-    return (stat (usePath (filename), sbuf));
+	return (stat (usePath (filename), sbuf));
 
   if (AM_LAST)
-    if ((i = stat (usePath (filename), sbuf)) != -1)
-      return i;
+	if ((i = stat (usePath (filename), sbuf)) != -1)
+	  return i;
 
   if (strstr (filename, "/net/") == filename)
-    return (stat (usePath (filename), sbuf));
+	return (stat (usePath (filename), sbuf));
 
   if (strstr (filename, "/tmp_mnt/") == filename)
-    return (stat (usePath (filename), sbuf));
+	return (stat (usePath (filename), sbuf));
 
   if ((mp = mountNet_ (hp)) == NULL)
-    return (stat (usePath (filename), sbuf));
+	return (stat (usePath (filename), sbuf));
 
   sprintf (fnamebuf, "%s%s", mp, filename);
   i = stat (usePath (fnamebuf), sbuf);
   if (i >= 0)
-    return i;
+	return i;
 
   return (stat (usePath (filename), sbuf));
 
@@ -496,25 +571,25 @@ mychmod_ (char *filename, mode_t mode, struct hostent *hp)
   char *mp;
 
   if (!hp || filename[0] != '/' || AM_NEVER)
-    return (chmod (usePath (filename), mode));
+	return (chmod (usePath (filename), mode));
 
   if (AM_LAST)
-    if ((i = chmod (usePath (filename), mode)) != -1)
-      return i;
+	if ((i = chmod (usePath (filename), mode)) != -1)
+	  return i;
 
   if (strstr (filename, "/net/") == filename)
-    return (chmod (usePath (filename), mode));
+	return (chmod (usePath (filename), mode));
 
   if (strstr (filename, "/tmp_mnt/") == filename)
-    return (chmod (usePath (filename), mode));
+	return (chmod (usePath (filename), mode));
 
   if ((mp = mountNet_ (hp)) == NULL)
-    return (chmod (usePath (filename), mode));
+	return (chmod (usePath (filename), mode));
 
   sprintf (fnamebuf, "%s%s", mp, filename);
   i = chmod (usePath (fnamebuf), mode);
   if (i >= 0)
-    return i;
+	return i;
 
   return (chmod (usePath (filename), mode));
 
@@ -527,34 +602,34 @@ myexecv_ (char *filename, char **argv, struct hostent *hp)
   char *mp;
 
   if (!hp || filename[0] != '/' || AM_NEVER)
-    {
-      lsfExecX( usePath (filename), argv , execv );
-      return;
-    }
+	{
+	  lsfExecX( usePath (filename), argv , execv );
+	  return;
+	}
 
   if (AM_LAST)
-    {
-      lsfExecX( usePath (filename), argv , execv );
-      return;
-    }
+	{
+	  lsfExecX( usePath (filename), argv , execv );
+	  return;
+	}
 
   if (strstr (filename, "/net/") == filename)
-    {
-      lsfExecX( usePath (filename), argv , execv );
-      return;
-    }
+	{
+	  lsfExecX( usePath (filename), argv , execv );
+	  return;
+	}
 
   if (strstr (filename, "/tmp_mnt/") == filename)
-    {
-      lsfExecX( usePath (filename), argv , execv );
-      return;
-    }
+	{
+	  lsfExecX( usePath (filename), argv , execv );
+	  return;
+	}
 
   if ((mp = mountNet_ (hp)) == NULL)
-    {
-      lsfExecX( usePath (filename), argv , execv );
-      return;
-    }
+	{
+	  lsfExecX( usePath (filename), argv , execv );
+	  return;
+	}
 
   sprintf (fnamebuf, "%s%s", mp, filename);
   lsfExecX( usePath (fnamebuf), argv , execv );
@@ -571,31 +646,31 @@ myunlink_ (char *filename, struct hostent *hp, int doMount)
   char *mp;
 
   if (!hp || filename[0] != '/' || AM_NEVER)
-    return (unlink (usePath (filename)));
+	return (unlink (usePath (filename)));
 
   if (AM_LAST)
-    if ((i = unlink (usePath (filename))) != -1)
-      return (1);
+	if ((i = unlink (usePath (filename))) != -1)
+	  return (1);
 
   if (doMount)
-    {
+	{
 
-      if (strstr (filename, "/net/") == filename)
+	  if (strstr (filename, "/net/") == filename)
 	return (unlink (usePath (filename)));
 
-      if (strstr (filename, "/tmp_mnt/") == filename)
+	  if (strstr (filename, "/tmp_mnt/") == filename)
 	return (unlink (usePath (filename)));
 
-      if ((mp = mountNet_ (hp)) == NULL)
+	  if ((mp = mountNet_ (hp)) == NULL)
 	{
 	  return (1);
 	}
 
-      sprintf (fnamebuf, "%s%s", mp, filename);
-      i = unlink (usePath (fnamebuf));
-      if (i >= 0)
+	  sprintf (fnamebuf, "%s%s", mp, filename);
+	  i = unlink (usePath (fnamebuf));
+	  if (i >= 0)
 	return i;
-    }
+	}
   return (unlink (usePath (filename)));
 
 }
@@ -608,25 +683,25 @@ mymkdir_ (char *filename, mode_t mode, struct hostent *hp)
   char *mp;
 
   if (!hp || filename[0] != '/' || AM_NEVER)
-    return (mkdir (usePath (filename), mode));
+	return (mkdir (usePath (filename), mode));
 
   if (AM_LAST)
-    if ((i = mkdir (usePath (filename), mode)) != -1)
-      return i;
+	if ((i = mkdir (usePath (filename), mode)) != -1)
+	  return i;
 
   if (strstr (filename, "/net/") == filename)
-    return (mkdir (usePath (filename), mode));
+	return (mkdir (usePath (filename), mode));
 
   if (strstr (filename, "/tmp_mnt/") == filename)
-    return (mkdir (usePath (filename), mode));
+	return (mkdir (usePath (filename), mode));
 
   if ((mp = mountNet_ (hp)) == NULL)
-    return (mkdir (usePath (filename), mode));
+	return (mkdir (usePath (filename), mode));
 
   sprintf (fnamebuf, "%s%s", mp, filename);
   i = mkdir (usePath (fnamebuf), mode);
   if (i >= 0)
-    return i;
+	return i;
 
   return (mkdir (usePath (filename), mode));
 
@@ -641,35 +716,35 @@ myrename_ (char *from, char *to, struct hostent *hp)
   char *mp;
 
   if (!hp || AM_NEVER)
-    return (rename (from, to));
+	return (rename (from, to));
 
   if (AM_LAST)
-    if ((i = rename (from, to)) != -1)
-      return i;
+	if ((i = rename (from, to)) != -1)
+	  return i;
 
   if ((strstr (from, "/net/") == from) && (strstr (to, "/net") == to))
-    return (rename (from, to));
+	return (rename (from, to));
 
   if ((strstr (from, "/tmp_mnt/") == from) &&
-      (strstr (to, "/tmp_mnt/") == to))
-    return (rename (from, to));
+	  (strstr (to, "/tmp_mnt/") == to))
+	return (rename (from, to));
 
   if ((mp = mountNet_ (hp)) == NULL)
-    return (rename (from, to));
+	return (rename (from, to));
 
   if (from[0] == '/')
-    sprintf (fnamebuf, "%s%s", mp, from);
+	sprintf (fnamebuf, "%s%s", mp, from);
   else
-    strcpy (fnamebuf, from);
+	strcpy (fnamebuf, from);
 
   if (to[0] == '/')
-    sprintf (tnamebuf, "%s%s", mp, to);
+	sprintf (tnamebuf, "%s%s", mp, to);
   else
-    strcpy (tnamebuf, to);
+	strcpy (tnamebuf, to);
 
   i = rename (fnamebuf, tnamebuf);
   if (i >= 0)
-    return i;
+	return i;
 
   return (rename (from, to));
 

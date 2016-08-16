@@ -21,10 +21,10 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "lib/lib.xdr.h"
+#include "daemons/libresd/resd.h"
 #include "lib/lproto.h"
-#include "res/res.h"
-
+#include "lib/xdr.h"
+#include "lib/lib.h"
 extern int flock (int, int);
 
 #define NL_SETN         29
@@ -34,18 +34,16 @@ void resAcctWrite (struct child *);
 static void openResAcctFileInTmp (char *);
 
 int resLogOn = 0;
-
 int resLogcpuTime = -1;
-
-char resAcctFN[MAXFILENAMELEN];
+char resAcctFN[MAXFILENAMELEN];  // FIXME FIXME FIXME this should be dynamically created
 
 void
 initResLog (void)
 {
   static char fname[] = "initResLog()";
-  int fd;
-  char *acctDir;
-  struct stat st;
+  int fd = 0;
+  char *acctDir = NULL;
+  struct stat st = { };
 
   if (resLogcpuTime == -1)
     {
@@ -72,11 +70,11 @@ initResLog (void)
   acctDir = resParams[LSF_RES_ACCTDIR].paramValue;
 
   if (acctDir != NULL)
-    strcpy (resAcctFN, acctDir);
+    strcpy (resAcctFN, acctDir); 
   else
-    strcpy (resAcctFN, "/tmp");
+    strcpy (resAcctFN, "/tmp"); // FIXME FIXME FIXME FIXME FIXME replace fixed strings with autoconf variables
 
-  strcat (resAcctFN, "/lsf.acct.");
+  strcat (resAcctFN, "/lsf.acct."); // FIXME FIXME FIXME FIXME FIXME replace fixed strings with autoconf variables
 
   strcat (resAcctFN, Myhost);
 
@@ -90,7 +88,7 @@ initResLog (void)
 	      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "open",
 			 resAcctFN);
 	      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5701, "%s: Using /tmp/lsf.acct for task logging"), fname);	/* catgets 5701 */
-	      strcpy (resAcctFN, "/tmp/lsf.acct.");
+	      strcpy (resAcctFN, "/tmp/lsf.acct."); // FIXME FIXME FIXME FIXME FIXME replace fixed strings with autoconf variables
 	      strcat (resAcctFN, Myhost);
 	      openResAcctFileInTmp (resAcctFN);
 	    }
@@ -110,7 +108,7 @@ initResLog (void)
 		      S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0)
 	{
 	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "open", resAcctFN);
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5701, "%s: Using /tmp/lsf.acct for task logging"), fname);	/* catgets 5701 */
+	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5701, "%s: Using /tmp/lsf.acct for task logging"), fname);	/* catgets 5701 */ // FIXME FIXME FIXME FIXME FIXME replace fixed strings with autoconf variables
 	  strcpy (resAcctFN, "/tmp/lsf.acct.");
 	  strcat (resAcctFN, Myhost);
 	  openResAcctFileInTmp (resAcctFN);
@@ -257,7 +255,7 @@ resAcctWrite (struct child *child)
 
   cleanLsfRusage (&acctRec.lsfRu);
   if (child->sigStatRu)
-    ls_ruunix2lsf (&(child->sigStatRu->ru), &acctRec.lsfRu);
+    ls_ruunix2lsf (child->sigStatRu->ru, &acctRec.lsfRu);
 
   if (ls_putacctrec (fd, &acctRec) < 0)
     {
@@ -280,7 +278,7 @@ resAcctWrite (struct child *child)
   if (!sbdMode)
     {
 
-      resAck ack;
+      enum resAck ack;
       struct LSFHeader msgHdr;
       struct stringLen str;
 

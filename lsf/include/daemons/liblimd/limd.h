@@ -21,9 +21,6 @@
 
 #pragma once
  
-#ifndef LSF_LIM_LIM_H
-#define LSF_LIM_LIM_H
-
 #include "libint/intlibout.h"
 #include "daemons/liblimd/limout.h"
 #include "lib/hdr.h"
@@ -325,26 +322,26 @@ extern int getpagesize (void);
  */
 typedef enum
 {
-  LSF_CONFDIR,
-  LSF_LIM_DEBUG,
-  LSF_SERVERDIR,
-  LSF_BINDIR,
-  LSF_LOGDIR,
-  LSF_LIM_PORT,
-  LSF_RES_PORT,
+  // LSF_CONFDIR,
+  // LSF_LIM_DEBUG,
+  // LSF_SERVERDIR,
+  // LSF_BINDIR,
+  // LSF_LOGDIR,
+  // LSF_LIM_PORT,
+  // LSF_RES_PORT,
   LSF_DEBUG_LIM,
   LSF_TIME_LIM,
-  LSF_LOG_MASK,
+  // LSF_LOG_MASK,
   LSF_CONF_RETRY_MAX,
   LSF_CONF_RETRY_INT,
   LSF_CROSS_UNIX_NT,
   LSF_LIM_IGNORE_CHECKSUM,
-  LSF_MASTER_LIST,
+  // LSF_MASTER_LIST,
   LSF_REJECT_NONLSFHOST,
   LSF_LIM_JACKUP_BUSY,
   LIM_RSYNC_CONFIG,
   LIM_COMPUTE_ONLY,
-  LSB_SHAREDIR,
+  // LSB_SHAREDIR,
   LIM_NO_MIGRANT_HOSTS,
   LIM_NO_FORK
 } limParams_t;
@@ -531,5 +528,3 @@ extern int logLIMDown (void);
 extern int logAddHost (struct hostEntry *);
 extern int logRmHost (struct hostEntry *);
 extern int addHostByTab (hTab *);
-
-#endif
