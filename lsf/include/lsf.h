@@ -69,16 +69,16 @@
 #define FALSE 0
 #endif
 
-typedef long LS_LONG_INT;
-typedef unsigned long LS_UNS_LONG_INT;
+typedef long LS_LONG_INT; // FIXME FIXME FIXME FIXME FIXME  untypedef, leave to compiler to deal with
+typedef unsigned long LS_UNS_LONG_INT; // FIXME FIXME FIXME FIXME FIXME untypedef, leave to compiler to deal with
 
-#define LS_LONG_FORMAT ("%ld")
-#define _OPENLAVA_PROJECT_ "openlava project 2.0"
+// #define LS_LONG_FORMAT ("%ld") // FIXME FIXME FIXME FIXME 
+#define _OPENLAVA_PROJECT_ "openlava project 2.0" // FIXME FIXME FIXME FIXME FIXME move to configure.ac
 
 /*
  * This is our identifier printed out by all daemons and commands.
  */
-#ifdef REL_DATE
+#ifdef REL_DATE  // FIXME FIXME FIXME FIXME FIXME move to configure.ac
 #define _LS_VERSION_ (_OPENLAVA_PROJECT_", " REL_DATE"\n")
 #else
 #define _LS_VERSION_ (_OPENLAVA_PROJECT_", " __DATE__"\n")
@@ -87,7 +87,7 @@ typedef unsigned long LS_UNS_LONG_INT;
 /*
  * This is our current version.
  */
-#define OPENLAVA_VERSION   20
+#define OPENLAVA_VERSION   20  // FIXME FIXME FIXME FIXME FIXME move to configure.ac
 
 #define LSF_DEFAULT_SOCKS       15
 #define MAXLINELEN              512
@@ -394,7 +394,8 @@ struct hostInfo
     float *busyThreshold;
     unsigned long numIndx;
     char **resources;
-    char hostName[MAXHOSTNAMELEN]; /* FIXME FIXME FIXME this should be converted to char *hostName */
+    // char hostName[MAXHOSTNAMELEN]; /* FIXME FIXME FIXME this should be converted to char *hostName */
+    char *hostName; // FIXME FIXME FIXME this should be converted to char *hostName 
 
 };
 

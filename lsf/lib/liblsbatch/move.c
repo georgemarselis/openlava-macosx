@@ -21,7 +21,7 @@
 #include <pwd.h>
 
 #include "lsb/lsb.h"
-#include "lsb/xdr.h"
+#include "lib/xdr.h"
 
 int
 lsb_movejob (LS_LONG_INT jobId, int *position, int opCode)

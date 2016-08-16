@@ -32,7 +32,7 @@
 #include <rpc/xdr.h>
 
 #include "lsb/lsb.h"
-#include "lsb/xdr.h"
+#include "lib/xdr.h"
 
 static int allocLoadIdx (float **sched, float **stop, uint *outSize, uint size);
 static bool_t xdr_lsbSharedResourceInfo (XDR *, struct lsbSharedResourceInfo *, struct LSFHeader *);

@@ -22,7 +22,7 @@
 #include <string.h>
 
 #include "lsb/lsb.h"
-#include "lsb/xdr.h"
+#include "lib/xdr.h"
 
 struct queueInfoEnt *
 lsb_queueinfo (char **queues, uint *numQueues, char *hosts, char *users, int options)

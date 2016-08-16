@@ -55,7 +55,7 @@
 #include "libint/intlibout.h"
 // #include "lsb/spool.h"
 #include "lsb/sub.h"
-#include "lsb/xdr.h"
+#include "lib/xdr.h"
 
 // #define SKIPSPACE(sp)      while (isspace(*(sp))) (sp)++;
 

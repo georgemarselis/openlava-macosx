@@ -18,18 +18,14 @@
 
 #pragma once
 
- 
-#ifndef LSF_LSB_XDR_H
-#define LSF_LSB_XDR_H
-
 #include <stdio.h>
+#include "lib/lproto.h"
 
 #include <rpc/types.h>
 #ifndef __XDR_HEADER__
 #include <rpc/xdr.h>
 #endif
 
-#include "lib/lproto.h"
 
 bool_t xdr_modifyReq            (XDR *, struct modifyReq *,     struct LSFHeader *);
 extern bool_t xdr_submitReq     (XDR *, struct submitReq *,     struct LSFHeader *);

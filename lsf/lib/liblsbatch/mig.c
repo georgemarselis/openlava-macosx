@@ -22,7 +22,7 @@
 #include <pwd.h>
 
 #include "lsb/lsb.h"
-#include "lsb/xdr.h"
+#include "lib/xdr.h"
 
 int
 lsb_mig (struct submig *mig, int *badHostIdx)

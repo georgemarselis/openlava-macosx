@@ -22,7 +22,7 @@
 #include "lib/xdr.h"
 #include "daemons/sbd/sbd.h"
 
-#define NL_SETN		11
+// #define NL_SETN		11
 
 bool_t
 xdr_jobSetup (XDR * xdrs, struct jobSetup *jsetup, struct LSFHeader *hdr)

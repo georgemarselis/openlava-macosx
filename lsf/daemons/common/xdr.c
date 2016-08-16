@@ -25,7 +25,7 @@
 
 #include "daemons/daemonout.h"
 #include "daemons/daemons.h"
-#include "lsb/xdr.h"
+#include "lib/xdr.h"
 
 // #define NL_SETN           10
 // #define MAX_USER_NAME_LEN 64

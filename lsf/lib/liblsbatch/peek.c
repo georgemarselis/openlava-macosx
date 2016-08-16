@@ -23,7 +23,7 @@
 #include <errno.h>
 
 #include "lsb/lsb.h"
-#include "lsb/xdr.h"
+#include "lib/xdr.h"
 
 char *
 lsb_peekjob (LS_LONG_INT jobid)

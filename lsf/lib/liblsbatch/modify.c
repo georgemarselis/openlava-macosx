@@ -22,9 +22,9 @@
 #include <string.h>
 
 #include "lsb/lsb.h"
-// #include "lsb/spool.h"
-#include "lsb/xdr.h"
+#include "lib/xdr.h"
 #include "lsb/modify.h"
+// #include "lsb/spool.h"
 
 // #define  NL_SETN   13
 

@@ -21,7 +21,7 @@
 #include <string.h>
 
 #include "lsb/lsb.h"
-#include "lsb/xdr.h"
+#include "lib/xdr.h"
 
 static struct groupInfoEnt *getGrpInfo (char **groups, uint *numGroups, int options);
 static int sendGrpReq (char *clusterName, int options, struct infoReq *groupInfo, struct groupInfoReply *reply);

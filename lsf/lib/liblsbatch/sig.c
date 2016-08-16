@@ -22,7 +22,7 @@
 #include <pwd.h>
 
 #include "lsb/lsb.h"
-#include "lsb/xdr.h"
+#include "lib/xdr.h"
 
 static int signalJob_ (int, LS_LONG_INT, time_t, int);
 

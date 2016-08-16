@@ -17,14 +17,15 @@
  */
 
 #include <unistd.h>
-
-#include "lim.h"
-#include "../lib/lib.xdr.h"
-#include "../lib/mls.h"
 #include <signal.h>
 
 
-#define NL_SETN 24
+#include "daemons/liblimd/limd.h"
+#include "lib/xdr.h"
+#include "lib/mls.h"
+
+
+// #define NL_SETN 24
 
 
 extern struct limLock limLock;
@@ -36,34 +37,19 @@ static void doReopen (void);
 void
 reconfigReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr)
 {
-  static char fname[] = "reconfigReq";
+  const char fname[] = "reconfigReq";
 
-  char mbuf[MSGSIZE];
-  XDR xdrs2;
   enum limReplyCode limReplyCode;
-  struct LSFHeader replyHdr;
-  struct lsfAuth auth;
+  struct LSFHeader replyHdr { };
+  struct lsfAuth auth = { };
+  XDR xdrs2 = { };
+  char *mbuf = malloc( sizeof( char ) * MSGSIZE + 1 );
 
   initLSFHeader_ (&replyHdr);
 
   if (!xdr_lsfAuth (xdrs, &auth, reqHdr))
     {
       limReplyCode = LIME_BAD_DATA;
-      goto Reply;
-    }
-
-  if (!lim_debug)
-    {
-      if (!limPortOk (from))
-	{
-	  limReplyCode = LIME_DENIED;
-	  goto Reply;
-	}
-    }
-
-  limReplyCode = LIME_NO_ERR;
-
-Reply:
   xdrmem_create (&xdrs2, mbuf, MSGSIZE, XDR_ENCODE);
   replyHdr.opCode = (short) limReplyCode;
   replyHdr.refCode = reqHdr->refCode;
@@ -77,12 +63,68 @@ Reply:
 
   if (chanSendDgram_ (limSock, mbuf, XDR_GETPOS (&xdrs2), from) < 0)
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7300, "%s: Error sending reconfig acknowledgement to %s (len=%d): %m"), fname, sockAdd2Str_ (from), XDR_GETPOS (&xdrs2));	/* catgets 7300 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7300, "%s: Error sending reconfig acknowledgement to %s (len=%d): %m"), fname, sockAdd2Str_ (from), XDR_GETPOS (&xdrs2));  /* catgets 7300 */
     }
   xdr_destroy (&xdrs2);
 
-  if (limReplyCode == LIME_NO_ERR)
+  if (limReplyCode == LIME_NO_ERR) {
     reconfig ();
+  }
+    }
+
+  if (!lim_debug)
+    {
+      if (!limPortOk (from))
+	{
+	  limReplyCode = LIME_DENIED;
+  xdrmem_create (&xdrs2, mbuf, MSGSIZE, XDR_ENCODE);
+  replyHdr.opCode = (short) limReplyCode;
+  replyHdr.refCode = reqHdr->refCode;
+
+  if (!xdr_LSFHeader (&xdrs2, &replyHdr))
+    {
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_LSFHeader");
+      xdr_destroy (&xdrs2);
+      reconfig ();
+    }
+
+  if (chanSendDgram_ (limSock, mbuf, XDR_GETPOS (&xdrs2), from) < 0)
+    {
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7300, "%s: Error sending reconfig acknowledgement to %s (len=%d): %m"), fname, sockAdd2Str_ (from), XDR_GETPOS (&xdrs2));  /* catgets 7300 */
+    }
+  xdr_destroy (&xdrs2);
+
+  if (limReplyCode == LIME_NO_ERR) {
+    reconfig ();
+  }
+	}
+    }
+
+  limReplyCode = LIME_NO_ERR;
+
+// Reply:
+//   xdrmem_create (&xdrs2, mbuf, MSGSIZE, XDR_ENCODE);
+//   replyHdr.opCode = (short) limReplyCode;
+//   replyHdr.refCode = reqHdr->refCode;
+
+//   if (!xdr_LSFHeader (&xdrs2, &replyHdr))
+//     {
+//       ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_LSFHeader");
+//       xdr_destroy (&xdrs2);
+//       reconfig ();
+//     }
+
+//   if (chanSendDgram_ (limSock, mbuf, XDR_GETPOS (&xdrs2), from) < 0)
+//     {
+//       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7300, "%s: Error sending reconfig acknowledgement to %s (len=%d): %m"), fname, sockAdd2Str_ (from), XDR_GETPOS (&xdrs2));	/* catgets 7300 */
+//     }
+//   xdr_destroy (&xdrs2);
+
+//   if (limReplyCode == LIME_NO_ERR) {
+//     reconfig ();
+//   }
+
+  return;
 }
 
 void

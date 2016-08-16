@@ -22,7 +22,7 @@
 #include <pwd.h>
 
 #include "lsb/lsb.h"
-#include "lsb/xdr.h"
+#include "lib/xdr.h"
 
 int
 lsb_switchjob (LS_LONG_INT jobId, char *queue)

@@ -26,9 +26,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "libint/list.h"
-#include "libint/intlibout.h"
 #include "daemons/libresd/resout.h"
+#include "libint/intlibout.h"
+#include "libint/list.h"
 #include "lib/osal.h"
 #include "lib/xdr.h"
 #include "lsf.h"

@@ -27,7 +27,7 @@
 #include "lib/lib.h"
 extern int flock (int, int);
 
-#define NL_SETN         29
+#define NL_SETN         29 // FIXME FIXME FIXME FIXME FIXME remove N_SETN
 
 void initResLog (void);
 void resAcctWrite (struct child *);

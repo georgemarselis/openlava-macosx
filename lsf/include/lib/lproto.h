@@ -18,9 +18,6 @@
 
 #pragma once
 
-#ifndef LSF_LIB_LPROTO_H
-#define LSF_LIB_LPROTO_H
-
 #include "lsf.h"
 #include "lib/conf.h"
 #include "lib/channel.h"
@@ -28,8 +25,8 @@
 #include "lib/table.h"
 #include "libint/lsi18n.h"
 #include "daemons/libpimd/pimd.h"
+#include "daemons/libresd/resd.h"
 #include "daemons/libresd/resout.h"
-
  
 
 #define BIND_RETRY_TIMES 100
@@ -50,11 +47,12 @@ struct debugReq
   int logClass;
   int options;
   char *hostName;
-  char logFileName[MAXPATHLEN];
+  char *logFileName;
 };
 
-extern void putMaskLevel (int, char **);
-extern bool_t xdr_debugReq (XDR *, struct debugReq *, struct LSFHeader *);
+void putMaskLevel (int, char **);
+
+bool_t xdr_debugReq (XDR *, struct debugReq *, struct LSFHeader *);
 #define    MBD_DEBUG         1
 #define    MBD_TIMING        2
 #define    SBD_DEBUG         3
@@ -105,7 +103,7 @@ struct lsbShareResourceInfoReply
 #define HOST_ATTR_NOT_LOCAL     (0x00000004)
 #define HOST_ATTR_NOT_READY     (0xffffffff)
 
-extern int sharedResConfigured_;
+int sharedResConfigured_;
 
 #define VALID_IO_ERR(x) ((x) == EWOULDBLOCK || (x) == EINTR || (x) == EAGAIN)
 #define BAD_IO_ERR(x)   ( ! VALID_IO_ERR(x))
@@ -175,11 +173,11 @@ extern int sharedResConfigured_;
 #define LSF_LIM_ERES_TYPE "!"
 
 /* FIXME FIXME FIXME : int resCmd bellow may be not int! */
-extern int lsResMsg_ (int, int resCmd, char *, char *, int, bool_t (*)(), int *, struct timeval *);
-extern int expectReturnCode_ (int s, pid_t seqno, struct LSFHeader *repHdr);
-extern int ackAsyncReturnCode_ (int, struct LSFHeader *);
-extern int resRC2LSErr_ (int);
-extern int ackReturnCode_ (int);
+int lsResMsg_ (int, int resCmd, char *, char *, int, bool_t (*)(), int *, struct timeval *);
+int expectReturnCode_ (int s, pid_t seqno, struct LSFHeader *repHdr);
+int ackAsyncReturnCode_ (int, struct LSFHeader *);
+int resRC2LSErr_ (int);
+int ackReturnCode_ (int);
 
 
 #define LSF_O_RDONLY    00000
@@ -195,203 +193,202 @@ extern int ackReturnCode_ (int);
 
 #define LSF_O_CREAT_DIR 04000
 
-extern int getConnectionNum_ (char *hostName);
-extern void inithostsock_ (void);
+int getConnectionNum_ (char *hostName);
+void inithostsock_ (void);
 
-extern int initenv_ (struct config_param *, char *);
-extern char *lsTmpDir_;
-extern short getMasterCandidateNoByName_ (char *);
-extern char *getMasterCandidateNameByNo_ (short);
-extern int getNumMasterCandidates_ ();
-extern int initMasterList_ ();
-extern int getIsMasterCandidate_ ();
-extern void freeupMasterCandidate_ (int);
-extern char *resetLSFUsreDomain (char *);
-
-
-extern int runEsub_ (struct lenData *, char *);
-extern int runEexec_ (char *, int, struct lenData *, char *);
-extern int runEClient_ (struct lenData *, char **);
-extern char *runEGroup_ (char *, char *);
-
-extern int getAuth_ (struct lsfAuth *, char *);
-extern int verifyEAuth_ (struct lsfAuth *, struct sockaddr_in *);
-extern int putEauthClientEnvVar (char *);
-extern int putEauthServerEnvVar (char *);
-
-extern void sw_remtty (int);
-extern void sw_loctty (int);
-
-extern int doAcceptResCallback_( int s, struct niosConnect * );
-extern int niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus, int terWhiPendStatus);
-
-extern int sig_encode (int);
-extern int sig_decode (int);
-extern int getSigVal (char *);
-extern char *getSigSymbolList (void);
-extern char *getSigSymbol (int);
-extern void (*Signal_ (int, void (*)(int))) (int);
-extern int blockALL_SIGS_ (sigset_t *, sigset_t *);
-
-extern int TcpCreate_ (int, int);
-
-extern int encodeTermios_ (XDR *, struct termios *);
-extern int decodeTermios_ (XDR *, struct termios *);
-extern int rstty_ (char *host);
-extern int rstty_async_ (char *host);
-extern int do_rstty_ (int, int, int);
-
-extern char isanumber_ (char *);
-extern char islongint_ (char *);
-extern unsigned int isint_ (char *);
-extern int isdigitstr_ (char *);
-extern char *putstr_ (const char *);
-extern int ls_strcat (char *, int, char *);
-extern char *mygetwd_ (char *);
-extern char *chDisplay_ (char *);
-extern void initLSFHeader_ (struct LSFHeader *);
-extern struct group *mygetgrnam (const char *name);
-extern void *myrealloc (void *ptr, size_t size);
-extern char *getNextToken (char **sp);
-extern int getValPair (char **resReq, int *val1, int *val2);
-extern char *my_getopt (int nargc, char **nargv, char *ostr, char **errMsg);
-extern int putEnv (char *env, char *val);
-extern int Bind_ (int sockfd, struct sockaddr *myaddr, socklen_t addrlen);
-extern const char *getCmdPathName_ (const char *cmdStr, long *cmdLen);
-extern int replace1stCmd_ (const char *oldCmdArgs, const char *newCmdArgs, char *outCmdArgs, int outLen);
-extern const char *getLowestDir_ (const char *filePath);
-extern void getLSFAdmins_ (void);
-extern bool_t isLSFAdmin_ (const char *name);
-extern int isAllowCross (char *paramValue);
-extern int isMasterCrossPlatform (void);
-extern LS_LONG_INT atoi64_ (char *);
-
-extern void stripDomain_ (char *);
-extern int equalHost_ (const char *, const char *);
-extern char *sockAdd2Str_ (struct sockaddr_in *);
-
-extern struct hostent *Gethostbyname_ (char *);
-extern struct hostent *Gethostbyaddr_ (in_addr_t *, socklen_t, int);
-extern int getAskedHosts_ (char *optarg_, char ***askedHosts, uint *numAskedHosts, unsigned long *badIdx, int checkHost);
-extern int lockHost_ (time_t, char *);
-extern int unlockHost_ (char *);
-
-extern int lsfRu2Str (FILE *, struct lsfRusage *);
-extern int str2lsfRu (char *, struct lsfRusage *, int *);
-extern void lsfRusageAdd_ (struct lsfRusage *, struct lsfRusage *);
-
-extern void inserttask_ (char *, hTab *);
-extern int deletetask_ (char *, hTab *);
-extern long listtask_ (char ***taskList, hTab *tasktb, int sortflag);
-extern int readtaskfile_ (char *, hTab *, hTab *, hTab *, hTab *, char);
-extern int writetaskfile_ (char *, hTab *, hTab *, hTab *, hTab *);
-
-extern int expSyntax_ (char *);
-
-extern char *getNextLineC_ (FILE *fp, uint *lineNum, int confFormat);
-extern char *getNextLine_ (FILE *, int);
-extern char *getNextWord_ (char **);
-extern char *getNextWord1_ (char **line);
-extern char *getNextWordSet (char **, const char *);
-extern char *getline_ (FILE * fp, int *);
-extern char *getThisLine_ (FILE * fp, int *LineCount);
-extern char *getNextValueQ_ (char **, char, char);
-extern int stripQStr (char *q, char *str);
-extern int addQStr (FILE *, char *str);
-extern struct pStack *initStack (void);
-extern int pushStack (struct pStack *, struct confNode *);
-extern struct confNode *popStack (struct pStack *);
-extern void freeStack (struct pStack *);
-
-extern char *getNextLineD_ (FILE *fp, uint *lineNum, int truefalse);
-extern char *getNextLineC_conf (struct lsConf *conf, uint *lineNum, int confFormat);
-extern char *getNextLine_conf (struct lsConf *, int);
-extern char *nextline_ (FILE *);
-extern void subNewLine_ (char *);
-
-extern void doSkipSection (FILE *fp, uint *lineNum, char *fname, char *unknown);
-extern int isSectionEnd (char *linep, char *fname, uint *lineNum, char *newindex);
-extern int keyMatch (struct keymap *keyList, char *line, int exact);
-extern int mapValues (struct keymap *keyList, char *line);
-extern int readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *fname, uint *lineNum, int boolean, char *newindex);
-extern char *getNextValue (char **line);
-extern int putValue (struct keymap *keyList, char *key, char *value);
-extern char *getBeginLine (FILE *fp, uint *lineNum);
-extern int putInLists (char *word, struct admins *admins, uint *numAds, char *forWhat);
-extern int isInlist (char **adminNames, char *userName, uint actAds);
-
-extern void doSkipSection_conf (struct lsConf *conf, uint *lineNum, char *lsfile, char *sectionName);
-extern char *getBeginLine_conf (struct lsConf *conf, uint *lineNum);
-
-extern void defaultAllHandlers (void);
-
-extern size_t  nb_read_fix  (int s, char *buf, size_t len);
-extern long  nb_write_fix (int s, char *buf, size_t len);
-extern long  nb_read_timeout (int s, char *buf, size_t len, int timeout);
-extern int   b_write_timeout (int, char *, int, int);
-extern int   detectTimeout_ (int, int);
-extern int   b_connect_ (int s, struct sockaddr *name, socklen_t namelen, unsigned int timeout);
-extern int   rd_select_ (int, struct timeval *);
-extern int   b_accept_ (int, struct sockaddr *, socklen_t *);
-extern int   blockSigs_ (int, sigset_t *, sigset_t *);
-extern long  b_write_fix  (int s, char *buf, size_t len);
-extern size_t b_read_fix   (int s, char *buf, size_t len);
-
-extern int readDecodeHdr_ (int s, char *buf, size_t (*readFunc) (), XDR * xdrs, struct LSFHeader *hdr);
-extern int readDecodeMsg_ (int s, char *buf, struct LSFHeader *hdr, size_t (*readFunc) (), XDR * xdrs, char *data, bool_t (*xdrFunc) (), struct lsfAuth *auth);
-extern int writeEncodeMsg_ (int s, char *buf, uint len, struct LSFHeader *hdr, char *data, long (*writeFunc) (), bool_t (*xdrFunc) (), int options);
-extern int writeEncodeHdr_ (int s, struct LSFHeader *sendHdr, long (*)());
-extern int lsSendMsg_ (int s, unsigned short opCode, size_t hdrLength, char *data, char *reqBuf, size_t reqLen, bool_t (*xdrFunc) (), long (*writeFunc) (),  struct lsfAuth *auth);
-extern int lsRecvMsg_ (int sock, char *buf, unsigned int bufLen, struct LSFHeader *hdr, char *data, bool_t (*xdrFunc) (), size_t (*readFunc) ());
-
-extern int io_nonblock_ (int);
-extern int io_block_ (int);
-
-extern void millisleep_ (int);
-
-extern void rlimitEncode_ (struct lsfLimit *, struct rlimit *, int);
-extern void rlimitDecode_ (struct lsfLimit *, struct rlimit *, int);
-
-extern void verrlog_ (int level, FILE * fp, const char *fmt, va_list ap);
-
-extern int errnoEncode_ (int);
-extern int errnoDecode_ (int);
-
-extern int getLogClass_ (char *, char *);
-extern int getLogMask (char **, char *);
-extern void ls_openlog (const char *, const char *, int, char *);
-extern void ls_closelog (void);
-extern int ls_setlogmask (int maskpri);
-
-extern void initkeylist (struct keymap *keyList, int, int, struct lsInfo *);
-extern void freekeyval (struct keymap *keyList);
-extern char *parsewindow (char *val, char *fname, uint *lineNum, char *host);
-
-extern uint expandList_ (char ***tolist, uint mask, char **keys);
-extern uint expandList1_ (char ***tolist, uint num, uint *bitmMaps, char **keys);
-
-extern int osInit_ (void);
-extern char *osPathName_ (char *);
-extern char *osPathName_ (char *);
-extern char *osHomeEnvVar_ (void);
-extern int osProcAlive_ (int);
-extern void osConvertPath_ (char *);
-
-extern void xdr_lsffree (bool_t (*)(), char *, struct LSFHeader *);
-
-extern int createUtmpEntry (char *, pid_t, char *);
-extern int removeUtmpEntry (pid_t);
-
-extern int createSpoolSubDir (const char *);
+int initenv_ (struct config_param *, char *);
+char *lsTmpDir_;
+short getMasterCandidateNoByName_ (char *);
+char *getMasterCandidateNameByNo_ (short);
+int getNumMasterCandidates_ ();
+int initMasterList_ ();
+int getIsMasterCandidate_ ();
+void freeupMasterCandidate_ (int);
+char *resetLSFUsreDomain (char *);
 
 
-extern struct passwd *getpwlsfuser_ (const char *lsfUserName);
-extern struct passwd *getpwdirlsfuser_ (const char *lsfUserName);
+int runEsub_ (struct lenData *, char *);
+int runEexec_ (char *, int, struct lenData *, char *);
+int runEClient_ (struct lenData *, char **);
+char *runEGroup_ (char *, char *);
 
-extern int getLSFUser_ (char *lsfUserName, unsigned int lsfUserNameSize);
-extern int getLSFUserByName_ (const char *osUserName, char *lsfUserName, unsigned int lsfUserNameSize);
-extern int getLSFUserByUid_ (uid_t uid, char *lsfUserName, unsigned int lsfUserNameSize);
-extern int getOSUserName_ (const char *lsfUserName, char *osUserName, unsigned int osUserNameSize);
-extern int getOSUid_ (const char *lsfUserName, uid_t * uid);
+int getAuth_ (struct lsfAuth *, char *);
+int verifyEAuth_ (struct lsfAuth *, struct sockaddr_in *);
+int putEauthClientEnvVar (char *);
+int putEauthServerEnvVar (char *);
 
-#endif
+void sw_remtty (int);
+void sw_loctty (int);
+
+int doAcceptResCallback_( int s, struct niosConnect * );
+int niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus, int terWhiPendStatus);
+
+int sig_encode (int);
+int sig_decode (int);
+int getSigVal (char *);
+char *getSigSymbolList (void);
+char *getSigSymbol (int);
+void (*Signal_ (int, void (*)(int))) (int);
+int blockALL_SIGS_ (sigset_t *, sigset_t *);
+
+int TcpCreate_ (int, int);
+
+int encodeTermios_ (XDR *, struct termios *);
+int decodeTermios_ (XDR *, struct termios *);
+int rstty_ (char *host);
+int rstty_async_ (char *host);
+int do_rstty_ (int, int, int);
+
+char isanumber_ (char *);
+char islongint_ (char *);
+unsigned int isint_ (char *);
+int isdigitstr_ (char *);
+char *putstr_ (const char *);
+int ls_strcat (char *, int, char *);
+char *mygetwd_ (char *);
+char *chDisplay_ (char *);
+void initLSFHeader_ (struct LSFHeader *);
+struct group *mygetgrnam (const char *name);
+void *myrealloc (void *ptr, size_t size);
+char *getNextToken (char **sp);
+int getValPair (char **resReq, int *val1, int *val2);
+char *my_getopt (int nargc, char **nargv, char *ostr, char **errMsg);
+int putEnv (char *env, char *val);
+int Bind_ (int sockfd, struct sockaddr *myaddr, socklen_t addrlen);
+const char *getCmdPathName_ (const char *cmdStr, long *cmdLen);
+int replace1stCmd_ (const char *oldCmdArgs, const char *newCmdArgs, char *outCmdArgs, int outLen);
+const char *getLowestDir_ (const char *filePath);
+void getLSFAdmins_ (void);
+bool_t isLSFAdmin_ (const char *name);
+int isAllowCross (char *paramValue);
+int isMasterCrossPlatform (void);
+LS_LONG_INT atoi64_ (char *);
+
+void stripDomain_ (char *);
+int equalHost_ (const char *, const char *);
+char *sockAdd2Str_ (struct sockaddr_in *);
+
+struct hostent *Gethostbyname_ (char *);
+struct hostent *Gethostbyaddr_ (in_addr_t *, socklen_t, int);
+int getAskedHosts_ (char *optarg_, char ***askedHosts, uint *numAskedHosts, unsigned long *badIdx, int checkHost);
+int lockHost_ (time_t, char *);
+int unlockHost_ (char *);
+
+int lsfRu2Str (FILE *, struct lsfRusage *);
+int str2lsfRu (char *, struct lsfRusage *, int *);
+void lsfRusageAdd_ (struct lsfRusage *, struct lsfRusage *);
+
+void inserttask_ (char *, hTab *);
+int deletetask_ (char *, hTab *);
+long listtask_ (char ***taskList, hTab *tasktb, int sortflag);
+int readtaskfile_ (char *, hTab *, hTab *, hTab *, hTab *, char);
+int writetaskfile_ (char *, hTab *, hTab *, hTab *, hTab *);
+
+int expSyntax_ (char *);
+
+char *getNextLineC_ (FILE *fp, uint *lineNum, int confFormat);
+char *getNextLine_ (FILE *, int);
+char *getNextWord_ (char **);
+char *getNextWord1_ (char **line);
+char *getNextWordSet (char **, const char *);
+char *getline_ (FILE * fp, int *);
+char *getThisLine_ (FILE * fp, int *LineCount);
+char *getNextValueQ_ (char **, char, char);
+int stripQStr (char *q, char *str);
+int addQStr (FILE *, char *str);
+struct pStack *initStack (void);
+int pushStack (struct pStack *, struct confNode *);
+struct confNode *popStack (struct pStack *);
+void freeStack (struct pStack *);
+
+char *getNextLineD_ (FILE *fp, uint *lineNum, int truefalse);
+char *getNextLineC_conf (struct lsConf *conf, uint *lineNum, int confFormat);
+char *getNextLine_conf (struct lsConf *, int);
+char *nextline_ (FILE *);
+void subNewLine_ (char *);
+
+void doSkipSection (FILE *fp, uint *lineNum, char *fname, char *unknown);
+int isSectionEnd (char *linep, char *fname, uint *lineNum, char *newindex);
+int keyMatch (struct keymap *keyList, char *line, int exact);
+int mapValues (struct keymap *keyList, char *line);
+int readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *fname, uint *lineNum, int boolean, char *newindex);
+char *getNextValue (char **line);
+int putValue (struct keymap *keyList, char *key, char *value);
+char *getBeginLine (FILE *fp, uint *lineNum);
+int putInLists (char *word, struct admins *admins, uint *numAds, char *forWhat);
+int isInlist (char **adminNames, char *userName, uint actAds);
+
+void doSkipSection_conf (struct lsConf *conf, uint *lineNum, char *lsfile, char *sectionName);
+char *getBeginLine_conf (struct lsConf *conf, uint *lineNum);
+
+void defaultAllHandlers (void);
+
+size_t  nb_read_fix  (int s, char *buf, size_t len);
+long  nb_write_fix (int s, char *buf, size_t len);
+long  nb_read_timeout (int s, char *buf, size_t len, int timeout);
+int   b_write_timeout (int, char *, int, int);
+int   detectTimeout_ (int, int);
+int   b_connect_ (int s, struct sockaddr *name, socklen_t namelen, unsigned int timeout);
+int   rd_select_ (int, struct timeval *);
+int   b_accept_ (int, struct sockaddr *, socklen_t *);
+int   blockSigs_ (int, sigset_t *, sigset_t *);
+long  b_write_fix  (int s, char *buf, size_t len);
+size_t b_read_fix   (int s, char *buf, size_t len);
+
+int readDecodeHdr_ (int s, char *buf, size_t (*readFunc) (), XDR * xdrs, struct LSFHeader *hdr);
+int readDecodeMsg_ (int s, char *buf, struct LSFHeader *hdr, size_t (*readFunc) (), XDR * xdrs, char *data, bool_t (*xdrFunc) (), struct lsfAuth *auth);
+int writeEncodeMsg_ (int s, char *buf, uint len, struct LSFHeader *hdr, char *data, long (*writeFunc) (), bool_t (*xdrFunc) (), int options);
+int writeEncodeHdr_ (int s, struct LSFHeader *sendHdr, long (*)());
+int lsSendMsg_ (int s, unsigned short opCode, size_t hdrLength, char *data, char *reqBuf, size_t reqLen, bool_t (*xdrFunc) (), long (*writeFunc) (),  struct lsfAuth *auth);
+int lsRecvMsg_ (int sock, char *buf, unsigned int bufLen, struct LSFHeader *hdr, char *data, bool_t (*xdrFunc) (), size_t (*readFunc) ());
+
+int io_nonblock_ (int);
+int io_block_ (int);
+
+void millisleep_ (int);
+
+void rlimitEncode_ (struct lsfLimit *, struct rlimit *, int);
+void rlimitDecode_ (struct lsfLimit *, struct rlimit *, int);
+
+void verrlog_ (int level, FILE * fp, const char *fmt, va_list ap);
+
+int errnoEncode_ (int);
+int errnoDecode_ (int);
+
+int getLogClass_ (char *, char *);
+int getLogMask (char **, char *);
+void ls_openlog (const char *, const char *, int, char *);
+void ls_closelog (void);
+int ls_setlogmask (int maskpri);
+
+void initkeylist (struct keymap *keyList, int, int, struct lsInfo *);
+void freekeyval (struct keymap *keyList);
+char *parsewindow (char *val, char *fname, uint *lineNum, char *host);
+
+uint expandList_ (char ***tolist, uint mask, char **keys);
+uint expandList1_ (char ***tolist, uint num, uint *bitmMaps, char **keys);
+
+int osInit_ (void);
+char *osPathName_ (char *);
+char *osPathName_ (char *);
+char *osHomeEnvVar_ (void);
+int osProcAlive_ (int);
+void osConvertPath_ (char *);
+
+void xdr_lsffree (bool_t (*)(), char *, struct LSFHeader *);
+
+int createUtmpEntry (char *, pid_t, char *);
+int removeUtmpEntry (pid_t);
+
+int createSpoolSubDir (const char *);
+
+
+struct passwd *getpwlsfuser_ (const char *lsfUserName);
+struct passwd *getpwdirlsfuser_ (const char *lsfUserName);
+
+int getLSFUser_ (char *lsfUserName, unsigned int lsfUserNameSize);
+int getLSFUserByName_ (const char *osUserName, char *lsfUserName, unsigned int lsfUserNameSize);
+int getLSFUserByUid_ (uid_t uid, char *lsfUserName, unsigned int lsfUserNameSize);
+int getOSUserName_ (const char *lsfUserName, char *osUserName, unsigned int osUserNameSize);
+int getOSUid_ (const char *lsfUserName, uid_t * uid);
+

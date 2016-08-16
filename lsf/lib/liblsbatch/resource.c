@@ -23,7 +23,7 @@
 
 #include "lib/lib.h"
 #include "lsb/lsb.h"
-#include "lsb/xdr.h"
+#include "lib/xdr.h"
 
 struct lsbSharedResourceInfo *
 lsb_sharedresourceinfo (char **resources, uint *numResources, char *hostName, int options)

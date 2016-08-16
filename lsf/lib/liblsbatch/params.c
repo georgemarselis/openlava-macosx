@@ -23,7 +23,7 @@
 #include <pwd.h>
 
 #include "lsb/lsb.h"
-#include "lsb/xdr.h"
+#include "lib/xdr.h"
 
 
 struct parameterInfo *
