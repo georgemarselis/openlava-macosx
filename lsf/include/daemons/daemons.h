@@ -18,9 +18,6 @@
 
 #pragma once
 
-#ifndef LSF_DAEMONS_H
-#define LSF_DAEMONS_H
-
 #include "daemons/daemonout.h"
 #include "libint/intlibout.h"
 #include "lib/lproto.h"
@@ -586,6 +583,3 @@ extern void daemon_doinit (void);
 extern void scaleByFactor (uint *h32, uint *l32, float cpuFactor);
 extern int execNqsi (u_long, int, int, int *, char *, int, char *);
 extern void doDaemonHang (char *);
-
-
-#endif
