@@ -34,8 +34,9 @@
 #include "lib/lib.h"
 #include "lib/lproto.h"
 #include "lib/rf.h"
-#include "res/res.h"
-#include "res/resout.h"
+#include "lib/res.h"
+#include "lib/xdrres.h"
+#include "daemons/libresd/resout.h"
 
 #define NL_SETN         29
 
@@ -65,19 +66,19 @@ rfServ_ (int acceptSock)
 
   sock = accept (acceptSock, (struct sockaddr *) &from, &fromLen);
   if (sock < 0)
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "readDecodeHdr_");
-      closesocket (acceptSock);
-      return;
-    }
+	{
+	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "readDecodeHdr_");
+	  closesocket (acceptSock);
+	  return;
+	}
 
   xdrmem_create (&xdrs, (char *) &buf, sizeof (buf), XDR_DECODE);
 
   for (;;)
-    {
+	{
 
-      XDR_SETPOS (&xdrs, 0);
-      if (readDecodeHdr_ (sock,
+	  XDR_SETPOS (&xdrs, 0);
+	  if (readDecodeHdr_ (sock,
 			  (char *) &buf, SOCK_READ_FIX, &xdrs, &msgHdr) < 0)
 	{
 	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "readDecodeHdr_");
@@ -86,7 +87,7 @@ rfServ_ (int acceptSock)
 	  return;
 	}
 
-      switch (msgHdr.opCode)
+	  switch (msgHdr.opCode)
 	{
 	case RF_OPEN:
 	  ropen (sock, &msgHdr);
@@ -130,81 +131,82 @@ rfServ_ (int acceptSock)
 
 	default:
 	  ls_errlog (stderr, _i18n_msg_get (ls_catd, NL_SETN, 602,
-					    "%s: Unknown opcode %d"),
-		     fname, msgHdr.opCode);
+						"%s: Unknown opcode %d"),
+			 fname, msgHdr.opCode);
 	  xdr_destroy (&xdrs);
 	  break;
 	}
-    }
+	}
 
 }
 
 static int
 ropen (int sock, struct LSFHeader *hdr)
 {
-  static char fname[] = "ropen()";
-  struct ropenReq req;
-  char buf[LSRCP_MSGSIZE];
-  char fn[MAXFILENAMELEN];
-  int fd;
-  XDR xdrs;
-  req.fn = fn;
+	static char fname[] = "ropen()";
+	int fd = 0 ;
+	XDR xdrs = { };
+	struct ropenReq req = { };
+	char *buf = malloc( sizeof( char ) * LSRCP_MSGSIZE + 1 ); // FIXME FIXME FIXME get rid of label
+	char *fn  = malloc( sizeof( char ) * MAXFILENAMELEN + 1 ); // FIXME FIXME FIXME get rid of label
 
-  xdrmem_create (&xdrs, buf, LSRCP_MSGSIZE, XDR_DECODE);
-  if (readDecodeMsg_ (sock, buf, hdr, SOCK_READ_FIX, &xdrs, (char *) &req,
-		      xdr_ropenReq, NULL))
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "readDecodeMsg_");
-      xdr_destroy (&xdrs);
-      closesocket (sock);
-      return (-1);
-    }
-  xdr_destroy (&xdrs);
+	req.fn = fn;
+
+	xdrmem_create (&xdrs, buf, LSRCP_MSGSIZE, XDR_DECODE);
+	if (readDecodeMsg_ (sock, buf, hdr, SOCK_READ_FIX, &xdrs, (char *) &req, xdr_ropenReq, NULL))
+	{
+	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "readDecodeMsg_");
+	  xdr_destroy (&xdrs);
+	  closesocket (sock);
+	  return (-1);
+	}
+	xdr_destroy (&xdrs);
 
   if (req.flags & LSF_O_CREAT_DIR)
-    {
-      req.flags &= ~LSF_O_CREAT_DIR;
+	{
+	  req.flags &= ~LSF_O_CREAT_DIR;
 
 
-      if (createSpoolSubDir (fn) < 0)
+	  if (createSpoolSubDir (fn) < 0)
 	{
 	  if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, buf,
 			  sizeof (struct LSFHeader),
 			  NULL, SOCK_WRITE_FIX, NULL) < 0)
-	    {
-	      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
-	      closesocket (sock);
-	      return (-1);
-	    }
+		{
+		  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
+		  closesocket (sock);
+		  return (-1);
+		}
 	  return (0);
 	}
-    }
+	}
 
 
   if ((fd = open (req.fn, req.flags, req.mode)) == -1)
-    {
-      if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, buf,
-		      sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL)
+	{
+	  if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, buf, sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL)
 	  < 0)
 	{
 	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
 	  closesocket (sock);
 	  return (-1);
 	}
-      return (0);
-    }
+	  return (0);
+	}
 
 
-  if (lsSendMsg_ (sock, fd, 0, NULL, buf,
-		  sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL) < 0)
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
-      closesocket (sock);
-      close (fd);
-      return (-1);
-    }
+  if (lsSendMsg_ (sock, fd, 0, NULL, buf, sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL) < 0)
+	{
+	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
+	  closesocket (sock);
+	  close (fd);
+	  return (-1);
+	}
 
-  return (0);
+	free(buf);
+	free(fn);
+
+  return 0;
 }
 
 
@@ -212,112 +214,119 @@ static int
 rclose (int sock, struct LSFHeader *hdr)
 {
   static char fname[] = "rclose()";
-  int reqfd;
-  char buf[LSRCP_MSGSIZE];
+  int reqfd = 0 ;
+  char *buf = malloc( sizeof( char ) * LSRCP_MSGSIZE + 1 );
   XDR xdrs;
 
   xdrmem_create (&xdrs, buf, LSRCP_MSGSIZE, XDR_DECODE);
   if (readDecodeMsg_ (sock, buf, hdr, SOCK_READ_FIX, &xdrs, (char *) &reqfd,
-		      xdr_int, NULL))
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "readDecodeMsg_");
-      xdr_destroy (&xdrs);
-      closesocket (sock);
-      return (-1);
-    }
+			  xdr_int, NULL))
+	{
+	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "readDecodeMsg_");
+	  xdr_destroy (&xdrs);
+	  closesocket (sock);
+	  return (-1);
+	}
   xdr_destroy (&xdrs);
 
   if (close (reqfd) == -1)
-    {
-      if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, buf,
-		      sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL)
+	{
+	  if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, buf,
+			  sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL)
 	  < 0)
 	{
 	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
 	  close (sock);
 	}
-      return (0);
-    }
+	  return (0);
+	}
 
   if (lsSendMsg_ (sock, 0, 0, NULL, buf,
 		  sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL) < 0)
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
-      close (sock);
-      return (-1);
-    }
+	{
+	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
+	  close (sock);
+	  return (-1);
+	}
 
-  return (0);
+   free(buf);
+  return 0;
 }
 
 static int
 rwrite (int sock, struct LSFHeader *hdr)
 {
   static char fname[] = "rwrite()";
-  struct rrdwrReq req;
-  char msgBuf[LSRCP_MSGSIZE];
-  XDR xdrs;
-  char *buf;
+  struct rrdwrReq req = { };
+  char *msgBuf = malloc( sizeof( char ) * LSRCP_MSGSIZE + 1 );
+  XDR xdrs = { };
+  char *buf = NULL;
+  ssize_t result = 0;
 
   xdrmem_create (&xdrs, msgBuf, LSRCP_MSGSIZE, XDR_DECODE);
-  if (readDecodeMsg_ (sock, msgBuf, hdr, SOCK_READ_FIX, &xdrs, (char *) &req,
-		      xdr_rrdwrReq, NULL))
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "readDeocdeMsg_");
-      xdr_destroy (&xdrs);
-      close (sock);
-      return (-1);
-    }
+  if (readDecodeMsg_ (sock, msgBuf, hdr, SOCK_READ_FIX, &xdrs, (char *) &req, // FIXME FIXME FIXME FIXME is that (char *) cast appropriate? replace? 
+			  xdr_rrdwrReq, NULL))
+	{
+	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "readDeocdeMsg_");
+	  xdr_destroy (&xdrs);
+	  close (sock);
+	  return (-1);
+	}
   xdr_destroy (&xdrs);
 
-  if ((buf = (char *) malloc (req.len)) == NULL)
-    {
-      if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, msgBuf,
-		      sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL)
+  buf = malloc( sizeof( char ) * req.len  + 1 ) ;
+  if ( NULL == buf ) 
+	{
+	  if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, msgBuf, sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL)
 	  < 0)
 	{
 	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
 	  close (sock);
 	}
-      clearSock (sock, req.len);
-      return (0);
-    }
+	  clearSock (sock, req.len);
+	  return (0);
+	}
 
   if (SOCK_READ_FIX (sock, buf, req.len) != req.len)
-    {
-      ls_errlog (stderr, I18N_FUNC_D_FAIL_M, fname, "SOCK_READ_FIX", req.len);
-      goto fail;
-    }
+	{
+	  ls_errlog (stderr, I18N_FUNC_D_FAIL_M, fname, "SOCK_READ_FIX", req.len);
+	  goto fail;
+	}
 
-  if ((req.len = write (req.fd, buf, req.len)) < 0)
-    {
-      goto fail;
-    }
+	result = write (req.fd, buf, req.len) ;
+	if( result == -1 && errno )
+	{
+	  goto fail;
+	}
 
-  free (buf);
 
   if (lsSendMsg_ (sock, 0, req.len, NULL, msgBuf,
 		  sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL) < 0)
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
-      close (sock);
-      return (-1);
-    }
+	{
+	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
+	  close (sock);
+	  return (-1);
+	}
 
-  return (0);
+	free( buf ); // FIXME FIXME FIXME move above previous if statement to save req.len * sizeof( char ) bytes
+	free( msgBuf );
 
-fail:
-  free (buf);
+	return 0;
+
+fail: // FIXME FIXME FIXME FIXME remove goto
 
   if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, msgBuf,
 		  sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL) < 0)
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
-      close (sock);
-      return (-1);
-    }
+	{
+	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
+	  close (sock);
+	  return (-1);
+	}
 
-  return (0);
+	free( buf );
+	free( msgBuf );
+
+	return (0);
 }
 
 
@@ -325,119 +334,135 @@ fail:
 static int
 rread (int sock, struct LSFHeader *hdr)
 {
-  static char fname[] = "rread()";
-  struct rrdwrReq req;
-  char msgBuf[LSRCP_MSGSIZE];
-  XDR xdrs;
-  char *buf;
+	static char fname[] = "rread()";
+	struct rrdwrReq req = { };
+	XDR xdrs            = { };
+	ssize_t readResult  = 0;
+	char *buf           = NULL;
+	char *msgBuf        = malloc( sizeof ( char ) * LSRCP_MSGSIZE + 1) ;
 
   xdrmem_create (&xdrs, msgBuf, LSRCP_MSGSIZE, XDR_DECODE);
-  if (readDecodeMsg_ (sock, msgBuf, hdr, SOCK_READ_FIX, &xdrs, (char *) &req,
-		      xdr_rrdwrReq, NULL))
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "readDecodeMsg_");
-      xdr_destroy (&xdrs);
-      close (sock);
-      return (-1);
-    }
+  if (readDecodeMsg_ (sock, msgBuf, hdr, SOCK_READ_FIX, &xdrs, (char *) &req, xdr_rrdwrReq, NULL)) // FIXME FIXME FIXME is this cast correct?
+	{
+	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "readDecodeMsg_");
+	  xdr_destroy (&xdrs);
+	  close (sock);
+	  return -1;
+	}
   xdr_destroy (&xdrs);
 
-  if ((buf = (char *) malloc (req.len)) == NULL)
-    {
-      if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, msgBuf,
-		      sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL)
-	  < 0)
+  buf = malloc( sizeof(char) * req.len + 1 ); 
+  if( NULL == buf )
+	{
+	  if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, msgBuf, sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL) < 0)
 	{
 	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
 	  close (sock);
 	}
-      return (0);
-    }
+	  return 0;
+	}
 
-  if ((req.len = read (req.fd, buf, req.len)) < 0)
-    {
-      goto fail;
-    }
+	readResult = read( req.fd, buf, req.len );
+	if ( readResult < 0 ) // FIXME FIXME is it ok to only consider the return value and not the error? should it not send more details?
+	{
+	  if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, buf, sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL) < 0)
+		{
+		  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
+		  close (sock);
+		  return -1;
+		}
+		return 0;
+	}
+	else {
+		req.len = readResult;
+	}
 
-  if (lsSendMsg_ (sock, 0, req.len, NULL, msgBuf,
-		  sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL) < 0)
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
-      close (sock);
-      free (buf);
-      return (-1);
-    }
+	if (lsSendMsg_ (sock, 0, req.len, NULL, msgBuf, sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL) < 0)
+	{
+		ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
+		close (sock);
+		free (buf);
+		free(msgBuf);
+		return -1;
+	}
 
-  if (SOCK_WRITE_FIX (sock, buf, req.len) != req.len)
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_M, fname, "SOCK_WRITE_FIX");
-      close (sock);
-      free (buf);
-      return (-1);
-    }
+	if (SOCK_WRITE_FIX (sock, buf, req.len) != req.len)
+	{
+		ls_errlog (stderr, I18N_FUNC_FAIL_M, fname, "SOCK_WRITE_FIX");
+		close (sock);
+		free (buf);
+		free(msgBuf);
+		return -1;
+	}
 
-  free (buf);
-  return (0);
+	free (buf);
+	free(msgBuf);
+	return (0);
 
-fail:
-  free (buf);
+// fail: // FIXME FIXME FIXME FIXME 
+//   free (buf);
 
-  if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, buf,
-		  sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL) < 0)
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
-      close (sock);
-      return (-1);
-    }
-  return (0);
+//   if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, buf,
+// 		  sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL) < 0)
+// 	{
+// 	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
+// 	  close (sock);
+// 	  return (-1);
+// 	}
+//   return (0);
 
 }
 
 static int
 rlseek (int sock, struct LSFHeader *hdr)
 {
-  static char fname[] = "rlseek()";
-  struct rlseekReq req;
-  char msgBuf[LSRCP_MSGSIZE];
-  XDR xdrs;
-  off_t pos;
+	static char fname[] = "rlseek()";
+	struct rlseekReq req = { };
+	XDR xdrs = { };
+	off_t pos = 0;
+	char *msgBuf = malloc( sizeof ( char ) * LSRCP_MSGSIZE + 1 );
+	int returnValue = 0;
 
-  xdrmem_create (&xdrs, msgBuf, LSRCP_MSGSIZE, XDR_DECODE);
-  if (readDecodeMsg_ (sock, msgBuf, hdr, SOCK_READ_FIX, &xdrs, (char *) &req,
-		      xdr_rlseekReq, NULL))
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "readDecodeMsg_");
-      xdr_destroy (&xdrs);
-      close (sock);
-      return (-1);
-    }
-  xdr_destroy (&xdrs);
+	xdrmem_create (&xdrs, msgBuf, LSRCP_MSGSIZE, XDR_DECODE);
+	if (readDecodeMsg_ (sock, msgBuf, hdr, SOCK_READ_FIX, &xdrs, (char *) &req, xdr_rlseekReq, NULL)) // FIXME FIXME FIXME is this cast correct? should it not be void * or something?
+	{
+		ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "readDecodeMsg_");
+		xdr_destroy (&xdrs);
+		close (sock);
+		free( msgBuf );
+		return -1;
+	}
+	xdr_destroy (&xdrs);
 
-  if ((pos = lseek (req.fd, (off_t) req.offset, req.whence)) < 0)
-    {
-      goto fail;
-    }
+	if ((pos = lseek (req.fd, req.offset, req.whence)) < 0)
+	{
+		if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, msgBuf, sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL) < 0)
+		{
+			ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
+			free( msgBuf );
+			close (sock);
+			return -1;
+		}
+	}
 
-  if (lsSendMsg_ (sock, 0, (int) pos, NULL, msgBuf,
-		  sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL) < 0)
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
-      close (sock);
-      return (-1);
-    }
+	if (lsSendMsg_ (sock, 0, pos, NULL, msgBuf, sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL) < 0)
+	{
+		ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
+		close (sock);
+		free( msgBuf );
+		return -1;
+	}
 
-  return (0);
+	free( msgBuf );
+	return 0;
 
-fail:
-  if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, msgBuf,
-		  sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL) < 0)
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
-      close (sock);
-      return (-1);
-    }
-
-  return (0);
+// fail:
+//   if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, msgBuf, sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL) < 0)
+// 	{
+// 	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
+// 	  close (sock);
+// 	  return (-1);
+// 	}
 }
 
 
@@ -450,15 +475,15 @@ clearSock (int sock, int len)
   char buf[LSRCP_MSGSIZE];
 
   for (; len; len -= l)
-    {
-      l = len > LSRCP_MSGSIZE ? LSRCP_MSGSIZE : len;
-      if (SOCK_READ_FIX (sock, buf, l) != l)
+	{
+	  l = len > LSRCP_MSGSIZE ? LSRCP_MSGSIZE : len;
+	  if (SOCK_READ_FIX (sock, buf, l) != l)
 	{
 	  ls_errlog (stderr, I18N_FUNC_D_FAIL_M, fname, "SOCK_READ_FIX", l);
 	  close (sock);
 	  return (-1);
 	}
-    }
+	}
 
   return (0);
 }
@@ -478,35 +503,35 @@ rstat (int sock, struct LSFHeader *hdr)
 
   xdrmem_create (&xdrs, buf, LSRCP_MSGSIZE, XDR_DECODE);
   if (readDecodeMsg_ (sock, buf, hdr, SOCK_READ_FIX, &xdrs,
-		      (char *) &fnStr, xdr_stringLen, NULL))
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "readDeocdeMsg_");
-      xdr_destroy (&xdrs);
-      close (sock);
-      return (-1);
-    }
+			  (char *) &fnStr, xdr_stringLen, NULL))
+	{
+	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "readDeocdeMsg_");
+	  xdr_destroy (&xdrs);
+	  close (sock);
+	  return (-1);
+	}
   xdr_destroy (&xdrs);
 
   if (stat (fn, &st) == -1)
-    {
-      if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, buf,
-		      sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL)
+	{
+	  if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, buf,
+			  sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL)
 	  < 0)
 	{
 	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
 	  close (sock);
 	  return (-1);
 	}
-      return (0);
-    }
+	  return (0);
+	}
 
   if (lsSendMsg_ (sock, 0, 0, (char *) &st, buf, LSRCP_MSGSIZE, xdr_stat,
 		  SOCK_WRITE_FIX, NULL) < 0)
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
-      close (sock);
-      return (-1);
-    }
+	{
+	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
+	  close (sock);
+	  return (-1);
+	}
 
   return (0);
 }
@@ -523,36 +548,36 @@ rfstat (int sock, struct LSFHeader *hdr)
 
   xdrmem_create (&xdrs, msgBuf, LSRCP_MSGSIZE, XDR_DECODE);
   if (readDecodeMsg_
-      (sock, msgBuf, hdr, SOCK_READ_FIX, &xdrs, (char *) &reqfd, xdr_int,
-       NULL))
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "readDecodeMsg_");
-      xdr_destroy (&xdrs);
-      close (sock);
-      return (-1);
-    }
+	  (sock, msgBuf, hdr, SOCK_READ_FIX, &xdrs, (char *) &reqfd, xdr_int,
+	   NULL))
+	{
+	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "readDecodeMsg_");
+	  xdr_destroy (&xdrs);
+	  close (sock);
+	  return (-1);
+	}
   xdr_destroy (&xdrs);
 
   if (fstat (reqfd, &st) == -1)
-    {
-      if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, msgBuf,
-		      sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL)
+	{
+	  if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, msgBuf,
+			  sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL)
 	  < 0)
 	{
 	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
 	  close (sock);
 	  return (-1);
 	}
-      return (0);
-    }
+	  return (0);
+	}
 
   if (lsSendMsg_ (sock, 0, 0, (char *) &st, msgBuf, LSRCP_MSGSIZE, xdr_stat,
 		  SOCK_WRITE_FIX, NULL) < 0)
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
-      close (sock);
-      return (-1);
-    }
+	{
+	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
+	  close (sock);
+	  return (-1);
+	}
 
   return (0);
 }
@@ -573,38 +598,38 @@ rgetmnthost (int sock, struct LSFHeader *hdr)
 
   xdrmem_create (&xdrs, buf, LSRCP_MSGSIZE, XDR_DECODE);
   if (readDecodeMsg_ (sock, buf, hdr, SOCK_READ_FIX, &xdrs,
-		      (char *) &fnStr, xdr_stringLen, NULL))
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "readDecodeMsg_");
-      xdr_destroy (&xdrs);
-      close (sock);
-      return (-1);
-    }
+			  (char *) &fnStr, xdr_stringLen, NULL))
+	{
+	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "readDecodeMsg_");
+	  xdr_destroy (&xdrs);
+	  close (sock);
+	  return (-1);
+	}
   xdr_destroy (&xdrs);
 
   if ((host = ls_getmnthost (fn)) == NULL)
-    {
-      if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, buf,
-		      sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL)
+	{
+	  if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, buf,
+			  sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL)
 	  < 0)
 	{
 	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
 	  close (sock);
 	  return (-1);
 	}
-      return (0);
-    }
+	  return (0);
+	}
 
   hostStr.len = MAXHOSTNAMELEN;
   hostStr.name = host;
   if (lsSendMsg_
-      (sock, 0, 0, (char *) &hostStr, buf, LSRCP_MSGSIZE, xdr_stringLen,
-       SOCK_WRITE_FIX, NULL) < 0)
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
-      close (sock);
-      return (-1);
-    }
+	  (sock, 0, 0, (char *) &hostStr, buf, LSRCP_MSGSIZE, xdr_stringLen,
+	   SOCK_WRITE_FIX, NULL) < 0)
+	{
+	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
+	  close (sock);
+	  return (-1);
+	}
 
   return (0);
 }
@@ -617,82 +642,126 @@ rgetmnthost (int sock, struct LSFHeader *hdr)
 #endif
 
 static int
-runlink (int sock, struct LSFHeader *hdr)
+runlink (int sock, struct LSFHeader *hdr) // FIXME FIXME is int the right choice here?
 {
-  static char fname[] = "runlink()";
-  char buf[LSRCP_MSGSIZE];
-  char fn[MAXFILENAMELEN];
-  XDR xdrs;
-  struct stringLen fnStr;
-  struct stat st;
+  static char fname[]    = "runlink()";
+  XDR xdrs               = { };
+  struct stat st         = { };
+  struct stringLen fnStr = { };
+  char *buf              = malloc( sizeof( char ) * LSRCP_MSGSIZE + 1 );
+  char *fn               = malloc( sizeof( char ) * MAXFILENAMELEN + 1 );
 
-  fnStr.len = MAXFILENAMELEN;
+  fnStr.len = MAXFILENAMELEN; // FIXME FIXME FIXME replace this by OS filename defined assigned into a constant.
   fnStr.name = fn;
 
   xdrmem_create (&xdrs, buf, LSRCP_MSGSIZE, XDR_DECODE);
-  if (readDecodeMsg_ (sock, buf, hdr, SOCK_READ_FIX, &xdrs,
-		      (char *) &fnStr, xdr_stringLen, NULL))
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "readDecodeMsg_");
-      xdr_destroy (&xdrs);
-      close (sock);
-      return (-1);
-    }
+  if (readDecodeMsg_ (sock, buf, hdr, SOCK_READ_FIX, &xdrs, (char *) &fnStr, xdr_stringLen, NULL)) // FIXME FIXME FIXME FIXME is this cast correct? should it not be void * or something?
+	{
+	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "readDecodeMsg_");
+	  xdr_destroy (&xdrs);
+	  close (sock);
+			  free( buf );
+			  free( fn );
+	  return (-1);
+	}
   xdr_destroy (&xdrs);
 
   if ((stat (fn, &st) == 0) && (st.st_mode & S_IFDIR))
-    {
-
-
-      DIR *dirp;
-      struct dirent *dp;
-      char path[MAXPATHLEN];
-
-      if ((dirp = opendir (fn)) == NULL)
 	{
-	  goto errrtn;
+
+
+	  DIR *dirp = NULL;
+	  struct dirent *dp = NULL;
+	  char *path = malloc( sizeof(char) * MAXPATHLEN + 1 ); // FIXME FIXME FIXME replace with OS define assigned into a const
+
+	  if ((dirp = opendir (fn)) == NULL)
+	{
+		  if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, buf, sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL) < 0)
+			{
+			  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
+			  closesocket (sock);
+			  free( path );
+			  free( buf );
+			  free( fn );
+			  return -1;
+			}
+			  free( path );
+			  free( buf );
+			  free( fn );
+		  return 0;
 	}
 
-      for (dp = readdir (dirp); dp != NULL; dp = readdir (dirp))
+	  for (dp = readdir (dirp); dp != NULL; dp = readdir (dirp))
 	{
 	  if (strcmp (dp->d_name, ".") != 0 && strcmp (dp->d_name, "..") != 0)
-	    {
-	      sprintf (path, "%s/%s", fn, dp->d_name);
-	      rmdir (path);
-	      unlink (path);
-	    }
+		{
+		  
+		  free( path );
+		  path = malloc( sizeof( char ) * strlen( dp->d_name )  + 1 ) ;
+		  sprintf (path, "%s/%s", fn, dp->d_name);
+		  rmdir (path);
+		  unlink (path);
+		  free( path );
+
+		}
 	}
 
-      closedir (dirp);
-      if (rmdir (fn) != 0)
+	  closedir (dirp);
+	  if (rmdir (fn) != 0)
 	{
-	  goto errrtn;
+		  if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, buf, sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL) < 0)
+			{
+			  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
+			  closesocket (sock);
+			  free( path );
+			  free( buf );
+			  free( fn );
+			  return (-1);
+			}
+			  free( path );
+			  free( buf );
+			  free( fn );
+		  return (0);
 	}
-    }
+	}
 
   if (unlink (fn) < 0)
-    {
-      goto errrtn;
-    }
+	{
+		  if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, buf, sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL) < 0)
+			{
+			  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
+			  closesocket (sock);
+			  free( buf );
+			  free( fn );
+			  return (-1);
+			}
+			  free( buf );
+			  free( fn );
+		  return (0);
+	}
 
-  if (lsSendMsg_ (sock, 0, 0, NULL, buf,
-		  sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL) < 0)
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
-      closesocket (sock);
-      return (-1);
-    }
+  if (lsSendMsg_ (sock, 0, 0, NULL, buf, sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL) < 0)
+	{
+	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
+	  closesocket (sock);
+			  free( buf );
+			  free( fn );
+	  return (-1);
+	}
 
-  return (0);
-
-errrtn:
-
-  if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, buf,
-		  sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL) < 0)
-    {
-      ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
-      closesocket (sock);
-      return (-1);
-    }
+	free( buf );
+	free( fn );
   return (0);
 }
+
+// errrtn: // FIXME FIXME FIXME FIXME FIXME remove 
+
+//   if (lsSendMsg_ (sock, -errnoEncode_ (errno), 0, NULL, buf,
+// 		  sizeof (struct LSFHeader), NULL, SOCK_WRITE_FIX, NULL) < 0)
+// 	{
+// 	  ls_errlog (stderr, I18N_FUNC_FAIL_MM, fname, "lsSendMsg_");
+// 	  closesocket (sock);
+// 	  return (-1);
+// 	}
+//   return (0);
+// }

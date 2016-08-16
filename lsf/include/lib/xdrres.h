@@ -30,7 +30,7 @@
 #include "lib/hdr.h"
 #include "lib/rf.h"
 
-extern int xdr_resConnect (XDR *, struct resConnect *, struct LSFHeader *);
+extern bool_t xdr_resConnect (XDR *, struct resConnect *, struct LSFHeader *);
 extern int xdr_resCmdBill (XDR *, struct resCmdBill *, struct LSFHeader *);
 extern int xdr_resSetenv (XDR *, struct resSetenv *, struct LSFHeader *);
 extern int xdr_resRKill (XDR *, struct resRKill *, struct LSFHeader *);

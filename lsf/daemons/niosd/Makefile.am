@@ -5,7 +5,8 @@ niosd_SOURCES = nios.c nios.handler.c nios.h
 #
 # yep.. true
 #
-nios_LDADD = $(top_builddir)/lsf/liblsbatch/liblsbatch.a $(top_builddir)/lsf/lib/liblsf/liblsf.a $(top_builddir)/lsf//intlib/liblsfint.a -lm -lnsl
+#nios_LDADD = $(top_builddir)/lsf/liblsbatch/liblsbatch.a $(top_builddir)/lsf/lib/liblsf/liblsf.a $(top_builddir)/lsf//intlib/liblsfint.a -lm -lnsl
+
 
 #etags:
 #	etags *.[hc] ../*.h ../lib/*.[hc] ../intlib/*.[hc]

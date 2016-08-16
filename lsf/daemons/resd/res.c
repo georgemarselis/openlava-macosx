@@ -1089,7 +1089,6 @@ houseKeeping (void)
 	}
 	}
 
-
 }
 
 static void

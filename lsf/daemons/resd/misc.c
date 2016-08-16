@@ -18,10 +18,12 @@
 #include <stdio.h>
 #include <errno.h>
 #include <unistd.h>
-#include "res.h"
-#include "../lim/limout.h"
 
-#define NL_SETN     29
+#include "daemons/libresd/resd.h"
+#include "daemons/liblimd/limout.h"
+#include "lib/xdrnio.h"
+
+// #define NL_SETN     29
 
 bool_t
 xdr_resChildInfo (XDR *xdrs, struct resChildInfo *childInfo, struct LSFHeader *hdr)
