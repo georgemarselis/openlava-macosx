@@ -18,9 +18,6 @@
 
 #pragma once
 
-#ifndef LSF_LIM_CONF_H
-#define LSF_LIM_CONF_H
-
 struct sharedResourceInstance *sharedResourceHead = NULL;
 struct lsInfo allInfo;
 struct shortLsInfo shortInfo;
@@ -30,7 +27,7 @@ static uint sizeOfResTable = 0;
 static uint numofhosts     = 0;
 static char mcServersSet   = FALSE;
 
-extern int ELIMdebug, ELIMrestarts, ELIMblocktime;
+int ELIMdebug, ELIMrestarts, ELIMblocktime;
 
 #define M_THEN_A  1
 #define A_THEN_M  2
@@ -87,7 +84,7 @@ static int    saveHostIPAddr (struct hostNode *, struct hostent *);
 
 int readShared (void);
 
-extern int convertNegNotation_ (char **, struct HostsArray *);
+int convertNegNotation_ (char **, struct HostsArray *);
 
 FILE *confOpen (char *filename, char *type);
 float mykey (void);
@@ -95,10 +92,10 @@ float mykey (void);
 static void setExtResourcesDefDefault (char *);
 static int setExtResourcesDef (char *);
 static int setExtResourcesLoc (char *, int);
-extern struct extResInfo *getExtResourcesDef (char *);
-extern char *getExtResourcesLoc (char *);
+struct extResInfo *getExtResourcesDef (char *);
+char *getExtResourcesLoc (char *);
 static char *getExtResourcesValDefault (char *);
-extern char *getExtResourcesVal (char *);
+char *getExtResourcesVal (char *);
 
 
 #endif

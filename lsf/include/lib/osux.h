@@ -18,8 +18,10 @@
 
 #pragma once
 
-#ifndef LSF_LIB_OSUX_H
-#define LSF_LIB_OSUX_H
+// #ifndef LSF_LIB_OSUX_H
+// #define LSF_LIB_OSUX_H
+
+// FIXME FIXME FIXME when port to HP/UX
 
 int
 procStart_ (char *argv[],
@@ -364,4 +366,4 @@ getEnvVar_ (char *name, char *buf, unsigned long size)
     }
 }
 
-#endif
+// #endif

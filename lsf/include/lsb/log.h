@@ -172,8 +172,8 @@ uint saveQStr( char *line, char *destStr);
     }
 */
 
-extern int putEventRec (FILE *, struct eventRec *);
-extern struct eventRec *getEventRec (char *);
-extern char *getNextValue0 (char **line, char, char);
+int putEventRec (FILE *, struct eventRec *);
+struct eventRec *getEventRec (char *);
+char *getNextValue0 (char **line, char, char);
 
 #endif

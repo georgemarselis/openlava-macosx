@@ -18,12 +18,7 @@
 
 #pragma once
  
-#ifndef LSF_MBD_PROXY_H
-#define LSF_MBD_PROXY_H
-
-
 typedef struct proxyListEntry PROXY_LIST_ENTRY_T;
-
 
 struct proxyListEntry
 {
@@ -32,41 +27,37 @@ struct proxyListEntry
   void *subject;
 };
 
-extern PROXY_LIST_ENTRY_T *proxyListEntryCreate (void *subject);
-extern void proxyListEntryDestroy (PROXY_LIST_ENTRY_T * pxy);
+PROXY_LIST_ENTRY_T *proxyListEntryCreate (void *subject);
+void proxyListEntryDestroy (PROXY_LIST_ENTRY_T * pxy);
 
 
-extern LIST_T *pxyRsvJL;
+LIST_T *pxyRsvJL;
 
 
 
-extern void proxyUSJLAttachObsvr (void);
-extern void proxyUSJLAddEntry (struct jData *job);
+void proxyUSJLAttachObsvr (void);
+void proxyUSJLAddEntry (struct jData *job);
 
-extern void proxyHSJLAttachObsvr (void);
-extern void proxyHSJLAddEntry (struct jData *job);
+void proxyHSJLAttachObsvr (void);
+void proxyHSJLAddEntry (struct jData *job);
 
-extern void proxyHRsvJLAddEntry (struct jData *job);
-extern void proxyHRsvJLRemoveEntry (struct jData *job);
+void proxyHRsvJLAddEntry (struct jData *job);
+void proxyHRsvJLRemoveEntry (struct jData *job);
 
-extern void proxyRsvJLAddEntry (struct jData *job);
-extern void proxyRsvJLRemoveEntry (struct jData *job);
+void proxyRsvJLAddEntry (struct jData *job);
+void proxyRsvJLRemoveEntry (struct jData *job);
 
 
-extern bool_t proxyListEntryEqual (PROXY_LIST_ENTRY_T * pxy,
-				   void *subject, int hint);
+bool_t proxyListEntryEqual (PROXY_LIST_ENTRY_T * pxy, void *subject, int hint);
 
-extern bool_t pendJobPrioEqual (PROXY_LIST_ENTRY_T * pxy,
-				struct jData *subjectJob, int hint);
+bool_t pendJobPrioEqual (PROXY_LIST_ENTRY_T * pxy, struct jData *subjectJob, int hint);
 
-extern bool_t startJobPrioEqual (PROXY_LIST_ENTRY_T * pxy,
-				 struct jData *subjectJob, int hint);
+bool_t startJobPrioEqual (PROXY_LIST_ENTRY_T * pxy, struct jData *subjectJob, int hint);
 
 
 #define JOB_PROXY_GET_JOB(pxy) ((struct jData *)(pxy)->subject)
 
-extern struct jData *jobProxyGetPendJob (PROXY_LIST_ENTRY_T * pxy);
-extern void jobProxySyslog (PROXY_LIST_ENTRY_T * pxy, void *hint);
-extern char *jobProxySprintf (PROXY_LIST_ENTRY_T * pxy, void *hint);
+struct jData *jobProxyGetPendJob (PROXY_LIST_ENTRY_T * pxy);
+void jobProxySyslog (PROXY_LIST_ENTRY_T * pxy, void *hint);
+char *jobProxySprintf (PROXY_LIST_ENTRY_T * pxy, void *hint);
 
-#endif

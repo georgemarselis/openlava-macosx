@@ -17,10 +17,6 @@
  */
 
 #pragma once
- 
-#ifndef LSF_CLITOOLS_CLITOOLS_H
-#define LSF_CLITOOLS_CLITOOLS_H
 
 #include <signal.h>
 
-#endif

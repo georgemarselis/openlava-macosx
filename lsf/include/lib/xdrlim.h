@@ -18,9 +18,6 @@
 
 #pragma once
  
-#ifndef LSF_LIB_XDRLIM_H
-#define LSF_LIB_XDRLIM_H
-
 #include "lib/hdr.h"
 #include "lib/lproto.h"
 #include "lib/xdrlim.h"
@@ -28,24 +25,21 @@
 
 
 
-extern bool_t xdr_decisionReq( 		XDR *, struct decisionReq *, 		struct LSFHeader *);
-extern bool_t xdr_placeReply( 		XDR *, struct placeReply *, 		struct LSFHeader *);
-extern bool_t xdr_loadReply( 		XDR *, struct loadReply *, 			struct LSFHeader *);
-extern bool_t xdr_jobXfer( 			XDR *, struct jobXfer *, 			struct LSFHeader *);
-extern bool_t xdr_hostInfo( 		XDR *, struct shortHInfo *, 		struct LSFHeader *);
-extern bool_t xdr_limLock( 			XDR *, struct limLock *, 			struct LSFHeader *);
-extern bool_t xdr_lsInfo( 			XDR *, struct lsInfo *, 			struct LSFHeader *);
-extern bool_t xdr_hostInfoReply( 	XDR *, struct hostInfoReply *, 		struct LSFHeader *);
-extern bool_t xdr_masterInfo( 		XDR *, struct masterInfo *, 		struct LSFHeader *);
-extern bool_t xdr_clusterInfoReq( 	XDR *, struct clusterInfoReq *, 	struct LSFHeader *);
-extern bool_t xdr_clusterInfoReply( XDR *, struct clusterInfoReply *, 	struct LSFHeader *);
-extern bool_t xdr_shortHInfo( 		XDR *, struct shortHInfo *, 		struct LSFHeader *, char *);
-extern bool_t xdr_shortCInfo( 		XDR *, struct shortCInfo *, 		struct LSFHeader *);
-extern bool_t xdr_cInfo( 			XDR *, struct cInfo *,  			struct LSFHeader *);
-extern bool_t xdr_resourceInfoReq( 	XDR *, struct resourceInfoReq *, 	struct LSFHeader *);
-extern bool_t xdr_resourceInfoReply(XDR *, struct resourceInfoReply *, 	struct LSFHeader *);
-extern bool_t xdr_hostEntry( 		XDR *, struct hostEntry *, 			struct LSFHeader *);
-extern bool_t xdr_hostName( 		XDR *, char *, 						struct LSFHeader *);
-
-
-#endif
+bool_t xdr_decisionReq( 	XDR *, struct decisionReq *, 		struct LSFHeader *);
+bool_t xdr_placeReply( 		XDR *, struct placeReply *, 		struct LSFHeader *);
+bool_t xdr_loadReply( 		XDR *, struct loadReply *, 			struct LSFHeader *);
+bool_t xdr_jobXfer( 		XDR *, struct jobXfer *, 			struct LSFHeader *);
+bool_t xdr_hostInfo( 		XDR *, struct shortHInfo *, 		struct LSFHeader *);
+bool_t xdr_limLock( 		XDR *, struct limLock *, 			struct LSFHeader *);
+bool_t xdr_lsInfo( 			XDR *, struct lsInfo *, 			struct LSFHeader *);
+bool_t xdr_hostInfoReply( 	XDR *, struct hostInfoReply *, 		struct LSFHeader *);
+bool_t xdr_masterInfo( 		XDR *, struct masterInfo *, 		struct LSFHeader *);
+bool_t xdr_clusterInfoReq( 	XDR *, struct clusterInfoReq *, 	struct LSFHeader *);
+bool_t xdr_clusterInfoReply(XDR *, struct clusterInfoReply *, 	struct LSFHeader *);
+bool_t xdr_shortHInfo( 		XDR *, struct shortHInfo *, 		struct LSFHeader *, char *);
+bool_t xdr_shortCInfo( 		XDR *, struct shortCInfo *, 		struct LSFHeader *);
+bool_t xdr_cInfo( 			XDR *, struct cInfo *,  			struct LSFHeader *);
+bool_t xdr_resourceInfoReq( XDR *, struct resourceInfoReq *, 	struct LSFHeader *);
+bool_t xdr_resourceInfoReply(XDR *, struct resourceInfoReply *, struct LSFHeader *);
+bool_t xdr_hostEntry( 		XDR *, struct hostEntry *, 			struct LSFHeader *);
+bool_t xdr_hostName( 		XDR *, char *, 						struct LSFHeader *);

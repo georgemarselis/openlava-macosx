@@ -18,10 +18,6 @@
 
 #pragma once
 
-#ifndef LSF_LIB_WORDS_H
-#define LSF_LIB_WORDS_H
-#endif
-
 #define NODE_LEFT_DONE  1
 #define NODE_ALL_DONE   2
 #define NODE_PASED      3

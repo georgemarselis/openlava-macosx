@@ -17,9 +17,6 @@
  */
 
 #pragma once
- 
-#ifndef LSF_CHECKPOINT_CHECKPOINT_H
-#define LSF_CHECKPOINT_CHECKPOINT_H
 
 #include <ctype.h>
 #include <netdb.h>
@@ -79,4 +76,3 @@ void  closeLog (void);
 void  setMesgHeader (char *);
 
 
-#endif

@@ -18,8 +18,8 @@
 
 #pragma once
 
-#ifndef LSF_LIB_RCP_H
-#define LSF_LIB_RCP_H
+// #ifndef LSF_LIB_RCP_H
+// #define LSF_LIB_RCP_H
 
 typedef struct rcpXfer
 {
@@ -37,7 +37,7 @@ typedef struct rcpXfer
     struct hostent *pheDest;
 } lsRcpXfer;
 
-#define RSHCMD "rsh"
+#define RSHCMD "rsh" // FIXME FIXME FIXME FIXME rsh must go
 
 #define SPOOL_DIR_SEPARATOR "/"
 #define SPOOL_DIR_SEPARATOR_CHAR '/'
@@ -72,4 +72,4 @@ extern int rmDirAndFiles (char *dir);
 extern int rmDirAndFilesEx (char *, int);
 extern int createSpoolSubDir (const char *spoolFileFullPath);
 
-#endif
+// #endif

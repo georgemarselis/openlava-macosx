@@ -18,8 +18,8 @@
 
 #pragma once
 
-#ifndef LSF_LIB_OSAL_H
-#define LSF_LIB_OSAL_H
+// #ifndef LSF_LIB_OSAL_H
+// #define LSF_LIB_OSAL_H
 
 #include <errno.h>
 #include <pwd.h>
@@ -188,5 +188,3 @@ extern int hdNotInherit_ (LS_HANDLE_T * h);
 #define PC_LSF_ANYUGID  (-12)
 #define PC_LSF_FMAPNAME	"!1j8Gp6o$(*7&$@"
 #define PC_LSF_FMAPSIZE	(4096)
-
-#endif

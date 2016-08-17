@@ -18,8 +18,6 @@
 
 #pragma once
 
-#ifndef LSF_INTLIB_BITSET_H
-#define LSF_INTLIB_BITSET_H
 
 #include "libint/list.h"
 #include "lib/lproto.h"
@@ -122,7 +120,7 @@ enum bitState
 #undef LS_BITSET_ERROR_CODE_ENTRY
 #define LS_BITSET_ERROR_CODE_ENTRY(Id, Desc) Id,
 
-extern int bitseterrno;
+int bitseterrno;
 
 enum _lsBitSetErrno_
 {
@@ -137,56 +135,49 @@ enum _lsBitSetErrno_
  *
  */
 
-  LS_BITSET_ERROR_CODE_ENTRY (LS_BITSET_ERR_NOERR, "No Error")
+    LS_BITSET_ERROR_CODE_ENTRY (LS_BITSET_ERR_NOERR, "No Error")
     LS_BITSET_ERROR_CODE_ENTRY (LS_BITSET_ERR_BADARG, "Bad Arguments")
     LS_BITSET_ERROR_CODE_ENTRY (LS_BITSET_ERR_SETEMPTY, "Set Is Empty")
-    LS_BITSET_ERROR_CODE_ENTRY (LS_BITSET_ERR_NOMEM,
-				"Memory allocation failed")
-    LS_BITSET_ERROR_CODE_ENTRY (LS_BITSET_ERR_FUNC,
-				"User function failed")
-    LS_BITSET_ERROR_CODE_ENTRY (LS_BITSET_ERR_ISALREDY,
-				" Object alredy in set")
-    LS_BITSET_ERROR_CODE_ENTRY (LS_BITSET_ERR_EINVAL,
-				"Invalid set operation")
-    LS_BITSET_ERROR_CODE_ENTRY (LS_BITSET_ERR_NOOBSVR,
-				"Observer permission denied")
+    LS_BITSET_ERROR_CODE_ENTRY (LS_BITSET_ERR_NOMEM, "Memory allocation failed")
+    LS_BITSET_ERROR_CODE_ENTRY (LS_BITSET_ERR_FUNC, "User function failed")
+    LS_BITSET_ERROR_CODE_ENTRY (LS_BITSET_ERR_ISALREDY, " Object alredy in set")
+    LS_BITSET_ERROR_CODE_ENTRY (LS_BITSET_ERR_EINVAL, "Invalid set operation")
+    LS_BITSET_ERROR_CODE_ENTRY (LS_BITSET_ERR_NOOBSVR, "Observer permission denied")
     LS_BITSET_ERR_LAST
 };
 
-extern LS_BITSET_T *setCreate (const int, int (*getIndexByObject) (void *),
+LS_BITSET_T *setCreate (const int, int (*getIndexByObject) (void *),
 			       void *(*getObjectByIndex) (int), char *);
-extern LS_BITSET_T *simpleSetCreate (const int, char *);
-extern int setDestroy (LS_BITSET_T *);
-extern LS_BITSET_T *setDup (LS_BITSET_T *);
-extern bool_t setTestValue (LS_BITSET_T *, const int);
-extern int setGetSize (LS_BITSET_T *);
-extern bool_t setIsMember (LS_BITSET_T *, void *);
-extern int setAddElement (LS_BITSET_T *, void *);
-extern int setRemoveElement (LS_BITSET_T *, void *);
-extern int setClear (LS_BITSET_T *);
-extern int setGetNumElements (LS_BITSET_T *);
-extern void *setGetElement (LS_BITSET_T *, unsigned int);
-extern LS_BITSET_ITERATOR_T *setIteratorCreate (LS_BITSET_T *);
-extern int setIteratorAttach (LS_BITSET_ITERATOR_T *, LS_BITSET_T *, char *);
-extern void setIteratorDetach (LS_BITSET_ITERATOR_T *);
-extern void *setIteratorGetNextElement (LS_BITSET_ITERATOR_T *);
-extern void *setIteratorBegin (LS_BITSET_ITERATOR_T *);
-extern bool_t setIteratorIsEndOfSet (LS_BITSET_ITERATOR_T *);
-extern void setIteratorDestroy (LS_BITSET_ITERATOR_T *);
-extern bool_t setAllowObservers (LS_BITSET_T *);
-extern LS_BITSET_OBSERVER_T *setObserverCreate (char *name, void *extra,
+LS_BITSET_T *simpleSetCreate (const int, char *);
+int setDestroy (LS_BITSET_T *);
+LS_BITSET_T *setDup (LS_BITSET_T *);
+bool_t setTestValue (LS_BITSET_T *, const int);
+int setGetSize (LS_BITSET_T *);
+bool_t setIsMember (LS_BITSET_T *, void *);
+int setAddElement (LS_BITSET_T *, void *);
+int setRemoveElement (LS_BITSET_T *, void *);
+int setClear (LS_BITSET_T *);
+int setGetNumElements (LS_BITSET_T *);
+void *setGetElement (LS_BITSET_T *, unsigned int);
+LS_BITSET_ITERATOR_T *setIteratorCreate (LS_BITSET_T *);
+int setIteratorAttach (LS_BITSET_ITERATOR_T *, LS_BITSET_T *, char *);
+void setIteratorDetach (LS_BITSET_ITERATOR_T *);
+void *setIteratorGetNextElement (LS_BITSET_ITERATOR_T *);
+void *setIteratorBegin (LS_BITSET_ITERATOR_T *);
+bool_t setIteratorIsEndOfSet (LS_BITSET_ITERATOR_T *);
+void setIteratorDestroy (LS_BITSET_ITERATOR_T *);
+bool_t setAllowObservers (LS_BITSET_T *);
+LS_BITSET_OBSERVER_T *setObserverCreate (char *name, void *extra,
 						LS_BITSET_ENTRY_SELECT_OP_T
 						select, ...);
-extern int setObserverAttach (LS_BITSET_OBSERVER_T * observer,
+int setObserverAttach (LS_BITSET_OBSERVER_T * observer,
 			      LS_BITSET_T * set);
-extern int setNotifyObservers (LS_BITSET_T * set, LS_BITSET_EVENT_T * event);
-extern int setDumpSet (LS_BITSET_T *, char *);
-extern char *setPerror (int);
-extern LS_BITSET_T *setEnlarge (LS_BITSET_T *, unsigned int);
-extern void setOperate (LS_BITSET_T *, LS_BITSET_T *, int);
-extern void setCat (LS_BITSET_T *, char *, int, char *(*)(void *, void *),
+int setNotifyObservers (LS_BITSET_T * set, LS_BITSET_EVENT_T * event);
+int setDumpSet (LS_BITSET_T *, char *);
+char *setPerror (int);
+LS_BITSET_T *setEnlarge (LS_BITSET_T *, unsigned int);
+void setOperate (LS_BITSET_T *, LS_BITSET_T *, int);
+void setCat (LS_BITSET_T *, char *, int, char *(*)(void *, void *),
 		    void *);
 
-extern int getNum1BitsInWord (unsigned int *word);
-
-#endif
+int getNum1BitsInWord (unsigned int *word);

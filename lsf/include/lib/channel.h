@@ -18,9 +18,6 @@
 
 #pragma once
 
-#ifndef LSF_LIB_CHANNEL_H
-#define LSF_LIB_CHANNEL_H
-
 #include <sys/types.h>
 
 #include "lib/hdr.h"
@@ -139,7 +136,6 @@ int chanFreeStashedBuf_ (struct Buffer *buf);
 int chanSetMode_ (uint chfd, int mode );
 int chanSetMode_ (uint chfd, int mode );
 
-extern unsigned int cherrno;
-extern unsigned int chanIndex;
+unsigned int cherrno;
+unsigned int chanIndex;
 
-#endif

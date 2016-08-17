@@ -19,7 +19,7 @@
 #include "lib/lib.h"
 #include "lib/so.h"
 
-#define NL_SETN 23
+// #define NL_SETN 23
 #define IDLIB_SO_NAME "liblsfid.so"
 
 #define GET_LSF_USER         "getLSFUser_"

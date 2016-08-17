@@ -18,9 +18,6 @@
 
 #pragma once
 
-#ifndef LSF_MLS_H
-#define LSF_MLS_H
-
 typedef enum
 {
   MLS_FATAL,
@@ -30,7 +27,7 @@ typedef enum
   MLS_DOMINATE
 } mlsErrCode;
 
-extern int mlsSbdMode;
+int mlsSbdMode;
 
 /*#define lsfSetUid(uid)              lsfSetXUid(0, uid, uid, -1, setuid)
 
@@ -43,8 +40,7 @@ extern int mlsSbdMode;
 
 // FIXME investigate if the third argument to lsfSetXUid can be set to the appropriate
 // [s]uid_t type. if yes, try to see if there is an alternative to passing -1.
-extern int lsfSetXUid (int, uid_t uid, gid_t gid, uid_t suid, int (*)());
-extern void lsfExecLog (const char *);
-extern int lsfExecX (char *path, char **argv, int (*func) ());
+int lsfSetXUid (int, uid_t uid, gid_t gid, uid_t suid, int (*)());
+void lsfExecLog (const char *);
+int lsfExecX (char *path, char **argv, int (*func) ());
 
-#endif

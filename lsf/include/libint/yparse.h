@@ -18,9 +18,6 @@
 
 #pragma once
 
-#ifndef LSF_INTLIB_YPARSE_H
-#define LSF_INTLIB_YPARSE_H
-
 #ifndef MIN
 #define MIN(x, y)  ((x) <= (y)) ? (x):(y)
 #endif
@@ -41,41 +38,42 @@
 
 struct intRegion
 {
-  int start, end;
+  int start
+  int end;
 };
 
 struct listLink
 {
-  struct intRegion iconList;
-  struct listLink *next;
+	struct intRegion iconList;
+	struct listLink *next;
 };
 
 struct mallocList
 {
-  void *space;
-  struct mallocList *next;
+	void *space;
+	struct mallocList *next;
 };
 
-extern char *token;
-extern char yyerr[];
+char *token;
+char yyerr[];
 #if !defined(__CYGWIN__) && !defined(__sun__)
-extern FILE *yyout;
+FILE *yyout;
 #endif
-extern struct mbd_func_type mbd_func;
-extern struct mallocList *idxAllocHead;
+struct mbd_func_type mbd_func;
+struct mallocList *idxAllocHead;
 
-extern int yylex (void);
-extern void calerror (register char *);
-extern char *safe_calloc (unsigned, unsigned);
-extern void timerror (register char *);
-extern void *yyalloc (struct mallocList **, int);
-extern void yyfree (struct mallocList **, void *);
-extern void yparseSucc (struct mallocList **);
-extern void yparseFail (struct mallocList **);
-extern struct calendarE *getCalExprNode ();
-extern void idxerror (register char *);
+int yylex (void);
+void calerror (register char *);
+char *safe_calloc (unsigned, unsigned);
+void timerror (register char *);
+void *yyalloc (struct mallocList **, int);
+void yyfree (struct mallocList **, void *);
+void yparseSucc (struct mallocList **);
+void yparseFail (struct mallocList **);
+struct calendarE *getCalExprNode ();
+void idxerror (register char *);
 
 
-extern int checkNameSpec (char *, char **);
+int checkNameSpec (char *, char **);
 
 #endif

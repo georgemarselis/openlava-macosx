@@ -17,20 +17,12 @@
  */
 
 #pragma once
- 
-#ifndef LSF_RES_RESOUT_H
-#define LSF_RES_RESOUT_H
 
 #include <sys/ioctl.h>
 #include <termios.h>
 
 #include "lib/hdr.h"
-/* #include "lib/xdrres.h" */ // FIXME FIXME remove after making sure we don't need any more
-/*#include "lib/lproto.h"*/
 #include "daemons/libresd/resd.h"
-
-
-
 
 #ifndef TIOCGWINSZ
 struct winsize
@@ -181,6 +173,4 @@ struct resSignal {
 #define LS_WSTOPSIG WSTOPSIG
 #define LS_WIFSTOPPED WIFSTOPPED
 #define LS_WIFSIGNALED WIFSIGNALED
-#endif
-
 #endif

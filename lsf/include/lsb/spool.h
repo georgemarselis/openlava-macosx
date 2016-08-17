@@ -18,10 +18,6 @@
 
 #pragma once
 
- 
-#ifndef LSF_LSB_SPOOL_H
-#define LSF_LSB_SPOOL_H
-
 typedef enum spoolOptions
 {
   SPOOL_INPUT_FILE,
@@ -68,27 +64,27 @@ typedef struct listHeader *listHeaderPtr_t;
 
 #define LSB_OK_HOST_LIST_UPDATE_PERIOD    300
 
-extern listHeaderPtr_t okHostsListPtr_;
+listHeaderPtr_t okHostsListPtr_;
 
-extern char *getLocalHostOfficialName ();
-extern LSB_SPOOL_INFO_T *copySpoolFile (const char *srcFilePath, spoolOptions_t option);
-extern char *findSpoolDir (const char *spoolHost);
-extern spoolCopyStatus_t copyFileToHost (const char *localSrcFileFullPath, const char *hostName, const char *destinFileFullDir, const char *destinFileName);
-extern int removeSpoolFile (const char *hostName, const char *destinFileFullPath);
-extern char *getSpoolHostBySpoolFile (const char *spoolFile);
+char *getLocalHostOfficialName ();
+LSB_SPOOL_INFO_T *copySpoolFile (const char *srcFilePath, spoolOptions_t option);
+char *findSpoolDir (const char *spoolHost);
+spoolCopyStatus_t copyFileToHost (const char *localSrcFileFullPath, const char *hostName, const char *destinFileFullDir, const char *destinFileName);
+int removeSpoolFile (const char *hostName, const char *destinFileFullPath);
+char *getSpoolHostBySpoolFile (const char *spoolFile);
 
-extern listHeaderPtr_t createListHeader ();
-extern int deleteListHeader (const listHeaderPtr_t pListHeader);
-extern int deleteList (const listHeaderPtr_t pListHeader);
+listHeaderPtr_t createListHeader ();
+int deleteListHeader (const listHeaderPtr_t pListHeader);
+int deleteList (const listHeaderPtr_t pListHeader);
 
-extern listElementPtr_t createListElement (const char *elementName);
-extern int deleteListElement (const listElementPtr_t pListElement);
+listElementPtr_t createListElement (const char *elementName);
+int deleteListElement (const listElementPtr_t pListElement);
 
-extern listElementPtr_t addElementToList (const char *elementName, const listHeaderPtr_t pListHeader);
-extern int removeElementFromList (const listElementPtr_t pListElement, const listHeaderPtr_t pListHeader);
-extern listElementPtr_t getBestListElement (const listHeaderPtr_t pListHeader);
+listElementPtr_t addElementToList (const char *elementName, const listHeaderPtr_t pListHeader);
+int removeElementFromList (const listElementPtr_t pListElement, const listHeaderPtr_t pListHeader);
+listElementPtr_t getBestListElement (const listHeaderPtr_t pListHeader);
 
-extern int setBestListElement (const listElementPtr_t pBestElement, const listHeaderPtr_t pListHeader);
+int setBestListElement (const listElementPtr_t pBestElement, const listHeaderPtr_t pListHeader);
 
 static char *getTrimmedString (const char *stringToTrim);
 static spoolCopyStatus_t cpLocalFiles (const char *localSrcFileFullPath, const char *outputFileName);
@@ -120,4 +116,3 @@ listElementPtr_t getBestListElement (const listHeaderPtr_t pListHeader);
 int setBestListElement (const listElementPtr_t pBestElement,const listHeaderPtr_t pListHeader);
 listHeaderPtr_t createListHeader ( void );
 
-#endif

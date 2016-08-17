@@ -19,4 +19,4 @@
 #pragma once
 
 
-#define NL_SETN   23
+// #define NL_SETN   23

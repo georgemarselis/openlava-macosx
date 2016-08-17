@@ -18,9 +18,6 @@
 
 #pragma once
 
-#ifndef LSF_LIM_COMMON_H
-#define LSF_LIM_COMMON_H
-
 #include <math.h>
 #include <utmp.h>
 
@@ -32,8 +29,8 @@
 #define  PAGE_INTVL_CNT 120/exchIntvl
 
 
-extern int pipefd[2];
-extern struct limLock limLock;
+int pipefd[2];
+struct limLock limLock;
 
 
 static float getIoRate (float);
@@ -50,5 +47,3 @@ static int numCpus (void);
 int maxnLbHost = 0;
 int ncpus = 1;
 float cpu_usage = 0.0;
-
-#endif

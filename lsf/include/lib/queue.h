@@ -18,9 +18,6 @@
 
 #pragma once
 
-#ifndef LSF_LIB_QUEUE_H
-#define LSF_LIB_QUEUE_H
-
 #include "lsf.h"
 
 struct lsQueueEntry
@@ -41,25 +38,24 @@ struct lsQueue
 
 #define LS_QUEUE_EMPTY(Head) ((Head)->start->forw == (Head)->start)
 
-extern void tMsgDestroy_ (void *);
-extern int lsReqCmp_ (char *, char *, int);
-extern int lsQueueInit_ (struct lsQueue **head, int (*compare) (char *, char *, int), lsQueueDestroyFuncType destroy);
+void tMsgDestroy_ (void *);
+int lsReqCmp_ (char *, char *, int);
+int lsQueueInit_ (struct lsQueue **head, int (*compare) (char *, char *, int), lsQueueDestroyFuncType destroy);
 
-extern int lsQueueEntryAddFront_ (struct lsQueueEntry *entry, struct lsQueue *head);
-extern int lsQueueDataAddFront_ (char *data, struct lsQueue *head);
+int lsQueueEntryAddFront_ (struct lsQueueEntry *entry, struct lsQueue *head);
+int lsQueueDataAddFront_ (char *data, struct lsQueue *head);
 
-extern int lsQueueEntryAppend_ (struct lsQueueEntry *entry, struct lsQueue *head);
-extern int lsQueueDataAppend_ (char *data, struct lsQueue *head);
-extern void lsQueueEntryRemove_ (struct lsQueueEntry *entry);
-extern void lsQueueEntryDestroy_ (struct lsQueueEntry *entry, struct lsQueue *head);
-extern void lsQueueEntryDestroyAll_ (struct lsQueue *head);
-extern void lsQueueDestroy_ (struct lsQueue *head);
-extern struct lsQueueEntry *lsQueueDequeue_ (struct lsQueue *head);
-extern struct lsQueueEntry *lsQueueSearch_ (int hint, char *data, struct lsQueue *head);
-extern char *lsQueueDataGet_ (int, struct lsQueue *head);
-extern void lsQueueSetAdd_ (struct lsQueue *q1, struct lsQueue *q2, bool_t (*memberFunc) (struct lsQueueEntry *, struct lsQueue *));
-extern void lsQueueSort_ (struct lsQueue *q, int hint);
-extern int lsQueueDequeueData_ (struct lsQueue *head, char **data);
-extern void lsQueueIter_ (struct lsQueue *head, void (*func) (char *data, void *hdata), void *hdata);
+int lsQueueEntryAppend_ (struct lsQueueEntry *entry, struct lsQueue *head);
+int lsQueueDataAppend_ (char *data, struct lsQueue *head);
+void lsQueueEntryRemove_ (struct lsQueueEntry *entry);
+void lsQueueEntryDestroy_ (struct lsQueueEntry *entry, struct lsQueue *head);
+void lsQueueEntryDestroyAll_ (struct lsQueue *head);
+void lsQueueDestroy_ (struct lsQueue *head);
+struct lsQueueEntry *lsQueueDequeue_ (struct lsQueue *head);
+struct lsQueueEntry *lsQueueSearch_ (int hint, char *data, struct lsQueue *head);
+char *lsQueueDataGet_ (int, struct lsQueue *head);
+void lsQueueSetAdd_ (struct lsQueue *q1, struct lsQueue *q2, bool_t (*memberFunc) (struct lsQueueEntry *, struct lsQueue *));
+void lsQueueSort_ (struct lsQueue *q, int hint);
+int lsQueueDequeueData_ (struct lsQueue *head, char **data);
+void lsQueueIter_ (struct lsQueue *head, void (*func) (char *data, void *hdata), void *hdata);
 
-#endif

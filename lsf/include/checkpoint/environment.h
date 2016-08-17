@@ -18,10 +18,7 @@
 
 #pragma once
  
-#ifndef LSF_CHECKPOINT_ENVIRONMENT_H
-#define LSF_CHECKPOINT_ENVIRONMENT_H
-
-#define LSF_CHECKPOINT_VAR_FILE 		"/echeckpoint.var"
+#define LSF_CHECKPOINT_VAR_FILE 		"/echeckpoint.var" // FIXME FIXME FIXME replace with var in configure.ac
 
 typedef struct varpair
 {
@@ -41,5 +38,3 @@ int writeCheckpointVar (const char *, const char *);
 int fileIsExist (const char *);
 
 void freeTable_ ();
-
-#endif

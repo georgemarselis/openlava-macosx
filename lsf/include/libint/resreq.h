@@ -18,9 +18,6 @@
 
 #pragma once
  
-#ifndef LSF_INTLIB_RESREQ_H
-#define LSF_INTLIB_RESREQ_H
-
 #include "lsf.h"
 
 #define IS_DIGIT(s)  ( (s) >= '0' && (s) <= '9')
@@ -71,6 +68,4 @@ struct resVal
     char **xorExprs;
 };
 
-extern int getValPair (char **resReq, int *val1, int *val2);
-
-#endif
+int getValPair (char **resReq, int *val1, int *val2);

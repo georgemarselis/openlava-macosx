@@ -17,9 +17,6 @@
  */
 
 #pragma once
- 
-#ifndef LS_I18N_H
-#define LS_I18N_H
 
 #include <sys/types.h>
 
@@ -74,13 +71,13 @@
 
 #define I18N_m(msgID, msg) (_i18n_msg_get(ls_catd, 33, msgID, msg))
 
-// extern int ls_catd;
-extern  LS_CATD ls_catd;
-extern  int    _i18n_end         ( void );
-extern  char  *_i18n_ctime       ( LS_CATD, int, const time_t * );
-extern  char  *_i18n_msg_get     ( LS_CATD, int typeofError, int catgetsNumber, char *errorMessage );
-extern  char **_i18n_msgArray_get( LS_CATD, int, int *, char ** );
-extern  void   _i18n_ctime_init  ( LS_CATD );
+// int ls_catd;
+LS_CATD ls_catd;
+int    _i18n_end         ( void );
+char  *_i18n_ctime       ( LS_CATD, int, const time_t * );
+char  *_i18n_msg_get     ( LS_CATD, int typeofError, int catgetsNumber, char *errorMessage );
+char **_i18n_msgArray_get( LS_CATD, int, int *, char ** );
+void   _i18n_ctime_init  ( LS_CATD );
 
 int   _i18n_init   ( int );
 char *_i18n_ctime  (LS_CATD, int, const time_t *);
@@ -497,7 +494,3 @@ char *_i18n_printf (const char *, ...);
 
 #define I18N_zombi                  (I18N_m(6000, "zombi"))                                         /*catgets6000 */
 
-
-
-
-#endif

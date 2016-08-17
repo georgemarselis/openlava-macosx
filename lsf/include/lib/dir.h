@@ -22,7 +22,7 @@ static struct hTab hashTab;
 
 char chosenPath[MAXPATHLEN];
 
-extern struct config_param genParams_[];
+// struct config_param genParams_[]; // FIXME FIXME FIXME commended line out, cuz compiler was complaining. no obvious side-effects. revisit
 
 static int putin_ (unsigned long status, char *inkey, int inkeylen, char *inval, int invallen, void *indata);
 static int getMap_ (void);

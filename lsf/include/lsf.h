@@ -19,9 +19,6 @@
 
 #pragma once
 
-#ifndef LSF_H
-#define LSF_H
-
 #include <arpa/inet.h>
 #include <assert.h>
 #include <ctype.h>
@@ -866,145 +863,145 @@ typedef struct stat LS_STAT_T;
 
 #define LSF_NSIG NSIG
 
-extern int lserrno;
-extern int masterLimDown;
-extern int ls_nerr;
-extern char *ls_errmsg[];
-extern int logclass;
-extern int timinglevel;
+int lserrno;
+int masterLimDown;
+int ls_nerr;
+extern char *ls_errmsg[];  // FIXME FIXME FIXME FIXME FIXME put in specific header
+int logclass;
+int timinglevel;
 
-extern int lsf_lim_version;
-extern int lsf_res_version;
+int lsf_lim_version;
+int lsf_res_version;
 
-extern int ls_initrex (int, int);
-extern int ls_readconfenv (struct config_param *, char *);
-extern int ls_connect (char *);
-extern int ls_rexecv (char *, char **, int);
-extern int ls_rexecve (char *, char **, int, char **);
-extern int ls_rtask (char *, char **, int);
-extern int ls_rtaske (char *, char **, int, char **);
-extern int ls_rwait (LS_WAIT_T *, int, struct rusage *);
-extern int ls_rwaittid (int, LS_WAIT_T *, int, struct rusage *);
-extern int lls_rkill (uint rtid, int sig);
-extern int ls_startserver (char *, char **, int);
-extern int ls_conntaskport (int);
-extern char **ls_placereq              (char *resreq, size_t *numhosts, int options, char *fromhost);
-extern char **ls_placeofhosts          (char *resreq, size_t *numhosts, int options, char *fromhost, char **hostlist, size_t listsize);
-extern char **ls_placeoftype           (char *resreq, size_t *numhosts, int options, char *fromhost, char *hosttype);
-extern struct hostLoad *ls_load        (char *resreq, size_t *numhosts, int options, char *fromhost);
-extern struct hostLoad *ls_loadofhosts (char *resreq, size_t *numhosts, int options, char *fromhost, char **hostlist, size_t listsize);
-extern struct hostLoad *ls_loadoftype  (char *resreq, size_t *numhosts, int options, char *fromhost, char *hosttype);
-extern struct hostLoad *ls_loadinfo    (char *resreq, size_t *numhosts, int options, char *fromhost, char **hostlist, size_t listsize, char ***indxnamelist);
-extern int ls_loadadj  (char *resreq, struct placeInfo *hostlist, size_t listsize);
-extern int ls_eligible (char *task, char *resreqstr, char mode);
-extern char *ls_resreq (char *task);
-extern int ls_insertrtask (char *task);
-extern int ls_insertltask (char *task);
-extern int ls_deletertask (char *task);
-extern int ls_deleteltask (char *task);
-extern long ls_listrtask (char ***taskList, int sortflag);
-extern long ls_listltask (char ***taskList, int sortflag);
-extern char **ls_findmyconnections (void);
-extern int ls_isconnected (char *hostName);
-extern int ls_lostconnection (void);
-extern char *ls_getclustername (void);
-extern struct clusterInfo *ls_clusterinfo (char *resReq, unsigned int *numclusters, char **clusterList, int listsize, int options);
-extern struct lsSharedResourceInfo *ls_sharedresourceinfo (char **resources, uint *numResources, char *hostName, int options);
-extern char *ls_getmastername (void);
-extern char *ls_getmastername2 (void);
-extern char *ls_getmyhostname (void);
-extern struct hostInfo *ls_gethostinfo (char *resReq, size_t *numhosts, char **hostlist, size_t listsize, int options);
-extern char *ls_getISVmode (void);
+int ls_initrex (int, int);
+int ls_readconfenv (struct config_param *, char *);
+int ls_connect (char *);
+int ls_rexecv (char *, char **, int);
+int ls_rexecve (char *, char **, int, char **);
+int ls_rtask (char *, char **, int);
+int ls_rtaske (char *, char **, int, char **);
+int ls_rwait (LS_WAIT_T *, int, struct rusage *);
+int ls_rwaittid (int, LS_WAIT_T *, int, struct rusage *);
+int lls_rkill (uint rtid, int sig);
+int ls_startserver (char *, char **, int);
+int ls_conntaskport (int);
+char **ls_placereq              (char *resreq, size_t *numhosts, int options, char *fromhost);
+char **ls_placeofhosts          (char *resreq, size_t *numhosts, int options, char *fromhost, char **hostlist, size_t listsize);
+char **ls_placeoftype           (char *resreq, size_t *numhosts, int options, char *fromhost, char *hosttype);
+struct hostLoad *ls_load        (char *resreq, size_t *numhosts, int options, char *fromhost);
+struct hostLoad *ls_loadofhosts (char *resreq, size_t *numhosts, int options, char *fromhost, char **hostlist, size_t listsize);
+struct hostLoad *ls_loadoftype  (char *resreq, size_t *numhosts, int options, char *fromhost, char *hosttype);
+struct hostLoad *ls_loadinfo    (char *resreq, size_t *numhosts, int options, char *fromhost, char **hostlist, size_t listsize, char ***indxnamelist);
+int ls_loadadj  (char *resreq, struct placeInfo *hostlist, size_t listsize);
+int ls_eligible (char *task, char *resreqstr, char mode);
+char *ls_resreq (char *task);
+int ls_insertrtask (char *task);
+int ls_insertltask (char *task);
+int ls_deletertask (char *task);
+int ls_deleteltask (char *task);
+long ls_listrtask (char ***taskList, int sortflag);
+long ls_listltask (char ***taskList, int sortflag);
+char **ls_findmyconnections (void);
+int ls_isconnected (char *hostName);
+int ls_lostconnection (void);
+char *ls_getclustername (void);
+struct clusterInfo *ls_clusterinfo (char *resReq, unsigned int *numclusters, char **clusterList, int listsize, int options);
+struct lsSharedResourceInfo *ls_sharedresourceinfo (char **resources, uint *numResources, char *hostName, int options);
+char *ls_getmastername (void);
+char *ls_getmastername2 (void);
+char *ls_getmyhostname (void);
+struct hostInfo *ls_gethostinfo (char *resReq, size_t *numhosts, char **hostlist, size_t listsize, int options);
+char *ls_getISVmode (void);
 
-extern struct lsInfo *ls_info (void);
+struct lsInfo *ls_info (void);
 
-extern char **ls_indexnames (struct lsInfo *);
-extern int ls_isclustername (char *);
-extern char *ls_gethosttype (char *hostname);
-extern float *ls_getmodelfactor (char *modelname);
-extern float *ls_gethostfactor (char *hostname);
-extern char *ls_gethostmodel (char *hostname);
-extern int ls_lockhost (time_t duration);
-extern int ls_unlockhost (void);
-extern int ls_limcontrol (char *hostname, int opCode);
-extern void ls_remtty (int ind, int enableIntSus);
-extern void ls_loctty (int ind);
-extern char *ls_sysmsg (void);
-extern void ls_perror (char *usrMsg);
+char **ls_indexnames (struct lsInfo *);
+int ls_isclustername (char *);
+char *ls_gethosttype (char *hostname);
+float *ls_getmodelfactor (char *modelname);
+float *ls_gethostfactor (char *hostname);
+char *ls_gethostmodel (char *hostname);
+int ls_lockhost (time_t duration);
+int ls_unlockhost (void);
+int ls_limcontrol (char *hostname, int opCode);
+void ls_remtty (int ind, int enableIntSus);
+void ls_loctty (int ind);
+char *ls_sysmsg (void);
+void ls_perror (char *usrMsg);
 
 
-extern struct lsConf *ls_getconf (char *);
-extern void ls_freeconf (struct lsConf *);
-extern struct sharedConf *ls_readshared (char *);
-extern struct clusterConf *ls_readcluster (char *, struct lsInfo *);
-extern struct clusterConf *ls_readcluster_ex (char *, struct lsInfo *, int);
+struct lsConf *ls_getconf (char *);
+void ls_freeconf (struct lsConf *);
+struct sharedConf *ls_readshared (char *);
+struct clusterConf *ls_readcluster (char *, struct lsInfo *);
+struct clusterConf *ls_readcluster_ex (char *, struct lsInfo *, int);
 
-extern int ls_initdebug (char *appName);
-extern void ls_syslog (int level, const char *fmt, ...);
-extern void ls_verrlog (FILE * fp, const char *fmt, va_list ap);
+int ls_initdebug (char *appName);
+void ls_syslog (int level, const char *fmt, ...);
+void ls_verrlog (FILE * fp, const char *fmt, va_list ap);
 
-extern int ls_rescontrol (char *host, int opcode, int options);
-extern int ls_stdinmode (int onoff);
-extern int ls_stoprex (void);
-extern int ls_donerex (void);
-extern int ls_rsetenv (char *host, char **env);
-extern int ls_rsetenv_async (char *host, char **env);
-extern int ls_setstdout (int on, char *format);
-extern int ls_niossync (long numTasks);
-extern int ls_setstdin (int on, int *rpidlist, size_t len);
-extern int ls_chdir (char *, char *);
-extern int ls_fdbusy (uint fd);
-extern char *ls_getmnthost (char *fn);
-extern int ls_servavail (int, int);
-extern int ls_setpriority (int newPriority);
+int ls_rescontrol (char *host, int opcode, int options);
+int ls_stdinmode (int onoff);
+int ls_stoprex (void);
+int ls_donerex (void);
+int ls_rsetenv (char *host, char **env);
+int ls_rsetenv_async (char *host, char **env);
+int ls_setstdout (int on, char *format);
+int ls_niossync (long numTasks);
+int ls_setstdin (int on, int *rpidlist, size_t len);
+int ls_chdir (char *, char *);
+int ls_fdbusy (uint fd);
+char *ls_getmnthost (char *fn);
+int ls_servavail (int, int);
+int ls_setpriority (int newPriority);
 
-extern int ls_ropen (char *host, char *fn, int flags, int mode);
-extern int ls_rclose (int rfd);
-extern int ls_rwrite (int rfd, char *buf, size_t len);
-extern int ls_rread (int rfd, char *buf, size_t len);
-extern off_t ls_rlseek (int rfd, off_t offset, int whence);
-extern int ls_runlink (char *host, char *fn);
-extern int ls_rfstat (int rfd, struct stat *buf);
-extern int ls_rstat (char *host, char *fn, struct stat *buf);
-extern char *ls_rgetmnthost (char *host, char *fn);
-extern int ls_rfcontrol (int command, int arg);
-extern int ls_rfterminate (char *host);
+int ls_ropen (char *host, char *fn, int flags, int mode);
+int ls_rclose (int rfd);
+int ls_rwrite (int rfd, char *buf, size_t len);
+int ls_rread (int rfd, char *buf, size_t len);
+off_t ls_rlseek (int rfd, off_t offset, int whence);
+int ls_runlink (char *host, char *fn);
+int ls_rfstat (int rfd, struct stat *buf);
+int ls_rstat (char *host, char *fn, struct stat *buf);
+char *ls_rgetmnthost (char *host, char *fn);
+int ls_rfcontrol (int command, int arg);
+int ls_rfterminate (char *host);
 
-extern void ls_ruunix2lsf (struct rusage *rusage, struct lsfRusage *lsfRusage);
-extern void ls_rulsf2unix (struct lsfRusage *lsfRusage, struct rusage *rusage);
-extern void cleanLsfRusage (struct lsfRusage *);
-extern void cleanRusage (struct rusage *);
+void ls_ruunix2lsf (struct rusage *rusage, struct lsfRusage *lsfRusage);
+void ls_rulsf2unix (struct lsfRusage *lsfRusage, struct rusage *rusage);
+void cleanLsfRusage (struct lsfRusage *);
+void cleanRusage (struct rusage *);
 
-extern struct resLogRecord *ls_readrexlog (FILE *);
-extern int ls_nioinit (int sock);
-extern int ls_nioselect (int, fd_set *, fd_set *, fd_set *, struct nioInfo **, struct timeval *);
-extern int ls_nioctl (int, int);
-extern int ls_nionewtask (int, int);
-extern int ls_nioremovetask (int);
-extern int ls_niowrite (char *, int);
-extern int ls_nioclose (void);
-extern int ls_nioread (int, char *, int);
-extern int ls_niotasks (int, int *, int);
-extern int ls_niostatus (int, int *, struct rusage *);
-extern int ls_niokill (int);
-extern int ls_niosetdebug (int);
-extern int ls_niodump (int, int, int, char *);
-extern struct lsfAcctRec *ls_getacctrec (FILE *, int *);
-extern int ls_putacctrec (FILE *, struct lsfAcctRec *);
-extern int getBEtime (char *, char, time_t *);
+struct resLogRecord *ls_readrexlog (FILE *);
+int ls_nioinit (int sock);
+int ls_nioselect (int, fd_set *, fd_set *, fd_set *, struct nioInfo **, struct timeval *);
+int ls_nioctl (int, int);
+int ls_nionewtask (int, int);
+int ls_nioremovetask (int);
+int ls_niowrite (char *, int);
+int ls_nioclose (void);
+int ls_nioread (int, char *, int);
+int ls_niotasks (int, int *, int);
+int ls_niostatus (int, int *, struct rusage *);
+int ls_niokill (int);
+int ls_niosetdebug (int);
+int ls_niodump (int, int, int, char *);
+struct lsfAcctRec *ls_getacctrec (FILE *, int *);
+int ls_putacctrec (FILE *, struct lsfAcctRec *);
+int getBEtime (char *, char, time_t *);
 
 /*
  * openlava add host
  */
-extern int ls_addhost (struct hostEntry *);
-extern int ls_rmhost (const char *);
+int ls_addhost (struct hostEntry *);
+int ls_rmhost (const char *);
 
 /*
  * openlava LIM log functions
  */
-extern struct lsEventRec *ls_readeventrec (FILE *);
-extern int ls_writeeventrec (FILE *, struct lsEventRec *);
-extern int freeHostEntryLog (struct hostEntryLog **);
+struct lsEventRec *ls_readeventrec (FILE *);
+int ls_writeeventrec (FILE *, struct lsEventRec *);
+int freeHostEntryLog (struct hostEntryLog **);
 
 struct extResInfo
 {
@@ -1016,10 +1013,10 @@ struct extResInfo
 };
 
 #ifndef __CYGWIN__
-extern int optind;
-extern char *optarg;
-extern int opterr;
-extern int optopt;
+int optind;
+char *optarg;
+int opterr;
+int optopt;
 #endif
 
-#endif /* _lsf_h_ */
+// end lsf_h_

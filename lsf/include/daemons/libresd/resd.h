@@ -18,9 +18,6 @@
 
 #pragma once
 
-#ifndef LSF_RES_RES_H
-#define LSF_RES_RES_H
-
 #include <rpc/types.h>
 #include <rpc/xdr.h>
 #include <stdio.h>
@@ -55,49 +52,49 @@ typedef gid_t GETGROUPS_T;
 #endif 
 */
 
-extern int rexecPriority;
-extern struct client *clients[];
-extern int client_cnt;
-extern struct child **children;
-extern int child_cnt;
-extern char *Myhost;
-extern char *myHostType;
+int rexecPriority;
+extern struct client *clients[]; // FIXME FIXME FIXME FIXME FIXME attach specific header!
+int client_cnt;
+struct child **children;
+int child_cnt;
+char *Myhost;
+char *myHostType;
 
-extern int lastChildExitStatus;
+int lastChildExitStatus;
 
-extern int sbdMode;
-extern int sbdFlags;
+int sbdMode;
+int sbdFlags;
 #define SBD_FLAG_STDIN  0x1
 #define SBD_FLAG_STDOUT 0x2
 #define SBD_FLAG_STDERR 0x4
 #define SBD_FLAG_TERM   0x8
 
-extern int accept_sock;
-extern char child_res;
-extern char child_go;
-extern char res_interrupted;
-extern char *gobuf;
-extern char allow_accept;
-extern char magic_str[];
-extern int child_res_port;
-extern int parent_res_port;
-extern fd_set readmask, writemask, exceptmask;
+int accept_sock;
+char child_res;
+char child_go;
+char res_interrupted;
+char *gobuf;
+char allow_accept;
+extern char magic_str[]; // FIXME FIXME FIXME FIXME FIXME attach specific header!
+int child_res_port;
+int parent_res_port;
+fd_set readmask, writemask, exceptmask;
 
-extern int ctrlSock;
-extern struct sockaddr_in ctrlAddr;
+int ctrlSock;
+struct sockaddr_in ctrlAddr;
 
-extern int on;
-extern int off;
-extern int debug;
-extern int res_status;
+int on;
+int off;
+int debug;
+int res_status;
 
-extern char *lsbJobStarter;
+char *lsbJobStarter;
 
-extern char res_logfile[];
-extern int res_logop;
-extern int restart_argc;
-extern char **restart_argv;
-extern char *env_dir;
+extern char res_logfile[]; // FIXME FIXME FIXME FIXME FIXME attach specific header!
+int res_logop;
+int restart_argc;
+char **restart_argv;
+char *env_dir;
 
 #define MAXCLIENTS_HIGHWATER_MARK 100
 #define MAXCLIENTS_LOWWATER_MARK  1
@@ -513,77 +510,75 @@ int currentRESSN;
 #define SIG_NT_CTRLC        2000
 #define SIG_NT_CTRLBREAK    2001
 
-extern struct config_param resParams[];
-extern struct config_param resConfParams[];
+struct config_param resParams[];
+extern struct config_param resConfParams[]; // FIXME FIXME FIXME FIXME FIXME attach specific header!
 
 #define RES_REPLYBUF_LEN   4096
 
 #define RESS_LOGBIT         0x00000001
 
-extern void init_res (void);
-extern void resExit_ (int exitCode);
-extern long  nb_write_fix (int s, char *buf, size_t len);
-extern int ptymaster (char *);
-extern int ptyslave (char *);
-extern void doacceptconn (void);
-extern void dochild_stdio (struct child *, int);
-extern void dochild_remsock (struct child *, int);
-extern void dochild_buffer (struct child *, int);
-extern void dochild_info (struct child *, int);
-extern void doclient (struct client *);
-extern void ptyreset (void);
-extern void stdout_flush (struct child *chld);
-extern void doResParentCtrl (void);
-extern enum resAck sendResParent (struct LSFHeader * msgHdr, char *msgBuf, bool_t (*xdrFunc) ());
-extern int sendReturnCode (int, int);
+void init_res (void);
+void resExit_ (int exitCode);
+long  nb_write_fix (int s, char *buf, size_t len);
+int ptymaster (char *);
+int ptyslave (char *);
+void doacceptconn (void);
+void dochild_stdio (struct child *, int);
+void dochild_remsock (struct child *, int);
+void dochild_buffer (struct child *, int);
+void dochild_info (struct child *, int);
+void doclient (struct client *);
+void ptyreset (void);
+void stdout_flush (struct child *chld);
+void doResParentCtrl (void);
+enum resAck sendResParent (struct LSFHeader * msgHdr, char *msgBuf, bool_t (*xdrFunc) ());
+int sendReturnCode (int, int);
 
-extern void donios_sock (struct child **, int);
-extern int deliver_notifications (LIST_T *);
+void donios_sock (struct child **, int);
+int deliver_notifications (LIST_T *);
 
-extern void term_handler (int);
-extern void sigHandler (int);
-extern void child_handler (void);
-extern void child_handler_ext (void);
-extern void getMaskReady (fd_set * rm, fd_set * wm, fd_set * em);
-extern void display_masks (fd_set *, fd_set *, fd_set *);
+void term_handler (int);
+void sigHandler (int);
+void child_handler (void);
+void child_handler_ext (void);
+void getMaskReady (fd_set * rm, fd_set * wm, fd_set * em);
+void display_masks (fd_set *, fd_set *, fd_set *);
 
-extern size_t b_read_fix   (int s, char *buf, size_t len);
-extern long b_write_fix  (int s, char *buf, size_t len);
+size_t b_read_fix   (int s, char *buf, size_t len);
+long b_write_fix  (int s, char *buf, size_t len);
 
-extern int lsbJobStart (char **, u_short, char *, int);
+int lsbJobStart (char **, u_short, char *, int);
 
-extern void childAcceptConn (int, struct passwd *, struct lsfAuth *, struct resConnect *, struct hostent *);
+void childAcceptConn (int, struct passwd *, struct lsfAuth *, struct resConnect *, struct hostent *);
 
-extern void resChild (char *, char *);
-extern int resParent (int, struct passwd *, struct lsfAuth *, struct resConnect *, struct hostent *);
-extern bool_t isLSFAdmin (const char *);
+void resChild (char *, char *);
+int resParent (int, struct passwd *, struct lsfAuth *, struct resConnect *, struct hostent *);
+bool_t isLSFAdmin (const char *);
 
-extern bool_t xdr_resChildInfo (XDR *, struct resChildInfo *, struct LSFHeader *);
+bool_t xdr_resChildInfo (XDR *, struct resChildInfo *, struct LSFHeader *);
 
-extern void rfServ_ (int);
+void rfServ_ (int);
 
-extern char *pty_translate (char *);
-extern int check_valid_tty (char *);
+char *pty_translate (char *);
+int check_valid_tty (char *);
 
-extern void resAcctWrite (struct child *);
-extern void initResLog (void);
-extern char resAcctFN[MAXFILENAMELEN];
-extern int resLogOn;
-extern int resLogcpuTime;
-extern void initRU (struct rusage *);
-extern void resParentWriteAcct (struct LSFHeader *, XDR *, int);
+void resAcctWrite (struct child *);
+void initResLog (void);
+char resAcctFN[MAXFILENAMELEN];
+int resLogOn;
+int resLogcpuTime;
+void initRU (struct rusage *);
+void resParentWriteAcct (struct LSFHeader *, XDR *, int);
 
-extern int findRmiDest (int *, int *);
+int findRmiDest (int *, int *);
 
-extern void delete_child (struct child *);
-extern void destroy_child (struct child *);
-extern int resSignal (struct child *chld, struct resSignal sig);
+void delete_child (struct child *);
+void destroy_child (struct child *);
+int resSignal (struct child *chld, struct resSignal sig);
 
-extern void dumpClient (struct client *, char *);
-extern void dumpChild (struct child *, int, char *);
+void dumpClient (struct client *, char *);
+void dumpChild (struct child *, int, char *);
 
 
 
 #define UTMP_CHECK_CODE "sbdRes"
-
-#endif

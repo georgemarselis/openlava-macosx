@@ -18,10 +18,6 @@
 
 #pragma once
 
- 
-#ifndef LSF_LSB_LSBATCH_H
-#define LSF_LSB_LSBATCH_H
-
 #include "lsf.h"
 
 #define _PATH_NULL      "/dev/null"
@@ -1612,9 +1608,9 @@ struct queueConf
 #define  IS_POST_ERR(s) ( ( (s) & JOB_STAT_PERR) == JOB_STAT_PERR )
 #define  IS_POST_FINISH(s) ( IS_POST_DONE(s) || IS_POST_ERR(s) )
 
-extern int lsberrno;
+int lsberrno;
 
-extern int lsb_mbd_version;
+int lsb_mbd_version;
 
 #define PRINT_SHORT_NAMELIST  0x01
 #define PRINT_LONG_NAMELIST   0x02
@@ -1627,11 +1623,11 @@ struct nameList
 	char **names;
 };
 
-extern struct nameList *lsb_parseShortStr (char *, int);
-extern struct nameList *lsb_parseLongStr (char *);
-extern char *lsb_printNameList (struct nameList *, int);
-extern struct nameList *lsb_compressStrList (char **, int);
-extern char *lsb_splitName (char *, unsigned int *);
+struct nameList *lsb_parseShortStr (char *, int);
+struct nameList *lsb_parseLongStr (char *);
+char *lsb_printNameList (struct nameList *, int);
+struct nameList *lsb_compressStrList (char **, int);
+char *lsb_splitName (char *, unsigned int *);
 
 
 #if defined(__STDC__)
@@ -1641,69 +1637,69 @@ extern char *lsb_splitName (char *, unsigned int *);
 #endif
 
 
-extern struct paramConf *lsb_readparam P_ ((struct lsConf *));
-extern struct userConf *lsb_readuser P_ ((struct lsConf *, int, struct clusterConf *));
-extern struct userConf *lsb_readuser_ex P_ ((struct lsConf *, int, struct clusterConf *, struct sharedConf *));
-extern struct hostConf *lsb_readhost P_ ((struct lsConf *, struct lsInfo *, int, struct clusterConf *));
-extern struct queueConf *lsb_readqueue P_ ((struct lsConf *, struct lsInfo *, int, struct sharedConf *));
-extern void updateClusterConf (struct clusterConf *);
+struct paramConf *lsb_readparam P_ ((struct lsConf *));
+struct userConf *lsb_readuser P_ ((struct lsConf *, int, struct clusterConf *));
+struct userConf *lsb_readuser_ex P_ ((struct lsConf *, int, struct clusterConf *, struct sharedConf *));
+struct hostConf *lsb_readhost P_ ((struct lsConf *, struct lsInfo *, int, struct clusterConf *));
+struct queueConf *lsb_readqueue P_ ((struct lsConf *, struct lsInfo *, int, struct sharedConf *));
+void updateClusterConf (struct clusterConf *);
 
 
-extern int lsb_init P_ ((char *appName));
-extern int lsb_openjobinfo P_ ((LS_LONG_INT, char *, char *, char *, char *, int));
-extern struct jobInfoHead *lsb_openjobinfo_a P_ ((LS_LONG_INT, char *, char *, char *, char *, int));
-extern struct jobInfoEnt *lsb_readjobinfo P_ ((int *));
-extern LS_LONG_INT lsb_submit P_ ((struct submit *, struct submitReply *));
+int lsb_init P_ ((char *appName));
+int lsb_openjobinfo P_ ((LS_LONG_INT, char *, char *, char *, char *, int));
+struct jobInfoHead *lsb_openjobinfo_a P_ ((LS_LONG_INT, char *, char *, char *, char *, int));
+struct jobInfoEnt *lsb_readjobinfo P_ ((int *));
+LS_LONG_INT lsb_submit P_ ((struct submit *, struct submitReply *));
 
 
-extern void lsb_closejobinfo P_ ((void));
+void lsb_closejobinfo P_ ((void));
 
-extern int lsb_hostcontrol P_ ((char *, int));
-extern struct queueInfoEnt *lsb_queueinfo P_ ((char **queues, uint *numQueues, char *host, char *userName, int options));
-extern int lsb_reconfig P_ ((int));
-extern int lsb_signaljob P_ ((LS_LONG_INT, int));
-extern int lsb_msgjob P_ ((LS_LONG_INT, char *));
-extern int lsb_chkpntjob P_ ((LS_LONG_INT, time_t, int));
-extern int lsb_deletejob P_ ((LS_LONG_INT, int, int));
-extern int lsb_forcekilljob P_ ((LS_LONG_INT));
-extern int lsb_requeuejob P_ ((struct jobrequeue *));
-extern char *lsb_sysmsg P_ ((void));
-extern void lsb_perror P_ ((char *));
-extern char *lsb_sperror P_ ((char *));
-extern char *lsb_peekjob P_ ((LS_LONG_INT));
+int lsb_hostcontrol P_ ((char *, int));
+struct queueInfoEnt *lsb_queueinfo P_ ((char **queues, uint *numQueues, char *host, char *userName, int options));
+int lsb_reconfig P_ ((int));
+int lsb_signaljob P_ ((LS_LONG_INT, int));
+int lsb_msgjob P_ ((LS_LONG_INT, char *));
+int lsb_chkpntjob P_ ((LS_LONG_INT, time_t, int));
+int lsb_deletejob P_ ((LS_LONG_INT, int, int));
+int lsb_forcekilljob P_ ((LS_LONG_INT));
+int lsb_requeuejob P_ ((struct jobrequeue *));
+char *lsb_sysmsg P_ ((void));
+void lsb_perror P_ ((char *));
+char *lsb_sperror P_ ((char *));
+char *lsb_peekjob P_ ((LS_LONG_INT));
 
-extern int lsb_mig P_ ((struct submig *, int *badHostIdx));
+int lsb_mig P_ ((struct submig *, int *badHostIdx));
 
-extern struct hostInfoEnt *lsb_hostinfo P_ ((char **, uint *));
-extern struct hostInfoEnt *lsb_hostinfo_ex P_ ((char **, uint *, char *, int));
-extern int lsb_movejob P_ ((LS_LONG_INT jobId, int *, int));
-extern int lsb_switchjob P_ ((LS_LONG_INT jobId, char *queue));
-extern int lsb_queuecontrol P_ ((char *, int));
-extern struct userInfoEnt *lsb_userinfo P_ ((char **, uint *));
-extern struct groupInfoEnt *lsb_hostgrpinfo P_ ((char **groups, uint *numGroups, int options));
-extern struct groupInfoEnt *lsb_usergrpinfo P_ ((char **groups, uint *numGroups, int options));
-extern struct parameterInfo *lsb_parameterinfo P_ ((char **, uint *, int));
-extern LS_LONG_INT lsb_modify
+struct hostInfoEnt *lsb_hostinfo P_ ((char **, uint *));
+struct hostInfoEnt *lsb_hostinfo_ex P_ ((char **, uint *, char *, int));
+int lsb_movejob P_ ((LS_LONG_INT jobId, int *, int));
+int lsb_switchjob P_ ((LS_LONG_INT jobId, char *queue));
+int lsb_queuecontrol P_ ((char *, int));
+struct userInfoEnt *lsb_userinfo P_ ((char **, uint *));
+struct groupInfoEnt *lsb_hostgrpinfo P_ ((char **groups, uint *numGroups, int options));
+struct groupInfoEnt *lsb_usergrpinfo P_ ((char **groups, uint *numGroups, int options));
+struct parameterInfo *lsb_parameterinfo P_ ((char **, uint *, int));
+LS_LONG_INT lsb_modify
 P_ ((struct submit *, struct submitReply *, LS_LONG_INT));
-extern float *getCpuFactor P_ ((char *, int));
-extern char *lsb_suspreason P_ ((int, int, struct loadIndexLog *));
-extern char *lsb_pendreason P_ ((int, int *, struct jobInfoHead *, struct loadIndexLog *));
+float *getCpuFactor P_ ((char *, int));
+char *lsb_suspreason P_ ((int, int, struct loadIndexLog *));
+char *lsb_pendreason P_ ((int, int *, struct jobInfoHead *, struct loadIndexLog *));
 
-extern int lsb_puteventrec P_ ((FILE *, struct eventRec *));
-extern struct eventRec *lsb_geteventrec P_ ((FILE *log_fp, uint *lineNum));
-extern struct lsbSharedResourceInfo *lsb_sharedresourceinfo P_ ((char **, uint *, char *, int));
+int lsb_puteventrec P_ ((FILE *, struct eventRec *));
+struct eventRec *lsb_geteventrec P_ ((FILE *log_fp, uint *lineNum));
+struct lsbSharedResourceInfo *lsb_sharedresourceinfo P_ ((char **, uint *, char *, int));
 
-extern int lsb_runjob P_ ((struct runJobRequest *));
+int lsb_runjob P_ ((struct runJobRequest *));
 
-extern char *lsb_jobid2str P_ ((LS_LONG_INT));
-extern char *lsb_jobidinstr P_ ((LS_LONG_INT));
-extern void jobId32To64 P_ ((LS_LONG_INT *, uint jobId, uint jobArrElemId ) );
-extern void jobId64To32 P_ ((LS_LONG_INT, uint *jobId, uint *jobArrElemId ) );
-extern int lsb_setjobattr (int, struct jobAttrInfoEnt *);
+char *lsb_jobid2str P_ ((LS_LONG_INT));
+char *lsb_jobidinstr P_ ((LS_LONG_INT));
+void jobId32To64 P_ ((LS_LONG_INT *, uint jobId, uint jobArrElemId ) );
+void jobId64To32 P_ ((LS_LONG_INT, uint *jobId, uint *jobArrElemId ) );
+int lsb_setjobattr (int, struct jobAttrInfoEnt *);
 
-extern LS_LONG_INT lsb_rexecv (int, char **, char **, int *, int);
-extern int lsb_catch (const char *, int (*)(void *));
-extern void lsb_throw (const char *, void *);
+LS_LONG_INT lsb_rexecv (int, char **, char **, int *, int);
+int lsb_catch (const char *, int (*)(void *));
+void lsb_throw (const char *, void *);
 
 struct sortIntList *initSortIntList (int);
 int insertSortIntList (struct sortIntList *, int);
@@ -1729,6 +1725,5 @@ static int readJobFinish (char *, struct jobFinishLog *, time_t);
 static int readQueueCtrl (char *, struct queueCtrlLog *);
 static int readHostCtrl (char *, struct hostCtrlLog *);*/
 
-#undef P_
+// #undef P_
 
-#endif

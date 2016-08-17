@@ -17,9 +17,6 @@
  */
 
 #pragma once 
- 
-#ifndef LSF_INTLIB_SET_H
-#define LSF_INTLIB_SET_H
 
 struct listSet
 {
@@ -27,14 +24,13 @@ struct listSet
   struct listSet *next;
 };
 
-extern void listSetFree (struct listSet *);
-extern struct listSet *listSetAlloc (int);
-extern int listSetEqual (struct listSet *, struct listSet *);
-extern struct listSet *listSetUnion (struct listSet *, struct listSet *);
-extern struct listSet *listSetIntersect (struct listSet *, struct listSet *);
-extern struct listSet *listSetDuplicate (struct listSet *);
-extern int listSetIn (int, struct listSet *);
-extern struct listSet *listSetInsert (int, struct listSet *);
-extern struct listSet *listSetSub (struct listSet *, struct listSet *);
+void listSetFree (struct listSet *);
+struct listSet *listSetAlloc (int);
+int listSetEqual (struct listSet *, struct listSet *);
+struct listSet *listSetUnion (struct listSet *, struct listSet *);
+struct listSet *listSetIntersect (struct listSet *, struct listSet *);
+struct listSet *listSetDuplicate (struct listSet *);
+int listSetIn (int, struct listSet *);
+struct listSet *listSetInsert (int, struct listSet *);
+struct listSet *listSetSub (struct listSet *, struct listSet *);
 
-#endif

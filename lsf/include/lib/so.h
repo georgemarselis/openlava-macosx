@@ -18,14 +18,10 @@
 
 #pragma once
 
-#ifndef LSF_LIB_SO_H
-#define LSF_LIB_SO_H
-
-typedef int SO_HANDLE_T;
+typedef int SO_HANDLE_T;  // FIXME FIXME FIXME un-typedef
 
 
-extern SO_HANDLE_T soOpen_ (const char *libFileName);
-extern void soClose_ (SO_HANDLE_T handle);
-extern void *soSym_ (SO_HANDLE_T handle, const char *entryName);
+SO_HANDLE_T soOpen_ (const char *libFileName);
+void soClose_ (SO_HANDLE_T handle);
+void *soSym_ (SO_HANDLE_T handle, const char *entryName);
 
-#endif

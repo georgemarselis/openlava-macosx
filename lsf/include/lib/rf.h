@@ -18,8 +18,6 @@
 
 #pragma once
 
-#ifndef LSF_LIB_RF_H
-#define LSF_LIB_RF_H
 
 #define RF_SERVERD "_rf_Server_"
 
@@ -60,4 +58,3 @@ struct rlseekReq
   off_t offset;
 };
 
-#endif

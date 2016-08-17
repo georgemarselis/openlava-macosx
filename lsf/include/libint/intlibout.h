@@ -18,9 +18,6 @@
 
 #pragma once
  
-#ifndef LSF_INTLIB_INTLIBOUT_H
-#define LSF_INTLIB_INTLIBOUT_H
-
 #include "libint/link.h"
 #include "libint/list2.h"
 #include "libint/listset.h"
@@ -61,57 +58,56 @@ struct listEntry
 };
 
 
-extern char chosenPath[MAXPATHLEN];
+char chosenPath[MAXPATHLEN];
 
-extern void daemonize_ (void);
-extern void saveDaemonDir_ (char *);
-extern char *getDaemonPath_ (char *, char *);
-extern int mychdir_ (char *, struct hostent *);
-extern int myopen_ (char *, int, int, struct hostent *);
-extern FILE *myfopen_ (char *, char *, struct hostent *);
-extern int mystat_ (char *, struct stat *, struct hostent *);
-extern int mychmod_ (char *, mode_t, struct hostent *);
-extern int mymkdir_ (char *, mode_t, struct hostent *);
-extern void myexecv_ (char *, char **, struct hostent *);
-extern int myunlink_ (char *, struct hostent *, int);
-extern int myrename_ (char *, char *, struct hostent *);
-extern int addWindow (char *wordpair, windows_t * week[], char *context);
-extern void insertW (windows_t ** window, float ohour, float chour);
-extern void checkWindow (struct dayhour *dayhour, char *active, time_t * wind_edge, windows_t * wp, time_t now);
-extern void getDayHour (struct dayhour *dayPtr, time_t nowtime);
-extern void delWindow (windows_t * wp);
+void daemonize_ (void);
+void saveDaemonDir_ (char *);
+char *getDaemonPath_ (char *, char *);
+int mychdir_ (char *, struct hostent *);
+int myopen_ (char *, int, int, struct hostent *);
+FILE *myfopen_ (char *, char *, struct hostent *);
+int mystat_ (char *, struct stat *, struct hostent *);
+int mychmod_ (char *, mode_t, struct hostent *);
+int mymkdir_ (char *, mode_t, struct hostent *);
+void myexecv_ (char *, char **, struct hostent *);
+int myunlink_ (char *, struct hostent *, int);
+int myrename_ (char *, char *, struct hostent *);
+int addWindow (char *wordpair, windows_t * week[], char *context);
+void insertW (windows_t ** window, float ohour, float chour);
+void checkWindow (struct dayhour *dayhour, char *active, time_t * wind_edge, windows_t * wp, time_t now);
+void getDayHour (struct dayhour *dayPtr, time_t nowtime);
+void delWindow (windows_t * wp);
 
-extern int hostOk (char *, int);
-extern int hostIsLocal (char *);
-extern int getHostAttribNonLim (char *hname, int updateIntvl);
-extern int parseResReq (char *, struct resVal *, struct lsInfo *, int);
-extern void initParse (struct lsInfo *);
-extern int getResEntry (const char *);
-extern void freeResVal (struct resVal *resVal);
-extern void initResVal (struct resVal *resVal);
-extern int hostValue (void);
-extern int getBootTime (time_t *);
-extern int procChangeUser_ (char *);
-extern char *encryptPassLSF (char *);
-extern char *decryptPassLSF (char *);
-extern char *encryptByKey_ (char *, char *);
-extern char *decryptByKey_ (char *, char *);
-extern int matchName (char *, char *);
-extern int readPassword (char *);
-extern char **parseCommandArgs (char *, char *);
-extern int FCLOSEUP (FILE ** fp);
-extern int withinAddrRange (char *addrRange, char *address);
-extern int validateAddrRange (char *addrRange);
-extern char *mystrncpy (char *s1, const char *s2, size_t n);
-extern void openChildLog (const char *defLogFileName, const char *confLogDir, int use_stderr, char **confLogMaskPtr);
-extern void cleanDynDbgEnv (void);
-extern struct listEntry *mkListHeader (void);
-extern void offList (struct listEntry *);
-extern void inList (struct listEntry *, struct listEntry *);
-extern int getResourceNames (int, char **, int, char **);
-extern void displayShareResource (int, char **, int, int, int);
-extern int makeShareField (char *, int, char ***, char ***, char ***);
-extern char *getMAC (int *length);
-extern char *mac2hex (char *mac, int len);
+int hostOk (char *, int);
+int hostIsLocal (char *);
+int getHostAttribNonLim (char *hname, int updateIntvl);
+int parseResReq (char *, struct resVal *, struct lsInfo *, int);
+void initParse (struct lsInfo *);
+int getResEntry (const char *);
+void freeResVal (struct resVal *resVal);
+void initResVal (struct resVal *resVal);
+int hostValue (void);
+int getBootTime (time_t *);
+int procChangeUser_ (char *);
+char *encryptPassLSF (char *);
+char *decryptPassLSF (char *);
+char *encryptByKey_ (char *, char *);
+char *decryptByKey_ (char *, char *);
+int matchName (char *, char *);
+int readPassword (char *);
+char **parseCommandArgs (char *, char *);
+int FCLOSEUP (FILE ** fp);
+int withinAddrRange (char *addrRange, char *address);
+int validateAddrRange (char *addrRange);
+char *mystrncpy (char *s1, const char *s2, size_t n);
+void openChildLog (const char *defLogFileName, const char *confLogDir, int use_stderr, char **confLogMaskPtr);
+void cleanDynDbgEnv (void);
+struct listEntry *mkListHeader (void);
+void offList (struct listEntry *);
+void inList (struct listEntry *, struct listEntry *);
+int getResourceNames (int, char **, int, char **);
+void displayShareResource (int, char **, int, int, int);
+int makeShareField (char *, int, char ***, char ***, char ***);
+char *getMAC (int *length);
+char *mac2hex (char *mac, int len);
 
-#endif

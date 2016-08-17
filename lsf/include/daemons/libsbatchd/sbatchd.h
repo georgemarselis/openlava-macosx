@@ -17,9 +17,6 @@
  */
 
 #pragma once
- 
-#ifndef LSF_SBD_SDB_H
-#define LSF_SBD_SDB_H
 
 
 #include <ctype.h>
@@ -200,139 +197,137 @@ struct jobSyslog
      PURE_INTERACTIVE(&(jp)->jobSpecs)))
 
 
-extern int mbdPid;
-extern int jobcnt;
-extern int maxJobs;
-extern int uJobLimit;
-extern int pgSuspIdleT;
-extern int listenNqs;
-extern windows_t *host_week[8];
-extern time_t host_windEdge;
-extern char host_active;
-extern char master_unknown;
-extern char myStatus;
+int mbdPid;
+int jobcnt;
+int maxJobs;
+int uJobLimit;
+int pgSuspIdleT;
+int listenNqs;
+windows_t *host_week[8];
+time_t host_windEdge;
+char host_active;
+char master_unknown;
+char myStatus;
 
 #define NO_LIM		0x0001
 
-extern char need_checkfinish;
-extern int failcnt;
-extern float myFactor;
-extern int pgSuspIdleT;
-extern char *env_dir;
-extern time_t bootTime;
+char need_checkfinish;
+int failcnt;
+float myFactor;
+int pgSuspIdleT;
+char *env_dir;
+time_t bootTime;
 
-extern struct listEntry *jobQue;
-extern struct jobCard *jobQueHead;
-extern struct jobTable *joblist[];
-extern struct clientNode *clientList;
-extern struct bucket *jmQueue;
+struct listEntry *jobQue;
+struct jobCard *jobQueHead;
+struct jobTable *joblist[];
+struct clientNode *clientList;
+struct bucket *jmQueue;
 
-extern int statusChan;
+int statusChan;
 
 
-extern void start_master (void);
-extern void shutDownClient (struct clientNode *);
+void start_master (void);
+void shutDownClient (struct clientNode *);
 
-extern void do_newjob (XDR * xdrs, int s, struct LSFHeader *);
-extern void do_switchjob (XDR * xdrs, int s, struct LSFHeader *);
-extern void do_sigjob (XDR * xdrs, int s, struct LSFHeader *);
-extern void do_probe (XDR * xdrs, int s, struct LSFHeader *);
-extern void do_reboot (XDR * xdrs, int s, struct LSFHeader *);
-extern void do_shutdown (XDR * xdrs, int s, struct LSFHeader *);
-extern void do_jobSetup (XDR * xdrs, int s, struct LSFHeader *);
-extern void do_jobSyslog (XDR * xdrs, int s, struct LSFHeader *);
-extern void do_jobMsg (struct bucket *, XDR *, int s, struct LSFHeader *);
-extern void do_rmConn (XDR *, int, struct LSFHeader *, struct clientNode *);
-extern void do_lsbMsg (XDR *, int s, struct LSFHeader *);
-extern void deliverMsg (struct bucket *);
+void do_newjob (XDR * xdrs, int s, struct LSFHeader *);
+void do_switchjob (XDR * xdrs, int s, struct LSFHeader *);
+void do_sigjob (XDR * xdrs, int s, struct LSFHeader *);
+void do_probe (XDR * xdrs, int s, struct LSFHeader *);
+void do_reboot (XDR * xdrs, int s, struct LSFHeader *);
+void do_shutdown (XDR * xdrs, int s, struct LSFHeader *);
+void do_jobSetup (XDR * xdrs, int s, struct LSFHeader *);
+void do_jobSyslog (XDR * xdrs, int s, struct LSFHeader *);
+void do_jobMsg (struct bucket *, XDR *, int s, struct LSFHeader *);
+void do_rmConn (XDR *, int, struct LSFHeader *, struct clientNode *);
+void do_lsbMsg (XDR *, int s, struct LSFHeader *);
+void deliverMsg (struct bucket *);
 
-extern void getJobsState (struct sbdPackage *sbdPackage);
-extern int status_job (mbdReqType, struct jobCard *, int, sbdReplyType);
-extern void sbdSyslog (int, char *);
-extern void jobSetupStatus (int, int, struct jobCard *);
-extern int msgSupervisor (struct lsbMsg *, struct clientNode *);
+void getJobsState (struct sbdPackage *sbdPackage);
+int status_job (mbdReqType, struct jobCard *, int, sbdReplyType);
+void sbdSyslog (int, char *);
+void jobSetupStatus (int, int, struct jobCard *);
+int msgSupervisor (struct lsbMsg *, struct clientNode *);
 #ifdef INTER_DAEMON_AUTH
-extern int getSbdAuth (struct lsfAuth *);
+int getSbdAuth (struct lsfAuth *);
 #endif
-extern int sendUnreportedStatus (struct chunkStatusReq *chunkStatusReq);
+int sendUnreportedStatus (struct chunkStatusReq *chunkStatusReq);
 
-extern struct jobCard *addJob (struct jobSpecs *, int);
-extern void refreshJob (struct jobSpecs *);
-extern sbdReplyType job_exec (struct jobCard *jobCardPtr, int);
-extern void status_report (void);
-extern int job_finish (struct jobCard *, int);
-extern void setRunLimit (struct jobCard *, int);
-extern void inJobLink (struct jobCard *);
-extern void deallocJobCard (struct jobCard *);
-extern void freeToHostsEtc (struct jobSpecs *);
-extern void saveSpecs (struct jobSpecs *, struct jobSpecs *);
-extern void renewJobStat (struct jobCard *jp);
-extern void jobGone (struct jobCard *jp);
-extern void preJobStatus (struct jobCard *jp, int sfd);
-extern int setIds (struct jobCard *jobCardPtr);
-extern void preExecFinish (struct jobCard *);
-extern void jobGone (struct jobCard *jp);
-extern int setJobEnv (struct jobCard *);
-extern int runQPost (struct jobCard *);
-extern int acctMapOk (struct jobCard *);
-extern int acctMapTo (struct jobCard *);
-extern int postJobSetup (struct jobCard *);
-extern void runUPre (struct jobCard *);
-extern int reniceJob (struct jobCard *);
-extern int updateRUsageFromSuper (struct jobCard *jp, char *mbuf);
-extern void sbdChild (char *, char *);
-extern int initJobCard (struct jobCard *jp, struct jobSpecs *jobSpecs, int *);
-extern void freeThresholds (struct thresholds *);
-extern void saveThresholds (struct jobSpecs *, struct thresholds *);
-extern void unlockHosts (struct jobCard *, int);
-extern int lockHosts (struct jobCard *);
+struct jobCard *addJob (struct jobSpecs *, int);
+void refreshJob (struct jobSpecs *);
+sbdReplyType job_exec (struct jobCard *jobCardPtr, int);
+void status_report (void);
+int job_finish (struct jobCard *, int);
+void setRunLimit (struct jobCard *, int);
+void inJobLink (struct jobCard *);
+void deallocJobCard (struct jobCard *);
+void freeToHostsEtc (struct jobSpecs *);
+void saveSpecs (struct jobSpecs *, struct jobSpecs *);
+void renewJobStat (struct jobCard *jp);
+void jobGone (struct jobCard *jp);
+void preJobStatus (struct jobCard *jp, int sfd);
+int setIds (struct jobCard *jobCardPtr);
+void preExecFinish (struct jobCard *);
+void jobGone (struct jobCard *jp);
+int setJobEnv (struct jobCard *);
+int runQPost (struct jobCard *);
+int acctMapOk (struct jobCard *);
+int acctMapTo (struct jobCard *);
+int postJobSetup (struct jobCard *);
+void runUPre (struct jobCard *);
+int reniceJob (struct jobCard *);
+int updateRUsageFromSuper (struct jobCard *jp, char *mbuf);
+void sbdChild (char *, char *);
+int initJobCard (struct jobCard *jp, struct jobSpecs *jobSpecs, int *);
+void freeThresholds (struct thresholds *);
+void saveThresholds (struct jobSpecs *, struct thresholds *);
+void unlockHosts (struct jobCard *, int);
+int lockHosts (struct jobCard *);
 
-extern void job_checking (void);
-extern int job_resume (struct jobCard *);
-extern void checkFinish (void);
-extern void setInclRs (struct jobSpecs *jobSpecs, int reason);
-extern void resetInclRs (struct jobSpecs *jobSpecs, int reason);
-extern int testInclRs (struct jobSpecs *jobSpecs, int reason);
-
-
-extern int chkpntJob (struct jobCard *, int);
-extern void execRestart (struct jobCard *jobCardPtr, struct hostent *hp);
+void job_checking (void);
+int job_resume (struct jobCard *);
+void checkFinish (void);
+void setInclRs (struct jobSpecs *jobSpecs, int reason);
+void resetInclRs (struct jobSpecs *jobSpecs, int reason);
+int testInclRs (struct jobSpecs *jobSpecs, int reason);
 
 
-extern int rmJobBufFiles (struct jobCard *);
-extern void writePreJobFail (struct jobCard *jp);
+int chkpntJob (struct jobCard *, int);
+void execRestart (struct jobCard *jobCardPtr, struct hostent *hp);
 
-extern int appendJobFile (struct jobCard *jobCard, char *header,
+
+int rmJobBufFiles (struct jobCard *);
+void writePreJobFail (struct jobCard *jp);
+
+int appendJobFile (struct jobCard *jobCard, char *header,
 			  struct hostent *hp, char *errMsg);
-extern int initPaths (struct jobCard *jp, struct hostent *fromHp,
+int initPaths (struct jobCard *jp, struct hostent *fromHp,
 		      struct lenData *jf);
-extern int rcpFile (struct jobSpecs *, struct xFile *, char *, int, char *);
-extern void delCredFiles (void);
-extern void jobFileExitStatus (struct jobCard *jobCard);
-extern int isAbsolutePathSub (struct jobCard *, const char *);
-extern int isAbsolutePathExec (const char *);
+int rcpFile (struct jobSpecs *, struct xFile *, char *, int, char *);
+void delCredFiles (void);
+void jobFileExitStatus (struct jobCard *jobCard);
+int isAbsolutePathSub (struct jobCard *, const char *);
+int isAbsolutePathExec (const char *);
 
-extern void milliSleep (int msec);
-extern char window_ok (struct jobCard *jobPtr);
-extern void child_handler (int);
-extern void shout_err (struct jobCard *jobPtr, char *);
-extern int fcp (char *, char *, struct hostent *);
-extern int rmDir (char *);
-extern void closeBatchSocket (void);
-extern void getManagerId (struct sbdPackage *);
+void milliSleep (int msec);
+char window_ok (struct jobCard *jobPtr);
+void child_handler (int);
+void shout_err (struct jobCard *jobPtr, char *);
+int fcp (char *, char *, struct hostent *);
+int rmDir (char *);
+void closeBatchSocket (void);
+void getManagerId (struct sbdPackage *);
 
 bool_t xdr_jobSetup (XDR *, struct jobSetup *, struct LSFHeader *);
 bool_t xdr_jobSyslog (XDR *, struct jobSyslog *, struct LSFHeader *);
 bool_t xdr_jobCard (XDR *, struct jobCard *, struct LSFHeader *);
-extern int sizeofJobCard (struct jobCard *);
+int sizeofJobCard (struct jobCard *);
 
-extern int jobSigStart (struct jobCard *jp, int sigValue, int actFlags,
+int jobSigStart (struct jobCard *jp, int sigValue, int actFlags,
 			int actPeriod, logType logFlag);
-extern int jobact (struct jobCard *, int, char *, int, int);
-extern int jobsig (struct jobCard *jobTable, int sig, int forkKill);
-extern int sbdread_jobstatus (struct jobCard *jp);
-extern int sbdCheckUnreportedStatus ();
-extern void exeActCmd (struct jobCard *jp, char *actCmd, char *exitFile);
-extern void exeChkpnt (struct jobCard *jp, int chkFlags, char *exitFile);
-
-#endif
+int jobact (struct jobCard *, int, char *, int, int);
+int jobsig (struct jobCard *jobTable, int sig, int forkKill);
+int sbdread_jobstatus (struct jobCard *jp);
+int sbdCheckUnreportedStatus ();
+void exeActCmd (struct jobCard *jp, char *actCmd, char *exitFile);
+void exeChkpnt (struct jobCard *jp, int chkFlags, char *exitFile);

@@ -17,9 +17,6 @@
  */
 
 #pragma once
- 
-#ifndef LSF_LSB_CONF_H
-#define LSF_LSB_CONF_H
 
 #define TYPE1  RESF_BUILTIN | RESF_DYNAMIC | RESF_GLOBAL
 #define TYPE2  RESF_BUILTIN | RESF_GLOBAL
@@ -166,11 +163,8 @@ int checkSpoolDir (char *spoolDir);
 int checkJobAttaDir (char *);
 
 
-extern int sigNameToValue_ (char *);
-extern int parseSigActCmd (struct queueInfoEnt *queue, char *val, char *fname, uint *lineNum, char *section);
-extern int terminateWhen (struct queueInfoEnt *qp, char *linep, char *fname, uint *lineNum, char *section);
-extern char checkRequeEValues (struct queueInfoEnt *qp, char *word, char *fname, uint *lineNum);
+int sigNameToValue_ (char *);
+int parseSigActCmd (struct queueInfoEnt *queue, char *val, char *fname, uint *lineNum, char *section);
+int terminateWhen (struct queueInfoEnt *qp, char *linep, char *fname, uint *lineNum, char *section);
+char checkRequeEValues (struct queueInfoEnt *qp, char *word, char *fname, uint *lineNum);
 
-
-
-#endif

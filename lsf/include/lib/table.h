@@ -18,9 +18,6 @@
 
 #pragma once
 
-#ifndef LSF_LIB_TABLE_H
-#define LSF_LIB_TABLE_H
-
 #define RESETFACTOR     2
 #define RESETLIMIT      1.5
 #define DEFAULT_SLOTS   11
@@ -94,21 +91,19 @@ typedef struct sTab
 
 typedef void (*HTAB_DATA_DESTROY_FUNC_T) (void *);
 
-extern void insList_ (struct hLinks *, struct hLinks *);
-extern void remList_ (struct hLinks *);
-extern void initList_ (struct hLinks *);
-extern void h_initTab_ (hTab * tabPtr, unsigned long numSlots);
-extern void h_freeTab_ (hTab *, void (*destroy) (void *));
-extern int h_TabEmpty_ (hTab *);
-extern void h_delTab_ (hTab *);
-extern hEnt *h_getEnt_ (hTab *tabPtr, const char *key);
-extern hEnt *h_addEnt_ (hTab *, const char *, int *);
-extern void h_delEnt_ (hTab *, hEnt *);
-extern void h_rmEnt_ (hTab *, hEnt *);
-extern hEnt *h_firstEnt_ (hTab *, sTab *);
-extern hEnt *h_nextEnt_ (sTab *);
-extern void h_freeRefTab_ (hTab *);
-extern void h_delRef_ (hTab *, hEnt *);
+void insList_ (struct hLinks *, struct hLinks *);
+void remList_ (struct hLinks *);
+void initList_ (struct hLinks *);
+void h_initTab_ (hTab * tabPtr, unsigned long numSlots);
+void h_freeTab_ (hTab *, void (*destroy) (void *));
+int h_TabEmpty_ (hTab *);
+void h_delTab_ (hTab *);
+hEnt *h_getEnt_ (hTab *tabPtr, const char *key);
+hEnt *h_addEnt_ (hTab *, const char *, int *);
+void h_delEnt_ (hTab *, hEnt *);
+void h_rmEnt_ (hTab *, hEnt *);
+hEnt *h_firstEnt_ (hTab *, sTab *);
+hEnt *h_nextEnt_ (sTab *);
+void h_freeRefTab_ (hTab *);
+void h_delRef_ (hTab *, hEnt *);
 
-
-#endif

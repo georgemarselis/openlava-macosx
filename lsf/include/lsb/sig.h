@@ -17,9 +17,6 @@
  */
 
 #pragma once
- 
-#ifndef LSF_LSB_SIG_H
-#define LSF_LSB_SIG_H
 
 #include "lsb/lsb.h"
 
@@ -51,11 +48,9 @@
 #define  SIG_TERM_MEMLIMIT       -22
 #define  SIG_ARRAY_REQUEUE       -23
 
-extern int sigNameToValue_ (char *sigString);
-extern char *getLsbSigSymbol (int sigValue);
-extern int getDefSigValue_ (int sigValue, char *actCmd);
-extern int isSigTerm (int sigValue);
-extern int isSigSusp (int sigValue);
-extern int terminateWhen_ (int *sigMap, char *name);
-
-#endif
+int sigNameToValue_ (char *sigString);
+char *getLsbSigSymbol (int sigValue);
+int getDefSigValue_ (int sigValue, char *actCmd);
+int isSigTerm (int sigValue);
+int isSigSusp (int sigValue);
+int terminateWhen_ (int *sigMap, char *name);

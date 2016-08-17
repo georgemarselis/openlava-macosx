@@ -19,19 +19,19 @@
 
 #include "daemons/daemonout.h"
 
-#define NL_SETN 	13
+// #define NL_SETN 	13
 
-extern char **environ;
-extern char *loginShell;
-extern int optionFlag;
-extern char optionFileName[MAXLSFNAMELEN];
-extern int sig_decode (int);
-extern int isatty (int);
+char **environ;
+char *loginShell;
+int optionFlag;
+char optionFileName[MAXLSFNAMELEN];
+int sig_decode (int);
+int isatty (int);
 
 
-extern int setOption_ (int argc, char **argv, char *template, struct submit *req, int mask, char **errMsg);
-extern struct submit *parseOptFile_ (char *filename, struct submit *req, char **errMsg);
-extern void subUsage_ (int, char **);
+int setOption_ (int argc, char **argv, char *template, struct submit *req, int mask, char **errMsg);
+struct submit *parseOptFile_ (char *filename, struct submit *req, char **errMsg);
+void subUsage_ (int, char **);
 
 static int emptyCmd;
 

@@ -5,9 +5,6 @@
  */
 
 #pragma once
- 
-#ifndef LSF_INTLIB_LINK_H
-#define LSF_INTLIB_LINK_H
 
 /* Each linked list is made of a head whose ptr is always
  * NULL, a list of following links starting from next and
@@ -47,4 +44,4 @@ void *visitLink (link_t *);
 void traverseInit (const link_t *, linkiter_t *);
 void *traverseLink (linkiter_t *);
 
-#endif /* LSF_INTLIB_LINK_H */
+

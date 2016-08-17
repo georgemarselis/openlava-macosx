@@ -18,9 +18,7 @@
 
 
 #pragma once
- 
-#ifndef BHISTOUT_H
-#define BHISTOUT_H
+
 
 #include <pwd.h>
 #include <time.h>
@@ -168,44 +166,43 @@ struct jobRecord
 
 };
 
-extern struct hTab jobIdHT;
-extern struct loadIndexLog *loadIndex;
-extern char *bhist_malloc (int);
-extern char *bhist_calloc (int, int);
-extern struct bhistReq Req;
-extern int readFromHeadFlag;
+struct hTab jobIdHT;
+struct loadIndexLog *loadIndex;
+char *bhist_malloc (int);
+char *bhist_calloc (int, int);
+struct bhistReq Req;
+int readFromHeadFlag;
 
 
-extern char read_loadIndex (struct eventRec *);
-extern char check_queue (struct bhistReq *, char *);
-extern char check_host (struct bhistReq *, struct jobRecord *);
-extern struct jobInfoEnt *read_newjob (struct eventRec *);
-extern struct jobInfoEnt *copyJobInfoEnt (struct jobInfoEnt *);
-extern struct jobRecord *read_startjob (struct eventRec *);
-extern char read_newstat (struct eventRec *);
-extern char read_chkpnt (struct eventRec *);
-extern char read_mig (struct eventRec *);
-extern char read_delete (struct eventRec *);
-extern char read_switch (struct eventRec *);
-extern char read_jobmove (struct eventRec *);
-extern char read_signal (struct eventRec *);
-extern char read_jobstartaccept (struct eventRec *);
-extern char read_jobmsg (struct eventRec *);
-extern char read_jobmsgack (struct eventRec *);
-extern char read_jobforce (struct eventRec *);
-extern int addJob (struct jobRecord *);
-extern int addEvent (struct eventRecord *, struct jobRecord *);
-extern void freeJobInfoEnt (struct jobInfoEnt *);
-extern void freeJobRecord (struct jobRecord *);
+char read_loadIndex (struct eventRec *);
+char check_queue (struct bhistReq *, char *);
+char check_host (struct bhistReq *, struct jobRecord *);
+struct jobInfoEnt *read_newjob (struct eventRec *);
+struct jobInfoEnt *copyJobInfoEnt (struct jobInfoEnt *);
+struct jobRecord *read_startjob (struct eventRec *);
+char read_newstat (struct eventRec *);
+char read_chkpnt (struct eventRec *);
+char read_mig (struct eventRec *);
+char read_delete (struct eventRec *);
+char read_switch (struct eventRec *);
+char read_jobmove (struct eventRec *);
+char read_signal (struct eventRec *);
+char read_jobstartaccept (struct eventRec *);
+char read_jobmsg (struct eventRec *);
+char read_jobmsgack (struct eventRec *);
+char read_jobforce (struct eventRec *);
+int addJob (struct jobRecord *);
+int addEvent (struct eventRecord *, struct jobRecord *);
+void freeJobInfoEnt (struct jobInfoEnt *);
+void freeJobRecord (struct jobRecord *);
 
-extern struct jobRecord *initJobList (void);
-extern void removeJobList (struct jobRecord *);
-extern struct jobInfoEnt *initJobInfo (void);
-extern char read_jobrequeue (struct eventRec *);
-extern int matchJobId (struct bhistReq *, LS_LONG_INT);
+struct jobRecord *initJobList (void);
+void removeJobList (struct jobRecord *);
+struct jobInfoEnt *initJobInfo (void);
+char read_jobrequeue (struct eventRec *);
+int matchJobId (struct bhistReq *, LS_LONG_INT);
 
-extern hEnt *chekMemb (struct hTab *tabPtr, LS_LONG_INT member);
-extern void parse_event (struct eventRec *, struct bhistReq *);
-extern int bhistReqInit (struct bhistReq *);
+hEnt *chekMemb (struct hTab *tabPtr, LS_LONG_INT member);
+void parse_event (struct eventRec *, struct bhistReq *);
+int bhistReqInit (struct bhistReq *);
 
-#endif

@@ -33,6 +33,7 @@
 #include "daemons/libresd/resd.h"
 #include "daemons/libresd/rescom.h"
 #include "daemons/libniosd/niosd.h"
+#include "daemons/libniosd/handler.h"
 
 #define NL_SETN         29
 typedef struct dead_tid

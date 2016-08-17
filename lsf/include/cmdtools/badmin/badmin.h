@@ -17,9 +17,7 @@
  */
 
 #pragma once
- 
-#ifndef LSF_BADMIN_BADMIN_H
-#define LSF_BADMIN_BADMIN_H
+
 
 #include <ctype.h>
 
@@ -27,20 +25,20 @@
 #include "intlib/intlibout.h"
 #include "lsf.h"
 
-extern int bhc (int argc, char **argv, int opCode);
-extern int bqc (int argc, char **argv, int opCode);
-extern int breconfig (int argc, char **argv, int configFlag);
-extern int sysHist (int argc, char **argv, int opCode);
+int bhc (int argc, char **argv, int opCode);
+int bqc (int argc, char **argv, int opCode);
+int breconfig (int argc, char **argv, int configFlag);
+int sysHist (int argc, char **argv, int opCode);
 
-extern void parseAndDo (char *cmdBuf, int (*func) ());
-extern int adminCmdIndex (char *cmd, char *cmdList[]);
-extern void cmdsUsage (char *cmd, char *cmdList[], char *cmdInfo[]);
-extern void oneCmdUsage (int i, char *cmdList[], char *cmdSyntax[]);
-extern void cmdHelp (int argc, char **argv, char *cmdList[],
+void parseAndDo (char *cmdBuf, int (*func) ());
+int adminCmdIndex (char *cmd, char *cmdList[]);
+void cmdsUsage (char *cmd, char *cmdList[], char *cmdInfo[]);
+void oneCmdUsage (int i, char *cmdList[], char *cmdSyntax[]);
+void cmdHelp (int argc, char **argv, char *cmdList[],
 		     char *cmdInfo[], char *cmdSyntax[]);
-extern char *myGetOpt (int nargc, char **nargv, char *ostr);
-extern int getConfirm (char *msg);
-extern int startup (int argc, char **argv, int opCode);
+char *myGetOpt (int nargc, char **nargv, char *ostr);
+int getConfirm (char *msg);
+int startup (int argc, char **argv, int opCode);
 
 
 static int opCodeList[] = { 0, 0, QUEUE_OPEN, QUEUE_CLOSED, QUEUE_ACTIVATE,
@@ -166,5 +164,3 @@ static int cmdInfo_ID[] = {
 };
 
 #endif /* I18N_COMPILE */
-
-#endif /* LSF_BADMIN_BADMIN_H */

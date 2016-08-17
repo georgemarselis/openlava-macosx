@@ -18,14 +18,11 @@
 
 #pragma once
  
-#ifndef LSF_INTLIB_JIDX_H
-#define LSF_INTLIB_JIDX_H
-
 #define IDX_NOERR       0
 #define IDX_BOUND       1
 #define IDX_MEM         2
 
-extern int idxerrno;
+int idxerrno;
 
 struct idxList
 {
@@ -34,6 +31,5 @@ struct idxList
   int step;
   struct idxList *next;
 };
-extern int idxparse (struct idxList **, int *);
+int idxparse (struct idxList **, int *);
 
-#endif

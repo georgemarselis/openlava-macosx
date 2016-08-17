@@ -17,9 +17,6 @@
  */
 
 #pragma once
- 
-#ifndef LSF_CMD_H
-#define LSF_CMD_H
 
 #include <stdio.h>
 #include <string.h>
@@ -87,52 +84,51 @@ struct histReq
   int found;
 };
 
-extern void prtLine (char *);
-extern char *get_status (struct jobInfoEnt *job);
-extern void prtHeader (struct jobInfoEnt *, int, int);
-extern void prtJobSubmit (struct jobInfoEnt *, int, int);
-extern void prtFileNames (struct jobInfoEnt *, int);
-extern void prtSubDetails (struct jobInfoEnt *, char *, float);
-extern void prtJobStart (struct jobInfoEnt *, int, int, int);
-extern void prtJobFinish (struct jobInfoEnt *, struct jobInfoHead *);
-extern void prtAcctFinish (struct jobInfoEnt *);
-extern struct loadIndexLog *initLoadIndex (void);
-extern int fillReq (int, char **, int, struct submit *);
-extern void prtErrMsg (struct submit *, struct submitReply *);
-extern void prtBTTime (struct jobInfoEnt *);
-extern void prtJobReserv (struct jobInfoEnt *);
-extern void displayLong (struct jobInfoEnt *, struct jobInfoHead *, float);
+void prtLine (char *);
+char *get_status (struct jobInfoEnt *job);
+void prtHeader (struct jobInfoEnt *, int, int);
+void prtJobSubmit (struct jobInfoEnt *, int, int);
+void prtFileNames (struct jobInfoEnt *, int);
+void prtSubDetails (struct jobInfoEnt *, char *, float);
+void prtJobStart (struct jobInfoEnt *, int, int, int);
+void prtJobFinish (struct jobInfoEnt *, struct jobInfoHead *);
+void prtAcctFinish (struct jobInfoEnt *);
+struct loadIndexLog *initLoadIndex (void);
+int fillReq (int, char **, int, struct submit *);
+void prtErrMsg (struct submit *, struct submitReply *);
+void prtBTTime (struct jobInfoEnt *);
+void prtJobReserv (struct jobInfoEnt *);
+void displayLong (struct jobInfoEnt *, struct jobInfoHead *, float);
 
-extern int lsbMode_;
+int lsbMode_;
 
-extern void prtBETime_ (struct submit *);
+void prtBETime_ (struct submit *);
 
-extern int supportJobNamePattern (char *);
+int supportJobNamePattern (char *);
 
 
-extern int repeatedName (char *, char **, int);
-extern void jobInfoErr (LS_LONG_INT, char *, char *, char *, char *, int);
-extern int printThresholds (float *, float *, int *, int *, int,
+int repeatedName (char *, char **, int);
+void jobInfoErr (LS_LONG_INT, char *, char *, char *, char *, int);
+int printThresholds (float *, float *, int *, int *, int,
 			    struct lsInfo *);
-extern void prtResourceLimit (int *, char *, float, int *);
-extern int getNames (int, char **, int, char ***, int *, char *);
-extern int getJobIds (int, char **, char *, char *, char *, char *,
+void prtResourceLimit (int *, char *, float, int *);
+int getNames (int, char **, int, char ***, int *, char *);
+int getJobIds (int, char **, char *, char *, char *, char *,
 		      LS_LONG_INT **, int);
-extern int getSpecJobIds (int, char **, LS_LONG_INT **, int *);
-extern int getSpecIdxs (char *, int **);
-extern int getOneJobId (char *, LS_LONG_INT *, int);
-extern int gettimefor (char *toptarg, time_t * tTime);
-extern int skipJob (int, int *, int);
+int getSpecJobIds (int, char **, LS_LONG_INT **, int *);
+int getSpecIdxs (char *, int **);
+int getOneJobId (char *, LS_LONG_INT *, int);
+int gettimefor (char *toptarg, time_t * tTime);
+int skipJob (int, int *, int);
 
-extern void prtWord (int, const char *, int);
-extern void prtWordL (int, const char *);
-extern char *prtValue (int, int);
-extern char *prtDash (int);
+void prtWord (int, const char *, int);
+void prtWordL (int, const char *);
+char *prtValue (int, int);
+char *prtDash (int);
 
 
-extern int searchEventFile (struct histReq *, int *);
-extern int bmsg (int, char **);
+int searchEventFile (struct histReq *, int *);
+int bmsg (int, char **);
 
-extern void bmove (int, char **, int);
+void bmove (int, char **, int);
 
-#endif

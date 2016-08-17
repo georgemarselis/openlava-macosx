@@ -30,7 +30,7 @@
 #define DEF_REXPRIORITY 0
 
 
-#define NL_SETN 42
+// #define NL_SETN 42
 
 static struct lsInfo lsinfo;
 static struct clusterInfo clinfo;

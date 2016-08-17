@@ -163,7 +163,7 @@
 #define JOB_URGENT        0x40000000
 #define JOB_URGENT_NOSTOP 0x80000000
 
-extern char errbuf[MAXLINELEN];
+char errbuf[MAXLINELEN];
 
 #define lsb_merr1(fmt,a1)        sprintf(errbuf,fmt,a1),lsb_merr(errbuf)
 #define lsb_merr2(fmt,a1,a2)     sprintf(errbuf,fmt,a1,a2),lsb_merr(errbuf)
@@ -479,41 +479,41 @@ struct bucket
     bucket->proto.msgId = jm.header->msgId; \
     bucket->proto.type  = jm.header->type;
 
-extern int errno;
-extern char **environ;
+int errno;
+char **environ;
 
-extern struct config_param daemonParams[];
+struct config_param daemonParams[];
 
-extern int nextJobId;
-extern int numRemoveJobs;
-extern int maxJobId;
+int nextJobId;
+int numRemoveJobs;
+int maxJobId;
 
 
-extern char *lsbManager;
-extern char *lsbSys;
+char *lsbManager;
+char *lsbSys;
 
-extern uid_t batchId;
-extern int debug;
-extern int lsb_CheckMode;
-extern int lsb_CheckError;
-extern ushort mbd_port;
-extern ushort sbd_port;
-extern int batchSock;
-extern char masterme;
-extern char *masterHost;
-extern char *clusterName;
-extern time_t now;
-extern int retryIntvl;
-extern int sbdSleepTime;
-extern int preemPeriod;
-extern int pgSuspIdleT;
-extern char *env_dir;
-extern struct lsInfo *allLsInfo;
-extern struct tclLsInfo *tclLsInfo;
-extern int rusageUpdateRate;
-extern int rusageUpdatePrecent;
-extern int jobTerminateInterval;
-extern int lsf_crossUnixNT;
+uid_t batchId;
+int debug;
+int lsb_CheckMode;
+int lsb_CheckError;
+ushort mbd_port;
+ushort sbd_port;
+int batchSock;
+char masterme;
+char *masterHost;
+char *clusterName;
+time_t now;
+int retryIntvl;
+int sbdSleepTime;
+int preemPeriod;
+int pgSuspIdleT;
+char *env_dir;
+struct lsInfo *allLsInfo;
+struct tclLsInfo *tclLsInfo;
+int rusageUpdateRate;
+int rusageUpdatePrecent;
+int jobTerminateInterval;
+int lsf_crossUnixNT;
 
 
 #define DEFAULT_MAILTO  "^U"
@@ -521,65 +521,65 @@ extern int lsf_crossUnixNT;
 #define DEFAULT_MAILPROG    "/usr/lib/sendmail"
 #define DEFAULT_CRDIR "/bin"
 
-extern FILE *smail (char *to, char *tohost);
-extern uid_t chuser (uid_t uid);
-extern int get_ports (void);
-extern void die (int sig);
-extern void *my_malloc (size_t size, const char *);
-extern void *my_calloc (size_t nelem, size_t esize, const char *caller);
-extern void lsb_merr (char *s);
-extern void merr_user (char *user, char *host, char *msg, char *type);
-extern int portok (struct sockaddr_in *from);
-extern char *safeSave (char *);
-extern void lsb_mperr (char *msg);
-extern void mclose (FILE * file);
-extern void relife (void);
-extern int getElock (void);
-extern int touchElock (void);
-extern void getElogLock (void);
-extern void touchElogLock (void);
-extern void releaseElogLock (void);
-extern struct listEntry *tmpListHeader (struct listEntry *listHeader);
-extern struct tclLsInfo *getTclLsInfo (void);
-extern struct resVal *checkThresholdCond (char *);
-extern uint *getResMaps (uint nRes, char **resource);
-extern int checkResumeByLoad (LS_LONG_INT jobId, int num, struct thresholds thresholds, struct hostLoad *loads, uint *reason, uint *subreasons, int jAttrib, struct resVal *resumeCondVal, struct tclHostData *tclHostData);
-extern void closeExceptFD (int);
-extern void freeLsfHostInfo (struct hostInfo *, int);
-extern void copyLsfHostInfo (struct hostInfo *, struct hostInfo *);
-extern void freeTclHostData (struct tclHostData *);
-extern void lsbFreeResVal (struct resVal **);
+FILE *smail (char *to, char *tohost);
+uid_t chuser (uid_t uid);
+int get_ports (void);
+void die (int sig);
+void *my_malloc (size_t size, const char *);
+void *my_calloc (size_t nelem, size_t esize, const char *caller);
+void lsb_merr (char *s);
+void merr_user (char *user, char *host, char *msg, char *type);
+int portok (struct sockaddr_in *from);
+char *safeSave (char *);
+void lsb_mperr (char *msg);
+void mclose (FILE * file);
+void relife (void);
+int getElock (void);
+int touchElock (void);
+void getElogLock (void);
+void touchElogLock (void);
+void releaseElogLock (void);
+struct listEntry *tmpListHeader (struct listEntry *listHeader);
+struct tclLsInfo *getTclLsInfo (void);
+struct resVal *checkThresholdCond (char *);
+uint *getResMaps (uint nRes, char **resource);
+int checkResumeByLoad (LS_LONG_INT jobId, int num, struct thresholds thresholds, struct hostLoad *loads, uint *reason, uint *subreasons, int jAttrib, struct resVal *resumeCondVal, struct tclHostData *tclHostData);
+void closeExceptFD (int);
+void freeLsfHostInfo (struct hostInfo *, int);
+void copyLsfHostInfo (struct hostInfo *, struct hostInfo *);
+void freeTclHostData (struct tclHostData *);
+void lsbFreeResVal (struct resVal **);
 
 
 int initTcl (struct tclLsInfo *);
 
 
-extern int fileExist (char *file, uid_t uid, struct hostent *);
-extern void freeWeek (windows_t **);
-extern void errorBack (uint chan, ushort replyCode, struct sockaddr_in *from);
+int fileExist (char *file, uid_t uid, struct hostent *);
+void freeWeek (windows_t **);
+void errorBack (uint chan, ushort replyCode, struct sockaddr_in *from);
 
-extern int init_ServSock (u_short port);
-extern int server_reply (int, char *, int);
-extern int rcvJobFile (int, struct lenData *);
-extern int do_readyOp (XDR * xdrs, int, struct sockaddr_in *,
+int init_ServSock (u_short port);
+int server_reply (int, char *, int);
+int rcvJobFile (int, struct lenData *);
+int do_readyOp (XDR * xdrs, int, struct sockaddr_in *,
                struct LSFHeader *);
 
 #define FORK_REMOVE_SPOOL_FILE  (0x1)
 #define CALL_RES_IF_NEEDED      (0x2)
-extern void childRemoveSpoolFile (const char *, int, const struct passwd *);
+void childRemoveSpoolFile (const char *, int, const struct passwd *);
 
-extern int xdr_statusReq (XDR *, struct statusReq *, struct LSFHeader *);
-extern int xdr_sbdPackage (XDR *, struct sbdPackage *, struct LSFHeader *);
-extern int xdr_jobSpecs (XDR * xdrs, struct jobSpecs *jobSpecs, struct LSFHeader *);
-extern int xdr_sbdPackage1 (XDR * xdrs, struct sbdPackage *, struct LSFHeader *);
-extern int xdr_jobReply (XDR * xdrs, struct jobReply *jobReply, struct LSFHeader *);
-extern int xdr_jobSig (XDR * xdrs, struct jobSig *jobSig, struct LSFHeader *);
-extern int xdr_chunkStatusReq (XDR *, struct chunkStatusReq *, struct LSFHeader *);
+int xdr_statusReq (XDR *, struct statusReq *, struct LSFHeader *);
+int xdr_sbdPackage (XDR *, struct sbdPackage *, struct LSFHeader *);
+int xdr_jobSpecs (XDR * xdrs, struct jobSpecs *jobSpecs, struct LSFHeader *);
+int xdr_sbdPackage1 (XDR * xdrs, struct sbdPackage *, struct LSFHeader *);
+int xdr_jobReply (XDR * xdrs, struct jobReply *jobReply, struct LSFHeader *);
+int xdr_jobSig (XDR * xdrs, struct jobSig *jobSig, struct LSFHeader *);
+int xdr_chunkStatusReq (XDR *, struct chunkStatusReq *, struct LSFHeader *);
 
-extern float normalizeRq_ (float rawql, float cpuFactor, int nprocs);
+float normalizeRq_ (float rawql, float cpuFactor, int nprocs);
 
-extern void daemon_doinit (void);
+void daemon_doinit (void);
 
-extern void scaleByFactor (uint *h32, uint *l32, float cpuFactor);
-extern int execNqsi (u_long, int, int, int *, char *, int, char *);
-extern void doDaemonHang (char *);
+void scaleByFactor (uint *h32, uint *l32, float cpuFactor);
+int execNqsi (u_long, int, int, int *, char *, int, char *);
+void doDaemonHang (char *);

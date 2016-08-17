@@ -21,12 +21,12 @@
 
 
 
-extern int getCommonParams (struct submit *, struct submitReq *, struct submitReply *);
-extern int getOtherParams (struct submit *, struct submitReq *,  struct submitReply *, struct lsfAuth *, LSB_SUB_SPOOL_FILE_T *);
-extern char *getSpoolHostBySpoolFile (const char *spoolFile);
+int getCommonParams (struct submit *, struct submitReq *, struct submitReply *);
+int getOtherParams (struct submit *, struct submitReq *,  struct submitReply *, struct lsfAuth *, LSB_SUB_SPOOL_FILE_T *);
+char *getSpoolHostBySpoolFile (const char *spoolFile);
 
 static LS_LONG_INT sendModifyReq (struct modifyReq *, struct submitReply *, struct lsfAuth *);
 static int esubValModify (struct submit *);
-extern void makeCleanToRunEsub ();
-extern void modifyJobInformation (struct submit *);
+void makeCleanToRunEsub ();
+void modifyJobInformation (struct submit *);
 

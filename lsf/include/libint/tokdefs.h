@@ -18,9 +18,6 @@
 
 #pragma once 
  
-#ifndef LSF_INTLIB_TOKDEFS_H
-#define LSF_INTLIB_TOKDEFS_H
-
 enum TOKEN_type
 {
   UNDEF,
@@ -29,5 +26,3 @@ enum TOKEN_type
   WEEK, MONTH, QUARTER, DAYS, OR, AND, LE, GE, EQ, DOTS,
   HH, MM, ESTRING, NAME, RANGE, DATES, SZZZZ
 };
-
-#endif

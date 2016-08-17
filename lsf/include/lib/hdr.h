@@ -18,8 +18,8 @@
 
 #pragma once
 
-#ifndef LSF_LIB_HDR_H
-#define LSF_LIB_HDR_H
+// #ifndef LSF_LIB_HDR_H
+// #define LSF_LIB_HDR_H
 
 #include <rpc/types.h>
 #ifndef __XDR_HEADER__
@@ -96,17 +96,16 @@ struct lsfLimit
 };
 
 
-extern bool_t xdr_LSFHeader (XDR *, struct LSFHeader *);
-extern bool_t xdr_packLSFHeader (char *, struct LSFHeader *);
+bool_t xdr_LSFHeader (XDR *, struct LSFHeader *);
+bool_t xdr_packLSFHeader (char *, struct LSFHeader *);
 
-extern bool_t xdr_encodeMsg (XDR *, char *, struct LSFHeader *, bool_t (*)(), int, struct lsfAuth *);
+bool_t xdr_encodeMsg (XDR *, char *, struct LSFHeader *, bool_t (*)(), int, struct lsfAuth *);
 
-extern bool_t xdr_arrayElement (XDR *, char *, struct LSFHeader *, bool_t (*)(), ...);
-extern bool_t xdr_LSFlong (XDR *, long *);
-extern bool_t xdr_stringLen (XDR *, struct stringLen *, struct LSFHeader *);
-extern bool_t xdr_stat (XDR *, struct stat *, struct LSFHeader *);
-extern bool_t xdr_lsfAuth (XDR *, struct lsfAuth *, struct LSFHeader *);
-extern int xdr_lsfAuthSize (struct lsfAuth *);
-extern bool_t xdr_jRusage (XDR *, struct jRusage *, struct LSFHeader *);
+bool_t xdr_arrayElement (XDR *, char *, struct LSFHeader *, bool_t (*)(), ...);
+bool_t xdr_LSFlong (XDR *, long *);
+bool_t xdr_stringLen (XDR *, struct stringLen *, struct LSFHeader *);
+bool_t xdr_stat (XDR *, struct stat *, struct LSFHeader *);
+bool_t xdr_lsfAuth (XDR *, struct lsfAuth *, struct LSFHeader *);
+int xdr_lsfAuthSize (struct lsfAuth *);
+bool_t xdr_jRusage (XDR *, struct jRusage *, struct LSFHeader *);
 
-#endif

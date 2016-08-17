@@ -17,9 +17,6 @@
  */
 
 #pragma once
- 
-#ifndef LSF_DAEMONOUT_H
-#define LSF_DAEMONOUT_H
 
 #include "lib/hdr.h"
 #include "lib/xdr.h"
@@ -347,32 +344,31 @@ struct lenDataList
 };
 
 
-extern void initTab (struct hTab *tabPtr);
-extern hEnt *addMemb (struct hTab *tabPtr, LS_LONG_INT member);
-extern char remvMemb (struct hTab *tabPtr, LS_LONG_INT member);
-extern hEnt *chekMemb (struct hTab *tabPtr, LS_LONG_INT member);
-extern hEnt *addMembStr (struct hTab *tabPtr, char *member);
-extern char remvMembStr (struct hTab *tabPtr, char *member);
-extern hEnt *chekMembStr (struct hTab *tabPtr, char *member);
-extern void convertRLimit (int *pRLimits, int toKb);
-extern int limitIsOk_ (int *rLimits);
+void initTab (struct hTab *tabPtr);
+hEnt *addMemb (struct hTab *tabPtr, LS_LONG_INT member);
+char remvMemb (struct hTab *tabPtr, LS_LONG_INT member);
+hEnt *chekMemb (struct hTab *tabPtr, LS_LONG_INT member);
+hEnt *addMembStr (struct hTab *tabPtr, char *member);
+char remvMembStr (struct hTab *tabPtr, char *member);
+hEnt *chekMembStr (struct hTab *tabPtr, char *member);
+void convertRLimit (int *pRLimits, int toKb);
+int limitIsOk_ (int *rLimits);
 
-extern int handShake_ (int, char, int);
+int handShake_ (int, char, int);
 
 #define CALL_SERVER_NO_WAIT_REPLY 0x1
 #define CALL_SERVER_USE_SOCKET    0x2
 #define CALL_SERVER_NO_HANDSHAKE  0x4
 #define CALL_SERVER_ENQUEUE_ONLY  0x8
-extern int call_server (char *host, ushort serv_port, char *req_buf, size_t req_size,  char **rep_buf, struct LSFHeader *replyHdr, int conn_timeout, int recv_timeout, int *connectedSock, int (*postSndFunc) (), int *postSndFuncArg, int flags);
+int call_server (char *host, ushort serv_port, char *req_buf, size_t req_size,  char **rep_buf, struct LSFHeader *replyHdr, int conn_timeout, int recv_timeout, int *connectedSock, int (*postSndFunc) (), int *postSndFuncArg, int flags);
 
-extern int sndJobFile_ (int, struct lenData *);
+int sndJobFile_ (int, struct lenData *);
 
-extern struct group *mygetgrnam (const char *);
-extern void freeUnixGrp (struct group *);
-extern struct group *copyUnixGrp (struct group *);
+struct group *mygetgrnam (const char *);
+void freeUnixGrp (struct group *);
+struct group *copyUnixGrp (struct group *);
 
-extern void freeGroupInfoReply (struct groupInfoReply *reply);
+void freeGroupInfoReply (struct groupInfoReply *reply);
 
-extern void appendEData (struct lenData *jf, struct lenData *ed);
+void appendEData (struct lenData *jf, struct lenData *ed);
 
-#endif

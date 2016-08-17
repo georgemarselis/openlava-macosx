@@ -20,9 +20,6 @@
  */
 
 #pragma once
- 
-#ifndef LSF_LIM_LINUX_H
-#define LSF_LIM_LINUX_H
 
 #include <dirent.h>
 #include <sys/mount.h>
@@ -570,4 +567,3 @@ getPage (double *page_in, double *page_out, bool_t isPaging)
   return 0;
 }
 
-#endif

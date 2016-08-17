@@ -21,7 +21,7 @@
 
 //#include "lsb/spool.h"
 
-extern char *getSpoolHostBySpoolFile (const char *spoolFile);
+char *getSpoolHostBySpoolFile (const char *spoolFile);
 typedef struct lsbSpoolInfo
 {
   char srcFile[MAXFILENAMELEN];
@@ -35,8 +35,8 @@ typedef enum spoolOptions
   SPOOL_COMMAND
 } spoolOptions_t;
 
-extern LSB_SPOOL_INFO_T *copySpoolFile (const char *srcFilePath, spoolOptions_t option);
-extern int removeSpoolFile (const char *hostName, const char *destinFileFullPath);
+LSB_SPOOL_INFO_T *copySpoolFile (const char *srcFilePath, spoolOptions_t option);
+int removeSpoolFile (const char *hostName, const char *destinFileFullPath);
 
 static int optionFlag = FALSE;
 static char optionFileName[MAXLSFNAMELEN];
@@ -51,12 +51,12 @@ void subUsage_ (int, char **);
 static char *niosArgv[5];
 static char niosPath[MAXFILENAMELEN];
 
-extern const char *defaultSpoolDir;
-extern void sub_perror (char *usrMsg);
-extern char *my_getopt (int, char **, char *, char **);
-extern char *getNextLine_ (FILE * fp, int confFormat);
-extern uid_t getuid (void);
-extern char *lsb_sysmsg (void);
+const char *defaultSpoolDir;
+void sub_perror (char *usrMsg);
+char *my_getopt (int, char **, char *, char **);
+char *getNextLine_ (FILE * fp, int confFormat);
+uid_t getuid (void);
+char *lsb_sysmsg (void);
 
 static const char *getDefaultSpoolDir ();
 static void trimSpaces (char *str);
@@ -73,10 +73,10 @@ typedef struct bException
   bException_handler_t handler;
 } bException_t;
 
-extern char **environ;
-extern char *yyerr;
-extern int _lsb_conntimeout;
-//extern int lsbMode_;
+char **environ;
+char *yyerr;
+int _lsb_conntimeout;
+//int lsbMode_;
 static char *useracctmap = NULL;
 static struct lenData ed = { 0, NULL };
 
@@ -98,17 +98,17 @@ static int readOptFile (char *filename, char *childLine);
 
 static const LSB_SPOOL_INFO_T *chUserCopySpoolFile (const char *srcFile, spoolOptions_t fileType);
 
-extern void makeCleanToRunEsub( void );
-extern char *translateString (char *);
-extern void modifyJobInformation (struct submit *);
-extern void compactXFReq (struct submit *);
-extern char *wrapCommandLine (char *);
-extern char *unwrapCommandLine (char *);
-extern int checkEmptyString (char *);
-extern int stringIsToken (char *, char *);
-extern int stringIsDigitNumber (char *s);
-extern int processXFReq (char *key, char *line, struct submit *jobSubReq);
-extern char *extractStringValue (char *line);
+void makeCleanToRunEsub( void );
+char *translateString (char *);
+void modifyJobInformation (struct submit *);
+void compactXFReq (struct submit *);
+char *wrapCommandLine (char *);
+char *unwrapCommandLine (char *);
+int checkEmptyString (char *);
+int stringIsToken (char *, char *);
+int stringIsDigitNumber (char *s);
+int processXFReq (char *key, char *line, struct submit *jobSubReq);
+char *extractStringValue (char *line);
 
 void PRINT_ERRMSG0( char **errMsg, char *fmt);
 void PRINT_ERRMSG1( char **errMsg, char *fmt, char *msg1);

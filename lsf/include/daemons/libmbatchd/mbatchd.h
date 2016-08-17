@@ -19,9 +19,6 @@
 
 #pragma once
  
-#ifndef LSF_MBD_MDB_H
-#define LSF_MBD_MBD_H
-
 #include "daemonout.h"
 #include "daemons.h"
 #include "intlib/bitset.h"
@@ -122,9 +119,9 @@ typedef enum
 #define JOB_STAGE_DONE  0x0008
 #define JOB_IS_PROCESSED(jp) ((jp)->processed & JOB_STAGE_DONE)
 
-extern int mSchedStage;
-extern int freshPeriod;
-extern int maxSchedStay;
+int mSchedStage;
+int freshPeriod;
+int maxSchedStay;
 
 #define DEL_ACTION_KILL      0x01
 #define DEL_ACTION_REQUEUE   0x02
@@ -165,7 +162,7 @@ struct objPRMO
   struct preemptResource *pResources;
 
 };
-extern struct objPRMO *pRMOPtr;
+struct objPRMO *pRMOPtr;
 
 #define PRMO_ALLVALUES                  0x0000
 #define PRMO_USEDBYRUNJOB               0x0001
@@ -675,7 +672,7 @@ struct sbdNode
   int sigFlags;
 };
 
-extern struct sbdNode sbdNodeList;
+struct sbdNode sbdNodeList;
 
 struct gData
 {
@@ -885,320 +882,320 @@ typedef enum profCounterType
 #define dptWindow dptUnion.window.timeWindow
 
 
-extern LIST_T *hostList;
-extern struct hTab hostTab;
-extern struct jData *jDataList[];
-extern struct migJob *migJobList;
-extern struct qData *qDataList;
-extern UDATA_TABLE_T *uDataPtrTb;
-extern struct hTab uDataList;
-extern struct hTab calDataList;
-extern struct jData *chkJList;
-extern struct clientNode *clientList;
-extern struct hTab jobIdHT;
-extern struct hTab jgrpIdHT;
-extern struct gData *usergroups[];
-extern struct gData *hostgroups[];
-extern struct profileCounters counters[];
-extern char errstr[];
-extern int debug;
-extern int errno;
-extern int nextId;
-extern int numRemoteJobsInList;
+LIST_T *hostList;
+struct hTab hostTab;
+struct jData *jDataList[];
+struct migJob *migJobList;
+struct qData *qDataList;
+UDATA_TABLE_T *uDataPtrTb;
+struct hTab uDataList;
+struct hTab calDataList;
+struct jData *chkJList;
+struct clientNode *clientList;
+struct hTab jobIdHT;
+struct hTab jgrpIdHT;
+struct gData *usergroups[];
+struct gData *hostgroups[];
+struct profileCounters counters[];
+char errstr[];
+int debug;
+int errno;
+int nextId;
+int numRemoteJobsInList;
 
 
-extern char *defaultQueues;
-extern char *defaultHostSpec;
-extern int max_retry;
-extern int max_sbdFail;
-extern int accept_intvl;
-extern int clean_period;
-extern int delay_period;
-extern char *dbSelectLoad;
-extern char *pjobSpoolDir;
-extern int preExecDelay;
-extern int slotResourceReserve;
-extern int maxAcctArchiveNum;
-extern int acctArchiveInDays;
-extern int acctArchiveInSize;
-extern int lsbModifyAllJobs;
+char *defaultQueues;
+char *defaultHostSpec;
+int max_retry;
+int max_sbdFail;
+int accept_intvl;
+int clean_period;
+int delay_period;
+char *dbSelectLoad;
+char *pjobSpoolDir;
+int preExecDelay;
+int slotResourceReserve;
+int maxAcctArchiveNum;
+int acctArchiveInDays;
+int acctArchiveInSize;
+int lsbModifyAllJobs;
 
 
-extern int numofqueues;
-extern int numofprocs;
-extern int numofusers;
-extern int numofugroups;
-extern int numofhgroups;
-extern int maxjobnum;
+int numofqueues;
+int numofprocs;
+int numofusers;
+int numofugroups;
+int numofhgroups;
+int maxjobnum;
 
 
-extern int msleeptime;
-extern int numRemoveJobs;
-extern int eventPending;
-extern int qAttributes;
-extern int **hReasonTb;
-extern uid_t *managerIds;
-extern char **lsbManagers;
-extern int nManagers;
-extern char *lsfDefaultProject;
-extern int dumpToDBPid;
-extern int dumpToDBExit;
-extern int maxJobArraySize;
-extern int jobRunTimes;
-extern int jobDepLastSub;
-extern int maxUserPriority;
-extern int jobPriorityValue;
-extern int jobPriorityTime;
-extern int scheRawLoad;
+int msleeptime;
+int numRemoveJobs;
+int eventPending;
+int qAttributes;
+int **hReasonTb;
+uid_t *managerIds;
+char **lsbManagers;
+int nManagers;
+char *lsfDefaultProject;
+int dumpToDBPid;
+int dumpToDBExit;
+int maxJobArraySize;
+int jobRunTimes;
+int jobDepLastSub;
+int maxUserPriority;
+int jobPriorityValue;
+int jobPriorityTime;
+int scheRawLoad;
 
-extern time_t last_hostInfoRefreshTime;
-extern struct hTab condDataList;
-extern int readNumber;
-extern time_t condCheckTime;
-extern struct userConf *userConf;
-extern time_t last_hostInfoRefreshTime;
-extern struct hTab condDataList;
-extern int readNumber;
-extern time_t condCheckTime;
-extern struct userConf *userConf;
+time_t last_hostInfoRefreshTime;
+struct hTab condDataList;
+int readNumber;
+time_t condCheckTime;
+struct userConf *userConf;
+time_t last_hostInfoRefreshTime;
+struct hTab condDataList;
+int readNumber;
+time_t condCheckTime;
+struct userConf *userConf;
 
-extern bool_t mcSpanClusters;
-extern bool_t disableUAcctMap;
+bool_t mcSpanClusters;
+bool_t disableUAcctMap;
 
-extern int numResources;
-extern struct sharedResource **sharedResources;
+int numResources;
+struct sharedResource **sharedResources;
 
-extern int nSbdConnections;
-extern int maxSbdConnections;
-extern int maxJobPerSession;
+int nSbdConnections;
+int maxSbdConnections;
+int maxJobPerSession;
 
-extern struct hostInfo *LIMhosts;
-extern int numLIMhosts;
+struct hostInfo *LIMhosts;
+int numLIMhosts;
 
-extern float maxCpuFactor;
-extern int freedSomeReserveSlot;
+float maxCpuFactor;
+int freedSomeReserveSlot;
 
-extern long schedSeqNo;
+long schedSeqNo;
 
 
-extern void pollSbatchds (int);
-extern void hStatChange (struct hData *, int status);
-extern int checkHosts (struct infoReq *, struct hostDataReply *);
-extern struct hData *getHostData (char *host);
-extern struct hData *getHostData2 (char *host);
-extern float *getHostFactor (char *host);
-extern float *getModelFactor (char *hostModel);
-extern int getModelFactor_r (char *hostModel, float *cpuFactor);
-extern void checkHWindow (void);
-extern hEnt *findHost (char *hname);
-extern void renewJob (struct jData *oldjob);
-extern void getTclHostData (struct tclHostData *,
+void pollSbatchds (int);
+void hStatChange (struct hData *, int status);
+int checkHosts (struct infoReq *, struct hostDataReply *);
+struct hData *getHostData (char *host);
+struct hData *getHostData2 (char *host);
+float *getHostFactor (char *host);
+float *getModelFactor (char *hostModel);
+int getModelFactor_r (char *hostModel, float *cpuFactor);
+void checkHWindow (void);
+hEnt *findHost (char *hname);
+void renewJob (struct jData *oldjob);
+void getTclHostData (struct tclHostData *,
 			    struct hData *, struct hData *);
-extern int getLsbHostNames (char ***);
-extern void getLsbHostInfo (void);
-extern int getLsbHostLoad (void);
-extern int getHostsByResReq (struct resVal *, int *,
+int getLsbHostNames (char ***);
+void getLsbHostInfo (void);
+int getLsbHostLoad (void);
+int getHostsByResReq (struct resVal *, int *,
 			     struct hData **,
 			     struct hData ***, struct hData *, int *);
 
-extern struct resVal *checkResReq (char *, int);
-extern void adjLsbLoad (struct jData *, int, bool_t);
-extern int countHostJobs (struct hData *);
-extern void getLsbResourceInfo (void);
-extern struct resVal *getReserveValues (struct resVal *, struct resVal *);
-extern void getLsfHostInfo (int);
-extern struct hData *getHostByType (char *);
+struct resVal *checkResReq (char *, int);
+void adjLsbLoad (struct jData *, int, bool_t);
+int countHostJobs (struct hData *);
+void getLsbResourceInfo (void);
+struct resVal *getReserveValues (struct resVal *, struct resVal *);
+void getLsfHostInfo (int);
+struct hData *getHostByType (char *);
 
-extern void checkQWindow (void);
-extern int checkQueues (struct infoReq *, struct queueInfoReply *);
-extern int ctrlQueue (struct controlReq *, struct lsfAuth *);
-extern int ctrlHost (struct controlReq *, struct hData *, struct lsfAuth *);
-extern void sumHosts (void);
-extern void inQueueList (struct qData *);
-extern struct qData *getQueueData (char *);
-extern char hostQMember (char *, struct qData *);
-extern char userQMember (char *, struct qData *);
-extern int isQueAd (struct qData *, char *);
-extern int isAuthQueAd (struct qData *, struct lsfAuth *);
-extern int isInQueues (char *, char **, int);
-extern void freeQueueInfoReply (struct queueInfoReply *, char *);
-extern struct hostInfo *getLsfHostData (char *);
-extern int createQueueHostSet (struct qData *);
-extern int gethIndexByhData (void *);
-extern void *gethDataByhIndex (int);
-extern bool_t isHostQMember (struct hData *, struct qData *);
-extern int getIndexByQueue (void *);
-extern void *getQueueByIndex (int);
-extern bool_t isQInQSet (struct qData *, LS_BITSET_T *);
+void checkQWindow (void);
+int checkQueues (struct infoReq *, struct queueInfoReply *);
+int ctrlQueue (struct controlReq *, struct lsfAuth *);
+int ctrlHost (struct controlReq *, struct hData *, struct lsfAuth *);
+void sumHosts (void);
+void inQueueList (struct qData *);
+struct qData *getQueueData (char *);
+char hostQMember (char *, struct qData *);
+char userQMember (char *, struct qData *);
+int isQueAd (struct qData *, char *);
+int isAuthQueAd (struct qData *, struct lsfAuth *);
+int isInQueues (char *, char **, int);
+void freeQueueInfoReply (struct queueInfoReply *, char *);
+struct hostInfo *getLsfHostData (char *);
+int createQueueHostSet (struct qData *);
+int gethIndexByhData (void *);
+void *gethDataByhIndex (int);
+bool_t isHostQMember (struct hData *, struct qData *);
+int getIndexByQueue (void *);
+void *getQueueByIndex (int);
+bool_t isQInQSet (struct qData *, LS_BITSET_T *);
 
-extern struct listSet *voidJobList;
-extern int newJob (struct submitReq *,
+struct listSet *voidJobList;
+int newJob (struct submitReq *,
 		   struct submitMbdReply *, int,
 		   struct lsfAuth *, int *, int, struct jData **);
-extern int chkAskedHosts (int, char **, int, int *,
+int chkAskedHosts (int, char **, int, int *,
 			  struct askedHost **, int *, int *, int);
-extern int selectJobs (struct jobInfoReq *, struct jData ***, int *);
-extern int signalJob (struct signalReq *, struct lsfAuth *);
-extern int statusJob (struct statusReq *, struct hostent *, int *);
-extern int rusageJob (struct statusReq *, struct hostent *);
-extern int statusMsgAck (struct statusReq *);
-extern int switchJobArray (struct jobSwitchReq *, struct lsfAuth *);
-extern int sbatchdJobs (struct sbdPackage *, struct hData *);
-extern int countNumSpecs (struct hData *);
-extern void packJobSpecs (struct jData *, struct jobSpecs *);
-extern void freeJobSpecs (struct jobSpecs *);
-extern int peekJob (struct jobPeekReq *,
+int selectJobs (struct jobInfoReq *, struct jData ***, int *);
+int signalJob (struct signalReq *, struct lsfAuth *);
+int statusJob (struct statusReq *, struct hostent *, int *);
+int rusageJob (struct statusReq *, struct hostent *);
+int statusMsgAck (struct statusReq *);
+int switchJobArray (struct jobSwitchReq *, struct lsfAuth *);
+int sbatchdJobs (struct sbdPackage *, struct hData *);
+int countNumSpecs (struct hData *);
+void packJobSpecs (struct jData *, struct jobSpecs *);
+void freeJobSpecs (struct jobSpecs *);
+int peekJob (struct jobPeekReq *,
 		    struct jobPeekReply *, struct lsfAuth *);
-extern int migJob (struct migReq *,
+int migJob (struct migReq *,
 		   struct submitMbdReply *, struct lsfAuth *);
-extern void clean (time_t);
-extern int moveJobArray (struct jobMoveReq *, int, struct lsfAuth *);
-extern void job_abort (struct jData *jData, char reason);
-extern void marktime (struct jData *, int);
-extern int rmjobfile (struct jData *jData);
-extern void jStatusChange (struct jData *, int, time_t, const char *);
-extern int findLastJob (int, struct jData *, struct jData **);
-extern void initJobIdHT (void);
-extern struct jData *getJobData (LS_LONG_INT jobId);
-extern void inPendJobList (struct jData *, int list, time_t);
-extern void inStartJobList (struct jData *);
-extern void inFinishJobList (struct jData *);
-extern void jobInQueueEnd (struct jData *, struct qData *);
-extern struct jData *initJData (struct jShared *);
-extern void assignLoad (float *, float *, struct qData *, struct hData *);
-extern int resigJobs (int *resignal);
-extern void removeJob (LS_LONG_INT);
-extern bool_t runJob (struct runJobRequest *, struct lsfAuth *);
-extern void addJobIdHT (struct jData *);
-extern struct jData *createjDataRef (struct jData *);
-extern void destroyjDataRef (struct jData *);
-extern void setJobPendReason (struct jData *, int);
-extern void destroySharedRef (struct jShared *);
-extern struct jShared *createSharedRef (struct jShared *);
-extern time_t runTimeSinceResume (const struct jData *);
+void clean (time_t);
+int moveJobArray (struct jobMoveReq *, int, struct lsfAuth *);
+void job_abort (struct jData *jData, char reason);
+void marktime (struct jData *, int);
+int rmjobfile (struct jData *jData);
+void jStatusChange (struct jData *, int, time_t, const char *);
+int findLastJob (int, struct jData *, struct jData **);
+void initJobIdHT (void);
+struct jData *getJobData (LS_LONG_INT jobId);
+void inPendJobList (struct jData *, int list, time_t);
+void inStartJobList (struct jData *);
+void inFinishJobList (struct jData *);
+void jobInQueueEnd (struct jData *, struct qData *);
+struct jData *initJData (struct jShared *);
+void assignLoad (float *, float *, struct qData *, struct hData *);
+int resigJobs (int *resignal);
+void removeJob (LS_LONG_INT);
+bool_t runJob (struct runJobRequest *, struct lsfAuth *);
+void addJobIdHT (struct jData *);
+struct jData *createjDataRef (struct jData *);
+void destroyjDataRef (struct jData *);
+void setJobPendReason (struct jData *, int);
+void destroySharedRef (struct jShared *);
+struct jShared *createSharedRef (struct jShared *);
+time_t runTimeSinceResume (const struct jData *);
 
-extern void modifyJobPriority (struct jData *, int);
-extern float queueGetUnscaledRunTimeLimit (struct qData *qp);
-extern int arrayRequeue (struct jData *,
+void modifyJobPriority (struct jData *, int);
+float queueGetUnscaledRunTimeLimit (struct qData *qp);
+int arrayRequeue (struct jData *,
 			 struct signalReq *, struct lsfAuth *);
 
-extern int modifyJob (struct modifyReq *,
+int modifyJob (struct modifyReq *,
 		      struct submitMbdReply *, struct lsfAuth *);
-extern void freeJData (struct jData *);
-extern void handleJParameters (struct jData *, struct jData *,
+void freeJData (struct jData *);
+void handleJParameters (struct jData *, struct jData *,
 			       struct submitReq *, int, int, int);
-extern void handleNewJob (struct jData *, int, int);
-extern void copyJobBill (struct submitReq *, struct submitReq *, LS_LONG_INT);
-extern void inZomJobList (struct jData *, int);
-extern struct jData *getZombieJob (LS_LONG_INT);
-extern int getNextJobId (void);
-extern void accumRunTime (struct jData *, int, time_t);
-extern void signalReplyCode (sbdReplyType reply,
+void handleNewJob (struct jData *, int, int);
+void copyJobBill (struct submitReq *, struct submitReq *, LS_LONG_INT);
+void inZomJobList (struct jData *, int);
+struct jData *getZombieJob (LS_LONG_INT);
+int getNextJobId (void);
+void accumRunTime (struct jData *, int, time_t);
+void signalReplyCode (sbdReplyType reply,
 			     struct jData *jData, int sigValue, int chkFlags);
-extern void jobStatusSignal (sbdReplyType reply,
+void jobStatusSignal (sbdReplyType reply,
 			     struct jData *jData,
 			     int sigValue, int chkFlags,
 			     struct jobReply *jobReply);
-extern void tryResume (void);
-extern void freeSubmitReq (struct submitReq *);
-extern int shouldLockJob (struct jData *, int);
-extern int sigPFjob (struct jData *, int, time_t, int);
-extern void offJobList (struct jData *, int);
-extern void handleRequeueJob (struct jData *, time_t);
-extern int PJLorMJL (struct jData *);
+void tryResume (void);
+void freeSubmitReq (struct submitReq *);
+int shouldLockJob (struct jData *, int);
+int sigPFjob (struct jData *, int, time_t, int);
+void offJobList (struct jData *, int);
+void handleRequeueJob (struct jData *, time_t);
+int PJLorMJL (struct jData *);
 
-extern void schedulerInit (void);
-extern int scheduleAndDispatchJobs (void);
-extern int scheduleJobs (int *schedule, int *dispatch, struct jData *);
-extern int dispatchJobs (int *dispatch);
-extern void updNumDependents (struct dptNode *, int);
-extern int userJobLimitCk (struct jData *, int disp);
-extern int pJobLimitOk (struct hData *, struct hostAcct *, float pJobLimit);
-extern int uJobLimitOk (struct jData *, struct hTab *, int, int disp);
-extern int hostSlots (int, struct jData *, struct hData *, int disp, int *);
-extern void disp_clean_job (struct jData *);
-extern bool_t dispatch_it (struct jData *);
-extern int findBestHosts (struct jData *, struct resVal *, int, int,
+void schedulerInit (void);
+int scheduleAndDispatchJobs (void);
+int scheduleJobs (int *schedule, int *dispatch, struct jData *);
+int dispatchJobs (int *dispatch);
+void updNumDependents (struct dptNode *, int);
+int userJobLimitCk (struct jData *, int disp);
+int pJobLimitOk (struct hData *, struct hostAcct *, float pJobLimit);
+int uJobLimitOk (struct jData *, struct hTab *, int, int disp);
+int hostSlots (int, struct jData *, struct hData *, int disp, int *);
+void disp_clean_job (struct jData *);
+bool_t dispatch_it (struct jData *);
+int findBestHosts (struct jData *, struct resVal *, int, int,
 			  struct candHost *, bool_t);
-extern int hJobLimitOk (struct hData *, struct hostAcct *, int);
-extern void freeReserveSlots (struct jData *);
-extern int jobStartError (struct jData *jData, sbdReplyType reply);
-extern int cntNumPrmptSlots (struct qData *, struct hData *,
+int hJobLimitOk (struct hData *, struct hostAcct *, int);
+void freeReserveSlots (struct jData *);
+int jobStartError (struct jData *jData, sbdReplyType reply);
+int cntNumPrmptSlots (struct qData *, struct hData *,
 			     struct uData *, int *numAvailSUSP);
-extern int skipAQueue (struct qData *qp2, struct qData *qp1);
-extern int userJobLimitOk (struct jData *, int, int *);
-extern int getQUsable (struct qData *);
-extern int handleForeignJob (struct jData *);
-extern int reservePreemptResourcesForHosts (struct jData *jp);
-extern int freeReservePreemptResources (struct jData *jp);
-extern int deallocReservePreemptResources (struct jData *jp);
-extern int orderByStatus (struct candHost *, int, bool_t);
-extern void setLsbPtilePack (const bool_t);
-extern int do_submitReq (XDR *, int, struct sockaddr_in *,
+int skipAQueue (struct qData *qp2, struct qData *qp1);
+int userJobLimitOk (struct jData *, int, int *);
+int getQUsable (struct qData *);
+int handleForeignJob (struct jData *);
+int reservePreemptResourcesForHosts (struct jData *jp);
+int freeReservePreemptResources (struct jData *jp);
+int deallocReservePreemptResources (struct jData *jp);
+int orderByStatus (struct candHost *, int, bool_t);
+void setLsbPtilePack (const bool_t);
+int do_submitReq (XDR *, int, struct sockaddr_in *,
 			 char *, struct LSFHeader *,
 			 struct sockaddr_in *,
 			 struct lsfAuth *, int *, int, struct jData **);
-extern int do_signalReq (XDR *, int, struct sockaddr_in *,
+int do_signalReq (XDR *, int, struct sockaddr_in *,
 			 char *, struct LSFHeader *, struct lsfAuth *);
-extern int do_jobMsg (struct bucket *, XDR *, int,
+int do_jobMsg (struct bucket *, XDR *, int,
 		      struct sockaddr_in *,
 		      char *, struct LSFHeader *, struct lsfAuth *);
-extern int do_statusReq (XDR *, int, struct sockaddr_in *,
+int do_statusReq (XDR *, int, struct sockaddr_in *,
 			 int *, struct LSFHeader *);
-extern int do_errorReq (int, struct LSFHeader *);
-extern int do_jobSwitchReq (XDR *, int, struct sockaddr_in *,
+int do_errorReq (int, struct LSFHeader *);
+int do_jobSwitchReq (XDR *, int, struct sockaddr_in *,
 			    char *, struct LSFHeader *, struct lsfAuth *);
-extern int do_hostInfoReq (XDR *, int, struct sockaddr_in *,
+int do_hostInfoReq (XDR *, int, struct sockaddr_in *,
 			   struct LSFHeader *);
-extern int do_jobPeekReq (XDR *, int, struct sockaddr_in *,
+int do_jobPeekReq (XDR *, int, struct sockaddr_in *,
 			  char *, struct LSFHeader *, struct lsfAuth *);
-extern int do_jobInfoReq (XDR *, int, struct sockaddr_in *,
+int do_jobInfoReq (XDR *, int, struct sockaddr_in *,
 			  struct LSFHeader *, int);
-extern int do_queueInfoReq (XDR *, int, struct sockaddr_in *,
+int do_queueInfoReq (XDR *, int, struct sockaddr_in *,
 			    struct LSFHeader *);
-extern int do_debugReq (XDR * xdrs, int chfd,
+int do_debugReq (XDR * xdrs, int chfd,
 			struct sockaddr_in *from,
 			char *hostName,
 			struct LSFHeader *reqHdr, struct lsfAuth *auth);
-extern int do_groupInfoReq (XDR *, int, struct sockaddr_in *,
+int do_groupInfoReq (XDR *, int, struct sockaddr_in *,
 			    struct LSFHeader *);
-extern int do_queueControlReq (XDR *, int,
+int do_queueControlReq (XDR *, int,
 			       struct sockaddr_in *, char *,
 			       struct LSFHeader *, struct lsfAuth *);
-extern int do_reconfigReq (XDR *, int, struct sockaddr_in *,
+int do_reconfigReq (XDR *, int, struct sockaddr_in *,
 			   char *, struct LSFHeader *);
-extern int do_restartReq (XDR *, int, struct sockaddr_in *,
+int do_restartReq (XDR *, int, struct sockaddr_in *,
 			  struct LSFHeader *);
-extern int do_hostControlReq (XDR *, int,
+int do_hostControlReq (XDR *, int,
 			      struct sockaddr_in *, char *,
 			      struct LSFHeader *, struct lsfAuth *);
-extern int do_jobMoveReq (XDR *, int, struct sockaddr_in *,
+int do_jobMoveReq (XDR *, int, struct sockaddr_in *,
 			  char *, struct LSFHeader *, struct lsfAuth *);
-extern int do_userInfoReq (XDR *, int, struct sockaddr_in *,
+int do_userInfoReq (XDR *, int, struct sockaddr_in *,
 			   struct LSFHeader *);
-extern int do_paramInfoReq (XDR *, int, struct sockaddr_in *,
+int do_paramInfoReq (XDR *, int, struct sockaddr_in *,
 			    struct LSFHeader *);
-extern int do_hostPartInfoReq (XDR *, int,
+int do_hostPartInfoReq (XDR *, int,
 			       struct sockaddr_in *, struct LSFHeader *);
-extern int do_migReq (XDR *, int, struct sockaddr_in *, char *,
+int do_migReq (XDR *, int, struct sockaddr_in *, char *,
 		      struct LSFHeader *, struct lsfAuth *);
-extern int do_modifyReq (XDR *, int, struct sockaddr_in *,
+int do_modifyReq (XDR *, int, struct sockaddr_in *,
 			 char *, struct LSFHeader *, struct lsfAuth *);
-extern void doNewJobReply (struct sbdNode *, int);
-extern void doProbeReply (struct sbdNode *, int);
-extern void doSignalJobReply (struct sbdNode *sbdPtr, int);
-extern void doSwitchJobReply (struct sbdNode *sbdPtr, int);
-extern int do_resourceInfoReq (XDR *, int,
+void doNewJobReply (struct sbdNode *, int);
+void doProbeReply (struct sbdNode *, int);
+void doSignalJobReply (struct sbdNode *sbdPtr, int);
+void doSwitchJobReply (struct sbdNode *sbdPtr, int);
+int do_resourceInfoReq (XDR *, int,
 			       struct sockaddr_in *, struct LSFHeader *);
-extern int do_runJobReq (XDR *,
+int do_runJobReq (XDR *,
 			 int,
 			 struct sockaddr_in *,
 			 struct lsfAuth *, struct LSFHeader *);
-extern int getQUsable (struct qData *);
-extern void allocateRemote (struct jData *, int);
-extern void setExecHostsAcceptInterval (struct jData *);
+int getQUsable (struct qData *);
+void allocateRemote (struct jData *, int);
+void setExecHostsAcceptInterval (struct jData *);
 #if defined(INTER_DAEMON_AUTH)
-extern int authDaemonRequest (int chfd,
+int authDaemonRequest (int chfd,
 			      XDR * xdrs,
 			      struct LSFHeader *reqHdr,
 			      struct sockaddr_in *from_host,
@@ -1206,201 +1203,201 @@ extern int authDaemonRequest (int chfd,
 #endif
 
 
-extern int requeueEParse (struct requeueEStruct **, char *, int *);
-extern int fill_requeueHist (struct rqHistory **, int *, struct hData *);
-extern int match_exitvalue (struct requeueEStruct *, int);
-extern void clean_requeue (struct qData *);
+int requeueEParse (struct requeueEStruct **, char *, int *);
+int fill_requeueHist (struct rqHistory **, int *, struct hData *);
+int match_exitvalue (struct requeueEStruct *, int);
+void clean_requeue (struct qData *);
 
-extern LS_BITSET_T *allUsersSet;
-extern LS_BITSET_T *uGrpAllSet;
-extern LS_BITSET_T *uGrpAllAncestorSet;
-extern int userSetOnNewUser (LS_BITSET_T *, void *, LS_BITSET_EVENT_T *);
-extern int checkGroups (struct infoReq *, struct groupInfoReply *);
-extern void fillMembers (struct gData *, char **, char);
-extern char **expandGrp (struct gData *, char *, int *);
-extern void fillMembers (struct gData *, char **, char);
-extern char *getGroupMembers (struct gData *, char);
-extern char *catGnames (struct gData *);
-extern struct gData *getGroup (int, char *);
-extern char gMember (char *word, struct gData *);
-extern char gDirectMember (char *, struct gData *);
-extern int countEntries (struct gData *, char);
-extern struct gData *getUGrpData (char *);
-extern struct gData *getHGrpData (char *);
-extern struct gData *getGrpData (struct gData **, char *, int);
-extern int sumMembers (struct gData *, char r, int first);
-extern void createGroupuData ();
-extern void createGroupTbPtr ();
-extern void createGroupSet ();
-extern int getIndexByuData (void *);
-extern void *getuDataByIndex (int);
-extern UDATA_TABLE_T *uDataTableCreate (void);
-extern void uDataPtrTbInitialize (void);
-extern void uDataTableAddEntry (UDATA_TABLE_T *, struct uData *);
-extern int uDataTableGetNumEntries (UDATA_TABLE_T *);
-extern struct uData *uDataTableGetNextEntry (UDATA_TABLE_T *);
-extern void setuDataCreate (void);
-extern void updHostList (void);
-extern void uDataGroupCreate (void);
-extern int sizeofGroupInfoReply (struct groupInfoReply *);
-extern void child_handler (int);
-extern void terminate_handler (int);
-extern void announce_master (void);
-extern void shutDownClient (struct clientNode *);
-extern void setNextSchedTimeUponNewJob (struct jData *);
-extern void setJobPriUpdIntvl (void);
-extern int isAuthManagerExt (struct lsfAuth *);
-extern void updCounters (struct jData *jData, int newStatus, time_t);
-extern void updSwitchJob (struct jData *, struct qData *,
+LS_BITSET_T *allUsersSet;
+LS_BITSET_T *uGrpAllSet;
+LS_BITSET_T *uGrpAllAncestorSet;
+int userSetOnNewUser (LS_BITSET_T *, void *, LS_BITSET_EVENT_T *);
+int checkGroups (struct infoReq *, struct groupInfoReply *);
+void fillMembers (struct gData *, char **, char);
+char **expandGrp (struct gData *, char *, int *);
+void fillMembers (struct gData *, char **, char);
+char *getGroupMembers (struct gData *, char);
+char *catGnames (struct gData *);
+struct gData *getGroup (int, char *);
+char gMember (char *word, struct gData *);
+char gDirectMember (char *, struct gData *);
+int countEntries (struct gData *, char);
+struct gData *getUGrpData (char *);
+struct gData *getHGrpData (char *);
+struct gData *getGrpData (struct gData **, char *, int);
+int sumMembers (struct gData *, char r, int first);
+void createGroupuData ();
+void createGroupTbPtr ();
+void createGroupSet ();
+int getIndexByuData (void *);
+void *getuDataByIndex (int);
+UDATA_TABLE_T *uDataTableCreate (void);
+void uDataPtrTbInitialize (void);
+void uDataTableAddEntry (UDATA_TABLE_T *, struct uData *);
+int uDataTableGetNumEntries (UDATA_TABLE_T *);
+struct uData *uDataTableGetNextEntry (UDATA_TABLE_T *);
+void setuDataCreate (void);
+void updHostList (void);
+void uDataGroupCreate (void);
+int sizeofGroupInfoReply (struct groupInfoReply *);
+void child_handler (int);
+void terminate_handler (int);
+void announce_master (void);
+void shutDownClient (struct clientNode *);
+void setNextSchedTimeUponNewJob (struct jData *);
+void setJobPriUpdIntvl (void);
+int isAuthManagerExt (struct lsfAuth *);
+void updCounters (struct jData *jData, int newStatus, time_t);
+void updSwitchJob (struct jData *, struct qData *,
 			  struct qData *, int);
-extern void updUserData (struct jData *, int, int, int, int, int, int);
-extern void updQaccount (struct jData *jData, int, int, int, int, int, int);
-extern struct uData *getUserData (char *user);
-extern struct userAcct *getUAcct (struct hTab *, struct uData *);
-extern struct hostAcct *getHAcct (struct hTab *, struct hData *);
-extern struct uData *addUserData (char *, int, float, char *, int, int);
-extern int checkUsers (struct infoReq *, struct userInfoReply *);
-extern void checkParams (struct infoReq *, struct parameterInfo *);
-extern void mbdDie (int);
-extern int isManager (char *);
-extern int isAuthManager (struct lsfAuth *);
-extern int isJobOwner (struct lsfAuth *, struct jData *);
-extern char *getDefaultProject (void);
-extern void updResCounters (struct jData *, int);
-extern struct hostAcct *addHAcct (struct hTab **, struct hData *,
+void updUserData (struct jData *, int, int, int, int, int, int);
+void updQaccount (struct jData *jData, int, int, int, int, int, int);
+struct uData *getUserData (char *user);
+struct userAcct *getUAcct (struct hTab *, struct uData *);
+struct hostAcct *getHAcct (struct hTab *, struct hData *);
+struct uData *addUserData (char *, int, float, char *, int, int);
+int checkUsers (struct infoReq *, struct userInfoReply *);
+void checkParams (struct infoReq *, struct parameterInfo *);
+void mbdDie (int);
+int isManager (char *);
+int isAuthManager (struct lsfAuth *);
+int isJobOwner (struct lsfAuth *, struct jData *);
+char *getDefaultProject (void);
+void updResCounters (struct jData *, int);
+struct hostAcct *addHAcct (struct hTab **, struct hData *,
 				  int, int, int, int);
-extern void checkQusable (struct qData *, int, int);
-extern void updHostLeftRusageMem (struct jData *, int);
-extern int minit (int);
-extern struct qData *lostFoundQueue (void);
-extern void freeHData (struct hData *);
-extern void deleteQData (struct qData *);
+void checkQusable (struct qData *, int, int);
+void updHostLeftRusageMem (struct jData *, int);
+int minit (int);
+struct qData *lostFoundQueue (void);
+void freeHData (struct hData *);
+void deleteQData (struct qData *);
 
-extern int my_atoi (char *, int, int);
-extern void freeKeyVal (struct keymap *);
-extern void queueHostsPF (struct qData *, int *);
-extern struct hData *initHData (struct hData *);
-extern int updAllConfCond (void);
-extern void mbdReConf (int);
+int my_atoi (char *, int, int);
+void freeKeyVal (struct keymap *);
+void queueHostsPF (struct qData *, int *);
+struct hData *initHData (struct hData *);
+int updAllConfCond (void);
+void mbdReConf (int);
 
-extern int log_newjob (struct jData *);
-extern void log_switchjob (struct jobSwitchReq *, int, char *);
-extern void log_movejob (struct jobMoveReq *, int, char *);
-extern void log_startjob (struct jData *, int);
-extern void log_startjobaccept (struct jData *);
-extern void log_newstatus (struct jData *);
-extern void log_chkpnt (struct jData *, int, int);
-extern void log_mig (struct jData *, int, char *);
-extern void log_route (struct jData *);
-extern int log_modifyjob (struct modifyReq *, struct lsfAuth *);
-extern void log_queuestatus (struct qData *, int, int, char *);
-extern void log_hoststatus (struct hData *, int, int, char *);
-extern void log_mbdStart (void);
-extern void log_mbdDie (int);
-extern void log_unfulfill (struct jData *);
-extern void log_jobaccept (struct jData *);
-extern void log_jobclean (struct jData *);
-extern void log_jobforward (struct jData *);
-extern void log_statusack (struct jData *);
-extern void log_logSwitch (int);
-extern void replay_requeuejob (struct jData *);
-extern int init_log (void);
-extern void switchELog (void);
-extern int switch_log (void);
-extern void checkAcctLog (void);
-extern int switchAcctLog (void);
-extern void logJobInfo (struct submitReq *, struct jData *, struct lenData *);
-extern int rmLogJobInfo_ (struct jData *, int);
-extern int readLogJobInfo (struct jobSpecs *, struct jData *,
+int log_newjob (struct jData *);
+void log_switchjob (struct jobSwitchReq *, int, char *);
+void log_movejob (struct jobMoveReq *, int, char *);
+void log_startjob (struct jData *, int);
+void log_startjobaccept (struct jData *);
+void log_newstatus (struct jData *);
+void log_chkpnt (struct jData *, int, int);
+void log_mig (struct jData *, int, char *);
+void log_route (struct jData *);
+int log_modifyjob (struct modifyReq *, struct lsfAuth *);
+void log_queuestatus (struct qData *, int, int, char *);
+void log_hoststatus (struct hData *, int, int, char *);
+void log_mbdStart (void);
+void log_mbdDie (int);
+void log_unfulfill (struct jData *);
+void log_jobaccept (struct jData *);
+void log_jobclean (struct jData *);
+void log_jobforward (struct jData *);
+void log_statusack (struct jData *);
+void log_logSwitch (int);
+void replay_requeuejob (struct jData *);
+int init_log (void);
+void switchELog (void);
+int switch_log (void);
+void checkAcctLog (void);
+int switchAcctLog (void);
+void logJobInfo (struct submitReq *, struct jData *, struct lenData *);
+int rmLogJobInfo_ (struct jData *, int);
+int readLogJobInfo (struct jobSpecs *, struct jData *,
 			   struct lenData *, struct lenData *);
-extern void log_signaljob (struct jData *, struct signalReq *, int, char *);
-extern void log_jobmsg (struct jData *, struct lsbMsg *, int);
-extern void log_jobmsgack (struct bucket *);
-extern char *readJobInfoFile (struct jData *, int *);
-extern void writeJobInfoFile (struct jData *, char *, int);
-extern int replaceJobInfoFile (char *, char *, char *, int);
-extern void log_executejob (struct jData *);
-extern void log_jobsigact (struct jData *, struct statusReq *, int);
-extern void log_jobrequeue (struct jData *jData);
-extern void log_jobForce (struct jData *, int, char *);
+void log_signaljob (struct jData *, struct signalReq *, int, char *);
+void log_jobmsg (struct jData *, struct lsbMsg *, int);
+void log_jobmsgack (struct bucket *);
+char *readJobInfoFile (struct jData *, int *);
+void writeJobInfoFile (struct jData *, char *, int);
+int replaceJobInfoFile (char *, char *, char *, int);
+void log_executejob (struct jData *);
+void log_jobsigact (struct jData *, struct statusReq *, int);
+void log_jobrequeue (struct jData *jData);
+void log_jobForce (struct jData *, int, char *);
 
-extern time_t eventTime;
-extern void log_jobattrset (struct jobAttrInfoEnt *, int);
+time_t eventTime;
+void log_jobattrset (struct jobAttrInfoEnt *, int);
 
 #define  REPLACE_1ST_CMD_ONLY  (0x1)
-extern int stripJobStarter (char *, int *, char *);
+int stripJobStarter (char *, int *, char *);
 
-extern sbdReplyType start_job (struct jData *, struct qData *,
+sbdReplyType start_job (struct jData *, struct qData *,
 			       struct jobReply *);
-extern sbdReplyType signal_job (struct jData *jobPtr, struct jobSig *,
+sbdReplyType signal_job (struct jData *jobPtr, struct jobSig *,
 				struct jobReply *jobReply);
-extern sbdReplyType switch_job (struct jData *, int options);
-extern sbdReplyType msg_job (struct jData *, struct Buffer *,
+sbdReplyType switch_job (struct jData *, int options);
+sbdReplyType msg_job (struct jData *, struct Buffer *,
 			     struct jobReply *);
-extern sbdReplyType probe_slave (struct hData *, char sendJobs);
-extern sbdReplyType rebootSbd (char *host);
-extern sbdReplyType shutdownSbd (char *host);
-extern struct dptNode *parseDepCond (char *, struct lsfAuth *,
+sbdReplyType probe_slave (struct hData *, char sendJobs);
+sbdReplyType rebootSbd (char *host);
+sbdReplyType shutdownSbd (char *host);
+struct dptNode *parseDepCond (char *, struct lsfAuth *,
 				     int *, char **, int *, int);
-extern int evalDepCond (struct dptNode *, struct jData *);
-extern void freeDepCond (struct dptNode *);
-extern void resetDepCond (struct dptNode *);
-extern bool_t autoAdjustIsEnabled (void);
-extern int getAutoAdjustAtNumPend (void);
-extern float getAutoAdjustAtPercent (void);
-extern bool_t autoAdjustIsEnabled (void);
-extern float getHRValue (char *, struct hData *, struct resourceInstance **);
-extern int checkResources (struct resourceInfoReq *,
+int evalDepCond (struct dptNode *, struct jData *);
+void freeDepCond (struct dptNode *);
+void resetDepCond (struct dptNode *);
+bool_t autoAdjustIsEnabled (void);
+int getAutoAdjustAtNumPend (void);
+float getAutoAdjustAtPercent (void);
+bool_t autoAdjustIsEnabled (void);
+float getHRValue (char *, struct hData *, struct resourceInstance **);
+int checkResources (struct resourceInfoReq *,
 			   struct lsbShareResourceInfoReply *);
-extern struct sharedResource *getResource (char *);
-extern void resetSharedResource (void);
-extern void updSharedResourceByRUNJob (const struct jData *);
-extern int sharedResourceUpdFactor;
-extern void freeSharedResource (void);
-extern void newPRMO (char *);
-extern void delPRMO ();
-extern void resetPRMOValues (int);
-extern void printPRMOValues ();
-extern void mbdReconfPRMO ();
-extern float getUsablePRHQValue (int, struct hData *,
+struct sharedResource *getResource (char *);
+void resetSharedResource (void);
+void updSharedResourceByRUNJob (const struct jData *);
+int sharedResourceUpdFactor;
+void freeSharedResource (void);
+void newPRMO (char *);
+void delPRMO ();
+void resetPRMOValues (int);
+void printPRMOValues ();
+void mbdReconfPRMO ();
+float getUsablePRHQValue (int, struct hData *,
 				 struct qData *, struct resourceInstance **);
-extern float getAvailableByPreemptPRHQValue (int,
+float getAvailableByPreemptPRHQValue (int,
 					     struct hData *, struct qData *);
-extern float getReservedByWaitPRHQValue (int, struct hData *, struct qData *);
-extern float takeAvailableByPreemptPRHQValue (int, float,
+float getReservedByWaitPRHQValue (int, struct hData *, struct qData *);
+float takeAvailableByPreemptPRHQValue (int, float,
 					      struct hData *, struct qData *);
-extern void addRunJobUsedPRHQValue (int, float,
+void addRunJobUsedPRHQValue (int, float,
 				    struct hData *, struct qData *);
-extern void removeRunJobUsedPRHQValue (int, float,
+void removeRunJobUsedPRHQValue (int, float,
 				       struct hData *, struct qData *);
-extern void addReservedByWaitPRHQValue (int, float,
+void addReservedByWaitPRHQValue (int, float,
 					struct hData *, struct qData *);
-extern void removeReservedByWaitPRHQValue (int, float,
+void removeReservedByWaitPRHQValue (int, float,
 					   struct hData *, struct qData *);
-extern void addAvailableByPreemptPRHQValue (int, float,
+void addAvailableByPreemptPRHQValue (int, float,
 					    struct hData *, struct qData *);
-extern void removeAvailableByPreemptPRHQValue (int, float,
+void removeAvailableByPreemptPRHQValue (int, float,
 					       struct hData *,
 					       struct qData *);
-extern int resName2resIndex (char *);
-extern int isItPreemptResourceName (char *);
-extern int isItPreemptResourceIndex (int);
-extern int isReservePreemptResource (struct resVal *);
-extern int isHostsInSameInstance (int, struct hData *, struct hData *);
+int resName2resIndex (char *);
+int isItPreemptResourceName (char *);
+int isItPreemptResourceIndex (int);
+int isReservePreemptResource (struct resVal *);
+int isHostsInSameInstance (int, struct hData *, struct hData *);
 
 
 
-extern void freeIdxList (struct idxList *);
-extern struct idxList *parseJobArrayIndex (char *, int *, int *);
-extern void handleNewJobArray (struct jData *, struct idxList *, int);
-extern void offArray (struct jData *);
-extern int getJobIdList (char *, int *, LS_LONG_INT **);
-extern int getJobIdIndexList (char *, int *, struct idxList **);
-extern struct jData *copyJData (struct jData *);
-extern struct jShared *copyJShared (struct jData *);
-extern struct idxList *getIdxListContext (void);
-extern void setIdxListContext (const char *);
-extern void freeIdxListContext (void);
+void freeIdxList (struct idxList *);
+struct idxList *parseJobArrayIndex (char *, int *, int *);
+void handleNewJobArray (struct jData *, struct idxList *, int);
+void offArray (struct jData *);
+int getJobIdList (char *, int *, LS_LONG_INT **);
+int getJobIdIndexList (char *, int *, struct idxList **);
+struct jData *copyJData (struct jData *);
+struct jShared *copyJShared (struct jData *);
+struct idxList *getIdxListContext (void);
+void setIdxListContext (const char *);
+void freeIdxListContext (void);
 
 #define FIRST_CHILD(x)   (x)->child
 #define PARENT(x)        (x)->parent
@@ -1411,7 +1408,7 @@ extern void freeIdxListContext (void);
 #define IS_CHILD(x,y)    is_child(x,y)
 #define IS_SIBLING(x,y)  ((PARENT(x) == PARENT(y))? TRUE:FALSE)
 
-extern long schedSeqNo;
+long schedSeqNo;
 
 #define QUEUE_LIMIT(qPtr, i) \
      ((qPtr)->defLimits[i] > 0 ? \
@@ -1466,11 +1463,9 @@ extern long schedSeqNo;
 #define CHK_TCL_SYNTAX 0x02
 #define PARSE_XOR        0x04
 
-extern void copyJUsage (struct jRusage *, struct jRusage *);
+void copyJUsage (struct jRusage *, struct jRusage *);
 
-extern struct timeWindow *newTimeWindow (void);
-extern void freeTimeWindow (struct timeWindow *);
-extern void updateTimeWindow (struct timeWindow *);
-extern inline int numofhosts (void);
-
-#endif
+struct timeWindow *newTimeWindow (void);
+void freeTimeWindow (struct timeWindow *);
+void updateTimeWindow (struct timeWindow *);
+inline int numofhosts (void);

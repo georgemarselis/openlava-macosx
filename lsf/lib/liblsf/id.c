@@ -82,32 +82,32 @@ initIdLib (IDLIB_INFO_T * idLib)
     soSym_ (idLib->handle, GET_LSF_USER);
   if (idLib->getLSFUser_ == NULL)
     {
-      ls_syslog (LOG_ERR, I18N (6351, "%s: Error loading symbol %s from library %s: %k"),   /* catgets 6351 */
-         fname, GET_LSF_USER, libPath);
+      /* catgets 6351 */
+      ls_syslog (LOG_ERR, "6351: %s: Error loading symbol %s from library %s: %k", fname, GET_LSF_USER, libPath);
       goto cleanup;
     }
   idLib->getLSFUserByName_ = (GET_LSF_USER_BY_NAME_FN_T)
     soSym_ (idLib->handle, GET_LSF_USER_BY_NAME);
   if (idLib->getLSFUserByName_ == NULL)
     {
-      ls_syslog (LOG_ERR, I18N (6351, "%s: Error loading symbol %s from library %s: %k"),   /* catgets 6351 */
-         fname, GET_LSF_USER_BY_NAME, libPath);
+      /* catgets 6351 */
+      ls_syslog (LOG_ERR, "6351: %s: Error loading symbol %s from library %s: %k", fname, GET_LSF_USER_BY_NAME, libPath);
       goto cleanup;
     }
   idLib->getLSFUserByUid_ = (GET_LSF_USER_BY_UID_FN_T)
     soSym_ (idLib->handle, GET_LSF_USER_BY_UID);
   if (idLib->getLSFUserByUid_ == NULL)
     {
-      ls_syslog (LOG_ERR, I18N (6351, "%s: Error loading symbol %s from library %s: %k"),   /* catgets 6351 */
-         fname, GET_LSF_USER_BY_UID, libPath);
+      /* catgets 6351 */
+      ls_syslog (LOG_ERR, "6351: %s: Error loading symbol %s from library %s: %k", fname, GET_LSF_USER_BY_UID, libPath);
       goto cleanup;
     }
   idLib->getOSUserName_ = (GET_OS_USER_NAME_FN_T)
     soSym_ (idLib->handle, GET_OS_USER_NAME);
   if (idLib->getOSUserName_ == NULL)
     {
-      ls_syslog (LOG_ERR, I18N (6351, "%s: Error loading symbol %s from library %s: %k"),   /* catgets 6351 */
-         fname, GET_OS_USER_NAME, libPath);
+        /* catgets 6351 */
+      ls_syslog (LOG_ERR, "6351: %s: Error loading symbol %s from library %s: %k", fname, GET_OS_USER_NAME, libPath);
       goto cleanup;
     }
     
@@ -116,13 +116,13 @@ initIdLib (IDLIB_INFO_T * idLib)
     idLib->getOSUid_ = (GET_OS_UID_FN_T) soSym_ (idLib->handle, "getOSUid_");
     if ( NULL == idLib->getOSUid_ ) {
         /* catgets 6351 */
-        ls_syslog (LOG_ERR, I18N (6351, "%s: Error loading symbol %s from library %s: %k"), fname, GET_OS_UID, libPath);
+        ls_syslog (LOG_ERR, "6351: %s: Error loading symbol %s from library %s: %k", fname, GET_OS_UID, libPath);
         goto cleanup;
     }
 
   retcode = 0;
 
-cleanup:
+cleanup:  // FIXME FIXME FIXME FIXME FIXME remove cleanup: label
 
   FREEUP (libPath);
 

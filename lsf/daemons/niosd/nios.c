@@ -37,6 +37,7 @@
 #include "res/nios.h"
 #include "res/res.h"
 #include "res/resout.h"
+#include "daemons/libniosd/hanlder.h"
 
 #define NL_SETN         29
 

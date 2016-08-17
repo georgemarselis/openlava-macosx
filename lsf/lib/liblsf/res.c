@@ -44,11 +44,12 @@ unsigned int requestSN            =  0;
 fd_set connection_ok_;
 struct sockaddr_in res_addr_;
 struct lsQueue *requestQ;
+static int getLimits (struct lsfLimit *);
+static int mygetLimits (struct lsfLimit *);
 
 #define REQUESTSN ((requestSN < USHRT_MAX) ? requestSN++ : (requestSN=11 , 10))
 
-static unsigned int currentSN;
-
+int callRes_ (int s, enum resCmd cmd, char *data, char *reqBuf, size_t reqLen, bool_t (*xdrFunc) (), int *rd, struct timeval *timeout, struct lsfAuth *auth);
 int   do_rstty1_ (char *host, int async);
 int   do_rstty2_ (int s, int io_fd, int redirect, int async);
 FILE *ls_popen   (int s, char *command, char *type);
@@ -58,11 +59,25 @@ int   enqueueTaskMsg_ (int s, pid_t taskID, struct LSFHeader *msgHdr);
 int   sendSig_   (char *host, pid_t rid, int sig, int options);
 int   rgetRusageCompletionHandler_ (struct lsRequest *request);
 int   ls_rstty (char *host);
+uint  getCurrentSN( void );
+uint  setCurrentSN( uint *currentSN );
 
-static int getLimits (struct lsfLimit *);
-static int mygetLimits (struct lsfLimit *);
 
-int callRes_ (int s, enum resCmd cmd, char *data, char *reqBuf, size_t reqLen, bool_t (*xdrFunc) (), int *rd, struct timeval *timeout, struct lsfAuth *auth);
+static unsigned int globCurrentSN;
+
+
+uint  getCurrentSN( void ) {
+    return globCurrentSN;
+}
+
+uint  setCurrentSN( uint *currentSN ) {
+    uint rvalue = 0; // on success return 0;
+
+    globCurrentSN = *currentSN;
+
+    return rvalue;
+}
+
 
 int
 ls_connect (char *host)
@@ -171,7 +186,7 @@ ls_connect (char *host)
     free (reqBuf);
 
     assert( currentSN <= INT_MAX );
-    (void) connected_ (official, s, -1, (int) currentSN);
+    connected_ (official, s, -1, currentSN);
 
     return (s);
 }
@@ -179,10 +194,11 @@ ls_connect (char *host)
 int
 lsConnWait_ (char *host)
 {
-    int s;
-    int descriptor[2];
+    int s = 0;
+    int descriptor[2] = { 0, 0 };
 
     if (_isconnected_ (host, descriptor)) {
+        assert( 0 != descriptor[0] );
         s = descriptor[0];
     }
     else {

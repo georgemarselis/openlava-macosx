@@ -20,9 +20,6 @@
 
 #include "intlib/jidx.h"
 
-#ifndef LSF_JGRP_H
-#define LSF_JGRP_H
-
 
 #define DESTROY_REF(x, y) { \
      y(x);\
@@ -97,7 +94,7 @@ typedef struct treeObserver TREE_OBSERVER_T;
 
 
 
-extern char treeFile[];
+char treeFile[];
 
 
 struct nodeList
@@ -106,47 +103,44 @@ struct nodeList
   void *info;
 };
 
-extern struct jgTreeNode *groupRoot;
+struct jgTreeNode *groupRoot;
 
-extern void treeInit ();
-extern struct jgTreeNode *treeLexNext (struct jgTreeNode *);
-extern struct jgTreeNode *treeLinkSibling (struct jgTreeNode *,
+void treeInit ();
+struct jgTreeNode *treeLexNext (struct jgTreeNode *);
+struct jgTreeNode *treeLinkSibling (struct jgTreeNode *,
 					   struct jgTreeNode *);
-extern struct jgTreeNode *treeInsertChild (struct jgTreeNode *,
+struct jgTreeNode *treeInsertChild (struct jgTreeNode *,
 					   struct jgTreeNode *);
-extern void treeInsertLeft (struct jgTreeNode *, struct jgTreeNode *);
-extern void treeInsertRight (struct jgTreeNode *, struct jgTreeNode *);
-extern struct jgTreeNode *treeClip (struct jgTreeNode *);
-extern struct jgTreeNode *treeNewNode (int);
-extern void treeFree (struct jgTreeNode *);
-extern int isAncestor (struct jgTreeNode *, struct jgTreeNode *);
-extern int isChild (struct jgTreeNode *, struct jgTreeNode *);
-extern char *parentGroup (char *);
-extern char *parentOfJob (char *);
-extern void initObj (char *, int);
-extern char *parentGroup (char *);
-extern struct jgArrayBase *createJgArrayBaseRef (struct jgArrayBase *);
-extern void destroyJgArrayBaseRef (struct jgArrayBase *);
-extern int getIndexOfJStatus (int);
-extern void updJgrpCountByJStatus (struct jData *, int, int);
-extern void putOntoTree (struct jData *, int jobType);
-extern void printTreeStruct (char *);
-extern int jgrpPermitOk (struct lsfAuth *, struct jgTreeNode *);
-extern int selectJgrps (struct jobInfoReq *, void **, int *);
-extern void updJgrpCountByOp (struct jgTreeNode *, int);
-extern char *myName (char *);
-extern void freeJarray (struct jarray *);
-extern void checkJgrpDep (void);
-extern int inIdxList (LS_LONG_INT, struct idxList *);
-extern int matchName (char *, char *);
-extern struct jgTreeNode *treeNextSib (struct jgTreeNode *);
-extern char *jgrpNodeParentPath (struct jgTreeNode *);
-extern char *fullJobName (struct jData *);
-extern int jgrpNodeParentPath_r (struct jgTreeNode *, char *);
-extern void fullJobName_r (struct jData *, char *);
-extern int updLocalJData (struct jData *, struct jData *);
-extern int localizeJobElement (struct jData *);
-extern int localizeJobArray (struct jData *);
-
-
-#endif
+void treeInsertLeft (struct jgTreeNode *, struct jgTreeNode *);
+void treeInsertRight (struct jgTreeNode *, struct jgTreeNode *);
+struct jgTreeNode *treeClip (struct jgTreeNode *);
+struct jgTreeNode *treeNewNode (int);
+void treeFree (struct jgTreeNode *);
+int isAncestor (struct jgTreeNode *, struct jgTreeNode *);
+int isChild (struct jgTreeNode *, struct jgTreeNode *);
+char *parentGroup (char *);
+char *parentOfJob (char *);
+void initObj (char *, int);
+char *parentGroup (char *);
+struct jgArrayBase *createJgArrayBaseRef (struct jgArrayBase *);
+void destroyJgArrayBaseRef (struct jgArrayBase *);
+int getIndexOfJStatus (int);
+void updJgrpCountByJStatus (struct jData *, int, int);
+void putOntoTree (struct jData *, int jobType);
+void printTreeStruct (char *);
+int jgrpPermitOk (struct lsfAuth *, struct jgTreeNode *);
+int selectJgrps (struct jobInfoReq *, void **, int *);
+void updJgrpCountByOp (struct jgTreeNode *, int);
+char *myName (char *);
+void freeJarray (struct jarray *);
+void checkJgrpDep (void);
+int inIdxList (LS_LONG_INT, struct idxList *);
+int matchName (char *, char *);
+struct jgTreeNode *treeNextSib (struct jgTreeNode *);
+char *jgrpNodeParentPath (struct jgTreeNode *);
+char *fullJobName (struct jData *);
+int jgrpNodeParentPath_r (struct jgTreeNode *, char *);
+void fullJobName_r (struct jData *, char *);
+int updLocalJData (struct jData *, struct jData *);
+int localizeJobElement (struct jData *);
+int localizeJobArray (struct jData *);

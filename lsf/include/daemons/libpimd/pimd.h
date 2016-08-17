@@ -18,9 +18,6 @@
 
 #pragma once
  
-#ifndef LSF_PIM_PIM_H
-#define LSF_PIM_PIM_H
-
 #include <time.h>
 
 enum lsPStatType
@@ -58,6 +55,4 @@ struct lsPidInfo
 #define PIM_SLEEP_TIME 3
 #define PIM_UPDATE_INTERVAL 30
 
-extern struct jRusage *getJInfo_ (int npgid, int *pgid, unsigned short options, gid_t cpgid);
-
-#endif
+struct jRusage *getJInfo_ (int npgid, int *pgid, unsigned short options, gid_t cpgid);

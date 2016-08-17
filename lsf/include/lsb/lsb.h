@@ -18,9 +18,6 @@
 
 #pragma once 
  
-#ifndef LSF_LSB_LSB_H
-#define LSF_LSB_LSB_H
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -42,11 +39,11 @@
 #define MAX(x,y)        ((x) > (y) ? (x) : (y))
 #endif
 
-#define DEF_COMMITTED_RUN_TIME_FACTOR 0.0
+#define DEF_COMMITTED_RUN_TIME_FACTOR 0.0  // FIXME FIXME FIXME why is this here?
 
-extern struct config_param lsbParams[];
-extern int initenv_ (struct config_param *, char *);
-extern int sig_encode (int);
+extern struct config_param lsbParams[];  // FIXME FIXME FIXME FIXME FIXME put in specific header
+int initenv_ (struct config_param *, char *);
+int sig_encode (int);
 
 
 #define DEFAULT_API_CONNTIMEOUT 10
@@ -79,30 +76,28 @@ typedef struct lsbSubSpoolFile
 } LSB_SUB_SPOOL_FILE_T;
 
 
-extern int creat_p_socket (void);
-extern int serv_connect (char *, ushort, int);
-extern int getServerMsg (int, struct LSFHeader *, char **rep_buf);
-extern int callmbd (char *, char *, int, char **, struct LSFHeader *, int *, int (*)(), int *);
-extern int cmdCallSBD_ (char *, char *, int, char **, struct LSFHeader *, int *);
+int creat_p_socket (void);
+int serv_connect (char *, ushort, int);
+int getServerMsg (int, struct LSFHeader *, char **rep_buf);
+int callmbd (char *, char *, int, char **, struct LSFHeader *, int *, int (*)(), int *);
+int cmdCallSBD_ (char *, char *, int, char **, struct LSFHeader *, int *);
 
 
-extern int PutQStr (FILE *, char *);
-extern int Q2Str (char *, char *);
-extern int authTicketTokens_ (struct lsfAuth *, char *);
+int PutQStr (FILE *, char *);
+int Q2Str (char *, char *);
+int authTicketTokens_ (struct lsfAuth *, char *);
 
-extern char *getNextValue0 (char **line, char, char);
-extern int readNextPacket (char **, int, struct LSFHeader *, int);
-extern void closeSession (int);
-extern void upperStr (char *, char *);
-extern char *getUnixSpoolDir (char *);
-extern char *getNTSpoolDir (char *);
-extern char *getMasterName (void);
-extern ushort get_mbd_port (void);
-extern ushort get_sbd_port (void);
-extern int getAuth (struct lsfAuth *);
+char *getNextValue0 (char **line, char, char);
+int readNextPacket (char **, int, struct LSFHeader *, int);
+void closeSession (int);
+void upperStr (char *, char *);
+char *getUnixSpoolDir (char *);
+char *getNTSpoolDir (char *);
+char *getMasterName (void);
+ushort get_mbd_port (void);
+ushort get_sbd_port (void);
+int getAuth (struct lsfAuth *);
 
-extern int chUserRemoveSpoolFile (const char *hostName, const char *spoolFile);
-extern void prtBETime_ (struct submit *);
-extern int runBatchEsub (struct lenData *, struct submit *);
-
-#endif
+int chUserRemoveSpoolFile (const char *hostName, const char *spoolFile);
+void prtBETime_ (struct submit *);
+int runBatchEsub (struct lenData *, struct submit *);

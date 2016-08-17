@@ -20,9 +20,6 @@
 #pragma once
  
 
-#ifndef LSF_LSADMIN_LSADMIN_H
-#define LSF_LSADMIN_LSADMIN_H
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -31,22 +28,22 @@
 #include "lsf.h"
 #include "lib/lproto.h"
 
-extern int limCtrl (int argc, char **argv, int opCode);
-extern int limLock (int argc, char **argv);
-extern int limUnlock (int argc, char **argv);
-extern int resCtrl (int argc, char **argv, int opCode);
-extern int checkConf (int verbose, int who);
-extern int oneLimDebug (struct debugReq *p, char *host);
-extern int oneResDebug (struct debugReq *p, char *host);
+int limCtrl (int argc, char **argv, int opCode);
+int limLock (int argc, char **argv);
+int limUnlock (int argc, char **argv);
+int resCtrl (int argc, char **argv, int opCode);
+int checkConf (int verbose, int who);
+int oneLimDebug (struct debugReq *p, char *host);
+int oneResDebug (struct debugReq *p, char *host);
 
-extern void parseAndDo (char *cmdBuf, int (*func) ());
-extern int adminCmdIndex (char *cmd, char *cmdList[]);
-extern void cmdsUsage (char *cmd, char *cmdList[], char *cmdInfo[]);
-extern void oneCmdUsage (int i, char *cmdList[], char *cmdSyntax[]);
-extern void cmdHelp (int argc, char **argv, char *cmdList[],
+void parseAndDo (char *cmdBuf, int (*func) ());
+int adminCmdIndex (char *cmd, char *cmdList[]);
+void cmdsUsage (char *cmd, char *cmdList[], char *cmdInfo[]);
+void oneCmdUsage (int i, char *cmdList[], char *cmdSyntax[]);
+void cmdHelp (int argc, char **argv, char *cmdList[],
 		     char *cmdInfo[], char *cmdSyntax[]);
-extern char *myGetOpt (int nargc, char **nargv, char *ostr);
-extern int getConfirm (char *msg);
+char *myGetOpt (int nargc, char **nargv, char *ostr);
+int getConfirm (char *msg);
 
 
 #define NL_SETN   25
@@ -70,5 +67,3 @@ extern int getConfirm (char *msg);
 #define LSADM_HELP       16
 #define LSADM_QES        17
 #define LSADM_QUIT       18
-
-#endif

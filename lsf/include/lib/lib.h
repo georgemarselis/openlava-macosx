@@ -37,8 +37,8 @@ struct taskMsg
     size_t len;
 };
 
-extern struct lsQueue *requestQ;
-extern unsigned int requestSN;
+struct lsQueue *requestQ;
+unsigned int requestSN;
 
 enum lsTMsgType
 {
@@ -212,39 +212,39 @@ typedef enum status genparams_t;
 
 #define CLOSEFD(s) if ((s) >= 0) {close((s)); (s) = -1;}
 
-extern struct sockaddr_in sockIds_[];
-extern int limchans_[];
+extern struct sockaddr_in sockIds_[]; // FIXME FIXME FIXME FIXME FIXME put in specific header
+extern int limchans_[]; // FIXME FIXME FIXME FIXME FIXME put in specific header
 
-extern struct config_param genParams_[];
-extern struct sockaddr_in limSockId_;
-extern struct sockaddr_in limTcpSockId_;
-extern char rootuid_;
-extern struct sockaddr_in res_addr_;
-extern fd_set connection_ok_;
-extern int currentsocket_;
-extern int totsockets_;
-extern int cli_nios_fd[];
-extern short nios_ok_;
-extern struct masterInfo masterInfo_;
-extern int masterknown_;
-extern char *indexfilter_;
-extern char *stripDomains_;
-extern hTab conn_table;
+extern struct config_param genParams_[]; // FIXME FIXME FIXME FIXME FIXME put in specific header
+struct sockaddr_in limSockId_;
+struct sockaddr_in limTcpSockId_;
+char rootuid_;
+struct sockaddr_in res_addr_;
+fd_set connection_ok_;
+int currentsocket_;
+int totsockets_;
+extern int cli_nios_fd[]; // FIXME FIXME FIXME FIXME FIXME put in specific header
+short nios_ok_;
+struct masterInfo masterInfo_;
+int masterknown_;
+char *indexfilter_;
+char *stripDomains_;
+hTab conn_table;
 
-extern char **environ;
+char **environ;
 
-extern void initconntbl_ (void);
-extern void inithostsock_ (void);
-extern int connected_ (char *, int, int, int);
-extern void hostIndex_ (char *, int);
-extern int gethostbysock_ (int, char *);
-extern int _isconnected_ (char *, int *);
-extern int _getcurseqno_ (char *);
-extern void _setcurseqno_ (char *hostname, uint currentSN);
-extern void _lostconnection_ (char *);
-extern int _findmyconnections_ (struct connectEnt **);
+void initconntbl_ (void);
+void inithostsock_ (void);
+int connected_ (char *, int, int, int);
+void hostIndex_ (char *, int);
+int gethostbysock_ (int, char *);
+int _isconnected_ (char *, int *);
+int _getcurseqno_ (char *);
+void _setcurseqno_ (char *hostname, uint currentSN);
+void _lostconnection_ (char *);
+int _findmyconnections_ (struct connectEnt **);
 
-extern int setLockOnOff_ (int, time_t, char *hname);
+int setLockOnOff_ (int, time_t, char *hname);
 
 typedef struct lsRequest LS_REQUEST_T;
 typedef struct lsRequest requestType;
@@ -268,56 +268,56 @@ struct lsRequest
     void *appExtra;
 };
 
-extern struct lsRequest *lsReqHandCreate_ (int, int, int, void *, requestCompletionHandler, appCompletionHandler, void *);
-extern void lsReqHandDestroy_ (struct lsRequest *);
+struct lsRequest *lsReqHandCreate_ (int, int, int, void *, requestCompletionHandler, appCompletionHandler, void *);
+void lsReqHandDestroy_ (struct lsRequest *);
 
-extern int lsConnWait_ (char *);
-extern int lsMsgWait_ (int inTidCnt, pid_t *tidArray, int *rdyTidCnt, int inFdCnt, int *fdArray, int *rdyFdCnt, int *outFdArray, struct timeval *timeout, int options);
-extern int lsMsgRdy_ (pid_t taskid, size_t *msgLen);
-extern int lsMsgRcv_ (pid_t taskid, char *buffer, size_t len, int options);
-extern int lsMsgSnd_ (pid_t taskid, char *buffer, size_t len, int options);
-extern int lsMsgSnd2_ (int *sock, ushort opcode, char *buffer, size_t len, int options);
-extern int lsReqTest_ (LS_REQUEST_T *);
-extern int lsReqWait_ (LS_REQUEST_T *, int);
-extern void lsReqFree_ (LS_REQUEST_T *);
-extern int lsRSig_ (char *host, pid_t rid, int sig, int options);
-extern int lsRGetpid_ (int, int);
-extern void *lsRGetpidAsync_ (int, int *);
-extern LS_REQUEST_T *lsIRGetRusage_ (pid_t rpid, struct jRusage * ru, appCompletionHandler appHandler, void *appExtra, int options);
-extern int lsRGetRusage (int, struct jRusage *, int);
-extern int lsGetRProcRusage (char *, int, struct jRusage *, int);
-extern LS_REQUEST_T *lsGetIRProcRusage_ (char *, int, int, struct jRusage *, appCompletionHandler, void *);
+int lsConnWait_ (char *);
+int lsMsgWait_ (int inTidCnt, pid_t *tidArray, int *rdyTidCnt, int inFdCnt, int *fdArray, int *rdyFdCnt, int *outFdArray, struct timeval *timeout, int options);
+int lsMsgRdy_ (pid_t taskid, size_t *msgLen);
+int lsMsgRcv_ (pid_t taskid, char *buffer, size_t len, int options);
+int lsMsgSnd_ (pid_t taskid, char *buffer, size_t len, int options);
+int lsMsgSnd2_ (int *sock, ushort opcode, char *buffer, size_t len, int options);
+int lsReqTest_ (LS_REQUEST_T *);
+int lsReqWait_ (LS_REQUEST_T *, int);
+void lsReqFree_ (LS_REQUEST_T *);
+int lsRSig_ (char *host, pid_t rid, int sig, int options);
+int lsRGetpid_ (int, int);
+void *lsRGetpidAsync_ (int, int *);
+LS_REQUEST_T *lsIRGetRusage_ (pid_t rpid, struct jRusage * ru, appCompletionHandler appHandler, void *appExtra, int options);
+int lsRGetRusage (int, struct jRusage *, int);
+int lsGetRProcRusage (char *, int, struct jRusage *, int);
+LS_REQUEST_T *lsGetIRProcRusage_ (char *, int, int, struct jRusage *, appCompletionHandler, void *);
 
-extern int initenv_ (struct config_param *, char *);
-extern int readconfenv_ (struct config_param *, struct config_param *, char *);
-extern int ls_readconfenv (struct config_param *, char *);
+int initenv_ (struct config_param *, char *);
+int readconfenv_ (struct config_param *, struct config_param *, char *);
+int ls_readconfenv (struct config_param *, char *);
 
-extern int callLim_ (enum limReqCode, void *, bool_t (*)(), void *, bool_t (*)(), char *, int, struct LSFHeader *);
-extern int initLimSock_ (void);
+int callLim_ (enum limReqCode, void *, bool_t (*)(), void *, bool_t (*)(), char *, int, struct LSFHeader *);
+int initLimSock_ (void);
 
-extern void err_return_ (enum limReplyCode);
+void err_return_ (enum limReplyCode);
 
-extern struct hostLoad *loadinfo_ (char *resReq, struct decisionReq *loadReqPtr, char *fromhost, unsigned long *numHosts, char ***outnlist);
+struct hostLoad *loadinfo_ (char *resReq, struct decisionReq *loadReqPtr, char *fromhost, unsigned long *numHosts, char ***outnlist);
 
-extern struct hostent *Gethostbyname_ (char *);
-extern short getRefNum_ (void);
-extern unsigned int isint_ (char *);
-extern char islongint_ (char *);
-extern int isdigitstr_ (char *);
-extern LS_LONG_INT atoi64_ (char *);
-extern char *chDisplay_ (char *);
-extern void strToLower_ (char *);
-extern void initLSFHeader_ (struct LSFHeader *);
-extern int isMasterCrossPlatform (void);
-extern int isAllowCross (char *);
+struct hostent *Gethostbyname_ (char *);
+short getRefNum_ (void);
+unsigned int isint_ (char *);
+char islongint_ (char *);
+int isdigitstr_ (char *);
+LS_LONG_INT atoi64_ (char *);
+char *chDisplay_ (char *);
+void strToLower_ (char *);
+void initLSFHeader_ (struct LSFHeader *);
+int isMasterCrossPlatform (void);
+int isAllowCross (char *);
 
-extern char **placement_ (char *resReq, struct decisionReq *placeReqPtr, char *fromhost, size_t *num);
+char **placement_ (char *resReq, struct decisionReq *placeReqPtr, char *fromhost, size_t *num);
 
-extern int sig_encode (int);
-extern int sig_decode (int);
-extern int getSigVal (char *);
-extern char *getSigSymbolList (void);
-extern char *getSigSymbol (int);
+int sig_encode (int);
+int sig_decode (int);
+int getSigVal (char *);
+char *getSigSymbolList (void);
+char *getSigSymbol (int);
 
 typedef struct svrsock
 {
@@ -332,40 +332,40 @@ typedef struct svrsock
 #define LS_CSO_ASYNC_NT       (0x0001)
 #define LS_CSO_PRIVILEGE_PORT (0x0002)
 
-extern int setLSFChanSockOpt_ (int newOpt);
+int setLSFChanSockOpt_ (int newOpt);
 
-extern int CreateSock_ (int);
-extern int CreateSockEauth_ (int);
-extern int Socket_ (int, int, int);
-extern int get_nonstd_desc_ (int);
-extern int TcpCreate_ (int, int);
-extern int opensocks_ (int);
-extern ls_svrsock_t *svrsockCreate_ (u_short, int, struct sockaddr_in *, int);
-extern int svrsockAccept_ (ls_svrsock_t *, int);
-extern char *svrsockToString_ (ls_svrsock_t *);
-extern void svrsockDestroy_ (ls_svrsock_t *);
-extern int TcpConnect_ (char *, u_short, struct timeval *);
+int CreateSock_ (int);
+int CreateSockEauth_ (int);
+int Socket_ (int, int, int);
+int get_nonstd_desc_ (int);
+int TcpCreate_ (int, int);
+int opensocks_ (int);
+ls_svrsock_t *svrsockCreate_ (u_short, int, struct sockaddr_in *, int);
+int svrsockAccept_ (ls_svrsock_t *, int);
+char *svrsockToString_ (ls_svrsock_t *);
+void svrsockDestroy_ (ls_svrsock_t *);
+int TcpConnect_ (char *, u_short, struct timeval *);
 
-extern char *getMsgBuffer_ (int fd, size_t *bufferSize);
+char *getMsgBuffer_ (int fd, size_t *bufferSize);
 
-extern int expSyntax_ (char *);
+int expSyntax_ (char *);
 
-extern int tid_register (pid_t taskid, int socknum, u_short taskPort, char *host, bool_t doTaskInfo);
-extern int tid_remove (pid_t taskid);
-extern struct tid *tid_find (pid_t taskid);
-extern struct tid *tidFindIgnoreConn_(pid_t taskid);
-extern void tid_lostconnection (int);
-extern int tidSameConnection_ (int, int *, int **);
+int tid_register (pid_t taskid, int socknum, u_short taskPort, char *host, bool_t doTaskInfo);
+int tid_remove (pid_t taskid);
+struct tid *tid_find (pid_t taskid);
+struct tid *tidFindIgnoreConn_(pid_t taskid);
+void tid_lostconnection (int);
+int tidSameConnection_ (int, int *, int **);
 
-extern int callRes_ (int s, enum resCmd cmd, char *data, char *reqBuf, size_t reqLen, bool_t (*xdrFunc) (), int *rd, struct timeval *timeout, struct lsfAuth *auth);
-extern int sendCmdBill_ (int, enum resCmd, struct resCmdBill *, int *, struct timeval *);
-extern void ls_errlog (FILE * fd, const char *fmt, ...)
+int callRes_ (int s, enum resCmd cmd, char *data, char *reqBuf, size_t reqLen, bool_t (*xdrFunc) (), int *rd, struct timeval *timeout, struct lsfAuth *auth);
+int sendCmdBill_ (int, enum resCmd, struct resCmdBill *, int *, struct timeval *);
+void ls_errlog (FILE * fd, const char *fmt, ...)
 #if defined(__GNUC__) && defined(CHECK_PRINTF)
     __attribute__ ((format (printf, 2, 3)))
 #endif
 ;
 
-extern void ls_verrlog (FILE * fd, const char *fmt, va_list ap);
-extern int isPamBlockWait;
+void ls_verrlog (FILE * fd, const char *fmt, va_list ap);
+int isPamBlockWait;
 
 #endif

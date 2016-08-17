@@ -18,9 +18,6 @@
 
 #pragma once
 
-#ifndef LSF_INTLIB_LSFTCL_H
-#define LSF_INTLIB_LSFTCL_H
-
 typedef struct
 {
   char *name;
@@ -89,5 +86,3 @@ struct tclLsInfo
 int initTcl (struct tclLsInfo *);
 void freeTclLsInfo (struct tclLsInfo *tclLsInfo, int mode);
 int evalResReq (char *resReq, struct tclHostData *hPtr2, char useFromType);
-
-#endif

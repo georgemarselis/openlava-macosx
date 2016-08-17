@@ -17,9 +17,7 @@
  */
 
 #pragma once
- 
-#ifndef LSF_RES_NIOS_H
-#define LSF_RES_NIOS_H
+
 
 typedef enum
 {
@@ -138,13 +136,11 @@ struct finishStatus
   int sendSignal;
 };
 
-extern int standalone;
-extern int niosSbdMode;
-extern LS_LONG_INT jobId;
-extern int heartbeatInterval;
-extern int jobStatusInterval;
-extern int pendJobTimeout;
-extern int msgInterval;
+int standalone;
+int niosSbdMode;
+LS_LONG_INT jobId;
+int heartbeatInterval;
+int jobStatusInterval;
+int pendJobTimeout;
+int msgInterval;
 
-
-#endif
