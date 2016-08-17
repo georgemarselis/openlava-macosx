@@ -29,7 +29,7 @@
 #include "lib/xdrnio.h"
 #include "lib/xdrrf.h"
 #include "lib/tid.h"
-#include "lib/res.h"
+#include "lib/res.h" // FIXME FIXME FIXME delete, move functions to appropriate header file
 
 /* #define SIGEMT SIGBUS */
 
@@ -59,21 +59,17 @@ int   enqueueTaskMsg_ (int s, pid_t taskID, struct LSFHeader *msgHdr);
 int   sendSig_   (char *host, pid_t rid, int sig, int options);
 int   rgetRusageCompletionHandler_ (struct lsRequest *request);
 int   ls_rstty (char *host);
-uint  getCurrentSN( void );
-uint  setCurrentSN( uint *currentSN );
-
-
-static unsigned int globCurrentSN;
 
 
 uint  getCurrentSN( void ) {
     return globCurrentSN;
 }
 
-uint  setCurrentSN( uint *currentSN ) {
+uint  setCurrentSN( uint currentSN ) {
     uint rvalue = 0; // on success return 0;
 
-    globCurrentSN = *currentSN;
+    assert( currentSN <= INT_MAX ); // FIXME FIXME FIXME once first debuging is done, remove. We are trying to catch any function sneaking in garbage.
+    globCurrentSN = currentSN;
 
     return rvalue;
 }
@@ -147,7 +143,7 @@ ls_connect (char *host)
             sizeof (struct lsfAuth) + (size_t)ALIGNWORD_ (connReq.eexec.len);
 
     assert(  size >= 0 );
-    reqBuf = malloc(5 * (size_t)size * sizeof (int) ); 
+    reqBuf = malloc(5 * size * sizeof (int) ); 
     if (NULL == reqBuf && ENOMEM == errno ) {
         lserrno = LSE_MALLOC;
           CLOSESOCKET (s);
@@ -185,9 +181,7 @@ ls_connect (char *host)
 
     free (reqBuf);
 
-    assert( currentSN <= INT_MAX );
-    connected_ (official, s, -1, currentSN);
-
+    connected_ (official, s, -1, getCurrentSN( ) );
     return (s);
 }
 
@@ -738,10 +732,8 @@ ackReturnCode_ (int s)
 
     gethostbysock_ (s, hostname);
     getcurseqnoReturnValue = _getcurseqno_ (hostname);
-    assert( getcurseqnoReturnValue >= 0 );
-    currentSN =  (uint) getcurseqnoReturnValue;
-    assert( currentSN <= INT_MAX );
-    rc = expectReturnCode_ (s, (pid_t) currentSN, &repHdr);
+    setCurrentSN(  getcurseqnoReturnValue );
+    rc = expectReturnCode_ (s, getCurrentSN( ), &repHdr);
     if (rc < 0) {
         return (rc);
     }
@@ -861,11 +853,11 @@ callRes_ (int s, enum resCmd cmd, char *data, char *reqBuf, size_t reqLen, bool_
 
     memset (hostname, 0, sizeof (hostname));
 
-    currentSN = REQUESTSN;
+    setCurrentSN( REQUESTSN );
 
     gethostbysock_ (s, hostname);
     if (strcmp (hostname, "LSF_HOST_NULL")) {
-        _setcurseqno_ (hostname, currentSN);
+        _setcurseqno_ (hostname, getCurrentSN( ) );
     }
     
     cc = lsSendMsg_ (s, cmd, 0, data, reqBuf, reqLen, xdrFunc, b_write_fix, auth);
@@ -882,10 +874,12 @@ callRes_ (int s, enum resCmd cmd, char *data, char *reqBuf, size_t reqLen, bool_
     nready = rd_select_ (*rd, timeout);
     if (nready <= 0)
     {
-      if (nready == 0)
-  lserrno = LSE_TIME_OUT;
-      else
-  lserrno = LSE_SELECT_SYS;
+        if (nready == 0) {
+            lserrno = LSE_TIME_OUT;
+        }
+        else {
+            lserrno = LSE_SELECT_SYS;
+        }
       sigprocmask (SIG_SETMASK, &oldMask, NULL);
       return (-1);
     }
@@ -995,11 +989,11 @@ do_rstty_ (int s, int io_fd, int redirect)
 int
 do_rstty2_ (int s, int io_fd, int redirect, int async)
 {
-  char buf[MSGSIZE];
-  char *cp;
-
   static int termFlag = FALSE;
   static struct resStty tty;
+  char *buf = malloc( sizeof( char ) * MSGSIZE + 1);
+  char *cp  = NULL;
+
 
   if (!termFlag) {
         termFlag = TRUE;
@@ -1013,7 +1007,7 @@ do_rstty2_ (int s, int io_fd, int redirect, int async)
         }
         
         if (redirect) {
-            tty.termattr.c_lflag &= (uint) ~ECHO; // FIXME check that this expresion will never assign negative (it won't, but still)
+            tty.termattr.c_lflag &= ~ECHO; // FIXME check that this expresion will never assign negative (it won't, but still)
         }
 
         if ((cp = getenv ("LINES")) != NULL) {
@@ -1116,7 +1110,7 @@ lsIRGetRusage_ (pid_t rpid, struct jRusage * ru, appCompletionHandler appHandler
         rusageReq.whatid = RES_RID_ISPID;
     }
 
-    if (callRes_ (s, RES_RUSAGE, (char *) &rusageReq, (char *) &requestBuf, sizeof (requestBuf), xdr_resGetRusage, 0, 0, NULL) == -1)
+    if (callRes_ (s, RES_RUSAGE, (char *) &rusageReq, (char *) &requestBuf, sizeof (requestBuf), xdr_resGetRusage, 0, 0, NULL) == -1) // FIXME FIXME FIXME char for data? really?
     {
         closesocket (s);
         _lostconnection_ (host);
@@ -1124,14 +1118,13 @@ lsIRGetRusage_ (pid_t rpid, struct jRusage * ru, appCompletionHandler appHandler
         return (NULL);
     }
 
-    assert( currentSN <= INT_MAX );
-    request = lsReqHandCreate_ (rpid, (int) currentSN, s, (void *) ru, rgetRusageCompletionHandler_, appHandler, appExtra);
+    request = lsReqHandCreate_ (rpid, getCurrentSN( ), s, ru, rgetRusageCompletionHandler_, appHandler, appExtra); // FIXME FIXME FIXME char for data? really?
 
     if (request == NULL) {
         return (NULL);
     }
 
-    if (lsQueueDataAppend_ ((char *) request, requestQ)) {
+    if (lsQueueDataAppend_ ((char *) request, requestQ)) { // FIXME FIXME FIXME char for data? really?
         lsReqFree_ (request);
         return (NULL);
     }
@@ -1181,21 +1174,20 @@ lsGetRProcRusage (char *host, int pid, struct jRusage *ru, int options)
     else {
         rusageReq.options = 0;
     }
-    callResResult = callRes_ (s, RES_RUSAGE, (char *) &rusageReq, (char *) &requestBuf, sizeof (requestBuf), xdr_resGetRusage, 0, 0, NULL);
+    callResResult = callRes_ (s, RES_RUSAGE, (char *) &rusageReq, (char *) &requestBuf, sizeof (requestBuf), xdr_resGetRusage, 0, 0, NULL); // FIXME FIXME FIXME char for data? really?
     if ( -1 == callResResult )  {
       closesocket (s);
       _lostconnection_ (host);
       return (-1);
     }
 
-    assert( currentSN <= INT_MAX );
-    request = lsReqHandCreate_ (pid, (int) currentSN, s, (void *) ru, rgetRusageCompletionHandler_, NULL, NULL);
+    request = lsReqHandCreate_ (pid, getCurrentSN( ), s, ru, rgetRusageCompletionHandler_, NULL, NULL);
 
     if (request == NULL) {
         return -1;
     }
 
-    if (lsQueueDataAppend_ ((char *) request, requestQ)) {
+    if (lsQueueDataAppend_ ( (char *) request, requestQ)) { // FIXME FIXME FIXME char for data? really?
         return -1;
     }
 
@@ -1242,26 +1234,25 @@ lsGetIRProcRusage_ (char *host, int tid, pid_t pid, struct jRusage * ru, appComp
   {
     closesocket (s);
     _lostconnection_ (host);
-    return (NULL);
+    return NULL;
   }
     }
 
   rusageReq.rid = pid;
   rusageReq.whatid = RES_RID_ISPID;
 
-  if (callRes_ (s, RES_RUSAGE, (char *) &rusageReq, (char *) &requestBuf,
+  if (callRes_ (s, RES_RUSAGE, (char *)&rusageReq, (char *)&requestBuf, // FIXME FIXME FIXME this is wrong, yo. data as char?
     sizeof (requestBuf), xdr_resGetRusage, 0, 0, NULL) == -1)
     {
       closesocket (s);
       _lostconnection_ (host);
-      return (NULL);
+      return NULL;
     }
+    request = lsReqHandCreate_ (tid, getCurrentSN( ), s, ru, rgetRusageCompletionHandler_, appHandler, appExtra);
 
-    assert( currentSN <= INT_MAX );
-    request = lsReqHandCreate_ (tid, (int) currentSN, s, (void *) ru, rgetRusageCompletionHandler_, appHandler, appExtra);
-
-  if (request == NULL)
-    return (NULL);
+    if (request == NULL) {
+        return (NULL);
+    }
 
   if (lsQueueDataAppend_ ((char *) request, requestQ))
     {
@@ -1276,20 +1267,20 @@ lsGetIRProcRusage_ (char *host, int tid, pid_t pid, struct jRusage * ru, appComp
 int
 lsRGetRusage (int rpid, struct jRusage *ru, int options)
 {
-  LS_REQUEST_T *request;
+    LS_REQUEST_T *request;
 
-  request = lsIRGetRusage_ (rpid,
-          ru, (appCompletionHandler) NULL, NULL, options);
+    request = lsIRGetRusage_ (rpid, ru, NULL, NULL, options);
 
-  if (!request)
-    return (-1);
+    if( !request ) {
+        return (-1);
+    }
 
-  if (lsReqWait_ (request, 0) < 0)
-    return (-1);
+    if( lsReqWait_( request, 0 ) < 0 ) {
+        return (-1);
+    }
+    lsReqFree_ (request);
 
-  lsReqFree_ (request);
-
-  return (0);
+    return 0;
 }
 
 int
@@ -1558,11 +1549,11 @@ lsMsgRcv_ (pid_t taskid, char *buffer, size_t len, int options)
 int
 lsMsgSnd2_ (int *sock, ushort opcode, char *buffer, size_t len, int options)
 {
-    struct LSFHeader header;
-    char headerBuf[sizeof (struct LSFHeader)];
-    XDR xdrs;
+    struct LSFHeader header = { };
+    XDR xdrs = { };
     long rc = 0;
-    char hostname[MAXHOSTNAMELEN];
+    char *headerBuf = malloc( sizeof( char )*sizeof( struct LSFHeader ) + 1 );
+    char *hostname  = malloc( sizeof( char )*MAXHOSTNAMELEN + 1 );
 
     assert( options ); // FIXME either the assert or int options has to go
 
@@ -1575,15 +1566,14 @@ lsMsgSnd2_ (int *sock, ushort opcode, char *buffer, size_t len, int options)
 #endif
 
     header.opCode = opcode;
-    currentSN = REQUESTSN;
-    assert( currentSN >= 0 );
-    header.refCode = (pid_t) currentSN;
+    setCurrentSN( REQUESTSN );
+    header.refCode = REQUESTSN;
     header.length = len;
     header.reserved = 0;
 
     gethostbysock_ (*sock, hostname);
     if (strcmp (hostname, "LSF_HOST_NULL")) {
-        _setcurseqno_ (hostname, currentSN);
+        _setcurseqno_ (hostname, getCurrentSN( ) );
     }
 
     xdrmem_create (&xdrs, headerBuf, LSF_HEADER_LEN, XDR_ENCODE);
@@ -1651,16 +1641,15 @@ lsMsgSnd_ (pid_t taskid, char *buffer, size_t len, int options)
 #endif
 
     header.opCode   = RES_NONRES;
-    currentSN       = REQUESTSN;
-    assert (currentSN >=0 );
-    header.refCode  =  (pid_t) currentSN;
+    setCurrentSN( REQUESTSN );
+    header.refCode  = getCurrentSN();
     header.length   = len;
     assert( taskid >= 0 );
-    header.reserved = (uint) taskid;
+    header.reserved = taskid;
 
     gethostbysock_ (tEnt->sock, hostname);
     if (strcmp (hostname, "LSF_HOST_NULL")) {
-        _setcurseqno_ (hostname, currentSN);
+        _setcurseqno_ (hostname, getCurrentSN( ) );
     }
 
     xdrmem_create (&xdrs, headerBuf, LSF_HEADER_LEN, XDR_ENCODE);

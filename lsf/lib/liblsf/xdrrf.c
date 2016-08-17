@@ -22,6 +22,7 @@
 #include "lib/xdr.h"
 #include "lib/lproto.h"
 #include "lib/xdrrf.h"
+#include "daemons/libresd/resd.h"
 
 int
 lsRecvMsg_ (int sock, char *buf, unsigned int bufLen, struct LSFHeader *hdr, char *data, bool_t (*xdrFunc) (), size_t (*readFunc) ())
@@ -58,8 +59,7 @@ lsSendMsg_ (int s, unsigned short opCode, size_t hdrLength, char *data, char *re
 
     initLSFHeader_ (&hdr);
     hdr.opCode = opCode;
-    hdr.refCode = currentSN; // in lib.h
-            // FIXME FIXME FIXME accessor/mutator function for currentSN
+    hdr.refCode = getCurrentSN( );
 
     if (!data) {
         hdr.length = hdrLength;

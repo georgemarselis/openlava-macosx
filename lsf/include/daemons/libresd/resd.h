@@ -96,6 +96,9 @@ int restart_argc;
 char **restart_argv;
 char *env_dir;
 
+#define UTMP_CHECK_CODE "sbdRes"
+
+
 #define MAXCLIENTS_HIGHWATER_MARK 100
 #define MAXCLIENTS_LOWWATER_MARK  1
 
@@ -502,8 +505,9 @@ struct taggedConn conn2NIOS;
 LIST_T *resNotifyList;
 
 // extern
-int currentRESSN;
+int currentRESSN; // FIXME FIXME FIXME FIXME accessor and mutators for this global
 
+static unsigned int globCurrentSN;
 
 #define LSB_UTMP           0
 
@@ -579,6 +583,12 @@ int resSignal (struct child *chld, struct resSignal sig);
 void dumpClient (struct client *, char *);
 void dumpChild (struct child *, int, char *);
 
+uint  getCurrentSN( void );
+uint  setCurrentSN( uint currentSN );
 
 
-#define UTMP_CHECK_CODE "sbdRes"
+
+
+
+
+
