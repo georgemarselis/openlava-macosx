@@ -27,34 +27,36 @@
 #include "lib/hdr.h"
 #include "lib/lproto.h"
 #include "daemons/daemonout.h"
+#include "lsb/lsbatch.h"
+#include "lib/common_structs.h"
 
 
-bool_t xdr_time_t (XDR *, time_t *);
-bool_t xdr_lsfRusage (XDR *, struct lsfRusage *);
-bool_t xdr_lvector (XDR *, float *, int);
-bool_t xdr_array_string (XDR * xdrs, char **astring, uint maxlen, uint arraysize);
-bool_t xdr_var_string (XDR *, char **);
-bool_t xdr_stringLen (XDR *, struct stringLen *, struct LSFHeader *);
-bool_t xdr_lenData (XDR *, struct lenData *);
-bool_t xdr_lsfLimit (XDR *, struct lsfLimit *, struct LSFHeader *);
-bool_t xdr_portno (XDR *, u_short *);
-bool_t xdr_address (XDR *, u_int *);
-int getXdrStrlen (char *);
+bool_t xdr_time_t        ( XDR *,      time_t * );
+bool_t xdr_lsfRusage     ( XDR *,      struct lsfRusage * );
+bool_t xdr_lvector       ( XDR *,      float *, int );
+bool_t xdr_array_string  ( XDR * xdrs, char **astring, uint maxlen, uint arraysize );
+bool_t xdr_var_string    ( XDR *,      char ** );
+bool_t xdr_stringLen     ( XDR *,      struct stringLen *, struct LSFHeader * );
+bool_t xdr_lenData       ( XDR *,      struct lenData * );
+bool_t xdr_lsfLimit      ( XDR *,      struct lsfLimit *, struct LSFHeader * );
+bool_t xdr_portno        ( XDR *,      u_short * );
+bool_t xdr_address       ( XDR *,      u_int * );
+int getXdrStrlen         ( char * );
 
-bool_t xdr_modifyReq            (XDR *, struct modifyReq *,     struct LSFHeader *);
+bool_t xdr_modifyReq     (XDR *, struct modifyReq *,     struct LSFHeader *);
 bool_t xdr_submitReq     (XDR *, struct submitReq *,     struct LSFHeader *);
 bool_t xdr_submitMbdReply(XDR *, struct submitMbdReply *,struct LSFHeader *);
 bool_t xdr_signalReq     (XDR *, struct signalReq *,     struct LSFHeader *);
 bool_t xdr_lsbMsg        (XDR *, struct lsbMsg *,        struct LSFHeader *);
 bool_t xdr_controlReq    (XDR *, struct controlReq *,    struct LSFHeader *);
-// bool_t xdr_debugReq      (XDR *, struct debugReq *,      struct LSFHeader *);
+// bool_t xdr_debugReq      (XDR *, struct debugReq *,      struct LSFHeader *); // FIXME FIXME commented out due to debugger complaining. no apparent brokerage
 bool_t xdr_infoReq       (XDR *, struct infoReq *,       struct LSFHeader *);
 bool_t xdr_parameterInfo (XDR *, struct parameterInfo *, struct LSFHeader *);
 bool_t xdr_userInfoEnt   (XDR *, struct userInfoEnt *,   struct LSFHeader *);
 bool_t xdr_userInfoReply (XDR *, struct userInfoReply *, struct LSFHeader *);
 bool_t xdr_hostInfoEnt   (XDR *, struct hostInfoEnt *,   struct LSFHeader *, uint *);
 bool_t xdr_hostDataReply (XDR *, struct hostDataReply *, struct LSFHeader *);
-bool_t xdr_queueInfoEnt (XDR *xdrs, struct queueInfoEnt * qInfo, struct LSFHeader *hdr, uint *nIdx);
+bool_t xdr_queueInfoEnt  (XDR *xdrs, struct queueInfoEnt * qInfo, struct LSFHeader *hdr, uint *nIdx);
 bool_t xdr_queueInfoReply(XDR *, struct queueInfoReply *,struct LSFHeader *);
 bool_t xdr_jobInfoHead   (XDR *, struct jobInfoHead *,   struct LSFHeader *);
 bool_t xdr_jobInfoReply  (XDR *, struct jobInfoReply *,  struct LSFHeader *);

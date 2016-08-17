@@ -24,6 +24,7 @@
 #include "lsb/sig.h"
 #include "lsb/lsbatch.h"
 #include "lsf.h"
+#include "lib/common_structs.h"
 
 #define BATCH_MASTER_PORT   40000
 #define ALL_HOSTS      "all"
@@ -81,54 +82,6 @@ typedef enum
 
 #define SUB_RLIMIT_UNIT_IS_KB 0x80000000
 
-struct submitReq
-{
-    char padding1[2];
-    ushort niosPort;
-    int options;
-    int options2;
-    int sigValue;
-    pid_t restartPid;
-    int userPriority;
-    mode_t umask;
-    uint nxf;
-    uint maxNumProcessors;
-    uint numAskedHosts;
-    uint numProcessors;
-    char padding3[4];
-    char *jobName;
-    char *queue;
-    char *jobFile;
-    char *fromHost;
-    char *resReq;
-    char *hostSpec;
-    char *subHomeDir;
-    char *inFile;
-    char *outFile;
-    char *errFile;
-    char *command;
-    char *inFileSpool;
-    char *commandSpool;
-    char **askedHosts;
-    char *dependCond;
-    char *chkpntDir;
-    char *cwd;
-    char *preExecCmd;
-    char *mailUser;
-    char *projectName;
-    char *loginShell;
-    char *schedHostType;
-    char *userGroup;
-    time_t beginTime;
-    time_t termTime;
-    time_t chkpntPeriod;
-    time_t submitTime;
-    int rLimits[LSF_RLIM_NLIMITS];
-    char padding2[4];
-    struct xFile *xf;
-};
-
-
 
 #define SHELLLINE "#! /bin/sh\n\n"
 #define CMDSTART "# LSBATCH: User input\n"
@@ -144,169 +97,7 @@ struct submitReq
 #define JOB_STARTER_KEYWORD "%USRCMD"
 #define SCRIPT_WORD "_USER_\\SCRIPT_"
 #define SCRIPT_WORD_END "_USER_SCRIPT_"
-
-struct submitMbdReply
-{
-    char *queue;
-    char *badJobName;
-    int badReqIndx;
-    char padding[4];
-    LS_LONG_INT jobId;
-};
-
-struct modifyReq
-{
-  LS_LONG_INT jobId;
-  char *jobIdStr;
-  int delOptions;
-  int delOptions2;
-  struct submitReq submitReq;
-};
-
-struct jobInfoReq
-{
-  LS_LONG_INT jobId;
-  int options;
-  char padding[4];
-  char *userName;
-  char *jobName;
-  char *queue;
-  char *host;
-};
-
-struct jobInfoReply
-{
-  u_short port;
-  char padding1[2];
-  int status;
-  int reasons;
-  int subreasons;
-  int execUid;
-  int exitStatus;
-  int jType;
-  int jobPriority;
-  int *reasonTb;
-  uint numReasons;
-  uint numToHosts;
-  uint nIdx;
-  char padding2[4];
-  time_t startTime;
-  time_t predictedStartTime;
-  time_t endTime;
-  time_t reserveTime;
-  time_t jRusageUpdateTime;
-  char *userName;
-  char *execHome;
-  char *execCwd;
-  char *execUsername;
-  char *parentGroup;
-  char *jName;
-  float *loadSched;
-  float *loadStop;
-  float cpuTime;
-  uid_t userId;
-  unsigned long jobPid;
-  struct submitReq *jobBill;
-  struct jRusage runRusage;
-  int counter[NUM_JGRP_COUNTERS];
-  LS_LONG_INT jobId;
-  char **toHosts;
-};
-
-struct infoReq
-{
-  int options;
-  uint numNames;
-  char **names;
-  char *resReq;
-};
-
-
-struct userInfoReply
-{
-  uint badUser;
-  uint numUsers;
-  struct userInfoEnt *users;
-};
-
-struct queueInfoReply
-{
-  uint badQueue;
-  uint numQueues;
-  uint nIdx;
-  char padding[4];
-  struct queueInfoEnt *queues;
-};
-
-struct hostDataReply
-{
-  uint badHost;
-  uint numHosts;
-  uint nIdx;
-  int flag;
 #define LOAD_REPLY_SHARED_RESOURCE 0x1
-  struct hostInfoEnt *hosts;
-};
-
-struct groupInfoReply
-{
-  uint numGroups;
-  char padding[4];
-  struct groupInfoEnt *groups;
-};
-
-struct jobPeekReq
-{
-  LS_LONG_INT jobId;
-};
-
-struct jobPeekReply
-{
-  char *outFile;
-  char *pSpoolDir;
-};
-
-
-
-struct signalReq
-{
-  int sigValue;
-  int actFlags;
-  time_t chkPeriod;
-  LS_LONG_INT jobId;
-};
-
-
-struct jobMoveReq
-{
-  uint opCode;
-  int position;
-  LS_LONG_INT jobId;
-};
-
-struct jobSwitchReq
-{
-  char queue[MAX_LSB_NAME_LEN];
-  char padding[4];
-  LS_LONG_INT jobId;
-
-};
-
-struct controlReq
-{
-  char *name;
-  int opCode;
-  char padding[4];
-};
-
-
-struct migReq
-{
-  LS_LONG_INT jobId;
-  int options;
-  uint numAskedHosts;
-  char **askedHosts;
-};
 
 typedef enum
 {
@@ -345,9 +136,9 @@ struct lenDataList
 
 
 void initTab (struct hTab *tabPtr);
-hEnt *addMemb (struct hTab *tabPtr, LS_LONG_INT member);
-char remvMemb (struct hTab *tabPtr, LS_LONG_INT member);
-hEnt *chekMemb (struct hTab *tabPtr, LS_LONG_INT member);
+hEnt *addMemb (struct hTab *tabPtr, long member);
+char remvMemb (struct hTab *tabPtr, long member);
+hEnt *chekMemb (struct hTab *tabPtr, long member);
 hEnt *addMembStr (struct hTab *tabPtr, char *member);
 char remvMembStr (struct hTab *tabPtr, char *member);
 hEnt *chekMembStr (struct hTab *tabPtr, char *member);

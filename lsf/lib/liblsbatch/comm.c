@@ -33,7 +33,7 @@
 #include <pwd.h>
 #include <sys/ioctl.h>
 
-#include "lib/lsb.h"
+#include "lsb/lsb.h"
 
 
 extern int _lsb_conntimeout;
