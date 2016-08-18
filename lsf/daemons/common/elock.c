@@ -27,6 +27,7 @@
 #include "daemons/daemonout.h"
 #include "daemons/daemons.h"
 #include "lib/osal.h"
+#include "lib/lib.h"
 
 #define NL_SETN      10
 
@@ -45,7 +46,7 @@ setLockOwnerPid (void)
 #define EVENT_LOCK_FILE  "#lsb.event.lock"
 
 extern int msleeptime;
-static char lockfile[MAXFILENAMELEN];
+static char lockfile[MAXFILENAMELEN]; // FIXME FIXME FIXME FIXME dynamic allocation
 static char gotLock = FALSE;
 
 void

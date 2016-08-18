@@ -18,6 +18,7 @@
 #include "daemons/liblimd/limd.h"
 #include "libint/lsi18n.h"
 #include "lib/xdrlim.h"
+#include "lib/lib.h"
 
 // #define NL_SETN         24
 

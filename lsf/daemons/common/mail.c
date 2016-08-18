@@ -31,6 +31,7 @@
 
 
 #include "daemons/daemons.h"
+#include "lib/lib.h"
 #include "lib/osal.h"
 
 // #define NL_SETN         10

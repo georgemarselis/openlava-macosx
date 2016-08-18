@@ -43,15 +43,6 @@ struct admins
 
 void putMaskLevel (int, char **);
 
-#define    MBD_DEBUG         1
-#define    MBD_TIMING        2
-#define    SBD_DEBUG         3
-#define    SBD_TIMING        4
-#define    LIM_DEBUG         5
-#define    LIM_TIMING        6
-#define    RES_DEBUG         7
-#define    RES_TIMING        8
-
 struct resPair
 {
   char *name;

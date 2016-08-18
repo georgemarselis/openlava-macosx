@@ -823,9 +823,6 @@ struct hostEntryLog
 
 typedef void (*SIGFUNCTYPE) (int);
 
-#define LIM_PORT        36000
-#define RES_PORT        36002
-
 #ifndef MSGSIZE
 #define MSGSIZE   8192
 #endif

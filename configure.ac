@@ -35,6 +35,11 @@ AC_CHECK_HEADERS([tcl.h], [HAVE_TCL_TCL_H=yes], [HAVE_TCL_H=y]) # FIXME FIXME FI
 # features
 # enable/disable enviromental value support
 # enable/disable TLS
+# set mbatchd port
+# set sbatchd port
+# set resd port
+# set limd port
+# set pimd port
 
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lm':

@@ -136,11 +136,12 @@ struct finishStatus
   int sendSignal;
 };
 
+int cli_nios_fd[2] = {-1, -1 };
 int standalone;
 int niosSbdMode;
-LS_LONG_INT jobId;
 int heartbeatInterval;
 int jobStatusInterval;
 int pendJobTimeout;
 int msgInterval;
+u_long jobId;
 

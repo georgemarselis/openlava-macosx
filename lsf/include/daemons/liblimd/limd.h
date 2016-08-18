@@ -214,8 +214,8 @@ struct liStruct
   float value;
 };
 
-static uint li_len;
-static struct liStruct *li;
+// static uint li_len;
+// static struct liStruct *li;
 
 #define  SEND_NO_INFO       0x00
 #define  SEND_CONF_INFO     0x01
@@ -317,34 +317,6 @@ struct sharedResourceInstance *sharedResourceHead;
 
 int getpagesize (void);
 
-/* These are the entries in the limParams[]
- * LIM configuration array.
- */
-typedef enum
-{
-	LIM_DEBUG,
-	LIM_PORT,
-	LIM_TIME,
-	LIM_IGNORE_CHECKSUM,
-  LIM_JACKUP_BUSY,
-	LIM_COMPUTE_ONLY,
-	LIM_NO_MIGRANT_HOSTS,
-	LIM_NO_FORK
-} limParams_t;
-
-
-struct config_param limParams[] = {
-	{"LIM_DEBUG",            NULL},
-	{"LIM_PORT",             NULL},
-	{"LIM_TIME",             NULL},
-	{"LIM_IGNORE_CHECKSUM",  NULL},
-	{"LIM_JACKUP_BUSY",      NULL},
-	{"LIM_COMPUTE_ONLY",     NULL},
-	{"LIM_NO_MIGRANT_HOSTS", NULL},
-	{"LIM_NO_FORK",          NULL},
-	{NULL,                   NULL},
-};
-
 
 int limSock = -1;
 int limTcpSock = -1;
@@ -356,7 +328,7 @@ short resInactivityCount = 0;
 struct clusterNode *myClusterPtr;
 struct hostNode *myHostPtr;
 int masterMe;
-int nClusAdmins = 0;
+uint nClusAdmins = 0;
 uid_t *clusAdminIds = NULL;
 gid_t *clusAdminGids = NULL;
 char **clusAdminNames = NULL;
@@ -378,28 +350,22 @@ struct sharedResource **hostResources = NULL;
 u_short lsfSharedCkSum = 0;
 
 pid_t pimPid = -1;
-static void startPIM (int, char **);
+// static void startPIM (int, char **);
 
-extern int chanIndex;
-
-static int initAndConfig (int, int *);
-static void term_handler (int);
-static void child_handler (int);
-static int processUDPMsg (void);
-static void doAcceptConn (void);
-static void initSignals (void);
-static void periodic (int);
-static struct tclLsInfo *getTclLsInfo (void);
-static void printTypeModel (void);
-static void initMiscLiStruct (void);
-static int getClusterConfig (void);
-extern struct extResInfo *getExtResourcesDef (char *);
-extern char *getExtResourcesLoc (char *);
-extern char *getExtResourcesVal (char *);
+// static int initAndConfig (int, int *);
+// static void term_handler (int);
+// static void child_handler (int);
+// static int processUDPMsg (void);
+// static void doAcceptConn (void);
+// static void initSignals (void);
+// static void periodic (int);
+// static struct tclLsInfo *getTclLsInfo (void);
+// static void printTypeModel (void);
+// static void initMiscLiStruct (void);
+// static int getClusterConfig (void);
 
 /* UDP message buffer.
  */
-// static char reqBuf[MSGSIZE];
 static char reqBuf[MSGSIZE];
 
 
@@ -430,7 +396,6 @@ short resInactivityCount;
 char jobxfer;
 short satper;
 float *extraload;
-uint nClusAdmins;
 uid_t *clusAdminIds;
 gid_t *clusAdminGids;
 char **clusAdminNames;
@@ -449,7 +414,7 @@ u_int masterAnnSeqNo;
 struct hostNode *fromHostPtr;
 struct lsInfo allInfo;
 struct shortLsInfo shortInfo;
-int clientHosts[];
+int *clientHosts; // FIXME FIXME FIXME must manage dynamically
 struct floatClientInfo floatClientPool;
 int ncpus;
 struct clientNode *clientMap[];
@@ -585,6 +550,3 @@ int logLIMDown (void);
 int logAddHost (struct hostEntry *);
 int logRmHost (struct hostEntry *);
 int addHostByTab (hTab *);
-
-
-extern char *argvmsg_ (int argc, char **argv);

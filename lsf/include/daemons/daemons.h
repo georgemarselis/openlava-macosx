@@ -83,10 +83,6 @@
 #define SLAVE_RESTART             103
 #define SLAVE_SHUTDOWN            104
 
-#define LSB_ARRAY_SCHED_ORDER     39
-#define LSB_BSUBI_OLD             30
-
-#define MBD_DONT_FORK             54
 #define NOT_LOG                    INFINIT_INT
 
 #define JOB_SAVE_OUTPUT   0x10000000

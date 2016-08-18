@@ -2231,7 +2231,7 @@ getOtherParams (struct submit *jobSubReq, struct submitReq *submitReq, struct su
 		const char *pSpoolCmd;
 		const char *pSrcCmd;
 		unsigned long spoolCmdLen = 0;
-		long *srcCmdLen   = 0;
+		u_long *srcCmdLen   = 0;
 
 
 		if (jobSubReq->options & SUB_MODIFY) {

@@ -25,53 +25,40 @@
 int
 ls_initdebug (char *appName)
 {
-  char *logMask;
-  struct config_param *pPtr;
-  struct config_param debParams[] = {
-    {"LSF_DEBUG_CMD", NULL},
-    {"LSF_TIME_CMD", NULL},
-    {"LSF_CMD_LOGDIR", NULL},
-    {"LSF_CMD_LOG_MASK", NULL},
-    {"LSF_LOG_MASK", NULL},
-    {NULL, NULL}
-  };
-
-#define LSF_DEBUG_CMD    0
-#define LSF_TIME_CMD     1
-#define LSF_CMD_LOGDIR   2
-#define LSF_CMD_LOG_MASK 3
-
-#ifdef LSF_LOG_MASK
-#undef LSF_LOG_MASK
-#endif
-#define LSF_LOG_MASK     4
+  char *logMask = malloc( sizeof( char ) * MAXLSFNAMELEN + 1);
+  struct config_param *pPtr = NULL;
 
 
-  if (initenv_ (debParams, NULL) < 0)
+  if (initenv_ (debParams, NULL) < 0) {
     return -1;
+  }
 
-  if (debParams[LSF_CMD_LOG_MASK].paramValue != NULL)
+  if (debParams[LSF_CMD_LOG_MASK].paramValue != NULL) {
     logMask = debParams[LSF_CMD_LOG_MASK].paramValue;
-  else
+  }
+  else {
     logMask = debParams[LSF_LOG_MASK].paramValue;
+  }
 
-  if (appName == NULL)
-    ls_openlog ("lscmd", debParams[LSF_CMD_LOGDIR].paramValue,
-		(debParams[LSF_CMD_LOGDIR].paramValue == NULL), logMask);
+  if (appName == NULL) {
+    ls_openlog ("lscmd", debParams[LSF_CMD_LOGDIR].paramValue,(debParams[LSF_CMD_LOGDIR].paramValue == NULL), logMask);
+  }
   else
     {
-      if (strrchr (appName, '/') != 0)
-	appName = strrchr (appName, '/') + 1;
+      if (strrchr (appName, '/') != 0) {
+	         appName = strrchr (appName, '/') + 1;
+      }
       ls_openlog (appName, debParams[LSF_CMD_LOGDIR].paramValue,
 		  (debParams[LSF_CMD_LOGDIR].paramValue == NULL), logMask);
     }
 
-  getLogClass_ (debParams[LSF_DEBUG_CMD].paramValue,
-		debParams[LSF_TIME_CMD].paramValue);
+  getLogClass_ (debParams[LSF_DEBUG_CMD].paramValue, debParams[LSF_TIME_CMD].paramValue);
 
-  for (pPtr = debParams; pPtr->paramName != NULL; pPtr++)
+  for (pPtr = debParams; pPtr->paramName != NULL; pPtr++) {
     FREEUP (pPtr->paramValue);
+  }
 
+  free( logMask );
   return 0;
 
 }

@@ -19,11 +19,12 @@
 #include <unistd.h>
 
 #include "lib/lib.h"
-#include "lib/lproto.h"
+#include "lib/lim.h"
 #include "lib/xdr.h"
+#include "lib/lproto.h"
 #include "lib/xdrlim.h"
 
-struct masterInfo masterInfo_;
+struct masterInfo masterInfo_ = { };
 int masterknown_ = FALSE;
 
 static struct hostInfo *expandSHinfo (struct hostInfoReply *);
@@ -36,14 +37,14 @@ ls_getclustername (void)
 {
 
     static char fname[] = "ls_getclustername";
-    static char clName[MAXLSFNAMELEN];
+    char *clName = malloc( sizeof( char ) * MAXLSFNAMELEN + 1 ); // FIXME FIXME FIXME FIXME dynamic memory allocation and management
 
     if (logclass & (LC_TRACE)) {
         ls_syslog (LOG_DEBUG, "%s: Entering this routine...", fname);
     }
 
-    if (clName[0] == '\0') {
-        if (getname_ (LIM_GET_CLUSNAME, clName, MAXLSFNAMELEN) < 0) {
+    if( NULL == clName ) { // FIXME FIXME refactor
+        if ( getname_ (LIM_GET_CLUSNAME, clName, MAXLSFNAMELEN) < 0) {
             return NULL;
         }
     }

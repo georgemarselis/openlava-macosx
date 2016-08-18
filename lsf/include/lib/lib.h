@@ -91,8 +91,6 @@ struct tid
 
 
 
-
-
 ///////////////////////////////////////////////////////
 //
 // The score so far:
@@ -104,10 +102,8 @@ struct tid
 // So, it makes sense we will have
 //      mbatchdParams
 //      sbatchdParams
-//      pemParams
-
-
-
+//      pemdParams
+//      niosdParams
 
 
 
@@ -163,6 +159,29 @@ struct tid
 //     NO_HOSTS_FILE
 // } status;
 
+
+// from lib/lproto.h
+// #define MBD_DEBUG                     1
+// #define MBD_TIMING                    2
+// #define SBD_DEBUG                     3
+// #define SBD_TIMING                    4
+// #define LIM_DEBUG                     5
+// #define LIM_TIMING                    6
+// #define RES_DEBUG                     7
+// #define RES_TIMING                    8
+// end lib/lproto.h
+enum {
+    MBD_DEBUG = 1,
+    MBD_TIMING,
+    SBD_DEBUG,
+    SBD_TIMING,
+// #define LIM_DEBUG 5
+    LIM_TIMING  = 6,
+    RES_DEBUG,
+    RES_TIMING 
+} debug_t;
+
+
 #define LSF_RES_DEBUG                 0
 // #define LSF_SERVERDIR                 1
 #define LSF_ENVDIR                    2 // FIXME FIXME newly inserted variable
@@ -216,6 +235,7 @@ struct tid
 // #define LSB_MBD_BLOCK_SEND            27
 // #define LSB_MEMLIMIT_ENFORCE          29
 
+// #define LSB_BSUBI_OLD                 30
 // #define LSB_STOP_IGNORE_IT            31
 // #define LSB_HJOB_PER_SESSION          32
 // #define LSB_REQUEUE_HOLD              34
@@ -223,6 +243,7 @@ struct tid
 // #define LSB_MAILSERVER                36
 // #define LSB_MAILSIZE_LIMIT            37
 // #define LSB_REQUEUE_TO_BOTTOM         38
+// #define LSB_ARRAY_SCHED_ORDER         39
 
 // #define LSB_QPOST_EXEC_ENFORCE        41
 // #define LSB_MIG2PEND                  42
@@ -237,9 +258,10 @@ struct tid
 // #define LSB_SBD_FINISH_SLEEP          51
 // #define LSB_VIRTUAL_SLOT              52
 // #define LSB_STDOUT_DIRECT             53
+// #define MBD_DONT_FORK                 54      // FIXME the pattern does not match, but what the heck.
 // #define LIM_NO_MIGRANT_HOSTS          55
 
-struct config_param genParams_[] = {
+struct config_param genParams_[ ] = {
     { "LSF_CONFDIR",            NULL },
     { "LSF_SERVERDIR",          NULL },
     { "LSF_LIM_DEBUG",          NULL },
@@ -265,6 +287,7 @@ struct config_param genParams_[] = {
     { "HOSTS_FILE",             NULL },
     { "LSB_SHAREDIR",           NULL },
     { "NO_HOSTS_FILE",          NULL },
+    { "LSF_SERVER_HOSTS",       NULL },
     { NULL,                     NULL }
 };
 
@@ -331,9 +354,10 @@ enum {
     LSB_VIRTUAL_SLOT,
     LSB_STDOUT_DIRECT,
     MBD_DONT_FORK,
-    LIM_NO_MIGRANT_HOSTS,
     LSF_AM_OPTIONS,
-    NO_HOSTS_FILE
+    NO_HOSTS_FILE,
+    LSF_SERVER_HOSTS,
+    LSF_INTERACTIVE_STDERR
 } daemonStatus;
 
 struct config_param daemonParams[] = {
@@ -460,6 +484,54 @@ struct config_param lsbParams[] = {
     { NULL,                     NULL }
 };
 
+typedef enum
+{
+    LIM_DEBUG,
+// #define LIM_PORT        36000 // FIXME FIXME FIXME FIXME FIXME set appropriate configuration variable in configure.ac
+// #define RES_PORT        36002 // FIXME FIXME FIXME FIXME FIXME set appropriate configuration variable in configure.ac 
+    LIM_PORT, // FIXME FIXME FIXME FIXME FIXME set appropriate configuration variable in configure.ac; 3600 by default
+    LIM_TIME,
+    LIM_IGNORE_CHECKSUM,
+    LIM_JACKUP_BUSY,
+    LIM_COMPUTE_ONLY,
+    LIM_NO_MIGRANT_HOSTS,
+    LIM_NO_FORK
+} limParams_t;
+
+typedef enum {
+    RES_PORT = 36002 // FIXME FIXME FIXME FIXME FIXME make it configurable in configure.ac; 36002 by default
+} resdParams_t;
+
+
+struct config_param limParams[] = {
+    {"LIM_DEBUG",            NULL },
+    {"LIM_PORT",             NULL },
+    {"LIM_TIME",             NULL },
+    {"LIM_IGNORE_CHECKSUM",  NULL },
+    {"LIM_JACKUP_BUSY",      NULL },
+    {"LIM_COMPUTE_ONLY",     NULL },
+    {"LIM_NO_MIGRANT_HOSTS", NULL },
+    {"LIM_NO_FORK",          NULL },
+    {NULL,                   NULL },
+};
+
+struct config_param debParams[] = {
+    { "LSF_DEBUG_CMD",      NULL },
+    { "LSF_TIME_CMD",       NULL },
+    { "LSF_CMD_LOGDIR",     NULL },
+    { "LSF_CMD_LOG_MASK",   NULL },
+    { "LSF_LOG_MASK_DEBUG", NULL },
+    { NULL,                 NULL }
+};
+
+enum {
+    LSF_DEBUG_CMD,
+    LSF_TIME_CMD,
+    LSF_CMD_LOGDIR,
+    LSF_CMD_LOG_MASK,
+    LSF_LOG_MASK_DEBUG
+} debugParams_t;
+
 
 enum { 
     NIOS2RES_EOF,
@@ -530,10 +602,6 @@ typedef enum status genparams_t;
 
 #define CLOSEFD(s) if ((s) >= 0) {close((s)); (s) = -1;}
 
-// extern struct sockaddr_in sockIds_[]; // FIXME FIXME FIXME FIXME FIXME put in specific header
-// extern int limchans_[]; // FIXME FIXME FIXME FIXME FIXME put in specific header
-
-// extern struct config_param genParams_[]; // FIXME FIXME FIXME FIXME FIXME put in specific header
 struct sockaddr_in limSockId_;
 struct sockaddr_in limTcpSockId_;
 char rootuid_;

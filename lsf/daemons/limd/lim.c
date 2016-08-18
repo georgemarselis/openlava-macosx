@@ -22,6 +22,7 @@
 #include <unistd.h>
 
 #include "lib/lib.h"
+#include "lib/lim.h"
 #include "lib/lproto.h"
 
 #define MAXMSGLEN  32*MSGSIZE
@@ -29,7 +30,7 @@
 #define RECV_TIMEOUT    3
 
 struct sockaddr_in sockIds_[4];
-int limchans_[4];
+
 static int conntimeout_ = CONNECT_TIMEOUT;
 static int recvtimeout_ = RECV_TIMEOUT;
 
@@ -141,23 +142,27 @@ callLim_ (enum limReqCode reqCode,
 	  if (!(*xdr_rfunc) (&xdrs, drecv, &replyHdr))
 	    {
 	      xdr_destroy (&xdrs);
-	      if (options & _USE_TCP_)
-		FREEUP (repBuf);
+	      if (options & _USE_TCP_) {
+            FREEUP (repBuf);
+        }
 	      lserrno = LSE_BAD_XDR;
 	      return -1;
 	    }
 	}
       xdr_destroy (&xdrs);
-      if (options & _USE_TCP_)
-	FREEUP (repBuf);
-      if (hdr != NULL)
-	*hdr = replyHdr;
+      if (options & _USE_TCP_) {
+          FREEUP (repBuf);
+      }
+      if (hdr != NULL) {
+          *hdr = replyHdr;
+        }
       return (0);
 
     default:
       xdr_destroy (&xdrs);
-      if (options & _USE_TCP_)
-	FREEUP (repBuf);
+      if (options & _USE_TCP_) {
+          FREEUP (repBuf);
+      }
       err_return_ (limReplyCode);
       return (-1);
     }
@@ -165,25 +170,25 @@ callLim_ (enum limReqCode reqCode,
 }
 
 static int
-callLimTcp_ (char *reqbuf,
-	     char **rep_buf,
-	     int req_size, struct LSFHeader *replyHdr, int options)
+callLimTcp_ (char *reqbuf, char **rep_buf, int req_size, struct LSFHeader *replyHdr, int options)
 {
   static char fname[] = "callLimTcp_";
   char retried = FALSE;
-  int cc;
-  XDR xdrs;
-  struct Buffer sndbuf;
-  struct Buffer rcvbuf;
+  int cc = 0;
+  XDR xdrs = 0;
+  struct Buffer sndbuf = { };
+  struct Buffer rcvbuf = { };
 
-  if (logclass & (LC_COMM | LC_TRACE))
+  if (logclass & (LC_COMM | LC_TRACE)) {
     ls_syslog (LOG_DEBUG2, "%s: Entering...req_size=%d", fname, req_size);
+  }
 
   *rep_buf = NULL;
   if (!sockIds_[TCP].sin_addr.s_addr)
     {
-      if (ls_getmastername () == NULL)
-	return (-1);
+      if (ls_getmastername () == NULL) {
+            return (-1);
+      }
     }
 
 contact:
@@ -191,8 +196,9 @@ contact:
     {
 
       limchans_[TCP] = chanClientSocket_ (AF_INET, SOCK_STREAM, 0);
-      if (limchans_[TCP] < 0)
-	return (-1);
+      if (limchans_[TCP] < 0) {
+          return (-1);
+        }
 
       cc = chanConnect_ (limchans_[TCP], &sockIds_[TCP], conntimeout_ * 1000);
       if (cc < 0)

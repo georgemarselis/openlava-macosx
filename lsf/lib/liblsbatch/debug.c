@@ -23,6 +23,7 @@
 #include <ctype.h>
 #include <pwd.h>
 
+#include "lib/lib.h"
 #include "lsb/lsb.h"
 
 
@@ -32,23 +33,23 @@ int
 lsb_debugReq (struct debugReq *pdebug, char *host)
 {
 
-
   static struct debugReq debug;
 
-  mbdReqType mbdReqtype;
-  XDR xdrs;
-  char request_buf[MSGSIZE], hostName[MAXHOSTNAMELEN];
-  char *reply_buf;
-  int cc;
-  struct LSFHeader hdr;
-  struct lsfAuth auth;
-  char *toHost = NULL;
+  char *request_buf = malloc( sizeof( char ) * MSGSIZE + 1 );
+  char *hostName    = malloc( sizeof( char ) * MAXHOSTNAMELEN + 1 );
+  char *toHost      = NULL;
+  char *reply_buf   = NULL;
+  mbdReqType mbdReqtype = 0;
+  int cc = 0;
+  XDR xdrs = { };
+  struct LSFHeader hdr  = { };
+  struct lsfAuth auth   = { };
+  
 
-
-  debug.opCode = pdebug->opCode;
+  debug.opCode   = pdebug->opCode;
   debug.logClass = pdebug->logClass;
-  debug.level = pdebug->level;
-  debug.options = pdebug->options;
+  debug.level    = pdebug->level;
+  debug.options  = pdebug->options;
   debug.hostName = hostName;
   strcpy (debug.logFileName, pdebug->logFileName);
 
@@ -128,10 +129,12 @@ lsb_debugReq (struct debugReq *pdebug, char *host)
 
 
   lsberrno = hdr.opCode;
-  if (cc)
+  if (cc) {
     free (reply_buf);
-  if (lsberrno == LSBE_NO_ERROR)
+  }
+  if (lsberrno == LSBE_NO_ERROR) {
     return (0);
+  }
 
   return (-1);
 

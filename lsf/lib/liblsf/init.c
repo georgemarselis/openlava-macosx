@@ -23,16 +23,17 @@
 #include <unistd.h>
 
 #include "lib/lib.h"
+#include "lib/lim.h"
 #include "lib/mls.h"
 #include "lib/init.h"
 #include "lib/lproto.h"
 #include "lib/queue.h"
+#include "daemons/libniosd/niosd.h"
 
 
 // #define NL_SETN 23
 
 int mlsSbdMode = FALSE;
-
 char rootuid_ = FALSE;
 
 int
@@ -193,32 +194,32 @@ opensocks_ (int num)
 int
 ls_fdbusy (uint fd)
 {
-    sTab hashSearchPtr;
-    hEnt *hEntPtr;
+    sTab hashSearchPtr = { };
+    hEnt *hEntPtr      = 0;
 
     assert (limchans_[PRIMARY] >= 0 );
     assert (limchans_[MASTER] >= 0 );
     assert (limchans_[UNBOUND] >= 0 );
-    if (    fd == chanSock_ ((uint)limchans_[PRIMARY]) ||
-            fd == chanSock_ ((uint)limchans_[MASTER])  ||
-            fd == chanSock_ ((uint)limchans_[UNBOUND])
+    if (    fd == chanSock_ (limchans_[PRIMARY]) ||
+            fd == chanSock_ (limchans_[MASTER])  ||
+            fd == chanSock_ (limchans_[UNBOUND])
         )
     {
         return TRUE;
     }
 
-    if ((int)fd == cli_nios_fd[0]) {
+    if ( fd == cli_nios_fd[0]) {
         return TRUE;
     }
 
     hEntPtr = h_firstEnt_ (&conn_table, &hashSearchPtr);
     while (hEntPtr)  {
-        int *pfd;
+        int *pfd = NULL;
 
         pfd = hEntPtr->hData;
         assert( pfd[0] >= 0);
         assert( pfd[1] >= 0 );
-        if (fd == (uint)pfd[0] || fd == (uint)pfd[1])  {
+        if (fd == pfd[0] || fd == pfd[1])  {
             return (TRUE);
         }
 
@@ -226,7 +227,7 @@ ls_fdbusy (uint fd)
     }
 
     assert( currentsocket_ >= 0 );
-    if (rootuid_ && fd >= (uint)currentsocket_ && fd < FIRST_RES_SOCK +  (uint)totsockets_) {
+    if (rootuid_ && fd >= currentsocket_ && fd < FIRST_RES_SOCK +  totsockets_) {
         return TRUE;
     }
 
@@ -262,7 +263,7 @@ void
 lsfExecLog (const char *cmd)
 {
     static char fname[] = "lsfExecLog";
-    char lsfUserName[MAXLSFNAMELEN];
+    char *lsfUserName   = malloc( sizeof( char ) * MAXLSFNAMELEN + 1 );
 
     if (genParams_[LSF_MLS_LOG].paramValue &&
             ((genParams_[LSF_MLS_LOG].paramValue[0] == 'y') ||
@@ -274,6 +275,8 @@ lsfExecLog (const char *cmd)
             syslog (LOG_INFO, "catgets 6259: %s: user - %s cmd - '%s'", fname, lsfUserName, cmd);
 
         }
+    free(  lsfUserName );
+    return;
 }
 
 int

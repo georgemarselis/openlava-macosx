@@ -16,6 +16,7 @@
  *
  */
 
+#include <stdarg.h>
 #include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -29,12 +30,11 @@
 #include "libint/lsi18n.h"
 #include "lib/osal.h"
 #include "lib/mls.h"
+#include "lib/lib.h"
+// #ifndef strchr
+// #include <string.h>
+// #endif
 
-#ifndef strchr
-#include <string.h>
-#endif
-
-# include <stdarg.h>
 
 // #define NL_SETN         10
 
@@ -43,8 +43,8 @@
 
 static int chuserId (uid_t);
 
-extern struct listEntry *mkListHeader (void);
-extern int shutdown (int, int);
+// extern struct listEntry *mkListHeader (void);
+// extern int shutdown (int, int);
 
 void die (int sig) __attribute__((noreturn));
 
