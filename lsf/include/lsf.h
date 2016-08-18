@@ -96,7 +96,8 @@ typedef unsigned long LS_UNS_LONG_INT; // FIXME FIXME FIXME FIXME FIXME untypede
 #define MAXMODELS               128
 #define MAXTYPES_31             25
 #define MAXMODELS_31            30
-#define MAXFILENAMELEN          256
+//#define MAXFILENAMELEN          4096
+const uint MAXFILENAMELEN = 4096;   // FIXME FIXME FIXME FIXME value of MAXFILENAMELEN must be set by configure script
 
 // #define FIRST_RES_SOCK  20
 static const uint FIRST_RES_SOCK = 20;
@@ -112,19 +113,19 @@ static const uint FIRST_RES_SOCK = 20;
 
 typedef enum
 {
-  R15S,
-  R1M,
-  R15M,
-  UT,
-  PG,
-  IO,
-  LS,
-  IT,
-  TMP,
-  SWP,
-  MEM,
-  USR1,
-  USR2
+    R15S,
+    R1M,
+    R15M,
+    UT,
+    PG,
+    IO,
+    LS,
+    IT,
+    TMP,
+    SWP,
+    MEM,
+    USR1,
+    USR2
 } lsindx_t;
 
 #ifndef MAXFLOAT

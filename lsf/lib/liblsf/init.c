@@ -66,7 +66,7 @@ ls_initrex (int num, int options)
         // FIXME cast. res_addr_ is of type sockaddres_in, which is a system struct.
         int envport = atoi( genParams_[LSF_RES_PORT].paramValue );
         assert( envport > 0 && envport <= USHRT_MAX );
-        res_addr_.sin_port = (in_port_t) envport;
+        res_addr_.sin_port = envport;
         if ( res_addr_.sin_port ) {
              res_addr_.sin_port = htons (res_addr_.sin_port);
         }
@@ -83,7 +83,7 @@ ls_initrex (int num, int options)
         if ((res_addr_.sin_port = get_port_number (RES_SERVICE, (char *) NULL)) == -1) {
 #else
         if ((sv = getservbyname ("res", "tcp")) != NULL) {
-            res_addr_.sin_port = (in_port_t) sv->s_port;
+            res_addr_.sin_port = sv->s_port;
         }
         else {
 #endif

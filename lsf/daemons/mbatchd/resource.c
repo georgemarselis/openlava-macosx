@@ -19,20 +19,17 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <math.h>
-#include "mbd.h"
 
+#include "mbd.h"
 #include "../../lsf/lib/lsi18n.h"
-#define NL_SETN		10
+
+// #define NL_SETN		10
 
 static void addSharedResource (struct lsSharedResourceInfo *);
-static void addInstances (struct lsSharedResourceInfo *,
-			  struct sharedResource *);
+static void addInstances (struct lsSharedResourceInfo *, struct sharedResource *);
 static void freeHostInstances (void);
 static void initHostInstances (int);
-static int copyResource (struct lsbShareResourceInfoReply *,
-			 struct sharedResource *, char *);
-
-struct objPRMO *pRMOPtr = NULL;
+static int copyResource (struct lsbShareResourceInfoReply *, struct sharedResource *, char *);
 
 static void initQPRValues (struct qPRValues *, struct qData *);
 static void freePreemptResourceInstance (struct preemptResourceInstance *);
@@ -43,21 +40,21 @@ static struct qPRValues *findQPRValues (int, struct hData *, struct qData *);
 static struct qPRValues *addQPRValues (int, struct hData *, struct qData *);
 static float roundFloatValue (float);
 
-static float
-checkOrTakeAvailableByPreemptPRHQValue (int index, float value,
-					struct hData *hPtr,
-					struct qData *qPtr, int update);
+static float checkOrTakeAvailableByPreemptPRHQValue (int index, float value, struct hData *hPtr, struct qData *qPtr, int update);
 
+struct objPRMO *pRMOPtr = NULL;
 
 void
 getLsbResourceInfo (void)
 {
   static char fname[] = "getLsbresourceInfo";
-  int i, numRes = 0;
-  struct lsSharedResourceInfo *resourceInfo;
+  int i = 0;
+  int numRes = 0;
+  struct lsSharedResourceInfo *resourceInfo = NULL;
 
-  if (logclass & LC_TRACE)
+  if (logclass & LC_TRACE)   {
     ls_syslog (LOG_DEBUG3, "%s: Entering ...", fname);
+  }
 
   if ((resourceInfo = ls_sharedresourceinfo (NULL, &numRes, NULL, 0)) == NULL)
     {

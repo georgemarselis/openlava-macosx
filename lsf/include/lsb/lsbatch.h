@@ -607,16 +607,16 @@ struct submig
 #define    JGRP_NODE_GROUP  2
 #define    JGRP_NODE_ARRAY  3
 
-#define LSB_MAX_ARRAY_JOBID 0x0FFFFFFFF
-#define LSB_MAX_ARRAY_IDX   0x0FFFF
+#define LSB_MAX_ARRAY_JOBID 0x0FFFFFFFF // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
+#define LSB_MAX_ARRAY_IDX   0x0FFFF  // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
 #define LSB_MAX_SEDJOB_RUNID    (0x0F)
 #define LSB_JOBID(array_jobId, array_idx)  \
-                 (((LS_UNS_LONG_INT)array_idx << 32) | array_jobId)
+                 (((LS_UNS_LONG_INT)array_idx << 32) | array_jobId) // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
 #define LSB_ARRAY_IDX(jobId) \
-        (((jobId) == -1) ? (0) : (int)(((LS_UNS_LONG_INT)jobId >> 32) \
-                                                    & LSB_MAX_ARRAY_IDX))
+        (((jobId) == -1) ? (0) : (u_long)(((LS_UNS_LONG_INT)jobId >> 32) \
+                                                    & LSB_MAX_ARRAY_IDX)) // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
 #define LSB_ARRAY_JOBID(jobId)\
-                 (((jobId) == -1) ? (-1) : (int)(jobId & LSB_MAX_ARRAY_JOBID))
+                 (((jobId) == -1) ? (-1) : (u_long)(jobId & LSB_MAX_ARRAY_JOBID))
 
 
 #define    JGRP_ACTIVE        1
@@ -1679,8 +1679,7 @@ struct userInfoEnt *lsb_userinfo P_ ((char **, uint *));
 struct groupInfoEnt *lsb_hostgrpinfo P_ ((char **groups, uint *numGroups, int options));
 struct groupInfoEnt *lsb_usergrpinfo P_ ((char **groups, uint *numGroups, int options));
 struct parameterInfo *lsb_parameterinfo P_ ((char **, uint *, int));
-LS_LONG_INT lsb_modify
-P_ ((struct submit *, struct submitReply *, LS_LONG_INT));
+LS_LONG_INT lsb_modify P_ ((struct submit *, struct submitReply *, LS_LONG_INT));
 float *getCpuFactor P_ ((char *, int));
 char *lsb_suspreason P_ ((int, int, struct loadIndexLog *));
 char *lsb_pendreason P_ ((int, int *, struct jobInfoHead *, struct loadIndexLog *));
@@ -1691,10 +1690,10 @@ struct lsbSharedResourceInfo *lsb_sharedresourceinfo P_ ((char **, uint *, char 
 
 int lsb_runjob P_ ((struct runJobRequest *));
 
-char *lsb_jobid2str P_ ((LS_LONG_INT));
-char *lsb_jobidinstr P_ ((LS_LONG_INT));
-void jobId32To64 P_ ((LS_LONG_INT *, uint jobId, uint jobArrElemId ) );
-void jobId64To32 P_ ((LS_LONG_INT, uint *jobId, uint *jobArrElemId ) );
+char *lsb_jobid2str P_ ( ( u_long ) );
+char *lsb_jobidinstr P_ ( ( u_long ) );
+void jobId32To64 P_ ((LS_LONG_INT *, uint jobId, uint jobArrElemId ) ); // FIXME FIXME FIXME FIXME uint to u_long or u_int64_t
+void jobId64To32 P_ ((LS_LONG_INT, uint *jobId, uint *jobArrElemId ) ); // FIXME FIXME FIXME FIXME uint to u_long or u_int64_t
 int lsb_setjobattr (int, struct jobAttrInfoEnt *);
 
 LS_LONG_INT lsb_rexecv (int, char **, char **, int *, int);

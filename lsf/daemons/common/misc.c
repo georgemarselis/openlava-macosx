@@ -52,10 +52,11 @@ void
 die (int sig)
 {
     static char fname[] = "die";
-    char myhost[MAXHOSTNAMELEN];
+    char *myhost = malloc( sizeof( char ) * MAXHOSTNAMELEN + 1 );
 
-    if (debug > 1)
+    if (debug > 1) {
         fprintf (stderr, "%s: signal %d\n", fname, sig);
+    }
 
     if (masterme)
         {

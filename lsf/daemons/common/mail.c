@@ -25,9 +25,9 @@
 #include <pwd.h>
 #include <stdarg.h>
 
-#ifndef strchr
-#include <string.h>
-#endif
+// #ifndef strchr
+// #include <string.h>
+// #endif
 
 
 #include "daemons/daemons.h"
@@ -35,41 +35,6 @@
 
 // #define NL_SETN         10
 
-#ifdef NO_MAIL
-void
-lsb_mperr (char *msg)
-{
-    return;
-}
-
-void
-lsb_merr (char *s)
-{
-}
-
-void
-merr_user (char *user, char *host, char *msg, char *type)
-{
-}
-
-static void
-addr_process (char *adbuf, char *user, char *tohost, char *spec)
-{
-}
-
-FILE *
-smail (char *to, char *tohost)
-{
-    return fopen ("/dev/null", "w");
-}
-
-void
-mclose (FILE * file)
-{
-    fclose (file);
-}
-
-#else
 void
 lsb_mperr (char *msg)
 {
@@ -205,17 +170,18 @@ FILE *
 smail (char *to, char *tohost)
 {
     char fname[] = "smail";
-    FILE *fmail;
-    int pid;
-    int maild[2];
-    char toaddr[256];
-    char smcmd[500];
-    char *sendmailp;
-    char osUserName[MAXLINELEN];
-    uid_t userid;
+    FILE *fmail = NULL;
+    int maild[2]     = { 0, 0 };
+    uid_t userid     = 0;
+    pid_t pid        = 0;
+    char *sendmailp  = NULL;
+    char *osUserName = malloc( sizeof(char) * 500 + 1 );
+    char *smcmd      = malloc( sizeof(char) * 500 + 1 );
+    char *toaddr     = malloc( sizeof(char) * 500 + 1 );
 
-    if (lsb_CheckMode)
+    if( lsb_CheckMode ) {
         return stderr;
+    }
 
     if ((to == NULL) || (tohost == NULL)) {
         /* catgets 8604 */
@@ -225,7 +191,7 @@ smail (char *to, char *tohost)
 
     if (getOSUserName_ (to, osUserName, MAXLINELEN) != 0) {
         strncpy (osUserName, to, MAXLINELEN);
-        osUserName[MAXLINELEN - 1] = '\0';
+        assert( osUserName[MAXLINELEN - 1] ==  '\0' );
     }
 
 
@@ -290,6 +256,8 @@ smail (char *to, char *tohost)
         ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, fname, "fprintf", "header", osUserName);
         return stderr;
         }
+
+    // FIXME FIXME FIXME FIXME FIXME memory management!
     return fmail;
 }
 
@@ -303,4 +271,3 @@ mclose (FILE * file)
         (void) fflush (file);
     }
 }
-#endif

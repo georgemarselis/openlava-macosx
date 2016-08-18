@@ -76,8 +76,8 @@ struct statInfo
   int maxTmp;
   int nDisks;
   u_short portno;
-  char hostType[MAXLSFNAMELEN];
-  char hostArch[MAXLSFNAMELEN];
+  char *hostType;
+  char *hostArch;
   char padding2[2];
 };
 
@@ -246,8 +246,8 @@ struct loadVectorStruct
 
 struct masterReg
 {
-  char clName[MAXLSFNAMELEN];
-  char hostName[MAXHOSTNAMELEN];
+  char *clName;
+  char *hostName;
   int flags;
   uint seqNo;
   int checkSum;
@@ -322,29 +322,86 @@ int getpagesize (void);
  */
 typedef enum
 {
-  // LSF_CONFDIR,
-  // LSF_LIM_DEBUG,
-  // LSF_SERVERDIR,
-  // LSF_BINDIR,
-  // LSF_LOGDIR,
-  // LSF_LIM_PORT,
-  // LSF_RES_PORT,
-  LSF_DEBUG_LIM,
-  LSF_TIME_LIM,
-  // LSF_LOG_MASK,
-  LSF_CONF_RETRY_MAX,
-  LSF_CONF_RETRY_INT,
-  LSF_CROSS_UNIX_NT,
-  LSF_LIM_IGNORE_CHECKSUM,
-  // LSF_MASTER_LIST,
-  LSF_REJECT_NONLSFHOST,
-  LSF_LIM_JACKUP_BUSY,
-  LIM_RSYNC_CONFIG,
-  LIM_COMPUTE_ONLY,
-  // LSB_SHAREDIR,
-  LIM_NO_MIGRANT_HOSTS,
-  LIM_NO_FORK
+	LIM_DEBUG,
+	LIM_PORT,
+	LIM_TIME,
+	LIM_IGNORE_CHECKSUM,
+  LIM_JACKUP_BUSY,
+	LIM_COMPUTE_ONLY,
+	LIM_NO_MIGRANT_HOSTS,
+	LIM_NO_FORK
 } limParams_t;
+
+
+struct config_param limParams[] = {
+	{"LIM_DEBUG",            NULL},
+	{"LIM_PORT",             NULL},
+	{"LIM_TIME",             NULL},
+	{"LIM_IGNORE_CHECKSUM",  NULL},
+	{"LIM_JACKUP_BUSY",      NULL},
+	{"LIM_COMPUTE_ONLY",     NULL},
+	{"LIM_NO_MIGRANT_HOSTS", NULL},
+	{"LIM_NO_FORK",          NULL},
+	{NULL,                   NULL},
+};
+
+
+int limSock = -1;
+int limTcpSock = -1;
+ushort lim_port;
+ushort lim_tcp_port;
+int probeTimeout = 2;
+short resInactivityCount = 0;
+
+struct clusterNode *myClusterPtr;
+struct hostNode *myHostPtr;
+int masterMe;
+int nClusAdmins = 0;
+uid_t *clusAdminIds = NULL;
+gid_t *clusAdminGids = NULL;
+char **clusAdminNames = NULL;
+
+int kernelPerm;
+
+struct limLock limLock;
+char myClusterName[MAXLSFNAMELEN];
+u_int loadVecSeqNo = 0;
+u_int masterAnnSeqNo = 0;
+int lim_debug = 0;
+int lim_CheckMode = 0;
+int lim_CheckError = 0;
+char *env_dir = NULL;
+static int alarmed;
+char ignDedicatedResource = FALSE;
+uint numHostResources;
+struct sharedResource **hostResources = NULL;
+u_short lsfSharedCkSum = 0;
+
+pid_t pimPid = -1;
+static void startPIM (int, char **);
+
+extern int chanIndex;
+
+static int initAndConfig (int, int *);
+static void term_handler (int);
+static void child_handler (int);
+static int processUDPMsg (void);
+static void doAcceptConn (void);
+static void initSignals (void);
+static void periodic (int);
+static struct tclLsInfo *getTclLsInfo (void);
+static void printTypeModel (void);
+static void initMiscLiStruct (void);
+static int getClusterConfig (void);
+extern struct extResInfo *getExtResourcesDef (char *);
+extern char *getExtResourcesLoc (char *);
+extern char *getExtResourcesVal (char *);
+
+/* UDP message buffer.
+ */
+// static char reqBuf[MSGSIZE];
+static char reqBuf[MSGSIZE];
+
 
 #define LOOP_ADDR       0x7F000001
 
@@ -528,3 +585,6 @@ int logLIMDown (void);
 int logAddHost (struct hostEntry *);
 int logRmHost (struct hostEntry *);
 int addHostByTab (hTab *);
+
+
+extern char *argvmsg_ (int argc, char **argv);

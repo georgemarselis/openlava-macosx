@@ -21,20 +21,19 @@
 #include "libint/lsi18n.h"
 #include "lib/initenv.h"
 #include "lib/init.h"
+#include "lib/lib.h"
 #include "lib/mls.h"
+
+
 #define BADCH   ":"
 
-#ifndef NL_SETN
-#define NL_SETN      22
-#endif
-
-extern int errLineNum_;
+// extern int errLineNum_;
 
 static int changeUserEUId (void);
 
 
 void
-parseAndDo (char *cmdBuf, int (*func)() )
+parseAndDo (char *cmdBuf, int (*func)() ) // FIXME FIXME FIXME replace with parser
 {
 
 	const uint MAX_ARG = 100;
@@ -75,7 +74,7 @@ parseAndDo (char *cmdBuf, int (*func)() )
 			{
 				see_string = 0;
 				/* catgets 100 */
-				ls_perror( _i18n_msg_get( ls_catd, NL_SETN, 100, "Syntax Error of line parameter! \n" ) );
+				ls_perror( "100: Syntax Error of line parameter! \n" );
 				exit (-1);
 			}
 
@@ -168,7 +167,7 @@ cmdHelp (int argc, char **argv, char *cmdList[], char *cmdInfo[],  char *cmdSynt
 	{
 
 		/* catgets 104  */
-		fprintf (stderr, "\n%s\n\n", _i18n_msg_get (ls_catd, NL_SETN, 104, "Commands are : "));
+		fprintf (stderr, "\n%s\n\n", "104: Commands are : ");
 
 		for ( uint i = 0, j = 0; cmdList[i] != NULL; i++)
 		{
@@ -184,7 +183,7 @@ cmdHelp (int argc, char **argv, char *cmdList[], char *cmdInfo[],  char *cmdSynt
 		}
 
 		/* catgets 105 */
-		fprintf (stderr, "\n\n%s\n\n", _i18n_msg_get (ls_catd, NL_SETN, 105, "Try help command... to get details. "));
+		fprintf (stderr, "\n\n%s\n\n", "105: Try help command... to get details. ");
 		fflush (stderr);
 		return;
 	}
@@ -194,11 +193,11 @@ cmdHelp (int argc, char **argv, char *cmdList[], char *cmdInfo[],  char *cmdSynt
 		{
 			oneCmdUsage (i, cmdList, cmdSyntax);
 			/* catgets 106 */
-			fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 106, "Function: %s\n\n"), cmdInfo[i]);
+			fprintf (stderr, "106: Function: %s\n\n", cmdInfo[i]);
 		}
 		else {
 			/* catgets 107 */
-			fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 107, "Invalid command <%s>\n\n"), argv[optind]);
+			fprintf (stderr, "107: Invalid command <%s>\n\n", argv[optind]);
 		}
 	}
 
@@ -210,12 +209,13 @@ cmdHelp (int argc, char **argv, char *cmdList[], char *cmdInfo[],  char *cmdSynt
 char *
 myGetOpt (int nargc, char **nargv, char *ostr)
 {
-	char svstr[256];
-	char *cp1 = svstr;
-	char *cp2 = svstr;
-	char *optName;
-	int num_arg;
-	uint i = 0;
+	// char svstr[256];
+	char *svstr   = malloc( sizeof( char ) * 256 + 1 ); // FIXME FIXME FIXME FIXME throw at debugger, might need larger allocation
+	char *cp1     = svstr;
+	char *cp2     = svstr;
+	char *optName = NULL;
+	int num_arg   = 0;
+	uint i        = 0;
 
 	if ((optName = nargv[optind]) == NULL) {
 		return (NULL);
@@ -233,9 +233,9 @@ myGetOpt (int nargc, char **nargv, char *ostr)
 	}
 	strcpy (svstr, ostr);
 	num_arg = 0;
-	optarg = NULL;
+	optarg  = NULL;
 
-	while (*cp2)
+	while (*cp2)  // FIXME FIXME FIXME FIXME FIXME  replace with getopts()
 	{
 		int cp2len = strlen (cp2);
 		for ( i = 0; i < cp2len; i++)
@@ -264,7 +264,7 @@ myGetOpt (int nargc, char **nargv, char *ostr)
 				if (nargc <= optind + 1)
 				{
 					/* catgets 108 */
-					fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 108, "%s: option requires an argument -- %s\n"), nargv[0], optName);
+					fprintf (stderr, "108: %s: option requires an argument -- %s\n", nargv[0], optName);
 					return (BADCH);
 				}
 				optarg = nargv[++optind];
@@ -277,14 +277,14 @@ myGetOpt (int nargc, char **nargv, char *ostr)
 	}
 
 	/* catgets 109 */
-	fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 109, "%s: illegal option -- %s\n"), nargv[0], optName);
+	fprintf (stderr, "109: %s: illegal option -- %s\n", nargv[0], optName );
 	return (BADCH);
 }
 
 int
 getConfirm (char *msg)
 {
-	char answer[MAXLINELEN];
+	char answer[MAXLINELEN]; // convert to dynamic allocation
 	int i = 0;
 
 	while (1)
@@ -313,22 +313,16 @@ int
 checkConf (int verbose, int who)
 {
 	char confCheckBuf[] = "RECONFIG_CHECK=TRUE";
-	pid_t pid;
-	char *daemon, *lsfEnvDir;
-	static struct config_param lsfParams[] = {
-		{"LSF_SERVERDIR", NULL},
-		{"LSF_CONFDIR", NULL},
-		{"LSB_CONFDIR", NULL},
-		{"LSB_SHAREDIR", NULL},
-		{NULL, NULL},
-	};
+	struct config_param *plp = NULL;
+	char *lsfEnvDir  = NULL;
+	char *daemon     = NULL;
+	LS_WAIT_T status = 0;
+	int fatalErr = FALSE;
+	pid_t pid    = 0;
+	int cc       = 0;
+	int fd       = 0;
 
-	struct config_param *plp;
-	LS_WAIT_T status;
-	int fatalErr = FALSE, cc = 0;
-	int fd;
-
-	if (lsfParams[0].paramValue == NULL)
+	if (lsfParams[LSF_ENVDIR].paramValue == NULL)
 	{
 		lsfEnvDir = getenv ("LSF_ENVDIR");
 		cc = initenv_ (lsfParams, lsfEnvDir);
@@ -338,9 +332,9 @@ checkConf (int verbose, int who)
 	{
 		if (lserrno == LSE_CONF_SYNTAX)
 		{
-			char lno[20];
+			char lno[20];   // FIXME FIXME FIXME FIXME convert to dynamic allocation
 			/* catgets 110 */
-			sprintf (lno, _i18n_msg_get (ls_catd, NL_SETN, 110, "Line %d"), errLineNum_);
+			sprintf (lno, "110: Line %ld", errLineNum_);
 			ls_perror (lno);
 		}
 		else {
@@ -353,7 +347,7 @@ checkConf (int verbose, int who)
 		if (plp->paramValue == NULL)
 		{
 			/* catgets 111 */
-			fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 111, "%s is missing or has a syntax error in lsf.conf file\n"),plp->paramName);
+			fprintf (stderr, "111: %s is missing or has a syntax error in lsf.conf file\n", plp->paramName);
 			fatalErr = TRUE;
 		}
 	}
@@ -365,14 +359,14 @@ checkConf (int verbose, int who)
 		return (EXIT_WARNING_ERROR);
 	}
 
-	if ((daemon = calloc (strlen (lsfParams[0].paramValue) + 15, sizeof (char))) == NULL)
+	if ((daemon = calloc (strlen (lsfParams[LSF_ENVDIR].paramValue) + 15, sizeof (char))) == NULL)
 	{
 		perror ("calloc");
 		return (EXIT_FATAL_ERROR);
 	}
 
-	strcpy (daemon, lsfParams[0].paramValue);
-	strcat (daemon, ((who == 1) ? "/lim" : "/mbatchd"));
+	strcpy (daemon, lsfParams[LSF_ENVDIR].paramValue);
+	strcat (daemon, ((who == 1) ? "/lim" : "/mbatchd")); // FIXME FIXME FIXME FIXME replace fixed strings
 
 	if (access (daemon, X_OK) < 0)
 	{

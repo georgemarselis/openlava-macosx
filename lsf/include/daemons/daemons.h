@@ -69,93 +69,25 @@
 
 // FIXME FIXME these have to be set in an enum
 
-#define  DEF_MSLEEPTIME               2
-#define  DEF_SSLEEPTIME               2
-#define  DEF_RETRY_INTVL              2
-#define  DEF_PREEM_PERIOD             INFINIT_INT
-#define  DEF_PG_SUSP_IT               180
-#define  WARN_TIME                    600
-#define  DEF_RUSAGE_UPDATE_RATE       1
-#define  DEF_RUSAGE_UPDATE_PERCENT    10
-#define  DEF_JTERMINATE_INTERVAL      10
-#define SLAVE_FATAL                   101
-#define SLAVE_MEM                     102
-#define SLAVE_RESTART                 103
-#define SLAVE_SHUTDOWN                104
+#define DEF_MSLEEPTIME            2
+#define DEF_SSLEEPTIME            2
+#define DEF_RETRY_INTVL           2
+#define DEF_PREEM_PERIOD          INFINIT_INT
+#define DEF_PG_SUSP_IT            180
+#define WARN_TIME                 600
+#define DEF_RUSAGE_UPDATE_RATE    1
+#define DEF_RUSAGE_UPDATE_PERCENT 10
+#define DEF_JTERMINATE_INTERVAL   10
+#define SLAVE_FATAL               101
+#define SLAVE_MEM                 102
+#define SLAVE_RESTART             103
+#define SLAVE_SHUTDOWN            104
 
-#define LIM_NO_MIGRANT_HOSTS          55
+#define LSB_ARRAY_SCHED_ORDER     39
+#define LSB_BSUBI_OLD             30
 
-#define LSB_ARRAY_SCHED_ORDER         39
-#define LSB_BSUBI_OLD                 30
-#define LSB_CONFDIR                   1
-#define LSB_CRDIR                     11
-#define LSB_DEBUG                     0
-#define LSB_DEBUG_MBD                 14
-#define LSB_DEBUG_SBD                 15
-#define LSB_HJOB_PER_SESSION          32
-#define LSB_JOB_CPULIMIT              44
-#define LSB_JOB_MEMLIMIT              47
-#define LSB_MAILPROG                  6
-#define LSB_MAILSERVER                36
-#define LSB_MAILSIZE_LIMIT            37
-#define LSB_MAILTO                    5
-#define LSB_MBD_BLOCK_SEND            27
-#define LSB_MBD_CONNTIMEOUT           21
-#define LSB_MBD_MAILREPLAY            24
-#define LSB_MBD_MIGTOPEND             25
-// #define LSB_MBD_PORT               8
-#define LSB_MEMLIMIT_ENFORCE          29
-#define LSB_MIG2PEND                  42
-#define LSB_MOD_ALL_JOBS              48
-#define LSB_PTILE_PACK                50
-#define LSB_QPOST_EXEC_ENFORCE        41
-#define LSB_RENICE_NEVER_AT_RESTART   45
-#define LSB_REQUEUE_HOLD              34
-#define LSB_REQUEUE_TO_BOTTOM         38
-#define LSB_SBD_CONNTIMEOUT           22
-#define LSB_SBD_FINISH_SLEEP          51
-// #define LSB_SBD_PORT               7
-#define LSB_SBD_READTIMEOUT           26
-#define LSB_SET_TMPDIR                49
-// #define LSB_SHAREDIR               4
-#define LSB_SIGSTOP                   18
-#define LSB_SMTP_SERVER               35
-#define LSB_STDOUT_DIRECT             53
-#define LSB_STOP_IGNORE_IT            31
-#define LSB_TIME_MBD                  16
-#define LSB_TIME_SBD                  17
-// #define LSB_UTMP                   43
-#define LSB_VIRTUAL_SLOT              52
-
-#define LSF_AUTH                      10
-#define LSF_AUTH_DAEMONS              33
-#define LSF_BINDIR                    20
-// #define LSF_BINDIR                 18
-#define LSF_CMD_SHELL                 15
-#define LSF_CONFDIR                   23
-#define LSF_DEBUG_RES                 11
-#define LSF_ENABLE_PTY                16
-#define LSF_GETPWNAM_RETRY            28
-#define LSF_ID_PORT                   9
-#define LSF_LIBDIR                    40
-#define LSF_LIM_PORT                  5
-#define LSF_LOGDIR                    3
-#define LSF_LOG_MASK                  19
-#define LSF_MLS_LOG                   46
-#define LSF_RES_ACCT                  10
-#define LSF_RES_ACCTDIR               9
-#define LSF_RES_DEBUG                 0
-#define LSF_RES_NO_LINEBUF            21
-#define LSF_RES_PORT                  6
-#define LSF_RES_RLIMIT_UNLIM          14
-#define LSF_RES_TIMEOUT               20
-// #define LSF_ROOT_REX                  13
-#define LSF_SERVERDIR                 1
-#define LSF_TIME_RES                  12
-#define LSF_TMPDIR                    17
-#define LSF_USE_HOSTEQUIV             12
-#define MBD_DONT_FORK                 54
-#define NOT_LOG                       INFINIT_INT
+#define MBD_DONT_FORK             54
+#define NOT_LOG                    INFINIT_INT
 
 #define JOB_SAVE_OUTPUT   0x10000000
 #define JOB_FORCE_KILL    0x20000000
@@ -163,7 +95,7 @@
 #define JOB_URGENT        0x40000000
 #define JOB_URGENT_NOSTOP 0x80000000
 
-char errbuf[MAXLINELEN];
+char errbuf[MAXLINELEN]; // FIXME FIXME FIXME FIXME convert to dynamic allocation
 
 #define lsb_merr1(fmt,a1)        sprintf(errbuf,fmt,a1),lsb_merr(errbuf)
 #define lsb_merr2(fmt,a1,a2)     sprintf(errbuf,fmt,a1,a2),lsb_merr(errbuf)
@@ -482,15 +414,18 @@ struct bucket
 int errno;
 char **environ;
 
-struct config_param daemonParams[];
+// was : struct config_param daemonParams[];
+// struct config_param *daemonParams;
 
-int nextJobId;
-int numRemoveJobs;
-int maxJobId;
+u_long nextJobId;
+u_long numRemoveJobs;
+u_long maxJobId;
 
 
 char *lsbManager;
 char *lsbSys;
+
+// FIXME FIXME FIXME FIXME bunc of loose variables? 
 
 uid_t batchId;
 int debug;
@@ -516,10 +451,9 @@ int jobTerminateInterval;
 int lsf_crossUnixNT;
 
 
-#define DEFAULT_MAILTO  "^U"
-
-#define DEFAULT_MAILPROG    "/usr/lib/sendmail"
-#define DEFAULT_CRDIR "/bin"
+#define DEFAULT_MAILTO     "^U"
+#define DEFAULT_CRDIR     "/bin"
+#define DEFAULT_MAILPROG  "/usr/lib/sendmail"  // FIXME FIXME FIXME FIXME FIXME replace with variable in config.ac
 
 FILE *smail (char *to, char *tohost);
 uid_t chuser (uid_t uid);

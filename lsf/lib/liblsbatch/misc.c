@@ -26,9 +26,10 @@
 #include "lsb/misc.h"
 #include "lib/table.h"
 
-#define NL_SETN     13
+// #define NL_SETN     13
+// #define MEMBERSTRLEN   20
 
-#define MEMBERSTRLEN   20
+const char LONG_INT_FORMAT[] = "%ld";
 
 void
 initTab (struct hTab *tabPtr)
@@ -42,72 +43,80 @@ initTab (struct hTab *tabPtr)
 }
 
 hEnt *
-addMemb (struct hTab *tabPtr, LS_LONG_INT member)
+addMemb (struct hTab *tabPtr, LS_LONG_INT member)  // FIXME FIXME FIXME replae LS_LONG_INT with 64-bit integer
 {
-  char memberStr[MEMBERSTRLEN];
-  hEnt *ent;
-  int new;
+  char *memberStr = malloc( sizeof (char ) * sizeof( LS_LONG_INT ) * 8 + 1 );
+  hEnt *ent = NULL;
+  int newNumber = 0;
 
   if (tabPtr)
     {
-      sprintf (memberStr, LS_LONG_FORMAT, member);
-      ent = h_addEnt_ (tabPtr, memberStr, &new);
-      if (!new)
+      sprintf (memberStr, LONG_INT_FORMAT, member);  // it's a const char global
+      ent = h_addEnt_ (tabPtr, memberStr, &newNumber);
+      if (!newNumber)
     {
+      free( memberStr);
       return (NULL);
     }
-      else
-    return (ent);
+      else {
+          free( memberStr);
+          return (ent);
+        }
     }
+  free( memberStr);
   return (NULL);
 }
 
 char
 remvMemb (struct hTab *tabPtr, LS_LONG_INT member)
 {
-  char memberStr[MEMBERSTRLEN];
-  hEnt *ent;
+  char *memberStr = malloc( sizeof (char ) * sizeof( LS_LONG_INT ) * 8 + 1 );;
+  hEnt *ent = NULL;
 
   if (tabPtr)
     {
-      sprintf (memberStr, LS_LONG_FORMAT, member);
-      if ((ent = h_getEnt_ (tabPtr, memberStr)) == NULL)
-    return (FALSE);
+      sprintf (memberStr, LONG_INT_FORMAT, member); // it's a const char global
+      if ((ent = h_getEnt_ (tabPtr, memberStr)) == NULL) {
+          free( memberStr);
+          return (FALSE);
+        }
       else
     {
       ent->hData = NULL;
       h_delEnt_ (tabPtr, ent);
+      free( memberStr);
       return (TRUE);
     }
     }
+  free( memberStr );
   return (FALSE);
 }
 
 hEnt *
 chekMemb (struct hTab * tabPtr, LS_LONG_INT member)
 {
-  char memberStr[MEMBERSTRLEN];
-  hEnt *ent = NULL;
+    hEnt *ent = NULL;
 
-  if (tabPtr)
+    if (tabPtr)
     {
-      sprintf (memberStr, LS_LONG_FORMAT, member);
+      char *memberStr = malloc( sizeof (char ) * sizeof( LS_LONG_INT ) * 8 + 1 );
+      sprintf (memberStr, LONG_INT_FORMAT, member);
       ent = h_getEnt_ (tabPtr, memberStr);
+      free( memberStr );
     }
-
-  return ent;
+    return ent;
 }
 
 hEnt *
 addMembStr (struct hTab * tabPtr, char *memberStr)
 {
-  hEnt *ent;
-  int new;
+  hEnt *ent = NULL;
+  int newNumber = 0;
 
   if (tabPtr && memberStr)
     {
-      ent = h_addEnt_ (tabPtr, memberStr, &new);
-      if (!new)
+      ent = h_addEnt_ (tabPtr, memberStr, &newNumber);
+      if (!newNumber)
     {
       return (NULL);
     }
@@ -120,12 +129,13 @@ addMembStr (struct hTab * tabPtr, char *memberStr)
 char
 remvMembStr (struct hTab *tabPtr, char *memberStr)
 {
-  hEnt *ent;
+  hEnt *ent = NULL;
 
   if (tabPtr && memberStr)
     {
-      if ((ent = h_getEnt_ (tabPtr, memberStr)) == NULL)
-    return (FALSE);
+      if ((ent = h_getEnt_ (tabPtr, memberStr)) == NULL) {
+         return (FALSE);
+      }
       else
     {
       ent->hData = NULL;
@@ -153,8 +163,7 @@ struct sortIntList *
 initSortIntList (int increased)
 {
   struct sortIntList *headerPtr;
-  if ((headerPtr =
-       (struct sortIntList *) malloc (sizeof (struct sortIntList))) == NULL)
+  if ((headerPtr = malloc (sizeof (struct sortIntList))) == NULL)
     {
       return (NULL);
     }
@@ -166,15 +175,16 @@ initSortIntList (int increased)
 int
 insertSortIntList (struct sortIntList *header, int value)
 {
-  struct sortIntList *listPtr;
-  struct sortIntList *newPtr;
+  struct sortIntList *listPtr = NULL;
+  struct sortIntList *newPtr  = NULL;
 
   listPtr = header->forw;
   while (listPtr != header)
     {
 
-      if (listPtr->value == value)
-    return (0);
+        if (listPtr->value == value) {
+            return (0);
+        }
       if (header->value)
     {
 
@@ -190,27 +200,27 @@ insertSortIntList (struct sortIntList *header, int value)
       listPtr = listPtr->forw;
     }
     }
-  if ((newPtr = (struct sortIntList *) malloc (sizeof (struct sortIntList)))
-      == NULL)
+  if ((newPtr = malloc (sizeof (struct sortIntList))) == NULL) {
     return (-1);
-  newPtr->forw = listPtr;
-  newPtr->back = listPtr->back;
+  }
+  newPtr->forw        = listPtr;
+  newPtr->back        = listPtr->back;
   listPtr->back->forw = newPtr;
-  listPtr->back = newPtr;
-  newPtr->value = value;
+  listPtr->back       = newPtr;
+  newPtr->value       = value;
   return (0);
 
 }
 
 struct sortIntList *
-getNextSortIntList (struct sortIntList *header,
-            struct sortIntList *current, int *value)
+getNextSortIntList (struct sortIntList *header, struct sortIntList *current, int *value)
 {
-  struct sortIntList *nextPtr;
+  struct sortIntList *nextPtr = NULL;
 
   nextPtr = current->forw;
-  if (nextPtr == header)
-    return (NULL);
+  if (nextPtr == header) {
+      return (NULL);
+  }
   *value = nextPtr->value;
   return (nextPtr);
 
@@ -237,13 +247,16 @@ freeSortIntList (struct sortIntList *header)
 int
 getMinSortIntList (struct sortIntList *header, int *minValue)
 {
-  if (header == header->forw)
+  if (header == header->forw) {
     return (-1);
-  if (header->value)
+  }
+  if (header->value) {
     *minValue = header->forw->value;
-  else
+  }
+  else {
     *minValue = header->back->value;
-  return (0);
+  }
+  return 0;
 
 }
 
@@ -251,20 +264,23 @@ int
 getMaxSortIntList (struct sortIntList *header, int *maxValue)
 {
 
-  if (header == header->forw)
+  if (header == header->forw) {
     return (-1);
-  if (header->value)
+  }
+  if (header->value) {
     *maxValue = header->back->value;
-  else
+  }
+  else {
     *maxValue = header->forw->value;
-  return (0);
+  }
+  return 0;
 
 }
 
 int
 getTotalSortIntList (struct sortIntList *header)
 {
-  struct sortIntList *listPtr;
+  struct sortIntList *listPtr = NULL;
   int total = 0;
 
   listPtr = header->forw;
@@ -419,15 +435,15 @@ char *
 lsb_splitName (char *str, unsigned int *number)
 {
     static char fname[] = "lsb_splitName";
-    static char name[4 * MAXLINELEN];
-    static uint nameNum;
+    static char name[4 * sizeof(char) * MAXLINELEN ];
+    static uint nameNum = 0;
     int twoPartFlag = 0;
     uint counter = 0;
 
     if (str == NULL || number == NULL)
     {
         /* catgets 5650 */
-        ls_syslog (LOG_ERR, I18N (5650, "%s: bad input.\n"), fname);
+        ls_syslog (LOG_ERR, "5650: %s: bad input.\n", fname);
         return NULL;
     }
 
@@ -440,14 +456,14 @@ lsb_splitName (char *str, unsigned int *number)
         }
         else {
             twoPartFlag = 1;
-// #warning FIXME FIXME FIXME FIXME FIXME  what the fuck are you doing putting a null here?
+// #warning FIXME FIXME FIXME FIXME FIXME  what the fuck are you doing putting a nul here?
             name[counter] = '\0';
             counter = 0;
             sscanf (name, "%d", &nameNum);
             if (nameNum <= 0)
             {
                 nameNum = 1;
-                ls_syslog (LOG_ERR, I18N (5651, "%s: bad input format.  Assuming 1 host.\n"), fname);
+                ls_syslog (LOG_ERR, "5651: %s: bad input format.  Assuming 1 host.\n", fname);
             }
         }
     }
@@ -493,8 +509,8 @@ lsb_compressStrList (char **strList, int numStr)
     }
 
     assert( numStr >= 0 );
-    nameList.names = (char **)calloc( (unsigned long)numStr, sizeof (char *));
-    nameList.counter = (unsigned long *)calloc( (unsigned long)numStr, sizeof (int));
+    nameList.names = calloc( numStr, sizeof (char * ) ); // FIXME FIXME FIXME FIXME this assignement may be wrong. along with all similar ones in this file
+    nameList.counter = calloc( numStr, sizeof (int));
     if ( ( NULL == nameList.names && ENOMEM == errno ) || 
          ( NULL == nameList.counter && ENOMEM == errno ) )
     {
@@ -527,20 +543,20 @@ lsb_compressStrList (char **strList, int numStr)
             hIndex++;
             nameList.listSize = hIndex;
 
-        nameList.names = (char **) realloc (nameList.names, nameList.listSize * sizeof (char *));
-        nameList.counter = (unsigned long *) realloc (nameList.counter, nameList.listSize * sizeof (int));
+        nameList.names = realloc (nameList.names, nameList.listSize * sizeof (char *));
+        nameList.counter = realloc (nameList.counter, nameList.listSize * sizeof (int));
         if ( ( NULL == nameList.names && ENOMEM == errno ) || 
              ( NULL == nameList.counter && ENOMEM == errno ) )
         {
             ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "realloc");
-// #warning this may be out of the loop, needs test case and debugger
+// FIXME FIXME FIXME FIXME FIXME this may be out of the loop, needs test case and debugger
             for ( unsigned long j = 0; j < nameList.listSize; j++) {
                 FREEUP (nameList.names[j]);
             }
             FREEUP (nameList.names);
             FREEUP (nameList.counter);
             nameList.listSize = 0;
-            return (struct nameList *) NULL;
+            return NULL;
         }
     }
 
@@ -560,7 +576,7 @@ lsb_printNameList (struct nameList * nameList, int format)
   
     if (nameList == NULL) {
       /* catgets 5652 */
-      ls_syslog (LOG_ERR, I18N (5652, "%s: NULL input.\n"), fname);
+      ls_syslog (LOG_ERR, "5652: %s: NULL input.\n", fname);
       return NULL;
     }
 
@@ -569,7 +585,7 @@ lsb_printNameList (struct nameList * nameList, int format)
     }
 
     allocLen = MAXLINELEN;
-    namestr = (char *) calloc (allocLen, sizeof (char));
+    namestr = calloc (allocLen, sizeof (char));
     if (!namestr) {
         ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
         return (char *) NULL;
@@ -580,7 +596,7 @@ lsb_printNameList (struct nameList * nameList, int format)
 
         if (format == PRINT_SHORT_NAMELIST)
         {
-            buf = (char *) calloc (MAXLINELEN, sizeof (char));
+            buf = calloc (MAXLINELEN, sizeof (char));
             if ( NULL == buf && ENOMEM == errno )
             {
                ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
@@ -648,8 +664,8 @@ lsb_parseLongStr (char *string)
     if (string == NULL || strlen (string) <= 0)
     {
         /* catgets 5653 */
-        ls_syslog (LOG_ERR, I18N (5653, "%s: bad input"), fname); 
-        return (struct nameList *) NULL;
+        ls_syslog (LOG_ERR, "5653: %s: bad input", fname); 
+        return NULL;
     }
 
 
@@ -663,15 +679,15 @@ lsb_parseLongStr (char *string)
     }
 
     nameList.listSize = 0;
-    nameList.names = (char **) calloc (numStr, sizeof (char *));
-    nameList.counter = (unsigned long *) calloc (numStr, sizeof (int));
+    nameList.names = calloc (numStr, sizeof (char *));
+    nameList.counter = calloc (numStr, sizeof (int));
     if ( ( NULL == nameList.names && ENOMEM == errno ) || 
          ( NULL == nameList.counter && ENOMEM == errno ) )
     {
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
       FREEUP (nameList.names);
       FREEUP (nameList.counter);
-      return (struct nameList *) NULL;
+      return NULL;
     }
 
     numSameStr = 1;
@@ -679,12 +695,13 @@ lsb_parseLongStr (char *string)
     if (strlen (prevStr) <= 0)
     {
         /* catgets 5654 */
-        ls_syslog (LOG_ERR, I18N (5654, "%s: blank input\n"), fname);
+        ls_syslog (LOG_ERR, "5654: %s: blank input\n", fname);
         FREEUP (prevStr);
         FREEUP (nameList.names);
         FREEUP (nameList.counter);
 
-        return (struct nameList *) & nameList;
+        return (struct nameList *) & nameList; // FIXME FIXME FIXME what does this do?
+                                                // FIXME FIXME FIXME test case
     }
 
 
@@ -695,7 +712,7 @@ lsb_parseLongStr (char *string)
             if (nameList.listSize == numStr)
             {
                 /* catgets 5655 */
-                ls_syslog (LOG_ERR, I18N (5655, "%s: list exceeded allocated memory (shouldn't happen)\n"), fname);
+                ls_syslog (LOG_ERR, "5655: %s: list exceeded allocated memory (shouldn't happen)\n", fname);
                 return (struct nameList *) NULL;
             }
 
@@ -780,8 +797,8 @@ lsb_parseShortStr (char *string, int format)
 
       if (nameList.listSize >= numStr)
     {
-      ls_syslog (LOG_ERR, I18N (5656, "%s: list exceeded allocated memory (shouldn't happen)\n"),   /* catgets 5656 */
-             fname);
+       /* catgets 5656 */
+      ls_syslog (LOG_ERR, "5656: %s: list exceeded allocated memory (shouldn't happen)\n", fname);
       return (struct nameList *) NULL;
     }
 
@@ -791,8 +808,8 @@ lsb_parseShortStr (char *string, int format)
       name = (char *) namestr;
       if ((curStr = getNextWord_ (&string)) == NULL)
         {
-          ls_syslog (LOG_ERR, I18N (5657, "%s: LSB_MCPU_HOSTS format error\n"), /* catgets 5657 */
-             fname);
+          /* catgets 5657 */
+          ls_syslog (LOG_ERR, "5657: %s: LSB_MCPU_HOSTS format error\n", fname);
           FREEUP (nameList.names);
           FREEUP (nameList.counter);
           return (struct nameList *) NULL;

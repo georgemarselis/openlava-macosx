@@ -18,9 +18,6 @@
 
 #pragma once
  
-#ifndef LSF_LIB_LIB_H
-#define LSF_LIB_LIB_H
-
 #include "lsf.h"
 #include "daemons/liblimd/limout.h"
 #include "daemons/libresd/resd.h"
@@ -29,6 +26,7 @@
 #include "lib/xdrlim.h"
 #include "lib/xdr.h"
 #include "lib/mls.h"
+#include "lsb/lsb.h"
 
 struct taskMsg
 {
@@ -139,9 +137,121 @@ enum
     LSF_MASTER_LIST,
     // LSF_MLS_LOG,
     LSF_INTERACTIVE_STDERR,
-    NO_HOSTS_FILE,
-    LSB_SHAREDIR           // dup with lsbatch, must remove
+    NO_HOSTS_FILE
 } status;
+
+#define LSF_RES_DEBUG                 0
+#define LSF_SERVERDIR                 1
+#define LSF_ENVDIR                    2 // FIXME FIXME newly inserted variable
+#define LSF_LOGDIR                    3
+#define LSF_LIM_PORT                  5
+#define LSF_RES_PORT                  6
+#define LSF_ID_PORT                   9
+#define LSF_RES_ACCTDIR               9
+#define LSF_RES_ACCT                  10
+#define LSF_AUTH                      10
+#define LSF_DEBUG_RES                 11
+#define LSF_TIME_RES                  12
+#define LSF_USE_HOSTEQUIV             12
+// #define LSF_ROOT_REX               13
+#define LSF_RES_RLIMIT_UNLIM          14
+#define LSF_CMD_SHELL                 15
+#define LSF_ENABLE_PTY                16
+#define LSF_TMPDIR                    17
+#define LSF_LOG_MASK                  19
+// #define LSF_BINDIR                 18
+#define LSF_RES_TIMEOUT               20  // FIXME FIXME move to resd.h
+#define LSF_BINDIR                    20
+#define LSF_RES_NO_LINEBUF            21
+#define LSF_CONFDIR                   23
+#define LSF_GETPWNAM_RETRY            28
+#define LSF_AUTH_DAEMONS              33
+#define LSF_LIBDIR                    40
+#define LSF_MLS_LOG                   46
+
+
+#define LSB_DEBUG                     0
+#define LSB_CONFDIR                   1
+// #define LSB_SHAREDIR               4
+#define LSB_MAILTO                    5
+#define LSB_MAILPROG                  6
+// #define LSB_MBD_PORT               8
+// #define LSB_SBD_PORT               7
+
+#define LSB_CRDIR                     11
+#define LSB_DEBUG_MBD                 14
+#define LSB_DEBUG_SBD                 15
+#define LSB_TIME_MBD                  16
+#define LSB_TIME_SBD                  17
+#define LSB_SIGSTOP                   18
+
+#define LSB_MBD_CONNTIMEOUT           21
+#define LSB_SBD_CONNTIMEOUT           22
+#define LSB_MBD_MAILREPLAY            24
+#define LSB_MBD_MIGTOPEND             25
+#define LSB_SBD_READTIMEOUT           26
+#define LSB_MBD_BLOCK_SEND            27
+#define LSB_MEMLIMIT_ENFORCE          29
+
+#define LSB_STOP_IGNORE_IT            31
+#define LSB_HJOB_PER_SESSION          32
+#define LSB_REQUEUE_HOLD              34
+#define LSB_SMTP_SERVER               35
+#define LSB_MAILSERVER                36
+#define LSB_MAILSIZE_LIMIT            37
+#define LSB_REQUEUE_TO_BOTTOM         38
+
+#define LSB_QPOST_EXEC_ENFORCE        41
+#define LSB_MIG2PEND                  42
+// #define LSB_UTMP                   43
+#define LSB_JOB_CPULIMIT              44
+#define LSB_RENICE_NEVER_AT_RESTART   45
+#define LSB_JOB_MEMLIMIT              47
+#define LSB_MOD_ALL_JOBS              48
+#define LSB_SET_TMPDIR                49
+
+#define LSB_PTILE_PACK                50
+#define LSB_SBD_FINISH_SLEEP          51
+#define LSB_VIRTUAL_SLOT              52
+#define LSB_STDOUT_DIRECT             53
+
+#define LIM_NO_MIGRANT_HOSTS          55
+
+// struct config_param genParams_[] = {
+//     { "LSF_CONFDIR",            NULL },
+//     { "LSF_SERVERDIR",          NULL },
+//     { "LSF_LIM_DEBUG",          NULL },
+//     { "LSF_RES_DEBUG",          NULL },
+//     { "LSF_STRIP_DOMAIN",       NULL },
+//     { "LSF_LIM_PORT",           NULL },
+//     { "LSF_RES_PORT",           NULL },
+//     { "LSF_LOG_MASK",           NULL },
+//     { "LSF_SERVER_HOSTS",       NULL },
+//     { "LSF_AUTH",               NULL },
+//     { "LSF_USE_HOSTEQUIV",      NULL },
+//     { "LSF_ID_PORT",            NULL },
+//     { "LSF_RES_TIMEOUT",        NULL },
+//     { "LSF_API_CONNTIMEOUT",    NULL },
+//     { "LSF_API_RECVTIMEOUT",    NULL },
+//     { "LSF_AM_OPTIONS",         NULL },
+//     { "LSF_TMPDIR",             NULL },
+//     { "LSF_LOGDIR",             NULL },
+//     { "LSF_SYMBOLIC_LINK",      NULL },
+//     { "LSF_MASTER_LIST",        NULL },
+//     { "LSF_MLS_LOG",            NULL },
+//     { "LSF_INTERACTIVE_STDERR", NULL },
+//     { "HOSTS_FILE",             NULL },
+//     { "LSB_SHAREDIR",           NULL },
+//     { NULL,                     NULL }
+// };
+
+struct config_param lsfParams[] = {
+    { "LSF_SERVERDIR", NULL },
+    { "LSF_CONFDIR",   NULL },
+    { "LSF_CONFDIR",   NULL },
+    { "LSF_SHAREDIR",  NULL },
+    { NULL,            NULL }
+};
 
 enum { 
     NIOS2RES_EOF,
@@ -319,14 +429,16 @@ int getSigVal (char *);
 char *getSigSymbolList (void);
 char *getSigSymbol (int);
 
-typedef struct svrsock
+struct svrsock
 {
     int sockfd;
     int port;
     struct sockaddr_in *localAddr;
     int backlog;
     int options;
-} ls_svrsock_t;
+};
+
+typedef struct svrsock ls_svrsock_t;
 
 
 #define LS_CSO_ASYNC_NT       (0x0001)
@@ -368,4 +480,4 @@ void ls_errlog (FILE * fd, const char *fmt, ...)
 void ls_verrlog (FILE * fd, const char *fmt, va_list ap);
 int isPamBlockWait;
 
-#endif
+

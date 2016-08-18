@@ -23,38 +23,21 @@
 #include "cmdtools/cmdtools.h"
 #include "lsb/lsb.h"
 
-#define NL_SETN 8
+// #define NL_SETN 8
 
-extern char *loginShell;
-extern int optionFlag;
-extern char optionFileName[MAXLSFNAMELEN];
-extern int sig_decode (int);
-extern int isatty (int);
+// extern int optionFlag;
+// extern char *loginShell;
+// extern char *optionFileName; // [MAXLSFNAMELEN];
+// extern int sig_decode (int);
+// extern int isatty (int);
 
-extern int setOption_ (int argc, char **argv, char *template,
-		       struct submit *req, int mask, int mask2,
-		       char **errMsg);
-extern struct submit *parseOptFile_ (char *filename, struct submit *req,
-				     char **errMsg);
-extern void subUsage_ (int, char **);
-static int parseLine (char *line, int *embedArgc, char ***embedArgv,
-		      int option);
-
-static int emptyCmd = TRUE;
-
-static int parseScript (FILE * from, int *embedArgc,
-			char ***embedArgv, int option);
-static int CopyCommand (char **, int);
-
-static int addLabel2RsrcReq (struct submit *subreq);
-
-void sub_perror (char *);
-
-static char *commandline;
+// extern int setOption_ (int argc, char **argv, char *template, struct submit *req, int mask, int mask2, char **errMsg);
+// extern struct submit *parseOptFile_ (char *filename, struct submit *req, char **errMsg);
+// extern void subUsage_ (int, char **);
 
 #define SKIPSPACE(sp)      while (isspace(*(sp))) (sp)++;
 #define SCRIPT_WORD        "_USER_\\SCRIPT_"
-#define SCRIPT_WORD_END       "_USER_SCRIPT_"
+#define SCRIPT_WORD_END    "_USER_SCRIPT_"
 
 #define EMBED_INTERACT     0x01
 #define EMBED_OPTION_ONLY  0x02
@@ -62,6 +45,14 @@ static char *commandline;
 #define EMBED_RESTART      0x10
 #define EMBED_QSUB         0x20
 
+static int parseLine (char *line, int *embedArgc, char ***embedArgv, int option);
+static int parseScript (FILE * from, int *embedArgc, har ***embedArgv, int option);
+static int addLabel2RsrcReq (struct submit *subreq);
+static int CopyCommand (char **, int);
+void sub_perror (char *);
+
+static char *commandline = NULL;
+static int emptyCmd = TRUE;
 
 int
 do_sub (int argc, char **argv, int option)
@@ -871,23 +862,29 @@ parseLine (char *line, int *embedArgc, char ***embedArgv, int option)
 static int
 addLabel2RsrcReq (struct submit *subreq)
 {
-  char *temp = NULL;
-  char *job_label = NULL;
-  char *req = NULL;
-  char *select = NULL,
-    *order = NULL, *rusage = NULL, *filter = NULL, *span = NULL, *same = NULL;
-  char *and_symbol = " && ";
-  int label_len, rsrcreq_len;
+	char *temp      = NULL;
+	char *req        = NULL;
+	char *select     = NULL;
+	char *order      = NULL;
+	char *rusage     = NULL;
+	char *filter     = NULL;
+	char *span       = NULL;
+	char *same       = NULL;
+	char *job_label  = NULL;
+	char *and_symbol = " && ";
+	int label_len    = 0
+	int rsrcreq_len  = 0;
 
-  if ((job_label = getenv ("LSF_JOB_SECURITY_LABEL")) == NULL)
+	if ((job_label = getenv ("LSF_JOB_SECURITY_LABEL")) == NULL)
     {
       return 0;
     }
 
-  SKIPSPACE (job_label);
-  label_len = strlen (job_label);
-  if (label_len == 0)
-    return 0;
+	SKIPSPACE (job_label);
+	label_len = strlen (job_label);
+	if (label_len == 0) {
+		return 0;
+	}
 
   if (subreq->resReq == NULL)
     {

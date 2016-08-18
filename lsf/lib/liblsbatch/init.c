@@ -18,108 +18,83 @@
 
 #include <netdb.h>
 
+#include "lsb/sub.h"
 #include "lsb/lsb.h"
+#include "lib/lib.h"
 
-struct config_param lsbParams[] = {
-  {"LSB_DEBUG", NULL},
-  {"LSB_SHAREDIR", NULL},
-  {"LSB_SBD_PORT", NULL},
-  {"LSB_MBD_PORT", NULL},
-  {"LSB_DEBUG_CMD", NULL},
-  {"LSB_TIME_CMD", NULL},
-  {"LSB_CMD_LOGDIR", NULL},
-  {"LSB_CMD_LOG_MASK", NULL},
-  {"LSF_LOG_MASK", NULL},
-  {"LSB_API_CONNTIMEOUT", NULL},
-  {"LSB_API_RECVTIMEOUT", NULL},
-  {"LSF_SERVERDIR", NULL},
-  {"LSB_MODE", NULL},
-  {"LSB_SHORT_HOSTLIST", NULL},
-  {"LSF_INTERACTIVE_STDERR", NULL},
-  {"LSB_32_PAREN_ESC", NULL},
-  {"LSB_API_QUOTE_CMD", NULL},
-  {NULL, NULL}
-};
-
-#ifdef LSF_LOG_MASK
-#undef LSF_LOG_MASK
-#endif
-#define LSF_LOG_MASK   8
 
 static int _lsb_conntimeout = DEFAULT_API_CONNTIMEOUT;
 static int _lsb_recvtimeout = DEFAULT_API_RECVTIMEOUT;
-// static int _lsb_fakesetuid = 0;
 
-
-
-extern int bExceptionTabInit (void);
-extern int mySubUsage_ (void *);
+int lsb_init (char *appName);
 
 int
 lsb_init (char *appName)
 {
-  static int lsbenvset = FALSE;
-  char *logMask;
+	static int lsbenvset = FALSE;
+	char *logMask = NULL;
 
-  if (lsbenvset)
-    return 0;
-
-
-  if (initenv_ (lsbParams, NULL) < 0)
-    {
-      lsberrno = LSBE_LSLIB;
-      return (-1);
-    }
-
-  if (lsbParams[LSB_API_CONNTIMEOUT].paramValue)
-    {
-
-      _lsb_conntimeout = atoi (lsbParams[LSB_API_CONNTIMEOUT].paramValue);
-      if (_lsb_conntimeout < 0)
-	_lsb_conntimeout = DEFAULT_API_CONNTIMEOUT;
-    }
-
-  if (lsbParams[LSB_API_RECVTIMEOUT].paramValue)
-    {
-
-      _lsb_recvtimeout = atoi (lsbParams[LSB_API_RECVTIMEOUT].paramValue);
-      if (_lsb_recvtimeout < 0)
-	_lsb_recvtimeout = DEFAULT_API_RECVTIMEOUT;
-    }
-
-  if (!lsbParams[LSB_SHAREDIR].paramValue)
-    {
-      lsberrno = LSBE_NO_ENV;
-      return (-1);
-    }
-
-  lsbenvset = TRUE;
-
-  if (lsbParams[LSB_CMD_LOG_MASK].paramValue != NULL)
-    logMask = lsbParams[LSB_CMD_LOG_MASK].paramValue;
-  else
-    logMask = lsbParams[LSF_LOG_MASK].paramValue;
-
-  if (appName == NULL)
-    ls_openlog ("bcmd", lsbParams[LSB_CMD_LOGDIR].paramValue,
-		(lsbParams[LSB_CMD_LOGDIR].paramValue == NULL), logMask);
-  else
-    ls_openlog (appName, lsbParams[LSB_CMD_LOGDIR].paramValue,
-		(lsbParams[LSB_CMD_LOGDIR].paramValue == NULL), logMask);
-
-  getLogClass_ (lsbParams[LSB_DEBUG_CMD].paramValue,
-		lsbParams[LSB_TIME_CMD].paramValue);
+	if( lsbenvset ) {
+		return 0;
+	}
 
 
-  if (bExceptionTabInit ())
-    {
-      lsberrno = LSBE_LSBLIB;
-      return (-1);
-    }
+	if( initenv_( lsbParams, NULL ) < 0 )
+	{
+		lsberrno = LSBE_LSLIB;
+		return -1;
+	}
 
-  if (lsb_catch ("LSB_BAD_BSUBARGS", mySubUsage_))
-    return (-1);
+	if( lsbParams[LSB_API_CONNTIMEOUT].paramValue )
+	{
+		_lsb_conntimeout = atoi( lsbParams[LSB_API_CONNTIMEOUT].paramValue );
+		if (_lsb_conntimeout < 0) {
+			_lsb_conntimeout = DEFAULT_API_CONNTIMEOUT;
+		}
+	}
 
-  return (0);
+	if (lsbParams[LSB_API_RECVTIMEOUT].paramValue)
+	{
+		_lsb_recvtimeout = atoi (lsbParams[LSB_API_RECVTIMEOUT].paramValue);
+		if (_lsb_recvtimeout < 0) {
+			_lsb_recvtimeout = DEFAULT_API_RECVTIMEOUT;
+		}
+	}
+
+	if (!lsbParams[LSB_SHAREDIR].paramValue)
+	{
+		lsberrno = LSBE_NO_ENV;
+		return -1;
+	}
+
+	lsbenvset = TRUE;
+
+	if (lsbParams[LSB_CMD_LOG_MASK].paramValue != NULL) {
+		logMask = lsbParams[LSB_CMD_LOG_MASK].paramValue;
+	}
+	else {
+		logMask = lsbParams[LSF_LOG_MASK].paramValue;
+	}
+
+	if (appName == NULL) {
+		ls_openlog ("bcmd", lsbParams[LSB_CMD_LOGDIR].paramValue, (lsbParams[LSB_CMD_LOGDIR].paramValue == NULL), logMask);
+	}
+	else {
+		ls_openlog (appName, lsbParams[LSB_CMD_LOGDIR].paramValue, (lsbParams[LSB_CMD_LOGDIR].paramValue == NULL), logMask);
+	}
+
+	getLogClass_ (lsbParams[LSB_DEBUG_CMD].paramValue, lsbParams[LSB_TIME_CMD].paramValue);
+
+	if (bExceptionTabInit ())
+	{
+		lsberrno = LSBE_LSBLIB;
+		return -1;
+	}
+
+	if (lsb_catch ("LSB_BAD_BSUBARGS", mySubUsage_)) {
+		return -1;
+	}
+
+  return 0;
 
 }

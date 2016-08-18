@@ -19,91 +19,9 @@
  *
  */
 
-#include "lim.h"
-#include "../lib/mls.h"
+#include "daemons/liblimd/limd.h"
+#include "lib/mls.h"
 
-extern char *argvmsg_ (int argc, char **argv);
-
-int limSock = -1;
-int limTcpSock = -1;
-ushort lim_port;
-ushort lim_tcp_port;
-int probeTimeout = 2;
-short resInactivityCount = 0;
-
-struct clusterNode *myClusterPtr;
-struct hostNode *myHostPtr;
-int masterMe;
-int nClusAdmins = 0;
-uid_t *clusAdminIds = NULL;
-gid_t *clusAdminGids = NULL;
-char **clusAdminNames = NULL;
-
-int kernelPerm;
-
-struct limLock limLock;
-char myClusterName[MAXLSFNAMELEN];
-u_int loadVecSeqNo = 0;
-u_int masterAnnSeqNo = 0;
-int lim_debug = 0;
-int lim_CheckMode = 0;
-int lim_CheckError = 0;
-char *env_dir = NULL;
-static int alarmed;
-char ignDedicatedResource = FALSE;
-uint numHostResources;
-struct sharedResource **hostResources = NULL;
-u_short lsfSharedCkSum = 0;
-
-pid_t pimPid = -1;
-static void startPIM (int, char **);
-
-struct config_param limParams[] = {
-  {"LSF_CONFDIR", NULL},
-  {"LSF_LIM_DEBUG", NULL},
-  {"LSF_SERVERDIR", NULL},
-  {"LSF_BINDIR", NULL},
-  {"LSF_LOGDIR", NULL},
-  {"LSF_LIM_PORT", NULL},
-  {"LSF_RES_PORT", NULL},
-  {"LSF_DEBUG_LIM", NULL},
-  {"LSF_TIME_LIM", NULL},
-  {"LSF_LOG_MASK", NULL},
-  {"LSF_CONF_RETRY_MAX", NULL},
-  {"LSF_CONF_RETRY_INT", NULL},
-  {"LSF_CROSS_UNIX_NT", NULL},
-  {"LSF_LIM_IGNORE_CHECKSUM", NULL},
-  {"LSF_MASTER_LIST", NULL},
-  {"LSF_REJECT_NONLSFHOST", NULL},
-  {"LSF_LIM_JACKUP_BUSY", NULL},
-  {"LIM_RSYNC_CONFIG", NULL},
-  {"LIM_COMPUTE_ONLY", NULL},
-  {"LSB_SHAREDIR", NULL},
-  {"LIM_NO_MIGRANT_HOSTS", NULL},
-  {"LIM_NO_FORK", NULL},
-  {NULL, NULL},
-};
-
-extern int chanIndex;
-
-static int initAndConfig (int, int *);
-static void term_handler (int);
-static void child_handler (int);
-static int processUDPMsg (void);
-static void doAcceptConn (void);
-static void initSignals (void);
-static void periodic (int);
-static struct tclLsInfo *getTclLsInfo (void);
-static void printTypeModel (void);
-static void initMiscLiStruct (void);
-static int getClusterConfig (void);
-extern struct extResInfo *getExtResourcesDef (char *);
-extern char *getExtResourcesLoc (char *);
-extern char *getExtResourcesVal (char *);
-
-/* UDP message buffer.
- */
-static char reqBuf[MSGSIZE];
 
 static void
 usage (void)

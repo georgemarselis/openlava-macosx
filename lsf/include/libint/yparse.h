@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include "lsf.h"
+
 #ifndef MIN
 #define MIN(x, y)  ((x) <= (y)) ? (x):(y)
 #endif
@@ -38,7 +40,7 @@
 
 struct intRegion
 {
-  int start
+  int start;
   int end;
 };
 
@@ -55,11 +57,12 @@ struct mallocList
 };
 
 char *token;
-char yyerr[];
+char yyerr[MAXLINELEN];
+// char *yyerr;
 #if !defined(__CYGWIN__) && !defined(__sun__)
 FILE *yyout;
 #endif
-struct mbd_func_type mbd_func;
+// struct mbd_func_type mbd_func; // FIXME FIXME FIXME FIXME FIXME single reference of this struct in the code!
 struct mallocList *idxAllocHead;
 
 int yylex (void);
@@ -76,4 +79,3 @@ void idxerror (register char *);
 
 int checkNameSpec (char *, char **);
 
-#endif

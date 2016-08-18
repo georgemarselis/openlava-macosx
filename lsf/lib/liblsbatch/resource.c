@@ -28,42 +28,31 @@
 struct lsbSharedResourceInfo *
 lsb_sharedresourceinfo (char **resources, uint *numResources, char *hostName, int options)
 {
-  static char fname[] = "lsb_sharedresourceinfo";
-  static struct lsbShareResourceInfoReply lsbResourceInfoReply;
-  struct resourceInfoReq resourceInfoReq;
-  int cc = 0;
-  char *clusterName = NULL;
-  static struct LSFHeader hdr;
-  char *request_buf;
-  char *reply_buf;
-  mbdReqType mbdReqtype;
-  XDR xdrs, xdrs2;
+    static char fname[] = "lsb_sharedresourceinfo";
+    static struct lsbShareResourceInfoReply lsbResourceInfoReply = { };
+    static struct LSFHeader hdr = { };
+    struct resourceInfoReq resourceInfoReq = { };
+    mbdReqType mbdReqtype = 0;
+    XDR xdrs              = { };
+    XDR xdrs2             = { };
+    char *clusterName     = NULL;
+    char *request_buf     = NULL;
+    char *reply_buf       = NULL;
+    int cc                = 0;
+    
+    assert( options );
 
-  assert( options );
-
-#define FREE_MEMORY \
-    { \
-	free(request_buf); \
-	free(resourceInfoReq.resourceNames); \
+    if (logclass & (LC_TRACE)) {
+        ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", fname);
     }
 
-#define FREE_REPLY_BUFFER \
-    { \
-	if (cc) \
-	    free(reply_buf); \
+    if (lsbResourceInfoReply.numResources > 0) {
+        xdr_lsffree (xdr_lsbShareResourceInfoReply, (char *) &lsbResourceInfoReply, &hdr);
     }
 
-
-  if (logclass & (LC_TRACE))
-    ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", fname);
-
-  if (lsbResourceInfoReply.numResources > 0)
-    xdr_lsffree (xdr_lsbShareResourceInfoReply,
-		 (char *) &lsbResourceInfoReply, &hdr);
-
-  if (numResources == NULL ||
-      (resources == NULL && *numResources != 0) ||
-      (resources != NULL && *numResources == 0))
+    if( numResources == NULL || ( resources == NULL && *numResources != 0) ||
+        ( resources != NULL && *numResources == 0)
+      )
     {
       lsberrno = LSBE_BAD_ARG;
       return (NULL);
@@ -75,10 +64,10 @@ lsb_sharedresourceinfo (char **resources, uint *numResources, char *hostName, in
 
       resourceInfoReq.resourceNames =(char **) malloc (sizeof (char *));
       if (NULL == resourceInfoReq.resourceNames && ENOMEM == errno )
-	{
-	  lsberrno = LSBE_NO_MEM;
-	  return (NULL);
-	}
+    {
+      lsberrno = LSBE_NO_MEM;
+      return (NULL);
+    }
       resourceInfoReq.resourceNames[0] = "";
       resourceInfoReq.numResourceNames = 1;
       cc += 2;
@@ -88,102 +77,110 @@ lsb_sharedresourceinfo (char **resources, uint *numResources, char *hostName, in
       assert( *numResources >= 0 );
       resourceInfoReq.resourceNames = (char **) malloc ((unsigned long)*numResources * sizeof (char *));
       if ( NULL == resourceInfoReq.resourceNames && ENOMEM == errno )
-	{
-	  lsberrno = LSBE_NO_MEM;
-	  return (NULL);
-	}
-      for ( uint i = 0; i < *numResources; i++)
-	{
-	  if (resources[i] && strlen (resources[i]) + 1 < MAXLSFNAMELEN)
-	    {
-	      resourceInfoReq.resourceNames[i] = resources[i];
-	      cc += MAXLSFNAMELEN;
-	    }
-	  else
-	    {
-	      free (resourceInfoReq.resourceNames);
-	      lserrno = LSBE_BAD_RESOURCE;
-	      return (NULL);
-	    }
-	}
-      resourceInfoReq.numResourceNames = *numResources;
-    }
-  if (hostName != NULL)
-    {
-      if (ls_isclustername (hostName) <= 0)
-	{
-	  if (strlen (hostName) + 1 < MAXHOSTNAMELEN)
-	    {
-	      resourceInfoReq.hostName = hostName;
-	    }
-	  else
-	    {
-	      lsberrno = LSBE_BAD_HOST;
-	      return (NULL);
-	    }
-	}
-      else
-	{
-	  clusterName = hostName;
-	  cc += MAXHOSTNAMELEN;
-	}
-    }
-  else
-    resourceInfoReq.hostName = " ";
-
-
-
-  mbdReqtype = BATCH_RESOURCE_INFO;
-  assert ( cc >= 0 && cc <= INT_MAX);
-  cc = (int)(sizeof (struct resourceInfoReq) + (unsigned long)cc + 100);
-  request_buf = (char *)malloc ((unsigned long)cc);
-  if ( NULL == request_buf && ENOMEM == errno )
     {
       lsberrno = LSBE_NO_MEM;
       return (NULL);
     }
-  xdrmem_create (&xdrs, request_buf, MSGSIZE, XDR_ENCODE);
-  initLSFHeader_ (&hdr);
-  hdr.opCode = mbdReqtype;
-  if (!xdr_encodeMsg
-      (&xdrs, (char *) &resourceInfoReq, &hdr, xdr_resourceInfoReq, 0, NULL))
+      for ( uint i = 0; i < *numResources; i++)
     {
-      lsberrno = LSBE_XDR;
-      xdr_destroy (&xdrs);
-      FREE_MEMORY;
-      return (NULL);
+      if (resources[i] && strlen (resources[i]) + 1 < MAXLSFNAMELEN)
+        {
+          resourceInfoReq.resourceNames[i] = resources[i];
+          cc += MAXLSFNAMELEN;
+        }
+      else
+        {
+          free (resourceInfoReq.resourceNames);
+          lserrno = LSBE_BAD_RESOURCE;
+          return (NULL);
+        }
+    }
+      resourceInfoReq.numResourceNames = *numResources;
+    }
+    if (hostName != NULL)
+    {
+        if (ls_isclustername (hostName) <= 0)
+        {
+            if (strlen (hostName) + 1 < MAXHOSTNAMELEN)
+            {
+                resourceInfoReq.hostName = hostName;
+            }
+                else
+                {
+                lsberrno = LSBE_BAD_HOST;
+                return NULL;
+            }
+        }
+        else
+        {
+            clusterName = hostName;
+            cc += MAXHOSTNAMELEN;
+        }
+    }
+    else {
+        resourceInfoReq.hostName = " ";
+    }
+
+
+    mbdReqtype = BATCH_RESOURCE_INFO;
+    assert ( cc >= 0 && cc <= INT_MAX);
+    cc = sizeof (struct resourceInfoReq) + cc + 100; // FIXME FIXME FIXME test case, find longest length needed
+    request_buf = malloc( sizeof( char ) * cc );
+    if ( NULL == request_buf && ENOMEM == errno )
+    {
+        lsberrno = LSBE_NO_MEM;
+        return NULL;
+    }
+    xdrmem_create (&xdrs, request_buf, MSGSIZE, XDR_ENCODE);
+    initLSFHeader_ (&hdr);
+    hdr.opCode = mbdReqtype;
+    if (!xdr_encodeMsg(&xdrs, (char *) &resourceInfoReq, &hdr, xdr_resourceInfoReq, 0, NULL))
+    {
+        lsberrno = LSBE_XDR;
+        xdr_destroy (&xdrs);
+        free(request_buf);
+        free(resourceInfoReq.resourceNames);;
+        return NULL;
     }
 
     assert( XDR_GETPOS (&xdrs) <= INT_MAX);
-  cc = callmbd (clusterName, request_buf, (int) XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL);
-  if (-1 == cc )
+    cc = callmbd (clusterName, request_buf, XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL);
+    if (-1 == cc )
     {
-      xdr_destroy (&xdrs);
-      FREE_MEMORY;
-      return (NULL);
+        xdr_destroy (&xdrs);
+        free(request_buf);
+        free(resourceInfoReq.resourceNames);
+        return NULL;
     }
-  FREE_MEMORY;
-
+    free(request_buf);
+    free(resourceInfoReq.resourceNames);
 
   lsberrno = hdr.opCode;
   if (lsberrno == LSBE_NO_ERROR)
     {
       assert( XDR_DECODE_SIZE_ (cc) >= 0 );
-      xdrmem_create (&xdrs2, reply_buf, (uint)XDR_DECODE_SIZE_ (cc), XDR_DECODE);
-      if (!xdr_lsbShareResourceInfoReply
-	  (&xdrs2, &lsbResourceInfoReply, &hdr))
-	{
-	  lsberrno = LSBE_XDR;
-	  xdr_destroy (&xdrs2);
-	  FREE_REPLY_BUFFER;
-	  return (NULL);
-	}
+      xdrmem_create (&xdrs2, reply_buf, XDR_DECODE_SIZE_(cc), XDR_DECODE);
+      if (!xdr_lsbShareResourceInfoReply (&xdrs2, &lsbResourceInfoReply, &hdr))
+    {
+        lsberrno = LSBE_XDR;
+        xdr_destroy (&xdrs2);
+        if (cc) {
+            free(reply_buf); 
+        }
+      return (NULL);
+    }
       xdr_destroy (&xdrs2);
-      FREE_REPLY_BUFFER;
+              if (cc) {
+            free(reply_buf); 
+        }
+
       *numResources = lsbResourceInfoReply.numResources;
       return (lsbResourceInfoReply.resources);
     }
 
-  FREE_REPLY_BUFFER;
+          if (cc) {
+            free(reply_buf); 
+        }
+
   return (NULL);
 }

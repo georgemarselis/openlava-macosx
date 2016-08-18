@@ -24,7 +24,7 @@ extern void resetStaticSchedVariables (void);
 extern void cleanSbdNode (struct jData *);
 extern void uDataPtrTbInitialize ();
 
-extern struct mbd_func_type mbd_func;
+// extern struct mbd_func_type mbd_func; // no decleration of struct anywhere
 
 extern int FY_MONTH;
 

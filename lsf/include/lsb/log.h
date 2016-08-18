@@ -18,19 +18,14 @@
 
 #pragma once
  
-#ifndef LSF_LSB_LOG_H
-#define LSF_LSB_LOG_H
-
 #include <string.h>
 #include <stdlib.h>
 
 #include "lsb/lsb.h"
 #include "lsb/lsbatch.h"
 
-//#define MAXFILENAMELEN    1024
-
-#define MAXEVENTNAMELEN   128
-
+// #define MAXEVENTNAMELEN   128
+// const uint MAXEVENTNAMELEN = 128
 
 
 /*struct chkpntLog
@@ -175,5 +170,3 @@ uint saveQStr( char *line, char *destStr);
 int putEventRec (FILE *, struct eventRec *);
 struct eventRec *getEventRec (char *);
 char *getNextValue0 (char **line, char, char);
-
-#endif

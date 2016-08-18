@@ -465,23 +465,23 @@ getCommonParams (struct submit *jobSubReq, struct submitReq *submitReq, struct s
 	}
 
 	return 0;
-
 }
 
 static int
 createJobInfoFile (struct submit *jobSubReq, struct lenData *jf)
 {
 	static char fname[] = "createJobInfoFile";
-	char **ep;
-	char *sp;
-	char num[MAX_LSB_NAME_LEN];
-	char *p; 
-	char *oldp;
-	uint length = 0;
-	uint len    = 0;
-	uint len1   = 0;
-	uint numEnv = 0, noEqual;
-	uint size    = MSGSIZE;
+	char **ep     = NULL;
+	char *sp      = NULL;
+	char *num     = malloc( sizeof( char ) * MAX_LSB_NAME_LEN + 1 );
+	char *p       = NULL; 
+	char *oldp    = NULL;
+	uint length   = 0;
+	uint len      = 0;
+	uint len1     = 0;
+	uint numEnv   = 0;
+	uint noEqual  = 0;;
+	uint size     = MSGSIZE;
 	uint tsoptlen = 0;
 
 	if (logclass & (LC_TRACE | LC_EXEC)) {
@@ -1246,20 +1246,20 @@ subRestart (struct submit *jobSubReq, struct submitReq *submitReq, struct submit
 
 
 	if (strlen (jobLog->jobName) >= MAX_CMD_DESC_LEN) {
-		goto parentErr;
+		goto parentErr;		// FIXME FIXME FIXME FIXME replace label with code;
 	}
 
 	if ((ptr = strchr (jobLog->jobName, '[')) != NULL && strrchr (jobSubReq->command, '/'))
 		{
 
-		char element[10];
-		*ptr = '\0';
+		char *element = malloc( sizeof(char ) * sizeof( u_long  ) * 8 + 1);
+		ptr = NULL;
 		ptr = strrchr (jobSubReq->command, '/');
 		ptr++;
 		if (islongint_ (ptr))
 			{
 
-			sprintf (element, "[%d]", LSB_ARRAY_IDX (atoi64_ (ptr)));
+			sprintf (element, "[%ld]", LSB_ARRAY_IDX (atoi64_ (ptr)));
 			}
 		strcat (jobLog->jobName, element);
 		}
@@ -1681,8 +1681,8 @@ cleanup:
 static const char *
 getDefaultSpoolDir ()
 {
-	static char spoolDir[MAXFILENAMELEN];
-	char *clusterName;
+	char *spoolDir   = NULL;
+	char *clusterName = NULL;
 
 	clusterName = ls_getclustername ();
 	if (clusterName == NULL)
@@ -1690,8 +1690,7 @@ getDefaultSpoolDir ()
 		return NULL;
 		}
 
-	sprintf (spoolDir, "%s/%s", lsbParams[LSB_SHAREDIR].paramValue,
-			 clusterName);
+	sprintf (spoolDir, "%s/%s", lsbParams[LSB_SHAREDIR].paramValue, clusterName);
 
 	return spoolDir;
 }

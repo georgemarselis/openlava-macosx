@@ -26,7 +26,6 @@
 #include "lib/initenv.h"
 
 char *stripDomains_ = NULL;
-static size_t errLineNum_ = 0;
 char *lsTmpDir_;
 
 static int

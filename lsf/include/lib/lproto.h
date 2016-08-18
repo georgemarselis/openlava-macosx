@@ -40,19 +40,9 @@ struct admins
   char **adminNames;
 };
 
-struct debugReq
-{
-  int opCode;
-  int level;
-  int logClass;
-  int options;
-  char *hostName;
-  char *logFileName;
-};
 
 void putMaskLevel (int, char **);
 
-bool_t xdr_debugReq (XDR *, struct debugReq *, struct LSFHeader *);
 #define    MBD_DEBUG         1
 #define    MBD_TIMING        2
 #define    SBD_DEBUG         3
@@ -91,12 +81,6 @@ struct resourceInfoReply
     struct lsSharedResourceInfo *resources;
 };
 
-struct lsbShareResourceInfoReply
-{
-  uint numResources;
-  uint badResource;
-  struct lsbSharedResourceInfo *resources;
- };
 
 #define HOST_ATTR_SERVER        (0x00000001)
 #define HOST_ATTR_CLIENT        (0x00000002)

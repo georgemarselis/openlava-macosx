@@ -19,13 +19,14 @@
 
 #pragma once
 
-//#include "lsb/spool.h"
+#include "lsf.h"
+#include "lsb/lsb.h"
 
 char *getSpoolHostBySpoolFile (const char *spoolFile);
 typedef struct lsbSpoolInfo
 {
-  char srcFile[MAXFILENAMELEN];
-  char spoolFile[MAXFILENAMELEN];
+  char *srcFile;  // [MAXFILENAMELEN]; // FIXME FIXME FIXME FIXME change to dynamic allocation
+  char *spoolFile; // [MAXFILENAMELEN];
 
 } LSB_SPOOL_INFO_T;
 
@@ -39,7 +40,7 @@ LSB_SPOOL_INFO_T *copySpoolFile (const char *srcFilePath, spoolOptions_t option)
 int removeSpoolFile (const char *hostName, const char *destinFileFullPath);
 
 static int optionFlag = FALSE;
-static char optionFileName[MAXLSFNAMELEN];
+static char *optionFileName; // [MAXLSFNAMELEN]; // FIXME FIXME FIXME change to dynamic allocation
 //char *loginShell;
 
 static char *additionEsubInfo = NULL;
@@ -49,7 +50,7 @@ int mySubUsage_ (void *);
 int bExceptionTabInit (void);
 void subUsage_ (int, char **);
 static char *niosArgv[5];
-static char niosPath[MAXFILENAMELEN];
+static char *niosPath; // [MAXFILENAMELEN]; // FIXME FIXME FIXME change to dynamic allocation
 
 const char *defaultSpoolDir;
 void sub_perror (char *usrMsg);
@@ -75,7 +76,7 @@ typedef struct bException
 
 char **environ;
 char *yyerr;
-int _lsb_conntimeout;
+//int _lsb_conntimeout;
 //int lsbMode_;
 static char *useracctmap = NULL;
 static struct lenData ed = { 0, NULL };
