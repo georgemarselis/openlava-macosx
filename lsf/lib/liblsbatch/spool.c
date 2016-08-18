@@ -1034,14 +1034,14 @@ Done:
 char *
 getSpoolHostBySpoolFile (const char *spoolFile)
 {
-  static char fname[] = "getSpoolHostBySpoolFile";
-  char *pEnd = NULL;
-  char *pBegin = NULL;
-  char *returnValue = NULL;
-  char localHost[MAXHOSTNAMELEN];
-  const char *officialHostNamePtr = NULL;
-  static char buf[MAXFILENAMELEN];
-  int numOfDot = 0;
+    static char fname[] = "getSpoolHostBySpoolFile";
+    char *pEnd        = NULL;
+    char *pBegin      = NULL;
+    char *returnValue = NULL;
+    char *localHost   = malloc( sizeof( char ) * MAXHOSTNAMELEN + 1 ); // FIXME FIXME FIXME FIXME free when done with
+    char *buf         = malloc( sizeof( char ) * MAXHOSTNAMELEN + 1 ); // FIXME FIXME FIXME FIXME free when done with
+    char *officialHostNamePtr = NULL;
+    int numOfDot = 0;
 
 
 

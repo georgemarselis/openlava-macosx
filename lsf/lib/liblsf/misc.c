@@ -518,15 +518,17 @@ Bind_ (int sockfd, struct sockaddr *myaddr, socklen_t addrlen)
     }
 }
 
-const char *
-getCmdPathName_ (const char *cmdStr, long *cmdLen)
+ char *
+getCmdPathName_ (const char *cmdStr, size_t *cmdLen)
 {
-  char *pRealCmd;
-  char *sp1;
-  char *sp2;
+  char *pRealCmd = NULL;
+  char *sp1      = NULL;
+  char *sp2      = NULL;
+  uint i         = 0;
 
-  for (pRealCmd = (char *) cmdStr; *pRealCmd == ' '
-       || *pRealCmd == '\t' || *pRealCmd == '\n'; pRealCmd++);
+  for(  pRealCmd = (char *) cmdStr; *pRealCmd == ' ' || 
+       *pRealCmd == '\t' || *pRealCmd == '\n'; pRealCmd++ ) 
+    {;}
 
   if (pRealCmd[0] == '\'' || pRealCmd[0] == '"')
     {
@@ -535,16 +537,16 @@ getCmdPathName_ (const char *cmdStr, long *cmdLen)
     }
   else
     {
-      int i;
-
       sp1 = pRealCmd;
-      for (i = 0; sp1[i] != '\0'; i++)
+      for ( i = 0; sp1[i] != '\0'; i++)
   {
     if (sp1[i] == ';' || sp1[i] == ' ' ||
         sp1[i] == '&' || sp1[i] == '>' ||
         sp1[i] == '<' || sp1[i] == '|' ||
-        sp1[i] == '\t' || sp1[i] == '\n')
-      break;
+        sp1[i] == '\t' || sp1[i] == '\n') 
+      {
+        break; 
+      }
   }
 
       sp2 = &sp1[i];
@@ -563,20 +565,18 @@ getCmdPathName_ (const char *cmdStr, long *cmdLen)
 
 int replace1stCmd_ (const char *oldCmdArgs, const char *newCmdArgs, char *outCmdArgs, int outLen)
 {
-    const char *sp1;
-    const char *sp2;
-    const char *sp3;
-    const char *newSp;
-
-    char *curSp;
+    const char *sp1     = NULL;
+    const char *sp2     = NULL;
+    const char *sp3     = NULL;
+    char *newSp   = NULL;
+    char *curSp   = NULL;
+    size_t len    = 0;
+    size_t len2   = 0;
+    size_t newLen = 0;
   
-    long len;
-    long len2;
-    long newLen;
-  
-    newSp = getCmdPathName_ (newCmdArgs, &newLen);
     sp1 = oldCmdArgs;
     sp2 = getCmdPathName_ (sp1, &len2);
+    newSp = getCmdPathName_ (newCmdArgs, &newLen);
 
     if ( newLen - len2 + (long) strlen (sp1) >= outLen) {
         return -1;
@@ -591,12 +591,13 @@ int replace1stCmd_ (const char *oldCmdArgs, const char *newCmdArgs, char *outCmd
     return 0;
 }
 
-const char *
+char *
 getLowestDir_ (const char *filePath)
 {
-    static char dirName[MAXFILENAMELEN];
-    const char *sp1, *sp2;
-    long len;
+    const char *sp1 = NULL;
+    const char *sp2 = NULL;
+    char *dirName = malloc( sizeof( char ) * MAXFILENAMELEN + 1 );
+    size_t len = 0;
 
     sp1 = strrchr (filePath, '/');
     if (sp1 == NULL) {
@@ -612,7 +613,10 @@ getLowestDir_ (const char *filePath)
 
     if (len) {
         memcpy (dirName, filePath, len);
-        dirName[len] = 0;
+        if( '\0' != dirName[len - 1] ) {
+          dirName[len - 1 ] = '\0';       // FIXME FIXME FIXME FIXME FIXME bug waiting to happen!
+        }
+
     }
     else {
       return NULL;

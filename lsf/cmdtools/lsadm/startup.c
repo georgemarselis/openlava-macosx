@@ -26,11 +26,11 @@
 #include "lsf.h"
 #include "lsi18n.h"
 
-#define RSHCMD "rsh"
+// #define RSHCMD "rsh"
 
-#define NL_SETN 25
+// #define NL_SETN 25
 
-extern int getConfirm (char *);
+int getConfirm (char *);
 static void startupAllHosts (int, int);
 static void startupLocalHost (int);
 static void startupRemoteHost (char *, int, int);
@@ -43,24 +43,24 @@ static int setStartupUid (void);
 static int startupUid;
 static struct clusterConf *myClusterConf = NULL;
 
-static struct config_param myParamList[] = {
-#define LSF_CONFDIR     0
-  {"LSF_CONFDIR", NULL},
-#define LSF_SERVERDIR     1
-  {"LSF_SERVERDIR", NULL},
-#define LSF_BINDIR     2
-  {"LSF_BINDIR", NULL},
-#define LSF_LIM_DEBUG     3
-  {"LSF_LIM_DEBUG", NULL},
-#define LSF_RES_DEBUG     4
-  {"LSF_RES_DEBUG", NULL},
-#define LSB_DEBUG     5
-  {"LSB_DEBUG", NULL},
-#define LSF_LINK_PATH     6
-  {"LSF_LINK_PATH", NULL},
-#define LSF_CONF_LAST  7
-  {NULL, NULL}
-};
+// static struct config_param myParamList[] = {
+// #define LSF_CONFDIR     0
+//   {"LSF_CONFDIR", NULL},
+// #define LSF_SERVERDIR     1
+//   {"LSF_SERVERDIR", NULL},
+// #define LSF_BINDIR     2
+//   {"LSF_BINDIR", NULL},
+// #define LSF_LIM_DEBUG     3
+//   {"LSF_LIM_DEBUG", NULL},
+// #define LSF_RES_DEBUG     4
+//   {"LSF_RES_DEBUG", NULL},
+// #define LSB_DEBUG     5
+//   {"LSB_DEBUG", NULL},
+// #define LSF_LINK_PATH     6
+//   {"LSF_LINK_PATH", NULL},
+// #define LSF_CONF_LAST  7
+//   {NULL, NULL}
+// };
 
 #define BADMIN_HSTARTUP 11
 
@@ -91,40 +91,35 @@ getLSFenv (void)
 
   if (myParamList[LSF_CONFDIR].paramValue == NULL)
     {
-      fprintf (stderr, "%s %s %s/lsf.conf\n", "LSF_CONFDIR",
-	       I18N (400, "not defined in") /* catgets 400 */ ,
-	       envDir);
+       /* catgets 400 */ 
+      fprintf (stderr, "%s %s %s/lsf.conf\n", "LSF_CONFDIR", I18N (400, "not defined in"), envDir);
       return (-1);
     }
 
   if (myParamList[LSF_SERVERDIR].paramValue == NULL
       && myParamList[LSF_LINK_PATH].paramValue != NULL)
     {
-      fprintf (stderr, "%s %s %s/lsf.conf or environment\n", "LSF_SERVERDIR",
-	       I18N (400, "not defined in"), envDir);
+      fprintf (stderr, "%s %s %s/lsf.conf or environment\n", "LSF_SERVERDIR", I18N (400, "not defined in"), envDir);
       return (-1);
     }
 
   if (myParamList[LSF_BINDIR].paramValue == NULL
       && myParamList[LSF_LINK_PATH].paramValue != NULL)
     {
-      fprintf (stderr, "%s %s %s/lsf.conf  or environment\n", "LSF_BINDIR",
-	       I18N (400, "not defined in"), envDir);
+      fprintf (stderr, "%s %s %s/lsf.conf  or environment\n", "LSF_BINDIR", I18N (400, "not defined in"), envDir);
       return (-1);
     }
 
   if (logclass & (LC_TRACE))
     {
-      ls_syslog (LOG_DEBUG,
-		 "LSF_CONFDIR=<%s>, LSF_BINDIR=<%s>, LSF_SERVERDIR=<%s>",
+      ls_syslog (LOG_DEBUG, "LSF_CONFDIR=<%s>, LSF_BINDIR=<%s>, LSF_SERVERDIR=<%s>",
 		 myParamList[LSF_CONFDIR].paramValue,
 		 myParamList[LSF_BINDIR].paramValue,
 		 myParamList[LSF_SERVERDIR].paramValue);
     }
 
   memset (lsfSharedFile, 0, sizeof (lsfSharedFile));
-  ls_strcat (lsfSharedFile, sizeof (lsfSharedFile),
-	     myParamList[LSF_CONFDIR].paramValue);
+  ls_strcat (lsfSharedFile, sizeof (lsfSharedFile), myParamList[LSF_CONFDIR].paramValue);
   ls_strcat (lsfSharedFile, sizeof (lsfSharedFile), "/lsf.shared");
 
 

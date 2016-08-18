@@ -20,16 +20,16 @@
 
 #include "cmdtools/badmin/badmin.h"
 
-extern char *myGetOpt (int nargc, char **nargv, char *ostr);
-extern int checkConf (int, int);
-extern int getConfirm (char *msg);
-extern int lsb_debugReq (struct debugReq *pdebug, char *host);
-extern int linux_optind;
-extern int linux_opterr;
+// char *myGetOpt (int nargc, char **nargv, char *ostr);
+// int checkConf (int, int);
+// int getConfirm (char *msg);
+// int lsb_debugReq (struct debugReq *pdebug, char *host);
+// int linux_optind;
+// int linux_opterr;
 static int doBatchCmd (int argc, char *argv[]);
 static int badminDebug (int nargc, char *nargv[], int opCode);
 
-#define NL_SETN 8
+// #define NL_SETN 8
 
 int
 main (int argc, char **argv)
@@ -480,12 +480,14 @@ badminDebug (int nargc, char *nargv[], int opCode)
   if (opCode == SBD_DEBUG || opCode == SBD_TIMING)
     {
 
-      numHosts = getNames (nargc, nargv, optind, &hosts, &all, "hostC");
-      hostPoint = NULL;
-      if (!numHosts && !all)
-	numHosts = 1;
-      else if (numHosts)
-	hostPoint = hosts;
+		numHosts = getNames (nargc, nargv, optind, &hosts, &all, "hostC");
+		hostPoint = NULL;
+		if (!numHosts && !all) {
+			numHosts = 1;
+		}
+		else if (numHosts) {
+			hostPoint = hosts;
+		}
 
       if ((hostInfo = lsb_hostinfo (hostPoint, &numHosts)) == NULL)
 	{
@@ -497,20 +499,24 @@ badminDebug (int nargc, char *nargv[], int opCode)
 	{
 	  if (strcmp (hostInfo[i].host, "lost_and_found") == 0)
 	    {
-	      if (!all)
-		fprintf (stderr, "%s.\n", _i18n_msg_get (ls_catd, NL_SETN, 2568, "<lost_and_found> is not a real host, ignored"));	/* catgets  2568  */
+			if (!all) {
+				/* catgets  2568  */
+				fprintf (stderr, "%s.\n", _i18n_msg_get (ls_catd, NL_SETN, 2568, "<lost_and_found> is not a real host, ignored"));
+			}
 	      continue;
 	    }
 
 	  fflush (stderr);
 	  if (hostInfo[i].hStatus & (HOST_STAT_UNAVAIL | HOST_STAT_UNREACH))
 	    {
-	      if (hostInfo[i].hStatus & HOST_STAT_UNAVAIL)
-		fprintf (stderr, I18N (2578, "failed : LSF daemon (LIM) is unavailable on host %s\n"),	/* catgets 2578 */
-			 hostInfo[i].host);
-	      else
-		fprintf (stderr, I18N (2579, "failed : Slave batch daemon (sbatchd) is unreachable now on host %s\n"),	/* catgets 2579 */
-			 hostInfo[i].host);
+	      if (hostInfo[i].hStatus & HOST_STAT_UNAVAIL) {
+				/* catgets 2578 */
+				fprintf (stderr, I18N (2578, "failed : LSF daemon (LIM) is unavailable on host %s\n"), hostInfo[i].host);
+			}
+	      else {
+				/* catgets 2579 */
+				fprintf (stderr, I18N (2579, "failed : Slave batch daemon (sbatchd) is unreachable now on host %s\n"), hostInfo[i].host);
+			}
 	      continue;
 	    }
 

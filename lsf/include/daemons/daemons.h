@@ -414,9 +414,6 @@ struct bucket
 int errno;
 char **environ;
 
-// was : struct config_param daemonParams[];
-// struct config_param *daemonParams;
-
 u_long nextJobId;
 u_long numRemoveJobs;
 u_long maxJobId;

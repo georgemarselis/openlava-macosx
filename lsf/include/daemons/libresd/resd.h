@@ -30,9 +30,9 @@
 #include "lib/xdr.h"
 #include "lsf.h"
 
-#ifndef _BSD
-#define _BSD
-#endif
+// #ifndef _BSD
+// #define _BSD
+// #endif
 
 typedef gid_t GETGROUPS_T;
 
@@ -53,7 +53,7 @@ typedef gid_t GETGROUPS_T;
 */
 
 int rexecPriority;
-extern struct client *clients[]; // FIXME FIXME FIXME FIXME FIXME attach specific header!
+// extern struct client *clients[]; // FIXME FIXME FIXME FIXME FIXME attach specific header!
 int client_cnt;
 struct child **children;
 int child_cnt;
@@ -509,7 +509,7 @@ int currentRESSN; // FIXME FIXME FIXME FIXME accessor and mutators for this glob
 
 static unsigned int globCurrentSN;
 
-#define LSB_UTMP           0
+// #define LSB_UTMP           0
 
 #define SIG_NT_CTRLC        2000
 #define SIG_NT_CTRLBREAK    2001

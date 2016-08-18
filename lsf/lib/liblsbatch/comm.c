@@ -34,6 +34,7 @@
 #include <sys/ioctl.h>
 
 #include "lsb/lsb.h"
+#include "lib/lib.h"
 
 
 extern int _lsb_conntimeout;

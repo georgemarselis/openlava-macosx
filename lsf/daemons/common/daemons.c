@@ -26,72 +26,10 @@
 
 #include "daemons/daemons.h"
 #include "libint/lsi18n.h"
+#include "lsb/spool.h"
 
 // #define NL_SETN   10
 
-struct config_param daemonParams[] = {
-    { "LSB_DEBUG",                    NULL },
-    { "LSB_CONFDIR",                  NULL },
-    { "LSF_SERVERDIR",                NULL },
-    { "LSF_LOGDIR",                   NULL },
-    { "LSB_SHAREDIR",                 NULL },
-    { "LSB_MAILTO",                   NULL },
-    { "LSB_MAILPROG",                 NULL },
-    { "LSB_SBD_PORT",                 NULL },
-    { "LSB_MBD_PORT",                 NULL },
-    { "LSF_ID_PORT",                  NULL },
-    { "LSF_AUTH",                     NULL },
-    { "LSB_CRDIR",                    NULL },
-    { "LSF_USE_HOSTEQUIV",            NULL },
-    { "LSF_ROOT_REX",                 NULL },
-    { "LSB_DEBUG_MBD",                NULL },
-    { "LSB_DEBUG_SBD",                NULL },
-    { "LSB_TIME_MBD",                 NULL },
-    { "LSB_TIME_SBD",                 NULL },
-    { "LSB_SIGSTOP",                  NULL },
-    { "LSF_LOG_MASK",                 NULL },
-    { "LSF_BINDIR",                   NULL },
-    { "LSB_MBD_CONNTIMEOUT",          NULL },
-    { "LSB_SBD_CONNTIMEOUT",          NULL },
-    { "LSF_CONFDIR",                  NULL },
-    { "LSB_MBD_MAILREPLAY",           NULL },
-    { "LSB_MBD_MIGTOPEND",            NULL },
-    { "LSB_SBD_READTIMEOUT",          NULL },
-    { "LSB_MBD_BLOCK_SEND",           NULL },
-    { "LSF_GETPWNAM_RETRY",           NULL },
-    { "LSB_MEMLIMIT_ENFORCE",         NULL },
-    { "LSB_BSUBI_OLD",                NULL },
-    { "LSB_STOP_IGNORE_IT",           NULL },
-    { "LSB_HJOB_PER_SESSION",         NULL },
-    { "LSF_AUTH_DAEMONS",             NULL },
-    { "LSB_REQUEUE_HOLD",             NULL },
-    { "LSB_SMTP_SERVER",              NULL },
-    { "LSB_MAILSERVER",               NULL },
-    { "LSB_MAILSIZE_LIMIT",           NULL },
-    { "LSB_REQUEUE_TO_BOTTOM",        NULL },
-    { "LSB_ARRAY_SCHED_ORDER",        NULL },
-    { "LSF_LIBDIR",                   NULL },
-    { "LSB_QPOST_EXEC_ENFORCE",       NULL },
-    { "LSB_MIG2PEND",                 NULL },
-    { "LSB_UTMP",                     NULL },
-    { "LSB_JOB_CPULIMIT",             NULL },
-    { "LSB_RENICE_NEVER_AT_RESTART",  NULL },
-    { "LSF_MLS_LOG",                  NULL },
-    { "LSB_JOB_MEMLIMIT",             NULL },
-    { "LSB_MOD_ALL_JOBS",             NULL },
-    { "LSB_SET_TMPDIR",               NULL },
-    { "LSB_PTILE_PACK",               NULL },
-    { "LSB_SBD_FINISH_SLEEP",         NULL },
-    { "LSB_VIRTUAL_SLOT",             NULL },
-    { "LSB_STDOUT_DIRECT",            NULL },
-    { "MBD_DONT_FORK",                NULL },
-    { "LIM_NO_MIGRANT_HOSTS",         NULL },
-    { NULL,                           NULL }
-};
-
-
-extern int removeSpoolFile (const char *, const char *);
-extern char *getSpoolHostBySpoolFile (const char *);
 
 int
 init_ServSock (u_short port)
@@ -101,8 +39,7 @@ init_ServSock (u_short port)
   ch = chanServSocket_ (SOCK_STREAM, ntohs (port), 1024, CHAN_OP_SOREUSE);
   if (ch < 0)
     {
-      ls_syslog (LOG_ERR, "\
-%s: chanServSocket_() failed to get socket %m", __func__);
+      ls_syslog (LOG_ERR, "%s: chanServSocket_() failed to get socket %m", __func__);
       return -1;
     }
 
@@ -189,22 +126,21 @@ do_readyOp (XDR *xdrs, int chanfd, struct sockaddr_in *from, struct LSFHeader *r
 
 
 void
-childRemoveSpoolFile (const char *spoolFile, int options,
-          const struct passwd *pwUser)
+childRemoveSpoolFile (const char *spoolFile, int options, const struct passwd *pwUser)
 {
-  char fname[] = "childRemoveSpoolFile";
-  char apiName[] = "ls_initrex";
-  pid_t pid;
-  char hostName[MAXHOSTNAMELEN];
-  char errMsg[MAXLINELEN];
-  int status;
-  char *fromHost = NULL;
-  const char *sp;
-  char dirName[MAXFILENAMELEN];
+    char fname[]    = "childRemoveSpoolFile";
+    char apiName[]  = "ls_initrex";
+    char *hostName  = malloc( sizeof( char ) * MAXHOSTNAMELEN + 1 ); // FIXME FIXME FIXME FIXME free memory after use
+    char *errMsg    = malloc( sizeof( char ) * MAXLINELEN + 1 ); // FIXME FIXME FIXME FIXME free memory after use
+    char *dirName   = malloc( sizeof( char ) * MAXLINELEN + 1 ); // FIXME FIXME FIXME FIXME free memory after use
+    char *fromHost  = NULL;
+    static char *sp = NULL ;
+    pid_t pid = 0;
+    int status = 0;
 
-  status = -1;
+    status = -1;
 
-  if ((fromHost = (char *) getSpoolHostBySpoolFile (spoolFile)) != NULL)
+  if ((fromHost = getSpoolHostBySpoolFile (spoolFile)) != NULL)
     {
       strcpy (hostName, fromHost);
     }
@@ -311,12 +247,12 @@ childRemoveSpoolFile (const char *spoolFile, int options,
       goto Done;
     }
 
-Error:
+Error: // FIXME FIXME FIXME FIXME FIXME remove label
 
   if (status == -1)
     {
       lsb_merr (errMsg);
     }
-Done:
+Done: // FIXME FIXME FIXME FIXME FIXME remove label
   return;
 }
