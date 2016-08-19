@@ -495,7 +495,9 @@ typedef enum
     LIM_JACKUP_BUSY,
     LIM_COMPUTE_ONLY,
     LIM_NO_MIGRANT_HOSTS,
-    LIM_NO_FORK
+    LIM_NO_FORK,
+    LSF_DEBUG_LIM,
+    LSF_TIME_LIM
 } limParams_t;
 
 typedef enum {
@@ -504,15 +506,17 @@ typedef enum {
 
 
 struct config_param limParams[] = {
-    {"LIM_DEBUG",            NULL },
-    {"LIM_PORT",             NULL },
-    {"LIM_TIME",             NULL },
-    {"LIM_IGNORE_CHECKSUM",  NULL },
-    {"LIM_JACKUP_BUSY",      NULL },
-    {"LIM_COMPUTE_ONLY",     NULL },
-    {"LIM_NO_MIGRANT_HOSTS", NULL },
-    {"LIM_NO_FORK",          NULL },
-    {NULL,                   NULL },
+    { "LIM_DEBUG",            NULL },
+    { "LIM_PORT",             NULL },
+    { "LIM_TIME",             NULL },
+    { "LIM_IGNORE_CHECKSUM",  NULL },
+    { "LIM_JACKUP_BUSY",      NULL },
+    { "LIM_COMPUTE_ONLY",     NULL },
+    { "LIM_NO_MIGRANT_HOSTS", NULL },
+    { "LIM_NO_FORK",          NULL },
+    { "LSF_DEBUG_LIM",        NULL },
+    { "LSF_TIME_LIM",         NULL },
+    { NULL,                   NULL },
 };
 
 struct config_param debParams[] = {

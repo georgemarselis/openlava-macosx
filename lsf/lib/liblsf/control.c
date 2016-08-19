@@ -32,7 +32,7 @@ int
 ls_limcontrol (char *hname, int opCode)
 {
   enum limReqCode limReqCode;
-  struct lsfAuth auth;
+  struct lsfAuth auth = { };
 
   memset (&auth, 0, sizeof (struct lsfAuth));
 

@@ -23,13 +23,14 @@
 #include "daemons/liblimd/limd.h"
 #include "lib/xdr.h"
 #include "lib/mls.h"
+#include "lib/lib.h"
 
 
 // #define NL_SETN 24
 
 
-extern struct limLock limLock;
-extern char mustSendLoad;
+// extern struct limLock limLock;
+// extern char mustSendLoad;
 
 static int userNameOk (uid_t, const char *);
 static void doReopen (void);
@@ -37,33 +38,32 @@ static void doReopen (void);
 void
 reconfigReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr)
 {
-  const char fname[] = "reconfigReq";
+	enum limReplyCode limReplyCode;
+	struct LSFHeader replyHdr = { };
+	struct lsfAuth auth = { };
+	XDR xdrs2 = { };
+	char *mbuf = malloc( sizeof( char ) * MSGSIZE + 1 );
 
-  enum limReplyCode limReplyCode;
-  struct LSFHeader replyHdr { };
-  struct lsfAuth auth = { };
-  XDR xdrs2 = { };
-  char *mbuf = malloc( sizeof( char ) * MSGSIZE + 1 );
+	initLSFHeader_ (&replyHdr);
 
-  initLSFHeader_ (&replyHdr);
-
-  if (!xdr_lsfAuth (xdrs, &auth, reqHdr))
+	if (!xdr_lsfAuth (xdrs, &auth, reqHdr))
 	{
-	  limReplyCode = LIME_BAD_DATA;
-  xdrmem_create (&xdrs2, mbuf, MSGSIZE, XDR_ENCODE);
-  replyHdr.opCode = (short) limReplyCode;
-  replyHdr.refCode = reqHdr->refCode;
+		limReplyCode = LIME_BAD_DATA;
+		xdrmem_create (&xdrs2, mbuf, MSGSIZE, XDR_ENCODE);
+		replyHdr.opCode = limReplyCode;
+		replyHdr.refCode = reqHdr->refCode;
 
   if (!xdr_LSFHeader (&xdrs2, &replyHdr))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_LSFHeader");
+	  ls_syslog (LOG_ERR, "failed at xdr_LSFHeader() in %s\n", __func__ );
 	  xdr_destroy (&xdrs2);
 	  reconfig ();
 	}
 
   if (chanSendDgram_ (limSock, mbuf, XDR_GETPOS (&xdrs2), from) < 0)
 	{
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7300, "%s: Error sending reconfig acknowledgement to %s (len=%d): %m"), fname, sockAdd2Str_ (from), XDR_GETPOS (&xdrs2));  /* catgets 7300 */
+	  /* catgets 7300 */
+	  ls_syslog (LOG_ERR, "7300: %s: Error sending reconfig acknowledgement to %s (len=%d): %m", __func__, sockAdd2Str_( from ), XDR_GETPOS( &xdrs2 ) );
 	}
   xdr_destroy (&xdrs2);
 
@@ -83,14 +83,15 @@ reconfigReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr)
 
   if (!xdr_LSFHeader (&xdrs2, &replyHdr))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_LSFHeader");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_LSFHeader");
 	  xdr_destroy (&xdrs2);
 	  reconfig ();
 	}
 
   if (chanSendDgram_ (limSock, mbuf, XDR_GETPOS (&xdrs2), from) < 0)
 	{
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7300, "%s: Error sending reconfig acknowledgement to %s (len=%d): %m"), fname, sockAdd2Str_ (from), XDR_GETPOS (&xdrs2));  /* catgets 7300 */
+	  /* catgets 7300 */
+	  ls_syslog (LOG_ERR, "7300: %s: Error sending reconfig acknowledgement to %s (len=%d): %m", __func__, sockAdd2Str_ (from), XDR_GETPOS (&xdrs2));
 	}
   xdr_destroy (&xdrs2);
 
@@ -109,14 +110,14 @@ reconfigReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr)
 
 //   if (!xdr_LSFHeader (&xdrs2, &replyHdr))
 //     {
-//       ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_LSFHeader");
+//       ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_LSFHeader");
 //       xdr_destroy (&xdrs2);
 //       reconfig ();
 //     }
 
 //   if (chanSendDgram_ (limSock, mbuf, XDR_GETPOS (&xdrs2), from) < 0)
 //     {
-//       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7300, "%s: Error sending reconfig acknowledgement to %s (len=%d): %m"), fname, sockAdd2Str_ (from), XDR_GETPOS (&xdrs2)); /* catgets 7300 */
+//       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7300, "%s: Error sending reconfig acknowledgement to %s (len=%d): %m"), __func__, sockAdd2Str_ (from), XDR_GETPOS (&xdrs2)); /* catgets 7300 */
 //     }
 //   xdr_destroy (&xdrs2);
 
@@ -130,12 +131,12 @@ reconfigReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr)
 void
 reconfig (void)
 {
-  char debug_buf[10];
-  char *myargv[5];
-  int i;
-  int sdesc;
-  sigset_t newmask;
-  pid_t pid;
+  char debug_buf[10] = "";
+  char *myargv[5] = { NULL, NULL, NULL, NULL, NULL };
+  int i = 0;
+  int sdesc = 0;
+  sigset_t newmask = 0;
+  pid_t pid = 0;
 
   ls_syslog (LOG_INFO, "%s: Restarting LIM", __func__);
 
@@ -220,7 +221,8 @@ reconfig (void)
 			}
 
 			putLastActiveTime ();
-			lsfExecvp (myargv[0], myargv);
+			lsfExecX(myargv[0], myargv, execvp); // FIXME FIXME FIXME FIXME sanitize myargv[0]
+			// lsfExecvp (myargv[0], myargv);
 			ls_syslog (LOG_ERR, "%s: execvp %s failed %m", myargv[0]);
 			lim_Exit (__func__);
 			break;
@@ -235,55 +237,106 @@ reconfig (void)
 void
 shutdownReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr)
 {
-  static char fname[] = "shutdownReq";
-  char mbuf[MSGSIZE];
-  XDR xdrs2;
-  enum limReplyCode limReplyCode;
-  struct LSFHeader replyHdr;
-  struct lsfAuth auth;
+	char *mbuf = malloc( sizeof ( char ) * MSGSIZE + 1 );
+	enum limReplyCode limReplyCode;
+	struct LSFHeader replyHdr = { };
+	struct lsfAuth auth       = { };
+	XDR xdrs2                 = { };
+  
+	initLSFHeader_ (&replyHdr);
 
-  initLSFHeader_ (&replyHdr);
-
-  if (!xdr_lsfAuth (xdrs, &auth, reqHdr))
+	if (!xdr_lsfAuth (xdrs, &auth, reqHdr))
 	{
-	  limReplyCode = LIME_BAD_DATA;
-	  goto Reply;
+		limReplyCode = LIME_BAD_DATA;
+		xdrmem_create (&xdrs2, mbuf, MSGSIZE, XDR_ENCODE);
+		replyHdr.opCode = (short) limReplyCode;
+		replyHdr.refCode = reqHdr->refCode;
+
+		if (!xdr_LSFHeader (&xdrs2, &replyHdr))
+		{
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_LSFHeader");
+			xdr_destroy (&xdrs2);
+			free( mbuf );
+			return;
+		}
+		if (chanSendDgram_ (limSock, mbuf, XDR_GETPOS (&xdrs2), from) < 0)
+		{
+		    /* catgets 7302 */
+			ls_syslog (LOG_ERR, "7302: %s: Error sending shutdown acknowledgement to %s (len=%d), shutdown failed : %m", __func__, sockAdd2Str_ (from), XDR_GETPOS (&xdrs2));
+			xdr_destroy (&xdrs2);
+			free( mbuf );
+			return;
+		}
+
+		xdr_destroy (&xdrs2);
+		if (limReplyCode == LIME_NO_ERR) {
+			free( mbuf );
+			shutdownLim ();
+		}
 	}
 
-  if (!lim_debug)
+	if (!lim_debug)
 	{
-	  if (!limPortOk (from))
-	{
-	  limReplyCode = LIME_DENIED;
-	  goto Reply;
+		if (!limPortOk (from))
+		{
+			limReplyCode = LIME_DENIED;
+			xdrmem_create (&xdrs2, mbuf, MSGSIZE, XDR_ENCODE);
+			replyHdr.opCode = limReplyCode;
+			replyHdr.refCode = reqHdr->refCode;
+
+			if (!xdr_LSFHeader (&xdrs2, &replyHdr))
+			{
+				ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_LSFHeader");
+				xdr_destroy (&xdrs2);
+				free( mbuf );
+				return;
+			}
+
+			if (chanSendDgram_ (limSock, mbuf, XDR_GETPOS (&xdrs2), from) < 0)
+			{
+				/* catgets 7302 */
+				ls_syslog (LOG_ERR, "7302: %s: Error sending shutdown acknowledgement to %s (len=%d), shutdown failed : %m", __func__, sockAdd2Str_ (from), XDR_GETPOS (&xdrs2));
+				xdr_destroy (&xdrs2);
+				free( mbuf );
+				return;
+			}
+
+			xdr_destroy (&xdrs2);
+			if (limReplyCode == LIME_NO_ERR) {
+				free( mbuf );
+				shutdownLim ();
+			}
+		}
 	}
-	}
 
-  limReplyCode = LIME_NO_ERR;
+	limReplyCode = LIME_NO_ERR;
 
-Reply:
-  xdrmem_create (&xdrs2, mbuf, MSGSIZE, XDR_ENCODE);
-  replyHdr.opCode = (short) limReplyCode;
-  replyHdr.refCode = reqHdr->refCode;
+	return;
 
-  if (!xdr_LSFHeader (&xdrs2, &replyHdr))
-	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_LSFHeader");
-	  xdr_destroy (&xdrs2);
-	  return;
-	}
-  if (chanSendDgram_ (limSock, mbuf, XDR_GETPOS (&xdrs2), from) < 0)
-	{
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7302, "%s: Error sending shutdown acknowledgement to %s (len=%d), shutdown failed : %m"),    /* catgets 7302 */
-		 fname, sockAdd2Str_ (from), XDR_GETPOS (&xdrs2));
-	  xdr_destroy (&xdrs2);
-	  return;
-	}
+// Reply:
+//   xdrmem_create (&xdrs2, mbuf, MSGSIZE, XDR_ENCODE);
+//   replyHdr.opCode = (short) limReplyCode;
+//   replyHdr.refCode = reqHdr->refCode;
 
-  xdr_destroy (&xdrs2);
+//   if (!xdr_LSFHeader (&xdrs2, &replyHdr))
+// 	{
+// 	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_LSFHeader");
+// 	  xdr_destroy (&xdrs2);
+// 	  return;
+// 	}
+//   if (chanSendDgram_ (limSock, mbuf, XDR_GETPOS (&xdrs2), from) < 0)
+// 	{
+// 	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7302, "%s: Error sending shutdown acknowledgement to %s (len=%d), shutdown failed : %m"),    /* catgets 7302 */
+// 		 __func__, sockAdd2Str_ (from), XDR_GETPOS (&xdrs2));
+// 	  xdr_destroy (&xdrs2);
+// 	  return;
+// 	}
 
-  if (limReplyCode == LIME_NO_ERR)
-	shutdownLim ();
+//   	xdr_destroy (&xdrs2);
+
+//   	if (limReplyCode == LIME_NO_ERR) {
+// 		shutdownLim ();
+// 	}
 }
 
 
@@ -292,8 +345,7 @@ shutdownLim (void)
 {
   chanClose_ (limSock);
 
-  ls_syslog (LOG_ERR, "\
-%s: LIM shutting down: shutdown request received", __func__);
+  ls_syslog (LOG_ERR, "%s: LIM shutting down: shutdown request received", __func__);
 
   if (elim_pid > 0)
 	{
@@ -312,21 +364,37 @@ shutdownLim (void)
 void
 lockReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr)
 {
-  static char fname[] = "lockReq";
-  char buf[MAXHOSTNAMELEN];
-  XDR xdrs2;
-  enum limReplyCode limReplyCode;
-  struct limLock limLockReq;
-  struct LSFHeader replyHdr;
+	char *buf = malloc( sizeof( char ) * MAXHOSTNAMELEN + 1 );
+	XDR xdrs2;
+	enum limReplyCode limReplyCode;
+	struct limLock limLockReq = { };
+	struct LSFHeader replyHdr = { };
 
-  ls_syslog (LOG_DEBUG1, "%s: received request from %s", fname,
-		 sockAdd2Str_ (from));
+	ls_syslog (LOG_DEBUG1, "%s: received request from %s", __func__, sockAdd2Str_ (from));
 
   initLSFHeader_ (&replyHdr);
   if (!xdr_limLock (xdrs, &limLockReq, reqHdr))
 	{
 	  limReplyCode = LIME_BAD_DATA;
-	  goto Reply;
+		  xdrmem_create (&xdrs2, buf, MAXHOSTNAMELEN, XDR_ENCODE);
+		  replyHdr.opCode = (short) limReplyCode;
+		  replyHdr.refCode = reqHdr->refCode;
+		  if (!xdr_LSFHeader (&xdrs2, &replyHdr))
+			{
+			  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_LSFHeader");
+			  xdr_destroy (&xdrs2);
+			  return;
+			}
+		  if (chanSendDgram_ (limSock, buf, XDR_GETPOS (&xdrs2), from) < 0)
+			{
+			  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "chanSendDgram_",
+				 sockAdd2Str_ (from));
+			  xdr_destroy (&xdrs2);
+			  return;
+			}
+		  xdr_destroy (&xdrs2);
+		  return;
+
 	}
 
   if (!lim_debug)
@@ -334,20 +402,51 @@ lockReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr)
 	  if (!limPortOk (from))
 	{
 	  limReplyCode = LIME_DENIED;
-	  goto Reply;
+		  xdrmem_create (&xdrs2, buf, MAXHOSTNAMELEN, XDR_ENCODE);
+		  replyHdr.opCode = (short) limReplyCode;
+		  replyHdr.refCode = reqHdr->refCode;
+		  if (!xdr_LSFHeader (&xdrs2, &replyHdr))
+			{
+			  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_LSFHeader");
+			  xdr_destroy (&xdrs2);
+			  return;
+			}
+		  if (chanSendDgram_ (limSock, buf, XDR_GETPOS (&xdrs2), from) < 0)
+			{
+			  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "chanSendDgram_",
+				 sockAdd2Str_ (from));
+			  xdr_destroy (&xdrs2);
+			  return;
+			}
+		  xdr_destroy (&xdrs2);
+		  return;
+
 	}
 	}
 
   if (!userNameOk (limLockReq.uid, limLockReq.lsfUserName))
 	{
-	  ls_syslog (LOG_INFO,
-		 (_i18n_msg_get
-		  (ls_catd, NL_SETN, 7306,
-		   "%s: lock/unlock request from uid %d rejected")),
-		 /* catgets 7306 */ "lockReq",
-		 limLock.uid);
-	  limReplyCode = LIME_DENIED;
-	  goto Reply;
+		/* catgets 7306 */ 
+		ls_syslog( LOG_INFO, "7306: %s: lock/unlock request from uid %d rejected", __func__, limLock.uid);
+		limReplyCode = LIME_DENIED;
+		  xdrmem_create (&xdrs2, buf, MAXHOSTNAMELEN, XDR_ENCODE);
+		  replyHdr.opCode = (short) limReplyCode;
+		  replyHdr.refCode = reqHdr->refCode;
+		  if (!xdr_LSFHeader (&xdrs2, &replyHdr))
+			{
+			  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_LSFHeader");
+			  xdr_destroy (&xdrs2);
+			  return;
+			}
+		  if (chanSendDgram_ (limSock, buf, XDR_GETPOS (&xdrs2), from) < 0)
+			{
+			  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "chanSendDgram_",
+				 sockAdd2Str_ (from));
+			  xdr_destroy (&xdrs2);
+			  return;
+			}
+		  xdr_destroy (&xdrs2);
+		  return;
 	}
 
 
@@ -356,7 +455,25 @@ lockReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr)
 	{
 
 	  limReplyCode = LIME_LOCKED_AL;
-	  goto Reply;
+		  xdrmem_create (&xdrs2, buf, MAXHOSTNAMELEN, XDR_ENCODE);
+		  replyHdr.opCode = (short) limReplyCode;
+		  replyHdr.refCode = reqHdr->refCode;
+		  if (!xdr_LSFHeader (&xdrs2, &replyHdr))
+			{
+			  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_LSFHeader");
+			  xdr_destroy (&xdrs2);
+			  return;
+			}
+		  if (chanSendDgram_ (limSock, buf, XDR_GETPOS (&xdrs2), from) < 0)
+			{
+			  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "chanSendDgram_",
+				 sockAdd2Str_ (from));
+			  xdr_destroy (&xdrs2);
+			  return;
+			}
+		  xdr_destroy (&xdrs2);
+		  return;
+
 	}
 
 
@@ -364,7 +481,25 @@ lockReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr)
 	  || (!LOCK_BY_MASTER (limLock.on) && limLockReq.on == LIM_UNLOCK_MASTER))
 	{
 	  limReplyCode = LIME_NOT_LOCKED;
-	  goto Reply;
+		  xdrmem_create (&xdrs2, buf, MAXHOSTNAMELEN, XDR_ENCODE);
+		  replyHdr.opCode = (short) limReplyCode;
+		  replyHdr.refCode = reqHdr->refCode;
+		  if (!xdr_LSFHeader (&xdrs2, &replyHdr))
+			{
+			  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_LSFHeader");
+			  xdr_destroy (&xdrs2);
+			  return;
+			}
+		  if (chanSendDgram_ (limSock, buf, XDR_GETPOS (&xdrs2), from) < 0)
+			{
+			  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "chanSendDgram_",
+				 sockAdd2Str_ (from));
+			  xdr_destroy (&xdrs2);
+			  return;
+			}
+		  xdr_destroy (&xdrs2);
+		  return;
+
 	}
 
 
@@ -400,20 +535,18 @@ lockReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr)
   mustSendLoad = TRUE;
   limReplyCode = LIME_NO_ERR;
 
-Reply:
+// Reply:
   xdrmem_create (&xdrs2, buf, MAXHOSTNAMELEN, XDR_ENCODE);
   replyHdr.opCode = (short) limReplyCode;
   replyHdr.refCode = reqHdr->refCode;
   if (!xdr_LSFHeader (&xdrs2, &replyHdr))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_LSFHeader");
-	  xdr_destroy (&xdrs2);
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_LSFHeader"); xdr_destroy (&xdrs2);
 	  return;
 	}
   if (chanSendDgram_ (limSock, buf, XDR_GETPOS (&xdrs2), from) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "chanSendDgram_",
-		 sockAdd2Str_ (from));
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "chanSendDgram_", sockAdd2Str_ (from));
 	  xdr_destroy (&xdrs2);
 	  return;
 	}
@@ -425,16 +558,13 @@ Reply:
 /* servAvailReq()
  */
 void
-servAvailReq (XDR * xdrs,
-		  struct hostNode *hPtr,
-		  struct sockaddr_in *from, struct LSFHeader *reqHdr)
+servAvailReq (XDR * xdrs,  struct hostNode *hPtr, struct sockaddr_in *from, struct LSFHeader *reqHdr)
 {
   int servId;
 
   if (hPtr != NULL && hPtr != myHostPtr)
 	{
-	  ls_syslog (LOG_WARNING, "\
-%s: Request from non-local host: <%s>", __func__, hPtr->hostName);
+	  ls_syslog (LOG_WARNING, "%s: Request from non-local host: <%s>", __func__, hPtr->hostName);
 	  return;
 	}
 
@@ -502,39 +632,38 @@ limPortOk (struct sockaddr_in *from)
 static int
 userNameOk (uid_t uid, const char *lsfUserName)
 {
-  int i;
 
-  if (uid == 0 || nClusAdmins == 0)
+	if (uid == 0 || nClusAdmins == 0)
 	{
-
-	  return TRUE;
+		return TRUE;
 	}
 
-  for (i = 0; i < nClusAdmins; i++)
+	for( uint i = 0; i < nClusAdmins; i++ )
 	{
-	  if (strcmp (lsfUserName, clusAdminNames[i]) == 0)
-	{
-	  return TRUE;
+		if (strcmp (lsfUserName, clusAdminNames[i]) == 0)
+		{
+			return TRUE;
+		}
 	}
-	}
-  return FALSE;
+
+	return FALSE;
 }
 
 void
 limDebugReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr)
 {
-  static char fname[] = "limDebugReq";
-  char buf[MAXHOSTNAMELEN];
-  XDR xdrs2;
-  enum limReplyCode limReplyCode;
-  struct debugReq debugReq;
-  struct LSFHeader replyHdr;
-  char *dir = NULL;
-  char logFileName[MAXLSFNAMELEN];
-  char lsfLogDir[MAXPATHLEN];
+	char *buf         = malloc( sizeof( char ) * MAXHOSTNAMELEN + 1 );// FIXME FIXME FIXME ; MAXHOSTNAMELEN? why?
+	char *logFileName = malloc( sizeof( char ) * MAXLSFNAMELEN + 1 ); // FIXME FIXME FIXME ; MAXLSFNAMELEN? why?
+	char *lsfLogDir   = malloc( sizeof( char ) * MAXPATHLEN + 1 );    // FIXME FIXME FIXME ; MAXPATHLEN? why? configurable from os limits
+	char *dir         = NULL;
+	enum limReplyCode limReplyCode;
+	struct debugReq debugReq = { };
+	struct LSFHeader replyHdr = { };
+	XDR xdrs2 = { };
 
-  memset (logFileName, 0, sizeof (logFileName));
-  memset (lsfLogDir, 0, sizeof (lsfLogDir));
+	// FIXME FIXME FIXME FIXME throw in debugger, see if the two memset below are needed	
+	// memset (logFileName, 0, strlen (logFileName));
+	// memset (lsfLogDir, 0, strlen (lsfLogDir));
 
   initLSFHeader_ (&replyHdr);
   if (!lim_debug)
@@ -604,36 +733,34 @@ limDebugReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr)
   else
 	{
 
-	  if (debugReq.level >= 0)
-	timinglevel = debugReq.level;
+		if (debugReq.level >= 0) {
+			timinglevel = debugReq.level;
+		}
 	  if (debugReq.logFileName[0] != '\0')
 	{
 
 	  closelog ();
 	  if (lim_debug > 1)
-		ls_openlog (logFileName, lsfLogDir,
-			TRUE, limParams[LSF_LOG_MASK].paramValue);
+		ls_openlog (logFileName, lsfLogDir, TRUE, limParams[LSF_LOG_MASK].paramValue);
 	  else
-		ls_openlog (logFileName, lsfLogDir,
-			FALSE, limParams[LSF_LOG_MASK].paramValue);
+		ls_openlog (logFileName, lsfLogDir, FALSE, limParams[LSF_LOG_MASK].paramValue);
 	}
 	}
   limReplyCode = LIME_NO_ERR;
 
-Reply:
+Reply:  // FIXME FIXME FIXME FIXME remove label
   xdrmem_create (&xdrs2, buf, MAXHOSTNAMELEN, XDR_ENCODE);
   replyHdr.opCode = (short) limReplyCode;
   replyHdr.refCode = reqHdr->refCode;
   if (!xdr_LSFHeader (&xdrs2, &replyHdr))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_LSFHeader");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_LSFHeader");
 	  xdr_destroy (&xdrs2);
 	  return;
 	}
   if (chanSendDgram_ (limSock, buf, XDR_GETPOS (&xdrs2), from) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "chanSendDgram_",
-		 sockAdd2Str_ (from));
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "chanSendDgram_", sockAdd2Str_ (from));
 	  xdr_destroy (&xdrs2);
 	  return;
 	}
@@ -645,9 +772,8 @@ Reply:
 static void
 doReopen (void)
 {
-  static char fname[] = "doReopen()";
-  struct config_param *plp;
-  char *sp;
+	struct config_param *plp = NULL;
+	char *sp = NULL;
 
   for (plp = limParams; plp->paramName != NULL; plp++)
 	{
@@ -662,9 +788,9 @@ doReopen (void)
 	limParams[LSF_LOGDIR].paramValue = sp;
 	  ls_openlog ("lim", limParams[LSF_LOGDIR].paramValue, (lim_debug == 2),
 		  limParams[LSF_LOG_MASK].paramValue);
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_MM, fname, "ls_openlog",
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_MM, __func__, "ls_openlog",
 		 limParams[LSF_LOGDIR].paramValue);
-	  lim_Exit (fname);
+	  lim_Exit (__func__);
 	}
 
 
