@@ -357,7 +357,9 @@ enum {
     LSF_AM_OPTIONS,
     NO_HOSTS_FILE,
     LSF_SERVER_HOSTS,
-    LSF_INTERACTIVE_STDERR
+    LSF_INTERACTIVE_STDERR,
+    LSF_CONF_RETRY_INT,
+    LSF_CONF_RETRY_MAX
 } daemonStatus;
 
 struct config_param daemonParams[] = {
@@ -418,6 +420,8 @@ struct config_param daemonParams[] = {
     { "MBD_DONT_FORK",                NULL },
     { "LIM_NO_MIGRANT_HOSTS",         NULL },
     { "LSF_AM_OPTIONS",               NULL },
+    { "LSF_CONF_RETRY_INT",           NULL },
+    { "LSF_CONF_RETRY_MAX",           NULL },
     { NULL,                           NULL }
 };
 

@@ -96,6 +96,3 @@ struct extResInfo *getExtResourcesDef (char *);
 char *getExtResourcesLoc (char *);
 static char *getExtResourcesValDefault (char *);
 char *getExtResourcesVal (char *);
-
-
-#endif
