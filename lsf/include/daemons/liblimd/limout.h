@@ -183,10 +183,10 @@ struct clusterInfoReq
 
 struct shortCInfo
 {
-    char clName[MAXLSFNAMELEN];
-    char masterName[MAXHOSTNAMELEN];
-    char managerName[MAXLSFNAMELEN];
-    pid_t managerId;
+    char *clName;      // [MAXLSFNAMELEN];
+    char *masterName;  // [MAXHOSTNAMELEN];
+    char *managerName; // [MAXLSFNAMELEN];
+    uid_t managerId;
     uint status;
     uint resClass;
     uint typeClass;
@@ -203,7 +203,7 @@ struct shortCInfo
     uint *hostTypeBitMaps;
     uint *hostModelBitMaps;
     uint *resBitMaps;
-    pid_t *adminIds;
+    uid_t *adminIds;
     char **admins;
     
 };

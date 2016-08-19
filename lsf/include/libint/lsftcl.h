@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <sys/types.h>
+
 typedef struct
 {
   char *name;
@@ -58,8 +60,8 @@ struct tclHostData
   int flag;
   int overRideFromType;
   int *status;
-  int *resBitMaps;
-  int *DResBitMaps;
+  uint *resBitMaps;
+  uint *DResBitMaps;
   short hostInactivityCount;
   char padding1[6];
   char *hostName;

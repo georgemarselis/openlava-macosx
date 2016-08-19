@@ -17,6 +17,7 @@
  */
 
 #include "daemons/liblimd/cluster.h"
+#include "daemons/liblimd/info.h"
 #include "daemons/liblimd/main.h"
 #include "daemons/liblimd/limd.h"
 #include "libint/lsi18n.h"

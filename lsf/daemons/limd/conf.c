@@ -57,7 +57,7 @@ readShared (void)
 
     initResTable ();
 
-    sprintf (lsfile, "%s/lsf.shared", limParams[LSF_CONFDIR].paramValue); // FIXME FIXME FIXME FIXME replace static string with var from configure.ac
+    sprintf (lsfile, "%s/lsf.shared", limParams[LSF_CONFDIR].paramValue); // FIXME FIXME FIXME FIXME replace string with var from configure.ac
 
     if (configCheckSum (lsfile, &lsfSharedCkSum) < 0) {
         ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "configCheckSum");
@@ -166,7 +166,7 @@ readShared (void)
         }
 }
 
-static char
+char
 doindex (FILE * fp, uint *lineNum, char *lsfile)
 {
     char *linep;
@@ -244,7 +244,7 @@ doindex (FILE * fp, uint *lineNum, char *lsfile)
 
 }
 
-static char
+char
 setIndex (struct keymap *keyList, char *lsfile, uint linenum)
 {
     int resIdx = 0;
@@ -347,7 +347,7 @@ setIndex (struct keymap *keyList, char *lsfile, uint linenum)
     return TRUE;
 }
 
-static char
+char
 doclist (FILE * fp, uint *lineNum, char *lsfile)
 {
     char *linep;
@@ -442,7 +442,7 @@ doclist (FILE * fp, uint *lineNum, char *lsfile)
     return FALSE;
 }
 
-static char
+char
 dotypelist (FILE * fp, uint *lineNum, char *lsfile)
 {
     struct keymap keyList[] = {
@@ -537,10 +537,10 @@ dotypelist (FILE * fp, uint *lineNum, char *lsfile)
     return FALSE;
 }
 
-static char
+char
 dohostmodel (FILE * fp, uint *lineNum, char *lsfile)
 {
-    static char first = TRUE;
+    char first = TRUE;
     char *linep;
     int new;
     hEnt *hashEntPtr;
@@ -712,7 +712,7 @@ dohostmodel (FILE * fp, uint *lineNum, char *lsfile)
     return FALSE;
 }
 
-static void
+void
 initResTable (void)
 {
     struct resItem *resTable;
@@ -767,7 +767,7 @@ resNameDefined (char *name)
 #define RKEY_RELEASE      4
 #define RKEY_DESCRIPTION  5
 
-static char
+char
 doresources (FILE * fp, uint *lineNum, char *lsfile)
 {
     char *linep = NULL;
@@ -1037,7 +1037,7 @@ doresources (FILE * fp, uint *lineNum, char *lsfile)
 
 }
 
-static void
+void
 chkUIdxAndSetDfltRunElim (void)
 {
     if (defaultRunElim == FALSE && allInfo.numUsrIndx > 0) {
@@ -1053,7 +1053,7 @@ chkUIdxAndSetDfltRunElim (void)
     }
 }
 
-static int
+int
 doresourcemap (FILE * fp, char *lsfile, uint *lineNum)
 {
     enum {
@@ -1238,12 +1238,12 @@ doresourcemap (FILE * fp, char *lsfile, uint *lineNum)
 }
 
 
-static int
+int
 addSharedResourceInstance (uint nHosts, char **hosts, char *resName)
 {
     struct sharedResourceInstance *tmp = NULL;
     struct hostNode *hPtr = NULL;
-    static int firstFlag = 1;
+    int firstFlag = 1;
     uint cnt = 0;
     int resNo = 0;
 
@@ -1303,7 +1303,7 @@ addSharedResourceInstance (uint nHosts, char **hosts, char *resName)
     return 1;
 }
 
-static int
+int
 addResourceMap (char *resName, char *location, char *lsfile, uint lineNum, int *isDefault)
 {
     struct sharedResource *resource = NULL;
@@ -1456,7 +1456,7 @@ addResourceMap (char *resName, char *location, char *lsfile, uint lineNum, int *
 
             if (initValue[0] == '\0' && !dynamic) {
                 /* catgets 5276 */
-                ls_syslog (LOG_ERR, "5276: %s: %s(%d): Value must be defined for static resource; ignoring resource <%s>, instance <%s>", __func__, lsfile, lineNum, resName, instance);
+                ls_syslog (LOG_ERR, "5276: %s: %s(%d): Value must be defined for resource; ignoring resource <%s>, instance <%s>", __func__, lsfile, lineNum, resName, instance);
                 continue;
             }
 
@@ -1553,7 +1553,7 @@ addResourceMap (char *resName, char *location, char *lsfile, uint lineNum, int *
 }
 
 
-static uint
+uint
 parseHostList (char *hostList, char *lsfile, uint lineNum, char ***hosts, int *hasDefault)
 {
     char *host       = NULL;
@@ -1610,7 +1610,7 @@ parseHostList (char *hostList, char *lsfile, uint lineNum, char ***hosts, int *h
     return (numHosts);
 }
 
-static char *
+char *
 validLocationHost (char *hostName)
 {
     int num;
@@ -1640,7 +1640,7 @@ validLocationHost (char *hostName)
     return NULL;
 }
 
-static void
+void
 initResItem (struct resItem *resTable)
 {
     if (resTable == NULL) {
@@ -1655,7 +1655,7 @@ initResItem (struct resItem *resTable)
     resTable->interval = 0;
 }
 
-static int
+int
 validType (char *type)
 {
     if (type == NULL) {
@@ -1745,7 +1745,8 @@ readCluster (int checkMode)
     checkHostWd ();
 
     if (nClusAdmins == 0) {
-        char rootName[MAXLSFNAMELEN];
+        size_t len = sizeof( char ) * MAXLSFNAMELEN + 1;
+        char *rootName = malloc( len );
 
         /* catgets 5396 */
         ls_syslog (LOG_ERR, "5396: %s: No LSF managers are specified in file lsf.cluster.%s, default cluster manager is root.", __func__, myClusterName);
@@ -1754,7 +1755,7 @@ readCluster (int checkMode)
         clusAdminIds[0] = 0;
         nClusAdmins = 1;
         clusAdminNames = malloc (sizeof (char *));
-        getLSFUserByUid_ (0, rootName, sizeof (rootName));
+        getLSFUserByUid_ (0, rootName, len);
         clusAdminNames[0] = putstr_ (rootName);
     }
 
@@ -1769,7 +1770,7 @@ readCluster (int checkMode)
     return 0;
 }
 
-static int
+int
 readCluster2 (struct clusterNode *clPtr)
 {
     char fileName[MAXFILENAMELEN];
@@ -1868,7 +1869,7 @@ readCluster2 (struct clusterNode *clPtr)
 
 }
 
-static void
+void
 adjIndx (void)
 {
     uint resNo = 0;
@@ -1946,7 +1947,7 @@ adjIndx (void)
 
 }
 
-static int
+int
 domanager (FILE * clfp, char *lsfile, uint *lineNum, char *secName)
 {
     char *linep;
@@ -2056,12 +2057,12 @@ domanager (FILE * clfp, char *lsfile, uint *lineNum, char *secName)
 
 }
 
-static int
+int
 getClusAdmins (char *line, char *lsfile, uint *lineNum, char *secName)
 {
     struct admins *admins;
-    static char lastSecName[40];
-    static int count = 0;
+    char lastSecName[40];
+    int count = 0;
 
     if (count > 1)
         {
@@ -2107,7 +2108,7 @@ getClusAdmins (char *line, char *lsfile, uint *lineNum, char *secName)
 
 }
 
-static int
+int
 setAdmins (struct admins *admins, int mOrA)
 {
     uint workNAdmins      = 0;
@@ -2206,7 +2207,7 @@ setAdmins (struct admins *admins, int mOrA)
 #define LSF_ELIM_BLOCKTIME      9
 #define LSF_ELIM_RESTARTS       10
 
-static int
+int
 doclparams (FILE * clfp, char *lsfile, uint *lineNum)
 {
     char *linep;
@@ -2446,10 +2447,10 @@ doclparams (FILE * clfp, char *lsfile, uint *lineNum)
         }
 }
 
-static struct keymap *
+struct keymap *
 initKeyList (void)
 {
-    static struct keymap *hostKeyList;
+    struct keymap *hostKeyList;
 
 #define  HOSTNAME_    allInfo.numIndx
 #define  MODEL        allInfo.numIndx+1
@@ -2664,7 +2665,7 @@ endfile:
         }
 }
 
-static void
+void
 freeKeyList (struct keymap *keyList)
 {
     int i;
@@ -2675,10 +2676,10 @@ freeKeyList (struct keymap *keyList)
 }
 
 
-static int
+int
 dohosts (FILE * clfp, struct clusterNode *clPtr, char *lsfile, uint *lineNum)
 {
-    static struct hostEntry hostEntry;
+    struct hostEntry hostEntry;
     char *sp     = NULL;
     char *cp     = NULL;
     char *word   = NULL;
@@ -2915,7 +2916,7 @@ dohosts (FILE * clfp, struct clusterNode *clPtr, char *lsfile, uint *lineNum)
 
 }
 
-static void
+void
 putThreshold (int indx, struct hostEntry *hostEntryPtr, int position, char *val, float def)
 {
     if (position != -1)
@@ -3011,7 +3012,7 @@ archNameToNo (const char *archName)
     return (-1);
 }
 
-static int
+int
 modelNameToNo (char *modelName)
 {
     for ( uint i = 0; i < allInfo.nModels; i++) {
@@ -3023,7 +3024,7 @@ modelNameToNo (char *modelName)
     return -1;
 }
 
-static struct hostNode *
+struct hostNode *
 addHost_ (struct clusterNode *clPtr, struct hostEntry *hEntPtr,  char *window, char *fileName, uint *lineNumPtr)
 {
     struct hostNode *hPtr = NULL;
@@ -3395,7 +3396,7 @@ freeHostNodes (struct hostNode *hPtr, int allList)
 }
 
 
-static struct sharedResource *
+struct sharedResource *
 addResource (char *resName, uint nHosts, char **hosts, char *value, char *fileName, uint lineNum, int resourceMap)
 {
 
@@ -3447,7 +3448,7 @@ addResource (char *resName, uint nHosts, char **hosts, char *value, char *fileNa
     return (temp);
 }
 
-static void
+void
 freeSharedRes (struct sharedResource *sharedRes)
 {
     if (sharedRes == NULL) {
@@ -3463,12 +3464,12 @@ freeSharedRes (struct sharedResource *sharedRes)
     return;
 }
 
-static int
+int
 addHostInstance (struct sharedResource *sharedResource, uint nHosts, char **hostNames, char *value, int resourceMap)
 {
     uint numList = 0;
-    static char **temp = NULL;
-    static uint numHosts = 0;
+    char **temp = NULL;
+    uint numHosts = 0;
     char **hostList = NULL ;
     struct resourceInstance *instance = NULL;
 
@@ -3558,10 +3559,10 @@ addHostInstance (struct sharedResource *sharedResource, uint nHosts, char **host
     return (0);
 }
 
-static char **
+char **
 getValidHosts (char *hostName, uint *numHost, struct sharedResource *resource)
 {
-    static char **temp = NULL;
+    char **temp = NULL;
     int num;
     struct hostNode *hPtr;
 
@@ -3644,7 +3645,7 @@ getValidHosts (char *hostName, uint *numHost, struct sharedResource *resource)
     return NULL;
 }
 
-static int
+int
 addHostNodeIns (struct resourceInstance *instance, uint nHosts, char **hostNames)
 {
     int resNo;
@@ -3695,7 +3696,7 @@ addHostNodeIns (struct resourceInstance *instance, uint nHosts, char **hostNames
     return (0);
 }
 
-static struct resourceInstance *
+struct resourceInstance *
 isInHostNodeIns (char *resName, uint numInstances, struct resourceInstance **instances)
 {
     if (numInstances <= 0 || instances == NULL) {
@@ -3709,7 +3710,7 @@ isInHostNodeIns (char *resName, uint numInstances, struct resourceInstance **ins
     return NULL;
 }
 
-static int
+int
 addHostList (struct resourceInstance *resourceInstance, uint nHosts, char **hostNames)
 {
     struct hostNode **temp;
@@ -3744,7 +3745,7 @@ addHostList (struct resourceInstance *resourceInstance, uint nHosts, char **host
 
 }
 
-static struct resourceInstance *
+struct resourceInstance *
 addInstance (struct sharedResource *sharedResource, uint nHosts, char **hostNames, char *value)
 {
     int resNo = 0;
@@ -3804,7 +3805,7 @@ addInstance (struct sharedResource *sharedResource, uint nHosts, char **hostName
 }
 
 
-static struct resourceInstance *
+struct resourceInstance *
 initInstance (void)
 {
     struct resourceInstance *temp;
@@ -3824,7 +3825,7 @@ initInstance (void)
     return (temp);
 }
 
-static void
+void
 freeInstance (struct resourceInstance *instance)
 {
     if (instance == NULL) {
@@ -3924,8 +3925,8 @@ validHostModel (const char *hModel)
 }
 
 
-static int cntofdefault = 0;
-static char
+int cntofdefault = 0;
+char
 addHostType (char *type)
 {
 
@@ -3957,7 +3958,7 @@ addHostType (char *type)
     return (TRUE);
 }
 
-static char
+char
 addHostModel (char *model, char *arch, double factor)
 {
 
@@ -4001,13 +4002,13 @@ addHostModel (char *model, char *arch, double factor)
     return (TRUE);
 }
 
-static struct clusterNode *
+struct clusterNode *
 addCluster (char *clName, char *candlist)
 {
     char *sp            = NULL;
     char *word          = NULL;
     struct hostent *hp  = NULL;
-    static uint nextClNo = 0;
+    uint nextClNo = 0;
     int counter         = 0;
     
     if (myClusterPtr != NULL) {
@@ -4069,10 +4070,10 @@ addCluster (char *clName, char *candlist)
     return myClusterPtr;
 }
 
-static char *
+char *
 findClusterServers (char *clName)
 {
-    static char servers[MAXLINELEN];
+    char *servers = malloc( sizeof( char ) * MAXLINELEN + 1 ); // FIXME FIXME FIXME FIXME memory management
     FILE *clfp;
     char *cp = NULL ;
     uint lineNum = 0;
@@ -4227,7 +4228,7 @@ reCheckRes (void)
     return;
 }
 
-static int
+int
 reCheckClusterClass (struct clusterNode *clPtr)
 {
     struct hostNode *hPtr = NULL;
@@ -4318,27 +4319,27 @@ reCheckClusterClass (struct clusterNode *clPtr)
     return 0;
 }
 
-static void
-addMapBits (int num, int *toBitMaps, int *fromMaps)
+void
+addMapBits (int num, uint *toBitMaps, uint *fromMaps)
 {
-    int j;
-    
-    for (j = 0; j < GET_INTNUM (num); j++)
-        {
-        toBitMaps[j] = (toBitMaps[j] | fromMaps[j]);
-        }
+   
+    for( uint j = 0; j < GET_INTNUM( num ); j++ )
+    {
+        toBitMaps[j] = ( toBitMaps[j] | fromMaps[j] );
+    }
 }
 
 int
 reCheckClass (void)
 {
-    if (reCheckClusterClass (myClusterPtr) < 0)
+    if (reCheckClusterClass (myClusterPtr) < 0) {
         return -1;
+    }
     
     return 0;
 }
 
-static int
+int
 configCheckSum (char *file, u_short * checkSum)
 {
     unsigned int sum;
@@ -4388,11 +4389,11 @@ configCheckSum (char *file, u_short * checkSum)
     return 0;
 }
 
-static struct admins *
+struct admins *
 getAdmins (char *line, char *lsfile, uint *lineNum, char *secName)
 {
-    static struct admins admins;
-    static int first = TRUE;
+    struct admins *admins = malloc( sizeof ( *admins ) );
+    int first = TRUE;
     uint numAds = 0;
     char *sp   = NULL;
     char *word = NULL;
@@ -4405,15 +4406,15 @@ getAdmins (char *line, char *lsfile, uint *lineNum, char *secName)
     assert( *secName );
 
     if (first == FALSE) {
-        for (uint i = 0; i < admins.nAdmins; i++) {
-            FREEUP (admins.adminNames[i]);
+        for (uint i = 0; i < admins->nAdmins; i++) {
+            FREEUP (admins->adminNames[i]);
         }
-        FREEUP (admins.adminNames);
-        FREEUP (admins.adminIds);
-        FREEUP (admins.adminGIds);
+        FREEUP (admins->adminNames);
+        FREEUP (admins->adminIds);
+        FREEUP (admins->adminGIds);
     }
     first = FALSE;
-    admins.nAdmins = 0;
+    admins->nAdmins = 0;
     sp = line;
 
     while ((word = getNextWord_ (&sp)) != NULL) {
@@ -4421,21 +4422,21 @@ getAdmins (char *line, char *lsfile, uint *lineNum, char *secName)
     }
     if (numAds)
         {
-        admins.adminIds = (uid_t *) malloc (numAds * sizeof (int));
-        admins.adminGIds = (gid_t *) malloc (numAds * sizeof (int));
-        admins.adminNames = (char **) malloc (numAds * sizeof (char *));
-        if ( ( NULL == admins.adminIds && ENOMEM == errno) || (NULL == admins.adminGIds && ENOMEM == errno ) || (NULL == admins.adminNames && ENOMEM == errno ) ) {
+        admins->adminIds = malloc (numAds * sizeof (uid_t));
+        admins->adminGIds = malloc (numAds * sizeof (gid_t));
+        admins->adminNames = (char **) malloc (numAds * sizeof (char *));
+        if ( ( NULL == admins->adminIds && ENOMEM == errno) || (NULL == admins->adminGIds && ENOMEM == errno ) || (NULL == admins->adminNames && ENOMEM == errno ) ) {
             ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
-            FREEUP (admins.adminIds);
-            FREEUP (admins.adminGIds);
-            FREEUP (admins.adminNames);
-            admins.nAdmins = 0;
+            FREEUP (admins->adminIds);
+            FREEUP (admins->adminGIds);
+            FREEUP (admins->adminNames);
+            admins->nAdmins = 0;
             lserrno = LSE_MALLOC;
-            return (&admins);
+            return admins;
         }
     }
     else {
-        return (&admins);
+        return admins;
     }
 
     sp = line;
@@ -4443,29 +4444,29 @@ getAdmins (char *line, char *lsfile, uint *lineNum, char *secName)
 
         if ((pw = getpwlsfuser_ (word)) != NULL)
             {
-            if (putInLists (word, &admins, &numAds, forWhat) < 0) {
-                return (&admins);
+            if (putInLists (word, admins, &numAds, forWhat) < 0) {
+                return admins;
             }
         }
         else if ((unixGrp = getgrnam (word)) != NULL) {
             uint i = 0;
             while (unixGrp->gr_mem[i] != NULL) {
-                if (putInLists (unixGrp->gr_mem[i++], &admins, &numAds, forWhat) < 0) {
-                    return (&admins);
+                if (putInLists (unixGrp->gr_mem[i++], admins, &numAds, forWhat) < 0) {
+                    return admins;
                 }
             }
         }
         else {
-            if (putInLists (word, &admins, &numAds, forWhat) < 0) {
-                return (&admins);
+            if (putInLists (word, admins, &numAds, forWhat) < 0) {
+                return admins;
             }
         }
     }
-    return (&admins);
+    return admins;
 }
 
 
-static int
+int
 doubleResTable (char *lsfile, uint lineNum)
 {
     struct resItem *tempTable = NULL;
@@ -4552,7 +4553,7 @@ mykey (void)
     
 }
 
-static void
+void
 setExtResourcesDefDefault (char *resName)
 {
     
@@ -4574,7 +4575,7 @@ setExtResourcesDefDefault (char *resName)
     
 }
 
-static int
+int
 setExtResourcesDef (char *resName)
 {
     struct extResInfo *extResInfoPtr = NULL;
@@ -4669,11 +4670,11 @@ setExtResourcesDef (char *resName)
     return (0);
 }
 
-static int
+int
 setExtResourcesLoc (char *resName, int resNo)
 {
     char *extResLocPtr;
-    static char defaultExtResLoc[] = "[default]";
+    char defaultExtResLoc[] = "[default]";
     uint lineNum = 0;
     int isDefault = 0;
     const char *fname = __func__ ;
@@ -4728,9 +4729,9 @@ getExtResourcesLoc (char *resName)
 char *
 getExtResourcesValDefault (char *resName)
 {
-    static char defaultVal[] = "-";
+    char *defaultVal = NULL;
     assert( *resName );
-    return (defaultVal);
+    return defaultVal;
 }
 
 
@@ -4818,7 +4819,7 @@ stripIllegalChars (char *str)
     return str;
 }
 
-static int
+int
 saveHostIPAddr (struct hostNode *hPtr, struct hostent *hp)
 {
     int i;
@@ -4851,7 +4852,7 @@ saveHostIPAddr (struct hostNode *hPtr, struct hostent *hp)
 void
 addMigrantHost (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr, uint chan)
 {
-    static char buf[MSGSIZE];
+    char buf[MSGSIZE];
     struct LSFHeader hdr;
     struct hostEntry hPtr;
     struct hostNode *node = 0;
@@ -4970,7 +4971,7 @@ addHostByTab (hTab * tab)
 void
 rmMigrantHost (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr, uint chan)
 {
-    static char buf[MSGSIZE];
+    char buf[MSGSIZE];
     struct LSFHeader hdr;
     char hostName[MAXHOSTNAMELEN];
     struct hostNode *hPtr = NULL;

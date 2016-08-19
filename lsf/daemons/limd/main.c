@@ -21,6 +21,7 @@
 
 #include "daemons/liblimd/limd.h"
 #include "daemons/liblimd/main.h"
+#include "daemons/liblimd/info.h"
 #include "lib/syslog.h"
 #include "lib/lib.h"
 #include "lib/mls.h"

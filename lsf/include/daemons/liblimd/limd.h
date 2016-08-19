@@ -107,8 +107,8 @@ struct hostNode
     int rexPriority;
     uint8_t migrant;
     char padding2[7];
-    int *resBitMaps;
-    int *DResBitMaps;
+    uint *resBitMaps;
+    uint *DResBitMaps;
     int *resBitArray;
     int *status;
     in_addr_t *addr;
@@ -154,12 +154,12 @@ struct clusterNode
     int modelClass;
     int masterInactivityCount;
     int chanfd;
-    int numIndx;
-    int numUsrIndx;
+    size_t numIndx;
+    size_t numUsrIndx;
     int usrIndxClass;
-    int *resBitMaps;
-    int *hostTypeBitMaps;
-    int *hostModelBitMaps;
+    uint *resBitMaps;
+    uint *hostTypeBitMaps;
+    uint *hostModelBitMaps;
     uint clusterNo;
     uint masterAddr;
     uint numHosts;
@@ -168,7 +168,7 @@ struct clusterNode
     uint nRes;
     uint numSharedRes;
     char padding3[4];
-    uint *adminIds;
+    uid_t *adminIds;
     uid_t managerId;
     char padding2[4];
     char *masterName;
@@ -372,7 +372,7 @@ static char reqBuf[MSGSIZE];
 #define LOOP_ADDR       0x7F000001
 
 
-struct config_param limParams[];
+// struct config_param limParams[];
 int lim_debug;
 int lim_CheckMode;
 int lim_CheckError;
@@ -380,7 +380,6 @@ int limSock;
 int limTcpSock;
 ushort lim_port;
 ushort lim_tcp_port;
-struct clusterNode *myClusterPtr;
 struct hostNode *myHostPtr;
 char myClusterName[];
 int masterMe;
@@ -471,11 +470,8 @@ void servAvailReq (XDR *, struct hostNode *, struct sockaddr_in *, struct LSFHea
 void pingReq (XDR *, struct sockaddr_in *, struct LSFHeader *);
 void clusNameReq (XDR *, struct sockaddr_in *, struct LSFHeader *);
 void masterInfoReq (XDR *, struct sockaddr_in *, struct LSFHeader *);
-void hostInfoReq (XDR * xdrs, struct hostNode *fromHostP, struct sockaddr_in *from, struct LSFHeader *reqHdr, unsigned int chfd);
-void infoReq (XDR *xdr, struct sockaddr_in *clientMap, struct LSFHeader *hdr, unsigned int chfd);
 void cpufReq (XDR *, struct sockaddr_in *, struct LSFHeader *);
 void clusInfoReq (XDR *, struct sockaddr_in *, struct LSFHeader *);
-void resourceInfoReq (XDR *xdr, struct sockaddr_in *clientMap, struct LSFHeader *hdr, unsigned int chfd);
 void masterRegister (XDR *, struct sockaddr_in *, struct LSFHeader *);
 void jobxferReq (XDR *, struct sockaddr_in *, struct LSFHeader *);
 void rcvConfInfo (XDR *, struct sockaddr_in *, struct LSFHeader *);
