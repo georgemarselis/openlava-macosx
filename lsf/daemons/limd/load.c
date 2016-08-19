@@ -19,34 +19,14 @@
  *
  */
 
-#include "lim.h"
-
-// #define NL_SETN 24
-
-enum loadstruct
-{ e_vec, e_mat };
-
-float exchIntvl = EXCHINTVL;
-float sampleIntvl = SAMPLINTVL;
-short hostInactivityLimit = HOSTINACTIVITYLIMIT;
-short masterInactivityLimit = MASTERINACTIVITYLIMIT;
-short resInactivityLimit = RESINACTIVITYLIMIT;
-short retryLimit = RETRYLIMIT;
-short keepTime = KEEPTIME;
-
-time_t lastSbdActiveTime = 0;
-
-char mustSendLoad = TRUE;
-
-extern int maxnLbHost;
-
-static void rcvLoadVector (XDR *, struct sockaddr_in *, struct LSFHeader *);
-static void copyResValues (struct loadVectorStruct, struct hostNode *);
+#include "daemons/liblimd/load.h"
+#include "daemons/liblimd/limd.h"
+#include "lib/lib.h"
 
 void
 sendLoad (void)
 {
-  static int noSendCount = 0;
+  int noSendCount = 0;
   struct loadVectorStruct myLoadVector;
   enum loadstruct loadType;
   struct hostNode *hPtr;
@@ -91,8 +71,7 @@ sendLoad (void)
 	      if (hPtr->hostInactivityCount >
 		  (hostInactivityLimit + retryLimit))
 		{
-		  ls_syslog (LOG_DEBUG, "\
-%s: Declaring %s unavailable inactivity Count=%d", __func__, hPtr->hostName, hPtr->hostInactivityCount);
+		  ls_syslog (LOG_DEBUG, "%s: Declaring %s unavailable inactivity Count=%d", __func__, hPtr->hostName, hPtr->hostInactivityCount);
 
 		  hPtr->status[0] |= LIM_UNAVAIL;
 		  hPtr->infoValid = FALSE;
@@ -139,8 +118,7 @@ sendLoad (void)
 
       myClusterPtr->masterInactivityCount++;
 
-      ls_syslog (LOG_DEBUG, "\
-%s: masterInactivityCount=%d, hostInactivityLimit=%d, masterKnown=%d, retryLimit=%d", __func__, myClusterPtr->masterInactivityCount, hostInactivityLimit, myClusterPtr->masterKnown, retryLimit);
+      ls_syslog (LOG_DEBUG, "%s: masterInactivityCount=%d, hostInactivityLimit=%d, masterKnown=%d, retryLimit=%d", __func__, myClusterPtr->masterInactivityCount, hostInactivityLimit, myClusterPtr->masterKnown, retryLimit);
 
       if (myClusterPtr->masterInactivityCount > hostInactivityLimit)
 	{
@@ -150,8 +128,7 @@ sendLoad (void)
 	      && (myClusterPtr->masterInactivityCount <=
 		  hostInactivityLimit + retryLimit))
 	    {
-	      ls_syslog (LOG_WARNING, "\
-%s: Attempting to probe master %s", __func__, myClusterPtr->masterPtr->hostName);
+	      ls_syslog (LOG_WARNING, "%s: Attempting to probe master %s", __func__, myClusterPtr->masterPtr->hostName);
 
 	      mustSendLoad = TRUE;
 	      sendInfo = SEND_MASTER_ANN;
@@ -168,8 +145,7 @@ sendLoad (void)
 	      myClusterPtr->masterPtr = NULL;
 	      ls_syslog (LOG_INFO, "%s: Master LIM unknown now", __func__);
 	      if (limParams[LIM_COMPUTE_ONLY].paramValue)
-		ls_syslog (LOG_INFO, "\
-%s: compute only host will not try to take over mastership", __func__);
+		ls_syslog (LOG_INFO, "%s: compute only host will not try to take over mastership", __func__);
 	    }
 
 	  /* Try to take over the current master only if
@@ -268,8 +244,7 @@ sendLoad (void)
 
       if (bufSize > MSGSIZE)
 	{
-	  ls_syslog (LOG_ERR, "\
-%s: message bigger then receive buf(%d)", __func__, bufSize);
+	  ls_syslog (LOG_ERR, "%s: message bigger then receive buf(%d)", __func__, bufSize);
 	  return;
 	}
 
@@ -324,7 +299,7 @@ struct resPair *
 getResPairs (struct hostNode *hPtr)
 {
   int i;
-  static struct resPair *resPairs;
+  struct resPair *resPairs;
 
   FREEUP (resPairs);
 
@@ -333,8 +308,7 @@ getResPairs (struct hostNode *hPtr)
       resPairs = calloc (hPtr->numInstances, sizeof (struct resPair));
       if (resPairs == NULL)
 	{
-	  ls_syslog (LOG_ERR, "\
-%s: malloc %dbytes failed %m", __func__, hPtr->numInstances * sizeof (struct resPair));
+	  ls_syslog (LOG_ERR, "%s: malloc %dbytes failed %m", __func__, hPtr->numInstances * sizeof (struct resPair));
 	  return NULL;
 	}
     }
@@ -377,11 +351,11 @@ rcvLoad (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *hdr)
 }
 
 
-static void
+void
 rcvLoadVector (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *hdr)
 {
-  static int checkSumMismatch;
-  static struct loadVectorStruct *loadVector;
+  int checkSumMismatch;
+  struct loadVectorStruct *loadVector;
   struct hostNode *hPtr;
   int i;
   int masterLock = FALSE;
@@ -481,10 +455,10 @@ rcvLoadVector (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *hdr)
     }
 }
 
-static void
+void
 copyResValues (struct loadVectorStruct loadVector, struct hostNode *hPtr)
 {
-  static char fname[] = "copyResValues";
+  char fname[] = "copyResValues";
   int i, j, updHostNo, curHostNo;
   struct sharedResource *resource;
   struct resourceInstance *instance;
