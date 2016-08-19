@@ -21,7 +21,7 @@
 
 #include "lim.h"
 
-#define NL_SETN 24
+// #define NL_SETN 24
 
 enum loadstruct
 { e_vec, e_mat };
@@ -410,7 +410,7 @@ rcvLoadVector (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *hdr)
 
   if (myClusterPtr->checkSum != loadVector->checkSum
       && checkSumMismatch < 5
-      && (limParams[LSF_LIM_IGNORE_CHECKSUM].paramValue == NULL))
+      && (limParams[LIM_IGNORE_CHECKSUM].paramValue == NULL))
     {
       ls_syslog (LOG_DEBUG, "\
 %s: Sender (%s) may have different config?.", __func__, sockAdd2Str_ (from));

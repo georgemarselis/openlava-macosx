@@ -26,8 +26,6 @@
 #include "lib/rf.h"
 #include "lib/xdrres.h"
 
-bool_t xdr_noxdr (XDR *xdrs, size_t size, struct LSFHeader *hdr);
-
 bool_t
 xdr_resCmdBill (XDR *xdrs, struct resCmdBill *cmd, struct LSFHeader *hdr)
 {

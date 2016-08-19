@@ -15,6 +15,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
+
+#include "daemons/liblimd/cluster.h"
+#include "daemons/liblimd/main.h"
 #include "daemons/liblimd/limd.h"
 #include "libint/lsi18n.h"
 #include "lib/xdrlim.h"
@@ -28,13 +31,7 @@
 // #define HINFO_TIMEOUT   120
 // #define LINFO_TIMEOUT   60
 
-struct clientNode *clientMap[MAXCLIENTS];
-
-extern unsigned int chanIndex;
-
-static void processMsg (unsigned int chfd);
-static void clientReq (XDR *xdrs, struct LSFHeader *hdr, unsigned int chfd);
-static void shutDownChan (unsigned int chfd);
+// struct clientNode **clientMap = NULL; // [MAXCLIENTS]; // FIXME FIXME FIXME FIXME build dynamically
 
 void
 clientIO (struct Masks *chanmasks)
@@ -43,7 +40,7 @@ clientIO (struct Masks *chanmasks)
     for (unsigned long i = 0; (i < chanIndex) && (i < MAXCLIENTS); i++)  {
 
         assert( i <= INT_MAX );
-        if ( (int)i == limSock || (int)i == limTcpSock) {
+        if ( i == limSock || i == limTcpSock) {
             continue;
         }
 
@@ -53,20 +50,20 @@ clientIO (struct Masks *chanmasks)
                 ls_syslog (LOG_ERR, "%s: Lost connection with client %s IO or decode error", __func__, sockAdd2Str_ (&clientMap[i]->from));
             }
             assert( i <= UINT_MAX );
-            shutDownChan ((uint)i);
+            shutDownChan (i);
             continue;
         }
 
         if (FD_ISSET (i, &chanmasks->rmask)) {
             assert( i <= UINT_MAX );
-            processMsg ((uint)i);
+            processMsg (i);
         }
     }
 }
 
 /* processMsg()
  */
-static void
+void
 processMsg (unsigned int chfd)
 {
     struct Buffer *buf;
@@ -176,7 +173,7 @@ processMsg (unsigned int chfd)
 }
 
 
-static void
+void
 clientReq (XDR *xdrs, struct LSFHeader *hdr, unsigned int chfd)
 {
     struct decisionReq decisionRequest;
@@ -202,7 +199,7 @@ clientReq (XDR *xdrs, struct LSFHeader *hdr, unsigned int chfd)
     }
     free (decisionRequest.preferredHosts);
 
-Reply1:
+Reply1: // FIXME FIXME FIXME FIXME get rid of label
 
     if (!limParams[LIM_NO_FORK].paramValue) {
         pid = fork ();
@@ -260,7 +257,7 @@ Reply1:
     return ;
 }
 
-static void
+void
 shutDownChan (unsigned int chfd)
 {
     chanClose_ ((int)chfd);

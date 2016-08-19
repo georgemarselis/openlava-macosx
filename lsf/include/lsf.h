@@ -288,14 +288,14 @@ struct connectEnt
 
 struct placeInfo
 {
-  char hostName[MAXHOSTNAMELEN];
+  char *hostName;
   int numtask;
 };
 
 struct hostLoad
 {
-    char hostName[MAXHOSTNAMELEN];
-    int *status;
+    char *hostName;
+    long *status;
     float *loadIndex;
 };
 

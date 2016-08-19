@@ -497,7 +497,8 @@ typedef enum
     LIM_NO_MIGRANT_HOSTS,
     LIM_NO_FORK,
     LSF_DEBUG_LIM,
-    LSF_TIME_LIM
+    LSF_TIME_LIM,
+    LIM_RSYNC_CONFIG
 } limParams_t;
 
 typedef enum {
@@ -516,6 +517,7 @@ struct config_param limParams[] = {
     { "LIM_NO_FORK",          NULL },
     { "LSF_DEBUG_LIM",        NULL },
     { "LSF_TIME_LIM",         NULL },
+    { "LIM_RSYNC_CONFIG",     NULL },
     { NULL,                   NULL },
 };
 

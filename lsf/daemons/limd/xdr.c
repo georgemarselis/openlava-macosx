@@ -16,26 +16,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
-#include "lim.h"
 #include <math.h>
 
-#define NL_SETN 24
+#include "daemons/liblimd/limd.h"
+#include "daemons/liblimd/xdr.h"
+#include "lib/lib.h"
 
-#define MAX_FLOAT16 4.227858E+09
+// #define NL_SETN 24
 
-static u_short encfloat16_ (float);
-static float decfloat16_ (u_short);
-static void freeResPairs (struct resPair *, int);
-static bool_t xdr_resPair (XDR *, struct resPair *, struct LSFHeader *);
+// #define MAX_FLOAT16 4.227858E+09
+
 
 
 bool_t
-xdr_loadvector (XDR * xdrs,
-		struct loadVectorStruct *lvp, struct LSFHeader *hdr)
+xdr_loadvector (XDR * xdrs,	struct loadVectorStruct *lvp, struct LSFHeader *hdr)
 {
   int i;
-  static struct resPair *resPairs;
-  static int numResPairs;
+  struct resPair *resPairs = NULL;
+  uint numResPairs = 0;
 
   if (!(xdr_int (xdrs, &lvp->hostNo) &&
 	xdr_u_int (xdrs, &lvp->seqNo) &&
@@ -48,15 +46,14 @@ xdr_loadvector (XDR * xdrs,
     }
 
   if (xdrs->x_op == XDR_DECODE
-      && !limParams[LSF_LIM_IGNORE_CHECKSUM].paramValue)
+      && !limParams[LIM_IGNORE_CHECKSUM].paramValue)
     {
 
       if (myClusterPtr->checkSum != lvp->checkSum)
 	{
-	  if (limParams[LSF_LIM_IGNORE_CHECKSUM].paramValue == NULL)
+	  if (limParams[LIM_IGNORE_CHECKSUM].paramValue == NULL)
 	    {
-	      ls_syslog (LOG_DEBUG, "\
-%s: Sender has a different configuration", __func__);
+	      ls_syslog (LOG_DEBUG, "%s: Sender has a different configuration", __func__);
 	    }
 	}
 
@@ -64,8 +61,7 @@ xdr_loadvector (XDR * xdrs,
 	  || allInfo.numUsrIndx != lvp->numUsrIndx)
 	{
 
-	  ls_syslog (LOG_ERR, "\
-%s: Sender has a different number of load index vectors. It will be rejected from the cluster by the master host.", __func__);
+	  ls_syslog (LOG_ERR, "%s: Sender has a different number of load index vectors. It will be rejected from the cluster by the master host.", __func__);
 	  return FALSE;
 	}
     }
@@ -115,42 +111,38 @@ xdr_loadvector (XDR * xdrs,
   return TRUE;
 }
 
-static void
-freeResPairs (struct resPair *resPairs, int num)
+void
+freeResPairs (struct resPair *resPairs, uint num)
 {
-  int i;
 
-  for (i = 0; i < num; i++)
+  for ( uint i = 0; i < num; i++)
     {
       FREEUP (resPairs[i].name);
       FREEUP (resPairs[i].value);
     }
   FREEUP (resPairs);
 }
-
 
-static bool_t
+bool_t
 xdr_resPair (XDR * xdrs, struct resPair *resPair, struct LSFHeader *hdr)
 {
-  if (!(xdr_var_string (xdrs, &resPair->name)
-	&& xdr_var_string (xdrs, &resPair->value)))
+  if (!(xdr_var_string (xdrs, &resPair->name) && xdr_var_string (xdrs, &resPair->value))) {
     return FALSE;
+  }
   return TRUE;
 
 }
-
+
 
 bool_t
-xdr_loadmatrix (XDR * xdrs, int len, struct loadVectorStruct * lmp,
-		struct LSFHeader * hdr)
+xdr_loadmatrix (XDR * xdrs, int len, struct loadVectorStruct * lmp,	struct LSFHeader * hdr)
 {
   return (TRUE);
 }
-
+
 
 bool_t
-xdr_masterReg (XDR * xdrs, struct masterReg * masterRegPtr,
-	       struct LSFHeader * hdr)
+xdr_masterReg (XDR * xdrs, struct masterReg * masterRegPtr, struct LSFHeader * hdr)
 {
   char *sp1;
   char *sp2;
@@ -209,9 +201,10 @@ xdr_statInfo (XDR * xdrs, struct statInfo * sip, struct LSFHeader * hdr)
   return (TRUE);
 }
 
-#define MIN_FLOAT16  2.328306E-10
-static u_short
-encfloat16_ (float f)
+// #define MIN_FLOAT16  2.328306E-10 // FIXME FIXME FIXME replace appropriatelly 
+
+u_short
+encfloat16_ (float f) // FIXME FIXME FIXME FIXME why are we en/decoding 16bit values?
 {
   int expo, mant;
   u_short result;
@@ -239,8 +232,8 @@ encfloat16_ (float f)
   return (result);
 }
 
-static float
-decfloat16_ (u_short sf)
+float
+decfloat16_ (u_short sf) // FIXME FIXME FIXME FIXME why are we en/decoding 16bit values?
 {
   int expo, mant;
   double fmant;

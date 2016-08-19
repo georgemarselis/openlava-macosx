@@ -52,12 +52,8 @@ static int unlinkBufFiles (char *, char *, struct jobCard *,
 			   struct hostent *);
 int myRename (char *, char *);
 
-extern char **environ;
-extern void freeLogRec (struct eventRec *);
 void rmvJobStarterStr (char *line, char *jobStarter);
 
-extern char chosenPath[MAXPATHLEN];
-extern int lsbStdoutDirect;
 static void determineFilebufStdoutDirect (char *filebuf,
 					  struct jobSpecs *jobSpecsPtr,
 					  int flag);

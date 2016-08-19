@@ -44,3 +44,4 @@ int xdr_resSignal (XDR *, struct resSignal *, struct LSFHeader *);
 bool_t xdr_ropenReq (XDR *, struct ropenReq *, struct LSFHeader *);
 bool_t xdr_rrdwrReq (XDR *, struct rrdwrReq *, struct LSFHeader *);
 bool_t xdr_rlseekReq (XDR *, struct rlseekReq *, struct LSFHeader *);
+bool_t xdr_noxdr (XDR *xdrs, size_t size, struct LSFHeader *hdr);

@@ -417,7 +417,6 @@ struct shortLsInfo shortInfo;
 int *clientHosts; // FIXME FIXME FIXME must manage dynamically
 // struct floatClientInfo floatClientPool; // FIXME FIXME re-isntate when floating-client feature is implemented
 int ncpus;
-struct clientNode *clientMap[];
 
 pid_t elim_pid;
 pid_t pimPid;
@@ -524,7 +523,7 @@ void errorBack (struct sockaddr_in *, struct LSFHeader *, enum limReplyCode, int
 int initSock (int);
 void initLiStruct (void);
 void placeReq (XDR *xdr, struct sockaddr_in *clientMap, struct LSFHeader *hdr, unsigned int chfd);
-void loadadjReq (XDR *, struct sockaddr_in *, struct LSFHeader *, int);
+void loadadjReq (XDR *, struct sockaddr_in *, struct LSFHeader *, uint s); // was int
 void updExtraLoad (struct hostNode **, char *, int);
 void loadReq (XDR *xdr, struct sockaddr_in *clientMap, struct LSFHeader *hdr, unsigned int chfd);
 int getEligibleSites (register struct resVal *, struct decisionReq *, char, char *);

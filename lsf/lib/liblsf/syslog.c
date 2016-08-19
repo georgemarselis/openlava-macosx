@@ -20,12 +20,14 @@
 #include <unistd.h>
 #include <syslog.h>
 #include <sys/types.h>
+#include <sys/param.h>
 #include <fcntl.h>
 
-#include "lib/osal.h"
-#include "lib/lproto.h"
-#include "lib/lib.h"
 #include "lib/syslog.h"
+#include "lib/lproto.h"
+#include "lib/osal.h"
+#include "lib/lib.h"
+#include "lib/err.h"
 
 // #define LSF_LOG_MASK   7
 #define DEF_LOG_MASK   LOG_INFO
@@ -35,20 +37,7 @@
 #define HAS_VSNPRINTF
 #endif
 */
-extern struct config_param genParams_[];
 
-extern const char *err_str_ (int errnum, const char *fmt, char *buf);
-void ls_closelog_ext (void);
-char *argvmsg_ (int argc, char **argv);
-
-int logclass = 0;
-int timinglevel = 0;
-
-static char logfile[MAXPATHLEN];
-static char logident[10];
-static int logmask;
-static enum { LOGTO_SYS, LOGTO_FILE, LOGTO_STDERR } log_dest;
-static int openLogFile (const char *, char *);
 
 char *
 argvmsg_ (int argc, char **argv)
@@ -185,7 +174,7 @@ syslog: 	// FIXME FIXME FIXME FIXME substitute where appropriate and get rid of 
 	ls_syslog (LOG_ERR, "%s", msg);
 }
 
-static int
+int
 openLogFile (const char *ident, char *myname)
 {
   FILE *lfp;
@@ -247,10 +236,10 @@ void
 ls_syslog (int level, const char *fmt, ...) // FIXME FIXME convert variable argument list to static
 {
 	int save_errno = errno;
-	va_list ap;
+	va_list ap = { };
 	// static char lastMsg[16384];
 	// static int counter = 0;
-	char buf[1024];
+	char *buf = malloc( sizeof( char ) * 1024 + 1 );
 
 	va_start (ap, fmt);
 
@@ -278,6 +267,7 @@ ls_syslog (int level, const char *fmt, ...) // FIXME FIXME convert variable argu
 				{
 					if ((lfp = fopen (logfile, "a")) == NULL)
 					{
+						char *kot = malloc( sizeof( char ) * strlen(  buf ) + 1 );
 
 						if (log_dest == LOGTO_FILE)
 						{
@@ -289,14 +279,17 @@ ls_syslog (int level, const char *fmt, ...) // FIXME FIXME convert variable argu
 						if (level > LOG_DEBUG) {
 							level = LOG_DEBUG;
 						}
-						
-						vsyslog (level, err_str_ (save_errno, fmt, buf), ap);   // FIXME FIXME FIXME FIXME 
-																				//    use debugger, unroll fmt
+
+						sprintf( kot, err_str_ (save_errno, fmt, buf) ); // FIXME FIXME FIXME FIXME use debugger, unroll format string
+						vsyslog (level, kot, ap); // FIXME FIXME FIXME FIXME use debugger, unroll format string 
 						closelog ();
+						free( kot );
 					}
 				}
 				else
 				{
+					err_str_ (save_errno, fmt, buf);
+					char *kot = malloc( sizeof( char ) * strlen( buf ) + 1 );
 					if (log_dest == LOGTO_FILE)
 					{
 						log_dest = LOGTO_SYS;
@@ -307,15 +300,18 @@ ls_syslog (int level, const char *fmt, ...) // FIXME FIXME convert variable argu
 					if (level > LOG_DEBUG) {
 						level = LOG_DEBUG;
 					}
-						
-					vsyslog (level, err_str_ (save_errno, fmt, buf), ap);   // FIXME FIXME FIXME FIXME 
-																			//    use debugger, unroll fmt
+
+					err_str_ (save_errno, fmt, buf);
+					sprintf( kot, buf ); // FIXME FIXME FIXME FIXME use debugger, unroll format string
+					vsyslog (level, kot, ap);  // FIXME FIXME FIXME FIXME use debugger, unroll format string
 					closelog ();
+					free( kot );
 				}
 			}
 			else if (!(S_ISREG (st.st_mode) && st.st_nlink == 1))
 			{
 
+				char *kot = malloc( sizeof( char ) * strlen( err_str_ (save_errno, fmt, buf) ) + 1 );
 				if (log_dest == LOGTO_FILE)
 				{
 					log_dest = LOGTO_SYS;
@@ -327,14 +323,15 @@ ls_syslog (int level, const char *fmt, ...) // FIXME FIXME convert variable argu
 					level = LOG_DEBUG;
 				}
 					
-				vsyslog (level, err_str_ (save_errno, fmt, buf), ap);   // FIXME FIXME FIXME FIXME 
-																		//    use debugger, unroll fmt
+				sprintf( kot, err_str_ (save_errno, fmt, buf) );
+				vsyslog (level, kot, ap); // FIXME FIXME FIXME FIXME use debugger, unroll format string
 				closelog ();
 			}
 			else
 			{
 				if ((lfp = fopen (logfile, "a")) == NULL)
 				{
+					char *kot = malloc( sizeof( char ) * strlen( err_str_ (save_errno, fmt, buf) ) + 1 );
 					if (log_dest == LOGTO_FILE)
 					{
 						log_dest = LOGTO_SYS;
@@ -345,9 +342,9 @@ ls_syslog (int level, const char *fmt, ...) // FIXME FIXME convert variable argu
 					if (level > LOG_DEBUG) {
 						level = LOG_DEBUG;
 					}
-						
-					vsyslog (level, err_str_ (save_errno, fmt, buf), ap);   // FIXME FIXME FIXME FIXME 
-																			//    use debugger, unroll fmt
+
+					sprintf( kot, err_str_ (save_errno, fmt, buf) ); // FIXME FIXME FIXME FIXME use debugger, unroll format string
+					vsyslog (level, kot, ap); // FIXME FIXME FIXME FIXME use debugger, unroll format string
 					closelog ();
 				}
 			}
@@ -366,16 +363,17 @@ ls_syslog (int level, const char *fmt, ...) // FIXME FIXME convert variable argu
 	}
 	else if ((logmask & LOG_MASK (level)) != 0)
 	{
-
+		char *kot = malloc( sizeof( char ) * strlen( err_str_ (save_errno, fmt, buf) ) + 1 );
 		if (level > LOG_DEBUG) {
 			level = LOG_DEBUG;
 		}
-		vsyslog (level, err_str_ (save_errno, fmt, buf), ap);   // FIXME FIXME FIXME FIXME 
-																//    use debugger, unroll fmt
+		sprintf( kot, err_str_ (save_errno, fmt, buf) ); // FIXME FIXME FIXME FIXME use debugger, unroll format string
+		vsyslog (level, kot, ap); // FIXME FIXME FIXME FIXME use debugger, unroll format string
 		closelog ();
 	}
 
-  va_end (ap);
+	free( buf );
+	va_end (ap);
 }
 
 void

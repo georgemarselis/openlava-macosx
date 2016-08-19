@@ -178,7 +178,7 @@ err_str_ (int errnum, const char *fmt, char *buf)
         return buf;
     }
 
-    return (fmt);
+    return (buf);
 }
 
 void

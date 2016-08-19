@@ -40,6 +40,7 @@ AC_CHECK_HEADERS([tcl.h], [HAVE_TCL_TCL_H=yes], [HAVE_TCL_H=y]) # FIXME FIXME FI
 # set resd port
 # set limd port
 # set pimd port
+# set __LP64__ or check for same for rpc/xdr.h header
 
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lm':
