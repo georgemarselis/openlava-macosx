@@ -26,72 +26,22 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#ifdef __LINUX__
+#include "daemons/liblimd/linux.h"
+#endif 
+#include "daemons/liblimd/limd.h"
 #include "lib/mls.h"
-#include "lim.h"
-
-#define NL_SETN 24
-
-#define  EXP3   0.716531311
-#define  EXP4   0.77880078
-#define  EXP6   0.846481725
-#define  EXP12  0.920044415
-#define  EXP180 0.994459848
-
-#define MAXIDLETIME  15552000
-
-#ifndef L_SET
-# ifdef SEEK_SET
-#  define L_SET         SEEK_SET
-# else
-#  define L_SET         0
-# endif
-#endif
-
-float k_hz;
-static FILE *lim_popen (char **, char *);
-static int lim_pclose (FILE *);
-
-static time_t getXIdle (void);
+#include "lib/lproto.h"
 
 
-
-#include "lim.linux.h"
-
-
-#include "../lib/lproto.h"
-
-pid_t elim_pid = -1;
-
-int defaultRunElim = FALSE;
-
-static float overRide[NBUILTINDEX];
-static char *getElimRes (void);
-static int saveSBValue (char *, char *);
-static int callElim (void);
-static int startElim (void);
-static void termElim (void);
-static int isResourceSharedInAllHosts (char *resName);
-
-
-int ELIMrestarts = -1;
-int ELIMdebug = 0;
-int ELIMblocktime = -1;
-
-extern int maxnLbHost;
-float initLicFactor (void);
-static void setUnkwnValues (void);
-
-extern char *getExtResourcesVal (char *);
-extern int blockSigs_ (int, sigset_t *, sigset_t *);
-static void unblockSigs_ (sigset_t *);
 void
 satIndex (void)
 {
-  int i;
+    for ( uint i = 0; i < allInfo.numIndx; i++) {
+       li[i].satvalue = myHostPtr->busyThreshold[i];
+    }
 
-  for (i = 0; i < allInfo.numIndx; i++)
-    li[i].satvalue = myHostPtr->busyThreshold[i];
-
+    return;
 }
 
 void
@@ -105,14 +55,14 @@ loadIndex (void)
 
 }
 
-static void
+void
 smooth (float *val, float instant, float factor)
 {
   (*val) = ((*val) * factor) + (instant * (1 - factor));
 
 }
 
-static time_t
+time_t
 getutime (char *usert)
 {
   struct stat ttystatus;
@@ -194,14 +144,14 @@ getLastActiveTime ()
     }
 }
 
-static float
+float
 idletime (int *logins)
 {
-  static char fname[] = "idletime()";
+  char fname[] = "idletime()";
   time_t itime;
-  static time_t idleSeconds;
-  static int idcount;
-  static int last_logins;
+  time_t idleSeconds;
+  int idcount;
+  int last_logins;
   time_t currentTime;
   int numusers;
   int ufd;
@@ -378,10 +328,10 @@ idletime (int *logins)
   return (idleSeconds / 60.0);
 }
 
-static time_t
+time_t
 getXIdle ()
 {
-  static char fname[] = "getXIdle()";
+  char fname[] = "getXIdle()";
   time_t lastTime = 0;
   time_t t;
   struct stat st;
@@ -422,19 +372,19 @@ readLoad (int kernelPerm)
   int busyBits = 0;
   double etime;
   double itime;
-  static int readCount0 = 10000;
-  static int readCount1 = 5;
-  static int readCount2 = 1500;
-  static float avrun15 = 0.0;
+  int readCount0 = 10000;
+  int readCount1 = 5;
+  int readCount2 = 1500;
+  float avrun15 = 0.0;
   float ql;
-  static float avrun1m = 0.0;
-  static float avrun15m = 0.0;
-  static float smpages;
-  static float smkbps;
+  float avrun1m = 0.0;
+  float avrun15m = 0.0;
+  float smpages;
+  float smkbps;
   float extrafactor;
-  static float swap;
-  static float instant_ut;
-  static int loginses;
+  float swap;
+  float instant_ut;
+  int loginses;
 
   TIMEIT (0, getusr (), "getusr()");
 
@@ -636,10 +586,10 @@ checkExchange:
   return;
 }
 
-static FILE *
+FILE *
 lim_popen (char **argv, char *mode)
 {
-  static char fname[] = "lim_popen()";
+  char fname[] = "lim_popen()";
   int p[2], pid, i;
 
   if (mode[0] != 'r')
@@ -686,7 +636,7 @@ lim_popen (char **argv, char *mode)
   return fdopen (p[0], mode);
 }
 
-static int
+int
 lim_pclose (FILE * ptr)
 {
   sigset_t omask;
@@ -715,11 +665,11 @@ lim_pclose (FILE * ptr)
   return (0);
 }
 
-static int
+int
 saveIndx (char *name, float value)
 {
-  static char fname[] = "saveIndx()";
-  static char **names;
+  char fname[] = "saveIndx()";
+  char **names;
   int indx, i;
 
   if (!names)
@@ -775,7 +725,7 @@ saveIndx (char *name, float value)
   return (0);
 }
 
-static int
+int
 getSharedResBitPos (char *resName)
 {
   struct sharedResourceInstance *tmpSharedRes;
@@ -796,7 +746,7 @@ getSharedResBitPos (char *resName)
 
 }
 
-static void
+void
 getExtResourcesLoad (void)
 {
   int i, bitPos;
@@ -854,17 +804,17 @@ isResourceSharedByHost (struct hostNode *host, char *resName)
 
 #define ELIMNAME "elim"
 #define MAXEXTRESLEN 4096
-static void
+void
 getusr (void)
 {
-  static char fname[] = "getusr";
-  static FILE *fp;
-  static time_t lastStart;
-  static char first = TRUE;
+  char fname[] = "getusr";
+  FILE *fp;
+  time_t lastStart;
+  char first = TRUE;
   int i, nfds;
   struct timeval timeout;
-  static char *masterResStr = "Y";
-  static char *resStr = NULL;
+  char *masterResStr = "Y";
+  char *resStr = NULL;
   int size;
   struct sharedResourceInstance *tmpSharedRes;
   char *hostNamePtr;
@@ -1059,8 +1009,8 @@ getusr (void)
       sigset_t oldMask;
       sigset_t newMask;
 
-      static char *fromELIM = NULL;
-      static int sizeOfFromELIM = MAXLINELEN;
+      char *fromELIM = NULL;
+      int sizeOfFromELIM = MAXLINELEN;
       char *elimPos;
       int spaceLeft, spaceRequired;
 
@@ -1253,7 +1203,7 @@ getusr (void)
 void
 unblockSigs_ (sigset_t * mask)
 {
-  static char fname[] = "unblockSigs_()";
+  char fname[] = "unblockSigs_()";
 
   sigprocmask (SIG_SETMASK, mask, NULL);
 
@@ -1265,7 +1215,7 @@ unblockSigs_ (sigset_t * mask)
 
 }
 
-static void
+void
 setUnkwnValues (void)
 {
   int i;
@@ -1290,10 +1240,10 @@ setUnkwnValues (void)
     }
 }
 
-static int
+int
 saveSBValue (char *name, char *value)
 {
-  static char fname[] = "saveSBValue()";
+  char fname[] = "saveSBValue()";
   int i, indx, j, myHostNo = -1, updHostNo = -1;
   char *temp = NULL;
   time_t currentTime = 0;
@@ -1370,7 +1320,7 @@ saveSBValue (char *name, char *value)
 void
 initConfInfo (void)
 {
-  static char fname[] = "initConfInfo()";
+  char fname[] = "initConfInfo()";
   char *sp;
 
   if ((sp = getenv ("LSF_NCPUS")) != NULL)
@@ -1392,7 +1342,7 @@ initConfInfo (void)
 
 }
 
-static char *
+char *
 getElimRes (void)
 {
 
@@ -1441,11 +1391,11 @@ getElimRes (void)
   return resNameString;
 }
 
-static int
+int
 callElim (void)
 {
-  static int runit = FALSE;
-  static int lastTimeMasterMe = FALSE;
+  int runit = FALSE;
+  int lastTimeMasterMe = FALSE;
 
   if (masterMe && !lastTimeMasterMe)
     {
@@ -1519,10 +1469,10 @@ callElim (void)
 
 }
 
-static int
+int
 startElim (void)
 {
-  static int notFirst = FALSE, startElim = FALSE;
+  int notFirst = FALSE, startElim = FALSE;
   int i;
 
   if (!notFirst)
@@ -1546,7 +1496,7 @@ startElim (void)
 }
 
 
-static void
+void
 termElim (void)
 {
   if (elim_pid == -1)
@@ -1557,7 +1507,7 @@ termElim (void)
 
 }
 
-static int
+int
 isResourceSharedInAllHosts (char *resName)
 {
   struct sharedResourceInstance *tmpSharedRes;
