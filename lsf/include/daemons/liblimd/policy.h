@@ -16,6 +16,8 @@
 #define SORT_INCR   0x08
 
 #define P_(s) s
+#define NOTORDERED(inc,a,b)   ((inc) ? ((a) > (b)) : ((a) < (b)))
+#define RQ  ((1 << R15S) | (1 << R1M) | (1 << R15M))
 
 void placeReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr, uint s);
 int findBestHost P_ ((register struct resVal *, int, int, char **, int, char, int, int));

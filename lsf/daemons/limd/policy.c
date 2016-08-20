@@ -18,19 +18,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
-#include <math.h>
-
-#ifndef __LP64__
-#define __LP64__    // FIXME FIXME FIXME FIXME FIXME set appropriate var in configure.ac
-#endif
-// #ifndef __XDR_HEADER__
-// #include <rpc/xdr.h>
-// #endif
 
 #include "daemons/liblimd/policy.h"
 #include "daemons/liblimd/rload.h"
-#include "daemons/liblimd/limd.h"
-#include "libint/resreq.h"
+// #include "daemons/liblimd/limd.h"
+// #include "libint/resreq.h"
 #include "lib/lib.h"
 
 
@@ -277,16 +269,17 @@ Reply1:
 int
 getOkSites (int num, int retain, int ignore_res)
 {
-  int i;
-  int j;
-  int left;
-  int tempstatus[2];
+    uint i = 0;
+    uint j = 0;
+    int left = 0;
+    int tempstatus[2] = { 0, 0 };
 
-    if (retain >= num)
+    if (retain >= num) {
         return num;
+    }
 
     left = num;
-    for (i = 0; i < num; i++) {
+    for ( i = 0; i < num; i++) {
 
         tempstatus[0] = candidates[i]->status[0];
         tempstatus[1] = candidates[i]->status[1];
@@ -319,7 +312,7 @@ getOkSites (int num, int retain, int ignore_res)
         }
     }
 
-    for (i = 0, j = 0; i < num; i++) {
+    for ( i = 0, j = 0; i < num; i++) {
         if (candidates[i]) {
             candidates[j] = candidates[i];
             j++;
@@ -377,228 +370,225 @@ getEligibleSites (struct resVal *resValPtr, struct decisionReq *reqPtr, char all
 int
 grabHosts (struct hostNode *hList, struct resVal *resValPtr, struct decisionReq *reqPtr, int ncand, char *fromEligible, int flags)
 {
-  struct hostNode *hPtr;
-  int j;
-  struct tclHostData tclHostData;
+    uint j = 0;
+    struct hostNode *hPtr = NULL;
+    struct tclHostData tclHostData = { };
 
-  for (hPtr = hList; hPtr; hPtr = hPtr->nextPtr)
+    for (hPtr = hList; hPtr; hPtr = hPtr->nextPtr)
     {
 
-      if ((fabs (resValPtr->val[MEM]) < INFINIT_LOAD) &&
-    (resValPtr->val[MEM] > hPtr->statInfo.maxMem))
-  continue;
+        if ((fabs (resValPtr->val[MEM]) < INFINIT_LOAD) && (resValPtr->val[MEM] > hPtr->statInfo.maxMem)) {
+            continue;
+        }
 
-      if ((fabs (resValPtr->val[SWP]) < INFINIT_LOAD) &&
-    (resValPtr->val[SWP] > hPtr->statInfo.maxSwap))
-  continue;
+        if ((fabs (resValPtr->val[SWP]) < INFINIT_LOAD) && (resValPtr->val[SWP] > hPtr->statInfo.maxSwap)) {
+            continue;
+        }
 
-      if ((fabs (resValPtr->val[TMP]) < INFINIT_LOAD)
-    && (resValPtr->val[TMP] > hPtr->statInfo.maxTmp))
-  continue;
+        if ((fabs (resValPtr->val[TMP]) < INFINIT_LOAD) && (resValPtr->val[TMP] > hPtr->statInfo.maxTmp)) {
+            continue;
+        }
 
-      if (reqPtr->ofWhat == OF_HOSTS && !(flags & ELIG_ALL))
-  {
-    for (j = 1; j < reqPtr->numPrefs; j++)
-      {
-        if (equalHost_ (hPtr->hostName, reqPtr->preferredHosts[j]))
-    break;
-      }
-    if (j == reqPtr->numPrefs)
-      continue;
-  }
+        if (reqPtr->ofWhat == OF_HOSTS && !(flags & ELIG_ALL)) 
+        {
+            for ( j = 1; j < reqPtr->numPrefs; j++)
+            {
+                if (equalHost_ (hPtr->hostName, reqPtr->preferredHosts[j])) {
+                    break;
+                }
+            }
+            if (j == reqPtr->numPrefs) {  // FIXME FIXME FIXME FIXME this may be located inside the for loop above
+                continue;
+            }
+        }
 
-      getTclHostData (&tclHostData, hPtr, fromHostPtr, FALSE);
-      if (evalResReq (resValPtr->selectStr,
-          &tclHostData, reqPtr->options & DFT_FROMTYPE) != 1)
-  continue;
+        getTclHostData (&tclHostData, hPtr, fromHostPtr, FALSE);
+        if (evalResReq (resValPtr->selectStr, &tclHostData, reqPtr->options & DFT_FROMTYPE) != 1) {
+            continue;
+        }
 
-      if (equalHost_ (hPtr->hostName, reqPtr->preferredHosts[0]))
-  *fromEligible = TRUE;
+        if (equalHost_ (hPtr->hostName, reqPtr->preferredHosts[0])) {
+            *fromEligible = TRUE;
+        }
 
-      if (addCandList (hPtr, ncand++) < 0)
-  return -1;
+        if (addCandList (hPtr, ncand++) < 0) {
+            return -1;
+        }
 
-      if ((reqPtr->ofWhat == OF_HOSTS) && !(flags & ELIG_NOLIMIT)
-    && (ncand >= reqPtr->numPrefs))
-  break;
+        if ((reqPtr->ofWhat == OF_HOSTS) && !(flags & ELIG_NOLIMIT) && (ncand >= reqPtr->numPrefs)) {
+            break;
+        }
     }
 
-  return ncand;
+    return ncand;
 }
 
 int
 getNumInstances (int ncandidates)
 {
-  int i;
-  int numInst;
+    int numInst = 0;
 
-  for (i = 0, numInst = 0; i < ncandidates; i++)
+    for ( uint i = 0, numInst = 0; i < ncandidates; i++)
     {
-      if (candidates[i] != NULL)
-  numInst += candidates[i]->availHigh;
+        if (candidates[i] != NULL) {
+            numInst += candidates[i]->availHigh;
+        }
     }
 
-  return numInst;
+    return numInst;
 }
 
-#define RQ  ((1 << R15S) | (1 << R1M) | (1 << R15M))
 
 void
 potentialOfHost (struct hostNode *hPtr, struct resVal *resValPtr)
 {
-  int indexpot;
-  int i;
-  int maxCpus;
+    int indexpot = 0;
+    uint maxCpus  = 0;
 
-  maxCpus = hPtr->statInfo.maxCpus;
-  if (resValPtr->genClass & RQ)
+    maxCpus = hPtr->statInfo.maxCpus;
+    if (resValPtr->genClass & RQ)
     {
-
-      hPtr->availLow = hPtr->statInfo.maxCpus / li[R15S].extraload[0];
-      hPtr->availHigh = hPtr->statInfo.maxCpus / li[R15S].extraload[0];
+        hPtr->availLow = hPtr->statInfo.maxCpus / li[R15S].extraload[0];
+        hPtr->availHigh = hPtr->statInfo.maxCpus / li[R15S].extraload[0];
     }
-  else
+    else
     {
-      hPtr->availLow = hPtr->statInfo.maxCpus;
-      hPtr->availHigh = hPtr->statInfo.maxCpus;
+        hPtr->availLow = hPtr->statInfo.maxCpus;
+        hPtr->availHigh = hPtr->statInfo.maxCpus;
     }
 
-  for (i = 0; i < NBUILTINDEX; i++)
+    for ( uint i = 0; i < NBUILTINDEX; i++)
     {
-      if (!(i == R15S || i == R1M || i == R15M ||
-      i == MEM || i == SWP || i == TMP))
-  continue;
+        if (!(i == R15S || i == R1M || i == R15M || i == MEM || i == SWP || i == TMP)) {
+            continue;
+        }
 
-      if (!(resValPtr->genClass & (1 << i)))
-  continue;
+        if (!(resValPtr->genClass & (1 << i))) {
+            continue;
+        }
 
-      if (resValPtr->val[i] >= INFINIT_LOAD)
-  {
-    hPtr->availLow = 1;
-    hPtr->availHigh = 1;
+        if (resValPtr->val[i] >= INFINIT_LOAD)
+        {
+            hPtr->availLow = 1;
+            hPtr->availHigh = 1;
+            return;
+        }
+
+        if (resValPtr->val[i] < 0.01) {
+            continue;
+        }
+
+        if (i == R15S || i == R1M || i == R15M)
+        {
+            indexpot = ((int)(maxCpus -  (hPtr->uloadIndex[i] + 0.5)) % maxCpus) / resValPtr->val[i]; // FIXME FIXME FIXME FIXME FIXME the cast has to go
+            if (indexpot < 1) {
+                indexpot = 1;
+            }
+                hPtr->availLow = MIN (hPtr->availLow, indexpot);
+
+                indexpot = maxCpus / resValPtr->val[i];
+                if (indexpot < 1) {
+                    indexpot = 1;
+                }
+                hPtr->availHigh = MIN (hPtr->availHigh, indexpot);
+        }
+        else
+        {
+
+            indexpot = hPtr->loadIndex[i] / resValPtr->val[i];
+            hPtr->availLow = MIN (hPtr->availLow, indexpot);
+            hPtr->availHigh = MIN (hPtr->availHigh, indexpot);
+        }
+    }
+
     return;
-  }
-
-      if (resValPtr->val[i] < 0.01)
-  continue;
-
-      if (i == R15S || i == R1M || i == R15M)
-  {
-
-    indexpot =
-      (int) (maxCpus -
-       ((int) (hPtr->uloadIndex[i] + 0.5) % maxCpus)) /
-      resValPtr->val[i];
-    if (indexpot < 1)
-      indexpot = 1;
-    hPtr->availLow = MIN (hPtr->availLow, indexpot);
-
-    indexpot = (int) (maxCpus / resValPtr->val[i]);
-    if (indexpot < 1)
-      indexpot = 1;
-    hPtr->availHigh = MIN (hPtr->availHigh, indexpot);
-
-  }
-      else
-  {
-
-    indexpot = (int) hPtr->loadIndex[i] / resValPtr->val[i];
-    hPtr->availLow = MIN (hPtr->availLow, indexpot);
-    hPtr->availHigh = MIN (hPtr->availHigh, indexpot);
-  }
-    }
 }
 
 
 void
 potentialOfCandidates (int ncandidates, struct resVal *resValPtr)
 {
-  int i;
-
-  for (i = 0; i < ncandidates; i++)
+    for ( uint i = 0; i < ncandidates; i++)
     {
-      if (candidates[i] == NULL)
-  continue;
-      potentialOfHost (candidates[i], resValPtr);
+        if (candidates[i] == NULL) {
+            continue;
+        }
+        potentialOfHost (candidates[i], resValPtr);
     }
+    return;
 }
 
 void
-selectBestInstances (int ncandidates,
-         int needed, char locality, int ignore_res)
+selectBestInstances (int ncandidates, int needed, char locality, int ignore_res)
 {
-  int avail;
-  int additional;
-  int i;
+    int additional = 0;
+    int avail = 0;
 
-  for (i = 0; i < ncandidates; i++)
-    candidates[i]->use = 0;
+    for ( uint i = 0; i < ncandidates; i++) {
+        candidates[i]->use = 0;
+    }
 
-  if (locality)
+    if (locality)
     {
 
-      char flags = SORT_FINAL | SORT_SINDX | SORT_INCR;
-      int cand;
+        char flags = SORT_FINAL | SORT_SINDX | SORT_INCR;
+        int cand = 0;
 
-      for (i = 0; i < ncandidates; i++)
-  {
+        for( uint i = 0; i < ncandidates; i++)
+        {
 
-    if (candidates[i]->availHigh > needed)
-      {
-        candidates[i]->use = needed;
+            if (candidates[i]->availHigh > needed)
+            {
+                candidates[i]->use = needed;
+                return;
+            }
+
+            candidates[i]->loadIndex[allInfo.numIndx] = candidates[i]->availHigh;
+            candidates[i]->loadIndex[allInfo.numIndx] += (ncandidates - i) / ncandidates;
+        }
+
+        cand = bsort (allInfo.numIndx, ncandidates, 0, ncandidates, 0, flags, ignore_res, NORMALIZE);
+        if (cand != ncandidates) {
+            ls_syslog (LOG_ERR, "%s: Internal scheduling error(1) cand %d ncandidates %d", __func__, cand, ncandidates);
+        }
+
+        for ( uint i = 0; (i < ncandidates) && (needed > 0); i++)
+        {
+            avail = candidates[i]->availHigh;
+            candidates[i]->use = MIN (needed, avail);
+            needed -= candidates[i]->use;
+        }
+
         return;
-      }
-
-    candidates[i]->loadIndex[allInfo.numIndx] =
-      candidates[i]->availHigh;
-
-    candidates[i]->loadIndex[allInfo.numIndx] +=
-      (float) (ncandidates - i) / ncandidates;
-  }
-
-      cand = bsort (allInfo.numIndx,
-        ncandidates,
-        0, ncandidates, 0, flags, ignore_res, NORMALIZE);
-      if (cand != ncandidates)
-  ls_syslog (LOG_ERR, "\
-%s: Internal scheduling error(1) cand %d ncandidates %d", __func__, cand, ncandidates);
-
-      for (i = 0; (i < ncandidates) && (needed > 0); i++)
-  {
-    avail = candidates[i]->availHigh;
-    candidates[i]->use = MIN (needed, avail);
-    needed -= candidates[i]->use;
-  }
-
-      return;
     }
 
-  for (i = 0; (i < ncandidates) && (needed > 0); i++)
+    for( uint i = 0; (i < ncandidates) && (needed > 0); i++)
     {
-      avail = candidates[i]->availLow;
+        avail = candidates[i]->availLow;
+        if ((needed <= candidates[i]->availHigh) && (i < ncandidates / 2)) {
+            avail = candidates[i]->availHigh;
+        }
 
-      if ((needed <= candidates[i]->availHigh) && (i < ncandidates / 2))
-  avail = candidates[i]->availHigh;
-
-      candidates[i]->use += MIN (needed, avail);
-      needed -= candidates[i]->use;
+        candidates[i]->use += MIN (needed, avail);
+        needed -= candidates[i]->use;
     }
 
-  if (needed > 0)
+    if (needed > 0)
     {
-
-      for (i = 0; (i < ncandidates) && (needed > 0); i++)
-  {
-
-    avail = candidates[i]->availHigh - candidates[i]->availLow;
-    if (avail == 0)
-      continue;
-    additional = MIN (needed, avail);
-    candidates[i]->use += additional;
-    candidates[i]->availHigh -= additional;
-    needed -= additional;
-  }
+        for ( uint i = 0; (i < ncandidates) && (needed > 0); i++)
+        {
+            avail = candidates[i]->availHigh - candidates[i]->availLow;
+            if (avail == 0) {
+                continue;
+            }
+            additional = MIN (needed, avail);
+            candidates[i]->use += additional;
+            candidates[i]->availHigh -= additional;
+            needed -= additional;
+        }
     }
+
+    return; 
 }
 
 int
@@ -744,13 +734,12 @@ findNPref (int ncandidates, int numPrefs, char **preferredHosts)
   return nec;
 }
 
-#define NOTORDERED(inc,a,b)   ((inc) ? ((a) > (b)) : ((a) < (b)))
 
 int
 bsort (int lidx, int ncandidates, int nec, int numHosts,float threshold, char flags, int ignore_res, int rqlOptions)
 {
   char swap;
-  register int i, j;
+  int i, j;
   char incr;
   float exld1, exld2;
   struct hostNode *tmp;
@@ -1160,15 +1149,16 @@ loadadjReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr, uint
   j = 0;
   for (i = 0; i < jobXfer.numHosts; i++)
     {
-      candidate = findHostbyList (myClusterPtr->hostList,
-          jobXfer.placeInfo[i].hostName);
-      if (candidate == NULL)
-  continue;
+      candidate = findHostbyList (myClusterPtr->hostList, jobXfer.placeInfo[i].hostName);
+        if (candidate == NULL) {
+            continue;           
+        }
 
       for (k = 0; k < j; k++)
   {
-    if (candidate == candidates[j])
-      break;
+        if (candidate == candidates[j]) {
+            break;
+        }
   }
 
       if (k == j)
@@ -1258,8 +1248,9 @@ updExtraLoad (struct hostNode **destHostPtr, char *resReq, int numHosts)
       destHostPtr[j]->lastJackTime = jtime;
       for (lidx = 0; lidx < NBUILTINDEX; lidx++)
   {
-    if (lidx == R15M)
+    if (lidx == R15M) {
       continue;
+    }
 
 
     if (resVal.genClass & (1 << lidx))
@@ -1535,65 +1526,71 @@ loadReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr, uint s)
       reply.indicies[j] = allInfo.resTable[k].name;
     }
 
-  for (i = 0; i < reply.nEntry; i++)
+    for (i = 0; i < reply.nEntry; i++)
     {
-      strcpy (reply.loadMatrix[i].hostName, candidates[i]->hostName);
-      if (definedSharedResource (candidates[i], &allInfo) == TRUE)
-  {
-    reply.flags |= LOAD_REPLY_SHARED_RESOURCE;
-  }
-      reply.loadMatrix[i].status[0] = candidates[i]->status[0];
-      if (LS_ISUNAVAIL (candidates[i]->status))
-  {
-    for (j = 0; j < resVal.nindex; j++) {
-      reply.loadMatrix[i].loadIndex[j] = INFINIT_LOAD;
-    }
-    for (j = 0; j < GET_INTNUM (resVal.nindex); j++) {
-      reply.loadMatrix[i].status[j + 1] = 0;
-    }
-    continue;
-  }
-
-
-      for (j = 0; j < GET_INTNUM (reply.nIndex); j++)
-  reply.loadMatrix[i].status[j + 1] = 0;
-      for (j = 0; j < reply.nIndex; j++)
-  {
-    int indx;
-    indx = resVal.indicies[j];
-    if (LS_ISBUSYON (candidates[i]->status, indx)) {
-      SET_BIT( INTEGER_BITS + j, reply.loadMatrix[i].status); // FIXME FIXME FIXME FIXME FIXME cast is totally inaccurate; replace with gnu arbitrary precision library.
-    }
-    if (indx == R15S || indx == R1M || indx == R15M)
-      {
-        if (ldReq.options & NORMALIZE) {
-            reply.loadMatrix[i].loadIndex[j] = candidates[i]->loadIndex[indx];
+        strcpy (reply.loadMatrix[i].hostName, candidates[i]->hostName);
+        if (definedSharedResource (candidates[i], &allInfo) == TRUE)
+        {
+            reply.flags |= LOAD_REPLY_SHARED_RESOURCE;
         }
-        else if (ldReq.options & EFFECTIVE)
-    {
-      float factor = 0.0;
-      factor = (candidates[i]->hModelNo >= 0) ?
-        shortInfo.cpuFactors[candidates[i]->hModelNo] : 1.0;
-      reply.loadMatrix[i].loadIndex[j]
-        = effectiveRq (candidates[i]->loadIndex[indx], factor);
+        reply.loadMatrix[i].status[0] = candidates[i]->status[0];
+        if (LS_ISUNAVAIL (candidates[i]->status))
+        {
+            for (j = 0; j < resVal.nindex; j++) {
+                reply.loadMatrix[i].loadIndex[j] = INFINIT_LOAD;
+            }
+            for (j = 0; j < GET_INTNUM (resVal.nindex); j++) {
+                reply.loadMatrix[i].status[j + 1] = 0;
+            }
+            continue;
+        }
 
-      if (reply.loadMatrix[i].loadIndex[j] < 0.0)
-        reply.loadMatrix[i].loadIndex[j] = 0.0;
-    }
-        else
-    reply.loadMatrix[i].loadIndex[j] = candidates[i]->uloadIndex[indx];
-      }
-    else
-      {
-        reply.loadMatrix[i].loadIndex[j] = candidates[i]->loadIndex[indx];
-      }
-  }
+        for (j = 0; j < GET_INTNUM (reply.nIndex); j++) {
+            reply.loadMatrix[i].status[j + 1] = 0;
+        }
+        for (j = 0; j < reply.nIndex; j++)
+        {
+            int indx = 0;
+            indx = resVal.indicies[j];
+    
+            if (indx == R15S || indx == R1M || indx == R15M)
+            {
+                if (ldReq.options & NORMALIZE) {
+                    reply.loadMatrix[i].loadIndex[j] = candidates[i]->loadIndex[indx];
+                }
+                else if (ldReq.options & EFFECTIVE)
+                {
+                    float factor = 0.0;
+                    if( candidates[i]->hModelNo >= 0.00000 ) { // FIXME FIXME FIXME FIXME replace number with hardware model label
+                     // factor = (candidates[i]->hModelNo >= 0) ? 
+                    factor = shortInfo.cpuFactors[candidates[i]->hModelNo];
+                    }
+                    else {
+                        factor = 1.0;
+                    }
+                    
+                    reply.loadMatrix[i].loadIndex[j]= effectiveRq (candidates[i]->loadIndex[indx], factor);
+
+                    if (reply.loadMatrix[i].loadIndex[j] < 0.0) {
+                        reply.loadMatrix[i].loadIndex[j] = 0.0;
+                    }
+                }
+                else {
+                    reply.loadMatrix[i].loadIndex[j] = candidates[i]->uloadIndex[indx];
+                }
+            }
+            else
+            {
+                reply.loadMatrix[i].loadIndex[j] = candidates[i]->loadIndex[indx];
+            }
+        }
     }
 
 Reply:
-  for (i = 0; i < ldReq.numPrefs; i++)
-    free (ldReq.preferredHosts[i]);
-  free (ldReq.preferredHosts);
+    for (i = 0; i < ldReq.numPrefs; i++) {
+        free (ldReq.preferredHosts[i]);
+    }
+    free (ldReq.preferredHosts);
 
 Reply1:
   freeResVal (&resVal);
@@ -1609,16 +1606,17 @@ Reply1:
     }
   else
     {
-      replyStruct = (char *) NULL;
-      bufSize = 512;
+      replyStruct = NULL;
+      bufSize = 512; // FIXME FIXME FIXME FIXME whaaaaaa???? why only 512?
     }
 
-  buf = (char *) malloc (bufSize);
+  buf = malloc (bufSize);
   if (!buf)
     {
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
-      if (limReplyCode == LIME_NO_ERR)
-  FREEUP (reply.loadMatrix);
+      if (limReplyCode == LIME_NO_ERR) {
+            FREEUP (reply.loadMatrix);
+      }
       FREEUP (reply.indicies);
       return;
     }
@@ -1628,8 +1626,9 @@ Reply1:
     {
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_encodeMsg");
       xdr_destroy (&xdrs2);
-      if (limReplyCode == LIME_NO_ERR)
-  FREEUP (reply.loadMatrix);
+        if (limReplyCode == LIME_NO_ERR) {
+            FREEUP (reply.loadMatrix);
+        }
       FREEUP (buf);
       FREEUP (reply.indicies);
       return;
@@ -1770,43 +1769,40 @@ void
 getTclHostData (struct tclHostData *tclHostData, struct hostNode *hostNode, struct hostNode *fromHostNode, int checkSyntax)
 {
 
-  tclHostData->hostName = hostNode->hostName;
-  tclHostData->maxCpus = hostNode->statInfo.maxCpus;
-  tclHostData->maxMem = hostNode->statInfo.maxMem;
-  tclHostData->maxSwap = hostNode->statInfo.maxSwap;
-  tclHostData->maxTmp = hostNode->statInfo.maxTmp;
-  tclHostData->nDisks = hostNode->statInfo.nDisks;
+    tclHostData->hostName = hostNode->hostName;
+    tclHostData->maxCpus  = hostNode->statInfo.maxCpus;
+    tclHostData->maxMem   = hostNode->statInfo.maxMem;
+    tclHostData->maxSwap  = hostNode->statInfo.maxSwap;
+    tclHostData->maxTmp   = hostNode->statInfo.maxTmp;
+    tclHostData->nDisks   = hostNode->statInfo.nDisks;
 
-  tclHostData->hostInactivityCount = hostNode->hostInactivityCount;
-  tclHostData->status = hostNode->status;
-  tclHostData->loadIndex = hostNode->loadIndex;
-  tclHostData->rexPriority = hostNode->rexPriority;
-  tclHostData->hostType = (hostNode->hTypeNo >= 0) ?
-    shortInfo.hostTypes[hostNode->hTypeNo] : "unknown";
-  tclHostData->hostModel = (hostNode->hModelNo >= 0) ?
-    shortInfo.hostModels[hostNode->hModelNo] : "unknown";
-  tclHostData->fromHostType = (fromHostNode->hTypeNo >= 0) ?
-    shortInfo.hostTypes[fromHostNode->hTypeNo] : "unknown";
-  tclHostData->fromHostModel = (fromHostNode->hModelNo >= 0) ?
-    shortInfo.hostModels[fromHostNode->hModelNo] : "unknown";
-  tclHostData->cpuFactor = (hostNode->hModelNo >= 0) ?
-    shortInfo.cpuFactors[hostNode->hModelNo] : 1.0;
-  tclHostData->DResBitMaps = hostNode->DResBitMaps;
-  tclHostData->ignDedicatedResource = ignDedicatedResource;
-  tclHostData->resBitMaps = hostNode->resBitMaps;
-  tclHostData->numResPairs = hostNode->numInstances;
-  tclHostData->resPairs = getResPairs (hostNode);
-  if (checkSyntax == TRUE)
-    tclHostData->flag = TCL_CHECK_SYNTAX;
-  else
-    tclHostData->flag = TCL_CHECK_EXPRESSION;
-
+    tclHostData->hostInactivityCount = hostNode->hostInactivityCount;
+    tclHostData->status        = hostNode->status;
+    tclHostData->loadIndex     = hostNode->loadIndex;
+    tclHostData->rexPriority   = hostNode->rexPriority;
+    tclHostData->hostType      = (hostNode->hTypeNo >= 0)       ?  shortInfo.hostTypes[hostNode->hTypeNo]       : "unknown";
+    tclHostData->hostModel     = (hostNode->hModelNo >= 0)      ?  shortInfo.hostModels[hostNode->hModelNo]     : "unknown";
+    tclHostData->fromHostType  = (fromHostNode->hTypeNo >= 0)   ?  shortInfo.hostTypes[fromHostNode->hTypeNo]   : "unknown";
+    tclHostData->fromHostModel = (fromHostNode->hModelNo >= 0) ?   shortInfo.hostModels[fromHostNode->hModelNo] : "unknown";
+    tclHostData->cpuFactor     = (hostNode->hModelNo >= 0) ?       shortInfo.cpuFactors[hostNode->hModelNo]     : 1.0;
+    tclHostData->DResBitMaps   = hostNode->DResBitMaps;
+    tclHostData->ignDedicatedResource = ignDedicatedResource;
+    tclHostData->resBitMaps           = hostNode->resBitMaps;
+    tclHostData->numResPairs          = hostNode->numInstances;
+    tclHostData->resPairs             = getResPairs (hostNode);
+    if (checkSyntax == TRUE) {
+        tclHostData->flag = TCL_CHECK_SYNTAX;
+    }
+    else {
+        tclHostData->flag = TCL_CHECK_EXPRESSION;
+    }
+    return;
 }
 
 void
 setBusyIndex (int lidx, struct hostNode *host)
 {
-  float load;
+  float load = 0.0;
 
   if (lidx == R15S || lidx == R1M)
     {
@@ -1825,12 +1821,13 @@ setBusyIndex (int lidx, struct hostNode *host)
       host->status[0] |= LIM_BUSY;
     }
 
+    return;
 }
 
 float
 loadIndexValue (int hostIdx, int loadIdx, int rqlOptions)
 {
-  float loadIndex;
+  float loadIndex = 0.0;
 
   if (loadIdx == R15S || loadIdx == R1M || loadIdx == R15M)
     {
@@ -1840,14 +1837,13 @@ loadIndexValue (int hostIdx, int loadIdx, int rqlOptions)
   }
       else if (rqlOptions & EFFECTIVE)
   {
-    float factor;
-    factor = (candidates[hostIdx]->hModelNo >= 0) ?
-      shortInfo.cpuFactors[candidates[hostIdx]->hModelNo] : 1.0;
-    loadIndex = effectiveRq (candidates[hostIdx]->loadIndex[loadIdx],
-           factor);
+    float factor = 0.0;
+    factor = (candidates[hostIdx]->hModelNo >= 0) ? shortInfo.cpuFactors[candidates[hostIdx]->hModelNo] : 1.0;
+    loadIndex = effectiveRq (candidates[hostIdx]->loadIndex[loadIdx],factor);
 
-    if (loadIndex < 0.0)
+    if (loadIndex < 0.0) {
       loadIndex = 0.0;
+    }
   }
       else
   {

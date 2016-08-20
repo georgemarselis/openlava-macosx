@@ -43,6 +43,7 @@ AC_CHECK_HEADERS([tcl.h], [HAVE_TCL_TCL_H=yes], [HAVE_TCL_H=y]) # FIXME FIXME FI
 # set __LP64__ or check for same for rpc/xdr.h header
 # check if macosx or other
 # location of /tmp should be configurable; might go on a network, rather than local
+# use gmp.h for floating point calculations?
 
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lm':
