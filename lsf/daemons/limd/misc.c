@@ -17,17 +17,15 @@
  *
  */
 
-#include "lim.h"
-
-static struct hostNode *findHNbyAddr (in_addr_t);
-static int loadEvents (void);
+#include "daemons/liblimd/limd.h"
+#include "daemons/liblimd/misc.h"
+#include "lib/lib.h"   // FIXME FIXME FIXME FIXME delete once lim structures have been moved to limd.h
 
 void
 lim_Exit (const char *fname)
 {
-  ls_syslog (LOG_ERR, "\
-%s: Above fatal error(s) found.", fname);
-  exit (EXIT_FATAL_ERROR);
+    ls_syslog (LOG_ERR, "%s: Above fatal error(s) found.", fname);
+    exit (EXIT_FATAL_ERROR);
 }
 
 int
@@ -39,7 +37,7 @@ equivHostAddr (struct hostNode *hPtr, u_int from)
     {
 
       if (hPtr->addr[i] == from)
-	return TRUE;
+    return TRUE;
     }
 
   return FALSE;
@@ -118,7 +116,7 @@ findHostbyAddr (struct sockaddr_in *from, char *fname)
        * NULL and the caller will know what to do.
        */
       if (limParams[LIM_NO_MIGRANT_HOSTS].paramValue)
-	ls_syslog (LOG_ERR, "\
+    ls_syslog (LOG_ERR, "\
 %s: Host %s (hp=%s/%s) is unknown by configuration; all hosts used by openlava must have unique official names", fname, sockAdd2Str_ (from), hp->h_name, inet_ntoa (*((struct in_addr *) hp->h_addr_list[0])));
       return NULL;
     }
@@ -135,7 +133,7 @@ findHostbyAddr (struct sockaddr_in *from, char *fname)
 }
 
 
-static struct hostNode *
+struct hostNode *
 findHNbyAddr (in_addr_t from)
 {
   struct clusterNode *clPtr;
@@ -145,13 +143,13 @@ findHNbyAddr (in_addr_t from)
   for (hPtr = clPtr->hostList; hPtr; hPtr = hPtr->nextPtr)
     {
       if (equivHostAddr (hPtr, from))
-	return hPtr;
+    return hPtr;
     }
 
   for (hPtr = clPtr->clientList; hPtr; hPtr = hPtr->nextPtr)
     {
       if (equivHostAddr (hPtr, from))
-	return hPtr;
+    return hPtr;
     }
 
   return NULL;
@@ -174,10 +172,10 @@ rmHost (struct hostNode *r)
   while (hPtr)
     {
       if (hPtr == r)
-	{
-	  hPtr0->nextPtr = hPtr->nextPtr;
-	  return r;
-	}
+    {
+      hPtr0->nextPtr = hPtr->nextPtr;
+      return r;
+    }
       hPtr0 = hPtr;
       hPtr = hPtr->nextPtr;
     }
@@ -210,13 +208,13 @@ definedSharedResource (struct hostNode *host, struct lsInfo *allInfo)
     {
       resName = host->instances[i]->resName;
       for (j = 0; j < allInfo->nRes; j++)
-	{
-	  if (strcmp (resName, allInfo->resTable[j].name) == 0)
-	    {
-	      if (allInfo->resTable[j].flags & RESF_SHARED)
-		return TRUE;
-	    }
-	}
+    {
+      if (strcmp (resName, allInfo->resTable[j].name) == 0)
+        {
+          if (allInfo->resTable[j].flags & RESF_SHARED)
+        return TRUE;
+        }
+    }
     }
   return FALSE;
 }
@@ -242,7 +240,7 @@ shortLsInfoDup (struct shortLsInfo *src)
 
 
   memp = malloc ((src->nRes + src->nTypes + src->nModels) * MAXLSFNAMELEN +
-		 src->nRes * sizeof (char *));
+         src->nRes * sizeof (char *));
 
   if (!memp)
     {
@@ -292,31 +290,23 @@ shortLsInfoDestroy (struct shortLsInfo *shortLInfo)
   FREEUP (shortLInfo);
 }
 
-/* LIM events
- * Keep a global FILE pointer to the
- * events file. The events file is always open
- * to speed up the operations.
- */
-static FILE *logFp;
 
 int
 logInit (void)
 {
-  static char eFile[PATH_MAX];
-  static char eFile2[PATH_MAX];
+  char eFile[PATH_MAX];
+  char eFile2[PATH_MAX];
   struct tm *t;
   struct stat sbuf;
   time_t tp;
   int cc;
 
-  sprintf (eFile, "\
-%s/lim.events", limParams[LSB_SHAREDIR].paramValue);
+  sprintf (eFile, "%s/lim.events", limParams[LSB_SHAREDIR].paramValue);
 
   logFp = fopen (eFile, "a+");
   if (logFp == NULL)
     {
-      ls_syslog (LOG_ERR, "\
-%s: failed opening %s: %m", __func__, eFile);
+      ls_syslog (LOG_ERR, "%s: failed opening %s: %m", __func__, eFile);
       return -1;
     }
 
@@ -329,8 +319,7 @@ logInit (void)
   cc = stat (eFile, &sbuf);
   if (cc != 0)
     {
-      ls_syslog (LOG_ERR, "\
-%s: Ohmygosh stat() failed on %s.. %m", __func__, eFile);
+      ls_syslog (LOG_ERR, "%s: Ohmygosh stat() failed on %s.. %m", __func__, eFile);
       return -1;
     }
 
@@ -346,21 +335,18 @@ logInit (void)
    */
   tp = time (NULL);
   t = localtime (&tp);
-  sprintf (eFile2, "\
-%s.%d.%d.%d.%d.%d", eFile, t->tm_mday, t->tm_mon + 1, t->tm_hour, t->tm_min, t->tm_sec);
+  sprintf (eFile2, "%s.%d.%d.%d.%d.%d", eFile, t->tm_mday, t->tm_mon + 1, t->tm_hour, t->tm_min, t->tm_sec);
 
   cc = rename (eFile, eFile2);
   if (cc != 0)
     {
-      ls_syslog (LOG_ERR, "\
-%s: failed to rename %s in %s %m, keeping the old file", __func__, eFile, eFile2);
+      ls_syslog (LOG_ERR, "%s: failed to rename %s in %s %m, keeping the old file", __func__, eFile, eFile2);
     }
 
   logFp = fopen (eFile, "a+");
   if (logFp == NULL)
     {
-      ls_syslog (LOG_ERR, "\
-%s: failed opening %s: %m", __func__, eFile);
+      ls_syslog (LOG_ERR, "%s: failed opening %s: %m", __func__, eFile);
       return -1;
     }
 
@@ -441,7 +427,7 @@ logRmHost (struct hostEntry *hPtr)
   return 0;
 }
 
-static int
+int
 loadEvents (void)
 {
   struct lsEventRec *eRec;
@@ -459,40 +445,38 @@ loadEvents (void)
       struct hostEntryLog *hPtr;
 
       switch (eRec->event)
-	{
-	case EV_ADD_HOST:
-	  hPtr = eRec->record;
-	  e = h_addEnt_ (&tab, hPtr->hostName, &new);
-	  if (new != TRUE)
-	    {
-	      /* Somebody has been messing around
-	       * with the LIM events?
-	       */
-	      ls_syslog (LOG_WARNING, "\
-%s: host %s already added, ignoring the second instance.", __func__, hPtr->hostName);
-	      freeHostEntryLog (&hPtr);
-	      break;
-	    }
-	  e->hData = hPtr;
-	  break;
-	case EV_REMOVE_HOST:
-	  hPtr = eRec->record;
-	  e = h_getEnt_ (&tab, hPtr->hostName);
-	  if (e == NULL)
-	    {
-	      ls_syslog (LOG_WARNING, "\
-%s: attempt to remove host %s which is not configured, ignoring it.", __func__, hPtr->hostName);
-	    }
-	  h_rmEnt_ (&tab, e);
-	  freeHostEntryLog (&hPtr);
-	  break;
-	case EV_LIM_START:
-	  break;
-	case EV_LIM_SHUTDOWN:
-	  break;
-	case EV_EVENT_LAST:
-	  break;
-	}
+    {
+    case EV_ADD_HOST:
+      hPtr = eRec->record;
+      e = h_addEnt_ (&tab, hPtr->hostName, &new);
+      if (new != TRUE)
+        {
+          /* Somebody has been messing around
+           * with the LIM events?
+           */
+          ls_syslog (LOG_WARNING, "%s: host %s already added, ignoring the second instance.", __func__, hPtr->hostName);
+          freeHostEntryLog (&hPtr);
+          break;
+        }
+      e->hData = hPtr;
+      break;
+    case EV_REMOVE_HOST:
+      hPtr = eRec->record;
+      e = h_getEnt_ (&tab, hPtr->hostName);
+      if (e == NULL)
+        {
+          ls_syslog (LOG_WARNING, "%s: attempt to remove host %s which is not configured, ignoring it.", __func__, hPtr->hostName);
+        }
+      h_rmEnt_ (&tab, e);
+      freeHostEntryLog (&hPtr);
+      break;
+    case EV_LIM_START:
+      break;
+    case EV_LIM_SHUTDOWN:
+      break;
+    case EV_EVENT_LAST:
+      break;
+    }
     }
 
   /* heresy...
@@ -506,7 +490,7 @@ loadEvents (void)
    * added but not yet removed
    * create a new lim.events file
    * purged of the old events.
-   */
+   */ // FiXME FIXME FIXME FIXME include ability to rotate files
 
 out:
   h_freeRefTab_ (&tab);
