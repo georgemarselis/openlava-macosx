@@ -19,22 +19,12 @@
  *
  */
 
-
 #pragma once
 
-
-#include <dirent.h>
-#include <sys/mount.h>
-#include <sys/stat.h>
-#include <sys/statvfs.h>
-#include <sys/sysmacros.h>
-
-#include "daemons/liblimd/common.h"
-
 #define CPUSTATES 4
-#define ut_name   ut_user
-#define nonuser(ut) ((ut).ut_type != USER_PROCESS)
 #define LINUX_LDAV_FILE "/proc/loadavg"
+// #define ut_name   ut_user
+// #define nonuser(ut) ((ut).ut_type != USER_PROCESS) // moved to rload.h
 
 
 ///////////////////////////////////////////////////
@@ -44,9 +34,6 @@
 int getPage (double *page_in, double *page_out, bool_t isPaging);
 int readMeminfo (void);
 int numCpus (void);
-int queueLengthEx (float *r15s, float *r1m, float *r15m);
-float queueLength ( void );
-void cpuTime (double *itime, double *etime);
 int realMem (float extrafactor);
 float tmpspace (void);
 float getswap (void);
@@ -63,20 +50,3 @@ int getPage (double *page_in, double *page_out, bool_t isPaging)
 //
 // Globals
 // 
-char *buffer; // [MSGSIZE];
-long long uint main_mem   = 0;
-long long uint free_mem   = 0;
-long long uint shared_mem = 0;
-long long uint buf_mem    = 0;
-long long uint cashed_mem = 0;
-long long uint swap_mem   = 0;
-long long uint free_swap  = 0;
-u_long prevRQ             = 0; 
-
-
-double prev_time = 0;
-double prev_idle = 0;
-double prev_cpu_user = 0.0; // FIXME FIXME FIXME FIXME prev_cpu_user or prev_cpu_user_time ?
-double prev_cpu_nice = 0.0;
-double prev_cpu_sys  = 0.0;
-double prev_cpu_idle = 0.0;

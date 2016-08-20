@@ -28,6 +28,7 @@
 // #endif
 
 #include "daemons/liblimd/policy.h"
+#include "daemons/liblimd/rload.h"
 #include "daemons/liblimd/limd.h"
 #include "libint/resreq.h"
 #include "lib/lib.h"

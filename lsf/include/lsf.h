@@ -295,7 +295,7 @@ struct placeInfo
 struct hostLoad
 {
     char *hostName;
-    long *status;
+    float *status;
     float *loadIndex;
 };
 

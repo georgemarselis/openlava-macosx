@@ -323,8 +323,8 @@ ls_syslog (int level, const char *fmt, ...) // FIXME FIXME convert variable argu
 					level = LOG_DEBUG;
 				}
 					
-				sprintf( kot, err_str_ (save_errno, fmt, buf) );
-				vsyslog (level, kot, ap); // FIXME FIXME FIXME FIXME use debugger, unroll format string
+				sprintf( kot, err_str_ (save_errno, fmt, buf) ); // FIXME FIXME FIXME FIXME use debugger, unroll format string
+				vsyslog (level, kot, ap); 
 				closelog ();
 			}
 			else

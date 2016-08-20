@@ -415,7 +415,6 @@ struct lsInfo allInfo;
 struct shortLsInfo shortInfo;
 int *clientHosts; // FIXME FIXME FIXME must manage dynamically
 // struct floatClientInfo floatClientPool; // FIXME FIXME re-isntate when floating-client feature is implemented
-int ncpus;
 
 pid_t elim_pid;
 pid_t pimPid;
