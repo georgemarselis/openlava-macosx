@@ -26,6 +26,9 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+// __DARWIN__ specific headers
+#include <sys/types.h>
+#include <sys/sysctl.h>
 #include <utmpx.h>
 
 #include "daemons/liblimd/rload.h"

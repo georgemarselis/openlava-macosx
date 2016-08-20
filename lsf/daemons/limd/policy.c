@@ -1518,9 +1518,7 @@ loadReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr, uint s)
         reply.loadMatrix[i].loadIndex = &currp;
     }
     for (i = 0; i < reply.nEntry; i++, currp += staSize) {
-        long kot = (long) round( currp );  // FIXME FIXME FIXME this cast is correct
-        reply.loadMatrix[i].status = &kot; // FIXME FIXME FIXME FIXME this may not be entirelly correct
-        // reply.loadMatrix[i].status = currp;
+        reply.loadMatrix[i].status = &currp; // FIXME FIXME FIXME FIXME this may not be entirelly correct
     }
 
     limReplyCode = LIME_NO_ERR;
@@ -1564,7 +1562,7 @@ loadReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr, uint s)
     int indx;
     indx = resVal.indicies[j];
     if (LS_ISBUSYON (candidates[i]->status, indx)) {
-      SET_BIT (INTEGER_BITS + j, reply.loadMatrix[i].status);
+      SET_BIT( INTEGER_BITS + j, reply.loadMatrix[i].status); // FIXME FIXME FIXME FIXME FIXME cast is totally inaccurate; replace with gnu arbitrary precision library.
     }
     if (indx == R15S || indx == R1M || indx == R15M)
       {
@@ -1573,7 +1571,7 @@ loadReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr, uint s)
         }
         else if (ldReq.options & EFFECTIVE)
     {
-      float factor;
+      float factor = 0.0;
       factor = (candidates[i]->hModelNo >= 0) ?
         shortInfo.cpuFactors[candidates[i]->hModelNo] : 1.0;
       reply.loadMatrix[i].loadIndex[j]
