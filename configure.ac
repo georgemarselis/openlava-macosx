@@ -44,6 +44,8 @@ AC_CHECK_HEADERS([tcl.h], [HAVE_TCL_TCL_H=yes], [HAVE_TCL_H=y]) # FIXME FIXME FI
 # check if macosx or other
 # location of /tmp should be configurable; might go on a network, rather than local
 # use gmp.h for floating point calculations?
+# get kern.msgbuf from sysctl()
+
 
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lm':

@@ -22,7 +22,7 @@
 #pragma once
 
 #define CPUSTATES 4
-#define LINUX_LDAV_FILE "/proc/loadavg"
+// #define LINUX_LDAV_FILE "/proc/loadavg"
 // #define ut_name   ut_user
 // #define nonuser(ut) ((ut).ut_type != USER_PROCESS) // moved to rload.h
 

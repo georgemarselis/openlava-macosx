@@ -16,53 +16,6 @@
 #include "daemons/liblimd/linux.h"
 #include "daemons/liblimd/rload.c"
 
-int
-numCpus (void)
-{
-  int cpu_number;
-  FILE *fp;
-
-  fp = fopen ("/proc/cpuinfo", "r");
-  if (fp == NULL)
-    {
-      ls_syslog (LOG_ERR, "%s: fopen() failed on proc/cpuinfo: %m", __FUNCTION__);
-      ls_syslog (LOG_ERR, "%s: assuming one CPU only", __FUNCTION__);
-      cpu_number = 1;
-      return (1);
-    }
-
-  cpu_number = 0;
-  while (fgets (buffer, sizeof (buffer), fp) != NULL)
-    {
-      if (strncmp (buffer, "processor", sizeof ("processor") - 1) == 0)
-	{
-	  cpu_number++;
-	}
-    }
-
-  fclose (fp);
-
-  return cpu_number;
-}
-
-
-int
-realMem (float extrafactor)
-{
-  int realmem;
-
-  if (readMeminfo () == -1)
-    return (0);
-
-  realmem = (free_mem + buf_mem + cashed_mem) / 1024;
-
-  realmem -= 2;
-  realmem += extraload[MEM] * extrafactor;
-  if (realmem < 0)
-    realmem = 0;
-
-  return (realmem);
-}
 
 
 

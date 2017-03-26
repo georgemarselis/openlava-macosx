@@ -53,11 +53,11 @@
 ///////////////////////////////////////////////////
 //
 // constants
-// 
-char ELIMNAME[] = "ELIM";
-char ENV_LAST_ACTIVE_TIME[] = "LSF_LAST_ACTIVE_TIME";
-time_t MAXIDLETIME          = 15552000;
-
+//
+      char ENV_LAST_ACTIVE_TIME[] = "LSF_LAST_ACTIVE_TIME";
+const char LINUX_LDAV_FILE[] = "/proc/loadavg";
+const char ELIMNAME[] = "ELIM";
+const time_t MAXIDLETIME    = 15552000;
 const u_long MAXEXTRESLEN   = 4096;
 const size_t GUESS_NUM      = 30;
 const size_t IDLE_INTVL     = 30;
@@ -66,6 +66,9 @@ const float  EXP4           = 0.77880078;
 const float  EXP6           = 0.846481725;
 const float  EXP12          = 0.920044415;
 const float  EXP180         = 0.994459848;
+
+
+
 
 ///////////////////////////////////////////////////
 //
@@ -85,7 +88,7 @@ void    setUnkwnValues(void);
 void    unblockSigs_(sigset_t *);
 void    getusr(void);
 int     queueLengthEx (float *r15s, float *r1m, float *r15m);
-void    cpuTime(double *itime, double *etime);
+void    cpuTime(time_t *itime, time_t *etime);
 float   queueLength(void);
 float   getpaging(float etime);
 float   getIoRate (float etime);
@@ -93,6 +96,8 @@ float   getswap(void);
 int     readMeminfo(void);
 int     getPage (double *page_in, double *page_out, bool_t isPaging);
 float   tmpspace (void);
+int     realMem (float extrafactor);
+int     numCpus (void);
 
 
 

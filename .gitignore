@@ -1,4 +1,5 @@
 *Makefile
+a.out
 libtool
 TAGS
 *.o

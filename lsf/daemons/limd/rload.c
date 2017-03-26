@@ -17,10 +17,13 @@
  */
 
 
+#include <errno.h>
 #include <math.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h> 
+#include <string.h>
+#include <sys/sysctl.h>
 #include <sys/types.h>
 #include <sys/utsname.h>
 #include <sys/wait.h>
@@ -33,7 +36,9 @@
 
 #include "daemons/liblimd/rload.h"
 #include "daemons/liblimd/limd.h"
+#include "daemons/liblimd/conf.h"
 #include "lib/lproto.h"
+#include "lib/lib.h"
 #include "lib/mls.h"
 #include "lsf.h"
 
@@ -360,8 +365,8 @@ readLoad (int kernelPerm)
 {
   int i;
   int busyBits = 0;
-  double etime;
-  double itime;
+  time_t etime = 0.0;
+  time_t itime = 0.0;
   int readCount0 = 10000;
   int readCount1 = 5;
   int readCount2 = 1500;
@@ -948,14 +953,13 @@ getusr (void)
 
 	  if ((fp = lim_popen (myClusterPtr->eLimArgv, "r")) == NULL)
 	    {
-	      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, __func__, "lim_popen",
-			 myClusterPtr->eLimArgv[0]);
+	      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, __func__, "lim_popen", myClusterPtr->eLimArgv[0]);
 	      setUnkwnValues ();
 
 	      return;
 	    }
-	  ls_syslog (LOG_INFO, (_i18n_msg_get (ls_catd, NL_SETN, 5930, "%s: Started ELIM %s pid %d")), __func__,	/* catgets 5930 */
-		     myClusterPtr->eLimArgv[0], (int) elim_pid);
+	   /* catgets 5930 */
+      ls_syslog (LOG_INFO, "5930: %s: Started ELIM %s pid %d", __func__, myClusterPtr->eLimArgv[0], elim_pid);
 	  mustSendLoad = TRUE;
 
 	}
@@ -1513,14 +1517,14 @@ queueLengthEx (float *r15s, float *r1m, float *r15m)
     fd = open (LINUX_LDAV_FILE, O_RDONLY);
     if (fd < 0)
     {
-        ls_syslog (LOG_ERR, "%s: %m", __FUNCTION__);
+        ls_syslog (LOG_ERR, "%s: %m", __func__);
         return -1;
     }
 
     count = read (fd, ldavgbuf, sizeof (ldavgbuf));
     if (count < 0)
     {
-        ls_syslog (LOG_ERR, "%s:%m", __FUNCTION__);
+        ls_syslog (LOG_ERR, "%s:%m", __func__);
         close (fd);
         return -1;
     }
@@ -1529,7 +1533,7 @@ queueLengthEx (float *r15s, float *r1m, float *r15m)
     count = sscanf (ldavgbuf, "%lf %lf %lf", &loadave[0], &loadave[1], &loadave[2]);
     if (count != 3)
     {
-        ls_syslog (LOG_ERR, "%s: %m", __FUNCTION__);
+        ls_syslog (LOG_ERR, "%s: %m", __func__);
         return -1;
     }
 
@@ -1556,7 +1560,7 @@ queueLength (void)
     dir_proc_fd = opendir ("/proc"); // FIXME FIXME FIXME FIXME FIXME remove fixed string
     if (dir_proc_fd == (DIR *) 0)
     {
-        ls_syslog (LOG_ERR, "%s: opendir() /proc failed: %m", __FUNCTION__);
+        ls_syslog (LOG_ERR, "%s: opendir() /proc failed: %m", __func__);
         return (0.0);
     }
 
@@ -1569,12 +1573,12 @@ queueLength (void)
             fd = open (filename, O_RDONLY, 0);
             if (fd == -1)
             {
-                ls_syslog (LOG_DEBUG, "%s: cannot open [%s], %m", __FUNCTION__, filename);
+                ls_syslog (LOG_DEBUG, "%s: cannot open [%s], %m", __func__, filename);
                 continue;
             }
             if( read (fd, buffer, strlen (buffer) ) <= 0 )  // FIXME FIXME FIXME FIXME test case to crash; might crash here, or read garbage, then set lenght to read to - 1
       {
-        ls_syslog (LOG_DEBUG, "%s: cannot read [%s], %m", __FUNCTION__, filename);
+        ls_syslog (LOG_DEBUG, "%s: cannot read [%s], %m", __func__, filename);
         close (fd);
         continue;
       }
@@ -1610,36 +1614,37 @@ cpuTime ( time_t *itime, time_t *etime)
   time_t cpu_user_time = 0.0;
   time_t cpu_nice_time = 0.0;
   time_t cpu_sys_time  = 0.0;
-  time_t cpu_idle      = 0.0;
+  time_t cpu_idle_time = 0.0;
 
   stat_fd = open ("/proc/stat", O_RDONLY, 0); // FIXME FIXME FIXME FIXME FIXME remove fixed string
   if (stat_fd == -1)
     {
-      ls_syslog (LOG_ERR, "%s: open() /proc/stat failed: %m:", __FUNCTION__);
+      ls_syslog (LOG_ERR, "%s: open() /proc/stat failed: %m:", __func__);
       return;
     }
 
   if (read (stat_fd, buffer, sizeof (buffer) - 1) <= 0)
     {
-      ls_syslog (LOG_ERR, "0%s: read() /proc/stat failed: %m", __FUNCTION__);
+      ls_syslog (LOG_ERR, "0%s: read() /proc/stat failed: %m", __func__);
       close (stat_fd);
       return;
     }
   close (stat_fd);
 
-  sscanf (buffer, "cpu  %lf %lf %lf %lf", &cpu_user, &cpu_nice, &cpu_sys, &cpu_idle);
+  sscanf (buffer, "cpu  %ld %ld %ld %ld", &cpu_user_time, &cpu_nice_time, &cpu_sys_time, &cpu_idle_time );
 
 
-  *itime = (cpu_idle - prev_idle);
-  prev_idle = cpu_idle;
+  *itime = (cpu_idle_time - prev_idle);
+  prev_idle = cpu_idle_time;
 
-  ttime = cpu_user + cpu_nice + cpu_sys + cpu_idle;
+  ttime = cpu_user_time + cpu_nice_time + cpu_sys_time + cpu_idle_time;
   *etime = ttime - prev_time;
 
   prev_time = ttime;
 
-  if (*etime == 0)
-    *etime = 1;
+    if (*etime == 0)  {
+        *etime = 1;
+    }
 
   return;
 }
@@ -1665,10 +1670,12 @@ getpaging (float etime)
     }
   else
     {
-      if (page < prev_pages)
-  smooth (&smoothpg, (prev_pages - page) / etime, EXP4);
-      else
-  smooth (&smoothpg, (page - prev_pages) / etime, EXP4);
+        if (page < prev_pages) {
+            smooth (&smoothpg, (prev_pages - page) / etime, EXP4);
+        }
+        else {
+            smooth (&smoothpg, (page - prev_pages) / etime, EXP4);
+        }
     }
 
   prev_pages = page;
@@ -1703,7 +1710,7 @@ getIoRate (float etime)
 
   if (kbps > 100000.0)
     {
-      ls_syslog (LOG_DEBUG, "%s:: IO rate=%f bread=%d bwrite=%d", __FUNCTION__, kbps, page_in, page_out);
+      ls_syslog (LOG_DEBUG, "%s:: IO rate=%f bread=%d bwrite=%d", __func__, kbps, page_in, page_out);
     }
 
   prev_blocks = page_in + page_out;
@@ -1715,72 +1722,105 @@ getIoRate (float etime)
 float
 getswap (void)
 {
-  short tmpcnt;
-  float swap;
+    short tmpcnt;
+    float swap;
 
-  if (tmpcnt >= SWP_INTVL_CNT)
-    tmpcnt = 0;
+    if (tmpcnt >= SWP_INTVL_CNT) {
+        tmpcnt = 0;
+    }
 
-  tmpcnt++;
-  if (tmpcnt != 1) {
+    tmpcnt++;
+    if (tmpcnt != 1) {
+        return swap;
+    }
+
+    if( readMeminfo () == -1) {
+        return 0;
+    }
+    swap = free_swap / 1024.0; // FIXME FIXME FIXME FIXME use probler library to format; i didn't write this, did I ?
+
     return swap;
-  }
-
-  if (readMeminfo () == -1) {
-    return (0);
-  }
-  swap = free_swap / 1024.0; // FIXME FIXME FIXME FIXME use probler library to format; i didn't write this, did I ?
-
-  return swap;
 }
 
 int
 readMeminfo (void)
 {
-    FILE *f = NULL;
-    char *lineBuffer = malloc( sizeof( char ) * MAXLSFNAMELEN + 1 );
-    char *tag        = malloc( sizeof( char ) * MAXLSFNAMELEN + 1 );
-    u_long value = 0;
+    // FILE *f = NULL;
+    // char *lineBuffer = malloc( sizeof( char ) * MAXLSFNAMELEN + 1 );
+    // char *tag        = malloc( sizeof( char ) * MAXLSFNAMELEN + 1 );
+    // u_long value = 0;
 
-    if( ( f = fopen ("/proc/meminfo", "r")) == NULL)
-    {
-        ls_syslog (LOG_ERR, "%s: open() failed /proc/meminfo: %m", __FUNCTION__);
-        return -1;
-    }
+    const char hw_memsize_label[] = "hw.memsize";
+    u_int64_t hw_memsize = 0;
+    size_t len = sizeof( hw_memsize );
 
-    while (fgets (lineBuffer, sizeof (lineBuffer), f))
-    {
+    // get free mem
+    // get memshared
+    // get buffers
+    const char vm_swapusage_label[] = "vm.swapusage";
+    struct xsw_usage xsu;
+    len = sizeof( struct xsw_usage );
+   
+    // get swap free
 
-        if (sscanf (lineBuffer, "%s %lld kB", tag, &value) != 2) {
-            continue;
-        }
 
-        if( strcmp( tag, "MemTotal:" ) == 0 ) {
-            main_mem = value;
-        }
-        if( strcmp( tag, "MemFree:" ) == 0 ) {
-            free_mem = value;
-        }
-        if( strcmp( tag, "MemShared:" ) == 0 ) {
-            shared_mem = value;
-        }
-        if( strcmp( tag, "Buffers:" ) == 0 ) {
-            buf_mem = value;
-        }
-        if( strcmp( tag, "Cached:" ) == 0 ) {
-            cashed_mem = value;
-        }
-        if( strcmp( tag, "SwapTotal:" ) == 0 ) {
-            swap_mem = value;
-        }
-        if( strcmp( tag, "SwapFree:" ) == 0 ) {
-            free_swap = value;
-        }
-    }
+    // get total physical memory
+    len = sizeof( struct xsw_usage );
+    sysctlbyname( hw_memsize_label, &hw_memsize, &len, NULL, 0 );
+    main_mem = hw_memsize;
+    // get free mem
+    // free mem = total_mel - machdep.memmap.Reserved - wired memory - compresseed
+    // get memshared
 
-    fclose (f);
-    free(tag);
-    free(lineBuffer);
+    // get buffers
+
+    // get swap total
+    len = sizeof( struct xsw_usage );
+    sysctlbyname( vm_swapusage_label, xsu, &len, NULL, 0 );
+    swap_mem = xsu.xsu_total;
+
+    exit( 127 );
+    
+
+    // if( ( f = fopen ("/proc/meminfo", "r")) == NULL)
+    // {
+    //     ls_syslog (LOG_ERR, "%s: open() failed /proc/meminfo: %m", __func__);
+    //     return -1;
+    // }
+
+    // while (fgets (lineBuffer, sizeof (lineBuffer), f))
+    // {
+
+    //     if (sscanf (lineBuffer, "%s %lu kB", tag, &value) != 2) {
+    //         continue;
+    //     }
+
+    //     if( strcmp( tag, "MemTotal:" ) == 0 ) {
+            // main_mem = value;
+    //     }
+    //     if( strcmp( tag, "MemFree:" ) == 0 ) {
+    //         free_mem = value;
+    //     }
+    //     if( strcmp( tag, "MemShared:" ) == 0 ) {
+    //         shared_mem = value;
+    //     }
+    //     if( strcmp( tag, "Buffers:" ) == 0 ) {
+    //         buf_mem = value;
+    //     }
+    //     if( strcmp( tag, "Cached:" ) == 0 ) {
+    //         cashed_mem = value;
+    //     }
+    //     if( strcmp( tag, "SwapTotal:" ) == 0 ) {
+    //         swap_mem = value;
+    //     }
+    //     if( strcmp( tag, "SwapFree:" ) == 0 ) {
+    //         free_swap = value;
+    //     }
+    // }
+
+    // fclose (f);
+    // free(tag);
+    // free(lineBuffer);
 
     return 0;
 }
@@ -1795,7 +1835,7 @@ getPage (double *page_in, double *page_out, bool_t isPaging)
 
     if ((f = fopen ("/proc/vmstat", "r")) == NULL) // FIXME FIXME FIXME FIXME FIXME set macosx appropriate path
     {
-        ls_syslog (LOG_ERR, "%s: fopen() failed /proc/vmstat: %m", __FUNCTION__);
+        ls_syslog (LOG_ERR, "%s: fopen() failed /proc/vmstat: %m", __func__);
         return -1;
     }
 
@@ -1852,7 +1892,7 @@ tmpspace (void)
 
     if (statvfs ("/tmp", &fs) < 0)  // FIXME FIXME FIXME FIXME /tmp should be set in configure.ac
     {
-        ls_syslog (LOG_ERR, "%s: statfs() /tmp failed: %m", __FUNCTION__);
+        ls_syslog (LOG_ERR, "%s: statfs() /tmp failed: %m", __func__);
         return (tmps);
     }
 
@@ -1865,5 +1905,52 @@ tmpspace (void)
 
     return tmps;
 
+}
+
+int
+realMem (float extrafactor)
+{
+    u_long realmem = 0;
+
+    if (readMeminfo () == -1) {
+        return (0);
+    }
+    realmem = (free_mem + buf_mem + cashed_mem) / 1024;
+    realmem -= 2;
+    realmem += extraload[MEM] * extrafactor;
+    // if (realmem < 0) {
+    //     realmem = 0;
+    // }
+    return realmem;
+}
+
+int
+numCpus (void)
+{
+    uint cpu_number = 0;
+    FILE *fp = NULL;
+
+    fp = fopen ("/proc/cpuinfo", "r");
+    if (fp == NULL)
+    {
+        ls_syslog (LOG_ERR, "%s: fopen() failed on proc/cpuinfo: %m", __func__);
+        ls_syslog (LOG_ERR, "%s: assuming one CPU only", __func__);
+        // cpu_number = 1;
+        // return (1);
+        fclose( fp );
+        exit( 127 );
+    }
+
+    cpu_number = 0;
+    while (fgets (buffer, sizeof (buffer), fp) != NULL)
+    {
+        if (strncmp (buffer, "processor", sizeof ("processor") - 1) == 0)
+        {
+            cpu_number++;
+        }
+    }
+
+    fclose (fp);
+    return cpu_number;
 }
 
