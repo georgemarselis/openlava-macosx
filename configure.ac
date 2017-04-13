@@ -14,7 +14,7 @@ AC_CONFIG_AUX_DIR([build-aux])
 # Init m4 macro dir
 AC_CONFIG_MACRO_DIR([m4])
 
-AC_PROG_RANLIB
+# AC_PROG_RANLIB
 
 AC_PROG_CC
 AC_PROG_LN_S
@@ -24,12 +24,12 @@ AC_PROG_LEX
 # turn on full diagnostics for bison/yacc
 AC_PROG_YACC 
 AM_PROG_AR
-AX_PROG_TCL
+# AX_PROG_TCL
 
 # must also check to see if specific data structures are available, and un/set
 # TCL_NO_DEPRECATED, USE_INTERP_RESULT, USE_INTERP_ERRORLINE
-HAVE_TCL_TCL_H = no 
-HAVE_TCL_H = no
+# HAVE_TCL_TCL_H = no 
+# HAVE_TCL_H = no
 # Checks for headers
 AC_CHECK_HEADERS([tcl.h])
 AC_CHECK_HEADERS([tcl.h], [HAVE_TCL_TCL_H=yes], [HAVE_TCL_H=y]) # FIXME FIXME FIXME FIXME FIXME 
