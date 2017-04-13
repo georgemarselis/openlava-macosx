@@ -151,7 +151,7 @@ int handShake_ (int, char, int);
 #define CALL_SERVER_USE_SOCKET    0x2
 #define CALL_SERVER_NO_HANDSHAKE  0x4
 #define CALL_SERVER_ENQUEUE_ONLY  0x8
-int call_server (char *host, ushort serv_port, char *req_buf, size_t req_size,  char **rep_buf, struct LSFHeader *replyHdr, int conn_timeout, int recv_timeout, int *connectedSock, int (*postSndFunc) (), int *postSndFuncArg, int flags);
+int call_server (char *host, unsigned short serv_port, char *req_buf, size_t req_size,  char **rep_buf, struct LSFHeader *replyHdr, int conn_timeout, int recv_timeout, int *connectedSock, int (*postSndFunc) (), int *postSndFuncArg, int flags);
 
 int sndJobFile_ (int, struct lenData *);
 

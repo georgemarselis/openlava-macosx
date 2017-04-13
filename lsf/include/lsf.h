@@ -97,10 +97,10 @@ typedef unsigned long LS_UNS_LONG_INT; // FIXME FIXME FIXME FIXME FIXME untypede
 #define MAXTYPES_31             25
 #define MAXMODELS_31            30
 //#define MAXFILENAMELEN          4096
-const uint MAXFILENAMELEN = 4096;   // FIXME FIXME FIXME FIXME value of MAXFILENAMELEN must be set by configure script
+const unsigned int MAXFILENAMELEN = 4096;   // FIXME FIXME FIXME FIXME value of MAXFILENAMELEN must be set by configure script
 
 // #define FIRST_RES_SOCK  20
-static const uint FIRST_RES_SOCK = 20;
+static const unsigned int FIRST_RES_SOCK = 20;
 
 #ifdef HAVE_UNION_WAIT
   #define LS_WAIT_T      union wait
@@ -335,12 +335,12 @@ struct resItem
 
 struct lsInfo
 {
-    uint nTypes;
-    uint nModels;
-    uint modelRefs[MAXMODELS];
-    uint nRes;
-    uint numIndx;
-    uint numUsrIndx;
+    unsigned int nTypes;
+    unsigned int nModels;
+    unsigned int modelRefs[MAXMODELS];
+    unsigned int nRes;
+    unsigned int numIndx;
+    unsigned int numUsrIndx;
     char hostTypes[MAXTYPES][MAXLSFNAMELEN];
     char hostModels[MAXMODELS][MAXLSFNAMELEN];
     char hostArchs[MAXMODELS][MAXLSFNAMELEN];
@@ -356,13 +356,13 @@ struct clusterInfo
 {
   uid_t *adminIds;
   uid_t managerId;
-  uint status;
-  uint nTypes;
-  uint nModels;
-  uint numServers;
-  uint numClients;
-  uint nRes;
-  uint nAdmins;
+  unsigned int status;
+  unsigned int nTypes;
+  unsigned int nModels;
+  unsigned int numServers;
+  unsigned int numClients;
+  unsigned int nRes;
+  unsigned int nAdmins;
   char **resources;
   char **hostTypes;
   char **hostModels;
@@ -376,12 +376,12 @@ struct clusterInfo
 struct hostInfo
 {
     int rexPriority;
-    uint maxCpus;
-    uint maxMem;
-    uint maxSwap;
-    uint maxTmp;
-    uint nDisks;
-    uint nRes;
+    unsigned int maxCpus;
+    unsigned int maxMem;
+    unsigned int maxSwap;
+    unsigned int maxTmp;
+    unsigned int nDisks;
+    unsigned int nRes;
     char isServer;
     char padding1[3];
     char *hostModel;
@@ -567,7 +567,7 @@ typedef struct lsSharedResourceInfo
 struct clusterConf
 {
   int numShareRes;
-  uint numHosts;
+  unsigned int numHosts;
   LS_SHARED_RESOURCE_INFO_T *shareRes;
   struct hostInfo *hosts;
   struct clusterInfo *clinfo;
@@ -613,7 +613,7 @@ typedef enum
 struct lsEventRec
 {
   event_t event;
-  uint16_t version;
+  uint16_t version; // FIXME um, why 16-bit int? 
   char padding[2];
   time_t etime;
   void *record;
@@ -880,7 +880,7 @@ int ls_rtask (char *, char **, int);
 int ls_rtaske (char *, char **, int, char **);
 int ls_rwait (LS_WAIT_T *, int, struct rusage *);
 int ls_rwaittid (int, LS_WAIT_T *, int, struct rusage *);
-int lls_rkill (uint rtid, int sig);
+int lls_rkill (unsigned int rtid, int sig);
 int ls_startserver (char *, char **, int);
 int ls_conntaskport (int);
 char **ls_placereq              (char *resreq, size_t *numhosts, int options, char *fromhost);
@@ -904,7 +904,7 @@ int ls_isconnected (char *hostName);
 int ls_lostconnection (void);
 char *ls_getclustername (void);
 struct clusterInfo *ls_clusterinfo (char *resReq, unsigned int *numclusters, char **clusterList, int listsize, int options);
-struct lsSharedResourceInfo *ls_sharedresourceinfo (char **resources, uint *numResources, char *hostName, int options);
+struct lsSharedResourceInfo *ls_sharedresourceinfo (char **resources, unsigned int *numResources, char *hostName, int options);
 char *ls_getmastername (void);
 char *ls_getmastername2 (void);
 char *ls_getmyhostname (void);
@@ -948,7 +948,6 @@ int ls_setstdout (int on, char *format);
 int ls_niossync (long numTasks);
 int ls_setstdin (int on, int *rpidlist, size_t len);
 int ls_chdir (char *, char *);
-int ls_fdbusy (uint fd);
 char *ls_getmnthost (char *fn);
 int ls_servavail (int, int);
 int ls_setpriority (int newPriority);

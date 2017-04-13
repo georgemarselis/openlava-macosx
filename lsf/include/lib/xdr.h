@@ -31,13 +31,13 @@
 #include "lib/common_structs.h"
 
 bool_t xdr_address       ( XDR *,     u_int * );
-bool_t xdr_array_string  ( XDR *xdrs, char **astring, uint maxlen, uint arraysize );
+bool_t xdr_array_string  ( XDR *xdrs, char **astring, unsigned int maxlen, unsigned int arraysize );
 bool_t xdr_controlReq    ( XDR *,     struct controlReq *,     struct LSFHeader *);
 bool_t xdr_debugReq      ( XDR *,     struct debugReq *,       struct LSFHeader *);
 bool_t xdr_groupInfoEnt  ( XDR *,     struct groupInfoEnt *,   struct LSFHeader *);
 bool_t xdr_groupInfoReply( XDR *,     struct groupInfoReply *, struct LSFHeader *);
 bool_t xdr_hostDataReply ( XDR *,     struct hostDataReply *,  struct LSFHeader *);
-bool_t xdr_hostInfoEnt   ( XDR *,     struct hostInfoEnt *,    struct LSFHeader *, uint *);
+bool_t xdr_hostInfoEnt   ( XDR *,     struct hostInfoEnt *,    struct LSFHeader *, unsigned int *);
 bool_t xdr_infoReq       ( XDR *,     struct infoReq *,        struct LSFHeader *);
 bool_t xdr_jgrpInfoReply ( XDR *xdrs, struct jobInfoReply * jobInfoReply, struct LSFHeader *hdr);
 bool_t xdr_jobAttrReq    ( XDR *,     struct jobAttrInfoEnt *, struct LSFHeader *);
@@ -59,7 +59,7 @@ bool_t xdr_migReq        ( XDR *, struct migReq *,        struct LSFHeader *);
 bool_t xdr_modifyReq     ( XDR *, struct modifyReq *,     struct LSFHeader *);
 bool_t xdr_parameterInfo ( XDR *, struct parameterInfo *, struct LSFHeader *);
 bool_t xdr_portno        ( XDR *, u_short * );
-bool_t xdr_queueInfoEnt  ( XDR *xdrs, struct queueInfoEnt * qInfo, struct LSFHeader *hdr, uint *nIdx);
+bool_t xdr_queueInfoEnt  ( XDR *xdrs, struct queueInfoEnt * qInfo, struct LSFHeader *hdr, unsigned int *nIdx);
 bool_t xdr_queueInfoReply( XDR *,     struct queueInfoReply *,     struct LSFHeader *);
 bool_t xdr_runJobReq     ( XDR *,     struct runJobRequest *,      struct LSFHeader *);
 bool_t xdr_signalReq     ( XDR *, struct signalReq *, struct LSFHeader *);
@@ -74,4 +74,5 @@ bool_t xdr_xFile         ( XDR *xdrs, struct xFile * xf, struct LSFHeader *hdr);
 
 int getXdrStrlen         ( char * );
 
-static int lsbSharedResConfigured_ = FALSE;
+// static 
+int lsbSharedResConfigured_ = FALSE;

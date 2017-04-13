@@ -76,8 +76,8 @@ struct chanData
   enum chanType type;
   enum chanState state;
   enum chanState prestate;
-  uint handle;
-  uint chanerr;
+  unsigned int handle;
+  unsigned int chanerr;
   char padding[4];
   struct Buffer *send;
   struct Buffer *recv;
@@ -109,7 +109,7 @@ int chanDequeue_ (int chfd, struct Buffer **buf);
 int chanSelect_ (struct Masks *, struct Masks *, struct timeval *timeout);
 int chanClose_ (int chfd);
 void chanCloseAll_ (void);
-uint chanSock_ (uint chfd);
+int chanSock_ (unsigned int chfd);
 
 int chanServSocket_ (int, u_short, int, int);
 int chanAccept_ (int, struct sockaddr_in *);
@@ -125,16 +125,16 @@ long chanRead_ (int chfd, char *buf, size_t len);
 long chanWrite_ (int, char *, size_t);
 
 
-void chanInactivate_ (uint chfd);
-void chanActivate_ (uint chfd);
+void chanInactivate_ (unsigned int chfd);
+void chanActivate_ (unsigned int chfd);
 void chanCloseAllBut_ (int chfd);
 
 
 int chanAllocBuf_ (struct Buffer **buf, int size);
 int chanFreeBuf_ (struct Buffer *buf);
 int chanFreeStashedBuf_ (struct Buffer *buf);
-int chanSetMode_ (uint chfd, int mode );
-int chanSetMode_ (uint chfd, int mode );
+int chanSetMode_ (unsigned int chfd, int mode );
+int chanSetMode_ (unsigned int chfd, int mode );
 
 unsigned int cherrno;
 unsigned int chanIndex;

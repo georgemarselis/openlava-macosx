@@ -36,11 +36,11 @@
 struct LSFHeader
 {
     size_t length;
-    ushort opCode;
-    ushort version;
-    ushort reserved0;
+    unsigned short opCode;
+    unsigned short version;
+    unsigned short reserved0;
     char   padding[2];
-    uint   reserved;
+    unsigned short   reserved;
     pid_t  refCode; 
 
 };

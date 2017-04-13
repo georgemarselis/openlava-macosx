@@ -636,7 +636,7 @@ void hostIndex_ (char *, int);
 int gethostbysock_ (int, char *);
 int _isconnected_ (char *, int *);
 int _getcurseqno_ (char *);
-void _setcurseqno_ (char *hostname, uint currentSN);
+void _setcurseqno_ (char *hostname, unsigned int currentSN);
 void _lostconnection_ (char *);
 int _findmyconnections_ (struct connectEnt **);
 
@@ -672,7 +672,7 @@ int lsMsgWait_ (int inTidCnt, pid_t *tidArray, int *rdyTidCnt, int inFdCnt, int 
 int lsMsgRdy_ (pid_t taskid, size_t *msgLen);
 int lsMsgRcv_ (pid_t taskid, char *buffer, size_t len, int options);
 int lsMsgSnd_ (pid_t taskid, char *buffer, size_t len, int options);
-int lsMsgSnd2_ (int *sock, ushort opcode, char *buffer, size_t len, int options);
+int lsMsgSnd2_ (int *sock, unsigned short opcode, char *buffer, size_t len, int options);
 int lsReqTest_ (LS_REQUEST_T *);
 int lsReqWait_ (LS_REQUEST_T *, int);
 void lsReqFree_ (LS_REQUEST_T *);
@@ -765,5 +765,4 @@ void ls_errlog (FILE * fd, const char *fmt, ...)
 
 void ls_verrlog (FILE * fd, const char *fmt, va_list ap);
 int isPamBlockWait;
-
 

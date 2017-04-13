@@ -32,11 +32,11 @@
 
 
 #ifndef MIN
-#define MIN(x,y)        ((x) < (y) ? (x) : (y))
+#define MIN(x,y)        ((x) < (y) ? (x) : (y))  // FIXME FIXME replace with math.h functions
 #endif
 
 #ifndef MAX
-#define MAX(x,y)        ((x) > (y) ? (x) : (y))
+#define MAX(x,y)        ((x) > (y) ? (x) : (y))  // FIXME FIXME replace with math.h functions
 #endif
 
 #define DEF_COMMITTED_RUN_TIME_FACTOR 0.0  // FIXME FIXME FIXME why is this here?
@@ -59,7 +59,7 @@ typedef struct lsbSubSpoolFile
 
 
 int creat_p_socket (void);
-int serv_connect (char *, ushort, int);
+int serv_connect (char *, unsigned short, int);
 int getServerMsg (int, struct LSFHeader *, char **rep_buf);
 int callmbd (char *, char *, int, char **, struct LSFHeader *, int *, int (*)(), int *);
 int cmdCallSBD_ (char *, char *, int, char **, struct LSFHeader *, int *);
@@ -76,8 +76,8 @@ void upperStr (char *, char *);
 char *getUnixSpoolDir (char *);
 char *getNTSpoolDir (char *);
 char *getMasterName (void);
-ushort get_mbd_port (void);
-ushort get_sbd_port (void);
+unsigned short get_mbd_port (void);
+unsigned short get_sbd_port (void);
 int getAuth (struct lsfAuth *);
 
 int chUserRemoveSpoolFile (const char *hostName, const char *spoolFile);

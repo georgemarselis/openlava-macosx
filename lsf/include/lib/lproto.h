@@ -52,14 +52,14 @@ struct resPair
 struct sharedResource
 {
   char *resourceName;
-  uint numInstances;
+  unsigned int numInstances;
   char padding1[4];
   struct resourceInstance **instances;
 };
 
 struct resourceInfoReq
 {
-  uint numResourceNames;
+  unsigned int numResourceNames;
   int options;
   char *hostName;
   char **resourceNames;
@@ -67,8 +67,8 @@ struct resourceInfoReq
 
 struct resourceInfoReply
 {
-    uint numResources;
-    uint badResource;
+    unsigned int numResources;
+    unsigned int badResource;
     struct lsSharedResourceInfo *resources;
 };
 
@@ -245,7 +245,7 @@ char *sockAdd2Str_ (struct sockaddr_in *);
 
 struct hostent *Gethostbyname_ (char *);
 struct hostent *Gethostbyaddr_ (in_addr_t *, socklen_t, int);
-int getAskedHosts_ (char *optarg_, char ***askedHosts, uint *numAskedHosts, unsigned long *badIdx, int checkHost);
+int getAskedHosts_ (char *optarg_, char ***askedHosts, unsigned int *numAskedHosts, unsigned long *badIdx, int checkHost);
 int lockHost_ (time_t, char *);
 int unlockHost_ (char *);
 
@@ -261,7 +261,7 @@ int writetaskfile_ (char *, hTab *, hTab *, hTab *, hTab *);
 
 int expSyntax_ (char *);
 
-char *getNextLineC_ (FILE *fp, uint *lineNum, int confFormat);
+char *getNextLineC_ (FILE *fp, unsigned int *lineNum, int confFormat);
 char *getNextLine_ (FILE *, int);
 char *getNextWord_ (char **);
 char *getNextWord1_ (char **line);
@@ -276,25 +276,25 @@ int pushStack (struct pStack *, struct confNode *);
 struct confNode *popStack (struct pStack *);
 void freeStack (struct pStack *);
 
-char *getNextLineD_ (FILE *fp, uint *lineNum, int truefalse);
-char *getNextLineC_conf (struct lsConf *conf, uint *lineNum, int confFormat);
+char *getNextLineD_ (FILE *fp, unsigned int *lineNum, int truefalse);
+char *getNextLineC_conf (struct lsConf *conf, unsigned int *lineNum, int confFormat);
 char *getNextLine_conf (struct lsConf *, int);
 char *nextline_ (FILE *);
 void subNewLine_ (char *);
 
-void doSkipSection (FILE *fp, uint *lineNum, char *fname, char *unknown);
-int isSectionEnd (char *linep, char *fname, uint *lineNum, char *newindex);
+void doSkipSection (FILE *fp, unsigned int *lineNum, char *fname, char *unknown);
+int isSectionEnd (char *linep, char *fname, unsigned int *lineNum, char *newindex);
 int keyMatch (struct keymap *keyList, char *line, int exact);
 int mapValues (struct keymap *keyList, char *line);
-int readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *fname, uint *lineNum, int boolean, char *newindex);
+int readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *fname, unsigned int *lineNum, int boolean, char *newindex);
 char *getNextValue (char **line);
 int putValue (struct keymap *keyList, char *key, char *value);
-char *getBeginLine (FILE *fp, uint *lineNum);
-int putInLists (char *word, struct admins *admins, uint *numAds, char *forWhat);
-int isInlist (char **adminNames, char *userName, uint actAds);
+char *getBeginLine (FILE *fp, unsigned int *lineNum);
+int putInLists (char *word, struct admins *admins, unsigned int *numAds, char *forWhat);
+int isInlist (char **adminNames, char *userName, unsigned int actAds);
 
-void doSkipSection_conf (struct lsConf *conf, uint *lineNum, char *lsfile, char *sectionName);
-char *getBeginLine_conf (struct lsConf *conf, uint *lineNum);
+void doSkipSection_conf (struct lsConf *conf, unsigned int *lineNum, char *lsfile, char *sectionName);
+char *getBeginLine_conf (struct lsConf *conf, unsigned int *lineNum);
 
 void defaultAllHandlers (void);
 
@@ -312,7 +312,7 @@ size_t b_read_fix   (int s, char *buf, size_t len);
 
 int readDecodeHdr_ (int s, char *buf, size_t (*readFunc) (), XDR * xdrs, struct LSFHeader *hdr);
 int readDecodeMsg_ (int s, char *buf, struct LSFHeader *hdr, size_t (*readFunc) (), XDR * xdrs, char *data, bool_t (*xdrFunc) (), struct lsfAuth *auth);
-int writeEncodeMsg_ (int s, char *buf, uint len, struct LSFHeader *hdr, char *data, long (*writeFunc) (), bool_t (*xdrFunc) (), int options);
+int writeEncodeMsg_ (int s, char *buf, unsigned int len, struct LSFHeader *hdr, char *data, long (*writeFunc) (), bool_t (*xdrFunc) (), int options);
 int writeEncodeHdr_ (int s, struct LSFHeader *sendHdr, long (*)());
 int lsSendMsg_ (int s, unsigned short opCode, size_t hdrLength, char *data, char *reqBuf, size_t reqLen, bool_t (*xdrFunc) (), long (*writeFunc) (),  struct lsfAuth *auth);
 int lsRecvMsg_ (int sock, char *buf, unsigned int bufLen, struct LSFHeader *hdr, char *data, bool_t (*xdrFunc) (), size_t (*readFunc) ());
@@ -338,10 +338,10 @@ int ls_setlogmask (int maskpri);
 
 void initkeylist (struct keymap *keyList, int, int, struct lsInfo *);
 void freekeyval (struct keymap *keyList);
-char *parsewindow (char *val, char *fname, uint *lineNum, char *host);
+char *parsewindow (char *val, char *fname, unsigned int *lineNum, char *host);
 
-uint expandList_ (char ***tolist, uint mask, char **keys);
-uint expandList1_ (char ***tolist, uint num, uint *bitmMaps, char **keys);
+unsigned int expandList_ (char ***tolist, unsigned int mask, char **keys);
+unsigned int expandList1_ (char ***tolist, unsigned int num, unsigned int *bitmMaps, char **keys);
 
 int osInit_ (void);
 char *osPathName_ (char *);

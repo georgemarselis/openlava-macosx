@@ -16,17 +16,17 @@ struct submitMbdReply
 struct submitReq
 {
     char padding1[2];
-    ushort niosPort;
+    unsigned short niosPort;
     int options;
     int options2;
     int sigValue;
     pid_t restartPid;
     int userPriority;
     mode_t umask;
-    uint nxf;
-    uint maxNumProcessors;
-    uint numAskedHosts;
-    uint numProcessors;
+    unsigned int nxf;
+    unsigned int maxNumProcessors;
+    unsigned int numAskedHosts;
+    unsigned int numProcessors;
     char padding3[4];
     char *jobName;
     char *queue;
@@ -70,7 +70,7 @@ struct jobSwitchReq
 
 struct jobMoveReq
 {
-  uint opCode;
+  unsigned int opCode;
   int position;
   long jobId;
 };
@@ -94,7 +94,7 @@ struct migReq
 {
 	long jobId;
 	int options;
-	uint numAskedHosts;
+	unsigned int numAskedHosts;
 	char **askedHosts;
 };
 
@@ -110,9 +110,9 @@ struct jobInfoReply
 	int jType;
 	int jobPriority;
 	int *reasonTb;
-	uint numReasons;
-	uint numToHosts;
-	uint nIdx;
+	unsigned int numReasons;
+	unsigned int numToHosts;
+	unsigned int nIdx;
 	char padding2[4];
 	time_t startTime;
 	time_t predictedStartTime;
@@ -147,7 +147,7 @@ struct signalReq
 
 struct groupInfoReply
 {
-  uint numGroups;
+  unsigned int numGroups;
   char padding[4];
   struct groupInfoEnt *groups;
 };
@@ -160,16 +160,16 @@ struct jobPeekReq
 struct infoReq
 {
   int options;
-  uint numNames;
+  unsigned int numNames;
   char **names;
   char *resReq;
 };
 
 struct queueInfoReply
 {
-  uint badQueue;
-  uint numQueues;
-  uint nIdx;
+  unsigned int badQueue;
+  unsigned int numQueues;
+  unsigned int nIdx;
   char padding[4];
   struct queueInfoEnt *queues;
 };
@@ -189,17 +189,17 @@ struct jobInfoReq
 
 struct hostDataReply
 {
-  uint badHost;
-  uint numHosts;
-  uint nIdx;
+  unsigned int badHost;
+  unsigned int numHosts;
+  unsigned int nIdx;
   int flag;
   struct hostInfoEnt *hosts;
 };
 
 struct userInfoReply
 {
-  uint badUser;
-  uint numUsers;
+  unsigned int badUser;
+  unsigned int numUsers;
   struct userInfoEnt *users;
 };
 
@@ -223,8 +223,8 @@ struct debugReq
 
 struct lsbShareResourceInfoReply
 {
-  uint numResources;
-  uint badResource;
+  unsigned int numResources;
+  unsigned int badResource;
   struct lsbSharedResourceInfo *resources;
 };
 

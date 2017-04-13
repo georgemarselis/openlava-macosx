@@ -507,7 +507,8 @@ LIST_T *resNotifyList;
 // extern
 int currentRESSN; // FIXME FIXME FIXME FIXME accessor and mutators for this global
 
-static unsigned int globCurrentSN;
+// static 
+unsigned int globCurrentSN;
 
 // #define LSB_UTMP           0
 
@@ -583,8 +584,8 @@ int resSignal (struct child *chld, struct resSignal sig);
 void dumpClient (struct client *, char *);
 void dumpChild (struct child *, int, char *);
 
-uint  getCurrentSN( void );
-uint  setCurrentSN( uint currentSN );
+unsigned int  getCurrentSN( void );
+unsigned int  setCurrentSN( unsigned int currentSN );
 
 
 

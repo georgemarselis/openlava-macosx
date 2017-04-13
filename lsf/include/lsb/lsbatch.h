@@ -529,13 +529,13 @@ struct submit
 {
     int options;
     int options2;
-    uint numAskedHosts;
-    uint numProcessors;
+    unsigned int numAskedHosts;
+    unsigned int numProcessors;
     int sigValue;
-    uint nxf;
+    unsigned int nxf;
     int delOptions;
     int delOptions2;
-    uint maxNumProcessors;
+    unsigned int maxNumProcessors;
     int userPriority;
     int rLimits[LSF_RLIM_NLIMITS];
     char padding[4];
@@ -574,7 +574,7 @@ struct submig
 {
   LS_LONG_INT jobId;
   int options;
-  uint numAskedHosts;
+  unsigned int numAskedHosts;
   char **askedHosts;
 };
 
@@ -652,7 +652,7 @@ struct jobAttrSetLog
 
 struct jobInfoHead
 {
-  uint numHosts;
+  unsigned int numHosts;
   char padding[4];
   LS_LONG_INT *jobIds;
   unsigned long numJobs;
@@ -671,9 +671,9 @@ struct jobInfoEnt
     int execUid;
     int jType;
     int jobPriority;
-    uint numReasons;
-    uint nIdx;
-    uint numExHosts;
+    unsigned int numReasons;
+    unsigned int nIdx;
+    unsigned int numExHosts;
     int *reasonTb;
     char *user;
     char *cwd;
@@ -706,14 +706,14 @@ struct userInfoEnt
 {
     char *user;					// FIXME FIXME FIXME this oughta get larger
     float procJobLimit;
-    uint maxJobs;
-    uint numStartJobs;
-    uint numJobs;
-    uint numPEND;
-    uint numRUN;
-    uint numSSUSP;
-    uint numUSUSP;
-    uint numRESERVE;
+    unsigned int maxJobs;
+    unsigned int numStartJobs;
+    unsigned int numJobs;
+    unsigned int numPEND;
+    unsigned int numRUN;
+    unsigned int numSSUSP;
+    unsigned int numUSUSP;
+    unsigned int numRESERVE;
     char padding[4];
 };
 
@@ -750,7 +750,7 @@ struct queueInfoEnt
     int chkpntPeriod;
     int minProcLimit;
     int defProcLimit;
-    uint nIdx;
+    unsigned int nIdx;
     int rLimits[LSF_RLIM_NLIMITS];
     int sigMap[LSB_SIG_NUM];
     int defLimits[LSF_RLIM_NLIMITS];
@@ -793,7 +793,7 @@ struct hostInfoEnt
     int attr;
     int numRESERVE;
     int chkSig;
-    uint nIdx;
+    unsigned int nIdx;
     int *busySched;
     int *busyStop;
     unsigned long userJobLimit;
@@ -841,10 +841,10 @@ struct parameterInfo
     int maxAcctArchiveNum;
     int acctArchiveInSize;
     int acctArchiveInDays;
-    uint disableUAcctMap;
-    uint jobRunTimes;
-    uint jobDepLastSub;
-    uint maxJobId;
+    unsigned int disableUAcctMap;
+    unsigned int jobRunTimes;
+    unsigned int jobDepLastSub;
+    unsigned int maxJobId;
     char *defaultQueues;
     char *defaultHostSpec;
     char *defaultProject;
@@ -881,7 +881,7 @@ struct groupInfoEnt
 struct runJobRequest
 {
   int options;
-  uint numHosts;
+  unsigned int numHosts;
   LS_LONG_INT jobId;
   char **hostname;
 };
@@ -931,10 +931,10 @@ struct jobNewLog
   int umask;
   int niosPort;
   int rLimits[LSF_RLIM_NLIMITS];
-  uint nxf;
-  uint numProcessors;
-  uint numAskedHosts;
-  uint maxNumProcessors;
+  unsigned int nxf;
+  unsigned int numProcessors;
+  unsigned int numAskedHosts;
+  unsigned int maxNumProcessors;
   char padding1[4];
   time_t chkpntPeriod;
   time_t submitTime;
@@ -1230,6 +1230,8 @@ struct unfulfillLog
     time_t chkPeriod;
 };
 
+#define MAXFILENAMELEN          4096 // FIXME FIXME FIXME re-introduced from lsf.h, cuz gcc was complaining
+
 struct jobFinishLog
 {
     int jobId;
@@ -1244,18 +1246,18 @@ struct jobFinishLog
     int idx;
     int maxRMem;
     int maxRSwap;
-    char queue      [MAX_LSB_NAME_LEN];
-    char userName   [MAX_LSB_NAME_LEN];
-    char fromHost   [MAXHOSTNAMELEN];
-    char cwd        [MAXPATHLEN];
-    char inFile     [MAXFILENAMELEN];
-    char outFile    [MAXFILENAMELEN];
-    char errFile    [MAXFILENAMELEN];
-    char inFileSpool[MAXFILENAMELEN];
+    char queue       [MAX_LSB_NAME_LEN];
+    char userName    [MAX_LSB_NAME_LEN];
+    char fromHost    [MAXHOSTNAMELEN];
+    char cwd         [MAXPATHLEN];
+    char inFile      [MAXFILENAMELEN];
+    char outFile     [MAXFILENAMELEN];
+    char errFile     [MAXFILENAMELEN];
+    char inFileSpool [MAXFILENAMELEN];
     char commandSpool[MAXFILENAMELEN];
-    char jobFile    [MAXFILENAMELEN];
-    char jobName    [MAXLINELEN];
-    char command    [MAXLINELEN];
+    char jobFile     [MAXFILENAMELEN];
+    char jobName     [MAXLINELEN];
+    char command     [MAXLINELEN];
     char *resReq;
     char *dependCond;
     char *preExecCmd;
@@ -1526,7 +1528,7 @@ struct sortIntList
 struct lsbMsgHdr
 {
     uid_t usrId;
-    uint   msgId;
+    unsigned int   msgId;
     int   type;
     char padding[4];
     char  *src;
@@ -1554,23 +1556,23 @@ struct paramConf
 
 struct userConf
 {
-    uint numUgroups;
-    uint numUsers;
+    unsigned int numUgroups;
+    unsigned int numUsers;
     struct groupInfoEnt *ugroups;
     struct userInfoEnt *users;
 };
 
 struct hostConf
 {
-    uint numHosts;
-    uint numHgroups;
+    unsigned int numHosts;
+    unsigned int numHgroups;
     struct hostInfoEnt *hosts;
     struct groupInfoEnt *hgroups;
 };
 
 typedef struct lsbSharedResourceInstance
 {
-  uint nHosts;
+  unsigned int nHosts;
   char padding[4];
   char *totalValue;
   char *rsvValue;
@@ -1581,14 +1583,14 @@ typedef struct lsbSharedResourceInstance
 typedef struct lsbSharedResourceInfo
 {
   char *resourceName;
-  uint nInstances;
+  unsigned int nInstances;
   char padding[4];
   LSB_SHARED_RESOURCE_INST_T *instances;
 } LSB_SHARED_RESOURCE_INFO_T;
 
 struct queueConf
 {
-    uint numQueues;
+    unsigned int numQueues;
     char padding[4];
     struct queueInfoEnt *queues;
 };
@@ -1655,7 +1657,7 @@ LS_LONG_INT lsb_submit P_ ((struct submit *, struct submitReply *));
 void lsb_closejobinfo P_ ((void));
 
 int lsb_hostcontrol P_ ((char *, int));
-struct queueInfoEnt *lsb_queueinfo P_ ((char **queues, uint *numQueues, char *host, char *userName, int options));
+struct queueInfoEnt *lsb_queueinfo P_ ((char **queues, unsigned int *numQueues, char *host, char *userName, int options));
 int lsb_reconfig P_ ((int));
 int lsb_signaljob P_ ((LS_LONG_INT, int));
 int lsb_msgjob P_ ((LS_LONG_INT, char *));
@@ -1670,30 +1672,30 @@ char *lsb_peekjob P_ ((LS_LONG_INT));
 
 int lsb_mig P_ ((struct submig *, int *badHostIdx));
 
-struct hostInfoEnt *lsb_hostinfo P_ ((char **, uint *));
-struct hostInfoEnt *lsb_hostinfo_ex P_ ((char **, uint *, char *, int));
+struct hostInfoEnt *lsb_hostinfo P_ ((char **, unsigned int *));
+struct hostInfoEnt *lsb_hostinfo_ex P_ ((char **, unsigned int *, char *, int));
 int lsb_movejob P_ ((LS_LONG_INT jobId, int *, int));
 int lsb_switchjob P_ ((LS_LONG_INT jobId, char *queue));
 int lsb_queuecontrol P_ ((char *, int));
-struct userInfoEnt *lsb_userinfo P_ ((char **, uint *));
-struct groupInfoEnt *lsb_hostgrpinfo P_ ((char **groups, uint *numGroups, int options));
-struct groupInfoEnt *lsb_usergrpinfo P_ ((char **groups, uint *numGroups, int options));
-struct parameterInfo *lsb_parameterinfo P_ ((char **, uint *, int));
+struct userInfoEnt *lsb_userinfo P_ ((char **, unsigned int *));
+struct groupInfoEnt *lsb_hostgrpinfo P_ ((char **groups, unsigned int *numGroups, int options));
+struct groupInfoEnt *lsb_usergrpinfo P_ ((char **groups, unsigned int *numGroups, int options));
+struct parameterInfo *lsb_parameterinfo P_ ((char **, unsigned int *, int));
 LS_LONG_INT lsb_modify P_ ((struct submit *, struct submitReply *, LS_LONG_INT));
 float *getCpuFactor P_ ((char *, int));
 char *lsb_suspreason P_ ((int, int, struct loadIndexLog *));
 char *lsb_pendreason P_ ((int, int *, struct jobInfoHead *, struct loadIndexLog *));
 
 int lsb_puteventrec P_ ((FILE *, struct eventRec *));
-struct eventRec *lsb_geteventrec P_ ((FILE *log_fp, uint *lineNum));
-struct lsbSharedResourceInfo *lsb_sharedresourceinfo P_ ((char **, uint *, char *, int));
+struct eventRec *lsb_geteventrec P_ ((FILE *log_fp, unsigned int *lineNum));
+struct lsbSharedResourceInfo *lsb_sharedresourceinfo P_ ((char **, unsigned int *, char *, int));
 
 int lsb_runjob P_ ((struct runJobRequest *));
 
 char *lsb_jobid2str P_ ( ( u_long ) );
 char *lsb_jobidinstr P_ ( ( u_long ) );
-void jobId32To64 P_ ((LS_LONG_INT *, uint jobId, uint jobArrElemId ) ); // FIXME FIXME FIXME FIXME uint to u_long or u_int64_t
-void jobId64To32 P_ ((LS_LONG_INT, uint *jobId, uint *jobArrElemId ) ); // FIXME FIXME FIXME FIXME uint to u_long or u_int64_t
+void jobId32To64 P_ ((LS_LONG_INT *, unsigned int jobId, unsigned int jobArrElemId ) ); // FIXME FIXME FIXME FIXME unsigned int to u_long or u_int64_t
+void jobId64To32 P_ ((LS_LONG_INT, unsigned int *jobId, unsigned int *jobArrElemId ) ); // FIXME FIXME FIXME FIXME unsigned int to u_long or u_int64_t
 int lsb_setjobattr (int, struct jobAttrInfoEnt *);
 
 LS_LONG_INT lsb_rexecv (int, char **, char **, int *, int);

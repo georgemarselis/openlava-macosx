@@ -23,3 +23,5 @@
 // [s]uid_t type. if yes, try to see if there is an alternative to passing -1
 int lsfSetXUid (int flag, uid_t ruid, uid_t euid, uid_t suid, int (*func) ());
 int lsfExecX (char *path, char **argv, int (*func) ());
+
+int ls_fdbusy (int fd);

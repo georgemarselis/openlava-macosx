@@ -60,8 +60,8 @@ struct tclHostData
   int flag;
   int overRideFromType;
   int *status;
-  uint *resBitMaps;
-  uint *DResBitMaps;
+  unsigned int *resBitMaps;
+  unsigned int *DResBitMaps;
   short hostInactivityCount;
   char padding1[6];
   char *hostName;
