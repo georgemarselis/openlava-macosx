@@ -16,17 +16,17 @@
  *
  */
 
+#include <assert.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <limits.h>
+#include <math.h>
+#include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <errno.h>
-#include <pwd.h>
-#include <syslog.h>
-#include <fcntl.h>
-#include <math.h>
-#include <limits.h>
 #include <string.h>
-#include <assert.h>
+#include <syslog.h>
+#include <unistd.h>
 
 #include "libint/lsi18n.h"
 
@@ -51,22 +51,19 @@ int
 createUtmpEntry (char *uname, pid_t job_pid, char *current_tty)
 {
 
-  	int err = 0;
-  	strlen( uname );
-  	assert (job_pid);
-  	strlen (current_tty);
+	int err = 0;
+	assert( uname   );
+	assert( job_pid );
+	assert( current_tty );
 
-  	return (err);
+	return err;
 
 }
-
 
 
 int
 removeUtmpEntry (pid_t job_pid)
 {
-
 	assert( job_pid );
-  	return (0);
-
+	return 0;
 }

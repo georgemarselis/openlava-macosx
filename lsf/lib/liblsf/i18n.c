@@ -141,8 +141,10 @@ _i18n_printf (const char *format, ...)
   va_list ap;
 
   va_start (ap, format);
-  vsprintf (i18nPrintBuffer, format, ap);   // FIXME FIXME FIXME FIXME FIXME 
-                                            //    unroll this shit using the debugger
+  fprintf( stderr, "%s: format is: %s", __PRETTY_FUNCTION__, format );
+  vsprintf (i18nPrintBuffer, "%s", ap);     // FIXME FIXME FIXME FIXME FIXME 
+                                            //    unroll with debugger
+                                            //  also put it back the way it was
   va_end (ap);
   return (i18nPrintBuffer);
 }

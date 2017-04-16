@@ -17,16 +17,17 @@
  */
 
 #include <errno.h>
-#include <sys/time.h>
+#include <time.h>
 #include <unistd.h>
 
+#include "lsf.h"
 #include "lib/lib.h"
 #include "lib/lproto.h"
 #include "lib/rdwr.h"
 
 #define IO_TIMEOUT  2000
 
-#define US_DIFF(t1, t2) (((t1).tv_sec - (t2).tv_sec) * 1000000 + (t1).tv_usec - (t2).tv_usec)
+#define US_DIFF(t1, t2) ((t1->tv_sec - t2->tv_sec) * 1000000 + t1->tv_usec - t2->tv_usec )
 
 void alarmer_ (void);
 
@@ -39,16 +40,15 @@ nb_write_fix (int s, char *buf,  size_t len)
 {
     ssize_t cc;
     size_t length = 0;
-    struct timeval start, now;
+    struct timeval *start = NULL;
+    struct timeval *now   = NULL;
 
-    struct timezone junk;
+    struct timezone *junk = NULL;
 
-    gettimeofday (&start, &junk);
+    gettimeofday (start, junk);
 
     for (length = len; len > 0;) {
         if ((cc = write (s, buf, len)) > 0) {
-            assert( cc >= 0);
-            assert( len - (size_t)cc >= 0 );
             len -= (size_t) cc;
             buf += cc;
             }
@@ -61,7 +61,7 @@ nb_write_fix (int s, char *buf,  size_t len)
         }
         
         if (len > 0) {
-            gettimeofday (&now, &junk);
+            gettimeofday (now, junk);
             
             if (US_DIFF (now, start) > IO_TIMEOUT * 1000) {
                 errno = ETIMEDOUT;
@@ -79,24 +79,24 @@ nb_write_fix (int s, char *buf,  size_t len)
 // changed return type from long into to size_t
 //      ensure with the debugger/test case that this function
 //      does return negative values
-size_t
+long
 nb_read_fix (int s, char *buf, size_t len)
 {
     long cc = 0;
     size_t length = 0;
-    struct timeval start, now;
-    struct timezone junk;
+    struct timeval  *start = NULL;
+    struct timeval  *now   = NULL;
+    struct timezone *junk  = NULL;
 
     if (logclass & LC_TRACE) {
         ls_syslog (LOG_DEBUG, "nb_read_fix: Entering this routine...");
     }
 
-    gettimeofday (&start, &junk);
+    gettimeofday (start, junk);
 
     for (length = len; len > 0;) {
         if ((cc = read (s, buf, len)) > 0) {
             assert( cc >= 0);
-            assert( len - (size_t)cc >= 0 );
             len -= (size_t) cc;
         }
         else if (cc == 0 || BAD_IO_ERR (errno))
@@ -112,7 +112,7 @@ nb_read_fix (int s, char *buf, size_t len)
 
         if (len > 0)
         {
-            gettimeofday (&now, &junk);
+            gettimeofday (now, junk);
             if (US_DIFF (now, start) > IO_TIMEOUT * 1000) {
             
                 errno = ETIMEDOUT;
@@ -132,13 +132,13 @@ nb_read_fix (int s, char *buf, size_t len)
 // changed return type from into to size_t
 //      ensure with the debugger/test case that this function
 //      cannot return negative values
-size_t
+long
 b_read_fix (int s, char *buf, size_t len)
 {
     int loop      = 0;
     int numLoop   = 0;
     size_t length = 0;
-    ssize_t cc     = 0;
+    ssize_t cc    = 0;
         
     if (len > MAXLOOP * 1024) {
         numLoop = MAXLOOP * 100;
@@ -171,7 +171,6 @@ b_read_fix (int s, char *buf, size_t len)
       return (-1);
     }
 
-    assert( length >= 0 );
     return (long)length;
 }
 
@@ -207,7 +206,6 @@ b_write_fix (int s, char *buf, size_t len)
         return (-1);
     }
 
-    assert( length >= 0 );
     return (long)length;
 }
 

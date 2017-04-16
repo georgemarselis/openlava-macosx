@@ -35,8 +35,8 @@ CreateSock_ (int protocol)
   static char fname[] = "CreateSock_";
   struct sockaddr_in cliaddr;
   int s;
-  static ushort port;
-  static ushort i;
+  static unsigned short port;
+  static unsigned short i;
   static char isroot = FALSE;
 
   if (geteuid () == 0)
@@ -131,8 +131,8 @@ CreateSockEauth_ (int protocol)
   static char fname[] = "CreateSock_";
   struct sockaddr_in cliaddr;
   int s;
-  static ushort port;
-  static ushort i;
+  static unsigned short port;
+  static unsigned short i;
   static char isroot = FALSE;
 
 
@@ -498,10 +498,11 @@ svrsockDestroy_ (ls_svrsock_t * svrsock)
 int
 TcpConnect_ (char *hostname, u_short port, struct timeval *timeout)
 {
-  int sock;
-  int nwRdy, i;
+  int sock = 0;
+  int nwRdy = 0;
+  int i = 0;
   struct sockaddr_in server;
-  struct hostent *hp;
+  struct hostent *hp = NULL;
   fd_set wm;
 
   server.sin_family = AF_INET;
@@ -511,7 +512,7 @@ TcpConnect_ (char *hostname, u_short port, struct timeval *timeout)
       return (-1);
     }
 
-  memcpy ((char *) &server.sin_addr, (char *) hp->h_addr, (int) hp->h_length);
+  memcpy ((char *) &server.sin_addr, (char *) hp->h_addr_list[0], hp->h_length);
 
   server.sin_port = htons (port);
 

@@ -24,8 +24,7 @@
 #include "lib/xdrrf.h"
 #include "daemons/libresd/resd.h"
 
-int
-lsRecvMsg_ (int sock, char *buf, unsigned int bufLen, struct LSFHeader *hdr, char *data, bool_t (*xdrFunc) (), size_t (*readFunc) ())
+int lsRecvMsg_ (int sock, char *buf, size_t bufLen, struct LSFHeader *hdr, char *data, bool_t (*xdrFunc) (), long (*readFunc) ())
 {
     XDR xdrs;
     int cc = 0;
@@ -66,7 +65,7 @@ lsSendMsg_ (int s, unsigned short opCode, size_t hdrLength, char *data, char *re
     }
 
     assert( reqLen <= UINT_MAX );
-    xdrmem_create (&xdrs, reqBuf, (uint) reqLen, XDR_ENCODE);
+    xdrmem_create (&xdrs, reqBuf, reqLen, XDR_ENCODE);
     if (!xdr_encodeMsg (&xdrs, data, &hdr, xdrFunc, 0, auth)) {
         xdr_destroy (&xdrs);
         lserrno = LSE_BAD_XDR;

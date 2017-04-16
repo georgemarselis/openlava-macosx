@@ -19,3 +19,4 @@
  #pragma once
 
 int lsSendMsg_ (int s, unsigned short opCode, size_t hdrLength, char *data, char *reqBuf, size_t reqLen, bool_t (*xdrFunc) (), long (*writeFunc) (),  struct lsfAuth *auth);
+int lsRecvMsg_ (int sock, char *buf, size_t bufLen, struct LSFHeader *hdr, char *data, bool_t (*xdrFunc) (), long (*readFunc) ());

@@ -19,9 +19,9 @@
 #include "lib/lib.h"
 #include "lsb/sig.h"
 
-/* #define SIGEMT  SIGBUS */
-#define SIGLOST SIGIO
-#define SIGIOT  SIGABRT
+#define SIGEMT  SIGBUS
+// #define SIGLOST SIGIO
+// #define SIGIOT  SIGABRT
 
 #if !defined(SIGWINCH) && defined(SIGWINDOW)
 #    define SIGWINCH SIGWINDOW
@@ -55,7 +55,9 @@ static int sig_map[] = { 0,
   SIGVTALRM,
   SIGPROF,
   SIGWINCH,
+#ifdef __sparc__
   SIGLOST,
+#endif
   SIGUSR1,
   SIGUSR2
 };
@@ -93,92 +95,101 @@ static char *sigSymbol[] = { "",
   "USR2"
 };
 
-static int NSIG_MAP = (sizeof (sig_map) / sizeof (int));
+static unsigned int NSIG_MAP = (sizeof (sig_map) / sizeof ( unsigned int)); // FIXME FIXME FIXME move this out to appropriate header
 
 int
 sig_encode (int sig)
 {
-  int i;
+	unsigned int i = 0;
 
-  if (sig < 0)
-    return sig;
+	if (sig < 0) {
+		return sig;
+	}
 
-  for (i = 0; i < NSIG_MAP; i++)
-    if (sig_map[i] == sig)
-      break;
-  if (i == NSIG_MAP)
-    {
-      if (sig >= NSIG_MAP)
-	return (sig);
-      else
-	return (0);
-    }
-  else
-    return (i);
+	for( i = 0; i < NSIG_MAP; i++ ) {
+		if (sig_map[i] == sig) {
+			break;
+		}
+	}
+
+	if (i == NSIG_MAP)  // FIXME FIXME FIXME the cast has to go; does sig below need to be negative at any point? if no, remove cast, change function param
+	{
+		if (sig >= (int) NSIG_MAP) {
+			return (sig);
+		}
+		else {
+			return (0);
+		}
+	}
+	else {
+		return (i);
+	}
 }
 
 int
 sig_decode (int sig)
 {
-  if (sig < 0)
-    return sig;
+	if (sig < 0)
+		return sig;
 
-  if (sig >= NSIG_MAP)
-    {
-      if (sig < NSIG)
-	return (sig);
-      else
+	if (sig >= (int) NSIG_MAP)  // FIXME FIXME FIXME the cast has to go; does sig below need to be negative at any point? if no, remove cast, change function param
 	{
-	  return (0);
+		if (sig < _NSIG) {  // FIXME FIXME FIXME _NSIG is linux perticular
+			return (sig);
+		}
+		else
+		{
+			return (0);
+		}
 	}
-    }
 
-  return (sig_map[sig]);
+	return (sig_map[sig]);
 }
 
 int
 getSigVal (char *sigString)
 {
-  int sigVal, i;
-  char sigSig[16];
+	int sigVal = 0;
+	char sigSig[16] = ""; // FIXME FIXME why 16?
 
-  if (sigString == NULL)
-    return -1;
-  if (sigString[0] == '\0')
-    return -1;
+	if (sigString == NULL) {
+		return -1;
+	}
+	if (sigString[0] == '\0') {
+		return -1;
+	}
 
-  if (isint_ (sigString) == TRUE)
-    {
-      if ((sigVal = atoi (sigString)) > NSIG)
+	if (isint_ (sigString) == TRUE)
+	{
+		if ((sigVal = atoi (sigString)) > _NSIG) {
+			return -1;
+		}
+		else {
+			return (sigVal);
+		}
+	}
+
+	for ( unsigned int i = 0; i < NSIG_MAP; i++)
+	{
+		sprintf (sigSig, "%s%s", "SIG", sigSymbol[i]);
+		if ((strcmp (sigSymbol[i], sigString) == 0) || (strcmp (sigSig, sigString) == 0)) {
+			return (sig_map[i]);
+		}
+	}
 	return -1;
-      else
-	return (sigVal);
-    }
-
-  for (i = 0; i < NSIG_MAP; i++)
-    {
-      sprintf (sigSig, "%s%s", "SIG", sigSymbol[i]);
-      if ((strcmp (sigSymbol[i], sigString) == 0)
-	  || (strcmp (sigSig, sigString) == 0))
-	return (sig_map[i]);
-    }
-  return -1;
 
 }
 
 char *
 getSigSymbolList (void)
 {
-  static char list[512];
-  int i;
-
-  list[0] = '\0';
-  for (i = 1; i < NSIG_MAP; i++)
-    {
-      strcat (list, sigSymbol[i]);
-      strcat (list, " ");
-    }
-  return (list);
+	char *list = malloc( sizeof( list ) * 512 + 1 );
+	for( unsigned int i = 1; i < NSIG_MAP; i++ )
+	{
+		strcat (list, sigSymbol[i]);
+		strcat (list, " ");
+	}
+	return (list);
 
 }
 
@@ -192,24 +203,24 @@ Signal_ (int sig, void (*handler) (int))
   sigemptyset (&act.sa_mask);
   sigaddset (&act.sa_mask, sig);
   if (sigaction (sig, &act, &oact) == -1)
-    {
-      oact.sa_handler = (void (*)()) SIG_ERR;
-    }
+	{
+	  oact.sa_handler = (void (*)()) SIG_ERR;
+	}
   return (oact.sa_handler);
 }
 
 char *
 getSigSymbol (int sig)
 {
-  static char symbol[30];
-
-  symbol[0] = '\0';
-  if (sig < 0 || sig >= NSIG_MAP)
-    strcpy (symbol, "UNKNOWN");
-  else
-    strcpy (symbol, sigSymbol[sig]);
-  return (symbol);
-
+	char *symbol = malloc( sizeof(*symbol)* 30 + 1 );
+	if (sig < 0 || sig >= (int) NSIG_MAP) { // FIXME FIXME FIXME find out if sig can ever take negative values, then alter code appropriatelly
+		strcpy (symbol, "UNKNOWN");
+	}
+	else {
+		strcpy (symbol, sigSymbol[sig]);
+	}
+	
+	return (symbol);
 }
 
 int

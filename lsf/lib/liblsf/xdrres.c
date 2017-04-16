@@ -25,6 +25,7 @@
 #include "lib/lproto.h"
 #include "lib/rf.h"
 #include "lib/xdrres.h"
+#include "lib/term.h"
 
 bool_t
 xdr_resCmdBill (XDR *xdrs, struct resCmdBill *cmd, struct LSFHeader *hdr)

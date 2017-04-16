@@ -16,8 +16,10 @@
  *
  */
 
-#include <pwd.h>
 #include <grp.h>
+#include <pwd.h>
+#include <strings.h>
+
 
 #include "lib/lib.h"
 #include "lib/lproto.h"
@@ -32,11 +34,11 @@ getNextValue (char **line)
 int
 keyMatch (struct keymap *keyList, char *line, int exact)
 {
-  int i;
-  int found;
-  int pos = 0;
-  char *sp = line;
-  char *word;
+    int i = 0;
+    int found = FALSE;
+    int pos = 0;
+    char *sp = line;
+    char *word;
 
 
   i = 0;
@@ -83,7 +85,7 @@ keyMatch (struct keymap *keyList, char *line, int exact)
 }
 
 int
-isSectionEnd (char *linep, char *lsfile, uint *lineNum, char *sectionName)
+isSectionEnd (char *linep, char *lsfile, size_t *lineNum, char *sectionName)
 {
   char *word;
 
@@ -109,7 +111,7 @@ isSectionEnd (char *linep, char *lsfile, uint *lineNum, char *sectionName)
 }
 
 char *
-getBeginLine (FILE * fp, uint *lineNum)
+getBeginLine (FILE * fp, size_t *lineNum)
 {
   char *sp;
   char *wp;
@@ -128,7 +130,7 @@ getBeginLine (FILE * fp, uint *lineNum)
 }
 
 int
-readHvalues (struct keymap *keyList, char *linep, FILE * fp, char *lsfile, uint *lineNum, int exact, char *section)
+readHvalues (struct keymap *keyList, char *linep, FILE * fp, char *lsfile, size_t *lineNum, int exact, char *section)
 {
   static char fname[] = "readHvalues";
   char *key;
@@ -233,7 +235,7 @@ readHvalues (struct keymap *keyList, char *linep, FILE * fp, char *lsfile, uint 
 // }
 
 void
-doSkipSection (FILE * fp, uint *lineNum, char *lsfile, char *sectionName)
+doSkipSection (FILE * fp, size_t *lineNum, char *lsfile, char *sectionName)
 {
   char *word;
   char *cp;
@@ -354,16 +356,19 @@ putInLists (char *word, struct admins *admins, unsigned int *numAds, char *forWh
     // the code should be investagated as to why does it need a negative UID number.
     // is it a standard thing to do? is there any other way of representing not finding
     // a specific UID?
-    assert( pw->pw_uid >= 0 ); assert( pw->pw_gid >= 0);
-    admins->adminIds[admins->nAdmins] = (pw == NULL) ? -1 : pw->pw_uid;
-    admins->adminGIds[admins->nAdmins] = (pw == NULL) ? -1 : pw->pw_gid;
+    if( NULL == pw )  // FIXME FIXME FIXME FIXME this is definatelly wrong
+    {
+        fprintf( stderr, "confmisc.c: error: pw is NULL" );
+        exit( EXIT_FAILURE );
+    }
+    admins->adminIds[admins->nAdmins]   = pw->pw_uid;
+    admins->adminGIds[admins->nAdmins]  = pw->pw_gid;
     admins->adminNames[admins->nAdmins] = putstr_ (word);
     admins->nAdmins += 1;
 
     if (admins->nAdmins >= *numAds)
     {
-        *numAds *= 2;
-        assert( *numAds >= 0 );
+        *numAds *= 2; 
         tempIds     = realloc (admins->adminIds,   *numAds * sizeof (int));
         tempGids    = realloc (admins->adminGIds,  *numAds * sizeof (int));
         tempNames   = realloc (admins->adminNames, *numAds * sizeof (char *));
@@ -414,7 +419,7 @@ isInlist (char **adminNames, char *userName, unsigned int actAds)
 }
 
 char *
-getBeginLine_conf (struct lsConf *conf, uint *lineNum)
+getBeginLine_conf (struct lsConf *conf, size_t *lineNum)
 {
   char *sp;
   char *wp;
@@ -436,7 +441,7 @@ getBeginLine_conf (struct lsConf *conf, uint *lineNum)
 }
 
 void
-doSkipSection_conf (struct lsConf *conf, uint *lineNum, char *lsfile, char *sectionName)
+doSkipSection_conf (struct lsConf *conf, size_t *lineNum, char *lsfile, char *sectionName)
 {
   char *word;
   char *cp;

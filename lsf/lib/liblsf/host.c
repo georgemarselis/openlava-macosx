@@ -20,7 +20,7 @@
 #include <arpa/inet.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
-#include <string.h>
+#include <strings.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -380,7 +380,7 @@ addHost2Tab (const char *hname, in_addr_t ** addrs, char **aliases)
 // *optarg_ was originally named optarg, but there is a variable named optarg in lsf.h
 //      so, rename.
 int
-getAskedHosts_ (char *optarg_, char ***askedHosts, uint *numAskedHosts, unsigned long *badIdx, int checkHost)
+getAskedHosts_ (char *optarg_, char ***askedHosts, unsigned int *numAskedHosts, unsigned long *badIdx, int checkHost)
 {
     unsigned long  num = 64;
     char *word;
@@ -447,7 +447,7 @@ getAskedHosts_ (char *optarg_, char ***askedHosts, uint *numAskedHosts, unsigned
             nhlist++;
             if (nhlist == num)
         {
-            if ((tmp = realloc (hlist, 2 * num * sizeof (char *))) == NULL)
+            if ((tmp = realloc( hlist, 2 * num * sizeof( tmp ) ) ) == NULL)
                 {
                     lserrno = LSE_MALLOC;
                     goto Error;
@@ -458,7 +458,7 @@ getAskedHosts_ (char *optarg_, char ***askedHosts, uint *numAskedHosts, unsigned
         }
 
         assert( nhlist <= UINT_MAX );
-    *numAskedHosts = (uint)nhlist;
+    *numAskedHosts = nhlist;
     *askedHosts = hlist;
 
     if (foundBadHost)

@@ -49,7 +49,7 @@ channels[i].handle = INVALID_HANDLE; }
 extern int errno;
 extern int CreateSock_ (int);
 
-uint cherrno = 0;
+unsigned int cherrno = 0;
 unsigned int chanIndex = 0;
 static const unsigned int INVALID_HANDLE = 0;
 
@@ -139,7 +139,7 @@ chanServSocket_ (int type, u_short port, int backlog, int options)
     }
 
     assert( s >= 0 );
-    channels[ch].handle = (uint)s;
+    channels[ch].handle = (unsigned int)s;
     channels[ch].state = CH_WAIT;
     if (type == SOCK_DGRAM) {
         channels[ch].type = CH_TYPE_UDP;
@@ -157,9 +157,9 @@ chanClientSocket_ (int domain, int type, int options)
     int ch = 0;
     int s0 = 0;
     int s1 = 0;
-    uint counter = 0;
+    unsigned int counter = 0;
     static char first  = TRUE;
-    static ushort port = 0;
+    static unsigned short port = 0;
     struct sockaddr_in cliaddr;
 
     if (domain != AF_INET)
@@ -189,7 +189,7 @@ chanClientSocket_ (int domain, int type, int options)
 
     channels[ch].state = CH_DISC;
     assert( s0 >= 0 );
-    channels[ch].handle = (uint) s0;
+    channels[ch].handle = (unsigned int) s0;
     if (s0 < 3)
     {
         s1 = get_nonstd_desc_ (s0);
@@ -197,7 +197,7 @@ chanClientSocket_ (int domain, int type, int options)
             close (s0);
         }
         assert( s1 >= 0 );
-        channels[ch].handle = (uint)s1;
+        channels[ch].handle = (unsigned int)s1;
     }
 
     if (options & CHAN_OP_PPORT)
@@ -219,7 +219,7 @@ chanClientSocket_ (int domain, int type, int options)
     cliaddr.sin_family = AF_INET;
     cliaddr.sin_addr.s_addr = htonl (INADDR_ANY);
 
-    for ( uint i = 0; i < IPPORT_RESERVED / 2; i++)
+    for ( unsigned int i = 0; i < IPPORT_RESERVED / 2; i++)
     {
 
         if (options & CHAN_OP_PPORT)
@@ -239,7 +239,7 @@ chanClientSocket_ (int domain, int type, int options)
 
             if (errno == EADDRINUSE)
             {
-                port = (ushort) (time (0) | getpid ());
+                port = (unsigned short) (time (0) | getpid ());
                 port = ((port < 1024) ? (port + 1024) : port);
                 cliaddr.sin_port = htons (port);
                 if (bind (s0, (struct sockaddr *) &cliaddr, sizeof (cliaddr)) ==
@@ -313,7 +313,7 @@ chanAccept_ (int chfd, struct sockaddr_in *from)
 }
 
 void
-chanInactivate_ (uint chfd)
+chanInactivate_ (unsigned int chfd)
 {
     if ( chfd > chanMaxSize) {
         return;
@@ -327,7 +327,7 @@ chanInactivate_ (uint chfd)
 }
 
 void
-chanActivate_ (uint chfd)
+chanActivate_ (unsigned int chfd)
 {
     if ( chfd > chanMaxSize) {
         return;
@@ -371,7 +371,7 @@ chanConnect_ (int chfd, struct sockaddr_in *peer, int timeout)
     if (timeout >= 0)
     {
         assert( channels[chfd].handle <= INT_MAX );
-        if (b_connect_ ((int)channels[chfd].handle, (struct sockaddr *) peer, sizeof (struct sockaddr_in), (uint)timeout / 1000) < 0)
+        if (b_connect_ ((int)channels[chfd].handle, (struct sockaddr *) peer, sizeof (struct sockaddr_in), (unsigned int)timeout / 1000) < 0)
         {
             if (errno == ETIMEDOUT) {
                 lserrno = LSE_TIME_OUT;
@@ -586,7 +586,7 @@ chanOpen_ (u_int iaddr, u_short port, int options)
     oldOpt = setLSFChanSockOpt_ (newOpt | LS_CSO_ASYNC_NT);
     returnValue = CreateSock_ (SOCK_STREAM);
     assert( returnValue >= 0 );
-    channels[i].handle = (uint) returnValue;
+    channels[i].handle = (unsigned int) returnValue;
     setLSFChanSockOpt_ (oldOpt);
     if (returnValue < 0)
     {
@@ -669,7 +669,7 @@ chanOpenSock_ (int s, int options)
         return (-1);
     }
     channels[i].type = CH_TYPE_TCP;
-    channels[i].handle = (uint)s;
+    channels[i].handle = (unsigned int)s;
     channels[i].state = CH_CONN;
 
     if (options & CHAN_OP_RAW) {
@@ -756,8 +756,8 @@ chanCloseAll_ (void)
 void
 chanCloseAllBut_ (int chfd)
 {
-    for (uint i = 0; i < chanIndex; i++) {
-        if ((channels[i].state != CH_FREE) && (i != (uint)chfd)) {
+    for (unsigned int i = 0; i < chanIndex; i++) {
+        if ((channels[i].state != CH_FREE) && (i != (unsigned int)chfd)) {
             chanClose_ ((int)i);
         }
     }
@@ -766,7 +766,7 @@ chanCloseAllBut_ (int chfd)
 int
 chanSelect_ (struct Masks *sockmask, struct Masks *chanmask, struct timeval *timeout)
 {
-    uint i = 0;
+    unsigned int i = 0;
     int nReady = 0;
     int maxfds = 0;
 
@@ -1067,7 +1067,7 @@ chanRpc_ (int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *out
     }
 
     xdrmem_create (&xdrs, (char *) &hdrBuf, sizeof (struct LSFHeader), XDR_DECODE);      // FIXME FIXME FIXME FIXME FIXME (char *) &hdrBuf ; does the char need to be there?
-    cc = readDecodeHdr_ (chfd, (char *) &hdrBuf, (size_t (*)()) chanRead_, &xdrs, outhdr); // FIXME FIXME FIXME FIXME FIXME (char *) &hdrBuf ; does the char need to be there?
+    cc = readDecodeHdr_ (chfd, (char *) &hdrBuf, (ssize_t (*)()) chanRead_, &xdrs, outhdr); // FIXME FIXME FIXME FIXME FIXME (char *) &hdrBuf ; does the char need to be there?
     
     if (cc < 0)
     {
@@ -1122,8 +1122,8 @@ chanRpc_ (int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *out
     return (0);
 }
 
-uint
-chanSock_ (uint chfd)
+int
+chanSock_ (unsigned int chfd)
 {
     if ( chfd > chanMaxSize)
     {
@@ -1135,7 +1135,7 @@ chanSock_ (uint chfd)
 }
 
 int
-chanSetMode_ (uint chfd, int mode)
+chanSetMode_ (unsigned int chfd, int mode)
 {
     if ( chfd > chanMaxSize)
     {
@@ -1303,7 +1303,7 @@ dowrite (int chfd, struct Masks *chanmask)
 
     // paranoid
     assert( sendbuf->pos >= 0 );
-    assert( sendbuf->len - (size_t) sendbuf->pos >= 0 );
+    // assert( sendbuf->len - sendbuf->pos >= 0 );
     assert( channels[chfd].handle <= INT_MAX );
     cc = write ( (int)channels[chfd].handle, sendbuf->data + sendbuf->pos, (sendbuf->len - (size_t) sendbuf->pos) ) ;
     if (cc < 0 && BAD_IO_ERR (errno))
@@ -1407,7 +1407,7 @@ enqueueTail_ (struct Buffer *entry, struct Buffer *pred)
 static int
 findAFreeChannel (void)
 {
-    uint i = 0;
+    unsigned int i = 0;
     int  returnValue = 0;
 
     if (chanIndex != 0)
@@ -1426,7 +1426,7 @@ findAFreeChannel (void)
         if (i == chanMaxSize)
         {
             assert( chanMaxSize <= UINT_MAX );
-            chanIndex = (uint)chanMaxSize;
+            chanIndex = (unsigned int)chanMaxSize;
             return (-1);
         }
 

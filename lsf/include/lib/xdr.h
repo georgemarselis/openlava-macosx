@@ -76,3 +76,15 @@ int getXdrStrlen         ( char * );
 
 // static 
 int lsbSharedResConfigured_ = FALSE;
+
+
+void encodeHdr ( pid_t *word1, size_t *word2, unsigned int *word3, unsigned int *word4, struct LSFHeader *header);
+bool_t xdr_LSFHeader (XDR * xdrs, struct LSFHeader *header);
+bool_t xdr_packLSFHeader (char *buf, struct LSFHeader * header);
+bool_t xdr_encodeMsg (XDR * xdrs, char *data, struct LSFHeader *hdr, bool_t (*xdr_func) (), int options, struct lsfAuth *auth);
+bool_t xdr_arrayElement (XDR * xdrs, char *data, struct LSFHeader * hdr, bool_t (*xdr_func) (), ...);
+int readDecodeHdr_ (int s, char *buf, long (*readFunc) (), XDR * xdrs, struct LSFHeader *hdr);
+int readDecodeMsg_ (int s, char *buf, struct LSFHeader *hdr, long (*readFunc) (),  XDR * xdrs,  char *data, bool_t (*xdrFunc) (), struct lsfAuth *auth);
+int writeEncodeMsg_ (int s, char *buf, unsigned int len, struct LSFHeader *hdr, char *data, long (*writeFunc) (), bool_t (*xdrFunc) (), int options);
+int getXdrStrlen (char *s);
+void xdr_lsffree (bool_t (*xdr_func) (), char *objp, struct LSFHeader *hdr);

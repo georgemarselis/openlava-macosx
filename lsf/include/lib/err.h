@@ -20,4 +20,5 @@
 #pragma once
 
 
-const char *err_str_(int errnum, const char *fmt, char *buf);
+// const 
+char *err_str_(int errnum, const char *fmt, char *buf);

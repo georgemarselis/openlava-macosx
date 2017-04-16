@@ -116,8 +116,7 @@ ls_placeofhosts (char *resreq, size_t *numhosts, int options, char *fromhost, ch
     }
 
     placeReq.numPrefs = listsize + 1;
-    assert( placeReq.numPrefs >= 0 );
-    placeReq.preferredHosts = calloc ( (unsigned long)placeReq.numPrefs, sizeof (char *));
+    placeReq.preferredHosts = calloc ( placeReq.numPrefs, sizeof( placeReq.preferredHosts ) );
     if ( NULL == placeReq.preferredHosts && ENOMEM == errno ) {
         lserrno = LSE_MALLOC;
         return NULL;
@@ -245,8 +244,7 @@ placement_ (char *resReq, struct decisionReq *placeReqPtr, char *fromhost, size_
         free (hostnames);
     }
 
-    assert( numnames >= 0 );
-    hostnames = calloc ( (unsigned long)numnames, sizeof (char *));
+    hostnames = calloc ( numnames, sizeof( hostnames ) );
     if ( NULL == hostnames && ENOMEM == errno ) {
         lserrno = LSE_MALLOC;
         return NULL;

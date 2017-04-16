@@ -16,11 +16,13 @@
  *
  */
 
-#ifdef __APPLE__
-#undef __LP64__ 
-#endif
+// #ifdef __APPLE__
+// #undef __LP64__ 
+// #endif
 
 #include <limits.h>
+#include <sys/types.h>
+#include <time.h>
 
 #include "lib/lib.h"
 #include "lib/lproto.h"
@@ -50,12 +52,12 @@ xdr_LSFlong (XDR * xdrs, long *l)
 
     assert( longNum.high <= INT_MAX);
     assert ( longNum.low <= INT_MAX);
-    if (!(xdr_int (xdrs, (int *) &longNum.high) && xdr_int (xdrs, (int *) &longNum.low))) {
-        return (FALSE);
+    if (!(xdr_long (xdrs, &longNum.high) && xdr_long (xdrs, &longNum.low))) {
+        return FALSE;
     }
     
     if (xdrs->x_op == XDR_ENCODE) {
-        return (TRUE);
+        return TRUE;
     }
     
 #if (LONG_BIT == 64)
@@ -73,7 +75,7 @@ xdr_LSFlong (XDR * xdrs, long *l)
     }
 #endif
     
-    return (TRUE);
+    return TRUE;
 }
  
 bool_t
@@ -87,7 +89,7 @@ xdr_stat (XDR *xdrs, struct stat *st, struct LSFHeader *hdr)
         i = st->st_dev;
     }
     if (!xdr_int (xdrs, &i)) {
-        return (FALSE);
+        return FALSE;
     }
     if (xdrs->x_op == XDR_DECODE) {
         st->st_dev = i;
@@ -97,18 +99,22 @@ xdr_stat (XDR *xdrs, struct stat *st, struct LSFHeader *hdr)
         i = (int)st->st_ino;
     }
     if (!xdr_int (xdrs, &i)) {
-        return (FALSE);
+        return FALSE;
     }
     if (xdrs->x_op == XDR_DECODE) {
         assert( i >= 0 );
+#ifdef __APPLE__
         st->st_ino = (__darwin_ino64_t ) i;
+#elif defined( __linux__ )
+        st->st_ino = i;
+#endif
     }
     if (xdrs->x_op == XDR_ENCODE) {
         assert( i >= 0 );
         i = (mode_t) st->st_mode;
     }
     if (!xdr_int (xdrs, &i)) {
-        return (FALSE);
+        return FALSE;
     }
     if (xdrs->x_op == XDR_DECODE) {
         assert( i >= 0);
@@ -119,7 +125,7 @@ xdr_stat (XDR *xdrs, struct stat *st, struct LSFHeader *hdr)
     }
 
     if (!xdr_int (xdrs, &i)) {
-        return (FALSE);
+        return FALSE;
     }
     if (xdrs->x_op == XDR_DECODE) {
         assert( i >=0 && i <= SHRT_MAX);
@@ -130,7 +136,7 @@ xdr_stat (XDR *xdrs, struct stat *st, struct LSFHeader *hdr)
         i = (int) st->st_uid;
     }
     if (!xdr_int (xdrs, &i)) {
-        return (FALSE);
+        return FALSE;
     }
     if (xdrs->x_op == XDR_DECODE) {
         assert( i >= 0 );
@@ -141,7 +147,7 @@ xdr_stat (XDR *xdrs, struct stat *st, struct LSFHeader *hdr)
         i = (int) st->st_gid;
     }
     if (!xdr_int (xdrs, &i)) {
-        return (FALSE);
+        return FALSE;
     }
     if (xdrs->x_op == XDR_DECODE) {
         assert( i > 0 );
@@ -151,7 +157,7 @@ xdr_stat (XDR *xdrs, struct stat *st, struct LSFHeader *hdr)
         i = st->st_rdev;
     }
     if (!xdr_int (xdrs, &i)) {
-        return (FALSE);
+        return FALSE;
     }
     if (xdrs->x_op == XDR_DECODE) {
         st->st_rdev = i;
@@ -161,7 +167,7 @@ xdr_stat (XDR *xdrs, struct stat *st, struct LSFHeader *hdr)
         i = (int) st->st_size;
     }
     if (!xdr_int (xdrs, &i)) {
-        return (FALSE);
+        return FALSE;
     }
     if (xdrs->x_op == XDR_DECODE) {
         st->st_size = i;
@@ -171,7 +177,7 @@ xdr_stat (XDR *xdrs, struct stat *st, struct LSFHeader *hdr)
         i = (int) st->st_atime;
     }
     if (!xdr_int (xdrs, &i)) {
-        return (FALSE);
+        return FALSE;
     }
     if (xdrs->x_op == XDR_DECODE) {
         st->st_atime = i;
@@ -182,7 +188,7 @@ xdr_stat (XDR *xdrs, struct stat *st, struct LSFHeader *hdr)
         i = (int) st->st_mtime;
     }
     if (!xdr_int (xdrs, &i)) {
-        return (FALSE);
+        return FALSE;
     }
     if (xdrs->x_op == XDR_DECODE) {
         st->st_mtime = i;
@@ -193,13 +199,13 @@ xdr_stat (XDR *xdrs, struct stat *st, struct LSFHeader *hdr)
         i = (int) st->st_ctime;
     }
     if (!xdr_int (xdrs, &i)) {
-        return (FALSE);
+        return FALSE;
     }
     if (xdrs->x_op == XDR_DECODE) {
         st->st_ctime = i;
     }
 
-    return (TRUE);
+    return TRUE;
  }
  
 bool_t
@@ -207,7 +213,7 @@ xdr_lsfRusage (XDR *xdrs, struct lsfRusage *lsfRu)
 {
     assert( lsfRu->ru_utime <= __DBL_MAX__ && lsfRu->ru_utime >= __DBL_MIN__ );
     if( !(xdr_long   (xdrs, &lsfRu->ru_utime)     &&
-          xdr_int    (xdrs, &lsfRu->ru_stime)     &&
+          xdr_long   (xdrs, &lsfRu->ru_stime)     &&
           xdr_long   (xdrs, &lsfRu->ru_maxrss)    &&
           xdr_long   (xdrs, &lsfRu->ru_ixrss)     &&
           xdr_double (xdrs, &lsfRu->ru_ismrss)    &&
@@ -226,10 +232,10 @@ xdr_lsfRusage (XDR *xdrs, struct lsfRusage *lsfRu)
           xdr_long   (xdrs, &lsfRu->ru_nivcsw)    &&
           xdr_double (xdrs, &lsfRu->ru_exutime)))
     {
-        return (FALSE);
+        return FALSE;
     }
 
-    return (TRUE);
+    return TRUE;
 }
  
 bool_t
@@ -279,23 +285,23 @@ xdr_lenData (XDR *xdrs, struct lenData *ld)
 
     assert( ld-> len <= INT_MAX );
     if (!xdr_int (xdrs, (int *) &ld->len)) {
-        return (FALSE);
+        return FALSE;
     }
 
     if (xdrs->x_op == XDR_FREE) {
         FREEUP (ld->data);
-        return (TRUE);
+        return TRUE;
     }
     
     if (ld->len == 0) {
         ld->data = NULL;
-        return (TRUE);
+        return TRUE;
     }
     
     if (xdrs->x_op == XDR_DECODE) {
         ld->data = (char *) malloc (ld->len);
         if ( NULL == ld->data  && ENOMEM == errno ) {
-            return (FALSE);
+            return FALSE;
         }
     }
     
@@ -305,10 +311,10 @@ xdr_lenData (XDR *xdrs, struct lenData *ld)
         if (xdrs->x_op == XDR_DECODE) {
             FREEUP (ld->data);
         }
-        return (FALSE);
+        return FALSE;
     }
     
-    return (TRUE);
+    return TRUE;
  }
  
  
@@ -325,11 +331,11 @@ xdr_lsfAuth (XDR *xdrs, struct lsfAuth *auth, struct LSFHeader *hdr)
 
     assert( auth->uid <= INT_MAX );
     if (!(xdr_int (xdrs, (int *)&auth->uid) && xdr_int (xdrs, (int *)&auth->gid) && xdr_string (xdrs, &sp, MAXLSFNAMELEN))) {
-        return (FALSE);
+        return FALSE;
     }
 
     if (!xdr_enum (xdrs, (int *) &auth->kind)) {
-        return (FALSE);
+        return FALSE;
     }
 
     switch (auth->kind)
@@ -338,18 +344,18 @@ xdr_lsfAuth (XDR *xdrs, struct lsfAuth *auth, struct LSFHeader *hdr)
 
             assert( auth->k.authToken.len <= INT_MAX );
             if (!xdr_int (xdrs, (int *)&auth->k.authToken.len)) {
-                return (FALSE);
+                return FALSE;
             }
             
             if (xdrs->x_op == XDR_DECODE) {
                 auth->k.authToken.data = (void *) malloc (auth->k.authToken.len);
                 if ( NULL == auth->k.authToken.data && ENOMEM == errno)
-                    return (FALSE);
+                    return FALSE;
             }
 
             assert( auth->k.authToken.len <= INT_MAX );
             if (!xdr_bytes (xdrs, (char **) &auth->k.authToken.data, (u_int *) & auth->k.authToken.len, (unsigned int) auth->k.authToken.len)) {
-                return (FALSE);
+                return FALSE;
             }
             
             break;
@@ -357,13 +363,13 @@ xdr_lsfAuth (XDR *xdrs, struct lsfAuth *auth, struct LSFHeader *hdr)
         case CLIENT_EAUTH:
             assert( auth->k.authToken.len <= INT_MAX );
             if (!xdr_int (xdrs, (int *) &auth->k.eauth.len)) {
-                return (FALSE);
+                return FALSE;
             }
             
             sp = auth->k.eauth.data;
             assert( auth->k.authToken.len <= INT_MAX );
             if (!xdr_bytes (xdrs, &sp, (u_int *) & auth->k.eauth.len, (unsigned int)auth->k.eauth.len)) {
-                return (FALSE);
+                return FALSE;
             }
             break;
         case CLIENT_SETUID:
@@ -371,7 +377,7 @@ xdr_lsfAuth (XDR *xdrs, struct lsfAuth *auth, struct LSFHeader *hdr)
         // default:
         
             if (!xdr_arrayElement (xdrs, (char *) &auth->k.filler, hdr, xdr_int)) {
-                return (FALSE);
+                return FALSE;
             }
         break;
     }
@@ -381,11 +387,11 @@ xdr_lsfAuth (XDR *xdrs, struct lsfAuth *auth, struct LSFHeader *hdr)
     }
     
     if (!xdr_int (xdrs, &auth->options)) {
-        return (FALSE);
+        return FALSE;
     }
     
     
-    return (TRUE);
+    return TRUE;
 }
  
 bool_t
@@ -445,7 +451,7 @@ xdr_pidInfo (XDR *xdrs, struct pidInfo *pidInfo, struct LSFHeader *hdr)
             return FALSE;
      }
 
-    return (TRUE);
+    return TRUE;
  }
  
 bool_t
@@ -455,7 +461,7 @@ xdr_jRusage (XDR * xdrs, struct jRusage * runRusage, struct LSFHeader * hdr)
     {
         FREEUP (runRusage->pidInfo);
         FREEUP (runRusage->pgid);
-        return (TRUE);
+        return TRUE;
     }
     
     if (xdrs->x_op == XDR_DECODE)
@@ -470,13 +476,13 @@ xdr_jRusage (XDR * xdrs, struct jRusage * runRusage, struct LSFHeader * hdr)
           xdr_int (xdrs, &runRusage->stime))
        )
     {
-        return (FALSE);
+        return FALSE;
     }
     
     
     
     if (!(xdr_int (xdrs, &runRusage->npids))) {
-        return (FALSE);
+        return FALSE;
     }
 
     if (xdrs->x_op == XDR_DECODE && runRusage->npids) {
@@ -485,7 +491,7 @@ xdr_jRusage (XDR * xdrs, struct jRusage * runRusage, struct LSFHeader * hdr)
         runRusage->pidInfo = calloc ((unsigned long)runRusage->npids, sizeof (struct pidInfo));
         if ( NULL == runRusage->pidInfo && ENOMEM == errno) {
             runRusage->npids = 0;
-            return (FALSE);
+            return FALSE;
         }
     }
     
@@ -499,12 +505,12 @@ xdr_jRusage (XDR * xdrs, struct jRusage * runRusage, struct LSFHeader * hdr)
                 runRusage->npids = 0;
                 runRusage->pidInfo = NULL;
             }
-            return (FALSE);
+            return FALSE;
         }
     }
     
     if (!(xdr_int (xdrs, &runRusage->npgids))) {
-        return (FALSE);
+        return FALSE;
     }
 
     if (xdrs->x_op == XDR_DECODE && runRusage->npgids) {
@@ -513,7 +519,7 @@ xdr_jRusage (XDR * xdrs, struct jRusage * runRusage, struct LSFHeader * hdr)
         runRusage->pgid = (pid_t *) calloc ( (unsigned long)runRusage->npgids, sizeof (int));
         if ( NULL == runRusage->pgid && ENOMEM == errno ) {
             runRusage->npgids = 0;
-            return (FALSE);
+            return FALSE;
         }
     }
     
@@ -527,8 +533,8 @@ xdr_jRusage (XDR * xdrs, struct jRusage * runRusage, struct LSFHeader * hdr)
                 runRusage->npgids = 0;
                 runRusage->pgid = NULL;
             }
-            return (FALSE);
+            return FALSE;
         }
     }
-    return (TRUE);
+    return TRUE;
 }

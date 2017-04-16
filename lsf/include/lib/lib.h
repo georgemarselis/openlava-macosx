@@ -18,15 +18,16 @@
 
 #pragma once
  
-#include "lsf.h"
 #include "daemons/liblimd/limout.h"
+#include "daemons/libpimd/pimd.h"
 #include "daemons/libresd/resd.h"
-#include "lib/lproto.h"
 #include "lib/hdr.h"
-#include "lib/xdrlim.h"
-#include "lib/xdr.h"
+#include "lib/lproto.h"
 #include "lib/mls.h"
+#include "lib/xdr.h"
+#include "lib/xdrlim.h"
 #include "lsb/lsb.h"
+#include "lsf.h"
 
 struct taskMsg
 {
@@ -158,6 +159,33 @@ struct tid
 //     LSF_INTERACTIVE_STDERR,
 //     NO_HOSTS_FILE
 // } status;
+
+// from include/daemons/libpimd/pimd.h
+
+#define PIM_API_TREAT_JID_AS_PGID 0x1
+#define PIM_API_UPDATE_NOW        0x2
+
+#define PIM_SLEEP_TIME 3
+#define PIM_UPDATE_INTERVAL 30
+
+#define LSF_PIM_INFODIR     0
+#define LSF_PIM_SLEEPTIME   1
+#define LSF_LIM_DEBUG       2
+// #define LSF_LOGDIR          3
+#define LSF_PIM_SLEEPTIME_UPDATE 4
+
+struct config_param pimParams[] = {
+    { "LSF_PIM_INFODIR",          NULL },
+    { "LSF_PIM_SLEEPTIME",        NULL },
+    { "LSF_LIM_DEBUG",            NULL },
+    { "LSF_LOGDIR",               NULL },
+    { "LSF_PIM_SLEEPTIME_UPDATE", NULL },
+    { NULL,                       NULL }
+};
+
+#define PGID_LIST_SIZE  16
+#define PID_LIST_SIZE   64
+#define MAX_NUM_PID     300
 
 
 // from lib/lproto.h

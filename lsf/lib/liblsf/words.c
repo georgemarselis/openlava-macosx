@@ -23,8 +23,8 @@
 char *
 getNextLine_ (FILE * fp, int confFormat)
 {
-  uint *dummy = 0;
-  return (getNextLineC_ (fp, dummy, confFormat));
+  size_t *zeroLineCount = 0;
+  return (getNextLineC_ (fp, zeroLineCount, confFormat));
 }
 
 char *
@@ -34,15 +34,15 @@ getNextWord_ (char **line)
   char *wordp = word;
 
   while (isspace (**line)) {
-    (*line)++;
+	(*line)++;
   }
 
   while (**line && !isspace (**line)) {
-    *wordp++ = *(*line)++;
+	*wordp++ = *(*line)++;
   }
 
   if (wordp == word) {
-    return (NULL);
+	return NULL;
   }
 
   *wordp = '\0';
@@ -56,16 +56,16 @@ getNextWord1_ (char **line)
   char *wordp = word;
 
   while (isspace (**line)) {
-    (*line)++;
+	(*line)++;
   }
 
 
   while (**line && !isspace (**line) && (**line != ',') && (**line != ']') && (**line != '[')) {
-    *wordp++ = *(*line)++;
+	*wordp++ = *(*line)++;
   }
 
   if (wordp == word) {
-    return (NULL);
+	return NULL;
   }
 
 
@@ -78,13 +78,13 @@ static int
 charInSet (char c, const char *set)
 {
   while (*set != '\0')
-    {
-      if (c == *set)
-    {
-      return TRUE;
-    }
-      set++;
-    }
+	{
+	  if (c == *set)
+	{
+	  return TRUE;
+	}
+	  set++;
+	}
   return FALSE;
 }
 
@@ -96,15 +96,15 @@ getNextWordSet (char **line, const char *set)
 
 
   while (charInSet (**line, set))
-    (*line)++;
+	(*line)++;
 
 
   while (**line && !charInSet (**line, set))
-    *wordp++ = *(*line)++;
+	*wordp++ = *(*line)++;
 
   if (wordp == word)
 
-    return (NULL);
+	return NULL;
 
 
   *wordp = '\0';
@@ -115,310 +115,313 @@ getNextWordSet (char **line, const char *set)
 char *
 getNextValueQ_ (char **line, char ch1, char ch2)
 {
-  char *sp, str[4];
-  static char *value;
-  unsigned long valuelen = 0;
+	char *sp = NULL;
+	char str[4] = { "aaaa" };
+	static char *value = NULL;
+	unsigned long valuelen = 0;
 
-  lserrno = LSE_NO_ERR;
-  sp = getNextWord_ (line);
-  if (!sp)
-    return NULL;
+	lserrno = LSE_NO_ERR;
+	sp = getNextWord_(line);
+	if( !sp ) {
+		return NULL;
+	}
 
-  if (sp[0] != ch1)
-    return sp;
+	if (sp[0] != ch1) {
+		return sp;
+	}
 
-
-
-
-  sprintf (str, "%c", ch1);
-  if (strcmp (sp, str) == 0)
-    {
-      sp = getNextWord_ (line);
-      if (sp == NULL)
-    {
-      lserrno = LSE_CONF_SYNTAX;
-      return (NULL);
-    }
-    }
-  else
-    sp++;
-
-
-  if (value != NULL)
-    free (value);
-  if (strlen (sp) > MAXLINELEN)
-    {
-      valuelen = 2 * strlen (sp); 
-      value = (char *) malloc (valuelen);
-    }
-  else
-    {
-      value = malloc (MAXLINELEN);
-      valuelen = MAXLINELEN;
-    }
-
-  if (value == NULL)
-    {
-      lserrno = LSE_MALLOC;
-      return (NULL);
-    }
-  strcpy (value, sp);
-  sp = strchr (value, ch2);
-  if (sp != NULL)
-    {
-      *sp = '\0';
-      return value;
-    }
-
-  sprintf (str, "%c", ch2);
-  while ((sp = getNextWord_ (line)) != NULL)
-    {
-      if (strcmp (sp, str) == 0)
-    return value;
-
-      if (strlen (value) + strlen (sp) + 2 > valuelen - 1)
-    {
-      char *newvp;
-      newvp = myrealloc (value, valuelen + strlen (sp) + MAXLINELEN);
-      if (newvp == NULL)
-        return value;
-      value = newvp;
-      valuelen += MAXLINELEN;
-    }
-
-      strcat (value, " ");
-      strcat (value, sp);
-      sp = strrchr (value, ch2);
-      if (sp != NULL)
-    {
-      *sp = '\0';
-      return value;
-    }
-    }
+	sprintf (str, "%c", ch1);
+	if( strcmp( sp, str ) == 0 )
+	{
+		sp = getNextWord_( line );
+		if( NULL == sp )
+		{
+			lserrno = LSE_CONF_SYNTAX;
+			return NULL;
+		}
+	}
+	else {
+		sp++;
+	}
 
 
-  FREEUP (value);
-  lserrno = LSE_CONF_SYNTAX;
-  return NULL;
+	if( NULL != value ) {
+		free (value);
+	}
+	if( strlen( sp ) > MAXLINELEN * sizeof( char ) ) {
+		valuelen = 2 * strlen( sp ); 
+		value = malloc( valuelen );
+	}
+	else {
+		value = malloc( MAXLINELEN * sizeof( char ) + 1 );
+		valuelen = MAXLINELEN * sizeof (char );
+	}
 
+	if( NULL == value )
+	{
+		lserrno = LSE_MALLOC;
+		return NULL;
+	}
+
+	strcpy( value, sp ); // FIXME FIXME FIXME possible buffer overflow
+	sp = strchr( value, ch2 );
+	if (NULL != sp )
+	{
+	  sp = NULL;
+	  return value;
+	}
+
+	sprintf( str, "%c", ch2 );
+	sp = getNextWord_( line );
+	while( NULL != sp )
+	{
+		if( strcmp( sp, str ) == 0 ) {
+			return value;
+		}
+
+		if( strlen( value ) + strlen( sp ) + 2 > valuelen - 1 ) {
+			char *newvp = NULL;
+			newvp = myrealloc (value, valuelen + strlen (sp) + MAXLINELEN);  // FIXME FIXME FIXME FIXME no need to a programmer-defined realloc?
+			if( NULL == newvp ) {
+				return value;
+			}
+			value = newvp;
+			valuelen += MAXLINELEN;
+		}
+
+		strcat (value, " ");
+		strcat (value, sp);
+		sp = strrchr (value, ch2);
+		if (sp != NULL)
+		{
+			sp = NULL;
+			return value;
+		}
+
+		sp = getNextWord_( line );
+	}
+
+	free( value );
+	lserrno = LSE_CONF_SYNTAX;
+	return NULL;
 }
 
 // i think they are trying to remove all double quotes
 int
 stripQStr (char *q, char *str) 
 {
-  char *fr = q;
+	char *fr = q;
 
-    for (; *q != '"' && *q != '\0'; q++) {
-        ;
-    }
-    
-    if (*q == '\0') {
-        return (-1);
-    }
+	for (; *q != '"' && *q != '\0'; q++) {
+		;
+	}
+	
+	if (*q == '\0') {
+		return (-1);
+	}
 
-    for (q++; *q != '\0'; q++, str++) {
-      
-        if (*q == '"') {
-            if (*(q + 1) == '"'){
-               q++;
-            }
-            else {
-              *str = '\0';
-              break;
-            }
-        }
-        
-        *str = *q;
-    }
+	for (q++; *q != '\0'; q++, str++) {
+	  
+		if (*q == '"') {
+			if (*(q + 1) == '"'){
+			   q++;
+			}
+			else {
+			  *str = '\0';
+			  break;
+			}
+		}
+		
+		*str = *q;
+	}
 
-    if (*q == '\0') {
-        return -1;
-    }
+	if (*q == '\0') {
+		return -1;
+	}
 
-    return (q - fr + 1); // FIXME FIXME FIXME ascii gymnastics must go
+	return (q - fr + 1); // FIXME FIXME FIXME ascii gymnastics must go
 }
 
 int
 addQStr (FILE * log_fp, char *str)
 {
-    int j = 1;
+	int j = 1;
 
-    if (putc (' ', log_fp) == EOF) {
-        return -1;
-    }
-    if (putc ('"', log_fp) == EOF) {
-        return -1;
-    }
+	if (putc (' ', log_fp) == EOF) {
+		return -1;
+	}
+	if (putc ('"', log_fp) == EOF) {
+		return -1;
+	}
   
-    for (; *str != '\0'; str++, j++)
-    {
-        if (*str == '"') {
-            if (putc ('"', log_fp) == EOF) {
-                return -1;
-            }
-        }
-        if (putc (*str, log_fp) == EOF) {
-            return -1;
-        }
-    }
-    if (putc ('"', log_fp) == EOF) {
-        return -1;
-    }
+	for (; *str != '\0'; str++, j++)
+	{
+		if (*str == '"') {
+			if (putc ('"', log_fp) == EOF) {
+				return -1;
+			}
+		}
+		if (putc (*str, log_fp) == EOF) {
+			return -1;
+		}
+	}
+	if (putc ('"', log_fp) == EOF) {
+		return -1;
+	}
 
-    return 0;
+	return 0;
 }
 
 char *
-getNextLineD_ (FILE * fp, uint *LineCount, int confFormat)
+getNextLineD_ (FILE * fp, size_t *LineCount, int confFormat)
 {
-    static char *line = NULL;
-    int cin         = 0;
-    int oneChar     = 0;
-    int cinBslash   = 0;
-    int quotes      = 0;
-    size_t lpos     = 0;
-    size_t linesize = MAXLINELEN;
-    
-    lserrno = LSE_NO_ERR;
-    oneChar = -1;
+	static char *line = NULL;
+	int cin         = 0;
+	int oneChar     = 0;
+	int cinBslash   = 0;
+	int quotes      = 0;
+	size_t lpos     = 0;
+	size_t linesize = MAXLINELEN;
+	
+	lserrno = LSE_NO_ERR;
+	oneChar = -1;
 
-    if( NULL != line) {
-        FREEUP (line);
-    }
+	if( NULL != line) {
+		FREEUP (line);
+	}
 
-    line = calloc (1, MAXLINELEN);
-    if (NULL == line && ENOMEM == errno ) {
-        lserrno = LSE_MALLOC;
-        return NULL;
-    }
+	line = calloc (1, MAXLINELEN);
+	if (NULL == line && ENOMEM == errno ) {
+		lserrno = LSE_MALLOC;
+		return NULL;
+	}
 
-    lpos = 0;
-    while ((cin = getc (fp)) != EOF) {
+	lpos = 0;
+	while ((cin = getc (fp)) != EOF) {
 
-        if (cin == '\n') {
-            *LineCount += 1;
-            break;
-        }
-        
-        if (cin == '"') { 
+		if (cin == '\n') {
+			*LineCount += 1;
+			break;
+		}
+		
+		if (cin == '"') { 
 
-            if (quotes == 0) {
-                quotes++;
-            }
-            else {
-                quotes--;
-            }
-        }
-        
-        if (confFormat && cin == '#' && quotes == 0)
-        {
+			if (quotes == 0) {
+				quotes++;
+			}
+			else {
+				quotes--;
+			}
+		}
+		
+		if (confFormat && cin == '#' && quotes == 0)
+		{
 
-            while ((cin = getc (fp)) != EOF)  {
-                
-                if (cin == '\n') {
-                    *LineCount += 1;
-                    break;
-                }
-            }
-            
-            break;
-        }
+			while ((cin = getc (fp)) != EOF)  {
+				
+				if (cin == '\n') {
+					*LineCount += 1;
+					break;
+				}
+			}
+			
+			break;
+		}
 
-        if (confFormat && cin == '\\')
-        {
-            cinBslash = cin;
-            if ((cin = getc (fp)) == EOF) {
-                break;
-            }
+		if (confFormat && cin == '\\')
+		{
+			cinBslash = cin;
+			if ((cin = getc (fp)) == EOF) {
+				break;
+			}
 
-            if (cin == '\n') {
-                *LineCount += 1;
-            }
-            else if (!isspace (cin))
-            {
-                if (lpos < linesize - 1) {
-                    assert( cinBslash >= 0);
-                    line[lpos++] = (char) cinBslash;
-                }
-                else {
-                    char *sp;
-                    linesize += MAXLINELEN;
-                    sp = myrealloc (line, linesize);
+			if (cin == '\n') {
+				*LineCount += 1;
+			}
+			else if (!isspace (cin))
+			{
+				if (lpos < linesize - 1) {
+					assert( cinBslash >= 0);
+					line[lpos++] = (char) cinBslash;
+				}
+				else {
+					char *sp;
+					linesize += MAXLINELEN;
+					sp = myrealloc (line, linesize);
 
-                    if (sp == NULL) {
-                        break;
-                    }
+					if (sp == NULL) {
+						break;
+					}
 
-                    line = sp;
-                    assert( cinBslash >= 0);
-                    line[lpos++] = (char) cinBslash;
-                }
-            }
-            else {
-                printf( "i done goofed up! getNextLineD_()\n");
-            }
-        }
+					line = sp;
+					assert( cinBslash >= 0);
+					line[lpos++] = (char) cinBslash;
+				}
+			}
+			else {
+				fprintf( stderr, "%s: You are not supposed to be here.\n", __PRETTY_FUNCTION__ );
+			}
+		}
 
-        if (isspace (cin)) {
-            cin = ' ';
-        }
-      
-        if (lpos < linesize - 1) {
-            assert( cin >= 0);
-            line[lpos++] = (char) cin;
-        }
-        else
-        {
-            char *sp;
-            linesize += MAXLINELEN;
-            sp = myrealloc (line, linesize);
-            if ( NULL == sp && ENOMEM == errno ) {
-                break;
-            }
-            line = sp;
-            assert( cin >= 0);
-            line[lpos++] = (char)cin;
-        }
-    }
+		if (isspace (cin)) {
+			cin = ' ';
+		}
+	  
+		if (lpos < linesize - 1) {
+			assert( cin >= 0);
+			line[lpos++] = (char) cin;
+		}
+		else
+		{
+			char *sp;
+			linesize += MAXLINELEN;
+			sp = myrealloc (line, linesize);
+			if ( NULL == sp && ENOMEM == errno ) {
+				break;
+			}
+			line = sp;
+			assert( cin >= 0);
+			line[lpos++] = (char)cin;
+		}
+	}
 
-    if ( 1 == lpos ) {
-        oneChar = 1;
-    }
+	if ( 1 == lpos ) {
+		oneChar = 1;
+	}
 
 
-    while (lpos > 0 && (line[--lpos] == ' ')) {
-        ;
-    }
+	while (lpos > 0 && (line[--lpos] == ' ')) {
+		;
+	}
 
-    if ((cin != EOF) || (oneChar == 1) || (cin == EOF && lpos > 0))
-    {
-        line[++lpos] = '\0';
-        return (line);
-    }
+	if ((cin != EOF) || (oneChar == 1) || (cin == EOF && lpos > 0))
+	{
+		line[++lpos] = '\0';
+		return (line);
+	}
 
-    return NULL;
+	return NULL;
 }
 
 char *
-getNextLineC_ (FILE * fp, uint *LineCount, int confFormat)
+getNextLineC_ (FILE * fp, size_t *LineCount, int confFormat)
 {
-    char *nextLine;
-    char *sp;
+	char *nextLine;
+	char *sp;
 
-    nextLine = getNextLineD_ (fp, LineCount, confFormat);
+	nextLine = getNextLineD_ (fp, LineCount, confFormat);
 
-    if (nextLine == NULL) {
-        return NULL;
-    }
+	if (nextLine == NULL) {
+		return NULL;
+	}
 
-    for (sp = nextLine; *sp != '\0'; sp++) {
-        if (*sp != ' ') {
-            return (nextLine);
-        }
-    }
+	for (sp = nextLine; *sp != '\0'; sp++) {
+		if (*sp != ' ') {
+			return (nextLine);
+		}
+	}
 
-    return (getNextLineC_ (fp, LineCount, confFormat));
+	return (getNextLineC_ (fp, LineCount, confFormat));
 
 }
 
@@ -426,18 +429,18 @@ getNextLineC_ (FILE * fp, uint *LineCount, int confFormat)
 void
 subNewLine_ (char *instr)
 {
-    int strlength = (int) strlen (instr);
-    if (instr && strlength > 0) {
-        for ( int i = strlength - 1; i > -1; i--) {
-            if (instr[i] == '\n') {
-                for ( int k = i; k < strlength; k++) {
-                    instr[k] = instr[k + 1];
-                }
-            }
-        }
-    }
+	size_t strlength = strlen( instr );
+	if (instr && strlength > 0) {
+		for ( ssize_t i = (ssize_t) strlength - 1; i > -1; i--) {
+			if (instr[i] == '\n') {
+				for ( size_t k = i; k < strlength; k++) {
+					instr[k] = instr[k + 1];
+				}
+			}
+		}
+	}
 
-    return;
+	return;
 }
 
 /* Get the next meaningful line from the configuration
@@ -447,27 +450,26 @@ subNewLine_ (char *instr)
 char *
 nextline_ (FILE * fp)
 {
-  static char buf[BUFSIZ];
-  char *p;
+	static char *buf = NULL;
+	char *p = NULL;
 
-  p = NULL;
-  while (fgets (buf, BUFSIZ, fp))
-    {
-      p = buf;
-      while (isspace (*p))
-    ++p;
-      if (*p == '#' || *p == 0)
-    {
-      /* If this is the last or only
-       * line do not return the
-       * previous buffer to the caller.
-       */
-      p = NULL;
-      continue;
-    }
-      break;
-    }
+	buf = malloc( BUFSIZ * sizeof( char ) + 1);
+	while( fgets( buf, BUFSIZ, fp ) ) {
+		p = buf;
+		while( isspace( *p ) ) {
+			++p;
+		}
+		if (*p == '#' || *p == 0)
+		{
+		/* If this is the last or only
+		 * line do not return the
+		 * previous buffer to the caller.
+		 */
+			p = NULL;
+			continue;
+		}
+		break;
+	}
 
-  return (p);
-
+	return (p);
 }               /* nextline_() */

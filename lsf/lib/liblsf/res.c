@@ -61,12 +61,12 @@ int   rgetRusageCompletionHandler_ (struct lsRequest *request);
 int   ls_rstty (char *host);
 
 
-uint  getCurrentSN( void ) {
+unsigned int  getCurrentSN( void ) {
     return globCurrentSN;
 }
 
-uint  setCurrentSN( uint currentSN ) {
-    uint rvalue = 0; // on success return 0;
+unsigned int  setCurrentSN( unsigned int currentSN ) {
+    unsigned int rvalue = 0; // on success return 0;
 
     assert( currentSN <= INT_MAX ); // FIXME FIXME FIXME once first debuging is done, remove. We are trying to catch any function sneaking in garbage.
     globCurrentSN = currentSN;
@@ -82,11 +82,11 @@ ls_connect (char *host)
     int descriptor[2] = { 0, 0 };
     int resTimeout;
     size_t size = 0;
-    char *reqBuf;
+    char *reqBuf = NULL;
     struct lsfAuth auth;
     struct resConnect connReq;
-    struct hostent *hp;
-    char official[MAXHOSTNAMELEN];
+    struct hostent *hp = NULL;
+    char official[MAXHOSTNAMELEN] = "";
  
     if (genParams_[LSF_RES_TIMEOUT].paramValue) {
         resTimeout = atoi (genParams_[LSF_RES_TIMEOUT].paramValue);
@@ -105,10 +105,10 @@ ls_connect (char *host)
     }
 
     strcpy (official, hp->h_name);
-    memcpy ((char *) &res_addr_.sin_addr, (char *) hp->h_addr, (int) hp->h_length);
+    memcpy ((char *) &res_addr_.sin_addr, (char *) hp->h_addr_list[0], hp->h_length);
     if ((rootuid_) && (genParams_[LSF_AUTH].paramValue == NULL))
     {
-        if (currentsocket_ > (int)(FIRST_RES_SOCK + (uint)totsockets_ - 1))
+        if (currentsocket_ > (int)(FIRST_RES_SOCK + (unsigned int)totsockets_ - 1))
         {
             lserrno = LSE_NOMORE_SOCK;
             return (-1);
@@ -142,8 +142,7 @@ ls_connect (char *host)
     size =  sizeof (struct LSFHeader) + sizeof (connReq) + 
             sizeof (struct lsfAuth) + (size_t)ALIGNWORD_ (connReq.eexec.len);
 
-    assert(  size >= 0 );
-    reqBuf = malloc(5 * size * sizeof (int) ); 
+    reqBuf = malloc(5 * size * sizeof (reqBuf) );  // FIXME FIXME why 5?
     if (NULL == reqBuf && ENOMEM == errno ) {
         lserrno = LSE_MALLOC;
           CLOSESOCKET (s);
@@ -260,6 +259,8 @@ int
 ls_pclose (FILE * stream)
 {
     stream = NULL;
+
+    assert( stream == NULL );
     return (0);     // FIXME FIXME FIXME what the heck?! 
                     //      put it under the debugger and eliminate
                     //      code that reaches here
@@ -590,7 +591,7 @@ expectReturnCode_ (int s, pid_t seqno, struct LSFHeader *repHdr)
   struct LSFHeader buf;
   static char fname[] = "expectReturnCode_";
   XDR xdrs;
-  int rc;
+  int rc = 0;
 
   xdrmem_create (&xdrs, (char *) &buf, sizeof (struct LSFHeader), XDR_DECODE);
   for (;;)
@@ -598,7 +599,7 @@ expectReturnCode_ (int s, pid_t seqno, struct LSFHeader *repHdr)
       if (logclass & LC_TRACE)
   ls_syslog (LOG_DEBUG, "%s: calling readDecodeHdr_...", fname);
       xdr_setpos (&xdrs, 0);
-      if (readDecodeHdr_ (s, (char *) &buf, b_read_fix, &xdrs, repHdr) < 0)
+      if (readDecodeHdr_ (s, (char *) &buf, &b_read_fix, &xdrs, repHdr) < 0)
   {
     xdr_destroy (&xdrs);
     return (-1);
@@ -1012,7 +1013,7 @@ do_rstty2_ (int s, int io_fd, int redirect, int async)
 
         if ((cp = getenv ("LINES")) != NULL) {
             assert( atoi(cp) >= 0 && atoi(cp) <= SHRT_MAX );
-            tty.ws.ws_row = (ushort) atoi (cp);
+            tty.ws.ws_row = (unsigned short) atoi (cp);
         }
         else {
             tty.ws.ws_row = 24;
@@ -1020,7 +1021,7 @@ do_rstty2_ (int s, int io_fd, int redirect, int async)
         
         if ((cp = getenv ("COLUMNS")) != NULL) {
             assert( atoi(cp) >= 0 && atoi(cp) <= SHRT_MAX );
-            tty.ws.ws_col = (ushort) atoi (cp);
+            tty.ws.ws_col = (unsigned short) atoi (cp);
         }
         else {
             tty.ws.ws_col = 80;
@@ -1056,7 +1057,7 @@ rgetRusageCompletionHandler_ (struct lsRequest *request)
     }
 
     assert( request->replyBufLen <= INT_MAX); //FIXME FIXME must go over struct lsRequest
-    xdrmem_create (&xdrs, request->replyBuf, (uint) request->replyBufLen, XDR_DECODE);
+    xdrmem_create (&xdrs, request->replyBuf, (unsigned int) request->replyBufLen, XDR_DECODE);
     if( !xdr_jRusage (&xdrs, (struct jRusage *) request->extra, NULL) ) {
         lserrno = LSE_BAD_XDR;
         xdr_destroy (&xdrs);
@@ -1314,7 +1315,7 @@ sendSig_ (char *host, pid_t rid, int sig, int options)
         }
     }
     
-    if (sig >= NSIG || sig < 0) {
+    if (sig >= _NSIG || sig < 0) {  // FIXME FIXME FIXME substitute _NSIG for appropriate signal or appropriate way of fixing it
         lserrno = LSE_BAD_ARGS;
         return -1;
     }
@@ -1547,7 +1548,7 @@ lsMsgRcv_ (pid_t taskid, char *buffer, size_t len, int options)
 }
 
 int
-lsMsgSnd2_ (int *sock, ushort opcode, char *buffer, size_t len, int options)
+lsMsgSnd2_ (int *sock, unsigned short opcode, char *buffer, size_t len, int options)
 {
     struct LSFHeader header = { };
     XDR xdrs = { };
@@ -1722,7 +1723,7 @@ lsMsgWait_ (int inTidCnt, pid_t *tidArray, int *rdyTidCnt, int inFdCnt, int *fdA
         outFdArray[i] = -1;
     }
 
-// Label Again: was here, replained while while loop
+// Label Again: was here, replaced with while loop
 
     while( ! goAgain ) {
 
@@ -1737,7 +1738,7 @@ lsMsgWait_ (int inTidCnt, pid_t *tidArray, int *rdyTidCnt, int inFdCnt, int *fdA
             *rdyFdCnt = 0;
         }
 
-        if (inFdCnt > 0 && fdArray)
+        if (inFdCnt > 0 && fdArray) {
             for ( int i = 0; i < inFdCnt; i++)
             {
                 if (FD_NOT_VALID (fdArray[i]))
@@ -1808,6 +1809,7 @@ lsMsgWait_ (int inTidCnt, pid_t *tidArray, int *rdyTidCnt, int inFdCnt, int *fdA
                 if (errno == EINTR) {
                     return rc;
                 }
+            }
             else {
                 lserrno = LSE_SELECT_SYS;
                 rc = -1;

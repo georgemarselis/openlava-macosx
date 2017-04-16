@@ -987,6 +987,12 @@ struct lsfAcctRec *ls_getacctrec (FILE *, int *);
 int ls_putacctrec (FILE *, struct lsfAcctRec *);
 int getBEtime (char *, char, time_t *);
 
+
+long nb_write_fix (int s, char *buf, size_t len);
+long nb_read_fix  (int s, char *buf, size_t len);
+long b_read_fix   (int s, char *buf, size_t len);
+long b_write_fix  (int s, char *buf, size_t len);
+
 /*
  * openlava add host
  */

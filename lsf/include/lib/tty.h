@@ -1,4 +1,4 @@
-/* $Id: lib.eauth.c 397 2007-11-26 19:04:00Z mblack $
+/* $Id: lib.tty.c 397 2007-11-26 19:04:00Z mblack $
  * Copyright (C) 2007 Platform Computing Inc
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,23 +16,9 @@
  *
  */
 
-
-// FIXME FIXME FIXME
-// WTF is exit() redefined?!
-// must investigate 
-/* #define exit(a)         _exit(a) 
-*/
-
-/* #define NL_SETN   23 */
-
 #pragma once
 
-#define EAUTH_ENV_BUF_LEN       (MAXPATHLEN+32)
-
-int putEauthClientEnvVar( char *client );
-int putEauthServerEnvVar( char *server );
-int verifyEAuth_        ( struct lsfAuth *auth, struct sockaddr_in *from );
-static int getEAuth     ( struct eauth *, char * );
-static int putEnvVar    ( char *buf, const char *envVar, const char *envValue );
-static char *getLSFAdmin( void );
-static char *getLSFAdmin( void );
+static void ttymode_ (int mode, int ind, int enableIntSus);
+void ls_remtty (int ind, int enableIntSus);
+void ls_loctty (int ind);
+void ttymode_ (int mode, int ind, int enableIntSus);

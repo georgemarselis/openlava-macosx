@@ -20,6 +20,7 @@
 #include <unistd.h>
 
 
+#include "lib/init.h"
 #include "lib/lib.h"
 #include "lib/table.h"
 
@@ -41,7 +42,6 @@ static char *connnamelist[MAXCONNECT + 1];
 void hostIndex_ (char *hostName, int sock);
 int delhostbysock_ (int sock);
 int *_gethostdata_ (char *hostName);
-extern uint chanSock_ (uint chfd);
 
 
 void
@@ -225,9 +225,9 @@ _getcurseqno_ (char *hostName)
 }
 
 void
-_setcurseqno_ (char *hostName, uint seqno)
+_setcurseqno_ (char *hostName, unsigned int seqno)
 {
-    uint *sp;
+    unsigned int *sp;
     int *wtf;   // FIXME wtf does this function do?
                 // 
 
@@ -237,7 +237,7 @@ _setcurseqno_ (char *hostName, uint seqno)
     }
 
     assert( *wtf );
-    sp = (uint *)wtf;
+    sp = (unsigned int *)wtf;
     sp[2] = seqno; // FIXME not very smart. addressing a semi-random memory location. find alternatives.
 }
 

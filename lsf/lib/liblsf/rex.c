@@ -18,6 +18,7 @@
 
 #include <pwd.h>
 #include <stdlib.h>
+#include <strings.h>
 #include <unistd.h>
 
 #include "lib/lib.h"
@@ -43,10 +44,12 @@ ls_rexecve (char *host, char **argv, int options, char **envp)
   struct resCmdBill cmdmsg;
   int resTimeout;
 
-  if (genParams_[LSF_RES_TIMEOUT].paramValue)
+  if (genParams_[LSF_RES_TIMEOUT].paramValue) {
     resTimeout = atoi (genParams_[LSF_RES_TIMEOUT].paramValue);
-  else
+  }
+  else {
     resTimeout = RES_TIMEOUT;
+  }
 
   if (_isconnected_ (host, descriptor))
     s = descriptor[0];

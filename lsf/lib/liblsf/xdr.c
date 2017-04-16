@@ -17,9 +17,9 @@
  *
  */
 
-#ifdef __APPLE__
-#undef __LP64__
-#endif
+// #ifdef __APPLE__
+// #undef __LP64__
+// #endif
 
 #include <limits.h>
 
@@ -32,8 +32,7 @@
  * if we don't pack xdr would align the shorts
  * into int and we 24 bytes instead of 16. Big deal?
  */
-static void
-encodeHdr ( pid_t *word1, size_t *word2, unsigned int *word3, unsigned int *word4, struct LSFHeader *header)
+void encodeHdr ( pid_t *word1, size_t *word2, unsigned int *word3, unsigned int *word4, struct LSFHeader *header)
 {
 	*word1 = header->refCode;
 	*word1 <<= 16;
@@ -45,8 +44,7 @@ encodeHdr ( pid_t *word1, size_t *word2, unsigned int *word3, unsigned int *word
 	*word4 = header->reserved0;
 }
 
-bool_t
-xdr_LSFHeader (XDR * xdrs, struct LSFHeader *header)
+bool_t xdr_LSFHeader (XDR * xdrs, struct LSFHeader *header)
 {
   /* openlava 2.0 header encode and
    * decode operations.
@@ -72,8 +70,8 @@ xdr_LSFHeader (XDR * xdrs, struct LSFHeader *header)
 	  header->length = word2;
 	  header->version = word3 >> 16;
 	  header->reserved = word3 & 0xFFFF;
-	  assert( word4 < USHRT_MAX );
-	  header->reserved0 = (ushort) word4;
+	  assert( word4 <= USHRT_MAX );
+	  header->reserved0 = (unsigned short) word4;
 	}
 
   return TRUE;
@@ -104,7 +102,7 @@ xdr_packLSFHeader (char *buf, struct LSFHeader * header)
 bool_t
 xdr_encodeMsg (XDR * xdrs, char *data, struct LSFHeader *hdr, bool_t (*xdr_func) (), int options, struct lsfAuth *auth)
 {
-  uint len = 0;
+  unsigned int len = 0;
 
   assert( options );
   XDR_SETPOS (xdrs, LSF_HEADER_LEN);
@@ -138,8 +136,8 @@ bool_t
 xdr_arrayElement (XDR * xdrs, char *data, struct LSFHeader * hdr, bool_t (*xdr_func) (), ...)
 {
   va_list ap;
-  uint nextElementOffset = 0; 
-  uint pos = 0;
+  unsigned int nextElementOffset = 0; 
+  unsigned int pos = 0;
   char *cp;
 
   va_start (ap, xdr_func);
@@ -184,19 +182,19 @@ xdr_arrayElement (XDR * xdrs, char *data, struct LSFHeader * hdr, bool_t (*xdr_f
 }
 
 bool_t
-xdr_array_string (XDR * xdrs, char **astring, uint maxlen, uint arraysize)
+xdr_array_string (XDR * xdrs, char **astring, unsigned int maxlen, unsigned int arraysize)
 {
 
-  char line[MAXLINELEN];
+  char line[MAXLINELEN] = "";
   char *sp = line;
 
-  for (uint i = 0; i < arraysize; i++) {
+  for (unsigned int i = 0; i < arraysize; i++) {
 	if (xdrs->x_op == XDR_FREE) {
 	  FREEUP (astring[i]);
 	}
 	else if (xdrs->x_op == XDR_DECODE) {
 	  if (!xdr_string (xdrs, &sp, maxlen) || (astring[i] = putstr_ (sp)) == NULL) {
-		for (uint j = 0; j < i; j++) {
+		for (unsigned int j = 0; j < i; j++) {
 		  FREEUP (astring[j]);
 		}
 		return (FALSE);
@@ -219,7 +217,7 @@ xdr_time_t (XDR * xdrs, time_t * t)
 }
 
 int
-readDecodeHdr_ (int s, char *buf, size_t (*readFunc) (), XDR * xdrs, struct LSFHeader *hdr)
+readDecodeHdr_ (int s, char *buf, long (*readFunc) (), XDR * xdrs, struct LSFHeader *hdr)
 {
   if ((*readFunc) (s, buf, LSF_HEADER_LEN) != LSF_HEADER_LEN)
 	{
@@ -237,10 +235,10 @@ readDecodeHdr_ (int s, char *buf, size_t (*readFunc) (), XDR * xdrs, struct LSFH
 }
 
 int
-readDecodeMsg_ (int s, char *buf, struct LSFHeader *hdr, size_t (*readFunc) (),  XDR * xdrs,  char *data, bool_t (*xdrFunc) (), struct lsfAuth *auth)
+readDecodeMsg_ (int s, char *buf, struct LSFHeader *hdr, long (*readFunc) (),  XDR * xdrs,  char *data, bool_t (*xdrFunc) (), struct lsfAuth *auth)
 {
 	assert( hdr->length <= LONG_MAX);
-	if ((*readFunc) (s, buf, hdr->length) != hdr->length)
+	if ((*readFunc) (s, buf, hdr->length) != (long) hdr->length) // FIXME the cast here is correct, but it would be nice to see if we research futher along to get rid of it
 	{
 		lserrno = LSE_MSG_SYS;
 		return -2;
@@ -267,7 +265,7 @@ readDecodeMsg_ (int s, char *buf, struct LSFHeader *hdr, size_t (*readFunc) (), 
 
 // FIXME FIXME size_t len , size_t (*writeFunc)
 int
-writeEncodeMsg_ (int s, char *buf, uint len, struct LSFHeader *hdr, char *data, long (*writeFunc) (), bool_t (*xdrFunc) (), int options)
+writeEncodeMsg_ (int s, char *buf, unsigned int len, struct LSFHeader *hdr, char *data, long (*writeFunc) (), bool_t (*xdrFunc) (), int options)
 {
   XDR xdrs;
 
@@ -311,6 +309,8 @@ writeEncodeHdr_ (int s, struct LSFHeader *hdr, long (*writeFunc) ())
 
   xdr_destroy (&xdrs);
 
+// FIXME FIXME FIXME try tofind a better way to write the struct to the function..... (void *), maybe?
+
   if ((*writeFunc) (s, (char *) &buf, LSF_HEADER_LEN) != LSF_HEADER_LEN)
 	{
 	  lserrno = LSE_MSG_SYS;
@@ -325,12 +325,14 @@ bool_t
 xdr_stringLen (XDR * xdrs, struct stringLen * str, struct LSFHeader *hdr)
 {
 	assert( hdr->length);
-  if (xdrs->x_op == XDR_DECODE)
-	str->name[0] = '\0';
+	if (xdrs->x_op == XDR_DECODE) {
+		str->name[0] = '\0';
+	}
 
 	assert( str->len <= UINT_MAX);
-  if (!xdr_string (xdrs, &str->name, (uint)str->len))
-	return FALSE;
+	if (!xdr_string (xdrs, &str->name, str->len)) {
+		return FALSE;
+	}
 
   return TRUE;
 }
@@ -351,30 +353,32 @@ xdr_lsfLimit (XDR * xdrs, struct lsfLimit * limits, struct LSFHeader *hdr)
 bool_t
 xdr_portno (XDR * xdrs, u_short * portno)
 {
-  uint32_t len = 2;
-  char *sp;
+	uint32_t len = 2;
+	char *sp;
 
-  if (xdrs->x_op == XDR_DECODE)
-	*portno = 0;
+ 	if (xdrs->x_op == XDR_DECODE) {
+		*portno = 0;
+ 	}
 
-  sp = (char *) portno;
+	sp = (char *) portno;
 
-  return (xdr_bytes (xdrs, &sp, &len, len));
+	return xdr_bytes( xdrs, &sp, &len, len );
 }
 
 
 bool_t
 xdr_address (XDR * xdrs, u_int * addr)
 {
-  uint32_t len = NET_INTSIZE_;
-  char *sp;
+	uint32_t len = NET_INTSIZE_;
+	char *sp;
 
-  if (xdrs->x_op == XDR_DECODE)
-	*addr = 0;
+	if (xdrs->x_op == XDR_DECODE) {
+		*addr = 0;
+	}
 
-  sp = (char *) addr;
+	sp = (char *) addr;
 
-  return (xdr_bytes (xdrs, &sp, &len, len));
+	return xdr_bytes( xdrs, &sp, &len, len );
 }
 
 
@@ -415,8 +419,7 @@ xdr_debugReq (XDR * xdrs, struct debugReq * debugReq, struct LSFHeader *hdr)
   return TRUE;
 }
 
-void
-xdr_lsffree (bool_t (*xdr_func) (), char *objp, struct LSFHeader *hdr)
+void xdr_lsffree (bool_t (*xdr_func) (), char *objp, struct LSFHeader *hdr)
 {
 
   XDR xdrs;
@@ -428,10 +431,9 @@ xdr_lsffree (bool_t (*xdr_func) (), char *objp, struct LSFHeader *hdr)
   xdr_destroy (&xdrs);
 }
 
-int
-getXdrStrlen (char *s)
+int getXdrStrlen (char *s)
 {
-  uint cc = 0;
+  unsigned int cc = 0;
 
   if (s == NULL)
 	return 4;

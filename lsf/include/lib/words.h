@@ -25,17 +25,17 @@
 char *getNextValueQ_( char **line, char ch1, char ch2 );
 char *getNextValueQ_( char **line, char ch1, char ch2 );
 char *getNextWord_( char **line );
-char *getNextLineC_( FILE * p, uint *LineCount, int confFormat );
+char *getNextLineC_( FILE * p, size_t *LineCount, int confFormat );
 
 #define PUSH_STACK(s, n) { if( pushStack( s, n ) < 0 ) { goto Error; } }
 
-static struct pStack *blockStack;
-static struct pStack *ptrStack;
+struct pStack *blockStack;
+struct pStack *ptrStack;
 
-static struct confNode *newNode (void);
-static void freeNode (struct confNode *);
-static char linkNode (struct confNode *, struct confNode *);
-static char *readNextLine (struct lsConf *conf, uint *lineNum);
+struct confNode *newNode (void);
+void freeNode (struct confNode *);
+char linkNode (struct confNode *, struct confNode *);
+char *readNextLine (struct lsConf *conf, size_t *lineNum);
 
-static char addCond (struct lsConf *, char *);
-static char checkCond (struct lsConf *, char *);
+char addCond (struct lsConf *, char *);
+char checkCond (struct lsConf *, char *);

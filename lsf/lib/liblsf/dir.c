@@ -320,7 +320,7 @@ tryPwd (char *path, char *pwdpath)
 	return -1;
 }
 
-static int
+int
 getMap_ (void)
 {
 #ifndef __CYGWIN__
@@ -330,8 +330,9 @@ getMap_ (void)
 	int i = 0;
 
 	h_initTab_ (&hashTab, 64);		// FIXME FIXME FIXME FIXME wtf is hashTab from?
-									// FIXME FIXME FIXME FIXME also the value of 64 is important here!
+									// FIXME FIXME FIXME FIXME also why is the value of 64 is important here?
 	incallback.foreach = &putin_;
+
 	if ((i = yp_get_default_domain (&domain)) != 0) {
 		return i;
 	}
@@ -342,9 +343,12 @@ getMap_ (void)
 #endif
 }
 
+int
+// FIXME FIXME one below is probably for MacOS
+// see more:	http://www-personal.umich.edu/~saarela/programming/2005/06/dumping-nis-database-programmatically.html
+// putin_ (unsigned long instatus, char *inkey, int inkeylen, char *inval, int invallen, void *indata)
+putin_ ( int instatus, char *inkey, int inkeylen, char *inval, int invallen, char *indata)
 
-static int
-putin_ (unsigned long status, char *inkey, int inkeylen, char *inval, int invallen, void *indata)
 {
 
 /* do nothing with this, but gets rid of the compilier complaining 
@@ -361,7 +365,7 @@ putin_ (unsigned long status, char *inkey, int inkeylen, char *inval, int invall
 
 #ifndef __CYGWIN__
 
-	if( 0 != ypprot_err( status ) ) {
+	if( 0 != ypprot_err( instatus ) ) {
 		return TRUE;
 	}
 #endif

@@ -20,6 +20,11 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <pwd.h>
+#include <signal.h>
+// FIXME FIXME FIXME
+// above is related to signal.h and specifically to NSIG (the maximum available signal for the platform) 
+// see if the define is necessary and get rid of it
+
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <termios.h>
@@ -32,7 +37,7 @@
 #include "daemons/libniosd/niosd.h"
 #include "daemons/libresd/resout.h"
 
-#define NL_SETN 23
+// #define NL_SETN 23
 
 int
 getAuth_ (struct lsfAuth *auth, char *host)
@@ -170,7 +175,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
     eauth_aux_data = getenv ("LSF_EAUTH_AUX_DATA");
     eauth_aux_status = getenv ("LSF_EAUTH_AUX_STATUS");
 
-    assert( auth->k.eauth.len <= INT_MAX  && auth->k.eauth.len >= 0 );
+    assert( auth->k.eauth.len <= INT_MAX ); // FIXME FIXME why does it need to be less than INT_MAX?S
     sprintf (uData, "%d %d %s %s %u %ld %s %s %s %s\n", auth->uid, auth->gid,
         auth->lsfUserName, inet_ntoa (from->sin_addr),
             ntohs (from->sin_port), auth->k.eauth.len,
@@ -266,7 +271,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
               exit (-1);
             }
 
-            for ( int i = 1; i < NSIG; i++) {
+            for ( int i = 1; i < _NSIG; i++) {  // FIXME FIXME FIXME FIXME _NSIG exists on linux, but does it exist in MacOS, as well?
                 Signal_ (i, SIG_DFL);
             }
 
@@ -323,7 +328,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
     if (cc != (long) uData_length)
     {
         /* catgets 5513 */
-        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5513, "%s: b_write_fix <%s> failed, cc=%d, i=%d: %m"), fname, uData, cc, uData_length);
+        ls_syslog (LOG_ERR, "5513: %s: b_write_fix <%s> failed, cc=%d, i=%d: %ld", fname, uData, cc, uData_length);
         CLOSEHANDLE (in[1]);
         CLOSEHANDLE (out[0]);
         connected = FALSE;
@@ -331,18 +336,17 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
     }
     
     if (logclass & (LC_AUTH | LC_TRACE)) {
-        ls_syslog (LOG_DEBUG, _i18n_msg_get (ls_catd, NL_SETN, 5514, "%s: b_write_fix <%s> ok, cc=%d, i=%d"), fname, uData, cc, uData_length);
+        ls_syslog (LOG_DEBUG, "5514: %s: b_write_fix <%s> ok, cc=%d, i=%d", fname, uData, cc, uData_length);
     }
 
     // FIXME investigate the type of auth->k.eauth.len and figure out if len
     //    should be a size_t type.
     //    remove cast after you are done
-    assert( auth->k.eauth.len >= 0);
     cc = (long) b_write_fix (in[1], auth->k.eauth.data, (size_t) auth->k.eauth.len);
     if ( cc != (long) auth->k.eauth.len)
     {
          /* catgets 5515 */
-        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5515, "%s: b_write_fix <%s> failed, eauth.len=%d, cc=%d"), fname, uData, auth->k.eauth.len, cc);
+        ls_syslog (LOG_ERR, "5515: %s: b_write_fix <%s> failed, eauth.len=%d, cc=%d", fname, uData, auth->k.eauth.len, cc);
         CLOSEHANDLE (in[1]);
         CLOSEHANDLE (out[0]);
         connected = FALSE;
@@ -350,13 +354,13 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
     }
 
     if (logclass & (LC_AUTH | LC_TRACE)) {
-        ls_syslog (LOG_DEBUG, _i18n_msg_get (ls_catd, NL_SETN, 5516, "%s: b_write_fix <%s> ok, eauth.len=%d, eauth.data=%.*s cc=%d:"), fname, uData, auth->k.eauth.len, auth->k.eauth.len, auth->k.eauth.data, cc);
+        ls_syslog (LOG_DEBUG, "5516: %s: b_write_fix <%s> ok, eauth.len=%d, eauth.data=%.*s cc=%d:", fname, uData, auth->k.eauth.len, auth->k.eauth.len, auth->k.eauth.data, cc);
     }
 
     cc = (long) b_read_fix (out[0], &ok, 1);
     if ( cc != 1) {
         /* catgets 5517 */
-        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5517, "%s: b_read_fix <%s> failed, cc=%d: %m"), fname, uData, cc);
+        ls_syslog (LOG_ERR, "5517: %s: b_read_fix <%s> failed, cc=%d: %ld", fname, uData, cc);
         CLOSEHANDLE (in[1]);
         CLOSEHANDLE (out[0]);
         connected = FALSE;
@@ -365,7 +369,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
 
     if (ok != '1') {
         /* catgets 5518 */
-        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5518, "%s: eauth <%s> len=%d failed, rc=%c"), fname, uData, auth->k.eauth.len, ok);
+        ls_syslog (LOG_ERR, "5518: %s: eauth <%s> len=%d failed, rc=%c", fname, uData, auth->k.eauth.len, ok);
         return (-1);
     }
 

@@ -342,7 +342,7 @@ runEexec_ (char *option, int job, struct lenData *eexec, char *path)
             exit (-1);
         }
 
-        for ( int i = 1; i < NSIG; i++) {
+        for ( int i = 1; i < _NSIG; i++) { // FIXME FIXME FIXME : _NSIG is related only to linux, find other way of finding the max signal
             Signal_ (i, SIG_DFL); 
         }
 

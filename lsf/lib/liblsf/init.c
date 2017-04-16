@@ -192,7 +192,7 @@ opensocks_ (int num)
 /* ls_fdbusy()
  */
 int
-ls_fdbusy (uint fd)
+ls_fdbusy (int fd)
 {
     sTab hashSearchPtr = { };
     hEnt *hEntPtr      = 0;
@@ -227,7 +227,7 @@ ls_fdbusy (uint fd)
     }
 
     assert( currentsocket_ >= 0 );
-    if (rootuid_ && fd >= currentsocket_ && fd < FIRST_RES_SOCK +  totsockets_) {
+    if (rootuid_ && fd >= currentsocket_ && fd < (int) FIRST_RES_SOCK +  totsockets_) { // NOFIX : cast is perfectly fine here, FIRST_RES_SOCK has a const value of 20, from lsf.h
         return TRUE;
     }
 

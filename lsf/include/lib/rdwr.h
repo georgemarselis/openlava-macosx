@@ -18,12 +18,7 @@
 
 #pragma once
 
-#include <unistd.h>
-
-long    nb_write_fix (int s, char *buf, size_t len);
-size_t  nb_read_fix  (int s, char *buf, size_t len);
-size_t  b_read_fix   (int s, char *buf, size_t len);
-long 	b_write_fix  (int s, char *buf, size_t len);
+#include <sys/time.h>
 
 void unblocksig (int sig);
 int  b_connect_ (int s, struct sockaddr *name, socklen_t namelen, unsigned int timeout);

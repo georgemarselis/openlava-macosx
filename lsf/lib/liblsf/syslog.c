@@ -18,6 +18,9 @@
  */
 
 #include <unistd.h>
+#ifndef __USE_MISC
+#define __USE_MISC // FIXME FIXME FIXME related to syslog.h via vsyslog(); not quite sure if portable
+#endif
 #include <syslog.h>
 #include <sys/types.h>
 #include <sys/param.h>
@@ -267,7 +270,7 @@ ls_syslog (int level, const char *fmt, ...) // FIXME FIXME convert variable argu
 				{
 					if ((lfp = fopen (logfile, "a")) == NULL)
 					{
-						char *kot = malloc( sizeof( char ) * strlen(  buf ) + 1 );
+						char *kot = malloc( sizeof( char ) * strlen( buf ) + 1 );
 
 						if (log_dest == LOGTO_FILE)
 						{
@@ -280,8 +283,11 @@ ls_syslog (int level, const char *fmt, ...) // FIXME FIXME convert variable argu
 							level = LOG_DEBUG;
 						}
 
-						sprintf( kot, err_str_ (save_errno, fmt, buf) ); // FIXME FIXME FIXME FIXME use debugger, unroll format string
-						vsyslog (level, kot, ap); // FIXME FIXME FIXME FIXME use debugger, unroll format string 
+						sprintf( kot, "%s", err_str_ (save_errno, fmt, buf) ); // FIXME FIXME FIXME FIXME use debugger, unroll format string
+						kot = realloc( kot, strlen( kot ) + strlen( (char *) ap ) + 1 );  // FIXME FIXME FIXME FIXME FIXME variable argument again, must fix
+						strcat( kot, (char *) ap );
+						syslog( level, "%s", kot ); // FIXME FIXME FIXME FIXME the "%s" is a hack to go around the problem of cc throing errors. must revisit function
+						vsyslog( level, "%s", ap ); // FIXME FIXME FIXME FIXME use debugger, unroll format string 
 						closelog ();
 						free( kot );
 					}
@@ -301,10 +307,13 @@ ls_syslog (int level, const char *fmt, ...) // FIXME FIXME convert variable argu
 						level = LOG_DEBUG;
 					}
 
-					err_str_ (save_errno, fmt, buf);
-					sprintf( kot, buf ); // FIXME FIXME FIXME FIXME use debugger, unroll format string
-					vsyslog (level, kot, ap);  // FIXME FIXME FIXME FIXME use debugger, unroll format string
-					closelog ();
+					err_str_ (save_errno, fmt, buf); // this maybe wrong
+					sprintf( kot, "%s", buf ); // FIXME FIXME FIXME FIXME use debugger, unroll format string
+					kot = realloc( kot, strlen( kot ) + strlen( (char *) ap ) + 1 );  // FIXME FIXME FIXME FIXME FIXME variable argument again, must fix
+					strcat( kot, (char *) ap );
+					syslog( level, "%s", kot ); // FIXME FIXME FIXME FIXME the "%s" is a hack to go around the problem of cc throwing errors. must revisit function
+					vsyslog( level, "%s", ap ); // FIXME FIXME FIXME FIXME use debugger, unroll format string 
+					closelog( );
 					free( kot );
 				}
 			}
@@ -323,9 +332,13 @@ ls_syslog (int level, const char *fmt, ...) // FIXME FIXME convert variable argu
 					level = LOG_DEBUG;
 				}
 					
-				sprintf( kot, err_str_ (save_errno, fmt, buf) ); // FIXME FIXME FIXME FIXME use debugger, unroll format string
-				vsyslog (level, kot, ap); 
+				sprintf( kot, "%s", err_str_ (save_errno, fmt, buf) ); // FIXME FIXME FIXME FIXME use debugger, unroll format string
+				kot = realloc( kot, strlen( kot ) + strlen( (char *) ap ) + 1 );  // FIXME FIXME FIXME FIXME FIXME variable argument again, must fix
+				strcat( kot, (char *) ap );
+				syslog( level, "%s", kot ); // FIXME FIXME FIXME FIXME the "%s" is a hack to go around the problem of cc throing errors. must revisit function
+				vsyslog( level, "%s", ap ); // FIXME FIXME FIXME FIXME use debugger, unroll format string 
 				closelog ();
+				free( kot );
 			}
 			else
 			{
@@ -343,9 +356,13 @@ ls_syslog (int level, const char *fmt, ...) // FIXME FIXME convert variable argu
 						level = LOG_DEBUG;
 					}
 
-					sprintf( kot, err_str_ (save_errno, fmt, buf) ); // FIXME FIXME FIXME FIXME use debugger, unroll format string
-					vsyslog (level, kot, ap); // FIXME FIXME FIXME FIXME use debugger, unroll format string
+					sprintf( kot, "%s", err_str_ (save_errno, fmt, buf) ); // FIXME FIXME FIXME FIXME use debugger, unroll format string
+					kot = realloc( kot, strlen( kot ) + strlen( (char *) ap ) + 1 );  // FIXME FIXME FIXME FIXME FIXME variable argument again, must fix
+					strcat( kot, (char *) ap );
+					syslog( level, "%s", kot ); // FIXME FIXME FIXME FIXME the "%s" is a hack to go around the problem of cc throing errors. must revisit function
+					vsyslog( level, "%s", ap ); // FIXME FIXME FIXME FIXME use debugger, unroll format string 
 					closelog ();
+					free( kot );
 				}
 			}
 
@@ -367,10 +384,14 @@ ls_syslog (int level, const char *fmt, ...) // FIXME FIXME convert variable argu
 		if (level > LOG_DEBUG) {
 			level = LOG_DEBUG;
 		}
-		sprintf( kot, err_str_ (save_errno, fmt, buf) ); // FIXME FIXME FIXME FIXME use debugger, unroll format string
-		vsyslog (level, kot, ap); // FIXME FIXME FIXME FIXME use debugger, unroll format string
+		sprintf( kot, "%s", err_str_ (save_errno, fmt, buf) ); // FIXME FIXME FIXME FIXME use debugger, unroll format string
+		kot = realloc( kot, strlen( kot ) + strlen( (char *) ap ) + 1 );  // FIXME FIXME FIXME FIXME FIXME variable argument again, must fix
+		strcat( kot, (char *) ap );
+		syslog( level, "%s", kot ); // FIXME FIXME FIXME FIXME the "%s" is a hack to go around the problem of cc throing errors. must revisit function
+		vsyslog( level, "%s", ap ); // FIXME FIXME FIXME FIXME use debugger, unroll format string 
 		closelog ();
-	}
+		free( kot );
+}
 
 	free( buf );
 	va_end (ap);

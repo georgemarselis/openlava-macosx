@@ -103,22 +103,22 @@ static const int builtInRes_ID[] = {
   1320, 1321
 };
 
-char do_Cluster     (FILE *fp, unsigned int *lineNum, char *fname);
-char do_HostTypes   (FILE *fp, unsigned int *lineNum, char *fname);
-char do_HostModels  (FILE *fp, unsigned int *lineNum, char *fname);
-char do_Resources   (FILE *fp, unsigned int *lineNum, char *fname);
-char do_Index       (FILE *fp, unsigned int *lineNum, char *fname);
-char do_Manager     (FILE *fp, char *fname,   unsigned int *lineNum, char *clustermanager, int lookupAdmins);
-char do_Hosts       (FILE *fp, char *fname,   unsigned int *lineNum, struct lsInfo *myInfo);
-char do_Clparams    (FILE *fp, char *fname,   unsigned int *lineNum);
+char do_Cluster     (FILE *fp, size_t *lineNum, char *fname);
+char do_HostTypes   (FILE *fp, size_t *lineNum, char *fname);
+char do_HostModels  (FILE *fp, size_t *lineNum, char *fname);
+char do_Resources   (FILE *fp, size_t *lineNum, char *fname);
+char do_Index       (FILE *fp, size_t *lineNum, char *fname);
+char do_Manager     (FILE *fp, char *fname,   size_t *lineNum, char *clustermanager, int lookupAdmins);
+char do_Hosts       (FILE *fp, char *fname,   size_t *lineNum, struct lsInfo *myInfo);
+char do_Clparams    (FILE *fp, char *fname,   size_t *lineNum);
 
 // static 
 char addHostType (char *);
 // static 
 char addHostModel (char *model, char *arch, double factor);
 // static 
-char setIndex    (struct keymap *keyList, char *fname, unsigned int lineNum);
-char addHost     (struct hostInfo *host,  char *fname, unsigned int *lineNum);
+char setIndex    (struct keymap *keyList, char *fname, size_t lineNum);
+char addHost     (struct hostInfo *host,  char *fname, size_t *lineNum);
 
 int resNameDefined (char *);
 
@@ -134,10 +134,10 @@ void liblsf_putThreshold (int indx, struct hostInfo *host, long position, char *
 
 
 // static 
-int wgetClusAdmins (char *line, char *lsfile, unsigned int *lineNum, char *secName);
+int wgetClusAdmins (char *line, char *lsfile, size_t *lineNum, char *secName);
 // static 
-struct admins *getAdmins_ (char *line, char *fname, unsigned int *lineNum, char *secName, int lookupAdmins);
-struct admins *liblsf_getAdmins (char *line, char *fname, unsigned int *lineNum, char *secName, int lookupAdmins);
+struct admins *getAdmins_ (char *line, char *fname, size_t *lineNum, char *secName, int lookupAdmins);
+struct admins *liblsf_getAdmins (char *line, char *fname, size_t *lineNum, char *secName, int lookupAdmins);
 
 // static 
 int parse_time (char *, float *, int *);
@@ -149,19 +149,19 @@ int setAdmins (struct admins *, int);
 void freeKeyList (struct keymap *keyList);
 // static 
 int validType (char *type);
-int doResourceMap (FILE *fp, char *lsfile, unsigned int *lineNum);
+int doResourceMap (FILE *fp, char *lsfile, size_t *lineNum);
 // static 
-int addResourceMap (char *resName, char *location, char *lsfile, unsigned int lineNum, int *isDefault);
-int liblsf_addResourceMap (char *resName, char *location, char *lsfile, unsigned int lineNum);
+int addResourceMap (char *resName, char *location, char *lsfile, size_t lineNum, int *isDefault);
+int liblsf_addResourceMap (char *resName, char *location, char *lsfile, size_t lineNum);
 
 // static 
-unsigned int parseHostList (char *hostList, char *lsfile, unsigned int lineNum, char ***hosts, int *isDefault);
-int liblsf_parseHostList (char *hostList, char *lsfile, unsigned int lineNum, char ***hosts);
+unsigned int parseHostList (char *hostList, char *lsfile, size_t lineNum, char ***hosts, int *isDefault);
+int liblsf_parseHostList (char *hostList, char *lsfile, size_t lineNum, char ***hosts);
 //  was : 
-// static struct lsSharedResourceInfo *addResource (char *resName, int nHosts, char **hosts, char *value, char *fileName, unsigned int lineNum);
-struct lsSharedResourceInfo *liblsf_addResource (char *resName, int nHosts, char **hosts, char *value, char *fileName, unsigned int lineNum);
+// static struct lsSharedResourceInfo *addResource (char *resName, int nHosts, char **hosts, char *value, char *fileName, size_t lineNum);
+struct lsSharedResourceInfo *liblsf_addResource (char *resName, int nHosts, char **hosts, char *value, char *fileName, size_t lineNum);
 // static 
-struct sharedResource *addResource (char *resName, unsigned int nHosts, char **hosts, char *value, char *fileName, unsigned int lineNum, int resourceMap);
+struct sharedResource *addResource (char *resName, unsigned int nHosts, char **hosts, char *value, char *fileName, size_t lineNum, int resourceMap);
 int liblsf_addHostInstance(struct lsSharedResourceInfo *sharedResource, int nHosts, char **hostNames, char *value);
 // static 
 int addHostInstance (struct sharedResource *sharedResource, unsigned int nHosts, char **hostNames, char *value, int resourceMap);
@@ -171,4 +171,4 @@ int resolveBaseNegHosts (char *, char **, struct HostsArray *);
 
 void freeSA_ (char **list, unsigned int num);
 
-void doSkipSection(FILE *fp, unsigned int *lineNum, char *lsfile, char *sectionName);
+void doSkipSection(FILE *fp, size_t *lineNum, char *lsfile, char *sectionName);

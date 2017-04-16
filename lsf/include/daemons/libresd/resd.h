@@ -549,7 +549,6 @@ void child_handler_ext (void);
 void getMaskReady (fd_set * rm, fd_set * wm, fd_set * em);
 void display_masks (fd_set *, fd_set *, fd_set *);
 
-size_t b_read_fix   (int s, char *buf, size_t len);
 long b_write_fix  (int s, char *buf, size_t len);
 
 int lsbJobStart (char **, u_short, char *, int);

@@ -18,6 +18,7 @@
 
 #pragma once
  
+#include <limits.h>
 #include <time.h>
 
 enum lsPStatType
@@ -46,13 +47,29 @@ struct lsPidInfo
   int resident_size;
   int stack_size;
   enum lsPStatType status;
-  char command[PATH_MAX];
+  char command[PATH_MAX]; // PATH_MAX is declared in limits.h
 };
 
-#define PIM_API_TREAT_JID_AS_PGID 0x1
-#define PIM_API_UPDATE_NOW        0x2
+const unsigned int NL_SETN = 32;     // FIXME FIXME remove at earliest convience
 
-#define PIM_SLEEP_TIME 3
-#define PIM_UPDATE_INTERVAL 30
+static int npidList                = 0;
+static struct pidInfo *pidList     = NULL;
+static struct lsPidInfo *pinfoList = NULL;
+static int npinfoList              = 0;
+static int npgidList               = 0;
+static int *pgidList               = NULL;
+static unsigned int hitPGid        = 0;
+static char *pimInfoBuf            = NULL;
+static unsigned long pimInfoLen    = 0;
+static int argOptions              = 0;
 
+char *getNextString (char *, char *);
+char *readPIMBuf (char *);
+FILE *openPIMFile (char *pfile);
+int inAddPList (struct lsPidInfo *pinfo);
+int intoPidList (struct lsPidInfo *pinfo);
+int pimPort (struct sockaddr_in *, char *);
+int readPIMFile (char *);
 struct jRusage *getJInfo_ (int npgid, int *pgid, unsigned short options, gid_t cpgid);
+struct jRusage *readPIMInfo (int, int *);
+
