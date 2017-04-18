@@ -217,7 +217,7 @@ do_Index (FILE * fp, size_t *lineNum, char *fname)
 
     char *textValues[4] = { "INTERVAL", "INCREASING", "DESCRIPTION", "NAME"};
 
-    struct keymap *keyList = (struct keymap *) malloc( structArraySize * sizeof( struct keymap ) );
+    struct keymap *keyList = malloc( structArraySize * sizeof( struct keymap ) );
 
     short n = 0;
     while( n < structArraySize ) {

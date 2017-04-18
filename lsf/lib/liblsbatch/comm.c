@@ -49,22 +49,22 @@ int lsb_mbd_version = -1;
 #define MAXMSGLEN     (1<<24)
 
 int
-serv_connect (char *serv_host, ushort serv_port, int timeout)
+serv_connect (char *serv_host, unsigned short serv_port, int timeout)
 {
-    int chfd;
-    int cc;
-    int options;
-    struct sockaddr_in serv_addr;
+    int chfd    = 0;
+    int cc      = 0;
+    int options = 0;
+    struct sockaddr_in serv_addr = { };
     const struct hostent *hp;
 
-    memset ((char *) &serv_addr, 0, sizeof (serv_addr));
+    memset ( &serv_addr, 0, sizeof (serv_addr));
     serv_addr.sin_family = AF_INET;
     if ((hp = Gethostbyname_ (serv_host)) == 0) {
         lsberrno = LSBE_BAD_HOST;
         return -1;
     }
 
-    memcpy ((char *) &serv_addr.sin_addr, (char *) hp->h_addr, (int) hp->h_length);
+    memcpy( &serv_addr.sin_addr, hp->h_addr_list[0], hp->h_length);
     serv_addr.sin_port = serv_port;
 
     if (geteuid () == 0) {
@@ -105,7 +105,7 @@ serv_connect (char *serv_host, ushort serv_port, int timeout)
 }
 
 int
-call_server (char *host, ushort serv_port, char *req_buf, size_t req_size,  char **rep_buf, struct LSFHeader *replyHdr, int conn_timeout, int recv_timeout, int *connectedSock, int (*postSndFunc) (), int *postSndFuncArg, int flags)
+call_server (char *host, unsigned short serv_port, char *req_buf, size_t req_size,  char **rep_buf, struct LSFHeader *replyHdr, int conn_timeout, int recv_timeout, int *connectedSock, int (*postSndFunc) (), int *postSndFuncArg, int flags)
 {
     int cc;
     static char fname[] = "call_server";
@@ -309,15 +309,15 @@ getServerMsg (int serverSock, struct LSFHeader *replyHdr, char **rep_buf)
     }
 
     assert( len <= MAXMSGLEN);
-    return ((int)len);
+    return len;
 }
 
 
-ushort
+unsigned short
 get_mbd_port (void)
 {
     struct servent *sv;
-    static ushort mbd_port = 0;
+    static unsigned short mbd_port = 0;
     int temp_port = 0;
 
     if( mbd_port != 0 ) {
@@ -352,7 +352,7 @@ get_mbd_port (void)
 }
 
 
-ushort
+unsigned short
 get_sbd_port (void)
 {
     struct servent *sv;
@@ -397,7 +397,7 @@ callmbd (char *clusterName, char *request_buf, int requestlen, char **reply_buf,
 {
     static char fname[] = "callmbd";
     char *masterHost;
-    ushort mbd_port;
+    unsigned short mbd_port;
     int cc;
     unsigned int num = 0;
     int try = 0;
@@ -450,7 +450,7 @@ callmbd (char *clusterName, char *request_buf, int requestlen, char **reply_buf,
         }
 
         assert( requestlen >= 0);
-        xdrmem_create (&xdrs, request_buf, (uint)requestlen, XDR_DECODE);
+        xdrmem_create (&xdrs, request_buf, requestlen, XDR_DECODE);
         if (!xdr_LSFHeader (&xdrs, &reqHdr)) {
             ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_LSFHeader");
             xdr_destroy (&xdrs);
@@ -511,7 +511,7 @@ int
 cmdCallSBD_ (char *sbdHost, char *request_buf, int requestlen, char **reply_buf, struct LSFHeader *replyHdr, int *serverSock)
 {
     static char fname[] = "cmdCallSBD_";
-    ushort sbdPort;
+    unsigned short sbdPort;
     int cc;
 
     if (logclass & LC_COMM) {
@@ -612,8 +612,7 @@ readNextPacket (char **msgBuf, int timeout, struct LSFHeader *hdr, int serverSoc
     }
     *msgBuf = replyBuf.data;
 
-    assert( hdr->reserved <= INT_MAX );
-    return (int) hdr->reserved;
+    return hdr->reserved;
 }
 
 void

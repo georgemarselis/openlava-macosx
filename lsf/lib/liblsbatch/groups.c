@@ -23,11 +23,11 @@
 #include "lsb/lsb.h"
 #include "lib/xdr.h"
 
-static struct groupInfoEnt *getGrpInfo (char **groups, uint *numGroups, int options);
+static struct groupInfoEnt *getGrpInfo (char **groups, unsigned int *numGroups, int options);
 static int sendGrpReq (char *clusterName, int options, struct infoReq *groupInfo, struct groupInfoReply *reply);
 
 struct groupInfoEnt *
-lsb_usergrpinfo (char **groups, uint *numGroups, int options)
+lsb_usergrpinfo (char **groups, unsigned int *numGroups, int options)
 {
   options |= USER_GRP;
   return (getGrpInfo (groups, numGroups, options));
@@ -35,7 +35,7 @@ lsb_usergrpinfo (char **groups, uint *numGroups, int options)
 }
 
 struct groupInfoEnt *
-lsb_hostgrpinfo (char **groups, uint *numGroups, int options)
+lsb_hostgrpinfo (char **groups, unsigned int *numGroups, int options)
 {
   options |= HOST_GRP;
   return (getGrpInfo (groups, numGroups, options));
@@ -43,7 +43,7 @@ lsb_hostgrpinfo (char **groups, uint *numGroups, int options)
 }
 
 static struct groupInfoEnt *
-getGrpInfo (char **groups, uint *numGroups, int options)
+getGrpInfo (char **groups, unsigned int *numGroups, int options)
 {
 
   char *clusterName = NULL;
@@ -79,7 +79,7 @@ getGrpInfo (char **groups, uint *numGroups, int options)
     {
 
 
-      for ( uint i = 0; i < *numGroups; i++)
+      for ( unsigned int i = 0; i < *numGroups; i++)
 	{
 	  if (ls_isclustername (groups[i]) <= 0 || (options & USER_GRP))
 	    continue;
@@ -163,7 +163,7 @@ assert( options );
   if (lsberrno == LSBE_NO_ERROR || lsberrno == LSBE_BAD_GROUP)
     {
       assert( cc >= 0 );
-      xdrmem_create (&xdrs, reply_buf, XDR_DECODE_SIZE_ ((uint)cc), XDR_DECODE);
+      xdrmem_create (&xdrs, reply_buf, XDR_DECODE_SIZE_ ((unsigned int)cc), XDR_DECODE);
 
       if (!xdr_groupInfoReply (&xdrs, reply, &hdr))
 	{
@@ -193,7 +193,7 @@ freeGroupInfoReply (struct groupInfoReply *reply)
     return;
   }
 
-  for (uint i = 0; i < reply->numGroups; i++)
+  for (unsigned int i = 0; i < reply->numGroups; i++)
     {
       FREEUP (reply->groups[i].memberList);
 
