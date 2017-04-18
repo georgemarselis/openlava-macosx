@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2011-2012 David Bigagli Copyright (C) 2007 Platform
- * Computing Inc
+ * Copyright (C) 2011-2012 David Bigagli 
+ * Copyright (C) 2007 Platform Computing Inc
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of version 2 of the GNU General Public License as published by
@@ -771,7 +771,7 @@ struct hostEntryLog
       func;                                                       \
       gettimeofday(&after, &tz);                                  \
       ls_syslog(LOG_INFO,"L%d %s %d ms",level,name,               \
-            (int)((after.tv_sec - before.tv_sec)*1000 +       \
+            (time_t)((after.tv_sec - before.tv_sec)*1000 +       \
               (after.tv_usec-before.tv_usec)/1000));      \
     } else                                                          \
       func;                                                       \

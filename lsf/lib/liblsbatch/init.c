@@ -18,7 +18,7 @@
 
 #include <netdb.h>
 
-#include "lsb/sub.h"
+#include "lsb/init.h"
 #include "lsb/lsb.h"
 #include "lib/lib.h"
 
@@ -26,7 +26,6 @@
 static int _lsb_conntimeout = DEFAULT_API_CONNTIMEOUT;
 static int _lsb_recvtimeout = DEFAULT_API_RECVTIMEOUT;
 
-int lsb_init (char *appName);
 
 int
 lsb_init (char *appName)

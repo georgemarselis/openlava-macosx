@@ -69,7 +69,8 @@ lsb_hostinfo_ex (char **hosts, unsigned int *numHosts, char *resReq, int options
 
       if (resReq != NULL)
 	{
-	  TIMEIT (0, (hostInfoReq.names[0] = ls_getmyhostname ()), "ls_getmyhostname");
+	  // TIMEIT (0, (
+    hostInfoReq.names[0] = ls_getmyhostname ();//), "ls_getmyhostname");
 	  options |= CHECK_HOST;
 	}
       else
@@ -87,21 +88,22 @@ lsb_hostinfo_ex (char **hosts, unsigned int *numHosts, char *resReq, int options
 	  lsberrno = LSBE_NO_MEM;
 	  return (NULL);
 	}
-      TIMEIT (0, (hostInfoReq.names[0] = ls_getmyhostname ()),
-	      "ls_getmyhostname");
+      // TIMEIT (0, (
+      hostInfoReq.names[0] = ls_getmyhostname ();
+      // ), "ls_getmyhostname");
       hostInfoReq.numNames = 1;
       cc = 1;
     }
   else
     {
       assert( numReq >= 0);
-      hostInfoReq.names = calloc( (unsigned long)numReq, sizeof (char *));
+      hostInfoReq.names = calloc( numReq, sizeof( hostInfoReq.names ));
       if ( NULL == hostInfoReq.names && ENOMEM == errno )
 	{
 	  lsberrno = LSBE_NO_MEM;
 	  return (NULL);
 	}
-      for (unsigned int i = 0; i < numReq; i++)
+      for (size_t i = 0; i < numReq; i++)
 	{
 	  if (ls_isclustername (hosts[i]) <= 0)
 	    continue;
@@ -172,7 +174,8 @@ lsb_hostinfo_ex (char **hosts, unsigned int *numHosts, char *resReq, int options
 
 
     assert(XDR_GETPOS (&xdrs) <= INT_MAX );
-  TIMEIT (0, (cc = callmbd (clusterName, request_buf, (int)XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL)), "callmbd");
+  //TIMEIT (0, (
+    cc = callmbd (clusterName, request_buf, XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL); //), "callmbd");
   if (cc == -1)
     {
       xdr_destroy (&xdrs);
