@@ -25,7 +25,7 @@
 #include "lsb/lsbatch.h"
 
 // #define MAXEVENTNAMELEN   128
-// const uint MAXEVENTNAMELEN = 128
+// const size_t MAXEVENTNAMELEN = 128
 
 
 /*struct chkpntLog
@@ -102,8 +102,8 @@ static int readJobAttrSet (char *, struct jobAttrSetLog *);
 
 static void freeLogRec (struct eventRec *);
 
-struct eventRec *lsbGetNextJobEvent (struct eventLogHandle *ePtr, uint *lineNum, uint numJobIds, LS_LONG_INT *jobIds, struct jobIdIndexS *indexS);
-static struct eventRec *lsbGetNextJobRecFromFile( FILE *logFp, uint *lineNum, uint numJobIds, LS_LONG_INT *jobIds );
+struct eventRec *lsbGetNextJobEvent (struct eventLogHandle *ePtr, size_t *lineNum, size_t numJobIds, LS_LONG_INT *jobIds, struct jobIdIndexS *indexS);
+static struct eventRec *lsbGetNextJobRecFromFile( FILE *logFp, size_t *lineNum, size_t numJobIds, LS_LONG_INT *jobIds );
 static int checkJobEventAndJobId (char *, int, int, LS_LONG_INT *);
 static int getEventTypeAndKind (char *, int *);
 static void readEventRecord (char *, struct eventRec *);
@@ -115,20 +115,21 @@ int updateJobIdIndexFile (char *, char *, int);
 int getNextFileNumFromIndexS (struct jobIdIndexS *, int, LS_LONG_INT *);
 
 
-struct eventLogHandle *lsb_openelog (struct eventLogFile *, uint *lineNum);
-struct eventRec *lsb_getelogrec (struct eventLogHandle *, uint *lineNum);
+struct eventLogHandle *lsb_openelog (struct eventLogFile *, size_t *lineNum);
+struct eventRec *lsb_getelogrec (struct eventLogHandle *, size_t *lineNum);
 void lsb_closeelog (struct eventLogHandle *);
-void countLineNum (FILE *, long, uint *lineNum);
+void countLineNum (FILE *, long, size_t *lineNum);
 
-struct eventRec *lsb_geteventrec_ex (FILE * log_fp, uint *LineNum, char *usedLine);
+struct eventRec *lsb_geteventrec (FILE *log_fp, size_t *lineNum);
+struct eventRec *lsb_geteventrec_ex (FILE * log_fp, size_t *lineNum, char *usedLine);
 time_t lsb_getAcctFileTime (char *fileName);
 
 #define   EVENT_JOB_RELATED     1
 #define   EVENT_NON_JOB_RELATED 0
 
 
-uint copyQStr(char *line, uint maxLen, int nonNil, char *destStr);
-uint saveQStr( char *line, char *destStr);
+size_t copyQStr(char *line, size_t maxLen, int nonNil, char *destStr);
+size_t saveQStr( char *line, char *destStr);
 
 /*#define copyQStr(line, maxLen, nonNil, destStr)    {            \
         char *tmpLine=0;                                        \

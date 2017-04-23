@@ -53,7 +53,6 @@
 #include "lib/table.h"
 #include "lib/mls.h"
 #include "libint/intlibout.h"
-// #include "lsb/spool.h"
 #include "lsb/sub.h"
 #include "lib/xdr.h"
 
@@ -66,8 +65,34 @@
 // #define EMBED_QSUB         0x20
 // #define    NL_SETN            13
 
-#define ESUBNAME "esub"
+// #define ESUBNAME "esub"
 
+
+/////////////////////////////////////////////////////
+// function prototypes ( @ file scope )
+void trimSpaces (char *str);
+int parseXF (struct submit *, char *, char **);
+int checkLimit (int limit, int factor);
+LS_LONG_INT send_batch (struct submitReq *, struct lenData *, struct submitReply *, struct lsfAuth *);
+int dependCondSyntax (char *);
+int createJobInfoFile (struct submit *, struct lenData *);
+LS_LONG_INT subRestart (struct submit *jobSubReq, struct submitReq *submitReq, struct submitReply *submitRep, struct lsfAuth *auth);
+LS_LONG_INT subJob (struct submit *jobSubReq, struct submitReq *submitReq, struct submitReply *submitRep, struct lsfAuth *auth);
+int getUserInfo (struct submitReq *, struct submit *);
+char *acctMapGet (int *, char *);
+int xdrSubReqSize (struct submitReq *req);
+void postSubMsg (struct submit *, LS_LONG_INT, struct submitReply *);
+int readOptFile (char *filename, char *childLine);
+const LSB_SPOOL_INFO_T *chUserCopySpoolFile (const char *srcFile, spoolOptions_t fileType);
+
+
+// nios
+int createNiosSock (struct submitReq *);
+void startNios (struct submitReq *, int, LS_LONG_INT) __attribute__ ((noreturn));
+
+
+/////////////////////////////////////////////////////
+// global variables
 static int lsbMode_ = LSB_MODE_BATCH;
 
 
@@ -2464,7 +2489,7 @@ acctMapGet (int *fail, char *lsfUserName)
 static int
 getUserInfo (struct submitReq *submitReq, struct submit *jobSubReq)
 {
-	char lsfUserName[MAXLINELEN];
+	char lsfUserName[MAXLINELEN];		// FIXME FIXME malloc
 	int childIoFd[2];
 	uid_t uid  = 0;
 	pid_t pid  = 0;
@@ -4422,7 +4447,6 @@ parseXF (struct submit *req, char *arg, char **errMsg)
 {
 	static uint maxNxf = 0;
 	static struct xFile *xp = NULL;
-	static char fname[] = "parseXF";
 	struct xFile *tmpXp = NULL;
 	int options = 0;
 	char op[MAXLINELEN], lf[MAXFILENAMELEN], rf[MAXFILENAMELEN];
@@ -4724,7 +4748,7 @@ fprintf(parmfp, "%s=%d\n", name, (int) field); \
 
 
 
-	sprintf (esub, "%s/%s", lsbParams[LSB_SERVERDIR].paramValue, ESUBNAME);
+	sprintf (esub, "%s/%s", lsbParams[LSB_SERVERDIR].paramValue, __PRETTY_FUNCTION__);
 	if (stat (esub, &sbuf) < 0) {
 		return 0;
 	}

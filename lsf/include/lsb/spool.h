@@ -115,4 +115,5 @@ int removeElementFromList (const listElementPtr_t pListElement, const listHeader
 listElementPtr_t getBestListElement (const listHeaderPtr_t pListHeader);
 int setBestListElement (const listElementPtr_t pBestElement,const listHeaderPtr_t pListHeader);
 listHeaderPtr_t createListHeader ( void );
+const char *getDefaultSpoolDir ();
 

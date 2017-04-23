@@ -18,9 +18,10 @@
 
 #include <netdb.h>
 
+#include "lib/lib.h"
 #include "lsb/init.h"
 #include "lsb/lsb.h"
-#include "lib/lib.h"
+#include "lsb/sub.h"
 
 
 static int _lsb_conntimeout = DEFAULT_API_CONNTIMEOUT;
@@ -84,7 +85,7 @@ lsb_init (char *appName)
 
 	getLogClass_ (lsbParams[LSB_DEBUG_CMD].paramValue, lsbParams[LSB_TIME_CMD].paramValue);
 
-	if (bExceptionTabInit ())
+	if( bExceptionTabInit() )
 	{
 		lsberrno = LSBE_LSBLIB;
 		return -1;

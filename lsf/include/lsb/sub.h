@@ -59,12 +59,6 @@ char *getNextLine_ (FILE * fp, int confFormat);
 uid_t getuid (void);
 char *lsb_sysmsg (void);
 
-static const char *getDefaultSpoolDir ();
-static void trimSpaces (char *str);
-static int parseXF (struct submit *, char *, char **);
-static int checkLimit (int limit, int factor);
-
-
 
 typedef int (*bException_handler_t) (void *);
 
@@ -81,23 +75,9 @@ char *yyerr;
 static char *useracctmap = NULL;
 static struct lenData ed = { 0, NULL };
 
-static LS_LONG_INT send_batch (struct submitReq *, struct lenData *, struct submitReply *, struct lsfAuth *);
-static int dependCondSyntax (char *);
-static int createJobInfoFile (struct submit *, struct lenData *);
-static LS_LONG_INT subRestart (struct submit *jobSubReq, struct submitReq *submitReq, struct submitReply *submitRep, struct lsfAuth *auth);
-static LS_LONG_INT subJob (struct submit *jobSubReq, struct submitReq *submitReq, struct submitReply *submitRep, struct lsfAuth *auth);
-static int getUserInfo (struct submitReq *, struct submit *);
-static char *acctMapGet (int *, char *);
-
-static int xdrSubReqSize (struct submitReq *req);
-static int createNiosSock (struct submitReq *);
-
 int getChkDir (char *, char *);
-static void startNios (struct submitReq *, int, LS_LONG_INT) __attribute__ ((noreturn));
-static void postSubMsg (struct submit *, LS_LONG_INT, struct submitReply *);
-static int readOptFile (char *filename, char *childLine);
 
-static const LSB_SPOOL_INFO_T *chUserCopySpoolFile (const char *srcFile, spoolOptions_t fileType);
+
 
 void makeCleanToRunEsub( void );
 char *translateString (char *);

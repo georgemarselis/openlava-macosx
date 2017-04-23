@@ -610,13 +610,9 @@ struct submig
 #define LSB_MAX_ARRAY_JOBID 0x0FFFFFFFF // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
 #define LSB_MAX_ARRAY_IDX   0x0FFFF  // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
 #define LSB_MAX_SEDJOB_RUNID    (0x0F)
-#define LSB_JOBID(array_jobId, array_idx)  \
-                 (((LS_UNS_LONG_INT)array_idx << 32) | array_jobId) // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
-#define LSB_ARRAY_IDX(jobId) \
-        (((jobId) == -1) ? (0) : (u_long)(((LS_UNS_LONG_INT)jobId >> 32) \
-                                                    & LSB_MAX_ARRAY_IDX)) // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
-#define LSB_ARRAY_JOBID(jobId)\
-                 (((jobId) == -1) ? (-1) : (u_long)(jobId & LSB_MAX_ARRAY_JOBID))
+#define LSB_JOBID(array_jobId, array_idx) (((LS_UNS_LONG_INT)array_idx << 32UL) | array_jobId) // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
+#define LSB_ARRAY_IDX(jobId) (((jobId) == -1UL) ? (0) : (u_long)(((LS_UNS_LONG_INT)jobId >> 32UL) & LSB_MAX_ARRAY_IDX)) // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
+#define LSB_ARRAY_JOBID(jobId) (((jobId) == -1UL) ? (-1) : (u_long)(jobId & LSB_MAX_ARRAY_JOBID)) // FIXME FIXME FIXME FIXME FIXME this needs to be unrolled.
 
 
 #define    JGRP_ACTIVE        1
@@ -1237,12 +1233,12 @@ struct jobFinishLog
     int jobId;
     int userId;
     int options;
-    int numProcessors;
+	size_t numProcessors;
     int jStatus;
-    int numAskedHosts;
-    int numExHosts;
+    size_t numAskedHosts;
+    size_t numExHosts;
     int exitStatus;
-    int maxNumProcessors;
+    size_t maxNumProcessors;
     int idx;
     int maxRMem;
     int maxRSwap;
@@ -1687,7 +1683,7 @@ char *lsb_suspreason P_ ((int, int, struct loadIndexLog *));
 char *lsb_pendreason P_ ((int, int *, struct jobInfoHead *, struct loadIndexLog *));
 
 int lsb_puteventrec P_ ((FILE *, struct eventRec *));
-struct eventRec *lsb_geteventrec P_ ((FILE *log_fp, unsigned int *lineNum));
+// struct eventRec *lsb_geteventrec P_ ((FILE *log_fp, size_t *lineNum));
 struct lsbSharedResourceInfo *lsb_sharedresourceinfo P_ ((char **, unsigned int *, char *, int));
 
 int lsb_runjob P_ ((struct runJobRequest *));
