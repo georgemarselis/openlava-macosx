@@ -31,7 +31,7 @@ lsb_reconfig (int configFlag)
   int cc = 0;
   struct LSFHeader hdr;
   struct lsfAuth auth;
-  uint tmp = 0;
+  unsigned int tmp = 0;
 
   mbdReqtype = BATCH_RECONFIG;
 
@@ -43,7 +43,7 @@ lsb_reconfig (int configFlag)
   initLSFHeader_ (&hdr);
   hdr.opCode = mbdReqtype;
   assert( configFlag >= 0 );
-  tmp = (uint)configFlag;
+  tmp = (unsigned int)configFlag;
   hdr.reserved = tmp;
 
   if (!xdr_encodeMsg (&xdrs, NULL, &hdr, NULL, 0, &auth))

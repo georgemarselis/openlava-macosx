@@ -88,7 +88,7 @@ lsb_peekjob (LS_LONG_INT jobid)
       struct passwd *pw;
       LS_STAT_T st;
       assert ( XDR_DECODE_SIZE_ (cc) >= 0 );
-      xdrmem_create (&xdrs, reply_buf, (uint)XDR_DECODE_SIZE_ (cc), XDR_DECODE);
+      xdrmem_create (&xdrs, reply_buf, XDR_DECODE_SIZE_ (cc), XDR_DECODE);
 
       if (!xdr_jobPeekReply (&xdrs, &jobPeekReply, &hdr))
 	{

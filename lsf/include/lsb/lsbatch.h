@@ -19,6 +19,7 @@
 #pragma once
 
 #include "lsf.h"
+#include "lsb/misc.h"
 
 #define _PATH_NULL      "/dev/null"
 
@@ -1613,19 +1614,6 @@ int lsb_mbd_version;
 #define PRINT_SHORT_NAMELIST  0x01
 #define PRINT_LONG_NAMELIST   0x02
 #define PRINT_MCPU_HOSTS      0x04
-
-struct nameList
-{
-	unsigned long listSize;
-	unsigned long *counter;
-	char **names;
-};
-
-struct nameList *lsb_parseShortStr (char *, int);
-struct nameList *lsb_parseLongStr (char *);
-char *lsb_printNameList (struct nameList *, int);
-struct nameList *lsb_compressStrList (char **, int);
-char *lsb_splitName (char *, unsigned int *);
 
 
 #if defined(__STDC__)

@@ -18,6 +18,21 @@
 
 #pragma once
 
+struct nameList
+{
+	unsigned long listSize;
+	unsigned long *counter;
+	char **names;
+};
+
+
 int supportJobNamePattern (char *jobname);
 void copyJUsage (struct jRusage *to, struct jRusage *from);
+struct nameList *lsb_compressStrList (char **strList, unsigned int numStr);
 
+struct nameList *lsb_parseShortStr (char *, int);
+struct nameList *lsb_parseLongStr (char *);
+char *lsb_printNameList (struct nameList *, int);
+char *lsb_splitName (char *, unsigned int *);
+int lsb_array_idx( int jobId );
+int lsb_arrayj_jobid( int jobId );

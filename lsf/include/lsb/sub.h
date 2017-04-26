@@ -108,3 +108,25 @@ int setOption_ (int argc, char **argv, char *template, struct submit *req, int m
 struct submit *parseOptFile_ (char *filename, struct submit *req, char **errMsg);
 
 
+/////////////////////////////////////////////////////
+// function prototypes ( @ file scope )
+void trimSpaces (char *str);
+int parseXF (struct submit *, char *, char **);
+int checkLimit (int limit, int factor);
+LS_LONG_INT send_batch (struct submitReq *, struct lenData *, struct submitReply *, struct lsfAuth *);
+int dependCondSyntax (char *);
+int createJobInfoFile (struct submit *, struct lenData *);
+LS_LONG_INT subRestart (struct submit *jobSubReq, struct submitReq *submitReq, struct submitReply *submitRep, struct lsfAuth *auth);
+LS_LONG_INT subJob (struct submit *jobSubReq, struct submitReq *submitReq, struct submitReply *submitRep, struct lsfAuth *auth);
+int getUserInfo (struct submitReq *, struct submit *);
+char *acctMapGet (int *, char *);
+int xdrSubReqSize (struct submitReq *req);
+void postSubMsg (struct submit *, LS_LONG_INT, struct submitReply *);
+int readOptFile (char *filename, char *childLine);
+const LSB_SPOOL_INFO_T *chUserCopySpoolFile (const char *srcFile, spoolOptions_t fileType);
+
+
+// nios
+int createNiosSock (struct submitReq *);
+void startNios (struct submitReq *, int, LS_LONG_INT) __attribute__ ((noreturn));
+

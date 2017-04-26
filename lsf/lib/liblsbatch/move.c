@@ -28,10 +28,10 @@ lsb_movejob (LS_LONG_INT jobId, int *position, int opCode)
 {
   struct jobMoveReq jobMoveReq;
   char request_buf[MSGSIZE];
-  char *reply_buf;
+  char *reply_buf = NULL;
   XDR xdrs;
   mbdReqType mbdReqtype;
-  int cc;
+  int cc = 0;
   struct LSFHeader hdr;
   struct lsfAuth auth;
 
@@ -65,8 +65,7 @@ lsb_movejob (LS_LONG_INT jobId, int *position, int opCode)
   xdrmem_create (&xdrs, request_buf, MSGSIZE, XDR_ENCODE);
 
   hdr.opCode = mbdReqtype;
-  if (!xdr_encodeMsg
-      (&xdrs, (char *) &jobMoveReq, &hdr, xdr_jobMoveReq, 0, &auth))
+  if (!xdr_encodeMsg(&xdrs, ( char * ) &jobMoveReq, &hdr, xdr_jobMoveReq, 0, &auth)) // FIXME FIXME FIXME is this struct necessary? 
     {
       xdr_destroy (&xdrs);
       lsberrno = LSBE_XDR;
@@ -75,7 +74,7 @@ lsb_movejob (LS_LONG_INT jobId, int *position, int opCode)
 
 
   assert( XDR_GETPOS (&xdrs) <= INT_MAX );
-  if ((cc = callmbd (NULL, request_buf, (int)XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL)) == -1)
+  if ((cc = callmbd (NULL, request_buf, XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL)) == -1)
     {
       xdr_destroy (&xdrs);
       return (-1);
@@ -87,7 +86,7 @@ lsb_movejob (LS_LONG_INT jobId, int *position, int opCode)
   if (lsberrno == LSBE_NO_ERROR)
     {
       assert( XDR_DECODE_SIZE_(cc) >= 0);
-      xdrmem_create (&xdrs, reply_buf, (uint)XDR_DECODE_SIZE_ (cc), XDR_DECODE);
+      xdrmem_create (&xdrs, reply_buf, XDR_DECODE_SIZE_ (cc), XDR_DECODE);
       if (!xdr_jobMoveReq (&xdrs, &jobMoveReq, &hdr))
 	{
 	  lsberrno = LSBE_XDR;

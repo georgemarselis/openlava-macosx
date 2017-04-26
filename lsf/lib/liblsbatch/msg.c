@@ -42,10 +42,12 @@ lsb_msgjob (LS_LONG_INT jobId, char *msg)
     header.dest = dest;
     jmsg.header = &header;
 
-    TIMEIT (0, (pw = getpwuid (getuid ())), "getpwuid");
-    if (pw == NULL) {
+    // TIMEIT (0, (
+    pw = getpwuid (getuid ());
+    //) , "getpwuid");
+    if( NULL == pw ) {
         lsberrno = LSBE_BAD_USER;
-        return (-1);
+        return -1;
     }
 
     jmsg.header->usrId = pw->pw_uid;
@@ -63,15 +65,15 @@ lsb_msgjob (LS_LONG_INT jobId, char *msg)
     if (!xdr_encodeMsg (&xdrs, (char *) &jmsg, &hdr, xdr_lsbMsg, 0, NULL)) {
         lsberrno = LSBE_XDR;
         xdr_destroy (&xdrs);
-        return (-1);
+        return -1;
     }
 
     assert( XDR_GETPOS (&xdrs) <= INT_MAX );
-    cc = callmbd (NULL, request_buf, (int)XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL);
+    cc = callmbd (NULL, request_buf, XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL);
 
     if (cc < 0) {
         xdr_destroy (&xdrs);
-        return (-1);
+        return -1;
     }
 
     xdr_destroy (&xdrs);
@@ -81,9 +83,9 @@ lsb_msgjob (LS_LONG_INT jobId, char *msg)
 
     lsberrno = hdr.opCode;
     if (lsberrno == LSBE_NO_ERROR) {
-        return (0);
+        return 0;
     }
     else {
-        return (-1);
+        return -1;
     }
 }

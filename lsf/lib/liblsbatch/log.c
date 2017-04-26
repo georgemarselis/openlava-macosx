@@ -524,7 +524,7 @@ freeLogRec (struct eventRec *logRec)
 
 			if (logRec->eventLog.jobFinishLog.numAskedHosts)
 			{
-				for ( int i = 0; i < logRec->eventLog.jobFinishLog.numAskedHosts; i++) {
+				for ( size_t i = 0; i < logRec->eventLog.jobFinishLog.numAskedHosts; i++) {
 					free (logRec->eventLog.jobFinishLog.askedHosts[i]);
 				}
 			}
@@ -534,7 +534,7 @@ freeLogRec (struct eventRec *logRec)
 
 			if (logRec->eventLog.jobFinishLog.numExHosts)
 			{
-				for (int  i = 0; i < logRec->eventLog.jobFinishLog.numExHosts; i++) {
+				for (size_t  i = 0; i < logRec->eventLog.jobFinishLog.numExHosts; i++) {
 					free (logRec->eventLog.jobFinishLog.execHosts[i]);
 				}
 			}
@@ -1443,21 +1443,26 @@ readLoadIndex (char *line, struct loadIndexLog *loadIndexLog)
 }
 
 static int
-readJobFinish (char *line, struct jobFinishLog *jobFinishLog,
-					 time_t eventTime)
+readJobFinish (char *line, struct jobFinishLog *jobFinishLog, time_t eventTime)
 {
-	int i, cc, ccount;
-	int tmpSubmit, tmpBegin, tmpTerm, tmpStart;
-	char hName[MAXLINELEN];
+	// int i = 0;
+	int cc = 0;
+	int ccount = 0;
+	int tmpSubmit = 0;
+	int tmpBegin = 0;
+	int tmpTerm = 0;
+	int tmpStart = 0;
+	char *hName = malloc( sizeof(char) * MAXLINELEN + 1 );
 
-	cc = sscanf (line, "%d%d%d%d%d%d%d%d%n",
+	cc = sscanf (line, "%d%d%d%lu%d%d%d%d%n",
 					 &(jobFinishLog->jobId),
 					 &(jobFinishLog->userId),
 					 &(jobFinishLog->options),
 					 &(jobFinishLog->numProcessors),
 					 &(tmpSubmit), &(tmpBegin), &(tmpTerm), &(tmpStart), &ccount);
-	if (cc != 8)
+	if (cc != 8) {
 		return LSBE_EVENT_FORMAT;
+	}
 	jobFinishLog->submitTime = tmpSubmit;
 	jobFinishLog->beginTime = tmpBegin;
 	jobFinishLog->termTime = tmpTerm;
@@ -1477,76 +1482,72 @@ readJobFinish (char *line, struct jobFinishLog *jobFinishLog,
 	copyQStr (line, MAXFILENAMELEN, 0, jobFinishLog->errFile);
 	copyQStr (line, MAXFILENAMELEN, 1, jobFinishLog->jobFile);
 
-		cc = sscanf (line, "%d%n", &jobFinishLog->numAskedHosts, &ccount);
-		if (cc != 1)  {
-				return LSBE_EVENT_FORMAT;
-		}
+	cc = sscanf (line, "%lu%n", &jobFinishLog->numAskedHosts, &ccount);
+	if (cc != 1)  {
+			return LSBE_EVENT_FORMAT;
+	}
 	line += ccount + 1;
 
-	if (jobFinishLog->numAskedHosts > 0)
-		{
+	if (jobFinishLog->numAskedHosts > 0) {
 			
-			assert( jobFinishLog->numAskedHosts >= 0 );
-			jobFinishLog->askedHosts = (char **)calloc((unsigned long)jobFinishLog->numAskedHosts, sizeof (char *));
-			if ( NULL == jobFinishLog->askedHosts && ENOMEM == errno )
-		{
+		assert( jobFinishLog->numAskedHosts >= 0 );
+		jobFinishLog->askedHosts = calloc( jobFinishLog->numAskedHosts, sizeof( jobFinishLog->numAskedHosts ) );
+		if ( NULL == jobFinishLog->askedHosts && ENOMEM == errno ) {
 			jobFinishLog->numAskedHosts = 0;
 			return LSBE_NO_MEM;
 		}
-		}
+	}
 
-	for (i = 0; i < jobFinishLog->numAskedHosts; i++)
-		{
-			if ((ccount = stripQStr (line, hName)) < 0)
-		{
+	for ( size_t i = 0; i < jobFinishLog->numAskedHosts; i++)
+	{
+		if ((ccount = stripQStr (line, hName)) < 0) {
 			jobFinishLog->numAskedHosts = i;
 			return LSBE_EVENT_FORMAT;
 		}
 			jobFinishLog->askedHosts[i] = putstr_ (hName);
-			if (jobFinishLog->askedHosts[i] == NULL)
-		{
+		if (jobFinishLog->askedHosts[i] == NULL) {
 			jobFinishLog->numAskedHosts = i;
 			return LSBE_NO_MEM;
 		}
 			line += ccount + 1;
-		}
+	}
 
-	cc = sscanf (line, "%d%n", &jobFinishLog->numExHosts, &ccount);
-	if (cc != 1)
+	cc = sscanf (line, "%lu%n", &jobFinishLog->numExHosts, &ccount);
+	if (cc != 1) {
 		return LSBE_EVENT_FORMAT;
+	}
 	line += ccount + 1;
 
-	if (jobFinishLog->numExHosts > 0)
-		{
-			assert( jobFinishLog->numExHosts >= 0 );
-			jobFinishLog->execHosts = (char **)calloc ((unsigned long)jobFinishLog->numExHosts, sizeof (char *));
-			if (jobFinishLog->execHosts == NULL)
-		{
+	if (jobFinishLog->numExHosts > 0) {
+
+		assert( jobFinishLog->numExHosts >= 0 );
+		jobFinishLog->execHosts = calloc( jobFinishLog->numExHosts, sizeof (jobFinishLog->numExHosts)); // FIXME FIXME FIXME sure buffer overflow
+
+		if (jobFinishLog->execHosts == NULL) {
 			jobFinishLog->numExHosts = 0;
 			return LSBE_NO_MEM;
 		}
-		}
+	}
 
-	for (i = 0; i < jobFinishLog->numExHosts; i++)
-		{
-			if ((ccount = stripQStr (line, hName)) < 0)
-		{
+	for ( size_t i = 0; i < jobFinishLog->numExHosts; i++) {
+
+		if ((ccount = stripQStr (line, hName)) < 0) {
+
 			jobFinishLog->numExHosts = i;
 			return LSBE_EVENT_FORMAT;
 		}
 			jobFinishLog->execHosts[i] = putstr_ (hName);
-			if (jobFinishLog->execHosts[i] == NULL)
-		{
-			jobFinishLog->numExHosts = i;
-			return LSBE_NO_MEM;
-		}
+			if (jobFinishLog->execHosts[i] == NULL) {
+				jobFinishLog->numExHosts = i;
+				return LSBE_NO_MEM;
+			}
 			line += ccount + 1;
 		}
 
-	cc = sscanf (line, "%d%f%n", &jobFinishLog->jStatus,
-					 &jobFinishLog->hostFactor, &ccount);
-	if (cc != 2)
+	cc = sscanf (line, "%d%f%n", &jobFinishLog->jStatus, &jobFinishLog->hostFactor, &ccount);
+	if (cc != 2) {
 		return LSBE_EVENT_FORMAT;
+	}
 	line += ccount + 1;
 
 	jobFinishLog->endTime = eventTime;
@@ -1554,40 +1555,44 @@ readJobFinish (char *line, struct jobFinishLog *jobFinishLog,
 	copyQStr (line, MAX_CMD_DESC_LEN, 0, jobFinishLog->jobName);
 	copyQStr (line, MAX_CMD_DESC_LEN, 0, jobFinishLog->command);
 
-	if ((cc = str2lsfRu (line, &jobFinishLog->lsfRusage, &ccount)) != 19)
+	if ((cc = str2lsfRu (line, &jobFinishLog->lsfRusage, &ccount)) != 19) {
 		return LSBE_EVENT_FORMAT;
+	}
 
-	jobFinishLog->cpuTime = (float) (jobFinishLog->lsfRusage.ru_utime +
-									 jobFinishLog->lsfRusage.ru_stime);
-	if (jobFinishLog->cpuTime < 0)
+	jobFinishLog->cpuTime = (jobFinishLog->lsfRusage.ru_utime + jobFinishLog->lsfRusage.ru_stime);
+	if (jobFinishLog->cpuTime < 0) {
 		jobFinishLog->cpuTime = 0.0;
+	}
 
 	line += ccount + 1;
 	saveQStr (line, jobFinishLog->mailUser);
 	saveQStr (line, jobFinishLog->projectName);
 
-	if ((cc = sscanf (line, "%d%n", &jobFinishLog->exitStatus, &ccount)) != 1)
+	if ((cc = sscanf (line, "%d%n", &jobFinishLog->exitStatus, &ccount)) != 1) {
 		return LSBE_EVENT_FORMAT;
+	}
 	line += ccount + 1;
 
-	if ((cc = sscanf (line, "%d%n", &jobFinishLog->maxNumProcessors,
-						&ccount)) != 1)
+	if ((cc = sscanf (line, "%lu%n", &jobFinishLog->maxNumProcessors, &ccount)) != 1) {
 		return LSBE_EVENT_FORMAT;
+	}
 	line += ccount + 1;
 	saveQStr (line, jobFinishLog->loginShell);
 
 	cc = sscanf (line, "%d%n", &(jobFinishLog->idx), &ccount);
-	if (cc != 1)
+	if (cc != 1) {
 		return LSBE_EVENT_FORMAT;
+	}
 	line += ccount + 1;
-	cc = sscanf (line, "%d%d%n", &(jobFinishLog->maxRMem),
-					 &(jobFinishLog->maxRSwap), &ccount);
-	if (cc != 2)
+	cc = sscanf (line, "%d%d%n", &(jobFinishLog->maxRMem), &(jobFinishLog->maxRSwap), &ccount);
+	if (cc != 2) {
 		return LSBE_EVENT_FORMAT;
+	}
 	line += ccount + 1;
 
 	copyQStr (line, MAXFILENAMELEN, 0, jobFinishLog->inFileSpool);
 	copyQStr (line, MAXFILENAMELEN, 0, jobFinishLog->commandSpool);
+	free( hName );
 
 	return LSBE_NO_ERROR;
 
@@ -1786,6 +1791,9 @@ lsb_puteventrec (FILE * log_fp, struct eventRec *logPtr)
 			break;
 		case EVENT_LOG_SWITCH:
 			lsberrno = writeLogSwitch (log_fp, &(logPtr->eventLog.logSwitchLog));
+			break;
+		default:
+			fprintf( stderr, "%s: you are not supposed to be here.\n", __PRETTY_FUNCTION__ );
 			break;
 		}
 
@@ -2459,7 +2467,7 @@ static int
 writeJobFinish (FILE * log_fp, struct jobFinishLog *jobFinishLog)
 {
 
-	if (fprintf (log_fp, " %d %d %d %d %lu %lu %lu %lu",
+	if (fprintf (log_fp, " %d %d %d %lu %lu %lu %lu %lu",
 					 jobFinishLog->jobId,
 					 jobFinishLog->userId,
 					 jobFinishLog->options,
@@ -2504,7 +2512,7 @@ writeJobFinish (FILE * log_fp, struct jobFinishLog *jobFinishLog)
 		return LSBE_SYS_CALL;
 	}
 
-	if (fprintf (log_fp, " %d", jobFinishLog->numAskedHosts) < 0) {
+	if (fprintf (log_fp, " %lu", jobFinishLog->numAskedHosts) < 0) {
 		return LSBE_SYS_CALL;
 	}
 	if (jobFinishLog->numAskedHosts) {
@@ -2515,7 +2523,7 @@ writeJobFinish (FILE * log_fp, struct jobFinishLog *jobFinishLog)
 		}
 	}
 
-	if (fprintf (log_fp, " %d", jobFinishLog->numExHosts) < 0) {
+	if (fprintf (log_fp, " %lu", jobFinishLog->numExHosts) < 0) {
 		return LSBE_SYS_CALL;
 	}
 
@@ -2554,7 +2562,7 @@ writeJobFinish (FILE * log_fp, struct jobFinishLog *jobFinishLog)
 		return LSBE_SYS_CALL;
 	}
 
-	if (fprintf (log_fp, " %d", jobFinishLog->maxNumProcessors) < 0) {
+	if (fprintf (log_fp, " %lu", jobFinishLog->maxNumProcessors) < 0) {
 		return LSBE_SYS_CALL;
 	}
 
@@ -2720,26 +2728,30 @@ writeJobMsgAck (FILE * log_fp, struct jobMsgLog *jobMsgLog)
 static int
 readJobSignal (char *line, struct signalLog *signalLog)
 {
-	int cc = 0
+	int cc = 0;
 	int ccount = 0;
-	char sigSymbol[MAXLINELEN];
+	char *sigSymbol = malloc( sizeof(char) * MAXLINELEN + 1 );
 
 	cc = sscanf (line, "%d%d%d%n",
 					 &(signalLog->jobId),
 					 &(signalLog->userId), &(signalLog->runCount), &ccount);
 	if (cc != 3) {
+		free( sigSymbol );
 		return LSBE_EVENT_FORMAT;
 	}
 	line += ccount + 1;
 	if ((ccount = stripQStr (line, sigSymbol)) < 0) {
+		free( sigSymbol );
 		return LSBE_EVENT_FORMAT;
 	}
 
 	line += ccount + 1;
 	signalLog->signalSymbol = putstr_ (sigSymbol);
 	if (!signalLog->signalSymbol) {
+		free( sigSymbol );
 		return LSBE_NO_MEM;
 	}
+	free( sigSymbol );
 
 	cc = sscanf (line, "%d%n", &(signalLog->idx), &ccount);
 	if (cc != 1) {
@@ -2986,7 +2998,7 @@ readJobAttrSet (char *line, struct jobAttrSetLog *jobAttrSetLog)
 }
 
 void
-countLineNum (FILE * fp, long pos,  *lineNum)
+countLineNum (FILE * fp, long pos, size_t *lineNum)
 {
 		int ch = 0;
 		long curPos;
@@ -3003,14 +3015,14 @@ countLineNum (FILE * fp, long pos,  *lineNum)
 }
 
 struct eventRec *
-lsbGetNextJobEvent (struct eventLogHandle *ePtr,  *lineNum,
-						 numJobIds, LS_LONG_INT *jobIds, // FIXME FIXME FIXME FIXME why LS_LONG_INT
+lsbGetNextJobEvent (struct eventLogHandle *ePtr,  size_t *lineNum,
+						 size_t numJobIds, LS_LONG_INT *jobIds, // FIXME FIXME FIXME FIXME why LS_LONG_INT
 						struct jobIdIndexS *indexS)
 {
-	static char __PRETTY_FUNCTION__[] = "lsbGetNextJobEvent";
 	struct eventRec *logRec = NULL;
-	FILE *newfp;
-	char *sp, eventFile[MAXFILENAMELEN];
+	FILE *newfp = NULL;
+	char *sp = NULL; 
+	char eventFile[MAXFILENAMELEN];
 
 	while (TRUE) // FIXME FIXME FIXME this while true has to be replaced by something more sensible
 	{
@@ -3106,13 +3118,12 @@ lsbGetNextJobEvent (struct eventLogHandle *ePtr,  *lineNum,
 }
 
 struct eventRec *
-lsbGetNextJobRecFromFile( FILE *logFp,  *lineNum,  numJobIds, LS_LONG_INT *jobIds )
+lsbGetNextJobRecFromFile( FILE *logFp, size_t *lineNum, size_t numJobIds, LS_LONG_INT *jobIds )
 {
-	static char __PRETTY_FUNCTION__[] = "lsbGetNextJobRecFromFile";
 	int cc = 0;
 	int ccount = 0;
 	char *line = NULL;
-	char nameBuf[MAXLINELEN] = "" ;
+	char nameBuf[MAXLINELEN];
 	static struct eventRec *logRec = NULL;
 	int eventKind = 0;
 	int tempTimeStamp = 0;
@@ -3124,7 +3135,7 @@ lsbGetNextJobRecFromFile( FILE *logFp,  *lineNum,  numJobIds, LS_LONG_INT *jobId
 	}
 
 
-	logRec = (struct eventRec *) calloc (1, sizeof (struct eventRec));
+	logRec =  calloc (1, sizeof (struct eventRec));
 	if (logRec == NULL)
 	{
 		lsberrno = LSBE_NO_MEM;
@@ -3152,8 +3163,9 @@ lsbGetNextJobRecFromFile( FILE *logFp,  *lineNum,  numJobIds, LS_LONG_INT *jobId
 
 		continue;
 
-			if (logclass & LC_TRACE)
-		ls_syslog (LOG_DEBUG2, "%s: line=%s", __PRETTY_FUNCTION__, line);
+		if (logclass & LC_TRACE)  { 
+			ls_syslog (LOG_DEBUG2, "%s: line=%s", __PRETTY_FUNCTION__, line); 
+		}
 
 			if ((ccount = stripQStr (line, nameBuf)) < 0 ||
 			strlen (nameBuf) >= MAX_LSB_NAME_LEN)
@@ -3163,11 +3175,13 @@ lsbGetNextJobRecFromFile( FILE *logFp,  *lineNum,  numJobIds, LS_LONG_INT *jobId
 		}
 			line += ccount + 1;
 
-			if ((logRec->type = getEventTypeAndKind (nameBuf, &eventKind)) == -1)
-		continue;
+		if ((logRec->type = getEventTypeAndKind (nameBuf, &eventKind)) == -1) {
+			continue;
+		}
 
-			if (eventKind != EVENT_JOB_RELATED)
-		continue;
+		if (eventKind != EVENT_JOB_RELATED) {
+			continue;
+		};
 
 			if ((ccount = stripQStr (line, nameBuf)) < 0 ||
 			strlen (nameBuf) >= MAX_VERSION_LEN)
@@ -3195,11 +3209,13 @@ lsbGetNextJobRecFromFile( FILE *logFp,  *lineNum,  numJobIds, LS_LONG_INT *jobId
 			line += ccount + 1;
 
 
-			if (!checkJobEventAndJobId (line, logRec->type, numJobIds, jobIds))
-		continue;
+		if (!checkJobEventAndJobId (line, logRec->type, numJobIds, jobIds)) {
+			continue;
+		}
 
-			if (logclass & LC_TRACE)
-		ls_syslog (LOG_DEBUG2, "%s: log.type=%x", __PRETTY_FUNCTION__, logRec->type);
+		if (logclass & LC_TRACE) {
+			ls_syslog (LOG_DEBUG2, "%s: log.type=%x", __PRETTY_FUNCTION__, logRec->type); 
+		}
 
 			readEventRecord (line, logRec);
 
@@ -3207,21 +3223,20 @@ lsbGetNextJobRecFromFile( FILE *logFp,  *lineNum,  numJobIds, LS_LONG_INT *jobId
 
 		}
 
-	if (lsberrno == LSBE_NO_ERROR)
+	if (lsberrno == LSBE_NO_ERROR) {
 		return logRec;
+	}
 
 	return NULL;
 
 }
 
 int
-checkJobEventAndJobId (char *line, int eventType, int numJobIds,
-							 LS_LONG_INT * jobIds)
+checkJobEventAndJobId (char *line, int eventType, size_t numJobIds, LS_LONG_INT * jobIds)
 {
 
-	int cc;
-	int eventJobId;
-	int i;
+	int cc = 0;
+	int eventJobId = 0;
 
 	switch (eventType)
 		{
@@ -3244,14 +3259,14 @@ checkJobEventAndJobId (char *line, int eventType, int numJobIds,
 		case EVENT_JOB_REQUEUE:
 		case EVENT_JOB_CLEAN:
 		case EVENT_JOB_FORCE:
-			cc = sscanf (line, "%d", (int *) &eventJobId);
+			cc = sscanf (line, "%d", &eventJobId);
 			if (cc != 1)
 		{
 			return 1;
 		}
 			break;
 		case EVENT_JOB_MODIFY2:
-			cc = sscanf (line, "\"%d[", (int *) &eventJobId);
+			cc = sscanf (line, "\"%d[", &eventJobId);
 			if (cc != 1)
 		{
 			return 1;
@@ -3262,7 +3277,7 @@ checkJobEventAndJobId (char *line, int eventType, int numJobIds,
 			{
 		int tempUserId;
 
-		cc = sscanf (line, "%d %d", (int *) &tempUserId, (int *) &eventJobId);
+		cc = sscanf (line, "%d %d", &tempUserId, &eventJobId);
 		if (cc != 2)
 			{
 				return 1;
@@ -3270,89 +3285,131 @@ checkJobEventAndJobId (char *line, int eventType, int numJobIds,
 			}
 			break;
 		default:
+			fprintf( stderr, "%s: you are you not supposed to be here!\n", __PRETTY_FUNCTION__ );
 			return 0;
 		}
 
 
-	if (!numJobIds || eventType == EVENT_JOB_NEW)
+	if (!numJobIds || eventType == EVENT_JOB_NEW) {
 		return 1;
+	}
 
 
-	for (i = 0; i < numJobIds; i++)
-		{
-			if (LSB_ARRAY_JOBID (jobIds[i]) == eventJobId)
-		return 1;
+	for ( size_t i = 0; i < numJobIds; i++) {
+
+		if (lsb_array_jobid (jobIds[i]) == eventJobId) {
+			return 1;
 		}
+	}
 
 	return 0;
 
 }
 
+long lsb_array_jobid( long jobId ) {
+	if( -1 == jobId ) {
+		return -1;
+	}
+	else {
+		return ( jobId & LSB_MAX_ARRAY_JOBID );
+	}
+}
+
 int
 getEventTypeAndKind (char *typeStr, int *eventKind)
 {
-	int eventType;
+	int eventType = 0;
 
-	if (strcmp (typeStr, "JOB_NEW") == 0)
+	if (strcmp (typeStr, "JOB_NEW") == 0) {
 		eventType = EVENT_JOB_NEW;
-	else if (strcmp (typeStr, "JOB_START") == 0)
+	}
+	else if (strcmp (typeStr, "JOB_START") == 0) {
 		eventType = EVENT_JOB_START;
-	else if (strcmp (typeStr, "JOB_START_ACCEPT") == 0)
+	}
+	else if (strcmp (typeStr, "JOB_START_ACCEPT") == 0) {
 		eventType = EVENT_JOB_START_ACCEPT;
-	else if (strcmp (typeStr, "JOB_STATUS") == 0)
+	}
+	else if (strcmp (typeStr, "JOB_STATUS") == 0) {
 		eventType = EVENT_JOB_STATUS;
-	else if (strcmp (typeStr, "SBD_JOB_STATUS") == 0)
+	}
+	else if (strcmp (typeStr, "SBD_JOB_STATUS") == 0) {
 		eventType = EVENT_SBD_JOB_STATUS;
-	else if (strcmp (typeStr, "JOB_EXECUTE") == 0)
+	}
+	else if (strcmp (typeStr, "JOB_EXECUTE") == 0) {
 		eventType = EVENT_JOB_EXECUTE;
-	else if (strcmp (typeStr, "JOB_CLEAN") == 0)
+	}
+	else if (strcmp (typeStr, "JOB_CLEAN") == 0) {
 		eventType = EVENT_JOB_CLEAN;
-	else if (strcmp (typeStr, "JOB_SWITCH") == 0)
+	}
+	else if (strcmp (typeStr, "JOB_SWITCH") == 0) {
 		eventType = EVENT_JOB_SWITCH;
-	else if (strcmp (typeStr, "JOB_MOVE") == 0)
+	}
+	else if (strcmp (typeStr, "JOB_MOVE") == 0) {
 		eventType = EVENT_JOB_MOVE;
-	else if (strcmp (typeStr, "JOB_FINISH") == 0)
+	}
+	else if (strcmp (typeStr, "JOB_FINISH") == 0) {
 		eventType = EVENT_JOB_FINISH;
-	else if (strcmp (typeStr, "LOAD_INDEX") == 0)
+	}
+	else if (strcmp (typeStr, "LOAD_INDEX") == 0) {
 		eventType = EVENT_LOAD_INDEX;
-	else if (strcmp (typeStr, "CHKPNT") == 0)
+	}
+	else if (strcmp (typeStr, "CHKPNT") == 0) {
 		eventType = EVENT_CHKPNT;
-	else if (strcmp (typeStr, "MIG") == 0)
+	}
+	else if (strcmp (typeStr, "MIG") == 0) {
 		eventType = EVENT_MIG;
-	else if (strcmp (typeStr, "PRE_EXEC_START") == 0)
+	}
+	else if (strcmp (typeStr, "PRE_EXEC_START") == 0) {
 		eventType = EVENT_PRE_EXEC_START;
-	else if (strcmp (typeStr, "JOB_MODIFY") == 0)
+	}
+	else if (strcmp (typeStr, "JOB_MODIFY") == 0) {
 		eventType = EVENT_JOB_MODIFY;
-	else if (strcmp (typeStr, "JOB_MODIFY2") == 0)
+	}
+	else if (strcmp (typeStr, "JOB_MODIFY2") == 0) {
 		eventType = EVENT_JOB_MODIFY2;
-	else if (strcmp (typeStr, "JOB_ATTR_SET") == 0)
+	}
+	else if (strcmp (typeStr, "JOB_ATTR_SET") == 0) {
 		eventType = EVENT_JOB_ATTR_SET;
-	else if (strcmp (typeStr, "QUEUE_CTRL") == 0)
+	}
+	else if (strcmp (typeStr, "QUEUE_CTRL") == 0) {
 		eventType = EVENT_QUEUE_CTRL;
-	else if (strcmp (typeStr, "HOST_CTRL") == 0)
+	}
+	else if (strcmp (typeStr, "HOST_CTRL") == 0) {
 		eventType = EVENT_HOST_CTRL;
-	else if (strcmp (typeStr, "MBD_START") == 0)
+	}
+	else if (strcmp (typeStr, "MBD_START") == 0) {
 		eventType = EVENT_MBD_START;
-	else if (strcmp (typeStr, "MBD_DIE") == 0)
+	}
+	else if (strcmp (typeStr, "MBD_DIE") == 0) {
 		eventType = EVENT_MBD_DIE;
-	else if (strcmp (typeStr, "UNFULFILL") == 0)
+	}
+	else if (strcmp (typeStr, "UNFULFILL") == 0) {
 		eventType = EVENT_MBD_UNFULFILL;
-	else if (strcmp (typeStr, "JOB_SIGNAL") == 0)
+	}
+	else if (strcmp (typeStr, "JOB_SIGNAL") == 0) {
 		eventType = EVENT_JOB_SIGNAL;
-	else if (strcmp (typeStr, "JOB_MSG") == 0)
+	}
+	else if (strcmp (typeStr, "JOB_MSG") == 0) {
 		eventType = EVENT_JOB_MSG;
-	else if (strcmp (typeStr, "JOB_MSG_ACK") == 0)
+	}
+	else if (strcmp (typeStr, "JOB_MSG_ACK") == 0) {
 		eventType = EVENT_JOB_MSG_ACK;
-	else if (strcmp (typeStr, "JOB_REQUEUE") == 0)
+	}
+	else if (strcmp (typeStr, "JOB_REQUEUE") == 0) {
 		eventType = EVENT_JOB_REQUEUE;
-	else if (strcmp (typeStr, "JOB_SIGACT") == 0)
+	}
+	else if (strcmp (typeStr, "JOB_SIGACT") == 0) {
 		eventType = EVENT_JOB_SIGACT;
-	else if (strcmp (typeStr, "JOB_FORCE") == 0)
+	}
+	else if (strcmp (typeStr, "JOB_FORCE") == 0) {
 		eventType = EVENT_JOB_FORCE;
-	else if (strcmp (typeStr, "LOG_SWITCH") == 0)
+	}
+	else if (strcmp (typeStr, "LOG_SWITCH") == 0) {
 		eventType = EVENT_LOG_SWITCH;
-	else if (strcmp (typeStr, "LOG_SWITCH") == 0)
+	}
+	else if (strcmp (typeStr, "LOG_SWITCH") == 0) {
 		eventType = EVENT_LOG_SWITCH;
+	}
 	else
 		{
 			lsberrno = LSBE_UNKNOWN_EVENT;
@@ -3360,8 +3417,7 @@ getEventTypeAndKind (char *typeStr, int *eventKind)
 			return -1;
 		}
 
-	switch (eventType)
-		{
+	switch (eventType) {
 		case EVENT_JOB_NEW:
 		case EVENT_JOB_START:
 		case EVENT_JOB_START_ACCEPT:
@@ -3383,13 +3439,15 @@ getEventTypeAndKind (char *typeStr, int *eventKind)
 		case EVENT_JOB_REQUEUE:
 		case EVENT_JOB_CLEAN:
 		case EVENT_JOB_SIGACT:
-		case EVENT_JOB_FORCE:
+		case EVENT_JOB_FORCE: {
 			*eventKind = EVENT_JOB_RELATED;
 			break;
-		default:
+		}
+		default: {
 			*eventKind = EVENT_NON_JOB_RELATED;
 			break;
 		}
+	}
 
 	return eventType;
 }
@@ -3399,12 +3457,11 @@ getEventTypeAndKind (char *typeStr, int *eventKind)
 int
 lsb_readeventrecord (char *line, struct eventRec *logRec)
 {
-	static char __PRETTY_FUNCTION__[] = "lsb_readeventrecord";
-	char etype[MAX_LSB_NAME_LEN];
-	char namebuf[MAXLINELEN];
-	int cc;
-	int ccount;
-	int eventKind;
+	char etype[MAX_LSB_NAME_LEN]; 	// FIXME FIXME convert to dynamic-length
+	char namebuf[MAXLINELEN]; 		// FIXME FIXME convert to dynamic-length
+	int cc = 0;
+	int ccount = 0;
+	int eventKind = 0;
 
 
 	if (logclass & LC_TRACE)
@@ -3417,7 +3474,7 @@ lsb_readeventrecord (char *line, struct eventRec *logRec)
 			ls_syslog (LOG_DEBUG2, "%s: line or logRec is NULL", __PRETTY_FUNCTION__);
 			return -1;
 		}
-	memset ((char *) logRec, 0, sizeof (struct eventRec));
+	memset( logRec, 0, sizeof (struct eventRec));
 
 
 	if ((ccount = stripQStr (line, namebuf)) < 0
@@ -3568,21 +3625,19 @@ readEventRecord (char *line, struct eventRec *logRec)
 }
 
 int
-getJobIdIndexFromEventFile (char *eventFile, struct sortIntList *header,
-								time_t * timeStamp)
+getJobIdIndexFromEventFile (char *eventFile, struct sortIntList *header, time_t * timeStamp)
 {
-	static char __PRETTY_FUNCTION__[] = "getJobIdIndexFromEventFile";
-	FILE *eventFp;
+	FILE *eventFp = NULL;
 	char ch;
-	int jobId;
-	int ccount;
-	char *line;
-	char nameBuf[MAXLINELEN];
-	int eventKind;
-	int eventType;
-	time_t eventTime;
-	int tempTimeStamp;
-	int cc;
+	long jobId = 0;
+	int ccount  = 0;
+	char *line = NULL;
+	char nameBuf[MAXLINELEN]; // FIXME FIXME convert to dynamic-length
+	int eventKind = 0;
+	int eventType = 0;
+	time_t eventTime = 0;
+	int tempTimeStamp = 0;
+	int cc = 0;
 
 
 	if ((eventFp = fopen (eventFile, "r")) == NULL)
@@ -3594,17 +3649,18 @@ getJobIdIndexFromEventFile (char *eventFile, struct sortIntList *header,
 
 	cc = fscanf (eventFp, "%c%d", &ch, &tempTimeStamp);
 	if (cc != 2 || ch != '#')
-		{
-			ls_syslog (LOG_INFO, I18N (5501, "%s: fscanf(%s) failed: old event file format"), /* catgets 5501 */
-				 __PRETTY_FUNCTION__, eventFile);
-			if (fseek (eventFp, 0, SEEK_SET) != 0)
-		ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __PRETTY_FUNCTION__, "fseek", 0);
-			*timeStamp = 0;
+	{
+		/* catgets 5501 */
+		ls_syslog (LOG_INFO, I18N (5501, "%s: fscanf(%s) failed: old event file format"),  __PRETTY_FUNCTION__, eventFile);
+		if (fseek (eventFp, 0, SEEK_SET) != 0) {
+			ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __PRETTY_FUNCTION__, "fseek", 0);
 		}
+		*timeStamp = 0;
+	}
 	*timeStamp = tempTimeStamp;
 
 
-	while (TRUE)
+	while (TRUE) // FIXME FIXME FIXME create terminating condition.
 		{
 
 			if ((line = getNextLine_ (eventFp, FALSE)) == NULL)
@@ -3620,21 +3676,24 @@ getJobIdIndexFromEventFile (char *eventFile, struct sortIntList *header,
 			break;
 		}
 
-			if (*line == '#')
+			if (*line == '#') {
+				continue;
+			}
 
-		continue;
-
-			if ((ccount = stripQStr (line, nameBuf)) < 0 ||
-			strlen (nameBuf) >= MAX_LSB_NAME_LEN)
+			if ((ccount = stripQStr (line, nameBuf)) < 0 ||  strlen (nameBuf) >= MAX_LSB_NAME_LEN)
 		{
-		}
+			// FIXME FIXME FIXME FIXME why is this empty? maybe line below?
 			line += ccount + 1;
+		}
+			// line += ccount + 1;
 
-			if ((eventType = getEventTypeAndKind (nameBuf, &eventKind)) == -1)
-		continue;
+			if ((eventType = getEventTypeAndKind (nameBuf, &eventKind)) == -1) {
+				continue;
+			}
 
-			if (eventKind != EVENT_JOB_RELATED)
-		continue;
+			if (eventKind != EVENT_JOB_RELATED) {
+				continue;
+			}
 
 			if ((ccount = stripQStr (line, nameBuf)) < 0 ||
 			strlen (nameBuf) >= MAX_VERSION_LEN)
@@ -3645,15 +3704,17 @@ getJobIdIndexFromEventFile (char *eventFile, struct sortIntList *header,
 			line += ccount + 1;
 
 			cc = sscanf (line, "%d%n", &tempTimeStamp, &ccount);
-			if (cc != 1)
-		continue;
+			if (cc != 1) { 
+				continue;
+			}
 
 			eventTime = tempTimeStamp;
 
 			line += ccount + 1;
 
-			if ((jobId = getJobIdFromEvent (line, eventType)) == 0)
-		continue;
+			if ((jobId = getJobIdFromEvent (line, eventType)) == 0) {
+				continue;
+			}
 
 			if (insertSortIntList (header, jobId) < 0)
 		{
@@ -3664,8 +3725,9 @@ getJobIdIndexFromEventFile (char *eventFile, struct sortIntList *header,
 		}
 
 	fclose (eventFp);
-	if (lsberrno != LSBE_EOF)
+	if (lsberrno != LSBE_EOF) {
 		return -1;
+	}
 
 	return 0;
 
@@ -3803,7 +3865,6 @@ writeJobIdIndexToIndexFile (FILE * indexFp, struct sortIntList *header,
 int
 updateJobIdIndexFile (char *indexFile, char *eventFile, int totalEventFile)
 {
-	static char __PRETTY_FUNCTION__[] = "updateJobIdIndexFile";
 	struct stat st;
 	FILE *indexFp = NULL;
 	char nameBuf[MAXLINELEN];
@@ -4021,10 +4082,11 @@ getNextFileNumFromIndexS (struct jobIdIndexS *indexS, int numJobIds, LS_LONG_INT
 		{
 			int jobId;
 
-			jobId = LSB_ARRAY_JOBID (jobIds[i]);
+			jobId = lsb_array_jobid( jobIds[i] );
 
-			if ((jobId > indexS->maxJobId) || (jobId < indexS->minJobId))
+			if ((jobId > indexS->maxJobId) || (jobId < indexS->minJobId)) {
 				continue;
+			}
 			for (j = 0; j < indexS->totalJobIds; j++)
 				{
 					if (jobId == indexS->jobIds[j])
@@ -4043,11 +4105,11 @@ getNextFileNumFromIndexS (struct jobIdIndexS *indexS, int numJobIds, LS_LONG_INT
 time_t
 lsb_getAcctFileTime (char *fileName)
 {
-	static char __PRETTY_FUNCTION__[] = "lsb_getAcctFileTime";
+
 	struct eventRec *acctLogPtr = NULL;
 	struct stat jbuf;
 	FILE *acctLogFp = NULL;
-	 lineNum = 0;
+	size_t lineNum = 0;
 	time_t lastAcctCreationTime = -1;
 
 	if ((fileName == NULL) || (stat (fileName, &jbuf) < 0))
@@ -4093,11 +4155,12 @@ lsb_getAcctFileTime (char *fileName)
 	return lastAcctCreationTime;
 }
 
- copyQStr( char *line,  maxLen, int nonNil, char* destStr )    {
+size_t copyQStr( char *line,  size_t maxLen, int nonNil, char *destStr )    {
 
-		 ccounter  = 0;
-		int temp        = 0;
-		char *tmpLine = (char *) malloc (strlen(line));
+		int temp        		= 0;
+		unsigned int ccounter  	= 0;
+		char *tmpLine = malloc( strlen( line ) + 1 );
+
 		if (NULL == tmpLine && ENOMEM == errno ) {
 				return LSBE_NO_MEM;
 		}
@@ -4106,7 +4169,7 @@ lsb_getAcctFileTime (char *fileName)
 				FREEUP (tmpLine);
 				return LSBE_EVENT_FORMAT;
 		}
-		ccounter = () temp;
+		ccounter = temp;
 
 		line += ccounter + 1;
 		if (strlen(tmpLine) >= maxLen || (nonNil && strlen(tmpLine)==0)) {
@@ -4119,27 +4182,27 @@ lsb_getAcctFileTime (char *fileName)
 		return ccounter;
 }
 
- saveQStr( char *line, char *destStr)  {
+size_t saveQStr( char *line, char *destStr)  {
 
-		 ccounter  = 0;
-		int temp       = 0;
-		char *tmpLine = (char *) malloc (strlen(line));
-		if ( NULL == tmpLine && ENOMEM == errno ) {
-				return LSBE_NO_MEM;
-		}
+	size_t ccounter = 0;
+	int temp        = 0;
+	char *tmpLine   = malloc( strlen( line ) );
+	if ( NULL == tmpLine && ENOMEM == errno ) {
+			return LSBE_NO_MEM;
+	}
 
-		if ((temp = stripQStr(line, tmpLine)) < 0)  {
-				FREEUP (tmpLine);
-				return LSBE_EVENT_FORMAT;
-		}
-		ccounter = () temp;
+	if ((temp = stripQStr(line, tmpLine)) < 0)  {
+			FREEUP (tmpLine);
+			return LSBE_EVENT_FORMAT;
+	}
+	ccounter = temp;
 
-		line += ccounter + 1;
-		if ((destStr = putstr_(tmpLine)) == NULL)     {
-				FREEUP (tmpLine);
-				return LSBE_NO_MEM;
-		}
-		FREEUP (tmpLine);
-		return ccounter;
+	line += ccounter + 1;
+	if ((destStr = putstr_(tmpLine)) == NULL)     {
+			FREEUP (tmpLine);
+			return LSBE_NO_MEM;
+	}
+	FREEUP (tmpLine);
+	return ccounter;
 }
 

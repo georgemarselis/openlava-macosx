@@ -26,7 +26,7 @@
 #include "lib/xdr.h"
 
 struct lsbSharedResourceInfo *
-lsb_sharedresourceinfo (char **resources, uint *numResources, char *hostName, int options)
+lsb_sharedresourceinfo (char **resources, unsigned int *numResources, char *hostName, int options)
 {
     static char fname[] = "lsb_sharedresourceinfo";
     static struct lsbShareResourceInfoReply lsbResourceInfoReply = { };
@@ -81,7 +81,7 @@ lsb_sharedresourceinfo (char **resources, uint *numResources, char *hostName, in
       lsberrno = LSBE_NO_MEM;
       return (NULL);
     }
-      for ( uint i = 0; i < *numResources; i++)
+      for ( unsigned int i = 0; i < *numResources; i++)
     {
       if (resources[i] && strlen (resources[i]) + 1 < MAXLSFNAMELEN)
         {

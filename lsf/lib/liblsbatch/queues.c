@@ -25,7 +25,7 @@
 #include "lib/xdr.h"
 
 struct queueInfoEnt *
-lsb_queueinfo (char **queues, uint *numQueues, char *hosts, char *users, int options)
+lsb_queueinfo (char **queues, unsigned int *numQueues, char *hosts, char *users, int options)
 {
   mbdReqType mbdReqtype;
   static struct infoReq queueInfoReq;
@@ -44,7 +44,7 @@ lsb_queueinfo (char **queues, uint *numQueues, char *hosts, char *users, int opt
 
   if (qInfo != NULL)
     {
-      for ( uint i = 0; i < reply.numQueues; i++)
+      for ( unsigned int i = 0; i < reply.numQueues; i++)
 	{
 	  xdr_lsffree (xdr_queueInfoEnt, (char *) qInfo[i], &hdr);
 	}
@@ -96,7 +96,7 @@ lsb_queueinfo (char **queues, uint *numQueues, char *hosts, char *users, int opt
 	  return (NULL);
 	}
       queueInfoReq.numNames = *numQueues;
-      for (uint i = 0; i < *numQueues; i++)
+      for (unsigned int i = 0; i < *numQueues; i++)
 	{
 	  if (queues[i] && strlen (queues[i]) + 1 < MAXHOSTNAMELEN)
 	    queueInfoReq.names[i] = queues[i];
@@ -188,7 +188,7 @@ lsb_queueinfo (char **queues, uint *numQueues, char *hosts, char *users, int opt
   if (lsberrno == LSBE_NO_ERROR || lsberrno == LSBE_BAD_QUEUE)
     {
       assert( XDR_DECODE_SIZE_ (cc) >=0 );
-      xdrmem_create (&xdrs2, reply_buf, (uint)XDR_DECODE_SIZE_ (cc), XDR_DECODE);
+      xdrmem_create (&xdrs2, reply_buf, (unsigned int)XDR_DECODE_SIZE_ (cc), XDR_DECODE);
       if (!xdr_queueInfoReply (&xdrs2, &reply, &hdr))
 	{
 	  lsberrno = LSBE_XDR;
@@ -214,7 +214,7 @@ lsb_queueinfo (char **queues, uint *numQueues, char *hosts, char *users, int opt
 	  return NULL;
 	}
       qInfo = qTmp;
-      for (uint i = 0; i < reply.numQueues; i++)
+      for (unsigned int i = 0; i < reply.numQueues; i++)
 	qInfo[i] = &(reply.queues[i]);
 
       *numQueues = reply.numQueues;

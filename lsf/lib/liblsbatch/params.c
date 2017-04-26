@@ -27,7 +27,7 @@
 
 
 struct parameterInfo *
-lsb_parameterinfo (char **names, uint *numUsers, int options)
+lsb_parameterinfo (char **names, unsigned int *numUsers, int options)
 {
     static struct parameterInfo paramInfo;
     static struct infoReq infoReq;
@@ -57,7 +57,7 @@ lsb_parameterinfo (char **names, uint *numUsers, int options)
         infoReq.names = names;
     }
     else {
-        infoReq.names = (char **) malloc (sizeof (char *));
+        infoReq.names =  malloc (sizeof ( infoReq.names ) );
         if ( NULL == infoReq.names && ENOMEM == errno ) {
 	       lsberrno = LSBE_NO_MEM;
 	       return (NULL);
@@ -81,7 +81,7 @@ lsb_parameterinfo (char **names, uint *numUsers, int options)
     }
 
     assert( cc >= 0 );
-    xdrmem_create (&xdrs, request_buf, (uint) cc, XDR_ENCODE);
+    xdrmem_create (&xdrs, request_buf, (unsigned int) cc, XDR_ENCODE);
 
     hdr.opCode = mbdReqtype;
     if (!xdr_encodeMsg (&xdrs, (char *) &infoReq, &hdr, xdr_infoReq, 0, NULL))
@@ -107,7 +107,7 @@ lsb_parameterinfo (char **names, uint *numUsers, int options)
     if (lsberrno == LSBE_NO_ERROR || lsberrno == LSBE_BAD_USER)
     {
       assert( XDR_DECODE_SIZE_ (cc) >= 0);
-      xdrmem_create (&xdrs, reply_buf, (uint)XDR_DECODE_SIZE_ (cc), XDR_DECODE);
+      xdrmem_create (&xdrs, reply_buf, (unsigned int)XDR_DECODE_SIZE_ (cc), XDR_DECODE);
       reply = &paramInfo;
       if (!xdr_parameterInfo (&xdrs, reply, &hdr))
 	{

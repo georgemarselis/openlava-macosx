@@ -16,11 +16,10 @@
  *
  */
 
+#include <ctype.h>
 #include <sys/types.h>
-#include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <ctype.h>
 
 #include "cmdtools/cmd.h"
 #include "lsb/rexecv.h"
@@ -29,11 +28,10 @@
 void
 prtBETime2 (struct submit req)
 {
-  static char fname[] = "prtBETime";
   char sp[60];
 
   if (logclass & (LC_TRACE | LC_EXEC | LC_SCHED))
-    ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", fname);
+    ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", __PRETTY_FUNCTION__);
 
 
   if (req.beginTime)
@@ -320,23 +318,24 @@ parseLine2 (char *line, int *embedArgc, char ***embedArgv, int option)
 static int
 parseScript2 (FILE * from, int *embedArgc, char ***embedArgv, int option)
 {
-  static char fname[] = "parseScript";
+
   register int ttyin  = 0;
   // char *prompt  = NULL;
   char firstLine[MAXLINELEN * 10];
   char line[MAXLINELEN * 10];
   int notBourne         = FALSE;
-  uint length           = 0;
+  unsigned int length           = 0;
   unsigned long lineLen = 0;
   unsigned long size    = 10 * MAXLINELEN;
   char *buf             = NULL;
   char *sp              = NULL;
-  # define szTmpShellCommands "%s\n) > $LSB_CHKFILENAME.shell\nchmod u+x $LSB_CHKFILENAME.shell\n$LSB_JOBFILENAME.shell\nsaveExit=$?\n/bin/rm -f $LSB_JOBFILENAME.shell\n(exit $saveExit)\n"
+  # define szTmpShellCommands "%s\n) > $LSB_CHKFILENAME.shell\nchmod u+x $LSB_CHKFILENAME.shell\n$LSB_JOBFILENAME.shell\nsaveExit=$?\n/bin/rm -f $LSB_JOBFILENAME.shell\n(exit $saveExit)\n" // FIXME FIXME FIXME this shit has to go
 
-  if (logclass & (LC_TRACE | LC_SCHED | LC_EXEC))
-    ls_syslog (LOG_DEBUG, "%s: Entering this routine...", fname);
+  if (logclass & (LC_TRACE | LC_SCHED | LC_EXEC)) {
+    ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __PRETTY_FUNCTION__);
+  }
 
-/*  if (option & EMBED_BSUB)
+/*  if (option & EMBED_BSUB) // FIXME FIXME what is this supposed to be ?
     prompt = "bsub> ";
 */
 #ifdef QSUB
@@ -400,7 +399,7 @@ parseScript2 (FILE * from, int *embedArgc, char ***embedArgv, int option)
         }
           buf = sp;
         }
-      for (uint i = length, j = 0; j < lineLen; i++, j++) {
+      for (unsigned int i = length, j = 0; j < lineLen; i++, j++) {
         buf[i] = line[j];
     }
       length += lineLen;
@@ -450,15 +449,15 @@ parseScript2 (FILE * from, int *embedArgc, char ***embedArgv, int option)
 int
 fillReq2 (int argc, char **argv, int operate, struct submit *req)
 {
-  static char fname[] = "fillReq";
+
   struct stat statBuf;
-  char *template, **embedArgv = NULL;
-  int i, embedArgc = 0, redirect = 0;
-  int myArgc;
-  char *myArgv0;
+  char *template = NULL, **embedArgv = NULL;
+  int i = 0, embedArgc = 0, redirect = 0;
+  int myArgc = 0;
+  char *myArgv0 = NULL;
 
   if (logclass & (LC_TRACE | LC_EXEC | LC_SCHED)) {
-    ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", fname);
+    ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", __PRETTY_FUNCTION__);
   }
 
 
@@ -639,7 +638,9 @@ lsb_rexecv (int argc, char **argv, char **env, int *fds, int options)
         putenv (envBuf);
 
         memset (&reply, 0, sizeof (struct submitReply));
-        TIMEIT (0, (jobId = lsb_submit (&req, &reply)), "lsb_submit");
+        //TIMEIT (0, (
+        jobId = lsb_submit (&req, &reply);
+        // ), "lsb_submit");
 
         if( jobId < 0 ) {
             jobId = -lsberrno;

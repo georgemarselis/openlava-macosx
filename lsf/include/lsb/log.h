@@ -104,7 +104,7 @@ static void freeLogRec (struct eventRec *);
 
 struct eventRec *lsbGetNextJobEvent (struct eventLogHandle *ePtr, size_t *lineNum, size_t numJobIds, LS_LONG_INT *jobIds, struct jobIdIndexS *indexS);
 static struct eventRec *lsbGetNextJobRecFromFile( FILE *logFp, size_t *lineNum, size_t numJobIds, LS_LONG_INT *jobIds );
-static int checkJobEventAndJobId (char *, int, int, LS_LONG_INT *);
+int checkJobEventAndJobId (char *line, int eventType, size_t numJobIds, LS_LONG_INT * jobIds);
 static int getEventTypeAndKind (char *, int *);
 static void readEventRecord (char *, struct eventRec *);
 int lsb_readeventrecord (char *, struct eventRec *);
@@ -171,3 +171,5 @@ size_t saveQStr( char *line, char *destStr);
 int putEventRec (FILE *, struct eventRec *);
 struct eventRec *getEventRec (char *);
 char *getNextValue0 (char **line, char, char);
+
+long lsb_array_jobid( long jobId );

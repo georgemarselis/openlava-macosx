@@ -16,10 +16,11 @@
  *
  */
 
-#include <unistd.h>
 #include <netdb.h>
-#include <string.h>
 #include <pwd.h>
+#include <signal.h>
+#include <string.h>
+#include <unistd.h>
 
 #include "lsb/lsb.h"
 #include "lib/xdr.h"
@@ -29,7 +30,7 @@ static int signalJob_ (int, LS_LONG_INT, time_t, int);
 int
 lsb_signaljob (LS_LONG_INT jobId, int sigValue)
 {
-  if (sigValue < 0 || sigValue >= LSF_NSIG)
+  if (sigValue < 0 || sigValue >= _NSIG)
     {
       lsberrno = LSBE_BAD_SIGNAL;
       return (-1);

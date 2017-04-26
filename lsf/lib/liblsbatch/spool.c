@@ -51,7 +51,7 @@ getLocalHostOfficialName (void)
 
   if (returnLocalHostPtr)
     {
-      return (returnLocalHostPtr);
+      return returnLocalHostPtr;
     }
 
 
@@ -61,7 +61,7 @@ getLocalHostOfficialName (void)
     {
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "gethostname");
       lsberrno = LSBE_SYS_CALL;
-      return (returnLocalHostPtr);
+      return returnLocalHostPtr;
     }
 
   if ((hp = Gethostbyname_ (localHost)) != NULL)
@@ -70,7 +70,7 @@ getLocalHostOfficialName (void)
       returnLocalHostPtr = (char *) &localHost;
     }
 
-  return (returnLocalHostPtr);
+  return returnLocalHostPtr;
 }
 
 LSB_SPOOL_INFO_T *
@@ -301,7 +301,7 @@ Error:
       ls_syslog (LOG_DEBUG, "%s: completed", fname);
     }
 
-  return (rtnSpoolInfo);
+  return rtnSpoolInfo;
 
 }
 
@@ -346,7 +346,7 @@ getTrimmedString (const char *stringToTrim)
 
 Ending:
 
-  return (returnStringPtr);
+  return returnStringPtr;
 
 }
 
@@ -427,7 +427,7 @@ Error:
     }
     }
 
-  return (returnStringPtr);
+  return returnStringPtr;
 
 }
 
@@ -444,11 +444,11 @@ createSpoolHostsList ()
     char *resReq                    = NULL;
     char localHost[MAXHOSTNAMELEN];
     char returnHost[MAXHOSTNAMELEN];
-    uint numHosts = 0;
+    unsigned int numHosts = 0;
     
     if ((returnValueList = createListHeader ()) == NULL) {
         okHostsListPtr_ = returnValueList;
-        return (returnValueList);
+        return returnValueList;
     }
 
     gethostname (localHost, MAXHOSTNAMELEN);
@@ -456,11 +456,11 @@ createSpoolHostsList ()
     // {
     if ((bestElement = addElementToList (localHost, returnValueList)) == NULL) {
         okHostsListPtr_ = returnValueList;
-        return (returnValueList);
+        return returnValueList;
     }
 /*    setBestListElement (bestElement, returnValueList);
       okHostsListPtr_ = returnValueList;
-    return (returnValueList);
+    return returnValueList;
     }
 */ 
     hInfo = lsb_hostinfo_ex (hostPoint, &numHosts, resReq, 0);
@@ -468,10 +468,10 @@ createSpoolHostsList ()
     if (!hInfo) {
         lsberrno = LSBE_LSBLIB;
         okHostsListPtr_ = returnValueList;
-        return (returnValueList);
+        return returnValueList;
     }
 
-    for ( uint i = 0; i < numHosts; i++) {
+    for ( unsigned int i = 0; i < numHosts; i++) {
 
         hPtr = &(hInfo[i]);
         if (hPtr->hStatus == HOST_STAT_OK) {
@@ -481,12 +481,12 @@ createSpoolHostsList ()
             }
             else {
                 okHostsListPtr_ = returnValueList;
-                return (returnValueList);
+                return returnValueList;
             }
 
             if ((addElement = addElementToList (returnHost, returnValueList)) == NULL) {
                 okHostsListPtr_ = returnValueList;
-                return (returnValueList);
+                return returnValueList;
             }
 
             if (strcmp (returnHost, localHost) == 0) {
@@ -496,7 +496,7 @@ createSpoolHostsList ()
     }
 
     okHostsListPtr_ = returnValueList;
-    return (returnValueList);
+    return returnValueList;
 }
 
 
@@ -504,7 +504,7 @@ static listHeaderPtr_t
 getSpoolHostsList ()
 {
 
-  return (okHostsListPtr_);
+  return okHostsListPtr_;
 }
 
 static listHeaderPtr_t
@@ -534,7 +534,7 @@ updateSpoolHostsListIfOld (const listHeaderPtr_t pListHeader,
 
 Done:
   okHostsListPtr_ = returnValue;
-  return (returnValue);
+  return returnValue;
 
 }
 
@@ -553,7 +553,7 @@ createOrUpdateSpoolHostsList (time_t permittedTimeToLiveInSec)
     updateSpoolHostsListIfOld (spoolHostsList, permittedTimeToLiveInSec);
     }
 
-  return (spoolHostsList);
+  return spoolHostsList;
 
 }
 
@@ -666,7 +666,7 @@ Error:
     }
     }
 
-  return (spoolCopyStatus);
+  return spoolCopyStatus;
 
 }
 
@@ -822,7 +822,7 @@ Error:
     {
       free (buf);
     }
-  return (spoolCopyStatus);
+  return spoolCopyStatus;
 
 }
 
@@ -894,7 +894,7 @@ Error:
     }
     }
 
-  return (spoolCopyStatus);
+  return spoolCopyStatus;
 
 }
 
@@ -993,7 +993,7 @@ removeSpoolFile (const char *hostName, const char *destinFileFullPath)
 
       sprintf (szRshDest, "rm -rf %s", destinFileFullPath);
       execlp (RSHCMD, RSHCMD, hostName, szRshDest, NULL);
-      return (-1);
+      return -1;
       //break;
 
     case -1:
@@ -1027,7 +1027,7 @@ Done:
     }
     }
 
-  return (returnValue);
+  return returnValue;
 
 }
 
@@ -1161,7 +1161,7 @@ Error:
     }
     }
 
-  return (returnValue);
+  return returnValue;
 
 }
 
@@ -1182,7 +1182,7 @@ createListHeader ( void )
   returnValue->bestElement = NULL;
 
 Done:
-  return (returnValue);
+  return returnValue;
 
 }
 
@@ -1205,7 +1205,7 @@ deleteListHeader (const listHeaderPtr_t pListHeader)
   returnValue = 0;
 
 Done:
-  return (returnValue);
+  return returnValue;
 
 }
 
@@ -1238,7 +1238,7 @@ deleteList (const listHeaderPtr_t pListHeader)
   returnValue = deleteListHeader (pListHeader);
 
 Done:
-  return (returnValue);
+  return returnValue;
 
 }
 
@@ -1269,7 +1269,7 @@ createListElement (const char *elementName)
   returnValue->nextElement = NULL;
 
 Done:
-  return (returnValue);
+  return returnValue;
 
 }
 
@@ -1292,7 +1292,7 @@ deleteListElement (const listElementPtr_t pListElement)
   returnValue = 0;
 
 Done:
-  return (returnValue);
+  return returnValue;
 
 }
 
@@ -1317,7 +1317,7 @@ addElementToList (const char *elementName, const listHeaderPtr_t pListHeader)
   pListHeader->firstElement = pNewElement;
 
 Done:
-  return (pNewElement);
+  return pNewElement;
 
 }
 
@@ -1374,7 +1374,7 @@ removeElementFromList (const listElementPtr_t pListElement,
     }
 
 Done:
-  return (returnValue);
+  return returnValue;
 
 }
 
@@ -1392,7 +1392,7 @@ setBestListElement (const listElementPtr_t pBestElement,
   pListHeader->bestElement = pBestElement;
   returnValue = 0;
 Done:
-  return (returnValue);
+  return returnValue;
 
 }
 
@@ -1416,6 +1416,6 @@ getBestListElement (const listHeaderPtr_t pListHeader)
     }
 
 Done:
-  return (returnValue);
+  return returnValue;
 
 }

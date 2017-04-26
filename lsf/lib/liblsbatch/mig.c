@@ -102,7 +102,7 @@ lsb_mig (struct submig *mig, int *badHostIdx)
 	}
 
       assert( XDR_DECODE_SIZE_ (cc) >= 0 );
-      xdrmem_create (&xdrs, reply_buf, (uint) XDR_DECODE_SIZE_ (cc), XDR_DECODE);
+      xdrmem_create (&xdrs, reply_buf, XDR_DECODE_SIZE_ (cc), XDR_DECODE);
       if (!xdr_submitMbdReply (&xdrs, &reply, &hdr))
 	{
 	  lsberrno = LSBE_XDR;
@@ -119,8 +119,9 @@ lsb_mig (struct submig *mig, int *badHostIdx)
     }
 
 
-  if (cc)
+  if (cc) {
     free (reply_buf);
+  }
   return (0);
 
 }
