@@ -35,7 +35,7 @@
 #include "lib/xdr.h"
 
 bool_t xdr_lsbShareResourceInfoReply (XDR *, struct lsbShareResourceInfoReply *, struct LSFHeader *hdr);
-static int allocLoadIdx (float **sched, float **stop, uint *outSize, uint size);
+static int allocLoadIdx (float **sched, float **stop, unsigned int *outSize, unsigned int size);
 static bool_t xdr_lsbSharedResourceInfo (XDR *, struct lsbSharedResourceInfo *, struct LSFHeader *);
 static bool_t xdr_lsbShareResourceInstance (XDR *xdrs, struct lsbSharedResourceInstance  *, struct LSFHeader *);
 
@@ -72,14 +72,14 @@ xdr_xFile (XDR *xdrs, struct xFile * xf, struct LSFHeader *hdr)
 
 bool_t
 xdr_submitReq (XDR *xdrs, struct submitReq *submitReq, struct LSFHeader *hdr)
-{
-    uint nLimits      = 0;
-    int *uintNxf      = 0;
-    uint *intNiosPort = 0;
-    uint *intNumAskedHosts    = 0;
-    uint *intMaxNumProcessors = 0;
-    static uint numAskedHosts = 0;
-    static char **askedHosts  = NULL;
+{ 
+    unsigned int nLimits              = 0;
+    int *uintNxf                      = 0; 
+    unsigned int *intNiosPort         = 0; 
+    unsigned int *intNumAskedHosts    = 0; 
+    unsigned int *intMaxNumProcessors = 0;
+    static unsigned int numAskedHosts = 0;
+    static char **askedHosts          = NULL;
 
     if (xdrs->x_op == XDR_DECODE)
     {
@@ -94,7 +94,7 @@ xdr_submitReq (XDR *xdrs, struct submitReq *submitReq, struct LSFHeader *hdr)
         FREEUP( submitReq->loginShell);
         FREEUP( submitReq->schedHostType);
         if (numAskedHosts > 0) {
-            for ( uint i = 0; i < numAskedHosts; i++) {
+            for ( unsigned int i = 0; i < numAskedHosts; i++) {
                 FREEUP (askedHosts[i]);
             }
             FREEUP (askedHosts);
@@ -142,7 +142,7 @@ xdr_submitReq (XDR *xdrs, struct submitReq *submitReq, struct LSFHeader *hdr)
         }
     }
 
-    for ( uint i = 0; i < submitReq->numAskedHosts; i++) {
+    for ( unsigned int i = 0; i < submitReq->numAskedHosts; i++) {
         if (!xdr_var_string (xdrs, &submitReq->askedHosts[i])) {
             submitReq->numAskedHosts = i;
             goto Error0;  // FIXME FIXME FIXME FIXME remove goto
@@ -154,7 +154,7 @@ xdr_submitReq (XDR *xdrs, struct submitReq *submitReq, struct LSFHeader *hdr)
         goto Error0;  // FIXME FIXME FIXME FIXME remove goto
     }
 
-    for (uint i = 0; i < nLimits; i++)
+    for ( unsigned int i = 0; i < nLimits; i++)
     {
         if (i < LSF_RLIM_NLIMITS)
         {
@@ -199,7 +199,7 @@ xdr_submitReq (XDR *xdrs, struct submitReq *submitReq, struct LSFHeader *hdr)
         }
     }
 
-    for ( uint i = 0; i < submitReq->nxf; i++)
+    for ( unsigned int i = 0; i < submitReq->nxf; i++)
     {
         // FIXME FIXME FIXME FIXME FIXME
         // .execFn is wrong, must throw compiler on it 
@@ -264,7 +264,7 @@ Error1:
 Error0:
     if (xdrs->x_op == XDR_DECODE)
     {
-        for ( uint i = 0; i < submitReq->numAskedHosts; i++) {
+        for ( unsigned int i = 0; i < submitReq->numAskedHosts; i++) {
             FREEUP (submitReq->askedHosts[i]);
         }
         FREEUP (submitReq->askedHosts);
@@ -276,9 +276,7 @@ Error0:
 
 bool_t
 xdr_modifyReq (XDR *xdrs, struct modifyReq *modifyReq, struct LSFHeader *hdr)
-{
-    uint jobArrId     = 0;
-    uint jobArrElemId = 0;
+{ unsigned int jobArrId     = 0; unsigned int jobArrElemId = 0;
 
     if (xdrs->x_op == XDR_DECODE) {
         FREEUP (modifyReq->jobIdStr);
@@ -316,9 +314,7 @@ xdr_modifyReq (XDR *xdrs, struct modifyReq *modifyReq, struct LSFHeader *hdr)
 
 bool_t
 xdr_jobInfoReq (XDR *xdrs, struct jobInfoReq *jobInfoReq, struct LSFHeader *hdr)
-{
-    uint jobArrId     = 0;
-    uint jobArrElemId = 0;
+{ unsigned int jobArrId     = 0; unsigned int jobArrElemId = 0;
 
     assert( hdr->length );
 
@@ -358,9 +354,7 @@ xdr_jobInfoReq (XDR *xdrs, struct jobInfoReq *jobInfoReq, struct LSFHeader *hdr)
 
 bool_t
 xdr_signalReq (XDR *xdrs, struct signalReq *signalReq, struct LSFHeader *hdr)
-{
-    uint jobArrId     = 0;
-    uint jobArrElemId = 0;
+{ unsigned int jobArrId     = 0; unsigned int jobArrElemId = 0;
 
     assert( hdr->length ); 	// FIXME if you see an assert about struct LSFHeader *hdr
     						// 		 make sure you check the rest of the function 
@@ -400,9 +394,7 @@ xdr_signalReq (XDR *xdrs, struct signalReq *signalReq, struct LSFHeader *hdr)
 bool_t
 xdr_lsbMsg (XDR *xdrs, struct lsbMsg *m, struct LSFHeader *hdr)
 {
-    int xdrrc = 0;
-    uint jobArrId = 0; 
-    uint jobArrElemId = 0;
+    int xdrrc = 0; unsigned int jobArrId = 0; unsigned int jobArrElemId = 0;
 
     assert( hdr->length );
 
@@ -477,9 +469,7 @@ xdr_submitMbdReply (XDR *xdrs, struct submitMbdReply *reply, struct LSFHeader *h
   // static char queueName[MAX_LSB_NAME_LEN]; // FIXME these oughta be malloc'ed
   //static char jobName[MAX_CMD_DESC_LEN];
 	char *queueName = NULL;
-	char *jobName = NULL;
-	uint jobArrId = 0;
-	uint jobArrElemId = 0;
+	char *jobName = NULL; unsigned int jobArrId = 0; unsigned int jobArrElemId = 0;
 
 	assert( hdr->length );
 
@@ -604,11 +594,9 @@ xdr_jobInfoHead (XDR *xdrs, struct jobInfoHead *jobInfoHead, struct LSFHeader *h
 {
     static char **hostNames      = NULL;
     static unsigned long numJobs = 0;
-    static uint numHosts         = 0;
+    static unsigned int numHosts         = 0;
     static LS_LONG_INT *jobIds   = NULL;
-    char *sp                     = NULL;
-    uint *jobArrIds              = NULL;
-    uint *jobArrElemIds          = NULL;
+    char *sp                     = NULL; unsigned int *jobArrIds              = NULL; unsigned int *jobArrElemIds          = NULL;
 
     assert( hdr->length );
 
@@ -649,7 +637,7 @@ xdr_jobInfoHead (XDR *xdrs, struct jobInfoHead *jobInfoHead, struct LSFHeader *h
 
     if (jobInfoHead->numHosts > numHosts)
     {
-        for ( uint i = 0; i < numHosts; i++) {
+        for ( unsigned int i = 0; i < numHosts; i++) {
             FREEUP (hostNames[i]);
         }
         numHosts = 0;
@@ -660,7 +648,7 @@ xdr_jobInfoHead (XDR *xdrs, struct jobInfoHead *jobInfoHead, struct LSFHeader *h
         lsberrno = LSBE_NO_MEM;
         return FALSE;
       }
-    for ( uint i = 0; i < jobInfoHead->numHosts; i++)
+    for ( unsigned int i = 0; i < jobInfoHead->numHosts; i++)
       {
         hostNames[i] = malloc (MAXHOSTNAMELEN);
         if (!hostNames[i])
@@ -676,7 +664,7 @@ xdr_jobInfoHead (XDR *xdrs, struct jobInfoHead *jobInfoHead, struct LSFHeader *h
       jobInfoHead->hostNames = hostNames;
     }
 
-  for (uint i = 0; i < jobInfoHead->numJobs; i++)
+  for ( unsigned int i = 0; i < jobInfoHead->numJobs; i++)
     {
       if (xdrs->x_op == XDR_ENCODE)
   {
@@ -689,7 +677,7 @@ xdr_jobInfoHead (XDR *xdrs, struct jobInfoHead *jobInfoHead, struct LSFHeader *h
         }
     }
 
-  for (uint i = 0; i < jobInfoHead->numHosts; i++)
+  for ( unsigned int i = 0; i < jobInfoHead->numHosts; i++)
     {
       sp = jobInfoHead->hostNames[i];
       if (xdrs->x_op == XDR_DECODE) {
@@ -700,7 +688,7 @@ xdr_jobInfoHead (XDR *xdrs, struct jobInfoHead *jobInfoHead, struct LSFHeader *h
       }
     }
 
-  for ( uint i = 0; i < jobInfoHead->numJobs; i++) {
+  for ( unsigned int i = 0; i < jobInfoHead->numJobs; i++) {
       if (!xdr_u_int (xdrs, &jobArrElemIds[i]))
   {
     return FALSE;
@@ -721,9 +709,7 @@ xdr_jobInfoHead (XDR *xdrs, struct jobInfoHead *jobInfoHead, struct LSFHeader *h
 bool_t
 xdr_jgrpInfoReply (XDR *xdrs, struct jobInfoReply * jobInfoReply, struct LSFHeader *hdr)
 {
-    char *sp          = NULL;
-    uint jobArrId     = 0;
-    uint jobArrElemId = 0;
+    char *sp          = NULL; unsigned int jobArrId     = 0; unsigned int jobArrElemId = 0;
 
     assert( hdr->length );
 
@@ -783,11 +769,9 @@ xdr_jobInfoReply (XDR *xdrs, struct jobInfoReply *jobInfoReply, struct LSFHeader
 {
   char *sp = NULL;
   static float *loadSched = NULL, *loadStop = NULL;
-  static uint nIdx = 0;
+  static unsigned int nIdx = 0;
   static int *reasonTb = NULL;
-  static uint nReasons = 0;
-  uint jobArrId = 0;
-  uint jobArrElemId = 0;
+  static unsigned int nReasons = 0; unsigned int jobArrId = 0; unsigned int jobArrElemId = 0;
 
 
   if (!(xdr_int (xdrs, &jobInfoReply->jType) &&
@@ -798,7 +782,7 @@ xdr_jobInfoReply (XDR *xdrs, struct jobInfoReply *jobInfoReply, struct LSFHeader
       FREEUP (jobInfoReply->jName);
       return FALSE;
     }
-  for (uint i = 0; i < NUM_JGRP_COUNTERS; i++)
+  for ( unsigned int i = 0; i < NUM_JGRP_COUNTERS; i++)
     {
       if (!xdr_int (xdrs, &jobInfoReply->counter[i]))
   {
@@ -862,14 +846,14 @@ xdr_jobInfoReply (XDR *xdrs, struct jobInfoReply *jobInfoReply, struct LSFHeader
   }
     }
 
-    for ( uint i = 0; i < jobInfoReply->nIdx; i++)
+    for ( unsigned int i = 0; i < jobInfoReply->nIdx; i++)
     {
         if (!xdr_float (xdrs, &jobInfoReply->loadSched[i]) || !xdr_float (xdrs, &jobInfoReply->loadStop[i])) {
             return FALSE;
         }
     }
 
-    for ( uint i = 0; i < jobInfoReply->numReasons; i++) {
+    for ( unsigned int i = 0; i < jobInfoReply->numReasons; i++) {
         if (!xdr_int (xdrs, &jobInfoReply->reasonTb[i])) {
             return FALSE;
         }
@@ -883,14 +867,14 @@ xdr_jobInfoReply (XDR *xdrs, struct jobInfoReply *jobInfoReply, struct LSFHeader
             return FALSE;
         }
     }
-    for ( uint i = 0; i < jobInfoReply->numToHosts; i++)
+    for ( unsigned int i = 0; i < jobInfoReply->numToHosts; i++)
     {
       if (xdrs->x_op == XDR_DECODE)
   {
     jobInfoReply->toHosts[i] = calloc (1, MAXHOSTNAMELEN);
     if (jobInfoReply->toHosts[i] == NULL)
       {
-        for ( uint j = 0; j < i; j++) {
+        for ( unsigned int j = 0; j < i; j++) {
     		free (jobInfoReply->toHosts[j]);
         }
         free (jobInfoReply->toHosts);
@@ -904,7 +888,7 @@ xdr_jobInfoReply (XDR *xdrs, struct jobInfoReply *jobInfoReply, struct LSFHeader
   {
     if (xdrs->x_op == XDR_DECODE)
 	{
-		for ( uint j = 0; j < i; j++) {
+		for ( unsigned int j = 0; j < i; j++) {
     		free (jobInfoReply->toHosts[j]);
 		}
         free (jobInfoReply->toHosts);
@@ -919,7 +903,7 @@ xdr_jobInfoReply (XDR *xdrs, struct jobInfoReply *jobInfoReply, struct LSFHeader
     {
       if (xdrs->x_op == XDR_DECODE)
   {
-    for ( uint j = 0; j < jobInfoReply->numToHosts; j++) {
+    for ( unsigned int j = 0; j < jobInfoReply->numToHosts; j++) {
       free (jobInfoReply->toHosts[j]);
     }
     free (jobInfoReply->toHosts);
@@ -987,8 +971,8 @@ xdr_jobInfoReply (XDR *xdrs, struct jobInfoReply *jobInfoReply, struct LSFHeader
 bool_t
 xdr_queueInfoReply (XDR *xdrs, struct queueInfoReply * qInfoReply, struct LSFHeader *hdr)
 {
-    static uint memSize = 0;
-    static uint nIdx = 0;
+    static unsigned int memSize = 0;
+    static unsigned int nIdx = 0;
     static float *loadStop = NULL;
     static float *loadSched = NULL;
     static struct queueInfoEnt *qInfo = NULL;
@@ -999,7 +983,7 @@ xdr_queueInfoReply (XDR *xdrs, struct queueInfoReply * qInfoReply, struct LSFHea
 
     if (xdrs->x_op == XDR_DECODE) {
         if (qInfoReply->numQueues > memSize) {
-            for ( uint i = 0; i < memSize; i++) {
+            for ( unsigned int i = 0; i < memSize; i++) {
                 FREEUP (qInfo[i].queue);
                 FREEUP (qInfo[i].hostSpec);
             }
@@ -1009,7 +993,7 @@ xdr_queueInfoReply (XDR *xdrs, struct queueInfoReply * qInfoReply, struct LSFHea
         if (!(qInfo = (struct queueInfoEnt *) calloc (qInfoReply->numQueues, sizeof (struct queueInfoEnt))))
             return FALSE;
 
-        for ( uint i = 0; i < qInfoReply->numQueues; i++) {
+        for ( unsigned int i = 0; i < qInfoReply->numQueues; i++) {
                 qInfo[i].queue = NULL;
                 qInfo[i].hostSpec = NULL;
                 memSize = i + 1;
@@ -1020,7 +1004,7 @@ xdr_queueInfoReply (XDR *xdrs, struct queueInfoReply * qInfoReply, struct LSFHea
     }
 
 
-    for ( uint i = 0; i < qInfoReply->numQueues; i++) {
+    for ( unsigned int i = 0; i < qInfoReply->numQueues; i++) {
         FREEUP (qInfo[i].description);
         FREEUP (qInfo[i].userList);
         FREEUP (qInfo[i].hostList);
@@ -1055,7 +1039,7 @@ xdr_queueInfoReply (XDR *xdrs, struct queueInfoReply * qInfoReply, struct LSFHea
   }
     }
 
-  for ( uint i = 0; i < qInfoReply->numQueues; i++)
+  for ( unsigned int i = 0; i < qInfoReply->numQueues; i++)
     {
       if (xdrs->x_op == XDR_DECODE)
   {
@@ -1073,7 +1057,7 @@ xdr_queueInfoReply (XDR *xdrs, struct queueInfoReply * qInfoReply, struct LSFHea
 }
 
 bool_t
-xdr_queueInfoEnt (XDR *xdrs, struct queueInfoEnt * qInfo, struct LSFHeader *hdr, uint *nIdx)
+xdr_queueInfoEnt (XDR *xdrs, struct queueInfoEnt * qInfo, struct LSFHeader *hdr, unsigned int *nIdx)
 {
     char *sp = NULL;
 
@@ -1120,14 +1104,14 @@ xdr_queueInfoEnt (XDR *xdrs, struct queueInfoEnt * qInfo, struct LSFHeader *hdr,
         return FALSE;
     }
 
-    for ( uint i = 0; i < LSF_RLIM_NLIMITS; i++)
+    for ( unsigned int i = 0; i < LSF_RLIM_NLIMITS; i++)
     {
         if (!(xdr_int (xdrs, &qInfo->rLimits[i])))
             return FALSE;
     }
 
     qInfo->nIdx = *nIdx;
-    for ( uint i = 0; i < *nIdx; i++)
+    for ( unsigned int i = 0; i < *nIdx; i++)
     {
         if (!(xdr_float (xdrs, &(qInfo->loadSched[i]))) || !(xdr_float (xdrs, &(qInfo->loadStop[i]))))
             return FALSE;
@@ -1183,7 +1167,7 @@ xdr_queueInfoEnt (XDR *xdrs, struct queueInfoEnt * qInfo, struct LSFHeader *hdr,
         return FALSE;
     }
 
-    for ( uint j = 0; j < LSB_SIG_NUM; j++)
+    for ( unsigned int j = 0; j < LSB_SIG_NUM; j++)
     {
         if (!xdr_int (xdrs, &qInfo->sigMap[j])) {
             return FALSE;
@@ -1194,7 +1178,7 @@ xdr_queueInfoEnt (XDR *xdrs, struct queueInfoEnt * qInfo, struct LSFHeader *hdr,
         return FALSE;
     }
 
-    for ( uint i = 0; i < LSF_RLIM_NLIMITS; i++)
+    for ( unsigned int i = 0; i < LSF_RLIM_NLIMITS; i++)
     {
         if (!(xdr_int (xdrs, &qInfo->defLimits[i]))) {
             return FALSE;
@@ -1212,10 +1196,9 @@ xdr_queueInfoEnt (XDR *xdrs, struct queueInfoEnt * qInfo, struct LSFHeader *hdr,
 bool_t
 xdr_infoReq (XDR *xdrs, struct infoReq * infoReq, struct LSFHeader *hdr)
 {
-    static uint memSize = 0;
+    static unsigned int memSize = 0;
     static char **names = NULL;
-    static char *resReq = NULL;
-    uint counter = 0;
+    static char *resReq = NULL; unsigned int counter = 0;
 
     assert( hdr->length );
 
@@ -1231,7 +1214,7 @@ xdr_infoReq (XDR *xdrs, struct infoReq * infoReq, struct LSFHeader *hdr)
     {
         if (names)
         {
-            for ( uint i = 0; i < memSize; i++) {
+            for ( unsigned int i = 0; i < memSize; i++) {
                 FREEUP (names[i]);
             }
         }
@@ -1249,7 +1232,7 @@ xdr_infoReq (XDR *xdrs, struct infoReq * infoReq, struct LSFHeader *hdr)
         infoReq->names = names;
     }
 
-    for (uint i = 0; i < infoReq->numNames; i++) {
+    for ( unsigned int i = 0; i < infoReq->numNames; i++) {
         if (!(xdr_var_string (xdrs, &infoReq->names[i]))) {
             return FALSE;
         }
@@ -1289,19 +1272,17 @@ xdr_infoReq (XDR *xdrs, struct infoReq * infoReq, struct LSFHeader *hdr)
 
 bool_t
 xdr_hostDataReply (XDR *xdrs, struct hostDataReply *hostDataReply, struct LSFHeader *hdr)
-{
-
-  uint hostCount = 0;
+{ unsigned int hostCount = 0;
   char *sp      = NULL;
   struct hostInfoEnt *hInfoTmp     = NULL;
   static struct hostInfoEnt *hInfo = NULL;
-  static uint curNumHInfo          = 0;
+  static unsigned int curNumHInfo          = 0;
   static char *mem                 = NULL;
   static float *loadSched = NULL; 
   static float *loadStop  = NULL;
   static float *load      = NULL;
   static float *realLoad  = NULL;
-  static uint  *nIdx      = 0;
+  static unsigned int *nIdx      = 0;
   static int *busySched   = NULL;
   static int *busyStop    = NULL;
 
@@ -1334,7 +1315,7 @@ xdr_hostDataReply (XDR *xdrs, struct hostDataReply *hostDataReply, struct LSFHea
             hInfo = hInfoTmp;
             curNumHInfo = hostCount;
             mem = sp;
-            for ( uint i = 0; i < hostCount; i++ ) {
+            for ( unsigned int i = 0; i < hostCount; i++ ) {
                 hInfo[i].host = sp;
                 sp += MAXHOSTNAMELEN;
                 hInfo[i].windows = sp;
@@ -1373,7 +1354,7 @@ xdr_hostDataReply (XDR *xdrs, struct hostDataReply *hostDataReply, struct LSFHea
         }
     }
 
-    for ( uint i = 0; i < hostDataReply->numHosts; i++)
+    for ( unsigned int i = 0; i < hostDataReply->numHosts; i++)
     {
         if (xdrs->x_op == XDR_DECODE) {
             hostDataReply->hosts[i].loadSched = loadSched + (i * hostDataReply->nIdx);
@@ -1403,7 +1384,7 @@ xdr_hostDataReply (XDR *xdrs, struct hostDataReply *hostDataReply, struct LSFHea
 }
 
 bool_t
-xdr_hostInfoEnt (XDR *xdrs, struct hostInfoEnt *hostInfoEnt, struct LSFHeader *hdr, uint *nIdx)
+xdr_hostInfoEnt (XDR *xdrs, struct hostInfoEnt *hostInfoEnt, struct LSFHeader *hdr, unsigned int *nIdx)
 {
     char *sp = hostInfoEnt->host;
     char *wp = hostInfoEnt->windows;
@@ -1433,20 +1414,20 @@ xdr_hostInfoEnt (XDR *xdrs, struct hostInfoEnt *hostInfoEnt, struct LSFHeader *h
     }
 
     hostInfoEnt->nIdx = *nIdx;
-    for ( uint i = 0; i < GET_INTNUM (*nIdx); i++)
+    for ( unsigned int i = 0; i < GET_INTNUM (*nIdx); i++)
     {
         if (!xdr_int (xdrs, &hostInfoEnt->busySched[i])|| !xdr_int (xdrs, &hostInfoEnt->busyStop[i])) {
             return FALSE;
         }
     }
 
-    for ( uint i = 0; i < *nIdx; i++)
+    for ( unsigned int i = 0; i < *nIdx; i++)
     {
         if (!xdr_float (xdrs, &hostInfoEnt->loadSched[i]) || !xdr_float (xdrs, &hostInfoEnt->loadStop[i]))
             return FALSE;
     }
 
-    for ( uint i = 0; i < *nIdx; i++)
+    for ( unsigned int i = 0; i < *nIdx; i++)
     {
         if (!xdr_float (xdrs, &hostInfoEnt->realLoad[i])) {
             return FALSE;
@@ -1469,10 +1450,8 @@ xdr_userInfoReply (XDR *xdrs, struct userInfoReply *userInfoReply, struct LSFHea
     struct userInfoEnt *uInfoTmp = NULL;
     char *sp = NULL;
     static struct userInfoEnt *uInfo;
-    static uint curNumUInfo;
-    static char *mem;
-    uint *badUser = 0;
-    uint *numUsers = 0;
+    static unsigned int curNumUInfo;
+    static char *mem; unsigned int *badUser = 0; unsigned int *numUsers = 0;
 
     assert( userInfoReply->numUsers <= INT_MAX );
     *numUsers = userInfoReply->numUsers;
@@ -1511,7 +1490,7 @@ xdr_userInfoReply (XDR *xdrs, struct userInfoReply *userInfoReply, struct LSFHea
     uInfo = uInfoTmp;
     curNumUInfo = userInfoReply->numUsers;
     mem = sp;
-    for (uint i = 0; i < userInfoReply->numUsers; i++)
+    for ( unsigned int i = 0; i < userInfoReply->numUsers; i++)
       {
         uInfo[i].user = sp;
         sp += MAX_LSB_NAME_LEN;
@@ -1520,7 +1499,7 @@ xdr_userInfoReply (XDR *xdrs, struct userInfoReply *userInfoReply, struct LSFHea
       userInfoReply->users = uInfo;
     }
 
-    for ( uint i = 0; i < userInfoReply->numUsers; i++) {
+    for ( unsigned int i = 0; i < userInfoReply->numUsers; i++) {
     	// FIXME throw the debugger to make sure that .user is what is needed here
         if (!xdr_arrayElement (xdrs, userInfoReply->users[i].user, hdr, xdr_userInfoEnt)) {
             return FALSE;
@@ -1562,10 +1541,7 @@ xdr_userInfoEnt (XDR *xdrs, struct userInfoEnt *userInfoEnt, struct LSFHeader *h
 
 bool_t
 xdr_jobPeekReq (XDR *xdrs, struct jobPeekReq *jobPeekReq, struct LSFHeader *hdr)
-{
-
-  uint jobArrId = 0;
-  uint jobArrElemId = 0;
+{ unsigned int jobArrId = 0; unsigned int jobArrElemId = 0;
 
   assert( hdr->length );
 
@@ -1619,11 +1595,10 @@ xdr_jobPeekReply (XDR *xdrs, struct jobPeekReply * jobPeekReply, struct LSFHeade
 
 bool_t
 xdr_groupInfoReply (XDR *xdrs, struct groupInfoReply *groupInfoReply, struct LSFHeader *hdr)
-{
-    uint *numGroups = 0;
+{ unsigned int *numGroups = 0;
 
     if (xdrs->x_op == XDR_FREE) {
-        for ( uint i = 0; i < groupInfoReply->numGroups; i++) {
+        for ( unsigned int i = 0; i < groupInfoReply->numGroups; i++) {
             FREEUP (groupInfoReply->groups[i].group);
             FREEUP (groupInfoReply->groups[i].memberList);
         }
@@ -1656,7 +1631,7 @@ xdr_groupInfoReply (XDR *xdrs, struct groupInfoReply *groupInfoReply, struct LSF
 
     }
 
-    for ( uint i = 0; i < groupInfoReply->numGroups; i++)
+    for ( unsigned int i = 0; i < groupInfoReply->numGroups; i++)
     {
         if (!xdr_arrayElement (xdrs, (char *)&(groupInfoReply->groups[i]), hdr, xdr_groupInfoEnt)) {  // FIXME FIXME FIXME FIXME FIXME is this correct? passing a struct as char *?
             return FALSE;
@@ -1730,9 +1705,7 @@ xdr_controlReq (XDR *xdrs, struct controlReq *controlReq, struct LSFHeader *hdr)
 bool_t
 xdr_jobSwitchReq (XDR *xdrs, struct jobSwitchReq * jobSwitchReq, struct LSFHeader *hdr)
 {
-    char *sp = NULL;
-    uint jobArrId = 0;
-    uint jobArrElemId = 0;
+    char *sp = NULL; unsigned int jobArrId = 0; unsigned int jobArrElemId = 0;
 
     assert( hdr->length );
 
@@ -1762,9 +1735,7 @@ xdr_jobSwitchReq (XDR *xdrs, struct jobSwitchReq * jobSwitchReq, struct LSFHeade
 
 bool_t
 xdr_jobMoveReq (XDR *xdrs, struct jobMoveReq * jobMoveReq, struct LSFHeader *hdr)
-{
-    uint jobArrId     = 0;
-    uint jobArrElemId = 0;
+{ unsigned int jobArrId     = 0; unsigned int jobArrElemId = 0;
 
     assert( hdr->length );
 
@@ -1791,10 +1762,7 @@ xdr_jobMoveReq (XDR *xdrs, struct jobMoveReq * jobMoveReq, struct LSFHeader *hdr
 bool_t
 xdr_migReq (XDR *xdrs, struct migReq *req, struct LSFHeader *hdr)
 {
-    char *sp = NULL;
-    uint jobArrId     = 0;
-    uint jobArrElemId = 0;
-    uint *numAskedHosts = 0;
+    char *sp = NULL; unsigned int jobArrId     = 0; unsigned int jobArrElemId = 0; unsigned int *numAskedHosts = 0;
 
     assert( hdr->length );
 
@@ -1820,7 +1788,7 @@ xdr_migReq (XDR *xdrs, struct migReq *req, struct LSFHeader *hdr)
             return FALSE;
         }
 
-        for ( uint i = 0; i < req->numAskedHosts; i++) {
+        for ( unsigned int i = 0; i < req->numAskedHosts; i++) {
 
             req->askedHosts[i] = calloc (1, MAXHOSTNAMELEN);
             if (req->askedHosts[i] == NULL) {
@@ -1833,14 +1801,14 @@ xdr_migReq (XDR *xdrs, struct migReq *req, struct LSFHeader *hdr)
         }
     }
 
-    for ( uint i = 0; i < req->numAskedHosts; i++)
+    for ( unsigned int i = 0; i < req->numAskedHosts; i++)
     {
         sp = req->askedHosts[i];
         if (xdrs->x_op == XDR_DECODE) {
             sp = NULL;
         }
         if (!xdr_string (xdrs, &sp, MAXHOSTNAMELEN)) {
-            for ( uint j = 0; j < req->numAskedHosts; j++) {
+            for ( unsigned int j = 0; j < req->numAskedHosts; j++) {
                 free (req->askedHosts[j]);
             }
 
@@ -1863,7 +1831,7 @@ xdr_migReq (XDR *xdrs, struct migReq *req, struct LSFHeader *hdr)
 
 
 static int
-allocLoadIdx (float **loadSched, float **loadStop, uint *outSize, uint size)
+allocLoadIdx (float **loadSched, float **loadStop, unsigned int *outSize, unsigned int size)
 {
     if (*loadSched) {
         free (*loadSched);
@@ -1891,9 +1859,7 @@ bool_t
 xdr_lsbShareResourceInfoReply (XDR *xdrs, struct lsbShareResourceInfoReply *lsbShareResourceInfoReply,  struct LSFHeader *hdr)
 {
 
-    int status = 0;
-    uint *badResource = 0;
-    uint *numResources = 0;
+    int status = 0; unsigned int *badResource = 0; unsigned int *numResources = 0;
 
     if (xdrs->x_op == XDR_DECODE) {
         lsbShareResourceInfoReply->numResources = 0;
@@ -1920,7 +1886,7 @@ xdr_lsbShareResourceInfoReply (XDR *xdrs, struct lsbShareResourceInfoReply *lsbS
         }
     }
 
-    for ( uint i = 0; i < lsbShareResourceInfoReply->numResources; i++) {
+    for ( unsigned int i = 0; i < lsbShareResourceInfoReply->numResources; i++) {
         status = xdr_arrayElement (xdrs, (char *)&lsbShareResourceInfoReply->resources[i], hdr, xdr_lsbSharedResourceInfo); // FIXME FIXME FIXME FIXME FIXME is this correct? passing a struct as char *?
         if (!status) {
             lsbShareResourceInfoReply->numResources = i;
@@ -1940,8 +1906,7 @@ xdr_lsbShareResourceInfoReply (XDR *xdrs, struct lsbShareResourceInfoReply *lsbS
 static bool_t
 xdr_lsbSharedResourceInfo (XDR *xdrs, struct lsbSharedResourceInfo *lsbSharedResourceInfo, struct LSFHeader *hdr)
 {
-    int status = 0;
-    uint *nInstances = 0;
+    int status = 0; unsigned int *nInstances = 0;
 
     if (xdrs->x_op == XDR_DECODE)
     {
@@ -1966,7 +1931,7 @@ xdr_lsbSharedResourceInfo (XDR *xdrs, struct lsbSharedResourceInfo *lsbSharedRes
         }
     }
 
-    for ( uint i = 0; i < lsbSharedResourceInfo->nInstances; i++)
+    for ( unsigned int i = 0; i < lsbSharedResourceInfo->nInstances; i++)
     {
         status = xdr_arrayElement (xdrs, (char *)&lsbSharedResourceInfo->instances[i], hdr, xdr_lsbShareResourceInstance);
         if (!status)
@@ -1987,8 +1952,7 @@ xdr_lsbSharedResourceInfo (XDR *xdrs, struct lsbSharedResourceInfo *lsbSharedRes
 
 static bool_t
 xdr_lsbShareResourceInstance (XDR *xdrs, struct lsbSharedResourceInstance *instance, struct LSFHeader *hdr)
-{
-    uint *nHosts = 0;
+{ unsigned int *nHosts = 0;
 
     assert( hdr->length );
   	if (xdrs->x_op == XDR_DECODE)
@@ -2033,10 +1997,7 @@ xdr_lsbShareResourceInstance (XDR *xdrs, struct lsbSharedResourceInstance *insta
 
 bool_t
 xdr_runJobReq (XDR *xdrs, struct runJobRequest *runJobRequest,  struct LSFHeader *hdr)
-{
-    uint jobArrId     = 0;
-    uint jobArrElemId = 0;
-    uint *tempIntPtr  = 0;
+{ unsigned int jobArrId     = 0; unsigned int jobArrElemId = 0; unsigned int *tempIntPtr  = 0;
 
     assert( hdr->length );
 
@@ -2061,7 +2022,7 @@ xdr_runJobReq (XDR *xdrs, struct runJobRequest *runJobRequest,  struct LSFHeader
         }
     }
 
-    for ( uint i = 0; i < runJobRequest->numHosts; i++) {
+    for ( unsigned int i = 0; i < runJobRequest->numHosts; i++) {
         if (!xdr_var_string (xdrs, &(runJobRequest->hostname[i])))
         {
             return FALSE;
@@ -2090,9 +2051,7 @@ xdr_runJobReq (XDR *xdrs, struct runJobRequest *runJobRequest,  struct LSFHeader
 bool_t
 xdr_jobAttrReq (XDR *xdrs, struct jobAttrInfoEnt * jobAttr, struct LSFHeader *hdr)
 {
-    char *sp = jobAttr->hostname;
-    uint jobArrId     = 0;
-    uint jobArrElemId = 0;
+    char *sp = jobAttr->hostname; unsigned int jobArrId     = 0; unsigned int jobArrElemId = 0;
 
     assert( hdr->length );
 

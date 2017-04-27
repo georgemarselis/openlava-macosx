@@ -22,6 +22,11 @@
 #include "lsf.h"
 #include "lsb/lsb.h"
 
+
+#define LSF_NIOSDIR 0
+#define SKIPSPACE(sp)      while (isspace(*(sp))) (sp)++; // FIXME FIXME this bullshit got to go
+
+
 char *getSpoolHostBySpoolFile (const char *spoolFile);
 typedef struct lsbSpoolInfo
 {

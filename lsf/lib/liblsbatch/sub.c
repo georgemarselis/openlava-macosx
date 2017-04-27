@@ -1057,457 +1057,457 @@ subRestart (struct submit *jobSubReq, struct submitReq *submitReq, struct submit
 		exitVal = 0;
 
 childExit:
-	{
-		if (logclass & (LC_TRACE | LC_EXEC)) {
-			if (exitVal == 0) {
-				ls_syslog (LOG_DEBUG1, "%s: Child succeeded in sending messages to parent", __PRETTY_FUNCTION__);
+		{
+			if (logclass & (LC_TRACE | LC_EXEC)) {
+				if (exitVal == 0) {
+					ls_syslog (LOG_DEBUG1, "%s: Child succeeded in sending messages to parent", __PRETTY_FUNCTION__);
+				}
+				else{
+					ls_syslog (LOG_DEBUG, "%s: Child failed in sending messages to parent", __PRETTY_FUNCTION__);
+				}
 			}
-			else{
-				ls_syslog (LOG_DEBUG, "%s: Child failed in sending messages to parent", __PRETTY_FUNCTION__);
-			}
-		}
-		fclose (fp);
-		close (childIoFd[1]);
-		exit (exitVal);
-
-		sendErr:
-		err.error = TRUE;
-		err.eno = errno;
-		err.lserrno = lserrno;
-		err.lsberrno = lsberrno;
-
-		if (write (childIoFd[1], &err, sizeof (err)) != sizeof (err)) {
+			fclose (fp);
 			close (childIoFd[1]);
-			exit (-1);
+			exit (exitVal);
+
+			sendErr:
+			err.error = TRUE;
+			err.eno = errno;
+			err.lserrno = lserrno;
+			err.lsberrno = lsberrno;
+
+			if (write (childIoFd[1], &err, sizeof (err)) != sizeof (err)) {
+				close (childIoFd[1]);
+				exit (-1);
+			}
+			close (childIoFd[1]);
+			exit (0);
 		}
+
 		close (childIoFd[1]);
-		exit (0);
-	}
 
-	close (childIoFd[1]);
-
-	if (read (childIoFd[0], chkPath, sizeof (chkPath)) != sizeof (chkPath)) {
-		goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
-	}
-
-	err.error = FALSE;
-	if (read (childIoFd[0], &err, sizeof (err)) != sizeof (err)) {
-		goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
-	}
-	if (err.error)
-	{
-		errno = err.eno;
-		lserrno = err.lserrno;
-		lsberrno = err.lsberrno;
-		goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
-	}
-
-
-	if (read (childIoFd[0], &ed.len, sizeof (ed.len)) != sizeof (ed.len)) {
-		goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
-	}
-
-	if (ed.len > 0) {
-
-		long temp = 0;
-		ed.data = malloc (ed.len);
-		if (NULL == ed.data && ENOMEM == errno ) {
+		if (read (childIoFd[0], chkPath, sizeof (chkPath)) != sizeof (chkPath)) {
 			goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
 		}
 
-		temp = b_read_fix (childIoFd[0], ed.data, ed.len);
-		assert( temp <= LONG_MAX && temp >= 0);
-		assert( ed.len <= LONG_MAX );
-		if ( temp != (long) ed.len) {
-			FREEUP (ed.data);
-			ed.len = 0;
+		err.error = FALSE;
+		if (read (childIoFd[0], &err, sizeof (err)) != sizeof (err)) {
 			goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
 		}
-	}
-	else {
-		ed.data = NULL;
-	}
-
-	jobLog = malloc (sizeof ( struct jobNewLog ) );
-	if ( NULL == jobLog && ENOMEM == errno ) {
-		goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
-	}
-	if (b_read_fix (childIoFd[0], (char *) jobLog, sizeof (struct jobNewLog)) != sizeof (struct jobNewLog)) {
-		goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
-	}
-	if (read (childIoFd[0], (char *) &length, sizeof (length)) != sizeof (length)) {
-		goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
-	}
-	jobLog->resReq = resReq;
-	if (read (childIoFd[0], jobLog->resReq, length) != length) {
-		goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
-	}
-	if ((jobLog->options & SUB_OTHER_FILES) && jobLog->nxf > 0)
-	{
-		assert( jobLog->nxf >= 0);
-		length = jobLog->nxf * sizeof (struct xFile);
-		xFiles = malloc (length); // FIXME FIXME FIXME FIXME FIXME wat
-		if ( NULL == xFiles && ENOMEM == errno ) {
+		if (err.error)
+		{
+			errno = err.eno;
+			lserrno = err.lserrno;
+			lsberrno = err.lsberrno;
 			goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
 		}
-		jobLog->xf = xFiles;
-		if (read (childIoFd[0], jobLog->xf, length) != length) {
-			free (jobLog->xf);
+
+
+		if (read (childIoFd[0], &ed.len, sizeof (ed.len)) != sizeof (ed.len)) {
 			goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
 		}
-	}
 
-	if (jobLog->options & SUB_MAIL_USER) {
-		if (read (childIoFd[0], &length, sizeof (length)) != sizeof (length)) {
-			goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
-		}
-		jobLog->mailUser = mailUser;
-		if (read (childIoFd[0], jobLog->mailUser, length) != length) {
-			goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
-		}
-	}
+		if (ed.len > 0) {
 
-	if (jobLog->options & SUB_PROJECT_NAME) {
-		if (read (childIoFd[0], &length, sizeof (length)) != sizeof (length)) {
-			goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
-		}
-		jobLog->projectName = projectName;
-		if (read (childIoFd[0], jobLog->projectName, length) != length) {
-			goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
-		}
-	}
+			long temp = 0;
+			ed.data = malloc (ed.len);
+			if (NULL == ed.data && ENOMEM == errno ) {
+				goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
+			}
 
-
-	if (jobLog->options & SUB_LOGIN_SHELL) {
-		if (read (childIoFd[0], &length, sizeof (length)) != sizeof (length)) {
-			goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
-		}
-		jobLog->loginShell = loginShell;
-		if (read (childIoFd[0], jobLog->loginShell, length) != length) {
-			goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
-		}
-	}
-	if (read (childIoFd[0], &length, sizeof (length)) != sizeof (length)) {
-		goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
-	}
-	jobLog->schedHostType = schedHostType;
-	if (read (childIoFd[0], jobLog->schedHostType, length) != length) {
-		goto parentErr;
-	}
-
-
-	length = sizeof (submitReq->restartPid);
-	if (read (childIoFd[0], (char *) &submitReq->restartPid, length) != length) {
-		goto parentErr;
-	}
-	if (read (childIoFd[0], (char *) &length, sizeof (length)) != sizeof (length)) {
-		goto parentErr;
-	}
-	submitReq->fromHost = fromHost;
-	if (read (childIoFd[0], submitReq->fromHost, length) != length) {
-		goto parentErr;
-	}
-
-	if (logclass & (LC_TRACE | LC_EXEC)) {
-		ls_syslog (LOG_DEBUG1, "%s: Parent got the job log from child", __PRETTY_FUNCTION__);
-	}
-
-
-	lsberrno = LSBE_BAD_CHKLOG;
-
-
-	if (strlen (jobLog->jobName) >= MAX_CMD_DESC_LEN) {
-		goto parentErr;		// FIXME FIXME FIXME FIXME replace label with code;
-	}
-
-	if ((ptr = strchr (jobLog->jobName, '[')) != NULL && strrchr (jobSubReq->command, '/')) {
-
-		char *element = malloc( sizeof(char ) * sizeof( u_long  ) * 8 + 1); // FIXME FIXME FIXME these numbers look awfully suspect? peculiar? 
-		ptr = NULL;
-		ptr = strrchr (jobSubReq->command, '/');
-		ptr++;
-		if (islongint_ (ptr)) {
-
+			temp = b_read_fix (childIoFd[0], ed.data, ed.len);
+			assert( temp <= LONG_MAX && temp >= 0);
+			assert( ed.len <= LONG_MAX );
 			if ( temp != (long) ed.len) {
-				sprintf (element, "[%ld]", lsb_array_idx(atoi64_ (ptr)));
-			}
-			strcat (jobLog->jobName, element);
-		}
-
-		if ((ptr = strchr (jobLog->jobName, '/')) != NULL) {
-			if (ptr == strrchr (jobLog->jobName, '/') ) {
-				sprintf (jobLog->jobName, "%s", ++ptr);
+				FREEUP (ed.data);
+				ed.len = 0;
+				goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
 			}
 		}
+		else {
+			ed.data = NULL;
+		}
 
-		submitReq->jobName = jobLog->jobName;
-		submitReq->options |= SUB_JOB_NAME;
-
-		if (!(jobSubReq->options & SUB_QUEUE)) {
-			if (strlen (jobLog->queue) >= MAX_LSB_NAME_LEN - 1) {
-				goto parentErr;
+		jobLog = malloc (sizeof ( struct jobNewLog ) );
+		if ( NULL == jobLog && ENOMEM == errno ) {
+			goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
+		}
+		if (b_read_fix (childIoFd[0], (char *) jobLog, sizeof (struct jobNewLog)) != sizeof (struct jobNewLog)) {
+			goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
+		}
+		if (read (childIoFd[0], (char *) &length, sizeof (length)) != sizeof (length)) {
+			goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
+		}
+		jobLog->resReq = resReq;
+		if (read (childIoFd[0], jobLog->resReq, length) != length) {
+			goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
+		}
+		if ((jobLog->options & SUB_OTHER_FILES) && jobLog->nxf > 0)
+		{
+			assert( jobLog->nxf >= 0);
+			length = jobLog->nxf * sizeof (struct xFile);
+			xFiles = malloc (length); // FIXME FIXME FIXME FIXME FIXME wat
+			if ( NULL == xFiles && ENOMEM == errno ) {
+				goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
 			}
-			submitReq->queue = jobLog->queue;
-			submitReq->options |= SUB_QUEUE;
-		}
-
-		if (strlen (jobLog->resReq) >= MAXLINELEN - 1) {
-			goto parentErr;
-		}
-		submitReq->resReq = jobLog->resReq;
-		if (jobLog->options & SUB_RES_REQ) {
-			submitReq->options |= SUB_RES_REQ;
-		}
-// FIXME FIXME FIXME file a ticket to check for negative host numbers from command-line tools or conf
-/*    if (jobLog->numProcessors < 0) {
-		goto parentErr;
-	}
-*/    	submitReq->numProcessors = jobLog->numProcessors;
-
-/*    if (jobLog->maxNumProcessors < 0) {
-		goto parentErr;
-	}*/
-		submitReq->maxNumProcessors = jobLog->maxNumProcessors;
-
-		if (strlen (jobLog->inFile) >= MAXFILENAMELEN - 1) {
-			goto parentErr;
-		}
-		submitReq->inFile = jobLog->inFile;
-		if (jobLog->options & SUB_IN_FILE) {
-			submitReq->options |= SUB_IN_FILE;
-		}
-
-		if (strlen (jobLog->outFile) >= MAXFILENAMELEN - 1) {
-			goto parentErr;
-		}
-		submitReq->outFile = jobLog->outFile;
-		if (jobLog->options & SUB_OUT_FILE) {
-			submitReq->options |= SUB_OUT_FILE;
-		}
-
-		if (strlen (jobLog->errFile) >= MAXFILENAMELEN - 1) {
-			goto parentErr;
-		}
-		submitReq->errFile = jobLog->errFile;
-		if (jobLog->options & SUB_ERR_FILE) {
-			submitReq->options |= SUB_ERR_FILE;
-		}
-
-		if (strlen (jobLog->inFileSpool) >= MAXFILENAMELEN) {
-			goto parentErr;
-		}
-		submitReq->inFileSpool = jobLog->inFileSpool;
-		if (jobLog->options2 & SUB2_IN_FILE_SPOOL) {
-			submitReq->options2 |= SUB2_IN_FILE_SPOOL;
-		}
-
-		if (strlen (jobLog->commandSpool) >= MAXFILENAMELEN) {
-			goto parentErr;
-		}
-		submitReq->commandSpool = jobLog->commandSpool;
-		if (jobLog->options2 & SUB2_JOB_CMD_SPOOL) {
-			submitReq->options2 |= SUB2_JOB_CMD_SPOOL;
-		}
-
-		if (strlen (jobLog->command) >= MAX_CMD_DESC_LEN) {
-			goto parentErr;
-		}
-		submitReq->command = jobLog->command;
-
-		if (jobLog->userPriority > 0) {
-		submitReq->userPriority = jobLog->userPriority;
-		}
-
-		submitReq->chkpntPeriod = jobLog->chkpntPeriod;
-		if (jobLog->options & SUB_CHKPNT_PERIOD) {
-			submitReq->options |= SUB_CHKPNT_PERIOD;
-		}
-
-		submitReq->options |= SUB_CHKPNT_DIR;
-		if (strlen (jobLog->chkpntDir) >= MAXFILENAMELEN - 1) {
-			goto parentErr;
-		}
-		submitReq->chkpntDir = chkPath;
-
-		if (strlen (jobLog->jobFile) >= MAXFILENAMELEN - 1) {
-			goto parentErr;
-		}
-		submitReq->jobFile = jobLog->jobFile;
-
-		submitReq->umask = jobLog->umask;
-
-		if (strlen (jobLog->cwd) >= MAXFILENAMELEN - 1) {
-			goto parentErr;
-		}
-		submitReq->cwd = jobLog->cwd;
-
-		if (strlen (jobLog->subHomeDir) >= MAXFILENAMELEN - 1) {
-			goto parentErr;
-		}
-		submitReq->subHomeDir = jobLog->subHomeDir;
-
-		submitReq->sigValue = (jobLog->options & SUB_WINDOW_SIG) ? sig_encode (jobLog->sigValue) : 0;
-		if (submitReq->sigValue > 31 || submitReq->sigValue < 0) {
-			goto parentErr;
+			jobLog->xf = xFiles;
+			if (read (childIoFd[0], jobLog->xf, length) != length) {
+				free (jobLog->xf);
+				goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
+			}
 		}
 
 		if (jobLog->options & SUB_MAIL_USER) {
-			submitReq->mailUser = jobLog->mailUser;
-			submitReq->options |= SUB_MAIL_USER;
-		}
-		else {
-			submitReq->mailUser = "";
+			if (read (childIoFd[0], &length, sizeof (length)) != sizeof (length)) {
+				goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
+			}
+			jobLog->mailUser = mailUser;
+			if (read (childIoFd[0], jobLog->mailUser, length) != length) {
+				goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
+			}
 		}
 
 		if (jobLog->options & SUB_PROJECT_NAME) {
-			submitReq->projectName = jobLog->projectName;
-			submitReq->options |= SUB_PROJECT_NAME;
+			if (read (childIoFd[0], &length, sizeof (length)) != sizeof (length)) {
+				goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
+			}
+			jobLog->projectName = projectName;
+			if (read (childIoFd[0], jobLog->projectName, length) != length) {
+				goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
+			}
 		}
-		else {
-			submitReq->projectName = "";
-		}
+
 
 		if (jobLog->options & SUB_LOGIN_SHELL) {
-			submitReq->loginShell = jobLog->loginShell;
-			submitReq->options |= SUB_LOGIN_SHELL;
+			if (read (childIoFd[0], &length, sizeof (length)) != sizeof (length)) {
+				goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
+			}
+			jobLog->loginShell = loginShell;
+			if (read (childIoFd[0], jobLog->loginShell, length) != length) {
+				goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
+			}
 		}
-		else {
-			submitReq->loginShell = "";
+		if (read (childIoFd[0], &length, sizeof (length)) != sizeof (length)) {
+			goto parentErr;    // FIXME FIXME FIXME FIXME remove goto
+		}
+		jobLog->schedHostType = schedHostType;
+		if (read (childIoFd[0], jobLog->schedHostType, length) != length) {
+			goto parentErr;
 		}
 
 
-		if (jobLog->options & SUB_RERUNNABLE) {
-			submitReq->options |= SUB_RERUNNABLE;
+		length = sizeof (submitReq->restartPid);
+		if (read (childIoFd[0], (char *) &submitReq->restartPid, length) != length) {
+			goto parentErr;
+		}
+		if (read (childIoFd[0], (char *) &length, sizeof (length)) != sizeof (length)) {
+			goto parentErr;
+		}
+		submitReq->fromHost = fromHost;
+		if (read (childIoFd[0], submitReq->fromHost, length) != length) {
+			goto parentErr;
 		}
 
-		if (jobLog->options2 & SUB2_HOLD) {
-			submitReq->options2 |= SUB2_HOLD;
+		if (logclass & (LC_TRACE | LC_EXEC)) {
+			ls_syslog (LOG_DEBUG1, "%s: Parent got the job log from child", __PRETTY_FUNCTION__);
 		}
 
-		if ((jobLog->options & SUB_OTHER_FILES) && jobLog->nxf > 0) {
-			submitReq->options |= SUB_OTHER_FILES;
-			submitReq->nxf = jobLog->nxf;
-			if (jobLog->nxf <= 0) {
+
+		lsberrno = LSBE_BAD_CHKLOG;
+
+
+		if (strlen (jobLog->jobName) >= MAX_CMD_DESC_LEN) {
+			goto parentErr;		// FIXME FIXME FIXME FIXME replace label with code;
+		}
+
+		if ((ptr = strchr (jobLog->jobName, '[')) != NULL && strrchr (jobSubReq->command, '/')) {
+
+			char *element = malloc( sizeof(char ) * sizeof( u_long  ) * 8 + 1); // FIXME FIXME FIXME these numbers look awfully suspect? peculiar? 
+			ptr = NULL;
+			ptr = strrchr (jobSubReq->command, '/');
+			ptr++;
+			if (islongint_ (ptr)) {
+
+				long temp = 0;
+				temp = b_read_fix (childIoFd[0], ed.data, ed.len); // FIXME FIXME FIXME FIXME FIXME FIXME this might not acutally do what the code intents to
+				assert( temp <= LONG_MAX && temp >= 0);
+				assert( ed.len <= LONG_MAX );
+				if ( temp != (long) ed.len) {
+					sprintf (element, "[%d]", lsb_array_idx(atoi64_ (ptr)));  // this may be the wrong size to return;
+				}
+				strcat (jobLog->jobName, element);
+			}
+
+			if ((ptr = strchr (jobLog->jobName, '/')) != NULL) {
+				if (ptr == strrchr (jobLog->jobName, '/') ) {
+					sprintf (jobLog->jobName, "%s", ++ptr);
+				}
+			}
+
+			submitReq->jobName = jobLog->jobName;
+			submitReq->options |= SUB_JOB_NAME;
+
+			if (!(jobSubReq->options & SUB_QUEUE)) {
+				if (strlen (jobLog->queue) >= MAX_LSB_NAME_LEN - 1) {
+					goto parentErr;
+				}
+				submitReq->queue = jobLog->queue;
+				submitReq->options |= SUB_QUEUE;
+			}
+
+			if (strlen (jobLog->resReq) >= MAXLINELEN - 1) {
 				goto parentErr;
 			}
-			submitReq->xf = jobLog->xf;
-		}
-		else {
-			submitReq->nxf = 0;
-		}
-		if (jobLog->schedHostType)
-			submitReq->schedHostType = jobLog->schedHostType;
-		else {
-			submitReq->schedHostType = "";
-		}
-
-		close (childIoFd[0]);
-		if (waitpid (pid, &status, 0) < 0) {
-			lsberrno = LSBE_SYS_CALL;
-			goto leave;
-		}
-		if (createJobInfoFile (jobSubReq, &jf) == -1) {
-			goto leave;
-		}
-
-		jobId = send_batch (submitReq, &jf, submitRep, auth);
-
-		if (jobId > 0) {
-			if (!getenv ("BSUB_QUIET")) {
-				postSubMsg (jobSubReq, jobId, submitRep);
+			submitReq->resReq = jobLog->resReq;
+			if (jobLog->options & SUB_RES_REQ) {
+				submitReq->options |= SUB_RES_REQ;
 			}
-		}
+// FIXME FIXME FIXME file a ticket to check for negative host numbers from command-line tools or conf
+/*    		if (jobLog->numProcessors < 0) {
+				goto parentErr;
+			}
+*/    		submitReq->numProcessors = jobLog->numProcessors;
+
+/*    	if (jobLog->maxNumProcessors < 0) {
+			goto parentErr;
+	}*/
+			submitReq->maxNumProcessors = jobLog->maxNumProcessors;
+
+			if (strlen (jobLog->inFile) >= MAXFILENAMELEN - 1) {
+				goto parentErr;
+			}
+			submitReq->inFile = jobLog->inFile;
+			if (jobLog->options & SUB_IN_FILE) {
+				submitReq->options |= SUB_IN_FILE;
+			}
+
+			if (strlen (jobLog->outFile) >= MAXFILENAMELEN - 1) {
+				goto parentErr;
+			}
+			submitReq->outFile = jobLog->outFile;
+			if (jobLog->options & SUB_OUT_FILE) {
+				submitReq->options |= SUB_OUT_FILE;
+			}
+
+			if (strlen (jobLog->errFile) >= MAXFILENAMELEN - 1) {
+				goto parentErr;
+			}
+			submitReq->errFile = jobLog->errFile;
+			if (jobLog->options & SUB_ERR_FILE) {
+				submitReq->options |= SUB_ERR_FILE;
+			}
+
+			if (strlen (jobLog->inFileSpool) >= MAXFILENAMELEN) {
+				goto parentErr;
+			}
+			submitReq->inFileSpool = jobLog->inFileSpool;
+			if (jobLog->options2 & SUB2_IN_FILE_SPOOL) {
+				submitReq->options2 |= SUB2_IN_FILE_SPOOL;
+			}
+
+			if (strlen (jobLog->commandSpool) >= MAXFILENAMELEN) {
+				goto parentErr;
+			}
+			submitReq->commandSpool = jobLog->commandSpool;
+			if (jobLog->options2 & SUB2_JOB_CMD_SPOOL) {
+				submitReq->options2 |= SUB2_JOB_CMD_SPOOL;
+			}
+
+			if (strlen (jobLog->command) >= MAX_CMD_DESC_LEN) {
+				goto parentErr;
+			}
+			submitReq->command = jobLog->command;
+
+			if (jobLog->userPriority > 0) {
+			submitReq->userPriority = jobLog->userPriority;
+			}
+
+			submitReq->chkpntPeriod = jobLog->chkpntPeriod;
+			if (jobLog->options & SUB_CHKPNT_PERIOD) {
+				submitReq->options |= SUB_CHKPNT_PERIOD;
+			}
+
+			submitReq->options |= SUB_CHKPNT_DIR;
+			if (strlen (jobLog->chkpntDir) >= MAXFILENAMELEN - 1) {
+				goto parentErr;
+			}
+			submitReq->chkpntDir = chkPath;
+
+			if (strlen (jobLog->jobFile) >= MAXFILENAMELEN - 1) {
+				goto parentErr;
+			}
+			submitReq->jobFile = jobLog->jobFile;
+
+			submitReq->umask = jobLog->umask;
+
+			if (strlen (jobLog->cwd) >= MAXFILENAMELEN - 1) {
+				goto parentErr;
+			}
+			submitReq->cwd = jobLog->cwd;
+
+			if (strlen (jobLog->subHomeDir) >= MAXFILENAMELEN - 1) {
+				goto parentErr;
+			}
+			submitReq->subHomeDir = jobLog->subHomeDir;
+
+			submitReq->sigValue = (jobLog->options & SUB_WINDOW_SIG) ? sig_encode (jobLog->sigValue) : 0;
+			if (submitReq->sigValue > 31 || submitReq->sigValue < 0) {
+				goto parentErr;
+			}
+
+			if (jobLog->options & SUB_MAIL_USER) {
+				submitReq->mailUser = jobLog->mailUser;
+				submitReq->options |= SUB_MAIL_USER;
+			}
+			else {
+				submitReq->mailUser = "";
+			}
+
+			if (jobLog->options & SUB_PROJECT_NAME) {
+				submitReq->projectName = jobLog->projectName;
+				submitReq->options |= SUB_PROJECT_NAME;
+			}
+			else {
+				submitReq->projectName = "";
+			}
+
+			if (jobLog->options & SUB_LOGIN_SHELL) {
+				submitReq->loginShell = jobLog->loginShell;
+				submitReq->options |= SUB_LOGIN_SHELL;
+			}
+			else {
+				submitReq->loginShell = "";
+			}
+
+
+			if (jobLog->options & SUB_RERUNNABLE) {
+				submitReq->options |= SUB_RERUNNABLE;
+			}
+
+			if (jobLog->options2 & SUB2_HOLD) {
+				submitReq->options2 |= SUB2_HOLD;
+			}
+
+			if ((jobLog->options & SUB_OTHER_FILES) && jobLog->nxf > 0) {
+				submitReq->options |= SUB_OTHER_FILES;
+				submitReq->nxf = jobLog->nxf;
+				if (jobLog->nxf <= 0) {
+					goto parentErr;
+				}
+				submitReq->xf = jobLog->xf;
+			}
+			else {
+				submitReq->nxf = 0;
+			}
+			if (jobLog->schedHostType)
+				submitReq->schedHostType = jobLog->schedHostType;
+			else {
+				submitReq->schedHostType = "";
+			}
+
+			close (childIoFd[0]);
+			if (waitpid (pid, &status, 0) < 0) {
+				lsberrno = LSBE_SYS_CALL;
+				goto leave;
+			}
+			if (createJobInfoFile (jobSubReq, &jf) == -1) {
+				goto leave;
+			}
+
+			jobId = send_batch (submitReq, &jf, submitRep, auth);
+
+			if (jobId > 0) {
+				if (!getenv ("BSUB_QUIET")) {
+					postSubMsg (jobSubReq, jobId, submitRep);
+				}
+			}
 
 leave:
 
-		if (jobLog) {
-			free (jobLog);
-		}
-		if (xFiles) {
-			free (xFiles);
-		}
-		return jobId;
+			if (jobLog) {
+				free (jobLog);
+			}
+			if (xFiles) {
+				free (xFiles);
+			}
+			return jobId;
 
 parentErr:
-		if (logclass & (LC_TRACE | LC_EXEC)) {
-			ls_syslog (LOG_DEBUG, "%s: Parent failed in receiving messages from child", __PRETTY_FUNCTION__);
-		}
-		if (!err.error) {
-			lsberrno = LSBE_SYS_CALL;
-			err.eno = errno;
-		}
+			if (logclass & (LC_TRACE | LC_EXEC)) {
+				ls_syslog (LOG_DEBUG, "%s: Parent failed in receiving messages from child", __PRETTY_FUNCTION__);
+			}
+			if (!err.error) {
+				lsberrno = LSBE_SYS_CALL;
+				err.eno = errno;
+			}
 
-		close (childIoFd[0]);
-		if (waitpid (pid, &status, 0) < 0) {
-			lsberrno = LSBE_SYS_CALL;
+			close (childIoFd[0]);
+			if (waitpid (pid, &status, 0) < 0) {
+				lsberrno = LSBE_SYS_CALL;
+			}
+			else {
+				errno = err.eno;
+			}
+			jobId = -1;
+			goto leave;
 		}
-		else {
-			errno = err.eno;
-		}
-		jobId = -1;
-		goto leave;
-	}
-
+	} // FIXME FIXME FIXME FIXME FIXME there is a 99% chance this bracket is in the wrong place
 	return 0;
 }
+
 
 int
 getChkDir (char *givenDir, char *chkPath)
 {
-	char *strPtr;
+	char *strPtr = NULL;
 
-	if (((strPtr = strrchr (givenDir, '/')) != NULL)
-		&& (islongint_ (strPtr + 1)))
-		{
+	if (((strPtr = strrchr (givenDir, '/')) != NULL) && (islongint_ (strPtr + 1))) {
 		sprintf (chkPath, "%s", givenDir);
 		return 0;
-		}
-	else
-		{
-		DIR *dirp;
-		struct dirent *dp;
+	}
+	else {
+		DIR *dirp = NULL;
+		struct dirent *dp = NULL;
 		char jobIdDir[MAXFILENAMELEN];
-		int i;
+		int i = 0;
 
 		i = 0;
 		if ((dirp = opendir (givenDir)) == NULL) {
 			return -1;
 		}
-		while ((dp = readdir (dirp)) != NULL)
-			{
+		while ((dp = readdir (dirp)) != NULL) {
 
 			if (strcpy (jobIdDir, dp->d_name) == NULL) {
 				i++;
 			}
-			if (i > 1)
-				{
-				(void) closedir (dirp);
+			if (i > 1) {
+				closedir (dirp);
 				return -1;
-				}
-			}
-		if (islongint_ (jobIdDir))
-			{
-			sprintf (chkPath, "%s/%s", givenDir, jobIdDir);
-			(void) closedir (dirp);
-			return 0;
-			}
-		else
-			{
-			(void) closedir (dirp);
-			return -1;
 			}
 		}
+		if (islongint_ (jobIdDir)) {
+			sprintf (chkPath, "%s/%s", givenDir, jobIdDir);
+			closedir (dirp);
+			return 0;
+		}
+		else {
+			closedir (dirp);
+			return -1;
+		}
+	}
 
+	fprintf( stderr, "%s: i am not sure you are supposed to be here.\n", __PRETTY_FUNCTION__ );
+	return -666;
 }
 
 
-static LS_LONG_INT
+LS_LONG_INT
 subJob (struct submit *jobSubReq, struct submitReq *submitReq, struct submitReply *submitRep, struct lsfAuth *auth)
 {
 
-	char homeDir[MAXFILENAMELEN];
-	char resReq[MAXLINELEN];
-	char cmd[MAXLINELEN];
+	char homeDir[MAXFILENAMELEN]; // FIXME FIXME FIXME convert to dynamic string
+	char resReq[MAXLINELEN]; // FIXME FIXME FIXME convert to dynamic string
+	char cmd[MAXLINELEN]; // FIXME FIXME FIXME convert to dynamic string
 	struct lenData jf;
 	int niosSock = 0;
 	LSB_SUB_SPOOL_FILE_T subSpoolFiles;
@@ -1516,9 +1516,9 @@ subJob (struct submit *jobSubReq, struct submitReq *submitReq, struct submitRepl
 	subSpoolFiles.inFileSpool[0] = 0;
 	subSpoolFiles.commandSpool[0] = 0;
 
-	submitReq->subHomeDir = homeDir;
-	submitReq->resReq = resReq;
-	submitReq->command = cmd;
+	submitReq->subHomeDir = homeDir; // FIXME FIXME FIXME FIXME FIXME the fuck is this and why?
+	submitReq->resReq = resReq; // FIXME FIXME FIXME FIXME FIXME the fuck is this and why?
+	submitReq->command = cmd; // FIXME FIXME FIXME FIXME FIXME the fuck is this and why?
 
 	if (getOtherParams (jobSubReq, submitReq, submitRep, auth, &subSpoolFiles) < 0)
 		{
@@ -1659,7 +1659,7 @@ getDefaultSpoolDir ()
 }
 
 
-static const LSB_SPOOL_INFO_T *
+const LSB_SPOOL_INFO_T *
 chUserCopySpoolFile (const char *srcFile, spoolOptions_t fileType)
 {
 	static LSB_SPOOL_INFO_T parentSpoolInfo;
@@ -2348,7 +2348,8 @@ getOtherParams (struct submit *jobSubReq, struct submitReq *submitReq, struct su
 
 }
 
-static char *
+
+char *
 acctMapGet (int *fail, char *lsfUserName)
 {
 
@@ -2424,7 +2425,7 @@ acctMapGet (int *fail, char *lsfUserName)
 
 }
 
-static int
+int
 getUserInfo (struct submitReq *submitReq, struct submit *jobSubReq)
 {
 	char lsfUserName[MAXLINELEN];		// FIXME FIXME malloc
@@ -2720,13 +2721,14 @@ errorParent:
 }
 
 
-static int
+int
 xdrSubReqSize (struct submitReq *req)
 {
 	int sz;
 
-	sz = 1024 + ALIGNWORD_ (sizeof (struct submitReq));
+	sz = 1024 + ALIGNWORD_ (sizeof (struct submitReq)); // FIXME FIXME FIXME FIXME that 1024 is .. suspect
 
+	//
 	sz += ALIGNWORD_ (strlen (req->queue) + 1) + 4 +
 	ALIGNWORD_ (strlen (req->resReq)) + 4 +
 	ALIGNWORD_ (strlen (req->fromHost) + 1) + 4 +
@@ -2759,10 +2761,10 @@ xdrSubReqSize (struct submitReq *req)
 }
 
 
-static int
+int
 createNiosSock (struct submitReq *submitReq)
 {
-	int asock;
+	int asock = 0;
 	socklen_t len;
 	struct sockaddr_in sin;
 
@@ -2773,20 +2775,19 @@ createNiosSock (struct submitReq *submitReq)
 		}
 
 	len = sizeof (sin);
-	if (getsockname (asock, (struct sockaddr *) &sin, &len) < 0)
-		{
+	if (getsockname (asock, (struct sockaddr *) &sin, &len) < 0) {
 		close (asock);
 		lsberrno = LSBE_LSLIB;
 		lserrno = LSE_SOCK_SYS;
 		return -1;
-		}
+	}
 
 	submitReq->niosPort = ntohs (sin.sin_port);
 	return asock;
 }
 
-#define LSF_NIOSDIR 0
-static void
+
+void
 startNios (struct submitReq *submitReq, int asock, LS_LONG_INT jobId)
 {
 	char sockStr[10];
@@ -2843,10 +2844,9 @@ startNios (struct submitReq *submitReq, int asock, LS_LONG_INT jobId)
 }
 
 
-static void
+void
 postSubMsg (struct submit *req, LS_LONG_INT jobId, struct submitReply *reply)
 {
-
 
 
 	if ((req->options & SUB_QUEUE) || (req->options & SUB_RESTART))
@@ -2886,8 +2886,7 @@ postSubMsg (struct submit *req, LS_LONG_INT jobId, struct submitReply *reply)
 void
 prtBETime_ (struct submit *req)
 {
-	static char __PRETTY_FUNCTION__[] = "prtBETime_";
-	char *sp;
+	char *sp = NULL;
 
 	if (logclass & (LC_TRACE | LC_EXEC | LC_SCHED)) {
 		ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", __PRETTY_FUNCTION__);
@@ -2904,7 +2903,9 @@ prtBETime_ (struct submit *req)
 		sp = _i18n_ctime (ls_catd, CTIME_FORMAT_a_b_d_T_Y, &req->termTime);
 		/* catgets 405 */
 		fprintf (stderr, "catgets 405: Job will be terminated by %s\n", sp);
-		}
+	}
+
+	return;
 }
 
 
@@ -2917,15 +2918,18 @@ gettimefor (char *toptarg, time_t * tTime)
 	int tindex, ttime[5];
 	int currhour, currmin, currday;
 
-	TIMEIT (1, *tTime = time (0), "time");
-	TIMEIT (1, tmPtr = localtime (tTime), "localtime");
+	// TIMEIT (1, 
+	*tTime = time (0);
+	//, "time");
+	// TIMEIT (1, 
+	tmPtr = localtime (tTime);
+	//, "localtime");
 	tmPtr->tm_sec = 0;
 	currhour = tmPtr->tm_hour;
 	currmin = tmPtr->tm_min;
 	currday = tmPtr->tm_mday;
 
-	for (tindex = 0; toptarg; tindex++)
-		{
+	for (tindex = 0; toptarg; tindex++) {
 		ttime[tindex] = 0;
 		cp = strrchr (toptarg, ':');
 		if (cp != NULL)
@@ -4028,30 +4032,31 @@ setOption_ (int argc, char **argv, char *template, struct submit *req, int mask,
 	return 0;
 }
 
-#define SKIPSPACE(sp)      while (isspace(*(sp))) (sp)++;
 
-static int
-parseLine_ (char *line, int *embedArgc, char ***embedArgv, char **errMsg)
+int
+parseLine_ (char *line, unsigned int *embedArgc, char ***embedArgv, char **errMsg)
 {
 #define INCREASE 40
 	int parsing = TRUE, i;
-	static char **argBuf = NULL, *key;
-	static char __PRETTY_FUNCTION__[] = "parseLine_";
+	static char **argBuf = NULL;
+	char *key         = NULL;
 	static int argNum = 0;
-	static int first = TRUE;
-	static unsigned int bufSize = INCREASE;
-	char *sp;
-	char *sQuote;
-	char *dQuote;
+	static int first  = TRUE;
+	unsigned int bufSize = INCREASE;
+	char *sp       = NULL;
+	char *sQuote   = NULL;
+	char *dQuote   = NULL;
 	char quoteMark;
-	char **tmp;
+	char **tmp     = NULL;
+
+	assert( errMsg ); // FIXME FIXME FIXME FIXME useless call
 
 	if (first == TRUE)
 		{
-		argBuf = (char **) malloc (INCREASE * sizeof (char *));
+		argBuf = malloc (INCREASE * sizeof( *argBuf ) );
 		if (NULL == argBuf && ENOMEM == errno)
 			{
-			PRINT_ERRMSG2 (errMsg, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "malloc");
+			fprintf( stderr,  "%s: failure to allocate more memory for argBuf.\n", __PRETTY_FUNCTION__ ); // FIXME FIXME FIXME FIXME this should really be a call to syslog
 			return -1;
 			}
 		first = FALSE;
@@ -4102,12 +4107,13 @@ parseLine_ (char *line, int *embedArgc, char ***embedArgv, char **errMsg)
 			}
 
 			assert( *embedArgc + 2 >= 0);
-			if ( (unsigned int)(*embedArgc + 2) > bufSize)
+			if ( (*embedArgc + 2) > bufSize)
 				{
-				tmp = (char **) realloc (argBuf, (bufSize + INCREASE) * sizeof (char *));
+				tmp = realloc (argBuf, (bufSize + INCREASE) * sizeof (char *));
 				if (NULL == tmp )
 					{
-					PRINT_ERRMSG2 (errMsg, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "realloc");
+					// PRINT_ERRMSG2 (errMsg, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "realloc");
+					fprintf( stderr, "%s: failed to realloc memory for argBuf\n", __PRETTY_FUNCTION__ );
 					argNum = *embedArgc - 1;
 					*embedArgv = argBuf;
 					return -1;
@@ -4135,10 +4141,9 @@ FINISH:
 struct submit *
 parseOptFile_ (char *filename, struct submit *req, char **errMsg)
 {
-	static char __PRETTY_FUNCTION__[] = "parseOptFile_";
 	ssize_t length  = 0;
 	size_t lineLen  = 0;
-	int optArgc     = 0;
+	unsigned int optArgc     = 0;
 	char **optArgv  = NULL;
 	char *lineBuf   = NULL;
 	char template[] = "E:T:w:f:k:R:m:J:L:u:i:o:e:n:q:b:t:sp:s:c:W:F:D:S:C:M:P:p:v:Ip|Is|I|r|H|x|N|B|h|V|G:X:";
@@ -4148,17 +4153,19 @@ parseOptFile_ (char *filename, struct submit *req, char **errMsg)
 	LS_WAIT_T status = 0;
 
 	if (logclass & (LC_TRACE | LC_SCHED | LC_EXEC)) {
-		ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __PRETTY_FUNCTION__);
+		ls_syslog (LOG_DEBUG, "%s: Entering function", __PRETTY_FUNCTION__);
 	}
 	if (access (filename, F_OK) != 0)
 		{
-		PRINT_ERRMSG3 (errMsg, I18N_FUNC_S_FAIL, __PRETTY_FUNCTION__, "access", filename);
+		// PRINT_ERRMSG3 (errMsg, I18N_FUNC_S_FAIL, __PRETTY_FUNCTION__, "access", filename);
+		fprintf( stderr, "%s: file access failure at filename %s\n", __PRETTY_FUNCTION__, filename);
 		return NULL;
 		}
 
 	if (socketpair (AF_UNIX, SOCK_STREAM, 0, childIoFd) < 0)
 		{
-		PRINT_ERRMSG2 (errMsg, I18N_FUNC_FAIL, __PRETTY_FUNCTION__, "socketpair");
+		// PRINT_ERRMSG2 (errMsg, I18N_FUNC_FAIL, __PRETTY_FUNCTION__, "socketpair");
+		fprintf( stderr, "%s: failure at openting socket pair\n", __PRETTY_FUNCTION__ );
 		lsberrno = LSBE_SYS_CALL;
 		return NULL;
 		}
@@ -4168,7 +4175,8 @@ parseOptFile_ (char *filename, struct submit *req, char **errMsg)
 	if (pid < 0)
 		{
 		lsberrno = LSBE_SYS_CALL;
-		PRINT_ERRMSG2 (errMsg, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "fork");
+//		PRINT_ERRMSG2 (errMsg, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "fork");
+		fprintf( stderr, "%s: could not fork \n", __PRETTY_FUNCTION__ );
 		return NULL;
 		}
 	else if (pid == 0)
@@ -4185,9 +4193,9 @@ parseOptFile_ (char *filename, struct submit *req, char **errMsg)
 			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "setuid");
 			goto childExit;
 			}
-		if (logclass & (LC_TRACE | LC_EXEC))
-			ls_syslog (LOG_DEBUG1, "%s: Child tries to open a option file <%s>",
-					   __PRETTY_FUNCTION__, filename);
+		if (logclass & (LC_TRACE | LC_EXEC)) {
+			ls_syslog (LOG_DEBUG1, "%s: Child tries to open a option file <%s>", __PRETTY_FUNCTION__, filename);
+		}
 		lineLen = 0;
 		childLine[0] = '\0';
 
@@ -4380,7 +4388,7 @@ subUsage_ (int option, char **errMsg)
 }
 
 
-static int
+int
 parseXF (struct submit *req, char *arg, char **errMsg)
 {
 	static unsigned int maxNxf = 0;
@@ -4540,7 +4548,7 @@ parseXF (struct submit *req, char *arg, char **errMsg)
 }
 
 
-static int
+int
 checkLimit (int limit, int factor)
 {
 	if ((float) limit * (float) factor >= (float) INFINIT_INT) {
@@ -4551,10 +4559,10 @@ checkLimit (int limit, int factor)
 	}
 }
 
+
 int
 runBatchEsub (struct lenData *ed_, struct submit *jobSubReq)
 {
-	static char __PRETTY_FUNCTION__[] = "runBatchEsub";
 
 	char *subRLimitName[LSF_RLIM_NLIMITS] = 
 	{   "LSB_SUB_RLIMIT_CPU",
@@ -4590,7 +4598,7 @@ for (ii=0; _str1[ii]; ii++){ \
 if (_str1[ii] == '"') \
 cnt++ ; \
 } \
-tmp_str = (char *)malloc((strlen(_str1)+1+cnt+2)*sizeof(char)) ; \
+tmp_str = malloc((strlen(_str1)+1+cnt+2)*sizeof(char)) ; \
 if (tmp_str != NULL) { \
 tmp_str[0] = '"' ; \
 _str = tmp_str+1 ; \
@@ -4950,7 +4958,8 @@ fprintf(parmfp, "%s=%d\n", name, (int) field); \
 
 }
 
-static int
+
+int
 readOptFile (char *filename, char *childLine)
 {
 	char *p     = NULL;
@@ -5139,7 +5148,6 @@ void makeCleanToRunEsub ( void )
 void
 modifyJobInformation (struct submit *jobSubReq)
 {
-	static char __PRETTY_FUNCTION__[] = "modifyJobInforation";
 	char parmDeltaFile[MAXPATHLEN];
 	char envDeltaFile[MAXPATHLEN];
 	int validKey = 0;
@@ -5160,7 +5168,7 @@ modifyJobInformation (struct submit *jobSubReq)
 #define FIELD_PTR_PTR(base,offset) (((char *)base)+offset)
 
 	FILE *fp;
-	unsigned long lineNum = 0;
+	size_t lineNum = 0;
 	char *line = NULL;
 	char *key  = NULL;
 	static struct
@@ -5220,15 +5228,15 @@ modifyJobInformation (struct submit *jobSubReq)
 		{ NULL, 0, "    ", 0, 0}
 	};
 
-	sprintf (parmDeltaFile, "%s/.lsbsubdeltaparm.%d.%d", LSTMPDIR, (int) getpid (), (int) getuid ());
-	sprintf (envDeltaFile, "%s/.lsbsubdeltaenv.%d.%d",   LSTMPDIR, (int) getpid (), (int) getuid ());
+	sprintf (parmDeltaFile, "%s/.lsbsubdeltaparm.%d.%d", LSTMPDIR, getpid (), getuid ());
+	sprintf (envDeltaFile, "%s/.lsbsubdeltaenv.%d.%d",   LSTMPDIR, getpid (), getuid ());
 
 	if (access (parmDeltaFile, R_OK) == F_OK)
 		{
 		fp = fopen (parmDeltaFile, "r");
 		lineNum = 0;
 
-		while ((line = getNextLineC_ (fp, (unsigned int *)&lineNum, TRUE)) != NULL)
+		while ((line = getNextLineC_ (fp, &lineNum, TRUE)) != NULL)
 			{
 			int i = 0;
 			long j = 0;
@@ -5485,7 +5493,7 @@ modifyJobInformation (struct submit *jobSubReq)
 								unsigned int numAskedHosts = 0;
 
 								assert( jobSubReq->numAskedHosts <= UINT_MAX );
-								numAskedHosts = (unsigned int)jobSubReq->numAskedHosts;
+								numAskedHosts = jobSubReq->numAskedHosts;
 
 								if (getAskedHosts_ (sValue, &jobSubReq->askedHosts, &numAskedHosts, badIdx, FALSE) < 0)
 									{
@@ -5522,7 +5530,7 @@ modifyJobInformation (struct submit *jobSubReq)
 
 	if (access (envDeltaFile, R_OK) == F_OK)
 		{
-		unsigned int linenum = 0;
+		size_t linenum = 0;
 		// lineNum = 0;
 		fp = fopen (envDeltaFile, "r");
 
@@ -5759,7 +5767,6 @@ extractStringValue (char *line)
 int
 processXFReq (char *key, char *line, struct submit *jobSubReq)
 {
-	static char __PRETTY_FUNCTION__[] = "processXFRequest";
 	int validKey = 0;
 	unsigned int v = 0;
 	char *sValue = NULL;
@@ -5911,7 +5918,8 @@ processXFReq (char *key, char *line, struct submit *jobSubReq)
 	return 0;
 }
 
-static void
+
+void
 trimSpaces (char *str)
 {
 	char *ptr;

@@ -26,7 +26,7 @@
 
 
 struct userInfoEnt *
-lsb_userinfo (char **users, uint *numUsers)
+lsb_userinfo (char **users, unsigned int *numUsers)
 {
   mbdReqType mbdReqtype;
   XDR xdrs;
@@ -35,7 +35,7 @@ lsb_userinfo (char **users, uint *numUsers)
   char *request_buf;
   struct userInfoReply userInfoReply, *reply;
   static struct infoReq userInfoReq;
-  uint i = 0;
+  unsigned int i = 0;
   unsigned long cc = 0;
   unsigned long numReq = 0;
   char lsfUserName[MAXLINELEN];
@@ -90,7 +90,7 @@ lsb_userinfo (char **users, uint *numUsers)
     return (NULL);
   }
       assert( numReq <= UINT_MAX );
-      userInfoReq.numNames = (uint)numReq;
+      userInfoReq.numNames = (unsigned int)numReq;
       for (i = 0; i < numReq; i++)
   {
     if (users[i] && strlen (users[i]) + 1 < MAXHOSTNAMELEN)
@@ -116,7 +116,7 @@ lsb_userinfo (char **users, uint *numUsers)
       return (NULL);
     }
   assert( cc <= INT_MAX );
-  xdrmem_create (&xdrs, request_buf, (uint)cc, XDR_ENCODE);
+  xdrmem_create (&xdrs, request_buf, (unsigned int)cc, XDR_ENCODE);
 
   initLSFHeader_ (&hdr);
   hdr.opCode = mbdReqtype;
@@ -144,7 +144,7 @@ lsb_userinfo (char **users, uint *numUsers)
   if (lsberrno == LSBE_NO_ERROR || lsberrno == LSBE_BAD_USER)
     {
       assert( cc <= UINT_MAX );
-      xdrmem_create (&xdrs, reply_buf, XDR_DECODE_SIZE_ ((uint)cc), XDR_DECODE);
+      xdrmem_create (&xdrs, reply_buf, XDR_DECODE_SIZE_ ((unsigned int)cc), XDR_DECODE);
       reply = &userInfoReply;
       if (!xdr_userInfoReply (&xdrs, reply, &hdr))
   {
@@ -160,11 +160,11 @@ lsb_userinfo (char **users, uint *numUsers)
       if (lsberrno == LSBE_BAD_USER)
   {
     assert( reply->badUser >= 0);
-    *numUsers = (uint)reply->badUser;
+    *numUsers = (unsigned int)reply->badUser;
     return (NULL);
   }
   assert( reply->numUsers >=0 );
-      *numUsers = (uint) reply->numUsers;
+      *numUsers = (unsigned int) reply->numUsers;
       return (reply->users);
     }
 

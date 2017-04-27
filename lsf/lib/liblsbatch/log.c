@@ -394,7 +394,7 @@ lsb_geteventrec_ex (FILE *log_fp,  size_t *lineNum, char *usedLine)
 
 }
 
-static void
+void
 freeLogRec (struct eventRec *logRec)
 {
 
@@ -595,7 +595,7 @@ freeLogRec (struct eventRec *logRec)
 }
 
 
-static int
+int
 readJobNew (char *line, struct jobNewLog *jobNewLog)
 {
 	int cc        = 0;
@@ -780,8 +780,7 @@ readJobNew (char *line, struct jobNewLog *jobNewLog)
 
 }
 
-static int
-readJobMod (char *line, struct jobModLog *jobModLog)
+int readJobMod (char *line, struct jobModLog *jobModLog)
 {
 		int i, cc, ccount;
 
@@ -957,8 +956,7 @@ readJobMod (char *line, struct jobModLog *jobModLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-readJobStart (char *line, struct jobStartLog *jobStartLog)
+int readJobStart (char *line, struct jobStartLog *jobStartLog)
 {
 	int i = 0, cc = 0, ccount = 0;
 
@@ -1022,8 +1020,7 @@ readJobStart (char *line, struct jobStartLog *jobStartLog)
 
 }
 
-static int
-readJobStartAccept (char *line, struct jobStartAcceptLog *jobStartAcceptLog)
+int readJobStartAccept (char *line, struct jobStartAcceptLog *jobStartAcceptLog)
 {
 	int cc, ccount;
 
@@ -1043,8 +1040,7 @@ readJobStartAccept (char *line, struct jobStartAcceptLog *jobStartAcceptLog)
 
 }
 
-static int
-readJobExecute (char *line, struct jobExecuteLog *jobExecuteLog)
+int readJobExecute (char *line, struct jobExecuteLog *jobExecuteLog)
 {
 	int cc, ccount;
 
@@ -1073,8 +1069,7 @@ readJobExecute (char *line, struct jobExecuteLog *jobExecuteLog)
 
 
 
-static int
-readJobStatus (char *line, struct jobStatusLog *jobStatusLog)
+int readJobStatus (char *line, struct jobStatusLog *jobStatusLog)
 {
 	int cc, ccount;
 	int tmpEnd;
@@ -1110,8 +1105,7 @@ readJobStatus (char *line, struct jobStatusLog *jobStatusLog)
 }
 
 
-static int
-readSbdJobStatus (char *line, struct sbdJobStatusLog *jobStatusLog)
+int readSbdJobStatus (char *line, struct sbdJobStatusLog *jobStatusLog)
 {
 	int cc, ccount;
 	int tmpActPeriod;
@@ -1138,8 +1132,7 @@ readSbdJobStatus (char *line, struct sbdJobStatusLog *jobStatusLog)
 }
 
 
-static int
-readMig (char *line, struct migLog *migLog)
+int readMig (char *line, struct migLog *migLog)
 {
 	int cc, ccount, i;
 	char hName[MAXHOSTNAMELEN];
@@ -1196,8 +1189,7 @@ readMig (char *line, struct migLog *migLog)
 		return LSBE_NO_ERROR;
 }
 
-static int
-readJobSigAct (char *line, struct sigactLog *sigactLog)
+int readJobSigAct (char *line, struct sigactLog *sigactLog)
 {
 	int cc, ccount;
 	int tmpPeriod;
@@ -1231,8 +1223,7 @@ readJobSigAct (char *line, struct sigactLog *sigactLog)
 
 }
 
-static int
-readJobRequeue (char *line, struct jobRequeueLog *jobRequeueLog)
+int readJobRequeue (char *line, struct jobRequeueLog *jobRequeueLog)
 {
 	int cc, ccount;
 
@@ -1248,8 +1239,7 @@ readJobRequeue (char *line, struct jobRequeueLog *jobRequeueLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-readJobClean (char *line, struct jobCleanLog *jobCleanLog)
+int readJobClean (char *line, struct jobCleanLog *jobCleanLog)
 {
 	int cc, ccount;
 
@@ -1263,8 +1253,7 @@ readJobClean (char *line, struct jobCleanLog *jobCleanLog)
 }
 
 
-static int
-readChkpnt (char *line, struct chkpntLog *chkpntLog)
+int readChkpnt (char *line, struct chkpntLog *chkpntLog)
 {
 	int cc, ccount;
 	int tmpPeriod;
@@ -1286,8 +1275,7 @@ readChkpnt (char *line, struct chkpntLog *chkpntLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-readJobSwitch (char *line, struct jobSwitchLog *jobSwitchLog)
+int readJobSwitch (char *line, struct jobSwitchLog *jobSwitchLog)
 {
 	int cc, ccount;
 
@@ -1310,8 +1298,7 @@ readJobSwitch (char *line, struct jobSwitchLog *jobSwitchLog)
 
 }
 
-static int
-readJobMove (char *line, struct jobMoveLog *jobMoveLog)
+int readJobMove (char *line, struct jobMoveLog *jobMoveLog)
 {
 	int cc;
 	int ccount;
@@ -1334,8 +1321,7 @@ readJobMove (char *line, struct jobMoveLog *jobMoveLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-readQueueCtrl (char *line, struct queueCtrlLog *queueCtrlLog)
+int readQueueCtrl (char *line, struct queueCtrlLog *queueCtrlLog)
 {
 	int cc, ccount;
 
@@ -1355,8 +1341,7 @@ readQueueCtrl (char *line, struct queueCtrlLog *queueCtrlLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-readHostCtrl (char *line, struct hostCtrlLog *hostCtrlLog)
+int readHostCtrl (char *line, struct hostCtrlLog *hostCtrlLog)
 {
 	int cc, ccount;
 
@@ -1378,8 +1363,7 @@ readHostCtrl (char *line, struct hostCtrlLog *hostCtrlLog)
 
 }
 
-static int
-readMbdDie (char *line, struct mbdDieLog *mbdDieLog)
+int readMbdDie (char *line, struct mbdDieLog *mbdDieLog)
 {
 	int cc;
 
@@ -1392,8 +1376,7 @@ readMbdDie (char *line, struct mbdDieLog *mbdDieLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-readUnfulfill (char *line, struct unfulfillLog *unfulfillLog)
+int readUnfulfill (char *line, struct unfulfillLog *unfulfillLog)
 {
 	int cc;
 	int ccount;
@@ -1418,8 +1401,7 @@ readUnfulfill (char *line, struct unfulfillLog *unfulfillLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-readLoadIndex (char *line, struct loadIndexLog *loadIndexLog)
+int readLoadIndex (char *line, struct loadIndexLog *loadIndexLog)
 {
 		int cc, ccount, i;
 
@@ -1442,8 +1424,7 @@ readLoadIndex (char *line, struct loadIndexLog *loadIndexLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-readJobFinish (char *line, struct jobFinishLog *jobFinishLog, time_t eventTime)
+int readJobFinish (char *line, struct jobFinishLog *jobFinishLog, time_t eventTime)
 {
 	// int i = 0;
 	int cc = 0;
@@ -1807,8 +1788,7 @@ lsb_puteventrec (FILE * log_fp, struct eventRec *logPtr)
 
 }
 
-static int
-writeJobNew (FILE * log_fp, struct jobNewLog *jobNewLog)
+int writeJobNew (FILE * log_fp, struct jobNewLog *jobNewLog)
 {
 
 	assert( jobNewLog->options >= 0);
@@ -1978,8 +1958,7 @@ writeJobNew (FILE * log_fp, struct jobNewLog *jobNewLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-writeJobMod (FILE * log_fp, struct jobModLog *jobModLog)
+int writeJobMod (FILE * log_fp, struct jobModLog *jobModLog)
 {
 	int i;
 
@@ -2122,8 +2101,7 @@ writeJobMod (FILE * log_fp, struct jobModLog *jobModLog)
 
 
 
-static int
-writeJobStart (FILE * log_fp, struct jobStartLog *jobStartLog)
+int writeJobStart (FILE * log_fp, struct jobStartLog *jobStartLog)
 {
 	int i;
 
@@ -2162,8 +2140,7 @@ writeJobStart (FILE * log_fp, struct jobStartLog *jobStartLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-writeJobStartAccept (FILE * log_fp,
+int writeJobStartAccept (FILE * log_fp,
 						 struct jobStartAcceptLog *jobStartAcceptLog)
 {
 
@@ -2181,8 +2158,7 @@ writeJobStartAccept (FILE * log_fp,
 	return LSBE_NO_ERROR;
 }
 
-static int
-writeJobExecute (FILE * log_fp, struct jobExecuteLog *jobExecuteLog)
+int writeJobExecute (FILE * log_fp, struct jobExecuteLog *jobExecuteLog)
 {
 
 
@@ -2213,8 +2189,7 @@ writeJobExecute (FILE * log_fp, struct jobExecuteLog *jobExecuteLog)
 
 
 
-static int
-writeJobStatus (FILE * log_fp, struct jobStatusLog *jobStatusLog)
+int writeJobStatus (FILE * log_fp, struct jobStatusLog *jobStatusLog)
 {
 	if (fprintf (log_fp, " %d %d %d %d %4.4f %d",
 					 jobStatusLog->jobId, jobStatusLog->jStatus,
@@ -2241,8 +2216,7 @@ writeJobStatus (FILE * log_fp, struct jobStatusLog *jobStatusLog)
 }
 
 
-static int
-writeSbdJobStatus (FILE * log_fp, struct sbdJobStatusLog *jobStatusLog)
+int writeSbdJobStatus (FILE * log_fp, struct sbdJobStatusLog *jobStatusLog)
 {
 	if (fprintf (log_fp, " %d %d %d %d %d %d %d %d %d %d %d",
 					 jobStatusLog->jobId, jobStatusLog->jStatus,
@@ -2259,8 +2233,7 @@ writeSbdJobStatus (FILE * log_fp, struct sbdJobStatusLog *jobStatusLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-writeJobSwitch (FILE * log_fp, struct jobSwitchLog *jobSwitchLog)
+int writeJobSwitch (FILE * log_fp, struct jobSwitchLog *jobSwitchLog)
 {
 	if (fprintf (log_fp, " %d %d", jobSwitchLog->userId,
 					 jobSwitchLog->jobId) < 0)
@@ -2280,8 +2253,7 @@ writeJobSwitch (FILE * log_fp, struct jobSwitchLog *jobSwitchLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-writeMig (FILE * log_fp, struct migLog *migLog)
+int writeMig (FILE * log_fp, struct migLog *migLog)
 {
 	int i;
 
@@ -2308,8 +2280,7 @@ writeMig (FILE * log_fp, struct migLog *migLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-writeJobSigAct (FILE * log_fp, struct sigactLog *sigactLog)
+int writeJobSigAct (FILE * log_fp, struct sigactLog *sigactLog)
 {
 	if (fprintf (log_fp, " %d %d %d %d %d %d %d",
 					 sigactLog->jobId,
@@ -2329,8 +2300,7 @@ writeJobSigAct (FILE * log_fp, struct sigactLog *sigactLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-writeJobRqueue (FILE * log_fp, struct jobRequeueLog *jobRequeueLog)
+int writeJobRqueue (FILE * log_fp, struct jobRequeueLog *jobRequeueLog)
 {
 	if (fprintf (log_fp, " %d %d\n", jobRequeueLog->jobId, jobRequeueLog->idx) <
 			0)
@@ -2339,8 +2309,7 @@ writeJobRqueue (FILE * log_fp, struct jobRequeueLog *jobRequeueLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-writeJobClean (FILE * log_fp, struct jobCleanLog *jobCleanLog)
+int writeJobClean (FILE * log_fp, struct jobCleanLog *jobCleanLog)
 {
 	if (fprintf (log_fp, " %d %d\n", jobCleanLog->jobId, jobCleanLog->idx) < 0)
 		return LSBE_SYS_CALL;
@@ -2348,8 +2317,7 @@ writeJobClean (FILE * log_fp, struct jobCleanLog *jobCleanLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-writeChkpnt (FILE * log_fp, struct chkpntLog *chkpntLog)
+int writeChkpnt (FILE * log_fp, struct chkpntLog *chkpntLog)
 {
 	if (fprintf (log_fp, " %d %d %d %d %d %d\n",
 					 chkpntLog->jobId,
@@ -2360,8 +2328,7 @@ writeChkpnt (FILE * log_fp, struct chkpntLog *chkpntLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-writeJobMove (FILE * log_fp, struct jobMoveLog *jobMoveLog)
+int writeJobMove (FILE * log_fp, struct jobMoveLog *jobMoveLog)
 {
 	if (fprintf (log_fp, " %d %d %d %d %d",
 					 jobMoveLog->userId, jobMoveLog->jobId,
@@ -2377,8 +2344,7 @@ writeJobMove (FILE * log_fp, struct jobMoveLog *jobMoveLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-writeQueueCtrl (FILE * log_fp, struct queueCtrlLog *queueCtrlLog)
+int writeQueueCtrl (FILE * log_fp, struct queueCtrlLog *queueCtrlLog)
 {
 	if (fprintf (log_fp, " %d", queueCtrlLog->opCode) < 0)
 		return LSBE_SYS_CALL;
@@ -2396,8 +2362,7 @@ writeQueueCtrl (FILE * log_fp, struct queueCtrlLog *queueCtrlLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-writeHostCtrl (FILE * log_fp, struct hostCtrlLog *hostCtrlLog)
+int writeHostCtrl (FILE * log_fp, struct hostCtrlLog *hostCtrlLog)
 {
 	if (fprintf (log_fp, " %d", hostCtrlLog->opCode) < 0)
 		return LSBE_SYS_CALL;
@@ -2415,8 +2380,7 @@ writeHostCtrl (FILE * log_fp, struct hostCtrlLog *hostCtrlLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-writeMbdDie (FILE * log_fp, struct mbdDieLog *mbdDieLog)
+int writeMbdDie (FILE * log_fp, struct mbdDieLog *mbdDieLog)
 {
 	if (addQStr (log_fp, mbdDieLog->master) < 0)
 		return LSBE_SYS_CALL;
@@ -2427,8 +2391,7 @@ writeMbdDie (FILE * log_fp, struct mbdDieLog *mbdDieLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-writeUnfulfill (FILE * log_fp, struct unfulfillLog *unfulfillLog)
+int writeUnfulfill (FILE * log_fp, struct unfulfillLog *unfulfillLog)
 {
 	if (fprintf (log_fp, " %d %d %d %d %d %d %d %d\n",
 					 unfulfillLog->jobId, unfulfillLog->notSwitched,
@@ -2441,8 +2404,7 @@ writeUnfulfill (FILE * log_fp, struct unfulfillLog *unfulfillLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-writeLoadIndex (FILE * log_fp, struct loadIndexLog *loadIndexLog)
+int writeLoadIndex (FILE * log_fp, struct loadIndexLog *loadIndexLog)
 {
 	if (fprintf (log_fp, " %d", loadIndexLog->nIdx) < 0) {
 		return LSBE_SYS_CALL;
@@ -2463,8 +2425,7 @@ writeLoadIndex (FILE * log_fp, struct loadIndexLog *loadIndexLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-writeJobFinish (FILE * log_fp, struct jobFinishLog *jobFinishLog)
+int writeJobFinish (FILE * log_fp, struct jobFinishLog *jobFinishLog)
 {
 
 	if (fprintf (log_fp, " %d %d %d %lu %lu %lu %lu %lu",
@@ -2598,8 +2559,7 @@ writeJobFinish (FILE * log_fp, struct jobFinishLog *jobFinishLog)
 
 }
 
-static int
-writeMbdStart (FILE *log_fp, struct mbdStartLog *mbdStartLog)
+int writeMbdStart (FILE *log_fp, struct mbdStartLog *mbdStartLog)
 {
 	if ((addQStr (log_fp, mbdStartLog->master) < 0) || (addQStr (log_fp, mbdStartLog->cluster) < 0)) {
 		return LSBE_SYS_CALL;
@@ -2611,8 +2571,7 @@ writeMbdStart (FILE *log_fp, struct mbdStartLog *mbdStartLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-readMbdStart (char *line, struct mbdStartLog *mbdStartLog)
+int readMbdStart (char *line, struct mbdStartLog *mbdStartLog)
 {
 	int cc = 0;
 
@@ -2627,8 +2586,7 @@ readMbdStart (char *line, struct mbdStartLog *mbdStartLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-readLogSwitch (char *line, struct logSwitchLog *logSwitchLog)
+int readLogSwitch (char *line, struct logSwitchLog *logSwitchLog)
 {
 	int cc = 0;
 	int ccount = 0;
@@ -2641,8 +2599,7 @@ readLogSwitch (char *line, struct logSwitchLog *logSwitchLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-writeJobSignal (FILE * log_fp, struct signalLog *signalLog)
+int writeJobSignal (FILE * log_fp, struct signalLog *signalLog)
 {
 
 	if (fprintf (log_fp, " %d %d %d", signalLog->jobId, signalLog->userId, signalLog->runCount) < 0) {
@@ -2667,8 +2624,7 @@ writeJobSignal (FILE * log_fp, struct signalLog *signalLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-writeJobMsg (FILE * log_fp, struct jobMsgLog *jobMsgLog)
+int writeJobMsg (FILE * log_fp, struct jobMsgLog *jobMsgLog)
 {
 	if (fprintf (log_fp, " %d %d %d %d", jobMsgLog->usrId, jobMsgLog->jobId, jobMsgLog->msgId, jobMsgLog->type) < 0) {
 		return LSBE_SYS_CALL;
@@ -2696,8 +2652,7 @@ writeJobMsg (FILE * log_fp, struct jobMsgLog *jobMsgLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-writeJobMsgAck (FILE * log_fp, struct jobMsgLog *jobMsgLog)
+int writeJobMsgAck (FILE * log_fp, struct jobMsgLog *jobMsgLog)
 {
 	if (fprintf (log_fp, " %d %d %d %d", jobMsgLog->usrId, jobMsgLog->jobId, jobMsgLog->msgId, jobMsgLog->type) < 0) {
 		return LSBE_SYS_CALL;
@@ -2725,8 +2680,7 @@ writeJobMsgAck (FILE * log_fp, struct jobMsgLog *jobMsgLog)
 }
 
 
-static int
-readJobSignal (char *line, struct signalLog *signalLog)
+int readJobSignal (char *line, struct signalLog *signalLog)
 {
 	int cc = 0;
 	int ccount = 0;
@@ -2765,8 +2719,7 @@ readJobSignal (char *line, struct signalLog *signalLog)
 
 }
 
-static int
-readJobMsg (char *line, struct jobMsgLog *jobMsgLog)
+int readJobMsg (char *line, struct jobMsgLog *jobMsgLog)
 {
 	int cc = 0;
 	int ccount = 0;
@@ -2821,8 +2774,7 @@ readJobMsg (char *line, struct jobMsgLog *jobMsgLog)
 
 }
 
-static int
-readJobMsgAck (char *line, struct jobMsgAckLog *jobMsgAckLog)
+int readJobMsgAck (char *line, struct jobMsgAckLog *jobMsgAckLog)
 {
 	int cc = 0;
 	int ccount = 0;
@@ -2871,8 +2823,7 @@ readJobMsgAck (char *line, struct jobMsgAckLog *jobMsgAckLog)
 }
 
 
-static int
-writeJobForce (FILE * log_fp, struct jobForceRequestLog *jobForceRequestLog)
+int writeJobForce (FILE * log_fp, struct jobForceRequestLog *jobForceRequestLog)
 {
 	int i;
 
@@ -2901,8 +2852,7 @@ writeJobForce (FILE * log_fp, struct jobForceRequestLog *jobForceRequestLog)
 }
 
 
-static int
-writeLogSwitch (FILE * log_fp, struct logSwitchLog *logSwitchLog)
+int writeLogSwitch (FILE * log_fp, struct logSwitchLog *logSwitchLog)
 {
 	if (fprintf (log_fp, " %d ", logSwitchLog->lastJobId) < 0)
 		return LSBE_SYS_CALL;
@@ -2911,8 +2861,7 @@ writeLogSwitch (FILE * log_fp, struct logSwitchLog *logSwitchLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-readJobForce (char *line, struct jobForceRequestLog *jobForceRequestLog)
+int readJobForce (char *line, struct jobForceRequestLog *jobForceRequestLog)
 {
 	int i = 0;
 	int cc = 0;
@@ -2966,8 +2915,7 @@ readJobForce (char *line, struct jobForceRequestLog *jobForceRequestLog)
 	return LSBE_NO_ERROR;
 }
 
-static int
-writeJobAttrSet (FILE * log_fp, struct jobAttrSetLog *jobAttrSetLog)
+int writeJobAttrSet (FILE * log_fp, struct jobAttrSetLog *jobAttrSetLog)
 {
 	if (fprintf (log_fp, " %d %d %d %d ",
 					 jobAttrSetLog->jobId,
@@ -2983,8 +2931,7 @@ writeJobAttrSet (FILE * log_fp, struct jobAttrSetLog *jobAttrSetLog)
 
 }
 
-static int
-readJobAttrSet (char *line, struct jobAttrSetLog *jobAttrSetLog)
+int readJobAttrSet (char *line, struct jobAttrSetLog *jobAttrSetLog)
 {
 	int ccount;
 

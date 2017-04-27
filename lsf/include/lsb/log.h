@@ -50,63 +50,63 @@
 
 
 
-static int readMbdStart (char *, struct mbdStartLog *);
-static int readMbdDie (char *, struct mbdDieLog *);
-static int readChkpnt (char *, struct chkpntLog *);
-static int readJobSigAct (char *, struct sigactLog *);
-static int readMig (char *, struct migLog *);
-static int readUnfulfill (char *, struct unfulfillLog *);
-static int readLoadIndex (char *, struct loadIndexLog *);
+int readMbdStart (char *, struct mbdStartLog *);
+int readMbdDie (char *, struct mbdDieLog *);
+int readChkpnt (char *, struct chkpntLog *);
+int readJobSigAct (char *, struct sigactLog *);
+int readMig (char *, struct migLog *);
+int readUnfulfill (char *, struct unfulfillLog *);
+int readLoadIndex (char *, struct loadIndexLog *);
 
-static int readJobRequeue (char *, struct jobRequeueLog *);
+int readJobRequeue (char *, struct jobRequeueLog *);
 
-static int readJobSignal (char *, struct signalLog *);
-static int readJobMsg (char *, struct jobMsgLog *);
-static int readJobMsgAck (char *, struct jobMsgAckLog *);
-static int readJobClean (char *, struct jobCleanLog *);
-static int readLogSwitch (char *, struct logSwitchLog *);
+int readJobSignal (char *, struct signalLog *);
+int readJobMsg (char *, struct jobMsgLog *);
+int readJobMsgAck (char *, struct jobMsgAckLog *);
+int readJobClean (char *, struct jobCleanLog *);
+int readLogSwitch (char *, struct logSwitchLog *);
 
-static int writeJobNew (FILE *, struct jobNewLog *);
-static int writeJobMod (FILE *, struct jobModLog *);
-static int writeJobStart (FILE *, struct jobStartLog *);
-static int writeJobStartAccept (FILE *, struct jobStartAcceptLog *);
-static int writeJobExecute (FILE *, struct jobExecuteLog *);
-static int writeJobStatus (FILE *, struct jobStatusLog *);
-static int writeSbdJobStatus (FILE *, struct sbdJobStatusLog *);
-static int writeJobSwitch (FILE *, struct jobSwitchLog *);
-static int writeJobMove (FILE *, struct jobMoveLog *);
+int writeJobNew (FILE *, struct jobNewLog *);
+int writeJobMod (FILE *, struct jobModLog *);
+int writeJobStart (FILE *, struct jobStartLog *);
+int writeJobStartAccept (FILE *, struct jobStartAcceptLog *);
+int writeJobExecute (FILE *, struct jobExecuteLog *);
+int writeJobStatus (FILE *, struct jobStatusLog *);
+int writeSbdJobStatus (FILE *, struct sbdJobStatusLog *);
+int writeJobSwitch (FILE *, struct jobSwitchLog *);
+int writeJobMove (FILE *, struct jobMoveLog *);
 
-static int writeQueueCtrl (FILE *, struct queueCtrlLog *);
-static int writeHostCtrl (FILE *, struct hostCtrlLog *);
-static int writeMbdStart (FILE *, struct mbdStartLog *);
-static int writeMbdDie (FILE *, struct mbdDieLog *);
-static int writeUnfulfill (FILE *, struct unfulfillLog *);
-static int writeMig (FILE *, struct migLog *);
-static int writeChkpnt (FILE *, struct chkpntLog *);
-static int writeJobSigAct (FILE *, struct sigactLog *);
-static int writeJobFinish (FILE *, struct jobFinishLog *);
-static int writeLoadIndex (FILE *, struct loadIndexLog *);
+int writeQueueCtrl (FILE *, struct queueCtrlLog *);
+int writeHostCtrl (FILE *, struct hostCtrlLog *);
+int writeMbdStart (FILE *, struct mbdStartLog *);
+int writeMbdDie (FILE *, struct mbdDieLog *);
+int writeUnfulfill (FILE *, struct unfulfillLog *);
+int writeMig (FILE *, struct migLog *);
+int writeChkpnt (FILE *, struct chkpntLog *);
+int writeJobSigAct (FILE *, struct sigactLog *);
+int writeJobFinish (FILE *, struct jobFinishLog *);
+int writeLoadIndex (FILE *, struct loadIndexLog *);
 
-static int writeJobSignal (FILE * log_fp, struct signalLog *);
-static int writeJobMsg (FILE * log_fp, struct jobMsgLog *);
-static int writeJobMsgAck (FILE * log_fp, struct jobMsgLog *);
-static int writeJobRqueue (FILE * log_fp, struct jobRequeueLog *);
-static int writeJobClean (FILE * log_fp, struct jobCleanLog *);
+int writeJobSignal (FILE * log_fp, struct signalLog *);
+int writeJobMsg (FILE * log_fp, struct jobMsgLog *);
+int writeJobMsgAck (FILE * log_fp, struct jobMsgLog *);
+int writeJobRqueue (FILE * log_fp, struct jobRequeueLog *);
+int writeJobClean (FILE * log_fp, struct jobCleanLog *);
 
-static int writeLogSwitch (FILE *, struct logSwitchLog *);
-static int writeJobForce (FILE *, struct jobForceRequestLog *);
-static int readJobForce (char *, struct jobForceRequestLog *);
+int writeLogSwitch (FILE *, struct logSwitchLog *);
+int writeJobForce (FILE *, struct jobForceRequestLog *);
+int readJobForce (char *, struct jobForceRequestLog *);
 
-static int writeJobAttrSet (FILE *, struct jobAttrSetLog *);
-static int readJobAttrSet (char *, struct jobAttrSetLog *);
+int writeJobAttrSet (FILE *, struct jobAttrSetLog *);
+int readJobAttrSet (char *, struct jobAttrSetLog *);
 
-static void freeLogRec (struct eventRec *);
+void freeLogRec (struct eventRec *);
 
 struct eventRec *lsbGetNextJobEvent (struct eventLogHandle *ePtr, size_t *lineNum, size_t numJobIds, LS_LONG_INT *jobIds, struct jobIdIndexS *indexS);
-static struct eventRec *lsbGetNextJobRecFromFile( FILE *logFp, size_t *lineNum, size_t numJobIds, LS_LONG_INT *jobIds );
+struct eventRec *lsbGetNextJobRecFromFile( FILE *logFp, size_t *lineNum, size_t numJobIds, LS_LONG_INT *jobIds );
 int checkJobEventAndJobId (char *line, int eventType, size_t numJobIds, LS_LONG_INT * jobIds);
-static int getEventTypeAndKind (char *, int *);
-static void readEventRecord (char *, struct eventRec *);
+int getEventTypeAndKind (char *, int *);
+void readEventRecord (char *, struct eventRec *);
 int lsb_readeventrecord (char *, struct eventRec *);
 int getJobIdIndexFromEventFile (char *, struct sortIntList *, time_t *);
 int getJobIdFromEvent (char *, int);
