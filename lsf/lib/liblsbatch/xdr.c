@@ -18,9 +18,9 @@
 
 // FIXME FIXME FIXME FIXME FIXME DO NOT DISABLE! leaving __LP64__ set creates isses with xdr!
 // FIXME FIXME FIXME FIXME FIXME investigate why
-#ifdef __APPLE__
-#undef __LP64__
-#endif
+// #ifdef __APPLE__
+// #undef __LP64__
+// #endif
 
 
 #include <sys/types.h>
@@ -173,7 +173,7 @@ xdr_submitReq (XDR *xdrs, struct submitReq *submitReq, struct LSFHeader *hdr)
     if (! ( xdr_time_t (xdrs, &submitReq->submitTime)   &&
             xdr_time_t (xdrs, &submitReq->beginTime)    &&
             xdr_time_t (xdrs, &submitReq->termTime)     &&
-            xdr_u_short(xdrs, &submitReq->umask)        &&
+            xdr_u_int  (xdrs, &submitReq->umask)        &&
             xdr_int    (xdrs, &submitReq->sigValue)     &&
             xdr_int    (xdrs, &submitReq->restartPid)   &&
             xdr_time_t (xdrs, &submitReq->chkpntPeriod) &&
@@ -466,10 +466,12 @@ xdr_lsbMsg (XDR *xdrs, struct lsbMsg *m, struct LSFHeader *hdr)
 bool_t
 xdr_submitMbdReply (XDR *xdrs, struct submitMbdReply *reply, struct LSFHeader *hdr)
 {
-  // static char queueName[MAX_LSB_NAME_LEN]; // FIXME these oughta be malloc'ed
-  //static char jobName[MAX_CMD_DESC_LEN];
-	char *queueName = NULL;
-	char *jobName = NULL; unsigned int jobArrId = 0; unsigned int jobArrElemId = 0;
+    // static char queueName[MAX_LSB_NAME_LEN]; // FIXME these oughta be malloc'ed
+    //static char jobName[MAX_CMD_DESC_LEN];
+	// char *queueName = NULL;
+	// char *jobName = NULL;
+    unsigned int jobArrId = 0;
+    unsigned int jobArrElemId = 0;
 
 	assert( hdr->length );
 
