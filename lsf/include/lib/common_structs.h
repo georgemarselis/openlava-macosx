@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "lsb/lsbatch.h"
+#include "lsf.h"
 
 struct submitMbdReply
 {

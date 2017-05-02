@@ -46,7 +46,7 @@ char *myGetOpt (int nargc, char **nargv, char *ostr);
 int getConfirm (char *msg);
 
 
-#define NL_SETN   25
+// #define NL_SETN   25
 
 #define LSADM_RECONFIG    0
 #define LSADM_CKCONFIG    1

@@ -27,8 +27,6 @@
 #include "lsb/lsb.h"
 
 
-int lsb_debugReq (struct debugReq *pdebug, char *host);
-
 int
 lsb_debugReq (struct debugReq *pdebug, char *host)
 {

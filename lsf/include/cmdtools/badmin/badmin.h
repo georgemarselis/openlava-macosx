@@ -21,8 +21,9 @@
 
 #include <ctype.h>
 
-#include "cmd.h"
-#include "intlib/intlibout.h"
+#include "cmdtools/cmd.h"
+#include "libint/intlibout.h"
+#include "lib/lib.h"
 #include "lsf.h"
 
 int bhc (int argc, char **argv, int opCode);
@@ -156,11 +157,6 @@ static char *cmdInfo[] = {
   NULL
 };
 
-#ifdef  I18N_COMPILE
-static int cmdInfo_ID[] = {
-  3101, 3102, 3103, 3104, 3105, 3106, 3107, 3108, 3109, 3110,
-  3111, 3112, 3113, 3114, 3115, 3116, 3117, 3122,
-  3118, 3119, 3120, 3120, 3121
-};
+// #ifdef  I18N_COMPILE
 
-#endif /* I18N_COMPILE */
+// #endif /* I18N_COMPILE */
