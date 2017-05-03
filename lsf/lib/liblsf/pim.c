@@ -48,7 +48,8 @@ getJInfo_ (int npgid, int *pgid, unsigned short options, gid_t cpgid)
     struct timeval  timeOut;
     char *myHost;
     time_t now;
-    int s, cc;
+    int s = 0;
+    int cc = 0;
 
     now = time (0);
 
