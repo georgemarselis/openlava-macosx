@@ -40,7 +40,7 @@ lsb_openjobinfo (LS_LONG_INT jobId, char *jobName, char *userName, char *queueNa
 
   jobInfoHead = lsb_openjobinfo_a (jobId, jobName, userName, queueName,  hostName, options);
   if ( NULL == jobInfoHead ) {
-	return (-1);
+	return -1;
   }
 
   assert (jobInfoHead->numJobs <= INT_MAX );
@@ -51,17 +51,17 @@ struct jobInfoHead *
 lsb_openjobinfo_a (LS_LONG_INT jobId, char *jobName, char *userName, char *queueName, char *hostName, int options)
 {
 	static int first = TRUE;
-	static struct jobInfoReq jobInfoReq   = { };
-	static struct jobInfoHead jobInfoHead = { };
+	static struct jobInfoReq jobInfoReq; 	// FIXME FIXME full init
+	static struct jobInfoHead jobInfoHead;	// FIXME FIXME full init
 	mbdReqType mbdReqtype = 0;
-	XDR xdrs  = { };
-	XDR xdrs2 = { };
+	XDR xdrs;								// FIXME FIXME full init
+	XDR xdrs2;								// FIXME FIXME full init
 	char *request_buf = malloc( sizeof( char ) * MSGSIZE + 1 );
 	char *reply_buf   = NULL;
 	char *clusterName = NULL;
 	int cc = 0;
 	int aa = 0;
-	struct LSFHeader hdr = { };
+	struct LSFHeader hdr; 					// FIXME FIXME full init
 	char *lsfUserName = malloc( sizeof( char ) * MAXLINELEN + 1);
 
 	if (first)
@@ -73,7 +73,7 @@ lsb_openjobinfo_a (LS_LONG_INT jobId, char *jobName, char *userName, char *queue
 		  )
 	{
 	  lsberrno = LSBE_SYS_CALL;
-	  return (NULL);
+	  return NULL;
 	}
 	  first = FALSE;
 	}
@@ -86,7 +86,7 @@ lsb_openjobinfo_a (LS_LONG_INT jobId, char *jobName, char *userName, char *queue
 	  if (strlen (queueName) >= MAX_LSB_NAME_LEN - 1)
 	{
 	  lsberrno = LSBE_BAD_QUEUE;
-	  return (NULL);
+	  return NULL;
 	}
 	  // TIMEIT (1, 
 	  strcpy (jobInfoReq.queue, queueName);
@@ -136,7 +136,7 @@ lsb_openjobinfo_a (LS_LONG_INT jobId, char *jobName, char *userName, char *queue
 													 // FIXME FIXME FIXME FIXME sanitize hostname entered
 		{
 		  lsberrno = LSBE_BAD_HOST;
-		  return (NULL);
+		  return NULL;
 		}
 		  strcpy (jobInfoReq.host, hostName);
 		}
@@ -151,7 +151,7 @@ lsb_openjobinfo_a (LS_LONG_INT jobId, char *jobName, char *userName, char *queue
 	  if (strlen (jobName) >= MAX_CMD_DESC_LEN - 1)
 	{
 	  lsberrno = LSBE_BAD_JOB;
-	  return (NULL);
+	  return NULL;
 	}
 	  strcpy (jobInfoReq.jobName, jobName);
 	}
@@ -163,7 +163,7 @@ lsb_openjobinfo_a (LS_LONG_INT jobId, char *jobName, char *userName, char *queue
 	  // ), "getLSFUser_");
 	  if (cc != 0)
 	{
-	  return (NULL);
+	  return NULL;
 	}
 	  // TIMEIT (1, 
 	  strcpy (jobInfoReq.userName, lsfUserName);
@@ -174,7 +174,7 @@ lsb_openjobinfo_a (LS_LONG_INT jobId, char *jobName, char *userName, char *queue
 	  if (strlen (userName) >= MAX_LSB_NAME_LEN - 1)
 	{
 	  lsberrno = LSBE_BAD_USER;
-	  return (NULL);
+	  return NULL;
 	}
 	  strcpy (jobInfoReq.userName, userName);
 	}
@@ -188,7 +188,7 @@ lsb_openjobinfo_a (LS_LONG_INT jobId, char *jobName, char *userName, char *queue
   if (jobId < 0)
 	{
 	  lsberrno = LSBE_BAD_ARG;
-	  return (NULL);
+	  return NULL;
 	}
   jobInfoReq.jobId = jobId;
 
@@ -202,7 +202,7 @@ lsb_openjobinfo_a (LS_LONG_INT jobId, char *jobName, char *userName, char *queue
   if (aa == FALSE)
 	{
 	  lsberrno = LSBE_XDR;
-	  return (NULL);
+	  return NULL;
 	}
 
 
@@ -213,7 +213,7 @@ lsb_openjobinfo_a (LS_LONG_INT jobId, char *jobName, char *userName, char *queue
 	if (cc == -1)
 	{
 	  xdr_destroy (&xdrs);
-	  return (NULL);
+	  return NULL;
 	}
 
   xdr_destroy (&xdrs);
@@ -233,19 +233,19 @@ lsb_openjobinfo_a (LS_LONG_INT jobId, char *jobName, char *userName, char *queue
 	  if (cc) {
 		free (reply_buf);
 	}
-	  return (NULL);
+	  return NULL;
 	}
 	  xdr_destroy (&xdrs2);
 	  if (cc) { 
 		   free (reply_buf);
 	   }
-	  return (&jobInfoHead);
+	  return &jobInfoHead;
 	}
 
   if (cc) {
 	free (reply_buf);
   }
-  return (NULL);
+  return NULL;
 
 }
 
@@ -502,7 +502,7 @@ lsb_runjob (struct runJobRequest *runJobRequest)
 
 	{
 	  lsberrno = LSBE_BAD_ARG;
-	  return (-1);
+	  return -1;
 	}
 
 
@@ -515,7 +515,7 @@ lsb_runjob (struct runJobRequest *runJobRequest)
   if (authTicketTokens_ (&auth, NULL) == -1)
 	{
 	  lsberrno = LSBE_LSBLIB;
-	  return (-1);
+	  return -1;
 	}
 
 
@@ -532,7 +532,7 @@ lsb_runjob (struct runJobRequest *runJobRequest)
 	{
 	  lsberrno = LSBE_XDR;
 	  xdr_destroy (&xdrs);
-	  return (-1);
+	  return -1;
 	}
 
 
@@ -540,7 +540,7 @@ lsb_runjob (struct runJobRequest *runJobRequest)
   if ((cc = callmbd (NULL, request_buf, XDR_GETPOS (&xdrs), &reply_buf, &lsfHeader, NULL, NULL, NULL)) == -1)
 	{
 	  xdr_destroy (&xdrs);
-	  return (-1);
+	  return -1;
 	}
 
 
@@ -556,7 +556,7 @@ lsb_runjob (struct runJobRequest *runJobRequest)
 	retVal = -1;
   }
 
-  return (retVal);
+  return retVal;
 
 }
 

@@ -23,20 +23,20 @@
 
 
 #define PRINT_ERRMSG(errMsg, fmt, msg1, msg2) \
-    if (errMsg == NULL) \
-        fprintf(stderr, fmt, msg1, msg2); \
-    else \
-	sprintf(*errMsg, fmt, msg1, msg2); \
+	if (errMsg == NULL) \
+		fprintf(stderr, fmt, msg1, msg2); \
+	else \
+  sprintf(*errMsg, fmt, msg1, msg2); \
 
 #ifndef EN0
-#define EN0	0
+#define EN0 0
 #endif
 #ifndef DE1
-#define DE1	1
+#define DE1 1
 #endif
 #define DEF_CRED_SESSION(s) { (s)[0] = 224; (s)[1] = 186; (s)[2] = 234; \
-			      (s)[3] = 112; (s)[4] = 11; (s)[5] = 37; \
-			      (s)[6] = 121; (s)[7] = 11; }
+			(s)[3] = 112; (s)[4] = 11; (s)[5] = 37; \
+			(s)[6] = 121; (s)[7] = 11; }
 
 int
 hostValue (void)
@@ -45,18 +45,18 @@ hostValue (void)
   char *sp;
 
   if (value)
-    return value;
+	return value;
 
 
   sp = ls_getmyhostname ();
   if (sp == NULL)
-    return 50;
+	return 50;
 
   while (*sp != '\0')
-    {
-      value = value + *sp;
-      sp++;
-    }
+	{
+	  value = value + *sp;
+	  sp++;
+	}
 
   return (int) value;
 
@@ -71,7 +71,7 @@ getBootTime (time_t * bootTime)
   static char fname[] = "getBootTime";
   FILE *fp;
   char *paths[] = { "/usr/bin/uptime", "/usr/ucb/uptime", "/bin/uptime",
-    "/usr/bsd/uptime", "/local/bin/uptime"
+	"/usr/bsd/uptime", "/local/bin/uptime"
   };
   char dummy[32], str1[32], str2[32], str3[32], str4[32], *c;
   int i, days, hr, minute;
@@ -81,85 +81,85 @@ getBootTime (time_t * bootTime)
 
 
   if ((oldIFS = getenv ("IFS")) != NULL)
-    {
-      len = strlen (oldIFS);
-      envIFS = (char *) malloc (len + 8);
-      if (envIFS == NULL)
 	{
-	  ls_syslog (LOG_ERR, "malloc failed at %s", fname );
-	  return (-1);
+	  len = strlen (oldIFS);
+	  envIFS = (char *) malloc (len + 8);
+	  if (envIFS == NULL)
+  {
+	ls_syslog (LOG_ERR, "malloc failed at %s", fname );
+	return (-1);
+  }
+	  sprintf (envIFS, "IFS=%s", oldIFS);
+	  putenv ("IFS=");
 	}
-      sprintf (envIFS, "IFS=%s", oldIFS);
-      putenv ("IFS=");
-    }
 
   for (i = 0; i < 5; i++)
-    {
-      if ((fp = popen (paths[i], "r")))
 	{
-	  if (fscanf (fp, "%s %s %s %s %s %s", dummy, dummy,
-		      str1, str2, str3, str4) != 6)
-	    {
-	      pclose (fp);
-	      continue;
-	    }
+	  if ((fp = popen (paths[i], "r")))
+  {
+	if (fscanf (fp, "%s %s %s %s %s %s", dummy, dummy,
+		  str1, str2, str3, str4) != 6)
+	  {
+		pclose (fp);
+		continue;
+	  }
 
-	  if (!strncmp (str2, "day", 3))
-	    {
-	      days = atoi (str1);
-	      strcpy (str1, str3);
-	      strcpy (str2, str4);
-	    }
-	  else
-	    {
-	      days = 0;
-	    }
+	if (!strncmp (str2, "day", 3))
+	  {
+		days = atoi (str1);
+		strcpy (str1, str3);
+		strcpy (str2, str4);
+	  }
+	else
+	  {
+		days = 0;
+	  }
 
-	  if ((c = strchr (str1, ':')))
-	    {
-	      *c = '\0';
-	      str1[strlen (c) - 1] = '\0';
-	      c++;
-	      minute = atoi (c);
-	      hr = atoi (str1);
-	    }
-	  else
-	    {
-	      if (!strncmp (str2, "hr", 2))
-		{
-		  hr = atoi (str1);
-		  minute = 0;
-		}
-	      else
-		{
-		  hr = 0;
-		  if (!strncmp (str2, "min", 3))
-		    minute = atoi (str1);
-		  else
-		    minute = 0;
-		}
-	    }
-
-	  *bootTime =
-	    time (0) - (days * 60 * 60 * 24 + hr * 60 * 60 + minute * 60);
-	  pclose (fp);
-
-	  if (envIFS != NULL)
-	    {
-	      putenv (envIFS);
-	      FREEUP (envIFS);
-	    }
-	  return (0);
+	if ((c = strchr (str1, ':')))
+	  {
+		*c = '\0';
+		str1[strlen (c) - 1] = '\0';
+		c++;
+		minute = atoi (c);
+		hr = atoi (str1);
+	  }
+	else
+	  {
+		if (!strncmp (str2, "hr", 2))
+	{
+	  hr = atoi (str1);
+	  minute = 0;
 	}
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "getBootTime", "popen");
-    }
+		else
+	{
+	  hr = 0;
+	  if (!strncmp (str2, "min", 3))
+		minute = atoi (str1);
+	  else
+		minute = 0;
+	}
+	  }
+
+	*bootTime =
+	  time (0) - (days * 60 * 60 * 24 + hr * 60 * 60 + minute * 60);
+	pclose (fp);
+
+	if (envIFS != NULL)
+	  {
+		putenv (envIFS);
+		FREEUP (envIFS);
+	  }
+	return (0);
+  }
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "getBootTime", "popen");
+	}
 
 
   if (envIFS != NULL)
-    {
-      putenv (envIFS);
-      FREEUP (envIFS);
-    }
+	{
+	  putenv (envIFS);
+	  FREEUP (envIFS);
+	}
 
   return (-1);
 }
@@ -172,13 +172,13 @@ encryptPassLSF (char *pass)
 {
   char *passEnc;
   if (pass)
-    {
-      passEnc = strdup (pass);
-    }
+	{
+	  passEnc = strdup (pass);
+	}
   else
-    {
-      passEnc = strdup ("");
-    }
+	{
+	  passEnc = strdup ("");
+	}
   return passEnc;
 }
 
@@ -188,13 +188,13 @@ decryptPassLSF (char *pass)
 {
   char *passEnc;
   if (pass)
-    {
-      passEnc = strdup (pass);
-    }
+	{
+	  passEnc = strdup (pass);
+	}
   else
-    {
-      passEnc = strdup ("");
-    }
+	{
+	  passEnc = strdup ("");
+	}
   return passEnc;
 }
 
@@ -204,7 +204,7 @@ char *
 encryptByKey_ (char *key, char *inputStr)
 {
   if (key != NULL)
-    strncpy ((char *) cblock, key, 8);
+	strncpy ((char *) cblock, key, 8);
   return (encryptPassLSF (inputStr));
 }
 
@@ -214,7 +214,7 @@ char *
 decryptByKey_ (char *key, char *inputStr)
 {
   if (key != NULL)
-    strncpy ((char *) cblock, key, 8);
+	strncpy ((char *) cblock, key, 8);
   return (decryptPassLSF (inputStr));
 }
 
@@ -224,25 +224,25 @@ putMaskLevel (int level, char **para)
   level = level + LOG_DEBUG;
 
   if ((level >= LOG_DEBUG) && (level <= LOG_DEBUG3))
-    {
-      FREEUP (*para);
-
-      switch (level)
 	{
-	case LOG_DEBUG:
-	  *para = putstr_ ("LOG_DEBUG");
-	  break;
-	case LOG_DEBUG1:
-	  *para = putstr_ ("LOG_DEBUG1");
-	  break;
-	case LOG_DEBUG2:
-	  *para = putstr_ ("LOG_DEBUG2");
-	  break;
-	case LOG_DEBUG3:
-	  *para = putstr_ ("LOG_DEBUG3");
-	  break;
+	  FREEUP (*para);
+
+	  switch (level)
+  {
+  case LOG_DEBUG:
+	*para = putstr_ ("LOG_DEBUG");
+	break;
+  case LOG_DEBUG1:
+	*para = putstr_ ("LOG_DEBUG1");
+	break;
+  case LOG_DEBUG2:
+	*para = putstr_ ("LOG_DEBUG2");
+	break;
+  case LOG_DEBUG3:
+	*para = putstr_ ("LOG_DEBUG3");
+	break;
+  }
 	}
-    }
 }
 
 
@@ -252,9 +252,9 @@ safe_calloc (unsigned number, unsigned size)
   void *start_address;
 
   if (!number)
-    {
-      return (NULL);
-    }
+	{
+	  return (NULL);
+	}
   start_address = (void *) calloc (number, size);
   return (start_address);
 
@@ -266,23 +266,23 @@ matchName (char *pattern, char *name)
   int i, ip;
 
   if (!pattern || !name)
-    return (FALSE);
+	return (FALSE);
 
   ip = (int) strlen (pattern);
   for (i = 0; i < ip && pattern[i] != '['; i++)
-    {
+	{
 
-      if (pattern[i] == '*')
-	return (TRUE);
+	  if (pattern[i] == '*')
+  return (TRUE);
 
-      if (name[i] == '\0' || name[i] == '[' || pattern[i] != name[i])
-	return (FALSE);
-    };
+	  if (name[i] == '\0' || name[i] == '[' || pattern[i] != name[i])
+  return (FALSE);
+	};
 
   if (name[i] == '\0' || name[i] == '[')
-    return (TRUE);
+	return (TRUE);
   else
-    return (FALSE);
+	return (FALSE);
 
 }
 
@@ -296,19 +296,19 @@ readPassword (char *buffer)
   fd = fileno (stdin);
 
   if (tcgetattr (fd, &echo_control) == -1)
-    return -1;
+	return -1;
 
   save_control = echo_control;
   echo_control.c_lflag &= ~(ECHO | ECHONL);
 
 
   if (tcsetattr (fd, TCSANOW, &echo_control) == -1)
-    return -1;
+	return -1;
 
   scanf ("%s", buffer);
 
   if (tcsetattr (fd, TCSANOW, &save_control) == -1)
-    return -1;
+	return -1;
 
   return 0;
 }
@@ -325,97 +325,97 @@ parseCommandArgs (char *comm, char *args)
 
 
   if ((argv = (char **) malloc (argmax * sizeof (char *))) == NULL)
-    goto END;
+	goto END;
 
 
   if (comm)
-    argv[argc++] = comm;
+	argv[argc++] = comm;
 
 
   if (!args)
-    goto END;
+	goto END;
 
 
   while (*j && (*j == ' ' || *j == '\t'))
-    ++j;
+	++j;
   if (!*j)
-    goto END;
+	goto END;
   *i = *j;
 
 
   quote = 0;
   argv[argc++] = i;
   do
-    {
-      switch (*j)
 	{
+	  switch (*j)
+  {
 
 
-	case ' ':
-	case '\t':
-	  if (quote)
-	    {
-	      *i++ = *j++;
-	    }
-	  else
-	    {
-	      *i++ = *j++ = '\0';
-	      while (*j && (*j == ' ' || *j == '\t'))
-		++j;
+  case ' ':
+  case '\t':
+	if (quote)
+	  {
+		*i++ = *j++;
+	  }
+	else
+	  {
+		*i++ = *j++ = '\0';
+		while (*j && (*j == ' ' || *j == '\t'))
+	++j;
 
 
-	      if (argc == argmax - 1)
-		{
-		  argmax *= 2;
-		  argv = (char **) realloc (argv, argmax * sizeof (char *));
-		  if (!argv)
-		    goto END;
-		}
-
-	      *i = *j;
-	      argv[argc++] = i;
-	    }
-	  break;
-
-
-	case '\'':
-	case '"':
-	  if (quote)
-	    {
-	      if (quote == *j)
-		{
-		  quote = 0;
-		  ++j;
-		}
-	      else
-		{
-		  *i++ = *j++;
-		}
-	    }
-	  else
-	    {
-	      quote = *j++;
-	    }
-	  break;
-
-
-	case '\\':
-	  if (quote != '\'')
-	    ++j;
-	  *i++ = *j++;
-	  break;
-
-
-	default:
-	  *i++ = *j++;
-	  break;
+		if (argc == argmax - 1)
+	{
+	  argmax *= 2;
+	  argv = (char **) realloc (argv, argmax * sizeof (char *));
+	  if (!argv)
+		goto END;
 	}
-    }
+
+		*i = *j;
+		argv[argc++] = i;
+	  }
+	break;
+
+
+  case '\'':
+  case '"':
+	if (quote)
+	  {
+		if (quote == *j)
+	{
+	  quote = 0;
+	  ++j;
+	}
+		else
+	{
+	  *i++ = *j++;
+	}
+	  }
+	else
+	  {
+		quote = *j++;
+	  }
+	break;
+
+
+  case '\\':
+	if (quote != '\'')
+	  ++j;
+	*i++ = *j++;
+	break;
+
+
+  default:
+	*i++ = *j++;
+	break;
+  }
+	}
   while (*j);
 
 END:
   if (argv)
-    argv[argc] = NULL;
+	argv[argc] = NULL;
   return argv;
 }
 
@@ -426,18 +426,18 @@ FCLOSEUP (FILE ** fp)
 
   n = 0;
   if (*fp)
-    {
-      n = fclose (*fp);
-      *fp = NULL;
-      if (n < 0)
 	{
-	  lserrno = LSE_FILE_SYS;
+	  n = fclose (*fp);
+	  *fp = NULL;
+	  if (n < 0)
+  {
+	lserrno = LSE_FILE_SYS;
+  }
 	}
-    }
   else
-    {
-      lserrno = LSE_FILE_CLOSE;
-    }
+	{
+	  lserrno = LSE_FILE_CLOSE;
+	}
 
   return n;
 }
@@ -459,96 +459,65 @@ int optopt = 0;
 int linux_opterr = 1, linux_optind = 1, linux_optopt;
 char *linux_optarg;
 
-#define	BADCH	(int)'?'
-#define	EMSG	""
+#define BADCH (int)'?'
+#define EMSG  ""
 
 int
-linux_getopt (nargc, nargv, ostr)
-     int nargc;
-     char *const *nargv;
-     const char *ostr;
+linux_getopt ( int nargc, char * const *nargv, const char *ostr)
 {
   static char *place = EMSG;
   register char *oli;
   char *p;
 
   if (!*place)
-    {
-      if (linux_optind >= nargc || *(place = nargv[linux_optind]) != '-')
 	{
-	  place = EMSG;
-	  opterr = linux_opterr;
-	  optopt = linux_optopt;
-	  optind = linux_optind;
-	  optarg = linux_optarg;
-	  return (EOF);
-	}
-      if (place[1] && *++place == '-')
-	{
-	  ++linux_optind;
-	  place = EMSG;
-	  opterr = linux_opterr;
-	  optopt = linux_optopt;
-	  optind = linux_optind;
-	  optarg = linux_optarg;
+	  if (linux_optind >= nargc || *(place = nargv[linux_optind]) != '-')
+  {
+	place = EMSG;
+	opterr = linux_opterr;
+	optopt = linux_optopt;
+	optind = linux_optind;
+	optarg = linux_optarg;
+	return (EOF);
+  }
+	  if (place[1] && *++place == '-')
+  {
+	++linux_optind;
+	place = EMSG;
+	opterr = linux_opterr;
+	optopt = linux_optopt;
+	optind = linux_optind;
+	optarg = linux_optarg;
 
-	  return (EOF);
+	return (EOF);
+  }
 	}
-    }
   if ((linux_optopt = (int) *place++) == (int) ':' ||
-      !(oli = strchr (ostr, linux_optopt)))
-    {
-
-      if (linux_optopt == (int) '-')
+	  !(oli = strchr (ostr, linux_optopt)))
 	{
-	  opterr = linux_opterr;
-	  optopt = linux_optopt;
-	  optind = linux_optind;
-	  optarg = linux_optarg;
 
-	  return (EOF);
-	}
-      if (!*place)
-	++linux_optind;
-      if (linux_opterr)
-	{
-	  if (!(p = strrchr (*nargv, '/')))
-	    p = *nargv;
-	  else
-	    ++p;
+	  if (linux_optopt == (int) '-')
+  {
+	opterr = linux_opterr;
+	optopt = linux_optopt;
+	optind = linux_optind;
+	optarg = linux_optarg;
 
-    /* catgets 653 */
-	  (void) fprintf (stderr, (_i18n_msg_get ( ls_catd, NL_SETN, 653, "%s: illegal option -- %c\n")), p, linux_optopt);
-	}
-      opterr = linux_opterr;
-      optopt = linux_optopt;
-      optind = linux_optind;
-      optarg = linux_optarg;
+	return (EOF);
+  }
+	  if (!*place)
+  ++linux_optind;
+	  if (linux_opterr)
+  {
+	if (!(p = strrchr (*nargv, '/')))
+	  p = *nargv;
+	else
+	  ++p;
 
-      return (BADCH);
-    }
-  if (*++oli != ':')
-    {
-      linux_optarg = NULL;
-      if (!*place)
-	++linux_optind;
-    }
-  else
-    {
-      if (*place)
-	linux_optarg = place;
-      else if (nargc <= ++linux_optind)
-	{
-	  place = EMSG;
-	  if (!(p = strrchr (*nargv, '/')))
-	    p = *nargv;
-	  else
-	    ++p;
-	  if (linux_opterr) {
-        /* catgets 654 */
-	    // (void) FIXME FIXME (void) was on the line below. Why?
-      fprintf (stderr, (_i18n_msg_get ( ls_catd, NL_SETN, 654, "%s: option requires an argument -- %c\n")), p, linux_optopt);
-    }
+	/* catgets 653 */
+	// fprintf (stderr, (_i18n_msg_get ( ls_catd, NL_SETN, 653, "%s: illegal option -- %c\n")), p, linux_optopt);
+	fprintf (stderr, "catgets 653: %s: %s: illegal option -- %c\n", __PRETTY_FUNCTION__, p, linux_optopt);
+  }
 	  opterr = linux_opterr;
 	  optopt = linux_optopt;
 	  optind = linux_optind;
@@ -556,11 +525,42 @@ linux_getopt (nargc, nargv, ostr)
 
 	  return (BADCH);
 	}
-      else
-	linux_optarg = nargv[linux_optind];
-      place = EMSG;
-      ++linux_optind;
-    }
+  if (*++oli != ':')
+	{
+	  linux_optarg = NULL;
+	  if (!*place)
+  ++linux_optind;
+	}
+  else
+	{
+	  if (*place)
+  linux_optarg = place;
+	  else if (nargc <= ++linux_optind)
+  {
+	place = EMSG;
+	if (!(p = strrchr (*nargv, '/')))
+	  p = *nargv;
+	else
+	  ++p;
+	if (linux_opterr) {
+		/* catgets 654 */
+		// (void) FIXME FIXME (void) was on the line below. Why?
+		// fprintf (stderr, (_i18n_msg_get ( ls_catd, NL_SETN, 654, "%s: option requires an argument -- %c\n")), p, linux_optopt);
+		fprintf (stderr, "catgets 654: %s: %s: option requires an argument -- %c\n", __PRETTY_FUNCTION__, p, linux_optopt);
+
+	}
+	opterr = linux_opterr;
+	optopt = linux_optopt;
+	optind = linux_optind;
+	optarg = linux_optarg;
+
+	return (BADCH);
+  }
+	  else
+  linux_optarg = nargv[linux_optind];
+	  place = EMSG;
+	  ++linux_optind;
+	}
   opterr = linux_opterr;
   optopt = linux_optopt;
   optind = linux_optind;
@@ -585,75 +585,75 @@ compareAddrValues (char *rangeStr, char *valueStr)
 
   value = atoi (valueStr);
   if (value < 0)
-    {
-      if (logclass & LC_TRACE)
 	{
-	  ls_syslog (LOG_DEBUG3, I18N (5710, "%s: Bad address value <%s>"),	/* catgets 5710 */
-		     fname, valueStr);
+	  if (logclass & LC_TRACE)
+  {
+	ls_syslog (LOG_DEBUG3, I18N (5710, "%s: Bad address value <%s>"), /* catgets 5710 */
+		 fname, valueStr);
+  }
+	  return (FALSE);
 	}
-      return (FALSE);
-    }
 
   lowPtr = range;
   highPtr = strchr (range, '-');
   if (highPtr != NULL)
-    {
-      *highPtr = '\0';
-      highPtr += sizeof (char);
-    }
+	{
+	  *highPtr = '\0';
+	  highPtr += sizeof (char);
+	}
   else
-    {
+	{
 
-      highPtr = range;
-    }
+	  highPtr = range;
+	}
 
   if ((highPtr == NULL) || (*highPtr == '*'))
-    {
-      highRange = INT_MAX;
-    }
-  else
-    {
-
-      highRange = atoi (highPtr);
-      if (highRange < 0)
 	{
-	  if (logclass & LC_TRACE)
-	    {
-	      ls_syslog (LOG_DEBUG3, I18N (5711, "%s: Bad high range value <%s>"),	/* catgets 5711 */
-			 fname, highPtr);
-	    }
-	  return (FALSE);
+	  highRange = INT_MAX;
 	}
-    }
+  else
+	{
+
+	  highRange = atoi (highPtr);
+	  if (highRange < 0)
+  {
+	if (logclass & LC_TRACE)
+	  {
+		ls_syslog (LOG_DEBUG3, I18N (5711, "%s: Bad high range value <%s>"),  /* catgets 5711 */
+	   fname, highPtr);
+	  }
+	return (FALSE);
+  }
+	}
 
   if ((lowPtr == NULL) || (*lowPtr == '*'))
-    {
-      lowRange = 0;
-    }
-  else
-    {
-
-      lowRange = atoi (lowPtr);
-      if (lowRange < 0)
 	{
-	  if (logclass & LC_TRACE)
-	    {
-	      ls_syslog (LOG_DEBUG3, I18N (5712, "%s: Bad low range value <%S>"),	/* catgets 5712 */
-			 fname, lowPtr);
-	    }
-	  return (FALSE);
+	  lowRange = 0;
 	}
-    }
+  else
+	{
+
+	  lowRange = atoi (lowPtr);
+	  if (lowRange < 0)
+  {
+	if (logclass & LC_TRACE)
+	  {
+		ls_syslog (LOG_DEBUG3, I18N (5712, "%s: Bad low range value <%S>"), /* catgets 5712 */
+	   fname, lowPtr);
+	  }
+	return (FALSE);
+  }
+	}
 
   if (logclass & LC_TRACE)
-    {
-      ls_syslog (LOG_DEBUG3, I18N (5715, "%s: Low <%d> High <%d> Value <%d>"),	/* catgets 5715 */
-		 fname, lowRange, highRange, value);
-    }
+	{
+	  ls_syslog (LOG_DEBUG3, I18N (5715, "%s: Low <%d> High <%d> Value <%d>"),  /* catgets 5715 */
+	 fname, lowRange, highRange, value);
+	}
   if ((lowRange <= value) && (highRange >= value))
-    {
-      return (TRUE);
-    }
+	{
+	  return (TRUE);
+	}
   return (FALSE);
 }
 
@@ -671,14 +671,14 @@ withinAddrRange (char *addrRange, char *address)
 
 
   if (addrRange == NULL)
-    {
-      return (TRUE);
-    }
+	{
+	  return (TRUE);
+	}
 
   if ((addrRange[0] == '\0') || (address == NULL) || (address[0] == '\0'))
-    {
-      return (FALSE);
-    }
+	{
+	  return (FALSE);
+	}
 
   mystrncpy (tempAddrRange, addrRange, sizeof (char) * MAXADDRSTRING);
   mystrncpy (tempAddress, address, sizeof (char) * MAXADDRSTRING);
@@ -686,30 +686,30 @@ withinAddrRange (char *addrRange, char *address)
 
   nextAddr = strchr (tempAddrRange, ' ');
   if (nextAddr != NULL)
-    {
-
-      *nextAddr = '\0';
-      nextAddr += sizeof (char);
-
-      while (*nextAddr == ' ')
 	{
+
+	  *nextAddr = '\0';
 	  nextAddr += sizeof (char);
-	}
-      if (*nextAddr != '\0')
-	{
 
-	  if (withinAddrRange (nextAddr, tempAddress) == TRUE)
-	    {
-	      return (TRUE);
-	    }
+	  while (*nextAddr == ' ')
+  {
+	nextAddr += sizeof (char);
+  }
+	  if (*nextAddr != '\0')
+  {
+
+	if (withinAddrRange (nextAddr, tempAddress) == TRUE)
+	  {
+		return (TRUE);
+	  }
+  }
 	}
-    }
 
   if (logclass & LC_TRACE)
-    {
-      ls_syslog (LOG_DEBUG, I18N (5716, "%s: comparing range <%s> with value <%s>"),	/* catgets 5716 */
-		 fname, tempAddrRange, tempAddress);
-    }
+	{
+	  ls_syslog (LOG_DEBUG, I18N (5716, "%s: comparing range <%s> with value <%s>"),  /* catgets 5716 */
+	 fname, tempAddrRange, tempAddress);
+	}
 
 
   ptr1 = tempAddrRange;
@@ -719,31 +719,31 @@ withinAddrRange (char *addrRange, char *address)
 
 
   while (mark1 != NULL && mark2 != NULL)
-    {
-      ptr1 = strchr (mark1, '.');
-      ptr2 = strchr (mark2, '.');
-
-
-      if (ptr1 != NULL)
 	{
-	  *ptr1 = '\0';
-	  ptr1 += sizeof (char);
-	}
-      if (ptr2 != NULL)
-	{
-	  *ptr2 = '\0';
-	  ptr2 += sizeof (char);
-	}
+	  ptr1 = strchr (mark1, '.');
+	  ptr2 = strchr (mark2, '.');
 
 
-      if (compareAddrValues (mark1, mark2) == FALSE)
-	{
-	  return (FALSE);
-	}
+	  if (ptr1 != NULL)
+  {
+	*ptr1 = '\0';
+	ptr1 += sizeof (char);
+  }
+	  if (ptr2 != NULL)
+  {
+	*ptr2 = '\0';
+	ptr2 += sizeof (char);
+  }
 
-      mark1 = ptr1;
-      mark2 = ptr2;
-    }
+
+	  if (compareAddrValues (mark1, mark2) == FALSE)
+  {
+	return (FALSE);
+  }
+
+	  mark1 = ptr1;
+	  mark2 = ptr2;
+	}
 
   return (TRUE);
 }
@@ -765,75 +765,75 @@ validateAddrValue (char *rangeStr)
   lowPtr = range;
   highPtr = strchr (range, '-');
   if (highPtr != NULL)
-    {
-      *highPtr = '\0';
-      highPtr += sizeof (char);
-    }
+	{
+	  *highPtr = '\0';
+	  highPtr += sizeof (char);
+	}
 
   if (highPtr != NULL)
-    {
-      if (*highPtr == '*')
 	{
-	  if (highPtr[1] != '\0')
-	    {
-	      return (FALSE);
-	    }
-	}
-      else
+	  if (*highPtr == '*')
+  {
+	if (highPtr[1] != '\0')
+	  {
+		return (FALSE);
+	  }
+  }
+	  else
+  {
+
+	digitCheck = highPtr;
+	while (*digitCheck != '\0')
+	  {
+		if (isdigit ((int) *digitCheck) == FALSE)
 	{
-
-	  digitCheck = highPtr;
-	  while (*digitCheck != '\0')
-	    {
-	      if (isdigit ((int) *digitCheck) == FALSE)
-		{
-		  return (FALSE);
-		}
-	      digitCheck += sizeof (char);
-	    }
-
-	  highRange = atoi (highPtr);
-	  if ((highRange < 0) || (highRange > 255))
-	    {
-	      return (FALSE);
-	    }
+	  return (FALSE);
 	}
-    }
+		digitCheck += sizeof (char);
+	  }
+
+	highRange = atoi (highPtr);
+	if ((highRange < 0) || (highRange > 255))
+	  {
+		return (FALSE);
+	  }
+  }
+	}
 
   if (lowPtr != NULL)
-    {
-      if (*lowPtr == '*')
 	{
-	  if (lowPtr[1] != '\0')
-	    {
-	      return (FALSE);
-	    }
-	}
-      else
+	  if (*lowPtr == '*')
+  {
+	if (lowPtr[1] != '\0')
+	  {
+		return (FALSE);
+	  }
+  }
+	  else
+  {
+
+	digitCheck = lowPtr;
+	while (*digitCheck != '\0')
+	  {
+		if (isdigit ((int) *digitCheck) == FALSE)
 	{
-
-	  digitCheck = lowPtr;
-	  while (*digitCheck != '\0')
-	    {
-	      if (isdigit ((int) *digitCheck) == FALSE)
-		{
-		  return (FALSE);
-		}
-	      digitCheck += sizeof (char);
-	    }
-
-	  lowRange = atoi (lowPtr);
-	  if ((lowRange < 0) || (lowRange > 255))
-	    {
-	      return (FALSE);
-	    }
+	  return (FALSE);
 	}
-    }
+		digitCheck += sizeof (char);
+	  }
+
+	lowRange = atoi (lowPtr);
+	if ((lowRange < 0) || (lowRange > 255))
+	  {
+		return (FALSE);
+	  }
+  }
+	}
 
   if (lowRange > highRange)
-    {
-      return (FALSE);
-    }
+	{
+	  return (FALSE);
+	}
   return (TRUE);
 }
 
@@ -851,9 +851,9 @@ validateAddrRange (char *addrRange)
 
 
   if (addrRange == NULL)
-    {
-      return (TRUE);
-    }
+	{
+	  return (TRUE);
+	}
 
 
   mystrncpy (tempAddrRange, addrRange, sizeof (char) * MAXADDRSTRING);
@@ -861,24 +861,24 @@ validateAddrRange (char *addrRange)
 
   nextAddr = strchr (tempAddrRange, ' ');
   if (nextAddr != NULL)
-    {
-
-      *nextAddr = '\0';
-      nextAddr += sizeof (char);
-
-      while (*nextAddr == ' ')
 	{
+
+	  *nextAddr = '\0';
 	  nextAddr += sizeof (char);
-	}
-      if (*nextAddr != '\0')
-	{
 
-	  if (validateAddrRange (nextAddr) == FALSE)
-	    {
-	      return (FALSE);
-	    }
+	  while (*nextAddr == ' ')
+  {
+	nextAddr += sizeof (char);
+  }
+	  if (*nextAddr != '\0')
+  {
+
+	if (validateAddrRange (nextAddr) == FALSE)
+	  {
+		return (FALSE);
+	  }
+  }
 	}
-    }
 
 
   ptr1 = tempAddrRange;
@@ -889,41 +889,41 @@ validateAddrRange (char *addrRange)
 
 
   while (match && mark1 != NULL && *mark1 != '\0')
-    {
-      ptr1 = strchr (mark1, '.');
-
-
-      if (ptr1 != NULL)
 	{
-	  *ptr1 = '\0';
-	  ptr1 += sizeof (char);
-	}
-
-      if (fieldCount >= 4)
-	{
-	  ls_syslog (LOG_ERR, I18N (5717, "%s: too many fields in address range <%s>"),	/* catgets 5717 */
-		     fname, debugAddrRange);
-	  return (FALSE);
-	}
+	  ptr1 = strchr (mark1, '.');
 
 
-      if (validateAddrValue (mark1) == FALSE)
-	{
-	  ls_syslog (LOG_ERR, I18N (9999, "%s: invalid address range <%s>\n"),	/* catgets 5718 */
-		     fname, debugAddrRange);
-	  return (FALSE);
-	}
-      fieldCount++;
+	  if (ptr1 != NULL)
+  {
+	*ptr1 = '\0';
+	ptr1 += sizeof (char);
+  }
 
-
-      mark1 = ptr1;
-    }
-  if ((fieldCount < 1) || (fieldCount > 4))
-    {
-      ls_syslog (LOG_ERR, I18N (5718, "%s: invalid address range <%s>\n"),	/* catgets 5718 */
+	  if (fieldCount >= 4)
+  {
+	ls_syslog (LOG_ERR, I18N (5717, "%s: too many fields in address range <%s>"), /* catgets 5717 */
 		 fname, debugAddrRange);
-      return (FALSE);
-    }
+	return (FALSE);
+  }
+
+
+	  if (validateAddrValue (mark1) == FALSE)
+  {
+	ls_syslog (LOG_ERR, I18N (9999, "%s: invalid address range <%s>\n"),  /* catgets 5718 */
+		 fname, debugAddrRange);
+	return (FALSE);
+  }
+	  fieldCount++;
+
+
+	  mark1 = ptr1;
+	}
+  if ((fieldCount < 1) || (fieldCount > 4))
+	{
+	  ls_syslog (LOG_ERR, I18N (5718, "%s: invalid address range <%s>\n"),  /* catgets 5718 */
+	 fname, debugAddrRange);
+	  return (FALSE);
+	}
   return (TRUE);
 }
 
@@ -932,15 +932,15 @@ mystrncpy (char *s1, const char *s2, size_t n)
 {
   strncpy (s1, s2, n);
   if (n > 0)
-    {
-      s1[n - 1] = '\0';
-    }
+	{
+	  s1[n - 1] = '\0';
+	}
   return s1;
 }
 
 void
 openChildLog (const char *defLogFileName,
-	      const char *confLogDir, int use_stderr, char **confLogMaskPtr)
+		const char *confLogDir, int use_stderr, char **confLogMaskPtr)
 {
 #define _RES_CHILD_LOGFILENAME "res"
   static char resChildLogMask[] = "LOG_DEBUG";
@@ -956,50 +956,50 @@ openChildLog (const char *defLogFileName,
 
   dbgEnv = getenv ("DYN_DBG_LOGCLASS");
   if (dbgEnv != NULL && dbgEnv[0] != '\0')
-    {
-      logclass = atoi (dbgEnv);
-    }
+	{
+	  logclass = atoi (dbgEnv);
+	}
 
   dbgEnv = getenv ("DYN_DBG_LOGLEVEL");
   if (dbgEnv != NULL && dbgEnv[0] != '\0')
-    {
-      putMaskLevel (atoi (dbgEnv), confLogMaskPtr);
-    }
+	{
+	  putMaskLevel (atoi (dbgEnv), confLogMaskPtr);
+	}
 
   dbgEnv = getenv ("DYN_DBG_LOGFILENAME");
   if (dbgEnv != NULL && dbgEnv[0] != '\0')
-    {
-      strcpy (logFileName, dbgEnv);
-
-      if (!isResChild)
 	{
-	  strcat (logFileName, "c");
+	  strcpy (logFileName, dbgEnv);
+
+	  if (!isResChild)
+  {
+	strcat (logFileName, "c");
+  }
 	}
-    }
   else
-    {
-      strcpy (logFileName, defLogFileName);
-    }
+	{
+	  strcpy (logFileName, defLogFileName);
+	}
 
   dbgEnv = getenv ("DYN_DBG_LOGDIR");
   if (dbgEnv != NULL && dbgEnv[0] != '\0')
-    {
-      logDir = dbgEnv;
-    }
+	{
+	  logDir = dbgEnv;
+	}
   else
-    {
-      logDir = (char *) confLogDir;
-    }
+	{
+	  logDir = (char *) confLogDir;
+	}
 
   if (use_stderr && isResChild)
-    {
+	{
 
-      logMask = resChildLogMask;
-    }
+	  logMask = resChildLogMask;
+	}
   else
-    {
-      logMask = *confLogMaskPtr;
-    }
+	{
+	  logMask = *confLogMaskPtr;
+	}
 
   ls_openlog (logFileName, logDir, use_stderr, logMask);
 
@@ -1010,21 +1010,21 @@ void
 cleanDynDbgEnv (void)
 {
   if (getenv ("DYN_DBG_LOGCLASS"))
-    {
-      putEnv ("DYN_DBG_LOGCLASS", "");
-    }
+	{
+	  putEnv ("DYN_DBG_LOGCLASS", "");
+	}
   if (getenv ("DYN_DBG_LOGLEVEL"))
-    {
-      putEnv ("DYN_DBG_LOGLEVEL", "");
-    }
+	{
+	  putEnv ("DYN_DBG_LOGLEVEL", "");
+	}
   if (getenv ("DYN_DBG_LOGDIR"))
-    {
-      putEnv ("DYN_DBG_LOGDIR", "");
-    }
+	{
+	  putEnv ("DYN_DBG_LOGDIR", "");
+	}
   if (getenv ("DYN_DBG_LOGFILENAME"))
-    {
-      putEnv ("DYN_DBG_LOGFILENAME", "");
-    }
+	{
+	  putEnv ("DYN_DBG_LOGFILENAME", "");
+	}
 }
 
 void

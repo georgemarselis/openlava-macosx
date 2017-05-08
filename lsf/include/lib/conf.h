@@ -103,6 +103,10 @@ static const int builtInRes_ID[] = {
   1320, 1321
 };
 
+//
+// Function prototypes
+////////////////////////////////////////////////////////
+
 char do_Cluster     (FILE *fp, size_t *lineNum, char *fname);
 char do_HostTypes   (FILE *fp, size_t *lineNum, char *fname);
 char do_HostModels  (FILE *fp, size_t *lineNum, char *fname);
@@ -172,3 +176,16 @@ int resolveBaseNegHosts (char *, char **, struct HostsArray *);
 void freeSA_ (char **list, unsigned int num);
 
 void doSkipSection(FILE *fp, size_t *lineNum, char *lsfile, char *sectionName);
+
+int putValue (struct keymap *keyList, char *key, char *value);
+int isInlist (char **adminNames, char *userName, unsigned int actAds);
+char *getNextValue (char **line);
+int keyMatch (struct keymap *keyList, char *line, int exact);
+int isSectionEnd (char *linep, char *lsfile, size_t *lineNum, char *sectionName);
+char *getBeginLine (FILE *fp, size_t *lineNum);
+int readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *lsfile, size_t *lineNum, int exact, char *section);
+void doSkipSection (FILE *fp, size_t *lineNum, char *lsfile, char *sectionName);
+int mapValues (struct keymap *keyList, char *line);
+// FIXME also found in lproto.h, should be in lib/conf.h
+// int putInLists (char *word, struct admins *admins, unsigned integer *numAds, char *forWhat);
+int isInlist (char **adminNames, char *userName, unsigned int actAds);

@@ -16,40 +16,23 @@
  *
  */
 
+#include <strings.h>
+
 #include "libint/intlibout.h"
 #include "lib/lproto.h"
 #include "lib/words.h"
 #include "lib/conf.h"
 #include "lib/misc.h"
 
-#ifndef NL_SETN
-#define NL_SETN 22
-#endif
+// #ifndef NL_SETN
+// #define NL_SETN 22
+// #endif
 
-//
-// Function prototypes
-////////////////////////////////////////////////////////
-int putValue (struct keymap *keyList, char *key, char *value);
-int isInlist (char **adminNames, char *userName, unsigned int actAds);
-char *getNextValue (char **line);
-int keyMatch (struct keymap *keyList, char *line, int exact);
-int isSectionEnd (char *linep, char *lsfile, uint *lineNum, char *sectionName);
-char *getBeginLine (FILE *fp, uint *lineNum);
-int readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *lsfile, uint *lineNum, int exact, char *section);
-void doSkipSection (FILE *fp, uint *lineNum, char *lsfile, char *sectionName);
-int mapValues (struct keymap *keyList, char *line);
-// FIXME also found in lproto.h, should be in lib/conf.h
-// int putInLists (char *word, struct admins *admins, uint *numAds, char *forWhat);
-int isInlist (char **adminNames, char *userName, unsigned int actAds);
-
-
-//
-////////////////////////////////////////////////////////
 
 char *
 getNextValue (char **line)
 {
-	return (getNextValueQ_ (line, '(', ')'));
+	return getNextValueQ_ (line, '(', ')');
 }
 
 int
@@ -108,10 +91,10 @@ keyMatch (struct keymap *keyList, char *line, int exact)
 }
 
 int
-isSectionEnd (char *linep, char *lsfile, uint *lineNum, char *sectionName)
+isSectionEnd (char *linep, char *lsfile, size_t *lineNum, char *sectionName)
 {
 	char *word = NULL;
-	char *buff = malloc( sizeof(char)*1024 + 1 );
+	char *buff = malloc( sizeof(char) * 1024 + 1 );
 
 	word = getNextWord_ (&linep);
 	if (strcasecmp (word, "end") != 0) {
@@ -121,14 +104,14 @@ isSectionEnd (char *linep, char *lsfile, uint *lineNum, char *sectionName)
 	word = getNextWord_ (&linep);
 	if (!word) {
 		/* catgets 5400 */
-		sprintf( buff, "NL_SETN, 5400, %s(%d): section %s ended without section name, ignored", lsfile, *lineNum, sectionName);
+		sprintf( buff, "NL_SETN, 5400, %s(%zu): section %s ended without section name, ignored", lsfile, *lineNum, sectionName);
 		ls_syslog (LOG_ERR, buff  );
 		return TRUE;
 	}
 
 	if (strcasecmp (word, sectionName) != 0) {
 		/* catgets 5401 */
-		sprintf( buff, "NL_SETN, 5401, %s(%d): section %s ended with wrong section name %s, ignored", lsfile, *lineNum, sectionName, word );
+		sprintf( buff, "NL_SETN, 5401, %s(%zu): section %s ended with wrong section name %s, ignored", lsfile, *lineNum, sectionName, word );
 		ls_syslog (LOG_ERR, buff );
 	}
 
@@ -136,16 +119,16 @@ isSectionEnd (char *linep, char *lsfile, uint *lineNum, char *sectionName)
 }
 
 char *
-getBeginLine (FILE *fp, uint *lineNum)
+getBeginLine (FILE *fp, size_t *lineNum)
 {
-	char *sp;
-	char *wp;
+	char *sp = NULL;
+	char *wp = NULL;
 
 	for (;;)
 	{
 		sp = getNextLineC_ (fp, lineNum, TRUE);
 		if (!sp) {
-			return (NULL);
+			return NULL;
 		}
 
 	  wp = getNextWord_ (&sp);
@@ -156,15 +139,14 @@ getBeginLine (FILE *fp, uint *lineNum)
 }
 
 int
-readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *lsfile, uint *lineNum, int exact, char *section)
+readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *lsfile, size_t *lineNum, int exact, char *section)
 {
 	char *key;
 	char *value;
 	char *sp, *sp1;
-	char buff[2048] = "";
+	char buff[2048];     // FIXME FIXME FIXME 2048 seems awfuly specific
 	char error = FALSE;
-	static char fname[] = "readHvalues";
-	uint i = 0;
+	unsigned int i = 0;
 
 	sp = linep;
 	key = getNextWord_ (&linep);
@@ -176,7 +158,7 @@ readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *lsfile, uint *
 	if (!value)
 	{
 		/* catgets 5402  */
-		sprintf( buff, "5402, %s: %s(%d): missing '=' after keyword %s, section %s ignored", fname, lsfile, *lineNum, key, section);
+		sprintf( buff, "5402, %s: %s(%zu): missing '=' after keyword %s, section %s ignored", __PRETTY_FUNCTION__, lsfile, *lineNum, key, section);
 		ls_syslog (LOG_ERR, buff );
 		doSkipSection (fp, lineNum, lsfile, section);
 		return -1;
@@ -190,7 +172,7 @@ readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *lsfile, uint *
 	if (value[0] == '\0')
 	{
 		/* catgets 5403  */
-		sprintf( buff, "5403, %s: %s(%d): nul value after keyword %s, section %s ignored", fname, lsfile, *lineNum, key, section);
+		sprintf( buff, "5403, %s: %s(%zu): nul value after keyword %s, section %s ignored", __PRETTY_FUNCTION__, lsfile, *lineNum, key, section);
 		ls_syslog (LOG_ERR, buff );
 		return -1;
 	}
@@ -207,7 +189,7 @@ readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *lsfile, uint *
 	{
 		char buff[2048] = "";
 		/* catgets 5404  */
-		sprintf( "5404, %s: %s(%d): bad keyword %s in section %s, ignoring the section", fname, lsfile, *lineNum, key, section );
+		sprintf( "5404, %s: %s(%d): bad keyword %s in section %s, ignoring the section", __PRETTY_FUNCTION__, lsfile, *lineNum, key, section );
 		ls_syslog (LOG_ERR, buff );
 		doSkipSection (fp, lineNum, lsfile, section);
 		return -1;
@@ -228,7 +210,7 @@ readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *lsfile, uint *
 				{
 					/* catgets 5405  */
 					char buffer[2048] = "";
-					sprintf( buffer, "5405: %s: %s(%d): required keyword %s is missing in section %s, ignoring the section", fname, lsfile, *lineNum, keyList[i].key, section);
+					sprintf( buffer, "5405: %s: %s(%zu): required keyword %s is missing in section %s, ignoring the section", __PRETTY_FUNCTION__, lsfile, *lineNum, keyList[i].key, section);
 					ls_syslog (LOG_ERR, buff );
 					error = TRUE;
 				}
@@ -255,7 +237,7 @@ readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *lsfile, uint *
 	}
 
 	/* catgets 5406  */
-	sprintf( buff, "5406: %s: %s(%d): Premature EOF in section %s", fname, lsfile, *lineNum, section );
+	sprintf( buff, "5406: %s: %s(%zu): Premature EOF in section %s", __PRETTY_FUNCTION__, lsfile, *lineNum, section );
 	ls_syslog (LOG_ERR, buff); 
 
 	return -1;
@@ -264,7 +246,7 @@ readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *lsfile, uint *
 int
 putValue (struct keymap *keyList, char *key, char *value)
 {
-	uint i = 0;
+	unsigned int i = 0;
 
 	while (keyList[i].key != NULL)
 	{
@@ -291,7 +273,7 @@ putValue (struct keymap *keyList, char *key, char *value)
 }
 
 void
-doSkipSection (FILE *fp, uint *lineNum, char *lsfile, char *sectionName)
+doSkipSection (FILE *fp, size_t *lineNum, char *lsfile, char *sectionName)
 {
 	char *word = NULL;
 	char *cp   = NULL;
@@ -306,13 +288,13 @@ doSkipSection (FILE *fp, uint *lineNum, char *lsfile, char *sectionName)
 			if (!word)
 			{
 				char buffer[2048] = "";
-				sprintf( buffer,  "5400: %s(%d): Section ended without section name, ignored", lsfile, *lineNum);
+				sprintf( buffer,  "5400: %s(%zu): Section ended without section name, ignored", lsfile, *lineNum);
 				ls_syslog (LOG_ERR, buffer) ;
 			}
 			else {
 				if (strcasecmp (word, sectionName) != 0) {
 					char buffer[2048] = "";
-					sprintf( buffer,  "5401: %s(%d): Section %s ended with wrong section name %s, ignored", lsfile, *lineNum, sectionName, word);
+					sprintf( buffer,  "5401: %s(%zu): Section %s ended with wrong section name %s, ignored", lsfile, *lineNum, sectionName, word);
 					ls_syslog (LOG_ERR, buffer );
 				}
 	  		}
@@ -322,7 +304,7 @@ doSkipSection (FILE *fp, uint *lineNum, char *lsfile, char *sectionName)
 	}
 
 	/* catgets 5409  */
-	sprintf( buffer, "5409: %s: %s(%d): premature EOF in section", "doSkipSection", lsfile, *lineNum);
+	sprintf( buffer, "5409: %s: %s(%zu): premature EOF in section", "doSkipSection", lsfile, *lineNum);
 	ls_syslog (LOG_ERR, buffer );
 
 	return;
@@ -335,7 +317,7 @@ mapValues (struct keymap *keyList, char *line)
 	char *value;
 	int found;
 	int numv = 0;
-	uint i = 0;
+	unsigned int i = 0;
 
 	while( keyList[ i ].key != NULL )
 	{
@@ -388,7 +370,7 @@ mapValues (struct keymap *keyList, char *line)
 	}
 
 	if( pos != numv ) {
-		uint i = 0;
+		unsigned int i = 0;
 		while (keyList[i].key != NULL)
 		{
 			if (keyList[i].val != NULL)
@@ -421,24 +403,23 @@ return 0;
 }
 
 int
-putInLists (char *word, struct admins *admins, uint *numAds, char *forWhat)
+putInLists (char *word, struct admins *admins, unsigned int *numAds, char *forWhat)
 {
 	struct passwd *pw = NULL;
-	const char fname[] = "putInLists";
 	char **tempNames;
-	int i = 0;
+	// int i = 0;
 	uid_t *tempIds = NULL;
 	gid_t *tempGids = NULL;
 
 	if( !( pw = getpwnam( word ) ) ) {
-		ls_syslog (LOG_ERR, "%s: <%s> is not a valid user name; ignored", fname, word);
-		return (0);
+		ls_syslog (LOG_ERR, "%s: <%s> is not a valid user name; ignored", __PRETTY_FUNCTION__, word);
+		return 0;
 	}
 
 	if( isInlist( admins->adminNames, pw->pw_name, admins->nAdmins ) )
 	{
 		/* catgets 5411  */
-		ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5411, "%s: Duplicate user name <%s> %s; ignored"), fname, word, forWhat);
+		ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5411, "%s: Duplicate user name <%s> %s; ignored"), __PRETTY_FUNCTION__, word, forWhat);
 		return 0;
 	}
 
@@ -460,14 +441,14 @@ putInLists (char *word, struct admins *admins, uint *numAds, char *forWhat)
 
 		if (tempIds == NULL || tempGids == NULL || tempNames == NULL)
   		{
-			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "realloc");
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "realloc");
 			FREEUP (tempIds);
 			FREEUP (tempGids);
 			FREEUP (tempNames);
 
 			FREEUP (admins->adminIds);
 			FREEUP (admins->adminGIds);
-			for (i = 0; i < admins->nAdmins; i++) {
+			for ( unsigned int i = 0; i < admins->nAdmins; i++) {
 				FREEUP (admins->adminNames[i]);
 			}
 
@@ -484,7 +465,7 @@ putInLists (char *word, struct admins *admins, uint *numAds, char *forWhat)
   		}
 	}
 
-	return (0);
+	return 0;
 }
 
 int
@@ -492,15 +473,15 @@ isInlist (char **adminNames, char *userName, unsigned int actAds)
 {
 
 	if (actAds == 0) {
-		return (FALSE);
+		return FALSE;
 	}
 
-	for( uint i = 0; i < actAds; i++)
+	for( unsigned int i = 0; i < actAds; i++)
 	{
 		if (strcmp (adminNames[i], userName) == 0) {
-			return (TRUE);
+			return TRUE;
 		}
 	}
 
-	return (FALSE);
+	return FALSE;
 }

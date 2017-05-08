@@ -271,11 +271,11 @@ readconfenv_ (struct config_param *pList1, struct config_param *pList2, char *co
 }
 
 
-static int
+int
 parseLine (char *line, char **keyPtr, char **valuePtr)
 {
     char *sp = line;
-#define L_MAXLINELEN_4ENV (8*MAXLINELEN)
+#define L_MAXLINELEN_4ENV (8*MAXLINELEN) // FIXME FIXME FIXME FIXME this seems awfuly specific
     static char key[L_MAXLINELEN_4ENV];
     static char value[L_MAXLINELEN_4ENV];
     char *word;
@@ -335,7 +335,7 @@ parseLine (char *line, char **keyPtr, char **valuePtr)
 
 }
 
-static int
+int
 matchEnv (char *name, struct config_param *paramList)
 {
     if (paramList == NULL)
@@ -348,7 +348,7 @@ matchEnv (char *name, struct config_param *paramList)
     return FALSE;
 }
 
-static int
+int
 setConfEnv (char *name, char *value, struct config_param *paramList)
 {
     if (paramList == NULL)

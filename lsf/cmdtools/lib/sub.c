@@ -45,11 +45,6 @@
 #define EMBED_RESTART      0x10
 #define EMBED_QSUB         0x20
 
-static int parseLine (char *line, int *embedArgc, char ***embedArgv, int option);
-static int parseScript (FILE * from, int *embedArgc, har ***embedArgv, int option);
-static int addLabel2RsrcReq (struct submit *subreq);
-static int CopyCommand (char **, int);
-void sub_perror (char *);
 
 static char *commandline = NULL;
 static int emptyCmd = TRUE;
@@ -394,7 +389,7 @@ fillReq (int argc, char **argv, int operate, struct submit *req)
 }
 
 
-static int
+int
 parseScript (FILE * from, int *embedArgc, char ***embedArgv, int option)
 {
   static char fname[] = "parseScript";
@@ -533,7 +528,7 @@ parseScript (FILE * from, int *embedArgc, char ***embedArgv, int option)
 
 }
 
-static int
+int
 CopyCommand (char **from, int len)
 {
   int i, size;
@@ -758,7 +753,7 @@ prtErrMsg (struct submit *req, struct submitReply *reply)
 
 
 
-static int
+int
 parseLine (char *line, int *embedArgc, char ***embedArgv, int option)
 {
 #define INCREASE 40
@@ -859,7 +854,7 @@ parseLine (char *line, int *embedArgc, char ***embedArgv, int option)
 
 }
 
-static int
+int
 addLabel2RsrcReq (struct submit *subreq)
 {
 	char *temp      = NULL;

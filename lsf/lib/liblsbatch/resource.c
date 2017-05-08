@@ -28,13 +28,12 @@
 struct lsbSharedResourceInfo *
 lsb_sharedresourceinfo (char **resources, unsigned int *numResources, char *hostName, int options)
 {
-    static char fname[] = "lsb_sharedresourceinfo";
-    static struct lsbShareResourceInfoReply lsbResourceInfoReply = { };
-    static struct LSFHeader hdr = { };
-    struct resourceInfoReq resourceInfoReq = { };
+    static struct lsbShareResourceInfoReply lsbResourceInfoReply; // FIXME FIXME full init
+    static struct LSFHeader hdr;            // FIXME FIXME full init
+    struct resourceInfoReq resourceInfoReq; // FIXME FIXME full init
     mbdReqType mbdReqtype = 0;
-    XDR xdrs              = { };
-    XDR xdrs2             = { };
+    XDR xdrs;               // FIXME FIXME full init
+    XDR xdrs2;              // FIXME FIXME full init
     char *clusterName     = NULL;
     char *request_buf     = NULL;
     char *reply_buf       = NULL;
@@ -43,7 +42,7 @@ lsb_sharedresourceinfo (char **resources, unsigned int *numResources, char *host
     assert( options );
 
     if (logclass & (LC_TRACE)) {
-        ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", fname);
+        ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", __PRETTY_FUNCTION__);
     }
 
     if (lsbResourceInfoReply.numResources > 0) {

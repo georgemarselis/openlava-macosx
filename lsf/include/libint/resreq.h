@@ -19,6 +19,9 @@
 #pragma once
  
 #include "lsf.h"
+#include "libint/intlibout.h"
+#include "lib/lproto.h"
+#include "lib/table.h"
 
 #define IS_DIGIT(s)  ( (s) >= '0' && (s) <= '9')
 #define IS_LETTER(s) ( ((s) >= 'a' && (s) <= 'z') || ((s) >= 'A' && (s) <= 'Z'))
@@ -55,7 +58,7 @@ struct resVal
     int duration;
     int pTile;
     int options;
-    int selectStrSize;
+    unsigned int selectStrSize;
     unsigned int nindex;
     unsigned int numHosts;
     unsigned int maxNumHosts;
@@ -69,3 +72,67 @@ struct resVal
 };
 
 int getValPair (char **resReq, int *val1, int *val2);
+struct sections
+{
+    char *select;
+    char *order;
+    char *rusage;
+    char *filter;
+    char *span;
+};
+
+enum syntaxType
+{ OLD, NEW, EITHER };
+
+int parseSection (char *, struct sections *);
+int parseSelect (char *, struct resVal *, struct lsInfo *, bool_t, int);
+int parseOrder (char *, struct resVal *, struct lsInfo *);
+int parseFilter (char *, struct resVal *, struct lsInfo *);
+int parseUsage (char *, struct resVal *, struct lsInfo *);
+int parseSpan (char *, struct resVal *);
+int resToClassNew (char *, struct resVal *, struct lsInfo *);
+int resToClassOld (char *, struct resVal *, struct lsInfo *);
+int setDefaults (struct resVal *, struct lsInfo *, int);
+int getVal (char **, float *);
+enum syntaxType getSyntax (char *);
+int getKeyEntry (char *);
+int getTimeVal (char **, float *);
+void freeResVal (struct resVal *);
+void initResVal (struct resVal *);
+
+extern char isanumber_ (char *);
+
+hTab resNameTbl = { NULL, 0, 0 };
+hTab keyNameTbl = { NULL, 0, 0 };
+
+#define KEY_DURATION    1
+#define KEY_HOSTS       2
+#define KEY_PTILE       3
+#define KEY_DECAY       4
+#define NUM_KEYS        5
+
+#define ALLOC_STRING( buffer, buffer_len, req_len) {     \
+        if (buffer == NULL || buffer_len < req_len) {   \
+            FREEUP(buffer);                             \
+            buffer = malloc(req_len);                   \
+            buffer_len = req_len;                       \
+        }                                               \
+    }
+
+#define REALLOC_STRING(buffer, buffer_len, req_len) {   \
+        if (buffer == NULL) {                           \
+            buffer = malloc(req_len);                   \
+            buffer_len = req_len;                       \
+        }                                               \
+        else if (buffer_len < req_len) {                \
+            char *tmp;                                  \
+            tmp = realloc(buffer, req_len);             \
+            if (tmp == NULL)                            \
+                FREEUP(buffer);                         \
+            buffer = tmp;                               \
+            buffer_len = req_len;                       \
+        }                                               \
+    }
+
+
+

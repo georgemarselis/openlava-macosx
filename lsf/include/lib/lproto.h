@@ -284,7 +284,6 @@ char *nextline_ (FILE *);
 void subNewLine_ (char *);
 
 void doSkipSection (FILE *fp, size_t *lineNum, char *fname, char *unknown);
-int isSectionEnd (char *linep, char *fname, size_t *lineNum, char *newindex);
 int keyMatch (struct keymap *keyList, char *line, int exact);
 int mapValues (struct keymap *keyList, char *line);
 int readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *fname, size_t *lineNum, int boolean, char *newindex);

@@ -146,8 +146,7 @@ enum _lsBitSetErrno_
     LS_BITSET_ERR_LAST
 };
 
-LS_BITSET_T *setCreate (const int, int (*getIndexByObject) (void *),
-			       void *(*getObjectByIndex) (int), char *);
+LS_BITSET_T *setCreate (const size_t size, int (*getIndexByObject) (void *), void *(*getObjectByIndex) (int), char *caller);
 LS_BITSET_T *simpleSetCreate (const int, char *);
 int setDestroy (LS_BITSET_T *);
 LS_BITSET_T *setDup (LS_BITSET_T *);
@@ -157,7 +156,7 @@ bool_t setIsMember (LS_BITSET_T *, void *);
 int setAddElement (LS_BITSET_T *, void *);
 int setRemoveElement (LS_BITSET_T *, void *);
 int setClear (LS_BITSET_T *);
-int setGetNumElements (LS_BITSET_T *);
+unsigned int setGetNumElements (LS_BITSET_T *);
 void *setGetElement (LS_BITSET_T *, unsigned int);
 LS_BITSET_ITERATOR_T *setIteratorCreate (LS_BITSET_T *);
 int setIteratorAttach (LS_BITSET_ITERATOR_T *, LS_BITSET_T *, char *);
@@ -167,17 +166,12 @@ void *setIteratorBegin (LS_BITSET_ITERATOR_T *);
 bool_t setIteratorIsEndOfSet (LS_BITSET_ITERATOR_T *);
 void setIteratorDestroy (LS_BITSET_ITERATOR_T *);
 bool_t setAllowObservers (LS_BITSET_T *);
-LS_BITSET_OBSERVER_T *setObserverCreate (char *name, void *extra,
-						LS_BITSET_ENTRY_SELECT_OP_T
-						select, ...);
-int setObserverAttach (LS_BITSET_OBSERVER_T * observer,
-			      LS_BITSET_T * set);
+LS_BITSET_OBSERVER_T *setObserverCreate (char *name, void *extra, LS_BITSET_ENTRY_SELECT_OP_T select, ...);
+int setObserverAttach (LS_BITSET_OBSERVER_T * observer, LS_BITSET_T * set);
 int setNotifyObservers (LS_BITSET_T * set, LS_BITSET_EVENT_T * event);
 int setDumpSet (LS_BITSET_T *, char *);
 char *setPerror (int);
 LS_BITSET_T *setEnlarge (LS_BITSET_T *, unsigned int);
 void setOperate (LS_BITSET_T *, LS_BITSET_T *, int);
-void setCat (LS_BITSET_T *, char *, int, char *(*)(void *, void *),
-		    void *);
-
-int getNum1BitsInWord (unsigned int *word);
+void setCat (LS_BITSET_T * set, char *buffer, size_t bufferSize, char *(*catFunc) (void *, void *), void *hint);
+unsigned int getNum1BitsInWord (unsigned int *word);

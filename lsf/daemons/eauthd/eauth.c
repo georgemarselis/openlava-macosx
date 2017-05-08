@@ -26,19 +26,16 @@
 #include "lsf.h"
 
 
-extern int userok (int, struct sockaddr_in *, char *, struct sockaddr_in *, struct lsfAuth *, int);
-
 #if defined(DEBUG)
 FILE *logfp;
-char logfile[100];
+char logfile[100]; // FIXME FIXME FIXME oddly specific
 #endif
 
-static int getAuth (char *);
-static int printUserName (void);
-static int vauth (char *, char *, int);
+int getAuth (char *);
+int printUserName (void);
+int vauth (char *, char *, int);
 
-int
-main (int argc, char **argv)
+int main (int argc, char **argv)
 {
 
   if (initenv_ (NULL, NULL) < 0)
@@ -137,11 +134,11 @@ main (int argc, char **argv)
   fclose (logfp);
 #endif
 
-  return (0);
+  return 0;
 }
 
 
-static int
+int
 getAuth (char *inst)
 {
 
@@ -151,11 +148,11 @@ assert( *inst );
   fprintf (logfp, "LSF_EAUTH_KEY=NULL\n");
 #endif
 
-  return (printUserName ());
+  return printUserName ();
 }
 
 
-static int
+int
 printUserName (void)
 {
   char lsfUserName[MAXLSFNAMELEN];
@@ -167,7 +164,7 @@ printUserName (void)
 #if defined(DEBUG)
       fprintf (logfp, "getLSFUser_ failed: %s!\n", ls_sysmsg ());
 #endif
-      return (-1);
+      return -1;
     }
 
   if ((encUsername = encryptByKey_ (NULL, lsfUserName)) == NULL)
@@ -175,7 +172,7 @@ printUserName (void)
 #if defined(DEBUG)
       fprintf (logfp, "encryptByKey_ (NULL, %s) failed!\n", pw->pw_name);
 
-      return (-1);
+      return -1;
 #endif
     }
   memset (dataBuff, 0, sizeof (dataBuff));
@@ -192,7 +189,7 @@ printUserName (void)
   return 0;
 }
 
-static int
+int
 vauth (char *lsfUserName, char *datBuf, int datLen)
 {
   char *authName;
@@ -217,7 +214,7 @@ vauth (char *lsfUserName, char *datBuf, int datLen)
 #if defined(DEBUG)
       fprintf (logfp, "decryptByKey_(NULL,  %s) failed!\n", datBuf);
 #endif
-      return (-1);
+      return -1;
     }
   if (strcmp (deUserName, lsfUserName) != 0)
     {
@@ -226,13 +223,13 @@ vauth (char *lsfUserName, char *datBuf, int datLen)
 	       deUserName, lsfUserName);
       fflush (logfp);
 #endif
-      return (-1);
+      return -1;
     }
 #if defined(DEBUG)
   fprintf (logfp, "decrypt username success, dataBuf is %s, username is %s\n",
 	   datBuf, lsfUserName);
   fflush (logfp);
 #endif
-  return (0);
+  return 0;
 
 }

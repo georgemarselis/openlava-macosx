@@ -39,7 +39,7 @@ initResTable_ (void)
     if (!resTable)
         {
         ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "initResTable", "malloc");
-        return (-1);
+        return -1;
         }
     i = 0;
     lsinfo.numIndx = 0;
@@ -58,7 +58,7 @@ initResTable_ (void)
         }
     lsinfo.nRes = i;
     lsinfo.resTable = resTable;
-    return (0);
+    return 0;
 }
 
 
@@ -146,7 +146,7 @@ ls_readshared (char *fname)
                 /* catgets 5056 */
                 ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5056, "%s: Cluster section missing or invalid")), fname);
                 }
-            return (sConf);
+            return sConf;
             }
 
 
@@ -801,16 +801,16 @@ int
 resNameDefined (char *name) {
 
     if (name == NULL) {
-        return (-1);
+        return -1;
     }
 
     for (unsigned int i = 0; i < lsinfo.nRes; i++) {
         if (strcmp (name, lsinfo.resTable[i].name) == 0) {
-            return (int)(i);
+            return int)(i;
         }
     }
 
-    return (-1);
+    return -1;
 }
 
 struct clusterConf *
@@ -939,7 +939,7 @@ ls_readcluster_ex (char *fname, struct lsInfo *info, int lookupAdmins)
                     return NULL;
                 }
                 else {
-                    return (cConf);
+                    return cConf;
                 }
             }
         }
@@ -948,7 +948,7 @@ ls_readcluster_ex (char *fname, struct lsInfo *info, int lookupAdmins)
             FREEUP (myinfo.resTable);
             /* catgets 5104 */
             ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5104, "%s: %s(%d): No hosts configured.")), "ls_readcluster", fname, lineNum);
-            return (cConf);
+            return cConf;
         }
 
         word = getNextWord_ (&cp);
@@ -1220,22 +1220,22 @@ getClusAdmins (char *line, char *fname, size_t *lineNum, char *secName, int look
         {
         strcpy (lastSecName, "");
         if (setAdmins (admins, A_THEN_M) < 0)
-            return (-1);
+            return -1;
         }
     else if (strcmp (lastSecName, "clustermanager") == 0 &&
              strcmp (secName, "clusteradmins") == 0)
         {
         strcpy (lastSecName, "");
         if (setAdmins (admins, M_THEN_A) < 0)
-            return (-1);
+            return -1;
         }
     else
         {
         if (setAdmins (admins, M_OR_A) < 0)
-            return (-1);
+            return -1;
         }
     strcpy (lastSecName, secName);
-    return (0);
+    return 0;
 }
 
 struct admins *
@@ -1287,11 +1287,11 @@ liblsf_getAdmins (char *line, char *fname, size_t *lineNum, char *secName, int l
             FREEUP (admins.adminNames);
             admins.nAdmins = 0;
             lserrno = LSE_MALLOC;
-            return (&admins);
+            return &admins;
             }
         }
     else {
-        return (&admins);
+        return &admins;
     }
 
     sp = line;
@@ -1301,31 +1301,31 @@ liblsf_getAdmins (char *line, char *fname, size_t *lineNum, char *secName, int l
         if (lookupAdmins) {
             if ((pw = getpwlsfuser_ (word)) != NULL) {
                 if (putInLists (word, &admins, &numAds, forWhat) < 0) {
-                    return (&admins);
+                    return &admins;
                 }
             }
             else if ((unixGrp = getgrnam (word)) != NULL) {
                 int i = 0;
                 while (unixGrp->gr_mem[i] != NULL) {
                     if( putInLists(unixGrp->gr_mem[i++], &admins, &numAds, forWhat) < 0) {
-                        return (&admins);
+                        return &admins;
                     }
                 }
             }
             else {
                 if (putInLists (word, &admins, &numAds, forWhat) < 0) {
-                    return (&admins);
+                    return &admins;
                 }
             }
         }
         else {
             if (putInLists (word, &admins, &numAds, forWhat) < 0) {
-                return (&admins);
+                return &admins;
             }
         }
     }
 
-    return (&admins);
+    return &admins;
 }
 
 int
@@ -1352,7 +1352,7 @@ setAdmins (struct admins *admins, int mOrA)
         ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "setAdmins", "malloc");
         FREEUP (tempAdminIds);
         FREEUP (tempAdminNames);
-        return (-1);
+        return -1;
     }
 
     if (mOrA == M_THEN_A) {
@@ -1379,7 +1379,7 @@ setAdmins (struct admins *admins, int mOrA)
 
             FREEUP (tempAdminIds);
             FREEUP (tempAdminNames);
-            return (-1);
+            return -1;
             }
     }
 
@@ -1416,7 +1416,7 @@ setAdmins (struct admins *admins, int mOrA)
 
             FREEUP (tempAdminIds);
             FREEUP (tempAdminNames);
-            return (-1);
+            return -1;
             }
 
         tempNAdmins++;
@@ -1434,7 +1434,7 @@ setAdmins (struct admins *admins, int mOrA)
     clinfo.adminIds = tempAdminIds;
     clinfo.admins = tempAdminNames;
 
-    return (0);
+    return 0;
 }
 
 char
@@ -2024,7 +2024,7 @@ parsewindow (char *linep, char *fname, size_t *lineNum, char *section)
         {
         FREEUP (windows);
         }
-    return (windows);
+    return windows;
 
 }
 
@@ -2040,7 +2040,7 @@ validWindow (char *wordpair, char *context)
     if (!sp)
         {
         ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5166, "Bad time expression in %s")), context);  /* catgets 5166 */
-        return (-1);
+        return -1;
         }
 
     *sp = '\0';
@@ -2053,7 +2053,7 @@ validWindow (char *wordpair, char *context)
                    (_i18n_msg_get
                     (ls_catd, NL_SETN, 5166, "Bad time expression in %s")),
                    context);
-        return (-1);
+        return -1;
         }
 
     word = wordpair;
@@ -2064,16 +2064,16 @@ validWindow (char *wordpair, char *context)
                    (_i18n_msg_get
                     (ls_catd, NL_SETN, 5166, "Bad time expression in %s")),
                    context);
-        return (-1);
+        return -1;
         }
 
     if (((oday && cday) == 0) && (oday != cday))
         {
         ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5169, "Ambiguous time in %s")), context);   /* catgets 5169 */
-        return (-1);
+        return -1;
         }
 
-    return (0);
+    return 0;
 
 }
 
@@ -2100,13 +2100,13 @@ parse_time (char *word, float *hour, int *day)
     if (!sp) {
 
         if (!isint_ (word) || atoi (word) < 0) {
-            return (-1);
+            return -1;
         }
 
         *hour = (float) atof (word);
         if (*hour > 23)
 
-            return (-1);
+            return -1;
 
     }
     else {
@@ -2114,13 +2114,13 @@ parse_time (char *word, float *hour, int *day)
         sp++;
 
         if (!isint_ (sp) || atoi (sp) < 0) {
-            return (-1);
+            return -1;
         }
 
         min = atoi (sp);
 
         if (min > 59) {
-            return (-1);
+            return -1;
         }
 
         sp = strrchr (word, ':');
@@ -2128,13 +2128,13 @@ parse_time (char *word, float *hour, int *day)
         if (!sp) {
 
             if (!isint_ (word) || atoi (word) < 0) {
-                return (-1);
+                return -1;
             }
 
             *hour = (float) atof (word);
 
             if (*hour > 23) {
-                return (-1);
+                return -1;
             }
         }
         else {
@@ -2143,17 +2143,17 @@ parse_time (char *word, float *hour, int *day)
             sp++;
 
             if (!isint_ (sp) || atoi (sp) < 0) {
-                return (-1);
+                return -1;
             }
 
             *hour = (float) atof (sp);
 
             if (*hour > 23) {
-                return (-1);
+                return -1;
             }
 
             if (!isint_ (word) || atoi (word) < 0){
-                return (-1);
+                return -1;
             }
 
             *day = atoi (word);
@@ -2162,7 +2162,7 @@ parse_time (char *word, float *hour, int *day)
             }
 
             if (*day < 1 || *day > 7) {
-                return (-1);
+                return -1;
             }
         }
     }
@@ -2339,22 +2339,22 @@ int
 validType (char *type)
 {
     if (type == NULL)  {
-        return (-1);
+        return -1;
     }
 
     if (!strcasecmp (type, "Boolean"))
-        return (LS_BOOLEAN);
+        return LS_BOOLEAN;
 
     if (!strcasecmp (type, "String"))
-        return (LS_STRING);
+        return LS_STRING;
 
     if (!strcasecmp (type, "Numeric"))
-        return (LS_NUMERIC);
+        return LS_NUMERIC;
 
     if (!strcmp (type, "!"))
-        return (LS_EXTERNAL);
+        return LS_EXTERNAL;
 
-    return (-1);
+    return -1;
 }
 
 #define RKEY_RESOURCE_NAME  0
@@ -2376,13 +2376,13 @@ doResourceMap (FILE * fp, char *lsfile, size_t *lineNum)
     linep = getNextLineC_ (fp, lineNum, TRUE);
     if (!linep) {
         ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, fname, lsfile, *lineNum, "resourceMap");
-        return (-1);
+        return -1;
     }
 
     if (isSectionEnd (linep, lsfile, lineNum, "resourceMap")) {
         /* catgets 5109 */
         ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5109, "%s: %s(%d): Empty resourceMap, no keywords or resources defined."), fname, lsfile, *lineNum);
-        return (-1);
+        return -1;
     }
 
     if (strchr (linep, '=') == NULL)
@@ -2391,14 +2391,14 @@ doResourceMap (FILE * fp, char *lsfile, size_t *lineNum)
             {
             ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5197, "%s: %s(%d): keyword line format error for section resource, ignoring section")), fname, lsfile, *lineNum);   /* catgets 5197 */
             doSkipSection (fp, lineNum, lsfile, "resourceMap");
-            return (-1);
+            return -1;
             }
 
 
         while ((linep = getNextLineC_ (fp, lineNum, TRUE)) != NULL)
             {
             if (isSectionEnd (linep, lsfile, lineNum, "resourceMap"))
-                return (0);
+                return 0;
             if (mapValues (keyList, linep) < 0)
                 {
                 ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5198, "%s: %s(%d): values do not match keys for resourceMap section, ignoring line")), fname, lsfile, *lineNum);    /* catgets 5198 */
@@ -2489,9 +2489,9 @@ doResourceMap (FILE * fp, char *lsfile, size_t *lineNum)
         {
         ls_syslog (LOG_ERR, I18N_HORI_NOT_IMPLE, fname, lsfile, *lineNum,
                    "resource");
-        return (-1);
+        return -1;
         }
-    return (0);
+    return 0;
 
 }
 
@@ -2508,7 +2508,7 @@ liblsf_addResourceMap (char *resName, char *location, char *lsfile, size_t lineN
     if (resName == NULL || location == NULL)
         {
         ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5203, "%s: %s(%d): Resource name <%s> location <%s>")), fname, lsfile, lineNum, (resName ? resName : "NULL"), (location ? location : "NULL"));  /* catgets 5203 */
-        return (-1);
+        return -1;
         }
 
     if (!strcmp (location, "!"))
@@ -2520,9 +2520,9 @@ liblsf_addResourceMap (char *resName, char *location, char *lsfile, size_t lineN
             {
             ls_syslog (LOG_ERR, I18N (5209, "%s: %s(%d): %s() failed; ignoring the instance <%s>"),   /* catgets 5209 */
                        fname, lsfile, lineNum, "addResource", "!");
-            return (-1);
+            return -1;
             }
-        return (0);
+        return 0;
         }
 
     resource = NULL;
@@ -2541,7 +2541,7 @@ liblsf_addResourceMap (char *resName, char *location, char *lsfile, size_t lineN
     if (i != 0)
         {
         ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5204, "%s: %s(%d): number of '[' is not match that of ']' in <%s> for resource <%s>; ignoring")), fname, lsfile, lineNum, location, resName);   /* catgets 5204 */
-        return (-1);
+        return -1;
         }
 
     while (sp != NULL && sp[0] != '\0')
@@ -2558,9 +2558,9 @@ liblsf_addResourceMap (char *resName, char *location, char *lsfile, size_t lineN
         if (*sp == '\0')
             {
             if (first == TRUE)
-                return (-1);
+                return -1;
             else
-                return (0);
+                return 0;
             }
         cp = sp;
         while (isalnum (*cp))
@@ -2596,7 +2596,7 @@ liblsf_addResourceMap (char *resName, char *location, char *lsfile, size_t lineN
             if (*sp == '\0')
                 {
                 ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5206, "%s: %s(%d): Bad format for instance <%s>; ignoring the instance")), fname, lsfile, lineNum, instance);   /* catgets 5206 */
-                return (-1);
+                return -1;
                 }
             if (error == TRUE)
                 {
@@ -2636,7 +2636,7 @@ liblsf_addResourceMap (char *resName, char *location, char *lsfile, size_t lineN
             while (*sp != ']' && *sp != '\0')
                 sp++;
             if (*sp == '\0')
-                return (-1);
+                return -1;
             sp++;
             }
         }
@@ -2644,7 +2644,7 @@ liblsf_addResourceMap (char *resName, char *location, char *lsfile, size_t lineN
         FREEUP (hosts[j]);
     }
     FREEUP (hosts);
-    return (0);
+    return 0;
 
 }
 
@@ -2663,7 +2663,7 @@ liblsf_parseHostList (char *hostList, char *lsfile, size_t lineNum, char ***host
                                 // are indeed passed over
 
     if ( NULL == hostList ) {
-        return (-1);
+        return -1;
     }
 
     sp = hostList;
@@ -2675,7 +2675,7 @@ liblsf_parseHostList (char *hostList, char *lsfile, size_t lineNum, char ***host
     hostTable = (char **) malloc( (unsigned long) numHosts * sizeof (char *));
     if( NULL == hostTable && ENOMEM == errno) {
         ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
-        return (-1);
+        return -1;
     }
 
     sp = hostList;
@@ -2691,18 +2691,18 @@ liblsf_parseHostList (char *hostList, char *lsfile, size_t lineNum, char ***host
 
             FREEUP (hostTable);
 
-            return (-1);
+            return -1;
         }
         numHosts++;
     }
     if ( 0 == numHosts ) {
         FREEUP (hostTable);
-        return (-1);
+        return -1;
     }
 
     *hosts = hostTable;
 
-    return (numHosts);
+    return numHosts;
 
 }
 
@@ -2745,7 +2745,7 @@ liblsf_addResource (char *resName, int nHosts, char **hosts, char *value, char *
 
     cConf->numShareRes++;
 
-    return (resInfo + nRes);
+    return resInfo + nRes;
 
 }
 
@@ -2757,7 +2757,7 @@ liblsf_addHostInstance (struct lsSharedResourceInfo *sharedResource, int nHosts,
     struct lsSharedResourceInstance *instance;
     
     if (nHosts <= 0 || hostNames == NULL) {
-        return (-1);
+        return -1;
     }
     
     assert( sharedResource->nInstances >= 0 ); // FIXME has to go.
@@ -2767,7 +2767,7 @@ liblsf_addHostInstance (struct lsSharedResourceInfo *sharedResource, int nHosts,
     if (NULL == instance )
         {
         ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "addHostInstance", "myrealloc");
-        return (-1);
+        return -1;
         }
     
     sharedResource->instances = instance;
@@ -2776,7 +2776,7 @@ liblsf_addHostInstance (struct lsSharedResourceInfo *sharedResource, int nHosts,
     if ((instance[inst].value = putstr_ (value)) == NULL)
         {
         ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "addHostInstance", "putstr_");
-        return (-1);
+        return -1;
         }
     
     assert( nHosts >= 0 );  // FIXME has to go ^_^
@@ -2785,7 +2785,7 @@ liblsf_addHostInstance (struct lsSharedResourceInfo *sharedResource, int nHosts,
     if( NULL == instance[inst].hostList && ENOMEM == errno ) {
         ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "addHostInstance", "malloc");
         free (instance[inst].value);
-        return (-1);
+        return -1;
     }
     
     for (int i = 0; i < nHosts; i++) {
@@ -2798,13 +2798,13 @@ liblsf_addHostInstance (struct lsSharedResourceInfo *sharedResource, int nHosts,
             
             free (instance[inst].hostList);
             free (instance[inst].value);
-            return (-1);
+            return -1;
         }
     }
     
     sharedResource->nInstances++;
     
-    return (0);
+    return 0;
     
 }
 

@@ -590,7 +590,7 @@ enum {
     RES2NIOS_STDOUT
 } resNiosCmd;
 
-typedef enum status genparams_t;
+// typedef enum status genparams_t;
 
 #define AM_LAST  (!(genParams_[LSF_AM_OPTIONS].paramValue && \
                                     strstr(genParams_[LSF_AM_OPTIONS].paramValue, \

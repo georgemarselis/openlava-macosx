@@ -23,45 +23,45 @@
 
 enum lsPStatType
 {
-  LS_PSTAT_RUNNING,
-  LS_PSTAT_INTERRUPTIBLE,
-  LS_PSTAT_UNINTERRUPTIBLE,
-  LS_PSTAT_ZOMBI,
-  LS_PSTAT_STOPPED,
-  LS_PSTAT_SWAPPED,
-  LS_PSTAT_SLEEP,
-  LS_PSTAT_EXITING
+	LS_PSTAT_RUNNING,
+	LS_PSTAT_INTERRUPTIBLE,
+	LS_PSTAT_UNINTERRUPTIBLE,
+	LS_PSTAT_ZOMBI,
+	LS_PSTAT_STOPPED,
+	LS_PSTAT_SWAPPED,
+	LS_PSTAT_SLEEP,
+	LS_PSTAT_EXITING
 };
 
 struct lsPidInfo
 {
-  int pid;
-  int ppid;
-  int pgid;
-  int jobid;
-  int utime;
-  int stime;
-  int cutime;
-  int cstime;
-  int proc_size;
-  int resident_size;
-  int stack_size;
-  enum lsPStatType status;
-  char command[PATH_MAX]; // PATH_MAX is declared in limits.h
+int pid;
+	int ppid;
+	int pgid;
+	int jobid;
+	int utime;
+	int stime;
+	int cutime;
+	int cstime;
+	int proc_size;
+	int resident_size;
+	int stack_size;
+	enum lsPStatType status;
+	char command[PATH_MAX]; // PATH_MAX is declared in limits.h
 };
 
 const unsigned int NL_SETN = 32;     // FIXME FIXME remove at earliest convience
 
-static int npidList                = 0;
-static struct pidInfo *pidList     = NULL;
-static struct lsPidInfo *pinfoList = NULL;
-static int npinfoList              = 0;
-static int npgidList               = 0;
-static int *pgidList               = NULL;
-static unsigned int hitPGid        = 0;
-static char *pimInfoBuf            = NULL;
-static unsigned long pimInfoLen    = 0;
-static int argOptions              = 0;
+int npidList                = 0;
+struct pidInfo *pidList     = NULL;
+struct lsPidInfo *pinfoList = NULL;
+int npinfoList              = 0;
+int npgidList               = 0;
+int *pgidList               = NULL;
+unsigned int hitPGid        = 0;
+char *pimInfoBuf            = NULL;
+unsigned long pimInfoLen    = 0;
+int argOptions              = 0;
 
 char *getNextString (char *, char *);
 char *readPIMBuf (char *);

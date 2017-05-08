@@ -746,23 +746,20 @@ checkThree (char *strng, char achar, char **cp1, char **cp2, char **cp3)
 static int
 checkChar (char *string, char **cp)
 {
-  int i;
-  *cp = NULL;
-  for (i = 0; i < strlen (string); i++)
-    {
-      if ((string[i] < '0') || (string[i] > '9'))
-	{
-	  if ((string[i] == '/') || (string[i] == ':'))
-	    *cp = &string[i];
-	  else
-	    {
-	      *cp = &string[i];
-	      return FALSE;
-	    }
+	// *cp = NULL;
+	for ( size_t i = 0; i < strlen (string); i++ ) {
+		if ((string[i] < '0') || (string[i] > '9')) {
+			if ((string[i] == '/') || (string[i] == ':')) {
+				*cp = &string[i];
+			}
+			else {
+				*cp = &string[i];
+				return FALSE;
+			}
+		}
 	}
-    }
-  return TRUE;
 
+	return TRUE;
 }
 
 static time_t

@@ -4,7 +4,7 @@
 
 # include $(top_srcdir)/common.mk
 # contencts of common.mk
-AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -I$(top_srcdir)/lsf/include -I$(top_srcdir)/config.h
+AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -I$(top_srcdir)/lsf/include -I$(top_srcdir)
 
 
 noinst_LIBRARIES = liblsfint.a

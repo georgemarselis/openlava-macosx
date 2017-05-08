@@ -1550,8 +1550,8 @@ lsMsgRcv_ (pid_t taskid, char *buffer, size_t len, int options)
 int
 lsMsgSnd2_ (int *sock, unsigned short opcode, char *buffer, size_t len, int options)
 {
-    struct LSFHeader header = { };
-    XDR xdrs = { };
+    struct LSFHeader header;
+    XDR xdrs;
     long rc = 0;
     char *headerBuf = malloc( sizeof( char )*sizeof( struct LSFHeader ) + 1 );
     char *hostname  = malloc( sizeof( char )*MAXHOSTNAMELEN + 1 );

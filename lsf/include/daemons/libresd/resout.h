@@ -159,10 +159,8 @@ struct resSignal {
 #define LS_WIFEXITED(x)    (((*(int *)&x)&0xFF)==0)
 #define LS_WEXITSTATUS(x)  (((*(int *)&x)>>8)&0xFF)
 #define LS_WSTOPSIG(x)     (((*(int *)&x)>>8)&0xFF)
-#define LS_WIFSTOPPED(x)   ((int)((*(int *)&x)&0xFF) == 0177 && \
-    				(int)((*(int *)&x)&0xFF00) != 0)
-#define LS_WIFSIGNALED(x)       ((int)((*(int *)&x)&0xFF) > 0 && \
-                                        (int)((*(int *)&x)&0xFF00) == 0)
+#define LS_WIFSTOPPED(x)   ((int)((*(int *)&x)&0xFF) == 0177 && (int)((*(int *)&x)&0xFF00) != 0)
+#define LS_WIFSIGNALED(x)       ((int)((*(int *)&x)&0xFF) > 0 && (int)((*(int *)&x)&0xFF00) == 0)
 #else
 
 #define SETTERMSIG(x,y) (x).w_termsig = (y)

@@ -135,3 +135,11 @@ const LSB_SPOOL_INFO_T *chUserCopySpoolFile (const char *srcFile, spoolOptions_t
 int createNiosSock (struct submitReq *);
 void startNios (struct submitReq *, int, LS_LONG_INT) __attribute__ ((noreturn));
 
+
+int parseLine (char *line, int *embedArgc, char ***embedArgv, int option);
+int parseScript (FILE * from, int *embedArgc, char ***embedArgv, int option);
+int addLabel2RsrcReq (struct submit *subreq);
+int CopyCommand (char **, int);
+void sub_perror (char *);
+
+

@@ -241,7 +241,7 @@ getJInfo_ (int npgid, int *pgid, unsigned short options, gid_t cpgid)
 char *readPIMBuf (char *pfile)
 {
 
-    struct stat bstat = { };
+    struct stat bstat;
     FILE *fp = NULL;
 
     FREEUP (pimInfoBuf);    // FIXME FIXME FIXME where on earth does this 

@@ -549,7 +549,7 @@ struct sharedConf
 
 typedef struct lsSharedResourceInstance
 {
-  int nHosts;
+  unsigned int nHosts;
   char padding[4];
   char *value;
   char **hostList;
@@ -558,7 +558,7 @@ typedef struct lsSharedResourceInstance
 
 typedef struct lsSharedResourceInfo
 {
-  int nInstances;
+  unsigned int nInstances;
   char padding[4];
   char *resourceName;
   LS_SHARED_RESOURCE_INST_T *instances;

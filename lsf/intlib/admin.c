@@ -36,9 +36,9 @@ void
 parseAndDo (char *cmdBuf, int (*func)() ) // FIXME FIXME FIXME replace with parser
 {
 
-	const uint MAX_ARG = 100;
+	const unsigned int MAX_ARG = 100;
 
-	uint i = 0;
+	unsigned int i = 0;
 	int argc = 0;
 	char *argv[MAX_ARG];
 
@@ -112,7 +112,7 @@ adminCmdIndex (char *cmd, char *cmdList[])
 		cmd = quit;
 	}
 
-	for( uint i = 0; NULL != cmdList[ i ]; i++ ) {
+	for( unsigned int i = 0; NULL != cmdList[ i ]; i++ ) {
 		if( strcmp( cmdList[ i ], cmd ) == 0 ) {
 			return i;
 		}
@@ -134,7 +134,7 @@ cmdsUsage (char *cmd, char *cmdList[], char *cmdInfo[])
 	/* catgets 102 */
 	fprintf( stderr, ",     where 'command' is:\n\n");
 
-	for ( uint i = 0; cmdList[i] != NULL; i++) {
+	for ( unsigned int i = 0; cmdList[i] != NULL; i++) {
 		if (strstr (intCmds, cmdList[i]) == NULL) {
 			fprintf (stderr, "    %-12.12s%s\n", cmdList[i], cmdInfo[i]);
 		}
@@ -161,7 +161,6 @@ cmdHelp (int argc, char **argv, char *cmdList[], char *cmdInfo[],  char *cmdSynt
 {
 
 	static char intCmds[] = " ";
-	uint i = 0;
 
 	if (argc <= optind)
 	{
@@ -169,7 +168,7 @@ cmdHelp (int argc, char **argv, char *cmdList[], char *cmdInfo[],  char *cmdSynt
 		/* catgets 104  */
 		fprintf (stderr, "\n%s\n\n", "104: Commands are : ");
 
-		for ( uint i = 0, j = 0; cmdList[i] != NULL; i++)
+		for ( unsigned int i = 0, j = 0; cmdList[i] != NULL; i++)
 		{
 
 			if (strstr (intCmds, cmdList[i]) == NULL)
@@ -189,6 +188,7 @@ cmdHelp (int argc, char **argv, char *cmdList[], char *cmdInfo[],  char *cmdSynt
 	}
 
 	for (; argc > optind; optind++) {
+		int i = 0;
 		if ((i = adminCmdIndex (argv[optind], cmdList)) != -1)
 		{
 			oneCmdUsage (i, cmdList, cmdSyntax);
@@ -215,21 +215,20 @@ myGetOpt (int nargc, char **nargv, char *ostr)
 	char *cp2     = svstr;
 	char *optName = NULL;
 	int num_arg   = 0;
-	uint i        = 0;
 
 	if ((optName = nargv[optind]) == NULL) {
-		return (NULL);
+		return NULL;
 	}
 	if (optind >= nargc || *optName != '-') {
-		return (NULL);
+		return NULL;
 	}
 	if (optName[1] && *++optName == '-')
 	{
 		++optind;
-		return (NULL);
+		return NULL;
 	}
 	if (ostr == NULL) {
-		return (NULL);
+		return NULL;
 	}
 	strcpy (svstr, ostr);
 	num_arg = 0;
@@ -237,7 +236,8 @@ myGetOpt (int nargc, char **nargv, char *ostr)
 
 	while (*cp2)  // FIXME FIXME FIXME FIXME FIXME  replace with getopts()
 	{
-		int cp2len = strlen (cp2);
+		unsigned int cp2len = strlen (cp2);
+		unsigned int i = 0;
 		for ( i = 0; i < cp2len; i++)
 		{
 			if (cp2[i] == '|')
@@ -254,7 +254,7 @@ myGetOpt (int nargc, char **nargv, char *ostr)
 			}
 		}
 		if (i >= cp2len) {
-			return (BADCH);
+			return BADCH;
 		}
 
 		if (!strcmp (optName, cp1))
@@ -265,12 +265,12 @@ myGetOpt (int nargc, char **nargv, char *ostr)
 				{
 					/* catgets 108 */
 					fprintf (stderr, "108: %s: option requires an argument -- %s\n", nargv[0], optName);
-					return (BADCH);
+					return BADCH;
 				}
 				optarg = nargv[++optind];
 			}
 			++optind;
-			return (optName);
+			return optName;
 		}
 		cp1 = &cp2[i];
 		cp2 = ++cp1;
@@ -278,7 +278,7 @@ myGetOpt (int nargc, char **nargv, char *ostr)
 
 	/* catgets 109 */
 	fprintf (stderr, "109: %s: illegal option -- %s\n", nargv[0], optName );
-	return (BADCH);
+	return BADCH;
 }
 
 int
@@ -306,7 +306,7 @@ getConfirm (char *msg)
 		}
 	}
 
-	return ((answer[i] == 'Y' || answer[i] == 'y'));
+	return (answer[i] == 'Y' || answer[i] == 'y');
 }
 
 int
@@ -353,16 +353,16 @@ checkConf (int verbose, int who)
 	}
 
 	if (fatalErr) {
-		return (EXIT_FATAL_ERROR);
+		return EXIT_FATAL_ERROR;
 	}
 	if (cc < 0) {
-		return (EXIT_WARNING_ERROR);
+		return EXIT_WARNING_ERROR;
 	}
 
 	if ((daemon = calloc (strlen (lsfParams[LSF_ENVDIR].paramValue) + 15, sizeof (char))) == NULL)
 	{
 		perror ("calloc");
-		return (EXIT_FATAL_ERROR);
+		return EXIT_FATAL_ERROR;
 	}
 
 	strcpy (daemon, lsfParams[LSF_ENVDIR].paramValue);
@@ -372,7 +372,7 @@ checkConf (int verbose, int who)
 	{
 		perror (daemon);
 		free (daemon);
-		return (EXIT_FATAL_ERROR);
+		return EXIT_FATAL_ERROR;
 	}
 
 	if (putenv (confCheckBuf))
@@ -380,7 +380,7 @@ checkConf (int verbose, int who)
 		/* catgets 112 */
 		fprintf (stderr, "112: Failed to set environment variable RECONFIG_CHECK\n");
 		free (daemon);
-		return (EXIT_FATAL_ERROR);
+		return EXIT_FATAL_ERROR;
 	}
 
 
@@ -388,7 +388,7 @@ checkConf (int verbose, int who)
 	{
 		perror ("fork");
 		free (daemon);
-		return (EXIT_FATAL_ERROR);
+		return EXIT_FATAL_ERROR;
 	}
 
 	if (pid == 0)
@@ -419,7 +419,7 @@ checkConf (int verbose, int who)
 	if (waitpid (pid, &status, 0) < 0)
 	{
 		perror ("waitpid");
-		return (EXIT_FATAL_ERROR);
+		return EXIT_FATAL_ERROR;
 	}
 
 	if( WIFEXITED( status ) != 0 && WEXITSTATUS( status ) != 0xf8 ) {
@@ -433,7 +433,7 @@ checkConf (int verbose, int who)
 	{
 		/* catgets 116 */
 		fprintf( stderr, "116: Child process killed by signal.\n\n" );
-		return (EXIT_FATAL_ERROR);
+		return EXIT_FATAL_ERROR;
 	}
 
 	switch (WEXITSTATUS (status)) // FIXME FIXME FIXMEFIXME must break and set the appropriate value. single return status at end.
@@ -441,29 +441,29 @@ checkConf (int verbose, int who)
 		case 0:
 		 	/* catgets 117 */
 			fprintf (stderr, "117: No errors found.\n\n");
-			return (EXIT_NO_ERROR);
+			return EXIT_NO_ERROR;
 
 		case 0xff:
 			/* catgets 118 */
 			fprintf (stderr, "118: There are fatal errors.\n\n");
-			return (EXIT_FATAL_ERROR);
+			return EXIT_FATAL_ERROR;
 
 		case 0xf8:
 			/* catgets 119 */
 			fprintf (stderr, "119: Fail to run checking program \n\n");
-			return (EXIT_FATAL_ERROR);
+			return EXIT_FATAL_ERROR;
 
 		case 0xfe:
 			/* catgets 120, 121, 122 */
 			fprintf (stderr, "120: No fatal errors found.\n\n" );
 			fprintf (stderr, "121: Warning: Some configuration parameters may be incorrect.\n");
 			fprintf (stderr, "122:         They are either ignored or replaced by default values.\n\n");
-			return (EXIT_WARNING_ERROR);
+			return EXIT_WARNING_ERROR;
 
 		default:
 			/* catgets 123 */
 			fprintf (stderr, "123: Errors found.\n\n");
-			return (EXIT_FATAL_ERROR);
+			return EXIT_FATAL_ERROR;
 	}
 
 	return 0;

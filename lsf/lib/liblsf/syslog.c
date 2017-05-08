@@ -239,7 +239,7 @@ void
 ls_syslog (int level, const char *fmt, ...) // FIXME FIXME convert variable argument list to static
 {
 	int save_errno = errno;
-	va_list ap = { };
+	va_list ap; // FIXME FIXME full initilization
 	// static char lastMsg[16384];
 	// static int counter = 0;
 	char *buf = malloc( sizeof( char ) * 1024 + 1 );

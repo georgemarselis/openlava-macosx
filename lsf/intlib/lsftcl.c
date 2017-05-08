@@ -48,7 +48,7 @@ int numericValue( ClientData clientData, Tcl_Interp *interp, Tcl_Value * args, T
 int booleanValue (ClientData clientData, Tcl_Interp *interp, Tcl_Value *args, Tcl_Value *resultPtr);
 int stringValue( ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[] );
 static int copyTclLsInfo( struct tclLsInfo *tclLsInfo );
-static char *getResValue( int resNo );
+static char *getResValue( unsigned int resNo );
 static int definedCmd (ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
 
 /* numericValue()
@@ -61,7 +61,10 @@ numericValue( ClientData clientData, Tcl_Interp *interp, Tcl_Value * args, Tcl_V
 	char *value = NULL;
 	float cpuf  = 0.0;
 	
-	assert( clientData != NULL);
+	assert( clientData );
+	assert( interp );
+	assert( args );
+
 	indx = clientData; 			// FIXME ClientData is void *, but I am not sure where that came from
 
 	if (logclass & LC_TRACE) {
@@ -174,6 +177,9 @@ booleanValue (ClientData clientData, Tcl_Interp *interp, Tcl_Value *args, Tcl_Va
 	int isSet   = 0;
   
 	assert( NULL != clientData );
+	assert( interp );
+	assert( args );
+
 	idx = clientData;
 
 	if (logclass & LC_TRACE) {
@@ -226,20 +232,20 @@ booleanValue (ClientData clientData, Tcl_Interp *interp, Tcl_Value *args, Tcl_Va
 int
 stringValue( ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[] )
 {
-	int code     = 0;
+	// int code     = 0;
 	int *indx    = NULL;
 	char *value  = NULL; // FIXME FIXME FIXME FIXME no allocation for char *value, possible buffer overflow
 	char *status = NULL; // FIXME FIXME FIXME FIXME this should be malloc'ed
 	char *sp     = NULL;
 	const char *sp2    = NULL;
-	const char *result = NULL;
-	Tcl_Obj *strObject = NULL;
-	Tcl_Obj *intObject = NULL;
+	// const char *result = NULL;
+	// Tcl_Obj *strObject = NULL;
+	// Tcl_Obj *intObject = NULL;
 	Tcl_Obj *objv[3]   = { NULL, NULL, NULL };
 
 	struct hostent *hp = NULL;
 
-	assert( NULL != interp );
+	assert( interp );
 	if (argc != 3)
 	{
 		Tcl_WrongNumArgs(interp, 3, objv, "Wrong number of arguments; should be exactly 3"); // FIXME FIXME must see if 3 is the correct number to enter
@@ -437,21 +443,21 @@ stringValue( ClientData clientData, Tcl_Interp *interp, int argc, const char *ar
 static int
 definedCmd (ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[])
 {
-	int resNo  = 0;
+	unsigned int resNo  = 0;
 	int hasRes = FALSE;
 	int isSet  = 0;
 	int *indx  = NULL ;
 	char *value = NULL;
 	Tcl_Obj *objv[2] = { NULL, NULL };
 
-	if (argc != 2)
-	{
+	if (argc != 2) {
+
 		Tcl_WrongNumArgs(interp, 2, objv, "Wrong number of arguments; should be exactly 2"); // FIXME FIXME is 2 the right number here?
 		//Tcl_SetResult( interp, "Wrong number of args; Should be 2", TCL_VOLATILE );
 		return TCL_ERROR;
 	}
 
-	assert( NULL != clientData );
+	assert( clientData );
 	indx = clientData; // FIXME FIXME wtf is clientData?
 
 	if (logclass & LC_TRACE) {
@@ -459,44 +465,47 @@ definedCmd (ClientData clientData, Tcl_Interp *interp, int argc, const char *arg
 	}
 
 	overRideFromType = TRUE;
-	for( resNo = 0; resNo < myTclLsInfo->nRes; resNo++ )
-	{
+	for( resNo = 0; resNo < myTclLsInfo->nRes; resNo++ ) {
+
 	  	if( strcmp( myTclLsInfo->resName[ resNo ], argv[1] ) == 0 )
 		{
 	  		hasRes = TRUE;
 	  		break;
 		}
 	}
+
 	if (hasRes == FALSE) {
 		return TCL_ERROR;
 	}
 
-		if (hPtr->resBitMaps == NULL)
-		{
-			Tcl_SetResult( interp, "0", TCL_VOLATILE );
-			return TCL_OK;
-		}
+	if (hPtr->resBitMaps == NULL) {
+
+		Tcl_SetResult( interp, "0", TCL_VOLATILE );
+		return TCL_OK;
+	}
+
   	TEST_BIT (resNo, hPtr->resBitMaps, isSet);
+
 	if (isSet == 1) {
 			Tcl_SetResult( interp, "1", TCL_VOLATILE );
 	}
-	else
-	{
-	  value = getResValue (resNo);
-	  if (value == NULL)
-	{
-		if (hPtr->flag == TCL_CHECK_SYNTAX) {
+	else {
+		value = getResValue (resNo);
+		if ( !value ) {
+
+			if (hPtr->flag == TCL_CHECK_SYNTAX) {
+				Tcl_SetResult( interp, "1", TCL_VOLATILE );
+			}
+			else {
+				Tcl_SetResult( interp, "0", TCL_VOLATILE );
+			}
+		}
+	  	else {
 			Tcl_SetResult( interp, "1", TCL_VOLATILE );
-		}
-		else {
-			Tcl_SetResult( interp, "0", TCL_VOLATILE );
-		}
-	}
-	  else
-		Tcl_SetResult( interp, "1", TCL_VOLATILE );
+	  	}
 	}
 
-  return TCL_OK;
+	return TCL_OK;
 
 }
 
@@ -507,8 +516,8 @@ definedCmd (ClientData clientData, Tcl_Interp *interp, int argc, const char *arg
 int
 initTcl( struct tclLsInfo *tclLsInfo )
 {
-	uint i    = 0;
-	int isSet = 0; 	// FIXME int or uint?
+	unsigned int i    = 0;
+	int isSet = 0; 	// FIXME int or unsigned int?
 	static int ar3[5] = { 0, 0, 0, 0, 0 }; // FIXME FIXME initialise values
 	attribFunc *funcPtr = NULL;
 
@@ -572,7 +581,7 @@ initTcl( struct tclLsInfo *tclLsInfo )
   		Tcl_CreateMathFunc( globinterp, tclLsInfo->indexNames[i], 0, NULL, numericValue, (ClientData) & ar[i] ); // FIXME FIXME FIXME FIXME where on earth did this come from? what is its value
 	}
 
-	for( uint resNo = 0; resNo < tclLsInfo->nRes; resNo++ )
+	for( unsigned int resNo = 0; resNo < tclLsInfo->nRes; resNo++ )
 	{
 
 		TEST_BIT (resNo, tclLsInfo->numericResBitMaps, isSet);
@@ -601,7 +610,7 @@ initTcl( struct tclLsInfo *tclLsInfo )
 
 	i = 0;
 	ar2 = calloc (tclLsInfo->nRes, sizeof (int));
-	for( uint resNo = 0; resNo < tclLsInfo->nRes; resNo++, i++)
+	for( unsigned int resNo = 0; resNo < tclLsInfo->nRes; resNo++, i++)
 	{
 		TEST_BIT (resNo, tclLsInfo->numericResBitMaps, isSet);
 		if (isSet == TRUE) {
@@ -635,7 +644,7 @@ initTcl( struct tclLsInfo *tclLsInfo )
 	i = 0;
 	ar4 = calloc (tclLsInfo->nRes, sizeof( int ) );  // suspect for overflow
 
-	for ( uint resNo = 0; resNo < tclLsInfo->nRes; resNo++)
+	for ( unsigned int resNo = 0; resNo < tclLsInfo->nRes; resNo++)
 	{
 
 		TEST_BIT (resNo, tclLsInfo->stringResBitMaps, isSet);
@@ -687,14 +696,14 @@ evalResReq (char *resReq, struct tclHostData *hPtr2, char useFromType)
 	resBits = 0;
 	if (!hPtr->ignDedicatedResource && hPtr->DResBitMaps != NULL)
 	{
-		for ( uint i = 0; i < GET_INTNUM (nRes); i++) {
+		for ( int i = 0; i < GET_INTNUM (nRes); i++) {
 			resBits += hPtr->DResBitMaps[i];
 		}
 
 		if (resBits != 0 && hPtr->resBitMaps)
 		{
 			resBits = 0;
-			for (uint i = 0; i < GET_INTNUM (nRes); i++) {
+			for ( int i = 0; i < GET_INTNUM (nRes); i++) {
 				resBits += hPtr->resBitMaps[i] & hPtr->DResBitMaps[i];
 			}
 
@@ -728,7 +737,7 @@ evalResReq (char *resReq, struct tclHostData *hPtr2, char useFromType)
 /* getResValue()
  */
 static char *
-getResValue (int resNo)
+getResValue ( unsigned int resNo)
 {
 
 	if( logclass & LC_TRACE ) {
@@ -736,11 +745,11 @@ getResValue (int resNo)
 			resNo, myTclLsInfo->resName[ resNo ], myTclLsInfo->nRes, hPtr->numResPairs );
 	}
 
-	if(resNo > myTclLsInfo->nRes || hPtr->numResPairs <= 0) {
+	if( resNo > myTclLsInfo->nRes || hPtr->numResPairs <= 0) {
 		return NULL;
 	}
 
-	for( uint i = 0; i < hPtr->numResPairs; i++ )
+	for( int i = 0; i < hPtr->numResPairs; i++ ) // FIXME FIXME FIXME look into hPtr and see if numRespairs member should be unsigned or not
 	{
 		if( strcmp( hPtr->resPairs[ i ].name, myTclLsInfo->resName[ resNo ] ) == 0 )
 		{
@@ -767,17 +776,17 @@ copyTclLsInfo( struct tclLsInfo *tclLsInfo )
 	myTclLsInfo->stringResBitMaps  = calloc( GET_INTNUM( myTclLsInfo->nRes ), sizeof( int ) );
 	myTclLsInfo->numericResBitMaps = calloc( GET_INTNUM( myTclLsInfo->nRes ), sizeof( int ) );
 
-	for( uint i = 0; i < myTclLsInfo->nRes; i++)
+	for( unsigned int i = 0; i < myTclLsInfo->nRes; i++)
 	{
 		myTclLsInfo->resName[ i ] = strdup( tclLsInfo->resName[ i ] );
 	}
 
-	for( uint i = 0; i < myTclLsInfo->numIndx; i++)
+	for( unsigned int i = 0; i < myTclLsInfo->numIndx; i++)
 	{
 		myTclLsInfo->indexNames[ i ] = strdup( tclLsInfo->indexNames[ i ] );
 	}
 
-	for( uint i = 0; i < GET_INTNUM( myTclLsInfo->nRes ); i++ )
+	for( unsigned int i = 0; i < GET_INTNUM( myTclLsInfo->nRes ); i++ )
 	{
 		myTclLsInfo->stringResBitMaps[ i ]  = tclLsInfo->stringResBitMaps[ i ];
 		myTclLsInfo->numericResBitMaps[ i ] = tclLsInfo->numericResBitMaps[ i ];
@@ -797,11 +806,11 @@ freeTclLsInfo( struct tclLsInfo *tclLsInfo, int mode )
 	{
 		// if (mode == 1)
 		// {
-			for( uint i = 0; i < tclLsInfo->numIndx; i++)
+			for( unsigned int i = 0; i < tclLsInfo->numIndx; i++)
 			{
 				FREEUP( tclLsInfo->indexNames[ i ] )
 			}
-			for( uint i = 0; i < tclLsInfo->nRes; i++ )
+			for( unsigned int i = 0; i < tclLsInfo->nRes; i++ )
 			{
 				FREEUP (tclLsInfo->resName[ i ] )
 			}

@@ -15,288 +15,282 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
-#if _BITSET_TEST_
+// #if _BITSET_TEST_
 
-#include<stdio.h>
-#include"bitset.h"
-#include"../lsf.h"
+#include <stdio.h>
 
-static void test_1 (void);
-static void test_2 (void);
-static void test_3 (void);
-static void test_4 (void);
+#include "libint/bitset.h"
+#include "lsf.h"
+
+
+#define VECT_SIZE 15
+#define OBJ_SIZE 2000
 
 extern int bitseterrno;
 
-void
-main (int argc, char **argv)
+void test_1 (void); 
+void test_2 (void);
+void test_3 (void); 
+void test_4 (void);
+
+
+struct X
 {
-
-  char fname[] = "main";
-
-  if (ls_initdebug (argv[0]) < 0)
-    {
-      ls_perror ("ls_initdebug");
-      exit (-1);
-    }
-  test_4 ();
-
-  exit (0);
-}
-
-#define VECT_SIZE 15
-static void
-test_1 ()
-{
-  static char fname[] = "test_1";
-  int vect[VECT_SIZE];
-  LS_BITSET_T *set;
-  int i;
-
-
-  for (i = 0; i < VECT_SIZE; i++)
-    vect[i] = i + 1;
-
-  set = simpleSetCreate (VECT_SIZE, fname);
-  if (!set)
-    {
-      ls_syslog (LOG_ERR, "%s failed in creating set", fname);
-      exit (-1);
-    }
-
-  for (i = 0; i < VECT_SIZE; i++)
-    {
-      if (setAddElement (set, &vect[i]) < 0)
-	{
-	  ls_syslog (LOG_ERR, "%s setAddElement failed for i=%d vect[i]=%d",
-		     fname, i, vect[i]);
-	  setDumpSet (set, fname);
-	  exit (-1);
-	}
-    }
-
-  setDumpSet (set, fname);
-
-  ls_syslog (LOG_ERR, "%s setGetNumElements=%d",
-	     fname, setGetNumElements (set));
-
-  for (i = 0; i < VECT_SIZE; i++)
-    {
-      if (setRemoveElement (set, &vect[i]) < 0)
-	{
-	  ls_syslog (LOG_ERR, "%s setAddElement failed for i=%d vect[i]=%d",
-		     fname, i, vect[i]);
-	  setDumpSet (set, fname);
-	  exit (-1);
-	}
-    }
-  setDumpSet (set, fname);
-
-
-}
-
-static void
-test_2 ()
-{
-  static char fname[] = "test_2";
-  int vect[VECT_SIZE];
-  LS_BITSET_T *set;
-  LS_BITSET_ITERATOR_T *iterator;
-  int i;
-  int *p;
-
-  for (i = 0; i < VECT_SIZE; i++)
-    vect[i] = i + 1;
-
-  set = simpleSetCreate (VECT_SIZE, fname);
-  if (!set)
-    {
-      ls_syslog (LOG_ERR, "%s failed in creating set", fname);
-      exit (-1);
-    }
-
-  for (i = 0; i < VECT_SIZE; i++)
-    {
-      if (setAddElement (set, &vect[i]) < 0)
-	{
-	  ls_syslog (LOG_ERR, "%s setAddElement failed for i=%d vect[i]=%d",
-		     fname, i, vect[i]);
-	  setDumpSet (set, fname);
-	  exit (-1);
-	}
-    }
-  iterator = setIteratorCreate (set);
-  if (!iterator)
-    {
-      ls_syslog (LOG_ERR, "%s setIteratorCreate failed", fname);
-      exit (-1);
-    }
-
-  while (p = setIteratorGetNextElement (iterator))
-    ls_syslog (LOG_ERR, "%s next element in set %d", fname, *p);
-
-  return;
-}
-
-
-static struct X
-{
-  int index;
-  char *blaBla;
+	int index;
+	char *blaBla;
 };
-#define OBJ_SIZE 2000
-static struct X objs[OBJ_SIZE];
 
+struct X objs[OBJ_SIZE];
 struct X **table;
 
-static int
-fun (void *hux)
+
+
+
+int main (int argc, char **argv)
 {
-  struct X p;
 
+	assert( argc );
 
-  memcpy (&p, (struct X *) hux, sizeof (struct X));
-
-  return (p.index);
-}
-
-static void *
-gun (int zug)
-{
-  return (table[zug]);
-}
-
-static void
-test_3 ()
-{
-  static char fname[] = "test_3";
-  int (*directFun) (void *);
-  void *(*inverseFun) (int);
-  int i;
-  LS_BITSET_T *set;
-  LS_BITSET_ITERATOR_T *iterator;
-  struct X *gimmeObject;
-
-  directFun = fun;
-  inverseFun = gun;
-
-
-  table = (struct X **) malloc (sizeof (struct X) * OBJ_SIZE);
-  if (!table)
-    {
-      ls_syslog (LOG_ERR, "%s failed malloc for %d bytes", fname, OBJ_SIZE);
-      exit (-1);
-    }
-
-
-  for (i = 0; i < OBJ_SIZE; i++)
-    {
-      char buf[1024];
-      memset (buf, 0, sizeof (buf));
-      sprintf (buf, "You couldn't disagree %d", i);
-      objs[i].index = i;
-      objs[i].blaBla = strdup (buf);
-      table[i] = &objs[i];
-    }
-
-  set = setCreate (OBJ_SIZE, directFun, inverseFun, fname);
-  if (!set)
-    {
-      ls_syslog (LOG_ERR, "%s failed allocating %d bytes", fname, OBJ_SIZE);
-      exit (-1);
-    }
-
-  for (i = 0; i < OBJ_SIZE; i++)
-    {
-
-      if (setAddElement (set, table[i]) < 0)
+	if (ls_initdebug (argv[0]) < 0)
 	{
-	  ls_syslog (LOG_ERR, "%s setAddElement failed, index=%d", fname, i);
-	  exit (-1);
+		ls_perror ("ls_initdebug");
+		exit (-1);
 	}
-      ls_syslog (LOG_ERR, "%s adding element obj=%x  index=%d",
-		 fname, table[i], i);
-    }
 
-  iterator = setIteratorCreate (set);
-  if (!iterator)
-    {
-      ls_syslog (LOG_ERR, "%s setIteratorCreate() failed", fname);
-      exit (-1);
-    }
+	test_4 ();
 
-  bitseterrno = LS_BITSET_ERR_NOERR;
-  while (gimmeObject = (struct X *) setIteratorGetNextElement (iterator))
-    {
-      ls_syslog (LOG_ERR, "%s Gotta object with index %d = <%s>",
-		 fname, gimmeObject->index, gimmeObject->blaBla);
-    }
-  if (bitseterrno != LS_BITSET_ERR_NOERR)
-    {
-      ls_syslog (LOG_ERR, "%s %s", fname, setPerror (bitseterrno));
-      exit (-1);
-    }
-
-  return;
+	exit (0);
 }
 
-static void
-test_4 ()
+
+void test_1 ()
 {
-  static char fname[] = "test_4()";
-  LS_BITSET_T *set;
-  LS_BITSET_T *set1;
-  LS_BITSET_ITERATOR_T iter;
-  int cc;
-  int i;
-  int *p;
+	int vect[VECT_SIZE];
+	LS_BITSET_T *set;
+	char *fname  = malloc( sizeof(char) * strlen( __PRETTY_FUNCTION__ ) + 1);
+	strcpy( fname, __PRETTY_FUNCTION__ );
 
-  set = simpleSetCreate (1, "Just one");
-
-  for (i = 0; i < 100; i++)
-    {
-      cc = setAddElement (set, (void *) i);
-      if (cc < 0)
-	{
-	  ls_syslog (LOG_ERR, "\
-%s setAddElement() failed fuck item=%d", fname, i);
-	  exit (-1);
+	for ( unsigned int i = 0; i < VECT_SIZE; i++) {
+		vect[i] = i + 1;
 	}
-    }
 
-  cc = setGetNumElements (set);
-  printf ("Suck element has %d members\n", cc);
-
-  set1 = simpleSetCreate (3, "do od");
-  for (i = 0; i < 30000; i++)
-    {
-      cc = setAddElement (set1, (void *) i);
-      if (cc < 0)
+	set = simpleSetCreate (VECT_SIZE, fname);
+	if (!set)
 	{
-	  ls_syslog (LOG_ERR, "\
-%s setAddElement() failed fuck item=%d", fname, i);
-	  exit (-1);
+		ls_syslog (LOG_ERR, "%s failed in creating set", __PRETTY_FUNCTION__);
+		exit (-1);
 	}
-    }
-  cc = setGetNumElements (set1);
-  printf ("Fuck element has %d members\n", cc);
 
-  setOperate (set, set1, LS_SET_UNION);
+	for ( unsigned int i = 0; i < VECT_SIZE; i++)
+	{
+		if (setAddElement (set, &vect[i]) < 0)
+		{
+			ls_syslog (LOG_ERR, "%s setAddElement failed for i=%d vect[i]=%d", __PRETTY_FUNCTION__, i, vect[i]);
+			setDumpSet (set, fname);
+			exit (-1);
+		}
+	}
 
-  cc = setIteratorAttach (&iter, set1);
-  if (cc < 0)
-    {
-      ls_syslog (LOG_ERR, "%s %s", fname, setPerror (bitseterrno));
-      exit (-1);
-    }
+	setDumpSet (set, fname);
 
-  for (i = (int) setIteratorBegin (&iter);
-       setIteratorIsEndOfSet (&iter) == FALSE;
-       i = (int) setIteratorGetNextElement (&iter));
+	ls_syslog (LOG_ERR, "%s setGetNumElements=%d", __PRETTY_FUNCTION__, setGetNumElements (set));
 
+	for ( unsigned int i = 0; i < VECT_SIZE; i++)
+	{
+		if (setRemoveElement (set, &vect[i]) < 0)
+		{
+			ls_syslog (LOG_ERR, "%s setAddElement failed for i=%d vect[i]=%d", __PRETTY_FUNCTION__, i, vect[i]);
+			setDumpSet (set, fname);
+			exit (-1);
+		}
+	}
+	setDumpSet (set, fname);
 
-  setIteratorDetach (&iter);
-  setDestroy (set);
-  setDestroy (set1);
+	free( fname );
+
+	return;
 }
-#endif
+
+void test_2 ()
+{
+	int vect[VECT_SIZE];
+	LS_BITSET_T *set = NULL;
+	LS_BITSET_ITERATOR_T *iterator = NULL;
+	int *p = NULL;
+
+	char *fname  = malloc( sizeof(char) * strlen( __PRETTY_FUNCTION__ ) + 1);
+	strcpy( fname, __PRETTY_FUNCTION__ );
+
+	for( unsigned int i = 0; i < VECT_SIZE; i++) {
+		vect[i] = i + 1;
+	}
+
+	set = simpleSetCreate (VECT_SIZE, fname);
+	if (!set)
+	{
+		ls_syslog (LOG_ERR, "%s failed in creating set", __PRETTY_FUNCTION__);
+		exit (-1);
+	}
+
+	for ( unsigned int i = 0; i < VECT_SIZE; i++)
+	{
+		if (setAddElement (set, &vect[i]) < 0)
+		{
+			ls_syslog (LOG_ERR, "%s setAddElement failed for i=%d vect[i]=%d", __PRETTY_FUNCTION__, i, vect[i]);
+			setDumpSet (set, fname);
+			exit (-1);
+		}
+	}
+	iterator = setIteratorCreate (set);
+	if (!iterator) {
+		ls_syslog (LOG_ERR, "%s setIteratorCreate failed", __PRETTY_FUNCTION__);
+		exit (-1);
+	}
+
+	while ( ( p = setIteratorGetNextElement (iterator) ) ) {     // FIXME FIXME FIXME this may actually be wrong, and just require == instead of =
+		ls_syslog (LOG_ERR, "%s next element in set %d", __PRETTY_FUNCTION__, *p);
+	}
+
+	free( fname );
+
+	return;
+}
+
+
+
+int fun (void *hux)
+{
+	struct X p;
+
+	memcpy (&p, (struct X *) hux, sizeof (struct X));
+
+	return (p.index);
+}
+
+void * gun (int zug)
+{
+	return (table[zug]);
+}
+
+void test_3 ()
+{
+	int (*directFun)  (void *);
+	void *(*inverseFun) (int);
+	LS_BITSET_T *set = NULL;
+	LS_BITSET_ITERATOR_T *iterator = NULL;
+	struct X *gimmeObject = NULL;
+
+	char *fname  = malloc( sizeof(char) * strlen( __PRETTY_FUNCTION__ ) + 1);
+	strcpy( fname, __PRETTY_FUNCTION__ );
+
+	directFun = fun;
+	inverseFun = gun;
+
+
+	table = malloc( sizeof (struct X) * OBJ_SIZE);
+	if (!table) {
+		ls_syslog (LOG_ERR, "%s failed malloc for %d bytes", __PRETTY_FUNCTION__, OBJ_SIZE);
+		exit (-1);
+	}
+
+
+	for( unsigned int i = 0; i < OBJ_SIZE; i++) {
+		char buf[1024];							// FIXME FIXME FIXME oddly specific
+		memset (buf, 0, sizeof (buf));
+		sprintf (buf, "You couldn't disagree %d", i);
+		objs[i].index = i;
+		objs[i].blaBla = strdup (buf);
+		table[i] = &objs[i];
+	}
+
+	set = setCreate (OBJ_SIZE, directFun, inverseFun, fname);
+	if (!set) {
+		ls_syslog (LOG_ERR, "%s failed allocating %d bytes", __PRETTY_FUNCTION__, OBJ_SIZE);
+		exit (-1);
+	}
+
+	for ( unsigned int i = 0; i < OBJ_SIZE; i++) {
+
+		if (setAddElement (set, table[i]) < 0) {
+			ls_syslog (LOG_ERR, "%s setAddElement failed, index=%d", __PRETTY_FUNCTION__, i);
+			exit (-1);
+		}
+		ls_syslog (LOG_ERR, "%s adding element obj=%x  index=%d", __PRETTY_FUNCTION__, table[i], i);
+	}
+
+	iterator = setIteratorCreate (set);
+	if (!iterator) {
+		ls_syslog (LOG_ERR, "%s setIteratorCreate() failed", __PRETTY_FUNCTION__);
+		exit (-1);
+	}
+
+	bitseterrno = LS_BITSET_ERR_NOERR;
+	while( ( gimmeObject = (struct X *) setIteratorGetNextElement (iterator))) {
+		ls_syslog (LOG_ERR, "%s has an object with index %d = <%s>", __PRETTY_FUNCTION__, gimmeObject->index, gimmeObject->blaBla);
+	}
+	if (bitseterrno != LS_BITSET_ERR_NOERR) {
+		ls_syslog (LOG_ERR, "%s %s", __PRETTY_FUNCTION__, setPerror (bitseterrno));
+		exit (-1);
+	}
+
+	free( fname );
+
+	return;
+}
+
+void test_4 ()
+{
+	LS_BITSET_T *set;
+	LS_BITSET_T *set1;
+	LS_BITSET_ITERATOR_T iter;
+	char foo[] = "this string does nothing, please ignore";
+	int cc = 0;
+
+	char *fname  = malloc( sizeof(char) * strlen( __PRETTY_FUNCTION__ ) + 1);
+	strcpy( fname, __PRETTY_FUNCTION__ );
+
+	set = simpleSetCreate (1, "Just one");
+
+	for( size_t i = 0; i < 100; i++) { 						// FIXME FIXME FIXME oddly specific
+		cc = setAddElement (set, (void *) (size_t) i); 		// cast is ok: upscales the type so it can be cast to void
+		if (cc < 0)
+		{
+			ls_syslog (LOG_ERR, "%s setAddElement() failed fuck item=%d", __PRETTY_FUNCTION__, i);
+			exit (-1);
+		}
+	}
+
+	cc = setGetNumElements (set);
+	printf ("Suck element has %d members\n", cc);
+
+	set1 = simpleSetCreate (3, "do od");
+	for ( unsigned int i = 0; i < 30000; i++) {			// FIXME FIXME FIXME 30000 seems oddly specific
+		cc = setAddElement (set1, (void *) (size_t) i); // cast is ok: upscales the type so it can be cast to void
+		if (cc < 0) {
+			ls_syslog (LOG_ERR, "%s setAddElement() failed fuck item=%d", __PRETTY_FUNCTION__, i);
+			exit (-1);
+		}
+	}
+	cc = setGetNumElements (set1);
+	printf ("Fuck element has %d members\n", cc);
+
+	setOperate (set, set1, LS_SET_UNION);
+
+												// FIXME FIXME FIXME FIXME alter the signature of setIteratorAttach( )
+	cc = setIteratorAttach (&iter, set1, foo ); // ignore foo[]: in the body of setIteratorAttach, the 3rd argument gets ignored.
+	if (cc < 0) {
+		ls_syslog (LOG_ERR, "%s %s", __PRETTY_FUNCTION__, setPerror (bitseterrno));
+		exit (-1);
+	}
+
+	for ( setIteratorBegin (&iter); setIteratorIsEndOfSet (&iter) == FALSE; setIteratorGetNextElement (&iter)) {
+		setIteratorDetach (&iter);
+	}
+	setDestroy (set);
+	setDestroy (set1);
+
+	free( fname );
+
+	return;
+}
+// #endif

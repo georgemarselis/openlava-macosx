@@ -17,6 +17,9 @@
  */
 # include "stdio.h"
 
+// FIXME FIXME FIXME FIXME FIXME this file is def out of a lexer. reverse it and recreate it
+
+
 #if (defined(__STDC__))
 extern int yyreject ();
 extern int yywrap ();
@@ -59,7 +62,7 @@ int yynls16 = 0;
 int yynls_wchar = 0;
 char *yylocale = "C C C C C C";
 int yymorfg;
-extern unsigned char *yysptr, yysbuf[];
+extern unsigned char *yysptr, yysbuf[YYLMAX]; // FIXME FIXME FIXME originally yysbuf was declared without a specified lenght
 int yytchar;
 #define yyin stdin
 #define yyout stdout
@@ -125,75 +128,75 @@ yylex ()
 {
   int nstr;
   while ((nstr = yylook ()) >= 0)
-    switch (nstr)
-      {
-      case 0:
-	if (yywrap ())
-	  return (0);
-	break;
-      case 1:
-	yymark ();
-	break;
-      case 2:
-	yymark ();
-	break;
-      case 3:
-	return (OR);
-	break;
-      case 4:
-	return (AND);
-	break;
-      case 5:
-	return (LE);
-	break;
-      case 6:
-	return (GE);
-	break;
-      case 7:
-	return (EQ);
-	break;
-      case 8:
-	return (DOTS);
-	break;
-      case 9:
-	return screen ();
-	break;
-      case 10:
+  switch (nstr)
 	{
-	  s_lookup ((ICON));
-	  return (ICON);
+	case 0:
+  if (yywrap ())
+  return 0;
+  break;
+	case 1:
+  yymark ();
+  break;
+	case 2:
+  yymark ();
+  break;
+	case 3:
+  return OR;
+  break;
+	case 4:
+  return AND;
+  break;
+	case 5:
+  return LE;
+  break;
+	case 6:
+  return GE;
+  break;
+	case 7:
+  return EQ;
+  break;
+	case 8:
+  return DOTS;
+  break;
+	case 9:
+  return screen ();
+  break;
+	case 10:
+  {
+  s_lookup ((ICON));
+  return ICON;
+  }
+  break;
+	case 11:
+  {
+  s_lookup ((RCON));
+  return RCON;
+  }
+  break;
+	case 12:
+  {
+  s_lookup ((ESTRING));
+  return ESTRING;
+  }
+  break;
+	case 13:
+  {
+  s_lookup ((ESTRING));
+  return ESTRING;
+  }
+  break;
+	case 14:
+  ;
+  break;
+	case 15:
+  return (yytext[0]);
+  break;
+	case -1:
+  break;
+	default:
+  fprintf (yyout, "bad switch yylook %d", nstr);
 	}
-	break;
-      case 11:
-	{
-	  s_lookup ((RCON));
-	  return (RCON);
-	}
-	break;
-      case 12:
-	{
-	  s_lookup ((ESTRING));
-	  return (ESTRING);
-	}
-	break;
-      case 13:
-	{
-	  s_lookup ((ESTRING));
-	  return (ESTRING);
-	}
-	break;
-      case 14:
-	;
-	break;
-      case 15:
-	return ((yytext[0]));
-	break;
-      case -1:
-	break;
-      default:
-	fprintf (yyout, "bad switch yylook %d", nstr);
-      }
-  return (0);
+  return 0;
 }
 
 extern int main (void);
@@ -306,30 +309,37 @@ static struct rwtable
 
 struct rwtable *
 END (low)
-     struct rwtable *low;
+   struct rwtable *low;
 {
   int c;
   struct rwtable *i;
 
   for (i = low;; i++)
-    {
-      if ((c = strcmp (i->rw_name, "zzzz")) == 0)
-	return (i);
-    }
+  {
+	if ((c = strcmp (i->rw_name, "zzzz")) == 0)
+  return i;
+  }
 
 }
 
-void
-set_lower (str)
-     char *str;
+void set_lower( char *str )
 {
-  int i;
+  // for( unsigned int i = 0; i < strlen (str); i++) {    
+  // ascii gymnastics...
+	// 
+	// if ('A' <= str[i] && str[i] <= 'Z') {
+	//  str[i] = str[i] + 'a' - 'A';
+	// }
 
-  for (i = 0; i < strlen (str); i++)
-    {
-      if ('A' <= str[i] && str[i] <= 'Z')
-	str[i] = str[i] + 'a' - 'A';
-    }
+  unsigned int i = 0;
+  while( str ) {
+	int c = 0;
+	c = tolower( *str );
+	*(str + i) = c;
+	  ++i;
+  }
+
+  return;
 }
 
 static int
@@ -342,31 +352,32 @@ screen (void)
   strcpy (str, (char *) yytext);
   set_lower ((char *) yytext);
   while ((int) (low <= high))
-    {
-      mid = low + (high - low) / 2;
-      if ((c = strcmp (mid->rw_name, (char *) yytext)) == 0)
-	{
-	  return (mid->rw_yylex);
-	}
-      else if (c < 0)
-	low = mid + 1;
-      else
-	high = mid - 1;
-    }
+  {
+	mid = low + (high - low) / 2;
+	if ((c = strcmp (mid->rw_name, (char *) yytext)) == 0)
+  {
+  return mid->rw_yylex;
+  }
+	else if (c < 0)
+  low = mid + 1;
+	else
+  high = mid - 1;
+  }
   strcpy ((char *) yytext, str);
   s_lookup (NAME);
-  return (NAME);
+  return NAME;
 }
 
 static void
-s_lookup (yylex)
-     int yylex;
+s_lookup (int yylex)
 {
+
+  assert( yylex );
   if (!token)
-    {
-      token = (char *) malloc (MAXTOKENLEN);
-      token[0] = '\0';
-    }
+  {
+	token = malloc ( sizeof(char) * MAXTOKENLEN + 1);
+	token[0] = '\0';
+  }
   strcpy (token, (char *) yytext);
 }
 
@@ -374,17 +385,19 @@ s_lookup (yylex)
 int
 yymark (void)
 {
-  if (source)
-    free (source);
-  source = (char *) calloc (yyleng, sizeof (char));
-  if (source)
-    sscanf ((char *) yytext, "# %d %s", &yylineno, source);
-  return (1);
+	if (source) {
+		free (source);
+	}
+	source = (char *) calloc (yyleng, sizeof (char));
+	if (source) {
+		sscanf ((char *) yytext, "# %d %s", &yylineno, source);
+	}
+
+	return 1;
 }
 
 void
-idxerror (s)
-     register char *s;
+idxerror (register char *s)
 {
   extern int idxnerrs;
   char sptr[YYLMAX];
@@ -400,50 +413,49 @@ idxerror (s)
 
 
 int
-yywhere (sptr)
-     char *sptr;
+yywhere (char *sptr)
 {
   char colon = 0;
 
   if (source && *source && strcmp (source, "\"\""))
-    {
-      char *cp = source;
-      int len = strlen (source);
+  {
+	char *cp = source;
+	int len = strlen (source);
 
-      if (*cp == '*')
-	++cp, len -= 2;
-      if (strncmp (cp, "./", 2) == 0)
-	cp += 2, len -= 2;
-      sprintf (sptr, "file %.*s", len, cp);
-      colon = 1;
-    }
+	if (*cp == '*')
+  ++cp, len -= 2;
+	if (strncmp (cp, "./", 2) == 0)
+  cp += 2, len -= 2;
+	sprintf (sptr, "file %.*s", len, cp);
+	colon = 1;
+  }
   if (yylineno > 0)
-    {
-      if (colon)
-	sprintf (sptr, "%s, ", sptr);
-      sprintf (sptr, "%s line %d", sptr, yylineno -
-	       (*yytext == '\n' || !*yytext));
-      colon = 1;
-    }
+  {
+	if (colon)
+  sprintf (sptr, "%s, ", sptr);
+	sprintf (sptr, "%s line %d", sptr, yylineno -
+	 (*yytext == '\n' || !*yytext));
+	colon = 1;
+  }
   if (*yytext)
-    {
-      register int i;
+  {
+	register int i;
 
-      for (i = 0; i < 20; ++i)
-	if (!yytext[i] || yytext[i] == '\n')
-	  break;
-      if (i)
-	{
-	  if (colon)
-	    sprintf (sptr, "%s ", sptr);
-	  sprintf (sptr, "%s near \"%.*s%.8s\"", sptr, i, yytext, yybuff);
-	  colon = 1;
-	}
-    }
+	for (i = 0; i < 20; ++i)
+  if (!yytext[i] || yytext[i] == '\n')
+  break;
+	if (i)
+  {
   if (colon)
-    sprintf (sptr, "%s: ", sptr);
+	sprintf (sptr, "%s ", sptr);
+  sprintf (sptr, "%s near \"%.*s%.8s\"", sptr, i, yytext, yybuff);
+  colon = 1;
+  }
+  }
+  if (colon)
+  sprintf (sptr, "%s: ", sptr);
 
-  return (yylineno);
+  return yylineno;
 }
 
 int
@@ -451,17 +463,17 @@ yywrap (void)
 {
   register Stream *sp;
   if ((sp = in->prev))
-    {
-      if (in->buf)
-	free (in->buf);
-      if (in)
-	{
-	  free (in);
-	  in = NULL;
-	}
-      in = sp;
-      return 0;
-    }
+  {
+	if (in->buf)
+  free (in->buf);
+	if (in)
+  {
+  free (in);
+  in = NULL;
+  }
+	in = sp;
+	return 0;
+  }
   return 1;
 }
 
@@ -469,9 +481,9 @@ static int
 getbufc (void)
 {
   if (*yybuff == '\0')
-    return (EOF);
+  return EOF;
   else
-    return (*yybuff++);
+  return *yybuff++;
 }
 
 
@@ -483,18 +495,18 @@ yyalloc (struct mallocList **head, int size)
 
   space = (void *) calloc (1, size);
   if (space)
-    {
-      entry = (struct mallocList *) malloc (sizeof (struct mallocList));
-      if (!entry)
-	{
-	  free (space);
-	  return (NULL);
-	}
-      entry->space = space;
-      entry->next = *head;
-      *head = entry;
-    };
-  return (space);
+  {
+	entry = (struct mallocList *) malloc (sizeof (struct mallocList));
+	if (!entry)
+  {
+  free (space);
+  return NULL;
+  }
+	entry->space = space;
+	entry->next = *head;
+	*head = entry;
+  };
+  return space;
 }
 
 
@@ -506,14 +518,14 @@ yyfree (struct mallocList **head, void *space)
 
   entry = *head;
   while (entry)
-    {
-      if (entry->space == space)
-	break;
-      entry = entry->next;
-    }
+  {
+	if (entry->space == space)
+  break;
+	entry = entry->next;
+  }
 
   if (entry)
-    entry->space = NULL;
+  entry->space = NULL;
   free (space);
 }
 
@@ -524,11 +536,11 @@ yparseSucc (struct mallocList **head)
 
   entry = *head;
   while (entry)
-    {
-      freeEntry = entry;
-      entry = entry->next;
-      free (freeEntry);
-    }
+  {
+	freeEntry = entry;
+	entry = entry->next;
+	free (freeEntry);
+  }
   *head = NULL;
   return;
 }
@@ -539,16 +551,16 @@ yparseFail (struct mallocList **head)
   struct mallocList *entry, *freeEntry;
 
   if (!head)
-    return;
+  return;
   entry = *head;
   while (entry)
-    {
-      freeEntry = entry;
-      entry = entry->next;
-      if (freeEntry->space)
-	free (freeEntry->space);
-      free (freeEntry);
-    }
+  {
+	freeEntry = entry;
+	entry = entry->next;
+	if (freeEntry->space)
+  free (freeEntry->space);
+	free (freeEntry);
+  }
   *head = NULL;
   return;
 }
@@ -557,74 +569,92 @@ yparseFail (struct mallocList **head)
 int
 checkNameSpec (char *name, char **errMsg)
 {
-  static char bufMess[1024];
-  int lexCode, retVal = 1;
+	static char bufMess[1024]; 	// FIXME FIXME FIXME 1024 seems aufuly specific
+	int lexCode, retVal = 1;
 
-  bufMess[0] = '\0';
-  yybuff = name;
-  lexCode = yylex ();
+	bufMess[0] = '\0'; 			// FIXME FIXME FIXME this has to go
+	yybuff = name;
+	lexCode = yylex ();
 
-  if (lexCode != NAME)
-    {
-      if (lexCode == UNDEF)
-	sprintf (bufMess, _i18n_msg_get (ls_catd, NL_SETN, 350, "Name is invalid: \"%s\""),	/* catgets 350 */
-		 name);
-      else if (lexCode == ICON || lexCode == RCON)
-	sprintf (bufMess, _i18n_msg_get (ls_catd, NL_SETN, 351, "Name cannot start with digits: \"%s\""),	/* catgets 351 */
-		 name);
-      else if (lexCode == CCON)
-	sprintf (bufMess, _i18n_msg_get (ls_catd, NL_SETN, 352, "Name cannot be const string: \"%s\""),	/* catgets 352 */
-		 name);
-      else if (MON <= lexCode && lexCode <= SUN)
-	sprintf (bufMess, _i18n_msg_get (ls_catd, NL_SETN, 353, "Name cannot be name of week: \"%s\""),	/* catgets 353 */
-		 name);
-      else if (JAN <= lexCode && lexCode <= DEC)
-	sprintf (bufMess, _i18n_msg_get (ls_catd, NL_SETN, 354, "Name cannot be name of month: \"%s\""),	/* catgets 354 */
-		 name);
-      else if (YY <= lexCode && lexCode <= SZZZZ)
-	sprintf (bufMess, _i18n_msg_get (ls_catd, NL_SETN, 355, "Name cannot be reserved word: \"%s\""),	/* catgets 355 */
-		 name);
-      else
-	sprintf (bufMess,
-		 _i18n_msg_get (ls_catd, NL_SETN, 350,
-				"Name is invalid: \"%s\""), name);
-      retVal = 0;
-      goto Exit;
-    }
-  else
-    {
-      lexCode = yylex ();
-      if ((char) lexCode == '@')
-	{
-	  lexCode = yylex ();
-	  if (lexCode != NAME)
-	    {
-	      sprintf (bufMess, _i18n_msg_get (ls_catd, NL_SETN, 357, "User name is wrong: \"%s\""),	/* catgets 357 */
-		       token);
-	      retVal = 0;
-	      goto Exit;
-	    }
-	  lexCode = yylex ();
+	if (lexCode != NAME) {
+		if (lexCode == UNDEF) {
+			 /* catgets 350 */
+			sprintf (bufMess, "catgets 350: Name is invalid: \"%s\"", name);
+		}
+		else if (lexCode == ICON || lexCode == RCON) {
+			/* catgets 351 */ 
+			sprintf (bufMess, "catgets 351: Name cannot start with digits: \"%s\"", name);
+		}
+		else if (lexCode == CCON) {
+			/* catgets 352 */ 
+			sprintf (bufMess, "catgets 352: Name cannot be const string: \"%s\"", name);
+		}
+		else if (MON <= lexCode && lexCode <= SUN) {
+			/* catgets 353 */ 
+			sprintf (bufMess, "catgets 353: Name cannot be name of week: \"%s\"", name);
+		}
+		else if (JAN <= lexCode && lexCode <= DEC) {
+			 /* catgets 354 */ 
+			sprintf (bufMess, "catgets 354: Name cannot be name of month: \"%s\"", name);
+		}
+		else if (YY <= lexCode && lexCode <= SZZZZ) {
+			 /* catgets 355 */ 
+			sprintf (bufMess, "catgets 355: Name cannot be reserved word: \"%s\"", name);
+		}
+		else {
+			/* catgets 350-1 */
+			sprintf (bufMess, "catgets 350-1: Name is invalid: \"%s\"", name); 
+		}
+		retVal = 0;
+		*errMsg = bufMess;
+		yysptr = yysbuf;
+		yylineno = 1;
+		return retVal;
+//		goto Exit;
 	}
-      if (lexCode > 0)
-	{
-	  sprintf (bufMess,
-		   _i18n_msg_get (ls_catd, NL_SETN, 350,
-				  "Name is invalid: \"%s\""), name);
-	  retVal = 0;
-	  goto Exit;
-	}
-      else
-	{
-	  retVal = 1;
-	  goto Exit;
-	}
-    }
-Exit:
-  *errMsg = bufMess;
-  yysptr = yysbuf;
-  yylineno = 1;
-  return (retVal);
+	else {
+		lexCode = yylex ();
+		if ((char) lexCode == '@') { // FIXME FIXME cast is not ok, especially for unicode input
+			lexCode = yylex ();
+			if (lexCode != NAME) {
+				/* catgets 357 */ 
+				sprintf (bufMess, "catgets 357: User name is wrong: \"%s\"", token);
+				retVal = 0;
+				*errMsg = bufMess;
+				yysptr = yysbuf;
+				yylineno = 1;
+				return retVal;
+				// goto Exit;
+			}
+			lexCode = yylex ();
+		}
+
+		if (lexCode > 0) {
+			/* catgets 350-2 */
+			sprintf (bufMess, "catgets 350-2: Name is invalid: \"%s\"", name);
+			retVal = 0;
+			*errMsg = bufMess;
+			yysptr = yysbuf;
+			yylineno = 1;
+			return retVal;
+			// goto Exit;
+		}
+		else {
+			retVal = 1;
+			*errMsg = bufMess;
+			yysptr = yysbuf;
+			yylineno = 1;
+			return retVal;
+			// goto Exit;
+		}
+  }
+
+// Exit:
+	fprintf( stderr, "You are not supposed to be here %s\n", __PRETTY_FUNCTION__ );
+	*errMsg = bufMess;
+	yysptr = yysbuf;
+	yylineno = 1;
+	return retVal;
 }
 
 int yyvstop[] = {
@@ -1437,296 +1467,297 @@ yylook ()
   yyfirst = 1;
   if (!yymorfg)
 #ifdef YYNLS16_WCHAR
-    yylastch = yytextuc;
+  yylastch = yytextuc;
 #else
 # ifdef YYCHAR_ARRAY
-    yylastch = (unsigned char *) yytext;
+  yylastch = (unsigned char *) yytext;
 # else
-    yylastch = yytext;
+  yylastch = yytext;
 # endif
 #endif
   else
-    {
-      yymorfg = 0;
+  {
+	yymorfg = 0;
 #ifdef YYNLS16_WCHAR
-      yylastch = yytextuc + yylenguc;
+	yylastch = yytextuc + yylenguc;
 #else
 # ifdef YYCHAR_ARRAY
-      yylastch = (unsigned char *) yytext + yyleng;
+	yylastch = (unsigned char *) yytext + yyleng;
 # else
-      yylastch = yytext + yyleng;
+	yylastch = yytext + yyleng;
 # endif
 #endif
-    }
+  }
   for (;;)
-    {
-      lsp = yylstate;
-      yyestate = yystate = yybgin;
-      if (yyprevious == YYNEWLINE)
-	yystate++;
-      for (;;)
+  {
+	lsp = yylstate;
+	yyestate = yystate = yybgin;
+	if (yyprevious == YYNEWLINE)
+  yystate++;
+	for (;;)
+  {
+# ifdef LEXDEBUG
+  if (debug)
+	fprintf (yyout, "state %d\n", yystate - yysvec - 1);
+# endif
+  yyt = &yycrank[yystate->yystoff];
+  if (yyt == yycrank && !yyfirst)
 	{
-# ifdef LEXDEBUG
-	  if (debug)
-	    fprintf (yyout, "state %d\n", yystate - yysvec - 1);
-# endif
-	  yyt = &yycrank[yystate->yystoff];
-	  if (yyt == yycrank && !yyfirst)
-	    {
-	      yyz = yystate->yyother;
-	      if (yyz == 0)
-		break;
-	      if (yyz->yystoff == 0)
-		break;
-	    }
-	  *yylastch++ = yych = input ();
-	  yyfirst = 0;
-	tryagain:
-# ifdef LEXDEBUG
-	  if (debug)
-	    {
-	      fprintf (yyout, "char ");
-	      allprint (yych);
-	      putchar ('\n');
-	    }
-# endif
-	  yyr = yyt;
-	  if ((int) yyt > (int) yycrank)
-	    {
-	      yyt = yyr + yych;
-	      if (yyt <= yytop && yyt->verify + yysvec == yystate)
-		{
-		  if (yyt->advance + yysvec == YYLERR)
-		    {
-		      unput (*--yylastch);
-		      break;
-		    }
-		  *lsp++ = yystate = yyt->advance + yysvec;
-		  goto contin;
-		}
-	    }
-# ifdef YYOPTIM
-	  else if ((int) yyt < (int) yycrank)
-	    {
-	      yyt = yyr = yycrank + (yycrank - yyt);
-# ifdef LEXDEBUG
-	      if (debug)
-		fprintf (yyout, "compressed state\n");
-# endif
-	      yyt = yyt + yych;
-	      if (yyt <= yytop && yyt->verify + yysvec == yystate)
-		{
-		  if (yyt->advance + yysvec == YYLERR)
-		    {
-		      unput (*--yylastch);
-		      break;
-		    }
-		  *lsp++ = yystate = yyt->advance + yysvec;
-		  goto contin;
-		}
-	      yyt = yyr + YYU (yymatch[yych]);
-# ifdef LEXDEBUG
-	      if (debug)
-		{
-		  fprintf (yyout, "try fall back character ");
-		  allprint (YYU (yymatch[yych]));
-		  putchar ('\n');
-		}
-# endif
-	      if (yyt <= yytop && yyt->verify + yysvec == yystate)
-		{
-		  if (yyt->advance + yysvec == YYLERR)
-		    {
-		      unput (*--yylastch);
-		      break;
-		    }
-		  *lsp++ = yystate = yyt->advance + yysvec;
-		  goto contin;
-		}
-	    }
-	  if ((yystate = yystate->yyother)
-	      && (yyt = &yycrank[yystate->yystoff]) != yycrank)
-	    {
-# ifdef LEXDEBUG
-	      if (debug)
-		fprintf (yyout, "fall back to state %d\n",
-			 yystate - yysvec - 1);
-# endif
-	      goto tryagain;
-	    }
-# endif
-	  else
-	    {
-	      unput (*--yylastch);
-	      break;
-	    }
-	contin:
-# ifdef LEXDEBUG
-	  if (debug)
-	    {
-	      fprintf (yyout, "state %d char ", yystate - yysvec - 1);
-	      allprint (yych);
-	      putchar ('\n');
-	    }
-# endif
-	  ;
+	yyz = yystate->yyother;
+	if (yyz == 0)
+  break;
+	if (yyz->yystoff == 0)
+  break;
 	}
+  *yylastch++ = yych = input ();
+  yyfirst = 0;
+  tryagain:
 # ifdef LEXDEBUG
-      if (debug)
+  if (debug)
 	{
-	  fprintf (yyout, "stopped at %d with ", *(lsp - 1) - yysvec - 1);
-	  allprint (yych);
-	  putchar ('\n');
-	}
-# endif
-      while (lsp-- > yylstate)
-	{
-	  *yylastch-- = 0;
-	  if (*lsp != 0 && (yyfnd = (*lsp)->yystops) && *yyfnd > 0)
-	    {
-	      yyolsp = lsp;
-	      if (yyextra[*yyfnd])
-		{
-		  while (yyback ((*lsp)->yystops, -*yyfnd) != 1
-			 && lsp > yylstate)
-		    {
-		      lsp--;
-		      unput (*yylastch--);
-		    }
-		}
-	      yyprevious = YYU (*yylastch);
-	      yylsp = lsp;
-#ifdef YYNLS16_WCHAR
-	      yylenguc = yylastch - yytextuc + 1;
-	      yytextuc[yylenguc] = 0;
-#else
-# ifdef YYCHAR_ARRAY
-	      yyleng = yylastch - (unsigned char *) yytext + 1;
-# else
-	      yyleng = yylastch - yytext + 1;
-# endif
-	      yytext[yyleng] = 0;
-#endif
-# ifdef LEXDEBUG
-	      if (debug)
-		{
-		  fprintf (yyout, "\nmatch ");
-#ifdef YYNLS16_WCHAR
-		  sprint (yytextuc);
-#else
-		  sprint (yytext);
-#endif
-		  fprintf (yyout, " action %d\n", *yyfnd);
-		}
-# endif
-	      return (*yyfnd++);
-	    }
-	  unput (*yylastch);
-	}
-#ifdef YYNLS16_WCHAR
-      if (yytextuc[0] == 0)
-#else
-      if (yytext[0] == 0)
-#endif
-	{
-	  yysptr = yysbuf;
-	  return (0);
-	}
-#ifdef YYNLS16_WCHAR
-      yyprevious = yytextuc[0] = input ();
-#else
-      yyprevious = yytext[0] = input ();
-#endif
-      if (yyprevious > 0)
-	{
-	  output (yyprevious);
-#ifdef YYNLS16
-	  if (yynls16)
-	    {
-	      int noBytes;
-	      sec = input ();
-	      third = input ();
-	      fourth = input ();
-#ifdef YYNLS16_WCHAR
-	      noBytes = MultiByte (yytextuc[0], sec, third, fourth);
-#else
-	      noBytes = MultiByte (yytext[0], sec, third, fourth);
-#endif
-	      switch (noBytes)
-		{
-		case 2:
-#ifdef YYNLS16_WCHAR
-		  output (yyprevious = yytextuc[0] = sec);
-#else
-		  output (yyprevious = yytext[0] = sec);
-#endif
-		  unput (fourth);
-		  unput (third);
-		  break;
-		case 3:
-#ifdef YYNLS16_WCHAR
-		  output (yyprevious = yytextuc[0] = sec);
-		  output (yyprevious = yytextuc[0] = third);
-#else
-		  output (yyprevious = yytext[0] = sec);
-		  output (yyprevious = yytext[0] = third);
-#endif
-		  unput (fourth);
-		  break;
-		case 4:
-#ifdef YYNLS16_WCHAR
-		  output (yyprevious = yytextuc[0] = sec);
-		  output (yyprevious = yytextuc[0] = third);
-		  output (yyprevious = yytextuc[0] = fourth);
-#else
-		  output (yyprevious = yytext[0] = sec);
-		  output (yyprevious = yytext[0] = third);
-		  output (yyprevious = yytext[0] = fourth);
-#endif
-		  break;
-		default:
-		  unput (fourth);
-		  unput (third);
-		  unput (sec);
-		  break;
-		}
-	    }
-#endif
-	}
-#ifdef YYNLS16_WCHAR
-      yylastch = yytextuc;
-#else
-# ifdef YYCHAR_ARRAY
-      yylastch = (unsigned char *) yytext;
-# else
-      yylastch = yytext;
-# endif
-#endif
-# ifdef LEXDEBUG
-      if (debug)
+	fprintf (yyout, "char ");
+	allprint (yych);
 	putchar ('\n');
+	}
 # endif
-    }
+  yyr = yyt;
+  if ((int) yyt > (int) yycrank)
+	{
+	yyt = yyr + yych;
+	if (yyt <= yytop && yyt->verify + yysvec == yystate)
+  {
+	if (yyt->advance + yysvec == YYLERR)
+	{
+	  unput (*--yylastch);
+	  break;
+	}
+	*lsp++ = yystate = yyt->advance + yysvec;
+	goto contin;
+  }
+	}
+# ifdef YYOPTIM
+  else if ((int) yyt < (int) yycrank)
+	{
+	yyt = yyr = yycrank + (yycrank - yyt);
+# ifdef LEXDEBUG
+	if (debug)
+  fprintf (yyout, "compressed state\n");
+# endif
+	yyt = yyt + yych;
+	if (yyt <= yytop && yyt->verify + yysvec == yystate)
+  {
+	if (yyt->advance + yysvec == YYLERR)
+	{
+	  unput (*--yylastch);
+	  break;
+	}
+	*lsp++ = yystate = yyt->advance + yysvec;
+	goto contin;
+  }
+	yyt = yyr + YYU (yymatch[yych]);
+# ifdef LEXDEBUG
+	if (debug)
+  {
+	fprintf (yyout, "try fall back character ");
+	allprint (YYU (yymatch[yych]));
+	putchar ('\n');
+  }
+# endif
+	if (yyt <= yytop && yyt->verify + yysvec == yystate)
+  {
+	if (yyt->advance + yysvec == YYLERR)
+	{
+	  unput (*--yylastch);
+	  break;
+	}
+	*lsp++ = yystate = yyt->advance + yysvec;
+	goto contin;
+  }
+	}
+  if ((yystate = yystate->yyother)
+	&& (yyt = &yycrank[yystate->yystoff]) != yycrank)
+	{
+# ifdef LEXDEBUG
+	if (debug)
+  fprintf (yyout, "fall back to state %d\n",
+	 yystate - yysvec - 1);
+# endif
+	goto tryagain;
+	}
+# endif
+  else
+	{
+	unput (*--yylastch);
+	break;
+	}
+  contin:
+# ifdef LEXDEBUG
+  if (debug)
+	{
+	fprintf (yyout, "state %d char ", yystate - yysvec - 1);
+	allprint (yych);
+	putchar ('\n');
+	}
+# endif
+  ;
+  }
+# ifdef LEXDEBUG
+	if (debug)
+  {
+  fprintf (yyout, "stopped at %d with ", *(lsp - 1) - yysvec - 1);
+  allprint (yych);
+  putchar ('\n');
+  }
+# endif
+	while (lsp-- > yylstate)
+  {
+  *yylastch-- = 0;
+  if (*lsp != 0 && (yyfnd = (*lsp)->yystops) && *yyfnd > 0)
+	{
+	yyolsp = lsp;
+	if (yyextra[*yyfnd])
+  {
+	while (yyback ((*lsp)->yystops, -*yyfnd) != 1
+	 && lsp > yylstate)
+	{
+	  lsp--;
+	  unput (*yylastch--);
+	}
+  }
+	yyprevious = YYU (*yylastch);
+	yylsp = lsp;
+#ifdef YYNLS16_WCHAR
+	yylenguc = yylastch - yytextuc + 1;
+	yytextuc[yylenguc] = 0;
+#else
+# ifdef YYCHAR_ARRAY
+	yyleng = yylastch - (unsigned char *) yytext + 1;
+# else
+	yyleng = yylastch - yytext + 1;
+# endif
+	yytext[yyleng] = 0;
+#endif
+# ifdef LEXDEBUG
+	if (debug)
+  {
+	fprintf (yyout, "\nmatch ");
+#ifdef YYNLS16_WCHAR
+	sprint (yytextuc);
+#else
+	sprint (yytext);
+#endif
+	fprintf (yyout, " action %d\n", *yyfnd);
+  }
+# endif
+	return *yyfnd++;
+	}
+  unput (*yylastch);
+  }
+#ifdef YYNLS16_WCHAR
+	if (yytextuc[0] == 0)
+#else
+	if (yytext[0] == 0)
+#endif
+  {
+  yysptr = yysbuf;
+  return 0;
+  }
+#ifdef YYNLS16_WCHAR
+	yyprevious = yytextuc[0] = input ();
+#else
+	yyprevious = yytext[0] = input ();
+#endif
+	if (yyprevious > 0)
+  {
+  output (yyprevious);
+#ifdef YYNLS16
+  if (yynls16)
+	{
+	int noBytes;
+	sec = input ();
+	third = input ();
+	fourth = input ();
+#ifdef YYNLS16_WCHAR
+	noBytes = MultiByte (yytextuc[0], sec, third, fourth);
+#else
+	noBytes = MultiByte (yytext[0], sec, third, fourth);
+#endif
+	switch (noBytes)
+  {
+  case 2:
+#ifdef YYNLS16_WCHAR
+	output (yyprevious = yytextuc[0] = sec);
+#else
+	output (yyprevious = yytext[0] = sec);
+#endif
+	unput (fourth);
+	unput (third);
+	break;
+  case 3:
+#ifdef YYNLS16_WCHAR
+	output (yyprevious = yytextuc[0] = sec);
+	output (yyprevious = yytextuc[0] = third);
+#else
+	output (yyprevious = yytext[0] = sec);
+	output (yyprevious = yytext[0] = third);
+#endif
+	unput (fourth);
+	break;
+  case 4:
+#ifdef YYNLS16_WCHAR
+	output (yyprevious = yytextuc[0] = sec);
+	output (yyprevious = yytextuc[0] = third);
+	output (yyprevious = yytextuc[0] = fourth);
+#else
+	output (yyprevious = yytext[0] = sec);
+	output (yyprevious = yytext[0] = third);
+	output (yyprevious = yytext[0] = fourth);
+#endif
+	break;
+  default:
+	unput (fourth);
+	unput (third);
+	unput (sec);
+	break;
+  }
+	}
+#endif
+  }
+#ifdef YYNLS16_WCHAR
+	yylastch = yytextuc;
+#else
+# ifdef YYCHAR_ARRAY
+	yylastch = (unsigned char *) yytext;
+# else
+	yylastch = yytext;
+# endif
+#endif
+# ifdef LEXDEBUG
+	if (debug)
+  putchar ('\n');
+# endif
+  }
 }
 
 int
-yyback (p, m)
-     int *p;
+yyback ( int *p, int m) // FIXME FIXME FIXME originally m was of unspecified type, added int keyword, according to code
 {
-  if (p == 0)
-    return (0);
-  while (*p)
-    {
-      if (*p++ == m)
-	return (1);
-    }
-  return (0);
+	if ( *p == 0) {  // FIXME FIXME FIXME originally, there was no dereference
+		return 0;
+	}
+	while (*p) {
+		if (*p++ == m) {
+			return 1;
+		}
+	}
+
+	return 0;
 }
 
 int
 yyinput ()
 {
-  return (input ());
+  return input ();
 
 }
 
@@ -1735,7 +1766,7 @@ void
 yyoutput (int c)
 #else
 yyoutput (c)
-     int c;
+   int c;
 # endif
 {
   output (c);
@@ -1746,7 +1777,7 @@ void
 yyunput (int c)
 #else
 yyunput (c)
-     int c;
+   int c;
 #endif
 {
   unput (c);

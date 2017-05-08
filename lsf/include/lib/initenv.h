@@ -20,9 +20,9 @@
 #pragma once
 
 char *getTempDir_ (void);
-static int parseLine (char *line, char **keyPtr, char **valuePtr);
-static int matchEnv (char *, struct config_param *);
-static int setConfEnv (char *, char *, struct config_param *);
+int parseLine (char *line, char **keyPtr, char **valuePtr);
+int matchEnv (char *, struct config_param *);
+int setConfEnv (char *, char *, struct config_param *);
 int initenv_ (struct config_param *userEnv, char *pathname);
 
 

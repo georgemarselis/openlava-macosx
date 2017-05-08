@@ -65,7 +65,7 @@ void
 displayShareResource (int argc, char **argv, int index, int flag, int extflag)
 {
 
-	uint numRes = 0;
+	unsigned int numRes = 0;
 	struct lsSharedResourceInfo *lsResourceInfo = NULL;
 	struct lsInfo *lsInfo = NULL;
 	char **resources = NULL, **resourceNames = NULL;
@@ -92,7 +92,8 @@ displayShareResource (int argc, char **argv, int index, int flag, int extflag)
 		resources = resourceNames;
 	}
 
-	TIMEIT( 0, (lsResourceInfo = ls_sharedresourceinfo (resources, &numRes, NULL, 0)), "ls_sharedresourceinfo");
+	// TIMEIT( 0, (
+	lsResourceInfo = ls_sharedresourceinfo (resources, &numRes, NULL, 0); // ), "ls_sharedresourceinfo");
 
 	if (lsResourceInfo == NULL)
 	{
@@ -102,11 +103,11 @@ displayShareResource (int argc, char **argv, int index, int flag, int extflag)
 
 
 
-	for( uint k = 0; k < numRes; k++)
+	for( unsigned int k = 0; k < numRes; k++)
 	{
-		for( uint i = 0; i < lsResourceInfo[k].nInstances; i++)
+		for( unsigned int i = 0; i < lsResourceInfo[k].nInstances; i++)
 		{
-			for ( uint j = 0; j < lsInfo->nRes; j++)
+			for ( unsigned int j = 0; j < lsInfo->nRes; j++)
 			{
 
 				if (!extflag) {  // FIXME FIXME refactor code to single if
@@ -176,7 +177,7 @@ prtTableHeader ()
 
 	if (res == NULL || val == NULL || loc == NULL)
 	{
-		printf (I18N_FUNC_FAIL_M, "prtTableHeader", "putstr_");
+		fprintf( stderr, "%s: %s() failed", __PRETTY_FUNCTION__ , "putstr_");
 		return;
 	}
 	else {
@@ -189,68 +190,61 @@ prtTableHeader ()
 static void
 prtOneInstance (char *name, struct lsSharedResourceInstance *instance)
 {
-  int i, currentPos, len;
-  char space52[] = "                                                    ";
-  char fmt[10];
+	unsigned int currentPos = 0;
+	size_t len = 0;
+	char space52[] = "                                                    "; // FIXME FIXME FIXME oddly specific
+	// char fmt[10];  // FIXME FIXME FIXME oddly specific
 
-  if ((len = strlen (instance->value)) <= 20)
-	{
-	  currentPos = 45 + 7;
-	  printf ("%-25s%20s       ", name, instance->value);
+	if ((len = strlen (instance->value)) <= 20) {
+		currentPos = 45 + 7;
+		printf ("%-25s%20s       ", name, instance->value);
 	}
-  else
-	{
-	  currentPos = 25 + len + 2;
-	  printf ("%-25s%20s  ", name, instance->value);
+	else {
+		currentPos = 25 + len + 2;
+		printf ("%-25s%20s  ", name, instance->value);
 	}
 
-  for (i = 0; i < instance->nHosts; i++)
-	{
+	for ( unsigned int i = 0; i < instance->nHosts; i++) {
 
-	  len = strlen (instance->hostList[i]);
-	  currentPos = currentPos + len + 1;
-	  sprintf (fmt, "%s%d%s ", "%", len, "s");
-	  if (currentPos > 80)
-	{
-	  printf ("\n%s", space52);
-	  currentPos = 52 + len + 1;
+		len = strlen (instance->hostList[i]);
+		currentPos = currentPos + len + 1;
+		// sprintf (fmt, "%s%zu%s ", "%", len, "s");
+		if (currentPos > 80) {						// FIXME FIXME FIXME FIXME we will need some termcap.h magic here.
+			printf ("\n%s", space52);
+			currentPos = 52 + len + 1;
+		}
+		fprintf( stdout, "%s%zu%s ", "%", len, "s", instance->hostList[i] ); // FIXME FIXME FIXME FIXME won't break at 80 lines
 	}
-	  printf (fmt, instance->hostList[i]);
-	}
-  printf ("\n");
+	printf ("\n");
+
+	return;
 }
 
 int
-makeShareField (char *hostname, int flag,
-		char ***nameTable, char ***valueTable, char ***formatTable)
+makeShareField (char *hostname, int flag, char ***nameTable, char ***valueTable, char ***formatTable)
 {
-  if (flag == TRUE)
-	{
-	  return makeShare (hostname, nameTable, valueTable, formatTable,
-			&isStaticSharedResource);
+	if (flag == TRUE) {
+		return makeShare (hostname, nameTable, valueTable, formatTable, &isStaticSharedResource);
 	}
-  else
-	{
-	  return makeShare (hostname, nameTable, valueTable, formatTable,
-			&isDynamicSharedResource);
+	else {
+		return makeShare (hostname, nameTable, valueTable, formatTable, &isDynamicSharedResource);
 	}
 }
 
 static int
-makeShare (char *hostname, char ***nameTable, char ***valueTable,
-		char ***formatTable, int (*resourceSelect) (struct resItem *))
+makeShare (char *hostname, char ***nameTable, char ***valueTable, char ***formatTable, int (*resourceSelect) (struct resItem *))
 {
-	static uint first = TRUE;
+	static unsigned int first = TRUE;
 	static struct lsSharedResourceInfo *resourceInfo = NULL;
 	static struct lsInfo *lsInfo = NULL;
 	static char **namTable = NULL;
 	static char **valTable = NULL;
 	static char **fmtTable = NULL;
-	static uint numRes = 0;
-	static int nRes = 0;
+	static unsigned int numRes = 0;
+	static unsigned int nRes = 0;
 	char *hPtr = NULL;
-	uint numHosts = 0;
-	uint found = 0;
+	unsigned int numHosts = 0;
+	unsigned int found = 0;
 
 	if (first == TRUE)
 	{
@@ -259,7 +253,8 @@ makeShare (char *hostname, char ***nameTable, char ***valueTable,
 			return (-1); // FIXME FIXME FIXME POSIX does not allow negative exit status
 		}
 
-		TIMEIT( 0, ( resourceInfo = ls_sharedresourceinfo (NULL, &numRes, NULL, 0 ) ), "ls_sharedresourceinfo" );
+		// TIMEIT( 0, ( 
+		resourceInfo = ls_sharedresourceinfo (NULL, &numRes, NULL, 0 ); // ), "ls_sharedresourceinfo" );
 
 		if( resourceInfo == NULL )
 		{
@@ -284,17 +279,17 @@ makeShare (char *hostname, char ***nameTable, char ***valueTable,
 	}
 	else
 	{
-		for( uint i = 0; i < nRes; i++ )
+		for( unsigned int i = 0; i < nRes; i++ )
 		{
 			FREEUP( fmtTable[i] );
 		}
 	}
 
 	nRes = 0;
-	for( uint k = 0; k < numRes; k++)
+	for( unsigned int k = 0; k < numRes; k++)
 	{
 		found = FALSE;
-		for( uint j = 0; j < lsInfo->nRes; j++ )
+		for( unsigned int j = 0; j < lsInfo->nRes; j++ )
 		{
 			if( strcmp( lsInfo->resTable[j].name, resourceInfo[k].resourceName ) == 0 )
 			{
@@ -314,10 +309,10 @@ makeShare (char *hostname, char ***nameTable, char ***valueTable,
 
 		namTable[ nRes ] = resourceInfo[ k ].resourceName;
 		found = FALSE;
-		for( uint i = 0; i < resourceInfo[ k ].nInstances; i++ )
+		for( unsigned int i = 0; i < resourceInfo[ k ].nInstances; i++ )
 		{
 			numHosts = resourceInfo[k].instances[i].nHosts;
-			for( uint ii = 0; ii < numHosts; ii++)
+			for( unsigned int ii = 0; ii < numHosts; ii++)
 			{
 				hPtr = resourceInfo[k].instances[i].hostList[ii];
 				if( strcmp( hPtr, hostname ) == 0 )
@@ -342,8 +337,8 @@ makeShare (char *hostname, char ***nameTable, char ***valueTable,
 
 	if( nRes )
 	{
-		uint j = 0;
-		for( uint i = 0; i < nRes; i++ )
+		unsigned int j = 0;
+		for( unsigned int i = 0; i < nRes; i++ )
 		{
 			char fmt[16] = ""; // FIXME 16? only 16?
 			int nameLen = 0;

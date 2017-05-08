@@ -11,6 +11,9 @@ AC_CONFIG_HEADERS([config.h])
 # Init configure aux dir
 AC_CONFIG_AUX_DIR([build-aux])
 
+# make autoconfiguration look for an external libintl
+AM_GNU_GETTEXT([external])
+
 # Init m4 macro dir
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -86,7 +89,7 @@ AC_FUNC_STRTOD
 AC_FUNC_WAIT3
 AC_CHECK_FUNCS([alarm atexit dup2 endgrent getcwd gethostbyaddr gethostbyname gethostname getpagesize gettimeofday inet_ntoa isascii memmove memset mkdir pow putenv rmdir select socket stime strcasecmp strchr strdup strerror strncasecmp strpbrk strrchr strstr strtol utime])
 
-AC_CONFIG_FILES([Makefile
+AC_CONFIG_FILES([Makefile po/Makefile.in
                 config/Makefile
                 docs/examples/Makefile
                 docs/man/Makefile

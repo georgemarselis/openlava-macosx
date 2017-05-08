@@ -23,6 +23,7 @@
 #include "libint/listset.h"
 #include "libint/lsftcl.h"
 #include "libint/resreq.h"
+
 #include "lsf.h"
 
 #define MINPASSWDLEN_LS      (3)
@@ -81,11 +82,8 @@ void delWindow (windows_t * wp);
 int hostOk (char *, int);
 int hostIsLocal (char *);
 int getHostAttribNonLim (char *hname, int updateIntvl);
-int parseResReq (char *, struct resVal *, struct lsInfo *, int);
 void initParse (struct lsInfo *);
 int getResEntry (const char *);
-void freeResVal (struct resVal *resVal);
-void initResVal (struct resVal *resVal);
 int hostValue (void);
 int getBootTime (time_t *);
 int procChangeUser_ (char *);
