@@ -68,7 +68,7 @@ hostValue (void)
 int
 getBootTime (time_t * bootTime)
 {
-  static char fname[] = "getBootTime";
+  static char __func__] = "getBootTime";
   FILE *fp;
   char *paths[] = { "/usr/bin/uptime", "/usr/ucb/uptime", "/bin/uptime",
 	"/usr/bsd/uptime", "/local/bin/uptime"
@@ -516,7 +516,7 @@ linux_getopt ( int nargc, char * const *nargv, const char *ostr)
 
 	/* catgets 653 */
 	// fprintf (stderr, (_i18n_msg_get ( ls_catd, NL_SETN, 653, "%s: illegal option -- %c\n")), p, linux_optopt);
-	fprintf (stderr, "catgets 653: %s: %s: illegal option -- %c\n", __PRETTY_FUNCTION__, p, linux_optopt);
+	fprintf (stderr, "catgets 653: %s: %s: illegal option -- %c\n", __func__, p, linux_optopt);
   }
 	  opterr = linux_opterr;
 	  optopt = linux_optopt;
@@ -546,7 +546,7 @@ linux_getopt ( int nargc, char * const *nargv, const char *ostr)
 		/* catgets 654 */
 		// (void) FIXME FIXME (void) was on the line below. Why?
 		// fprintf (stderr, (_i18n_msg_get ( ls_catd, NL_SETN, 654, "%s: option requires an argument -- %c\n")), p, linux_optopt);
-		fprintf (stderr, "catgets 654: %s: %s: option requires an argument -- %c\n", __PRETTY_FUNCTION__, p, linux_optopt);
+		fprintf (stderr, "catgets 654: %s: %s: option requires an argument -- %c\n", __func__, p, linux_optopt);
 
 	}
 	opterr = linux_opterr;
@@ -571,7 +571,7 @@ linux_getopt ( int nargc, char * const *nargv, const char *ostr)
 int
 compareAddrValues (char *rangeStr, char *valueStr)
 {
-  static char fname[] = "compareAddrValues";
+  static char __func__] = "compareAddrValues";
   int lowRange = INT_MAX;
   char *lowPtr = NULL;
   int highRange = INT_MAX;
@@ -660,7 +660,7 @@ compareAddrValues (char *rangeStr, char *valueStr)
 int
 withinAddrRange (char *addrRange, char *address)
 {
-  static char fname[] = "withinAddrRange";
+  static char __func__] = "withinAddrRange";
   char *nextAddr = NULL;
   char *mark1 = NULL;
   char *ptr1 = NULL;
@@ -840,7 +840,7 @@ validateAddrValue (char *rangeStr)
 int
 validateAddrRange (char *addrRange)
 {
-  static char fname[] = "validateAddrRange";
+  static char __func__] = "validateAddrRange";
   char *nextAddr = NULL;
   char *mark1 = NULL;
   char *ptr1 = NULL;

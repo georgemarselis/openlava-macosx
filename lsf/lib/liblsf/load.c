@@ -69,7 +69,7 @@ namestofilter_ (char **indxs )
 struct hostLoad *
 ls_loadinfo (char *resreq, size_t *numhosts, int options, char *fromhost, char **hostlist, size_t listsize, char ***indxnamelist)
 {
-    static char fname[] = "ls_loadinfo";
+    static char __func__] = "ls_loadinfo";
 
 
     int isClus          = 0;
@@ -264,7 +264,7 @@ ls_loadofhosts (char *resreq, size_t *numhosts, int options, char *fromhost, cha
 struct hostLoad *
 loadinfo_ (char *resReq, struct decisionReq *loadReqPtr, char *fromhost, unsigned long *numHosts, char ***outnlist)
 {
-    static char fname[] = "loadinfo_";
+    static char __func__] = "loadinfo_";
     static struct loadReply loadReply;
     char *hname;
     int options = 0;

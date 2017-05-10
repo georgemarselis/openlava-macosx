@@ -50,7 +50,7 @@ usage (char *cmd)
 int
 main (int argc, char **argv)
 {
-  static char fname[] = "lsload:main";
+  static char __func__] = "lsload:main";
   int i, j, num, numneeded;
   char *resreq = NULL;
   struct hostLoad *hosts;

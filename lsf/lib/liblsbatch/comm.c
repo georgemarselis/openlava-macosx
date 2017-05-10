@@ -108,7 +108,7 @@ int
 call_server (char *host, unsigned short serv_port, char *req_buf, size_t req_size,  char **rep_buf, struct LSFHeader *replyHdr, int conn_timeout, int recv_timeout, int *connectedSock, int (*postSndFunc) (), int *postSndFuncArg, int flags)
 {
     int cc;
-    static char fname[] = "call_server";
+    static char __func__] = "call_server";
     struct Buffer *sndBuf;
     struct Buffer reqbuf, reqbuf2, replybuf;
     struct Buffer *replyBufPtr;
@@ -251,7 +251,7 @@ call_server (char *host, unsigned short serv_port, char *req_buf, size_t req_siz
 int
 getServerMsg (int serverSock, struct LSFHeader *replyHdr, char **rep_buf)
 {
-    static char fname[] = "getServerMsg";
+    static char __func__] = "getServerMsg";
     size_t len;
     struct LSFHeader hdrBuf;
     XDR xdrs;
@@ -395,7 +395,7 @@ get_sbd_port (void)
 int
 callmbd (char *clusterName, char *request_buf, int requestlen, char **reply_buf, struct LSFHeader *replyHdr, int *serverSock, int (*postSndFunc) (), int *postSndFuncArg)
 {
-    static char fname[] = "callmbd";
+    static char __func__] = "callmbd";
     char *masterHost;
     unsigned short mbd_port;
     int cc;
@@ -510,7 +510,7 @@ callmbd (char *clusterName, char *request_buf, int requestlen, char **reply_buf,
 int
 cmdCallSBD_ (char *sbdHost, char *request_buf, int requestlen, char **reply_buf, struct LSFHeader *replyHdr, int *serverSock)
 {
-    static char fname[] = "cmdCallSBD_";
+    static char __func__] = "cmdCallSBD_";
     unsigned short sbdPort;
     int cc;
 

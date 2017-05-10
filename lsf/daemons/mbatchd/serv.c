@@ -52,7 +52,7 @@ do_submitReq (XDR * xdrs,
 	      struct lsfAuth *auth,
 	      int *schedule, int dispatch, struct jData **jobData)
 {
-  static char fname[] = "do_submitReq";
+  static char __func__] = "do_submitReq";
   static struct submitMbdReply submitReply;
   static int first = TRUE;
   static struct submitReq subReq;
@@ -141,7 +141,7 @@ do_jobInfoReq (XDR * xdrs,
 	       struct sockaddr_in *from,
 	       struct LSFHeader *reqHdr, int schedule)
 {
-  static char fname[] = "do_jobInfoReq";
+  static char __func__] = "do_jobInfoReq";
   char *reply_buf = NULL;
   char *buf = NULL;
   XDR xdrs2;
@@ -313,7 +313,7 @@ packJgrpInfo (struct jgTreeNode *jgNode, int remain, char **replyBuf,
   struct submitReq jobBill;
   struct LSFHeader hdr;
   char *request_buf = NULL;
-  static char fname[] = "packJgrpInfo";
+  static char __func__] = "packJgrpInfo";
   XDR xdrs;
   int i, len;
 
@@ -428,7 +428,7 @@ packJobInfo (struct jData *jobData,
 	     int remain,
 	     char **replyBuf, int schedule, int options, int version)
 {
-  static char fname[] = "packJobInfo";
+  static char __func__] = "packJobInfo";
   struct jobInfoReply jobInfoReply;
   struct submitReq jobBill;
   struct LSFHeader hdr;
@@ -816,7 +816,7 @@ do_jobPeekReq (XDR * xdrs, int chfd, struct sockaddr_in *from, char *hostName,
 	       struct LSFHeader *reqHdr, struct lsfAuth *auth)
 {
 
-  static char fname[] = "do_jobPeekReq";
+  static char __func__] = "do_jobPeekReq";
   char reply_buf[MSGSIZE];
   XDR xdrs2;
   struct jobPeekReq jobPeekReq;
@@ -869,7 +869,7 @@ int
 do_signalReq (XDR * xdrs, int chfd, struct sockaddr_in *from, char *hostName,
 	      struct LSFHeader *reqHdr, struct lsfAuth *auth)
 {
-  static char fname[] = "do_signalReq";
+  static char __func__] = "do_signalReq";
   char reply_buf[MSGSIZE];
   XDR xdrs2;
   static struct signalReq signalReq;
@@ -928,7 +928,7 @@ do_jobMsg (struct bucket *bucket,
 	   struct sockaddr_in *from,
 	   char *hostName, struct LSFHeader *reqHdr, struct lsfAuth *auth)
 {
-  static char fname[] = "do_jobMsg";
+  static char __func__] = "do_jobMsg";
   char reply_buf[MSGSIZE];
   XDR xdrs2;
   int reply;
@@ -1025,7 +1025,7 @@ int
 do_migReq (XDR * xdrs, int chfd, struct sockaddr_in *from, char *hostName,
 	   struct LSFHeader *reqHdr, struct lsfAuth *auth)
 {
-  static char fname[] = "do_migReq";
+  static char __func__] = "do_migReq";
   char reply_buf[MSGSIZE];
   XDR xdrs2;
   struct migReq migReq;
@@ -1086,7 +1086,7 @@ int
 do_statusReq (XDR * xdrs, int chfd, struct sockaddr_in *from, int *schedule,
 	      struct LSFHeader *reqHdr)
 {
-  static char fname[] = "do_statusReq()";
+  static char __func__] = "do_statusReq()";
   char reply_buf[MSGSIZE];
   XDR xdrs2;
   struct statusReq statusReq;
@@ -1175,7 +1175,7 @@ int
 do_chunkStatusReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
 		   int *schedule, struct LSFHeader *reqHdr)
 {
-  static char fname[] = "do_chunkStatusReq()";
+  static char __func__] = "do_chunkStatusReq()";
   char reply_buf[MSGSIZE];
   XDR xdrs2;
   struct chunkStatusReq chunkStatusReq;
@@ -1252,7 +1252,7 @@ int
 do_restartReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
 	       struct LSFHeader *reqHdr)
 {
-  static char fname[] = "do_restartReq()";
+  static char __func__] = "do_restartReq()";
   char *reply_buf;
   XDR xdrs2;
   int buflen;
@@ -1702,7 +1702,7 @@ int
 do_paramInfoReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
 		 struct LSFHeader *reqHdr)
 {
-  static char fname[] = "do_paramInfoReq()";
+  static char __func__] = "do_paramInfoReq()";
   char *reply_buf;
   XDR xdrs2;
   int reply;
@@ -1769,7 +1769,7 @@ do_queueControlReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
 		    char *hostName, struct LSFHeader *reqHdr,
 		    struct lsfAuth *auth)
 {
-  static char fname[] = "do_queueControlReq()";
+  static char __func__] = "do_queueControlReq()";
   struct controlReq bqcReq;
   char reply_buf[MSGSIZE];
   XDR xdrs2;
@@ -1811,7 +1811,7 @@ int
 do_mbdShutDown (XDR * xdrs, int s, struct sockaddr_in *from, char *hostName,
 		struct LSFHeader *reqHdr)
 {
-  static char fname[] = "do_mbdShutDown()";
+  static char __func__] = "do_mbdShutDown()";
   char reply_buf[MSGSIZE];
   XDR xdrs2;
   struct LSFHeader replyHdr;
@@ -1880,7 +1880,7 @@ do_hostControlReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
 		   char *hostName, struct LSFHeader *reqHdr,
 		   struct lsfAuth *auth)
 {
-  static char fname[] = "do_hostControlReq()";
+  static char __func__] = "do_hostControlReq()";
   struct controlReq hostControlReq;
   char reply_buf[MSGSIZE];
   XDR xdrs2;
@@ -1921,7 +1921,7 @@ do_jobSwitchReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
 		 char *hostName, struct LSFHeader *reqHdr,
 		 struct lsfAuth *auth)
 {
-  static char fname[] = "do_jobSwitchReq()";
+  static char __func__] = "do_jobSwitchReq()";
   char reply_buf[MSGSIZE];
   XDR xdrs2;
   struct jobSwitchReq jobSwitchReq;
@@ -1961,7 +1961,7 @@ int
 do_jobMoveReq (XDR * xdrs, int chfd, struct sockaddr_in *from, char *hostName,
 	       struct LSFHeader *reqHdr, struct lsfAuth *auth)
 {
-  static char fname[] = "do_jobMoveReq()";
+  static char __func__] = "do_jobMoveReq()";
   char reply_buf[MSGSIZE];
   XDR xdrs2;
   struct jobMoveReq jobMoveReq;
@@ -2009,7 +2009,7 @@ int
 do_modifyReq (XDR * xdrs, int s, struct sockaddr_in *from, char *hostName,
 	      struct LSFHeader *reqHdr, struct lsfAuth *auth)
 {
-  static char fname[] = "do_modifyReq()";
+  static char __func__] = "do_modifyReq()";
   static struct submitMbdReply submitReply;
   static int first = TRUE;
   static struct modifyReq modifyReq;
@@ -2044,7 +2044,7 @@ static void
 initSubmit (int *first, struct submitReq *subReq,
 	    struct submitMbdReply *submitReply)
 {
-  static char fname[] = "initSubmit";
+  static char __func__] = "initSubmit";
 
 
   if (*first == TRUE)
@@ -2092,7 +2092,7 @@ static int
 sendBack (int reply, struct submitReq *submitReq,
 	  struct submitMbdReply *submitReply, int chfd)
 {
-  static char fname[] = "sendBack()";
+  static char __func__] = "sendBack()";
   char reply_buf[MSGSIZE / 2];
   XDR xdrs2;
   struct LSFHeader replyHdr;
@@ -2123,7 +2123,7 @@ sendBack (int reply, struct submitReq *submitReq,
 void
 doNewJobReply (struct sbdNode *sbdPtr, int exception)
 {
-  static char fname[] = "doNewJobReply";
+  static char __func__] = "doNewJobReply";
   struct LSFHeader replyHdr;
   XDR xdrs;
   struct jData *jData = sbdPtr->jData;
@@ -2326,7 +2326,7 @@ hout:
 void
 doSwitchJobReply (struct sbdNode *sbdPtr, int exception)
 {
-  static char fname[] = "doSwitchJobReply";
+  static char __func__] = "doSwitchJobReply";
   struct LSFHeader replyHdr;
   XDR xdrs;
   struct jData *jData = sbdPtr->jData;
@@ -2422,7 +2422,7 @@ Leave:
 void
 doSignalJobReply (struct sbdNode *sbdPtr, int exception)
 {
-  static char fname[] = "doSignalJobReply";
+  static char __func__] = "doSignalJobReply";
   struct LSFHeader replyHdr;
   XDR xdrs;
   struct jData *jData = sbdPtr->jData;
@@ -2556,7 +2556,7 @@ addPendSigEvent (struct sbdNode *sbdPtr)
 int
 ctrlMbdDebug (struct debugReq *pdebug, struct lsfAuth *auth)
 {
-  static char fname[] = "ctrlMbdDebug";
+  static char __func__] = "ctrlMbdDebug";
   int opCode, level, newClass, options;
   char logFileName[MAXLSFNAMELEN];
   char lsfLogDir[MAXPATHLEN];
@@ -2727,7 +2727,7 @@ int
 do_debugReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
 	     char *hostName, struct LSFHeader *reqHdr, struct lsfAuth *auth)
 {
-  static char fname[] = "do_debugReq";
+  static char __func__] = "do_debugReq";
   struct debugReq debugReq;
   char reply_buf[MSGSIZE];
   XDR xdrs2;
@@ -2788,7 +2788,7 @@ int
 do_resourceInfoReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
 		    struct LSFHeader *reqHdr)
 {
-  static char fname[] = "do_resourceInfoReq";
+  static char __func__] = "do_resourceInfoReq";
   XDR xdrs2;
   static struct resourceInfoReq resInfoReq;
   struct lsbShareResourceInfoReply resInfoReply;
@@ -2935,7 +2935,7 @@ do_runJobReq (XDR * xdrs,
 	      struct sockaddr_in *from,
 	      struct lsfAuth *auth, struct LSFHeader *reqHeader)
 {
-  static char fname[] = "do_runJobReq()";
+  static char __func__] = "do_runJobReq()";
   struct runJobRequest runJobRequest;
   XDR replyXdr;
   struct LSFHeader lsfHeader;
@@ -2989,7 +2989,7 @@ int
 do_setJobAttr (XDR * xdrs, int s, struct sockaddr_in *from, char *hostName,
 	       struct LSFHeader *reqHdr, struct lsfAuth *auth)
 {
-  static char fname[] = "do_setJobAttr()";
+  static char __func__] = "do_setJobAttr()";
   struct jobAttrInfoEnt jobAttr;
   struct jData *job;
   XDR xdrs2;

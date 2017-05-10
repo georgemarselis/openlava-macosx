@@ -55,7 +55,7 @@ inQueueList (struct qData *entry)
 void
 checkQWindow (void)
 {
-  static char fname[] = "checkQWindow";
+  static char __func__] = "checkQWindow";
   struct qData *qp;
   struct dayhour dayhour;
   windows_t *wp;
@@ -179,7 +179,7 @@ int
 checkQueues (struct infoReq *queueInfoReqPtr,
 	     struct queueInfoReply *queueInfoReplyPtr)
 {
-  static char fname[] = "checkQueues()";
+  static char __func__] = "checkQueues()";
   struct qData *qp;
   struct qData *next;
   struct queueInfoEnt *qRep = NULL;
@@ -908,7 +908,7 @@ getQueueByIndex (int queueIndex)
 static time_t
 runWindowCloseTime (struct qData *qp)
 {
-  static char fname[] = "runWindowCloseTime";
+  static char __func__] = "runWindowCloseTime";
   struct dayhour dayhour;
   time_t deadline, lastdeadline, midnight, thismidnight, nowTime = now;
   char windOpen;

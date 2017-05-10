@@ -2363,7 +2363,7 @@ validType (char *type)
 int
 doResourceMap (FILE * fp, char *lsfile, size_t *lineNum)
 {
-    static char fname[] = "doResourceMap";
+    static char __func__] = "doResourceMap";
 
     char *linep;
     struct keymap keyList[] = {
@@ -2498,7 +2498,7 @@ doResourceMap (FILE * fp, char *lsfile, size_t *lineNum)
 int
 liblsf_addResourceMap (char *resName, char *location, char *lsfile, size_t lineNum)
 {
-    static char fname[] = "addResourceMap";
+    static char __func__] = "addResourceMap";
     struct lsSharedResourceInfo *resource;
     int i, j, numHosts = 0, first = TRUE, error;
     char **hosts = NULL, initValue[MAXFILENAMELEN], *sp, *cp, ssp, *instance;
@@ -2651,7 +2651,7 @@ liblsf_addResourceMap (char *resName, char *location, char *lsfile, size_t lineN
 int
 liblsf_parseHostList (char *hostList, char *lsfile, size_t lineNum, char ***hosts)
 {
-    static char fname[] = "parseHostList";
+    static char __func__] = "parseHostList";
     char *host = NULL;
     char *sp = NULL;
     char **hostTable = NULL;

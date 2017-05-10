@@ -39,7 +39,7 @@
 void
 lsb_mperr (char *msg)
 {
-    static char fname[] = "lsb_mperr()";
+    static char __func__] = "lsb_mperr()";
     char *p;
     char err[MAXLINELEN];
 
@@ -65,7 +65,7 @@ lsb_mperr (char *msg)
 void
 lsb_merr (char *s)
 {
-    char fname[] = "lsb_merr";
+    char __func__] = "lsb_merr";
     FILE *mail;
     char *myhostnm;
 
@@ -113,7 +113,7 @@ lsb_merr (char *s)
 void
 merr_user (char *user, char *host, char *msg, char *type)
 {
-    char fname[] = "merr_user";
+    char __func__] = "merr_user";
     FILE *mail;
     char *myhostnm;
 
@@ -170,7 +170,7 @@ addr_process (char *adbuf, char *user, char *tohost, char *spec)
 FILE *
 smail (char *to, char *tohost)
 {
-    char fname[] = "smail";
+    char __func__] = "smail";
     FILE *fmail = NULL;
     int maild[2]     = { 0, 0 };
     uid_t userid     = 0;

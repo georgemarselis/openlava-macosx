@@ -56,7 +56,7 @@ static int runlink (int sock, struct LSFHeader *hdr);
 void
 rfServ_ (int acceptSock)
 {
-  static char fname[] = "rfServ_()";
+  static char __func__] = "rfServ_()";
   struct LSFHeader msgHdr;
   struct LSFHeader buf;
   struct sockaddr_in from;
@@ -143,7 +143,7 @@ rfServ_ (int acceptSock)
 static int
 ropen (int sock, struct LSFHeader *hdr)
 {
-	static char fname[] = "ropen()";
+	static char __func__] = "ropen()";
 	int fd = 0 ;
 	XDR xdrs = { };
 	struct ropenReq req = { };
@@ -213,7 +213,7 @@ ropen (int sock, struct LSFHeader *hdr)
 static int
 rclose (int sock, struct LSFHeader *hdr)
 {
-  static char fname[] = "rclose()";
+  static char __func__] = "rclose()";
   int reqfd = 0 ;
   char *buf = malloc( sizeof( char ) * LSRCP_MSGSIZE + 1 );
   XDR xdrs;
@@ -256,7 +256,7 @@ rclose (int sock, struct LSFHeader *hdr)
 static int
 rwrite (int sock, struct LSFHeader *hdr)
 {
-  static char fname[] = "rwrite()";
+  static char __func__] = "rwrite()";
   struct rrdwrReq req = { };
   char *msgBuf = malloc( sizeof( char ) * LSRCP_MSGSIZE + 1 );
   XDR xdrs = { };
@@ -334,7 +334,7 @@ fail: // FIXME FIXME FIXME FIXME remove goto
 static int
 rread (int sock, struct LSFHeader *hdr)
 {
-	static char fname[] = "rread()";
+	static char __func__] = "rread()";
 	struct rrdwrReq req = { };
 	XDR xdrs            = { };
 	ssize_t readResult  = 0;
@@ -416,7 +416,7 @@ rread (int sock, struct LSFHeader *hdr)
 static int
 rlseek (int sock, struct LSFHeader *hdr)
 {
-	static char fname[] = "rlseek()";
+	static char __func__] = "rlseek()";
 	struct rlseekReq req = { };
 	XDR xdrs = { };
 	off_t pos = 0;
@@ -470,7 +470,7 @@ rlseek (int sock, struct LSFHeader *hdr)
 static int
 clearSock (int sock, int len)
 {
-  static char fname[] = "clearSock()";
+  static char __func__] = "clearSock()";
   int l;
   char buf[LSRCP_MSGSIZE];
 
@@ -491,7 +491,7 @@ clearSock (int sock, int len)
 static int
 rstat (int sock, struct LSFHeader *hdr)
 {
-  static char fname[] = "rstat()";
+  static char __func__] = "rstat()";
   struct stat st;
   char buf[LSRCP_MSGSIZE];
   char fn[MAXFILENAMELEN];
@@ -540,7 +540,7 @@ rstat (int sock, struct LSFHeader *hdr)
 static int
 rfstat (int sock, struct LSFHeader *hdr)
 {
-  static char fname[] = "rfstat()";
+  static char __func__] = "rfstat()";
   int reqfd;
   char msgBuf[LSRCP_MSGSIZE];
   XDR xdrs;
@@ -586,7 +586,7 @@ rfstat (int sock, struct LSFHeader *hdr)
 static int
 rgetmnthost (int sock, struct LSFHeader *hdr)
 {
-  static char fname[] = "rgetmnthost()";
+  static char __func__] = "rgetmnthost()";
   char buf[LSRCP_MSGSIZE];
   char fn[MAXFILENAMELEN], *host;
   XDR xdrs;
@@ -644,7 +644,7 @@ rgetmnthost (int sock, struct LSFHeader *hdr)
 static int
 runlink (int sock, struct LSFHeader *hdr) // FIXME FIXME is int the right choice here?
 {
-  static char fname[]    = "runlink()";
+  static char __func__]    = "runlink()";
   XDR xdrs               = { };
   struct stat st         = { };
   struct stringLen fnStr = { };

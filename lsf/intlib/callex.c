@@ -650,7 +650,7 @@ checkNameSpec (char *name, char **errMsg)
   }
 
 // Exit:
-	fprintf( stderr, "You are not supposed to be here %s\n", __PRETTY_FUNCTION__ );
+	fprintf( stderr, "You are not supposed to be here %s\n", __func__ );
 	*errMsg = bufMess;
 	yysptr = yysbuf;
 	yylineno = 1;

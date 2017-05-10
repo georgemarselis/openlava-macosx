@@ -31,7 +31,7 @@ initIdLibDefaults (IDLIB_INFO_T * idLib)
 static int
 initIdLib (IDLIB_INFO_T * idLib)
 {
-  static char fname[] = "initIdLib";
+  static char __func__] = "initIdLib";
   int retcode = -1;
   char *serverDir;
   char *libPath = NULL;

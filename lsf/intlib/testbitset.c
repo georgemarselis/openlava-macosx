@@ -67,8 +67,8 @@ void test_1 ()
 {
 	int vect[VECT_SIZE];
 	LS_BITSET_T *set;
-	char *fname  = malloc( sizeof(char) * strlen( __PRETTY_FUNCTION__ ) + 1);
-	strcpy( fname, __PRETTY_FUNCTION__ );
+	char *fname  = malloc( sizeof(char) * strlen( __func__ ) + 1);
+	strcpy( fname, __func__ );
 
 	for ( unsigned int i = 0; i < VECT_SIZE; i++) {
 		vect[i] = i + 1;
@@ -77,7 +77,7 @@ void test_1 ()
 	set = simpleSetCreate (VECT_SIZE, fname);
 	if (!set)
 	{
-		ls_syslog (LOG_ERR, "%s failed in creating set", __PRETTY_FUNCTION__);
+		ls_syslog (LOG_ERR, "%s failed in creating set", __func__);
 		exit (-1);
 	}
 
@@ -85,7 +85,7 @@ void test_1 ()
 	{
 		if (setAddElement (set, &vect[i]) < 0)
 		{
-			ls_syslog (LOG_ERR, "%s setAddElement failed for i=%d vect[i]=%d", __PRETTY_FUNCTION__, i, vect[i]);
+			ls_syslog (LOG_ERR, "%s setAddElement failed for i=%d vect[i]=%d", __func__, i, vect[i]);
 			setDumpSet (set, fname);
 			exit (-1);
 		}
@@ -93,13 +93,13 @@ void test_1 ()
 
 	setDumpSet (set, fname);
 
-	ls_syslog (LOG_ERR, "%s setGetNumElements=%d", __PRETTY_FUNCTION__, setGetNumElements (set));
+	ls_syslog (LOG_ERR, "%s setGetNumElements=%d", __func__, setGetNumElements (set));
 
 	for ( unsigned int i = 0; i < VECT_SIZE; i++)
 	{
 		if (setRemoveElement (set, &vect[i]) < 0)
 		{
-			ls_syslog (LOG_ERR, "%s setAddElement failed for i=%d vect[i]=%d", __PRETTY_FUNCTION__, i, vect[i]);
+			ls_syslog (LOG_ERR, "%s setAddElement failed for i=%d vect[i]=%d", __func__, i, vect[i]);
 			setDumpSet (set, fname);
 			exit (-1);
 		}
@@ -118,8 +118,8 @@ void test_2 ()
 	LS_BITSET_ITERATOR_T *iterator = NULL;
 	int *p = NULL;
 
-	char *fname  = malloc( sizeof(char) * strlen( __PRETTY_FUNCTION__ ) + 1);
-	strcpy( fname, __PRETTY_FUNCTION__ );
+	char *fname  = malloc( sizeof(char) * strlen( __func__ ) + 1);
+	strcpy( fname, __func__ );
 
 	for( unsigned int i = 0; i < VECT_SIZE; i++) {
 		vect[i] = i + 1;
@@ -128,7 +128,7 @@ void test_2 ()
 	set = simpleSetCreate (VECT_SIZE, fname);
 	if (!set)
 	{
-		ls_syslog (LOG_ERR, "%s failed in creating set", __PRETTY_FUNCTION__);
+		ls_syslog (LOG_ERR, "%s failed in creating set", __func__);
 		exit (-1);
 	}
 
@@ -136,19 +136,19 @@ void test_2 ()
 	{
 		if (setAddElement (set, &vect[i]) < 0)
 		{
-			ls_syslog (LOG_ERR, "%s setAddElement failed for i=%d vect[i]=%d", __PRETTY_FUNCTION__, i, vect[i]);
+			ls_syslog (LOG_ERR, "%s setAddElement failed for i=%d vect[i]=%d", __func__, i, vect[i]);
 			setDumpSet (set, fname);
 			exit (-1);
 		}
 	}
 	iterator = setIteratorCreate (set);
 	if (!iterator) {
-		ls_syslog (LOG_ERR, "%s setIteratorCreate failed", __PRETTY_FUNCTION__);
+		ls_syslog (LOG_ERR, "%s setIteratorCreate failed", __func__);
 		exit (-1);
 	}
 
 	while ( ( p = setIteratorGetNextElement (iterator) ) ) {     // FIXME FIXME FIXME this may actually be wrong, and just require == instead of =
-		ls_syslog (LOG_ERR, "%s next element in set %d", __PRETTY_FUNCTION__, *p);
+		ls_syslog (LOG_ERR, "%s next element in set %d", __func__, *p);
 	}
 
 	free( fname );
@@ -180,8 +180,8 @@ void test_3 ()
 	LS_BITSET_ITERATOR_T *iterator = NULL;
 	struct X *gimmeObject = NULL;
 
-	char *fname  = malloc( sizeof(char) * strlen( __PRETTY_FUNCTION__ ) + 1);
-	strcpy( fname, __PRETTY_FUNCTION__ );
+	char *fname  = malloc( sizeof(char) * strlen( __func__ ) + 1);
+	strcpy( fname, __func__ );
 
 	directFun = fun;
 	inverseFun = gun;
@@ -189,7 +189,7 @@ void test_3 ()
 
 	table = malloc( sizeof (struct X) * OBJ_SIZE);
 	if (!table) {
-		ls_syslog (LOG_ERR, "%s failed malloc for %d bytes", __PRETTY_FUNCTION__, OBJ_SIZE);
+		ls_syslog (LOG_ERR, "%s failed malloc for %d bytes", __func__, OBJ_SIZE);
 		exit (-1);
 	}
 
@@ -205,31 +205,31 @@ void test_3 ()
 
 	set = setCreate (OBJ_SIZE, directFun, inverseFun, fname);
 	if (!set) {
-		ls_syslog (LOG_ERR, "%s failed allocating %d bytes", __PRETTY_FUNCTION__, OBJ_SIZE);
+		ls_syslog (LOG_ERR, "%s failed allocating %d bytes", __func__, OBJ_SIZE);
 		exit (-1);
 	}
 
 	for ( unsigned int i = 0; i < OBJ_SIZE; i++) {
 
 		if (setAddElement (set, table[i]) < 0) {
-			ls_syslog (LOG_ERR, "%s setAddElement failed, index=%d", __PRETTY_FUNCTION__, i);
+			ls_syslog (LOG_ERR, "%s setAddElement failed, index=%d", __func__, i);
 			exit (-1);
 		}
-		ls_syslog (LOG_ERR, "%s adding element obj=%x  index=%d", __PRETTY_FUNCTION__, table[i], i);
+		ls_syslog (LOG_ERR, "%s adding element obj=%x  index=%d", __func__, table[i], i);
 	}
 
 	iterator = setIteratorCreate (set);
 	if (!iterator) {
-		ls_syslog (LOG_ERR, "%s setIteratorCreate() failed", __PRETTY_FUNCTION__);
+		ls_syslog (LOG_ERR, "%s setIteratorCreate() failed", __func__);
 		exit (-1);
 	}
 
 	bitseterrno = LS_BITSET_ERR_NOERR;
 	while( ( gimmeObject = (struct X *) setIteratorGetNextElement (iterator))) {
-		ls_syslog (LOG_ERR, "%s has an object with index %d = <%s>", __PRETTY_FUNCTION__, gimmeObject->index, gimmeObject->blaBla);
+		ls_syslog (LOG_ERR, "%s has an object with index %d = <%s>", __func__, gimmeObject->index, gimmeObject->blaBla);
 	}
 	if (bitseterrno != LS_BITSET_ERR_NOERR) {
-		ls_syslog (LOG_ERR, "%s %s", __PRETTY_FUNCTION__, setPerror (bitseterrno));
+		ls_syslog (LOG_ERR, "%s %s", __func__, setPerror (bitseterrno));
 		exit (-1);
 	}
 
@@ -246,8 +246,8 @@ void test_4 ()
 	char foo[] = "this string does nothing, please ignore";
 	int cc = 0;
 
-	char *fname  = malloc( sizeof(char) * strlen( __PRETTY_FUNCTION__ ) + 1);
-	strcpy( fname, __PRETTY_FUNCTION__ );
+	char *fname  = malloc( sizeof(char) * strlen( __func__ ) + 1);
+	strcpy( fname, __func__ );
 
 	set = simpleSetCreate (1, "Just one");
 
@@ -255,7 +255,7 @@ void test_4 ()
 		cc = setAddElement (set, (void *) (size_t) i); 		// cast is ok: upscales the type so it can be cast to void
 		if (cc < 0)
 		{
-			ls_syslog (LOG_ERR, "%s setAddElement() failed fuck item=%d", __PRETTY_FUNCTION__, i);
+			ls_syslog (LOG_ERR, "%s setAddElement() failed fuck item=%d", __func__, i);
 			exit (-1);
 		}
 	}
@@ -267,7 +267,7 @@ void test_4 ()
 	for ( unsigned int i = 0; i < 30000; i++) {			// FIXME FIXME FIXME 30000 seems oddly specific
 		cc = setAddElement (set1, (void *) (size_t) i); // cast is ok: upscales the type so it can be cast to void
 		if (cc < 0) {
-			ls_syslog (LOG_ERR, "%s setAddElement() failed fuck item=%d", __PRETTY_FUNCTION__, i);
+			ls_syslog (LOG_ERR, "%s setAddElement() failed fuck item=%d", __func__, i);
 			exit (-1);
 		}
 	}
@@ -279,7 +279,7 @@ void test_4 ()
 												// FIXME FIXME FIXME FIXME alter the signature of setIteratorAttach( )
 	cc = setIteratorAttach (&iter, set1, foo ); // ignore foo[]: in the body of setIteratorAttach, the 3rd argument gets ignored.
 	if (cc < 0) {
-		ls_syslog (LOG_ERR, "%s %s", __PRETTY_FUNCTION__, setPerror (bitseterrno));
+		ls_syslog (LOG_ERR, "%s %s", __func__, setPerror (bitseterrno));
 		exit (-1);
 	}
 

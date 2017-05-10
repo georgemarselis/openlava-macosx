@@ -72,7 +72,7 @@ extern float version;
 void
 treeInit ()
 {
-  static char fname[] = "treeInit";
+  static char __func__] = "treeInit";
   int mbdPid = getpid ();
 
   groupRoot = treeNewNode (JGRP_NODE_GROUP);
@@ -105,7 +105,7 @@ treeInit ()
 static TREE_OBSERVER_T *
 treeObserverCreate (char *name, void *entry, TREE_EVENT_OP_T eventOp)
 {
-  static char fname[] = "treeObserverCreate";
+  static char __func__] = "treeObserverCreate";
   struct treeObserver *observer;
 
   observer = (TREE_OBSERVER_T *) calloc (1, sizeof (TREE_OBSERVER_T));
@@ -717,7 +717,7 @@ printSubtree (struct jgTreeNode *root, FILE * out_file, int indent)
 void
 printTreeStruct (char *fileName)
 {
-  static char fname[] = "printTreeStruct";
+  static char __func__] = "printTreeStruct";
   FILE *out_file, *fopen ();
 
   if ((out_file = fopen (fileName, "w")) == NULL)
@@ -878,7 +878,7 @@ destroyJgArrayBaseRef (struct jgArrayBase *jgArrayBase)
 void
 checkJgrpDep (void)
 {
-  static char fname[] = "checkJgrpDep";
+  static char __func__] = "checkJgrpDep";
   struct jgTreeNode *nPtr;
   int iterNum = 0;
   time_t entryTime;
@@ -1043,7 +1043,7 @@ updJgrpCountByJStatus (struct jData *job, int oldStatus, int newStatus)
 int
 getIndexOfJStatus (int status)
 {
-  static char fname[] = "getIndexOfJStatus()";
+  static char __func__] = "getIndexOfJStatus()";
 
   switch (MASK_STATUS (status & ~JOB_STAT_UNKWN
 		       & ~JOB_STAT_PDONE & ~JOB_STAT_PERR))
@@ -1394,7 +1394,7 @@ static int
 isSelected (struct jobInfoReq *jobInfoReq, struct jData *jpbw,
 	    struct jgrpInfo *jgrp)
 {
-  static char fname[] = "isSelected()";
+  static char __func__] = "isSelected()";
   int i;
   char allqueues = jgrp->allqueues;
   char allusers = jgrp->allusers;

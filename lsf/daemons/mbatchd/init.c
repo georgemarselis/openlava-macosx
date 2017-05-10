@@ -722,7 +722,7 @@ readQueueConf (int mbdInitFlags)
 static void
 createDefQueue (void)
 {
-  static char fname[] = "createDefQueue";
+  static char __func__] = "createDefQueue";
   struct qData *qp;
 
   ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 6136, "%s: Using the default queue <default> provided by the batch system"), fname);	/* catgets 6136 */
@@ -1002,7 +1002,7 @@ addMember (struct gData *groupPtr,
 	   int grouptype,
 	   char *filename, struct gData *groups[], int *ngroups)
 {
-  static char fname[] = "addMember";
+  static char __func__] = "addMember";
   struct passwd *pw = NULL;
   char isgrp = FALSE;
   struct gData *subgrpPtr = NULL;
@@ -1110,7 +1110,7 @@ addMember (struct gData *groupPtr,
 static void
 parseAUids (struct qData *qp, char *line)
 {
-  static char fname[] = "parseAUids";
+  static char __func__] = "parseAUids";
   int i, numAds = 0, callFail = FALSE;
   char *sp, *word, *tempStr = NULL, *member;
   struct passwd *pw;
@@ -1324,7 +1324,7 @@ freeQData (struct qData *qp, int delete)
 static void
 parseGroups (int groupType, struct gData **group, char *line, char *filename)
 {
-  static char fname[] = "parseGroups";
+  static char __func__] = "parseGroups";
   char *word, *groupName, *grpSl = NULL;
   int lastChar, i;
   struct group *unixGrp;
@@ -1830,7 +1830,7 @@ addUnixGrp (struct group *unixGrp, char *grpName,
 static void
 getClusterData (void)
 {
-  static char fname[] = "getClusterData()";
+  static char __func__] = "getClusterData()";
   int i;
   int num;
 
@@ -1927,7 +1927,7 @@ getClusterData (void)
 static void
 setManagers (struct clusterInfo clusterInfo)
 {
-  static char fname[] = "setManagers";
+  static char __func__] = "setManagers";
   struct passwd *pw;
   int i, numValid = 0, gid, temNum = 0, tempId;
   char *sp;
@@ -1996,7 +1996,7 @@ setManagers (struct clusterInfo clusterInfo)
 static void
 setParams (struct paramConf *paramConf)
 {
-  static char fname[] = "setParams";
+  static char __func__] = "setParams";
   struct parameterInfo *params;
 
   if (paramConf == NULL || paramConf->param == NULL)
@@ -2056,7 +2056,7 @@ setParams (struct paramConf *paramConf)
 static void
 addUData (struct userConf *userConf)
 {
-  static char fname[] = "addUData";
+  static char __func__] = "addUData";
   struct userInfoEnt *uPtr;
   int i;
 
@@ -2076,7 +2076,7 @@ createTmpGData (struct groupInfoEnt *groups,
 		int num,
 		int groupType, struct gData *tempGData[], int *nTempGroups)
 {
-  static char fname[] = "createTmpGData";
+  static char __func__] = "createTmpGData";
   struct groupInfoEnt *gPtr;
   char *HUgroups, *sp, *wp;
   int i;
@@ -2160,7 +2160,7 @@ isHostAlias (char *grpName)
 static void
 addHostData (int numHosts, struct hostInfoEnt *hosts)
 {
-  static char fname[] = "addHostData";
+  static char __func__] = "addHostData";
   int i;
   int j;
   struct hData hPtr;
@@ -2695,7 +2695,7 @@ copyGroups (int copyHGroups)
 static void
 createCondNodes (int numConds, char **conds, char *fileName, int flags)
 {
-  static char fname[] = "createCondNodes";
+  static char __func__] = "createCondNodes";
   static int first = TRUE;
   int i, errcode = 0, jFlags = 0, new;
   struct lsfAuth auth;
@@ -2764,7 +2764,7 @@ updAllConfCond (void)
 static int
 updCondData (struct lsConf *conf, int fileType)
 {
-  static char fname[] = "updCondData";
+  static char __func__] = "updCondData";
   hEnt *hashEntryPtr;
   struct condData *condition;
   int status, i, needReadAgain = FALSE;
@@ -2841,7 +2841,7 @@ initConfData (void)
 static struct lsConf *
 getFileConf (char *fileName, int fileType)
 {
-  static char fname[] = "getFileConf";
+  static char __func__] = "getFileConf";
   struct lsConf *confPtr = NULL;
 
   confPtr = ls_getconf (fileName);
@@ -2992,7 +2992,7 @@ addDefaultHost (void)
 static void
 removeFlags (struct hTab *dataList, int flags, int listType)
 {
-  static char fname[] = "removeFlags()";
+  static char __func__] = "removeFlags()";
   sTab sTabPtr;
   hEnt *hEntPtr;
   struct hData *hData;
@@ -3224,7 +3224,7 @@ updQueueList (void)
 static void
 updUserList (int mbdInitFlags)
 {
-  static char fname[] = "updUserList()";
+  static char __func__] = "updUserList()";
   struct uData *defUser;
   struct gData *gPtr;
   int i;
@@ -3365,7 +3365,7 @@ updUserList (int mbdInitFlags)
 static void
 addUGDataValues (struct uData *gUData, struct gData *gPtr)
 {
-  static char fname[] = "addUGDataValues()";
+  static char __func__] = "addUGDataValues()";
   int i, numMembers;
   char **groupMembers;
   struct uData *uPtr;
@@ -3425,7 +3425,7 @@ addUGDataValues1 (struct uData *gUData, struct uData *uData)
 static int
 parseQHosts (struct qData *qp, char *hosts)
 {
-  static char fname[] = "parseQHosts";
+  static char __func__] = "parseQHosts";
   int i;
   int numAskedHosts = 0;
   struct askedHost *returnHosts;
@@ -3520,7 +3520,7 @@ fillClusterConf (struct clusterConf *clusterConf)
 static void
 fillSharedConf (struct sharedConf *sConf)
 {
-  static char fname[] = "fillSharedConf";
+  static char __func__] = "fillSharedConf";
 
   sConf->lsinfo = allLsInfo;
   sConf->servers = NULL;

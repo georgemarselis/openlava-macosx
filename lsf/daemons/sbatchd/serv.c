@@ -37,7 +37,7 @@ extern int lsbJobMemLimit;
 void
 do_newjob (XDR * xdrs, int chfd, struct LSFHeader *reqHdr)
 {
-  static char fname[] = "do_newjob()";
+  static char __func__] = "do_newjob()";
   char reply_buf[MSGSIZE];
   XDR xdrs2;
   struct jobSpecs jobSpecs;
@@ -215,7 +215,7 @@ sendReply:
 void
 do_switchjob (XDR * xdrs, int chfd, struct LSFHeader *reqHdr)
 {
-  static char fname[] = "do_switchjob()";
+  static char __func__] = "do_switchjob()";
   char reply_buf[MSGSIZE];
   XDR xdrs2;
   struct jobSpecs jobSpecs;
@@ -392,7 +392,7 @@ sendReply:
 void
 do_modifyjob (XDR * xdrs, int chfd, struct LSFHeader *reqHdr)
 {
-  static char fname[] = "do_switchjob()";
+  static char __func__] = "do_switchjob()";
   char reply_buf[MSGSIZE];
   XDR xdrs2;
   struct jobSpecs jobSpecs;
@@ -543,7 +543,7 @@ sendReply:
 void
 do_probe (XDR * xdrs, int chfd, struct LSFHeader *reqHdr)
 {
-  static char fname[] = "do_probe()";
+  static char __func__] = "do_probe()";
   char reply_buf[MSGSIZE];
   XDR xdrs2;
   struct LSFHeader replyHdr;
@@ -642,7 +642,7 @@ do_probe (XDR * xdrs, int chfd, struct LSFHeader *reqHdr)
 void
 do_sigjob (XDR * xdrs, int chfd, struct LSFHeader *reqHdr)
 {
-  static char fname[] = "do_sigjob()";
+  static char __func__] = "do_sigjob()";
   char reply_buf[MSGSIZE];
   XDR xdrs2;
   struct jobSig jobSig;
@@ -823,7 +823,7 @@ Reply1:
 void
 do_jobMsg (struct bucket *bucket, XDR * xdrs, int s, struct LSFHeader *reqHdr)
 {
-  static char fname[] = "do_jobMsg()";
+  static char __func__] = "do_jobMsg()";
   struct Buffer *buf;
   sbdReplyType reply;
   struct jobCard *jp = NULL;
@@ -888,7 +888,7 @@ Reply1:
 void
 deliverMsg (struct bucket *bucket)
 {
-  static char fname[] = "deliverMsg()";
+  static char __func__] = "deliverMsg()";
   struct clientNode *cliPtr;
   struct clientNode *nextClient;
   int nbytes;
@@ -987,7 +987,7 @@ deliverMsg (struct bucket *bucket)
 void
 do_reboot (XDR * xdrs, int chfd, struct LSFHeader *reqHdr)
 {
-  static char fname[] = "do_reboot()";
+  static char __func__] = "do_reboot()";
   char reply_buf[MSGSIZE / 8];
   XDR xdrs2;
   sbdReplyType reply;
@@ -1031,7 +1031,7 @@ do_reboot (XDR * xdrs, int chfd, struct LSFHeader *reqHdr)
 int
 ctrlSbdDebug (struct debugReq *pdebug)
 {
-  static char fname[] = "ctrlSbdDebug()";
+  static char __func__] = "ctrlSbdDebug()";
   int opCode;
   int level;
   int newClass;
@@ -1179,7 +1179,7 @@ ctrlSbdDebug (struct debugReq *pdebug)
 void
 do_sbdDebug (XDR * xdrs, int chfd, struct LSFHeader *reqHdr)
 {
-  static char fname[] = "do_sbdDebug()";
+  static char __func__] = "do_sbdDebug()";
   struct debugReq debugReq;
   char reply_buf[MSGSIZE / 8];
   XDR xdrs2;
@@ -1218,7 +1218,7 @@ do_sbdDebug (XDR * xdrs, int chfd, struct LSFHeader *reqHdr)
 void
 do_shutdown (XDR * xdrs, int chfd, struct LSFHeader *reqHdr)
 {
-  static char fname[] = "do_shutdown()";
+  static char __func__] = "do_shutdown()";
   char reply_buf[MSGSIZE / 8];
   XDR xdrs2;
   sbdReplyType reply;
@@ -1260,7 +1260,7 @@ do_shutdown (XDR * xdrs, int chfd, struct LSFHeader *reqHdr)
 void
 do_jobSetup (XDR * xdrs, int chfd, struct LSFHeader *reqHdr)
 {
-  static char fname[] = "do_jobSetup()";
+  static char __func__] = "do_jobSetup()";
   struct jobSetup jsetup;
   struct jobCard *jp = NULL;
   char found = FALSE;
@@ -1358,7 +1358,7 @@ do_jobSetup (XDR * xdrs, int chfd, struct LSFHeader *reqHdr)
 void
 do_jobSyslog (XDR * xdrs, int chfd, struct LSFHeader *reqHdr)
 {
-  static char fname[] = "do_jobSyslog()";
+  static char __func__] = "do_jobSyslog()";
   struct jobSyslog sysMsg;
 
   if (logclass & LC_TRACE)
@@ -1378,7 +1378,7 @@ void
 do_rmConn (XDR * xdrs, int s, struct LSFHeader *reqHdr,
 	   struct clientNode *cln)
 {
-  static char fname[] = "do_rmConn()";
+  static char __func__] = "do_rmConn()";
   char src[LSB_MAX_SD_LENGTH];
   char dest[LSB_MAX_SD_LENGTH];
   struct lsbMsgHdr header;
@@ -1447,7 +1447,7 @@ do_rmConn (XDR * xdrs, int s, struct LSFHeader *reqHdr,
 void
 do_lsbMsg (XDR * xdrs, int s, struct LSFHeader *reqHdr)
 {
-  static char fname[] = "do_lsbMsg";
+  static char __func__] = "do_lsbMsg";
   char src[LSB_MAX_SD_LENGTH];
   char dest[LSB_MAX_SD_LENGTH];
   struct lsbMsgHdr header;
@@ -1560,7 +1560,7 @@ do_lsbMsg (XDR * xdrs, int s, struct LSFHeader *reqHdr)
 static int
 replyHdrWithRC (int rc, int chfd, int jobId)
 {
-  static char fname[] = "replyHdrWithRC()";
+  static char __func__] = "replyHdrWithRC()";
   XDR xdrs2;
   char reply_buf[MSGSIZE];
   struct LSFHeader replyHdr;
@@ -1595,7 +1595,7 @@ replyHdrWithRC (int rc, int chfd, int jobId)
 static void
 do_syslogMsg (int s, char *buf)
 {
-  static char fname[] = "do_syslog";
+  static char __func__] = "do_syslog";
   char *level;
 
   if (logclass & LC_TRACE)
@@ -1618,7 +1618,7 @@ do_syslogMsg (int s, char *buf)
 static void
 do_rusageMsg (int s, struct jobCard *jp, struct lsbMsg *m, char *workMsgBuf)
 {
-  static char fname[] = "do_rusageMsg()";
+  static char __func__] = "do_rusageMsg()";
   int rc;
 
   if (!(jp->regOpFlag & REG_RUSAGE))
@@ -1638,7 +1638,7 @@ do_rusageMsg (int s, struct jobCard *jp, struct lsbMsg *m, char *workMsgBuf)
 static void
 do_regOpMsg (int s, struct jobCard *jp, struct lsbMsg *m, char *workMsgBuf)
 {
-  static char fname[] = "do_regOpMsg()";
+  static char __func__] = "do_regOpMsg()";
   char *op;
 
   ls_syslog (LOG_INFO, "\
@@ -1696,7 +1696,7 @@ static void
 do_chkpntEndMsg (int s, struct jobCard *jp, struct lsbMsg *m,
 		 char *workMsgBuf)
 {
-  static char fname[] = "do_chkpntEndMsg";
+  static char __func__] = "do_chkpntEndMsg";
 
   if (replyHdrWithRC (LSBE_NO_ERROR, s, m->header->jobId) < 0)
     ls_syslog (LOG_ERR, I18N_JOB_FAIL_S, fname,
@@ -1711,7 +1711,7 @@ do_chkpntEndMsg (int s, struct jobCard *jp, struct lsbMsg *m,
 static void
 do_getPid (int s, struct jobCard *jp, struct lsbMsg *m, char *workMsgBuf)
 {
-  static char fname[] = "do_getPid/sbd.serv.c";
+  static char __func__] = "do_getPid/sbd.serv.c";
   struct lsbMsgHdr pmMsgHdr;
   struct lsbMsg pmMsg;
   char regParam[128];

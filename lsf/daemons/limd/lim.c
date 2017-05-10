@@ -172,7 +172,7 @@ callLim_ (enum limReqCode reqCode,
 static int
 callLimTcp_ (char *reqbuf, char **rep_buf, int req_size, struct LSFHeader *replyHdr, int options)
 {
-  static char fname[] = "callLimTcp_";
+  static char __func__] = "callLimTcp_";
   char retried = FALSE;
   int cc = 0;
   XDR xdrs = 0;

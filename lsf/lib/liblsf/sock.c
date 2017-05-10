@@ -32,7 +32,7 @@ static int mLSFChanSockOpt = 0;
 int
 CreateSock_ (int protocol)
 {
-  static char fname[] = "CreateSock_";
+  static char __func__] = "CreateSock_";
   struct sockaddr_in cliaddr;
   int s;
   static unsigned short port;
@@ -128,7 +128,7 @@ CreateSock_ (int protocol)
 int
 CreateSockEauth_ (int protocol)
 {
-  static char fname[] = "CreateSock_";
+  static char __func__] = "CreateSock_";
   struct sockaddr_in cliaddr;
   int s;
   static unsigned short port;

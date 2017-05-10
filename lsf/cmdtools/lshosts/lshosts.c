@@ -316,7 +316,7 @@ print_long (struct hostInfo *hostInfo)
 int
 main (int argc, char **argv)
 {
-  static char fname[] = "lshosts/main";
+  static char __func__] = "lshosts/main";
   char *namebufs[256];
   struct hostInfo *hostinfo;
   int numhosts = 0;

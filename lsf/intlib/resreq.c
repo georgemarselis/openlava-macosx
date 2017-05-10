@@ -31,7 +31,7 @@ initParse (struct lsInfo *lsInfo)
 	hEnt *hashEntPtr = NULL;
 
 	if (logclass & (LC_TRACE | LC_SCHED)) {
-		ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", __PRETTY_FUNCTION__);
+		ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", __func__);
 	}
 
 	if (!h_TabEmpty_ (&resNameTbl)) {
@@ -139,7 +139,7 @@ parseResReq (char *resReq, struct resVal *resVal, struct lsInfo *lsInfo, int opt
 	size_t req_len = 0;
 
 	if (logclass & (LC_TRACE | LC_SCHED)) {
-		ls_syslog (LOG_DEBUG3, "%s: resReq=%s", __PRETTY_FUNCTION__, resReq);
+		ls_syslog (LOG_DEBUG3, "%s: resReq=%s", __func__, resReq);
 	}
 
 	initResVal (resVal);
@@ -328,7 +328,7 @@ parseSelect (char *resReq, struct resVal *resVal, struct lsInfo *lsInfo, bool_t 
 	char *resReq2 = NULL;
 
 	if (logclass & (LC_TRACE | LC_SCHED)) {
-		ls_syslog (LOG_DEBUG3, "%s: resReq=%s", __PRETTY_FUNCTION__, resReq);
+		ls_syslog (LOG_DEBUG3, "%s: resReq=%s", __func__, resReq);
 	}
 
 	if (parseXor && resReq[0] != '\0') {
@@ -351,7 +351,7 @@ parseSelect (char *resReq, struct resVal *resVal, struct lsInfo *lsInfo, bool_t 
 		free (countPtr);
 
 		if (logclass & (LC_TRACE | LC_SCHED)) {
-			ls_syslog (LOG_DEBUG3, "%s: numXorExprs = %d", __PRETTY_FUNCTION__, numXorExprs);
+			ls_syslog (LOG_DEBUG3, "%s: numXorExprs = %d", __func__, numXorExprs);
 		}
 
 		if (numXorExprs > 1) {
@@ -399,7 +399,7 @@ parseSelect (char *resReq, struct resVal *resVal, struct lsInfo *lsInfo, bool_t 
 
 				strcpy (resVal->xorExprs[i], tmpResVal.selectStr);
 				if (logclass & (LC_TRACE | LC_SCHED)) {
-					ls_syslog (LOG_DEBUG3, "%s: xorExprs[%d] = %s", __PRETTY_FUNCTION__, i, resVal->xorExprs[i]);
+					ls_syslog (LOG_DEBUG3, "%s: xorExprs[%d] = %s", __func__, i, resVal->xorExprs[i]);
 				}
 				if (i == 0) {
 					sprintf (resReq2, "(%s)", expr);
@@ -413,7 +413,7 @@ parseSelect (char *resReq, struct resVal *resVal, struct lsInfo *lsInfo, bool_t 
 
 			resVal->xorExprs[i] = NULL;
 			if (logclass & (LC_TRACE | LC_SCHED)) {
-				ls_syslog (LOG_DEBUG3, "%s: new selectStr=%s", __PRETTY_FUNCTION__, resReq2);
+				ls_syslog (LOG_DEBUG3, "%s: new selectStr=%s", __func__, resReq2);
 			}
 			resReq = resReq2;
 		}
@@ -975,8 +975,8 @@ resToClassNew (char *resReq, struct resVal *resVal, struct lsInfo *lsInfo)
 					t += strlen (tmpbuf);
 
 				case LS_EXTERNAL:
-					ls_syslog( LOG_DEBUG, "%s: case LS_EXTERNAL met, but was not handled", __PRETTY_FUNCTION__ ); 	// FIXME FIXME FIXME how to handle LS_EXTERNAL?
-					fprintf( stderr, "%s: case LS_EXTERNAL met, but was not handled", __PRETTY_FUNCTION__ );		// FIXME FIXME FIXME how to handle LS_EXTERNAL?
+					ls_syslog( LOG_DEBUG, "%s: case LS_EXTERNAL met, but was not handled", __func__ ); 	// FIXME FIXME FIXME how to handle LS_EXTERNAL?
+					fprintf( stderr, "%s: case LS_EXTERNAL met, but was not handled", __func__ );		// FIXME FIXME FIXME how to handle LS_EXTERNAL?
 				break;
 				default:
 

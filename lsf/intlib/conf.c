@@ -158,7 +158,7 @@ readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *lsfile, size_t
 	if (!value)
 	{
 		/* catgets 5402  */
-		sprintf( buff, "5402, %s: %s(%zu): missing '=' after keyword %s, section %s ignored", __PRETTY_FUNCTION__, lsfile, *lineNum, key, section);
+		sprintf( buff, "5402, %s: %s(%zu): missing '=' after keyword %s, section %s ignored", __func__, lsfile, *lineNum, key, section);
 		ls_syslog (LOG_ERR, buff );
 		doSkipSection (fp, lineNum, lsfile, section);
 		return -1;
@@ -172,7 +172,7 @@ readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *lsfile, size_t
 	if (value[0] == '\0')
 	{
 		/* catgets 5403  */
-		sprintf( buff, "5403, %s: %s(%zu): nul value after keyword %s, section %s ignored", __PRETTY_FUNCTION__, lsfile, *lineNum, key, section);
+		sprintf( buff, "5403, %s: %s(%zu): nul value after keyword %s, section %s ignored", __func__, lsfile, *lineNum, key, section);
 		ls_syslog (LOG_ERR, buff );
 		return -1;
 	}
@@ -189,7 +189,7 @@ readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *lsfile, size_t
 	{
 		char buff[2048] = "";
 		/* catgets 5404  */
-		sprintf( "5404, %s: %s(%d): bad keyword %s in section %s, ignoring the section", __PRETTY_FUNCTION__, lsfile, *lineNum, key, section );
+		sprintf( "5404, %s: %s(%d): bad keyword %s in section %s, ignoring the section", __func__, lsfile, *lineNum, key, section );
 		ls_syslog (LOG_ERR, buff );
 		doSkipSection (fp, lineNum, lsfile, section);
 		return -1;
@@ -210,7 +210,7 @@ readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *lsfile, size_t
 				{
 					/* catgets 5405  */
 					char buffer[2048] = "";
-					sprintf( buffer, "5405: %s: %s(%zu): required keyword %s is missing in section %s, ignoring the section", __PRETTY_FUNCTION__, lsfile, *lineNum, keyList[i].key, section);
+					sprintf( buffer, "5405: %s: %s(%zu): required keyword %s is missing in section %s, ignoring the section", __func__, lsfile, *lineNum, keyList[i].key, section);
 					ls_syslog (LOG_ERR, buff );
 					error = TRUE;
 				}
@@ -237,7 +237,7 @@ readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *lsfile, size_t
 	}
 
 	/* catgets 5406  */
-	sprintf( buff, "5406: %s: %s(%zu): Premature EOF in section %s", __PRETTY_FUNCTION__, lsfile, *lineNum, section );
+	sprintf( buff, "5406: %s: %s(%zu): Premature EOF in section %s", __func__, lsfile, *lineNum, section );
 	ls_syslog (LOG_ERR, buff); 
 
 	return -1;
@@ -412,14 +412,14 @@ putInLists (char *word, struct admins *admins, unsigned int *numAds, char *forWh
 	gid_t *tempGids = NULL;
 
 	if( !( pw = getpwnam( word ) ) ) {
-		ls_syslog (LOG_ERR, "%s: <%s> is not a valid user name; ignored", __PRETTY_FUNCTION__, word);
+		ls_syslog (LOG_ERR, "%s: <%s> is not a valid user name; ignored", __func__, word);
 		return 0;
 	}
 
 	if( isInlist( admins->adminNames, pw->pw_name, admins->nAdmins ) )
 	{
 		/* catgets 5411  */
-		ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5411, "%s: Duplicate user name <%s> %s; ignored"), __PRETTY_FUNCTION__, word, forWhat);
+		ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5411, "%s: Duplicate user name <%s> %s; ignored"), __func__, word, forWhat);
 		return 0;
 	}
 
@@ -441,7 +441,7 @@ putInLists (char *word, struct admins *admins, unsigned int *numAds, char *forWh
 
 		if (tempIds == NULL || tempGids == NULL || tempNames == NULL)
   		{
-			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "realloc");
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "realloc");
 			FREEUP (tempIds);
 			FREEUP (tempGids);
 			FREEUP (tempNames);

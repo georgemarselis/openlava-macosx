@@ -43,7 +43,7 @@ usage (char *cmd)
 int
 main (int argc, char **argv)
 {
-  static char fname[] = "lsplace/main";
+  static char __func__] = "lsplace/main";
   char *resreq = NULL;
   char *hostnames[MAXLISTSIZE];
   char **desthosts;

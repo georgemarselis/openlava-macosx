@@ -550,7 +550,7 @@ static void
 prtLoad (struct hostInfoEnt *hPtrs, struct lsInfo *lsInfo)
 {
 
-  static char fname[] = "prtLoad";
+  static char __func__] = "prtLoad";
   char **nlp = NULL;
   int i, nf;
   char **loadval;
@@ -894,7 +894,7 @@ displayShareRes (int argc, char **argv, int index)
   struct lsbSharedResourceInfo *lsbResourceInfo;
   int numRes = 0;
   char **resourceNames = NULL, **resources = NULL;
-  char fname[] = "displayShareRes";
+  char __func__] = "displayShareRes";
 
   if (argc > index)
     {

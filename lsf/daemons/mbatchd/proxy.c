@@ -25,7 +25,7 @@ LIST_T *pxyRsvJL = NULL;
 static int
 proxyUSJLEnter (LIST_T * list, void *extra, LIST_EVENT_T * event)
 {
-  static char fname[] = "proxyUSJLEnter";
+  static char __func__] = "proxyUSJLEnter";
   PROXY_LIST_ENTRY_T *pxyPred;
   PROXY_LIST_ENTRY_T *newPxy;
   struct jData *theJob;
@@ -71,7 +71,7 @@ proxyUSJLEnter (LIST_T * list, void *extra, LIST_EVENT_T * event)
 static int
 proxyUSJLLeave (LIST_T * list, void *extra, LIST_EVENT_T * event)
 {
-  static char fname[] = "proxyUSJLLeave";
+  static char __func__] = "proxyUSJLLeave";
   PROXY_LIST_ENTRY_T *pxy;
   struct jData *theJob;
   struct uData *uPtr;
@@ -112,7 +112,7 @@ proxyUSJLLeave (LIST_T * list, void *extra, LIST_EVENT_T * event)
 void
 proxyUSJLAttachObsvr ()
 {
-  static char fname[] = "proxyUSJLAttachObsvr";
+  static char __func__] = "proxyUSJLAttachObsvr";
   LIST_OBSERVER_T *observer;
   int rc;
 
@@ -146,7 +146,7 @@ proxyUSJLAttachObsvr ()
 void
 proxyUSJLAddEntry (struct jData *job)
 {
-  static char fname[] = "proxyHSJLAddEntry";
+  static char __func__] = "proxyHSJLAddEntry";
   LIST_EVENT_T event;
   int rc;
 
@@ -168,7 +168,7 @@ proxyUSJLAddEntry (struct jData *job)
 static int
 proxyHSJLEnter (LIST_T * list, void *extra, LIST_EVENT_T * event)
 {
-  static char fname[] = "proxyUSJLEnter";
+  static char __func__] = "proxyUSJLEnter";
   PROXY_LIST_ENTRY_T *pxyPred;
   PROXY_LIST_ENTRY_T *newPxy;
   struct jData *theJob;
@@ -219,7 +219,7 @@ proxyHSJLEnter (LIST_T * list, void *extra, LIST_EVENT_T * event)
 static int
 proxyHSJLLeave (LIST_T * list, void *extra, LIST_EVENT_T * event)
 {
-  static char fname[] = "proxyUSJLEnter";
+  static char __func__] = "proxyUSJLEnter";
   PROXY_LIST_ENTRY_T *pxy;
   struct jData *theJob;
 
@@ -262,7 +262,7 @@ proxyHSJLLeave (LIST_T * list, void *extra, LIST_EVENT_T * event)
 void
 proxyHSJLAttachObsvr ()
 {
-  static char fname[] = "proxyHSJLAttachObsvr";
+  static char __func__] = "proxyHSJLAttachObsvr";
   LIST_OBSERVER_T *observer;
   int rc;
 
@@ -296,7 +296,7 @@ proxyHSJLAttachObsvr ()
 void
 proxyHSJLAddEntry (struct jData *job)
 {
-  static char fname[] = "proxyHSJLAddEntry";
+  static char __func__] = "proxyHSJLAddEntry";
   LIST_EVENT_T event;
   int rc;
 
@@ -317,7 +317,7 @@ proxyHSJLAddEntry (struct jData *job)
 void
 proxyHRsvJLAddEntry (struct jData *job)
 {
-  static char fname[] = "proxyHRsvJLAddEntry";
+  static char __func__] = "proxyHRsvJLAddEntry";
   PROXY_LIST_ENTRY_T *pxy;
 
   if (logclass & LC_TRACE)
@@ -360,7 +360,7 @@ proxyHRsvJLAddEntry (struct jData *job)
 void
 proxyHRsvJLRemoveEntry (struct jData *job)
 {
-  static char fname[] = "proxyHRsvJLRemoveEntry";
+  static char __func__] = "proxyHRsvJLRemoveEntry";
   PROXY_LIST_ENTRY_T *pxy;
 
   if (logclass & LC_TRACE)
@@ -400,7 +400,7 @@ proxyHRsvJLRemoveEntry (struct jData *job)
 void
 proxyRsvJLAddEntry (struct jData *job)
 {
-  static char fname[] = "proxyRsvJLAddEntry";
+  static char __func__] = "proxyRsvJLAddEntry";
   PROXY_LIST_ENTRY_T *pxyPred;
   PROXY_LIST_ENTRY_T *newPxy;
 
@@ -447,7 +447,7 @@ proxyRsvJLAddEntry (struct jData *job)
 void
 proxyRsvJLRemoveEntry (struct jData *job)
 {
-  static char fname[] = "proxyRsvJLRemoveEntry";
+  static char __func__] = "proxyRsvJLRemoveEntry";
   PROXY_LIST_ENTRY_T *pxy;
 
   if (logclass & LC_TRACE)
@@ -491,7 +491,7 @@ static LIST_T *proxyEntFreeList = NULL;
 PROXY_LIST_ENTRY_T *
 proxyListEntryCreate (void *subject)
 {
-  static char fname[] = "proxyListEntryCreate";
+  static char __func__] = "proxyListEntryCreate";
   PROXY_LIST_ENTRY_T *pxy;
 
   if (proxyEntFreeList == NULL)

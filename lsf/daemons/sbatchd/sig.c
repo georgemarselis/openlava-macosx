@@ -71,7 +71,7 @@ int
 jobSigStart (struct jobCard *jp, int sigValue,
 	     int actFlags, int actPeriod, logType logFlag)
 {
-  static char fname[] = "sbd.sig.c/jobSigStart";
+  static char __func__] = "sbd.sig.c/jobSigStart";
   int defSigValue;
 
   char *actCmd;
@@ -714,7 +714,7 @@ jobSigLog (struct jobCard *jp, int finishStatus)
 int
 jobsig (struct jobCard *jp, int sig, int forkSig)
 {
-  static char fname[] = "sbd.job/jobsig";
+  static char __func__] = "sbd.job/jobsig";
   struct lsbMsgHdr pmMsgHdr;
   struct lsbMsg pmMsg;
   static int pmMsgId = 0;
@@ -777,7 +777,7 @@ jobsig (struct jobCard *jp, int sig, int forkSig)
 static int
 jobsig1 (struct jobCard *jp, int sig, int forkSig)
 {
-  static char fname[] = "jobsig1()";
+  static char __func__] = "jobsig1()";
   int preSig;
   int pid = -1;
 
@@ -847,7 +847,7 @@ jobsig1 (struct jobCard *jp, int sig, int forkSig)
 static int
 mykillpg (struct jobCard *jp, int sig)
 {
-  static char fname[] = "mykillpg";
+  static char __func__] = "mykillpg";
   static int sbdPgid = -1;
   struct jRusage *jru;
   int pgid0[1], *pgid, npgid;
@@ -1155,7 +1155,7 @@ mykillpg: job file name = %s\n", jobFileName);
 int
 updateJRru (struct jRusage *jru, char *jobFile)
 {
-  static char fname[] = "updateJRru()";
+  static char __func__] = "updateJRru()";
   int status;
   FILE *jrfPtr;
   struct jRusage tmpJru;
@@ -1232,7 +1232,7 @@ int
 jobact (struct jobCard *jp, int actValue, char *actCmd, int actFlags,
 	int forkSig)
 {
-  static char fname[] = "jobact";
+  static char __func__] = "jobact";
   pid_t pid;
   char exitFile[MAXFILENAMELEN], msg[MAXLINELEN * 2];
 
@@ -1353,7 +1353,7 @@ jobact (struct jobCard *jp, int actValue, char *actCmd, int actFlags,
 void
 exeActCmd (struct jobCard *jp, char *actCmd, char *exitFile)
 {
-  static char fname[] = "exeActCmd";
+  static char __func__] = "exeActCmd";
   pid_t pid1, actCmdExecPid;
   LS_WAIT_T status;
   char msg[MAXLINELEN * 2];
@@ -1590,7 +1590,7 @@ getJobPids (struct jobCard *jp)
 void
 execRestart (struct jobCard *jobCardPtr, struct hostent *hp)
 {
-  static char fname[] = "execRestart()";
+  static char __func__] = "execRestart()";
   struct jobSpecs *jspecs = &(jobCardPtr->jobSpecs);
   char *rargv[MAX_ARGS];
   char *erestartPath;
@@ -1840,7 +1840,7 @@ rcvPidPGid (char *message, pid_t * Pid, pid_t * PGid)
 void
 exeChkpnt (struct jobCard *jp, int chkFlags, char *exitFile)
 {
-  static char fname[] = "exeChkpnt";
+  static char __func__] = "exeChkpnt";
   char s[MAXFILENAMELEN], t[MAXFILENAMELEN];
 
 
@@ -2395,7 +2395,7 @@ writeChkLog (char *fn, char *chkpntDir, struct jobCard *jp,
 int
 sbdlog_newstatus (struct jobCard *jp)
 {
-  static char fname[] = "sbdlog_newstatus()";
+  static char __func__] = "sbdlog_newstatus()";
   char logFile[MAXFILENAMELEN];
   struct eventRec logPtr;
   int eno;

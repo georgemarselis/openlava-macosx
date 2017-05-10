@@ -578,7 +578,7 @@ Error:
 int
 evalDepCond (struct dptNode *node, struct jData *jobRec)
 {
-  static char fname[] = "evalDepCond";
+  static char __func__] = "evalDepCond";
   int value;
 
   switch (node->type)
@@ -1104,7 +1104,7 @@ initStackDep (void)
 static int
 pushStackDep (struct Stack *stack, struct dptNode *node)
 {
-  static char fname[] = "pushStackDep";
+  static char __func__] = "pushStackDep";
   char *sp;
   if (stack->size == stack->top + 1)
     {
@@ -1533,7 +1533,7 @@ opExpr (int opType, int operand1, int operand2)
 static int
 getCounterOfDep (int type, int *counts)
 {
-  static char fname[] = "getCounterOfDep()";
+  static char __func__] = "getCounterOfDep()";
   switch (type)
     {
     case DPT_NUMPEND:

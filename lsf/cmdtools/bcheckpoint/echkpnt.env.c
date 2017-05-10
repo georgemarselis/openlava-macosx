@@ -43,7 +43,7 @@ int
 fileIsExist (const char *pWorkPath)
 {
 
-  static char fname[] = "fileIsExist()";
+  static char __func__] = "fileIsExist()";
 
 
   static char pFileName[MAXPATHLEN];

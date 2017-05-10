@@ -51,7 +51,7 @@ getMsg (struct msgMap *msgMap, int *msg_ID, int number)
 char *
 lsb_suspreason (int reasons, int subreasons, struct loadIndexLog *ld)
 {
-    static char fname[] = "lsb_suspreason";
+    static char __func__] = "lsb_suspreason";
     msgbuf[0] = '\0';
 
     if (logclass & (LC_TRACE | LC_SCHED | LC_EXEC))  {
@@ -168,7 +168,7 @@ char *
 lsb_pendreason (int numReasons, int *rsTb, struct jobInfoHead *jInfoH,
         struct loadIndexLog *ld)
 {
-  static char fname[] = "lsb_pendreason";
+  static char __func__] = "lsb_pendreason";
   int i, j, num = 0;
   int hostId, reason, hostIdJ, reasonJ;
   static int *reasonTb, memSize = 0;

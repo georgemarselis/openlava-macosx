@@ -51,7 +51,7 @@ void die (int sig) __attribute__((noreturn));
 void
 die (int sig)
 {
-    static char fname[] = "die";
+    static char __func__] = "die";
     char *myhost = malloc( sizeof( char ) * MAXHOSTNAMELEN + 1 );
 
     if (debug > 1) {
@@ -133,7 +133,7 @@ die (int sig)
 int
 portok (struct sockaddr_in *from)
 {
-    static char fname[] = "portok";
+    static char __func__] = "portok";
     if (from->sin_family != AF_INET) {
         ls_syslog (LOG_ERR, "%s: sin_family(%d) != AF_INET(%d)", fname, from->sin_family, AF_INET);
         return FALSE;
@@ -154,7 +154,7 @@ int
 get_ports (void)
 {
 
-    static char fname[] = "get_ports";
+    static char __func__] = "get_ports";
     struct servent *sv;
 
     if (daemonParams[LSB_MBD_PORT].paramValue != NULL)
@@ -236,7 +236,7 @@ chuser (uid_t uid)
 static int
 chuserId (uid_t uid)
 {
-    static char fname[] = "chuserId";
+    static char __func__] = "chuserId";
 
     if (lsfSetXUid(0, 1, uid, -1, seteuid) < 0) {
         ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "setresuid/seteuid", (int) uid);
@@ -429,7 +429,7 @@ tmpListHeader (struct listEntry *listHeader)
 int
 fileExist (char *file, uid_t uid, struct hostent *hp)
 {
-    static char fname[] = "fileExist";
+    static char __func__] = "fileExist";
     pid_t pid;
     int fds[2] = { 0, 0 };
     int answer = 0;
@@ -508,7 +508,7 @@ freeWeek (windows_t * week[])
 void
 errorBack (uint chan, ushort replyCode, struct sockaddr_in *from)
 {
-    static char fname[] = "errorBack";
+    static char __func__] = "errorBack";
     struct LSFHeader replyHdr;
     XDR xdrs;
     char errBuf[MSGSIZE / 8];
@@ -565,7 +565,7 @@ scaleByFactor (uint *h32, uint *l32, float cpuFactor)
 struct tclLsInfo *
 getTclLsInfo (void)
 {
-    static char fname[] = "getTclLsInfo";
+    static char __func__] = "getTclLsInfo";
 
     if (tclLsInfo) {
         freeTclLsInfo (tclLsInfo, 0);
@@ -611,7 +611,7 @@ getTclLsInfo (void)
 struct resVal *
 checkThresholdCond (char *resReq)
 {
-    static char fname[] = "checkThresholdCond";
+    static char __func__] = "checkThresholdCond";
     struct resVal *resValPtr;
 
     resValPtr = (struct resVal *) my_malloc (sizeof (struct resVal), "checkThresholdCond");
@@ -658,7 +658,7 @@ getResMaps (uint nRes, char **resource)
 int
 checkResumeByLoad (LS_LONG_INT jobId, int num, struct thresholds thresholds, struct hostLoad *loads, uint *reason, uint *subreasons, int jAttrib, struct resVal *resumeCondVal, struct tclHostData *tclHostData)
 {
-    static char fname[] = "checkResumeByLoad";
+    static char __func__] = "checkResumeByLoad";
     int resume = TRUE;
     uint lastReason = *reason;
 
@@ -926,7 +926,7 @@ lsbFreeResVal (struct resVal **resVal)
 void
 doDaemonHang (char *caller)
 {
-    char fname[] = "doDaemonHang()";
+    char __func__] = "doDaemonHang()";
     struct timeval timeval;
     bool_t hanging = TRUE;
     

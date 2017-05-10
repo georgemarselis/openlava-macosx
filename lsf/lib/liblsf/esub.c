@@ -96,7 +96,7 @@ runEClient_ (struct lenData *ed, char **argv)
 static int
 getEData (struct lenData *ed, char **argv, const char *lsfUserName)
 {
-    char fname[] = "getEData";
+    char __func__] = "getEData";
 
     int ePorts[2];
     long cc = 0 ;
@@ -251,7 +251,7 @@ errorReturn:
 int
 runEexec_ (char *option, int job, struct lenData *eexec, char *path)
 {
-    static char fname[] = "runEexec";
+    static char __func__] = "runEexec";
 
     int p[2]            = {0, 0};
     int isRenew         = FALSE;
@@ -392,7 +392,7 @@ runEexec_ (char *option, int job, struct lenData *eexec, char *path)
 char *
 runEGroup_ (char *type, char *gname)
 {
-  static char fname[] = "runEGroup";
+  static char __func__] = "runEGroup";
   struct lenData ed;
   char lsfUserName[MAXLSFNAMELEN];
   char egroupPath[MAXFILENAMELEN];

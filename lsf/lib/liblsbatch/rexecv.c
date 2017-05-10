@@ -31,7 +31,7 @@ prtBETime2 (struct submit req)
   char sp[60];
 
   if (logclass & (LC_TRACE | LC_EXEC | LC_SCHED))
-    ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", __PRETTY_FUNCTION__);
+    ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", __func__);
 
 
   if (req.beginTime)
@@ -332,7 +332,7 @@ parseScript2 (FILE * from, int *embedArgc, char ***embedArgv, int option)
   # define szTmpShellCommands "%s\n) > $LSB_CHKFILENAME.shell\nchmod u+x $LSB_CHKFILENAME.shell\n$LSB_JOBFILENAME.shell\nsaveExit=$?\n/bin/rm -f $LSB_JOBFILENAME.shell\n(exit $saveExit)\n" // FIXME FIXME FIXME this shit has to go
 
   if (logclass & (LC_TRACE | LC_SCHED | LC_EXEC)) {
-    ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __PRETTY_FUNCTION__);
+    ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
   }
 
 /*  if (option & EMBED_BSUB) // FIXME FIXME what is this supposed to be ?
@@ -457,7 +457,7 @@ fillReq2 (int argc, char **argv, int operate, struct submit *req)
   char *myArgv0 = NULL;
 
   if (logclass & (LC_TRACE | LC_EXEC | LC_SCHED)) {
-    ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", __PRETTY_FUNCTION__);
+    ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", __func__);
   }
 
 

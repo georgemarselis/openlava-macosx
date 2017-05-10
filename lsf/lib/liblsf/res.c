@@ -589,7 +589,7 @@ int
 expectReturnCode_ (int s, pid_t seqno, struct LSFHeader *repHdr)
 {
   struct LSFHeader buf;
-  static char fname[] = "expectReturnCode_";
+  static char __func__] = "expectReturnCode_";
   XDR xdrs;
   int rc = 0;
 
@@ -720,7 +720,7 @@ resRC2LSErr_ (int resRC)
 int
 ackReturnCode_ (int s)
 {
-    static char fname[] = "ackReturnCode_";
+    static char __func__] = "ackReturnCode_";
     
     int rc = 0;
     int getcurseqnoReturnValue = 0;

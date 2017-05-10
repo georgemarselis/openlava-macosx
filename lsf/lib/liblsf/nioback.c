@@ -32,7 +32,7 @@
 int
 niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus, int terWhiPendStatus)
 {
-    static char fname[] = "niosCallback_";
+    static char __func__] = "niosCallback_";
     int s;
     struct niosConnect conn;
     struct {

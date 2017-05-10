@@ -146,7 +146,7 @@ lsb_submit (struct submit *jobSubReq, struct submitReply *submitRep)
 	};
 
 	if (logclass & (LC_TRACE | LC_EXEC)) {
-		ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __PRETTY_FUNCTION__);
+		ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
 	}
 
 	lsberrno = LSBE_BAD_ARG;
@@ -188,7 +188,7 @@ lsb_submit (struct submit *jobSubReq, struct submitReply *submitRep)
 	if ((grpEntry = getgrgid (getgid ())) == NULL)
 		{
 		if (logclass & (LC_TRACE | LC_EXEC))
-			ls_syslog (LOG_DEBUG, "%s: group id %d, does not have an name in the unix group file", __PRETTY_FUNCTION__, (int) getgid ());
+			ls_syslog (LOG_DEBUG, "%s: group id %d, does not have an name in the unix group file", __func__, (int) getgid ());
 		}
 	else
 		{
@@ -197,7 +197,7 @@ lsb_submit (struct submit *jobSubReq, struct submitReply *submitRep)
 		if (putEnv ("LSB_UNIXGROUP", grpEntry->gr_name) < 0)
 			{
 			if (logclass & (LC_TRACE | LC_EXEC))
-				ls_syslog (LOG_DEBUG, "%s: group <%s>, cannot be set in the environment.", __PRETTY_FUNCTION__, grpEntry->gr_name);
+				ls_syslog (LOG_DEBUG, "%s: group <%s>, cannot be set in the environment.", __func__, grpEntry->gr_name);
 			}
 		}
 
@@ -232,7 +232,7 @@ lsb_submit (struct submit *jobSubReq, struct submitReply *submitRep)
 		{
 		if (putEnv ("LSF_INTERACTIVE_STDERR", "y") < 0)
 			{
-			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_S, __PRETTY_FUNCTION__, "putenv");
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_S, __func__, "putenv");
 			}
 		}
 
@@ -259,7 +259,7 @@ getCommonParams (struct submit *jobSubReq, struct submitReq *submitReq, struct s
 	int useKb = 0;
 
 	if (logclass & (LC_TRACE | LC_EXEC)) {
-		ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __PRETTY_FUNCTION__);
+		ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
 	}
 
 	if (jobSubReq == NULL || submitRep == NULL)
@@ -465,7 +465,7 @@ getCommonParams (struct submit *jobSubReq, struct submitReq *submitReq, struct s
 		}
 
 	if (logclass & (LC_TRACE | LC_EXEC)) {
-		ls_syslog (LOG_DEBUG, "%s: Okay", __PRETTY_FUNCTION__);
+		ls_syslog (LOG_DEBUG, "%s: Okay", __func__);
 	}
 
 	return 0;
@@ -488,7 +488,7 @@ createJobInfoFile (struct submit *jobSubReq, struct lenData *jf)
 	unsigned int tsoptlen = 0;
 
 	if (logclass & (LC_TRACE | LC_EXEC)) {
-		ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __PRETTY_FUNCTION__);
+		ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
 	}
 
 	length += sizeof (CMDSTART);
@@ -534,7 +534,7 @@ createJobInfoFile (struct submit *jobSubReq, struct lenData *jf)
 		noEqual = FALSE;
 		if (logclass & (LC_TRACE | LC_EXEC))
 			{
-			ls_syslog (LOG_DEBUG, "%s: environment variable <%s>", __PRETTY_FUNCTION__, *ep);
+			ls_syslog (LOG_DEBUG, "%s: environment variable <%s>", __func__, *ep);
 			}
 
 		if (!strncmp (*ep, "LSB_JOBID=", 10) ||
@@ -593,7 +593,7 @@ createJobInfoFile (struct submit *jobSubReq, struct lenData *jf)
 				{
 				ls_syslog (LOG_DEBUG,
 						   "%s: environment variable <%s> doesn't have '='",
-						   __PRETTY_FUNCTION__, sp);
+						   __func__, sp);
 				}
 			}
 		else
@@ -648,7 +648,7 @@ createJobInfoFile (struct submit *jobSubReq, struct lenData *jf)
 		if (logclass & (LC_TRACE | LC_EXEC))
 			{
 			ls_syslog (LOG_DEBUG,
-					   "%s:length=%d, size=%d, jf->len=%d, numEnv=%d", __PRETTY_FUNCTION__,
+					   "%s:length=%d, size=%d, jf->len=%d, numEnv=%d", __func__,
 					   length, size, strlen (jf->data), ++numEnv);
 			}
 		FREEUP (oldp);
@@ -678,7 +678,7 @@ createJobInfoFile (struct submit *jobSubReq, struct lenData *jf)
 	if (logclass & (LC_TRACE | LC_EXEC))
 		{
 		ls_syslog (LOG_DEBUG, "%s:length=%d, size=%d, jf->len=%d, numEnv=%d",
-				   __PRETTY_FUNCTION__, length, size, strlen (jf->data), numEnv);
+				   __func__, length, size, strlen (jf->data), numEnv);
 		}
 
 	strcat (jf->data, TRAPSIGCMD);
@@ -723,7 +723,7 @@ send_batch (struct submitReq *submitReqPtr, struct lenData *jf, struct submitRep
 	LS_LONG_INT jobId;
 
 	if (logclass & (LC_TRACE | LC_EXEC)) {
-		ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __PRETTY_FUNCTION__);
+		ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
 	}
 
 	reqBufSize = (unsigned long)xdrSubReqSize (submitReqPtr);
@@ -732,7 +732,7 @@ send_batch (struct submitReq *submitReqPtr, struct lenData *jf, struct submitRep
 	if ( NULL == request_buf && ENOMEM == errno )
 		{
 		if (logclass & LC_EXEC) {
-			ls_syslog (LOG_DEBUG, "%s: request_buf malloc (%d) failed: %m", __PRETTY_FUNCTION__, reqBufSize);
+			ls_syslog (LOG_DEBUG, "%s: request_buf malloc (%d) failed: %m", __func__, reqBufSize);
 		}
 		lsberrno = LSBE_NO_MEM;
 		return -1;
@@ -759,7 +759,7 @@ send_batch (struct submitReq *submitReqPtr, struct lenData *jf, struct submitRep
 		{
 		xdr_destroy (&xdrs);
 		if (logclass & (LC_TRACE | LC_EXEC)) {
-			ls_syslog (LOG_DEBUG, "%s: callmbd() failed; cc=%d", __PRETTY_FUNCTION__, cc);
+			ls_syslog (LOG_DEBUG, "%s: callmbd() failed; cc=%d", __func__, cc);
 		}
 		free (request_buf);
 		return -1;
@@ -815,7 +815,7 @@ send_batch (struct submitReq *submitReqPtr, struct lenData *jf, struct submitRep
 		jobId = reply->jobId;
 		free (reply);
 		if (logclass & (LC_TRACE | LC_EXEC)) {
-			ls_syslog (LOG_DEBUG1, "%s: mbd says job <%s> has been restarted", __PRETTY_FUNCTION__, lsb_jobid2str (jobId));
+			ls_syslog (LOG_DEBUG1, "%s: mbd says job <%s> has been restarted", __func__, lsb_jobid2str (jobId));
 		}
 		return jobId;
 		}
@@ -867,7 +867,7 @@ subRestart (struct submit *jobSubReq, struct submitReq *submitReq, struct submit
 	chkPath = malloc( sizeof( char ) * MAXFILENAMELEN + 1);
 	
 	if (logclass & (LC_TRACE | LC_EXEC)) {
-		ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __PRETTY_FUNCTION__);
+		ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
 	}
 
 
@@ -916,7 +916,7 @@ subRestart (struct submit *jobSubReq, struct submitReq *submitReq, struct submit
 		}
 
 		if (logclass & (LC_TRACE | LC_EXEC)) {
-			ls_syslog (LOG_DEBUG1, "%s: Child tries to open chklog file <%s>", __PRETTY_FUNCTION__, chklog);
+			ls_syslog (LOG_DEBUG1, "%s: Child tries to open chklog file <%s>", __func__, chklog);
 		}
 		if( ( fp = fopen( chklog, "r" ) ) == NULL )	{
 			lsberrno = LSBE_BAD_CHKLOG;
@@ -930,7 +930,7 @@ subRestart (struct submit *jobSubReq, struct submitReq *submitReq, struct submit
 		jobLog = &logPtr->eventLog.jobNewLog;
 
 		if (logclass & (LC_TRACE | LC_EXEC)) {
-			ls_syslog (LOG_DEBUG1, "%s: Child got job log from chklog file", __PRETTY_FUNCTION__);
+			ls_syslog (LOG_DEBUG1, "%s: Child got job log from chklog file", __func__);
 		}
 
 		err.error = FALSE;
@@ -945,7 +945,7 @@ subRestart (struct submit *jobSubReq, struct submitReq *submitReq, struct submit
 		if (ed.len > 0) {
 			ssize_t temp = write (childIoFd[1], ed.data, ed.len);
 			if( temp == -1 ) {
-				ls_syslog (LOG_DEBUG1, "%s: Write could not complete", __PRETTY_FUNCTION__);
+				ls_syslog (LOG_DEBUG1, "%s: Write could not complete", __func__);
 			}
 
 			if ( (size_t)temp != ed.len) {
@@ -1060,10 +1060,10 @@ childExit:
 		{
 			if (logclass & (LC_TRACE | LC_EXEC)) {
 				if (exitVal == 0) {
-					ls_syslog (LOG_DEBUG1, "%s: Child succeeded in sending messages to parent", __PRETTY_FUNCTION__);
+					ls_syslog (LOG_DEBUG1, "%s: Child succeeded in sending messages to parent", __func__);
 				}
 				else{
-					ls_syslog (LOG_DEBUG, "%s: Child failed in sending messages to parent", __PRETTY_FUNCTION__);
+					ls_syslog (LOG_DEBUG, "%s: Child failed in sending messages to parent", __func__);
 				}
 			}
 			fclose (fp);
@@ -1209,7 +1209,7 @@ childExit:
 		}
 
 		if (logclass & (LC_TRACE | LC_EXEC)) {
-			ls_syslog (LOG_DEBUG1, "%s: Parent got the job log from child", __PRETTY_FUNCTION__);
+			ls_syslog (LOG_DEBUG1, "%s: Parent got the job log from child", __func__);
 		}
 
 
@@ -1434,7 +1434,7 @@ leave:
 
 parentErr:
 			if (logclass & (LC_TRACE | LC_EXEC)) {
-				ls_syslog (LOG_DEBUG, "%s: Parent failed in receiving messages from child", __PRETTY_FUNCTION__);
+				ls_syslog (LOG_DEBUG, "%s: Parent failed in receiving messages from child", __func__);
 			}
 			if (!err.error) {
 				lsberrno = LSBE_SYS_CALL;
@@ -1496,7 +1496,7 @@ getChkDir (char *givenDir, char *chkPath)
 		}
 	}
 
-	fprintf( stderr, "%s: i am not sure you are supposed to be here.\n", __PRETTY_FUNCTION__ );
+	fprintf( stderr, "%s: i am not sure you are supposed to be here.\n", __func__ );
 	return -666;
 }
 
@@ -2889,7 +2889,7 @@ prtBETime_ (struct submit *req)
 	char *sp = NULL;
 
 	if (logclass & (LC_TRACE | LC_EXEC | LC_SCHED)) {
-		ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", __PRETTY_FUNCTION__);
+		ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", __func__);
 	}
 
 	if (req->beginTime > 0)
@@ -4056,7 +4056,7 @@ parseLine_ (char *line, unsigned int *embedArgc, char ***embedArgv, char **errMs
 		argBuf = malloc (INCREASE * sizeof( *argBuf ) );
 		if (NULL == argBuf && ENOMEM == errno)
 			{
-			fprintf( stderr,  "%s: failure to allocate more memory for argBuf.\n", __PRETTY_FUNCTION__ ); // FIXME FIXME FIXME FIXME this should really be a call to syslog
+			fprintf( stderr,  "%s: failure to allocate more memory for argBuf.\n", __func__ ); // FIXME FIXME FIXME FIXME this should really be a call to syslog
 			return -1;
 			}
 		first = FALSE;
@@ -4112,8 +4112,8 @@ parseLine_ (char *line, unsigned int *embedArgc, char ***embedArgv, char **errMs
 				tmp = realloc (argBuf, (bufSize + INCREASE) * sizeof (char *));
 				if (NULL == tmp )
 					{
-					// PRINT_ERRMSG2 (errMsg, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "realloc");
-					fprintf( stderr, "%s: failed to realloc memory for argBuf\n", __PRETTY_FUNCTION__ );
+					// PRINT_ERRMSG2 (errMsg, I18N_FUNC_FAIL_M, __func__, "realloc");
+					fprintf( stderr, "%s: failed to realloc memory for argBuf\n", __func__ );
 					argNum = *embedArgc - 1;
 					*embedArgv = argBuf;
 					return -1;
@@ -4153,19 +4153,19 @@ parseOptFile_ (char *filename, struct submit *req, char **errMsg)
 	LS_WAIT_T status = 0;
 
 	if (logclass & (LC_TRACE | LC_SCHED | LC_EXEC)) {
-		ls_syslog (LOG_DEBUG, "%s: Entering function", __PRETTY_FUNCTION__);
+		ls_syslog (LOG_DEBUG, "%s: Entering function", __func__);
 	}
 	if (access (filename, F_OK) != 0)
 		{
-		// PRINT_ERRMSG3 (errMsg, I18N_FUNC_S_FAIL, __PRETTY_FUNCTION__, "access", filename);
-		fprintf( stderr, "%s: file access failure at filename %s\n", __PRETTY_FUNCTION__, filename);
+		// PRINT_ERRMSG3 (errMsg, I18N_FUNC_S_FAIL, __func__, "access", filename);
+		fprintf( stderr, "%s: file access failure at filename %s\n", __func__, filename);
 		return NULL;
 		}
 
 	if (socketpair (AF_UNIX, SOCK_STREAM, 0, childIoFd) < 0)
 		{
-		// PRINT_ERRMSG2 (errMsg, I18N_FUNC_FAIL, __PRETTY_FUNCTION__, "socketpair");
-		fprintf( stderr, "%s: failure at openting socket pair\n", __PRETTY_FUNCTION__ );
+		// PRINT_ERRMSG2 (errMsg, I18N_FUNC_FAIL, __func__, "socketpair");
+		fprintf( stderr, "%s: failure at openting socket pair\n", __func__ );
 		lsberrno = LSBE_SYS_CALL;
 		return NULL;
 		}
@@ -4175,8 +4175,8 @@ parseOptFile_ (char *filename, struct submit *req, char **errMsg)
 	if (pid < 0)
 		{
 		lsberrno = LSBE_SYS_CALL;
-//		PRINT_ERRMSG2 (errMsg, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "fork");
-		fprintf( stderr, "%s: could not fork \n", __PRETTY_FUNCTION__ );
+//		PRINT_ERRMSG2 (errMsg, I18N_FUNC_FAIL_M, __func__, "fork");
+		fprintf( stderr, "%s: could not fork \n", __func__ );
 		return NULL;
 		}
 	else if (pid == 0)
@@ -4190,11 +4190,11 @@ parseOptFile_ (char *filename, struct submit *req, char **errMsg)
 		if (setuid (uid) < 0)
 			{
 			lsberrno = LSBE_BAD_USER;
-			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "setuid");
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "setuid");
 			goto childExit;
 			}
 		if (logclass & (LC_TRACE | LC_EXEC)) {
-			ls_syslog (LOG_DEBUG1, "%s: Child tries to open a option file <%s>", __PRETTY_FUNCTION__, filename);
+			ls_syslog (LOG_DEBUG1, "%s: Child tries to open a option file <%s>", __func__, filename);
 		}
 		lineLen = 0;
 		childLine[0] = '\0';
@@ -4220,10 +4220,10 @@ parseOptFile_ (char *filename, struct submit *req, char **errMsg)
 		if (logclass & (LC_TRACE | LC_EXEC))
 			{
 			if (exitVal == 0) {
-				ls_syslog (LOG_DEBUG, "%s: Child succeeded in sending messages to parent", __PRETTY_FUNCTION__);
+				ls_syslog (LOG_DEBUG, "%s: Child succeeded in sending messages to parent", __func__);
 			}
 			else {
-				ls_syslog (LOG_DEBUG, "%s: Child failed in sending messages to parent", __PRETTY_FUNCTION__);
+				ls_syslog (LOG_DEBUG, "%s: Child failed in sending messages to parent", __func__);
 			}
 			}
 		close (childIoFd[1]);
@@ -4240,7 +4240,7 @@ parseOptFile_ (char *filename, struct submit *req, char **errMsg)
 	close (childIoFd[1]);
 	if (WEXITSTATUS (status))
 		{
-		ls_syslog (LOG_DEBUG, "%s: child failed!", __PRETTY_FUNCTION__);
+		ls_syslog (LOG_DEBUG, "%s: child failed!", __func__);
 		goto parentErr;
 		}
 
@@ -4253,7 +4253,7 @@ parseOptFile_ (char *filename, struct submit *req, char **errMsg)
 	if (NULL == lineBuf && ENOMEM == errno  )
 		{
 		if (logclass & (LC_TRACE | LC_EXEC)) {
-			ls_syslog (LOG_DEBUG, "%s: parent malloc faild!", __PRETTY_FUNCTION__);
+			ls_syslog (LOG_DEBUG, "%s: parent malloc faild!", __func__);
 		}
 		goto parentErr;
 		}
@@ -4286,7 +4286,7 @@ parseOptFile_ (char *filename, struct submit *req, char **errMsg)
 
 parentErr:
 	if (logclass & (LC_TRACE | LC_EXEC)) {
-		ls_syslog (LOG_DEBUG, "%s: parent malloc faild!", __PRETTY_FUNCTION__);
+		ls_syslog (LOG_DEBUG, "%s: parent malloc faild!", __func__);
 	}
 	FREEUP (lineBuf);
 	close (childIoFd[0]);
@@ -4406,7 +4406,7 @@ parseXF (struct submit *req, char *arg, char **errMsg)
 		if ( NULL == xp && ENOMEM == errno ) {
 			if (errMsg != NULL) {
 				 /* catgets 4 */
-				sprintf (*errMsg, "catgets 4: %s: %s() failed, %s.", __PRETTY_FUNCTION__, "malloc", lsb_sysmsg ());
+				sprintf (*errMsg, "catgets 4: %s: %s() failed, %s.", __func__, "malloc", lsb_sysmsg ());
 			}
 			else {
 				/* catgets 484 */
@@ -4526,7 +4526,7 @@ parseXF (struct submit *req, char *arg, char **errMsg)
 			if (errMsg != NULL)
 				{
 				/* catgets 4 */
-				sprintf (*errMsg, "catgets 4: %s: %s() failed, %s.", __PRETTY_FUNCTION__, "myrealloc", lsb_sysmsg ());
+				sprintf (*errMsg, "catgets 4: %s: %s() failed, %s.", __func__, "myrealloc", lsb_sysmsg ());
 				}
 			else {
 				/* catgets 484 */
@@ -4694,7 +4694,7 @@ fprintf(parmfp, "%s=%d\n", name, (int) field); \
 
 
 
-	sprintf (esub, "%s/%s", lsbParams[LSB_SERVERDIR].paramValue, __PRETTY_FUNCTION__);
+	sprintf (esub, "%s/%s", lsbParams[LSB_SERVERDIR].paramValue, __func__);
 	if (stat (esub, &sbuf) < 0) {
 		return 0;
 	}
@@ -4923,7 +4923,7 @@ fprintf(parmfp, "%s=%d\n", name, (int) field); \
 	if ((cc = runEsub_ (ed_, NULL)) < 0)
 		{
 		if (logclass & LC_TRACE) {
-			ls_syslog (LOG_DEBUG, "%s: runEsub_() failed %d: %M", __PRETTY_FUNCTION__, cc);
+			ls_syslog (LOG_DEBUG, "%s: runEsub_() failed %d: %M", __func__, cc);
 		}
 		if (cc == -2)
 			{
@@ -5272,7 +5272,7 @@ modifyJobInformation (struct submit *jobSubReq)
 							if (checkEmptyString (line))
 								{
 								/* catgets 5557 */
-								ls_syslog (LOG_WARNING, "catgets 5557: %s: The value of parameter %s is empty, the setting will be ignored.", __PRETTY_FUNCTION__, key);
+								ls_syslog (LOG_WARNING, "catgets 5557: %s: The value of parameter %s is empty, the setting will be ignored.", __func__, key);
 								break;
 								}
 
@@ -5296,7 +5296,7 @@ modifyJobInformation (struct submit *jobSubReq)
 								if (sValue == NULL)
 									{
 									/* catgets 5556 */
-									ls_syslog (LOG_WARNING, "catgets 5556: %s: Bad value(%s) read from $LSB_SUB_MODIFY_FILE for parameter %s, the setting will be ignored.", __PRETTY_FUNCTION__, line, key);
+									ls_syslog (LOG_WARNING, "catgets 5556: %s: Bad value(%s) read from $LSB_SUB_MODIFY_FILE for parameter %s, the setting will be ignored.", __func__, line, key);
 									break;
 									}
 
@@ -5332,7 +5332,7 @@ modifyJobInformation (struct submit *jobSubReq)
 								if (!stringIsDigitNumber (line))
 									{
 									/* catgets 5551 */
-									ls_syslog (LOG_WARNING, "catgets 5551: %s: Bad value(%s) read from $LSB_SUB_MODIFY_FILE for parameter %s, the setting will be ignored. The value of this parameter can  only be SUB_RESET or an integer.", __PRETTY_FUNCTION__, line, key);
+									ls_syslog (LOG_WARNING, "catgets 5551: %s: Bad value(%s) read from $LSB_SUB_MODIFY_FILE for parameter %s, the setting will be ignored. The value of this parameter can  only be SUB_RESET or an integer.", __func__, line, key);
 									break;
 									}
 
@@ -5356,14 +5356,14 @@ modifyJobInformation (struct submit *jobSubReq)
 							else
 								{
 								/* catgets 5554 */
-								ls_syslog (LOG_WARNING, "catgets 5554: %s: Bad value(%s) read from $LSB_SUB_MODIFY_FILE for parameter %s, the setting will be ignored. The value of this parameter can only be SUB_RESET or 'Y'.", __PRETTY_FUNCTION__, line, key);
+								ls_syslog (LOG_WARNING, "catgets 5554: %s: Bad value(%s) read from $LSB_SUB_MODIFY_FILE for parameter %s, the setting will be ignored. The value of this parameter can only be SUB_RESET or 'Y'.", __func__, line, key);
 								}
 							break;
 							case STR2PARM:
 							if (checkEmptyString (line))
 								{
 								/* catgets 5557 */
-								ls_syslog (LOG_WARNING, "catgets 5557: %s: The value of parameter %s is empty, the setting will be ignored.", __PRETTY_FUNCTION__, key);
+								ls_syslog (LOG_WARNING, "catgets 5557: %s: The value of parameter %s is empty, the setting will be ignored.", __func__, key);
 								break;
 								}
 
@@ -5379,7 +5379,7 @@ modifyJobInformation (struct submit *jobSubReq)
 								if (sValue == NULL)
 									{
 									/* catgets 5556 */
-									ls_syslog (LOG_WARNING, "catgets 5556: %s: Bad value(%s) read from $LSB_SUB_MODIFY_FILE for parameter %s, the setting will be ignored.", __PRETTY_FUNCTION__, line, key);
+									ls_syslog (LOG_WARNING, "catgets 5556: %s: Bad value(%s) read from $LSB_SUB_MODIFY_FILE for parameter %s, the setting will be ignored.", __func__, line, key);
 									break;
 									}
 
@@ -5400,7 +5400,7 @@ modifyJobInformation (struct submit *jobSubReq)
 								if (!stringIsDigitNumber (line))
 									{
 									/* catgets 5557 ? */
-									// ls_syslog (LOG_WARNING, _i18n_msg_get(ls_catd,NL_SETN,msgid,msg), __PRETTY_FUNCTION__, line, key);
+									// ls_syslog (LOG_WARNING, _i18n_msg_get(ls_catd,NL_SETN,msgid,msg), __func__, line, key);
 									break;
 									}
 
@@ -5424,7 +5424,7 @@ modifyJobInformation (struct submit *jobSubReq)
 							else
 								{
 								/* catgets 5554 */
-								ls_syslog (LOG_WARNING, "catgets 5554: %s: Bad value(%s) read from $LSB_SUB_MODIFY_FILE for parameter %s, the setting will be ignored. The value of this parameter can only be SUB_RESET or 'Y'.", __PRETTY_FUNCTION__, line, key);
+								ls_syslog (LOG_WARNING, "catgets 5554: %s: Bad value(%s) read from $LSB_SUB_MODIFY_FILE for parameter %s, the setting will be ignored. The value of this parameter can only be SUB_RESET or 'Y'.", __func__, line, key);
 								}
 							break;
 							case NUMPARM:
@@ -5438,7 +5438,7 @@ modifyJobInformation (struct submit *jobSubReq)
 								if (!stringIsDigitNumber (line))
 									{
 									/* catgets 5557 ? */
-									// ls_syslog (LOG_WARNING, _i18n_msg_get(ls_catd,NL_SETN,msgid,msg), __PRETTY_FUNCTION__, line, key);
+									// ls_syslog (LOG_WARNING, _i18n_msg_get(ls_catd,NL_SETN,msgid,msg), __func__, line, key);
 									break;
 									}
 
@@ -5463,7 +5463,7 @@ modifyJobInformation (struct submit *jobSubReq)
 								if (!stringIsDigitNumber (line))
 									{
 									/* catgets 5557 ? */                                       
-									// ls_syslog (LOG_WARNING, _i18n_msg_get(ls_catd,NL_SETN,msgid,msg), __PRETTY_FUNCTION__, line, key);
+									// ls_syslog (LOG_WARNING, _i18n_msg_get(ls_catd,NL_SETN,msgid,msg), __func__, line, key);
 									break;
 									}
 
@@ -5475,7 +5475,7 @@ modifyJobInformation (struct submit *jobSubReq)
 							if (checkEmptyString (line))
 								{
 								/* catgets 5557 */
-								ls_syslog (LOG_WARNING, "catgets 5557: %s: The value of parameter %s is empty, the setting will be ignored.", __PRETTY_FUNCTION__, key);
+								ls_syslog (LOG_WARNING, "catgets 5557: %s: The value of parameter %s is empty, the setting will be ignored.", __func__, key);
 								break;
 								}
 
@@ -5483,7 +5483,7 @@ modifyJobInformation (struct submit *jobSubReq)
 							if (sValue == NULL)
 								{
 								/* catgets 5556 */
-								ls_syslog (LOG_WARNING, "catgets 5556: %s: Bad value(%s) read from $LSB_SUB_MODIFY_FILE for parameter %s, the setting will be ignored.", __PRETTY_FUNCTION__, line, key);
+								ls_syslog (LOG_WARNING, "catgets 5556: %s: Bad value(%s) read from $LSB_SUB_MODIFY_FILE for parameter %s, the setting will be ignored.", __func__, line, key);
 								break;
 								}
 
@@ -5508,7 +5508,7 @@ modifyJobInformation (struct submit *jobSubReq)
 							break;
 							default:
 							/* catgets 55550 */
-							ls_syslog (LOG_WARNING, "catgets 5550: %s: Bad parameter variable name(%s) read from $LSB_SUB_MODIFY_FILE, the setting will be ignored.", __PRETTY_FUNCTION__, key);
+							ls_syslog (LOG_WARNING, "catgets 5550: %s: Bad parameter variable name(%s) read from $LSB_SUB_MODIFY_FILE, the setting will be ignored.", __func__, key);
 							break;
 						}
 					break;
@@ -5518,7 +5518,7 @@ modifyJobInformation (struct submit *jobSubReq)
 			if (!validKey)
 				{
 				/* catgets 5550 */    
-				ls_syslog (LOG_WARNING, "catgets 5550: %s: Bad parameter variable name(%s) read from $LSB_SUB_MODIFY_FILE, the setting will be ignored.", __PRETTY_FUNCTION__, key);
+				ls_syslog (LOG_WARNING, "catgets 5550: %s: Bad parameter variable name(%s) read from $LSB_SUB_MODIFY_FILE, the setting will be ignored.", __func__, key);
 				}
 			}
 		fclose (fp);
@@ -5790,7 +5790,7 @@ processXFReq (char *key, char *line, struct submit *jobSubReq)
 			if (!stringIsDigitNumber (line))
 				{
 				/* catgets ? */
-				// ls_syslog (LOG_WARNING, _i18n_msg_get(ls_catd,NL_SETN,msgid,msg), __PRETTY_FUNCTION__, line, key);
+				// ls_syslog (LOG_WARNING, _i18n_msg_get(ls_catd,NL_SETN,msgid,msg), __func__, line, key);
 				return -1;
 				}
 
@@ -5801,7 +5801,7 @@ processXFReq (char *key, char *line, struct submit *jobSubReq)
 			if (p == NULL)
 				{
 				/* catgets 5552*/
-				ls_syslog (LOG_ERR, "catgets 5552: %s: Memory allocate failed for file transfer request.", __PRETTY_FUNCTION__);
+				ls_syslog (LOG_ERR, "catgets 5552: %s: Memory allocate failed for file transfer request.", __func__);
 				return -1;
 				}
 			else
@@ -5827,7 +5827,7 @@ processXFReq (char *key, char *line, struct submit *jobSubReq)
 		if (!stringIsDigitNumber (xfSeq))
 			{
 			/* catgets 5550 */
-			ls_syslog (LOG_WARNING, "catgets 5550: %s: Bad parameter variable name(%s) read from $LSB_SUB_MODIFY_FILE, the setting will be ignored.", __PRETTY_FUNCTION__, key);
+			ls_syslog (LOG_WARNING, "catgets 5550: %s: Bad parameter variable name(%s) read from $LSB_SUB_MODIFY_FILE, the setting will be ignored.", __func__, key);
 			return -1;
 			}
 		assert( atoi(xfSeq) >= 0 );
@@ -5844,7 +5844,7 @@ processXFReq (char *key, char *line, struct submit *jobSubReq)
 			if (sValue == NULL)
 				{
 				/* catgets 5556 */
-				ls_syslog (LOG_WARNING, "catgets 5556: %s: Bad value(%s) read from $LSB_SUB_MODIFY_FILE for parameter %s, the setting will be ignored.", __PRETTY_FUNCTION__, line, sValue);
+				ls_syslog (LOG_WARNING, "catgets 5556: %s: Bad value(%s) read from $LSB_SUB_MODIFY_FILE for parameter %s, the setting will be ignored.", __func__, line, sValue);
 				return -1;
 				}
 
@@ -5858,7 +5858,7 @@ processXFReq (char *key, char *line, struct submit *jobSubReq)
 			if (srcf == NULL)
 				{
 				/* catgets 5556 */
-				ls_syslog (LOG_WARNING, "catgets 5556: %s: Bad value(%s) read from $LSB_SUB_MODIFY_FILE for parameter %s, the setting will be ignored.", __PRETTY_FUNCTION__, line, sValue);
+				ls_syslog (LOG_WARNING, "catgets 5556: %s: Bad value(%s) read from $LSB_SUB_MODIFY_FILE for parameter %s, the setting will be ignored.", __func__, line, sValue);
 				return -1;
 				}
 
@@ -5905,13 +5905,13 @@ processXFReq (char *key, char *line, struct submit *jobSubReq)
 			else
 				{
 				/* catgets 5553 */
-				ls_syslog (LOG_WARNING, "catgets 5553: %s: unknown file transfer operator %s, this transfer request will be ignored.", __PRETTY_FUNCTION__, op);
+				ls_syslog (LOG_WARNING, "catgets 5553: %s: unknown file transfer operator %s, this transfer request will be ignored.", __func__, op);
 				}
 			}
 		else
 			{
 			/* catgets 5556 */
-			ls_syslog (LOG_WARNING, "catgets 5556: %s: Bad value(%s) read from $LSB_SUB_MODIFY_FILE for parameter %s, the setting will be ignored.", __PRETTY_FUNCTION__, line, key);
+			ls_syslog (LOG_WARNING, "catgets 5556: %s: Bad value(%s) read from $LSB_SUB_MODIFY_FILE for parameter %s, the setting will be ignored.", __func__, line, key);
 			}
 		}
 

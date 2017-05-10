@@ -47,7 +47,7 @@ struct objPRMO *pRMOPtr = NULL;
 void
 getLsbResourceInfo (void)
 {
-  static char fname[] = "getLsbresourceInfo";
+  static char __func__] = "getLsbresourceInfo";
   int i = 0;
   int numRes = 0;
   struct lsSharedResourceInfo *resourceInfo = NULL;
@@ -73,7 +73,7 @@ getLsbResourceInfo (void)
 static void
 addSharedResource (struct lsSharedResourceInfo *lsResourceInfo)
 {
-  static char fname[] = "addSharedResource";
+  static char __func__] = "addSharedResource";
   struct sharedResource *resource, **temp;
 
   if (lsResourceInfo == NULL)
@@ -118,7 +118,7 @@ static void
 addInstances (struct lsSharedResourceInfo *lsResourceInfo,
 	      struct sharedResource *resource)
 {
-  static char fname[] = "addInstances";
+  static char __func__] = "addInstances";
   int i, numHosts, j, numInsatnces = 0;
   struct resourceInstance *instance;
   struct hData *hPtr;
@@ -280,7 +280,7 @@ int
 checkResources (struct resourceInfoReq *resourceInfoReq,
 		struct lsbShareResourceInfoReply *reply)
 {
-  static char fname[] = "checkResources";
+  static char __func__] = "checkResources";
   int i, j, allResources = FALSE, found = FALSE, replyCode;
   struct hData *hPtr;
   struct hostent *hp;
@@ -362,7 +362,7 @@ static int
 copyResource (struct lsbShareResourceInfoReply *reply,
 	      struct sharedResource *resource, char *hostName)
 {
-  static char fname[] = "copyResource";
+  static char __func__] = "copyResource";
   int i, j, num, found = FALSE, numInstances;
   float rsvValue;
   char stringValue[12];
@@ -428,7 +428,7 @@ getHRValue (char *resName, struct hData *hPtr,
 	    struct resourceInstance **instance)
 {
   int i;
-  static char fname[] = "getHRValue()";
+  static char __func__] = "getHRValue()";
 
   for (i = 0; i < hPtr->numInstances; i++)
     {
@@ -469,7 +469,7 @@ resetSharedResource ()
 void
 updSharedResourceByRUNJob (const struct jData *jp)
 {
-  static char fname[] = "updSharedResourceByRUNJob";
+  static char __func__] = "updSharedResourceByRUNJob";
   int i;
   int ldx;
   int resAssign = 0;
@@ -702,7 +702,7 @@ freePreemptResource (struct preemptResource *pRPtr)
 void
 newPRMO (char *nameList)
 {
-  static char fname[] = "newPRMO";
+  static char __func__] = "newPRMO";
   NAMELIST *nameListPtr;
   int i, index, addedNum = 0;
 
@@ -1176,7 +1176,7 @@ isReservePreemptResource (struct resVal *resValPtr)
 static int
 addPreemptableResource (int index)
 {
-  static char fname[] = "addPreemptableResource";
+  static char __func__] = "addPreemptableResource";
   int i;
   int loc;
   int sharedIndex = -1;
@@ -1310,7 +1310,7 @@ findQPRValues (int index, struct hData *hPtr, struct qData *qPtr)
 static struct qPRValues *
 addQPRValues (int index, struct hData *hPtr, struct qData *qPtr)
 {
-  static char fname[] = "addQPRValues";
+  static char __func__] = "addQPRValues";
   struct preemptResourceInstance *pRIPtr;
   struct qPRValues *temp;
   int i, pos;
@@ -1375,7 +1375,7 @@ roundFloatValue (float old)
 void
 printPRMOValues ()
 {
-  static char fname[] = "printPRMOValues";
+  static char __func__] = "printPRMOValues";
   int i, j, k;
 
   if (!(logclass & LC_SCHED))

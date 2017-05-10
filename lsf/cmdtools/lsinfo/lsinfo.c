@@ -39,7 +39,7 @@ static char *valueTypeToStr (enum valueType);
 int
 main (int argc, char **argv)
 {
-  static char fname[] = "lsinfo/main";
+  static char __func__] = "lsinfo/main";
   struct lsInfo *lsInfo;
   int i, cc, nnames;
   char *namebufs[256];

@@ -177,7 +177,7 @@ prtTableHeader ()
 
 	if (res == NULL || val == NULL || loc == NULL)
 	{
-		fprintf( stderr, "%s: %s() failed", __PRETTY_FUNCTION__ , "putstr_");
+		fprintf( stderr, "%s: %s() failed", __func__ , "putstr_");
 		return;
 	}
 	else {

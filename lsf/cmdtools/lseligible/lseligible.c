@@ -36,7 +36,7 @@ usage (const char *cmd)
 int
 main (int argc, char **argv)
 {
-  static char fname[] = "lseligible/main";
+  static char __func__] = "lseligible/main";
   char resreq[MAXLINELEN];
   char mode = LSF_LOCAL_MODE;
   int quiet = 0;

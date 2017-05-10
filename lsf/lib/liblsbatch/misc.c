@@ -445,7 +445,7 @@ lsb_splitName (char *str, unsigned int *number)
 	if (str == NULL || number == NULL)
 	{
 			/* catgets 5650 */
-			ls_syslog (LOG_ERR, "5650: %s: bad input.\n", __PRETTY_FUNCTION__);
+			ls_syslog (LOG_ERR, "5650: %s: bad input.\n", __func__);
 			return NULL;
 	}
 
@@ -465,7 +465,7 @@ lsb_splitName (char *str, unsigned int *number)
 					if (nameNum <= 0)
 					{
 							nameNum = 1;
-							ls_syslog (LOG_ERR, "5651: %s: bad input format.  Assuming 1 host.\n", __PRETTY_FUNCTION__);
+							ls_syslog (LOG_ERR, "5651: %s: bad input format.  Assuming 1 host.\n", __func__);
 					}
 			}
 	}
@@ -516,7 +516,7 @@ lsb_compressStrList (char **strList, unsigned int numStr)
 	if ( ( NULL == nameList.names && ENOMEM == errno ) || 
 			 ( NULL == nameList.counter && ENOMEM == errno ) )
 	{
-			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "calloc");
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "calloc");
 			FREEUP (nameList.names);
 			FREEUP (nameList.counter);
 			return (struct nameList *) NULL;
@@ -550,7 +550,7 @@ lsb_compressStrList (char **strList, unsigned int numStr)
 			if ( ( NULL == nameList.names && ENOMEM == errno ) || 
 					 ( NULL == nameList.counter && ENOMEM == errno ) )
 			{
-					ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "realloc");
+					ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "realloc");
 // FIXME FIXME FIXME FIXME FIXME this may be out of the loop, needs test case and debugger
 					for ( unsigned long j = 0; j < nameList.listSize; j++) {
 							FREEUP (nameList.names[j]);
@@ -578,7 +578,7 @@ lsb_printNameList (struct nameList * nameList, int format)
 	
 		if (nameList == NULL) {
 			/* catgets 5652 */
-			ls_syslog (LOG_ERR, "5652: %s: NULL input.\n", __PRETTY_FUNCTION__);
+			ls_syslog (LOG_ERR, "5652: %s: NULL input.\n", __func__);
 			return NULL;
 		}
 
@@ -589,7 +589,7 @@ lsb_printNameList (struct nameList * nameList, int format)
 		allocLen = MAXLINELEN;
 		namestr = calloc (allocLen, sizeof (char));
 		if (!namestr) {
-				ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "calloc");
+				ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "calloc");
 				return (char *) NULL;
 		}
 
@@ -601,7 +601,7 @@ lsb_printNameList (struct nameList * nameList, int format)
 						buf = calloc (MAXLINELEN, sizeof (char));
 						if ( NULL == buf && ENOMEM == errno )
 						{
-							 ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "calloc");
+							 ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "calloc");
 							 return NULL;
 						}
 
@@ -613,7 +613,7 @@ lsb_printNameList (struct nameList * nameList, int format)
 								buf = (char *) calloc (MAXLINELEN, sizeof (char));
 								if ( NULL == buf && ENOMEM == errno )
 								{
-									 ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "calloc");
+									 ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "calloc");
 									 return NULL;
 								}
 								sprintf (buf, "%s %ld ", nameList->names[i], nameList->counter[i]);
@@ -626,7 +626,7 @@ lsb_printNameList (struct nameList * nameList, int format)
 						buf = (char *) calloc (buflen, sizeof (char));
 						if ( NULL == buf && ENOMEM == errno )
 						{
-								ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "calloc");
+								ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "calloc");
 								return NULL;
 						}
 						
@@ -641,7 +641,7 @@ lsb_printNameList (struct nameList * nameList, int format)
 						namestr = (char *) realloc (namestr, allocLen * sizeof (char));
 						if ( NULL == namestr && ENOMEM == errno )
 						{
-								ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "realloc");
+								ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "realloc");
 								return NULL;
 						}
 				}
@@ -665,7 +665,7 @@ lsb_parseLongStr (char *string)
 		if (string == NULL || strlen (string) <= 0)
 		{
 				/* catgets 5653 */
-				ls_syslog (LOG_ERR, "5653: %s: bad input", __PRETTY_FUNCTION__); 
+				ls_syslog (LOG_ERR, "5653: %s: bad input", __func__); 
 				return NULL;
 		}
 
@@ -685,7 +685,7 @@ lsb_parseLongStr (char *string)
 		if ( ( NULL == nameList.names && ENOMEM == errno ) || 
 				 ( NULL == nameList.counter && ENOMEM == errno ) )
 		{
-			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "calloc");
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "calloc");
 			FREEUP (nameList.names);
 			FREEUP (nameList.counter);
 			return NULL;
@@ -696,7 +696,7 @@ lsb_parseLongStr (char *string)
 		if (strlen (prevStr) <= 0)
 		{
 				/* catgets 5654 */
-				ls_syslog (LOG_ERR, "5654: %s: blank input\n", __PRETTY_FUNCTION__);
+				ls_syslog (LOG_ERR, "5654: %s: blank input\n", __func__);
 				FREEUP (prevStr);
 				FREEUP (nameList.names);
 				FREEUP (nameList.counter);
@@ -713,7 +713,7 @@ lsb_parseLongStr (char *string)
 						if (nameList.listSize == numStr)
 						{
 								/* catgets 5655 */
-								ls_syslog (LOG_ERR, "5655: %s: list exceeded allocated memory (shouldn't happen)\n", __PRETTY_FUNCTION__);
+								ls_syslog (LOG_ERR, "5655: %s: list exceeded allocated memory (shouldn't happen)\n", __func__);
 								return NULL;
 						}
 
@@ -736,7 +736,7 @@ lsb_parseLongStr (char *string)
 		if ( ( NULL == nameList.names && ENOMEM == errno ) || 
 				 ( NULL == nameList.counter && ENOMEM == errno ) )
 		{
-				ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "realloc");
+				ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "realloc");
 				for ( unsigned long i = 0; i < nameList.listSize; i++) {
 						FREEUP (nameList.names[i]);
 				}
@@ -785,7 +785,7 @@ lsb_parseShortStr (char *string, int format)
 
 	if (!nameList.names || !nameList.counter)
 		{
-			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "calloc");
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "calloc");
 			FREEUP (nameList.names);
 			FREEUP (nameList.counter);
 			return (struct nameList *) NULL;
@@ -799,7 +799,7 @@ lsb_parseShortStr (char *string, int format)
 			if (nameList.listSize >= numStr)
 		{
 			 /* catgets 5656 */
-			ls_syslog (LOG_ERR, "5656: %s: list exceeded allocated memory (shouldn't happen)\n", __PRETTY_FUNCTION__);
+			ls_syslog (LOG_ERR, "5656: %s: list exceeded allocated memory (shouldn't happen)\n", __func__);
 			return NULL;
 		}
 
@@ -810,7 +810,7 @@ lsb_parseShortStr (char *string, int format)
 			if ((curStr = getNextWord_ (&string)) == NULL)
 				{
 					/* catgets 5657 */
-					ls_syslog (LOG_ERR, "5657: %s: LSB_MCPU_HOSTS format error\n", __PRETTY_FUNCTION__);
+					ls_syslog (LOG_ERR, "5657: %s: LSB_MCPU_HOSTS format error\n", __func__);
 					FREEUP (nameList.names);
 					FREEUP (nameList.counter);
 					return NULL;
@@ -836,7 +836,7 @@ lsb_parseShortStr (char *string, int format)
 				 ( NULL == nameList.counter && ENOMEM == errno ) 
 			 )
 		{
-				ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "realloc");
+				ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "realloc");
 				for ( unsigned long i = 0; i < nameList.listSize; i++) {
 						FREEUP (nameList.names[i]);
 				}

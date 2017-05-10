@@ -272,7 +272,7 @@ output (char *fname, char *exHost, int fflag, char *execUsername, char **envp)
   disOut[fidx + 1] = NULL;
 
 
-  if (fname[0] != '/' || stat (fname, &buf) < 0)
+  if (__func__0] != '/' || stat (fname, &buf) < 0)
     {
       remoteOutput (fidx, disOut, exHost, fname, execUsername, envp);
     }

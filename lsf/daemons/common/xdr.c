@@ -39,7 +39,7 @@ static int xdr_thresholds (XDR *xdrs, struct jobSpecs *jp);
 bool_t
 xdr_jobSpecs (XDR *xdrs, struct jobSpecs *jobSpecs, struct LSFHeader *hdr)
 {
-    static char fname[] = "xdr_jobSpecs";
+    static char __func__] = "xdr_jobSpecs";
     char *sp[15]         = { "a" }; // FIXME wtf
     char *pTemp          = 0;
     uint nLimits         = 0;
@@ -643,7 +643,7 @@ xdr_statusReq (XDR *xdrs, struct statusReq *statusReq, struct LSFHeader *hdr)
 bool_t
 xdr_chunkStatusReq (XDR *xdrs, struct chunkStatusReq *chunkStatusReq, struct LSFHeader *hdr)
 {
-    static char fname[] = "xdr_chunkStatusReq";
+    static char __func__] = "xdr_chunkStatusReq";
 
     if (xdrs->x_op == XDR_DECODE)
         {
@@ -684,7 +684,7 @@ xdr_chunkStatusReq (XDR *xdrs, struct chunkStatusReq *chunkStatusReq, struct LSF
 bool_t
 xdr_sbdPackage (XDR *xdrs, struct sbdPackage * sbdPackage, struct LSFHeader *hdr)
 {
-    static char fname[] = "xdr_sbdPackage";
+    static char __func__] = "xdr_sbdPackage";
     char *sp;
 
     sp = sbdPackage->lsbManager;
@@ -725,7 +725,7 @@ xdr_sbdPackage (XDR *xdrs, struct sbdPackage * sbdPackage, struct LSFHeader *hdr
 bool_t
 xdr_sbdPackage1 (XDR *xdrs, struct sbdPackage *sbdPackage, struct LSFHeader *hdr)
 {
-    static char fname[] = "xdr_sbdPackage1";
+    static char __func__] = "xdr_sbdPackage1";
 
     assert( hdr->length );
 
@@ -776,7 +776,7 @@ xdr_sbdPackage1 (XDR *xdrs, struct sbdPackage *sbdPackage, struct LSFHeader *hdr
 static int
 xdr_thresholds (XDR *xdrs, struct jobSpecs *jobSpecs)
 {
-    static char fname[] = "xdr_thresholds";
+    static char __func__] = "xdr_thresholds";
     
     if (xdrs->x_op == XDR_DECODE) {
         jobSpecs->thresholds.loadSched = NULL;

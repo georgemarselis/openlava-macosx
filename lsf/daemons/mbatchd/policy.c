@@ -437,7 +437,7 @@ static struct _list *jRefList;
 static int
 readyToDisp (struct jData *jpbw, int *numAvailSlots)
 {
-  static char fname[] = "readyToDisp";
+  static char __func__] = "readyToDisp";
   int jReason = 0;
   time_t deadline;
 
@@ -642,7 +642,7 @@ readyToDisp (struct jData *jpbw, int *numAvailSlots)
 int
 getMinGSlots (struct uData *uPtr, struct qData *qPtr, int *numGAvailSlots)
 {
-  static char fname[] = "getMinGSlots";
+  static char __func__] = "getMinGSlots";
   int minNumAvailSlots = INFINIT_INT;
   int minGUsableSlots = INFINIT_INT;
 
@@ -688,7 +688,7 @@ getMinGSlots (struct uData *uPtr, struct qData *qPtr, int *numGAvailSlots)
 static int
 cntUQSlots (struct jData *jpbw, int *numAvailSlots)
 {
-  static char fname[] = "cntUQSlots";
+  static char __func__] = "cntUQSlots";
   struct uData *up = jpbw->uPtr;
   struct qData *qp = jpbw->qPtr;
   struct userAcct *uAcct = NULL;
@@ -891,7 +891,7 @@ cntUQSlots (struct jData *jpbw, int *numAvailSlots)
 static enum candRetCode
 getCandHosts (struct jData *jpbw)
 {
-  static char fname[] = "getCandHosts";
+  static char __func__] = "getCandHosts";
   int numJUsable;
   int nHosts;
   int nProc;
@@ -1305,7 +1305,7 @@ getQUsable (struct qData *qp)
 static struct candHost *
 getJUsable (struct jData *jp, int *numJUsable, int *nProc)
 {
-  static char fname[] = "getJUsable";
+  static char __func__] = "getJUsable";
   static struct hData **jUsable;
   static struct candHost *candHosts;
   static struct hData **jUnusable;
@@ -2155,7 +2155,7 @@ getPeerCand1 (struct jData *jobp, struct jData *jpbw)
 static void
 copyPeerCand (struct jData *jobp, struct jData *jpbw)
 {
-  static char fname[] = "copyPeerCand";
+  static char __func__] = "copyPeerCand";
   int i;
 
   jobp->usePeerCand = TRUE;
@@ -2334,7 +2334,7 @@ static int
 ckPerHULimits (struct qData *qp, struct hData *hp, struct uData *up,
 	       int *numAvailSlots, int *reason)
 {
-  static char fname[] = "ckPerHULimits";
+  static char __func__] = "ckPerHULimits";
   int numSlots = INFINIT_INT, numSlots1 = INFINIT_INT;
   int i, num, numAvailSlots1 = INFINIT_INT;
   int pJobLimit, numNonPrmptSlots, numAvailSUSP;
@@ -2463,7 +2463,7 @@ static int
 getHostJobSlots (struct jData *jp, struct hData *hp, int *numAvailSlots,
 		 int noHULimits, LIST_T ** backfilleeList)
 {
-  static char fname[] = "getHostJobSlots";
+  static char __func__] = "getHostJobSlots";
   int numNeeded = 1;
   int numSlots, numSlots1, numAvailSlots1;
   int tmpVal = 0;
@@ -2672,7 +2672,7 @@ static int
 getHostJobSlots1 (int numNeeded, struct jData *jp, struct hData *hp,
 		  int *numAvailSlots, int noHULimits)
 {
-  static char fname[] = "getHostJobSlots1";
+  static char __func__] = "getHostJobSlots1";
   struct qData *qp = jp->qPtr;
   struct uData *up = jp->uPtr;
   int numSlots;
@@ -2752,7 +2752,7 @@ getHostJobSlots1 (int numNeeded, struct jData *jp, struct hData *hp,
 int
 uJobLimitOk (struct jData *jp, struct hTab *uAcct, int uJobLimit, int disp)
 {
-  static char fname[] = "uJobLimitOk";
+  static char __func__] = "uJobLimitOk";
   struct userAcct *ap;
   char found = FALSE;
   int numSlots, numStartJobs;
@@ -2809,7 +2809,7 @@ uJobLimitOk (struct jData *jp, struct hTab *uAcct, int uJobLimit, int disp)
 int
 pJobLimitOk (struct hData *hp, struct hostAcct *hAcct, float pJobLimit)
 {
-  static char fname[] = "pJobLimitOk";
+  static char __func__] = "pJobLimitOk";
   int numCPUs, numSlots;
 
   INC_CNT (PROF_CNT_pJobLimitOk);
@@ -2843,7 +2843,7 @@ pJobLimitOk (struct hData *hp, struct hostAcct *hAcct, float pJobLimit)
 int
 hJobLimitOk (struct hData *hp, struct hostAcct *hAcct, int hJobLimit)
 {
-  static char fname[] = "hJobLimitOk";
+  static char __func__] = "hJobLimitOk";
   int numSlots;
 
   INC_CNT (PROF_CNT_hJobLimitOk);
@@ -2903,7 +2903,7 @@ int
 hostSlots (int numNeeded, struct jData *jp, struct hData *hp,
 	   int disp, int *numAvailSlots)
 {
-  static char fname[] = "hostSlots";
+  static char __func__] = "hostSlots";
   struct jData *jpbw, *next;
   struct uData *uData;
   int i, j, num;
@@ -3148,7 +3148,7 @@ hostSlots (int numNeeded, struct jData *jp, struct hData *hp,
 static int
 candHostOk (struct jData *jp, int indx, int *numAvailSlots, int *hReason)
 {
-  static char fname[] = "candHostOk";
+  static char __func__] = "candHostOk";
   struct candHost *hp = &(jp->candPtr[indx]);
   int rtReason = 0;
   int nSlots = INFINIT_INT;
@@ -3370,7 +3370,7 @@ moveHostPos (struct candHost *candH, int source, int target)
 static int
 allocHosts (struct jData *jp)
 {
-  static char fname[] = "allocHosts";
+  static char __func__] = "allocHosts";
   struct hData **hPtr;
   int i, j, numh;
 
@@ -3436,7 +3436,7 @@ deallocHosts (struct jData *jp)
 bool_t
 dispatch_it (struct jData * jp)
 {
-  static char fname[] = "dispatch_it";
+  static char __func__] = "dispatch_it";
   sbdReplyType reply;
   struct jobReply jobReply;
   struct jData *jpbw, *jptr;
@@ -3513,7 +3513,7 @@ dispatch_it (struct jData * jp)
 int
 jobStartError (struct jData *jData, sbdReplyType reply)
 {
-  static char fname[] = "jobStartError";
+  static char __func__] = "jobStartError";
   char *toHost = jData->hPtr[0]->host;
   int newReason = 0;
 
@@ -3668,7 +3668,7 @@ disp_clean_job (struct jData *jpbw)
 static void
 disp_clean (void)
 {
-  static char fname[] = "disp_clean";
+  static char __func__] = "disp_clean";
   struct jData *jpbw;
   int list;
   time_t t;
@@ -3696,7 +3696,7 @@ disp_clean (void)
 static void
 hostPreference (struct jData *jp, int nHosts)
 {
-  static char fname[] = "hostPreference";
+  static char __func__] = "hostPreference";
   int pref = FALSE, i;
 
   if (jp->usePeerCand)
@@ -3741,7 +3741,7 @@ static void
 hostPreference1 (struct jData *jp, int nHosts, struct askedHost *askedPtr,
 		 int numAskedPtr, int askedOthPrio, int *pref, int jobPref)
 {
-  static char fname[] = "hostPreference1";
+  static char __func__] = "hostPreference1";
   int i, j, k;
   struct candHost *tmpCandPtr;
   int *flags;
@@ -3937,7 +3937,7 @@ copyCandHosts (int i, struct askedHost *askedPtr, struct candHost *tmpCandPtr,
 static void
 copyCandHostData (struct candHost *dst, struct candHost *source)
 {
-  static char fname[] = "copyCandHostData";
+  static char __func__] = "copyCandHostData";
   LIST_T *list;
 
   *dst = *source;
@@ -3972,7 +3972,7 @@ findBestHosts (struct jData *jp, struct resVal *resValPtr, int needed,
   struct resVal defResVal, *resVal;
   float threshold;
 
-  static char fname[] = "findBestHosts";
+  static char __func__] = "findBestHosts";
 
   if (logclass & (LC_EXEC))
     ls_syslog (LOG_DEBUG, "%s: the number of candidates for sort is %d",
@@ -4029,7 +4029,7 @@ findBestHosts (struct jData *jp, struct resVal *resValPtr, int needed,
 static void
 getRawLsbLoad (int ncandidates, struct candHost *hosts)
 {
-  static char fname[] = "getRawLsbLoad";
+  static char __func__] = "getRawLsbLoad";
   int i, num;
   char **hostNames;
   struct hData *hDataPtr;
@@ -4097,7 +4097,7 @@ static float
 getNumericLoadValue (const struct hData *hp, int lidx)
 {
   int i;
-  static char fname[] = "getNumericLoadValue()";
+  static char __func__] = "getNumericLoadValue()";
 
 
   if (NOT_NUMERIC (allLsInfo->resTable[lidx]))
@@ -4142,7 +4142,7 @@ sortHosts (int lidx, int numHosts, int ncandidates, struct candHost *hosts,
   char flip;
   float exld1, exld2;
 
-  static char fname[] = "sortHosts()";
+  static char __func__] = "sortHosts()";
 
   if (logclass & (LC_TRACE))
     ls_syslog (LOG_DEBUG, "%s, Entering this routine ...", fname);
@@ -4360,7 +4360,7 @@ orderByStatus (struct candHost *hosts, int j, bool_t orderByClosedFull)
 static bool_t
 isCandHost (char *hostname, struct jData *jp)
 {
-  static char fname[] = "isCandHost";
+  static char __func__] = "isCandHost";
   int i;
 
   for (i = 0; i < jp->numCandPtr; i++)
@@ -4380,7 +4380,7 @@ isCandHost (char *hostname, struct jData *jp)
 static void
 reserveSlots (struct jData *jp)
 {
-  static char fname[] = "reserveSlots";
+  static char __func__] = "reserveSlots";
   int i;
 
   if (jp->numHostPtr < 0)
@@ -4450,7 +4450,7 @@ freeReserveSlots (struct jData *jpbw)
 static void
 checkSlotReserve (struct jData **jobp, int *continueSched)
 {
-  static char fname[] = "checkSlotReserve";
+  static char __func__] = "checkSlotReserve";
   struct jData *jpbw;
 
   jpbw = *jobp;
@@ -4510,7 +4510,7 @@ compareFunc (const void *element1, const void *element2)
 static void
 jobStartTime (struct jData *jp)
 {
-  static char fname[] = "jobStartTime";
+  static char __func__] = "jobStartTime";
   int i, num;
   struct hData *hPtr;
   struct jData *jpbw;
@@ -4688,7 +4688,7 @@ cntHostSlots (struct hTab *hAcct, struct hData *hp)
 int
 scheduleAndDispatchJobs (void)
 {
-  static char fname[] = "scheduleAndDispatchJobs";
+  static char __func__] = "scheduleAndDispatchJobs";
   static struct qData *nextSchedQ;
   struct qData *qp;
   static time_t lastUpdTime = 0;
@@ -5096,7 +5096,7 @@ again:
 static int
 checkIfJobIsReady (struct jData *jp)
 {
-  static char fname[] = "checkIfJobIsReady";
+  static char __func__] = "checkIfJobIsReady";
   int tmpVal;
   int cc;
 
@@ -5143,7 +5143,7 @@ checkIfJobIsReady (struct jData *jp)
 static int
 scheduleAJob (struct jData *jp, bool_t checkReady, bool_t checkOtherGroup)
 {
-  static char fname[] = "scheduleAJob";
+  static char __func__] = "scheduleAJob";
   int ret;
   int tmpVal = 0;
 
@@ -5235,7 +5235,7 @@ dispatchAJob0 (struct jData *jp, int dontTryNextCandHost)
 static enum dispatchAJobReturnCode
 dispatchAJob (struct jData *jp, int dontTryNextCandHost)
 {
-  static char fname[] = "dispatchAJob";
+  static char __func__] = "dispatchAJob";
   int qSchedDelay;
   int notEnoughSlot = FALSE;
   int notEnoughResource = FALSE;
@@ -5459,7 +5459,7 @@ dispatchAJob (struct jData *jp, int dontTryNextCandHost)
 static enum candRetCode
 checkIfCandHostIsOk (struct jData *jp)
 {
-  static char fname[] = "checkIfCandHostIsOk";
+  static char __func__] = "checkIfCandHostIsOk";
   int nSlots, nAvailSlots, numTotalSlots = 0;
   int hReason = 0;
   int svReason = jp->newReason;
@@ -5571,7 +5571,7 @@ getNumSlots (struct jData *jp)
 static enum dispatchAJobReturnCode
 dispatchToCandHost (struct jData *jp)
 {
-  static char fname[] = "dispatchToCandHost";
+  static char __func__] = "dispatchToCandHost";
   int tmpVal;
 
   if (allocHosts (jp) < 0)
@@ -5642,7 +5642,7 @@ static void
 getNumProcs (struct jData *jp)
 {
 #define HAS_HOST_PREFERNECE(jp) ((jp)->numAskedPtr || (jp)->qPtr->numAskedPtr)
-  static char fname[] = "getNumProcs";
+  static char __func__] = "getNumProcs";
   int i, nSlots, nAvailSlots, backfillSlots;
   struct candHost *execCandPtr;
   struct backfillCand *backfillCandPtr;
@@ -6135,7 +6135,7 @@ j1IsBeforeJ2 (struct jData *j1, struct jData *j2, struct jData *list)
 void
 schedulerInit ()
 {
-  static char fname[] = "schedulerInit";
+  static char __func__] = "schedulerInit";
   char myhostname[MAXHOSTNAMELEN], *myhostp = myhostname;
   static LIST_OBSERVER_T *schedulerObserverOnPJL,
     *schedulerObserverOnMJL,
@@ -6282,7 +6282,7 @@ queueObserverLeave (LIST_T * list, void *extra, LIST_EVENT_T * event)
 static int
 listNumber (struct jData *jList)
 {
-  static char fname[] = "listNumber";
+  static char __func__] = "listNumber";
   char myhostname[MAXHOSTNAMELEN], *myhostp = myhostname;
 
   if (jList == jDataList[MJL])
@@ -6509,7 +6509,7 @@ removeNOccuranceOfHost (struct jData *jp, struct hData *host, int num,
 static struct backfillee *
 backfilleeCreate ()
 {
-  static char fname[] = "backfilleeCreate";
+  static char __func__] = "backfilleeCreate";
   struct backfillee *ent;
 
   ent = (struct backfillee *) my_malloc (sizeof (struct backfillee), fname);
@@ -6525,7 +6525,7 @@ backfilleeCreate ()
 static struct backfillee *
 backfilleeCreateByCopy (struct backfillee *bp)
 {
-  static char fname[] = "backfilleeCreateByCopy";
+  static char __func__] = "backfilleeCreateByCopy";
   struct backfillee *ent;
 
   ent = (struct backfillee *) my_malloc (sizeof (struct backfillee), fname);
@@ -6637,7 +6637,7 @@ candHostInBackfillCandList (struct backfillCand *backfillCandPtr,
 static void
 freeBackfillSlotsFromBackfillee (struct jData *jp)
 {
-  static char fname[] = "freeBackfillSlotsFromBackfillee";
+  static char __func__] = "freeBackfillSlotsFromBackfillee";
 
   struct backfillSlotsData
   {
@@ -6801,7 +6801,7 @@ backfilleeDataCmp (void *ent, void *subject, int hint)
 static void
 removeBackfillSlotsFromBackfiller (struct jData *jp)
 {
-  static char fname[] = "removeBackfillSlotsFromBackfiller";
+  static char __func__] = "removeBackfillSlotsFromBackfiller";
   LIST_ITERATOR_T iter;
   int i, backfillSlots, totalSlots = 0, totalAvailSlots = 0;
   struct backfillee *backfillee;
@@ -7181,7 +7181,7 @@ enoughMaxUsableSlots (struct jData *jp)
 void
 setExecHostsAcceptInterval (struct jData *jp)
 {
-  static char fname[] = "setExecHostAcceptInterval";
+  static char __func__] = "setExecHostAcceptInterval";
   int i;
   int hostId;
   struct qData *qp;
@@ -7583,7 +7583,7 @@ resetStaticSchedVariables (void)
 static bool_t
 jobIsReady (struct jData *jp)
 {
-  static char fname[] = "jobIsReady()";
+  static char __func__] = "jobIsReady()";
   int ret;
 
 
@@ -7615,7 +7615,7 @@ jobIsReady (struct jData *jp)
 int
 reservePreemptResourcesForHosts (struct jData *jp)
 {
-  static char fname[] = "reservePreemptResourcesForHosts";
+  static char __func__] = "reservePreemptResourcesForHosts";
   struct hData **hosts = (struct hData **) my_calloc (jp->numHostPtr,
 						      sizeof (struct hData *),
 						      fname);
@@ -7632,7 +7632,7 @@ reservePreemptResourcesForHosts (struct jData *jp)
 int
 reservePreemptResourcesForExecCands (struct jData *jp)
 {
-  static char fname[] = "reservePreemptResourcesForExecCands";
+  static char __func__] = "reservePreemptResourcesForExecCands";
   struct hData **hosts = (struct hData **) my_calloc (jp->numExecCandPtr,
 						      sizeof (struct hData *),
 						      fname);
@@ -7651,7 +7651,7 @@ reservePreemptResourcesForExecCands (struct jData *jp)
 int
 reservePreemptResources (struct jData *jp, int numHosts, struct hData **hosts)
 {
-  static char fname[] = "reservePreemptResources";
+  static char __func__] = "reservePreemptResources";
   struct resVal *resValPtr;
   if ((resValPtr = getReserveValues (jp->shared->resValPtr,
 				     jp->qPtr->resValPtr)) == NULL)
@@ -7687,7 +7687,7 @@ reservePreemptResources (struct jData *jp, int numHosts, struct hData **hosts)
 int
 freeReservePreemptResources (struct jData *jp)
 {
-  static char fname[] = "freeReservePreemptResources";
+  static char __func__] = "freeReservePreemptResources";
   int hostn, resn;
   float val;
   FORALL_PRMPT_HOST_RSRCS (hostn, resn, val, jp)
@@ -7840,7 +7840,7 @@ markPreemptForPRHQInstance (int needResN, float needVal,
 static enum candRetCode
 handleXor (struct jData *jpbw)
 {
-  static char fname[] = "handleXor";
+  static char __func__] = "handleXor";
   int i, j, foundGroup, numXorExprs;
   int *indicesOfCandPtr;
   struct resVal *resValPtr;
@@ -7991,7 +7991,7 @@ static void
 copyCandHostPtr (struct candHost **sourceCandPtr,
 		 struct candHost **destCandPtr, int *sourceNum, int *destNum)
 {
-  static char fname[] = "copyCandHostPtr";
+  static char __func__] = "copyCandHostPtr";
   int j;
 
 
@@ -8218,7 +8218,7 @@ removeCandHostFromCandPtr (struct candHost **pCandPtr, int *pNumCandPtr,
 static void
 groupCandsCopy (struct jData *dest, struct jData *src)
 {
-  static char fname[] = "groupCandsCopy";
+  static char __func__] = "groupCandsCopy";
   int i;
 
   dest->numOfGroups = src->numOfGroups;
@@ -8252,7 +8252,7 @@ groupCandHostsInit (struct groupCandHosts *gc)
 static void
 inEligibleGroupsInit (int **inEligibleGroups, int numGroups)
 {
-  static char fname[] = "inEligibleGroupsInit";
+  static char __func__] = "inEligibleGroupsInit";
   int j;
 
 
@@ -8269,7 +8269,7 @@ static void
 groupCands2CandPtr (int numOfGroups, struct groupCandHosts *gc,
 		    int *numCandPtr, struct candHost **candPtr)
 {
-  static char fname[] = "groupCands2CandPtr";
+  static char __func__] = "groupCands2CandPtr";
   int i, j, k, num;
 
   for (i = 0, num = 0; i < numOfGroups; i++)

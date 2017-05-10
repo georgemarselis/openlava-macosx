@@ -605,7 +605,7 @@ clientIO (struct Masks *chanmask)
 static int
 processClient (struct clientNode *client, int *needFree)
 {
-  static char fname[] = "processClient()";
+  static char __func__] = "processClient()";
   struct Buffer *buf;
   struct bucket *bucket;
   mbdReqType mbdReqtype;

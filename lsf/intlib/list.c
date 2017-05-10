@@ -215,7 +215,7 @@ listNotifyObservers (LIST_T * list, LIST_EVENT_T * event)
 				}
 			break;
 			case LIST_EVENT_NULL:
-				ls_syslog( LOG_DEBUG, "%s: you are not supposed to be here, I think", __PRETTY_FUNCTION__ ); // FIXME FIXME FIXME LOG_DEBUG is the wrong id to put here
+				ls_syslog( LOG_DEBUG, "%s: you are not supposed to be here, I think", __func__ ); // FIXME FIXME FIXME LOG_DEBUG is the wrong id to put here
 				break;
 			default:
 				listerrno = LIST_ERR_BADARG;
@@ -295,8 +295,8 @@ listCat (LIST_T * list, int direction,  char *buffer, size_t bufferSize, char *(
 	size_t curSize 		= 0;
 
 	if( buffer ) {
-		ls_syslog( LOG_DEBUG, "%s buffer is not NULL. clearning buffer", __PRETTY_FUNCTION__ );
-		fprintf( stderr, "%s buffer is not NULL. clearning buffer", __PRETTY_FUNCTION__ );
+		ls_syslog( LOG_DEBUG, "%s buffer is not NULL. clearning buffer", __func__ );
+		fprintf( stderr, "%s buffer is not NULL. clearning buffer", __func__ );
 		memset( buffer, 0, strlen( buffer ) ); 
 	}
 
@@ -427,7 +427,7 @@ listObserverCreate (char *name, void *extra, LIST_ENTRY_SELECT_OP_T select, ...)
 
 			case LIST_EVENT_NULL:
 				listerrno = LIST_EVENT_NULL;
-				ls_syslog( LOG_DEBUG, "%s: LIST_EVENT_NULL event recieved. Should we?", __PRETTY_FUNCTION__ );
+				ls_syslog( LOG_DEBUG, "%s: LIST_EVENT_NULL event recieved. Should we?", __func__ );
 				FREEUP (observer);
 				return NULL;
 			break;

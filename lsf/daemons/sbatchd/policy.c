@@ -60,7 +60,7 @@ extern int lsbJobCpuLimit;
 void
 job_checking (void)
 {
-  static char fname[] = "job_checking";
+  static char __func__] = "job_checking";
   struct jobCard *jobCard, *nextJob;
   struct hostLoad *myload, savedLoad;
   char *myhostnm;
@@ -359,7 +359,7 @@ tryChkpntMig (void)
 static void
 tryResume (struct hostLoad *myload)
 {
-  char fname[] = "tryResume";
+  char __func__] = "tryResume";
   struct jobCard *jobCard, *next;
 
   static int errCount = 0, lastTryResumeTime = 0;
@@ -444,7 +444,7 @@ tryResume (struct hostLoad *myload)
 static void
 tryStop (char *myhostnm, struct hostLoad *myload)
 {
-  static char fname[] = "tryStop";
+  static char __func__] = "tryStop";
   struct jobCard *jobCard, *next;
   int reasons, subreasons, stopmore = FALSE;
   static int errCount = 0, lastTryStopTime = 0;
@@ -546,7 +546,7 @@ shouldStop (struct hostLoad *loadV,
 	    struct jobCard *jobCard, int *reasons, int *subreasons, int num,
 	    int *stopmore)
 {
-  static char fname[] = "shouldStop";
+  static char __func__] = "shouldStop";
   int i, numLoad = -1, j;
   struct hostLoad *load = NULL;
   static struct tclHostData tclHostData;
@@ -811,7 +811,7 @@ shouldStop1 (struct hostLoad *loadV)
 static int
 shouldResume (struct hostLoad *loadV, struct jobCard *jp, int num)
 {
-  static char fname[] = "shouldResume";
+  static char __func__] = "shouldResume";
   int i, j, numHosts = -1;
   int resume = TRUE, found;
   int lastReasons = jp->jobSpecs.reasons;
@@ -940,7 +940,7 @@ shouldResume (struct hostLoad *loadV, struct jobCard *jp, int num)
 int
 job_resume (struct jobCard *jp)
 {
-  static char fname[] = "job_resume";
+  static char __func__] = "job_resume";
   int rep;
 
   if (jp->jobSpecs.actPid)
@@ -971,7 +971,7 @@ job_resume (struct jobCard *jp)
 static int
 jobResumeAction (struct jobCard *jp, int sigValue, int suspReason)
 {
-  static char fname[] = "jobResumeAction";
+  static char __func__] = "jobResumeAction";
 
 
   if (jp->jobSpecs.reasons & SUSP_MBD_LOCK)
@@ -1011,7 +1011,7 @@ void
 jobSuspendAction (struct jobCard *jp, int sigValue, int suspReasons,
 		  int suspSubReasons)
 {
-  static char fname[] = "jobSuspendAction";
+  static char __func__] = "jobSuspendAction";
   int cc;
 
   if (logclass & (LC_TRACE | LC_SCHED | LC_EXEC))
@@ -1157,7 +1157,7 @@ sigActEnd (struct jobCard *jobCard)
 static void
 chkpntEnd (struct jobCard *jobCard, int w_status, bool_t * freed)
 {
-  static char fname[] = "chkpntEnd()";
+  static char __func__] = "chkpntEnd()";
   int savePid, saveStatus;
 
 
@@ -1299,7 +1299,7 @@ resumeActEnd (struct jobCard *jobCard, int w_status)
 static int
 rmJobBufFilesPid (struct jobCard *jp)
 {
-  static char fname[] = "rmJobBufFilesPid()";
+  static char __func__] = "rmJobBufFilesPid()";
   int pid;
 
   if ((pid = fork ()) < 0)
@@ -1332,7 +1332,7 @@ rmJobBufFilesPid (struct jobCard *jp)
 static int
 cleanupMigJob (struct jobCard *jp)
 {
-  static char fname[] = "cleanupMigJob()";
+  static char __func__] = "cleanupMigJob()";
   int pid;
 
 
@@ -1425,7 +1425,7 @@ getTclHostData (struct hostLoad *load, struct tclHostData *tclHostData,
 		int freeMem)
 {
 
-  static char fname[] = "getTclHostData";
+  static char __func__] = "getTclHostData";
   static time_t lastUpdHostInfo = 0;
   static int numLsfHosts = 0;
   static struct hostInfo *hostInfo = NULL;

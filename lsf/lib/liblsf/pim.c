@@ -71,7 +71,7 @@ getJInfo_ (int npgid, int *pgid, unsigned short options, gid_t cpgid)
 
         if (initenv_ (pimParams, NULL) < 0) {
             if (logclass & LC_PIM) {
-                ls_syslog (LOG_DEBUG, "%s: initenv_() failed: %M", __PRETTY_FUNCTION__);
+                ls_syslog (LOG_DEBUG, "%s: initenv_() failed: %M", __func__);
             }
             
             return NULL;
@@ -80,7 +80,7 @@ getJInfo_ (int npgid, int *pgid, unsigned short options, gid_t cpgid)
         if ((myHost = ls_getmyhostname ()) == NULL) {
             
             if (logclass & LC_PIM) {
-                ls_syslog (LOG_DEBUG, "%s: ls_getmyhostname() failed: %m", __PRETTY_FUNCTION__);
+                ls_syslog (LOG_DEBUG, "%s: ls_getmyhostname() failed: %m", __func__);
             }
             
             return NULL;
@@ -119,7 +119,7 @@ getJInfo_ (int npgid, int *pgid, unsigned short options, gid_t cpgid)
             periodicUpdateOnly = TRUE;
             
             if (logclass & LC_PIM) {
-                ls_syslog (LOG_DEBUG, "%s: Only to call pim each PIM_SLEEP_TIME interval", __PRETTY_FUNCTION__);
+                ls_syslog (LOG_DEBUG, "%s: Only to call pim each PIM_SLEEP_TIME interval", __func__);
             }
         }
 
@@ -135,7 +135,7 @@ getJInfo_ (int npgid, int *pgid, unsigned short options, gid_t cpgid)
 
     if (now - lastUpdateNow >= pimSleepTime || (options & PIM_API_UPDATE_NOW)) {
         if (logclass & LC_PIM) {
-            ls_syslog (LOG_DEBUG, "%s: update now", __PRETTY_FUNCTION__);
+            ls_syslog (LOG_DEBUG, "%s: update now", __func__);
         }
 
         lastUpdateNow = now;
@@ -143,7 +143,7 @@ getJInfo_ (int npgid, int *pgid, unsigned short options, gid_t cpgid)
         if ((s = TcpCreate_ (FALSE, 0)) < 0) {
             
             if (logclass & LC_PIM) {
-                ls_syslog (LOG_DEBUG, "%s: tcpCreate failed: %m", __PRETTY_FUNCTION__);
+                ls_syslog (LOG_DEBUG, "%s: tcpCreate failed: %m", __func__);
             }
             return NULL;
         }
@@ -156,7 +156,7 @@ getJInfo_ (int npgid, int *pgid, unsigned short options, gid_t cpgid)
         if (b_connect_ (s, (struct sockaddr *) &pimAddr, sizeof (pimAddr), 0) == -1) {
             
             if (logclass & LC_PIM) {
-                ls_syslog (LOG_DEBUG, "%s: b_connect() failed: %m", __PRETTY_FUNCTION__);
+                ls_syslog (LOG_DEBUG, "%s: b_connect() failed: %m", __func__);
             }
             
             lserrno = LSE_CONN_SYS;
@@ -174,7 +174,7 @@ getJInfo_ (int npgid, int *pgid, unsigned short options, gid_t cpgid)
         cc = writeEncodeHdr_ (s, &sendHdr, b_write_fix);
         if ( cc < 0) {
             if (logclass & LC_PIM) {
-                ls_syslog (LOG_DEBUG, "%s: writeEncodeHdr failed cc=%d: %M", __PRETTY_FUNCTION__, cc);
+                ls_syslog (LOG_DEBUG, "%s: writeEncodeHdr failed cc=%d: %M", __func__, cc);
             }
             
             close (s);
@@ -187,7 +187,7 @@ getJInfo_ (int npgid, int *pgid, unsigned short options, gid_t cpgid)
         if ((cc = rd_select_ (s, &timeOut)) < 0) {
 
             if (logclass & LC_PIM)  {
-                ls_syslog (LOG_DEBUG, "%s: rd_select_ cc=%d: %m", __PRETTY_FUNCTION__, cc);
+                ls_syslog (LOG_DEBUG, "%s: rd_select_ cc=%d: %m", __func__, cc);
             }
             close (s);
             
@@ -197,7 +197,7 @@ getJInfo_ (int npgid, int *pgid, unsigned short options, gid_t cpgid)
         if ((cc = lsRecvMsg_ (s, (char *) &hdrBuf, sizeof (hdrBuf), &recvHdr, NULL, NULL, &b_read_fix)) < 0) { // FIXME FIXME FIXME FIXME FIXME this is def wrong
 
             if (logclass & LC_PIM) {
-                ls_syslog (LOG_DEBUG, "%s: lsRecvMsg_ failed cc=%d: %M", __PRETTY_FUNCTION__, cc);
+                ls_syslog (LOG_DEBUG, "%s: lsRecvMsg_ failed cc=%d: %M", __func__, cc);
             }
 
             close (s);
@@ -207,18 +207,18 @@ getJInfo_ (int npgid, int *pgid, unsigned short options, gid_t cpgid)
 
         if (recvHdr.refCode != sendHdr.refCode) {
             if (logclass & LC_PIM) {
-                ls_syslog (LOG_DEBUG, "%s: recv refCode=%d not equal to send refCode=%d, server is not PIM", __PRETTY_FUNCTION__, (int) recvHdr.refCode, (int) sendHdr.refCode);
+                ls_syslog (LOG_DEBUG, "%s: recv refCode=%d not equal to send refCode=%d, server is not PIM", __func__, (int) recvHdr.refCode, (int) sendHdr.refCode);
             }
 
             return NULL;
         }
 
         if (logclass & LC_PIM) {
-            ls_syslog (LOG_DEBUG, "%s updated now", __PRETTY_FUNCTION__);
+            ls_syslog (LOG_DEBUG, "%s updated now", __func__);
         }
 
         if (!readPIMFile (pfile)) {
-            ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __PRETTY_FUNCTION__, "readPIMFile");
+            ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "readPIMFile");
             return NULL;
         }
     }
@@ -248,26 +248,26 @@ char *readPIMBuf (char *pfile)
     pimInfoLen = 0;
 
     if (stat (pfile, &bstat) < 0) {
-        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __PRETTY_FUNCTION__, "stat", pfile);
+        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "stat", pfile);
         return NULL;
     }
 
     pimInfoLen = bstat.st_size;
     assert( pimInfoLen >= 0);
     if ((pimInfoBuf = (char *) malloc( (unsigned long) pimInfoLen + 1)) == NULL) {
-        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "malloc");
+        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
         return NULL;
     }
     
     if ((fp = openPIMFile (pfile)) == NULL) {
 
-        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __PRETTY_FUNCTION__, "openPIMFile", pfile);
+        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "openPIMFile", pfile);
         return FALSE;
     }
     
     assert( pimInfoLen >= 0);
     if (fread (pimInfoBuf, sizeof (char), (size_t) pimInfoLen, fp) <= 0) {  // FIXME FIXME verify usefulness of cast
-        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __PRETTY_FUNCTION__, "fread");
+        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "fread");
         FREEUP (pimInfoBuf);
         return NULL;
     }
@@ -312,7 +312,7 @@ int readPIMFile (char *pfile)
     pimString = malloc( MAXLINELEN * sizeof( *pimString ) );
 
     if ((buffer = readPIMBuf (pfile)) == NULL) {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __PRETTY_FUNCTION__, "readPIMBuf");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "readPIMBuf");
       return FALSE;
     }
 
@@ -320,7 +320,7 @@ int readPIMFile (char *pfile)
     npinfoList = 0;
     pinfoList = malloc (sizeof (struct lsPidInfo) * MAX_NUM_PID);
     if (pinfoList == NULL) {
-        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __PRETTY_FUNCTION__, "malloc", sizeof (struct lsPidInfo) * MAX_NUM_PID);
+        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", sizeof (struct lsPidInfo) * MAX_NUM_PID);
         return FALSE;
     }
 
@@ -357,7 +357,7 @@ int readPIMFile (char *pfile)
 
             if (tmp == NULL) {
                 assert( npinfoList + MAX_NUM_PID > 0 );
-                ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __PRETTY_FUNCTION__, "realloc", sizeof (struct lsPidInfo) * (npinfoList + MAX_NUM_PID));
+                ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "realloc", sizeof (struct lsPidInfo) * (npinfoList + MAX_NUM_PID));
                 free( pimString );
                 return FALSE;
             }
@@ -384,7 +384,7 @@ struct jRusage *readPIMInfo (int inNPGids, int *inPGid)
     assert( inNPGids >= 0 );
     activeInPGid = (int *) malloc( (unsigned long)inNPGids * sizeof (int));
     if (activeInPGid == NULL) {
-        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __PRETTY_FUNCTION__, "malloc", (unsigned long)inNPGids * sizeof (int));
+        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", (unsigned long)inNPGids * sizeof (int));
         return NULL;
     }
 
@@ -392,7 +392,7 @@ struct jRusage *readPIMInfo (int inNPGids, int *inPGid)
 
     pgidList = (int *) malloc ((inNPGids < PGID_LIST_SIZE ? PGID_LIST_SIZE : (unsigned long)(inNPGids + PGID_LIST_SIZE)) * sizeof (int));
     if (pgidList == NULL) {
-        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __PRETTY_FUNCTION__, "malloc", (inNPGids < PGID_LIST_SIZE ? PGID_LIST_SIZE : (unsigned long)(inNPGids + PGID_LIST_SIZE)) * sizeof (int));
+        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", (inNPGids < PGID_LIST_SIZE ? PGID_LIST_SIZE : (unsigned long)(inNPGids + PGID_LIST_SIZE)) * sizeof (int));
         return NULL;
     }
 
@@ -403,7 +403,7 @@ struct jRusage *readPIMInfo (int inNPGids, int *inPGid)
     pidList = (struct pidInfo *) malloc (PID_LIST_SIZE * sizeof (struct pidInfo));
 
     if (pidList == NULL) {
-        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __PRETTY_FUNCTION__, "malloc", PID_LIST_SIZE * sizeof (struct pidInfo));
+        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", PID_LIST_SIZE * sizeof (struct pidInfo));
         return NULL;
     }
     npidList = 0;
@@ -443,7 +443,7 @@ struct jRusage *readPIMInfo (int inNPGids, int *inPGid)
                 if (logclass & LC_PIM) {
                     ls_syslog (LOG_DEBUG,
                         "%s: Got pid=%d ppid=%d pgid=%d utime=%d stime=%d cutime=%d cstime=%d proc_size=%d resident_size=%d stack_size=%d status=%d",
-                        __PRETTY_FUNCTION__,
+                        __func__,
                         pinfoList[pinfoNum].pid, pinfoList[pinfoNum].ppid,
                         pinfoList[pinfoNum].pgid,
                         pinfoList[pinfoNum].utime,
@@ -602,7 +602,7 @@ FILE *openPIMFile (char *pfile)
       if ((fp = fopen (pfile, "r")) == NULL)
     {
       if (logclass & LC_PIM) {
-        ls_syslog (LOG_DEBUG, "%s: fopen(%s) failed: %m", __PRETTY_FUNCTION__, pfile);
+        ls_syslog (LOG_DEBUG, "%s: fopen(%s) failed: %m", __func__, pfile);
         }
       lserrno = LSE_FILE_SYS;
       return NULL;

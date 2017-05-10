@@ -118,7 +118,7 @@ ls_initrex (int num, int options)
 int
 opensocks_ (int num)
 {
-    static char fname[] = "opensocks_";
+    static char __func__] = "opensocks_";
     int s;
     int nextdescr;
     int i;
@@ -262,7 +262,7 @@ lsfSetXUid (int flag, uid_t ruid, uid_t euid, uid_t suid, int (*func) ())
 void
 lsfExecLog (const char *cmd)
 {
-    static char fname[] = "lsfExecLog";
+    static char __func__] = "lsfExecLog";
     char *lsfUserName   = malloc( sizeof( char ) * MAXLSFNAMELEN + 1 );
 
     if (genParams_[LSF_MLS_LOG].paramValue &&

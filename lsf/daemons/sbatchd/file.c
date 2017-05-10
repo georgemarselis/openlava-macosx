@@ -268,7 +268,7 @@ static int
 unlinkBufFiles (char *lsbDir, char *jobFile, struct jobCard *jp,
 		struct hostent *hp)
 {
-  static char fname[] = "unlinkBufFiles()";
+  static char __func__] = "unlinkBufFiles()";
   char fileBuf[MAXFILENAMELEN], jfPath[MAXFILENAMELEN];
   char errMsg[MAXLINELEN];
   int error = FALSE;
@@ -366,7 +366,7 @@ unlinkBufFiles (char *lsbDir, char *jobFile, struct jobCard *jp,
 int
 initPaths (struct jobCard *jp, struct hostent *fromHp, struct lenData *jf)
 {
-  static char fname[] = "initPaths()";
+  static char __func__] = "initPaths()";
   char errMsg[MAXLINELEN];
   char fileBuf[MAXFILENAMELEN];
   char cwd[MAXFILENAMELEN], lsbDir[MAXFILENAMELEN];
@@ -799,7 +799,7 @@ static int
 lsbatchDir (char *lsbDir, struct jobCard *jp, struct hostent *fromHp,
 	    struct lenData *jf)
 {
-  static char fname[] = "lsbatchDir()";
+  static char __func__] = "lsbatchDir()";
   char errMsg[MAXLINELEN];
   struct passwd *pw;
   bool_t goodSpoolDir = FALSE;
@@ -926,7 +926,7 @@ static int
 lsbDirOk (char *lsbDir, struct jobCard *jp, struct hostent *fromHp,
 	  struct lenData *jf)
 {
-  static char fname[] = "lsbDirOk()";
+  static char __func__] = "lsbDirOk()";
   struct stat st;
   char jobFile[MAXFILENAMELEN];
   char errMsg[MAXLINELEN];
@@ -1041,7 +1041,7 @@ createChkpntJobFile (char *lsbDir, struct jobCard *jp, struct lenData *jf,
 		     struct hostent *fromHp, char *chkpntDir,
 		     char *restartDir)
 {
-  static char fname[] = "createChkpntJobFile()";
+  static char __func__] = "createChkpntJobFile()";
   char errMsg[MAXLINELEN];
 
   char chkDir[MAXFILENAMELEN], restartDirBak[MAXFILENAMELEN];
@@ -1270,7 +1270,7 @@ myRename (char *fromDir, char *toDir)
 static int
 stdoutDirectSymLink (char *jobFile, char *ext, struct jobSpecs *jobSpecsPtr)
 {
-  static char fname[] = "stdoutDirectSymLink";
+  static char __func__] = "stdoutDirectSymLink";
   char errMsg[MAXLINELEN];
   char fileLink[MAXFILENAMELEN];
   char fullpath[MAXFILENAMELEN * 2];
@@ -1308,7 +1308,7 @@ static void
 determineFilebufStdoutDirect (char *filebuf,
 			      struct jobSpecs *jobSpecsPtr, int flag)
 {
-  static char fname[] = "determineFilebufStdoutDirect";
+  static char __func__] = "determineFilebufStdoutDirect";
   char chr;
   int lastSlash = FALSE;
   int outDirOk = FALSE;
@@ -1380,7 +1380,7 @@ static int
 openStdFiles (char *lsbDir, char *chkpntDir, struct jobCard *jobCardPtr,
 	      struct hostent *hp)
 {
-  static char fname[] = "openStdFiles()";
+  static char __func__] = "openStdFiles()";
   int i;
   char filebuf[MAXFILENAMELEN], filebufLink[MAXFILENAMELEN];
   static char stdinName[MAXFILENAMELEN];
@@ -1956,7 +1956,7 @@ int
 appendJobFile (struct jobCard *jobCard, char *header, struct hostent *hp,
 	       char *errMsg)
 {
-  static char fname[] = "appendJobFile()";
+  static char __func__] = "appendJobFile()";
   FILE *jobFile_fp;
 
   if ((jobFile_fp = myfopen_ (jobCard->jobSpecs.jobFile, "a", hp)) == NULL)
@@ -2007,7 +2007,7 @@ appendJobFile (struct jobCard *jobCard, char *header, struct hostent *hp,
 void
 writePreJobFail (struct jobCard *jp)
 {
-  static char fname[] = "writePreJobFail()";
+  static char __func__] = "writePreJobFail()";
   FILE *fp;
   char fn[MAXFILENAMELEN];
 
@@ -2030,7 +2030,7 @@ static int
 createJobFile (char *lsbDir, char *chkpntDir, struct jobCard *jp,
 	       struct lenData *jf, struct hostent *hp)
 {
-  static char fname[] = "createJobFile";
+  static char __func__] = "createJobFile";
   struct jobSpecs *jobSpecsPtr = &jp->jobSpecs;
   int fd, cc, len;
   char errMsg[MAXLINELEN];
@@ -2167,7 +2167,7 @@ isAbsolutePathExec (const char *path)
 void
 jobFileExitStatus (struct jobCard *jobCard)
 {
-  static char fname[] = "jobFileExitStatus()";
+  static char __func__] = "jobFileExitStatus()";
   FILE *jobFile_fp;
   char line[MAXLINELEN];
   struct hostent *hp;
@@ -2281,7 +2281,7 @@ static int
 localJobRestartFiles (char *lsbDir, char *restartDir, struct jobCard *jp,
 		      struct hostent *hp)
 {
-  static char fname[] = "localJobRestartFiles";
+  static char __func__] = "localJobRestartFiles";
   struct jobSpecs *jspecs = &jp->jobSpecs;
   char errMsg[MAXLINELEN];
   char t[MAXFILENAMELEN], s[MAXFILENAMELEN];

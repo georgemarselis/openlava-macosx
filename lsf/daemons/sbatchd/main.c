@@ -121,7 +121,7 @@ int sbdLogMask;
 int
 main (int argc, char **argv)
 {
-  static char fname[] = "sbatchd/main";
+  static char __func__] = "sbatchd/main";
   int nready, i;
   sigset_t oldsigmask, newmask;
   struct timeval timeout;
@@ -545,7 +545,7 @@ clientIO (struct Masks *chanmask)
 static void
 processMsg (struct clientNode *client)
 {
-  static char fname[] = "processMsg";
+  static char __func__] = "processMsg";
   struct Buffer *buf;
   struct bucket *bucket;
   int s;
@@ -909,7 +909,7 @@ get_new_master (struct sockaddr_in *from)
 void
 sinit (void)
 {
-  static char fname[] = "sinit";
+  static char __func__] = "sinit";
   struct hostInfo *myinfo;
   char *myhostname;
 

@@ -611,7 +611,7 @@ do_options (int argc, char **argv, struct bhistReq *bhistReq)
 static char *
 getEventStatus (struct eventRecord *event)
 {
-  static char fname[] = "getEventStatus";
+  static char __func__] = "getEventStatus";
   static char status[MSGSIZE];
   LS_WAIT_T wStatus;
 
@@ -821,7 +821,7 @@ skip_jobRecord (struct jobRecord *jobRecord, struct bhistReq *Req)
 static void
 displayhist (struct bhistReq *bhistReq)
 {
-  static char fname[] = "displayhist";
+  static char __func__] = "displayhist";
   struct jobRecord *jobRecord;
   struct jobInfoEnt *job;
   struct eventRecord *event, *nextevent, *lastevent;
@@ -2299,7 +2299,7 @@ printEvent (struct bhistReq *bhistReq, struct jobRecord *jobRecord,
 	    struct jobInfoEnt *job, struct eventRecord *event,
 	    time_t timeStamp, char *timeStampStr, int option)
 {
-  static char fname[] = "printEvent()";
+  static char __func__] = "printEvent()";
   int i;
   char tBuff[20];
   char *disptime = NULL;
@@ -2720,7 +2720,7 @@ printEvent (struct bhistReq *bhistReq, struct jobRecord *jobRecord,
 static void
 printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
 {
-  static char fname[] = "printChronicleEventLog";
+  static char __func__] = "printChronicleEventLog";
   struct jobInfoEnt *job;
   struct submit *submitPtr;
   struct eventRecord *event;

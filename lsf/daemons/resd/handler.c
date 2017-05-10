@@ -158,7 +158,7 @@ static int resFindPamJobStarter (void);
 void
 doacceptconn (void)
 {
-  static char fname[] = "doacceptconn()";
+  static char __func__] = "doacceptconn()";
   int s;
   struct sockaddr_in from;
   struct sockaddr_in local;
@@ -469,7 +469,7 @@ void
 childAcceptConn (int s, struct passwd *pw, struct lsfAuth *auth,
 		 struct resConnect *connReq, struct hostent *hostp)
 {
-  static char fname[] = "childAcceptConn";
+  static char __func__] = "childAcceptConn";
   struct client *cli_ptr;
   char msg[512];
   int i;
@@ -701,7 +701,7 @@ doAcceptFail:
 static int
 setClUid (struct client *cli_ptr)
 {
-  static char fname[] = "setClUid";
+  static char __func__] = "setClUid";
   char **saveEnv = environ;
   char val[MAXLINELEN];
 
@@ -755,7 +755,7 @@ setClUid (struct client *cli_ptr)
 static int
 recvConnect (int s, struct resConnect *connReq, size_t (*readFunc) (), struct lsfAuth *auth)
 {
-	static char fname[] = "recvConnect";
+	static char __func__] = "recvConnect";
 	char *buf = NULL;
 	XDR xdrs = { };
 	struct LSFHeader reqHdr = {};
@@ -803,7 +803,7 @@ recvConnect (int s, struct resConnect *connReq, size_t (*readFunc) (), struct ls
 void
 doclient (struct client *cli_ptr)
 {
-  static char fname[] = "doclient";
+  static char __func__] = "doclient";
   char *buf = NULL;
   char *hdrbuf = malloc( sizeof (struct LSFHeader) + 1 );
   struct LSFHeader msgHdr = { };
@@ -1014,7 +1014,7 @@ dochild_info (struct child *chld, int op)
 {
   struct client *cliPtr;
 
-  static char fname[] = "dochild_info";
+  static char __func__] = "dochild_info";
   char hdrbuf[sizeof (struct LSFHeader)];
   struct LSFHeader msgHdr;
   XDR xdrs;
@@ -1103,7 +1103,7 @@ dochild_info (struct child *chld, int op)
 static void
 resChdir (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 {
-  static char fname[] = "resChdir";
+  static char __func__] = "resChdir";
   int i, cc;
   struct stat statbuf;
   char resdir[MAXPATHLEN];
@@ -1155,7 +1155,7 @@ resChdir (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 static void
 resSetenv (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 {
-  static char fname[] = "resSetenv";
+  static char __func__] = "resSetenv";
   struct resSetenv envReq;
   char bufHome[MAXLINELEN];
   char bufWinDir[MAXLINELEN];
@@ -1214,7 +1214,7 @@ static void
 resStty (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs,
 	 int async)
 {
-  static char fname[] = "resStty";
+  static char __func__] = "resStty";
   struct resStty tty;
 
   if (!xdr_resStty (xdrs, &tty, msgHdr))
@@ -1237,7 +1237,7 @@ resStty (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs,
 static void
 resRKill (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 {
-  static char fname[] = "resRKill";
+  static char __func__] = "resRKill";
   int rempid, sig;
   int i, cc;
   struct resRKill rkill;
@@ -1355,7 +1355,7 @@ resRKill (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 static void
 resGetpid (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 {
-  static char fname[] = "resGetpid";
+  static char __func__] = "resGetpid";
   int rempid;
   struct _buf_
   {
@@ -1418,7 +1418,7 @@ resGetpid (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 static void
 resRusage (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 {
-  static char fname[] = "resRusage()";
+  static char __func__] = "resRusage()";
   struct resRusage rusageReq;
   int rid;
   int pid;
@@ -1595,7 +1595,7 @@ resTaskMsg (struct client *cli_ptr, struct LSFHeader *msgHdr, char *hdrBuf, char
 void
 doResParentCtrl (void)
 {
-	static char fname[] = "doResParentCtrl()";
+	static char __func__] = "doResParentCtrl()";
 	struct sockaddr_in from = { };
 	socklen_t fromlen = 0;
 	int s = 0;
@@ -1677,7 +1677,7 @@ doResParentCtrl (void)
 static void
 resControl (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs, int childSock)
 {
-  static char fname[] = "resControl";
+  static char __func__] = "resControl";
   char *daemon_path = NULL;
   int i = 0;
   int err = 0;
@@ -1797,7 +1797,7 @@ resControl (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs, int ch
 enum resAck
 sendResParent (struct LSFHeader * msgHdr, char *msgBuf, bool_t (*xdrFunc) ())
 {
-	static char fname[] = "sendResParent";
+	static char __func__] = "sendResParent";
 	int s = 0;
 	char *buf = malloc( sizeof(char) * MSGSIZE );
 
@@ -1853,7 +1853,7 @@ sendResParent (struct LSFHeader * msgHdr, char *msgBuf, bool_t (*xdrFunc) ())
 static int
 checkPermResCtrl (struct client *cli_ptr)
 {
-	static char fname[] = "checkPermResCtrl";
+	static char __func__] = "checkPermResCtrl";
 	struct clusterInfo *clusterInfo = NULL;
 	static char *mycluster = NULL;
 	static int nAdmins = -1;
@@ -1943,7 +1943,7 @@ checkPermResCtrl (struct client *cli_ptr)
 static void
 resRexec (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 {
-	static char fname[]      = "resRexec()";
+	static char __func__]      = "resRexec()";
 	struct resCmdBill cmdmsg = { };
 	struct sockaddr_in addr  = { };
 	struct sockaddr_in from  = { };
@@ -2114,7 +2114,7 @@ resFindPamJobStarter (void)
 static struct child *
 doRexec (struct client *cli_ptr, struct resCmdBill *cmdmsg, int retsock, int taskSock, int server, enum resAck *ack)
 {
-	static char fname[] = "doRexec";
+	static char __func__] = "doRexec";
 	int pty[2]     = { 0, 0 };
 	int sv[2]      = { 0, 0 };
 	int info[2]    = { 0, 0 };
@@ -2345,7 +2345,7 @@ static int
 forkPty (struct client *cli_ptr, int *pty, int *sv, int *info, int *errSock,
 	 char *pty_name, enum resAck *ack, int retsock, int echoOff)
 {
-  static char fname[] = "forkPty";
+  static char __func__] = "forkPty";
   int pid = -1;
 
   ptyreset ();
@@ -2473,7 +2473,7 @@ forkPty (struct client *cli_ptr, int *pty, int *sv, int *info, int *errSock,
 static int
 forkSV (struct client *cli_ptr, int *sv, int *info, int *errSock, enum resAck * ack)
 {
-  static char fname[] = "forkSV";
+  static char __func__] = "forkSV";
   int pid = -1;
 
 	if( info ) {
@@ -2564,7 +2564,7 @@ forkSV (struct client *cli_ptr, int *sv, int *info, int *errSock, enum resAck * 
 static void
 setPGid (struct client *cli_ptr, int tflag)
 {
-  static char fname[] = "setPGid";
+  static char __func__] = "setPGid";
 
 
   if (sbdMode && !(sbdFlags & SBD_FLAG_TERM))
@@ -2590,7 +2590,7 @@ setPGid (struct client *cli_ptr, int tflag)
 static enum resAck
 parentPty (int *pty, int *sv, char *pty_name)
 {
-  static char fname[] = "parentPty";
+  static char __func__] = "parentPty";
   struct hand_shake handShake = { };
 
 
@@ -2638,7 +2638,7 @@ parentPty (int *pty, int *sv, char *pty_name)
 static void
 set_noecho (int fd)
 {
-  static char fname[] = "set_noecho";
+  static char __func__] = "set_noecho";
   struct termios stermios;
 
   if (tcgetattr (fd, &stermios) < 0)
@@ -2658,7 +2658,7 @@ set_noecho (int fd)
 static enum resAck
 childPty (struct client *cli_ptr, int *pty, int *sv, char *pty_name, int echoOff)
 {
-  static char fname[] = "childPty";
+  static char __func__] = "childPty";
   struct hand_shake handShake;
 
 
@@ -2801,7 +2801,7 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 		int taskSock, int *pty,
 		int *sv, int *info, int *err, int retsock, int *pid)
 {
-  static char fname[] = "rexecChild";
+  static char __func__] = "rexecChild";
   sigset_t sigMask;
   char val[MAXPATHLEN];
   int i, maxfds, lastUnusedFd;
@@ -3286,7 +3286,7 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 static void
 lsbExecChild (struct resCmdBill *cmdmsg, int *pty, int *sv, int *err, int *info, pid_t *pid)
 {
-  static char fname[] = "lsbExecChild";
+  static char __func__] = "lsbExecChild";
   sigset_t sigMask;
   int i, maxfds, lastUnusedFd;
   int iofd;
@@ -3409,7 +3409,7 @@ lsbExecChild (struct resCmdBill *cmdmsg, int *pty, int *sv, int *err, int *info,
 static void
 execit (char **uargv, char *jobStarter, pid_t *pid, int stdio, int taskSock, int loseRoot)
 {
-	static char fname[] = "execit()";
+	static char __func__] = "execit()";
 	char *cmd = NULL;
 	int i = 0;
 	int num = 0;
@@ -3521,7 +3521,7 @@ execit (char **uargv, char *jobStarter, pid_t *pid, int stdio, int taskSock, int
 static void
 delete_client (struct client *cli_ptr)
 {
-	static char fname[] = "delete_client()";
+	static char __func__] = "delete_client()";
 	int i = 0;
 	int j = 0;
 	char exbuf = ' ';
@@ -3629,7 +3629,7 @@ delete_client (struct client *cli_ptr)
 void
 delete_child (struct child *cp)
 {
-	static char fname[] = "delete_child";
+	static char __func__] = "delete_child";
 	int i = 0;
 	int j = 0;
 
@@ -3711,7 +3711,7 @@ delete_child (struct child *cp)
 static void
 kill_child (struct child *cp)
 {
-	static char fname[] = "kill_child()";
+	static char __func__] = "kill_child()";
 	if (kill (-(cp->pid), 0) == 0)
 	{
 
@@ -3729,7 +3729,7 @@ static int
 unlink_child (struct child *cp)
 {
 	int rc = 0;
-	static char fname[] = "unlink_child";
+	static char __func__] = "unlink_child";
 
 	if (debug > 1)
 	{
@@ -3759,7 +3759,7 @@ unlink_child (struct child *cp)
 static int
 notify_client (int s, int rpid, enum resAck ack, struct sigStatusUsage *sigStatRu)
 {
-  static char fname[] = "notify_client";
+  static char __func__] = "notify_client";
   struct niosStatus st = { };
   char *reqBuf = malloc( sizeof( char ) * MSGSIZE + 1 );
   int reqBufSize = 0;
@@ -3855,7 +3855,7 @@ notify_client (int s, int rpid, enum resAck ack, struct sigStatusUsage *sigStatR
 static void
 setptymode (ttyStruct * tts, int slave)
 {
-  static char fname[] = "setptymode()";
+  static char __func__] = "setptymode()";
   struct termios termattr = { };
 
 	if (debug > 1) {
@@ -3900,7 +3900,7 @@ setptymode (ttyStruct * tts, int slave)
 void
 dochild_stdio (struct child *chld, int op)
 {
-  static char fname[] = "dochild_stdio";
+  static char __func__] = "dochild_stdio";
   int cc = 0;
   int i = 0;
 
@@ -3991,7 +3991,7 @@ dochild_stdio (struct child *chld, int op)
 int
 resSignal (struct child *chld, struct resSignal sig)
 {
-	static char fname[] = "resSignal";
+	static char __func__] = "resSignal";
 	char *sigBuf1 = NULL;
 	char *sigBuf2 = NULL;
 	static int firstTime = 1;
@@ -4083,7 +4083,7 @@ resSignal (struct child *chld, struct resSignal sig)
 static void
 simu_eof (struct child *chld, int which)
 {
-	static char fname[] = "simul_eof";
+	static char __func__] = "simul_eof";
 	char tbuf[2];      // FIXME FIXME throw in debugger, this might be overflow
 
 	if (debug > 1)
@@ -4164,7 +4164,7 @@ copyArray (char **from)
 void
 child_handler (void)
 {
-  static char fname[] = "child_handler";
+  static char __func__] = "child_handler";
 
   child_handler_ext ();
 
@@ -4179,7 +4179,7 @@ child_handler (void)
 void
 child_handler_ext (void)
 {
-  static char fname[] = "child_handler_ext";
+  static char __func__] = "child_handler_ext";
   int pid;
   LS_WAIT_T status;
   struct rusage ru;
@@ -4341,7 +4341,7 @@ coredumped=<%d> exited=<%d>", fname, pid, LS_STATUS (status), WEXITSTATUS (statu
 static int
 notify_sigchild (struct child *cp)
 {
-  static char fname[] = "notify_sigchild";
+  static char __func__] = "notify_sigchild";
   struct sigStatusUsage sstat = { };
   struct sigStatusUsage *sru = NULL;
   int rc = 0;
@@ -4430,7 +4430,7 @@ notify_sigchild (struct child *cp)
 void
 term_handler (int signum)
 {
-  static char fname[] = "term_handler";
+  static char __func__] = "term_handler";
 
   if (sbdMode)
 	{
@@ -4460,7 +4460,7 @@ term_handler (int signum)
 void
 sigHandler (int signum)
 {
-  static char fname[] = "sigHandler";
+  static char __func__] = "sigHandler";
 
   if (sbdMode && (sbdFlags & SBD_FLAG_TERM))
 	{
@@ -4495,7 +4495,7 @@ sigHandler (int signum)
 static void
 declare_eof_condition (struct child *childPtr, int which)
 {
-  static char fname[] = "declare_eof_condition";
+  static char __func__] = "declare_eof_condition";
 
   if ((which < 0) || (which > 2))
 	{
@@ -4595,7 +4595,7 @@ matchExitVal (int val, char *requeueEval)
 static void
 eof_to_nios (struct child *chld)
 {
-  static char fname[] = "eof_to_nios";
+  static char __func__] = "eof_to_nios";
   struct LSFHeader reqHdr;
   int rc;
 
@@ -4648,7 +4648,7 @@ eof_to_nios (struct child *chld)
 static void
 eof_to_client (struct child *chld)
 {
-  static char fname[] = "eof_to_client";
+  static char __func__] = "eof_to_client";
   struct LSFHeader reqHdr;
 
   initLSFHeader_ (&reqHdr);;
@@ -4691,7 +4691,7 @@ eof_to_client (struct child *chld)
 static int
 pairsocket (int af, int type, int protocol, int *sv)
 {
-  static char fname[] = "pairsocket()";
+  static char __func__] = "pairsocket()";
   struct sockaddr_in sa;
   struct hostent *hp;
   int s;
@@ -4823,7 +4823,7 @@ pairsocket (int af, int type, int protocol, int *sv)
 int
 sendReturnCode (int s, int code)
 {
-  static char fname[] = "sendReturnCode()";
+  static char __func__] = "sendReturnCode()";
   struct LSFHeader replyHdr;
 
   initLSFHeader_ (&replyHdr);
@@ -4842,7 +4842,7 @@ sendReturnCode (int s, int code)
 void
 child_channel_clear (struct child *chld, struct outputchannel *channel)
 {
-  static char fname[] = "child_channel_clear";
+  static char __func__] = "child_channel_clear";
   int cc, len;
   char cvalue;
   struct relaylinebuf *buffer = &(channel->buffer);
@@ -5176,7 +5176,7 @@ addCliEnv (struct client *cl, char *envName, char *value)
 int
 lsbJobStart (char **jargv, u_short retPort, char *host, int usePty)
 {
-	static char fname[] = "lsbJobStart()";
+	static char __func__] = "lsbJobStart()";
 	struct resCmdBill cmdBill = { };
 	char *Ω = NULL;
 	struct client cli = { };
@@ -5439,7 +5439,7 @@ lsbJobStart (char **jargv, u_short retPort, char *host, int usePty)
 static int
 ttyCallback (int s, ttyStruct * tty)
 {
-  static char fname[] = "ttyCallback()";
+  static char __func__] = "ttyCallback()";
   XDR xdrs;
   struct LSFHeader msgHdr;
   char hdrBuf[sizeof (struct LSFHeader)];
@@ -5514,7 +5514,7 @@ void doDebugReq ();
 static void
 resDebugReq (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs, int childSock)
 {
-  static char fname[] = "resDebugReq";
+  static char __func__] = "resDebugReq";
   struct debugReq debugReq;
   enum resAck ack;
   char *dir = NULL;
@@ -5640,7 +5640,7 @@ resDebugReq (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs, int c
 static void
 doReopen (void)
 {
-  static char fname[] = "doReopen";
+  static char __func__] = "doReopen";
   struct config_param *plp;
   char *sp;
   char *pathname = NULL;
@@ -5718,7 +5718,7 @@ setEUid (uid_t uid)
 static void
 dumpResCmdBill (struct resCmdBill *bill)
 {
-	static char fname[] = "dumpResCmdBill()";
+	static char __func__] = "dumpResCmdBill()";
 	char **args = NULL;
 
 	ls_syslog (LOG_DEBUG, "%s: retport=<%d>, rpid=<%d>, priority=<%d>, filemask=<%d>, options=<%d>, cwd=<%s>", fname, bill->retport, bill->rpid, bill->priority, bill->filemask, bill->options, bill->cwd);
@@ -5735,7 +5735,7 @@ dumpResCmdBill (struct resCmdBill *bill)
 static int
 changeEUid (uid_t uid)
 {
-  static char fname[] = "changeEUid()";
+  static char __func__] = "changeEUid()";
   if (lsfSetXUid(0, -1, uid, -1, seteuid) < 0)
 	{
 	  ls_syslog (LOG_WARNING, I18N_FUNC_D_FAIL_M, fname, "setresuid/seteuid", uid);
@@ -5758,7 +5758,7 @@ changeEUid (uid_t uid)
 void
 dumpClient (struct client *client, char *why)
 {
-  static char fname[] = "dumpClient()";
+  static char __func__] = "dumpClient()";
 
   ls_syslog (LOG_DEBUG, "%s: %s: Client=<%x> socket=<%d> ruid=<%d> username=<%s> from=<%s>", fname, why, client, client->client_sock, client->ruid, client->username, client->hostent.h_name);
 }
@@ -5766,7 +5766,7 @@ dumpClient (struct client *client, char *why)
 void
 dumpChild (struct child *child, int operation, char *why)
 {
-	static char fname[] = "dumpChild()";
+	static char __func__] = "dumpChild()";
 
 	ls_syslog (LOG_DEBUG, // FIXME sprintf && concatenate string, to tidy it up a bit
 		"%s: %s: Operation=<%d> on child=<%x> child->pid=<%d> child->rpid=<%d> backClient=<%x> refcnt=<%d> stdio=<%d> remsock.fd=<%d> remsock.rcount/remsock.wcount=<%d/%d> rexflag=<%d> server=<%d> c_eof=<%d> running=<%d> sigchild=<%d> endstdin=<%d> i_buf.bcount=<%d> std_out.endFlag=<%d> std_out.retry=<%d> std_out.buffer.bcount=<%d> std_out.bytes=<%d> std_err.endFlag=<%d> std_err.retry=<%d> std_err.buffer.bcount=<%d> std_err.bytes=<%d> sent_eof=<%d> sent_status=<%d> child->username=<%s> child->fromhost=<%s> ", 
@@ -5784,7 +5784,7 @@ dumpChild (struct child *child, int operation, char *why)
 void
 dochild_buffer (struct child *chld, int op)
 {
-	static char fname[] = "dochild_buffer";
+	static char __func__] = "dochild_buffer";
 	static int linebuf = -1;    // FIXME rename to more appropriate variable; replace type to size_t ?
 
 	int i = 0;
@@ -6038,7 +6038,7 @@ dochild_buffer (struct child *chld, int op)
 void
 donios_sock (struct child **children, int op)
 {
-	static char fname[] = "donios_sock";
+	static char __func__] = "donios_sock";
 	int cc = 0;
 	int i = 0;
 
@@ -6510,7 +6510,7 @@ deliver_notifications (LIST_T * list)
 static int
 notify_nios (int retsock, int rpid, int opCode)
 {
-  static char fname[] = "notify_nios";
+  static char __func__] = "notify_nios";
   struct LSFHeader reqHdr;
   int i, rc;
 
@@ -6561,7 +6561,7 @@ notify_nios (int retsock, int rpid, int opCode)
 static int
 resUpdatetty (struct LSFHeader msgHdr)
 {
-  static char fname[] = "resUpdatetty";
+  static char __func__] = "resUpdatetty";
   XDR xdrs;
   struct resStty restty;
   ttyStruct ttyInfo;
@@ -6620,7 +6620,7 @@ resUpdatetty (struct LSFHeader msgHdr)
 static void
 cleanUpKeptPids (void)
 {
-  static char fname[] = "cleanUpKeptPids";
+  static char __func__] = "cleanUpKeptPids";
   struct listSetIterator iter;
   long *pid;
 

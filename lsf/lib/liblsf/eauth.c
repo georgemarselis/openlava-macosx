@@ -157,7 +157,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
 
     static int connected = FALSE;
     static int in[2], out[2];
-    static char fname[] = "verifyEAuth/lib.eauth.c";
+    static char __func__] = "verifyEAuth/lib.eauth.c";
 
     if (logclass & LC_TRACE) {
         ls_syslog (LOG_DEBUG, "%s ...", fname);
@@ -380,7 +380,7 @@ static char *
 getLSFAdmin (void)
 {
   static char admin[MAXLSFNAMELEN];
-  static char fname[] = "getLSFAdmin";
+  static char __func__] = "getLSFAdmin";
   char *mycluster;
   struct clusterInfo *clusterInfo;
   struct passwd *pw;

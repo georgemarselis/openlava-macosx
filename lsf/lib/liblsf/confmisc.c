@@ -132,7 +132,7 @@ getBeginLine (FILE * fp, size_t *lineNum)
 int
 readHvalues (struct keymap *keyList, char *linep, FILE * fp, char *lsfile, size_t *lineNum, int exact, char *section)
 {
-  static char fname[] = "readHvalues";
+  static char __func__] = "readHvalues";
   char *key;
   char *value;
   char *sp, *sp1;
@@ -331,7 +331,7 @@ fail:
 int
 putInLists (char *word, struct admins *admins, unsigned int *numAds, char *forWhat)
 {
-  static char fname[] = "putInLists";
+  static char __func__] = "putInLists";
   struct passwd *pw;
   char **tempNames; 
   uid_t *tempIds;

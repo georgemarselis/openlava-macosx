@@ -199,7 +199,7 @@ check_queue (struct bhistReq *Req, char *queue)
 struct jobInfoEnt *
 read_newjob (struct eventRec *log)
 {
-  static char fname[] = "read_newjob";
+  static char __func__] = "read_newjob";
   struct jobInfoEnt *job;
   struct submit *submitPtr;
   struct jobNewLog *jobNewLog;
@@ -608,7 +608,7 @@ check_host (struct bhistReq *Req, struct jobRecord *jobRecord)
 struct jobRecord *
 read_startjob (struct eventRec *log)
 {
-  static char fname[] = "read_startjob";
+  static char __func__] = "read_startjob";
   struct jobRecord *jobRecord;
   struct jobStartLog *jobStartLog;
   int i;
@@ -1347,7 +1347,7 @@ initJobInfo (void)
 void
 parse_event (struct eventRec *log, struct bhistReq *Req)
 {
-  static char fname[] = "parse_event";
+  static char __func__] = "parse_event";
   struct jobInfoEnt *job;
   struct submit *submitPtr;
   struct jobRecord *newjobRecord, *jobRecord;

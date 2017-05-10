@@ -36,7 +36,7 @@ char *
 ls_getclustername (void)
 {
 
-	static char fname[] = "ls_getclustername";
+	static char __func__] = "ls_getclustername";
 	char *clName = malloc( sizeof( char ) * MAXLSFNAMELEN + 1 ); // FIXME FIXME FIXME FIXME dynamic memory allocation and management
 
 	if (logclass & (LC_TRACE)) {
@@ -582,7 +582,7 @@ expandSHinfo (struct hostInfoReply *hostInfoReply)
 struct hostInfo *
 ls_gethostinfo (char *resReq, size_t *numhosts, char **hostlist, size_t listsize, int options)
 {
-	static char fname[] = "ls_gethostinfo";
+	static char __func__] = "ls_gethostinfo";
 	char *hname;
 	int cc = 0;
 	struct shortLsInfo lsInfo;
@@ -760,7 +760,7 @@ ls_isclustername (char *name)
 struct lsSharedResourceInfo *
 ls_sharedresourceinfo (char **resources, unsigned int *numResources, char *hostName, int options)
 {
-	static char fname[] = "ls_sharedresourceinfo";
+	static char __func__] = "ls_sharedresourceinfo";
 	static struct resourceInfoReq resourceInfoReq;
 	static struct resourceInfoReply resourceInfoReply;
 	static struct LSFHeader replyHdr;

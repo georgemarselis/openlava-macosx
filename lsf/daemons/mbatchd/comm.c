@@ -54,7 +54,7 @@ sbdReplyType
 start_ajob (struct jData * jDataPtr,
 	    struct qData * qp, struct jobReply * jobReply)
 {
-  static char fname[] = "start_job()";
+  static char __func__] = "start_job()";
   struct jobSpecs jobSpecs;
   char *request_buf = NULL;
   struct LSFHeader hdr;
@@ -197,7 +197,7 @@ start_ajob (struct jData * jDataPtr,
 sbdReplyType
 switch_job (struct jData * jDataPtr, int options)
 {
-  static char fname[] = "switch_job()";
+  static char __func__] = "switch_job()";
   struct jobSpecs jobSpecs;
   char *request_buf = NULL;
   struct LSFHeader hdr;
@@ -287,7 +287,7 @@ sbdReplyType
 signal_job (struct jData * jp,
 	    struct jobSig * sendReq, struct jobReply * jobReply)
 {
-  static char fname[] = "signal_job()";
+  static char __func__] = "signal_job()";
   struct LSFHeader hdr;
   char request_buf[MSGSIZE];
   char *reply_buf;
@@ -379,7 +379,7 @@ signal_job (struct jData * jp,
 sbdReplyType
 msg_job (struct jData * jp, struct Buffer * mbuf, struct jobReply * jobReply)
 {
-  static char fname[] = "msg_job()";
+  static char __func__] = "msg_job()";
   struct LSFHeader hdr;
   char *reply_buf;
   sbdReplyType reply;
@@ -425,7 +425,7 @@ msg_job (struct jData * jp, struct Buffer * mbuf, struct jobReply * jobReply)
 sbdReplyType
 probe_slave (struct hData * hData, char sendJobs)
 {
-  static char fname[] = "probe_slave()";
+  static char __func__] = "probe_slave()";
   char *request_buf;
   char *reply_buf = NULL;
   int buflen = 0;
@@ -559,7 +559,7 @@ probe_slave (struct hData * hData, char sendJobs)
 sbdReplyType
 rebootSbd (char *host)
 {
-  static char fname[] = "rebootSbd()";
+  static char __func__] = "rebootSbd()";
   sbdReplyType reply;
   char request_buf[MSGSIZE];
   char *reply_buf;
@@ -608,7 +608,7 @@ rebootSbd (char *host)
 sbdReplyType
 shutdownSbd (char *host)
 {
-  static char fname[] = "shutdownSbd()";
+  static char __func__] = "shutdownSbd()";
   sbdReplyType reply;
   char request_buf[MSGSIZE];
   char *reply_buf;
@@ -670,7 +670,7 @@ callSBD (char *toHost,
 	 int *cnt,
 	 int *cc, int callServerFlags, struct sbdNode *sbdPtr, int *sockPtr)
 {
-  static char fname[] = "callSBD";
+  static char __func__] = "callSBD";
   struct sbdNode *newSbdNode;
 
   if (daemonParams[LSB_MBD_BLOCK_SEND].paramValue == NULL
@@ -752,7 +752,7 @@ callSBD (char *toHost,
 sbdReplyType
 callSbdDebug (struct debugReq * pdebug)
 {
-  static char fname[] = "callSbddebug()";
+  static char __func__] = "callSbddebug()";
   sbdReplyType reply;
   char request_buf[MSGSIZE];
   char *reply_buf;

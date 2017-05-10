@@ -953,7 +953,7 @@ chanDequeue_ (int chfd, struct Buffer **buf)
 long
 chanReadNonBlock_ (int chfd, char *buf, size_t len, int timeout)
 {
-    static char fname[] = "chanReadNonBlock_";
+    static char __func__] = "chanReadNonBlock_";
 
     if (io_nonblock_ ((int)channels[chfd].handle) < 0)
     {
@@ -986,7 +986,7 @@ int
 chanRpc_ (int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *outhdr, int timeout)
 {
     
-    const char fname[] = "chanRpc_";
+    const char __func__] = "chanRpc_";
     long cc;
     
     XDR xdrs;

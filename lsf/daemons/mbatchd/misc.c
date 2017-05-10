@@ -47,7 +47,7 @@ extern int getQUsable (struct qData *);
 void
 updCounters (struct jData *jData, int oldStatus, time_t eventTime)
 {
-	static char fname[] = "updCounters";
+	static char __func__] = "updCounters";
 	int num    = 0;
 	int numReq = 0;
 
@@ -364,7 +364,7 @@ void
 updQaccount (struct jData *jp, int numJobs, int numPEND,
 	     int numRUN, int numSSUSP, int numUSUSP, int numRESERVE)
 {
-  static char fname[] = "updQaccount";
+  static char __func__] = "updQaccount";
   struct qData *qp = jp->qPtr;
   int numSlots;
   int newJob;
@@ -438,7 +438,7 @@ updUAcct (struct jData *jData,
 	  struct hData *hp,
 	  void (*onNewEntry) (struct userAcct *, void *), void *extra)
 {
-  static char fname[] = "updUAcct";
+  static char __func__] = "updUAcct";
   struct userAcct *foundU;
   struct qData *qp = jData->qPtr;
   int numSlots;
@@ -590,7 +590,7 @@ updHAcct (struct jData *jData,
 	  int numRESERVE,
 	  void (*onNewEntry) (struct hostAcct *, void *), void *extra)
 {
-  static char fname[] = "updHAcct";
+  static char __func__] = "updHAcct";
   struct hostAcct *foundH = NULL;
   struct hData *hp;
   int i, numSlots;
@@ -850,7 +850,7 @@ void
 updUserData (struct jData *jData, int numJobs, int numPEND,
 	     int numRUN, int numSSUSP, int numUSUSP, int numRESERVE)
 {
-  static char fname[] = "updUserData";
+  static char __func__] = "updUserData";
   struct uData *up, *ugp;
   static struct uData **grpPtr = NULL;
   int i, numSlots, numNew;
@@ -999,7 +999,7 @@ updUserData1 (struct jData *jData, struct uData *up, int numJobs,
 	      int numPEND, int numRUN, int numSSUSP, int numUSUSP,
 	      int numRESERVE)
 {
-  static char fname[] = "updUserData1";
+  static char __func__] = "updUserData1";
   bool_t newJob;
 
 
@@ -1031,7 +1031,7 @@ static void
 updHostData (char updHPart, struct jData *jData, int numJobs, int numRUN,
 	     int numSSUSP, int numUSUSP, int numRESERVE)
 {
-  static char fname[] = "updHostData";
+  static char __func__] = "updHostData";
   int i;
 
   for (i = 0; i < jData->numHostPtr; i++)
@@ -1123,7 +1123,7 @@ addValue (int *currentValue, int num, struct jData *jp, char *fname,
 struct uData *
 getUserData (char *user)
 {
-  static char fname[] = "getUserData";
+  static char __func__] = "getUserData";
   hEnt *userEnt;
   struct uData *uData, *defUser;
 
@@ -1268,7 +1268,7 @@ struct uData *
 addUserData (char *username, int maxjobs, float pJobLimit,
 	     char *filename, int override, int config)
 {
-  static char fname[] = "addUserData";
+  static char __func__] = "addUserData";
   hEnt *userEnt;
   int new;
   struct uData *uData;
@@ -1551,7 +1551,7 @@ getDefaultProject (void)
 void
 updResCounters (struct jData *jData, int newStatus)
 {
-  static char fname[] = "updResCounters";
+  static char __func__] = "updResCounters";
   int num, numReq;
 
   if (!IS_PEND (jData->jStatus) && !IS_START (jData->jStatus))
@@ -1705,7 +1705,7 @@ initUData (struct uData *uPtr)
 void
 updHostLeftRusageMem (struct jData *jobP, int order)
 {
-  static char fname[] = "updHostLeftRusageMem";
+  static char __func__] = "updHostLeftRusageMem";
   int numHost;
   struct resVal *resValPtr;
   float resMem;

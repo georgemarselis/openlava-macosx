@@ -46,7 +46,7 @@ int
 main (int argc, char **argv)
 {
 
-  static char fname[] = "main()";
+  static char __func__] = "main()";
 
 
   char *pMethodName = NULL;

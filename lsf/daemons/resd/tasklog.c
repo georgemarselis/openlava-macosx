@@ -40,7 +40,7 @@ char resAcctFN[MAXFILENAMELEN];  // FIXME FIXME FIXME this should be dynamically
 void
 initResLog (void)
 {
-  static char fname[] = "initResLog()";
+  static char __func__] = "initResLog()";
   int fd = 0;
   char *acctDir = NULL;
   struct stat st = { };
@@ -133,7 +133,7 @@ initResLog (void)
 static void
 openResAcctFileInTmp (char *resAcctFN)
 {
-  static char fname[] = "openResAcctFileInTmp";
+  static char __func__] = "openResAcctFileInTmp";
   struct stat st;
   int fd;
 
@@ -183,7 +183,7 @@ openResAcctFileInTmp (char *resAcctFN)
 void
 resAcctWrite (struct child *child)
 {
-  static char fname[] = "resAcctWrite()";
+  static char __func__] = "resAcctWrite()";
   FILE *fd;
   int l = 0, j = 0;
   struct lsfAcctRec acctRec;
@@ -305,7 +305,7 @@ resAcctWrite (struct child *child)
 void
 resParentWriteAcct (struct LSFHeader *msgHdr, XDR * xdrs, int sock)
 {
-  static char fname[] = "resParentWriteAcct()";
+  static char __func__] = "resParentWriteAcct()";
   char acctFile[MAXFILENAMELEN];
   FILE *fp;
   char *buf;

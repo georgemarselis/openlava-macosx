@@ -42,7 +42,7 @@ lsb_sharedresourceinfo (char **resources, unsigned int *numResources, char *host
     assert( options );
 
     if (logclass & (LC_TRACE)) {
-        ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", __PRETTY_FUNCTION__);
+        ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", __func__);
     }
 
     if (lsbResourceInfoReply.numResources > 0) {

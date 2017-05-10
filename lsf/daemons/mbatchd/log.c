@@ -143,7 +143,7 @@ static int renameAcctLogFiles (int);
 int
 init_log (void)
 {
-  static char fname[] = "init_log";
+  static char __func__] = "init_log";
   char first = TRUE;
   int ConfigError = 0;
   int lineNum = 0;
@@ -338,7 +338,7 @@ init_log (void)
 static int
 replay_event (char *filename, int lineNum)
 {
-  static char fname[] = "replay_event()";
+  static char __func__] = "replay_event()";
 
   switch (logPtr->type)
     {
@@ -406,7 +406,7 @@ replay_event (char *filename, int lineNum)
 static int
 replay_newjob (char *filename, int lineNum)
 {
-  static char fname[] = "replay_newjob";
+  static char __func__] = "replay_newjob";
   struct jData *job;
   struct idxList *idxList;
   int error;
@@ -437,7 +437,7 @@ replay_newjob (char *filename, int lineNum)
 static int
 replay_switchjob (char *filename, int lineNum)
 {
-  static char fname[] = "replay_switchjob";
+  static char __func__] = "replay_switchjob";
   struct jobSwitchReq switchReq;
   struct qData *qfp, *qtp;
   struct jData *jp;
@@ -548,7 +548,7 @@ replay_cleanjob (char *filename, int lineNum)
 static int
 replay_movejob (char *filename, int lineNum)
 {
-  static char fname[] = "replay_movejob";
+  static char __func__] = "replay_movejob";
   struct jobMoveReq jobMoveReq;
   int reply;
   struct lsfAuth auth;
@@ -680,7 +680,7 @@ replay_startjob (char *filename, int lineNum, int preExecStart)
 static int
 replay_executejob (char *filename, int lineNum)
 {
-  static char fname[] = "replay_executejob";
+  static char __func__] = "replay_executejob";
   struct jobExecuteLog *jobExecuteLog;
   struct jData *jp;
   LS_LONG_INT jobId;
@@ -721,7 +721,7 @@ replay_executejob (char *filename, int lineNum)
 static int
 replay_startjobaccept (char *filename, int lineNum)
 {
-  static char fname[] = "replay_startjobaccept";
+  static char __func__] = "replay_startjobaccept";
   struct jobStartAcceptLog *jobStartAcceptLog;
   struct jData *jp;
   LS_LONG_INT jobId;
@@ -750,7 +750,7 @@ replay_startjobaccept (char *filename, int lineNum)
 static int
 replay_newstat (char *filename, int lineNum)
 {
-  static char fname[] = "replay_newstat";
+  static char __func__] = "replay_newstat";
   struct jData *jp, *job;
   struct jobStatusLog *newStat;
 
@@ -891,7 +891,7 @@ replay_newstat (char *filename, int lineNum)
 static int
 replay_qc (char *filename, int lineNum)
 {
-  static char fname[] = "replay_qc";
+  static char __func__] = "replay_qc";
   int opCode;
   struct qData *qp;
 
@@ -916,7 +916,7 @@ replay_qc (char *filename, int lineNum)
 static int
 replay_hostcontrol (char *filename, int lineNum)
 {
-  static char fname[] = "replay_hostcontrol";
+  static char __func__] = "replay_hostcontrol";
   int opCode;
   char host[MAXHOSTNAMELEN];
   struct hData *hp;
@@ -973,7 +973,7 @@ replay_mbdDie (char *filename, int lineNum)
 static int
 replay_unfulfill (char *filename, int lineNum)
 {
-  static char fname[] = "replay_unfulfill";
+  static char __func__] = "replay_unfulfill";
   LS_LONG_INT jobId;
   struct jData *jp;
 
@@ -1006,7 +1006,7 @@ replay_unfulfill (char *filename, int lineNum)
 static int
 replay_mig (char *filename, int lineNum)
 {
-  static char fname[] = "replay_mig";
+  static char __func__] = "replay_mig";
   struct jData *jp;
   struct migLog *migLog;
   int i;
@@ -1080,7 +1080,7 @@ replay_mig (char *filename, int lineNum)
 static int
 replay_jobsigact (char *filename, int lineNum)
 {
-  static char fname[] = "replay_jobsigact";
+  static char __func__] = "replay_jobsigact";
   struct jData *jp;
   int newActPid;
   LS_LONG_INT jobId;
@@ -1163,7 +1163,7 @@ replay_jobsigact (char *filename, int lineNum)
 static int
 replay_jobrequeue (char *filename, int lineNum)
 {
-  static char fname[] = "replay_jobrequeue";
+  static char __func__] = "replay_jobrequeue";
   struct jData *jp;
   LS_LONG_INT jobId;
 
@@ -1194,7 +1194,7 @@ replay_jobrequeue (char *filename, int lineNum)
 static int
 replay_chkpnt (char *filename, int lineNum)
 {
-  static char fname[] = "replay_chkpnt";
+  static char __func__] = "replay_chkpnt";
   struct jData *jp;
   int newChkPid;
   LS_LONG_INT jobId;
@@ -1281,7 +1281,7 @@ replay_loadIndex (char *filename, int lineNum)
 int
 log_modifyjob (struct modifyReq *modReq, struct lsfAuth *auth)
 {
-  static char fname[] = "log_modifyjob";
+  static char __func__] = "log_modifyjob";
   struct jobModLog *jobModLog;
   int j;
 
@@ -1357,7 +1357,7 @@ log_modifyjob (struct modifyReq *modReq, struct lsfAuth *auth)
 int
 log_newjob (struct jData *job)
 {
-  static char fname[] = "log_newjob";
+  static char __func__] = "log_newjob";
 
   return (log_jobdata (job, fname, EVENT_JOB_NEW));
 }
@@ -1373,7 +1373,7 @@ replay_logSwitch (char *filename, int lineNum)
 static int
 log_jobdata (struct jData *job, char *fname1, int type)
 {
-  static char fname[] = "log_jobdata";
+  static char __func__] = "log_jobdata";
   struct submitReq *jobBill = &(job->shared->jobBill);
   struct jobNewLog *jobNewLog;
   int j;
@@ -1548,7 +1548,7 @@ log_jobdata (struct jData *job, char *fname1, int type)
 void
 log_switchjob (struct jobSwitchReq *switchReq, int uid, char *userName)
 {
-  static char fname[] = "log_switchjob";
+  static char __func__] = "log_switchjob";
   if (openEventFile (fname) < 0)
     {
       ls_syslog (LOG_ERR, I18N_JOB_FAIL_S,
@@ -1571,7 +1571,7 @@ log_switchjob (struct jobSwitchReq *switchReq, int uid, char *userName)
 void
 log_movejob (struct jobMoveReq *moveReq, int uid, char *userName)
 {
-  static char fname[] = "log_movejob";
+  static char __func__] = "log_movejob";
 
   if (openEventFile (fname) < 0)
     {
@@ -1596,7 +1596,7 @@ log_movejob (struct jobMoveReq *moveReq, int uid, char *userName)
 void
 log_startjob (struct jData *job, int preExecStart)
 {
-  static char fname[] = "log_startjob";
+  static char __func__] = "log_startjob";
   int i;
   struct jobStartLog *jobStartLog;
   char **execHosts = NULL;
@@ -1659,7 +1659,7 @@ log_startjob (struct jData *job, int preExecStart)
 void
 log_executejob (struct jData *job)
 {
-  static char fname[] = "log_executejob";
+  static char __func__] = "log_executejob";
   struct jobExecuteLog *jobExecuteLog;
 
   if (openEventFile (fname) < 0)
@@ -1692,7 +1692,7 @@ log_executejob (struct jData *job)
 void
 log_startjobaccept (struct jData *job)
 {
-  static char fname[] = "log_startjobaccept";
+  static char __func__] = "log_startjobaccept";
   struct jobStartAcceptLog *jobStartAcceptLog;
 
   if (openEventFile (fname) < 0)
@@ -1727,7 +1727,7 @@ log_startjobaccept (struct jData *job)
 void
 log_newstatus (struct jData *job)
 {
-  static char fname[] = "log_newstatus";
+  static char __func__] = "log_newstatus";
 
   if (openEventFile (fname) < 0)
     {
@@ -1786,7 +1786,7 @@ log_newstatus (struct jData *job)
 void
 log_mig (struct jData *jData, int uid, char *userName)
 {
-  static char fname[] = "log_mig";
+  static char __func__] = "log_mig";
 
   if (openEventFile (fname) < 0)
     {
@@ -1811,7 +1811,7 @@ log_mig (struct jData *jData, int uid, char *userName)
 void
 log_jobrequeue (struct jData *jData)
 {
-  static char fname[] = "log_jobrequeue";
+  static char __func__] = "log_jobrequeue";
 
   if (openEventFile (fname) < 0)
     {
@@ -1831,7 +1831,7 @@ log_jobrequeue (struct jData *jData)
 void
 log_jobclean (struct jData *jData)
 {
-  static char fname[] = "log_jobclean";
+  static char __func__] = "log_jobclean";
 
   if (openEventFile (fname) < 0)
     {
@@ -1852,7 +1852,7 @@ log_jobclean (struct jData *jData)
 void
 log_chkpnt (struct jData *jData, int ok, int flags)
 {
-  static char fname[] = "log_chkpnt";
+  static char __func__] = "log_chkpnt";
 
   if (openEventFile (fname) < 0)
     {
@@ -1877,7 +1877,7 @@ log_chkpnt (struct jData *jData, int ok, int flags)
 void
 log_jobsigact (struct jData *jData, struct statusReq *statusReq, int sigFlags)
 {
-  static char fname[] = "log_jobsigact";
+  static char __func__] = "log_jobsigact";
 
   if (openEventFile (fname) < 0)
     {
@@ -1924,7 +1924,7 @@ log_jobsigact (struct jData *jData, struct statusReq *statusReq, int sigFlags)
 void
 log_queuestatus (struct qData *qp, int opCode, int userId, char *userName)
 {
-  static char fname[] = "log_queuestatus";
+  static char __func__] = "log_queuestatus";
 
   if (openEventFile (fname) < 0)
     {
@@ -1945,7 +1945,7 @@ log_queuestatus (struct qData *qp, int opCode, int userId, char *userName)
 void
 log_hoststatus (struct hData *hp, int opCode, int userId, char *userName)
 {
-  static char fname[] = "log_hoststatus";
+  static char __func__] = "log_hoststatus";
 
   if (openEventFile (fname) < 0)
     {
@@ -1964,7 +1964,7 @@ log_hoststatus (struct hData *hp, int opCode, int userId, char *userName)
 void
 log_mbdDie (int sig)
 {
-  static char fname[] = "log_mbdDie";
+  static char __func__] = "log_mbdDie";
   char hname[MAXHOSTNAMELEN];
 
   if (openEventFile (fname) < 0)
@@ -1985,7 +1985,7 @@ log_mbdDie (int sig)
 void
 log_unfulfill (struct jData *jp)
 {
-  static char fname[] = "log_unfulfill";
+  static char __func__] = "log_unfulfill";
 
   if (openEventFile (fname) < 0)
     {
@@ -2012,7 +2012,7 @@ log_unfulfill (struct jData *jp)
 static void
 log_loadIndex (void)
 {
-  static char fname[] = "log_loadIndex";
+  static char __func__] = "log_loadIndex";
   int i;
   static char **names;
 
@@ -2043,7 +2043,7 @@ log_loadIndex (void)
 void
 log_jobForce (struct jData *job, int uid, char *userName)
 {
-  static char fname[] = "log_JobForce()";
+  static char __func__] = "log_JobForce()";
   int i;
   struct jobForceRequestLog jobForceRequestLog;
 
@@ -2194,7 +2194,7 @@ putEventRec1 (char *fname)
 static void
 logFinishedjob (struct jData *job)
 {
-  static char fname[] = "logFinishedjob()";
+  static char __func__] = "logFinishedjob()";
   struct submitReq *jobBill = &(job->shared->jobBill);
   struct jobFinishLog *jobFinishLog;
   int i;
@@ -2422,7 +2422,7 @@ checkAcctLog (void)
 int
 switchAcctLog (void)
 {
-  static char fname[] = "switchAcctLog";
+  static char __func__] = "switchAcctLog";
   int errnoSv;
   int totalAcctFile;
 
@@ -2472,7 +2472,7 @@ Acct_exiterr:
 int
 switch_log (void)
 {
-  static char fname[] = "switch_log";
+  static char __func__] = "switch_log";
   char tmpfn[MAXFILENAMELEN];
   int i, lineNum = 0, errnoSv;
   LS_LONG_INT jobId = 0;
@@ -2766,7 +2766,7 @@ Fail to switch lsb.events; see mbatchd error log for details");
 static int
 createAcct0File (void)
 {
-  static char fname[] = "createAcct0File";
+  static char __func__] = "createAcct0File";
   char acct0File[MAXFILENAMELEN];
   struct stat st;
   char buf[MSGSIZE];
@@ -2836,7 +2836,7 @@ createAcct0File (void)
 static int
 createEvent0File (void)
 {
-  static char fname[] = "createEvent0File";
+  static char __func__] = "createEvent0File";
   char event0File[MAXFILENAMELEN];
   char buf[MSGSIZE];
   char ch;
@@ -2923,7 +2923,7 @@ createEvent0File (void)
 static int
 renameElogFiles (void)
 {
-  static char fname[] = "renameElogFiles";
+  static char __func__] = "renameElogFiles";
   int i;
   int max;
   char tmpfn[MAXFILENAMELEN], eventfn[MAXFILENAMELEN];
@@ -2973,7 +2973,7 @@ renameElogFiles (void)
 void
 logJobInfo (struct submitReq *req, struct jData *jp, struct lenData *jf)
 {
-  static char fname[] = "logJobInfo";
+  static char __func__] = "logJobInfo";
   int errnoSv;
   char logFn[MAXFILENAMELEN];
   FILE *fp;
@@ -3036,7 +3036,7 @@ error:
 int
 rmLogJobInfo_ (struct jData *jp, int check)
 {
-  static char fname[] = "rmLogJobInfo_()";
+  static char __func__] = "rmLogJobInfo_()";
   char logFn[MAXFILENAMELEN];
   struct stat st;
   struct submitReq *req;
@@ -3106,7 +3106,7 @@ readLogJobInfo (struct jobSpecs *jobSpecs, struct jData *jpbw,
 		struct lenData *jf, struct lenData *aux_auth_data)
 {
 #define ENVEND "$LSB_TRAPSIGS\n"
-  static char fname[] = "readLogJobInfo()";
+  static char __func__] = "readLogJobInfo()";
   char logFn[MAXFILENAMELEN];
   LS_STAT_T st;
   int fd, i, numEnv, cc;
@@ -3338,7 +3338,7 @@ readLogJobInfo (struct jobSpecs *jobSpecs, struct jData *jpbw,
 char *
 readJobInfoFile (struct jData *jp, int *len)
 {
-  static char fname[] = "readJobInfoFile";
+  static char __func__] = "readJobInfoFile";
   char logFn[MAXFILENAMELEN];
   LS_STAT_T st;
   int fd;
@@ -3387,7 +3387,7 @@ void
 writeJobInfoFile (struct jData *jp, char *jf, int len)
 {
 
-  static char fname[] = "writeJobInfoFile";
+  static char __func__] = "writeJobInfoFile";
   char logFn[MAXFILENAMELEN];
   int fd, errnoSv;
 
@@ -3431,7 +3431,7 @@ int
 replaceJobInfoFile (char *jobFileName,
 		    char *newCommand, char *jobStarter, int options)
 {
-  static char fname[] = "replaceJobInfoFile";
+  static char __func__] = "replaceJobInfoFile";
   char jobFile[MAXFILENAMELEN];
   char workFile[MAXFILENAMELEN];
   char line[MAXLINELEN];
@@ -3647,7 +3647,7 @@ log_mbdStart (void)
 static int
 replay_modifyjob (char *filename, int lineNum)
 {
-  static char fname[] = "replay_modifyjob";
+  static char __func__] = "replay_modifyjob";
   struct jData *job, *jpbw;
 
   job = replay_jobdata (filename, lineNum, fname);
@@ -3952,7 +3952,7 @@ replay_jobdata (char *filename, int lineNum, char *fname)
 void
 log_logSwitch (int lastJobId)
 {
-  static char fname[] = "log_logSwitch";
+  static char __func__] = "log_logSwitch";
 
   if (openEventFile ("log_logSwitch") < 0)
     {
@@ -3978,7 +3978,7 @@ void
 log_signaljob (struct jData *jp, struct signalReq *signalReq, int userId,
 	       char *userName)
 {
-  static char fname[] = "log_signaljob";
+  static char __func__] = "log_signaljob";
   int sigValue;
   int defSigValue;
 
@@ -4065,7 +4065,7 @@ getSignalSymbol (const struct signalReq *sigPtr)
 void
 log_jobmsg (struct jData *jp, struct lsbMsg *jmsg, int userId)
 {
-  static char fname[] = "log_jobmsg";
+  static char __func__] = "log_jobmsg";
 
   if (openEventFile ("log_jobmsg") < 0)
     {
@@ -4094,7 +4094,7 @@ log_jobmsg (struct jData *jp, struct lsbMsg *jmsg, int userId)
 void
 log_jobmsgack (struct bucket *bucket)
 {
-  static char fname[] = "log_jobmsgack";
+  static char __func__] = "log_jobmsgack";
   struct jData *jp;
 
   LSBMSG_DECL (header, jmsg);
@@ -4143,7 +4143,7 @@ log_jobmsgack (struct bucket *bucket)
 static int
 replay_signaljob (char *filename, int lineNum)
 {
-  static char fname[] = "replay_signaljob";
+  static char __func__] = "replay_signaljob";
   struct jData *jp;
   LS_LONG_INT jobId;
   int sigValue;
@@ -4262,7 +4262,7 @@ replay_arrayrequeue (struct jData *jPtr, const struct signalLog *sigLogPtr)
 static int
 replay_jobmsg (char *filename, int lineNum)
 {
-  static char fname[] = "replay_jobmsg";
+  static char __func__] = "replay_jobmsg";
   int len;
   struct jData *jp;
   struct bucket *bucket;
@@ -4339,7 +4339,7 @@ replay_jobmsg (char *filename, int lineNum)
 static int
 replay_jobmsgack (char *filename, int lineNum)
 {
-  static char fname[] = "replay_jobmsgack";
+  static char __func__] = "replay_jobmsgack";
   struct jData *jp;
   struct bucket *bucket;
   int found;
@@ -4395,7 +4395,7 @@ replay_jobmsgack (char *filename, int lineNum)
 static void
 ckSchedHost (void)
 {
-  static char fname[] = "ckSchedHost";
+  static char __func__] = "ckSchedHost";
   int list;
   struct jData *jp;
   struct hData *hp;
@@ -4432,7 +4432,7 @@ static bool_t
 replay_jobforce (char *file, int line)
 {
 
-  static char fname[] = "replay_jobforce()";
+  static char __func__] = "replay_jobforce()";
   struct jobForceRequestLog *jobForceRequestLog;
   struct jData *job;
   LS_LONG_INT jobId;
@@ -4473,7 +4473,7 @@ canSwitch (struct eventRec *logPtr, struct jData *jp)
 void
 log_jobattrset (struct jobAttrInfoEnt *jobAttr, int uid)
 {
-  static char fname[] = "log_jobattrset()";
+  static char __func__] = "log_jobattrset()";
 
   if (openEventFile (fname) < 0)
     {
@@ -4498,7 +4498,7 @@ log_jobattrset (struct jobAttrInfoEnt *jobAttr, int uid)
 static int
 replay_jobattrset (char *filename, int lineNum)
 {
-  static char fname[] = "replay_jobattrset()";
+  static char __func__] = "replay_jobattrset()";
   struct jobAttrSetLog *jobAttrSetLog;
   struct jData *job;
   LS_LONG_INT jobId;
@@ -4540,7 +4540,7 @@ checkJobInCore (LS_LONG_INT jobId)
 static char *
 instrJobStarter1 (char *data, int datalen, char *begin, char *end, char *jstr)
 {
-  static char fname[] = "instrJobStarter1()";
+  static char __func__] = "instrJobStarter1()";
   char *jstr_header = NULL;
   char *jstr_tailer = NULL;
   char *ptr1 = NULL;
@@ -4761,7 +4761,7 @@ destroyHostCtrlEvent (void *ptr)
 static void
 saveHostCtrlEvent (struct hostCtrlLog *hostCtrlLog, const time_t eventTime)
 {
-  static char fname[] = "saveHostCtrlEvent()";
+  static char __func__] = "saveHostCtrlEvent()";
   hEnt *hEntry;
   int new;
   struct hData *hPtr;
@@ -4842,7 +4842,7 @@ writeHostCtrlEvent (void)
 static void
 log_hostStatusAtSwitch (const struct hostCtrlEvent *ctrlPtr)
 {
-  static char fname[] = "log_hostStatusAtSwitch";
+  static char __func__] = "log_hostStatusAtSwitch";
 
   if (openEventFile (fname) < 0)
     {
@@ -4941,7 +4941,7 @@ saveQueueCtrlEvent (struct queueCtrlLog *queueCtrlLog, const time_t eventTime)
 static void
 queueTableUpdate (hTab * tbPtr, struct queueCtrlLog *queueCtrlLog)
 {
-  static char fname[] = "queueTableUpdate";
+  static char __func__] = "queueTableUpdate";
   int new;
   hEnt *hEntry;
   struct queueCtrlEvent *ctrlPtr;
@@ -5012,7 +5012,7 @@ writeQueueCtrlEvent (void)
 static void
 log_queueStatusAtSwitch (const struct queueCtrlEvent *ctrlPtr)
 {
-  static char fname[] = "log_queueStatusAtSwitch";
+  static char __func__] = "log_queueStatusAtSwitch";
 
   if (openEventFile (fname) < 0)
     {
@@ -5043,7 +5043,7 @@ log_queueStatusAtSwitch (const struct queueCtrlEvent *ctrlPtr)
 static int
 renameAcctLogFiles (int fileLimit)
 {
-  static char fname[] = "renameAcctLogFiles";
+  static char __func__] = "renameAcctLogFiles";
   int i;
   int max;
   char tmpfn[MAXFILENAMELEN], acctfn[MAXFILENAMELEN];

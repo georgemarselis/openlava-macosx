@@ -55,7 +55,7 @@ ptyreset (void)
 int
 ptymaster (char *line)
 {
-  static char fname[] = "ptymaster()";
+  static char __func__] = "ptymaster()";
   int master_fd = 0;
   int ptyno = 0;
   char *slave = NULL;

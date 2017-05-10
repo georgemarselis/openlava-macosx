@@ -34,7 +34,7 @@ int
 status_job (mbdReqType reqType,
 	    struct jobCard *jp, int newStatus, sbdReplyType err)
 {
-  static char fname[] = "status_job()";
+  static char __func__] = "status_job()";
   static int seq = 1;
   static char lastHost[MAXHOSTNAMELEN];
   int reply;
@@ -449,7 +449,7 @@ znovu:
 void
 jobSetupStatus (int jStatus, int pendReason, struct jobCard *jp)
 {
-  static char fname[] = "jobSetupStatus()";
+  static char __func__] = "jobSetupStatus()";
   struct jobSetup jsetup;
 
   jsetup.jobId = jp->jobSpecs.jobId;
@@ -502,7 +502,7 @@ sbdSyslog (int level, char *msg)
 static int
 msgSbd (LS_LONG_INT jobId, char *req, sbdReqType reqType, int (*xdrFunc) ())
 {
-  static char fname[] = "msgSbd";
+  static char __func__] = "msgSbd";
   XDR xdrs;
   struct LSFHeader hdr;
   char requestBuf[MSGSIZE];
@@ -570,7 +570,7 @@ msgSbd (LS_LONG_INT jobId, char *req, sbdReqType reqType, int (*xdrFunc) ())
 int
 msgSupervisor (struct lsbMsg *lsbMsg, struct clientNode *cliPtr)
 {
-  static char fname[] = "msgSupervisor/sbd.comm.c";
+  static char __func__] = "msgSupervisor/sbd.comm.c";
   struct LSFHeader reqHdr;
   char reqBuf[MSGSIZE * 2];
   int cc;
@@ -614,7 +614,7 @@ msgSupervisor (struct lsbMsg *lsbMsg, struct clientNode *cliPtr)
 int
 getSbdAuth (struct lsfAuth *auth)
 {
-  static char fname[] = "getSbdAuth";
+  static char __func__] = "getSbdAuth";
   int rc;
   char buf[1024];
 
@@ -641,7 +641,7 @@ getSbdAuth (struct lsfAuth *auth)
 int
 sendUnreportedStatus (struct chunkStatusReq *chunkStatusReq)
 {
-  static char fname[] = "sendUnreportedStatus()";
+  static char __func__] = "sendUnreportedStatus()";
   static char lastHost[MAXHOSTNAMELEN];
   int reply;
   char *request_buf;

@@ -36,7 +36,7 @@ extern int errno;
 int
 main (int argc, char **argv)
 {
-  static char fname[] = "lsloadadj/main";
+  static char __func__] = "lsloadadj/main";
   char *resreq = NULL;
   struct placeInfo placeadvice[MAXLISTSIZE];
   char *p, *hname;

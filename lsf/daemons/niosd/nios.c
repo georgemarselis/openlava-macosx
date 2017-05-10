@@ -177,7 +177,7 @@ signalBufEmpty (int dummy)
 int
 main (int argc, char **argv)
 {
-  static char fname[] = "nios/main()";
+  static char __func__] = "nios/main()";
   ushort port;
   int asock;
   socklen_t len;
@@ -514,7 +514,7 @@ main (int argc, char **argv)
 static void
 serv (char **argv, int asock)
 {
-  static char fname[] = "nios/serv()";
+  static char __func__] = "nios/serv()";
   fd_set rmask, wmask;
   int nready;
   int i, cc;
@@ -991,7 +991,7 @@ die (void)
 void
 kill_self (int exit_sig, int exit_stat)
 {
-  static char fname[] = "kill_self()";
+  static char __func__] = "kill_self()";
 
   if (niosDebug)
     {
@@ -1089,7 +1089,7 @@ kill_self (int exit_sig, int exit_stat)
 static void
 do_newtask (void)
 {
-  static char fname[] = "do_newtask()";
+  static char __func__] = "do_newtask()";
   struct lslibNiosHdr hdr;
   static int first = 1;
   if (first)
@@ -1211,7 +1211,7 @@ do_newtask (void)
 static void
 rtask (struct lslibNiosHdr *hdr)
 {
-  static char fname[] = "rtask()";
+  static char __func__] = "rtask()";
   struct lslibNiosRTask req;
 
   if (b_read_fix (chfd, (char *) &req.r, sizeof (req.r)) != sizeof (req.r))
@@ -1404,7 +1404,7 @@ setStdout (struct lslibNiosHdr *hdr)
 static void
 setStdin (struct lslibNiosHdr *hdr)
 {
-  static char fname[] = "setStdin()";
+  static char __func__] = "setStdin()";
   static struct lslibNiosStdin req;
   int i, err;
   static int first = TRUE;
@@ -1462,7 +1462,7 @@ setStdin (struct lslibNiosHdr *hdr)
 static void
 getStdin (struct lslibNiosHdr *hdr)
 {
-  static char fname[] = "nios/getStdin()";
+  static char __func__] = "nios/getStdin()";
   int retVal;
   static struct lslibNiosStdin req;
   static struct lslibNiosGetStdinReply reply;
@@ -1513,7 +1513,7 @@ getStdin (struct lslibNiosHdr *hdr)
 static void
 emusig (int tid, int st)
 {
-  static char fname[] = "emusig()";
+  static char __func__] = "emusig()";
   SIGFUNCTYPE handle;
   LS_WAIT_T status = *((LS_WAIT_T *) & st);
 
@@ -1598,7 +1598,7 @@ emusig (int tid, int st)
 static void
 PassSig (int signo)
 {
-  static char fname[] = "PassSig()";
+  static char __func__] = "PassSig()";
   sigset_t omask, nmask;
 
   if (niosDebug)
@@ -1682,7 +1682,7 @@ conin (int signo)
 static void
 reset_uid (void)
 {
-  static char fname[] = "nios/reset_uid()";
+  static char __func__] = "nios/reset_uid()";
   int ruid = getuid ();
 
   if (geteuid () == 0)
@@ -1702,7 +1702,7 @@ reset_uid (void)
 static int
 acceptCallBack (int asock)
 {
-  static char fname[] = "nios/acceptCallBack()";
+  static char __func__] = "nios/acceptCallBack()";
   int sock;
   char *sp;
   struct niosConnect connReq;
@@ -1920,7 +1920,7 @@ JobStateInfo (LS_LONG_INT jid)
 int
 cmpJobStates (struct jobInfoEnt *job)
 {
-  static char fname[] = "cmpJobStates()";
+  static char __func__] = "cmpJobStates()";
   static int status = JOB_STAT_UNKWN;
   static int *reasonTb = NULL;
   static int numReasons = 0;
@@ -2210,7 +2210,7 @@ get_status (struct jobInfoEnt *job)
 struct loadIndexLog *
 initLoadIndex (void)
 {
-  static char fname[] = "initLoadIndex()";
+  static char __func__] = "initLoadIndex()";
   int i;
   struct lsInfo *lsInfo;
   static struct loadIndexLog loadIndex;

@@ -28,7 +28,7 @@
 char *
 lsb_peekjob (LS_LONG_INT jobid)
 {
-  static char fname[] = "lsb_peekjob";
+  static char __func__] = "lsb_peekjob";
   struct jobPeekReq jobPeekReq;
   mbdReqType mbdReqtype;
   XDR xdrs;

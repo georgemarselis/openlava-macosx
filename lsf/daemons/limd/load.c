@@ -458,7 +458,7 @@ rcvLoadVector (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *hdr)
 void
 copyResValues (struct loadVectorStruct loadVector, struct hostNode *hPtr)
 {
-  char fname[] = "copyResValues";
+  char __func__] = "copyResValues";
   int i, j, updHostNo, curHostNo;
   struct sharedResource *resource;
   struct resourceInstance *instance;

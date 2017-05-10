@@ -518,7 +518,7 @@ lsadminDebug (int argc, char **argv, int opCode)
 static int
 checkPerm (void)
 {
-  static char fname[] = "checkPerm";
+  static char __func__] = "checkPerm";
   struct clusterInfo *clusterInfo;
   char *mycluster = NULL;
   int nAdmins = -1;

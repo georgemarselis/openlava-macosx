@@ -131,7 +131,7 @@ checkGroups (struct infoReq *groupInfoReq,
 static struct groupInfoEnt *
 getGroupInfoEnt (char **groups, int *num, char recursive)
 {
-  static char fname[] = "getGroupInfoEnt()";
+  static char __func__] = "getGroupInfoEnt()";
   struct groupInfoEnt *groupInfoEnt;
 
   if (groups == NULL)
@@ -519,7 +519,7 @@ getGrpData (struct gData *groups[], char *name, int num)
 void
 uDataGroupCreate ()
 {
-  static char fname[] = "uDataGroupCreate()";
+  static char __func__] = "uDataGroupCreate()";
   int i;
 
   for (i = 0; i < numofugroups; i++)
@@ -617,7 +617,7 @@ getuDataByIndex (int index)
 void
 setuDataCreate ()
 {
-  static char fname[] = "setuDataCreate";
+  static char __func__] = "setuDataCreate";
   struct uData *u;
 
   while ((u = uDataTableGetNextEntry (uDataPtrTb)))
@@ -687,7 +687,7 @@ setuDataCreate ()
 static void
 traverseGroupTree (struct gData *grp)
 {
-  static char fname[] = "traverseGroupTree";
+  static char __func__] = "traverseGroupTree";
   struct uStackEntry uStack[MAX_GROUPS];
   int uStackTop;
   int uStackCur;
@@ -809,7 +809,7 @@ traverseGroupTree (struct gData *grp)
 static void
 checkuDataSet (struct uData *u)
 {
-  static char fname[] = "checkuDataSet()";
+  static char __func__] = "checkuDataSet()";
   static char strBuf[128];
 
   if (u->children == NULL)
@@ -855,7 +855,7 @@ checkuDataSet (struct uData *u)
 UDATA_TABLE_T *
 uDataTableCreate ()
 {
-  static char fname[] = "uDataTableCreate()";
+  static char __func__] = "uDataTableCreate()";
   UDATA_TABLE_T *this;
 
   this = (UDATA_TABLE_T *) my_calloc (1, sizeof (UDATA_TABLE_T), fname);
@@ -883,7 +883,7 @@ uDataTableFree (UDATA_TABLE_T * uTab)
 void
 uDataTableAddEntry (UDATA_TABLE_T * this, struct uData *new)
 {
-  static char fname[] = "uDataTableAddEntry()";
+  static char __func__] = "uDataTableAddEntry()";
 
   if (!this)
     {
@@ -937,7 +937,7 @@ int
 userSetOnNewUser (LS_BITSET_T * subjectSet,
 		  void *extra, LS_BITSET_EVENT_T * event)
 {
-  static char fname[] = "userSetOnNewUser";
+  static char __func__] = "userSetOnNewUser";
   LS_BITSET_T *set;
   struct uData *newUser;
 

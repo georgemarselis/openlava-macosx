@@ -52,7 +52,7 @@ static int emptyCmd = TRUE;
 int
 do_sub (int argc, char **argv, int option)
 {
-  static char fname[] = "do_sub";
+  static char __func__] = "do_sub";
   struct submit req;
   struct submitReply reply;
   LS_LONG_INT jobId = -1;
@@ -96,7 +96,7 @@ do_sub (int argc, char **argv, int option)
 void
 prtBETime (struct submit req)
 {
-  static char fname[] = "prtBETime";
+  static char __func__] = "prtBETime";
   char sp[60];
 
   if (logclass & (LC_TRACE | LC_EXEC | LC_SCHED))
@@ -120,7 +120,7 @@ prtBETime (struct submit req)
 int
 fillReq (int argc, char **argv, int operate, struct submit *req)
 {
-  static char fname[] = "fillReq";
+  static char __func__] = "fillReq";
   struct stat statBuf;
   char *template, **embedArgv;
   int i, embedArgc = 0, redirect = 0;
@@ -392,7 +392,7 @@ fillReq (int argc, char **argv, int operate, struct submit *req)
 int
 parseScript (FILE * from, int *embedArgc, char ***embedArgv, int option)
 {
-  static char fname[] = "parseScript";
+  static char __func__] = "parseScript";
   char *buf, line[MAXLINELEN * 10], *prompt;
   register int ttyin = 0;
   int length = 0, size = 10 * MAXLINELEN;
@@ -533,7 +533,7 @@ CopyCommand (char **from, int len)
 {
   int i, size;
   char *arg, *temP, *endArg, *endArg1, endChar = '\0';
-  char fname[] = "CopyCommand";
+  char __func__] = "CopyCommand";
   int oldParenthesis = 0;
 
   if (lsbParams[LSB_32_PAREN_ESC].paramValue)
@@ -760,7 +760,7 @@ parseLine (char *line, int *embedArgc, char ***embedArgv, int option)
 
   static char **argBuf = NULL, *key;
   static int bufSize = 0;
-  char fname[] = "parseLine";
+  char __func__] = "parseLine";
 
   char *sp, *sQuote, *dQuote, quoteMark;
 

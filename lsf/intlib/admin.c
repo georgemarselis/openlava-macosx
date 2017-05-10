@@ -472,7 +472,7 @@ checkConf (int verbose, int who)
 static int
 changeUserEUId (void)
 {
-	static char fname[] = "changeUserEUId";
+	static char __func__] = "changeUserEUId";
 	uid_t uid;
 
 	uid = getuid ();

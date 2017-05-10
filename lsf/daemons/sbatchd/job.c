@@ -133,7 +133,7 @@ sbdChildCloseChan (int exceptChan)
 sbdReplyType
 job_exec (struct jobCard *jobCardPtr, int chfd)
 {
-  static char fname[] = "job_exec";
+  static char __func__] = "job_exec";
   struct jobSpecs *jobSpecsPtr;
   int pid;
 
@@ -188,7 +188,7 @@ job_exec (struct jobCard *jobCardPtr, int chfd)
 static int
 sendNotification (struct jobCard *jobCardPtr)
 {
-  static char fname[] = "sendNotification";
+  static char __func__] = "sendNotification";
   struct jobSpecs *jobSpecsPtr = &(jobCardPtr->jobSpecs);
   FILE *mail;
   char myhostnm[MAXHOSTNAMELEN];
@@ -282,7 +282,7 @@ createJobTmpDir (struct jobCard *jobCardPtr)
 static void
 execJob (struct jobCard *jobCardPtr, int chfd)
 {
-  static char fname[] = "execJob";
+  static char __func__] = "execJob";
   int i;
   struct jobSpecs *jobSpecsPtr;
   struct hostent *fromHp;
@@ -588,7 +588,7 @@ resetEnv (void)
 int
 setJobEnv (struct jobCard *jp)
 {
-  static char fname[] = "setJobEnv()";
+  static char __func__] = "setJobEnv()";
   char val[MAXLINELEN];
   int i;
   char *hosts, *sp;
@@ -989,7 +989,7 @@ static int
 mysetLimits (struct jobSpecs *jobSpecsPtr)
 {
   struct rlimit rlimit;
-  static char fname[] = "mysetLimits";
+  static char __func__] = "mysetLimits";
 
 #ifdef  RLIMIT_CPU
 
@@ -1092,7 +1092,7 @@ mysetLimits (struct jobSpecs *jobSpecsPtr)
 int
 job_finish (struct jobCard *jobCard, int report)
 {
-  static char fname[] = "job_finish";
+  static char __func__] = "job_finish";
   int pid;
 
 
@@ -1169,7 +1169,7 @@ job_finish (struct jobCard *jobCard, int report)
 void
 unlockHosts (struct jobCard *jp, int num)
 {
-  static char fname[] = "unlockHosts()";
+  static char __func__] = "unlockHosts()";
   int i;
 
   if (jp == NULL || num <= 0)
@@ -1197,7 +1197,7 @@ unlockHosts (struct jobCard *jp, int num)
 static int
 finishJob (struct jobCard *jobCard)
 {
-  static char fname[] = "finishJob";
+  static char __func__] = "finishJob";
   int doSendResults;
   int hasError = 0;
 
@@ -1275,7 +1275,7 @@ finishJob (struct jobCard *jobCard)
 void
 status_report (void)
 {
-  static char fname[] = "status_report()";
+  static char __func__] = "status_report()";
   struct jobCard *jp, *next;
   static char mailed = TRUE;
   int rep, allReported = TRUE;
@@ -1405,7 +1405,7 @@ rmvJobStarterStr (char *line, char *jobStarter)
 static int
 isLink (char *filename)
 {
-  static char fname[] = "isLink";
+  static char __func__] = "isLink";
   struct stat statBuf;
   int lstatReturnValue;
   int returnValue = FALSE;
@@ -1443,7 +1443,7 @@ static void
 shouldCopyFromLsbatch (struct jobCard *jp,
 		       int *cpyStdoutFromLsbatch, int *cpyStderrFromLsbatch)
 {
-  static char fname[] = "shouldCopyFromLsbatch";
+  static char __func__] = "shouldCopyFromLsbatch";
 
   *cpyStdoutFromLsbatch = TRUE;
   *cpyStderrFromLsbatch = TRUE;
@@ -1494,7 +1494,7 @@ shouldCopyFromLsbatch (struct jobCard *jp,
 static int
 send_results (struct jobCard *jp)
 {
-  static char fname[] = "send_results()";
+  static char __func__] = "send_results()";
   struct hostent *hp;
   FILE *mail = NULL, *fp, *errout = NULL, *output = NULL, *notif = NULL;
   int sendWarning = FALSE;
@@ -2309,7 +2309,7 @@ Read file <%s> for stdout output of this job.\n", jp->jobSpecs.outFile);
 struct jobCard *
 addJob (struct jobSpecs *jobSpecs, int mbdVersion)
 {
-  static char fname[] = "addJob";
+  static char __func__] = "addJob";
   struct jobCard *jp = NULL;
   struct passwd *pw = NULL;
   int reply;
@@ -2617,7 +2617,7 @@ jobGone (struct jobCard *jp)
 void
 refreshJob (struct jobSpecs *jobSpecs)
 {
-  static char fname[] = "refreshJob()";
+  static char __func__] = "refreshJob()";
   struct jobCard *jp;
   char *word, *cp;
   int i, j;
@@ -2747,7 +2747,7 @@ inJobLink (struct jobCard *jp)
 int
 setIds (struct jobCard *jobCardPtr)
 {
-  static char fname[] = "setIds()";
+  static char __func__] = "setIds()";
   struct jobSpecs *jobSpecsPtr = &(jobCardPtr->jobSpecs);
   char *tGname, *sGname = NULL;
   struct group *grEntry;
@@ -2845,7 +2845,7 @@ setIds (struct jobCard *jobCardPtr)
 void
 deallocJobCard (struct jobCard *jobCard)
 {
-  static char fname[] = "deallocJobCard()";
+  static char __func__] = "deallocJobCard()";
   char fileBuf[MAXFILENAMELEN];
 
   sprintf (fileBuf, "%s/.%s.%s.fail", LSTMPDIR, jobCard->jobSpecs.jobFile,
@@ -2990,7 +2990,7 @@ freeToHostsEtc (struct jobSpecs *jobSpecs)
 void
 saveSpecs (struct jobSpecs *jobSpecs, struct jobSpecs *specs)
 {
-  static char fname[] = "saveSpecs";
+  static char __func__] = "saveSpecs";
   int i;
 
   jobSpecs->toHosts = (char **) my_calloc (specs->numToHosts,
@@ -3065,7 +3065,7 @@ setRunLimit (struct jobCard *jp, int initRunTime)
 static int
 setPGid (struct jobCard *jc)
 {
-  static char fname[] = "setPGid()";
+  static char __func__] = "setPGid()";
 
 
   if (setpgid (0, getpid ()) < 0)
@@ -3158,7 +3158,7 @@ static int
 createTmpJobFile (struct jobSpecs *jobSpecsPtr, struct hostent *hp,
 		  char *stdinFile)
 {
-  static char fname[] = "createTmpJobFile";
+  static char __func__] = "createTmpJobFile";
   char errMsg[MAXLINELEN];
   char path[MAXFILENAMELEN];
   char cmdBuf[MAXLINELEN];
@@ -3281,7 +3281,7 @@ Error:
 int
 acctMapTo (struct jobCard *jobCard)
 {
-  static char fname[] = "acctMapTo";
+  static char __func__] = "acctMapTo";
   char *sp = NULL, *myhostnm, clusorhost[MAX_LSB_NAME_LEN];
   char user[MAX_LSB_NAME_LEN], line[MAXLINELEN];
   struct passwd *pw;
@@ -3748,7 +3748,7 @@ chPrePostUser (struct jobCard *jp)
 int
 postJobSetup (struct jobCard *jp)
 {
-  static char fname[] = "postJobSetup";
+  static char __func__] = "postJobSetup";
   struct hostent *hp;
   char userName[MAXLINELEN];
 
@@ -3851,7 +3851,7 @@ postJobSetup (struct jobCard *jp)
 void
 runUPre (struct jobCard *jp)
 {
-  static char fname[] = "runUPre";
+  static char __func__] = "runUPre";
   int pid, i;
   char errMsg[MAXLINELEN];
 
@@ -3896,7 +3896,7 @@ runUPre (struct jobCard *jp)
 static void
 collectPreStatus (struct jobCard *jp, int pid, char *context)
 {
-  static char fname[] = "collectPreStatus()";
+  static char __func__] = "collectPreStatus()";
   int id;
   LS_WAIT_T status;
   struct lsfRusage lsfRusage;
@@ -3947,7 +3947,7 @@ collectPreStatus (struct jobCard *jp, int pid, char *context)
 static int
 requeueJob (struct jobCard *jp)
 {
-  static char fname[] = "requeueJob";
+  static char __func__] = "requeueJob";
   char *sp, *cp;
   int w_status;
   LS_WAIT_T status;
@@ -3983,7 +3983,7 @@ requeueJob (struct jobCard *jp)
 int
 reniceJob (struct jobCard *jp)
 {
-  char fname[] = "reniceJob/sbd.job.c";
+  char __func__] = "reniceJob/sbd.job.c";
   int which, who, i;
 
   if (logclass & LC_TRACE)
@@ -4049,7 +4049,7 @@ reniceJob (struct jobCard *jp)
 int
 updateRUsageFromSuper (struct jobCard *jp, char *mbuf)
 {
-  static char fname[] = "updateRUsageFromSuper";
+  static char __func__] = "updateRUsageFromSuper";
   static struct jRusage jusage;
   int i, ret, cnt;
 
@@ -4151,7 +4151,7 @@ updateRUsageFromSuper (struct jobCard *jp, char *mbuf)
 static void
 updateJUsage (struct jobCard *jPtr, const struct jRusage *jRusage)
 {
-  static char fname[] = "updateJUsage";
+  static char __func__] = "updateJUsage";
 
   if (logclass & LC_EXEC)
     {
@@ -4213,7 +4213,7 @@ updateJUsage (struct jobCard *jPtr, const struct jRusage *jRusage)
 static void
 copyPidInfo (struct jobCard *jPtr, const struct jRusage *jRusage)
 {
-  static char fname[] = "copyPidInfo";
+  static char __func__] = "copyPidInfo";
 
 
   FREEUP (jPtr->runRusage.pidInfo);
@@ -4263,7 +4263,7 @@ copyPidInfo (struct jobCard *jPtr, const struct jRusage *jRusage)
 static void
 writePidInfoFile (const struct jobCard *jPtr, const struct jRusage *jRusage)
 {
-  static char fname[] = "writePidInfoFile";
+  static char __func__] = "writePidInfoFile";
   char buf[MAXFILENAMELEN];
   FILE *fp;
   int i;
@@ -4301,7 +4301,7 @@ writePidInfoFile (const struct jobCard *jPtr, const struct jRusage *jRusage)
 static void
 jobFinishRusage (struct jobCard *jp)
 {
-  static char fname[] = "jobFinishRusage()";
+  static char __func__] = "jobFinishRusage()";
   char rufn[MAXFILENAMELEN];
   char rufn30[MAXFILENAMELEN];
   char tmpDirName[MAXFILENAMELEN];
@@ -4386,7 +4386,7 @@ jobFinishRusage (struct jobCard *jp)
 int
 initJobCard (struct jobCard *jp, struct jobSpecs *jobSpecs, int *reply)
 {
-  static char fname[] = "initJobCard";
+  static char __func__] = "initJobCard";
   char *cp, *word;
   int j;
 
@@ -4494,7 +4494,7 @@ initJobCard (struct jobCard *jp, struct jobSpecs *jobSpecs, int *reply)
 void
 saveThresholds (struct jobSpecs *jobSpecs, struct thresholds *thresholds)
 {
-  static char fname[] = "saveThresholds";
+  static char __func__] = "saveThresholds";
   int i, j;
 
 
@@ -4588,7 +4588,7 @@ getJobVersion (struct jobSpecs *jobSpecs)
 int
 lockHosts (struct jobCard *jp)
 {
-  static char fname[] = "lockHosts";
+  static char __func__] = "lockHosts";
   int i;
 
 
@@ -4643,7 +4643,7 @@ REShasPTYfix (char *resPath)
 static void
 setJobArrayEnv (char *jobName, int jobIndex)
 {
-  static char fname[] = "setJobArrayEnv";
+  static char __func__] = "setJobArrayEnv";
   struct idxList *idxList = NULL, *idx;
   char *index, val[MAXLINELEN];
   int found = FALSE;

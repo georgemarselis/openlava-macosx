@@ -180,7 +180,7 @@ returnHostInfo (struct hostDataReply *hostsReplyPtr, int numHosts,
   struct hostInfoEnt *hInfo;
   struct resVal *resVal = NULL;
   struct candHost *candHosts = NULL;
-  static char fname[] = "returnHostInfo() ";
+  static char __func__] = "returnHostInfo() ";
 
   if (logclass & LC_EXEC)
     {
@@ -962,7 +962,7 @@ ctrlHost (struct controlReq *hcReq, struct hData *hData, struct lsfAuth *auth)
 int
 getLsbHostNames (char ***hostNames)
 {
-  static char fname[] = "getLsbHostNames";
+  static char __func__] = "getLsbHostNames";
   static char **hosts = NULL;
   static int numHosts = 0;
   int i;
@@ -1244,7 +1244,7 @@ getHostsByResReq (struct resVal *resValPtr,
 		  struct hData ***thrown,
 		  struct hData *fromHost, int *overRideFromType)
 {
-  static char fname[] = "getHostsByResReq";
+  static char __func__] = "getHostsByResReq";
   struct hData **hData = NULL;
   int i, numHosts, k = 0;
   struct tclHostData tclHostData;
@@ -1303,7 +1303,7 @@ void
 getTclHostData (struct tclHostData *tclHostData,
 		struct hData *hPtr, struct hData *fromHost)
 {
-  static char fname[] = "getTclHostData";
+  static char __func__] = "getTclHostData";
   int i;
 
   tclHostData->hostName = hPtr->host;
@@ -1385,7 +1385,7 @@ runTimeSinceResume (const struct jData * jp)
 void
 adjLsbLoad (struct jData *jpbw, int forResume, bool_t doAdj)
 {
-  static char fname[] = "adjLsbLoad";
+  static char __func__] = "adjLsbLoad";
   int i, ldx, resAssign = 0;
   float jackValue, orgnalLoad, duration, decay;
   struct resVal *resValPtr;
@@ -1633,7 +1633,7 @@ adjLsbLoad (struct jData *jpbw, int forResume, bool_t doAdj)
 struct resVal *
 getReserveValues (struct resVal *jobResVal, struct resVal *qResVal)
 {
-  static char fname[] = "getReserveValues";
+  static char __func__] = "getReserveValues";
   static int first = TRUE;
   static struct resVal resVal;
   int i, diffrent = FALSE;

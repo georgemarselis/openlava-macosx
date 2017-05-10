@@ -804,7 +804,7 @@ skip_job (struct jobInfoEnt *job)
 static int
 isLSFAdmin (void)
 {
-  static char fname[] = "isLSFAdmin";
+  static char __func__] = "isLSFAdmin";
   struct clusterInfo *clusterInfo;
   char *mycluster;
   char lsfUserName[MAXLINELEN];

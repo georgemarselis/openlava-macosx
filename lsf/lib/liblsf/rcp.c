@@ -119,7 +119,7 @@ doXferRcp (lsRcpXfer * lsXfer, int option)
         int local_errno = 0;
         // int n = 0 ;
         int status = 0;
-        char fname[] = "doXferRcp";
+        char __func__] = "doXferRcp";
 
         if ((lsXfer->iOptions & O_APPEND) || (option & SPOOL_BY_LSRCP)) {
                 
@@ -369,7 +369,7 @@ equivalentXferFile (lsRcpXfer * lsXfer, char *szLocalFile, char *szRemoteFile, s
 int
 copyFile (lsRcpXfer * lsXfer, char *buf, int option)
 {
-    char fname[] = "copyFile";
+    char __func__] = "copyFile";
     int s             = 0;
     int lfd           = 0;
     int rfd           = 0;

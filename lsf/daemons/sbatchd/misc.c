@@ -247,7 +247,7 @@ child_handler (int sig)
 int
 fcp (char *file1, char *file2, struct hostent *hp)
 {
-  static char fname[] = "fcp()";
+  static char __func__] = "fcp()";
   struct stat sbuf;
   int fd1, fd2;
   char buf[BSIZE];

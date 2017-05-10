@@ -43,7 +43,7 @@ listHeaderPtr_t okHostsListPtr_ = NULL;
 char *
 getLocalHostOfficialName (void)
 {
-  static char fname[] = "getLocalHostOfficialName";
+  static char __func__] = "getLocalHostOfficialName";
   size_t localHostLength = 0;
   static char *returnLocalHostPtr = NULL;
   static char localHost[MAXHOSTNAMELEN];
@@ -76,7 +76,7 @@ getLocalHostOfficialName (void)
 LSB_SPOOL_INFO_T *
 copySpoolFile (const char *srcFilePath, spoolOptions_t option)
 {
-  static char fname[] = "copySpoolFile";
+  static char __func__] = "copySpoolFile";
   listElementPtr_t bestHostFromList = NULL;
   char dirSeparator[] = SPOOL_DIR_SEPARATOR;
 
@@ -353,7 +353,7 @@ Ending:
 char *
 findSpoolDir (const char *spoolHost)
 {
-  static char fname[] = "findSpoolDir";
+  static char __func__] = "findSpoolDir";
   static char *returnStringPtr = NULL;
   static char spoolDir[MAXFILENAMELEN];
   char *delimiterPtr = NULL;
@@ -561,7 +561,7 @@ createOrUpdateSpoolHostsList (time_t permittedTimeToLiveInSec)
 static spoolCopyStatus_t
 cpLocalFiles (const char *localSrcFileFullPath, const char *outputFileName)
 {
-  static char fname[] = "cpLocalFiles";
+  static char __func__] = "cpLocalFiles";
   spoolCopyStatus_t spoolCopyStatus = SPOOL_COPY_FAILURE;
   int input, output;
   char line[MAXLINELEN + 1];
@@ -674,7 +674,7 @@ Error:
 static spoolCopyStatus_t
 cpRemoteFiles (const char *localSrcFileFullPath, const char *hostName, const char *outputDirectory, const char *outputFileName)
 {
-  static char fname[] = "cpRemoteFiles";
+  static char __func__] = "cpRemoteFiles";
   lsRcpXfer lsXfer;
   spoolCopyStatus_t spoolCopyStatus = SPOOL_COPY_FAILURE;
   char remoteHost[MAXHOSTNAMELEN];
@@ -830,7 +830,7 @@ spoolCopyStatus_t
 copyFileToHost (const char *localSrcFileFullPath, const char *hostName,
         const char *destinFullDir, const char *destinFileName)
 {
-  static char fname[] = "copyFileToHost";
+  static char __func__] = "copyFileToHost";
   spoolCopyStatus_t spoolCopyStatus = SPOOL_COPY_FAILURE;
   char localHost[MAXHOSTNAMELEN];
   char hostNameTwin[MAXHOSTNAMELEN];
@@ -901,7 +901,7 @@ Error:
 int
 removeSpoolFile (const char *hostName, const char *destinFileFullPath)
 {
-  static char fname[] = "removeSpoolFile";
+  static char __func__] = "removeSpoolFile";
   pid_t pid;
   DIR *dirPtr = NULL;
   char szRshDest[MAXFILENAMELEN];
@@ -1034,7 +1034,7 @@ Done:
 char *
 getSpoolHostBySpoolFile (const char *spoolFile)
 {
-    static char fname[] = "getSpoolHostBySpoolFile";
+    static char __func__] = "getSpoolHostBySpoolFile";
     char *pEnd        = NULL;
     char *pBegin      = NULL;
     char *returnValue = NULL;

@@ -64,7 +64,7 @@ sendPidPGid (pid_t pid, pid_t pgid)
 int
 main (int argc, char **argv)
 {
-  static char fname[] = "main()";
+  static char __func__] = "main()";
 
 
   char *pMethodName = NULL;
@@ -617,7 +617,7 @@ Error:
 static int
 getUserCmdFromJF (char *pUserCmd, const char *pJobFileName)
 {
-  static char fname[] = "getUserCmdFromJF()";
+  static char __func__] = "getUserCmdFromJF()";
 
   char line[MAXLINELEN];
   FILE *pFile = NULL;
@@ -745,7 +745,7 @@ isUserCmdLineMark (const char *pLine)
 static int
 getUserCmdFromCmdF (char *pNewUserCmd)
 {
-  static char fname[] = "getUserCmdFromCmdF()";
+  static char __func__] = "getUserCmdFromCmdF()";
 
   char line[MAXLINELEN];
   char cmdFileName[MAXPATHLEN];
@@ -834,7 +834,7 @@ static int
 buildNewJobFile (char *pNewJobFileName, const char *pUserCmd,
 		 const char *pJobFileName)
 {
-  static char fname[] = "buildNewJobFile()";
+  static char __func__] = "buildNewJobFile()";
 
   char line[MAXLINELEN];
   FILE *pSource, *pDest;

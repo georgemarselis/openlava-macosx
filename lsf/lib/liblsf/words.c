@@ -359,7 +359,7 @@ getNextLineD_ (FILE * fp, size_t *LineCount, int confFormat)
 				}
 			}
 			else {
-				fprintf( stderr, "%s: You are not supposed to be here.\n", __PRETTY_FUNCTION__ );
+				fprintf( stderr, "%s: You are not supposed to be here.\n", __func__ );
 			}
 		}
 

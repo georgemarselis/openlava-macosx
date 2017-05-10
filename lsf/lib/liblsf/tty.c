@@ -121,7 +121,7 @@ static void ttymode_ (int mode, int ind, int enableIntSus)
 
 		default: 
 		{
-			fprintf( stderr, "%s: you are not supposed to be here\n", __PRETTY_FUNCTION__ );
+			fprintf( stderr, "%s: you are not supposed to be here\n", __func__ );
 		}
 	}
 

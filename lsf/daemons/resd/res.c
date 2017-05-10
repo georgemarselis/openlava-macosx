@@ -127,7 +127,7 @@ usage (char *cmd)
 int
 main (int argc, char **argv)
 {
-	static char fname[] = "res/main";
+	static char __func__] = "res/main";
 	int nready = 0;
 	int maxfd  = 0;
 	// int i      = 0;
@@ -854,7 +854,7 @@ printf ("0x%8.8x ", (int) mask->fds_bits[0]);
 static void
 periodic (int signum)
 {
-	static char fname[] = "res/periodic";
+	static char __func__] = "res/periodic";
 	time_t now = 0;
 	static int count = 0;
 	static time_t lastPri = 0;
@@ -916,7 +916,7 @@ periodic (int signum)
 static void
 houseKeeping (void)
 {
-	static char fname[] = "houseKeeping";
+	static char __func__] = "houseKeeping";
 	static int previousIndex = -1;
 	int ch_cnt = 0;
 	int i = 0;

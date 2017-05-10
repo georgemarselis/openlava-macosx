@@ -65,7 +65,7 @@ getElogLock (void)
 int
 getElock (void)
 {
-    static char fname[] = "getElock";
+    static char __func__] = "getElock";
     int force = 0;
     int retry = 0;
     int lock_fd = -1;
@@ -244,7 +244,7 @@ touchElogLock (void)
 int
 touchElock (void)
 {
-    static char fname[] = "touchElock";
+    static char __func__] = "touchElock";
     char buf[2];
     int lock_fd = 0;
     long cc = 0;

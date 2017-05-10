@@ -41,7 +41,7 @@ char *
 getEchkpntMethodDir (char *pChkpnt_Cmd, const char *pMethodDir, const char *pProgramName, const char *pMethodName)
 {
 
-    static char fname[] = "getEchkpntMethodDir()";
+    static char __func__] = "getEchkpntMethodDir()";
     char tmp_chkpnt_cmd[MAXPATHLEN];
     char *pConfigPath = NULL;
     char *pChkpntBuf = NULL;
@@ -133,7 +133,7 @@ int
 getChkpntDirFile (char *pPathBuf, const char *pFileName)
 {
 
-    static char fname[] = "getChkpntDirFile()";
+    static char __func__] = "getChkpntDirFile()";
     char *pChkpntPath = NULL;
     unsigned long iIndex;
 
@@ -185,7 +185,7 @@ int
 redirectFd (const char *pFileName, int iFileNo)
 {
 
-    static char fname[] = "redirectFd()";
+    static char __func__] = "redirectFd()";
     int iFd;
     int ireValue = -1;
 

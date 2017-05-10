@@ -56,7 +56,7 @@ lsb_openelog (struct eventLogFile *ePtr, size_t *lineNum)
 	if( 0 == strlen( ePtr->eventDir ) )
 		{
 			 /* catgets 5500 */
-			ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5500, "%s: event directory is NULL"), __PRETTY_FUNCTION__);   
+			ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5500, "%s: event directory is NULL"), __func__);   
 			return NULL;
 		}
 
@@ -82,7 +82,7 @@ lsb_openelog (struct eventLogFile *ePtr, size_t *lineNum)
 					if (fscanf (elog_fp, "%c%ld", &ch, &eventTime) != 2 || ch != '#')
 				{
 					/* catgets 5501 */
-					ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5501, "%s: fscanf(%s) failed: old event file format"),__PRETTY_FUNCTION__, eventFile);
+					ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5501, "%s: fscanf(%s) failed: old event file format"),__func__, eventFile);
 					fclose (elog_fp);
 					oldFormat = TRUE;
 					if (findLast == FALSE) {
@@ -148,7 +148,7 @@ lsb_openelog (struct eventLogFile *ePtr, size_t *lineNum)
 		sprintf (eventFile, "%s/lsb.events.%d", ePtr->eventDir, curOpenFile);
 			if ((elog_fp = fopen (eventFile, "r")) == NULL)
 		{
-			ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __PRETTY_FUNCTION__, "fopen", eventFile);
+			ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "fopen", eventFile);
 			return NULL;
 		}
 
@@ -160,7 +160,7 @@ lsb_openelog (struct eventLogFile *ePtr, size_t *lineNum)
 				{
 					ls_syslog (LOG_WARNING, I18N (5501,
 												"%s: fscanf(%s) failed: event file is old format"),
-						 __PRETTY_FUNCTION__, eventFile);
+						 __func__, eventFile);
 					pos = 0;
 				}
 			else
@@ -169,13 +169,13 @@ lsb_openelog (struct eventLogFile *ePtr, size_t *lineNum)
 					countLineNum (elog_fp, pos, lineNum);
 				}
 			if (fseek (elog_fp, pos, SEEK_SET) != 0)
-				ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __PRETTY_FUNCTION__, "fseek", pos);
+				ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "fseek", pos);
 		}
 		}
 	else
 		{
 			/* catgets 5505 */
-			ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5505, "%s: current open event file number < 0"), __PRETTY_FUNCTION__);
+			ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5505, "%s: current open event file number < 0"), __func__);
 			return NULL;
 		}
 
@@ -222,7 +222,7 @@ lsb_getelogrec (struct eventLogHandle *ePtr, size_t *lineNum)
 
 			if ((newfp = fopen (eventFile, "r")) == NULL)
 		{
-			ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __PRETTY_FUNCTION__, "fopen", eventFile);
+			ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "fopen", eventFile);
 			return NULL;
 		}
 			else if (ePtr->curOpenFile == 0)
@@ -235,7 +235,7 @@ lsb_getelogrec (struct eventLogHandle *ePtr, size_t *lineNum)
 				{
 					ls_syslog (LOG_ERR, I18N (5501,
 										"%s: fscanf(%s) failed: old event file format"),
-						 __PRETTY_FUNCTION__, eventFile);
+						 __func__, eventFile);
 					pos = 0;
 				}
 			else
@@ -244,7 +244,7 @@ lsb_getelogrec (struct eventLogHandle *ePtr, size_t *lineNum)
 					countLineNum (newfp, pos, lineNum);
 				}
 			if (fseek (newfp, pos, SEEK_SET) != 0)
-				ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __PRETTY_FUNCTION__, "fseek", pos);
+				ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "fseek", pos);
 		}
 			logRec = lsb_geteventrec (newfp, lineNum);
 			ePtr->fp = newfp;
@@ -322,7 +322,7 @@ lsb_geteventrec_ex (FILE *log_fp,  size_t *lineNum, char *usedLine)
 		}
 
 	if (logclass & LC_TRACE) {
-		ls_syslog (LOG_DEBUG2, "%s: line=%s", __PRETTY_FUNCTION__, line);
+		ls_syslog (LOG_DEBUG2, "%s: line=%s", __func__, line);
 	}
 
 	if (usedLine)
@@ -382,7 +382,7 @@ lsb_geteventrec_ex (FILE *log_fp,  size_t *lineNum, char *usedLine)
 		return NULL;
 	}
 	if (logclass & LC_TRACE) {
-		ls_syslog (LOG_DEBUG2, "%s: log.type=%x", __PRETTY_FUNCTION__, logRec->type);
+		ls_syslog (LOG_DEBUG2, "%s: log.type=%x", __func__, logRec->type);
 	}
 
 	readEventRecord (line, logRec);
@@ -588,7 +588,7 @@ freeLogRec (struct eventRec *logRec)
 			return;
 			break;
 		default:
-			fprintf( stderr, "%s: you are not supposed to be here.\n", __PRETTY_FUNCTION__);
+			fprintf( stderr, "%s: you are not supposed to be here.\n", __func__);
 			return;
 			break;
 		}
@@ -975,7 +975,7 @@ int readJobStart (char *line, struct jobStartLog *jobStartLog)
 	if (jobStartLog->numExHosts == 0)
 		{
 			 /* catgets 5502 */
-			ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5502, "%s: The number of execution hosts is zero for job <%d>"), __PRETTY_FUNCTION__, jobStartLog->jobId);
+			ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5502, "%s: The number of execution hosts is zero for job <%d>"), __func__, jobStartLog->jobId);
 			return LSBE_EVENT_FORMAT;
 		}
 
@@ -1774,7 +1774,7 @@ lsb_puteventrec (FILE * log_fp, struct eventRec *logPtr)
 			lsberrno = writeLogSwitch (log_fp, &(logPtr->eventLog.logSwitchLog));
 			break;
 		default:
-			fprintf( stderr, "%s: you are not supposed to be here.\n", __PRETTY_FUNCTION__ );
+			fprintf( stderr, "%s: you are not supposed to be here.\n", __func__ );
 			break;
 		}
 
@@ -3032,7 +3032,7 @@ lsbGetNextJobEvent (struct eventLogHandle *ePtr,  size_t *lineNum,
 			*lineNum = 0;
 			if ((newfp = fopen (eventFile, "r")) == NULL)
 			{
-				ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __PRETTY_FUNCTION__, "fopen", eventFile);
+				ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "fopen", eventFile);
 				lsberrno = LSBE_SYS_CALL;
 				return NULL;
 			}
@@ -3045,7 +3045,7 @@ lsbGetNextJobEvent (struct eventLogHandle *ePtr,  size_t *lineNum,
 				if (fscanf (newfp, "%c%d ", &ch, &pos) != 2 || ch != '#')
 				{
 					/* catgets 5501 */
-					ls_syslog (LOG_INFO, I18N (5501, "%s: fscanf(%s) warning: old event file format"), __PRETTY_FUNCTION__, eventFile);
+					ls_syslog (LOG_INFO, I18N (5501, "%s: fscanf(%s) warning: old event file format"), __func__, eventFile);
 					pos = 0;
 				}
 				else
@@ -3054,7 +3054,7 @@ lsbGetNextJobEvent (struct eventLogHandle *ePtr,  size_t *lineNum,
 					countLineNum (newfp, pos, lineNum);
 				}
 					if (fseek (newfp, pos, SEEK_SET) != 0) {
-						ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __PRETTY_FUNCTION__, "fseek", pos);
+						ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "fseek", pos);
 					}
 				}
 				ePtr->fp = newfp;
@@ -3111,7 +3111,7 @@ lsbGetNextJobRecFromFile( FILE *logFp, size_t *lineNum, size_t numJobIds, LS_LON
 		continue;
 
 		if (logclass & LC_TRACE)  { 
-			ls_syslog (LOG_DEBUG2, "%s: line=%s", __PRETTY_FUNCTION__, line); 
+			ls_syslog (LOG_DEBUG2, "%s: line=%s", __func__, line); 
 		}
 
 			if ((ccount = stripQStr (line, nameBuf)) < 0 ||
@@ -3161,7 +3161,7 @@ lsbGetNextJobRecFromFile( FILE *logFp, size_t *lineNum, size_t numJobIds, LS_LON
 		}
 
 		if (logclass & LC_TRACE) {
-			ls_syslog (LOG_DEBUG2, "%s: log.type=%x", __PRETTY_FUNCTION__, logRec->type); 
+			ls_syslog (LOG_DEBUG2, "%s: log.type=%x", __func__, logRec->type); 
 		}
 
 			readEventRecord (line, logRec);
@@ -3232,7 +3232,7 @@ checkJobEventAndJobId (char *line, int eventType, size_t numJobIds, LS_LONG_INT 
 			}
 			break;
 		default:
-			fprintf( stderr, "%s: you are you not supposed to be here!\n", __PRETTY_FUNCTION__ );
+			fprintf( stderr, "%s: you are you not supposed to be here!\n", __func__ );
 			return 0;
 		}
 
@@ -3413,12 +3413,12 @@ lsb_readeventrecord (char *line, struct eventRec *logRec)
 
 	if (logclass & LC_TRACE)
 		{
-			ls_syslog (LOG_DEBUG2, "%s: Entering ...", __PRETTY_FUNCTION__);
+			ls_syslog (LOG_DEBUG2, "%s: Entering ...", __func__);
 		}
 
 	if (line == NULL || logRec == NULL)
 		{
-			ls_syslog (LOG_DEBUG2, "%s: line or logRec is NULL", __PRETTY_FUNCTION__);
+			ls_syslog (LOG_DEBUG2, "%s: line or logRec is NULL", __func__);
 			return -1;
 		}
 	memset( logRec, 0, sizeof (struct eventRec));
@@ -3427,7 +3427,7 @@ lsb_readeventrecord (char *line, struct eventRec *logRec)
 	if ((ccount = stripQStr (line, namebuf)) < 0
 			|| strlen (namebuf) >= MAX_LSB_NAME_LEN)
 		{
-			ls_syslog (LOG_DEBUG2, "%s: get event type fail", __PRETTY_FUNCTION__);
+			ls_syslog (LOG_DEBUG2, "%s: get event type fail", __func__);
 			return -1;
 		}
 	line += ccount + 1;
@@ -3437,7 +3437,7 @@ lsb_readeventrecord (char *line, struct eventRec *logRec)
 	if ((ccount = stripQStr (line, namebuf)) < 0
 			|| strlen (namebuf) >= MAX_VERSION_LEN)
 		{
-			ls_syslog (LOG_DEBUG2, "%s: get event version fail", __PRETTY_FUNCTION__);
+			ls_syslog (LOG_DEBUG2, "%s: get event version fail", __func__);
 			return -1;
 		}
 	line += ccount + 1;
@@ -3447,19 +3447,19 @@ lsb_readeventrecord (char *line, struct eventRec *logRec)
 	cc = sscanf (line, "%d%n", (int *) &(logRec->eventTime), &ccount);
 	if (cc != 1)
 		{
-			ls_syslog (LOG_DEBUG2, "%s: get event time stamp fail", __PRETTY_FUNCTION__);
+			ls_syslog (LOG_DEBUG2, "%s: get event time stamp fail", __func__);
 			return -1;
 		}
 	line += ccount + 1;
 
 	if ((version = atof (logRec->version)) <= 0.0)
 		{
-			ls_syslog (LOG_DEBUG2, "%s: get event version error", __PRETTY_FUNCTION__);
+			ls_syslog (LOG_DEBUG2, "%s: get event version error", __func__);
 			return -1;
 		}
 	if ((logRec->type = getEventTypeAndKind (etype, &eventKind)) == -1)
 		{
-			ls_syslog (LOG_DEBUG2, "%s: get event time stamp error", __PRETTY_FUNCTION__);
+			ls_syslog (LOG_DEBUG2, "%s: get event time stamp error", __func__);
 			return -1;
 		}
 
@@ -3468,7 +3468,7 @@ lsb_readeventrecord (char *line, struct eventRec *logRec)
 	readEventRecord (line, logRec);
 	if (lsberrno != LSBE_NO_ERROR)
 		{
-			ls_syslog (LOG_DEBUG2, "%s: readEventRecord fail", __PRETTY_FUNCTION__);
+			ls_syslog (LOG_DEBUG2, "%s: readEventRecord fail", __func__);
 			return -1;
 		}
 	return 0;
@@ -3598,9 +3598,9 @@ getJobIdIndexFromEventFile (char *eventFile, struct sortIntList *header, time_t 
 	if (cc != 2 || ch != '#')
 	{
 		/* catgets 5501 */
-		ls_syslog (LOG_INFO, I18N (5501, "%s: fscanf(%s) failed: old event file format"),  __PRETTY_FUNCTION__, eventFile);
+		ls_syslog (LOG_INFO, I18N (5501, "%s: fscanf(%s) failed: old event file format"),  __func__, eventFile);
 		if (fseek (eventFp, 0, SEEK_SET) != 0) {
-			ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __PRETTY_FUNCTION__, "fseek", 0);
+			ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "fseek", 0);
 		}
 		*timeStamp = 0;
 	}
@@ -3839,7 +3839,7 @@ updateJobIdIndexFile (char *indexFile, char *eventFile, int totalEventFile)
 			strcmp (nameBuf, LSF_JOBIDINDEX_FILETAG))
 		{
 			ls_syslog (LOG_ERR, I18N (5506, "%s: %s is not an jobid index file"), /* catgets 5506 */
-						 __PRETTY_FUNCTION__, indexFile);
+						 __func__, indexFile);
 			lsberrno = LSBE_INDEX_FORMAT;
 			fclose (indexFp);
 			unlink (indexFile);
@@ -3879,7 +3879,7 @@ updateJobIdIndexFile (char *indexFile, char *eventFile, int totalEventFile)
 
 			if (fchmod (fileno (indexFp), 0644) != 0)
 		{
-			ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __PRETTY_FUNCTION__, "fchmod", indexFile);
+			ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "fchmod", indexFile);
 		}
 
 			addedEventFile = totalEventFile;
@@ -4079,7 +4079,7 @@ lsb_getAcctFileTime (char *fileName)
 					if (logclass & LC_EXEC)
 						{
 							ls_syslog (LOG_DEBUG, I18N (5507, "%s: Error in reading event file <%s> at line <%d>\n"), /* catgets 5507 */
-								 __PRETTY_FUNCTION__, fileName, lineNum);
+								 __func__, fileName, lineNum);
 						}
 				}
 					else

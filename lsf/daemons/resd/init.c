@@ -53,7 +53,7 @@ ttyStruct defaultTty = { };
 static void
 initConn2NIOS (void)
 {
-	static  char fname[] = "initConn2NIOS"; // FIXME FIXME change type of all fnames-named-variable to const
+	static  char __func__] = "initConn2NIOS"; // FIXME FIXME change type of all fnames-named-variable to const
 	conn2NIOS.task_duped = calloc (sysconf (_SC_OPEN_MAX), sizeof (int));
 
 	if ( NULL == conn2NIOS.task_duped )
@@ -92,7 +92,7 @@ initConn2NIOS (void)
 void
 init_res( void )
 {
-	static char fname[] = "init_res";
+	static char __func__] = "init_res";
 	int i = 0;
 	int maxfds = 0;
 
@@ -194,7 +194,7 @@ init_res( void )
 static void
 init_AcceptSock (void)
 {
-	static char fname[] = "init_AcceptSock()";
+	static char __func__] = "init_AcceptSock()";
 	struct sockaddr_in svaddr = { };
 	struct servent *sv = NULL ;
 	struct hostent *hp = NULL;
@@ -278,7 +278,7 @@ init_AcceptSock (void)
 static void
 initChildRes (char *envdir)
 {
-  static char fname[] = "initChildRes";
+  static char __func__] = "initChildRes";
   int i, maxfds;
 
   getLogClass_ (resParams[LSF_DEBUG_RES].paramValue,
@@ -325,7 +325,7 @@ initChildRes (char *envdir)
 int
 resParent (int s, struct passwd *pw, struct lsfAuth *auth, struct resConnect *connReq, struct hostent *hostp)
 {
-	static char fname[]           = "resParent";
+	static char __func__]           = "resParent";
 	struct resChildInfo childInfo = { };
 	struct LSFHeader hdr          = { };
 	XDR xdrs      = { };
@@ -513,7 +513,7 @@ resParent (int s, struct passwd *pw, struct lsfAuth *auth, struct resConnect *co
 void
 resChild (char *arg, char *envdir)
 {
-  static char fname[] = "resChild";
+  static char __func__] = "resChild";
   struct passwd pw;
   struct hostent hp;
   struct resConnect connReq;

@@ -27,7 +27,7 @@
 bool_t
 xdr_jobSetup (XDR * xdrs, struct jobSetup *jsetup, struct LSFHeader *hdr)
 {
-  static char fname[] = "xdr_jobSetup";
+  static char __func__] = "xdr_jobSetup";
   char *sp1, *sp2, *sp3;
   int jobArrId, jobArrElemId;
   if (xdrs->x_op == XDR_ENCODE)
@@ -88,7 +88,7 @@ xdr_jobSetup (XDR * xdrs, struct jobSetup *jsetup, struct LSFHeader *hdr)
 bool_t
 xdr_jobSyslog (XDR * xdrs, struct jobSyslog * slog, struct LSFHeader * hdr)
 {
-  static char fname[] = "xdr_jobSyslog";
+  static char __func__] = "xdr_jobSyslog";
   char *sp1;
 
   if (!xdr_int (xdrs, &slog->logLevel))
@@ -116,7 +116,7 @@ xdr_jobSyslog (XDR * xdrs, struct jobSyslog * slog, struct LSFHeader * hdr)
 bool_t
 xdr_jobCard (XDR * xdrs, struct jobCard * jCard, struct LSFHeader * hdr)
 {
-  static char fname[] = "xdr_jobCard()";
+  static char __func__] = "xdr_jobCard()";
   char *sp1;
 
   if (xdrs->x_op == XDR_FREE)

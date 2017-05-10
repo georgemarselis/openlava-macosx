@@ -49,7 +49,7 @@ init_ServSock (u_short port)
 int
 rcvJobFile (int chfd, struct lenData *jf)
 {
-  static char fname[] = "rcvJobFile";
+  static char __func__] = "rcvJobFile";
   long cc = 0;
   unsigned long returnValue = 0;
 
@@ -83,7 +83,7 @@ rcvJobFile (int chfd, struct lenData *jf)
 int
 do_readyOp (XDR *xdrs, int chanfd, struct sockaddr_in *from, struct LSFHeader *reqHdr)
 {
-    static char fname[] = "do_readyOp";
+    static char __func__] = "do_readyOp";
     XDR xdrs2;
     struct Buffer *buf;
     struct LSFHeader replyHdr;
@@ -128,7 +128,7 @@ do_readyOp (XDR *xdrs, int chanfd, struct sockaddr_in *from, struct LSFHeader *r
 void
 childRemoveSpoolFile (const char *spoolFile, int options, const struct passwd *pwUser)
 {
-    char fname[]    = "childRemoveSpoolFile";
+    char __func__]    = "childRemoveSpoolFile";
     char apiName[]  = "ls_initrex";
     char *hostName  = malloc( sizeof( char ) * MAXHOSTNAMELEN + 1 ); // FIXME FIXME FIXME FIXME free memory after use
     char *errMsg    = malloc( sizeof( char ) * MAXLINELEN + 1 ); // FIXME FIXME FIXME FIXME free memory after use

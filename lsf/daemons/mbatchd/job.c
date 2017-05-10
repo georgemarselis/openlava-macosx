@@ -151,7 +151,7 @@ newJob (struct submitReq *subReq, struct submitMbdReply *Reply, int chan,
 	struct lsfAuth *auth, int *schedule, int dispatch,
 	struct jData **jobData)
 {
-  static char fname[] = "newJob";
+  static char __func__] = "newJob";
   static struct jData *newjob;
   int returnErr;
   LS_LONG_INT nextId;
@@ -343,7 +343,7 @@ getHostByType (char *hostType)
 int
 getNextJobId (void)
 {
-  static char fname[] = "getNextJobId()";
+  static char __func__] = "getNextJobId()";
   int i = 0;
   int freeJobId;
 
@@ -378,7 +378,7 @@ getNextJobId (void)
 void
 addJobIdHT (struct jData *job)
 {
-  static char fname[] = "addJobIdHT()";
+  static char __func__] = "addJobIdHT()";
   hEnt *ent;
 
   while ((ent = addMemb (&jobIdHT, job->jobId)) == NULL)
@@ -453,7 +453,7 @@ chkAskedHosts (int inNumAskedHosts, char **inAskedHosts, int numProcessors,
 	       int *outNumAskedHosts, struct askedHost **outAskedHosts,
 	       int *badHostIndx, int *askedOthPrio, int returnBadHost)
 {
-  static char fname[] = "chkAskedHosts";
+  static char __func__] = "chkAskedHosts";
   int currentsize = inNumAskedHosts + 1;
   int j, i, k;
   struct askedHost *askedHosts;
@@ -987,7 +987,7 @@ int
 selectJobs (struct jobInfoReq *jobInfoReq, struct jData ***jobDataList,
 	    int *listSize)
 {
-  static char fname[] = "selectJobs()";
+  static char __func__] = "selectJobs()";
   char allqueues = FALSE;
   char allusers = FALSE;
   char allhosts = FALSE;
@@ -1347,7 +1347,7 @@ peekJob (struct jobPeekReq *jpeekReq, struct jobPeekReply *jpeekReply,
 	 struct lsfAuth *auth)
 {
 
-  static char fname[] = "peekJob";
+  static char __func__] = "peekJob";
   struct jData *job = NULL;
   char jobFile[MAXFILENAMELEN];
 
@@ -1415,7 +1415,7 @@ int
 migJob (struct migReq *req, struct submitMbdReply *reply,
 	struct lsfAuth *auth)
 {
-  static char fname[] = "migJob";
+  static char __func__] = "migJob";
   struct jData *job = NULL;
   int replyStatus, i, askedOthPrio;
 
@@ -1784,7 +1784,7 @@ signalJob (struct signalReq *signalReq, struct lsfAuth *auth)
 int
 sigPFjob (struct jData *jData, int sigValue, time_t chkPeriod, int logIt)
 {
-  static char fname[] = "sigPFjob";
+  static char __func__] = "sigPFjob";
   struct jData *zombieData = NULL;
 
   switch (sigValue)
@@ -1883,7 +1883,7 @@ static sbdReplyType
 sigStartedJob (struct jData *jData, int sigValue, time_t chkPeriod,
 	       int actFlags)
 {
-  static char fname[] = "sigStartedJob";
+  static char __func__] = "sigStartedJob";
   sbdReplyType reply;
   struct jobReply jobReply;
   struct jobSig jobSig;
@@ -1999,7 +1999,7 @@ void
 signalReplyCode (sbdReplyType reply, struct jData *jData, int sigValue,
 		 int chkFlags)
 {
-  static char fname[] = "signalReplyCode";
+  static char __func__] = "signalReplyCode";
 
   switch (reply)
     {
@@ -2067,7 +2067,7 @@ void
 jobStatusSignal (sbdReplyType reply, struct jData *jData, int sigValue,
 		 int actFlags, struct jobReply *jobReply)
 {
-  static char fname[] = "jobStatusSignal";
+  static char __func__] = "jobStatusSignal";
   struct statusReq statusReq;
   char *actCmd;
 
@@ -2207,7 +2207,7 @@ jobStatusSignal (sbdReplyType reply, struct jData *jData, int sigValue,
 int
 sbatchdJobs (struct sbdPackage *sbdPackage, struct hData *hData)
 {
-  static char fname[] = "sbatchdJobs";
+  static char __func__] = "sbatchdJobs";
   struct jData *jpbw, *next;
   struct jobSpecs *jobSpecs;
   struct lenData jf;
@@ -2363,7 +2363,7 @@ countNumSpecs (struct hData *hData)
 void
 packJobSpecs (struct jData *jDataPtr, struct jobSpecs *jobSpecs)
 {
-  static char fname[] = "packJobSpecs";
+  static char __func__] = "packJobSpecs";
   struct hData *hp = jDataPtr->hPtr[0];
   struct qData *qp = jDataPtr->qPtr;
   int i;
@@ -2805,7 +2805,7 @@ freeThresholds (struct thresholds *thresholds)
 int
 statusJob (struct statusReq *statusReq, struct hostent *hp, int *schedule)
 {
-  static char fname[] = "statusJob";
+  static char __func__] = "statusJob";
   struct jData *jpbw, *jData;
   struct hData *hData;
   char stopit = FALSE;
@@ -3553,7 +3553,7 @@ terminatePendingEvent (struct jData *jpbw)
 int
 rusageJob (struct statusReq *statusReq, struct hostent *hp)
 {
-  static char fname[] = "rusageJob";
+  static char __func__] = "rusageJob";
   struct jData *jpbw;
   struct hData *hData;
   int diffSTime;
@@ -4033,7 +4033,7 @@ handleRequeueJob (struct jData *jData, time_t requeueTime)
 static void
 changeJobParams (struct jData *jData)
 {
-  static char fname[] = "changeJobParams";
+  static char __func__] = "changeJobParams";
   struct submitReq *oldSub = NULL;
   struct qData *qPtr;
   int errcode, jFlags;
@@ -4271,7 +4271,7 @@ clean (time_t curTime)
 void
 job_abort (struct jData *jData, char reason)
 {
-  static char fname[] = "job_abort";
+  static char __func__] = "job_abort";
   char mailmsg[2048];
   char *cp;
   char *reasonp;
@@ -4376,7 +4376,7 @@ job_abort (struct jData *jData, char reason)
 int
 switchJobArray (struct jobSwitchReq *switchReq, struct lsfAuth *auth)
 {
-  static char fname[] = "switchJobArray";
+  static char __func__] = "switchJobArray";
   struct jData *jArrayPtr;
   struct qData *qPtr;
   int cc;
@@ -4466,7 +4466,7 @@ static int
 switchAJob (struct jobSwitchReq *switchReq,
 	    struct lsfAuth *auth, struct qData *qtp)
 {
-  static char fname[] = "switchAJob";
+  static char __func__] = "switchAJob";
   struct qData *qfp;
   struct jData *job = NULL;
   int returnErr, noUse, i;
@@ -4719,7 +4719,7 @@ switchAJob (struct jobSwitchReq *switchReq,
 int
 moveJobArray (struct jobMoveReq *moveReq, int log, struct lsfAuth *auth)
 {
-  static char fname[] = "moveJobArray";
+  static char __func__] = "moveJobArray";
   struct jData *jArrayPtr;
   int cc;
   int savePosition;
@@ -5082,7 +5082,7 @@ removeJob (LS_LONG_INT jobId)
 void
 inPendJobList (struct jData *job, int listno, time_t requeueTime)
 {
-  static char fname[] = "inPendJobList";
+  static char __func__] = "inPendJobList";
   struct jData *jp;
   time_t compareTime;
 
@@ -5572,7 +5572,7 @@ acumulateValue (double statusValue, double jobValue)
 int
 resigJobs (int *resignal)
 {
-  static char fname[] = "resigJobs()";
+  static char __func__] = "resigJobs()";
   static char first = TRUE;
   int sigcnt = 0;
   int sVsigcnt;
@@ -5769,7 +5769,7 @@ resigJobs (int *resignal)
 static int
 resigJobs1 (struct jData *jpbw, int *sigcnt)
 {
-  static char fname[] = "resigJobs1";
+  static char __func__] = "resigJobs1";
   sbdReplyType reply;
 
   if (logclass & (LC_SIGNAL))
@@ -6513,7 +6513,7 @@ handleJParameters (struct jData *jpbw, struct jData *job,
 		   struct submitReq *modReq, int replay, int delOptions,
 		   int delOptions2)
 {
-  static char fname[] = "handleJParameters";
+  static char __func__] = "handleJParameters";
   struct submitReq *newSub;
   struct submitReq *subReq = &(job->shared->jobBill);
 
@@ -6831,7 +6831,7 @@ static int
 checkJobParams (struct jData *job, struct submitReq *subReq,
 		struct submitMbdReply *Reply, struct lsfAuth *auth)
 {
-  static char fname[] = "checkJobParams";
+  static char __func__] = "checkJobParams";
   int i, returnErr;
   int numAskedHosts = 0;
   int jFlag = 0;
@@ -7087,7 +7087,7 @@ checkJobParams (struct jData *job, struct submitReq *subReq,
 struct resVal *
 checkResReq (char *resReq, int checkOptions)
 {
-  static char fname[] = "checkResReq";
+  static char __func__] = "checkResReq";
   int rusgDefined = FALSE, jj, isSet, options;
   struct resVal *resValPtr = NULL;
   struct tclHostData tclHostData;
@@ -7330,7 +7330,7 @@ copyJobBill (struct submitReq *subReq, struct submitReq *jobBill,
 void
 freeJData (struct jData *jpbw)
 {
-  static char fname[] = "freeJData";
+  static char __func__] = "freeJData";
   PROXY_LIST_ENTRY_T *pxy;
 
   if (!jpbw)
@@ -7468,7 +7468,7 @@ static int
 mergeSubReq (struct submitReq *to, struct submitReq *old,
 	     struct modifyReq *req, const struct passwd *pwUser)
 {
-  static char fname[] = "mergeSubReq";
+  static char __func__] = "mergeSubReq";
   int i;
   int delOptions = req->delOptions;
   int delOptions2 = req->delOptions2;
@@ -8086,7 +8086,7 @@ msgJob (struct bucket *bucket, struct lsfAuth *auth)
 static sbdReplyType
 msgStartedJob (struct jData *jData, struct bucket *bucket)
 {
-  static char fname[] = "msgStartedJob";
+  static char __func__] = "msgStartedJob";
   sbdReplyType reply;
   struct jobReply jobReply;
 
@@ -8131,7 +8131,7 @@ msgStartedJob (struct jData *jData, struct bucket *bucket)
 static void
 sndJobMsgs (struct hData *hData, int *sigcnt)
 {
-  static char fname[] = "sndJobMsgs";
+  static char __func__] = "sndJobMsgs";
   int sndrc;
   int num = 0, maxSent = 1;
   struct bucket *bucket, *next, *head = hData->msgq[MSG_STAT_QUEUED];
@@ -8173,7 +8173,7 @@ breakCallback (struct jData *jData, bool_t termWhiPendStatus)
   struct hostent *hp;
   struct sockaddr_in from;
   int len;
-  static char fname[] = "breakCallback";
+  static char __func__] = "breakCallback";
 
   if (logclass & LC_TRACE)
     ls_syslog (LOG_DEBUG, "%s: Enter ...", fname);
@@ -8223,7 +8223,7 @@ breakCallback (struct jData *jData, bool_t termWhiPendStatus)
 int
 statusMsgAck (struct statusReq *statusReq)
 {
-  static char fname[] = "statusMsgAck";
+  static char __func__] = "statusMsgAck";
   struct jData *jp;
   struct bucket *bucket;
   struct bucket *msgQHead;
@@ -8345,7 +8345,7 @@ rUsagesOk (struct resVal *jobResVal, struct resVal *queueResVal)
 static void
 packJobThresholds (struct thresholds *thresholds, struct jData *jData)
 {
-  static char fname[] = "packJobThresholds";
+  static char __func__] = "packJobThresholds";
   int i, numThresholds = 0;
 
   if (jData == NULL || jData->qPtr == NULL)
@@ -8462,7 +8462,7 @@ getReserveParams (struct resVal *resValPtr, int *duration, int *rusgBitMaps)
 void
 tryResume (void)
 {
-  char fname[] = "tryResume";
+  char __func__] = "tryResume";
   struct jData *jp;
   int resumeSig;
   int returnCode;
@@ -8571,7 +8571,7 @@ tryResume (void)
 static int
 shouldResume (struct jData *jp, int *resumeSig)
 {
-  static char fname[] = "shouldResume";
+  static char __func__] = "shouldResume";
   int saveReason, saveSubReasons, returnCode = RESUME_JOB;
 
   if (logclass & (LC_EXEC))
@@ -8716,7 +8716,7 @@ shouldResume (struct jData *jp, int *resumeSig)
 static int
 shouldResumeByLoad (struct jData *jp)
 {
-  static char fname[] = "shouldResumeByLoad";
+  static char __func__] = "shouldResumeByLoad";
   int resume, i, j, numHosts, lastReason = jp->newReason;
   struct tclHostData *tclHostData;
   struct thresholds thresholds;
@@ -8800,7 +8800,7 @@ shouldResumeByLoad (struct jData *jp)
 static int
 shouldResumeByRes (struct jData *jp)
 {
-  static char fname[] = "shouldResumeByRes";
+  static char __func__] = "shouldResumeByRes";
   int i, j, returnCode = RESUME_JOB;
   struct resVal *resValPtr;
   float **loads;
@@ -9012,7 +9012,7 @@ destroyjDataRef (struct jData *jp)
 bool_t
 runJob (struct runJobRequest * request, struct lsfAuth * auth)
 {
-  static char fname[] = "runJob";
+  static char __func__] = "runJob";
   struct jData *job;
   int cc;
   struct candHost candHost;
@@ -9139,7 +9139,7 @@ runJob (struct runJobRequest * request, struct lsfAuth * auth)
 static int
 setUrgentJobExecHosts (struct runJobRequest *request, struct jData *job)
 {
-  static char fname[] = "setUrgentJobExecHosts()";
+  static char __func__] = "setUrgentJobExecHosts()";
   struct hData *host;
   int i;
   int j;
@@ -9594,7 +9594,7 @@ setNewSub (struct jData *jpbw, struct jData *job,
 int
 mbdRcvJobFile (int chfd, struct lenData *jf)
 {
-  static char fname[] = "mbdRcvJobFile";
+  static char __func__] = "mbdRcvJobFile";
   int timeout = RECV_JOBFILE_TIMEOUT;
   int cc;
 
@@ -9621,7 +9621,7 @@ mbdRcvJobFile (int chfd, struct lenData *jf)
 float
 queueGetUnscaledRunTimeLimit (struct qData *qp)
 {
-  static char fname[] = "queueGetUnscaledRunTimeLimit";
+  static char __func__] = "queueGetUnscaledRunTimeLimit";
   char *spec;
   float *cpuFactor;
   float one = 1;
@@ -9701,7 +9701,7 @@ int
 arrayRequeue (struct jData *jArray,
 	      struct signalReq *sigPtr, struct lsfAuth *authPtr)
 {
-  static char fname[] = "arrayRequeue";
+  static char __func__] = "arrayRequeue";
   struct jData *jPtr;
   time_t requeueTime;
   int requeueSuccess = FALSE;
