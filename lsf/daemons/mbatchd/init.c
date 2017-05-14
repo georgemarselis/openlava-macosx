@@ -725,7 +725,7 @@ createDefQueue (void)
   static char __func__] = "createDefQueue";
   struct qData *qp;
 
-  ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 6136, "%s: Using the default queue <default> provided by the batch system"), fname);	/* catgets 6136 */
+  ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 6136, "%s: Using the default queue <default> provided by the batch system"), __func__);	/* catgets 6136 */
   FREEUP (defaultQueues);
   defaultQueues = safeSave ("default");
   qp = initQData ();
@@ -1044,7 +1044,7 @@ addMember (struct gData *groupPtr,
 				      groups, ngroups);
 	      if (!subgrpPtr)
 		{
-		  ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 6149, "%s: No valid users defined in Unix group <%s>; ignoring"), fname, word);	/* catgets 6149 */
+		  ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 6149, "%s: No valid users defined in Unix group <%s>; ignoring"), __func__, word);	/* catgets 6149 */
 		  lsb_CheckError = WARNING_ERR;
 		  return;
 		}
@@ -1070,14 +1070,14 @@ addMember (struct gData *groupPtr,
 	  hp = Gethostbyname_ (word);
 	  if (hp == NULL)
 	    {
-	      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6151, "%s: Bad host/group name <%s> in group <%s>; ignored"), fname, word, groupPtr->group);	/* catgets 6151 */
+	      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6151, "%s: Bad host/group name <%s> in group <%s>; ignored"), __func__, word, groupPtr->group);	/* catgets 6151 */
 	      lsb_CheckError = WARNING_ERR;
 	      return;
 	    }
 	  strcpy (name, hp->h_name);
 	  if (findHost (name) == NULL && numofhosts () != 0)
 	    {
-	      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6152, "%s: Host <%s> is not used by the batch system; ignored"), fname, name);	/* catgets 6152 */
+	      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6152, "%s: Host <%s> is not used by the batch system; ignored"), __func__, name);	/* catgets 6152 */
 	      lsb_CheckError = WARNING_ERR;
 	      return;
 	    }
@@ -1088,9 +1088,9 @@ addMember (struct gData *groupPtr,
   if (isInGrp (word, groupPtr))
     {
       if (isgrp)
-	ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6153, "%s: Group <%s> is multiply defined in group <%s>; ignored"), fname, word, groupPtr->group);	/* catgets 6153 */
+	ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6153, "%s: Group <%s> is multiply defined in group <%s>; ignored"), __func__, word, groupPtr->group);	/* catgets 6153 */
       else
-	ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6154, "%s: Member <%s> is multiply defined in group <%s>; ignored"), fname, word, groupPtr->group);	/* catgets 6154 */
+	ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6154, "%s: Member <%s> is multiply defined in group <%s>; ignored"), __func__, word, groupPtr->group);	/* catgets 6154 */
       lsb_CheckError = WARNING_ERR;
       return;
     }
@@ -1127,16 +1127,16 @@ parseAUids (struct qData *qp, char *line)
     numAds++;
   if (numAds)
     {
-      admins.adminIds = (int *) my_malloc ((numAds) * sizeof (int), fname);
-      admins.adminGIds = (int *) my_malloc ((numAds) * sizeof (int), fname);
+      admins.adminIds = (int *) my_malloc ((numAds) * sizeof (int), __func__);
+      admins.adminGIds = (int *) my_malloc ((numAds) * sizeof (int), __func__);
       admins.adminNames =
-	(char **) my_malloc (numAds * sizeof (char *), fname);
+	(char **) my_malloc (numAds * sizeof (char *), __func__);
       admins.nAdmins = 0;
     }
   else
     {
 
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6155, "%s: No queue's administrators defined; ignored"), fname);	/* catgets 6155 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6155, "%s: No queue's administrators defined; ignored"), __func__);	/* catgets 6155 */
       lsb_CheckError = WARNING_ERR;
       return;
     }
@@ -1205,7 +1205,7 @@ parseAUids (struct qData *qp, char *line)
 
   if (!admins.nAdmins)
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6157, "%s: No valid queue's administrators defined in <%s> for queue <%s>; ignored"), fname, line, qp->queue);	/* catgets 6157 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6157, "%s: No valid queue's administrators defined in <%s> for queue <%s>; ignored"), __func__, line, qp->queue);	/* catgets 6157 */
       lsb_CheckError = WARNING_ERR;
       FREEUP (admins.adminIds);
       FREEUP (admins.adminGIds);
@@ -1214,7 +1214,7 @@ parseAUids (struct qData *qp, char *line)
     }
   qp->nAdmins = admins.nAdmins;
   qp->adminIds = admins.adminIds;
-  qp->admins = (char *) my_malloc (admins.nAdmins * MAX_LSB_NAME_LEN, fname);
+  qp->admins = (char *) my_malloc (admins.nAdmins * MAX_LSB_NAME_LEN, __func__);
   qp->admins[0] = '\0';
   for (i = 0; i < admins.nAdmins; i++)
     {
@@ -1332,7 +1332,7 @@ parseGroups (int groupType, struct gData **group, char *line, char *filename)
   struct passwd *pw;
   struct hostent *hp;
 
-  mygp = my_malloc (sizeof (struct gData), fname);
+  mygp = my_malloc (sizeof (struct gData), __func__);
   *group = mygp;
   mygp->group = "";
   h_initTab_ (&mygp->memberTab, 16);
@@ -1349,7 +1349,7 @@ parseGroups (int groupType, struct gData **group, char *line, char *filename)
     {
       if (isInGrp (word, mygp))
 	{
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6164, "%s/%s: Member <%s> is multiply defined; ignored"), filename, fname, word);	/* catgets 6164 */
+	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6164, "%s/%s: Member <%s> is multiply defined; ignored"), filename, __func__, word);	/* catgets 6164 */
 	  lsb_CheckError = WARNING_ERR;
 	  continue;
 	}
@@ -1395,7 +1395,7 @@ parseGroups (int groupType, struct gData **group, char *line, char *filename)
 			    &nTempUGroups);
 	      if (gp == NULL)
 		{
-		  ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 6165, "%s/%s: No valid users in Unix group <%s>; ignoring"), filename, fname, word);	/* catgets 6165 */
+		  ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 6165, "%s/%s: No valid users in Unix group <%s>; ignoring"), filename, __func__, word);	/* catgets 6165 */
 		  lsb_CheckError = WARNING_ERR;
 		  continue;
 		}
@@ -1430,14 +1430,14 @@ parseGroups (int groupType, struct gData **group, char *line, char *filename)
 		{
 		  if (!h_getEnt_ (&hostTab, word))
 		    {
-		      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6170, "%s/%s: Host <%s> is not used by the batch system; ignored"), filename, fname, word);	/* catgets 6170 */
+		      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6170, "%s/%s: Host <%s> is not used by the batch system; ignored"), filename, __func__, word);	/* catgets 6170 */
 		      lsb_CheckError = WARNING_ERR;
 		      continue;
 		    }
 		}
 	      if (isInGrp (word, mygp))
 		{
-		  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6171, "%s/%s: Host name <%s> is multiply defined; ignored"), filename, fname, word);	/* catgets 6171 */
+		  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6171, "%s/%s: Host name <%s> is multiply defined; ignored"), filename, __func__, word);	/* catgets 6171 */
 		  lsb_CheckError = WARNING_ERR;
 		  continue;
 		}
@@ -1446,7 +1446,7 @@ parseGroups (int groupType, struct gData **group, char *line, char *filename)
 	    }
 	  else
 	    {
-	      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6172, "%s/%s: Unknown host or host group <%s>; ignored"), filename, fname, word);	/* catgets 6172 */
+	      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6172, "%s/%s: Unknown host or host group <%s>; ignored"), filename, __func__, word);	/* catgets 6172 */
 	      lsb_CheckError = WARNING_ERR;
 	      continue;
 	    }
@@ -1837,7 +1837,7 @@ getClusterData (void)
   TIMEIT (0, clusterName = ls_getclustername (), "minit_ls_getclustername");
   if (clusterName == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "ls_getclustername");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "ls_getclustername");
       if (!lsb_CheckMode)
 	mbdDie (MASTER_RESIGN);
       else
@@ -1853,15 +1853,15 @@ getClusterData (void)
 	FREEUP (lsbManagers[0]);
       FREEUP (lsbManagers);
       nManagers = 1;
-      lsbManagers = my_malloc (sizeof (char *), fname);
-      lsbManagers[0] = my_malloc (MAX_LSB_NAME_LEN, fname);
+      lsbManagers = my_malloc (sizeof (char *), __func__);
+      lsbManagers[0] = my_malloc (MAX_LSB_NAME_LEN, __func__);
       if (getLSFUser_ (lsbManagers[0], MAX_LSB_NAME_LEN) == 0)
 	{
 
-	  managerIds = my_malloc (sizeof (uid_t), fname);
+	  managerIds = my_malloc (sizeof (uid_t), __func__);
 	  if (getOSUid_ (lsbManagers[0], &managerIds[0]) != 0)
 	    {
-	      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "getOSUid_");
+	      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "getOSUid_");
 	      if (!lsb_CheckMode)
 		mbdDie (MASTER_RESIGN);
 	      else
@@ -1874,11 +1874,11 @@ getClusterData (void)
 	}
       else
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "getLSFUser_");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "getLSFUser_");
 	  mbdDie (MASTER_RESIGN);
 	}
       if (!lsb_CheckMode)
-	ls_syslog (LOG_NOTICE, I18N (6256, "%s: The LSF administrator is the invoker in debug mode"), fname);	/*catgets 6256 */
+	ls_syslog (LOG_NOTICE, I18N (6256, "%s: The LSF administrator is the invoker in debug mode"), __func__);	/*catgets 6256 */
       lsbManager = lsbManagers[0];
       managerId = managerIds[0];
     }
@@ -1886,7 +1886,7 @@ getClusterData (void)
   clusterInfo = ls_clusterinfo (NULL, &num, NULL, 0, 0);
   if (clusterInfo == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "ls_clusterinfo");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "ls_clusterinfo");
       if (!lsb_CheckMode)
 	mbdDie (MASTER_RESIGN);
       else
@@ -1917,7 +1917,7 @@ getClusterData (void)
 
       if (!nManagers && !debug)
 	{
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6182, "%s: Local cluster %s not returned by LIM"), fname, clusterName);	/* catgets 6182 */
+	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6182, "%s: Local cluster %s not returned by LIM"), __func__, clusterName);	/* catgets 6182 */
 	  mbdDie (MASTER_FATAL);
 	}
       numofclusters = num;
@@ -1934,8 +1934,8 @@ setManagers (struct clusterInfo clusterInfo)
   char managerIdStr[MAX_LSB_NAME_LEN], managerStr[MAX_LSB_NAME_LEN];
 
   temNum = (clusterInfo.nAdmins) ? clusterInfo.nAdmins : 1;
-  managerIds = my_malloc (sizeof (uid_t) * temNum, fname);
-  lsbManagers = my_malloc (sizeof (char *) * temNum, fname);
+  managerIds = my_malloc (sizeof (uid_t) * temNum, __func__);
+  lsbManagers = my_malloc (sizeof (char *) * temNum, __func__);
 
   for (i = 0; i < temNum; i++)
     {
@@ -1965,14 +1965,14 @@ setManagers (struct clusterInfo clusterInfo)
 	    {
 	      ls_syslog (LOG_DEBUG,
 			 "%s: Non recognize LSF administrator name <%s> and userId <%d> detected. It may be a user from other realm",
-			 fname, sp, tempId);
+			 __func__, sp, tempId);
 	    }
 	  managerIds[i] = -1;
 	}
     }
   if (numValid == 0)
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6184, "%s: No valid LSF administrators"), fname);	/* catgets 6184 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6184, "%s: No valid LSF administrators"), __func__);	/* catgets 6184 */
       mbdDie (MASTER_FATAL);
     }
   nManagers = temNum;
@@ -2001,7 +2001,7 @@ setParams (struct paramConf *paramConf)
 
   if (paramConf == NULL || paramConf->param == NULL)
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6185, "%s: paramConf or param in paramConf is NULL; default  parameters will be used"), fname);	/* catgets 6185 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6185, "%s: paramConf or param in paramConf is NULL; default  parameters will be used"), __func__);	/* catgets 6185 */
       return;
     }
   params = paramConf->param;
@@ -2065,7 +2065,7 @@ addUData (struct userConf *userConf)
     {
       uPtr = &(userConf->users[i]);
       addUserData (uPtr->user, uPtr->maxJobs, uPtr->procJobLimit,
-		   fname, TRUE, TRUE);
+		   __func__, TRUE, TRUE);
       if (strcmp ("default", uPtr->user) == 0)
 	defUser = TRUE;
     }
@@ -2095,14 +2095,14 @@ createTmpGData (struct groupInfoEnt *groups,
       if (groupType == HOST_GRP && gPtr && gPtr->group
 	  && isHostAlias (gPtr->group))
 	{
-	  ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 6186, "%s: Host group name <%s> conflicts with host name; ignoring"), fname, gPtr->group);	/* catgets 6186 */
+	  ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 6186, "%s: Host group name <%s> conflicts with host name; ignoring"), __func__, gPtr->group);	/* catgets 6186 */
 	  lsb_CheckError = WARNING_ERR;
 	  continue;
 	}
 
       if (getGrpData (tempGData, gPtr->group, *nTempGroups))
 	{
-	  ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 6187, "%s: Group <%s> is multiply defined in %s; ignoring"), fname, gPtr->group, HUgroups);	/* catgets 6187 */
+	  ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 6187, "%s: Group <%s> is multiply defined in %s; ignoring"), __func__, gPtr->group, HUgroups);	/* catgets 6187 */
 	  lsb_CheckError = WARNING_ERR;
 	  continue;
 	}
@@ -2113,13 +2113,13 @@ createTmpGData (struct groupInfoEnt *groups,
       while (strcmp (gPtr->memberList, "all") != 0 &&
 	     (wp = getNextWord_ (&sp)) != NULL)
 	{
-	  addMember (grpPtr, wp, groupType, fname, tempGData, nTempGroups);
+	  addMember (grpPtr, wp, groupType, __func__, tempGData, nTempGroups);
 	}
 
       if (grpPtr->memberTab.numEnts == 0 &&
 	  grpPtr->numGroups == 0 && strcmp (gPtr->memberList, "all") != 0)
 	{
-	  ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 6188, "%s: No valid member in group <%s>; ignoring the group"), fname, grpPtr->group);	/* catgets 6188 */
+	  ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 6188, "%s: No valid member in group <%s>; ignoring the group"), __func__, grpPtr->group);	/* catgets 6188 */
 	  lsb_CheckError = WARNING_ERR;
 	  freeGrp (grpPtr);
 	  *nTempGroups -= 1;
@@ -2168,7 +2168,7 @@ addHostData (int numHosts, struct hostInfoEnt *hosts)
   removeFlags (&hostTab, HOST_UPDATE | HOST_AUTOCONF_MXJ, HDATA);
   if (numHosts == 0 || hosts == NULL)
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6189, "%s: No hosts specified in lsb.hosts; all hosts known by LSF will be used"), fname);	/* catgets 6189 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6189, "%s: No hosts specified in lsb.hosts; all hosts known by LSF will be used"), __func__);	/* catgets 6189 */
       addDefaultHost ();
       return;
     }
@@ -2183,18 +2183,18 @@ addHostData (int numHosts, struct hostInfoEnt *hosts)
 	}
       if (j == numLIMhosts)
 	{
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6190, "%s: Host <%s> is not used by the batch system; ignored"), fname, hosts[i].host);	/* catgets 6190 */
+	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6190, "%s: Host <%s> is not used by the batch system; ignored"), __func__, hosts[i].host);	/* catgets 6190 */
 	  continue;
 	}
       if (LIMhosts[j].isServer != TRUE)
 	{
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6191, "%s: Host <%s> is not a server; ignoring"), fname, hosts[i].host);	/* catgets 6191 */
+	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6191, "%s: Host <%s> is not a server; ignoring"), __func__, hosts[i].host);	/* catgets 6191 */
 	  continue;
 	}
 
       if (!Gethostbyname_ (LIMhosts[j].hostName))
 	{
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6242, "%s: Host <%s> is not a valid host; ignoring"), fname, hosts[i].host);	/* catgets 6242 */
+	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6242, "%s: Host <%s> is not a valid host; ignoring"), __func__, hosts[i].host);	/* catgets 6242 */
 	  continue;
 	}
 
@@ -2223,7 +2223,7 @@ addHostData (int numHosts, struct hostInfoEnt *hosts)
       /* Add the host by merging the lsf base
        * host information with the batch configuration.
        */
-      addHost (&LIMhosts[j], &hPtr, fname);
+      addHost (&LIMhosts[j], &hPtr, __func__);
 
     }				/* for (i = 0; i < numHosts; i++) */
 }
@@ -2723,7 +2723,7 @@ createCondNodes (int numConds, char **conds, char *fileName, int flags)
 	{
 	  ls_syslog (LOG_DEBUG,
 		     "%s: Condition <%s> in file <%s> is multiply specified;retaining old definition",
-		     fname, conds[i], fileName);
+		     __func__, conds[i], fileName);
 	  continue;
 	}
       condNode = initConfData ();
@@ -2732,7 +2732,7 @@ createCondNodes (int numConds, char **conds, char *fileName, int flags)
       if ((condNode->rootNode = parseDepCond (conds[i], &auth, &errcode,
 					      NULL, &jFlags, 0)) == NULL)
 	{
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6207, "%s: Bad condition <%s> in file <%s> :%M; ignored"), fname, conds[i], fileName);	/* catgets 6207 */
+	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6207, "%s: Bad condition <%s> in file <%s> :%M; ignored"), __func__, conds[i], fileName);	/* catgets 6207 */
 	  lsb_CheckError = WARNING_ERR;
 	}
       ent = h_addEnt_ (&condDataList, condNode->name, &new);
@@ -2770,18 +2770,18 @@ updCondData (struct lsConf *conf, int fileType)
   int status, i, needReadAgain = FALSE;
 
   if (logclass & LC_TRACE)
-    ls_syslog (LOG_DEBUG2, "%s: Entering this routine...", fname);
+    ls_syslog (LOG_DEBUG2, "%s: Entering this routine...", __func__);
 
   if (conf == NULL)
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6208, "%s: NULL Conf pointer for fileType <%x>"), fname, fileType);	/* catgets 6208 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6208, "%s: NULL Conf pointer for fileType <%x>"), __func__, fileType);	/* catgets 6208 */
       return FALSE;
     }
   if (conf->numConds <= 0 || conf->conds == NULL)
     return FALSE;
 
   if (logclass & LC_TRACE)
-    ls_syslog (LOG_DEBUG2, "%s: numConds <%d>, fileType <%x>", fname,
+    ls_syslog (LOG_DEBUG2, "%s: numConds <%d>, fileType <%x>", __func__,
 	       conf->numConds, fileType);
 
   for (i = 0; i < conf->numConds; i++)
@@ -2814,7 +2814,7 @@ updCondData (struct lsConf *conf, int fileType)
       if (logclass & LC_TRACE)
 	ls_syslog (LOG_DEBUG3,
 		   "%s: Condition name <%s> for %dth condition status <%d> lastStatus <%d>",
-		   fname, conf->conds[i], i + 1, condition->status,
+		   __func__, conf->conds[i], i + 1, condition->status,
 		   condition->lastStatus);
     }
   return (needReadAgain);
@@ -2847,7 +2847,7 @@ getFileConf (char *fileName, int fileType)
   confPtr = ls_getconf (fileName);
   if (confPtr == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "ls_getconf");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "ls_getconf");
       if (lserrno != LSE_NO_FILE)
 	{
 	  if (lsb_CheckMode)
@@ -3013,7 +3013,7 @@ removeFlags (struct hTab *dataList, int flags, int listType)
 	  break;
 	default:
 	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6210, "%s: Bad data list type <%d>"),	/* catgets 6210 */
-		     fname, listType);
+		     __func__, listType);
 	  return;
 	}
       hEntPtr = h_nextEnt_ (&sTabPtr);
@@ -3248,8 +3248,8 @@ updUserList (int mbdInitFlags)
 	int j;
 	FREEUP (uData->reasonTb[0]);
 	FREEUP (uData->reasonTb[1]);
-	uData->reasonTb[0] = my_calloc (numLIMhosts + 2, sizeof (int), fname);
-	uData->reasonTb[1] = my_calloc (numLIMhosts + 2, sizeof (int), fname);
+	uData->reasonTb[0] = my_calloc (numLIMhosts + 2, sizeof (int), __func__);
+	uData->reasonTb[1] = my_calloc (numLIMhosts + 2, sizeof (int), __func__);
 
 	for (j = 0; j < numLIMhosts + 2; j++)
 	  {
@@ -3378,7 +3378,7 @@ addUGDataValues (struct uData *gUData, struct gData *gPtr)
   if (numMembers == 1 && strcmp (gUData->user, groupMembers[0]) == 0)
     {
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6215, "%s: User group <%s> with no members is ignored"),	/* catgets 6215 */
-		 fname, gUData->user);
+		 __func__, gUData->user);
     }
   else
     {
@@ -3434,13 +3434,13 @@ parseQHosts (struct qData *qp, char *hosts)
 
   if (qp == NULL)
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6216, "%s: NULL pointer for queue"), fname);	/* catgets 6216 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6216, "%s: NULL pointer for queue"), __func__);	/* catgets 6216 */
       return -1;
     }
   if (hosts == NULL)
     {
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6217, "%s: NULL pointer in HOSTS for queue <%s>"),	/* catgets 6217 */
-		 fname, qp->queue);
+		 __func__, qp->queue);
       return -1;
     }
 
@@ -3451,10 +3451,10 @@ parseQHosts (struct qData *qp, char *hosts)
   if (numAskedHosts == 0)
     {
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6218, "%s: No host specified in HOSTS for queue <%s>"),	/* catgets 6218 */
-		 fname, qp->queue);
+		 __func__, qp->queue);
       return -1;
     }
-  askedHosts = (char **) my_calloc (numAskedHosts, sizeof (char *), fname);
+  askedHosts = (char **) my_calloc (numAskedHosts, sizeof (char *), __func__);
   sp = hosts;
   numAskedHosts = 0;
   while ((word = getNextWord_ (&sp)) != NULL)
@@ -3472,7 +3472,7 @@ parseQHosts (struct qData *qp, char *hosts)
 	  qp->askedPtr = (struct askedHost *) my_calloc (numReturnHosts,
 							 sizeof (struct
 								 askedHost),
-							 fname);
+							 __func__);
 	  for (i = 0; i < numReturnHosts; i++)
 	    {
 	      qp->askedPtr[i].hData = returnHosts[i].hData;
@@ -3488,10 +3488,10 @@ parseQHosts (struct qData *qp, char *hosts)
     }
   else
     if (parseFirstHostErr
-	(returnErr, fname, hosts, qp, returnHosts, numReturnHosts))
+	(returnErr, __func__, hosts, qp, returnHosts, numReturnHosts))
     {
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6219, "%s: No valid host used by the batch system is specified in HOSTS <%s> for queue <%s>"),	/* catgets 6219 */
-		 fname, hosts, qp->queue);
+		 __func__, hosts, qp->queue);
     }
   for (i = 0; i < numAskedHosts; i++)
     FREEUP (askedHosts[i]);
@@ -3525,7 +3525,7 @@ fillSharedConf (struct sharedConf *sConf)
   sConf->lsinfo = allLsInfo;
   sConf->servers = NULL;
 
-  sConf->clusterName = (char *) my_malloc (sizeof (char *), fname);
+  sConf->clusterName = (char *) my_malloc (sizeof (char *), __func__);
 
 }
 
@@ -3572,7 +3572,7 @@ getMaxCpufactor (void)
 }
 
 static int
-parseFirstHostErr (int returnErr, char *fname, char *hosts, struct qData *qp,
+parseFirstHostErr (int returnErr, char *__func__, char *hosts, struct qData *qp,
 		   struct askedHost *returnHosts, int numReturnHosts)
 {
   int i;
@@ -3585,16 +3585,16 @@ parseFirstHostErr (int returnErr, char *fname, char *hosts, struct qData *qp,
 
       if (returnErr == LSBE_MULTI_FIRST_HOST)
 	ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6242, "%s: Multiple first execution hosts specified <%s> in HOSTS section for queue <%s>. Ignored."),	/*catgets 6242 */
-		   fname, hosts, qp->queue);
+		   __func__, hosts, qp->queue);
       else if (returnErr == LSBE_HG_FIRST_HOST)
 	ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6243, "%s: host group <%s> specified as first execution host in HOSTS section for queue <%s>. Ignored."),	/* catgets 6243 */
-		   fname, hosts, qp->queue);
+		   __func__, hosts, qp->queue);
       else if (returnErr == LSBE_HP_FIRST_HOST)
 	ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6244, "%s: host partition <%s> specified as first execution hosts specified <%s> in HOSTS section for queue <%s>. Ignored."),	/* catgets 6244 */
-		   fname, hosts, qp->queue);
+		   __func__, hosts, qp->queue);
       else if (returnErr == LSBE_OTHERS_FIRST_HOST)
 	ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6245, "%s: \"others\" specified as first execution host specified in HOSTS section for queue <%s>. Ignored."),	/* catgets 6245 */
-		   fname, qp->queue);
+		   __func__, qp->queue);
 
       if (returnHosts)
 	FREEUP (returnHosts);
@@ -3604,7 +3604,7 @@ parseFirstHostErr (int returnErr, char *fname, char *hosts, struct qData *qp,
 	  qp->askedPtr = (struct askedHost *) my_calloc (numReturnHosts,
 							 sizeof (struct
 								 askedHost),
-							 fname);
+							 __func__);
 	  for (i = 0; i < numReturnHosts; i++)
 	    {
 	      qp->askedPtr[i].hData = returnHosts[i].hData;

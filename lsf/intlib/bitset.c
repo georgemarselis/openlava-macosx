@@ -522,8 +522,6 @@ setCat (LS_BITSET_T * set, char *buffer, size_t bufferSize, char *(*catFunc) (vo
 	LS_BITSET_ITERATOR_T iter;
 	void *entry = NULL;
 	size_t curSize = 0;
-	char *fname = malloc( strlen( __func__ ) + 1 );
-	strcpy( fname, __func__ );
 
 	if (!set || !catFunc) {
 		ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5300, "%s: expected a non-NULL set but get a NULL one"),  __func__);
@@ -533,7 +531,7 @@ setCat (LS_BITSET_T * set, char *buffer, size_t bufferSize, char *(*catFunc) (vo
 	assert( !buffer ); // FIXME FIXME FIXME FIXME FIXME not quite sure if buffer is supposed to be NULL'ed or not
 
 	BITSET_ITERATOR_ZERO_OUT (&iter);
-	setIteratorAttach (&iter, set, fname); // ya this call is correct
+	setIteratorAttach (&iter, set, "setCat"); // ya this call is correct
 
 	curSize = 0;
 	for (entry = setIteratorBegin (&iter);	entry != NULL && (setIteratorIsEndOfSet (&iter) == FALSE);	entry = setIteratorGetNextElement (&iter)) {

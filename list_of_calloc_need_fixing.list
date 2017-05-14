@@ -1,0 +1,778 @@
+
+======== ./docs/examples/client.c ========
+
+
+======== ./docs/examples/gethostbyaddr.c ========
+
+
+======== ./docs/examples/gethostbyname.c ========
+
+
+======== ./docs/examples/hdr.c ========
+
+
+======== ./docs/examples/msg.c ========
+
+
+======== ./docs/examples/pimme.c ========
+
+
+======== ./docs/examples/qstring.c ========
+
+
+======== ./docs/examples/readevent.c ========
+
+
+======== ./docs/examples/server.c ========
+
+
+======== ./docs/examples/sobufsiz.c ========
+
+
+======== ./lsf/cmdtools/badmin/badmin.c ========
+
+
+======== ./lsf/cmdtools/bbottom/bbot.c ========
+
+
+======== ./lsf/cmdtools/bcheckpoint/echkpnt.c ========
+
+
+======== ./lsf/cmdtools/bcheckpoint/echkpnt.env.c ========
+
+
+======== ./lsf/cmdtools/bcheckpoint/erestart.c ========
+
+
+======== ./lsf/cmdtools/beligible/beligible.c ========
+
+
+======== ./lsf/cmdtools/bhc/bhc.c ========
+
+189:  if ((hostInfo = (struct hostInfoEnt *) calloc (*numHosts + 1,
+
+======== ./lsf/cmdtools/bhist/bhist.c ========
+
+
+======== ./lsf/cmdtools/bhosts/bhosts.c ========
+
+
+======== ./lsf/cmdtools/bjobs/bjobs.c ========
+
+
+======== ./lsf/cmdtools/bkill/bkill.c ========
+
+
+======== ./lsf/cmdtools/bmigrate/bmigrate.c ========
+
+
+======== ./lsf/cmdtools/bmigrategroup/bmigrategroup.c ========
+
+
+======== ./lsf/cmdtools/bmodify/bmodify.c ========
+
+
+======== ./lsf/cmdtools/bmove/bmove.c ========
+
+
+======== ./lsf/cmdtools/bparams/bparams.c ========
+
+
+======== ./lsf/cmdtools/bpeek/bpeek.c ========
+
+
+======== ./lsf/cmdtools/bqc/bqc.c ========
+
+
+======== ./lsf/cmdtools/bqueues/bqueues.c ========
+
+
+======== ./lsf/cmdtools/brequeue/brequeue.c ========
+
+
+======== ./lsf/cmdtools/brestart/brestart.c ========
+
+
+======== ./lsf/cmdtools/brun/brun.c ========
+
+130:      runJobRequest.hostname = (char **) calloc (runJobRequest.numHosts,
+
+======== ./lsf/cmdtools/bsub/bsub.c ========
+
+
+======== ./lsf/cmdtools/bswitch/bswitch.c ========
+
+
+======== ./lsf/cmdtools/btop/btop.c ========
+
+
+======== ./lsf/cmdtools/busers/busers.c ========
+
+
+======== ./lsf/cmdtools/lib/err.c ========
+
+
+======== ./lsf/cmdtools/lib/hist.c ========
+
+
+======== ./lsf/cmdtools/lib/job.c ========
+
+
+======== ./lsf/cmdtools/lib/jobid.c ========
+
+224:  if ((idxs = (int *) calloc (MAX_JOB_IDS, sizeof (int))) == NULL)
+
+======== ./lsf/cmdtools/lib/load.c ========
+
+
+======== ./lsf/cmdtools/lib/misc.c ========
+
+
+======== ./lsf/cmdtools/lib/prt.c ========
+
+107:      if ((loadStopVal = (loadCharType *) calloc (nIdx,
+
+======== ./lsf/cmdtools/lib/read.event.c ========
+
+352:      des->xf = (struct xFile *) calloc (des->nxf, sizeof (struct xFile));
+1560:		if ((idxList = (int *) calloc (1, sizeof (int))) == NULL)
+
+======== ./lsf/cmdtools/lib/sig.c ========
+
+
+======== ./lsf/cmdtools/lib/sub.c ========
+
+929:      temp = (char *) calloc (1, size);
+967:      temp = (char *) calloc (1, size);
+984:      temp = (char *) calloc (1, size);
+
+======== ./lsf/cmdtools/lsacct/lsacct.c ========
+
+
+======== ./lsf/cmdtools/lsaddhost/lsaddhost.c ========
+
+
+======== ./lsf/cmdtools/lsadm/limcontrol.c ========
+
+
+======== ./lsf/cmdtools/lsadm/lsadmin.c ========
+
+
+======== ./lsf/cmdtools/lsadm/rescontrol.c ========
+
+
+======== ./lsf/cmdtools/lsadm/startup.c ========
+
+
+======== ./lsf/cmdtools/lseligible/lseligible.c ========
+
+
+======== ./lsf/cmdtools/lshosts/lshosts.c ========
+
+
+======== ./lsf/cmdtools/lshosts/lshosts.print_long.c ========
+
+
+======== ./lsf/cmdtools/lshosts/lshosts.print_wide.c ========
+
+
+======== ./lsf/cmdtools/lshosts/lshosts.usage.c ========
+
+
+======== ./lsf/cmdtools/lshosts/lshosts1.c ========
+
+
+======== ./lsf/cmdtools/lsid/lsid.c ========
+
+
+======== ./lsf/cmdtools/lsinfo/lsinfo.c ========
+
+
+======== ./lsf/cmdtools/lsload/lsload.c ========
+
+
+======== ./lsf/cmdtools/lsloadadj/lsloadadj.c ========
+
+
+======== ./lsf/cmdtools/lsmon/lsmon.c ========
+
+
+======== ./lsf/cmdtools/lsplace/lsplace.c ========
+
+
+======== ./lsf/cmdtools/lsrcp/lsrcp.c ========
+
+
+======== ./lsf/cmdtools/lsrmhost/lsrmhost.c ========
+
+
+======== ./lsf/cmdtools/lsrun/lsrun.c ========
+
+
+======== ./lsf/daemons/common/daemons.c ========
+
+
+======== ./lsf/daemons/common/elock.c ========
+
+
+======== ./lsf/daemons/common/mail.c ========
+
+
+======== ./lsf/daemons/common/misc.c ========
+
+
+======== ./lsf/daemons/common/xdr.c ========
+
+598:            statusReq->execHosts = (char **) calloc (statusReq->numExecHosts, sizeof (char *));
+754:            sbdPackage->admins = (char **) calloc (sbdPackage->nAdmins, sizeof (char *));
+
+======== ./lsf/daemons/mbatchd/dep.c ========
+
+
+======== ./lsf/daemons/mbatchd/grp.c ========
+
+
+======== ./lsf/daemons/mbatchd/host.c ========
+
+
+======== ./lsf/daemons/mbatchd/jarray.c ========
+
+
+======== ./lsf/daemons/mbatchd/jgrp.c ========
+
+111:  observer = (TREE_OBSERVER_T *) calloc (1, sizeof (TREE_OBSERVER_T));
+
+======== ./lsf/daemons/mbatchd/job.c ========
+
+1147:	      joblist = (struct jData **) calloc (arraysize,
+9958:  select = (char *) calloc (1, len + 20);
+
+======== ./lsf/daemons/mbatchd/main.c ========
+
+
+======== ./lsf/daemons/mbatchd/policy.c ========
+
+
+======== ./lsf/daemons/mbatchd/proxy.c ========
+
+
+======== ./lsf/daemons/mbatchd/queue.c ========
+
+
+======== ./lsf/daemons/mbatchd/requeue.c ========
+
+
+======== ./lsf/daemons/mbatchd/serv.c ========
+
+187:	  jgrplist = (struct nodeList *) calloc (listSize,
+
+======== ./lsf/daemons/mbatchd/window.c ========
+
+
+======== ./lsf/daemons/mbatchd/comm.c ========
+
+
+======== ./lsf/daemons/mbatchd/init.c ========
+
+
+======== ./lsf/daemons/mbatchd/log.c ========
+
+
+======== ./lsf/daemons/mbatchd/misc.c ========
+
+
+======== ./lsf/daemons/mbatchd/resource.c ========
+
+
+======== ./lsf/daemons/sbatchd/job.c ========
+
+
+======== ./lsf/daemons/sbatchd/main.c ========
+
+
+======== ./lsf/daemons/sbatchd/policy.c ========
+
+
+======== ./lsf/daemons/sbatchd/serv.c ========
+
+75:  jp = (struct jobCard *) calloc (1, sizeof (struct jobCard));
+
+======== ./lsf/daemons/sbatchd/sig.c ========
+
+1023:	      set1 = (int *) calloc (jru->npids, sizeof (int));
+1024:	      set2 = (int *) calloc (jp->mbdRusage.npids, sizeof (int));
+
+======== ./lsf/daemons/sbatchd/comm.c ========
+
+
+======== ./lsf/daemons/sbatchd/file.c ========
+
+
+======== ./lsf/daemons/sbatchd/misc.c ========
+
+
+======== ./lsf/daemons/sbatchd/xdr.c ========
+
+
+======== ./lsf/daemons/eauthd/eauth.c ========
+
+
+======== ./lsf/daemons/limd/cluster.c ========
+
+
+======== ./lsf/daemons/limd/conf.c ========
+
+1573:    hostTable = (char **) calloc (numHosts, sizeof (char *));
+
+======== ./lsf/daemons/limd/control.c ========
+
+
+======== ./lsf/daemons/limd/info.c ========
+
+
+======== ./lsf/daemons/limd/internal.c ========
+
+
+======== ./lsf/daemons/limd/lim.c ========
+
+
+======== ./lsf/daemons/limd/linux.c ========
+
+
+======== ./lsf/daemons/limd/load.c ========
+
+
+======== ./lsf/daemons/limd/main.c ========
+
+
+======== ./lsf/daemons/limd/misc.c ========
+
+
+======== ./lsf/daemons/limd/policy.c ========
+
+
+======== ./lsf/daemons/limd/rload.c ========
+
+
+======== ./lsf/daemons/limd/xdr.c ========
+
+
+======== ./lsf/daemons/niosd/handler.c ========
+
+235:  conn = (struct connInfo *) calloc (maxfds, sizeof (struct connInfo));
+236:  ioTable = (struct nioEvent *) calloc (maxfds, sizeof (struct nioEvent));
+237:  ioTable1 = (struct nioEvent *) calloc (maxfds, sizeof (struct nioEvent));
+
+======== ./lsf/daemons/niosd/nios.c ========
+
+532:  tid_list = (int *) calloc (maxtasks, sizeof (int));
+1374:	  req.format = (char *) calloc (MAXLINELEN, sizeof (char));
+1416:      req.rpidlist = (int *) calloc (maxtasks, sizeof (int));
+1473:      reply.rpidlist = (int *) calloc (maxtasks, sizeof (int));
+1474:      req.rpidlist = (int *) calloc (maxtasks, sizeof (int));
+
+======== ./lsf/daemons/pimd/linux.c ========
+
+
+======== ./lsf/daemons/pimd/pim.c ========
+
+
+======== ./lsf/daemons/resd/getproc.c ========
+
+
+======== ./lsf/daemons/resd/handler.c ========
+
+542:  cli_ptr->hostent.h_aliases = (char **) calloc (num + 1, sizeof (char **));
+588:  if ((cli_ptr->env = (char **) calloc (5, sizeof (char *))) == NULL)
+
+======== ./lsf/daemons/resd/init.c ========
+
+
+======== ./lsf/daemons/resd/misc.c ========
+
+
+======== ./lsf/daemons/resd/pty.c ========
+
+
+======== ./lsf/daemons/resd/res.c ========
+
+
+======== ./lsf/daemons/resd/rf.c ========
+
+
+======== ./lsf/daemons/resd/tasklog.c ========
+
+
+======== ./lsf/include/lib/lim.c ========
+
+
+======== ./lsf/intlib/testbitset.c ========
+
+
+======== ./lsf/intlib/admin.c ========
+
+
+======== ./lsf/intlib/bitset.c ========
+
+
+======== ./lsf/intlib/callex.c ========
+
+391:	source = (char *) calloc (yyleng, sizeof (char));
+496:  space = (void *) calloc (1, size);
+
+======== ./lsf/intlib/cmdtime.c ========
+
+
+======== ./lsf/intlib/conf.c ========
+
+
+======== ./lsf/intlib/daemon.c ========
+
+
+======== ./lsf/intlib/idx.c ========
+
+
+======== ./lsf/intlib/jidx.c ========
+
+
+======== ./lsf/intlib/link.c ========
+
+
+======== ./lsf/intlib/list.c ========
+
+358:	  newListEntry = (LIST_ENTRY_T *) calloc (1, sizeOfEntry);
+
+======== ./lsf/intlib/list2.c ========
+
+
+======== ./lsf/intlib/listset.c ========
+
+
+======== ./lsf/intlib/lsftcl.c ========
+
+
+======== ./lsf/intlib/misc.c ========
+
+257:  start_address = (void *) calloc (number, size);
+
+======== ./lsf/intlib/resourcecmd.c ========
+
+
+======== ./lsf/intlib/resreq.c ========
+
+
+======== ./lsf/intlib/set.c ========
+
+
+======== ./lsf/intlib/userok.c ========
+
+
+======== ./lsf/intlib/window.c ========
+
+
+======== ./lsf/lib/checkpoint/checkpoint.c ========
+
+
+======== ./lsf/lib/liblsbatch/comm.c ========
+
+
+======== ./lsf/lib/liblsbatch/debug.c ========
+
+
+======== ./lsf/lib/liblsbatch/err.c ========
+
+
+======== ./lsf/lib/liblsbatch/groups.c ========
+
+
+======== ./lsf/lib/liblsbatch/hc.c ========
+
+
+======== ./lsf/lib/liblsbatch/hosts.c ========
+
+
+======== ./lsf/lib/liblsbatch/init.c ========
+
+
+======== ./lsf/lib/liblsbatch/jobs.c ========
+
+
+======== ./lsf/lib/liblsbatch/log.c ========
+
+290:	logRec = (struct eventRec *) calloc (1, sizeof (struct eventRec));
+708:				jobNewLog->xf = (struct xFile *)calloc ((unsigned long)jobNewLog->nxf, sizeof (struct xFile));
+823:						jobModLog->askedHosts = (char **)calloc( (unsigned long)jobModLog->numAskedHosts, sizeof (char *));
+888:			jobModLog->xf = (struct xFile *)calloc ((unsigned long)jobModLog->nxf, sizeof (struct xFile));
+983:	jobStartLog->execHosts = (char **)calloc( (unsigned long)jobStartLog->numExHosts, sizeof (char *));
+1151:				migLog->askedHosts = (char **)calloc ((unsigned long)migLog->numAskedHosts, sizeof (char *));
+1413:		loadIndexLog->name = (char **) calloc ((unsigned long)loadIndexLog->nIdx, sizeof (char *));
+
+======== ./lsf/lib/liblsbatch/mig.c ========
+
+
+======== ./lsf/lib/liblsbatch/misc.c ========
+
+342:			newPidInfo = (struct pidInfo *) calloc ((unsigned long)from->npids, sizeof (struct pidInfo));
+363:			newPgid = (int *) calloc ((unsigned long)from->npgids, sizeof (int));
+613:								buf = (char *) calloc (MAXLINELEN, sizeof (char));
+626:						buf = (char *) calloc (buflen, sizeof (char));
+
+======== ./lsf/lib/liblsbatch/modify.c ========
+
+
+======== ./lsf/lib/liblsbatch/move.c ========
+
+
+======== ./lsf/lib/liblsbatch/msg.c ========
+
+
+======== ./lsf/lib/liblsbatch/params.c ========
+
+
+======== ./lsf/lib/liblsbatch/peek.c ========
+
+
+======== ./lsf/lib/liblsbatch/qc.c ========
+
+
+======== ./lsf/lib/liblsbatch/queues.c ========
+
+92:      queueInfoReq.names = (char **) calloc ((unsigned long )*numQueues + 2, sizeof (char *));
+
+======== ./lsf/lib/liblsbatch/reason.c ========
+
+297:      reasonTb = (int *) calloc ((unsigned long)numReasons, sizeof (int));
+
+======== ./lsf/lib/liblsbatch/reconfig.c ========
+
+
+======== ./lsf/lib/liblsbatch/resource.c ========
+
+
+======== ./lsf/lib/liblsbatch/rexecv.c ========
+
+
+======== ./lsf/lib/liblsbatch/sig.c ========
+
+
+======== ./lsf/lib/liblsbatch/signals.c ========
+
+
+======== ./lsf/lib/liblsbatch/spool.c ========
+
+
+======== ./lsf/lib/liblsbatch/sub.c ========
+
+
+======== ./lsf/lib/liblsbatch/switch.c ========
+
+
+======== ./lsf/lib/liblsbatch/users.c ========
+
+86:      userInfoReq.names = (char **) calloc(numReq, sizeof (char *));
+
+======== ./lsf/lib/liblsbatch/xdr.c ========
+
+995:        if (!(qInfo = (struct queueInfoEnt *) calloc (qInfoReply->numQueues, sizeof (struct queueInfoEnt))))
+
+======== ./lsf/lib/liblsbatch/conf.c ========
+
+5959:            (mygrentry->gr_entry.gr_mem) = (char **) calloc (sizeof (char *), (unsigned long)(num + 1) );
+5994:    (grretentry->gr_mem) = (char **) calloc (sizeof (char *), (unsigned long)(total_entries + 1) );
+6104:    unixGrpCopy->gr_mem = (char **)calloc( sizeof (char *), (unsigned long)(count + 1) );
+6161:    inTable = (struct inNames **)calloc ( (unsigned long)cConf->numHosts, sizeof (struct inNames *));
+6193:    outTable = (char **)calloc( (unsigned long)cConf->numHosts, sizeof (char *));
+
+======== ./lsf/lib/liblsf/channel.c ========
+
+
+======== ./lsf/lib/liblsf/comm.c ========
+
+
+======== ./lsf/lib/liblsf/conf.c ========
+
+
+======== ./lsf/lib/liblsf/confmisc.c ========
+
+
+======== ./lsf/lib/liblsf/conn.c ========
+
+
+======== ./lsf/lib/liblsf/control.c ========
+
+
+======== ./lsf/lib/liblsf/cwd.c ========
+
+
+======== ./lsf/lib/liblsf/debug.c ========
+
+
+======== ./lsf/lib/liblsf/dir.c ========
+
+
+======== ./lsf/lib/liblsf/eauth.c ========
+
+
+======== ./lsf/lib/liblsf/eligible.c ========
+
+
+======== ./lsf/lib/liblsf/err.c ========
+
+
+======== ./lsf/lib/liblsf/errno.c ========
+
+
+======== ./lsf/lib/liblsf/esub.c ========
+
+
+======== ./lsf/lib/liblsf/host.c ========
+
+
+======== ./lsf/lib/liblsf/i18n.c ========
+
+
+======== ./lsf/lib/liblsf/id.c ========
+
+
+======== ./lsf/lib/liblsf/info.c ========
+
+70:	temp = (char **) calloc ( (unsigned long) num, sizeof (char *));
+652:		hostInfoReq.preferredHosts = (char **) calloc (1, sizeof (char *));
+
+======== ./lsf/lib/liblsf/init.c ========
+
+
+======== ./lsf/lib/liblsf/initenv.c ========
+
+
+======== ./lsf/lib/liblsf/limits.c ========
+
+
+======== ./lsf/lib/liblsf/load.c ========
+
+130:        loadReq.preferredHosts = (char **) calloc ( loadReq.numPrefs, sizeof (char *));
+198:        loadReq.preferredHosts = (char **) calloc( loadReq.numPrefs, sizeof (char *));
+
+======== ./lsf/lib/liblsf/lsf.c ========
+
+
+======== ./lsf/lib/liblsf/misc.c ========
+
+
+======== ./lsf/lib/liblsf/nioback.c ========
+
+
+======== ./lsf/lib/liblsf/nios.c ========
+
+
+======== ./lsf/lib/liblsf/osal.c ========
+
+
+======== ./lsf/lib/liblsf/pim.c ========
+
+
+======== ./lsf/lib/liblsf/place.c ========
+
+58:    placeReq.preferredHosts = (char **) calloc ( (unsigned long)i, sizeof (char *));
+
+======== ./lsf/lib/liblsf/priority.c ========
+
+
+======== ./lsf/lib/liblsf/queue.c ========
+
+
+======== ./lsf/lib/liblsf/rcp.c ========
+
+
+======== ./lsf/lib/liblsf/rdwr.c ========
+
+
+======== ./lsf/lib/liblsf/res.c ========
+
+
+======== ./lsf/lib/liblsf/resctrl.c ========
+
+
+======== ./lsf/lib/liblsf/reslog.c ========
+
+
+======== ./lsf/lib/liblsf/rex.c ========
+
+
+======== ./lsf/lib/liblsf/rf.c ========
+
+72:		ft = (struct rfTab *) calloc ( (unsigned long)maxOpen, sizeof (struct rfTab));
+
+======== ./lsf/lib/liblsf/rtask.c ========
+
+584:  envp = (char **) calloc (numEnv + 1, sizeof (char *));
+
+======== ./lsf/lib/liblsf/rwait.c ========
+
+
+======== ./lsf/lib/liblsf/sig.c ========
+
+
+======== ./lsf/lib/liblsf/so.c ========
+
+
+======== ./lsf/lib/liblsf/sock.c ========
+
+
+======== ./lsf/lib/liblsf/syntax.c ========
+
+
+======== ./lsf/lib/liblsf/syslog.c ========
+
+
+======== ./lsf/lib/liblsf/table.c ========
+
+
+======== ./lsf/lib/liblsf/term.c ========
+
+
+======== ./lsf/lib/liblsf/tid.c ========
+
+
+======== ./lsf/lib/liblsf/tty.c ========
+
+
+======== ./lsf/lib/liblsf/usleep.c ========
+
+
+======== ./lsf/lib/liblsf/utmp.c ========
+
+
+======== ./lsf/lib/liblsf/wconf.c ========
+
+
+======== ./lsf/lib/liblsf/whathost.c ========
+
+
+======== ./lsf/lib/liblsf/words.c ========
+
+
+======== ./lsf/lib/liblsf/xdr.c ========
+
+
+======== ./lsf/lib/liblsf/xdrlim.c ========
+
+829:        clusterInfoReq->clusters = (char **) calloc ( (u_long) clusterInfoReq->listsize, sizeof (char *));
+1146:        cInfo->loadIndxNames = (char **) calloc ( (u_long)cInfo->numIndx, sizeof (char *));
+1415:        hPtr->busyThreshold = (float *)calloc ((u_long)hPtr->numIndx, sizeof (float));
+1434:        hPtr->resList = (char **)calloc( (u_long)hPtr->nRes, sizeof (char *));
+
+======== ./lsf/lib/liblsf/xdrmisc.c ========
+
+519:        runRusage->pgid = (pid_t *) calloc ( (unsigned long)runRusage->npgids, sizeof (int));
+
+======== ./lsf/lib/liblsf/xdrnio.c ========
+
+
+======== ./lsf/lib/liblsf/xdrres.c ========
+
+64:        if ((cmd->argv = (char **) calloc ( (unsigned long)argc + 1, sizeof (char *))) == NULL)
+146:        if ((envp->env = (char **) calloc ( (unsigned long)(nenv + 1), sizeof (char *))) == NULL) {
+
+======== ./lsf/lib/liblsf/xdrrf.c ========
+

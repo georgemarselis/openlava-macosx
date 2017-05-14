@@ -119,7 +119,7 @@ lsb_peekjob (LS_LONG_INT jobid)
 
       if (logclass & LC_EXEC)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: the jobReply.outfile is <%s>", fname, jobPeekReply.outFile);
+	  ls_syslog (LOG_DEBUG, "%s: the jobReply.outfile is <%s>", __func__, jobPeekReply.outFile);
 	}
       pSpoolDirUnix = getUnixSpoolDir (jobPeekReply.pSpoolDir);
 

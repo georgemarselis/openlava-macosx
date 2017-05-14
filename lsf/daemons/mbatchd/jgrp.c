@@ -88,7 +88,7 @@ treeInit ()
   if (treeObserverList == NULL)
     {
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6400, "%s: failed to create tree observer list: %s"),	/* catgets 6400 */
-		 fname, listStrError (listerrno));
+		 __func__, listStrError (listerrno));
       mbdDie (MASTER_MEM);
     }
 
@@ -111,7 +111,7 @@ treeObserverCreate (char *name, void *entry, TREE_EVENT_OP_T eventOp)
   observer = (TREE_OBSERVER_T *) calloc (1, sizeof (TREE_OBSERVER_T));
   if (observer == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "calloc");
       lsberrno = LIST_ERR_NOMEM;
       goto Fail;
     }
@@ -722,7 +722,7 @@ printTreeStruct (char *fileName)
 
   if ((out_file = fopen (fileName, "w")) == NULL)
     {
-      ls_syslog (LOG_ERR, "%s: can't open file %s: %m", fname, fileName);
+      ls_syslog (LOG_ERR, "%s: can't open file %s: %m", __func__, fileName);
       return;
     }
   fprintf (out_file, "***********************************\n");
@@ -894,7 +894,7 @@ checkJgrpDep (void)
 
   if (logclass & LC_SCHED)
     ls_syslog (LOG_DEBUG1, "%s: (Re-)entering checkJgrpDep at node <%s%s>;",
-	       fname, jgrpNodeParentPath (nPtr), nPtr->name);
+	       __func__, jgrpNodeParentPath (nPtr), nPtr->name);
 
   entryTime = time (0);
 
@@ -981,7 +981,7 @@ Entry:
 	{
 	  if (logclass & LC_SCHED)
 	    ls_syslog (LOG_DEBUG1,
-		       "%s: Stayed too long; leave at node <%s%s>;", fname,
+		       "%s: Stayed too long; leave at node <%s%s>;", __func__,
 		       jgrpNodeParentPath (nPtr), nPtr->name);
 	  goto Exit;
 	}
@@ -1068,7 +1068,7 @@ getIndexOfJStatus (int status)
     default:
 
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6403, "%s: job status <%d> out of bound"),	/* catgets 6403 */
-		 fname, MASK_STATUS (status));
+		 __func__, MASK_STATUS (status));
       return (8);
     }
 }
@@ -1424,7 +1424,7 @@ isSelected (struct jobInfoReq *jobInfoReq, struct jData *jpbw,
 	{
 	  if (!(jpbw->jStatus & JOB_STAT_EXIT))
 	    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6404, "%s: Execution host for job <%s> is null"),	/* catgets 6404 */
-		       fname, lsb_jobid2str (jpbw->jobId));
+		       __func__, lsb_jobid2str (jpbw->jobId));
 	  return (FALSE);
 	}
       gp = getHGrpData (jobInfoReq->host);

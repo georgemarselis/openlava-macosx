@@ -278,7 +278,7 @@ unlinkBufFiles (char *lsbDir, char *jobFile, struct jobCard *jp,
   if (logclass & LC_EXEC)
     {
       sprintf (errMsg, "%s: Enter ... job <%s> lsbDir <%s> jobFile <%s>",
-	       fname, lsb_jobidinstr (jp->jobSpecs.jobId), lsbDir, jobFile);
+	       __func__, lsb_jobidinstr (jp->jobSpecs.jobId), lsbDir, jobFile);
       sbdSyslog (LOG_DEBUG, errMsg);
     }
 
@@ -298,7 +298,7 @@ unlinkBufFiles (char *lsbDir, char *jobFile, struct jobCard *jp,
   errCode = myunlink_ (fileBuf, hp, doMount);
   if (errCode < 0 && errno != ENOENT)
     {
-      sprintf (errMsg, I18N_JOB_FAIL_S_S_M, fname,
+      sprintf (errMsg, I18N_JOB_FAIL_S_S_M, __func__,
 	       lsb_jobid2str (jp->jobSpecs.jobId), "myunlink", fileBuf);
       sbdSyslog (LOG_ERR, errMsg);
       error = TRUE;
@@ -314,7 +314,7 @@ unlinkBufFiles (char *lsbDir, char *jobFile, struct jobCard *jp,
       sprintf (fileBuf, "%s.out", jfPath);
       if (myunlink_ (fileBuf, hp, doMount) < 0 && errno != ENOENT)
 	{
-	  sprintf (errMsg, I18N_JOB_FAIL_S_S_M, fname,
+	  sprintf (errMsg, I18N_JOB_FAIL_S_S_M, __func__,
 		   lsb_jobid2str (jp->jobSpecs.jobId), "myunlink", fileBuf);
 	  sbdSyslog (LOG_ERR, errMsg);
 	  error = TRUE;
@@ -324,7 +324,7 @@ unlinkBufFiles (char *lsbDir, char *jobFile, struct jobCard *jp,
   sprintf (fileBuf, "%s.err", jfPath);
   if (myunlink_ (fileBuf, hp, doMount) < 0 && errno != ENOENT)
     {
-      sprintf (errMsg, I18N_JOB_FAIL_S_S_M, fname,
+      sprintf (errMsg, I18N_JOB_FAIL_S_S_M, __func__,
 	       lsb_jobid2str (jp->jobSpecs.jobId), "myunlink", fileBuf);
       sbdSyslog (LOG_ERR, errMsg);
       error = TRUE;
@@ -333,7 +333,7 @@ unlinkBufFiles (char *lsbDir, char *jobFile, struct jobCard *jp,
   sprintf (fileBuf, "%s.in", jfPath);
   if (myunlink_ (fileBuf, hp, doMount) < 0 && errno != ENOENT)
     {
-      sprintf (errMsg, I18N_JOB_FAIL_S_S_M, fname,
+      sprintf (errMsg, I18N_JOB_FAIL_S_S_M, __func__,
 	       lsb_jobid2str (jp->jobSpecs.jobId), "myunlink", fileBuf);
       sbdSyslog (LOG_ERR, errMsg);
       error = TRUE;
@@ -342,7 +342,7 @@ unlinkBufFiles (char *lsbDir, char *jobFile, struct jobCard *jp,
   sprintf (fileBuf, "%s.tmp", jfPath);
   if (myunlink_ (fileBuf, hp, doMount) < 0 && errno != ENOENT)
     {
-      sprintf (errMsg, I18N_JOB_FAIL_S_S_M, fname,
+      sprintf (errMsg, I18N_JOB_FAIL_S_S_M, __func__,
 	       lsb_jobid2str (jp->jobSpecs.jobId), "myunlink", fileBuf);
       sbdSyslog (LOG_ERR, errMsg);
       error = TRUE;
@@ -351,7 +351,7 @@ unlinkBufFiles (char *lsbDir, char *jobFile, struct jobCard *jp,
   sprintf (fileBuf, "%s.shell", jfPath);
   if (myunlink_ (fileBuf, hp, doMount) < 0 && errno != ENOENT)
     {
-      sprintf (errMsg, I18N_JOB_FAIL_S_S_M, fname,
+      sprintf (errMsg, I18N_JOB_FAIL_S_S_M, __func__,
 	       lsb_jobid2str (jp->jobSpecs.jobId), "myunlink", fileBuf);
       sbdSyslog (LOG_ERR, errMsg);
       error = TRUE;
@@ -451,7 +451,7 @@ initPaths (struct jobCard *jp, struct hostent *fromHp, struct lenData *jf)
 	{
 
 	  sprintf (errMsg, _i18n_msg_get (ls_catd, NL_SETN, 314, "%s: Job <%s> chdir(%s) failed, errno=<%s>. Use <%s> as execCwd"),	/* catgets 314 */
-		   fname,
+		   __func__,
 		   lsb_jobidinstr (jp->jobSpecs.jobId),
 		   jp->jobSpecs.execCwd, strerror (errno), lsTmpDir_);
 	  sbdSyslog (LOG_INFO, errMsg);
@@ -509,7 +509,7 @@ initPaths (struct jobCard *jp, struct hostent *fromHp, struct lenData *jf)
 	    {
 	      sprintf (errMsg,
 		       "%s: job <%s> jp->jobSpecs.jobFile is %s goodspooldir is %d",
-		       fname, lsb_jobidinstr (jp->jobSpecs.jobId),
+		       __func__, lsb_jobidinstr (jp->jobSpecs.jobId),
 		       jp->jobSpecs.jobFile, goodSpoolDir);
 	      sbdSyslog (LOG_DEBUG, errMsg);
 	    }
@@ -583,7 +583,7 @@ initPaths (struct jobCard *jp, struct hostent *fromHp, struct lenData *jf)
 	{
 	  sprintf (errMsg,
 		   "%s: job <%s>, lsbDir is %s, jp->jobSpecs.jobFile is <%s>, goodspooldir %d",
-		   fname, lsb_jobidinstr (jp->jobSpecs.jobId), lsbDir,
+		   __func__, lsb_jobidinstr (jp->jobSpecs.jobId), lsbDir,
 		   jp->jobSpecs.jobFile, goodSpoolDir);
 	  sbdSyslog (LOG_DEBUG, errMsg);
 	}
@@ -591,7 +591,7 @@ initPaths (struct jobCard *jp, struct hostent *fromHp, struct lenData *jf)
 	{
 	  sprintf (errMsg,
 		   "%s: job <%s>, spooldir is %s, lsbDir is %s, jp->jobSpecs.jobFile is %s, goodSpoolDir %d",
-		   fname, lsb_jobidinstr (jp->jobSpecs.jobId),
+		   __func__, lsb_jobidinstr (jp->jobSpecs.jobId),
 		   jp->jobSpecs.jobSpoolDir, lsbDir, jp->jobSpecs.jobFile,
 		   goodSpoolDir);
 	  sbdSyslog (LOG_DEBUG, errMsg);
@@ -819,7 +819,7 @@ lsbatchDir (char *lsbDir, struct jobCard *jp, struct hostent *fromHp,
     {
       sprintf (errMsg,
 	       "%s: Enter this function... job <%s> spool dir <%s> is %d",
-	       fname, lsb_jobidinstr (jp->jobSpecs.jobId),
+	       __func__, lsb_jobidinstr (jp->jobSpecs.jobId),
 	       jp->jobSpecs.jobSpoolDir, goodSpoolDir);
       sbdSyslog (LOG_DEBUG, errMsg);
     }
@@ -890,7 +890,7 @@ lsbatchDir (char *lsbDir, struct jobCard *jp, struct hostent *fromHp,
 
   if (mkdir (lsbDir, 0700) == -1 && errno != EEXIST)
     {
-      sprintf (errMsg, I18N_JOB_FAIL_S_M, fname,
+      sprintf (errMsg, I18N_JOB_FAIL_S_M, __func__,
 	       lsb_jobid2str (jp->jobSpecs.jobId), "mkdir");
       sbdSyslog (LOG_ERR, errMsg);
 
@@ -935,7 +935,7 @@ lsbDirOk (char *lsbDir, struct jobCard *jp, struct hostent *fromHp,
 
   if ((lsbDir != NULL) && (chosenPath != NULL) && (logclass & LC_EXEC))
     {
-      sprintf (errMsg, "Enter %s: lsbDir is %s, chosenPath is %s", fname,
+      sprintf (errMsg, "Enter %s: lsbDir is %s, chosenPath is %s", __func__,
 	       lsbDir, chosenPath);
       sbdSyslog (LOG_DEBUG, errMsg);
     }
@@ -1024,7 +1024,7 @@ lsbDirOk (char *lsbDir, struct jobCard *jp, struct hostent *fromHp,
 
       if (errno != ENOENT)
 	{
-	  sprintf (errMsg, I18N_JOB_FAIL_S_M, fname,
+	  sprintf (errMsg, I18N_JOB_FAIL_S_M, __func__,
 		   lsb_jobid2str (jp->jobSpecs.jobId), "stat");
 	  sbdSyslog (LOG_ERR, errMsg);
 	}
@@ -1073,7 +1073,7 @@ createChkpntJobFile (char *lsbDir, struct jobCard *jp, struct lenData *jf,
 	      if (cwdJob (jp, cwd, fromHp) == -1)
 		{
 		  ls_syslog (LOG_ERR, "%s: cannot find execCwd for job <%s>",
-			     fname, lsb_jobid2str (jp->jobSpecs.jobId));
+			     __func__, lsb_jobid2str (jp->jobSpecs.jobId));
 		  return (-1);
 		}
 	      strcpy (jp->jobSpecs.execCwd, cwd);
@@ -1119,7 +1119,7 @@ createChkpntJobFile (char *lsbDir, struct jobCard *jp, struct lenData *jf,
 	      || (mymkdir_ (chkpntDir, 0700, fromHp) < 0 && errno != EEXIST))
 	    {
 	      sprintf (errMsg, I18N_FUNC_S_FAIL_EMSG_S,
-		       fname,
+		       __func__,
 		       "mymkdir_", jp->jobSpecs.chkpntDir, strerror (errno));
 	      *p = '/';
 	      sbdSyslog (LOG_ERR, errMsg);
@@ -1134,7 +1134,7 @@ createChkpntJobFile (char *lsbDir, struct jobCard *jp, struct lenData *jf,
 	      || (mkdir (chkpntDir, 0700) < 0 && errno != EEXIST))
 	    {
 	      sprintf (errMsg, I18N_FUNC_S_FAIL_EMSG_S,
-		       fname,
+		       __func__,
 		       "mkdir", jp->jobSpecs.chkpntDir, strerror (errno));
 	      sbdSyslog (LOG_ERR, errMsg);
 	      umask (mode);
@@ -1180,7 +1180,7 @@ createChkpntJobFile (char *lsbDir, struct jobCard *jp, struct lenData *jf,
 		  && (errno == ENOENT))
 		{
 		  sprintf (errMsg, I18N_FUNC_S_FAIL_EMSG_S,
-			   fname, "opendir", chkpntDir, strerror (errno));
+			   __func__, "opendir", chkpntDir, strerror (errno));
 		  sbdSyslog (LOG_ERR, errMsg);
 		  return (-1);
 		}
@@ -1293,7 +1293,7 @@ stdoutDirectSymLink (char *jobFile, char *ext, struct jobSpecs *jobSpecsPtr)
   if ((symlink (fullpath, fileLink) == -1) && (errno != EEXIST))
     {
       sprintf (errMsg, _i18n_msg_get (ls_catd, NL_SETN, 328, "%s:Job <%s> Unable to creat a symbolic link from <%s> to <%s>: %s"),	/* catgets 328 */
-	       fname,
+	       __func__,
 	       lsb_jobidinstr (jobSpecsPtr->jobId), fileLink,
 	       fullpath, strerror (errno));
       sbdSyslog (LOG_ERR, errMsg);
@@ -1319,7 +1319,7 @@ determineFilebufStdoutDirect (char *filebuf,
 
   if (logclass & (LC_TRACE | LC_EXEC))
     {
-      ls_syslog (LOG_DEBUG, "%s: Entering...", fname);
+      ls_syslog (LOG_DEBUG, "%s: Entering...", __func__);
     }
 
   if (flag == STDOUT_DIRECT)
@@ -1399,14 +1399,14 @@ openStdFiles (char *lsbDir, char *chkpntDir, struct jobCard *jobCardPtr,
 
   if (logclass & LC_EXEC)
     {
-      sprintf (errMsg, "%s, Entering openStdFiles()", fname);
+      sprintf (errMsg, "%s, Entering openStdFiles()", __func__);
       sbdSyslog (LOG_DEBUG, errMsg);
-      sprintf (errMsg, "%s, the lsbDir is <%s>", fname, lsbDir);
+      sprintf (errMsg, "%s, the lsbDir is <%s>", __func__, lsbDir);
       sbdSyslog (LOG_DEBUG, errMsg);
-      sprintf (errMsg, "%s, the chkpntDir is <%s>", fname,
+      sprintf (errMsg, "%s, the chkpntDir is <%s>", __func__,
 	       chkpntDir ? chkpntDir : "NULL");
       sbdSyslog (LOG_DEBUG, errMsg);
-      sprintf (errMsg, "%s, jobFile is <%s>", fname, jobSpecsPtr->jobFile);
+      sprintf (errMsg, "%s, jobFile is <%s>", __func__, jobSpecsPtr->jobFile);
       sbdSyslog (LOG_DEBUG, errMsg);
     }
   if (chkpntDir == NULL)
@@ -1422,7 +1422,7 @@ openStdFiles (char *lsbDir, char *chkpntDir, struct jobCard *jobCardPtr,
       if (logclass & LC_EXEC)
 	{
 	  sprintf (errMsg, "%s, jobFile is <%s> not chkpntDir",
-		   fname, jobFile);
+		   __func__, jobFile);
 	  sbdSyslog (LOG_DEBUG, errMsg);
 	}
     }
@@ -1439,7 +1439,7 @@ openStdFiles (char *lsbDir, char *chkpntDir, struct jobCard *jobCardPtr,
 	}
       if (logclass & LC_EXEC)
 	{
-	  sprintf (errMsg, "%s, jobFileLink is <%s>", fname, jobFileLink);
+	  sprintf (errMsg, "%s, jobFileLink is <%s>", __func__, jobFileLink);
 	  sbdSyslog (LOG_DEBUG, errMsg);
 	}
     }
@@ -1448,12 +1448,12 @@ openStdFiles (char *lsbDir, char *chkpntDir, struct jobCard *jobCardPtr,
     {
       if ((lsbDir != NULL) && (strlen (lsbDir) > 0))
 	{
-	  sprintf (errMsg, "%s: Job File: %s/%s", fname, lsbDir,
+	  sprintf (errMsg, "%s: Job File: %s/%s", __func__, lsbDir,
 		   jobSpecsPtr->jobFile);
 	}
       else
 	{
-	  sprintf (errMsg, "%s: Job File: %s", fname, jobSpecsPtr->jobFile);
+	  sprintf (errMsg, "%s: Job File: %s", __func__, jobSpecsPtr->jobFile);
 	}
       sbdSyslog (LOG_DEBUG, errMsg);
     }
@@ -1638,7 +1638,7 @@ OpenStdin:
 
       if (errno != ENOENT)
 	{
-	  sprintf (xMsg, I18N_FUNC_S_FAIL_M, fname, "myopen_", filebuf);
+	  sprintf (xMsg, I18N_FUNC_S_FAIL_M, __func__, "myopen_", filebuf);
 	}
       else
 	{
@@ -1698,7 +1698,7 @@ OpenStdin:
       if (dup2 (i, 0) == -1)
 	{
 	  sprintf (errMsg, _i18n_msg_get (ls_catd, NL_SETN, 327, "%s: Job <%s> dup2(%d,0) stdin <%s>: %s"),	/* catgets 327 */
-		   fname,
+		   __func__,
 		   lsb_jobidinstr (jobSpecsPtr->jobId), i,
 		   jobSpecsPtr->inFile, strerror (errno));
 	  sbdSyslog (LOG_ERR, errMsg);
@@ -1737,7 +1737,7 @@ OpenStdin:
     {
       sprintf (errMsg,
 	       "%s: job <%s> filebuf/stdout file <%s> lsbStdoutDirect=%d",
-	       fname, lsb_jobidinstr (jobSpecsPtr->jobId), filebuf,
+	       __func__, lsb_jobidinstr (jobSpecsPtr->jobId), filebuf,
 	       lsbStdoutDirect);
       sbdSyslog (LOG_DEBUG, errMsg);
     }
@@ -1759,12 +1759,12 @@ OpenStdin:
 
       sprintf (errMsg,
 	       "%s: job <%s> could not open <%s> for writing stdout, %s",
-	       fname, lsb_jobidinstr (jobSpecsPtr->jobId),
+	       __func__, lsb_jobidinstr (jobSpecsPtr->jobId),
 	       filebuf, strerror (errno));
       sbdSyslog (LOG_DEBUG, errMsg);
       sprintf (filebuf, "%s.out", jobFile);
       sprintf (errMsg, "%s: job <%s> filebuf/stdout file <%s>",
-	       fname, lsb_jobidinstr (jobSpecsPtr->jobId), filebuf);
+	       __func__, lsb_jobidinstr (jobSpecsPtr->jobId), filebuf);
       sbdSyslog (LOG_DEBUG, errMsg);
 
       i = myopen_ (filebuf, O_WRONLY | O_CREAT | O_APPEND, 0600, hp);
@@ -1790,7 +1790,7 @@ OpenStdin:
       if ((symlink (filebuf, filebufLink) == -1) && (errno != EEXIST))
 	{
 	  sprintf (errMsg, _i18n_msg_get (ls_catd, NL_SETN, 328, "%s:Job <%s> Unable to creat a symbolic link from <%s> to <%s>: %s"),	/* catgets 328 */
-		   fname,
+		   __func__,
 		   lsb_jobidinstr (jobSpecsPtr->jobId), filebufLink,
 		   filebuf, strerror (errno));
 	  sbdSyslog (LOG_ERR, errMsg);
@@ -1801,7 +1801,7 @@ OpenStdin:
 
   if (i < 0)
     {
-      sprintf (errMsg, I18N_JOB_FAIL_S_M, fname,
+      sprintf (errMsg, I18N_JOB_FAIL_S_M, __func__,
 	       lsb_jobid2str (jobSpecsPtr->jobId), "open");
       sbdSyslog (LOG_ERR, errMsg);
       return (-1);
@@ -1809,7 +1809,7 @@ OpenStdin:
   if (dup2 (i, 1) == -1)
     {
       sprintf (errMsg, _i18n_msg_get (ls_catd, NL_SETN, 330, "%s: Job <%s> dup(%d,1) stdout <%s> failed: %s"),	/* catgets 330 */
-	       fname,
+	       __func__,
 	       lsb_jobidinstr (jobSpecsPtr->jobId), i, filebuf,
 	       strerror (errno));
       sbdSyslog (LOG_ERR, errMsg);
@@ -1827,7 +1827,7 @@ OpenStdin:
       if (dup2 (1, 2) == -1)
 	{
 	  sprintf (errMsg, _i18n_msg_get (ls_catd, NL_SETN, 331, "%s: Job <%s> dup(1,2) stderr failed: %s"),	/* catgets 331 */
-		   fname,
+		   __func__,
 		   lsb_jobidinstr (jobSpecsPtr->jobId), strerror (errno));
 	  sbdSyslog (LOG_ERR, errMsg);
 	  return (-1);
@@ -1863,7 +1863,7 @@ OpenStdin:
 	{
 	  sprintf (errMsg,
 		   "%s: job <%s> filebuf/stderr file <%s> lsbStdoutDirect=%d",
-		   fname, lsb_jobidinstr (jobSpecsPtr->jobId), filebuf,
+		   __func__, lsb_jobidinstr (jobSpecsPtr->jobId), filebuf,
 		   lsbStdoutDirect);
 	  sbdSyslog (LOG_DEBUG, errMsg);
 	}
@@ -1884,12 +1884,12 @@ OpenStdin:
 
 	  sprintf (errMsg,
 		   "%s: job <%s> could not open <%s> for writing stderr, %s",
-		   fname, lsb_jobidinstr (jobSpecsPtr->jobId),
+		   __func__, lsb_jobidinstr (jobSpecsPtr->jobId),
 		   filebuf, strerror (errno));
 	  sbdSyslog (LOG_DEBUG, errMsg);
 	  sprintf (filebuf, "%s.err", jobFile);
 	  sprintf (errMsg, "%s: job <%s> filebuf/stderr file <%s>",
-		   fname, lsb_jobidinstr (jobSpecsPtr->jobId), filebuf);
+		   __func__, lsb_jobidinstr (jobSpecsPtr->jobId), filebuf);
 	  sbdSyslog (LOG_DEBUG, errMsg);
 
 	  i = myopen_ (filebuf, O_WRONLY | O_CREAT | O_APPEND, 0600, hp);
@@ -1914,7 +1914,7 @@ OpenStdin:
 	  if ((symlink (filebuf, filebufLink) == -1) && (errno != EEXIST))
 	    {
 	      sprintf (errMsg, _i18n_msg_get (ls_catd, NL_SETN, 332, "%s:Job <%s> Unable to creat a symbolic link from <%s> to <%s>: %s"),	/* catgets 332 */
-		       fname,
+		       __func__,
 		       lsb_jobidinstr (jobSpecsPtr->jobId),
 		       filebufLink, filebuf, strerror (errno));
 	      sbdSyslog (LOG_ERR, errMsg);
@@ -1926,7 +1926,7 @@ OpenStdin:
       if (i < 0)
 	{
 	  sprintf (errMsg, _i18n_msg_get (ls_catd, NL_SETN, 333, "%s: Job <%s> open(%s) stderr failed: %s"),	/* catgets 333 */
-		   fname,
+		   __func__,
 		   lsb_jobidinstr (jobSpecsPtr->jobId), filebuf,
 		   strerror (errno));
 	  sbdSyslog (LOG_ERR, errMsg);
@@ -1936,7 +1936,7 @@ OpenStdin:
       if (dup2 (i, 2) == -1)
 	{
 	  sprintf (errMsg, _i18n_msg_get (ls_catd, NL_SETN, 334, "%s: Job <%s> dup(%d,2) stderr <%s> failed: %s"),	/* catgets 334 */
-		   fname,
+		   __func__,
 		   lsb_jobidinstr (jobSpecsPtr->jobId),
 		   i, filebuf, strerror (errno));
 	  sbdSyslog (LOG_ERR, errMsg);
@@ -1961,7 +1961,7 @@ appendJobFile (struct jobCard *jobCard, char *header, struct hostent *hp,
 
   if ((jobFile_fp = myfopen_ (jobCard->jobSpecs.jobFile, "a", hp)) == NULL)
     {
-      sprintf (errMsg, I18N_FUNC_S_FAIL_M, fname, "myopen_",
+      sprintf (errMsg, I18N_FUNC_S_FAIL_M, __func__, "myopen_",
 	       jobCard->jobSpecs.jobFile);
       return (-1);
     }
@@ -1969,7 +1969,7 @@ appendJobFile (struct jobCard *jobCard, char *header, struct hostent *hp,
   if ((fprintf (jobFile_fp, "# JOB_PID:\n") < 0) ||
       (fprintf (jobFile_fp, "%d\n", jobCard->jobSpecs.jobPid) < 0))
     {
-      sprintf (errMsg, I18N_FUNC_S_S_FAIL_M, fname, "fprintf",
+      sprintf (errMsg, I18N_FUNC_S_S_FAIL_M, __func__, "fprintf",
 	       jobCard->jobSpecs.jobFile, "JOB_PID");
       FCLOSEUP (&jobFile_fp);
       return (-1);
@@ -1978,7 +1978,7 @@ appendJobFile (struct jobCard *jobCard, char *header, struct hostent *hp,
   if ((fprintf (jobFile_fp, "# JOB_PGID:\n") < 0) ||
       (fprintf (jobFile_fp, "%d\n", jobCard->jobSpecs.jobPGid) < 0))
     {
-      sprintf (errMsg, I18N_FUNC_S_S_FAIL_M, fname, "fprintf",
+      sprintf (errMsg, I18N_FUNC_S_S_FAIL_M, __func__, "fprintf",
 	       jobCard->jobSpecs.jobFile, "JOB_PGID");
       FCLOSEUP (&jobFile_fp);
       return (-1);
@@ -1987,7 +1987,7 @@ appendJobFile (struct jobCard *jobCard, char *header, struct hostent *hp,
   if ((fprintf (jobFile_fp, header) < 0) ||
       (fprintf (jobFile_fp, "\n%d\n", jobCard->w_status) < 0))
     {
-      sprintf (errMsg, I18N_FUNC_S_S_FAIL_M, fname, "fprintf",
+      sprintf (errMsg, I18N_FUNC_S_S_FAIL_M, __func__, "fprintf",
 	       jobCard->jobSpecs.jobFile, "STATUS");
       FCLOSEUP (&jobFile_fp);
       return (-1);
@@ -1995,7 +1995,7 @@ appendJobFile (struct jobCard *jobCard, char *header, struct hostent *hp,
 
   if (FCLOSEUP (&jobFile_fp) < 0)
     {
-      sprintf (errMsg, I18N_FUNC_S_FAIL_M, fname, "fclose",
+      sprintf (errMsg, I18N_FUNC_S_FAIL_M, __func__, "fclose",
 	       jobCard->jobSpecs.jobFile);
       return (-1);
     }
@@ -2015,13 +2015,13 @@ writePreJobFail (struct jobCard *jp)
 	   lsb_jobidinstr (jp->jobSpecs.jobId));
   if ((fp = fopen (fn, "w")) == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_S_M, fname,
+      ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_S_M, __func__,
 		 lsb_jobid2str (jp->jobSpecs.jobId), "fopen", fn);
     }
   else
     {
       if (FCLOSEUP (&fp) < 0)
-	ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_S_M, fname,
+	ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_S_M, __func__,
 		   lsb_jobid2str (jp->jobSpecs.jobId), "fclose", fn);
     }
 }
@@ -2100,7 +2100,7 @@ createJobFile (char *lsbDir, char *chkpntDir, struct jobCard *jp,
     {
       sprintf (errMsg,
 	       "%s: Job <%s> write jobfile %s len=%d cc=%d failed: %s",
-	       fname, lsb_jobidinstr (jobSpecsPtr->jobId),
+	       __func__, lsb_jobidinstr (jobSpecsPtr->jobId),
 	       jobFile, len, cc, strerror (errno));
       sbdSyslog (LOG_DEBUG, errMsg);
       close (fd);
@@ -2179,7 +2179,7 @@ jobFileExitStatus (struct jobCard *jobCard)
 	       lsb_jobid2str (jobCard->jobSpecs.jobId));
   if ((pid = fork ()) < 0)
     {
-      ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_M, fname,
+      ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_M, __func__,
 		 lsb_jobid2str (jobCard->jobSpecs.jobId), "fork");
       jobCard->exitPid = 0;
       return;
@@ -2197,7 +2197,7 @@ jobFileExitStatus (struct jobCard *jobCard)
 
   if (postJobSetup (jobCard) < 0)
     {
-      ls_syslog (LOG_ERR, I18N_JOB_FAIL_S, fname,
+      ls_syslog (LOG_ERR, I18N_JOB_FAIL_S, __func__,
 		 lsb_jobid2str (jobCard->jobSpecs.jobId), "postJobSetup");
       exit (jobCard->w_status);
     }
@@ -2349,7 +2349,7 @@ localJobRestartFiles (char *lsbDir, char *restartDir, struct jobCard *jp,
 
 return_error:
   sprintf (errMsg, _i18n_msg_get (ls_catd, NL_SETN, 321, "%s: Job <%s> Unable to creat a symbolic link from <%s> to <%s>: %s"),	/* catgets 321 */
-	   fname, lsb_jobidinstr (jspecs->jobId), t, s, strerror (errno));
+	   __func__, lsb_jobidinstr (jspecs->jobId), t, s, strerror (errno));
   sbdSyslog (LOG_ERR, errMsg);
   return (-1);
 

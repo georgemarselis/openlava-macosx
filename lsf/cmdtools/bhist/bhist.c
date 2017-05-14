@@ -716,7 +716,7 @@ getEventStatus (struct eventRecord *event)
 succeed_rtn:
   if (logclass & LC_TRACE)
     ls_syslog (LOG_DEBUG2, "%s: Job status is %s/%x",
-	       fname, status, event->jStatus);
+	       __func__, status, event->jStatus);
   return status;
 }
 
@@ -923,10 +923,10 @@ displayhist (struct bhistReq *bhistReq)
 
 	  if (logclass & LC_TRACE)
 	    ls_syslog (LOG_DEBUG2, "%s: (1)event.kind=%x",
-		       fname, event->kind);
+		       __func__, event->kind);
 	  if (nextevent && (logclass & LC_TRACE))
 	    ls_syslog (LOG_DEBUG2, "%s: (1)nextevent.kind=%x",
-		       fname, nextevent->kind);
+		       __func__, nextevent->kind);
 	  while ((nextevent != NULL) &&
 		 ((nextevent->kind == EVENT_JOB_SWITCH)))
 	    {
@@ -2314,7 +2314,7 @@ printEvent (struct bhistReq *bhistReq, struct jobRecord *jobRecord,
     return;
 
   if (logclass & LC_TRACE)
-    ls_syslog (LOG_DEBUG2, "%s: (2)event.kind=%x", fname, event->kind);
+    ls_syslog (LOG_DEBUG2, "%s: (2)event.kind=%x", __func__, event->kind);
 
   if ((bhistReq->options & OPT_CHRONICLE))
     {
@@ -2736,7 +2736,7 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
   foundJob = TRUE;
 
   if (logclass & LC_TRACE)
-    ls_syslog (LOG_DEBUG2, "%s: log.type=%x", fname, log->type);
+    ls_syslog (LOG_DEBUG2, "%s: log.type=%x", __func__, log->type);
 
   strcpy (timeStampStr,
 	  _i18n_ctime (ls_catd, CTIME_FORMAT_a_b_d_T,
@@ -2751,7 +2751,7 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
       job = read_newjob (log);
       if (job == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "read_newjob");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "read_newjob");
 	  break;
 	}
       submitPtr = &job->submit;
@@ -2980,7 +2980,7 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
       job = read_newjob (log);
       if (job == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "read_newjob");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "read_newjob");
 	  break;
 	}
       prtParameters (job, req, timeStampStr);
@@ -3180,7 +3180,7 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
       }
       break;
     default:
-      ls_syslog (LOG_ERR, "%s: %s, log.type=%x", fname, I18N (3356, "unknown type"),	/* catgets 3356 */
+      ls_syslog (LOG_ERR, "%s: %s, log.type=%x", __func__, I18N (3356, "unknown type"),	/* catgets 3356 */
 		 log->type);
       break;
     }

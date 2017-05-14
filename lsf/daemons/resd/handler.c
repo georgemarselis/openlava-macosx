@@ -185,7 +185,7 @@ doacceptconn (void)
   if (logclass & LC_TRACE)
 	{
 	  ls_syslog (LOG_DEBUG, "\
-%s: Accepting connections on the main socket", fname);
+%s: Accepting connections on the main socket", __func__);
 	}
 
   crossPlatform = -1;
@@ -194,13 +194,13 @@ doacceptconn (void)
 	{
 
 	  ls_syslog (LOG_INFO, "\
-%s: High water mark reached, client_cnt (%d),child_cnt(%d)", fname, client_cnt, child_cnt);
+%s: High water mark reached, client_cnt (%d),child_cnt(%d)", __func__, client_cnt, child_cnt);
 
 
 	  if (socketpair (AF_UNIX, SOCK_STREAM, 0, pfd) < 0)
 	{
 
-	  ls_syslog (LOG_ERR, "%s: socketoair9) failed %m", fname);
+	  ls_syslog (LOG_ERR, "%s: socketoair9) failed %m", __func__);
 	  fromlen = sizeof (struct sockaddr_in);
 	  s = accept (accept_sock, (struct sockaddr *) &from, &fromlen);
 	  if (s >= 0)
@@ -215,13 +215,13 @@ doacceptconn (void)
 	  pid = fork ();
 	  if (pid < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "fork");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "fork");
 	  fromlen = sizeof (struct sockaddr_in);
 	  s = accept (accept_sock, (struct sockaddr *) &from, &fromlen);
 
 	  if (s < 0)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "accept");
+		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "accept");
 		  return;
 		}
 	  else
@@ -265,7 +265,7 @@ doacceptconn (void)
 
 	  if (initLimSock_ () < 0)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "initLimSock_");
+		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "initLimSock_");
 		}
 	  return;
 	}
@@ -291,14 +291,14 @@ doacceptconn (void)
   if ((s = accept (accept_sock, (struct sockaddr *) &from, &fromlen)) < 0)
 	{
 	  if (errno != EWOULDBLOCK)
-	ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "accept");
+	ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "accept");
 	  return;
 	}
 
 
 
   if (io_nonblock_ (s) < 0)
-	ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "io_nonblock_");
+	ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "io_nonblock_");
 
   if (recvConnect (s, &connReq, nb_read_fix, &auth) == -1)
 	{
@@ -313,11 +313,11 @@ doacceptconn (void)
 	  else
 	crossPlatform = TRUE;
 	}
-  ls_syslog (LOG_DEBUG, "%s: auth.options=%d, crossPlatform=%d: %m", fname,
+  ls_syslog (LOG_DEBUG, "%s: auth.options=%d, crossPlatform=%d: %m", __func__,
 		 auth.options, crossPlatform);
 
   if (io_block_ (s) < 0)
-	ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "io_block_");
+	ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "io_block_");
 
   setsockopt (s, SOL_SOCKET, SO_LINGER, (char *) &linstr, sizeof (linstr));
 
@@ -325,7 +325,7 @@ doacceptconn (void)
 	{
 	  char tempBuffer[1024];
 	  sprintf (tempBuffer, "%s@%s", auth.lsfUserName, sockAdd2Str_ (&from));
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "getpwnam", tempBuffer);
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "getpwnam", tempBuffer);
 	  sendReturnCode (s, RESE_BADUSER);
 	  goto doAcceptFail;
 	}
@@ -350,7 +350,7 @@ doacceptconn (void)
 
   if (getsockname (s, (struct sockaddr *) &local, &localLen) == -1)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "getsockname");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "getsockname");
 	  sendReturnCode (s, RESE_REQUEST);
 	  goto doAcceptFail;
 	}
@@ -388,13 +388,13 @@ doacceptconn (void)
   if (hostOk (hostp->h_name, RECV_FROM_CLUSTERS) < 0)
 	{
 	  ls_syslog (LOG_INFO, "\
-%s: Received request from non-LSF host %s", fname, hostp->h_name);
+%s: Received request from non-LSF host %s", __func__, hostp->h_name);
 	  sendReturnCode (s, RESE_NOLSF_HOST);
 	  goto doAcceptFail;
 	}
 
   ls_syslog (LOG_DEBUG, "\
-%s: received connecting request from host %s", fname, hostp->h_name);
+%s: received connecting request from host %s", __func__, hostp->h_name);
 
 
   memcpy ((char *) &from.sin_addr, (char *) hostp->h_addr,
@@ -431,7 +431,7 @@ doacceptconn (void)
   if (!userok (s, &from, hostp->h_name, &local, &auth, debug))
 	{
 	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5113, "%s: Permission denied %s(%d)@%s"),    /* catgets 5113 */
-		 fname, auth.lsfUserName, auth.uid, hostp->h_name);
+		 __func__, auth.lsfUserName, auth.uid, hostp->h_name);
 	  sendReturnCode (s, RESE_DENIED);
 	  goto doAcceptFail;
 	}
@@ -450,7 +450,7 @@ doacceptconn (void)
 
   closesocket (s);
   if (cc < 0)
-	ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "fork");
+	ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "fork");
 
   return;
 
@@ -481,7 +481,7 @@ childAcceptConn (int s, struct passwd *pw, struct lsfAuth *auth,
   if (logclass & LC_TRACE)
 	{
 	  ls_syslog (LOG_DEBUG, "\
-%s: Application Res begin processing", fname);
+%s: Application Res begin processing", __func__);
 	}
 
   signal (SIGALRM, SIG_IGN);
@@ -497,7 +497,7 @@ childAcceptConn (int s, struct passwd *pw, struct lsfAuth *auth,
   cli_ptr = malloc (sizeof (struct client));
   if (cli_ptr == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
 	  sendReturnCode (s, RESE_NOMEM);
 	  goto doAcceptFail;
 	}
@@ -507,7 +507,7 @@ childAcceptConn (int s, struct passwd *pw, struct lsfAuth *auth,
 
   if ((cli_ptr->homedir = putstr_ (pw->pw_dir ? pw->pw_dir : "/tmp")) == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, fname, "putstr_",
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, __func__, "putstr_",
 		 pw->pw_dir ? pw->pw_dir : "/tmp");
 	  sendReturnCode (s, RESE_NOMEM);
 	  free (cli_ptr);
@@ -516,7 +516,7 @@ childAcceptConn (int s, struct passwd *pw, struct lsfAuth *auth,
 
   if ((cli_ptr->username = putstr_ (auth->lsfUserName)) == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, fname, "putstr_",
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, __func__, "putstr_",
 		 auth->lsfUserName);
 	  sendReturnCode (s, RESE_NOMEM);
 	  free (cli_ptr->homedir);
@@ -528,7 +528,7 @@ childAcceptConn (int s, struct passwd *pw, struct lsfAuth *auth,
 
   if ((cli_ptr->hostent.h_name = putstr_ (hostp->h_name)) == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, fname, "putstr_", hostp->h_name);
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, __func__, "putstr_", hostp->h_name);
 	  sendReturnCode (s, RESE_NOMEM);
 	  free (cli_ptr->homedir);
 	  free (cli_ptr->username);
@@ -542,7 +542,7 @@ childAcceptConn (int s, struct passwd *pw, struct lsfAuth *auth,
   cli_ptr->hostent.h_aliases = (char **) calloc (num + 1, sizeof (char **));
   if (cli_ptr->hostent.h_aliases == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "calloc");
 	  sendReturnCode (s, RESE_NOMEM);
 	  free (cli_ptr->username);
 	  free (cli_ptr->homedir);
@@ -555,7 +555,7 @@ childAcceptConn (int s, struct passwd *pw, struct lsfAuth *auth,
 	if ((cli_ptr->hostent.h_aliases[i] = putstr_ (hostp->h_aliases[i]))
 	== NULL)
 	  {
-	ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, fname, "putstr_",
+	ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, __func__, "putstr_",
 		   hostp->h_aliases[i]);
 	sendReturnCode (s, RESE_NOMEM);
 	for (i--; i >= 0; i--)
@@ -571,7 +571,7 @@ childAcceptConn (int s, struct passwd *pw, struct lsfAuth *auth,
   if ((cli_ptr->clntdir = putstr_ (pw->pw_dir ? pw->pw_dir : LSTMPDIR))
 	  == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, fname, "putstr_",
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, __func__, "putstr_",
 		 pw->pw_dir ? pw->pw_dir : "/tmp");
 	  sendReturnCode (s, RESE_NOMEM);
 	  for (i = 0; i < num; i++)
@@ -587,7 +587,7 @@ childAcceptConn (int s, struct passwd *pw, struct lsfAuth *auth,
   cli_ptr->tty = defaultTty;
   if ((cli_ptr->env = (char **) calloc (5, sizeof (char *))) == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "calloc");
 	  sendReturnCode (s, RESE_NOMEM);
 	  for (i = 0; i < num; i++)
 	free (cli_ptr->hostent.h_aliases[i]);
@@ -619,7 +619,7 @@ childAcceptConn (int s, struct passwd *pw, struct lsfAuth *auth,
 	{
 	  if (cli_ptr->env[i] == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
 	  sendReturnCode (s, RESE_NOMEM);
 	  for (i = 0; i < 4; i++)
 		{
@@ -655,7 +655,7 @@ childAcceptConn (int s, struct passwd *pw, struct lsfAuth *auth,
 
   if ((getuid () == 0) && (initgroups (cli_ptr->username, pw->pw_gid) < 0))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, fname, "initgroups",
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, __func__, "initgroups",
 		 cli_ptr->username, (int) pw->pw_gid);
 
 	  cli_ptr->ngroups = 0;
@@ -709,7 +709,7 @@ setClUid (struct client *cli_ptr)
 
   if (setCliEnv (cli_ptr, "LSF_FROM_HOST", cli_ptr->hostent.h_name) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, fname, "setenv",
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, __func__, "setenv",
 		 "LSF_FROM_HOST", cli_ptr->hostent.h_name);
 	}
 
@@ -717,13 +717,13 @@ setClUid (struct client *cli_ptr)
 
   if (setCliEnv (cli_ptr, "LS_JOBPID", val) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, fname, "setenv",
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, __func__, "setenv",
 		 "LS_JOBPID", val);
 	}
 
   if (setCliEnv (cli_ptr, LS_EXEC_T, "START") < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, fname, "setenv",
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, __func__, "setenv",
 		 "LS_EXEC_T", "START");
 	}
 
@@ -736,17 +736,17 @@ setClUid (struct client *cli_ptr)
   environ = saveEnv;
 
   if (setgid (cli_ptr->gid) < 0) {
-	ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, fname, "setgid", cli_ptr->username, cli_ptr->gid);
+	ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, __func__, "setgid", cli_ptr->username, cli_ptr->gid);
   }
 
   	// FIXME setEUid() is never negative
   	// FIXME insert something here to display username
 	// if ( setEUid (cli_ptr->ruid) < 0) {
-	// 	ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, fname, "setEUid", cli_ptr->username, cli_ptr->ruid);
+	// 	ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, __func__, "setEUid", cli_ptr->username, cli_ptr->ruid);
 	// }
 
 	if (setsid () == -1) {
-		ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "setsid", cli_ptr->username);
+		ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "setsid", cli_ptr->username);
 	}
 
   return (0);
@@ -766,7 +766,7 @@ recvConnect (int s, struct resConnect *connReq, size_t (*readFunc) (), struct ls
 
 	if ((tmp = readDecodeHdr_ (s, hdrBuf, readFunc, &xdrs, &reqHdr)) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "readDecodeHdr_");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "readDecodeHdr_");
 	  sendReturnCode (s, RESE_REQUEST);
 	  xdr_destroy (&xdrs);
 	  return (-1);
@@ -777,7 +777,7 @@ recvConnect (int s, struct resConnect *connReq, size_t (*readFunc) (), struct ls
 
   if ((buf = malloc (reqHdr.length)) == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
 	  sendReturnCode (s, RESE_NOMEM);
 	  return (-1);
 	}
@@ -786,7 +786,7 @@ recvConnect (int s, struct resConnect *connReq, size_t (*readFunc) (), struct ls
 
   if (readDecodeMsg_ (s, buf, &reqHdr, readFunc, &xdrs, (char *)connReq, xdr_resConnect, auth) < 0) // FIXME FIXME FIXME FIXME FIXME thow in debugger
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "readDecodeMsg_");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "readDecodeMsg_");
 	  sendReturnCode (s, RESE_REQUEST);
 	  xdr_destroy (&xdrs);
 	  free (buf);
@@ -818,7 +818,7 @@ doclient (struct client *cli_ptr)
 	++called;
 	if (logclass & LC_TRACE)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: called=<%d> client=<%x> client_sock=<%d>, ruid=<%d>, username=<%s>", fname, called, cli_ptr, cli_ptr->client_sock, cli_ptr->ruid, cli_ptr->username);
+	  ls_syslog (LOG_DEBUG, "%s: called=<%d> client=<%x> client_sock=<%d>, ruid=<%d>, username=<%s>", __func__, called, cli_ptr, cli_ptr->client_sock, cli_ptr->ruid, cli_ptr->username);
 	}
 
 	xdrmem_create (&xdrs, hdrbuf, sizeof (struct LSFHeader), XDR_DECODE);
@@ -843,7 +843,7 @@ doclient (struct client *cli_ptr)
 	  buf = malloc (msgHdr.length);
 	  if (!buf)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
 	  sendReturnCode (cli_ptr->client_sock, RESE_NOMEM);
 	  delete_client (cli_ptr);
 	}
@@ -856,7 +856,7 @@ doclient (struct client *cli_ptr)
   if (SOCK_READ_FIX (cli_ptr->client_sock, buf, msgHdr.length) !=
 	  msgHdr.length)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "SOCK_READ_FIX",
+	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "SOCK_READ_FIX",
 		 msgHdr.length);
 	  sendReturnCode (cli_ptr->client_sock, RESE_REQUEST);
 	  delete_client (cli_ptr);
@@ -872,7 +872,7 @@ doclient (struct client *cli_ptr)
 		  && (hostIsLocal (cli_ptr->hostent.h_name) == FALSE))))
 	{
 		/* catgets 5285 */
-		ls_syslog (LOG_INFO, (_i18n_msg_get (ls_catd, NL_SETN, 5285, "%s: root remote execution from host %s permission denied")), fname, cli_ptr->hostent.h_name);
+		ls_syslog (LOG_INFO, (_i18n_msg_get (ls_catd, NL_SETN, 5285, "%s: root remote execution from host %s permission denied")), __func__, cli_ptr->hostent.h_name);
 		sendReturnCode (cli_ptr->client_sock, RESE_ROOTSECURE);
 		delete_client (cli_ptr);
 		xdr_destroy (&xdrs);
@@ -884,7 +884,7 @@ doclient (struct client *cli_ptr)
 
   if (logclass & LC_TRACE)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Res got request=<%d>", fname, msgHdr.opCode);
+	  ls_syslog (LOG_DEBUG, "%s: Res got request=<%d>", __func__, msgHdr.opCode);
 	}
 
   switch (msgHdr.opCode)
@@ -926,14 +926,14 @@ doclient (struct client *cli_ptr)
 	  break;
 	default:
 		/* catgets 5139 */
-		ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5139, "%s: Unrecognized service request(%d)"), fname, msgHdr.opCode);
+		ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5139, "%s: Unrecognized service request(%d)"), __func__, msgHdr.opCode);
 		sendReturnCode (cli_ptr->client_sock, RESE_REQUEST);
 		break;
 	}
 
 	if (logclass & LC_TRACE)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Res request <%d> has been processed, back to the main loop", fname, msgHdr.opCode);
+	  ls_syslog (LOG_DEBUG, "%s: Res request <%d> has been processed, back to the main loop", __func__, msgHdr.opCode);
 	}
 
 	xdr_destroy (&xdrs);
@@ -947,7 +947,7 @@ doclient (struct client *cli_ptr)
 static int
 forwardTaskMsg (int srcSock, int destSock, struct LSFHeader *msgHdr, char *hdrbuf, char *dataBuf, bool_t noAck, int pid)
 {
-  static char *fname = "forwardTaskMsg";
+  static char *__func__ = "forwardTaskMsg";
 
   if (FD_NOT_VALID (destSock))
 	{
@@ -963,7 +963,7 @@ forwardTaskMsg (int srcSock, int destSock, struct LSFHeader *msgHdr, char *hdrbu
   if (SOCK_WRITE_FIX (destSock, hdrbuf, LSF_HEADER_LEN) != LSF_HEADER_LEN)
 	{
 
-	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "SOCK_WRITE_FIX",
+	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "SOCK_WRITE_FIX",
 		 LSF_HEADER_LEN);
 
 	  if (kill (-pid, 0) < 0)
@@ -985,7 +985,7 @@ forwardTaskMsg (int srcSock, int destSock, struct LSFHeader *msgHdr, char *hdrbu
 	  if (SOCK_WRITE_FIX (destSock, dataBuf, msgHdr->length) !=
 	  msgHdr->length)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "SOCK_WRITE_FIX",
+	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "SOCK_WRITE_FIX",
 			 msgHdr->length);
 
 	  if (kill (-pid, 0) < 0)
@@ -997,7 +997,7 @@ forwardTaskMsg (int srcSock, int destSock, struct LSFHeader *msgHdr, char *hdrbu
 		{
 		  if (debug > 1)
 		ls_syslog (LOG_DEBUG, "\
-%s: the process <%d> is still there.\n", fname, pid);
+%s: the process <%d> is still there.\n", __func__, pid);
 		  if (!noAck)
 		sendReturnCode (srcSock, RESE_FATAL);
 		}
@@ -1034,7 +1034,7 @@ dochild_info (struct child *chld, int op)
 	{
 	  FD_CLR (chld->info, &readmask);
 	  ls_syslog (LOG_DEBUG, "%s: task <%d> closed info <%d>:%M",
-			 fname, chld->rpid, chld->info);
+			 __func__, chld->rpid, chld->info);
 	  CLOSE_IT (chld->info);
 	  eof_to_client (chld);
 	  unlink_child (chld);
@@ -1056,7 +1056,7 @@ dochild_info (struct child *chld, int op)
 	  buf = malloc (msgHdr.length);
 	  if (!buf)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
 	  sendReturnCode (chld->info, RESE_NOMEM);
 	  return;
 	}
@@ -1064,7 +1064,7 @@ dochild_info (struct child *chld, int op)
 
 	  if (b_read_fix (chld->info, buf, msgHdr.length) != msgHdr.length)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "b_read_fix",
+	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "b_read_fix",
 			 msgHdr.length);
 	  sendReturnCode (chld->info, RESE_REQUEST);
 
@@ -1111,12 +1111,12 @@ resChdir (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 
   if (getcwd (resdir, sizeof (resdir)) == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "getwd");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "getwd");
 	  return;
 	}
   if (!xdr_resChdir (xdrs, &ch, msgHdr))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_resChdir");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_resChdir");
 	  sendReturnCode (cli_ptr->client_sock, RESE_REQUEST);
 	  return;
 	}
@@ -1164,14 +1164,14 @@ resSetenv (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
   if (logclass & LC_TRACE)
 	{
 	  ls_syslog (LOG_DEBUG, "\
-%s: Setting the environment for the remote client=<%x>", fname, cli_ptr);
+%s: Setting the environment for the remote client=<%x>", __func__, cli_ptr);
 	}
 
   bufHome[0] = '\0';
   bufWinDir[0] = '\0';
   if (!xdr_resSetenv (xdrs, &envReq, msgHdr))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_resSetenv");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_resSetenv");
 	  if (msgHdr->opCode == RES_SETENV)
 	sendReturnCode (cli_ptr->client_sock, RESE_REQUEST);
 	  return;
@@ -1219,7 +1219,7 @@ resStty (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs,
 
   if (!xdr_resStty (xdrs, &tty, msgHdr))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_resStty");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_resStty");
 	  sendReturnCode (cli_ptr->client_sock, RESE_REQUEST);
 	  return;
 	}
@@ -1250,7 +1250,7 @@ resRKill (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 
   if (!xdr_resRKill (xdrs, &rkill, msgHdr))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_resRKill");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_resRKill");
 	  sendReturnCode (cli_ptr->client_sock, RESE_REQUEST);
 	  return;
 	}
@@ -1261,7 +1261,7 @@ resRKill (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
   if (!(rkill.whatid & (RES_RID_ISTID | RES_RID_ISPID)))
 	{
 	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5149, "%s: unexpeced id class for rkill: %x"),   /* catgets 5149 */
-		 fname, rkill.whatid);
+		 __func__, rkill.whatid);
 	  sendReturnCode (cli_ptr->client_sock, RESE_REQUEST);
 	  return;
 	}
@@ -1276,7 +1276,7 @@ resRKill (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 		  break;
 	  if (cc == child_cnt)
 		{
-		  ls_syslog (LOG_DEBUG, "%s: no task with tid = <%d>", fname,
+		  ls_syslog (LOG_DEBUG, "%s: no task with tid = <%d>", __func__,
 			 rkill.rid);
 		  sendReturnCode (cli_ptr->client_sock, RESE_INVCHILD);
 		  return;
@@ -1298,14 +1298,14 @@ resRKill (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 	{
 	  ls_syslog (LOG_DEBUG3,
 			 "%s: send signal <%d> to process <%d> tid <%d> ok",
-			 fname, sig, pid, rkill.rid);
+			 __func__, sig, pid, rkill.rid);
 	  sendReturnCode (cli_ptr->client_sock, RESE_OK);
 	}
 	  else
 	{
 	  if (logclass & LC_EXEC)
 		{
-		  ls_syslog (LOG_DEBUG, _i18n_msg_get (ls_catd, NL_SETN, 5150, "%s: unable to send signal <%d> to process <%d> rid <%d>: %m"), fname, sig, pid, rkill.rid); /* catgets 5150 */
+		  ls_syslog (LOG_DEBUG, _i18n_msg_get (ls_catd, NL_SETN, 5150, "%s: unable to send signal <%d> to process <%d> rid <%d>: %m"), __func__, sig, pid, rkill.rid); /* catgets 5150 */
 		}
 	  sendReturnCode (cli_ptr->client_sock, RESE_KILLFAIL);
 	}
@@ -1341,7 +1341,7 @@ resRKill (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 	  if (i == 0)
 	{
 	  sendReturnCode (cli_ptr->client_sock, RESE_INVCHILD);
-	  ls_syslog (LOG_DEBUG, "%s: no valid task to be killed", fname);
+	  ls_syslog (LOG_DEBUG, "%s: no valid task to be killed", __func__);
 	}
 	  else
 	{
@@ -1371,7 +1371,7 @@ resGetpid (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 
   if (!xdr_resGetpid (xdrs, &pidreq, msgHdr))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_resGetpid");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_resGetpid");
 	  sendReturnCode (cli_ptr->client_sock, RESE_REQUEST);
 	  return;
 	}
@@ -1408,7 +1408,7 @@ resGetpid (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 			xdr_resGetpid, 0);
   if (rc < 0)
 	ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5152, "%s: failed to reply to a getpid req for uid = <%d> rpid = <%d>"),   /* catgets 5152 */
-		   fname, cli_ptr->ruid, pidreq.rpid);
+		   __func__, cli_ptr->ruid, pidreq.rpid);
 
   return;
 }
@@ -1435,7 +1435,7 @@ resRusage (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 
   if (!xdr_resGetRusage (xdrs, &rusageReq, msgHdr))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_resGetRusage");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_resGetRusage");
 	  sendReturnCode (cli_ptr->client_sock, RESE_REQUEST);
 	  return;
 	}
@@ -1445,7 +1445,7 @@ resRusage (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
   if (!(rusageReq.whatid & (RES_RID_ISTID | RES_RID_ISPID)))
 	{
 	  ls_syslog (LOG_ERR, "\
-%s: unexpected id class for rusage: %x", fname, rusageReq.whatid);
+%s: unexpected id class for rusage: %x", __func__, rusageReq.whatid);
 	  sendReturnCode (cli_ptr->client_sock, RESE_REQUEST);
 	  return;
 	}
@@ -1483,7 +1483,7 @@ resRusage (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 	  if (logclass & LC_TRACE)
 	{
 	  ls_syslog (LOG_DEBUG, "\
-%s: client %x is asking RES_RPID_KEEPPID, pid saved", fname, cli_ptr);
+%s: client %x is asking RES_RPID_KEEPPID, pid saved", __func__, cli_ptr);
 	}
 
 	}
@@ -1496,13 +1496,13 @@ resRusage (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 	  if (lserrno == LSE_CONN_SYS)
 	{
 	  ls_syslog (LOG_DEBUG, _i18n_msg_get (ls_catd, NL_SETN, 5155, "%s: failed to getrusage for process <%d> tid <%d>"),    /* catgets 5155 */
-			 fname, pid, rid);
+			 __func__, pid, rid);
 	}
 	  else
 	{
 	  ls_syslog (LOG_DEBUG,
 			 "%s: failed to getrusage for process <%d> tid <%d> (not updated)",
-			 fname, pid, rid);
+			 __func__, pid, rid);
 	}
 	  return;
 	}
@@ -1511,14 +1511,14 @@ resRusage (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 	{
 
 	  ls_syslog (LOG_DEBUG, "\
-%s: Res child=<%x> whatId=<%x> rpid=<%d> mem(%d) swap(%d) utime(%d) stime(%d) npids(%d)", fname, children[cc], rusageReq.whatid, rid, jru->mem, jru->swap, jru->utime, jru->stime, jru->npids);
+%s: Res child=<%x> whatId=<%x> rpid=<%d> mem(%d) swap(%d) utime(%d) stime(%d) npids(%d)", __func__, children[cc], rusageReq.whatid, rid, jru->mem, jru->swap, jru->utime, jru->stime, jru->npids);
 
 	  if (jru->npids)
 	{
 	  for (cc = 0; cc < jru->npids; cc++)
 		{
 		  ls_syslog (LOG_DEBUG, "\
-%s: pid(%d) ppid(%d) pgid(%d) jobid(%d)", fname, jru->pidInfo[cc].pid, jru->pidInfo[cc].ppid, jru->pidInfo[cc].pgid, jru->pidInfo[cc].jobid);
+%s: pid(%d) ppid(%d) pgid(%d) jobid(%d)", __func__, jru->pidInfo[cc].pid, jru->pidInfo[cc].ppid, jru->pidInfo[cc].pgid, jru->pidInfo[cc].jobid);
 		}
 	}
 	}
@@ -1548,10 +1548,10 @@ resRusage (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
   if (rc < 0)
 	{
 	  if (debug > 1)
-	printf ("%s: failed to reply to the getrusage request\n", fname);
+	printf ("%s: failed to reply to the getrusage request\n", __func__);
 
 	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5156, "%s: failed to reply to a getrusage request for uid = <%d> %s = <%d>\n"),  /* catgets 5156 */
-		 fname,
+		 __func__,
 		 cli_ptr->ruid,
 		 (rusageReq.whatid & RES_RID_ISTID) ? "rpid" : "pid", rid);
 	}
@@ -1609,7 +1609,7 @@ doResParentCtrl (void)
 	if ((s = b_accept_ (ctrlSock, (struct sockaddr *) &from, &fromlen)) < 0)
 	{
 		if (errno != EWOULDBLOCK) {
-			ls_syslog (LOG_ERR, "%s: b_accept() failed %M", fname);
+			ls_syslog (LOG_ERR, "%s: b_accept() failed %M", __func__);
 		}
 	  return;
 	}
@@ -1619,7 +1619,7 @@ doResParentCtrl (void)
   cc = readDecodeHdr_ (s, hdrbuf, SOCK_READ_FIX, &xdrs, &msgHdr);
   if (cc < 0)
 	{
-	  ls_syslog (LOG_ERR, "%s: readDecodeHdr failed, cc=%d: %M", fname, cc);
+	  ls_syslog (LOG_ERR, "%s: readDecodeHdr failed, cc=%d: %M", __func__, cc);
 	  xdr_destroy (&xdrs);
 	  closesocket (s);
 	  return;
@@ -1631,7 +1631,7 @@ doResParentCtrl (void)
 		buf = malloc (msgHdr.length);
 		if (!buf)
 		{
-			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
 			closesocket (s);
 			return;
 		}
@@ -1644,7 +1644,7 @@ doResParentCtrl (void)
 
   if (SOCK_READ_FIX (s, buf, msgHdr.length) != msgHdr.length)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "SOCK_READ_FIX");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "SOCK_READ_FIX");
 	  xdr_destroy (&xdrs);
 	  FREEUP (buf);
 	  closesocket (s);
@@ -1663,7 +1663,7 @@ doResParentCtrl (void)
 	  resParentWriteAcct (&msgHdr, &xdrs, s);
 	  break;
 	default:
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5160, "%s: Unknown opCode %d"), fname, msgHdr.opCode);   /* catgets 5160 */
+	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5160, "%s: Unknown opCode %d"), __func__, msgHdr.opCode);   /* catgets 5160 */
 	}
 
   xdr_destroy (&xdrs);
@@ -1687,7 +1687,7 @@ resControl (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs, int ch
 
 	if (!xdr_resControl (xdrs, &ctrl, msgHdr))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_resControl"); 
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_resControl"); 
 		if (cli_ptr) {
 			sendReturnCode (cli_ptr->client_sock, RESE_REQUEST);
 		}
@@ -1702,7 +1702,7 @@ resControl (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs, int ch
 	  if (err != 0)
 	{
 	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5162, "%s: Ctrl opCode %d permission denied, uid = <%d>"),   /* catgets 5162 */
-			 fname, ctrl.opCode, cli_ptr->ruid);
+			 __func__, ctrl.opCode, cli_ptr->ruid);
 	  sendReturnCode (cli_ptr->client_sock, err);
 	  return;
 	}
@@ -1721,11 +1721,11 @@ resControl (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs, int ch
 	  daemon_path = getDaemonPath_ ("/res", resParams[LSF_SERVERDIR].paramValue); // FIXME FIXME hard coded string
 	  if (access (daemon_path, X_OK) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, fname, "access", daemon_path, X_OK);
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, __func__, "access", daemon_path, X_OK);
 	  sendReturnCode (childSock, RESE_DENIED);
 	  return;
 	}
-	  ls_syslog (LOG_DEBUG, "%s: re-executing from %s", fname, daemon_path);
+	  ls_syslog (LOG_DEBUG, "%s: re-executing from %s", __func__, daemon_path);
 	  switch (fork ())
 	{
 	case 0:
@@ -1739,16 +1739,16 @@ resControl (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs, int ch
 	  millisleep_ (5000);
 	  //lsfExecvp (daemon_path, restart_argv);
 	  lsfExecX(daemon_path, restart_argv, execvp);
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "execvp",daemon_path);
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "execvp",daemon_path);
 	  resExit_ (-1);
 	case -1:
 	  sendReturnCode (childSock, RESE_FORK);
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "fork");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "fork");
 	  return;
 	default:
 	  sendReturnCode (childSock, RESE_OK);
 	  ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5167, "%s: RES restart received, restarting."),  /* catgets 5167 */
-			 fname);
+			 __func__);
 	  allow_accept = 0;
 	  closesocket (accept_sock);
 	  closesocket (ctrlSock);
@@ -1762,7 +1762,7 @@ resControl (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs, int ch
 
 	case RES_CMD_SHUTDOWN:
 	  sendReturnCode (childSock, RESE_OK);
-	  ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5168, "%s: RES shutdown received, keep current service and then exit"), fname);  /* catgets 5168 */
+	  ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5168, "%s: RES shutdown received, keep current service and then exit"), __func__);  /* catgets 5168 */
 	  allow_accept = 0;
 	  closesocket (accept_sock);
 	  closesocket (ctrlSock);
@@ -1780,7 +1780,7 @@ resControl (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs, int ch
 	  return;
 
 	case RES_CMD_LOGOFF:
-	  ls_syslog (LOG_INFO, (_i18n_msg_get (ls_catd, NL_SETN, 5287, "%s: Task Log OFF")), fname);    /* catgets 5287 */
+	  ls_syslog (LOG_INFO, (_i18n_msg_get (ls_catd, NL_SETN, 5287, "%s: Task Log OFF")), __func__);    /* catgets 5287 */
 	  resLogOn = 0;
 	  sendReturnCode (childSock, RESE_OK);
 	  return;
@@ -1788,7 +1788,7 @@ resControl (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs, int ch
 	default:
 	  sendReturnCode (childSock, RESE_REQUEST);
 	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5169, "%s: Unknown request code: %d Ignored."),  /* catgets 5169 */
-		 fname, ctrl.opCode);
+		 __func__, ctrl.opCode);
 	  return;
 	}
 
@@ -1804,14 +1804,14 @@ sendResParent (struct LSFHeader * msgHdr, char *msgBuf, bool_t (*xdrFunc) ())
   if ((s = TcpCreate_ (FALSE, 0)) < 0)
 	{
 	  if (logclass & LC_EXEC)
-	ls_syslog (LOG_DEBUG, "%s: tcpCreate failed: %m", fname);
+	ls_syslog (LOG_DEBUG, "%s: tcpCreate failed: %m", __func__);
 	  return (RESE_NOMORECONN);
 	}
 
 	if (b_connect_ (s, (struct sockaddr *) &ctrlAddr, sizeof (ctrlAddr), 0) < 0)
 	{
 		if (logclass & LC_EXEC) {
-			ls_syslog (LOG_DEBUG, "%s: b_connect failed: <%s> %m", fname,  sockAdd2Str_ (&ctrlAddr));
+			ls_syslog (LOG_DEBUG, "%s: b_connect failed: <%s> %m", __func__,  sockAdd2Str_ (&ctrlAddr));
 		}
 		closesocket (s);
 		return (RESE_RES_PARENT);
@@ -1820,7 +1820,7 @@ sendResParent (struct LSFHeader * msgHdr, char *msgBuf, bool_t (*xdrFunc) ())
 	if (lsSendMsg_ (s, msgHdr->opCode, 0, msgBuf, buf, MSGSIZE, xdrFunc, SOCK_WRITE_FIX, NULL) < 0)
 	{
 		if (logclass & LC_EXEC) {
-			ls_syslog (LOG_DEBUG, "%s: lsSendMsg failed: %m", fname);
+			ls_syslog (LOG_DEBUG, "%s: lsSendMsg failed: %m", __func__);
 		}
 		closesocket (s);
 		return (RESE_RES_PARENT);
@@ -1829,7 +1829,7 @@ sendResParent (struct LSFHeader * msgHdr, char *msgBuf, bool_t (*xdrFunc) ())
 	if (lsRecvMsg_ (s, buf, sizeof (buf), msgHdr, NULL, NULL, SOCK_READ_FIX) < 0)
 	{
 		if (logclass & LC_EXEC) {
-			ls_syslog (LOG_DEBUG, "%s: lsRecvMsg failed: %m", fname);
+			ls_syslog (LOG_DEBUG, "%s: lsRecvMsg failed: %m", __func__);
 		}
 		closesocket (s);
 		return (RESE_RES_PARENT);
@@ -1840,7 +1840,7 @@ sendResParent (struct LSFHeader * msgHdr, char *msgBuf, bool_t (*xdrFunc) ())
 	if (msgHdr->opCode != RESE_OK)
 	{
 		if (logclass & LC_EXEC) {
-			ls_syslog (LOG_DEBUG, "%s: RES parent rejected request: %d", fname, msgHdr->opCode);
+			ls_syslog (LOG_DEBUG, "%s: RES parent rejected request: %d", __func__, msgHdr->opCode);
 		}
 	}
 
@@ -1868,7 +1868,7 @@ checkPermResCtrl (struct client *cli_ptr)
 	{
 		if ((mycluster = ls_getclustername ()) == NULL)
 		{
-			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "ls_getclustername");
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "ls_getclustername");
 			// goto tryDefault;
 			if (isLSFAdmin_ (cli_ptr->username))
 			{
@@ -1882,7 +1882,7 @@ checkPermResCtrl (struct client *cli_ptr)
 	{
 		if ((clusterInfo = ls_clusterinfo (NULL, NULL, NULL, 0, 0)) == NULL)
 		{
-			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "ls_clusterinfo");
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "ls_clusterinfo");
 			// goto tryDefault;
 			if (isLSFAdmin_ (cli_ptr->username))
 			{
@@ -1897,7 +1897,7 @@ checkPermResCtrl (struct client *cli_ptr)
 		if (admins == NULL)
 		{
 			nAdmins = -1;
-			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
 			// goto tryDefault;
 			if (isLSFAdmin_ (cli_ptr->username))
 			{
@@ -1958,12 +1958,12 @@ resRexec (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 
 	if (logclass & LC_TRACE)
 	{
-		ls_syslog (LOG_DEBUG, "%s: Executing the task on behalf of the remote client=<%x>", fname, cli_ptr);
+		ls_syslog (LOG_DEBUG, "%s: Executing the task on behalf of the remote client=<%x>", __func__, cli_ptr);
 	}
 
 	if (!xdr_resCmdBill (xdrs, &cmdmsg, msgHdr))
 	{
-		ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_resCmdBill");
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_resCmdBill");
 		if (msgHdr->opCode == RES_SERVER) {
 			sendReturnCode (cli_ptr->client_sock, RESE_REQUEST);
 		}
@@ -1978,14 +1978,14 @@ resRexec (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 	{
 		if ((taskSock = TcpCreate_ (TRUE, 0)) < 0)
 		{
-			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "TcpCreate");
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "TcpCreate");
 			addr.sin_port = 0;
 		}
 		else
 		{
 			if (getsockname (taskSock, (struct sockaddr *) &addr, &addrLen) < 0)
 			{
-				ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "getsockname", taskSock);
+				ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "getsockname", taskSock);
 				addr.sin_port = 0;
 			}
 		}
@@ -1996,7 +1996,7 @@ resRexec (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 
 	if (getpeername (cli_ptr->client_sock, (struct sockaddr *)&from, &fromLen) < 0) // FIXME FIXME FIXME FIXME FIXME is this the right way of passing address data?
 	{
-		ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "getpeername", cli_ptr->client_sock);
+		ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "getpeername", cli_ptr->client_sock);
 		if (msgHdr->opCode == RES_SERVER) {
 			sendReturnCode (cli_ptr->client_sock, RESE_CALLBACK);
 		}
@@ -2011,7 +2011,7 @@ resRexec (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 	if (logclass & LC_TRACE)
 	{
 		dumpResCmdBill (&cmdmsg);
-		ls_syslog (LOG_DEBUG, "%s: Calling back nios retport=<%d> rpid=<%d>", fname, cmdmsg.retport, cmdmsg.rpid);
+		ls_syslog (LOG_DEBUG, "%s: Calling back nios retport=<%d> rpid=<%d>", __func__, cmdmsg.retport, cmdmsg.rpid);
 	}
 
 
@@ -2019,7 +2019,7 @@ resRexec (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 	{
 		if ((conn2NIOS.sock->fd = niosCallback_ (&from, cmdmsg.retport, cmdmsg.rpid, exitStatus, terWhiPendStatus)) < 0)
 		{
-			ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, fname, "niosCallback_", ntohs (cmdmsg.retport));
+			ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__, "niosCallback_", ntohs (cmdmsg.retport));
 			if (msgHdr->opCode == RES_SERVER) {
 				sendReturnCode (cli_ptr->client_sock, RESE_CALLBACK);
 			}
@@ -2036,7 +2036,7 @@ resRexec (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
 		{
 			char *errSockId = malloc( sizeof(MAXLINELEN) + 1 );
 			sprintf (errSockId, "setsockopt failed on %d", conn2NIOS.sock->fd);
-			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, *errSockId);
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, *errSockId);
 			free( errSockId);
 		}
 
@@ -2176,7 +2176,7 @@ doRexec (struct client *cli_ptr, struct resCmdBill *cmdmsg, int retsock, int tas
 		{
 		  if (setCliEnv (cli_ptr, "HOSTNAME", Myhost) < 0)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, fname, "setenv",
+		  ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, __func__, "setenv",
 				 "HOSTNAME", Myhost);
 		}
 		}
@@ -2184,7 +2184,7 @@ doRexec (struct client *cli_ptr, struct resCmdBill *cmdmsg, int retsock, int tas
 		{
 		  if (setCliEnv (cli_ptr, "HOSTTYPE", myHostType) < 0)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, fname, "setenv",
+		  ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, __func__, "setenv",
 				 "HOSTTYPE", myHostType);
 		}
 		}
@@ -2200,7 +2200,7 @@ doRexec (struct client *cli_ptr, struct resCmdBill *cmdmsg, int retsock, int tas
 
 
 	if (debug > 1) {
-		ls_syslog (LOG_DEBUG, "%s: Parent ...", fname);
+		ls_syslog (LOG_DEBUG, "%s: Parent ...", __func__);
 	}
 
 
@@ -2209,7 +2209,7 @@ doRexec (struct client *cli_ptr, struct resCmdBill *cmdmsg, int retsock, int tas
   sigStatRu = malloc (sizeof (struct sigStatusUsage));
   if (child_ptr == NULL || sigStatRu == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname,
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__,
 		 "malloc(child or sigStatusUsage)");
 	  if (cmdmsg->options & REXF_USEPTY)
 	{
@@ -2307,7 +2307,7 @@ doRexec (struct client *cli_ptr, struct resCmdBill *cmdmsg, int retsock, int tas
 	{
 		child_ptr->cwd = NULL;
 		/* catgets 5182 */
-		ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5182, "%s: cwd is null"), fname);
+		ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5182, "%s: cwd is null"), __func__);
 	}
 
   child_ptr->dpTime = time (NULL);
@@ -2323,7 +2323,7 @@ doRexec (struct client *cli_ptr, struct resCmdBill *cmdmsg, int retsock, int tas
 
   if (logclass & LC_TRACE)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Child with pid=<%d> executed", fname, pid);
+	  ls_syslog (LOG_DEBUG, "%s: Child with pid=<%d> executed", __func__, pid);
 	  dumpChild (child_ptr, -1, "child just built");
 	}
 
@@ -2358,19 +2358,19 @@ forkPty (struct client *cli_ptr, int *pty, int *sv, int *info, int *errSock,
 
   if (pty[0] < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "ptymaster", pty_name);
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "ptymaster", pty_name);
 	  *ack = RESE_PTYMASTER;
 	  return (-1);
 	}
 
   if (debug > 1)
-	ls_syslog (LOG_DEBUG, "%s: ptymaster pty_name <%s>", fname, pty_name);
+	ls_syslog (LOG_DEBUG, "%s: ptymaster pty_name <%s>", __func__, pty_name);
 
 
 
   if (socketpair (AF_UNIX, SOCK_STREAM, 0, sv) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "socketpair");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "socketpair");
 	  close (pty[0]);
 	  *ack = RESE_SOCKETPAIR;
 	  return (-1);
@@ -2379,7 +2379,7 @@ forkPty (struct client *cli_ptr, int *pty, int *sv, int *info, int *errSock,
   if (info)
 	if (socketpair (AF_UNIX, SOCK_STREAM, 0, info) < 0)
 	  {
-	ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "socketpair");
+	ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "socketpair");
 	close (sv[0]);
 	close (sv[1]);
 	close (pty[0]);
@@ -2391,7 +2391,7 @@ forkPty (struct client *cli_ptr, int *pty, int *sv, int *info, int *errSock,
   if ((errSock != NULL)
 	  && (socketpair (AF_UNIX, SOCK_STREAM, 0, errSock) < 0))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "pairsocket");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "pairsocket");
 	  *ack = RESE_SOCKETPAIR;
 	  close (sv[0]);
 	  close (sv[1]);
@@ -2406,7 +2406,7 @@ forkPty (struct client *cli_ptr, int *pty, int *sv, int *info, int *errSock,
 
   if ((pid = fork ()) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "fork");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "fork");
 	  close (pty[0]);
 	  close (sv[0]);
 	  close (sv[1]);
@@ -2436,7 +2436,7 @@ forkPty (struct client *cli_ptr, int *pty, int *sv, int *info, int *errSock,
 	  setPGid (cli_ptr, TRUE);
 	  if ((*ack = childPty (cli_ptr, pty, sv, pty_name, echoOff)) != RESE_OK)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "childPty");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "childPty");
 	  _exit (127);
 	}
 	}
@@ -2453,7 +2453,7 @@ forkPty (struct client *cli_ptr, int *pty, int *sv, int *info, int *errSock,
 
 	  if ((errSock != NULL) && (io_nonblock_ (errSock[0]) < 0))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "io_nonblock_",
+	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "io_nonblock_",
 			 errSock[0]);
 	}
 
@@ -2479,7 +2479,7 @@ forkSV (struct client *cli_ptr, int *sv, int *info, int *errSock, enum resAck * 
 	if( info ) {
 		if (socketpair (AF_UNIX, SOCK_STREAM, 0, info) < 0)
 		{
-			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "socketpair");
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "socketpair");
 			*ack = RESE_SOCKETPAIR;
 			return -1;
 		}
@@ -2487,7 +2487,7 @@ forkSV (struct client *cli_ptr, int *sv, int *info, int *errSock, enum resAck * 
 
 	if (pairsocket (AF_INET, SOCK_STREAM, 0, sv) < 0)
 	{
-		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "pairsocket");
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "pairsocket");
 		*ack = RESE_SOCKETPAIR;
 		return -1;
 	}
@@ -2496,7 +2496,7 @@ forkSV (struct client *cli_ptr, int *sv, int *info, int *errSock, enum resAck * 
   if ((errSock != NULL)
 	  && (pairsocket (AF_INET, SOCK_STREAM, 0, errSock) < 0))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "pairsocket");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "pairsocket");
 	  *ack = RESE_SOCKETPAIR;
 	  close (sv[0]);
 	  close (sv[1]);
@@ -2507,7 +2507,7 @@ forkSV (struct client *cli_ptr, int *sv, int *info, int *errSock, enum resAck * 
 
   if (pid < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "fork");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "fork");
 	  close (sv[0]);
 	  close (sv[1]);
 	  if (info)
@@ -2536,10 +2536,10 @@ forkSV (struct client *cli_ptr, int *sv, int *info, int *errSock, enum resAck * 
 	}
 
 	  if (io_nonblock_ (sv[0]) < 0)
-	ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "io_nonblock_", sv[0]);
+	ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "io_nonblock_", sv[0]);
 	  if ((errSock != NULL) && (io_nonblock_ (errSock[0]) < 0))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "io_nonblock_",
+	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "io_nonblock_",
 			 errSock[0]);
 	}
 	}
@@ -2573,13 +2573,13 @@ setPGid (struct client *cli_ptr, int tflag)
   if (tflag)
 	{
 	  if (setsid () < 0)
-	ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "setsid");
+	ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "setsid");
 
 	}
   else
 	{
 	  if (setpgid (0, getpid ()) < 0)
-	ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "setpgid", 0);
+	ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "setpgid", 0);
 	}
 
 }
@@ -2604,7 +2604,7 @@ parentPty (int *pty, int *sv, char *pty_name)
 	  close (pty[0]);
 	  if ((pty[0] = ptymaster (pty_name)) < 0)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "ptymaster",
+		  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "ptymaster",
 			 pty_name);
 		  handShake.code = PTY_NOMORE;
 		  write (sv[0], (char *) &handShake, sizeof (handShake));
@@ -2625,12 +2625,12 @@ parentPty (int *pty, int *sv, char *pty_name)
 
 
   if (io_nonblock_ (pty[0]) < 0)
-	ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "io_nonblock_", pty[0]);
+	ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "io_nonblock_", pty[0]);
 
 #ifndef __sun__
   if (ioctl (pty[0], TIOCPKT, &on) < 0)
 #endif
-	ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "ioctl", pty[0]);
+	ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "ioctl", pty[0]);
 
   return (RESE_OK);
 }
@@ -2643,7 +2643,7 @@ set_noecho (int fd)
 
   if (tcgetattr (fd, &stermios) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "tcgetattr", "slave");
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "tcgetattr", "slave");
 	  return;
 	}
 
@@ -2651,7 +2651,7 @@ set_noecho (int fd)
 
   if (tcsetattr (fd, TCSANOW, &stermios) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "tcsetattr", "slave");
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "tcsetattr", "slave");
 	}
 }
 
@@ -2666,7 +2666,7 @@ childPty (struct client *cli_ptr, int *pty, int *sv, char *pty_name, int echoOff
   close (sv[0]);
   for (;;)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: ptyslave(%s) trying", fname, pty_name);
+	  ls_syslog (LOG_DEBUG, "%s: ptyslave(%s) trying", __func__, pty_name);
 
 	  setEUid (0);
 	  pty[1] = ptyslave (pty_name);
@@ -2674,7 +2674,7 @@ childPty (struct client *cli_ptr, int *pty, int *sv, char *pty_name, int echoOff
 
 	  if (pty[1] < 0)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: ptyslave(%s) failed: %m", fname,
+	  ls_syslog (LOG_DEBUG, "%s: ptyslave(%s) failed: %m", __func__,
 			 pty_name);
 	  handShake.code = PTY_BAD;
 	  write (sv[1], (char *) &handShake.code, sizeof (status_t));
@@ -2684,17 +2684,17 @@ childPty (struct client *cli_ptr, int *pty, int *sv, char *pty_name, int echoOff
 	  else
 		{
 		  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5203, "%s: No more pty(%s); dying"), /* catgets 5203 */
-			 fname, pty_name);
+			 __func__, pty_name);
 		  return RESE_PTYSLAVE;
 		}
 	}
 	  else
 	{
-	  ls_syslog (LOG_DEBUG, "%s: ptyslave(%s) handshake", fname,
+	  ls_syslog (LOG_DEBUG, "%s: ptyslave(%s) handshake", __func__,
 			 pty_name);
 	  handShake.code = PTY_GOOD;
 	  write (sv[1], (char *) &handShake.code, sizeof (status_t));
-	  ls_syslog (LOG_DEBUG, "%s: ptyslave(%s) handshake ok", fname,
+	  ls_syslog (LOG_DEBUG, "%s: ptyslave(%s) handshake ok", __func__,
 			 pty_name);
 	  break;
 	}
@@ -2702,7 +2702,7 @@ childPty (struct client *cli_ptr, int *pty, int *sv, char *pty_name, int echoOff
   close (sv[1]);
 
   if (debug > 1)
-	ls_syslog (LOG_DEBUG, "%s: chown", fname);
+	ls_syslog (LOG_DEBUG, "%s: chown", __func__);
 
 
 
@@ -2711,12 +2711,12 @@ childPty (struct client *cli_ptr, int *pty, int *sv, char *pty_name, int echoOff
   if (fchown (pty[1], (uid_t) cli_ptr->ruid, cli_ptr->gid) < 0)
 	{
 	  ls_syslog (LOG_DEBUG, "%s: fchown failed for uid <%d>/gid <%d>",
-		 fname, cli_ptr->ruid, cli_ptr->gid);
+		 __func__, cli_ptr->ruid, cli_ptr->gid);
 	}
 
   if (fchmod (pty[1], 0600) < 0)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: fchmod failed", fname);
+	  ls_syslog (LOG_DEBUG, "%s: fchmod failed", __func__);
 	}
 
   setEUid (cli_ptr->ruid);
@@ -2729,7 +2729,7 @@ childPty (struct client *cli_ptr, int *pty, int *sv, char *pty_name, int echoOff
 	  set_noecho (pty[1]);
 	}
   if (debug > 1)
-	ls_syslog (LOG_DEBUG, "%s: Leaving", fname);
+	ls_syslog (LOG_DEBUG, "%s: Leaving", __func__);
 
   return (RESE_OK);
 
@@ -2812,7 +2812,7 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 
   if (setCliEnv (cli_ptr, "LSF_FROM_HOST", cli_ptr->hostent.h_name) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, fname, "setenv",
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, __func__, "setenv",
 		 "LSF_FROM_HOST", cli_ptr->hostent.h_name);
 	}
 
@@ -2821,27 +2821,27 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 	  char buf[64];
 	  sprintf (buf, "%d", cli_ptr->client_sock);
 	  if (setCliEnv (cli_ptr, "LSF_APP_SERVSOCK", buf) < 0)
-	ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, fname, "setenv",
+	ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, __func__, "setenv",
 		   "LSF_APP_SERVSOCK", buf);
 	}
 
   sprintf (val, "%d", (int) getpid ());
   if (setCliEnv (cli_ptr, "LS_JOBPID", val) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, fname, "setenv",
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, __func__, "setenv",
 		 "LS_JOBPID", val);
 	}
 
   if (setCliEnv (cli_ptr, LS_EXEC_T, "START") < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "setenv", "LS_EXEC_T");
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "setenv", "LS_EXEC_T");
 	}
 
 
   sprintf (val, "%d", cmdmsg->rpid);
   if (setCliEnv (cli_ptr, "LSF_PM_TASKID", val))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, fname, "setenv",
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, __func__, "setenv",
 		 "LSF_PM_TASKID", val);
 	}
 
@@ -2850,7 +2850,7 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 	  sprintf (val, "%d", info[1]);
 	  if (setCliEnv (cli_ptr, "LSF_PM_SOCKFD", val))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, fname, "setenv",
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, __func__, "setenv",
 			 "LSF_PM_SOCKFD", val);
 	}
 	}
@@ -2863,7 +2863,7 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 
   if (setCliEnv (cli_ptr, "LS_SUBCWD", val) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, fname, "setenv",
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, __func__, "setenv",
 		 "LS_SUBCWD", val);
 	}
 
@@ -2874,7 +2874,7 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 	  if (setCliEnv (cli_ptr, "LSF_EAUTH_AUX_DATA",
 			 getenv ("LSF_EAUTH_AUX_DATA")) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, fname, "setenv",
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, __func__, "setenv",
 			 "LSF_EAUTH_AUX_DATA", getenv ("LSF_EAUTH_AUX_DATA"));
 	}
 	}
@@ -2932,7 +2932,7 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 		  tmppath = malloc (len);
 		  if (tmppath == NULL)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
+		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
 		  exit (-1);
 		}
 		  strcpy (tmppath, resParams[LSF_BINDIR].paramValue);
@@ -2997,7 +2997,7 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 	  newPriority = newPriority - (-20);
 	  if (ls_setpriority (newPriority) == FALSE)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_MM, fname, "ls_setpriority",
+	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_MM, __func__, "ls_setpriority",
 			 newPriority);
 	}
 	}
@@ -3020,7 +3020,7 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 	  if (setsockopt (err[1], SOL_SOCKET, SO_LINGER, (char *) &linger,
 			  sizeof (struct linger)) < 0)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "setsockopt");
+		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "setsockopt");
 		}
 	  dup2 (err[1], 2);
 	  close (err[1]);
@@ -3042,7 +3042,7 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 
 	  if (setsockopt (sv[1], SOL_SOCKET, SO_LINGER, (char *) &linger,
 			  sizeof (struct linger)) < 0)
-	ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "setsockopt");
+	ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "setsockopt");
 
 	  dup2 (sv[1], 0);
 	  dup2 (sv[1], 1);
@@ -3053,7 +3053,7 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 	  if (setsockopt (err[1], SOL_SOCKET, SO_LINGER, (char *) &linger,
 			  sizeof (struct linger)) < 0)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "setsockopt");
+		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "setsockopt");
 		}
 	  dup2 (err[1], 2);
 	  close (err[1]);
@@ -3070,11 +3070,11 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 	{
 	  if (fromNT)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Submission host is NT", fname);
+	  ls_syslog (LOG_DEBUG, "%s: Submission host is NT", __func__);
 	}
 	  else
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Submission host is UNIX", fname);
+	  ls_syslog (LOG_DEBUG, "%s: Submission host is UNIX", __func__);
 	}
 	}
 
@@ -3088,7 +3088,7 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 	  if (debug != 2 && pwdHome == NULL)
 		{
 		  ls_syslog (LOG_DEBUG, "%s: getpwnam failed for user %s",
-			 fname, cli_ptr->username);
+			 __func__, cli_ptr->username);
 		}
 
 	  if (pwdHome != NULL && pwdHome->pw_dir && pwdHome->pw_dir[0])
@@ -3103,7 +3103,7 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 	  if (debug != 2 && pwdHome == NULL)
 	{
 	  ls_syslog (LOG_DEBUG, "%s: getpwnam failed for user %s",
-			 fname, cli_ptr->username);
+			 __func__, cli_ptr->username);
 	}
 
 	  if (pwdHome != NULL && pwdHome->pw_dir && pwdHome->pw_dir[0])
@@ -3116,10 +3116,10 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 	{
 
 	  if (debug != 2)
-	ls_syslog (LOG_DEBUG, "%s: Execution homedir is %s", fname, curdir);
+	ls_syslog (LOG_DEBUG, "%s: Execution homedir is %s", __func__, curdir);
 	  if (mychdir_ (curdir, &(cli_ptr->hostent)) < 0)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Couldn't change to %s", fname, curdir);
+	  ls_syslog (LOG_DEBUG, "%s: Couldn't change to %s", __func__, curdir);
 	}
 	}
 
@@ -3191,7 +3191,7 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 
 
   if (debug != 2)
-	ls_syslog (LOG_DEBUG, "%s: Execution relative cwd is %s", fname, curdir);
+	ls_syslog (LOG_DEBUG, "%s: Execution relative cwd is %s", __func__, curdir);
 
   if (curdir[0] && mychdir_ (curdir, &(cli_ptr->hostent)) < 0)
 	{
@@ -3199,7 +3199,7 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 	{
 	  if (!getenv ("windir") && getenv ("LSF_JOB_STARTER") == NULL)
 		{
-		  fprintf (stderr, I18N_FUNC_S_FAIL, fname, "chdir", curdir);
+		  fprintf (stderr, I18N_FUNC_S_FAIL, __func__, "chdir", curdir);
 		  perror ("LSF error (res)");
 
 		  if (info != NULL)
@@ -3221,7 +3221,7 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 		{
 		  if (mychdir_ (ep, NULL) < 0)
 		{
-		  fprintf (stderr, I18N_FUNC_S_FAIL_M, fname, "chdir", ep);
+		  fprintf (stderr, I18N_FUNC_S_FAIL_M, __func__, "chdir", ep);
 		  perror ("");
 		  fputs (_i18n_msg_get (ls_catd, NL_SETN, 4, "Trying to run in /tmp\n"), stderr);   /* catgets 4 */
 		  chdir (LSTMPDIR);
@@ -3293,7 +3293,7 @@ lsbExecChild (struct resCmdBill *cmdmsg, int *pty, int *sv, int *err, int *info,
   struct linger linger;
 
   if (debug > 1)
-	ls_syslog (LOG_DEBUG, "%s: Entering ...", fname);
+	ls_syslog (LOG_DEBUG, "%s: Entering ...", __func__);
 
 
   mlsSbdMode = sbdMode;
@@ -3318,7 +3318,7 @@ lsbExecChild (struct resCmdBill *cmdmsg, int *pty, int *sv, int *err, int *info,
 	{
 	  ls_syslog (LOG_ERR, I18N (5292, "\
 %s: setsockopt on socket=<%d> option SO_LINGER failed: %m"),    /*catgets 5292 */
-			 fname, iofd);
+			 __func__, iofd);
 	}
 
 
@@ -3330,7 +3330,7 @@ lsbExecChild (struct resCmdBill *cmdmsg, int *pty, int *sv, int *err, int *info,
 			  &linger, sizeof (struct linger)) < 0)
 		{
 			/*catgets 5292 */
-			ls_syslog (LOG_ERR, I18N (5292, "%s: setsockopt on socket=<%d> option SO_LINGER failed: %m"), fname, err[1]);
+			ls_syslog (LOG_ERR, I18N (5292, "%s: setsockopt on socket=<%d> option SO_LINGER failed: %m"), __func__, err[1]);
 		}
 	}
 	  if (cmdmsg->options & REXF_TASKINFO)
@@ -3341,7 +3341,7 @@ lsbExecChild (struct resCmdBill *cmdmsg, int *pty, int *sv, int *err, int *info,
 			  &linger, sizeof (struct linger)) < 0)
 		{
 			/*catgets 5292 */
-			ls_syslog (LOG_ERR, I18N (5292, "%s: setsockopt on socket=<%d> option SO_LINGER failed: %m"), fname, info[1]);
+			ls_syslog (LOG_ERR, I18N (5292, "%s: setsockopt on socket=<%d> option SO_LINGER failed: %m"), __func__, info[1]);
 		}
 	}
 	}
@@ -3397,7 +3397,7 @@ lsbExecChild (struct resCmdBill *cmdmsg, int *pty, int *sv, int *err, int *info,
 	  sprintf (val, "%d", info[1]);
 	  if (putEnv ("LSF_PM_SOCKFD", val) != 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "putenv", val);
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "putenv", val);
 	}
 	}
 
@@ -3458,7 +3458,7 @@ execit (char **uargv, char *jobStarter, pid_t *pid, int stdio, int taskSock, int
 	  if ((real_argv =
 		   malloc (sizeof (char *) * (i + 2))) == NULL)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
+		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
 		  /* catgets 5222 */
 		  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5222, "Not enough memory, job not executed"));
 		  return;
@@ -3484,7 +3484,7 @@ execit (char **uargv, char *jobStarter, pid_t *pid, int stdio, int taskSock, int
 
 	  if (cmd == NULL)
 		{
-		  perror (_i18n_printf (I18N_FUNC_FAIL, fname, "malloc"));
+		  perror (_i18n_printf (I18N_FUNC_FAIL, __func__, "malloc"));
 		  resExit_ (-1);
 		}
 
@@ -3533,7 +3533,7 @@ delete_client (struct client *cli_ptr)
 
 	if (logclass & LC_TRACE)
 	{
-		ls_syslog (LOG_DEBUG, "%s: client_sock=<%d>, ruid=<%d>, username=<%s>", fname, cli_ptr->client_sock, cli_ptr->ruid, cli_ptr->username);
+		ls_syslog (LOG_DEBUG, "%s: client_sock=<%d>, ruid=<%d>, username=<%s>", __func__, cli_ptr->client_sock, cli_ptr->ruid, cli_ptr->username);
 	}
 	if (cli_ptr == NULL) {
 		return;
@@ -3549,7 +3549,7 @@ delete_client (struct client *cli_ptr)
 	if (i == client_cnt)
 	{
 		/* catgets 5226 */
-		ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5226, "%s: Deleting nonexistent client"), fname);
+		ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5226, "%s: Deleting nonexistent client"), __func__);
 		return;
 	}
 
@@ -3640,7 +3640,7 @@ delete_child (struct child *cp)
 	}
 
 	if (logclass & LC_TRACE) {
-		ls_syslog (LOG_DEBUG, "%s: entering the routine...", fname);
+		ls_syslog (LOG_DEBUG, "%s: entering the routine...", __func__);
 	}
 
 	for (i = 0; i < child_cnt; i++)
@@ -3652,7 +3652,7 @@ delete_child (struct child *cp)
 
 	if (i == child_cnt)
 	{
-		ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5227, "%s: Deleting nonexistent child"), fname); /* catgets 5227 */
+		ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5227, "%s: Deleting nonexistent child"), __func__); /* catgets 5227 */
 		return;
 	}
 
@@ -3700,7 +3700,7 @@ delete_child (struct child *cp)
 
 	if (logclass & LC_TRACE)
 	{
-		ls_syslog (LOG_DEBUG, "%s: Res has destroyed the child=<%x> current number of child is=<%d>", fname, cp, child_cnt);
+		ls_syslog (LOG_DEBUG, "%s: Res has destroyed the child=<%x> current number of child is=<%d>", __func__, cp, child_cnt);
 	}
 
 	free (cp);
@@ -3716,11 +3716,11 @@ kill_child (struct child *cp)
 	{
 
 		if (kill (-(cp->pid), SIGTERM) < 0 && errno != ESRCH) {
-			ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, fname, "kill", "SIGTERM", cp->pid);
+			ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, __func__, "kill", "SIGTERM", cp->pid);
 		}
 		sleep (1);
 		if (kill (-(cp->pid), SIGKILL) < 0 && errno != ESRCH) {
-			ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, fname, "kill", "SIGKILL", cp->pid);
+			ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, __func__, "kill", "SIGKILL", cp->pid);
 		}
 	}
 }
@@ -3745,7 +3745,7 @@ unlink_child (struct child *cp)
 	cp->refcnt--;
 	if (logclass & LC_TRACE)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Unlinking child=<%x> reference count decremented to=<%d>", fname, cp, cp->refcnt);
+	  ls_syslog (LOG_DEBUG, "%s: Unlinking child=<%x> reference count decremented to=<%d>", __func__, cp, cp->refcnt);
 	}
 	if (cp->refcnt <= 0 && cp->std_out->buffer.bcount == 0 && (cp->std_err->buffer.bcount == 0))
 	{
@@ -3769,7 +3769,7 @@ notify_client (int s, int rpid, enum resAck ack, struct sigStatusUsage *sigStatR
 
   if (debug > 1)
 	{
-	  printf ("%s(%d): retsock=%d ack=%d\n", fname, rpid, s, ack);
+	  printf ("%s(%d): retsock=%d ack=%d\n", __func__, rpid, s, ack);
 	  fflush (stdout);
 	}
 
@@ -3781,7 +3781,7 @@ notify_client (int s, int rpid, enum resAck ack, struct sigStatusUsage *sigStatR
 	{
 	  if (logclass & LC_TRACE)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Res in sbdMode no SBD_FLAG_TERM doesn't need to notify_client", fname);
+	  ls_syslog (LOG_DEBUG, "%s: Res in sbdMode no SBD_FLAG_TERM doesn't need to notify_client", __func__);
 	}
 	  return 0;
 	}
@@ -3793,19 +3793,19 @@ notify_client (int s, int rpid, enum resAck ack, struct sigStatusUsage *sigStatR
 	{
 	  int sig = LS_WTERMSIG (*status);
 
-	  ls_syslog (LOG_DEBUG, "%s Res notifying Nios by RES2NIOS_STATUS child signaled by sig=<%d>", fname, sig);
+	  ls_syslog (LOG_DEBUG, "%s Res notifying Nios by RES2NIOS_STATUS child signaled by sig=<%d>", __func__, sig);
 	}
 
 	  if (LS_WIFSTOPPED (*status))
 	{
-	  ls_syslog (LOG_DEBUG, "%s Res notifying Nios by RES2NIOS_STATUS child stopped", fname);
+	  ls_syslog (LOG_DEBUG, "%s Res notifying Nios by RES2NIOS_STATUS child stopped", __func__);
 	}
 
 	  if (LS_WIFEXITED (*status))
 	{
 	  int exit_status = LS_WEXITSTATUS (*status);
 
-	  ls_syslog (LOG_DEBUG, "%s Res notifying Nios by RES2NIOS_STATUS child exited exit_status=<%d>", fname, exit_status);
+	  ls_syslog (LOG_DEBUG, "%s Res notifying Nios by RES2NIOS_STATUS child exited exit_status=<%d>", __func__, exit_status);
 	}
 	}
 
@@ -3838,7 +3838,7 @@ notify_client (int s, int rpid, enum resAck ack, struct sigStatusUsage *sigStatR
 				 ( char * )&st, NB_SOCK_WRITE_FIX, xdr_niosStatus, // FIXME FIXME FIXME FIXME make sure this is the right way to pass data
 				 0)) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "writeEncodeMsg_");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "writeEncodeMsg_");
 	  return (rc);
 	}
   if (debug > 1)
@@ -3864,7 +3864,7 @@ setptymode (ttyStruct * tts, int slave)
 
   if (tcgetattr (slave, &termattr) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "tcgetattr", "slave");
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "tcgetattr", "slave");
 	  return;
 	}
 
@@ -3882,11 +3882,11 @@ setptymode (ttyStruct * tts, int slave)
 
 	  if (errno == EINVAL)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: tcsetattr: Invalid argument!", fname);
+	  ls_syslog (LOG_DEBUG, "%s: tcsetattr: Invalid argument!", __func__);
 	}
 	  else
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "tcsetattr",
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "tcsetattr",
 			 "slave");
 	}
 	}
@@ -3908,15 +3908,15 @@ dochild_stdio (struct child *chld, int op)
 	{
 	  if (op == DOWRITE)
 	{
-	  printf ("%s: op DOWRITE buffer.bcount %d for task<%d>\n", fname, chld->i_buf->bcount, chld->rpid);
+	  printf ("%s: op DOWRITE buffer.bcount %d for task<%d>\n", __func__, chld->i_buf->bcount, chld->rpid);
 	}
 	  else if (op == DOSTDERR)
 	{
-	  printf ("%s: op DOSTDERR buffer.bcount %d for task<%d>\n", fname, chld->std_err->buffer.bcount, chld->rpid);
+	  printf ("%s: op DOSTDERR buffer.bcount %d for task<%d>\n", __func__, chld->std_err->buffer.bcount, chld->rpid);
 	}
 	  else if (op == DOREAD)
 	{
-		printf ("%s: op DOREAD buffer.bcount %d for task<%d>\n", fname, chld->std_err->buffer.bcount, chld->rpid);
+		printf ("%s: op DOREAD buffer.bcount %d for task<%d>\n", __func__, chld->std_err->buffer.bcount, chld->rpid);
 	}
 	  fflush (stdout);
 	}
@@ -3962,7 +3962,7 @@ dochild_stdio (struct child *chld, int op)
 		}
 	  if (logclass & LC_TRACE)
 		{
-		  ls_syslog (LOG_DEBUG, "%s: Res wrote <%d> bytes to child=<%x> remaining bytes i_buf.bcount=<%d>", fname, cc, chld, chld->i_buf->bcount);
+		  ls_syslog (LOG_DEBUG, "%s: Res wrote <%d> bytes to child=<%x> remaining bytes i_buf.bcount=<%d>", __func__, cc, chld, chld->i_buf->bcount);
 		}
 	  if (chld->i_buf->bcount == 0 && chld->endstdin)
 		{
@@ -3972,7 +3972,7 @@ dochild_stdio (struct child *chld, int op)
 	}
 	  else if (cc < 0 && BAD_IO_ERR (errno))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, fname, "write",
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, __func__, "write",
 			 "chld->stdio", chld->stdio);
 
 	  simu_eof (chld, chld->stdio);
@@ -3981,7 +3981,7 @@ dochild_stdio (struct child *chld, int op)
 	  break;
 
 	default:
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5237, "%s: Unrecognized operation(%d) on child's stdin/out"), fname, op);    /* catgets 5237 */
+	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5237, "%s: Unrecognized operation(%d) on child's stdin/out"), __func__, op);    /* catgets 5237 */
 	  break;
 	}
 
@@ -4030,7 +4030,7 @@ resSignal (struct child *chld, struct resSignal sig)
 		{
 			if ((sigUnixNTCtrlC = getSigVal (sigBuf1)) == -1)
 			{
-				ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "getSigVal");
+				ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "getSigVal");
 				return -1;
 			}
 		}
@@ -4040,7 +4040,7 @@ resSignal (struct child *chld, struct resSignal sig)
 		else
 		{
 			if ((sigUnixNTCtrlB = getSigVal (sigBuf2)) == -1) {
-				ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "getSigVal", "CTRL_BREAK"); // FIXME this can be concatenated with the else above
+				ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "getSigVal", "CTRL_BREAK"); // FIXME this can be concatenated with the else above
 				return -1;
 			}
 		}
@@ -4063,11 +4063,11 @@ resSignal (struct child *chld, struct resSignal sig)
 
 	if (kill (-chld->pid, sig.sigval) < 0)
 	{
-		ls_syslog (LOG_ERR, I18N_FUNC_D_D_FAIL_M, fname, "kill", sig.sigval, chld->pid);
+		ls_syslog (LOG_ERR, I18N_FUNC_D_D_FAIL_M, __func__, "kill", sig.sigval, chld->pid);
 	}
 	if (logclass & LC_TRACE)
 	{
-		ls_syslog (LOG_DEBUG, "%s: Res sent a signal=<%d> to the child=<%x> process group with pid=<%d>", fname, sig.sigval, chld, chld->pid);
+		ls_syslog (LOG_DEBUG, "%s: Res sent a signal=<%d> to the child=<%x> process group with pid=<%d>", __func__, sig.sigval, chld, chld->pid);
 	}
 
 	if (sig.sigval == SIGCONT) {
@@ -4088,7 +4088,7 @@ simu_eof (struct child *chld, int which)
 
 	if (debug > 1)
 	{
-		printf ("%s(%d)\n", fname, chld->rpid);
+		printf ("%s(%d)\n", __func__, chld->rpid);
 		fflush (stdout);
 	}
 
@@ -4102,7 +4102,7 @@ simu_eof (struct child *chld, int which)
 	{
 		if (logclass & LC_TRACE)
 		{
-			ls_syslog (LOG_DEBUG, "%s: Res is sending EOF to child=<%x> by shutting half connection", fname, chld);
+			ls_syslog (LOG_DEBUG, "%s: Res is sending EOF to child=<%x> by shutting half connection", __func__, chld);
 		}
 		shutdown (chld->stdio, 1);
 		chld->stdin_up = 0;
@@ -4171,7 +4171,7 @@ child_handler (void)
   res_interrupted = 1;
   if (debug > 1)
 	{
-	  printf ("%s: Masks Reset: \n", fname);
+	  printf ("%s: Masks Reset: \n", __func__);
 	  display_masks (&readmask, &writemask, &exceptmask);
 	}
 }
@@ -4202,7 +4202,7 @@ child_handler_ext (void)
 	{
 	  ls_syslog (LOG_DEBUG, "\
 %s: pid=<%d> status=<%x> exitcode=<%d> stopped=<%d> signaled=<%d> \
-coredumped=<%d> exited=<%d>", fname, pid, LS_STATUS (status), WEXITSTATUS (status), WIFSTOPPED (status), WIFSIGNALED (status), WCOREDUMP (status), WIFEXITED (status));
+coredumped=<%d> exited=<%d>", __func__, pid, LS_STATUS (status), WEXITSTATUS (status), WIFSTOPPED (status), WIFSIGNALED (status), WCOREDUMP (status), WIFEXITED (status));
 	}
 
 	  if (debug > 1)
@@ -4283,7 +4283,7 @@ coredumped=<%d> exited=<%d>", fname, pid, LS_STATUS (status), WEXITSTATUS (statu
 		  if (logclass & LC_TRACE)
 		{
 		  ls_syslog (LOG_DEBUG, "\
-%s: Res in sdbMod no SBD_FLAG_TERM exiting, lastChildExitStatus=<%d>", fname, lastChildExitStatus);
+%s: Res in sdbMod no SBD_FLAG_TERM exiting, lastChildExitStatus=<%d>", __func__, lastChildExitStatus);
 		}
 		  exit (lastChildExitStatus);
 		}
@@ -4349,14 +4349,14 @@ notify_sigchild (struct child *cp)
 
   if (debug > 1)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: entering", fname);
+	  ls_syslog (LOG_DEBUG, "%s: entering", __func__);
 	}
 
   sru = (cp->sigStatRu) ? cp->sigStatRu : &sstat;
 
   if (logclass & LC_TRACE)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Informing Nios about the gotten SIGCHLD for child=<%d>:%d after <%d> bytes", fname, cp->rpid, cp->wait, cp->std_out->bytes);
+	  ls_syslog (LOG_DEBUG, "%s: Informing Nios about the gotten SIGCHLD for child=<%d>:%d after <%d> bytes", __func__, cp->rpid, cp->wait, cp->std_out->bytes);
 	}
 
 
@@ -4379,7 +4379,7 @@ notify_sigchild (struct child *cp)
 
   if (logclass & LC_TRACE)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Nios notified about child=<%x> RESE_SIGCHILD sigchld=<%d> sent_status=<%d>", fname, cp, cp->sigchild, cp->sent_status);
+	  ls_syslog (LOG_DEBUG, "%s: Nios notified about child=<%x> RESE_SIGCHILD sigchld=<%d> sent_status=<%d>", __func__, cp, cp->sigchild, cp->sent_status);
 	}
 	if (rc == -2)
 	{
@@ -4441,7 +4441,7 @@ term_handler (int signum)
 	  if (logclass & LC_TRACE)
 		{
 		  ls_syslog (LOG_DEBUG, "\
-%s: Res in sbdMode and SBD_FLAG_TERM is killing signal <%d> chld_cnt=<%d>", fname, signum, child_cnt);
+%s: Res in sbdMode and SBD_FLAG_TERM is killing signal <%d> chld_cnt=<%d>", __func__, signum, child_cnt);
 		}
 
 	  for (i = 0; i < child_cnt; i++)
@@ -4452,7 +4452,7 @@ term_handler (int signum)
 	}
 
   ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5252, "%s: Received signal %d, exiting"),    /* catgets 5252 */
-		 fname, signum);
+		 __func__, signum);
   exit (0);
 
 }
@@ -4470,7 +4470,7 @@ sigHandler (int signum)
 	  if (logclass & LC_TRACE)
 	{
 	  ls_syslog (LOG_DEBUG, "\
-%s: Res in sbdMode and SBD_FLAG_TERM is propagating signal <%d> chld_cnt=<%d>", fname, signum, child_cnt);
+%s: Res in sbdMode and SBD_FLAG_TERM is propagating signal <%d> chld_cnt=<%d>", __func__, signum, child_cnt);
 	}
 
 	  if (signum == SIGCONT)
@@ -4500,7 +4500,7 @@ declare_eof_condition (struct child *childPtr, int which)
   if ((which < 0) || (which > 2))
 	{
 		/* catgets 5101 */
-		ls_syslog (LOG_ERR, I18N (5101, "%s: Invalid input parameter which<%d>"), fname, which);
+		ls_syslog (LOG_ERR, I18N (5101, "%s: Invalid input parameter which<%d>"), __func__, which);
 	}
 
 	if (debug >= 2) {
@@ -4509,7 +4509,7 @@ declare_eof_condition (struct child *childPtr, int which)
 
 	if (logclass & LC_TRACE)
 	{
-		ls_syslog (LOG_DEBUG, "%s: Res declaring EOF with child=<%x> to Nios", fname, childPtr);
+		ls_syslog (LOG_DEBUG, "%s: Res declaring EOF with child=<%x> to Nios", __func__, childPtr);
 	}
 
   eof_to_nios (childPtr);
@@ -4528,7 +4528,7 @@ declare_eof_condition (struct child *childPtr, int which)
 
 	  if (logclass & LC_TRACE)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Nios notified, std_err descriptor with the child=<%x> closed", fname, childPtr);
+	  ls_syslog (LOG_DEBUG, "%s: Nios notified, std_err descriptor with the child=<%x> closed", __func__, childPtr);
 	}
 	}
   else
@@ -4538,7 +4538,7 @@ declare_eof_condition (struct child *childPtr, int which)
 
 	  if (logclass & LC_TRACE)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Nios notified, stdio descriptor with the child=<%x> closed", fname, childPtr);
+	  ls_syslog (LOG_DEBUG, "%s: Nios notified, stdio descriptor with the child=<%x> closed", __func__, childPtr);
 	}
 	}
 
@@ -4609,7 +4609,7 @@ eof_to_nios (struct child *chld)
 	  if (logclass & LC_TRACE)
 	{
 	  ls_syslog (LOG_DEBUG, "\
-%s: Res in sbdMode no SBD_FLAG_TERM doesn't send eof_to_nios", fname);
+%s: Res in sbdMode no SBD_FLAG_TERM doesn't send eof_to_nios", __func__);
 	}
 	  return;
 	}
@@ -4617,7 +4617,7 @@ eof_to_nios (struct child *chld)
   if (logclass & LC_TRACE)
 	{
 	  ls_syslog (LOG_DEBUG, "\
-%s: Res is sending RES2NIOS_EOF about child=<%x>", fname, chld);
+%s: Res is sending RES2NIOS_EOF about child=<%x>", __func__, chld);
 	}
 
   reqHdr.opCode = RES2NIOS_EOF;
@@ -4628,7 +4628,7 @@ eof_to_nios (struct child *chld)
   if (rc < 0)
 	{
 	  int i;
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "writeEncodeHdr_");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "writeEncodeHdr_");
 	  if (rc == -2)
 	{
 
@@ -4662,7 +4662,7 @@ eof_to_client (struct child *chld)
 	  if (logclass & LC_TRACE)
 	{
 	  ls_syslog (LOG_DEBUG, "\
-%s: Res in sbdMode no SBD_FLAG_TERM doesn't send eof_to_client", fname);
+%s: Res in sbdMode no SBD_FLAG_TERM doesn't send eof_to_client", __func__);
 	}
 	  return;
 	}
@@ -4684,7 +4684,7 @@ eof_to_client (struct child *chld)
 
   if (writeEncodeHdr_
 	  (chld->backClnPtr->client_sock, &reqHdr, SOCK_WRITE_FIX))
-	ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "writeEncodeHdr_");
+	ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "writeEncodeHdr_");
 
 }
 
@@ -4716,7 +4716,7 @@ pairsocket (int af, int type, int protocol, int *sv)
 	}
   if ((s = socket (af, type, protocol)) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "malloc", "af");
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "malloc", "af");
 	  return (-1);
 	}
   memset ((char *) &sa, 0, sizeof (sa));
@@ -4725,28 +4725,28 @@ pairsocket (int af, int type, int protocol, int *sv)
   sa.sin_port = 0;
   if (Bind_ (s, (struct sockaddr *) &sa, sizeof (sa)) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "Bind_");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "Bind_");
 	  close (s);
 	  return (-1);
 	}
   sa_size = sizeof (sa);
   if (getsockname (s, (struct sockaddr *) &sa, &sa_size) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "getsockname");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "getsockname");
 	  close (s);
 	  return (-1);
 	}
 
   if (listen (s, 1) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "listen");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "listen");
 	  close (s);
 	  return (-1);
 	}
 
   if ((sv[1] = socket (af, type, protocol)) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "socket");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "socket");
 	  close (s);
 	  return (-1);
 	}
@@ -4754,7 +4754,7 @@ pairsocket (int af, int type, int protocol, int *sv)
   memcpy ((char *) &sa.sin_addr, hp->h_addr, hp->h_length);
   if (connect (sv[1], (struct sockaddr *) &sa, sizeof (sa)) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "connect");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "connect");
 	  close (s);
 	  close (sv[1]);
 	  return (-1);
@@ -4800,7 +4800,7 @@ pairsocket (int af, int type, int protocol, int *sv)
 
 	  if ((sv[0] = accept (s, (struct sockaddr *) &sa, &sa_size)) < 0)
 	{
-	  ls_syslog (LOG_DEBUG, I18N_FUNC_FAIL_M, fname, "accept");
+	  ls_syslog (LOG_DEBUG, I18N_FUNC_FAIL_M, __func__, "accept");
 	  close (s);
 	  close (sv[1]);
 	  return (-1);
@@ -4832,7 +4832,7 @@ sendReturnCode (int s, int code)
 
   if (writeEncodeHdr_ (s, &replyHdr, SOCK_WRITE_FIX) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "writeEncodeHdr_");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "writeEncodeHdr_");
 	  return (-1);
 	}
 
@@ -4849,7 +4849,7 @@ child_channel_clear (struct child *chld, struct outputchannel *channel)
 
   if (debug > 1)
 	{
-	  printf ("%s: buffer->bcount=%d\n", fname, buffer->bcount);
+	  printf ("%s: buffer->bcount=%d\n", __func__, buffer->bcount);
 	  fflush (stdout);
 	}
 
@@ -4875,12 +4875,12 @@ child_channel_clear (struct child *chld, struct outputchannel *channel)
 	{
 	  if (debug > 1)
 	ls_syslog (LOG_ERR, I18N (5295, "%s: EOF detected for task <%d>"),  /*catgets 5295 */
-		   fname, chld->rpid);
+		   __func__, chld->rpid);
 	  channel->endFlag = 1;
 	  if (logclass & LC_TRACE)
 	{
 	  ls_syslog (LOG_DEBUG, "\
-%s: Res read=<%d> bytes (EOF) from child=<%x> setting endFlag=<%d> invalidating the child", fname, cc, chld, channel->endFlag);
+%s: Res read=<%d> bytes (EOF) from child=<%x> setting endFlag=<%d> invalidating the child", __func__, cc, chld, channel->endFlag);
 	}
 
 	  if (channel->fd == chld->stdio)
@@ -4896,7 +4896,7 @@ child_channel_clear (struct child *chld, struct outputchannel *channel)
 
 	  if (logclass & LC_TRACE)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Res read error cc=<%d> %m", fname, cc);
+	  ls_syslog (LOG_DEBUG, "%s: Res read error cc=<%d> %m", __func__, cc);
 	}
 
 	  if (BAD_IO_ERR (errno))
@@ -4904,13 +4904,13 @@ child_channel_clear (struct child *chld, struct outputchannel *channel)
 	  if (debug > 1)
 		ls_syslog (LOG_ERR, I18N (5296, "\
 %s: Read error on channel->fd<%d>: %m: EOF assumed"),   /*catgets 5296 */
-			   fname, channel->fd);
+			   __func__, channel->fd);
 	  channel->endFlag = 1;
 
 	  if (logclass & LC_TRACE)
 		{
 		  ls_syslog (LOG_DEBUG, "\
-%s: Res read=<%d> from child=<%x>, BAD_IO_ERROR assuming EOF endFlag=<%d>", fname, cc, chld, channel->endFlag);
+%s: Res read=<%d> from child=<%x>, BAD_IO_ERROR assuming EOF endFlag=<%d>", __func__, cc, chld, channel->endFlag);
 		}
 
 
@@ -4932,13 +4932,13 @@ child_channel_clear (struct child *chld, struct outputchannel *channel)
 		{
 		  if (debug > 1)
 		ls_syslog (LOG_ERR, I18N (5297, "\
-%s: final read failed, assuming EOF: %m"), fname);  /* catgets 5297 */
+%s: final read failed, assuming EOF: %m"), __func__);  /* catgets 5297 */
 		  channel->endFlag = 1;
 
 		  if (logclass & LC_TRACE)
 		{
 		  ls_syslog (LOG_DEBUG, "\
-%s: Res can't flush child=<%x> read=<%d> assuming EOF, endFlag=<%d> %m", fname, chld, cc, channel->endFlag);
+%s: Res can't flush child=<%x> read=<%d> assuming EOF, endFlag=<%d> %m", __func__, chld, cc, channel->endFlag);
 		}
 
 
@@ -4953,13 +4953,13 @@ child_channel_clear (struct child *chld, struct outputchannel *channel)
 		{
 		  if (debug > 1)
 		ls_syslog (LOG_ERR, I18N (5298, "%s: EOF in final read"),   /*catgets 5298 */
-			   fname);
+			   __func__);
 		  channel->endFlag = 1;
 
 		  if (logclass & LC_TRACE)
 		{
 		  ls_syslog (LOG_DEBUG, "\
-%s: Res flushed child=<%x> read=<%d> EOF, endFlag=<%d>", fname, chld, cc, channel->endFlag);
+%s: Res flushed child=<%x> read=<%d> EOF, endFlag=<%d>", __func__, chld, cc, channel->endFlag);
 		}
 
 
@@ -4976,7 +4976,7 @@ child_channel_clear (struct child *chld, struct outputchannel *channel)
 	  if (logclass & LC_TRACE)
 		{
 		  ls_syslog (LOG_DEBUG, "\
-%s: Res got some data from child=<%x> read=<%d>, retry=<%d>", fname, chld, cc, channel->retry);
+%s: Res got some data from child=<%x> read=<%d>, retry=<%d>", __func__, chld, cc, channel->retry);
 		}
 
 	}
@@ -4987,7 +4987,7 @@ child_channel_clear (struct child *chld, struct outputchannel *channel)
 	  if (logclass & LC_TRACE)
 		{
 		  ls_syslog (LOG_DEBUG, "\
-%s: Res read=<%d> bytes from child=<%x> but process group is not empty, keep on trying", fname, cc, chld);
+%s: Res read=<%d> bytes from child=<%x> but process group is not empty, keep on trying", __func__, cc, chld);
 		}
 
 	  return;
@@ -4996,7 +4996,7 @@ child_channel_clear (struct child *chld, struct outputchannel *channel)
 
   if (debug > 1)
 	{
-	  printf ("%s: read %d chars from channel\n", fname, cc);
+	  printf ("%s: read %d chars from channel\n", __func__, cc);
 	  fflush (stdout);
 	}
 
@@ -5007,7 +5007,7 @@ child_channel_clear (struct child *chld, struct outputchannel *channel)
 
 	if (logclass & LC_TRACE)
 	{
-		ls_syslog (LOG_DEBUG, "%s: Res read=<%d> bytes from child=<%x> bytes=<%d> buffer->bcount=<%d>", fname, cc, chld, channel->bytes, buffer->bcount);
+		ls_syslog (LOG_DEBUG, "%s: Res read=<%d> bytes from child=<%x> bytes=<%d> buffer->bcount=<%d>", __func__, cc, chld, channel->bytes, buffer->bcount);
 	}
 
 	if( ( chld->rexflag & REXF_USEPTY ) && ( channel != chld->std_err ) )
@@ -5198,7 +5198,7 @@ lsbJobStart (char **jargv, u_short retPort, char *host, int usePty)
 
 	if (logclass & LC_TRACE)
 	{
-		ls_syslog (LOG_DEBUG, "%s: Starting a batch job", fname);
+		ls_syslog (LOG_DEBUG, "%s: Starting a batch job", __func__);
 	}
 
 
@@ -5236,7 +5236,7 @@ lsbJobStart (char **jargv, u_short retPort, char *host, int usePty)
 	jf = getenv ("LSB_JOBFILENAME");
 	if (jf == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, fname, "getenv", "LSB_JOBFILENAME");
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, __func__, "getenv", "LSB_JOBFILENAME");
 	}
 	else
 	{
@@ -5290,7 +5290,7 @@ lsbJobStart (char **jargv, u_short retPort, char *host, int usePty)
 	  jidStr = getenv ("LSB_JOBID");
 	  if (jidStr == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, fname, "getenv", "LSB_JOBID");
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, __func__, "getenv", "LSB_JOBID");
 	  resExit_ (-1);
 	}
 	  jobId = atoi (jidStr);
@@ -5312,7 +5312,7 @@ lsbJobStart (char **jargv, u_short retPort, char *host, int usePty)
 
 	  if ((cli.username = getenv ("USER")) == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, fname, "getenv", "USER");
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, __func__, "getenv", "USER");
 	  resExit_ (-1);
 	}
 	}
@@ -5323,7 +5323,7 @@ lsbJobStart (char **jargv, u_short retPort, char *host, int usePty)
 
 	  if (getOSUid_ (cli.username, &uid) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_MM, fname, "getOSUid_",
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_MM, __func__, "getOSUid_",
 			 cli.username);
 	  resExit_ (-1);
 	}
@@ -5357,12 +5357,12 @@ lsbJobStart (char **jargv, u_short retPort, char *host, int usePty)
 
 	  if (logclass & LC_TRACE)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Calling back to Nios retport=<%d> rpid=<%d>", fname, cmdBill.retport, jobId);
+	  ls_syslog (LOG_DEBUG, "%s: Calling back to Nios retport=<%d> rpid=<%d>", __func__, cmdBill.retport, jobId);
 	}
 
 	  if ((retsock = niosCallback_ (&from, cmdBill.retport, jobId, exitStatus, terWhiPendStatus)) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, fname, "niosCallback_", retPort);
+	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__, "niosCallback_", retPort);
 	  resExit_ (-1);
 	}
 
@@ -5373,13 +5373,13 @@ lsbJobStart (char **jargv, u_short retPort, char *host, int usePty)
 		// setEUid cannot return a negative number
 		// if (setEUid (cli.ruid) < 0)
 		// {
-		// 	ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, fname, "setEUid", cli.ruid);
+		// 	ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__, "setEUid", cli.ruid);
 		// 	resExit_ (-1);
 		// }
 
 	  if (ttyCallback (retsock, &cli.tty) < 0)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "ttyCallback");
+		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "ttyCallback");
 		  resExit_ (-1);
 		}
 	}
@@ -5390,13 +5390,13 @@ lsbJobStart (char **jargv, u_short retPort, char *host, int usePty)
 	  retsock = INVALID_FD;
 	  if (logclass & LC_TRACE)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Res no niosCallback_() since no tty suport requested", fname);
+	  ls_syslog (LOG_DEBUG, "%s: Res no niosCallback_() since no tty suport requested", __func__);
 	}
 	}
 
   if ((child = doRexec (&cli, &cmdBill, retsock, 0, FALSE, &ack)) == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, fname, "doRexec", ack);
+	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__, "doRexec", ack);
 	  resExit_ (-1);
 	}
 
@@ -5462,7 +5462,7 @@ ttyCallback (int s, ttyStruct * tty)
 	  buf = malloc (msgHdr.length);
 	  if (!buf)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
 	  return (-1);
 	}
 
@@ -5488,7 +5488,7 @@ ttyCallback (int s, ttyStruct * tty)
 			 XDR_DECODE);
 	  if (!xdr_resStty (&xdrs, &restty, &msgHdr))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_resStty");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_resStty");
 	  xdr_destroy (&xdrs);
 	  return (-1);
 	}
@@ -5500,7 +5500,7 @@ ttyCallback (int s, ttyStruct * tty)
 	  return (0);
 
 	default:
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5278, "%s: unknown opCode=%d"), fname, msgHdr.opCode);   /* catgets 5278 */
+	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5278, "%s: unknown opCode=%d"), __func__, msgHdr.opCode);   /* catgets 5278 */
 	}
   if (buf)
 	free (buf);
@@ -5526,11 +5526,11 @@ resDebugReq (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs, int c
   memset (lsfLogDir, 0, sizeof (lsfLogDir));
 
   if (debug > 1)
-	printf ("%s: Entering this routine...Pid is %d \n", fname,
+	printf ("%s: Entering this routine...Pid is %d \n", __func__,
 		(int) getpid ());
   if (!xdr_debugReq (xdrs, &debugReq, msgHdr))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_debugReq");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_debugReq");
 	  sendReturnCode (cli_ptr->client_sock, RESE_REQUEST);
 	  return;
 	}
@@ -5660,7 +5660,7 @@ doReopen (void)
 	resParams[LSF_LOGDIR].paramValue = sp;
 	  ls_openlog ("res", resParams[LSF_LOGDIR].paramValue, (debug > 1),
 		  resParams[LSF_LOG_MASK].paramValue);
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_MM, fname, "initenv_", pathname);
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_MM, __func__, "initenv_", pathname);
 	  resExit_ (-1);
 	}
 
@@ -5721,12 +5721,12 @@ dumpResCmdBill (struct resCmdBill *bill)
 	static char __func__] = "dumpResCmdBill()";
 	char **args = NULL;
 
-	ls_syslog (LOG_DEBUG, "%s: retport=<%d>, rpid=<%d>, priority=<%d>, filemask=<%d>, options=<%d>, cwd=<%s>", fname, bill->retport, bill->rpid, bill->priority, bill->filemask, bill->options, bill->cwd);
+	ls_syslog (LOG_DEBUG, "%s: retport=<%d>, rpid=<%d>, priority=<%d>, filemask=<%d>, options=<%d>, cwd=<%s>", __func__, bill->retport, bill->rpid, bill->priority, bill->filemask, bill->options, bill->cwd);
 
 	args = bill->argv;
 	while (*args != NULL)
 	{
-		ls_syslog (LOG_DEBUG, "%s: argv=<%s>", fname, *args);
+		ls_syslog (LOG_DEBUG, "%s: argv=<%s>", __func__, *args);
 		args++;
 	}
 
@@ -5738,7 +5738,7 @@ changeEUid (uid_t uid)
   static char __func__] = "changeEUid()";
   if (lsfSetXUid(0, -1, uid, -1, seteuid) < 0)
 	{
-	  ls_syslog (LOG_WARNING, I18N_FUNC_D_FAIL_M, fname, "setresuid/seteuid", uid);
+	  ls_syslog (LOG_WARNING, I18N_FUNC_D_FAIL_M, __func__, "setresuid/seteuid", uid);
 	  return -1;
 	}
 
@@ -5747,7 +5747,7 @@ changeEUid (uid_t uid)
 		//  lsfSetXUid(0, ruid, euid, -1, setreuid)
 		if( lsfSetXUid(0, 0,    0,    -1, setreuid)  < 0 ) //lsfSetREUid (0, 0) < 0)
 	{
-	  ls_syslog (LOG_WARNING, I18N_FUNC_D_FAIL_M, fname, "setresuid/seteuid", uid);
+	  ls_syslog (LOG_WARNING, I18N_FUNC_D_FAIL_M, __func__, "setresuid/seteuid", uid);
 	  return -1;
 	}
 	}
@@ -5760,7 +5760,7 @@ dumpClient (struct client *client, char *why)
 {
   static char __func__] = "dumpClient()";
 
-  ls_syslog (LOG_DEBUG, "%s: %s: Client=<%x> socket=<%d> ruid=<%d> username=<%s> from=<%s>", fname, why, client, client->client_sock, client->ruid, client->username, client->hostent.h_name);
+  ls_syslog (LOG_DEBUG, "%s: %s: Client=<%x> socket=<%d> ruid=<%d> username=<%s> from=<%s>", __func__, why, client, client->client_sock, client->ruid, client->username, client->hostent.h_name);
 }
 
 void
@@ -5770,7 +5770,7 @@ dumpChild (struct child *child, int operation, char *why)
 
 	ls_syslog (LOG_DEBUG, // FIXME sprintf && concatenate string, to tidy it up a bit
 		"%s: %s: Operation=<%d> on child=<%x> child->pid=<%d> child->rpid=<%d> backClient=<%x> refcnt=<%d> stdio=<%d> remsock.fd=<%d> remsock.rcount/remsock.wcount=<%d/%d> rexflag=<%d> server=<%d> c_eof=<%d> running=<%d> sigchild=<%d> endstdin=<%d> i_buf.bcount=<%d> std_out.endFlag=<%d> std_out.retry=<%d> std_out.buffer.bcount=<%d> std_out.bytes=<%d> std_err.endFlag=<%d> std_err.retry=<%d> std_err.buffer.bcount=<%d> std_err.bytes=<%d> sent_eof=<%d> sent_status=<%d> child->username=<%s> child->fromhost=<%s> ", 
-		fname, why, operation, child, child->pid, child->rpid, child->backClnPtr, child->refcnt,
+		__func__, why, operation, child, child->pid, child->rpid, child->backClnPtr, child->refcnt,
 		child->stdio, child->remsock->fd, child->remsock->rcount, child->remsock->wcount,
 		child->rexflag, child->server, child->c_eof, child->running, child->sigchild,
 		child->endstdin, child->i_buf->bcount, child->std_out->endFlag, child->std_out->retry,
@@ -5794,15 +5794,15 @@ dochild_buffer (struct child *chld, int op)
 	{
 	  if (op == DOSTDERR)
 	{
-	  printf ("%s: DOSTDERR bcount %d for task<%d>\n", fname, chld->std_err->buffer.bcount, chld->rpid);
+	  printf ("%s: DOSTDERR bcount %d for task<%d>\n", __func__, chld->std_err->buffer.bcount, chld->rpid);
 	}
 	  else if (op == DOWRITE)
 	{
-	  printf ("%s: DOWRITE bcount %d for task<%d>\n", fname, chld->std_out->buffer.bcount, chld->rpid);
+	  printf ("%s: DOWRITE bcount %d for task<%d>\n", __func__, chld->std_out->buffer.bcount, chld->rpid);
 	}
 	  else if (op == DOREAD)
 	{
-	  printf ("%s: DOREAD bcount %d for task<%d>\n", fname, conn2NIOS.sock->rbuf->bcount, chld->rpid);
+	  printf ("%s: DOREAD bcount %d for task<%d>\n", __func__, conn2NIOS.sock->rbuf->bcount, chld->rpid);
 	}
 	  fflush (stdout);
 	}
@@ -5884,7 +5884,7 @@ dochild_buffer (struct child *chld, int op)
 		}
 	  if (debug > 1)
 		{
-		  printf ("%s: child_cnt=%d num_duped=%d bcount=%d\n", fname, child_cnt, conn2NIOS.num_duped, conn2NIOS.sock->rbuf->bcount);
+		  printf ("%s: child_cnt=%d num_duped=%d bcount=%d\n", __func__, child_cnt, conn2NIOS.num_duped, conn2NIOS.sock->rbuf->bcount);
 		  fflush (stdout);
 		}
 	}
@@ -5983,7 +5983,7 @@ dochild_buffer (struct child *chld, int op)
 			if (debug > 1)
 			  {
 			p = channel->buffer.bp;
-			printf ("%s: leftover: \"", fname);
+			printf ("%s: leftover: \"", __func__);
 			for (i = 0; i < channel->buffer.bcount; i++) {
 				printf ("%c", p[i]);
 			}
@@ -6045,10 +6045,10 @@ donios_sock (struct child **children, int op)
 	if (debug > 1)
 	{
 		if (op == DOWRITE) {
-			printf ("%s(%d): DOWRITE wcount=%d bcount=%d\n", fname, conn2NIOS.wtag, conn2NIOS.sock->wcount, conn2NIOS.sock->wbuf->bcount);
+			printf ("%s(%d): DOWRITE wcount=%d bcount=%d\n", __func__, conn2NIOS.wtag, conn2NIOS.sock->wcount, conn2NIOS.sock->wbuf->bcount);
 		}
 		else {
-			printf ("%s(%d): DOREAD rcount=%d bcount=%d\n", fname, children[0]->rpid, conn2NIOS.sock->rcount, conn2NIOS.sock->rbuf->bcount); 
+			printf ("%s(%d): DOREAD rcount=%d bcount=%d\n", __func__, children[0]->rpid, conn2NIOS.sock->rcount, conn2NIOS.sock->rbuf->bcount); 
 		}
 		fflush (stdout);
 	}
@@ -6081,7 +6081,7 @@ donios_sock (struct child **children, int op)
 				xdr_destroy (&xdrs);
 
 				if (child_cnt > 0) {
-					ls_syslog (LOG_DEBUG, "%s: Read package head failed: %M", fname); // FIXME FIME watch out for that %m
+					ls_syslog (LOG_DEBUG, "%s: Read package head failed: %M", __func__); // FIXME FIME watch out for that %m
 				}
 		  return;
 		}
@@ -6094,7 +6094,7 @@ donios_sock (struct child **children, int op)
 			case NIOS2RES_STDIN:
 				if (logclass & LC_TRACE)
 				{
-					ls_syslog (LOG_DEBUG, "%s: NIOS2RES_STDIN message with tag <%d>", fname, rtag);
+					ls_syslog (LOG_DEBUG, "%s: NIOS2RES_STDIN message with tag <%d>", __func__, rtag);
 				}
 				if (debug > 1) {
 					printf ("Received SIDIN for task <%d>\n", rtag);
@@ -6108,7 +6108,7 @@ donios_sock (struct child **children, int op)
 			{
 				if (logclass & LC_TRACE)
 				{
-					ls_syslog (LOG_DEBUG, "%s: NIOS2RES_SIGNAL message with tag <%d>", fname, rtag);
+					ls_syslog (LOG_DEBUG, "%s: NIOS2RES_SIGNAL message with tag <%d>", __func__, rtag);
 				}
 
 				if (debug > 1) {
@@ -6123,7 +6123,7 @@ donios_sock (struct child **children, int op)
 				xdr_destroy (&xdrs);
 		  if (rc < 0)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "readDecodeMsg_");
+		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "readDecodeMsg_");
 		  if (rc == -2)
 			{
 			  sig.pid = 0;
@@ -6135,7 +6135,7 @@ donios_sock (struct child **children, int op)
 				{
 				  if (resSignal (children[i], sig) == -1)
 				{
-				  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "resSignal");
+				  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "resSignal");
 
 				  unlink_child (children[i]);
 				}
@@ -6151,7 +6151,7 @@ donios_sock (struct child **children, int op)
 					}
 				  if (resSignal (children[i], sig) == -1)
 				{
-				  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "resSignal");
+				  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "resSignal");
 
 				  unlink_child (children[i]);
 
@@ -6175,7 +6175,7 @@ donios_sock (struct child **children, int op)
 			{
 			  if (resSignal (children[i], sig) == -1)
 			{
-			  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname,
+			  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__,
 					 "resSignal");
 
 			  unlink_child (children[i]);
@@ -6191,7 +6191,7 @@ donios_sock (struct child **children, int op)
 			continue;
 			  if (resSignal (children[i], sig) == -1)
 			{
-			  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname,
+			  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__,
 					 "resSignal");
 
 			  unlink_child (children[i]);
@@ -6205,7 +6205,7 @@ donios_sock (struct child **children, int op)
 
 		  if (logclass & LC_TRACE)
 		{
-		  ls_syslog (LOG_DEBUG, "%s: NIOS2RES_EOF message with tag <%d>", fname, rtag);
+		  ls_syslog (LOG_DEBUG, "%s: NIOS2RES_EOF message with tag <%d>", __func__, rtag);
 		}
 		  if (debug > 1)
 		printf ("Received EOF notification of stdin for task <%d>\n",
@@ -6235,7 +6235,7 @@ donios_sock (struct child **children, int op)
 		case NIOS2RES_TIMEOUT:
 		  if (logclass & LC_TRACE)
 		{
-		  ls_syslog (LOG_DEBUG, "%s: NIOS2RES_TIMEOUT message with tag <%d>", fname, rtag);
+		  ls_syslog (LOG_DEBUG, "%s: NIOS2RES_TIMEOUT message with tag <%d>", __func__, rtag);
 		}
 			if (debug > 1) {
 				printf ("Received TIMEOUT notification for task <%d>\n", rtag);
@@ -6275,13 +6275,13 @@ donios_sock (struct child **children, int op)
 		case NIOS2RES_HEARTBEAT:
 		  if (logclass & LC_TRACE)
 		{
-		  ls_syslog (LOG_DEBUG, "%s: NIOS2RES_HEARTBEAT message from nios", fname);
+		  ls_syslog (LOG_DEBUG, "%s: NIOS2RES_HEARTBEAT message from nios", __func__);
 		}
 		  return;
 
 		default:
 			/* catgets 5239 */
-			ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5239, "%s: Unknown msg type %d: %m"), fname, msgHdr.opCode);
+			ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5239, "%s: Unknown msg type %d: %m"), __func__, msgHdr.opCode);
 			return;
 		}
 	}
@@ -6305,7 +6305,7 @@ donios_sock (struct child **children, int op)
 		  if (cc == 0 || BAD_IO_ERR (errno))
 		{
 			if (cc < 0) {
-				ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "recv/read", conn2NIOS.sock->fd);
+				ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "recv/read", conn2NIOS.sock->fd);
 			}
 
 		  conn2NIOS.sock->fd = INVALID_FD;
@@ -6328,7 +6328,7 @@ donios_sock (struct child **children, int op)
 
 	  if (logclass & LC_TRACE)
 		{
-		  ls_syslog (LOG_DEBUG, "%s: Res read <%d> bytes with tag=<%d> rcount=<%d> rbuf->bcount=<%d>", fname, cc, conn2NIOS.rtag, conn2NIOS.sock->rcount, conn2NIOS.sock->rbuf->bcount);
+		  ls_syslog (LOG_DEBUG, "%s: Res read <%d> bytes with tag=<%d> rcount=<%d> rbuf->bcount=<%d>", __func__, cc, conn2NIOS.rtag, conn2NIOS.sock->rcount, conn2NIOS.sock->rbuf->bcount);
 		}
 	  return;
 	}
@@ -6354,7 +6354,7 @@ donios_sock (struct child **children, int op)
 
 	  if (!xdr_packLSFHeader (conn2NIOS.sock->wbuf->bp, &reqHdr))
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_packLSFHeader");
+		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_packLSFHeader");
 		  for (i = 0; i < child_cnt; i++)
 		if (children[i]->rpid == conn2NIOS.wtag)
 		  {
@@ -6370,7 +6370,7 @@ donios_sock (struct child **children, int op)
 	{
 	  if (cc < 0 && BAD_IO_ERR (errno))
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "write", "conn2NIOS.sock");
+		  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "write", "conn2NIOS.sock");
 
 		  conn2NIOS.sock->fd = INVALID_FD;
 
@@ -6394,7 +6394,7 @@ donios_sock (struct child **children, int op)
 
 	  if (logclass & LC_TRACE)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Res wrote <%d> bytes with tag=<%d> back to client, remaining bytes=<%d>", fname, cc, conn2NIOS.wtag, conn2NIOS.sock->wcount);
+	  ls_syslog (LOG_DEBUG, "%s: Res wrote <%d> bytes with tag=<%d> back to client, remaining bytes=<%d>", __func__, cc, conn2NIOS.wtag, conn2NIOS.sock->wcount);
 	}
 
 		if (conn2NIOS.sock->wcount == 0) {
@@ -6410,7 +6410,7 @@ donios_sock (struct child **children, int op)
 	  break;
 
 	case DOEXCEPTION:
-	  ls_syslog (LOG_DEBUG, "%s: DOEXCEPTION situation detected for tag=<%d>", fname, conn2NIOS.rtag);
+	  ls_syslog (LOG_DEBUG, "%s: DOEXCEPTION situation detected for tag=<%d>", __func__, conn2NIOS.rtag);
 	  break;
 
 	default:
@@ -6516,7 +6516,7 @@ notify_nios (int retsock, int rpid, int opCode)
 
   if (debug > 1)
 	{
-	  printf ("%s(%d): retsock=%d opCode=%d\n", fname, rpid, retsock, opCode);
+	  printf ("%s(%d): retsock=%d opCode=%d\n", __func__, rpid, retsock, opCode);
 	  fflush (stdout);
 	}
 
@@ -6530,7 +6530,7 @@ notify_nios (int retsock, int rpid, int opCode)
   rc = writeEncodeHdr_ (retsock, &reqHdr, NB_SOCK_WRITE_FIX);
   if (rc < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "writeEncodeHdr_");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "writeEncodeHdr_");
 	  if (rpid == 0)
 	{
 	  for (i = 0; i < child_cnt; i++)
@@ -6570,7 +6570,7 @@ resUpdatetty (struct LSFHeader msgHdr)
 
   if (logclass & LC_TRACE)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Entering", fname);
+	  ls_syslog (LOG_DEBUG, "%s: Entering", __func__);
 	}
 
 
@@ -6579,13 +6579,13 @@ resUpdatetty (struct LSFHeader msgHdr)
 	  tempBuf = malloc (msgHdr.length);
 	  if (!tempBuf)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
 	  return (-1);
 	}
 
 	  if ((cc = SOCK_READ_FIX (conn2NIOS.sock->fd, tempBuf, msgHdr.length))!= msgHdr.length)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: b_read_fix(%d) failed, cc=%d: %m", fname, msgHdr.length, cc);
+	  ls_syslog (LOG_DEBUG, "%s: b_read_fix(%d) failed, cc=%d: %m", __func__, msgHdr.length, cc);
 	  free (tempBuf);
 	  return (-1);
 	}
@@ -6600,7 +6600,7 @@ resUpdatetty (struct LSFHeader msgHdr)
 		 XDR_DECODE);
   if (!xdr_resStty (&xdrs, &restty, &msgHdr))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_resStty");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_resStty");
 	  xdr_destroy (&xdrs);
 	  return (-1);
 	}
@@ -6641,7 +6641,7 @@ cleanUpKeptPids (void)
 	  if (logclass & LC_TRACE)
 	{
 	  ls_syslog (LOG_DEBUG, "\
-%s: killing process id (%d) with SIGKILL", fname, *pid);
+%s: killing process id (%d) with SIGKILL", __func__, *pid);
 	}
 	}
 

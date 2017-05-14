@@ -331,20 +331,20 @@ main (int argc, char **argv)
 
       if (read (chfd, (char *) &ppid, sizeof (ppid)) <= 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "read");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "read");
 	  exit (-1);
 	}
 
 
       if ((asock = TcpCreate_ (TRUE, 0)) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "TcpCreate_");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "TcpCreate_");
 	  exit (-1);
 	}
       len = sizeof (sin);
       if (getsockname (asock, (struct sockaddr *) &sin, &len) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "getsockname");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "getsockname");
 	  (void) closesocket (asock);
 	  exit (-1);
 	}
@@ -352,13 +352,13 @@ main (int argc, char **argv)
 
       if (write (chfd, &port, sizeof (port)) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "write");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "write");
 	  (void) closesocket (asock);
 	  exit (-1);
 	}
       if ((maxfds = ls_nioinit (asock)) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "ls_nioinit");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "ls_nioinit");
 	  closesocket (asock);
 	  exit (-1);
 	}
@@ -376,7 +376,7 @@ main (int argc, char **argv)
 
       if (niosDebug)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Nios running in standalone mode", fname);
+	  ls_syslog (LOG_DEBUG, "%s: Nios running in standalone mode", __func__);
 	}
 
       if (!strcmp (argv[1], "-p"))
@@ -385,7 +385,7 @@ main (int argc, char **argv)
 
 	  if ((asock = TcpCreate_ (TRUE, atoi (argv[2]))) < 0)
 	    {
-	      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname,
+	      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__,
 			 "tcpCreate", "-p");
 	      exit (-1);
 	    }
@@ -399,7 +399,7 @@ main (int argc, char **argv)
 	  if (niosDebug)
 	    {
 	      ls_syslog (LOG_DEBUG, "%s: Nios running in sbdMode mode",
-			 fname);
+			 __func__);
 	    }
 
 
@@ -436,7 +436,7 @@ main (int argc, char **argv)
 		  if ((sp = getenv ("LSB_JOBID")) == NULL)
 		    {
 		      ls_syslog (LOG_ERR, I18N (5803, "%s: LSB_JOBID is not defined %M"),	/* catgets 5803 */
-				 fname);
+				 __func__);
 		      exit (-1);
 		    }
 
@@ -445,7 +445,7 @@ main (int argc, char **argv)
 		  if (lsb_init ("nios") < 0)
 		    {
 		      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M,
-				 fname, "lsb_init");
+				 __func__, "lsb_init");
 		      exit (-lsberrno);
 		    }
 
@@ -454,7 +454,7 @@ main (int argc, char **argv)
 
 		  if (atexit (JobExitInfo) < 0)
 		    {
-		      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname,
+		      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__,
 				 "atexit : JobExitInfo");
 		      exit (-1);
 		    }
@@ -475,13 +475,13 @@ main (int argc, char **argv)
 
       if ((maxfds = ls_nioinit (0)) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "ls_nioinit");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "ls_nioinit");
 	  exit (-1);
 	}
 
       if (ls_nionewtask (1, sock) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "ls_nionewtask");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "ls_nionewtask");
 	  exit (-1);
 	}
 
@@ -532,7 +532,7 @@ serv (char **argv, int asock)
   tid_list = (int *) calloc (maxtasks, sizeof (int));
   if (tid_list == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "calloc");
       exit (-1);
     }
 
@@ -540,7 +540,7 @@ serv (char **argv, int asock)
     (struct finishStatus *) calloc (maxtasks, sizeof (struct finishStatus));
   if (taskStatus == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "calloc");
       exit (-1);
     }
 
@@ -594,9 +594,9 @@ serv (char **argv, int asock)
 	      if (niosDebug)
 		{
 		  ls_syslog (LOG_DEBUG, "\
-%s: Nios ls_niotasks returned 0, got_eof=%d", fname, got_eof);
+%s: Nios ls_niotasks returned 0, got_eof=%d", __func__, got_eof);
 		  ls_syslog (LOG_DEBUG, "\
-%s: Nios exit_sig=%d exit_status=%d. exiting", fname, exit_sig, exit_status);
+%s: Nios exit_sig=%d exit_status=%d. exiting", __func__, exit_sig, exit_status);
 		}
 	      PassSig (SIGKILL);
 	      die ();
@@ -605,7 +605,7 @@ serv (char **argv, int asock)
       else if (m < 0)
 	{
 	  PassSig (SIGKILL);
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "ls_niotasks");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "ls_niotasks");
 	  die ();
 	}
 
@@ -622,7 +622,7 @@ serv (char **argv, int asock)
 
       if (niosDebug)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Nios into select", fname);
+	  ls_syslog (LOG_DEBUG, "%s: Nios into select", __func__);
 	}
 
 
@@ -632,7 +632,7 @@ serv (char **argv, int asock)
 	  if (LSE_SYSCALL (lserrno) && errno == EINTR)
 	    continue;
 
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "ls_nioselect");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "ls_nioselect");
 
 	  if (niosSbdMode && standalone && (jobStatusInterval > 0))
 	    {
@@ -659,12 +659,12 @@ serv (char **argv, int asock)
 		      if (tasks->ioTask[i].type == NIO_STDERR)
 			{
 			  ls_syslog (LOG_DEBUG, "\
-%s: Nios Got stderr from connection <%d>", fname, tasks->ioTask[i].tid);
+%s: Nios Got stderr from connection <%d>", __func__, tasks->ioTask[i].tid);
 			}
 		      else
 			{
 			  ls_syslog (LOG_DEBUG, "\
-%s: Nios Got stdout from connection <%d>", fname, tasks->ioTask[i].tid);
+%s: Nios Got stdout from connection <%d>", __func__, tasks->ioTask[i].tid);
 			}
 		    }
 
@@ -699,7 +699,7 @@ serv (char **argv, int asock)
 				  dumpOption, taggingFormat) < 0)
 		    {
 		      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M,
-				 fname, "ls_niodump");
+				 __func__, "ls_niodump");
 		      ls_niokill (SIGKILL);
 		      die ();
 		    }
@@ -707,7 +707,7 @@ serv (char **argv, int asock)
 		case NIO_EOF:
 		  if (niosDebug)
 		    ls_syslog (LOG_DEBUG, "\
-%s: Nios got EOF from remote task standalone=%d got_status=%d", fname, standalone, got_status);
+%s: Nios got EOF from remote task standalone=%d got_status=%d", __func__, standalone, got_status);
 		  taskStatus[tasks->ioTask[i].tid].got_eof = 1;
 		  if (taskStatus[tasks->ioTask[i].tid].got_status
 		      && !taskStatus[tasks->ioTask[i].tid].sendSignal)
@@ -729,7 +729,7 @@ serv (char **argv, int asock)
 		case NIO_STATUS:
 		  if (niosDebug)
 		    ls_syslog (LOG_DEBUG, "\
-%s: Nios Got status <%#x> from task remote", fname, tasks->ioTask[i].status);
+%s: Nios Got status <%#x> from task remote", __func__, tasks->ioTask[i].status);
 		  taskStatus[tasks->ioTask[i].tid].got_status = TRUE;
 
 		  if (REX_FATAL_ERROR (tasks->ioTask[i].status))
@@ -812,7 +812,7 @@ serv (char **argv, int asock)
 		    {
 		      ls_syslog (LOG_ERR, I18N (5806, "\
 %s: Nios IO_ERR while reading from remote task"),	/* catgets 5806 */
-				 fname);
+				 __func__);
 
 		      if ((jobStatusInterval > 0) && niosSbdMode)
 			{
@@ -836,7 +836,7 @@ serv (char **argv, int asock)
 		    {
 		      if (niosDebug)
 			ls_syslog (LOG_DEBUG, "\
-%s: Nios got REQUEUE from remote task standalone=%d got_status=%d", fname, standalone, got_status);
+%s: Nios got REQUEUE from remote task standalone=%d got_status=%d", __func__, standalone, got_status);
 		      fprintf (stderr, I18N (803, "<<Job has been requeued, waiting for dispatch......>>\n"));	/* catgets 803 */
 		      if (usepty && io_fd >= 0 && isatty (io_fd))
 			{
@@ -846,7 +846,7 @@ serv (char **argv, int asock)
 			}
 		      lsfExecv (argv[0], argv);
 
-		      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "execv");
+		      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "execv");
 		      exit (-1);
 		    }
 		  break;
@@ -888,7 +888,7 @@ serv (char **argv, int asock)
 	      if (niosDebug)
 		{
 		  ls_syslog (LOG_DEBUG, "\
-%s: Nios NIOS2RES_STDIN <%d> bytes to remote task", fname, readCount);
+%s: Nios NIOS2RES_STDIN <%d> bytes to remote task", __func__, readCount);
 		}
 
 	      if ((cc = ls_niowrite (bp, readCount)) < 0)
@@ -921,7 +921,7 @@ serv (char **argv, int asock)
 		if (niosDebug)
 		  {
 		    ls_syslog (LOG_DEBUG, "\
-%s: Nios got <EOF> NIOS2RES_EOF for all current remote tasks", fname);
+%s: Nios got <EOF> NIOS2RES_EOF for all current remote tasks", __func__);
 		  }
 		ls_nioclose ();
 		FD_CLR (STDIN_FD, &nios_rmask);
@@ -939,7 +939,7 @@ serv (char **argv, int asock)
 		  continue;
 		}
 
-	      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "reading stdin");
+	      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "reading stdin");
 
 	      signalBufEmpty (stdinBufEmptyEvent);
 
@@ -996,7 +996,7 @@ kill_self (int exit_sig, int exit_stat)
   if (niosDebug)
     {
       ls_syslog (LOG_DEBUG, "\
-%s: Nios kill_self, exit_sig=%d exit_stat=%d", fname, exit_sig, exit_stat);
+%s: Nios kill_self, exit_sig=%d exit_stat=%d", __func__, exit_sig, exit_stat);
     }
 
   if (usepty && io_fd >= 0 && isatty (io_fd))
@@ -1042,7 +1042,7 @@ kill_self (int exit_sig, int exit_stat)
 	case SIGXCPU:
 	  ls_syslog (LOG_ERR, I18N (5807, "\
 %s: Nios receives signal SIGXCPU, exit\n"),	/* catgets 5807 */
-		     fname);
+		     __func__);
 	  exit (exit_stat);
 	  break;
 #endif
@@ -1050,7 +1050,7 @@ kill_self (int exit_sig, int exit_stat)
 	case SIGXFSZ:
 	  ls_syslog (LOG_ERR, I18N (5808, "\
 %s: Nios receives signal SIGXFSZ, exit"),	/* catgets 5808 */
-		     fname);
+		     __func__);
 	  exit (exit_stat);
 	  break;
 #endif
@@ -1072,12 +1072,12 @@ kill_self (int exit_sig, int exit_stat)
 	  kill (getpid (), exit_sig);
 	  ls_syslog (LOG_ERR, I18N (5809, "\
 %s: Nios does not die at sig %d: errno %d"),	/* catgets 5809 */
-		     fname, exit_sig, errno);
+		     __func__, exit_sig, errno);
 	  exit (-1);
 	}
 
       ls_syslog (LOG_ERR, I18N (5810, "%s: Nios Failed to create the task"),	/* catgets 5810 */
-		 fname);
+		 __func__);
       exit (-10);
     }
 
@@ -1115,7 +1115,7 @@ do_newtask (void)
     case LIB_NIOS_RTASK:
       if (niosDebug)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Nios got LIB_NIOS_RTASK", fname);
+	  ls_syslog (LOG_DEBUG, "%s: Nios got LIB_NIOS_RTASK", __func__);
 	}
       rtask (&hdr);
       break;
@@ -1123,7 +1123,7 @@ do_newtask (void)
     case LIB_NIOS_RWAIT:
       if (niosDebug)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Nios got LIB_NIOS_RWAIT", fname);
+	  ls_syslog (LOG_DEBUG, "%s: Nios got LIB_NIOS_RWAIT", __func__);
 	}
       rwait (&hdr);
       break;
@@ -1131,7 +1131,7 @@ do_newtask (void)
     case LIB_NIOS_REM_ON:
       if (niosDebug)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Nios got LIB_NIOS_REM_ON", fname);
+	  ls_syslog (LOG_DEBUG, "%s: Nios got LIB_NIOS_REM_ON", __func__);
 	}
       remOn (&hdr);
       break;
@@ -1139,7 +1139,7 @@ do_newtask (void)
     case LIB_NIOS_REM_OFF:
       if (niosDebug)
 	{
-	  ls_syslog (LOG_DEBUG, "%s Nios got LIB_NIOS_REM_OFF", fname);
+	  ls_syslog (LOG_DEBUG, "%s Nios got LIB_NIOS_REM_OFF", __func__);
 	}
       remOff (&hdr);
       break;
@@ -1147,7 +1147,7 @@ do_newtask (void)
     case LIB_NIOS_SETSTDOUT:
       if (niosDebug)
 	{
-	  ls_syslog (LOG_DEBUG, "%s Nios got LIB_NIOS_SETSTDOUT", fname);
+	  ls_syslog (LOG_DEBUG, "%s Nios got LIB_NIOS_SETSTDOUT", __func__);
 	}
       setStdout (&hdr);
       break;
@@ -1155,7 +1155,7 @@ do_newtask (void)
     case LIB_NIOS_SETSTDIN:
       if (niosDebug)
 	{
-	  ls_syslog (LOG_DEBUG, "%s Nios got LIB_NIOS_SETSTDIN", fname);
+	  ls_syslog (LOG_DEBUG, "%s Nios got LIB_NIOS_SETSTDIN", __func__);
 	}
       setStdin (&hdr);
       break;
@@ -1163,7 +1163,7 @@ do_newtask (void)
     case LIB_NIOS_GETSTDIN:
       if (niosDebug)
 	{
-	  ls_syslog (LOG_DEBUG, "%s Nios got LIB_NIOS_GETSTDIN", fname);
+	  ls_syslog (LOG_DEBUG, "%s Nios got LIB_NIOS_GETSTDIN", __func__);
 	}
       getStdin (&hdr);
       break;
@@ -1171,7 +1171,7 @@ do_newtask (void)
     case LIB_NIOS_EXIT:
       if (niosDebug)
 	{
-	  ls_syslog (LOG_DEBUG, "%s Nios got LIB_NIOS_EXIT", fname);
+	  ls_syslog (LOG_DEBUG, "%s Nios got LIB_NIOS_EXIT", __func__);
 	}
       exExit (&hdr);
       ls_syslog (LOG_ERR, I18N (5811, "nios: LIB_NIOS_EXIT returned!"));	/* catgets 5811 */
@@ -1180,7 +1180,7 @@ do_newtask (void)
     case LIB_NIOS_SUSPEND:
       if (niosDebug)
 	{
-	  ls_syslog (LOG_DEBUG, "%s Nios got LIB_NIOS_SUSPEND", fname);
+	  ls_syslog (LOG_DEBUG, "%s Nios got LIB_NIOS_SUSPEND", __func__);
 	}
       exSuspend (&hdr);
       break;
@@ -1189,7 +1189,7 @@ do_newtask (void)
       if (niosDebug)
 	{
 	  ls_syslog (LOG_DEBUG, "%s Nios got LIB_NIOS_SYNC: %d",
-		     fname, hdr.len);
+		     __func__, hdr.len);
 	}
       niosSyncTasks = hdr.len;
       hdr.opCode = SYNC_OK;
@@ -1203,7 +1203,7 @@ do_newtask (void)
     default:
       ls_syslog (LOG_ERR, I18N (5812, "\
 %s: No such service provided by NIOS code = %d"),	/* catgets 5812 */
-		 fname, hdr.opCode);
+		 __func__, hdr.opCode);
     }
 }
 
@@ -1222,7 +1222,7 @@ rtask (struct lslibNiosHdr *hdr)
 
   if (niosDebug)
     ls_syslog (LOG_DEBUG, "%s: parent registered rpid %d, peer %s",
-	       fname, req.r.pid, inet_ntoa (req.r.peer));
+	       __func__, req.r.pid, inet_ntoa (req.r.peer));
 
   if (req.r.pid < 0)
     {
@@ -1233,7 +1233,7 @@ rtask (struct lslibNiosHdr *hdr)
 
   if (ls_nionewtask (req.r.pid, 0) < 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "ls_nionewtask");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "ls_nionewtask");
       if (lserrno == LSE_MALLOC)
 	{
 	  PassSig (SIGKILL);
@@ -1441,7 +1441,7 @@ setStdin (struct lslibNiosHdr *hdr)
 	  if (ls_nioctl (req.rpidlist[i], req.r.set_on ?
 			 NIO_STDIN_ON : NIO_STDIN_OFF) < 0)
 	    {
-	      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "ls_nioctl");
+	      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "ls_nioctl");
 	      err = 1;
 	    }
 	}
@@ -1474,7 +1474,7 @@ getStdin (struct lslibNiosHdr *hdr)
       req.rpidlist = (int *) calloc (maxtasks, sizeof (int));
       if (req.rpidlist == NULL)
 	{
-	  perror (_i18n_printf (I18N_FUNC_FAIL, fname, "calloc"));
+	  perror (_i18n_printf (I18N_FUNC_FAIL, __func__, "calloc"));
 	  exit (-1);
 	}
       first = FALSE;
@@ -1491,7 +1491,7 @@ getStdin (struct lslibNiosHdr *hdr)
 			reply.rpidlist, maxtasks);
   if (retVal < 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "ls_niotasks");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "ls_niotasks");
 
       PassSig (SIGKILL);
       die ();
@@ -1522,7 +1522,7 @@ emusig (int tid, int st)
 
       if (niosDebug)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: Nios remote stopped", fname);
+	  ls_syslog (LOG_DEBUG, "%s: Nios remote stopped", __func__);
 	}
 
 
@@ -1575,7 +1575,7 @@ emusig (int tid, int st)
 	  if (niosDebug)
 	    {
 	      ls_syslog (LOG_DEBUG, "\
-%s: Nios remote signaled exit_sig=<%d> exit_status=<%d>", fname, exit_sig, exit_status);
+%s: Nios remote signaled exit_sig=<%d> exit_status=<%d>", __func__, exit_sig, exit_status);
 	    }
 
 	}
@@ -1587,7 +1587,7 @@ emusig (int tid, int st)
 	  if (niosDebug)
 	    {
 	      ls_syslog (LOG_DEBUG, "\
-%s: Nios signaled exit_sig=<%d> sending SIGUSR1 to oparent", fname, LS_WTERMSIG (status));
+%s: Nios signaled exit_sig=<%d> sending SIGUSR1 to oparent", __func__, LS_WTERMSIG (status));
 	    }
 
 	  kill (ppid, SIGUSR1);
@@ -1604,7 +1604,7 @@ PassSig (int signo)
   if (niosDebug)
     {
       ls_syslog (LOG_DEBUG, "\
-%s: Nios NIOS2RES_SIGNAL delivering signal = <%d> to remote tasks.", fname, signo);
+%s: Nios NIOS2RES_SIGNAL delivering signal = <%d> to remote tasks.", __func__, signo);
     }
 
 
@@ -1612,7 +1612,7 @@ PassSig (int signo)
     {
 
       execl ("/bin/sh", "/bin/sh", "-c", getenv ("LSF_NIOS_DIE_CMD"), NULL);
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "execl");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "execl");
       exit (-10);
     }
 
@@ -1625,10 +1625,10 @@ PassSig (int signo)
     {
       if (lserrno == LSE_BAD_XDR)
 	ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M,
-		   fname, ls_niokill, "failed to xdr");
+		   __func__, ls_niokill, "failed to xdr");
       else
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "ls_niokill");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "ls_niokill");
 	  die ();
 	}
     }
@@ -1692,7 +1692,7 @@ reset_uid (void)
 	{
 
 
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "setreuid");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "setreuid");
 	  exit (ERR_SYSTEM);
 	}
     }
@@ -1717,7 +1717,7 @@ acceptCallBack (int asock)
   if ((sp = getenv ("LSB_JOBID")) == NULL)
     {
       ls_syslog (LOG_ERR, "\
-%s: LSB_JOBID is not defined", fname);
+%s: LSB_JOBID is not defined", __func__);
       exit (-1);
     }
 
@@ -1737,13 +1737,13 @@ acceptCallBack (int asock)
 	{
 	  if (niosDebug)
 	    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M,
-		       fname, "doAcceptResCallback_()");
+		       __func__, "doAcceptResCallback_()");
 	}
       else
 	{
 	  if (niosDebug)
 	    ls_syslog (LOG_DEBUG, "%s: jobId %s opCode %d",
-		       fname, lsb_jobid2str (jobId), connReq.rpid);
+		       __func__, lsb_jobid2str (jobId), connReq.rpid);
 	  if (connReq.rpid == jobId)
 	    break;
 
@@ -1803,7 +1803,7 @@ acceptCallBack (int asock)
 
       if (getpeername (sock, (struct sockaddr *) &sin, &len) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "getpeername");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "getpeername");
 	}
       else
 	{
@@ -1844,7 +1844,7 @@ acceptCallBack (int asock)
     {
       ls_syslog (LOG_ERR, I18N (5816, "\
 %s: usepty specified but TTY not detected\r\n"),	/* catgets 5816 */
-		 fname);
+		 __func__);
       exit (-1);
     }
 
@@ -1996,7 +1996,7 @@ cmpJobStates (struct jobInfoEnt *job)
   if (niosDebug)
     ls_syslog (LOG_DEBUG,
 	       "%s: status =%d,numReasons=%d,reasonTb[0]=%d,reasons=%d,subreasons=%d,STAT=%d\n",
-	       fname, status, numReasons,
+	       __func__, status, numReasons,
 	       (reasonTb != NULL) ? reasonTb[0] : 0,
 	       reasons, subreasons, stat);
 
@@ -2232,7 +2232,7 @@ initLoadIndex (void)
 	if (!(names = (char **) malloc (lsInfo->numIndx * sizeof (char *))))
 	  {
 	    lserrno = LSE_MALLOC;
-	    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "initLoadIndex");
+	    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "initLoadIndex");
 	    return NULL;
 	  }
       for (i = 0; i < loadIndex.nIdx; i++)

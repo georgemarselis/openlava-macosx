@@ -280,7 +280,7 @@ read_newjob (struct eventRec *log)
   job->jobPriority = jobNewLog->userPriority;
 
   if ((logclass & LC_TRACE))
-    ls_syslog (LOG_DEBUG2, "%s: jobId=%s", fname, lsb_jobid2str (job->jobId));
+    ls_syslog (LOG_DEBUG2, "%s: jobId=%s", __func__, lsb_jobid2str (job->jobId));
 
   return (job);
 }
@@ -691,7 +691,7 @@ read_startjob (struct eventRec *log)
   jobRecord->job->cpuFactor = log->eventLog.jobStartLog.hostFactor;
 
   if ((logclass & LC_TRACE))
-    ls_syslog (LOG_DEBUG2, "%s: jobId=%s", fname,
+    ls_syslog (LOG_DEBUG2, "%s: jobId=%s", __func__,
 	       lsb_jobid2str (jobRecord->job->jobId));
 
   return (jobRecord);
@@ -1357,7 +1357,7 @@ parse_event (struct eventRec *log, struct bhistReq *Req)
   int oldjobnum = 0;
 
   if (logclass & LC_TRACE)
-    ls_syslog (LOG_DEBUG2, "%s: log.type=%x", fname, log->type);
+    ls_syslog (LOG_DEBUG2, "%s: log.type=%x", __func__, log->type);
   switch (log->type)
     {
     case EVENT_JOB_NEW:
@@ -1455,7 +1455,7 @@ parse_event (struct eventRec *log, struct bhistReq *Req)
 			malloc (sizeof (struct jobRecord))))
 		    {
 		      char i18nBuf[100];
-		      sprintf (i18nBuf, I18N_FUNC_FAIL_M, fname, "malloc");
+		      sprintf (i18nBuf, I18N_FUNC_FAIL_M, __func__, "malloc");
 		      perror (i18nBuf);
 		      exit (-1);
 		    }
@@ -1473,7 +1473,7 @@ parse_event (struct eventRec *log, struct bhistReq *Req)
 			malloc (sizeof (struct eventRecord))))
 		    {
 		      char i18nBuf[100];
-		      sprintf (i18nBuf, I18N_FUNC_FAIL_M, fname, "malloc");
+		      sprintf (i18nBuf, I18N_FUNC_FAIL_M, __func__, "malloc");
 		      perror (i18nBuf);
 		      exit (-1);
 		    }
@@ -1626,7 +1626,7 @@ parse_event (struct eventRec *log, struct bhistReq *Req)
 	      if (event == NULL)
 		{
 		  char i18nBuf[100];
-		  sprintf (i18nBuf, I18N_FUNC_FAIL, fname, "malloc");
+		  sprintf (i18nBuf, I18N_FUNC_FAIL, __func__, "malloc");
 		  perror (i18nBuf);
 		  exit (-1);
 		}

@@ -166,7 +166,7 @@ int liblsf_parseHostList (char *hostList, char *lsfile, size_t lineNum, char ***
 struct lsSharedResourceInfo *liblsf_addResource (char *resName, int nHosts, char **hosts, char *value, char *fileName, size_t lineNum);
 // static 
 struct sharedResource *addResource (char *resName, unsigned int nHosts, char **hosts, char *value, char *fileName, size_t lineNum, int resourceMap);
-int liblsf_addHostInstance(struct lsSharedResourceInfo *sharedResource, int nHosts, char **hostNames, char *value);
+int liblsf_addHostInstance(struct lsSharedResourceInfo *sharedResource, unsigned int nHosts, char **hostNames, char *value);
 // static 
 int addHostInstance (struct sharedResource *sharedResource, unsigned int nHosts, char **hostNames, char *value, int resourceMap);
 

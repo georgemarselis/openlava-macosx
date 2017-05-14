@@ -139,14 +139,14 @@ checkQWindow (void)
 		    {
 		      ls_syslog (LOG_DEBUG2,
 				 "%s: run window of queue <%s> will close at %s",
-				 fname, qp->queue,
+				 __func__, qp->queue,
 				 ctime (&qp->runWinCloseTime));
 		    }
 		  else
 		    {
 		      ls_syslog (LOG_DEBUG2,
 				 "%s: run window of queue <%s> is open but runWinCloseTime is 0, reset queue's run window to close",
-				 fname, qp->queue);
+				 __func__, qp->queue);
 		    }
 		}
 	    }
@@ -311,7 +311,7 @@ checkQueues (struct infoReq *queueInfoReqPtr,
 				 sizeof (char));
 	      if (qRep->hostList == NULL)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "calloc",
+		  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "calloc",
 			     (strlen (qp->hostList) + len * 2 +
 			      2) * sizeof (char));
 		  return (LSBE_NO_MEM);
@@ -366,7 +366,7 @@ checkQueues (struct infoReq *queueInfoReqPtr,
 		      float one = 1.0;
 
 		      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7500, "%s: Cannot find cpu factor for hostSpec <%s> in queue <%s>; cpuFactor is set to 1.0"),	/* catgets 7500 */
-				 fname, qp->hostSpec, qp->queue);
+				 __func__, qp->hostSpec, qp->queue);
 		      cpuFactor = &one;
 		    }
 		}
@@ -920,7 +920,7 @@ runWindowCloseTime (struct qData *qp)
     {
 
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7510, "%s: run window for queue <%s> on day <%d> is NULL"),	/* catgets 7510 */
-		 fname, qp->queue, dayhour.day);
+		 __func__, qp->queue, dayhour.day);
       return 0;
     }
 

@@ -64,26 +64,26 @@ ptymaster (char *line)
   master_fd = open ("/dev/ptmx", O_RDWR);
   if (master_fd < 0)
   {
-      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "open", "/dev/ptmx");
+      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "open", "/dev/ptmx");
       return (-1);
   }
   if (grantpt (master_fd) < 0)
   {
-      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "grantpt", master_fd);
+      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "grantpt", master_fd);
       close (master_fd);
       return (-1);
   }
 
   if (unlockpt (master_fd) < 0)
   {
-      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "unlockpt", master_fd);
+      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "unlockpt", master_fd);
       close (master_fd);
   }
 #ifdef __CYGWIN__
   slave = ptsname (master_fd);
   if (slave == NULL)
   {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "ptsname");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "ptsname");
       close (master_fd);
       return (-1);
   }
@@ -94,11 +94,11 @@ ptymaster (char *line)
       if (ioctl (master_fd, TIOCGPTN, &ptyno) != 0)
       {
     #endif
-      ls_syslog (LOG_DEBUG, I18N_FUNC_FAIL_M, fname, "ioctl(TIOCGPTN)");
+      ls_syslog (LOG_DEBUG, I18N_FUNC_FAIL_M, __func__, "ioctl(TIOCGPTN)");
       slave = ptsname (master_fd);
       if (slave == NULL)
       {
-          ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "ptsname");
+          ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "ptsname");
           close (master_fd);
           return (-1);
       }

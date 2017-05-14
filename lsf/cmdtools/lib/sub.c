@@ -65,7 +65,7 @@ do_sub (int argc, char **argv, int option)
     }
 
   if (logclass & (LC_TRACE | LC_SCHED | LC_EXEC))
-    ls_syslog (LOG_DEBUG, "%s: Entering this routine...", fname);
+    ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
 
   if (fillReq (argc, argv, option, &req) < 0)
     {
@@ -100,7 +100,7 @@ prtBETime (struct submit req)
   char sp[60];
 
   if (logclass & (LC_TRACE | LC_EXEC | LC_SCHED))
-    ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", fname);
+    ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", __func__);
 
 
   if (req.beginTime)
@@ -132,7 +132,7 @@ fillReq (int argc, char **argv, int operate, struct submit *req)
   memset (req, 0, sizeof (struct submit));
 
   if (logclass & (LC_TRACE | LC_EXEC | LC_SCHED))
-    ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", fname);
+    ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", __func__);
 
 
 
@@ -409,7 +409,7 @@ parseScript (FILE * from, int *embedArgc, char ***embedArgv, int option)
 
 
   if (logclass & (LC_TRACE | LC_SCHED | LC_EXEC))
-    ls_syslog (LOG_DEBUG, "%s: Entering this routine...", fname);
+    ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
 
   if (option & EMBED_BSUB)
     {
@@ -425,7 +425,7 @@ parseScript (FILE * from, int *embedArgc, char ***embedArgv, int option)
       firstLine[0] = '\0';
       if ((buf = malloc (size)) == NULL)
 	{
-	  fprintf (stderr, I18N_FUNC_FAIL, fname, "malloc");
+	  fprintf (stderr, I18N_FUNC_FAIL, __func__, "malloc");
 	  return (-1);
 	}
       ttyin = isatty (fileno (from));
@@ -480,7 +480,7 @@ parseScript (FILE * from, int *embedArgc, char ***embedArgv, int option)
 	      if ((buf = (char *) realloc (buf, size)) == NULL)
 		{
 		  free (buf);
-		  fprintf (stderr, I18N_FUNC_FAIL, fname, "realloc");
+		  fprintf (stderr, I18N_FUNC_FAIL, __func__, "realloc");
 		  return (-1);
 		}
 	    }
@@ -515,7 +515,7 @@ parseScript (FILE * from, int *embedArgc, char ***embedArgv, int option)
 		  if ((buf = (char *) realloc (buf, size)) == NULL)
 		    {
 		      free (buf);
-		      fprintf (stderr, I18N_FUNC_FAIL, fname, "realloc");
+		      fprintf (stderr, I18N_FUNC_FAIL, __func__, "realloc");
 		      return (-1);
 		    }
 		}
@@ -553,7 +553,7 @@ CopyCommand (char **from, int len)
 
   if ((commandline = (char *) malloc (size)) == NULL)
     {
-      fprintf (stderr, I18N_FUNC_FAIL, fname, "malloc");
+      fprintf (stderr, I18N_FUNC_FAIL, __func__, "malloc");
       return (FALSE);
     }
 
@@ -768,7 +768,7 @@ parseLine (char *line, int *embedArgc, char ***embedArgv, int option)
     {
       if ((argBuf = (char **) malloc (INCREASE * sizeof (char *))) == NULL)
 	{
-	  fprintf (stderr, I18N_FUNC_FAIL, fname, "malloc");
+	  fprintf (stderr, I18N_FUNC_FAIL, __func__, "malloc");
 	  return (-1);
 	}
       bufSize = INCREASE;
@@ -840,7 +840,7 @@ parseLine (char *line, int *embedArgc, char ***embedArgv, int option)
 					       bufSize * sizeof (char *)))
 		  == NULL)
 		{
-		  fprintf (stderr, I18N_FUNC_FAIL, fname, "realloc");
+		  fprintf (stderr, I18N_FUNC_FAIL, __func__, "realloc");
 		  return (-1);
 		}
 	      *embedArgv = argBuf;

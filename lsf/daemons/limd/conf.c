@@ -4677,7 +4677,7 @@ setExtResourcesLoc (char *resName, int resNo)
     char defaultExtResLoc[] = "[default]";
     uint lineNum = 0;
     int isDefault = 0;
-    const char *fname = __func__ ;
+    const char *__func__ = __func__ ;
 
     extResLocPtr = getExtResourcesLoc (resName);
     
@@ -4689,8 +4689,8 @@ setExtResourcesLoc (char *resName, int resNo)
 
     allInfo.resTable[resNo].flags |= RESF_EXTERNAL;
 
-    if (addResourceMap(resName, extResLocPtr, (char *)fname, lineNum, &isDefault) < 0) { // this cast is correct
-        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, (char *)fname, "addResourceMap", resName); // this cast is correct
+    if (addResourceMap(resName, extResLocPtr, (char *)__func__, lineNum, &isDefault) < 0) { // this cast is correct
+        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, (char *)__func__, "addResourceMap", resName); // this cast is correct
         lim_CheckError = WARNING_ERR;
         return (-1);
     }

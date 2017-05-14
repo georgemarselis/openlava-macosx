@@ -628,7 +628,7 @@ processClient (struct clientNode *client, int *needFree)
 
   if (chanDequeue_ (client->chanfd, &buf) < 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_ENO_D, fname, "chanDequeue_",
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_ENO_D, __func__, "chanDequeue_",
 		 cherrno);
       shutDownClient (client);
       return (-1);
@@ -637,7 +637,7 @@ processClient (struct clientNode *client, int *needFree)
   xdrmem_create (&xdrs, buf->data, buf->len, XDR_DECODE);
   if (!xdr_LSFHeader (&xdrs, &reqHdr))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_LSFHeader");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_LSFHeader");
       xdr_destroy (&xdrs);
       chanFreeBuf_ (buf);
       shutDownClient (client);
@@ -652,7 +652,7 @@ processClient (struct clientNode *client, int *needFree)
   if (logclass & (LC_COMM | LC_TRACE))
     {
       ls_syslog (LOG_DEBUG, "\
-%s: Received request <%d> from host <%s/%s> on channel <%d>", fname, mbdReqtype, client->fromHost, sockAdd2Str_ (&from), s);
+%s: Received request <%d> from host <%s/%s> on channel <%d>", __func__, mbdReqtype, client->fromHost, sockAdd2Str_ (&from), s);
     }
 
   if (hostIsLocal (client->fromHost))
@@ -669,7 +669,7 @@ processClient (struct clientNode *client, int *needFree)
     case -1:
 
       ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5014, "%s: Request from non-LSF host <%s>"),	/* catgets 5014 */
-		 fname, sockAdd2Str_ (&from));
+		 __func__, sockAdd2Str_ (&from));
       errorBack (s, LSBE_NOLSF_HOST, &from);
       goto endLoop;
     default:
@@ -679,12 +679,12 @@ processClient (struct clientNode *client, int *needFree)
 
   if (reqHdr.opCode != PREPARE_FOR_OP)
     if (io_block_ (chanSock_ (s)) < 0)
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "io_block_");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "io_block_");
 
   if (getsockname (chanSock_ (s),
 		   (struct sockaddr *) &laddr, &laddrLen) == -1)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "getsockname");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "getsockname");
       errorBack (s, LSBE_PROTOCOL, &from);
       goto endLoop;
     }
@@ -701,7 +701,7 @@ processClient (struct clientNode *client, int *needFree)
 
       if ((pid = fork ()) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "fork");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "fork");
 	  errorBack (s, LSBE_NO_FORK, &from);
 	}
 
@@ -751,7 +751,7 @@ processClient (struct clientNode *client, int *needFree)
 	}
       else
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "NEW_BUCKET");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "NEW_BUCKET");
 	}
       break;
     case BATCH_QUE_CTRL:
@@ -872,7 +872,7 @@ processClient (struct clientNode *client, int *needFree)
       errorBack (s, LSBE_PROTOCOL, &from);
       if (reqHdr.version <= OPENLAVA_VERSION)
 	ls_syslog (LOG_ERR, "\
-%s: Unknown request type %d from host %s", fname, mbdReqtype, sockAdd2Str_ (&from));
+%s: Unknown request type %d from host %s", __func__, mbdReqtype, sockAdd2Str_ (&from));
       break;
     }
 

@@ -103,7 +103,7 @@ main (int argc, char **argv)
   if (access (pChkpntDir, W_OK | X_OK) < 0)
     {
       fprintf (stderr, "%s : the chkpnt dir %s can not be accessed\n",
-	       fname, pChkpntDir);
+	       __func__, pChkpntDir);
       exit (-1);
     }
 
@@ -144,7 +144,7 @@ main (int argc, char **argv)
 	jf = getenv ("LSB_JOBFILENAME");
 	if (jf == NULL)
 	  {
-	    fprintf (stderr, "%s : getenv of LSB_JOBFILENAME failed", fname);
+	    fprintf (stderr, "%s : getenv of LSB_JOBFILENAME failed", __func__);
 	  }
 	else
 	  {
@@ -165,7 +165,7 @@ main (int argc, char **argv)
   else
     {
       fprintf (stderr, "%s : the .echkpnt file content occurs error: %s\n",
-	       fname, strerror (errno));
+	       __func__, strerror (errno));
       exit (-1);
     }
 
@@ -178,10 +178,10 @@ main (int argc, char **argv)
     }
 
 #ifdef DEBUG
-  sprintf (logMesgBuf, "%s : the LSB_ECHKPNT_METHOD = %s\n", fname,
+  sprintf (logMesgBuf, "%s : the LSB_ECHKPNT_METHOD = %s\n", __func__,
 	   pMethodName);
   logMesg (logMesgBuf);
-  sprintf (logMesgBuf, "%s : the LSB_ECHKPNT_METHOD_DIR = %s\n", fname,
+  sprintf (logMesgBuf, "%s : the LSB_ECHKPNT_METHOD_DIR = %s\n", __func__,
 	   pMethodDir != NULL ? pMethodDir : "");
   logMesg (logMesgBuf);
 #endif
@@ -191,13 +191,13 @@ main (int argc, char **argv)
       (echkpntProgPath, pMethodDir, ECHKPNT_PROGRAM, pMethodName) == NULL)
     {
       sprintf (logMesgBuf,
-	       "%s : the echkpnt method(%s) path is not correct\n", fname,
+	       "%s : the echkpnt method(%s) path is not correct\n", __func__,
 	       pMethodName);
       goto Error;
     }
 
 #ifdef DEBUG
-  sprintf (logMesgBuf, "%s : the echkpntProgPath is : %s\n", fname,
+  sprintf (logMesgBuf, "%s : the echkpntProgPath is : %s\n", __func__,
 	   echkpntProgPath);
   logMesg (logMesgBuf);
 #endif
@@ -220,7 +220,7 @@ main (int argc, char **argv)
       closeLog ();
       execv (echkpntProgPath, cargv);
       sprintf (logMesgBuf, "%s : execute the echkpnt.default fail\n%s\n",
-	       fname, (errno ? strerror (errno) : ""));
+	       __func__, (errno ? strerror (errno) : ""));
       fprintf (stderr, "%s", logMesgBuf);
       exit (-1);
     }
@@ -230,7 +230,7 @@ main (int argc, char **argv)
   if (iChildPid < 0)
     {
       sprintf (logMesgBuf, "%s : fork() fork a child process fail...\n",
-	       fname);
+	       __func__);
       goto Error;
 
 
@@ -253,14 +253,14 @@ main (int argc, char **argv)
 	  if (redirectFd (ECHKPNT_DEFAULT_OUTPUT_FILE, 1) == -1)
 	    {
 	      sprintf (logMesgBuf, "%s : redirect stdout to %s file\n%s\n",
-		       fname, ECHKPNT_DEFAULT_OUTPUT_FILE,
+		       __func__, ECHKPNT_DEFAULT_OUTPUT_FILE,
 		       errno ? strerror (errno) : "");
 	      goto Error;
 	    }
 	  if (redirectFd (ECHKPNT_DEFAULT_OUTPUT_FILE, 2) == -1)
 	    {
 	      sprintf (logMesgBuf, "%s : redirect stderr to %s file\n%s\n",
-		       fname, ECHKPNT_DEFAULT_OUTPUT_FILE,
+		       __func__, ECHKPNT_DEFAULT_OUTPUT_FILE,
 		       errno ? strerror (errno) : "");
 	      goto Error;
 	    }
@@ -276,14 +276,14 @@ main (int argc, char **argv)
 	      || (redirectFd (aFileName, 1) == -1))
 	    {
 	      sprintf (logMesgBuf, "%s : redirect the stdout to %s fail\n",
-		       fname, ECHKPNT_STDOUT_FILE);
+		       __func__, ECHKPNT_STDOUT_FILE);
 	      logMesg (logMesgBuf);
 
 	      if (redirectFd (ECHKPNT_DEFAULT_OUTPUT_FILE, 1) == -1)
 		{
 		  sprintf (logMesgBuf,
 			   "%s : redirect stdout to %s file fail\n%s\n",
-			   fname, ECHKPNT_DEFAULT_OUTPUT_FILE,
+			   __func__, ECHKPNT_DEFAULT_OUTPUT_FILE,
 			   errno ? strerror (errno) : "");
 		  goto Error;
 		}
@@ -293,14 +293,14 @@ main (int argc, char **argv)
 	      || (redirectFd (aFileName, 2) == -1))
 	    {
 	      sprintf (logMesgBuf, "%s : redirect the stderr to %s fail\n",
-		       fname, ERESTART_STDERR_FILE);
+		       __func__, ERESTART_STDERR_FILE);
 	      logMesg (logMesgBuf);
 
 	      if (redirectFd (ECHKPNT_DEFAULT_OUTPUT_FILE, 2) == -1)
 		{
 		  sprintf (logMesgBuf,
 			   "%s : redirect stderr to %s file fail\n%s\n",
-			   fname, ECHKPNT_DEFAULT_OUTPUT_FILE,
+			   __func__, ECHKPNT_DEFAULT_OUTPUT_FILE,
 			   errno ? strerror (errno) : "");
 		  goto Error;
 		}
@@ -319,7 +319,7 @@ main (int argc, char **argv)
 
       execv (echkpntProgPath, cargv);
       sprintf (logMesgBuf, "%s : the child process execute the %s fail\n",
-	       fname, progName);
+	       __func__, progName);
       fprintf (stderr, "%s", logMesgBuf);
       logMesg (logMesgBuf);
       closeLog ();
@@ -335,7 +335,7 @@ main (int argc, char **argv)
   if (iChildPid < 0)
     {
       sprintf (logMesgBuf, "%s : %s fail, \n%s\n",
-	       fname, "waitpid", errno ? strerror (errno) : "");
+	       __func__, "waitpid", errno ? strerror (errno) : "");
       goto Error;
     }
   else
@@ -343,7 +343,7 @@ main (int argc, char **argv)
       if (WEXITSTATUS (iStatus) != 0)
 	{
 	  sprintf (logMesgBuf,
-		   "%s : the echkpnt.%s fail,the exit value is %d\n", fname,
+		   "%s : the echkpnt.%s fail,the exit value is %d\n", __func__,
 		   pMethodName, WEXITSTATUS (iStatus));
 	  fprintf (stderr, "%s", logMesgBuf);
 	  logMesg (logMesgBuf);
@@ -360,7 +360,7 @@ main (int argc, char **argv)
       writeEchkpntVar (ECHKPNT_OLD_JOBID, "");
       sprintf (logMesgBuf,
 	       "%s : getenv() can not get the env variable LSB_JOBID\n",
-	       fname);
+	       __func__);
       logMesg (logMesgBuf);
     }
   else

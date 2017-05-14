@@ -422,7 +422,7 @@ ls_nioselect (int nfds, fd_set * readfds, fd_set * writefds,
 
       if (nioDebug && notifyList->numEnts)
 	ls_syslog (LOG_DEBUG, "%s: number of notifications: <%d>",
-		   fname, notifyList->numEnts);
+		   __func__, notifyList->numEnts);
 
 
       if (writeBuf.empty)
@@ -550,7 +550,7 @@ ls_nioselect (int nfds, fd_set * readfds, fd_set * writefds,
 			}
 		      if (nioDebug)
 			ls_syslog (LOG_DEBUG, "\
-%s: read hdr failure in connection <%d>: %d", fname, conn[i].rpid, conn[i].sock.fd);
+%s: read hdr failure in connection <%d>: %d", __func__, conn[i].rpid, conn[i].sock.fd);
 
 		      DISCONNECT (i);
 		      xdr_destroy (&xdrs);
@@ -563,7 +563,7 @@ ls_nioselect (int nfds, fd_set * readfds, fd_set * writefds,
 
 		  if (nioDebug)
 		    ls_syslog (LOG_DEBUG, "\
-%s: got hdr <%d> with rtag <%d> from connection <%d>", fname, msgHdr.opCode, conn[i].rtag, conn[i].rpid);
+%s: got hdr <%d> with rtag <%d> from connection <%d>", __func__, msgHdr.opCode, conn[i].rtag, conn[i].rpid);
 
 		  switch (msgHdr.opCode)
 		    {
@@ -586,7 +586,7 @@ ls_nioselect (int nfds, fd_set * readfds, fd_set * writefds,
 		      retVal = addTaskList (conn[i].rtag, i);
 		      if (retVal < 0 && lserrno == LSE_MALLOC)
 			{
-			  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname,
+			  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__,
 				     "malloc");
 			  add_list (&readyTaskList, conn[i].rpid, NIO_IOERR,
 				    NULL);
@@ -604,7 +604,7 @@ ls_nioselect (int nfds, fd_set * readfds, fd_set * writefds,
 		      retVal = get_status (i, &msgHdr, &status);
 		      if (retVal == LSE_MALLOC)
 			{
-			  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname,
+			  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__,
 				     "malloc");
 			  add_list (&readyTaskList, conn[i].rpid, NIO_IOERR,
 				    NULL);
@@ -617,7 +617,7 @@ ls_nioselect (int nfds, fd_set * readfds, fd_set * writefds,
 			}
 		      else if (retVal == LSE_BAD_XDR)
 			{
-			  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "xdr");
+			  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "xdr");
 			  add_list (&readyTaskList, conn[i].rpid,
 				    NIO_IOERR, NULL);
 			  add_list (&readyTaskList, conn[i].rpid,
@@ -1125,7 +1125,7 @@ deliver_eof ()
 		}
 	      ls_syslog (LOG_ERR, I18N (5901, "\
 %s: Error writing EOF to task %d\n"),	/* catgets 5901 */
-			 fname, conn[i].rpid);
+			 __func__, conn[i].rpid);
 	      add_list (&abortedTasks, conn[i].rpid, NIO_IOERR, NULL);
 	      add_list (&abortedTasks, conn[i].rpid, NIO_EOF, NULL);
 	      DISCONNECT (i);
@@ -1193,7 +1193,7 @@ ls_nioread (int tid, char *buf, int len)
 	  add_list (&abortedTasks, conn[index].rpid, NIO_EOF, NULL);
 	  DISCONNECT (index);
 	}
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "recv");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "recv");
       errno = sverrno;
       lserrno = LSE_MSG_SYS;
       return (-1);
@@ -1260,7 +1260,7 @@ ls_nionewtask (int tid, int sock)
       connIndexTable[tid - 1] = i;
       if (nioDebug)
 	ls_syslog (LOG_DEBUG, "\
-%s: connection to new task <%d> is completed", fname, tid);
+%s: connection to new task <%d> is completed", __func__, tid);
       return (0);
     }
   else if ((i = getFirstFreeIndex ()) < maxfds)
@@ -1277,7 +1277,7 @@ ls_nionewtask (int tid, int sock)
 	  count_unconn++;
 	  if (nioDebug)
 	    ls_syslog (LOG_DEBUG, "%s: new task <%d> is registered",
-		       fname, tid);
+		       __func__, tid);
 	}
       else
 	{
@@ -1312,7 +1312,7 @@ ls_nionewtask (int tid, int sock)
 	  io_nonblock_ (conn[i].sock.fd);
 	  if (nioDebug)
 	    ls_syslog (LOG_DEBUG, "\
-%s: new connection to task <%d> is completed", fname, tid);
+%s: new connection to task <%d> is completed", __func__, tid);
 	}
       connIndexTable[tid - 1] = i;
       if (i == lastConn)
@@ -1673,7 +1673,7 @@ do_newconnect (int s)
   struct sockaddr_in sin;
 
   if (nioDebug)
-    ls_syslog (LOG_DEBUG, "%s: accept new connection", fname);
+    ls_syslog (LOG_DEBUG, "%s: accept new connection", __func__);
 
   if ((newsock = doAcceptResCallback_ (s, &connReq)) == -1)
     return (-1);
@@ -1767,7 +1767,7 @@ do_newconnect (int s)
       count_unconn--;
       if (nioDebug)
 	ls_syslog (LOG_DEBUG, "\
-%s: completed the leading task's connection: rpid=%d newsock=%d", fname, connReq.rpid, newsock);
+%s: completed the leading task's connection: rpid=%d newsock=%d", __func__, connReq.rpid, newsock);
     }
   else
     {
@@ -1778,7 +1778,7 @@ do_newconnect (int s)
 	lastConn++;
       if (nioDebug)
 	ls_syslog (LOG_DEBUG, "\
-%s: received the leading task's request: rpid=%d newsock=%d", fname, connReq.rpid, newsock);
+%s: received the leading task's request: rpid=%d newsock=%d", __func__, connReq.rpid, newsock);
     }
   return (0);
 
@@ -1801,7 +1801,7 @@ doAcceptResCallback_ (int s, struct niosConnect *connReq)
     {
       if (nioDebug)
 	ls_syslog (LOG_DEBUG, "%s: Accept error %d on socket %d",
-		   fname, errno, s);
+		   __func__, errno, s);
       lserrno = LSE_ACCEPT_SYS;
       return (-1);
     }
@@ -1900,7 +1900,7 @@ get_status (int indx, struct LSFHeader *msgHdr, LS_WAIT_T * statusp)
   xdr_destroy (&xdrs);
 
   if (nioDebug > 1)
-    ls_syslog (LOG_DEBUG, "%s: get_status: ack=%d", fname, st.ack);
+    ls_syslog (LOG_DEBUG, "%s: get_status: ack=%d", __func__, st.ack);
 
   if (st.ack != RESE_SIGCHLD)
     {
@@ -2083,7 +2083,7 @@ ls_niokill (int sigval)
 	{
 	  ls_syslog (LOG_ERR, I18N (5902, "\
 %s: Unable to update tty information."),	/* catgets 5902 */
-		     fname);
+		     __func__);
 	}
     }
 #endif
@@ -2262,7 +2262,7 @@ READ_RETRY:
 		  conn[connIndex].sock.rcount)) <= 0)
     {
       int sverrno = errno;
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "read");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "read");
       if (cc == 0 || BAD_IO_ERR (errno))
 	{
 	  memset ((void *) &status, 0, sizeof (LS_WAIT_T));
@@ -2353,7 +2353,7 @@ ls_niodump (LS_HANDLE_T outputFile, int tid, int options, char *taggingFormat)
 		  errDisplayflag = 1;
 		  ls_syslog (LOG_ERR, I18N (5904, "\
 %s: error writing remote output"),	/* catgets 5904 */
-			     fname);
+			     __func__);
 		  lserrno = LSE_MISC_SYS;
 		  return (-1);
 		}
@@ -2400,7 +2400,7 @@ ls_niodump (LS_HANDLE_T outputFile, int tid, int options, char *taggingFormat)
 		  errDisplayflag = 1;
 		  ls_syslog (LOG_ERR, I18N (5904, "\
 %s: error writing remote output"),	/* catgets 5904 */
-			     fname);
+			     __func__);
 		  lserrno = LSE_MISC_SYS;
 		  return (-1);
 		}
@@ -2457,7 +2457,7 @@ ls_niodump (LS_HANDLE_T outputFile, int tid, int options, char *taggingFormat)
 	      errDisplayflag = 1;
 	      ls_syslog (LOG_ERR, I18N (5904, "\
 %s: error writing remote output"),	/* catgets 5904 */
-			 fname);
+			 __func__);
 	      lserrno = LSE_MISC_SYS;
 	      return (-1);
 	    }
@@ -2479,7 +2479,7 @@ ls_niodump (LS_HANDLE_T outputFile, int tid, int options, char *taggingFormat)
 		  errDisplayflag = 1;
 		  ls_syslog (LOG_ERR, I18N (5904, "\
 %s: error writing remote output"),	/* catgets 5904 */
-			     fname);
+			     __func__);
 		  lserrno = LSE_MISC_SYS;
 		  return (-1);
 		}
@@ -2661,11 +2661,11 @@ addTaskList (int tid, int connIndex)
     {
       if (rtime > 0)
 	ls_syslog (LOG_DEBUG, "%s: received new task's request: rpid=%d",
-		   fname, tid);
+		   __func__, tid);
       else
 	ls_syslog (LOG_DEBUG,
 		   "%s: completed new task's connection: rpid=%d",
-		   fname, tid);
+		   __func__, tid);
     }
   return 0;
 }
@@ -2738,7 +2738,7 @@ notify_task (int tid, int opCode)
 	      return (-1);
 	    }
 	  ls_syslog (LOG_ERR, I18N (5905, "%s: Error writing EOF to task %d"),	/* catgets 5905 */
-		     fname, conn[connIndex].rpid);
+		     __func__, conn[connIndex].rpid);
 	  add_list (&abortedTasks, conn[connIndex].rpid, NIO_IOERR, NULL);
 	  add_list (&abortedTasks, conn[connIndex].rpid, NIO_EOF, NULL);
 	  DISCONNECT (connIndex);
@@ -2746,7 +2746,7 @@ notify_task (int tid, int opCode)
       else if (nioDebug)
 	ls_syslog (LOG_DEBUG,
 		   "%s: remote task <%d> has been notified: opCode=%d",
-		   fname, tid, opCode);
+		   __func__, tid, opCode);
     }
   else
     {
@@ -2788,7 +2788,7 @@ sendUpdatetty ()
 
   if (logclass & LC_TRACE)
     {
-      ls_syslog (LOG_DEBUG, "%s: Entering", fname);
+      ls_syslog (LOG_DEBUG, "%s: Entering", __func__);
     }
 
 
@@ -2808,7 +2808,7 @@ sendUpdatetty ()
     {
       ls_syslog (LOG_ERR, I18N (5906, "\
 %s: usepty specified but TTY not detected"),	/* catgets 5906 */
-		 fname);
+		 __func__);
       return (-1);
     }
 
@@ -2850,7 +2850,7 @@ sendUpdatetty ()
 	    {
 	      ls_syslog (LOG_ERR, I18N (5907, "\
 %s: Error: could not connect to %d"),	/* catgets 5907 */
-			 fname, i);
+			 __func__, i);
 	      return (-1);
 	    }
 	}
@@ -2884,7 +2884,7 @@ checkHeartbeat (int nready)
 	      if (nioDebug)
 		{
 		  ls_syslog (LOG_DEBUG, "\
-%s: Nios sends NIOS2RES_HEARTBEAT okay", fname);
+%s: Nios sends NIOS2RES_HEARTBEAT okay", __func__);
 		}
 	    }
 	  else
@@ -2893,7 +2893,7 @@ checkHeartbeat (int nready)
 	      if (nioDebug)
 		{
 		  ls_syslog (LOG_DEBUG, "\
-%s: Nios fails sending NIOS2RES_HEARTBEAT", fname);
+%s: Nios fails sending NIOS2RES_HEARTBEAT", __func__);
 		}
 	    }
 	  lastCheckTime = now;
@@ -2947,7 +2947,7 @@ sendHeartbeat (void)
 	    {
 	      ls_syslog (LOG_ERR, I18N (5908, "\
 %s: Error sending heartbeat to host <%s>"),	/* catgets 5908 */
-			 fname, conn[0].hostname);
+			 __func__, conn[0].hostname);
 	      cc = -2;
 	    }
 	}
@@ -2971,7 +2971,7 @@ checkJobStatus (int numTries)
 
   if (nioDebug)
     {
-      ls_syslog (LOG_DEBUG, "%s: Nios checking job status", fname);
+      ls_syslog (LOG_DEBUG, "%s: Nios checking job status", __func__);
     }
 
 
@@ -3005,7 +3005,7 @@ checkJobStatus (int numTries)
 	      if (nioDebug)
 		{
 		  ls_syslog (LOG_DEBUG, "\
-%s: Nios job has exited from LSF system exitStatus<%d>", fname, WEXITSTATUS (wStatus));
+%s: Nios job has exited from LSF system exitStatus<%d>", __func__, WEXITSTATUS (wStatus));
 		}
 	      kill_self (0, WEXITSTATUS (wStatus));
 	    }
@@ -3041,7 +3041,7 @@ checkPendingJobStatus (int s)
   if (nioDebug)
     {
       ls_syslog (LOG_DEBUG, "\
-%s: Nios pendJobTimeout=%dmin jobStatusInterval=%dmin msgInterval=%dmin.", fname, pendJobTimeout / 60, jobStatusInterval / 60, msgInterval / 60);
+%s: Nios pendJobTimeout=%dmin jobStatusInterval=%dmin msgInterval=%dmin.", __func__, pendJobTimeout / 60, jobStatusInterval / 60, msgInterval / 60);
     }
 
   lastMsgCheck = lastPendJobCheck = lastCheckTime = time (NULL);
@@ -3069,7 +3069,7 @@ checkPendingJobStatus (int s)
 	      && (now - lastPendJobCheck) >= pendJobTimeout)
 	    {
 	      ls_syslog (LOG_INFO, "\
-%s: Nios pending job timeout %dmin  expired, killing the job\n", fname, pendJobTimeout / 60);
+%s: Nios pending job timeout %dmin  expired, killing the job\n", __func__, pendJobTimeout / 60);
 
 	      if (getenv ("LSF_NIOS_DIE_CMD"))
 		{
@@ -3116,7 +3116,7 @@ getJobStatus (LS_LONG_INT jid, struct jobInfoEnt ** job,
 
   if (lsb_init ("nios") != 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "lsb_init");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "lsb_init");
       kill_self (0, -1);
     }
 
@@ -3138,7 +3138,7 @@ getJobStatus (LS_LONG_INT jid, struct jobInfoEnt ** job,
 	    {
 	      ls_syslog (LOG_DEBUG,
 			 "%s: Nios job<%s> - unknown by MBD",
-			 fname, lsb_jobid2str (jid));
+			 __func__, lsb_jobid2str (jid));
 	    }
 	  retval = JOB_STATUS_FINISH;
 	}
@@ -3149,7 +3149,7 @@ getJobStatus (LS_LONG_INT jid, struct jobInfoEnt ** job,
 	    {
 	      ls_syslog (LOG_DEBUG,
 			 "%s: Nios job<%s> - no response from MBD",
-			 fname, lsb_jobid2str (jid));
+			 __func__, lsb_jobid2str (jid));
 	    }
 	  retval = JOB_STATUS_UNKNOWN;
 	}
@@ -3160,7 +3160,7 @@ getJobStatus (LS_LONG_INT jid, struct jobInfoEnt ** job,
       jobInfo = lsb_readjobinfo (NULL);
       if (jobInfo == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "lsb_readjobinfo");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "lsb_readjobinfo");
 	  retval = JOB_STATUS_UNKNOWN;
 	}
       else
@@ -3180,7 +3180,7 @@ getJobStatus (LS_LONG_INT jid, struct jobInfoEnt ** job,
 	    {
 	      ls_syslog (LOG_DEBUG,
 			 "%s: Nios job<%s> status<0x%x>",
-			 fname,
+			 __func__,
 			 lsb_jobid2str (jobInfo->jobId), jobInfo->status);
 	    }
 	}

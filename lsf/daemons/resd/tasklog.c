@@ -57,7 +57,7 @@ initResLog (void)
 	      if (resLogcpuTime < 0)
 		{
 		  ls_syslog (LOG_ERR, "\
-%s: LSF_RES_ACCT cputime <%s> must be non-negative 0 msec assumed", fname, resParams[LSF_RES_ACCT].paramValue);
+%s: LSF_RES_ACCT cputime <%s> must be non-negative 0 msec assumed", __func__, resParams[LSF_RES_ACCT].paramValue);
 		  resLogcpuTime = 0;
 		}
 	    }
@@ -85,9 +85,9 @@ initResLog (void)
 	  if ((fd = open (resAcctFN, O_CREAT,
 			  S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0)
 	    {
-	      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "open",
+	      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "open",
 			 resAcctFN);
-	      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5701, "%s: Using /tmp/lsf.acct for task logging"), fname);	/* catgets 5701 */
+	      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5701, "%s: Using /tmp/lsf.acct for task logging"), __func__);	/* catgets 5701 */
 	      strcpy (resAcctFN, "/tmp/lsf.acct."); // FIXME FIXME FIXME FIXME FIXME replace fixed strings with autoconf variables
 	      strcat (resAcctFN, Myhost);
 	      openResAcctFileInTmp (resAcctFN);
@@ -97,7 +97,7 @@ initResLog (void)
 	}
       else
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "stat", resAcctFN);
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "stat", resAcctFN);
 	  resLogOn = -1;
 	}
     }
@@ -107,8 +107,8 @@ initResLog (void)
       if ((fd = open (resAcctFN, O_APPEND,
 		      S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "open", resAcctFN);
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5701, "%s: Using /tmp/lsf.acct for task logging"), fname);	/* catgets 5701 */ // FIXME FIXME FIXME FIXME FIXME replace fixed strings with autoconf variables
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "open", resAcctFN);
+	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5701, "%s: Using /tmp/lsf.acct for task logging"), __func__);	/* catgets 5701 */ // FIXME FIXME FIXME FIXME FIXME replace fixed strings with autoconf variables
 	  strcpy (resAcctFN, "/tmp/lsf.acct.");
 	  strcat (resAcctFN, Myhost);
 	  openResAcctFileInTmp (resAcctFN);
@@ -120,7 +120,7 @@ initResLog (void)
     {
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5705,
 					 "%s: file <%s> is not a regular file, file untouched"),
-		 fname, resAcctFN);
+		 __func__, resAcctFN);
       /* catgets 5705 */
       resLogOn = -1;
     }
@@ -144,7 +144,7 @@ openResAcctFileInTmp (char *resAcctFN)
 	  if ((fd = open (resAcctFN, O_CREAT,
 			  S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0)
 	    {
-	      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "open",
+	      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "open",
 			 resAcctFN);
 	      resLogOn = -1;
 	      return;
@@ -154,7 +154,7 @@ openResAcctFileInTmp (char *resAcctFN)
 	}
       else
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "stat", resAcctFN);
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "stat", resAcctFN);
 	  resLogOn = -1;
 	  return;
 	}
@@ -165,7 +165,7 @@ openResAcctFileInTmp (char *resAcctFN)
       if ((fd = open (resAcctFN, O_APPEND,
 		      S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "open", resAcctFN);
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "open", resAcctFN);
 	  resLogOn = -1;
 	  return;
 	}
@@ -174,7 +174,7 @@ openResAcctFileInTmp (char *resAcctFN)
     }
   ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5705,
 				     "%s: file <%s> is not a regular file, file untouched"),
-	     fname, resAcctFN);
+	     __func__, resAcctFN);
   /* catgets 5705 */
   resLogOn = -1;
   return;
@@ -214,7 +214,7 @@ resAcctWrite (struct child *child)
   fd = fopen (acctFile, "w");
   if (fd == (FILE *) NULL)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "fopen", acctFile);
+      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "fopen", acctFile);
       return;
     }
 
@@ -237,7 +237,7 @@ resAcctWrite (struct child *child)
   acctRec.cmdln = (char *) malloc (l * (sizeof (char)));
   if (acctRec.cmdln == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
       FCLOSEUP (&fd);
       unlink (acctFile);
       return;
@@ -259,7 +259,7 @@ resAcctWrite (struct child *child)
 
   if (ls_putacctrec (fd, &acctRec) < 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "ls_putacctrec");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "ls_putacctrec");
       FCLOSEUP (&fd);
       free (acctRec.cmdln);
       unlink (acctFile);
@@ -269,7 +269,7 @@ resAcctWrite (struct child *child)
   if (logclass & LC_EXEC)
     {
       ls_syslog (LOG_DEBUG, I18N (5704, "%s: pid <%d> status <%d> exitcode <%d>"),	/*catgets 5704 */
-		 fname, child->pid, child->wait, WEXITSTATUS (child->wait));
+		 __func__, child->pid, child->wait, WEXITSTATUS (child->wait));
     }
 
   FCLOSEUP (&fd);
@@ -318,28 +318,28 @@ resParentWriteAcct (struct LSFHeader *msgHdr, XDR * xdrs, int sock)
 
   if (!xdr_stringLen (xdrs, &str, msgHdr))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_stringLen");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_stringLen");
       sendReturnCode (sock, RESE_REQUEST);
       return;
     }
 
   if (stat (acctFile, &sbuf) < 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "stat", acctFile);
+      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "stat", acctFile);
       sendReturnCode (sock, RESE_DENIED);
       return;
     }
 
   if ((buf = malloc ((int) sbuf.st_size)) == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
       sendReturnCode (sock, RESE_NOMEM);
       return;
     }
 
   if ((fp = fopen (acctFile, "r")) == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "fopen", acctFile);
+      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "fopen", acctFile);
       sendReturnCode (sock, RESE_FILE);
       free (buf);
       return;
@@ -347,7 +347,7 @@ resParentWriteAcct (struct LSFHeader *msgHdr, XDR * xdrs, int sock)
 
   if (fread (buf, 1, sbuf.st_size, fp) != sbuf.st_size)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, fname, "fread",
+      ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, __func__, "fread",
 		 acctFile, (int) sbuf.st_size);
       sendReturnCode (sock, RESE_FILE);
       free (buf);
@@ -361,7 +361,7 @@ resParentWriteAcct (struct LSFHeader *msgHdr, XDR * xdrs, int sock)
 	  || (errno == ENOENT && (fp = fopen (resAcctFN, "a")) == NULL))
 	{
 	  ls_syslog (LOG_ERR, "\
-%s: fopen(%s) failed %M", fname, resAcctFN);
+%s: fopen(%s) failed %M", __func__, resAcctFN);
 	  sendReturnCode (sock, RESE_FILE);
 	  free (buf);
 	  return;
@@ -372,7 +372,7 @@ resParentWriteAcct (struct LSFHeader *msgHdr, XDR * xdrs, int sock)
 
       if ((fp = fopen (resAcctFN, "a")) == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "fopen", resAcctFN);
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "fopen", resAcctFN);
 	  sendReturnCode (sock, RESE_FILE);
 	  free (buf);
 	  return;
@@ -382,7 +382,7 @@ resParentWriteAcct (struct LSFHeader *msgHdr, XDR * xdrs, int sock)
     {
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5705,
 					 "%s: file <%s> is not a regular file, file untouched"),
-		 fname, resAcctFN);
+		 __func__, resAcctFN);
       /* catgets 5705 */
       sendReturnCode (sock, RESE_FILE);
       free (buf);
@@ -391,7 +391,7 @@ resParentWriteAcct (struct LSFHeader *msgHdr, XDR * xdrs, int sock)
 
   if (fwrite (buf, 1, sbuf.st_size, fp) != sbuf.st_size)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, fname, "fwrite",
+      ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, __func__, "fwrite",
 		 acctFile, (int) sbuf.st_size);
       sendReturnCode (sock, RESE_FILE);
       free (buf);

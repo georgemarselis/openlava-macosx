@@ -141,7 +141,7 @@ getGroupInfoEnt (char **groups, int *num, char recursive)
 
 
       groupInfoEnt = (struct groupInfoEnt *)
-	my_calloc (numofugroups, sizeof (struct groupInfoEnt), fname);
+	my_calloc (numofugroups, sizeof (struct groupInfoEnt), __func__);
 
       i = 0;
 
@@ -171,7 +171,7 @@ getGroupInfoEnt (char **groups, int *num, char recursive)
       int i;
 
       groupInfoEnt = (struct groupInfoEnt *)
-	my_calloc (*num, sizeof (struct groupInfoEnt), fname);
+	my_calloc (*num, sizeof (struct groupInfoEnt), __func__);
 
       for (i = 0; i < *num; i++)
 	{
@@ -202,7 +202,7 @@ getGroupInfoEnt (char **groups, int *num, char recursive)
 		}
 
 	      tmpgroupInfoEnt = (struct groupInfoEnt *)
-		my_calloc (i, sizeof (struct groupInfoEnt), fname);
+		my_calloc (i, sizeof (struct groupInfoEnt), __func__);
 
 	      for (k = 0; k < i; k++)
 		tmpgroupInfoEnt[k] = groupInfoEnt[k];
@@ -216,7 +216,7 @@ getGroupInfoEnt (char **groups, int *num, char recursive)
 	  if (u == NULL)
 	    {
 	      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL,
-			 fname, "getUserData", groups[i]);
+			 __func__, "getUserData", groups[i]);
 	      continue;
 	    }
 
@@ -530,14 +530,14 @@ uDataGroupCreate ()
       if ((u = getUserData (usergroups[i]->group)) == NULL)
 	{
 	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M,
-		     fname, "getUserData", usergroups[i]->group);
+		     __func__, "getUserData", usergroups[i]->group);
 	  mbdDie (MASTER_FATAL);
 	}
       u->flags |= USER_GROUP;
 
       if (logclass & (LC_TRACE))
 	ls_syslog (LOG_DEBUG2, "\
-%s: removing user group <%s> from all user set", fname, u->user);
+%s: removing user group <%s> from all user set", __func__, u->user);
 
       setRemoveElement (allUsersSet, (void *) u);
 
@@ -639,7 +639,7 @@ setuDataCreate ()
 	  LS_BITSET_ITERATOR_T iter;
 
 	  BITSET_ITERATOR_ZERO_OUT (&iter);
-	  setIteratorAttach (&iter, uGrpAllSet, fname);
+	  setIteratorAttach (&iter, uGrpAllSet, __func__);
 	  for (allUserGrp = (struct uData *) setIteratorBegin (&iter);
 	       allUserGrp != NULL;
 	       allUserGrp =
@@ -672,7 +672,7 @@ setuDataCreate ()
 	      if (observer == NULL)
 		{
 		  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5902, "%s: failed to create observer for all users set: %s"),	/* catgets 5902 */
-			     fname, setPerror (bitseterrno));
+			     __func__, setPerror (bitseterrno));
 		  mbdDie (MASTER_FATAL);
 		}
 
@@ -733,7 +733,7 @@ traverseGroupTree (struct gData *grp)
 	  if (u == NULL)
 	    {
 	      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL,
-			 fname, "getUserData", user);
+			 __func__, "getUserData", user);
 	      continue;
 	    }
 
@@ -847,7 +847,7 @@ checkuDataSet (struct uData *u)
       u->descendants == NULL || u->parents == NULL || u->ancestors == NULL)
     {
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5904, "%s: Failed in creating user set %s"),	/* catgets 5904 */
-		 fname, setPerror (bitseterrno));
+		 __func__, setPerror (bitseterrno));
       mbdDie (MASTER_FATAL);
     }
 }
@@ -858,10 +858,10 @@ uDataTableCreate ()
   static char __func__] = "uDataTableCreate()";
   UDATA_TABLE_T *this;
 
-  this = (UDATA_TABLE_T *) my_calloc (1, sizeof (UDATA_TABLE_T), fname);
+  this = (UDATA_TABLE_T *) my_calloc (1, sizeof (UDATA_TABLE_T), __func__);
 
   this->_base_ = (struct uData **) my_calloc (MAX_GROUPS,
-					      sizeof (struct uData *), fname);
+					      sizeof (struct uData *), __func__);
   this->_cur_ = 0;
   this->_size_ = MAX_GROUPS;
 
@@ -898,7 +898,7 @@ uDataTableAddEntry (UDATA_TABLE_T * this, struct uData *new)
 						* (sizeof (struct uData *)));
       if (this->_base_ == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "realloc");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "realloc");
 	  mbdDie (MASTER_FATAL);
 	}
 
@@ -946,7 +946,7 @@ userSetOnNewUser (LS_BITSET_T * subjectSet,
 
   if (logclass & (LC_TRACE))
     ls_syslog (LOG_DEBUG, "\
-%s: added new user <%s> to <%s>", fname, newUser->user, set->setDescription);
+%s: added new user <%s> to <%s>", __func__, newUser->user, set->setDescription);
 
   setAddElement (set, (void *) newUser);
 

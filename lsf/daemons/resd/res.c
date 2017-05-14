@@ -193,7 +193,7 @@ main (int argc, char **argv)
 			resParams[LSF_LOGDIR].paramValue = sp;
 		}
 		ls_openlog ("res", resParams[LSF_LOGDIR].paramValue, (debug > 1), resParams[LSF_LOG_MASK].paramValue);
-		ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_MM, fname, "initenv_", pathname);
+		ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_MM, __func__, "initenv_", pathname);
 		ls_syslog (LOG_ERR, I18N_Exiting);
 		exit (-1); // replace exit(-1) with valid POSIX exit status
 	}
@@ -363,10 +363,10 @@ main (int argc, char **argv)
 		ls_openlog ("res", resParams[LSF_LOGDIR].paramValue, FALSE, resParams[LSF_LOG_MASK].paramValue);
 	}
 	if (logclass & (LC_TRACE | LC_HANG)) {
-		ls_syslog (LOG_DEBUG, "%s: logclass=%x", fname, logclass);
+		ls_syslog (LOG_DEBUG, "%s: logclass=%x", __func__, logclass);
 	}
 
-  	ls_syslog (LOG_DEBUG, "%s: LSF_SERVERDIR=%s", fname, resParams[LSF_SERVERDIR].paramValue);
+  	ls_syslog (LOG_DEBUG, "%s: LSF_SERVERDIR=%s", __func__, resParams[LSF_SERVERDIR].paramValue);
 
 
 
@@ -406,7 +406,7 @@ main (int argc, char **argv)
 
 	  if (logclass & LC_TRACE)
 	{
-	  ls_syslog (LOG_DEBUG, "%s: %s Res child_res=<%d> child_go=<%d> child_cnt=<%d> client_cnt=<%d>", fname, ((child_res) ? "Application" : "Root"), child_res, child_go, child_cnt, client_cnt);
+	  ls_syslog (LOG_DEBUG, "%s: %s Res child_res=<%d> child_go=<%d> child_cnt=<%d> client_cnt=<%d>", __func__, ((child_res) ? "Application" : "Root"), child_res, child_go, child_cnt, client_cnt);
 	  if (child_cnt == 1 && children != NULL && children[0] != NULL)
 		{
 		  dumpChild (children[0], 1, "in main()");
@@ -423,7 +423,7 @@ main (int argc, char **argv)
 
 	  if (logclass & LC_TRACE)
 		{
-		  ls_syslog (LOG_DEBUG, "%s: Application Res is exiting.....", fname);
+		  ls_syslog (LOG_DEBUG, "%s: Application Res is exiting.....", __func__);
 		}
 
 
@@ -531,7 +531,7 @@ main (int argc, char **argv)
 
 		  if (selectError == EBADF)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MN, fname, "select");
+		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MN, __func__, "select");
 		  if (child_res)
 			{
 			  resExit_ (-1);
@@ -539,7 +539,7 @@ main (int argc, char **argv)
 		}
 		  else if (selectError != EINTR)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MN, fname, "select");
+		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MN, __func__, "select");
 		}
 		}
 	  continue;
@@ -860,7 +860,7 @@ periodic (int signum)
 	static time_t lastPri = 0;
 
 	if (logclass & (LC_TRACE | LC_HANG)) {
-		ls_syslog (LOG_DEBUG, "%s: Entering this routine...", fname);
+		ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
 	}
 
   if (!child_res)
@@ -875,7 +875,7 @@ periodic (int signum)
 	  lastPri = now;
 	  if ((myhostname = ls_getmyhostname ()) == NULL)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname,
+		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__,
 			 "ls_getmyhostname");
 		  rexecPriority = 0;
 		}
@@ -884,7 +884,7 @@ periodic (int signum)
 		  hInfo = ls_gethostinfo (NULL, NULL, &myhostname, 1, 0);
 		  if (!hInfo)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname,
+		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__,
 				 "ls_gethostinfo");
 		  rexecPriority = 0;
 		}
@@ -907,7 +907,7 @@ periodic (int signum)
 		  ls_syslog (LOG_DEBUG, "periodic: ls_servavail called");
 		}
 	  if (ls_servavail (1, 1) < 0)
-		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "ls_servavail");
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "ls_servavail");
 	}
 	}
 
@@ -928,7 +928,7 @@ houseKeeping (void)
 
 	if (logclass & LC_TRACE)
 	{
-		ls_syslog (LOG_DEBUG, "%s: Nothing else to do but housekeeping", fname);
+		ls_syslog (LOG_DEBUG, "%s: Nothing else to do but housekeeping", __func__);
 	}
 
 	for (i = 0; i < child_cnt; i++)
@@ -942,7 +942,7 @@ houseKeeping (void)
 				}
 
 				if (logclass & LC_TRACE) {
-					ls_syslog (LOG_DEBUG, "%s: Trying to flush child=<%d> stdout, std_out.retry=<%d>", fname, i, children[i]->std_out->retry);
+					ls_syslog (LOG_DEBUG, "%s: Trying to flush child=<%d> stdout, std_out.retry=<%d>", __func__, i, children[i]->std_out->retry);
 				}
 				child_channel_clear (children[i], //&(children[i]->std_out));
 				children[i]->std_err);
@@ -959,7 +959,7 @@ houseKeeping (void)
 			}
 
 		  if (logclass & LC_TRACE) {
-				ls_syslog (LOG_DEBUG, "%s: Trying to flush child=<%d> stderr, std_err.retry=<%d>", fname, i, children[i]->std_err->retry);
+				ls_syslog (LOG_DEBUG, "%s: Trying to flush child=<%d> stderr, std_err.retry=<%d>", __func__, i, children[i]->std_err->retry);
 		  }
 		  child_channel_clear (children[i], 
 		  	// &(children[i]->std_err));

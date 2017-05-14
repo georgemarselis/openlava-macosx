@@ -583,14 +583,14 @@ prtLoad (struct hostInfoEnt *hPtrs, struct lsInfo *lsInfo)
       == NULL)
     {
       lserrno = LSE_MALLOC;
-      lsb_perror (fname);
+      lsb_perror (__func__);
       exit (-1);
     }
   if ((loadval1 = (char **) malloc ((lsInfo->numIndx + 1) * sizeof (char *)))
       == NULL)
     {
       lserrno = LSE_MALLOC;
-      lsb_perror (fname);
+      lsb_perror (__func__);
       exit (-1);
     }
 
@@ -603,7 +603,7 @@ prtLoad (struct hostInfoEnt *hPtrs, struct lsInfo *lsInfo)
       if (loadval[i] == NULL || loadval[i] == NULL)
 	{
 	  lserrno = LSE_MALLOC;
-	  lsb_perror (fname);
+	  lsb_perror (__func__);
 	  exit (-1);
 	}
     }
@@ -902,7 +902,7 @@ displayShareRes (int argc, char **argv, int index)
 	   (char **) malloc ((argc - index) * sizeof (char *))) == NULL)
 	{
 	  char i18nBuf[100];
-	  sprintf (i18nBuf, I18N_FUNC_FAIL, fname, "malloc");
+	  sprintf (i18nBuf, I18N_FUNC_FAIL, __func__, "malloc");
 	  perror (i18nBuf);
 	  exit (-1);
 	}

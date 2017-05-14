@@ -59,7 +59,7 @@ getLocalHostOfficialName (void)
 
   if (gethostname (localHost, localHostLength) == -1)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "gethostname");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "gethostname");
       lsberrno = LSBE_SYS_CALL;
       return returnLocalHostPtr;
     }
@@ -106,7 +106,7 @@ copySpoolFile (const char *srcFilePath, spoolOptions_t option)
 
   if (logclass & (LC_TRACE | LC_EXEC))
     {
-      ls_syslog (LOG_DEBUG, "%s: Entering this routine...", fname);
+      ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
     }
 
 
@@ -114,7 +114,7 @@ copySpoolFile (const char *srcFilePath, spoolOptions_t option)
   if ((srcFilePath == NULL) || (strlen (srcFilePath) == 0))
     {
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5702, "%s: srcFilePath is NULL or empty"),   /* catgets 5702 */
-         fname);
+         __func__);
       lsberrno = LSBE_BAD_ARG;
       goto Error;
     }
@@ -122,7 +122,7 @@ copySpoolFile (const char *srcFilePath, spoolOptions_t option)
   if ((option != SPOOL_INPUT_FILE) && (option != SPOOL_COMMAND))
     {
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5706, "%s: option parameter is wrong"),  /* catgets 5706 */
-         fname);
+         __func__);
       lsberrno = LSBE_BAD_ARG;
       goto Error;
     }
@@ -149,7 +149,7 @@ copySpoolFile (const char *srcFilePath, spoolOptions_t option)
 
       if (getcwd (srcFileFullPath, size) == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "getcwd");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "getcwd");
       lsberrno = LSBE_SYS_CALL;
       goto Error;
     }
@@ -167,7 +167,7 @@ copySpoolFile (const char *srcFilePath, spoolOptions_t option)
   if ((stat (srcFileFullPath, &srcFilePathStat) == -1) && (errno == ENOENT))
     {
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5704, "%s: source file \'%s\' does not exist"),  /* catgets 5704 */
-         fname, srcFileFullPath);
+         __func__, srcFileFullPath);
       lsberrno = LSBE_SP_SRC_NOT_SEEN;
       goto Error;
     }
@@ -226,7 +226,7 @@ copySpoolFile (const char *srcFilePath, spoolOptions_t option)
       if (bestHostFromList == NULL)
     {
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5705, "%s: Unable to copy file <%s>. $JOB_SPOOLDIR <%s> doesn't exist or permission denied."),   /* catgets 5705 */
-             fname, srcFilePath, spoolDirPtr);
+             __func__, srcFilePath, spoolDirPtr);
       goto Error;
     }
       else
@@ -298,7 +298,7 @@ Error:
 
   if (logclass & (LC_TRACE | LC_EXEC))
     {
-      ls_syslog (LOG_DEBUG, "%s: completed", fname);
+      ls_syslog (LOG_DEBUG, "%s: completed", __func__);
     }
 
   return rtnSpoolInfo;
@@ -362,7 +362,7 @@ findSpoolDir (const char *spoolHost)
 
   if (logclass & (LC_TRACE | LC_EXEC))
     {
-      ls_syslog (LOG_DEBUG, "%s: Entering this routine...", fname);
+      ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
     }
   if (spoolHost == NULL)
     {
@@ -419,11 +419,11 @@ Error:
     {
       if (returnStringPtr == NULL)
     {
-      ls_syslog (LOG_DEBUG, "%s: completed with failure", fname);
+      ls_syslog (LOG_DEBUG, "%s: completed with failure", __func__);
     }
       else
     {
-      ls_syslog (LOG_DEBUG, "%s: completed successfuly", fname);
+      ls_syslog (LOG_DEBUG, "%s: completed successfuly", __func__);
     }
     }
 
@@ -569,7 +569,7 @@ cpLocalFiles (const char *localSrcFileFullPath, const char *outputFileName)
 
   if (logclass & (LC_TRACE | LC_EXEC))
     {
-      ls_syslog (LOG_DEBUG, "%s: Entering this routine...", fname);
+      ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
     }
 
   if ((localSrcFileFullPath == NULL) || (outputFileName == NULL))
@@ -584,7 +584,7 @@ cpLocalFiles (const char *localSrcFileFullPath, const char *outputFileName)
       spoolCopyStatus = SPOOL_COPY_FAILURE;
       if (logclass & (LC_TRACE | LC_EXEC))
     {
-      ls_syslog (LOG_ERR, "%s: %s, spoolCopyStatus = SPOOL_COPY_FAILURE\n", fname, I18N (5709, "Unable to open source file ")); /*catgets 5709 */
+      ls_syslog (LOG_ERR, "%s: %s, spoolCopyStatus = SPOOL_COPY_FAILURE\n", __func__, I18N (5709, "Unable to open source file ")); /*catgets 5709 */
     }
       close (input);
       goto Error;
@@ -600,7 +600,7 @@ cpLocalFiles (const char *localSrcFileFullPath, const char *outputFileName)
       if (logclass & (LC_TRACE | LC_EXEC))
     {
       ls_syslog (LOG_ERR, "%s: spoolCopyStatus = SPOOL_COPY_EXISTS\n",
-             fname);
+             __func__);
     }
       goto Close;
     }
@@ -610,7 +610,7 @@ cpLocalFiles (const char *localSrcFileFullPath, const char *outputFileName)
       spoolCopyStatus = SPOOL_COPY_FAILURE;
       if (logclass & (LC_TRACE | LC_EXEC))
     {
-      ls_syslog (LOG_ERR, "%s: %s \'%s\', spoolCopyStatus = SPOOL_COPY_FAILURE\n", fname, I18N (5707, "Unable to create outputfile ")   /*catgets 5707 */
+      ls_syslog (LOG_ERR, "%s: %s \'%s\', spoolCopyStatus = SPOOL_COPY_FAILURE\n", __func__, I18N (5707, "Unable to create outputfile ")   /*catgets 5707 */
              , outputFileName);
     }
 
@@ -640,7 +640,7 @@ cpLocalFiles (const char *localSrcFileFullPath, const char *outputFileName)
       spoolCopyStatus = SPOOL_COPY_FAILURE;
       if (logclass & (LC_TRACE | LC_EXEC))
         {
-          ls_syslog (LOG_ERR, "%s: spoolCopyStatus = SPOOL_COPY_FAILURE\n", fname, I18N (5708, "write operation failure")); /*catgets 5708 */
+          ls_syslog (LOG_ERR, "%s: spoolCopyStatus = SPOOL_COPY_FAILURE\n", __func__, I18N (5708, "write operation failure")); /*catgets 5708 */
         }
       goto Close;
     }
@@ -658,11 +658,11 @@ Error:
     {
       if (spoolCopyStatus == SPOOL_COPY_FAILURE)
     {
-      ls_syslog (LOG_DEBUG, "%s: completed with failure", fname);
+      ls_syslog (LOG_DEBUG, "%s: completed with failure", __func__);
     }
       else
     {
-      ls_syslog (LOG_DEBUG, "%s: completed successfuly", fname);
+      ls_syslog (LOG_DEBUG, "%s: completed successfuly", __func__);
     }
     }
 
@@ -689,7 +689,7 @@ cpRemoteFiles (const char *localSrcFileFullPath, const char *hostName, const cha
 
   if (logclass & (LC_TRACE | LC_EXEC))
     {
-      ls_syslog (LOG_DEBUG, "%s: Entering this routine...", fname);
+      ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
     }
 
   if ((localSrcFileFullPath == NULL)
@@ -730,7 +730,7 @@ cpRemoteFiles (const char *localSrcFileFullPath, const char *hostName, const cha
       if (logclass & (LC_TRACE | LC_EXEC))
     {
       ls_syslog (LOG_ERR, "%s: spoolCopyStatus = SPOOL_COPY_EXISTS\n",
-             fname);
+             __func__);
     }
       goto Done;
     }
@@ -839,7 +839,7 @@ copyFileToHost (const char *localSrcFileFullPath, const char *hostName,
 
   if (logclass & (LC_TRACE | LC_EXEC))
     {
-      ls_syslog (LOG_DEBUG, "%s: Entering this routine...", fname);
+      ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
     }
 
   if ((localSrcFileFullPath == NULL)
@@ -886,11 +886,11 @@ Error:
     {
       if (spoolCopyStatus == SPOOL_COPY_FAILURE)
     {
-      ls_syslog (LOG_DEBUG, "%s: completed with failure", fname);
+      ls_syslog (LOG_DEBUG, "%s: completed with failure", __func__);
     }
       else
     {
-      ls_syslog (LOG_DEBUG, "%s: completed successfuly", fname);
+      ls_syslog (LOG_DEBUG, "%s: completed successfuly", __func__);
     }
     }
 
@@ -913,7 +913,7 @@ removeSpoolFile (const char *hostName, const char *destinFileFullPath)
 
   if (logclass & (LC_TRACE | LC_EXEC))
     {
-      ls_syslog (LOG_DEBUG, "%s: Entering this routine...", fname);
+      ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
     }
 
   if ((hostName == NULL) || (destinFileFullPath == NULL))
@@ -999,7 +999,7 @@ removeSpoolFile (const char *hostName, const char *destinFileFullPath)
     case -1:
 
       if (logclass & (LC_FILE))
-    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "fork");
+    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "fork");
       lsberrno = LSBE_SP_FORK_FAILED;
       goto Done;
 
@@ -1019,11 +1019,11 @@ Done:
     {
       if (returnValue != 0)
     {
-      ls_syslog (LOG_DEBUG, "%s: completed with failure", fname);
+      ls_syslog (LOG_DEBUG, "%s: completed with failure", __func__);
     }
       else
     {
-      ls_syslog (LOG_DEBUG, "%s: completed successfuly", fname);
+      ls_syslog (LOG_DEBUG, "%s: completed successfuly", __func__);
     }
     }
 
@@ -1048,7 +1048,7 @@ getSpoolHostBySpoolFile (const char *spoolFile)
 
   if (logclass & (LC_TRACE | LC_EXEC))
     {
-      ls_syslog (LOG_DEBUG, "%s: Entering this routine...", fname);
+      ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
     }
 
   if (spoolFile == NULL)
@@ -1153,11 +1153,11 @@ Error:
     {
       if (returnValue == NULL)
     {
-      ls_syslog (LOG_DEBUG, "%s: completed with failure", fname);
+      ls_syslog (LOG_DEBUG, "%s: completed with failure", __func__);
     }
       else
     {
-      ls_syslog (LOG_DEBUG, "%s: completed successfuly", fname);
+      ls_syslog (LOG_DEBUG, "%s: completed successfuly", __func__);
     }
     }
 

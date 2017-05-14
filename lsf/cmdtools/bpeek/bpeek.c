@@ -33,9 +33,9 @@ static void displayOutput (char *, struct jobInfoEnt *, char, char **);
 static void oneOf (char *);
 static void output (char *, char *, int, char *, char **);
 static void usage (char *cmd);
-static void remoteOutput (int fidx, char **disOut, char *exHost, char *fname,
+static void remoteOutput (int fidx, char **disOut, char *exHost, char *__func__,
 			  char *execUsername, char **);
-static int useTmp (char *exHost, char *fname);
+static int useTmp (char *exHost, char *__func__);
 static void stripClusterName (char *);
 
 static void
@@ -232,7 +232,7 @@ displayOutput (char *jobFile, struct jobInfoEnt *jInfo, char fflag,
 
 
 static void
-output (char *fname, char *exHost, int fflag, char *execUsername, char **envp)
+output (char *__func__, char *exHost, int fflag, char *execUsername, char **envp)
 {
   char *disOut[MAX_PEEK_ARGS];
   int fidx;
@@ -272,15 +272,15 @@ output (char *fname, char *exHost, int fflag, char *execUsername, char **envp)
   disOut[fidx + 1] = NULL;
 
 
-  if (__func__0] != '/' || stat (fname, &buf) < 0)
+  if (__func__0] != '/' || stat (__func__, &buf) < 0)
     {
-      remoteOutput (fidx, disOut, exHost, fname, execUsername, envp);
+      remoteOutput (fidx, disOut, exHost, __func__, execUsername, envp);
     }
   else
     {
       setuid (getuid ());
 
-      disOut[fidx] = fname;
+      disOut[fidx] = __func__;
       lsfExecvp (disOut[0], disOut);
       fprintf (stderr, I18N_FUNC_S_S_FAIL_S, "execvp", disOut[0],
 	       strerror (errno));
@@ -292,7 +292,7 @@ output (char *fname, char *exHost, int fflag, char *execUsername, char **envp)
 
 
 static void
-remoteOutput (int fidx, char **disOut, char *exHost, char *fname,
+remoteOutput (int fidx, char **disOut, char *exHost, char *__func__,
 	      char *execUsername, char **envp)
 {
   char buf[MAXFILENAMELEN];
@@ -306,14 +306,14 @@ remoteOutput (int fidx, char **disOut, char *exHost, char *fname,
     {
 
 
-      if (useTmp (exHost, fname))
+      if (useTmp (exHost, __func__))
 	{
-	  sprintf (buf, "/tmp/.lsbtmp%d/%s", (int) getuid (), fname);
+	  sprintf (buf, "/tmp/.lsbtmp%d/%s", (int) getuid (), __func__);
 	  disOut[fidx] = buf;
 	}
       else
 	{
-	  disOut[fidx] = fname;
+	  disOut[fidx] = __func__;
 	}
 
       args[0] = RSHCMD;
@@ -341,13 +341,13 @@ remoteOutput (int fidx, char **disOut, char *exHost, char *fname,
       return;
     }
 
-  if (useTmp (exHost, fname))
+  if (useTmp (exHost, __func__))
     {
-      sprintf (buf, "/tmp/.lsbtmp%d/%s", (int) getuid (), fname);
+      sprintf (buf, "/tmp/.lsbtmp%d/%s", (int) getuid (), __func__);
       disOut[fidx] = buf;
     }
   else
-    disOut[fidx] = fname;
+    disOut[fidx] = __func__;
 
   if (ls_initrex (1, 0) < 0)
     {
@@ -364,7 +364,7 @@ remoteOutput (int fidx, char **disOut, char *exHost, char *fname,
 }
 
 static int
-useTmp (char *exHost, char *fname)
+useTmp (char *exHost, char *__func__)
 {
   int pid;
   LS_WAIT_T status;
@@ -382,7 +382,7 @@ useTmp (char *exHost, char *fname)
 
       ls_rfcontrol (RF_CMD_RXFLAGS, REXF_CLNTDIR);
 
-      if (ls_rstat (exHost, fname, &st) < 0)
+      if (ls_rstat (exHost, __func__, &st) < 0)
 	{
 	  if (lserrno == LSE_FILE_SYS && (errno == ENOENT || errno == EACCES))
 	    {

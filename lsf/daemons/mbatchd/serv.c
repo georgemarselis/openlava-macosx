@@ -60,7 +60,7 @@ do_submitReq (XDR * xdrs,
 
   if (logclass & (LC_TRACE | LC_EXEC | LC_COMM))
     ls_syslog (LOG_DEBUG, "%s: Entering this routine...; host=%s, socket=%d",
-	       fname, hostName, chanSock_ (chfd));
+	       __func__, hostName, chanSock_ (chfd));
 
 
   initSubmit (&first, &subReq, &submitReply);
@@ -69,7 +69,7 @@ do_submitReq (XDR * xdrs,
   if (!xdr_submitReq (xdrs, &subReq, reqHdr))
     {
       reply = LSBE_XDR;
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_submitReq");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_submitReq");
       goto sendback;
     }
 
@@ -156,7 +156,7 @@ do_jobInfoReq (XDR * xdrs,
   struct hData *hPtr;
 
   if (logclass & (LC_TRACE | LC_COMM))
-    ls_syslog (LOG_DEBUG, "%s: Entering this routine...; channel=%d", fname,
+    ls_syslog (LOG_DEBUG, "%s: Entering this routine...; channel=%d", __func__,
 	       chfd);
 
   jobInfoHead.hostNames = NULL;
@@ -165,7 +165,7 @@ do_jobInfoReq (XDR * xdrs,
   if (!xdr_jobInfoReq (xdrs, &jobInfoReq, reqHdr))
     {
       reply = LSBE_XDR;
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_jobInfoReq");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_jobInfoReq");
     }
   if (jobInfoReq.host[0] != '\0'
       && getHGrpData (jobInfoReq.host) == NULL
@@ -200,7 +200,7 @@ do_jobInfoReq (XDR * xdrs,
   jobInfoHead.numJobs = listSize;
 
   if (jobInfoHead.numJobs > 0)
-    jobInfoHead.jobIds = my_calloc (listSize, sizeof (LS_LONG_INT), fname);
+    jobInfoHead.jobIds = my_calloc (listSize, sizeof (LS_LONG_INT), __func__);
   for (i = 0; i < listSize; i++)
     {
       if (!jgrplist[i].isJData)
@@ -213,7 +213,7 @@ do_jobInfoReq (XDR * xdrs,
   if (jobInfoReq.options & HOST_NAME)
     {
       jobInfoHead.hostNames = my_calloc (numofhosts (),
-					 sizeof (char *), fname);
+					 sizeof (char *), __func__);
       for (hPtr = (struct hData *) hostList->back;
 	   hPtr != (void *) hostList; hPtr = (struct hData *) hPtr->back)
 	{
@@ -228,7 +228,7 @@ do_jobInfoReq (XDR * xdrs,
     + jobInfoHead.numJobs * sizeof (LS_LONG_INT)
     + jobInfoHead.numHosts * (sizeof (char *) + MAXHOSTNAMELEN) + 100;
 
-  reply_buf = (char *) my_malloc (len, fname);
+  reply_buf = (char *) my_malloc (len, __func__);
   xdrmem_create (&xdrs2, reply_buf, len, XDR_ENCODE);
   replyHdr.opCode = reply;
 
@@ -237,7 +237,7 @@ do_jobInfoReq (XDR * xdrs,
     {
       FREEUP (reply_buf);
       freeJobHead (&jobInfoHead);
-      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, fname,
+      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, __func__,
 		 "xdr_encodeMsg", "jobInfoHead");
       xdr_destroy (&xdrs2);
       FREEUP (jgrplist);
@@ -248,7 +248,7 @@ do_jobInfoReq (XDR * xdrs,
   {
     if (chanWrite_ (chfd, reply_buf, len) != len)
       {
-	ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "chanWrite_");
+	ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "chanWrite_");
 	FREEUP (reply_buf);
 	freeJobHead (&jobInfoHead);
 	FREEUP (jgrplist);
@@ -274,7 +274,7 @@ do_jobInfoReq (XDR * xdrs,
 			       listSize - 1 - i, &buf, schedule,
 			       jobInfoReq.options, reqHdr->version)) < 0))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "packJobInfo");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "packJobInfo");
 	  FREEUP (jgrplist);
 	  return (-1);
 	}
@@ -283,7 +283,7 @@ do_jobInfoReq (XDR * xdrs,
 				listSize - 1 - i, &buf, schedule,
 				reqHdr->version)) < 0))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "packJgrpInfo");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "packJgrpInfo");
 	  FREEUP (jgrplist);
 	  return (-1);
 	}
@@ -291,7 +291,7 @@ do_jobInfoReq (XDR * xdrs,
       {
 	if (chanWrite_ (chfd, buf, len) != len)
 	  {
-	    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "chanWrite_");
+	    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "chanWrite_");
 	    FREEUP (buf);
 	    FREEUP (jgrplist);
 	    return (-1);
@@ -357,7 +357,7 @@ packJgrpInfo (struct jgTreeNode *jgNode, int remain, char **replyBuf,
   if (!xdr_encodeMsg (&xdrs, (char *) &jobInfoReply,
 		      &hdr, xdr_jobInfoReply, 0, NULL))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, fname,
+      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, __func__,
 		 "xdr_encodeMsg", "jobInfoReply");
       xdr_destroy (&xdrs);
       FREEUP (request_buf);
@@ -459,8 +459,8 @@ packJobInfo (struct jData *jobData,
 
   if (reasonTb == NULL)
     {
-      reasonTb = my_calloc (numofhosts () + 1, sizeof (int), fname);
-      jReasonTb = my_calloc (numofhosts () + 1, sizeof (int), fname);
+      reasonTb = my_calloc (numofhosts () + 1, sizeof (int), __func__);
+      jReasonTb = my_calloc (numofhosts () + 1, sizeof (int), __func__);
     }
 
   jobInfoReply.jobId = jobData->jobId;
@@ -486,7 +486,7 @@ packJobInfo (struct jData *jobData,
   if (logclass & LC_PEND)
     ls_syslog (LOG_DEBUG3,
 	       "%s: job=%s, rs=%d, nrs=%d srs=%d, qNrs=%d, jNrs=%d nLsb=%d nQU=%d mStage=%d",
-	       fname, lsb_jobid2str (jobData->jobId), jobData->oldReason,
+	       __func__, lsb_jobid2str (jobData->jobId), jobData->oldReason,
 	       jobData->newReason, jobData->subreasons,
 	       jobData->qPtr->numReasons, job_numReasons, numLsbUsable,
 	       jobData->qPtr->numUsable, mSchedStage);
@@ -546,7 +546,7 @@ packJobInfo (struct jData *jobData,
 	  if (svReason == 0)
 	    {
 	      if (logclass & LC_PEND)
-		ls_syslog (LOG_DEBUG2, "%s: Get h/u/q reasons", fname);
+		ls_syslog (LOG_DEBUG2, "%s: Get h/u/q reasons", __func__);
 	      k = 0;
 
 	      /* traverse the list of hosts
@@ -576,7 +576,7 @@ packJobInfo (struct jData *jobData,
 		      k++;
 		      if (debug && (logclass & LC_PEND))
 			ls_syslog (LOG_DEBUG2, "%s: hReasonTb[%d]=%d",
-				   fname, i, pkHReasonTb[i]);
+				   __func__, i, pkHReasonTb[i]);
 		      continue;
 		    }
 		  if (pkQReasonTb[i])
@@ -586,7 +586,7 @@ packJobInfo (struct jData *jobData,
 		      k++;
 		      if (debug && (logclass & LC_PEND))
 			ls_syslog (LOG_DEBUG2, "%s: qReason[%d]=%d",
-				   fname, i, pkQReasonTb[i]);
+				   __func__, i, pkQReasonTb[i]);
 		      continue;
 		    }
 		  if (pkUReasonTb[i])
@@ -596,7 +596,7 @@ packJobInfo (struct jData *jobData,
 		      k++;
 		      if (debug && (logclass & LC_PEND))
 			ls_syslog (LOG_DEBUG2, "%s: uReason[%d]=%d",
-				   fname, i, pkUReasonTb[i]);
+				   __func__, i, pkUReasonTb[i]);
 		      continue;
 		    }
 		  if (jReasonTb[i])
@@ -607,7 +607,7 @@ packJobInfo (struct jData *jobData,
 			  int rs;
 			  GET_LOW (rs, jReasonTb[i]);
 			  ls_syslog (LOG_DEBUG2, "%s: jReason[%d]=%d",
-				     fname, i, rs);
+				     __func__, i, rs);
 			}
 		      continue;
 		    }
@@ -621,7 +621,7 @@ packJobInfo (struct jData *jobData,
 		  if (debug && (logclass & LC_PEND))
 		    {
 		      ls_syslog (LOG_DEBUG2, "%s: jReason[0]=%d",
-				 fname, jReasonTb[0]);
+				 __func__, jReasonTb[0]);
 		    }
 		}
 	    }
@@ -635,7 +635,7 @@ packJobInfo (struct jData *jobData,
   if (jobData->numHostPtr > 0)
     {
       jobInfoReply.toHosts = my_calloc (jobData->numHostPtr,
-					sizeof (char *), fname);
+					sizeof (char *), __func__);
       for (i = 0; i < jobData->numHostPtr; i++)
 	{
 	  jobInfoReply.toHosts[i] = safeSave (jobData->hPtr[i]->host);
@@ -651,7 +651,7 @@ packJobInfo (struct jData *jobData,
 
       if ((!loadSched) || (!loadStop))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "malloc");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "malloc");
 	  mbdDie (MASTER_FATAL);
 	}
     }
@@ -736,7 +736,7 @@ packJobInfo (struct jData *jobData,
 	      if (cpuFactor == NULL)
 		{
 		  ls_syslog (LOG_ERR, "\
-%s: Cannot find cpu factor for hostSpec %s; cpuFactor is set to 1.0", fname, jobInfoReply.jobBill->fromHost);
+%s: Cannot find cpu factor for hostSpec %s; cpuFactor is set to 1.0", __func__, jobInfoReply.jobBill->fromHost);
 		  cpuFactor = &one;
 		}
 	    }
@@ -788,7 +788,7 @@ packJobInfo (struct jData *jobData,
   if (!xdr_encodeMsg (&xdrs, (char *) &jobInfoReply,
 		      &hdr, xdr_jobInfoReply, 0, NULL))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, fname,
+      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, __func__,
 		 "xdr_encodeMsg", "jobInfoReply");
       xdr_destroy (&xdrs);
       freeJobInfoReply (&jobInfoReply);
@@ -830,7 +830,7 @@ do_jobPeekReq (XDR * xdrs, int chfd, struct sockaddr_in *from, char *hostName,
   if (!xdr_jobPeekReq (xdrs, &jobPeekReq, reqHdr))
     {
       reply = LSBE_XDR;
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_jobPeekReq");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_jobPeekReq");
     }
   else
     {
@@ -846,7 +846,7 @@ do_jobPeekReq (XDR * xdrs, int chfd, struct sockaddr_in *from, char *hostName,
   if (!xdr_encodeMsg (&xdrs2, replyStruct, &replyHdr, xdr_jobPeekReply, 0,
 		      NULL))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_encodeMsg");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_encodeMsg");
       xdr_destroy (&xdrs2);
       FREEUP (jobPeekReply.outFile);
       return -1;
@@ -854,7 +854,7 @@ do_jobPeekReq (XDR * xdrs, int chfd, struct sockaddr_in *from, char *hostName,
   cc = XDR_GETPOS (&xdrs2);
   if ((chanWrite_ (chfd, reply_buf, cc)) != cc)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "chanWrite_");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "chanWrite_");
       xdr_destroy (&xdrs2);
       FREEUP (jobPeekReply.outFile);
       return -1;
@@ -880,7 +880,7 @@ do_signalReq (XDR * xdrs, int chfd, struct sockaddr_in *from, char *hostName,
   if (!xdr_signalReq (xdrs, &signalReq, reqHdr))
     {
       reply = LSBE_XDR;
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_signalReq");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_signalReq");
       goto Reply;
     }
   signalReq.sigValue = sig_decode (signalReq.sigValue);
@@ -906,13 +906,13 @@ Reply:
 
   if (!xdr_encodeMsg (&xdrs2, (char *) NULL, &replyHdr, xdr_int, 0, NULL))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_encodeMsg");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_encodeMsg");
       xdr_destroy (&xdrs2);
       return -1;
     }
   if (chanWrite_ (chfd, reply_buf, XDR_GETPOS (&xdrs2)) <= 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "b_write_fix");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "b_write_fix");
       xdr_destroy (&xdrs2);
       return -1;
     }
@@ -942,12 +942,12 @@ do_jobMsg (struct bucket *bucket,
   LSBMSG_INIT (header, jmsg);
 
   if (logclass & (LC_TRACE | LC_SIGNAL))
-    ls_syslog (LOG_DEBUG1, "%s: Entering this routine ...", fname);
+    ls_syslog (LOG_DEBUG1, "%s: Entering this routine ...", __func__);
 
   if (!xdr_lsbMsg (xdrs, &jmsg, reqHdr))
     {
       reply = LSBE_XDR;
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_lsbMsg");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_lsbMsg");
       goto Reply;
     }
 
@@ -966,7 +966,7 @@ do_jobMsg (struct bucket *bucket,
     {
 
       reply = LSBE_XDR;
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_encodeMsg");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_encodeMsg");
       goto Reply;
     }
   xdr_destroy (&bucket->xdrs);
@@ -993,7 +993,7 @@ do_jobMsg (struct bucket *bucket,
 
   if (logclass & (LC_SIGNAL))
     ls_syslog (LOG_DEBUG2, "%s: A message for job %s; eP=%d",
-	       fname, lsb_jobid2str (jpbw->jobId), eventPending);
+	       __func__, lsb_jobid2str (jpbw->jobId), eventPending);
 
   QUEUE_APPEND (bucket, msgq);
   bucket->storage->stashed = TRUE;
@@ -1005,13 +1005,13 @@ Reply:
 
   if (!xdr_encodeMsg (&xdrs2, (char *) NULL, &replyHdr, xdr_int, 0, NULL))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_encodeMsg");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_encodeMsg");
       xdr_destroy (&xdrs2);
       return -1;
     }
   if (chanWrite_ (chfd, reply_buf, XDR_GETPOS (&xdrs2)) <= 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "b_write_fix");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "b_write_fix");
       xdr_destroy (&xdrs2);
       return -1;
     }
@@ -1043,7 +1043,7 @@ do_migReq (XDR * xdrs, int chfd, struct sockaddr_in *from, char *hostName,
   if (!xdr_migReq (xdrs, &migReq, reqHdr))
     {
       reply = LSBE_XDR;
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_migReq");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_migReq");
       migReq.numAskedHosts = 0;
       goto Reply;
     }
@@ -1067,13 +1067,13 @@ Reply:
   if (!xdr_encodeMsg (&xdrs2, replyStruct, &replyHdr, xdr_submitMbdReply, 0,
 		      NULL))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_encodeMsg");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_encodeMsg");
       xdr_destroy (&xdrs2);
       return -1;
     }
   if (chanWrite_ (chfd, reply_buf, XDR_GETPOS (&xdrs2)) <= 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "b_write_fix");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "b_write_fix");
       xdr_destroy (&xdrs2);
       return -1;
     }
@@ -1116,7 +1116,7 @@ do_statusReq (XDR * xdrs, int chfd, struct sockaddr_in *from, int *schedule,
   if (!xdr_statusReq (xdrs, &statusReq, reqHdr))
     {
       reply = LSBE_XDR;
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_statusReq");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_statusReq");
     }
   else
     {
@@ -1133,7 +1133,7 @@ do_statusReq (XDR * xdrs, int chfd, struct sockaddr_in *from, int *schedule,
 	  break;
 	default:
 	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7827, "%s: Unknown request %d"),	/* catgets 7827 */
-		     fname, reqHdr->opCode);
+		     __func__, reqHdr->opCode);
 	  reply = LSBE_PROTOCOL;
 	}
     }
@@ -1152,13 +1152,13 @@ do_statusReq (XDR * xdrs, int chfd, struct sockaddr_in *from, int *schedule,
   replyHdr.length = 0;
   if (!xdr_LSFHeader (&xdrs2, &replyHdr))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, fname, "xdr_LSFHeader", reply);
+      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__, "xdr_LSFHeader", reply);
       xdr_destroy (&xdrs2);
       return -1;
     }
   if (chanWrite_ (chfd, reply_buf, XDR_GETPOS (&xdrs2)) <= 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "b_write_fix");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "b_write_fix");
       xdr_destroy (&xdrs2);
       return -1;
     }
@@ -1198,7 +1198,7 @@ do_chunkStatusReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
       ls_syslog (LOG_ERR, "\
 %s: gethostbyaddr() failed %s", __func__, sockAdd2Str_ (from));
 
-      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_MM, fname, "getHostEntryByAddr_",
+      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_MM, __func__, "getHostEntryByAddr_",
 		 sockAdd2Str_ (from));
       errorBack (chfd, LSBE_BAD_HOST, from);
       return (-1);
@@ -1207,7 +1207,7 @@ do_chunkStatusReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
   if (!xdr_chunkStatusReq (xdrs, &chunkStatusReq, reqHdr))
     {
       reply = LSBE_XDR;
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_chunkStatusReq");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_chunkStatusReq");
     }
   else
     {
@@ -1228,13 +1228,13 @@ do_chunkStatusReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
   replyHdr.length = 0;
   if (!xdr_LSFHeader (&xdrs2, &replyHdr))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, fname, "xdr_LSFHeader", reply);
+      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__, "xdr_LSFHeader", reply);
       xdr_destroy (&xdrs2);
       return -1;
     }
   if (chanWrite_ (chfd, reply_buf, XDR_GETPOS (&xdrs2)) <= 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "b_write_fix");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "b_write_fix");
       xdr_destroy (&xdrs2);
       return -1;
     }
@@ -1308,7 +1308,7 @@ do_restartReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
   if (!xdr_encodeMsg (&xdrs2, (char *) &sbdPackage, &replyHdr,
 		      xdr_sbdPackage, 0, NULL))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_encodeMsg");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_encodeMsg");
       xdr_destroy (&xdrs2);
       free (reply_buf);
       for (i = 0; i < sbdPackage.nAdmins; i++)
@@ -1322,7 +1322,7 @@ do_restartReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
     }
   cc = XDR_GETPOS (&xdrs2);
   if (chanWrite_ (chfd, reply_buf, cc) <= 0)
-    ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "chanWrite_", cc);
+    ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "chanWrite_", cc);
 
   free (reply_buf);
   xdr_destroy (&xdrs2);
@@ -1715,7 +1715,7 @@ do_paramInfoReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
   if (!xdr_infoReq (xdrs, &infoReq, reqHdr))
     {
       reply = LSBE_XDR;
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_infoReq");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_infoReq");
     }
   else
     checkParams (&infoReq, &paramInfo);
@@ -1745,7 +1745,7 @@ do_paramInfoReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
   if (!xdr_encodeMsg (&xdrs2, replyStruct, &replyHdr, xdr_parameterInfo,
 		      0, NULL))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_encodeMsg");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_encodeMsg");
       xdr_destroy (&xdrs2);
       FREEUP (reply_buf);
       return -1;
@@ -1753,7 +1753,7 @@ do_paramInfoReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
 
   if (chanWrite_ (chfd, reply_buf, XDR_GETPOS (&xdrs2)) <= 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "chanWrite_",
+      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "chanWrite_",
 		 XDR_GETPOS (&xdrs2));
       xdr_destroy (&xdrs2);
       FREEUP (reply_buf);
@@ -1779,7 +1779,7 @@ do_queueControlReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
   if (!xdr_controlReq (xdrs, &bqcReq, reqHdr))
     {
       reply = LSBE_XDR;
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_controlReq");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_controlReq");
     }
   else
     {
@@ -1791,13 +1791,13 @@ do_queueControlReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
   replyHdr.length = 0;
   if (!xdr_LSFHeader (&xdrs2, &replyHdr))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "xdr_LSFHeader", reply);
+      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "xdr_LSFHeader", reply);
       xdr_destroy (&xdrs2);
       return -1;
     }
   if (chanWrite_ (chfd, reply_buf, XDR_GETPOS (&xdrs2)) <= 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "chanWrite_",
+      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "chanWrite_",
 		 XDR_GETPOS (&xdrs2));
       xdr_destroy (&xdrs2);
       return -1;
@@ -1821,11 +1821,11 @@ do_mbdShutDown (XDR * xdrs, int s, struct sockaddr_in *from, char *hostName,
   replyHdr.length = 0;
   if (!xdr_LSFHeader (&xdrs2, &replyHdr))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "xdr_LSFHeader",
+      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "xdr_LSFHeader",
 		 replyHdr.opCode);
     }
   if (b_write_fix (s, reply_buf, XDR_GETPOS (&xdrs2)) <= 0)
-    ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "b_write_fix",
+    ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "b_write_fix",
 	       XDR_GETPOS (&xdrs2));
   xdr_destroy (&xdrs2);
   millisleep_ (3000);
@@ -1891,7 +1891,7 @@ do_hostControlReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
   if (!xdr_controlReq (xdrs, &hostControlReq, reqHdr))
     {
       reply = LSBE_XDR;
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_controlReq");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_controlReq");
       goto checkout;
     }
   hData = getHostData (hostControlReq.name);
@@ -1906,10 +1906,10 @@ checkout:
   replyHdr.length = 0;
   if (!xdr_LSFHeader (&xdrs2, &replyHdr))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "xdr_LSFHeader", reply);
+      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "xdr_LSFHeader", reply);
     }
   if (chanWrite_ (chfd, reply_buf, XDR_GETPOS (&xdrs2)) <= 0)
-    ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "chanWrite_",
+    ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "chanWrite_",
 	       XDR_GETPOS (&xdrs2));
   xdr_destroy (&xdrs2);
   return 0;
@@ -1931,7 +1931,7 @@ do_jobSwitchReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
   if (!xdr_jobSwitchReq (xdrs, &jobSwitchReq, reqHdr))
     {
       reply = LSBE_XDR;
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_jobSwitchReq");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_jobSwitchReq");
     }
   else
     {
@@ -1942,13 +1942,13 @@ do_jobSwitchReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
   replyHdr.length = 0;
   if (!xdr_LSFHeader (&xdrs2, &replyHdr))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "xdr_LSFHeader", reply);
+      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "xdr_LSFHeader", reply);
       xdr_destroy (&xdrs2);
       return -1;
     }
   if (chanWrite_ (chfd, reply_buf, XDR_GETPOS (&xdrs2)) <= 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "chanWrite_",
+      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "chanWrite_",
 		 XDR_GETPOS (&xdrs2));
       xdr_destroy (&xdrs2);
       return -1;
@@ -1972,7 +1972,7 @@ do_jobMoveReq (XDR * xdrs, int chfd, struct sockaddr_in *from, char *hostName,
   if (!xdr_jobMoveReq (xdrs, &jobMoveReq, reqHdr))
     {
       reply = LSBE_XDR;
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_jobMoveReq");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_jobMoveReq");
     }
   else
     {
@@ -1989,13 +1989,13 @@ do_jobMoveReq (XDR * xdrs, int chfd, struct sockaddr_in *from, char *hostName,
   if (!xdr_encodeMsg (&xdrs2, replyStruct, &replyHdr, xdr_jobMoveReq, 0,
 		      NULL))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_encodeMsg");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_encodeMsg");
       xdr_destroy (&xdrs2);
       return -1;
     }
   if (chanWrite_ (chfd, reply_buf, XDR_GETPOS (&xdrs2)) <= 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "chanWrite_",
+      ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "chanWrite_",
 		 XDR_GETPOS (&xdrs2));
       xdr_destroy (&xdrs2);
       return -1;
@@ -2022,7 +2022,7 @@ do_modifyReq (XDR * xdrs, int s, struct sockaddr_in *from, char *hostName,
   if (!xdr_modifyReq (xdrs, &modifyReq, reqHdr))
     {
       reply = LSBE_XDR;
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_modifyReq");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_modifyReq");
       goto sendback;
     }
 
@@ -2050,26 +2050,26 @@ initSubmit (int *first, struct submitReq *subReq,
   if (*first == TRUE)
     {
 
-      subReq->fromHost = (char *) my_malloc (MAXHOSTNAMELEN, fname);
-      subReq->jobFile = (char *) my_malloc (MAXFILENAMELEN, fname);
-      subReq->inFile = (char *) my_malloc (MAXFILENAMELEN, fname);
-      subReq->outFile = (char *) my_malloc (MAXFILENAMELEN, fname);
-      subReq->errFile = (char *) my_malloc (MAXFILENAMELEN, fname);
-      subReq->inFileSpool = (char *) my_malloc (MAXFILENAMELEN, fname);
-      subReq->commandSpool = (char *) my_malloc (MAXFILENAMELEN, fname);
-      subReq->cwd = (char *) my_malloc (MAXFILENAMELEN, fname);
-      subReq->subHomeDir = (char *) my_malloc (MAXFILENAMELEN, fname);
-      subReq->chkpntDir = (char *) my_malloc (MAXFILENAMELEN, fname);
-      subReq->hostSpec = (char *) my_malloc (MAXHOSTNAMELEN, fname);
-      submitReply->badJobName = (char *) my_malloc (MAX_CMD_DESC_LEN, fname);
+      subReq->fromHost = (char *) my_malloc (MAXHOSTNAMELEN, __func__);
+      subReq->jobFile = (char *) my_malloc (MAXFILENAMELEN, __func__);
+      subReq->inFile = (char *) my_malloc (MAXFILENAMELEN, __func__);
+      subReq->outFile = (char *) my_malloc (MAXFILENAMELEN, __func__);
+      subReq->errFile = (char *) my_malloc (MAXFILENAMELEN, __func__);
+      subReq->inFileSpool = (char *) my_malloc (MAXFILENAMELEN, __func__);
+      subReq->commandSpool = (char *) my_malloc (MAXFILENAMELEN, __func__);
+      subReq->cwd = (char *) my_malloc (MAXFILENAMELEN, __func__);
+      subReq->subHomeDir = (char *) my_malloc (MAXFILENAMELEN, __func__);
+      subReq->chkpntDir = (char *) my_malloc (MAXFILENAMELEN, __func__);
+      subReq->hostSpec = (char *) my_malloc (MAXHOSTNAMELEN, __func__);
+      submitReply->badJobName = (char *) my_malloc (MAX_CMD_DESC_LEN, __func__);
       *first = FALSE;
     }
   else
     {
       FREEUP (subReq->chkpntDir);
       FREEUP (submitReply->badJobName);
-      subReq->chkpntDir = (char *) my_malloc (MAXFILENAMELEN, fname);
-      submitReply->badJobName = (char *) my_malloc (MAX_CMD_DESC_LEN, fname);
+      subReq->chkpntDir = (char *) my_malloc (MAXFILENAMELEN, __func__);
+      submitReply->badJobName = (char *) my_malloc (MAX_CMD_DESC_LEN, __func__);
     }
 
 
@@ -2106,13 +2106,13 @@ sendBack (int reply, struct submitReq *submitReq,
   if (!xdr_encodeMsg (&xdrs2, (char *) submitReply, &replyHdr,
 		      xdr_submitMbdReply, 0, NULL))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_encodeMsg");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_encodeMsg");
       xdr_destroy (&xdrs2);
       return (-1);
     }
   if (chanWrite_ (chfd, reply_buf, XDR_GETPOS (&xdrs2)) !=
       XDR_GETPOS (&xdrs2))
-    ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "chanWrite_",
+    ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "chanWrite_",
 	       XDR_GETPOS (&xdrs2));
   xdr_destroy (&xdrs2);
   return (0);
@@ -2134,7 +2134,7 @@ doNewJobReply (struct sbdNode *sbdPtr, int exception)
   int cc, s, svReason, replayReason;
 
   if (logclass & LC_COMM)
-    ls_syslog (LOG_DEBUG, "%s: Entering ...", fname);
+    ls_syslog (LOG_DEBUG, "%s: Entering ...", __func__);
 
 
   if (jData->jobPid != 0)
@@ -2144,15 +2144,15 @@ doNewJobReply (struct sbdNode *sbdPtr, int exception)
     {
       if (exception == TRUE)
 	ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7887, "%s: Exception bit of <%d> is set for job <%s>"),	/* catgets 7887 */
-		   fname, sbdPtr->chanfd, lsb_jobid2str (jData->jobId));
+		   __func__, sbdPtr->chanfd, lsb_jobid2str (jData->jobId));
       else
 	ls_syslog (LOG_ERR, I18N_JOB_FAIL_S,
-		   fname, lsb_jobid2str (jData->jobId), "chanRecv_");
+		   __func__, lsb_jobid2str (jData->jobId), "chanRecv_");
 
       if (IS_START (jData->jStatus))
 	{
 	  jData->newReason = PEND_JOB_START_FAIL;
-	  jStatusChange (jData, JOB_STAT_PEND, LOG_IT, fname);
+	  jStatusChange (jData, JOB_STAT_PEND, LOG_IT, __func__);
 	}
       return;
     }
@@ -2162,12 +2162,12 @@ doNewJobReply (struct sbdNode *sbdPtr, int exception)
   if (!xdr_LSFHeader (&xdrs, &replyHdr))
     {
       ls_syslog (LOG_ERR, I18N_JOB_FAIL_S,
-		 fname, lsb_jobid2str (jData->jobId), "xdr_LSFHeader");
+		 __func__, lsb_jobid2str (jData->jobId), "xdr_LSFHeader");
 
       if (IS_START (jData->jStatus))
 	{
 	  jData->newReason = PEND_JOB_START_FAIL;
-	  jStatusChange (jData, JOB_STAT_PEND, LOG_IT, fname);
+	  jStatusChange (jData, JOB_STAT_PEND, LOG_IT, __func__);
 	}
       goto Leave;
     }
@@ -2175,12 +2175,12 @@ doNewJobReply (struct sbdNode *sbdPtr, int exception)
 #ifdef INTER_DAEMON_AUTH
   if (authSbdRequest (sbdPtr, &xdrs, &replyHdr, NULL) != LSBE_NO_ERROR)
     {
-      ls_syslog (LOG_ERR, I18N_JOB_FAIL_S, fname,
+      ls_syslog (LOG_ERR, I18N_JOB_FAIL_S, __func__,
 		 lsb_jobid2str (jData->jobId), "authSbdRequest");
       if (IS_START (jData->jStatus))
 	{
 	  jData->newReason = PEND_JOB_START_FAIL;
-	  jStatusChange (jData, JOB_STAT_PEND, LOG_IT, fname);
+	  jStatusChange (jData, JOB_STAT_PEND, LOG_IT, __func__);
 	}
       goto Leave;
     }
@@ -2195,7 +2195,7 @@ doNewJobReply (struct sbdNode *sbdPtr, int exception)
 	    jobStartError (jData, (sbdReplyType) replyHdr.opCode);
 	  svReason = jData->newReason;
 	  jData->newReason = replayReason;
-	  jStatusChange (jData, JOB_STAT_PEND, LOG_IT, fname);
+	  jStatusChange (jData, JOB_STAT_PEND, LOG_IT, __func__);
 	  jData->newReason = svReason;
 	}
       goto Leave;
@@ -2204,11 +2204,11 @@ doNewJobReply (struct sbdNode *sbdPtr, int exception)
   if (!xdr_jobReply (&xdrs, &jobReply, &replyHdr))
     {
       ls_syslog (LOG_ERR, I18N_JOB_FAIL_S,
-		 fname, lsb_jobid2str (jData->jobId), "xdr_jobReply");
+		 __func__, lsb_jobid2str (jData->jobId), "xdr_jobReply");
       if (IS_START (jData->jStatus))
 	{
 	  jData->newReason = PEND_JOB_START_FAIL;
-	  jStatusChange (jData, JOB_STAT_PEND, LOG_IT, fname);
+	  jStatusChange (jData, JOB_STAT_PEND, LOG_IT, __func__);
 	}
       goto Leave;
     }
@@ -2226,7 +2226,7 @@ doNewJobReply (struct sbdNode *sbdPtr, int exception)
 
 	  if (chanAllocBuf_ (&replyBuf, sizeof (struct LSFHeader)) < 0)
 	    {
-	      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "chanAllocBuf_");
+	      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "chanAllocBuf_");
 	      goto Leave;
 	    }
 
@@ -2237,7 +2237,7 @@ doNewJobReply (struct sbdNode *sbdPtr, int exception)
 
 	  if (chanEnqueue_ (sbdPtr->chanfd, replyBuf) < 0)
 	    {
-	      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "chanEnqueue");
+	      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "chanEnqueue");
 	      chanFreeBuf_ (replyBuf);
 	    }
 	  else
@@ -2257,7 +2257,7 @@ doNewJobReply (struct sbdNode *sbdPtr, int exception)
 	  if ((cc = writeEncodeHdr_ (sbdPtr->chanfd, &hdr, chanWrite_)) < 0)
 	    {
 	      ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_MM,
-			 fname, lsb_jobid2str (jData->jobId),
+			 __func__, lsb_jobid2str (jData->jobId),
 			 "writeEncodeHdr");
 	    }
 	}
@@ -2336,7 +2336,7 @@ doSwitchJobReply (struct sbdNode *sbdPtr, int exception)
 
 
   if (logclass & LC_COMM)
-    ls_syslog (LOG_DEBUG, "%s: Entering ...", fname);
+    ls_syslog (LOG_DEBUG, "%s: Entering ...", __func__);
 
   if (!IS_START (jData->jStatus))
 
@@ -2346,10 +2346,10 @@ doSwitchJobReply (struct sbdNode *sbdPtr, int exception)
     {
       if (exception == TRUE)
 	ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7898, "%s: Exception bit of <%d> is set for job <%s>"),	/* catgets 7898 */
-		   fname, sbdPtr->chanfd, lsb_jobid2str (jData->jobId));
+		   __func__, sbdPtr->chanfd, lsb_jobid2str (jData->jobId));
       else
 	ls_syslog (LOG_ERR, I18N_JOB_FAIL_S,
-		   fname, lsb_jobid2str (jData->jobId), "chanRecv_");
+		   __func__, lsb_jobid2str (jData->jobId), "chanRecv_");
       jData->pendEvent.notSwitched = TRUE;
       eventPending = TRUE;
       return;
@@ -2360,7 +2360,7 @@ doSwitchJobReply (struct sbdNode *sbdPtr, int exception)
   if (!xdr_LSFHeader (&xdrs, &replyHdr))
     {
       ls_syslog (LOG_ERR, I18N_JOB_FAIL_S,
-		 fname, lsb_jobid2str (jData->jobId), "xdr_LSFHeader");
+		 __func__, lsb_jobid2str (jData->jobId), "xdr_LSFHeader");
       jData->pendEvent.notSwitched = TRUE;
       eventPending = TRUE;
       goto Leave;
@@ -2369,7 +2369,7 @@ doSwitchJobReply (struct sbdNode *sbdPtr, int exception)
 #ifdef INTER_DAEMON_AUTH
   if (authSbdRequest (sbdPtr, &xdrs, &replyHdr, NULL) != LSBE_NO_ERROR)
     {
-      ls_syslog (LOG_ERR, I18N_JOB_FAIL_S, fname,
+      ls_syslog (LOG_ERR, I18N_JOB_FAIL_S, __func__,
 		 lsb_jobid2str (jData->jobId), "authSbdRequest");
       jData->pendEvent.notSwitched = TRUE;
       eventPending = TRUE;
@@ -2385,12 +2385,12 @@ doSwitchJobReply (struct sbdNode *sbdPtr, int exception)
 	{
 	  if (jData->jobId != jobReply.jobId)
 	    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7901, "%s: Got bad jobId <%s> for job <%s>"),	/* catgets 7901 */
-		       fname,
+		       __func__,
 		       lsb_jobid2str (jobReply.jobId),
 		       lsb_jobid2str (jData->jobId));
 	  else
 	    ls_syslog (LOG_ERR, I18N_JOB_FAIL_S,
-		       fname, lsb_jobid2str (jData->jobId), "xdr_jobReply");
+		       __func__, lsb_jobid2str (jData->jobId), "xdr_jobReply");
 	}
       break;
     case ERR_NO_JOB:
@@ -2399,16 +2399,16 @@ doSwitchJobReply (struct sbdNode *sbdPtr, int exception)
 		 (_i18n_msg_get
 		  (ls_catd, NL_SETN, 7913,
 		   "%s: Job <%s> was missing by sbatchd on host <%s>\n")),
-		 fname, lsb_jobid2str (jData->jobId), toHost);
+		 __func__, lsb_jobid2str (jData->jobId), toHost);
       /* catgets 7913 */
       break;
     case ERR_JOB_FINISH:
       break;
     case ERR_BAD_REQ:
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7903, "%s: Job <%s>: sbatchd on host <%s> complained of bad request"), fname, lsb_jobid2str (jData->jobId), toHost);	/* catgets 7903 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7903, "%s: Job <%s>: sbatchd on host <%s> complained of bad request"), __func__, lsb_jobid2str (jData->jobId), toHost);	/* catgets 7903 */
       break;
     default:
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7904, "%s: Job <%s>: Illegal reply code <%d> from sbatchd on host <%s>"), fname, lsb_jobid2str (jData->jobId), replyHdr.opCode, toHost);	/* catgets 7904 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7904, "%s: Job <%s>: Illegal reply code <%d> from sbatchd on host <%s>"), __func__, lsb_jobid2str (jData->jobId), replyHdr.opCode, toHost);	/* catgets 7904 */
     }
 
 Leave:
@@ -2431,7 +2431,7 @@ doSignalJobReply (struct sbdNode *sbdPtr, int exception)
   struct Buffer *buf;
 
   if (logclass & LC_COMM)
-    ls_syslog (LOG_DEBUG, "%s: Entering ...", fname);
+    ls_syslog (LOG_DEBUG, "%s: Entering ...", __func__);
 
   if (IS_FINISH (jData->jStatus))
     {
@@ -2452,10 +2452,10 @@ doSignalJobReply (struct sbdNode *sbdPtr, int exception)
     {
       if (exception == TRUE)
 	ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7905, "%s: Exception bit of <%d> is set for job <%s>"),	/* catgets 7905 */
-		   fname, sbdPtr->chanfd, lsb_jobid2str (jData->jobId));
+		   __func__, sbdPtr->chanfd, lsb_jobid2str (jData->jobId));
       else
 	ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_M,
-		   fname, lsb_jobid2str (jData->jobId), "chanRecv_");
+		   __func__, lsb_jobid2str (jData->jobId), "chanRecv_");
       addPendSigEvent (sbdPtr);
       return;
     }
@@ -2466,7 +2466,7 @@ doSignalJobReply (struct sbdNode *sbdPtr, int exception)
   if (!xdr_LSFHeader (&xdrs, &replyHdr))
     {
       ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_M,
-		 fname, lsb_jobid2str (jData->jobId), "xdr_LSFHeader");
+		 __func__, lsb_jobid2str (jData->jobId), "xdr_LSFHeader");
       addPendSigEvent (sbdPtr);
       goto Leave;
     }
@@ -2474,7 +2474,7 @@ doSignalJobReply (struct sbdNode *sbdPtr, int exception)
 #ifdef INTER_DAEMON_AUTH
   if (authSbdRequest (sbdPtr, &xdrs, &replyHdr, NULL) != LSBE_NO_ERROR)
     {
-      ls_syslog (LOG_ERR, I18N_JOB_FAIL_S, fname,
+      ls_syslog (LOG_ERR, I18N_JOB_FAIL_S, __func__,
 		 lsb_jobid2str (jData->jobId), "authSbdRequest");
       addPendSigEvent (sbdPtr);
       goto Leave;
@@ -2483,7 +2483,7 @@ doSignalJobReply (struct sbdNode *sbdPtr, int exception)
 
   if (logclass & LC_SIGNAL)
     ls_syslog (LOG_DEBUG, "%s: Job <%s> sigVal %d got reply code=%d",
-	       fname, lsb_jobid2str (jData->jobId),
+	       __func__, lsb_jobid2str (jData->jobId),
 	       sbdPtr->sigVal, replyHdr.opCode);
 
   signalReplyCode (replyHdr.opCode, jData, sbdPtr->sigVal, sbdPtr->sigFlags);
@@ -2496,10 +2496,10 @@ doSignalJobReply (struct sbdNode *sbdPtr, int exception)
 	{
 	  if (jData->jobId != jobReply.jobId)
 	    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7908, "%s: Got bad jobId <%s> for job <%s>"),	/* catgets 7908 */
-		       fname, lsb_jobid2str (jobReply.jobId), jData->jobId);
+		       __func__, lsb_jobid2str (jobReply.jobId), jData->jobId);
 	  else
 	    ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_M,
-		       fname, lsb_jobid2str (jData->jobId), "xdr_jobReply");
+		       __func__, lsb_jobid2str (jData->jobId), "xdr_jobReply");
 	  addPendSigEvent (sbdPtr);
 	}
       else
@@ -2634,7 +2634,7 @@ ctrlMbdDebug (struct debugReq *pdebug, struct lsfAuth *auth)
 	  ls_openlog ("mbatchd", daemonParams[LSF_LOGDIR].paramValue,
 		      (debug > 1 || lsb_CheckMode),
 		      daemonParams[LSF_LOG_MASK].paramValue);
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "initenv_");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "initenv_");
 
 	  if (!lsb_CheckMode)
 	    mbdDie (MASTER_FATAL);
@@ -2659,7 +2659,7 @@ ctrlMbdDebug (struct debugReq *pdebug, struct lsfAuth *auth)
 	ls_openlog ("mbatchd", daemonParams[LSF_LOGDIR].paramValue,
 		    FALSE, daemonParams[LSF_LOG_MASK].paramValue);
       if (logclass & LC_TRACE)
-	ls_syslog (LOG_DEBUG, "%s: logclass=%x", fname, logclass);
+	ls_syslog (LOG_DEBUG, "%s: logclass=%x", __func__, logclass);
 
       return (LSBE_NO_ERROR);
     }
@@ -2674,7 +2674,7 @@ ctrlMbdDebug (struct debugReq *pdebug, struct lsfAuth *auth)
       putMaskLevel (level, &(daemonParams[LSF_LOG_MASK].paramValue));
 
       if (logclass & LC_TRACE)
-	ls_syslog (LOG_DEBUG, "%s: LSF_LOG_MASK =%s", fname,
+	ls_syslog (LOG_DEBUG, "%s: LSF_LOG_MASK =%s", __func__,
 		   daemonParams[LSF_LOG_MASK].paramValue);
 
       if (newClass >= 0)
@@ -2737,7 +2737,7 @@ do_debugReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
   if (!xdr_debugReq (xdrs, &debugReq, reqHdr))
     {
       reply = LSBE_XDR;
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_debugReq");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_debugReq");
     }
   else
     {
@@ -2756,7 +2756,7 @@ do_debugReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
       else
 	{
 	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7912, "%s: Bad opCode <%d>"),	/* catgets 7912 */
-		     fname, debugReq.opCode);
+		     __func__, debugReq.opCode);
 	  return -1;
 	}
     }
@@ -2767,7 +2767,7 @@ do_debugReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
   replyHdr.length = 0;
   if (!xdr_LSFHeader (&xdrs2, &replyHdr))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_LSFHeader");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_LSFHeader");
       xdr_destroy (&xdrs2);
       return -1;
     }
@@ -2775,7 +2775,7 @@ do_debugReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
   if (chanWrite_ (chfd, reply_buf, XDR_GETPOS (&xdrs2)) <= 0)
     {
       ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M,
-		 fname, "chanWrite_", XDR_GETPOS (&xdrs2));
+		 __func__, "chanWrite_", XDR_GETPOS (&xdrs2));
       xdr_destroy (&xdrs2);
       return -1;
     }
@@ -2800,7 +2800,7 @@ do_resourceInfoReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
 
 
   if (logclass & LC_TRACE)
-    ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", fname);
+    ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", __func__);
 
   resInfoReply.numResources = 0;
   resInfoReply.resources = NULL;
@@ -2811,7 +2811,7 @@ do_resourceInfoReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
   if (!xdr_resourceInfoReq (xdrs, &resInfoReq, reqHdr))
     {
       reply = LSBE_XDR;
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_resourceInfoReq");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_resourceInfoReq");
       len = MSGSIZE;
     }
   else
@@ -2843,7 +2843,7 @@ do_resourceInfoReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
 	}
       len += 4 * MSGSIZE;
     }
-  reply_buf = (char *) my_malloc (len, fname);
+  reply_buf = (char *) my_malloc (len, __func__);
   xdrmem_create (&xdrs2, reply_buf, len, XDR_ENCODE);
   replyHdr.opCode = reply;
   if (reply == LSBE_NO_ERROR || reply == LSBE_BAD_RESOURCE)
@@ -2853,7 +2853,7 @@ do_resourceInfoReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
   if (!xdr_encodeMsg (&xdrs2, replyStruct, &replyHdr,
 		      xdr_lsbShareResourceInfoReply, 0, NULL))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_encodeMsg");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_encodeMsg");
       xdr_destroy (&xdrs2);
       FREEUP (reply_buf);
       freeShareResourceInfoReply (&resInfoReply);
@@ -2862,7 +2862,7 @@ do_resourceInfoReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
   if (chanWrite_ (chfd, reply_buf, XDR_GETPOS (&xdrs2)) <= 0)
     {
       ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M,
-		 fname, "b_write_fix", XDR_GETPOS (&xdrs2));
+		 __func__, "b_write_fix", XDR_GETPOS (&xdrs2));
       xdr_destroy (&xdrs2);
       FREEUP (reply_buf);
       freeShareResourceInfoReply (&resInfoReply);
@@ -2949,7 +2949,7 @@ do_runJobReq (XDR * xdrs,
   if (!xdr_runJobReq (xdrs, &runJobRequest, reqHeader))
     {
       reply = LSBE_XDR;
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_runJobReq");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_runJobReq");
       goto Reply;
     }
 
@@ -2968,7 +2968,7 @@ Reply:
 
   if (!xdr_encodeMsg (&replyXdr, NULL, &lsfHeader, xdr_int, 0, NULL))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_encodeMsg");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_encodeMsg");
       xdr_destroy (&replyXdr);
       return (-1);
     }
@@ -2976,7 +2976,7 @@ Reply:
 
   if (chanWrite_ (chfd, reply_buf, XDR_GETPOS (&replyXdr)) <= 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "chanWrite_");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "chanWrite_");
       xdr_destroy (&replyXdr);
       return (-1);
     }
@@ -3000,7 +3000,7 @@ do_setJobAttr (XDR * xdrs, int s, struct sockaddr_in *from, char *hostName,
   if (!xdr_jobAttrReq (xdrs, &jobAttr, reqHdr))
     {
       reply = LSBE_XDR;
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_jobAttrReq");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_jobAttrReq");
     }
   else
     {
@@ -3044,13 +3044,13 @@ do_setJobAttr (XDR * xdrs, int s, struct sockaddr_in *from, char *hostName,
   if (!xdr_encodeMsg (&xdrs2, (char *) &jobAttr, &replyHdr, xdr_jobAttrReq,
 		      0, NULL))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_encodeMsg");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_encodeMsg");
       xdr_destroy (&xdrs2);
       return (-1);
     }
   if (chanWrite_ (s, reply_buf, XDR_GETPOS (&xdrs2)) != XDR_GETPOS (&xdrs2))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "chanWrite_");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "chanWrite_");
       xdr_destroy (&xdrs2);
       return (-1);
     }

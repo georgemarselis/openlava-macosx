@@ -474,14 +474,14 @@ copyResValues (struct loadVectorStruct loadVector, struct hostNode *hPtr)
 	{
 	  ls_syslog (LOG_DEBUG2,
 		     "%s: Resource name <%s> reported by host <%s> is not in shared resource list",
-		     fname, loadVector.resPairs[i].name, hPtr->hostName);
+		     __func__, loadVector.resPairs[i].name, hPtr->hostName);
 	  continue;
 	}
       if ((instance = isInHostList (resource, hPtr->hostName)) == NULL)
 	{
 	  ls_syslog (LOG_DEBUG2,
 		     "%s: Host <%s> does not have the resource <%s> defined",
-		     fname, hPtr->hostName, loadVector.resPairs[i].name);
+		     __func__, hPtr->hostName, loadVector.resPairs[i].name);
 	  continue;
 	}
       if (!strcmp (loadVector.resPairs[i].value, "-")
@@ -525,7 +525,7 @@ copyResValues (struct loadVectorStruct loadVector, struct hostNode *hPtr)
 	}
       if ((temp = putstr_ (loadVector.resPairs[i].value)) == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
 	  return;
 	}
       FREEUP (instance->value);

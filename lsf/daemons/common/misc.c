@@ -55,7 +55,7 @@ die (int sig)
     char *myhost = malloc( sizeof( char ) * MAXHOSTNAMELEN + 1 );
 
     if (debug > 1) {
-        fprintf (stderr, "%s: signal %d\n", fname, sig);
+        fprintf (stderr, "%s: signal %d\n", __func__, sig);
     }
 
     if (masterme)
@@ -65,7 +65,7 @@ die (int sig)
 
     if (gethostname (myhost, MAXHOSTNAMELEN) < 0)
         {
-        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "gethostname", myhost);
+        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "gethostname", myhost);
         strcpy (myhost, "localhost");
         }
 
@@ -135,7 +135,7 @@ portok (struct sockaddr_in *from)
 {
     static char __func__] = "portok";
     if (from->sin_family != AF_INET) {
-        ls_syslog (LOG_ERR, "%s: sin_family(%d) != AF_INET(%d)", fname, from->sin_family, AF_INET);
+        ls_syslog (LOG_ERR, "%s: sin_family(%d) != AF_INET(%d)", __func__, from->sin_family, AF_INET);
         return FALSE;
     }
 
@@ -162,7 +162,7 @@ get_ports (void)
         assert( atoi (daemonParams[LSB_MBD_PORT].paramValue) <= USHRT_MAX );
         if (!isint_ (daemonParams[LSB_MBD_PORT].paramValue) || (mbd_port = (ushort) atoi (daemonParams[LSB_MBD_PORT].paramValue)) <= 0)
             /* catgets 8226 */
-            ls_syslog (LOG_ERR, "catgets 8226: %s: LSB_MBD_PORT <%s> in lsf.conf must be a positive number", fname, daemonParams[LSB_MBD_PORT].paramValue);
+            ls_syslog (LOG_ERR, "catgets 8226: %s: LSB_MBD_PORT <%s> in lsf.conf must be a positive number", __func__, daemonParams[LSB_MBD_PORT].paramValue);
         else {
             mbd_port = htons (mbd_port);
         }
@@ -176,8 +176,8 @@ get_ports (void)
         if (!sv)
             {
             /* catgets 8227 */
-            ls_syslog (LOG_ERR, "catgets 8227: %s: %s service not registered", fname, MBATCHD_SERV);
-            // lsb_merr ("catgets 3208: %s: %s service not registered", fname, MBATCHD_SERV);
+            ls_syslog (LOG_ERR, "catgets 8227: %s: %s service not registered", __func__, MBATCHD_SERV);
+            // lsb_merr ("catgets 3208: %s: %s service not registered", __func__, MBATCHD_SERV);
             return (-1);
             }
         assert ( sv->s_port <= USHRT_MAX );
@@ -188,7 +188,7 @@ get_ports (void)
         assert( atoi (daemonParams[LSB_SBD_PORT].paramValue) <= USHRT_MAX );
         if (!isint_ (daemonParams[LSB_SBD_PORT].paramValue) || (sbd_port = (ushort) atoi (daemonParams[LSB_SBD_PORT].paramValue)) <= 0)
             /* catgets 8229 */
-            ls_syslog (LOG_ERR, "catgets 8229: %s: LSB_SBD_PORT <%s> in lsf.conf must be a positive number", fname, daemonParams[LSB_SBD_PORT].paramValue);
+            ls_syslog (LOG_ERR, "catgets 8229: %s: LSB_SBD_PORT <%s> in lsf.conf must be a positive number", __func__, daemonParams[LSB_SBD_PORT].paramValue);
         else {
             sbd_port = htons (sbd_port);
         }
@@ -200,8 +200,8 @@ get_ports (void)
         sv = getservbyname (SBATCHD_SERV, "tcp");
         if (!sv) {
             /* catgets 8231 */
-            ls_syslog (LOG_ERR, "catgets 8231: %s: %s service not registered", fname, SBATCHD_SERV);
-            //lsb_merr ( "catgets 3208: %s: %s service not registered", fname, SBATCHD_SERV);
+            ls_syslog (LOG_ERR, "catgets 8231: %s: %s service not registered", __func__, SBATCHD_SERV);
+            //lsb_merr ( "catgets 3208: %s: %s service not registered", __func__, SBATCHD_SERV);
             return (-1);
         }
         assert( sv->s_port <= USHRT_MAX );
@@ -239,7 +239,7 @@ chuserId (uid_t uid)
     static char __func__] = "chuserId";
 
     if (lsfSetXUid(0, 1, uid, -1, seteuid) < 0) {
-        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "setresuid/seteuid", (int) uid);
+        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "setresuid/seteuid", (int) uid);
         if (lsb_CheckMode) {
             lsb_CheckError = FATAL_ERR;
             return -1;
@@ -252,7 +252,7 @@ chuserId (uid_t uid)
     if (uid == 0) {
         if (lsfSetXUid(0, 0, 0, -1, setreuid)< 0)
             {
-            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "setresuid/setreuid", (int) uid);
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "setresuid/setreuid", (int) uid);
             if (lsb_CheckMode)
                 {
                 lsb_CheckError = FATAL_ERR;
@@ -437,14 +437,14 @@ fileExist (char *file, uid_t uid, struct hostent *hp)
 
     if (socketpair (AF_UNIX, SOCK_STREAM, 0, fds) < 0)
         {
-        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "socketpair");
+        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "socketpair");
         return TRUE;
         }
 
     pid = fork ();
     if (pid < 0)
         {
-        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "fork");
+        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "fork");
         return TRUE;
         }
 
@@ -454,7 +454,7 @@ fileExist (char *file, uid_t uid, struct hostent *hp)
         // FIXME FIXME FIXME find altenrative mechanism to notify user of b_read_fix failing
         // if (b_read_fix (fds[0], &answer, sizeof (int)) < 0)
         //     {
-        //     ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "read");
+        //     ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "read");
         //     answer = TRUE;
         //     }
         close (fds[0]);
@@ -465,7 +465,7 @@ fileExist (char *file, uid_t uid, struct hostent *hp)
         close (fds[0]);
         if (lsfSetXUid(0, uid, uid, -1, setuid) < 0)
             {
-            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "setuid", uid);
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "setuid", uid);
             answer = TRUE;
             write (fds[1], (char *) &answer, sizeof (int));
             close (fds[1]);
@@ -520,11 +520,11 @@ errorBack (uint chan, ushort replyCode, struct sockaddr_in *from)
     if (xdr_encodeMsg (&xdrs, NULL, &replyHdr, NULL, 0, NULL)) {
         assert( chan <= INT_MAX );
         if (chanWrite_ ((int)chan, errBuf, XDR_GETPOS (&xdrs)) < 0) {
-            ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "chanWrite_", sockAdd2Str_ (from));
+            ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "chanWrite_", sockAdd2Str_ (from));
         }
     }
     else {
-        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "xdr_encodeMsg", sockAdd2Str_ (from));
+        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "xdr_encodeMsg", sockAdd2Str_ (from));
     }
 
     xdr_destroy (&xdrs);
@@ -571,17 +571,17 @@ getTclLsInfo (void)
         freeTclLsInfo (tclLsInfo, 0);
     }
 
-    tclLsInfo = my_malloc (sizeof (struct tclLsInfo), fname);
+    tclLsInfo = my_malloc (sizeof (struct tclLsInfo), __func__);
     tclLsInfo->numIndx = allLsInfo->numIndx;
-    tclLsInfo->indexNames = my_malloc (allLsInfo->numIndx * sizeof (char *), fname);
+    tclLsInfo->indexNames = my_malloc (allLsInfo->numIndx * sizeof (char *), __func__);
     for ( uint resNo = 0; resNo < allLsInfo->numIndx; resNo++) {
         tclLsInfo->indexNames[resNo] = allLsInfo->resTable[resNo].name;
     }
 
     tclLsInfo->nRes = 0;
-    tclLsInfo->resName           = my_malloc (allLsInfo->nRes * sizeof (char *), fname);
-    tclLsInfo->stringResBitMaps  = my_malloc (GET_INTNUM (allLsInfo->nRes) * sizeof (int), fname);
-    tclLsInfo->numericResBitMaps = my_malloc (GET_INTNUM (allLsInfo->nRes) * sizeof (int), fname);
+    tclLsInfo->resName           = my_malloc (allLsInfo->nRes * sizeof (char *), __func__);
+    tclLsInfo->stringResBitMaps  = my_malloc (GET_INTNUM (allLsInfo->nRes) * sizeof (int), __func__);
+    tclLsInfo->numericResBitMaps = my_malloc (GET_INTNUM (allLsInfo->nRes) * sizeof (int), __func__);
 
     for ( uint i = 0; i < GET_INTNUM (allLsInfo->nRes); i++)
         {
@@ -620,7 +620,7 @@ checkThresholdCond (char *resReq)
 
         lsbFreeResVal (&resValPtr);
         if (logclass & (LC_EXEC) && resReq) {
-            ls_syslog (LOG_DEBUG1, "%s: parseResReq(%s) failed", fname, resReq);
+            ls_syslog (LOG_DEBUG1, "%s: parseResReq(%s) failed", __func__, resReq);
         }
         return (NULL);
     }
@@ -663,7 +663,7 @@ checkResumeByLoad (LS_LONG_INT jobId, int num, struct thresholds thresholds, str
     uint lastReason = *reason;
 
     if (logclass & (LC_SCHED | LC_EXEC)) {
-        ls_syslog (LOG_DEBUG3, "%s: reason=%x, subreasons=%d, numHosts=%d", fname, *reason, *subreasons, thresholds.nThresholds);
+        ls_syslog (LOG_DEBUG3, "%s: reason=%x, subreasons=%d, numHosts=%d", __func__, *reason, *subreasons, thresholds.nThresholds);
     }
 
     if (num <= 0) {
@@ -700,7 +700,7 @@ checkResumeByLoad (LS_LONG_INT jobId, int num, struct thresholds thresholds, str
 
         if (!resume) {
             if (logclass & (LC_SCHED | LC_EXEC)) {
-                ls_syslog (LOG_DEBUG2, "%s: Can't resume job %s; *reason=%x", fname, lsb_jobid2str (jobId), *reason);
+                ls_syslog (LOG_DEBUG2, "%s: Can't resume job %s; *reason=%x", __func__, lsb_jobid2str (jobId), *reason);
             }
             if (lastReason & SUSP_MBD_LOCK) {
                 *reason |= SUSP_MBD_LOCK;
@@ -722,7 +722,7 @@ checkResumeByLoad (LS_LONG_INT jobId, int num, struct thresholds thresholds, str
                 resume = FALSE;
                 *reason = SUSP_QUE_RESUME_COND;
                 if ((logclass & (LC_SCHED | LC_EXEC)) && !resume) {
-                    ls_syslog (LOG_DEBUG2, "%s: Can't resume job %s; reason=%x", fname, lsb_jobid2str (jobId), *reason);
+                    ls_syslog (LOG_DEBUG2, "%s: Can't resume job %s; reason=%x", __func__, lsb_jobid2str (jobId), *reason);
                 }
                 if (lastReason & SUSP_MBD_LOCK) {
                     *reason |= SUSP_MBD_LOCK;
@@ -832,7 +832,7 @@ checkResumeByLoad (LS_LONG_INT jobId, int num, struct thresholds thresholds, str
     }
 
     if ((logclass & (LC_SCHED | LC_EXEC)) && !resume) {
-        ls_syslog (LOG_DEBUG2, "%s: Can't resume job %s; reason=%x, subreasons=%d", fname, lsb_jobid2str (jobId), *reason, *subreasons);
+        ls_syslog (LOG_DEBUG2, "%s: Can't resume job %s; reason=%x, subreasons=%d", __func__, lsb_jobid2str (jobId), *reason, *subreasons);
     }
 
     return (resume);
@@ -934,7 +934,7 @@ doDaemonHang (char *caller)
         timeval.tv_sec = 20;
         timeval.tv_usec = 0;
         /* catgets 8271 */
-        ls_syslog (LOG_ERR, "catgets 8271: %s hanging in %s", fname, caller);
+        ls_syslog (LOG_ERR, "catgets 8271: %s hanging in %s", __func__, caller);
         select (0, NULL, NULL, NULL, &timeval);
     }
 }

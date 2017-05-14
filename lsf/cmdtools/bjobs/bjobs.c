@@ -813,7 +813,7 @@ isLSFAdmin (void)
   if ((mycluster = ls_getclustername ()) == NULL)
     {
       if (logclass & (LC_TRACE))
-	ls_syslog (LOG_ERR, "%s: ls_getclustername(): %M", fname);
+	ls_syslog (LOG_ERR, "%s: ls_getclustername(): %M", __func__);
       return (FALSE);
     }
 
@@ -821,14 +821,14 @@ isLSFAdmin (void)
   if ((clusterInfo = ls_clusterinfo (NULL, &num, NULL, 0, 0)) == NULL)
     {
       if (logclass & (LC_TRACE))
-	ls_syslog (LOG_ERR, "%s: ls_clusterinfo(): %M", fname);
+	ls_syslog (LOG_ERR, "%s: ls_clusterinfo(): %M", __func__);
       return (FALSE);
     }
 
 
   if (getLSFUser_ (lsfUserName, MAXLINELEN) != 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "getLSFUser_");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "getLSFUser_");
       return (FALSE);
     }
 

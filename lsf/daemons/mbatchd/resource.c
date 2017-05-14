@@ -53,7 +53,7 @@ getLsbResourceInfo (void)
   struct lsSharedResourceInfo *resourceInfo = NULL;
 
   if (logclass & LC_TRACE)   {
-    ls_syslog (LOG_DEBUG3, "%s: Entering ...", fname);
+    ls_syslog (LOG_DEBUG3, "%s: Entering ...", __func__);
   }
 
   if ((resourceInfo = ls_sharedresourceinfo (NULL, &numRes, NULL, 0)) == NULL)
@@ -84,11 +84,11 @@ addSharedResource (struct lsSharedResourceInfo *lsResourceInfo)
       if (logclass & LC_TRACE)
 	ls_syslog (LOG_DEBUG3,
 		   "%s: More than one resource <%s> is found in lsResourceInfo got from lim; ignoring later",
-		   fname, lsResourceInfo->resourceName);
+		   __func__, lsResourceInfo->resourceName);
       return;
     }
   resource = (struct sharedResource *)
-    my_malloc (sizeof (struct sharedResource), fname);
+    my_malloc (sizeof (struct sharedResource), __func__);
   resource->numInstances = 0;
   resource->instances = NULL;
   resource->resourceName = safeSave (lsResourceInfo->resourceName);
@@ -96,7 +96,7 @@ addSharedResource (struct lsSharedResourceInfo *lsResourceInfo)
 
   if (numResources == 0)
     temp = (struct sharedResource **)
-      my_malloc (sizeof (struct sharedResource *), fname);
+      my_malloc (sizeof (struct sharedResource *), __func__);
   else
     temp = (struct sharedResource **) realloc (sharedResources,
 					       (numResources +
@@ -105,7 +105,7 @@ addSharedResource (struct lsSharedResourceInfo *lsResourceInfo)
 						       *));
   if (temp == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "realloc");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "realloc");
       mbdDie (MASTER_MEM);
     }
   sharedResources = (struct sharedResource **) temp;
@@ -127,11 +127,11 @@ addInstances (struct lsSharedResourceInfo *lsResourceInfo,
     return;
 
   resource->instances = (struct resourceInstance **) my_malloc
-    (lsResourceInfo->nInstances * sizeof (struct resourceInstance *), fname);
+    (lsResourceInfo->nInstances * sizeof (struct resourceInstance *), __func__);
   for (i = 0; i < lsResourceInfo->nInstances; i++)
     {
       instance = (struct resourceInstance *) my_malloc
-	(sizeof (struct resourceInstance), fname);
+	(sizeof (struct resourceInstance), __func__);
       instance->nHosts = 0;
       instance->lsfValue = NULL;
       instance->value = NULL;
@@ -140,7 +140,7 @@ addInstances (struct lsSharedResourceInfo *lsResourceInfo,
 	{
 	  instance->hosts = (struct hData **) my_malloc
 	    (lsResourceInfo->instances[i].nHosts * sizeof (struct hData *),
-	     fname);
+	     __func__);
 	}
       else
 	instance->hosts = NULL;
@@ -154,7 +154,7 @@ addInstances (struct lsSharedResourceInfo *lsResourceInfo,
 	      if (logclass & LC_TRACE)
 		ls_syslog (LOG_DEBUG3,
 			   "%s: Host <%s> is not used by the batch system;ignoring",
-			   fname, lsResourceInfo->instances[i].hostList[j]);
+			   __func__, lsResourceInfo->instances[i].hostList[j]);
 	      continue;
 	    }
 
@@ -304,7 +304,7 @@ checkResources (struct resourceInfoReq *resourceInfoReq,
 
       if ((hp = Gethostbyname_ (resourceInfoReq->hostName)) == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, fname,
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, __func__,
 		     "getHostOfficialByName_", resourceInfoReq->hostName);
 	  return LSBE_BAD_HOST;
 	}
@@ -312,14 +312,14 @@ checkResources (struct resourceInfoReq *resourceInfoReq,
       if ((hPtr = getHostData (hp->h_name)) == NULL)
 	{
 	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7703, "%s: Host <%s>  is not used by the batch system"),	/* catgets 7703 */
-		     fname, resourceInfoReq->hostName);
+		     __func__, resourceInfoReq->hostName);
 	  return LSBE_BAD_HOST;
 	}
     }
 
   reply->numResources = 0;
   reply->resources = (struct lsbSharedResourceInfo *)
-    my_malloc (numResources * sizeof (struct lsbSharedResourceInfo), fname);
+    my_malloc (numResources * sizeof (struct lsbSharedResourceInfo), __func__);
 
   for (i = 0; i < resourceInfoReq->numResourceNames; i++)
     {
@@ -375,7 +375,7 @@ copyResource (struct lsbShareResourceInfoReply *reply,
     (struct lsbSharedResourceInstance *) my_malloc (resource->numInstances *
 						    sizeof (struct
 							    lsbSharedResourceInstance),
-						    fname);
+						    __func__);
   reply->resources[num].nInstances = 0;
   numInstances = 0;
 
@@ -408,7 +408,7 @@ copyResource (struct lsbShareResourceInfoReply *reply,
 
       reply->resources[num].instances[numInstances].hostList =
 	(char **) my_malloc (resource->instances[i]->nHosts * sizeof (char *),
-			     fname);
+			     __func__);
       for (j = 0; j < resource->instances[i]->nHosts; j++)
 	{
 	  reply->resources[num].instances[numInstances].hostList[j] =
@@ -441,7 +441,7 @@ getHRValue (char *resName, struct hData *hPtr,
 	}
       return (atof (hPtr->instances[i]->value));
     }
-  ls_syslog (LOG_ERR, I18N (7704, "%s, instance name not found."), fname);	/*catgets 7704 */
+  ls_syslog (LOG_ERR, I18N (7704, "%s, instance name not found."), __func__);	/*catgets 7704 */
   return (-INFINIT_LOAD);
 
 }
@@ -484,12 +484,12 @@ updSharedResourceByRUNJob (const struct jData *jp)
 
   if (logclass & LC_TRACE)
     ls_syslog (LOG_DEBUG, "\
-%s: Updating shared resource by job=%s", fname, lsb_jobid2str (jp->jobId));
+%s: Updating shared resource by job=%s", __func__, lsb_jobid2str (jp->jobId));
 
   if (rusgBitMaps == NULL)
     {
       rusgBitMaps = (int *) my_malloc
-	(GET_INTNUM (allLsInfo->nRes) * sizeof (int), fname);
+	(GET_INTNUM (allLsInfo->nRes) * sizeof (int), __func__);
     }
 
   if (!jp->numHostPtr || jp->hPtr == NULL)
@@ -606,7 +606,7 @@ updSharedResourceByRUNJob (const struct jData *jp)
 
 	  if (logclass & LC_SCHED)
 	    ls_syslog (LOG_DEBUG, "\
-%s: jobId=<%s>, hostName=<%s>, resource name=<%s>, the specified rusage of the load or instance <%f>, current lsbload or instance value <%f>, duration <%f>, decay <%f>", fname, lsb_jobid2str (jp->jobId), jp->hPtr[i]->host, allLsInfo->resTable[ldx].name, jackValue, load, duration, decay);
+%s: jobId=<%s>, hostName=<%s>, resource name=<%s>, the specified rusage of the load or instance <%f>, current lsbload or instance value <%f>, duration <%f>, decay <%f>", __func__, lsb_jobid2str (jp->jobId), jp->hPtr[i]->host, allLsInfo->resTable[ldx].name, jackValue, load, duration, decay);
 
 
 	  factor = 1.0;
@@ -651,7 +651,7 @@ updSharedResourceByRUNJob (const struct jData *jp)
 
 	  if (logclass & LC_SCHED)
 	    ls_syslog (LOG_DEBUG, "\
-%s: JobId=<%s>, hostname=<%s>, resource name=<%s>, the amount by which the load or the instance has been adjusted <%f>, original load or instance value <%f>, runTime=<%d>, value of the load or the instance after the adjustment <%f>, factor <%f>", fname, lsb_jobid2str (jp->jobId), jp->hPtr[i]->host, allLsInfo->resTable[ldx].name, jackValue, originalLoad, jp->runTime, load, factor);
+%s: JobId=<%s>, hostname=<%s>, resource name=<%s>, the amount by which the load or the instance has been adjusted <%f>, original load or instance value <%f>, runTime=<%d>, value of the load or the instance after the adjustment <%f>, factor <%f>", __func__, lsb_jobid2str (jp->jobId), jp->hPtr[i]->host, allLsInfo->resTable[ldx].name, jackValue, originalLoad, jp->runTime, load, factor);
 	}
     }
 }
@@ -707,7 +707,7 @@ newPRMO (char *nameList)
   int i, index, addedNum = 0;
 
   if (logclass & LC_TRACE)
-    ls_syslog (LOG_DEBUG3, "%s: Entering ...", fname);
+    ls_syslog (LOG_DEBUG3, "%s: Entering ...", __func__);
 
   if (pRMOPtr != NULL)
     {
@@ -732,11 +732,11 @@ newPRMO (char *nameList)
     {
       return;
     }
-  pRMOPtr = (struct objPRMO *) my_malloc (sizeof (struct objPRMO), fname);
+  pRMOPtr = (struct objPRMO *) my_malloc (sizeof (struct objPRMO), __func__);
   pRMOPtr->numPreemptResources = 0;
   pRMOPtr->pResources = (struct preemptResource *)
     my_malloc (nameListPtr->listSize * sizeof (struct preemptResource),
-	       fname);
+	       __func__);
 
 
   for (i = 0; i < nameListPtr->listSize; i++)
@@ -1225,7 +1225,7 @@ addPreemptableResource (int index)
   pRMOPtr->pResources[loc].pRInstance =
     (struct preemptResourceInstance *)
     my_malloc (sharedResources[sharedIndex]->numInstances *
-	       sizeof (struct preemptResourceInstance), fname);
+	       sizeof (struct preemptResourceInstance), __func__);
 
   for (i = 0; i < pRMOPtr->pResources[loc].numInstances; i++)
     {
@@ -1337,14 +1337,14 @@ addQPRValues (int index, struct hData *hPtr, struct qData *qPtr)
 
 
   if (pRIPtr->nQPRValues == 0)
-    temp = (struct qPRValues *) my_malloc (sizeof (struct qPRValues), fname);
+    temp = (struct qPRValues *) my_malloc (sizeof (struct qPRValues), __func__);
   else
     temp = (struct qPRValues *) realloc (pRIPtr->qPRValues,
 					 (pRIPtr->nQPRValues +
 					  1) * sizeof (struct qPRValues));
   if (temp == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "realloc");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "realloc");
       mbdDie (MASTER_MEM);
     }
   pRIPtr->qPRValues = (struct qPRValues *) temp;
@@ -1395,7 +1395,7 @@ printPRMOValues ()
       pRPtr = &(pRMOPtr->pResources[i]);
       ls_syslog (LOG_DEBUG2,
 		 "%s: preemptable resource(%s, %d) has %d instances:",
-		 fname,
+		 __func__,
 		 allLsInfo->resTable[pRPtr->index].name,
 		 pRPtr->index, pRPtr->numInstances);
 
@@ -1406,13 +1406,13 @@ printPRMOValues ()
 	  pRIPtr = &(pRPtr->pRInstance[j]);
 	  ls_syslog (LOG_DEBUG2,
 		     "%s: instance(%d) has %d queues:",
-		     fname, j, pRIPtr->nQPRValues);
+		     __func__, j, pRIPtr->nQPRValues);
 
 	  for (k = 0; k < pRIPtr->nQPRValues; k++)
 	    {
 	      ls_syslog (LOG_DEBUG2,
 			 "%s: queue(%s) has UBRJ-%f, RBPW-%f, ABP-%f, PRJ-%f.",
-			 fname,
+			 __func__,
 			 pRIPtr->qPRValues[k].qData->queue,
 			 pRIPtr->qPRValues[k].usedByRunJob,
 			 pRIPtr->qPRValues[k].reservedByPreemptWait,

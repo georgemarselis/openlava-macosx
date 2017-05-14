@@ -123,7 +123,7 @@ job_checking (void)
 		    {
 
 		      ls_syslog (LOG_INFO, I18N (5703, "%s: warning period expired killing the job=%d"),	/* catgets 5703 */
-				 fname, jobCard->jobSpecs.jobId);
+				 __func__, jobCard->jobSpecs.jobId);
 		      jobSigStart (jobCard, SIG_TERM_RUNLIMIT, 0, 0, SIGLOG);
 		      sbdlog_newstatus (jobCard);
 		      jobCard->jobSpecs.jStatus |= JOB_STAT_KILL;
@@ -132,7 +132,7 @@ job_checking (void)
 	      else if (!jobCard->timeExpire)
 		{
 		  ls_syslog (LOG_INFO, I18N (5704, "%s: sending warning signal to job=%d"),	/* catgets 5704 */
-			     fname, jobCard->jobSpecs.jobId);
+			     __func__, jobCard->jobSpecs.jobId);
 		  jobsig (jobCard, SIGUSR2, FALSE);
 		  jobCard->timeExpire = TRUE;
 		}
@@ -237,7 +237,7 @@ job_checking (void)
 
   if ((myhostnm = ls_getmyhostname ()) == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "ls_getmyhostname");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "ls_getmyhostname");
       die (SLAVE_FATAL);
     }
   myload = ls_loadofhosts (NULL, 0, EXACT | EFFECTIVE, 0, &myhostnm, 1);
@@ -245,7 +245,7 @@ job_checking (void)
     {
       if (myStatus != NO_LIM)
 
-	ls_syslog (LOG_INFO, I18N_FUNC_FAIL_MM, fname, "ls_loadofhosts");
+	ls_syslog (LOG_INFO, I18N_FUNC_FAIL_MM, __func__, "ls_loadofhosts");
       if (lserrno == LSE_LIM_BADHOST)
 	relife ();
       if (lserrno == LSE_BAD_XDR)
@@ -408,7 +408,7 @@ tryResume (struct hostLoad *myload)
 	  if (load == NULL)
 	    {
 	      if (errCount < 3)
-		ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_M, fname,
+		ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_M, __func__,
 			   lsb_jobid2str (jobCard->jobSpecs.jobId),
 			   "ls_loadofhosts");
 	      errCount++;
@@ -502,7 +502,7 @@ tryStop (char *myhostnm, struct hostLoad *myload)
 	  if (load == NULL)
 	    {
 	      if (errCount < 3)
-		ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_MM, fname,
+		ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_MM, __func__,
 			   lsb_jobid2str (jobCard->jobSpecs.jobId),
 			   "ls_loadofhosts");
 	      errCount++;
@@ -597,7 +597,7 @@ shouldStop (struct hostLoad *loadV,
 	}
       if (load == NULL)
 	{
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5705, "%s: Can not find load information for host <%s>"), fname, jobCard->jobSpecs.toHosts[i]);	/* catgets 5705 */
+	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5705, "%s: Can not find load information for host <%s>"), __func__, jobCard->jobSpecs.toHosts[i]);	/* catgets 5705 */
 	  return FALSE;
 	}
       if (LS_ISLOCKEDU (load->status)
@@ -771,7 +771,7 @@ shouldStop (struct hostLoad *loadV,
       if (logclass & (LC_SCHED | LC_EXEC))
 	ls_syslog (LOG_DEBUG2,
 		   "%s: Should stop job %s; reason=%x, subreasons=%d",
-		   fname, lsb_jobid2str (jobCard->jobSpecs.jobId),
+		   __func__, lsb_jobid2str (jobCard->jobSpecs.jobId),
 		   *reasons, *subreasons);
 
       return TRUE;
@@ -822,7 +822,7 @@ shouldResume (struct hostLoad *loadV, struct jobCard *jp, int num)
   if (logclass & (LC_SCHED | LC_EXEC))
     ls_syslog (LOG_DEBUG3,
 	       "%s: job=%s; jStatus=%d; reasons=%x, subreasons=%d, numHosts=%d",
-	       fname, lsb_jobid2str (jp->jobSpecs.jobId),
+	       __func__, lsb_jobid2str (jp->jobSpecs.jobId),
 	       jp->jobSpecs.jStatus, jp->jobSpecs.reasons,
 	       jp->jobSpecs.subreasons, num);
 
@@ -844,11 +844,11 @@ shouldResume (struct hostLoad *loadV, struct jobCard *jp, int num)
 
 
   loads = (struct hostLoad *)
-    my_malloc (num * sizeof (struct hostLoad), fname);
+    my_malloc (num * sizeof (struct hostLoad), __func__);
   if (jp->resumeCondVal != NULL)
     {
       tclHostData = (struct tclHostData *)
-	my_malloc (num * sizeof (struct tclHostData), fname);
+	my_malloc (num * sizeof (struct tclHostData), __func__);
       for (i = 0; i < num; i++)
 	{
 	  initTclHostData (&tclHostData[i]);
@@ -885,7 +885,7 @@ shouldResume (struct hostLoad *loadV, struct jobCard *jp, int num)
       if (found != TRUE)
 	{
 
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5706, "%s: Can not find load information for host <%s> to check resume condiftions for job <%s>"), fname, jp->jobSpecs.toHosts[j], lsb_jobid2str (jp->jobSpecs.jobId));	/* catgets 5706 */
+	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5706, "%s: Can not find load information for host <%s> to check resume condiftions for job <%s>"), __func__, jp->jobSpecs.toHosts[j], lsb_jobid2str (jp->jobSpecs.jobId));	/* catgets 5706 */
 	  loads[numHosts].li = NULL;
 	  continue;
 	}
@@ -913,11 +913,11 @@ shouldResume (struct hostLoad *loadV, struct jobCard *jp, int num)
     }
   else
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5707, "%s: No valid load information is found for job <%s>"), fname, lsb_jobid2str (jp->jobSpecs.jobId));	/* catgets 5707 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5707, "%s: No valid load information is found for job <%s>"), __func__, lsb_jobid2str (jp->jobSpecs.jobId));	/* catgets 5707 */
     }
   if ((logclass & (LC_SCHED | LC_EXEC)) && !resume)
     ls_syslog (LOG_DEBUG2,
-	       "%s: Can't resume job %s; reason=%x, subreasons=%d", fname,
+	       "%s: Can't resume job %s; reason=%x, subreasons=%d", __func__,
 	       lsb_jobid2str (jp->jobSpecs.jobId), jp->jobSpecs.reasons,
 	       jp->jobSpecs.subreasons);
 
@@ -963,7 +963,7 @@ job_resume (struct jobCard *jp)
     }
   if (logclass & (LC_TRACE | LC_SCHED | LC_EXEC))
     ls_syslog (LOG_DEBUG1, "%s: Resume job %s",
-	       fname, lsb_jobid2str (jp->jobSpecs.jobId));
+	       __func__, lsb_jobid2str (jp->jobSpecs.jobId));
   return 0;
 }
 
@@ -991,7 +991,7 @@ jobResumeAction (struct jobCard *jp, int sigValue, int suspReason)
   if (logclass & (LC_TRACE | LC_SCHED | LC_EXEC))
     ls_syslog (LOG_DEBUG1,
 	       "%s: Try to resume job %s with the current reason %d and the triggered reason %d;",
-	       fname, lsb_jobid2str (jp->jobSpecs.jobId),
+	       __func__, lsb_jobid2str (jp->jobSpecs.jobId),
 	       jp->jobSpecs.reasons, suspReason);
 
   if (jobSigStart (jp, sigValue, 0, 0, SIGLOG) < 0)
@@ -1017,7 +1017,7 @@ jobSuspendAction (struct jobCard *jp, int sigValue, int suspReasons,
   if (logclass & (LC_TRACE | LC_SCHED | LC_EXEC))
     ls_syslog (LOG_DEBUG1,
 	       "%s: Suspend job %s; reasons=%x, subresons=%d, sigValue=%d, status=%x",
-	       fname, lsb_jobid2str (jp->jobSpecs.jobId),
+	       __func__, lsb_jobid2str (jp->jobSpecs.jobId),
 	       jp->jobSpecs.reasons, jp->jobSpecs.subreasons, sigValue,
 	       jp->jobSpecs.jStatus);
 
@@ -1053,7 +1053,7 @@ jobSuspendAction (struct jobCard *jp, int sigValue, int suspReasons,
 
   if (logclass & (LC_TRACE | LC_SCHED | LC_EXEC))
     ls_syslog (LOG_DEBUG1,
-	       "%s: Call jobSigStart(sigValue =%d) to suspend job", fname,
+	       "%s: Call jobSigStart(sigValue =%d) to suspend job", __func__,
 	       sigValue + jp->jobSpecs.sigMap[-(sigValue)]);
 
 
@@ -1186,7 +1186,7 @@ chkpntEnd (struct jobCard *jobCard, int w_status, bool_t * freed)
 		return;
 
 	      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5709, "%s: Unable to cleanup migrating job <%s>"),	/* catgets 5709 */
-			 fname, lsb_jobid2str (jobCard->jobSpecs.jobId));
+			 __func__, lsb_jobid2str (jobCard->jobSpecs.jobId));
 	    }
 
 	  SBD_SET_STATE (jobCard, JOB_STAT_PEND);
@@ -1304,7 +1304,7 @@ rmJobBufFilesPid (struct jobCard *jp)
 
   if ((pid = fork ()) < 0)
     {
-      ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_M, fname,
+      ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_M, __func__,
 		 lsb_jobid2str (jp->jobSpecs.jobId), "fork");
       return (pid);
     }
@@ -1320,7 +1320,7 @@ rmJobBufFilesPid (struct jobCard *jp)
   if (postJobSetup (jp) < 0)
     {
       ls_syslog (LOG_ERR, I18N_JOB_FAIL_S,
-		 fname, lsb_jobid2str (jp->jobSpecs.jobId), "postSetupUser");
+		 __func__, lsb_jobid2str (jp->jobSpecs.jobId), "postSetupUser");
       exit (-1);
     }
 
@@ -1344,7 +1344,7 @@ cleanupMigJob (struct jobCard *jp)
 
   if ((pid = fork ()) < 0)
     {
-      ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_M, fname,
+      ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_M, __func__,
 		 lsb_jobid2str (jp->jobSpecs.jobId), "fork");
       lsb_merr2 (_i18n_msg_get (ls_catd, NL_SETN, 700, "Unable to fork a child to run the queue's post-exec command for job <%s>.  Please run <%s> manually if necessary.\n"),	/* catgets 700 */
 		 lsb_jobid2str (jp->jobSpecs.jobId), jp->jobSpecs.postCmd);
@@ -1361,7 +1361,7 @@ cleanupMigJob (struct jobCard *jp)
 
   if (postJobSetup (jp) == -1)
     {
-      ls_syslog (LOG_ERR, I18N_JOB_FAIL_S, fname,
+      ls_syslog (LOG_ERR, I18N_JOB_FAIL_S, __func__,
 		 lsb_jobid2str (jp->jobSpecs.jobId), "postJobSetup");
       lsb_merr2 (_i18n_msg_get (ls_catd, NL_SETN, 701, "Unable to setup the environment for job <%s> to run the queue's post exec.  Please run <%s> manually if necessary.\n"),	/* catgets 701 */
 		 lsb_jobid2str (jp->jobSpecs.jobId), jp->jobSpecs.postCmd);
@@ -1438,7 +1438,7 @@ getTclHostData (struct hostLoad *load, struct tclHostData *tclHostData,
       if ((temp = ls_gethostinfo ("-:server", &num, 0,
 				  0, LOCAL_ONLY)) == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "ls_gethostinfo");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "ls_gethostinfo");
 	  return -1;
 	}
       if (hostInfo != NULL)
@@ -1449,7 +1449,7 @@ getTclHostData (struct hostLoad *load, struct tclHostData *tclHostData,
 	}
 
       hostInfo = (struct hostInfo *) my_malloc
-	(num * sizeof (struct hostInfo), fname);
+	(num * sizeof (struct hostInfo), __func__);
       for (i = 0; i < num; i++)
 	{
 	  copyLsfHostInfo (&hostInfo[i], &temp[i]);
@@ -1458,7 +1458,7 @@ getTclHostData (struct hostLoad *load, struct tclHostData *tclHostData,
 	    {
 	      ls_syslog (LOG_DEBUG2,
 			 "%s: host <%s> ncpus <%d> maxmem <%u> maxswp <%u> maxtmp <%u> ndisk <%d>",
-			 fname, hostInfo[i].hostName, hostInfo[i].maxCpus,
+			 __func__, hostInfo[i].hostName, hostInfo[i].maxCpus,
 			 hostInfo[i].maxMem, hostInfo[i].maxSwap,
 			 hostInfo[i].maxTmp, hostInfo[i].nDisks);
 	    }
@@ -1480,7 +1480,7 @@ getTclHostData (struct hostLoad *load, struct tclHostData *tclHostData,
   if (i == numLsfHosts)
     {
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5716, "%s: Host <%s> is not used by the batch system"),	/* catgets 5716 */
-		 fname, load->hostName);
+		 __func__, load->hostName);
       return -1;
     }
   tclHostData->hostName = hostInfo[i].hostName;
@@ -1503,7 +1503,7 @@ getTclHostData (struct hostLoad *load, struct tclHostData *tclHostData,
   tclHostData->flag = TCL_CHECK_EXPRESSION;
   tclHostData->status = load->status;
   tclHostData->loadIndex
-    = (float *) my_malloc (allLsInfo->numIndx * sizeof (float), fname);
+    = (float *) my_malloc (allLsInfo->numIndx * sizeof (float), __func__);
   tclHostData->loadIndex[R15S] = (hostInfo[i].cpuFactor != 0.0) ?
     ((load->li[R15S] + 1.0) / hostInfo[i].cpuFactor) : load->li[R15S];
   tclHostData->loadIndex[R1M] = (hostInfo[i].cpuFactor != 0.0) ?

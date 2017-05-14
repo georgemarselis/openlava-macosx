@@ -184,12 +184,12 @@ returnHostInfo (struct hostDataReply *hostsReplyPtr, int numHosts,
 
   if (logclass & LC_EXEC)
     {
-      ls_syslog (LOG_DEBUG, "%s: Entering this routine...", fname);
-      ls_syslog (LOG_DEBUG, "%s: The numHosts parameter is %d", fname,
+      ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
+      ls_syslog (LOG_DEBUG, "%s: The numHosts parameter is %d", __func__,
 		 numHosts);
-      ls_syslog (LOG_DEBUG, "%s: The hostReq->resReq is %s", fname,
+      ls_syslog (LOG_DEBUG, "%s: The hostReq->resReq is %s", __func__,
 		 hostReq->resReq);
-      ls_syslog (LOG_DEBUG, "%s: The hostReq->options is %d", fname,
+      ls_syslog (LOG_DEBUG, "%s: The hostReq->options is %d", __func__,
 		 hostReq->options);
     }
 
@@ -237,7 +237,7 @@ returnHostInfo (struct hostDataReply *hostsReplyPtr, int numHosts,
       int k, lostandfound = 0;
       if (logclass & (LC_EXEC))
 	{
-	  ls_syslog (LOG_DEBUG, "%s, host[%d]'s name is %s", fname, i,
+	  ls_syslog (LOG_DEBUG, "%s, host[%d]'s name is %s", __func__, i,
 		     hDList[i]->host);
 	}
       hInfo = &(hostsReplyPtr->hosts[hostsReplyPtr->numHosts]);
@@ -974,12 +974,12 @@ getLsbHostNames (char ***hostNames)
   FREEUP (hosts);
   if (numofhosts () == 0)
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6002, "%s: No host used by the batch system"), fname);	/* catgets 6002 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 6002, "%s: No host used by the batch system"), __func__);	/* catgets 6002 */
       *hostNames = NULL;
       return -1;
     }
 
-  hosts = my_malloc (numofhosts () * sizeof (char *), fname);
+  hosts = my_malloc (numofhosts () * sizeof (char *), __func__);
 
   hent = h_firstEnt_ (&hostTab, &stab);
   hData = ((struct hData *) hent->hData);
@@ -1259,7 +1259,7 @@ getHostsByResReq (struct resVal *resValPtr,
       return (*num);
     }
   if (hData == NULL)
-    hData = my_calloc (numofhosts (), sizeof (struct hData *), fname);
+    hData = my_calloc (numofhosts (), sizeof (struct hData *), __func__);
   numHosts = 0;
   for (i = 0, k = 0; i < *num; i++)
     {
@@ -1317,7 +1317,7 @@ getTclHostData (struct tclHostData *tclHostData,
 
   tclHostData->status = hPtr->limStatus;
   tclHostData->loadIndex =
-    my_malloc (allLsInfo->numIndx * sizeof (float), fname);
+    my_malloc (allLsInfo->numIndx * sizeof (float), __func__);
   tclHostData->loadIndex[R15S] = (hPtr->cpuFactor != 0.0) ?
     ((hPtr->lsbLoad[R15S] + 1.0) / hPtr->cpuFactor) : hPtr->lsbLoad[R15S];
   tclHostData->loadIndex[R1M] = (hPtr->cpuFactor != 0.0) ?
@@ -1394,12 +1394,12 @@ adjLsbLoad (struct jData *jpbw, int forResume, bool_t doAdj)
   int adjForPreemptableResource = FALSE;
 
   if (logclass & LC_TRACE)
-    ls_syslog (LOG_DEBUG, "%s: Entering this routine...", fname);
+    ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
 
   if (rusgBitMaps == NULL)
     {
       rusgBitMaps = (int *) my_malloc
-	(GET_INTNUM (allLsInfo->nRes) * sizeof (int), fname);
+	(GET_INTNUM (allLsInfo->nRes) * sizeof (int), __func__);
     }
 
   if (!jpbw->numHostPtr || jpbw->hPtr == NULL)
@@ -1519,7 +1519,7 @@ adjLsbLoad (struct jData *jpbw, int forResume, bool_t doAdj)
 		  if (logclass & LC_TRACE)
 		    ls_syslog (LOG_DEBUG3,
 			       "%s: Host <%s> doesn't share resource <%s>",
-			       fname, jpbw->hPtr[i]->host,
+			       __func__, jpbw->hPtr[i]->host,
 			       allLsInfo->resTable[ldx].name);
 		  continue;
 		}
@@ -1539,7 +1539,7 @@ adjLsbLoad (struct jData *jpbw, int forResume, bool_t doAdj)
 
 	  if (logclass & LC_SCHED)
 	    ls_syslog (LOG_DEBUG1, "\
-%s: jobId=<%s>, hostName=<%s>, resource name=<%s>, the specified rusage of the load or instance <%f>, current lsbload or instance value <%f>, duration <%f>, decay <%f>", fname, lsb_jobid2str (jpbw->jobId), jpbw->hPtr[i]->host, allLsInfo->resTable[ldx].name, jackValue, load, duration, decay);
+%s: jobId=<%s>, hostName=<%s>, resource name=<%s>, the specified rusage of the load or instance <%f>, current lsbload or instance value <%f>, duration <%f>, decay <%f>", __func__, lsb_jobid2str (jpbw->jobId), jpbw->hPtr[i]->host, allLsInfo->resTable[ldx].name, jackValue, load, duration, decay);
 
 
 	  factor = 1.0;
@@ -1625,7 +1625,7 @@ adjLsbLoad (struct jData *jpbw, int forResume, bool_t doAdj)
 
 	  if (logclass & LC_SCHED)
 	    ls_syslog (LOG_DEBUG1, "\
-%s: JobId=<%s>, hostname=<%s>, resource name=<%s>, the amount by which the load or the instance has been adjusted <%f>, original load or instance value <%f>, runTime=<%d>, sinceresume=<%d>, value of the load or the instance after the adjustment <%f>, factor <%f>", fname, lsb_jobid2str (jpbw->jobId), jpbw->hPtr[i]->host, allLsInfo->resTable[ldx].name, jackValue, orgnalLoad, jpbw->runTime, runTimeSinceResume (jpbw), load, factor);
+%s: JobId=<%s>, hostname=<%s>, resource name=<%s>, the amount by which the load or the instance has been adjusted <%f>, original load or instance value <%f>, runTime=<%d>, sinceresume=<%d>, value of the load or the instance after the adjustment <%f>, factor <%f>", __func__, lsb_jobid2str (jpbw->jobId), jpbw->hPtr[i]->host, allLsInfo->resTable[ldx].name, jackValue, orgnalLoad, jpbw->runTime, runTimeSinceResume (jpbw), load, factor);
 	}
     }
 }
@@ -1670,10 +1670,10 @@ getReserveValues (struct resVal *jobResVal, struct resVal *qResVal)
   if (first == TRUE)
     {
       resVal.val =
-	(float *) my_malloc (allLsInfo->nRes * sizeof (float), fname);
+	(float *) my_malloc (allLsInfo->nRes * sizeof (float), __func__);
       resVal.rusgBitMaps =
 	(int *) my_malloc (GET_INTNUM (allLsInfo->nRes) * sizeof (int),
-			   fname);
+			   __func__);
       first = FALSE;
     }
 

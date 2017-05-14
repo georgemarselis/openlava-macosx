@@ -24,9 +24,9 @@
 
 
 void
-lim_Exit (const char *fname)
+lim_Exit (const char *__func__)
 {
-    ls_syslog (LOG_ERR, "%s: Above fatal error(s) found.", fname);
+    ls_syslog (LOG_ERR, "%s: Above fatal error(s) found.", __func__);
     exit (EXIT_FATAL_ERROR);
 }
 
@@ -87,7 +87,7 @@ findHostbyNo (struct hostNode *hList, int hostNo)
 }
 
 struct hostNode *
-findHostbyAddr (struct sockaddr_in *from, char *fname)
+findHostbyAddr (struct sockaddr_in *from, char *__func__)
 {
   struct hostNode *hPtr;
   struct hostent *hp;
@@ -119,7 +119,7 @@ findHostbyAddr (struct sockaddr_in *from, char *fname)
        */
       if (limParams[LIM_NO_MIGRANT_HOSTS].paramValue)
     ls_syslog (LOG_ERR, "\
-%s: Host %s (hp=%s/%s) is unknown by configuration; all hosts used by openlava must have unique official names", fname, sockAdd2Str_ (from), hp->h_name, inet_ntoa (*((struct in_addr *) hp->h_addr_list[0])));
+%s: Host %s (hp=%s/%s) is unknown by configuration; all hosts used by openlava must have unique official names", __func__, sockAdd2Str_ (from), hp->h_name, inet_ntoa (*((struct in_addr *) hp->h_addr_list[0])));
       return NULL;
     }
 

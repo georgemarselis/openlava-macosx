@@ -67,14 +67,12 @@ void test_1 ()
 {
 	int vect[VECT_SIZE];
 	LS_BITSET_T *set;
-	char *fname  = malloc( sizeof(char) * strlen( __func__ ) + 1);
-	strcpy( fname, __func__ );
 
 	for ( unsigned int i = 0; i < VECT_SIZE; i++) {
 		vect[i] = i + 1;
 	}
 
-	set = simpleSetCreate (VECT_SIZE, fname);
+	set = simpleSetCreate (VECT_SIZE, "test_1");
 	if (!set)
 	{
 		ls_syslog (LOG_ERR, "%s failed in creating set", __func__);
@@ -86,12 +84,12 @@ void test_1 ()
 		if (setAddElement (set, &vect[i]) < 0)
 		{
 			ls_syslog (LOG_ERR, "%s setAddElement failed for i=%d vect[i]=%d", __func__, i, vect[i]);
-			setDumpSet (set, fname);
+			setDumpSet (set, "test_1" );
 			exit (-1);
 		}
 	}
 
-	setDumpSet (set, fname);
+	setDumpSet (set, "test_1");
 
 	ls_syslog (LOG_ERR, "%s setGetNumElements=%d", __func__, setGetNumElements (set));
 
@@ -100,13 +98,11 @@ void test_1 ()
 		if (setRemoveElement (set, &vect[i]) < 0)
 		{
 			ls_syslog (LOG_ERR, "%s setAddElement failed for i=%d vect[i]=%d", __func__, i, vect[i]);
-			setDumpSet (set, fname);
+			setDumpSet (set, "test_1");
 			exit (-1);
 		}
 	}
-	setDumpSet (set, fname);
-
-	free( fname );
+	setDumpSet (set, "test_1");
 
 	return;
 }
@@ -118,14 +114,11 @@ void test_2 ()
 	LS_BITSET_ITERATOR_T *iterator = NULL;
 	int *p = NULL;
 
-	char *fname  = malloc( sizeof(char) * strlen( __func__ ) + 1);
-	strcpy( fname, __func__ );
-
 	for( unsigned int i = 0; i < VECT_SIZE; i++) {
 		vect[i] = i + 1;
 	}
 
-	set = simpleSetCreate (VECT_SIZE, fname);
+	set = simpleSetCreate( VECT_SIZE, "test_2" );
 	if (!set)
 	{
 		ls_syslog (LOG_ERR, "%s failed in creating set", __func__);
@@ -137,7 +130,7 @@ void test_2 ()
 		if (setAddElement (set, &vect[i]) < 0)
 		{
 			ls_syslog (LOG_ERR, "%s setAddElement failed for i=%d vect[i]=%d", __func__, i, vect[i]);
-			setDumpSet (set, fname);
+			setDumpSet (set, "test_1" );
 			exit (-1);
 		}
 	}
@@ -150,8 +143,6 @@ void test_2 ()
 	while ( ( p = setIteratorGetNextElement (iterator) ) ) {     // FIXME FIXME FIXME this may actually be wrong, and just require == instead of =
 		ls_syslog (LOG_ERR, "%s next element in set %d", __func__, *p);
 	}
-
-	free( fname );
 
 	return;
 }
@@ -180,9 +171,6 @@ void test_3 ()
 	LS_BITSET_ITERATOR_T *iterator = NULL;
 	struct X *gimmeObject = NULL;
 
-	char *fname  = malloc( sizeof(char) * strlen( __func__ ) + 1);
-	strcpy( fname, __func__ );
-
 	directFun = fun;
 	inverseFun = gun;
 
@@ -203,7 +191,7 @@ void test_3 ()
 		table[i] = &objs[i];
 	}
 
-	set = setCreate (OBJ_SIZE, directFun, inverseFun, fname);
+	set = setCreate (OBJ_SIZE, directFun, inverseFun, "test_3" );
 	if (!set) {
 		ls_syslog (LOG_ERR, "%s failed allocating %d bytes", __func__, OBJ_SIZE);
 		exit (-1);
@@ -233,8 +221,6 @@ void test_3 ()
 		exit (-1);
 	}
 
-	free( fname );
-
 	return;
 }
 
@@ -245,9 +231,6 @@ void test_4 ()
 	LS_BITSET_ITERATOR_T iter;
 	char foo[] = "this string does nothing, please ignore";
 	int cc = 0;
-
-	char *fname  = malloc( sizeof(char) * strlen( __func__ ) + 1);
-	strcpy( fname, __func__ );
 
 	set = simpleSetCreate (1, "Just one");
 
@@ -288,8 +271,6 @@ void test_4 ()
 	}
 	setDestroy (set);
 	setDestroy (set1);
-
-	free( fname );
 
 	return;
 }

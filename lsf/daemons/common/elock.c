@@ -82,7 +82,7 @@ getElock (void)
 
     if ((myhostnm = ls_getmyhostname ()) == NULL)
         {
-        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "ls_getmyhostname");
+        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "ls_getmyhostname");
         return (MASTER_FATAL);
         }
 
@@ -102,7 +102,7 @@ access:
         write (lock_fd, buf, strlen (buf));
         close (lock_fd);
         chuser (batchId);
-        ls_syslog (LOG_INFO, "%s: Got lock file", fname);
+        ls_syslog (LOG_INFO, "%s: Got lock file", __func__);
         gotLock = TRUE;
         return 0;
     }
@@ -116,7 +116,7 @@ access:
         fd = open (lockfile, O_RDONLY, 0444);
         chuser (batchId);
         if (fd < 0) {
-            ls_syslog (LOG_ERR, "%s: Can't open existing lock file <%s>: %m", fname, lockfile);
+            ls_syslog (LOG_ERR, "%s: Can't open existing lock file <%s>: %m", __func__, lockfile);
             return (MASTER_FATAL);
         }
         i = 0;
@@ -134,7 +134,7 @@ access:
                 buf[i] = '\0';
                 pid = atoi (buf);
                 if (kill (pid, 0) < 0) {
-                    ls_syslog (LOG_ERR, " %s: Last owner of lock file was on this host with pid <%d>; attempting to take over lock file", fname, pid);
+                    ls_syslog (LOG_ERR, " %s: Last owner of lock file was on this host with pid <%d>; attempting to take over lock file", __func__, pid);
                     close (fd);
                     force = 1;
                     goto access;
@@ -144,7 +144,7 @@ access:
         close (fd);
 
         if (stat (lockfile, &statbuf) < 0) {
-            ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "stat", lockfile);
+            ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "stat", lockfile);
             return (MASTER_FATAL);
         }
         lastmodtime = statbuf.st_mtime;
@@ -162,25 +162,25 @@ access:
 
             if (mastername == NULL) {
                 /* catgets 8246 */
-                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 8246, "%s: Can't get master host name: %M"), fname);
+                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 8246, "%s: Can't get master host name: %M"), __func__);
                 return (MASTER_FATAL);
             }
 
             if (!equalHost_ (mastername, myhostnm)) {
                 /* catgets 8247 */
-                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 8247, "%s: Local host <%s> is not master <%s>"), fname, myhostnm, mastername);
+                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 8247, "%s: Local host <%s> is not master <%s>"), __func__, myhostnm, mastername);
                 return (MASTER_RESIGN);
             }
 
             if (stat (lockfile, &statbuf) < 0) {
                 if (errno == ENOENT)
                     goto access;
-                ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "stat", lockfile);
+                ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "stat", lockfile);
                 return (MASTER_FATAL);
             }
             if (statbuf.st_mtime == lastmodtime) {
                 if (retry > 4) {
-                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 8249, "%s: Previous mbatchd appears dead; attempting to take over lock file"), fname); /* catgets 8249 */
+                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 8249, "%s: Previous mbatchd appears dead; attempting to take over lock file"), __func__); /* catgets 8249 */
                     force = 1;
                     goto access;
                 }
@@ -190,7 +190,7 @@ access:
             }
             else {
                 if (first) {
-                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 8250, "%s: Another mbatchd is accessing lock file; waiting ..."), fname);  /* catgets 8250 */
+                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 8250, "%s: Another mbatchd is accessing lock file; waiting ..."), __func__);  /* catgets 8250 */
                     first = FALSE;
                 }
                 lastmodtime = statbuf.st_mtime;
@@ -201,7 +201,7 @@ access:
     else {
         chuser (batchId);
         /* catgets 8251 */
-        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 8251, "%s: Failed in opening lock file <%s>: %m"), fname, lockfile);
+        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 8251, "%s: Failed in opening lock file <%s>: %m"), __func__, lockfile);
         return (MASTER_FATAL);
     }
 }
@@ -265,31 +265,31 @@ touchElock (void)
     if (lock_fd < 0)
         {
         chuser (batchId);
-        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "open", lockfile);
+        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "open", lockfile);
         return (MASTER_FATAL);
         }
     else if (lseek (lock_fd, 0, SEEK_SET) != 0)
         {
         chuser (batchId);
-        ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, fname, "lseek", lockfile, lock_fd);
+        ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, __func__, "lseek", lockfile, lock_fd);
         return (MASTER_FATAL);
         }
     else if ((cc = read (lock_fd, buf, 1)) != 1)
         {
         chuser (batchId);
         if (cc < 0) {
-            ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, fname, "read", lockfile, lock_fd);
+            ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, __func__, "read", lockfile, lock_fd);
         }
         
         else {
-            ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, fname, "read", lockfile);
+            ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, __func__, "read", lockfile);
         }
         return (MASTER_FATAL);
         }
     else if (lseek (lock_fd, 0, SEEK_SET) != 0)
         {
         chuser (batchId);
-        ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, fname, "lseek",
+        ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, __func__, "lseek",
                    lockfile, lock_fd);
         return (MASTER_FATAL);
         }
@@ -298,17 +298,17 @@ touchElock (void)
         chuser (batchId);
         if (cc < 0)
             {
-            ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "write", lockfile);
+            ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "write", lockfile);
             }
         else
-            ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, fname, "write", lockfile);
+            ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, __func__, "write", lockfile);
         return (MASTER_FATAL);
         }
     
     if (close (lock_fd) != 0)
         {
         chuser (batchId);
-        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "close", lockfile);
+        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "close", lockfile);
         }
     else
         chuser (batchId);

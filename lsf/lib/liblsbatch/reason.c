@@ -55,7 +55,7 @@ lsb_suspreason (int reasons, int subreasons, struct loadIndexLog *ld)
     msgbuf[0] = '\0';
 
     if (logclass & (LC_TRACE | LC_SCHED | LC_EXEC))  {
-        ls_syslog (LOG_DEBUG1, "%s: reasons=%x, subreasons=%d", fname, reasons, subreasons);
+        ls_syslog (LOG_DEBUG1, "%s: reasons=%x, subreasons=%d", __func__, reasons, subreasons);
     }
 
 
@@ -283,7 +283,7 @@ lsb_pendreason (int numReasons, int *rsTb, struct jobInfoHead *jInfoH,
   };
 
   if (logclass & (LC_TRACE | LC_SCHED | LC_EXEC))
-    ls_syslog (LOG_DEBUG1, "%s: numReasons=%d", fname, numReasons);
+    ls_syslog (LOG_DEBUG1, "%s: numReasons=%d", __func__, numReasons);
 
   if (!numReasons || !rsTb)
     {
@@ -341,7 +341,7 @@ lsb_pendreason (int numReasons, int *rsTb, struct jobInfoHead *jInfoH,
       GET_HIGH (hostId, reasonTb[i]);
       if (logclass & (LC_TRACE | LC_SCHED | LC_EXEC))
     ls_syslog (LOG_DEBUG2, "%s: hostId=%d, reason=%d reasonTb[%d]=%d",
-           fname, hostId, reason, i, reasonTb[i]);
+           __func__, hostId, reason, i, reasonTb[i]);
       if (!hostId)
     {
       sprintf (msgline, " %s;\n", getMsg (pendMsg, pendMsg_ID, reason));
@@ -360,12 +360,12 @@ lsb_pendreason (int numReasons, int *rsTb, struct jobInfoHead *jInfoH,
       GET_LOW (reasonJ, reasonTb[j]);
       if (logclass & (LC_TRACE | LC_SCHED | LC_EXEC))
         ls_syslog (LOG_DEBUG2, "%s: reasonJ=%d reasonTb[j]=%d",
-               fname, reasonJ, reasonTb[j]);
+               __func__, reasonJ, reasonTb[j]);
       if (reasonJ != reason)
         continue;
       GET_HIGH (hostIdJ, reasonTb[j]);
       if (logclass & (LC_TRACE | LC_SCHED | LC_EXEC))
-        ls_syslog (LOG_DEBUG2, "%s: j=%d, hostIdJ=%d", fname, j, hostIdJ);
+        ls_syslog (LOG_DEBUG2, "%s: j=%d, hostIdJ=%d", __func__, j, hostIdJ);
       reasonTb[j] = 0;
       if (jInfoH && jInfoH->numHosts != 0 && jInfoH->hostNames != NULL)
         {

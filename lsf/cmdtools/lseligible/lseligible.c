@@ -52,7 +52,7 @@ main (int argc, char **argv)
       exit (-1);
     }
   if (logclass & (LC_TRACE))
-    ls_syslog (LOG_DEBUG, "%s: Entering this routine...", fname);
+    ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
 
   opterr = 0;
   while ((cc = getopt (argc, argv, "Vqrhs")) != EOF)

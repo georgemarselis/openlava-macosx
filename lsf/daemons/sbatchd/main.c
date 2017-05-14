@@ -166,7 +166,7 @@ main (int argc, char **argv)
     {
       ls_openlog ("sbatchd", daemonParams[LSF_LOGDIR].paramValue, (debug > 1),
 		  daemonParams[LSF_LOG_MASK].paramValue);
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "initenv_");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "initenv_");
       die (SLAVE_FATAL);
     }
 
@@ -178,7 +178,7 @@ main (int argc, char **argv)
     }
 
   ls_syslog (LOG_WARNING, "\
-%s: LSB_STDOUT_DIRECT configured as %s", fname, (daemonParams[LSB_STDOUT_DIRECT].paramValue) ? daemonParams[LSB_STDOUT_DIRECT].paramValue : "NULL");
+%s: LSB_STDOUT_DIRECT configured as %s", __func__, (daemonParams[LSB_STDOUT_DIRECT].paramValue) ? daemonParams[LSB_STDOUT_DIRECT].paramValue : "NULL");
 
   opterr = 0;
   while ((aopt = getopt (argc, argv, "hV:d:123")) != EOF)
@@ -267,12 +267,12 @@ main (int argc, char **argv)
 		daemonParams[LSF_LOG_MASK].paramValue);
 
   if (logclass)
-    ls_syslog (LOG_DEBUG3, "%s: logclass=%x", fname, logclass);
+    ls_syslog (LOG_DEBUG3, "%s: logclass=%x", __func__, logclass);
 
 
   sbdLogMask = getLogMask (&msg, daemonParams[LSF_LOG_MASK].paramValue);
   if (msg != NULL)
-    ls_syslog (LOG_ERR, "%s: %s", fname, msg);
+    ls_syslog (LOG_ERR, "%s: %s", __func__, msg);
 
 
   if (isint_ (daemonParams[LSB_SBD_CONNTIMEOUT].paramValue))
@@ -280,7 +280,7 @@ main (int argc, char **argv)
   else
     connTimeout = 6;
   if (logclass & (LC_TRACE | LC_HANG))
-    ls_syslog (LOG_DEBUG, "%s: connTimeout=%d", fname, connTimeout);
+    ls_syslog (LOG_DEBUG, "%s: connTimeout=%d", __func__, connTimeout);
 
 
   if (isint_ (daemonParams[LSB_SBD_READTIMEOUT].paramValue))
@@ -288,7 +288,7 @@ main (int argc, char **argv)
   else
     readTimeout = 20;
   if (logclass & (LC_TRACE | LC_HANG))
-    ls_syslog (LOG_DEBUG, "%s: readTimeout=%d", fname, readTimeout);
+    ls_syslog (LOG_DEBUG, "%s: readTimeout=%d", __func__, readTimeout);
 
 
   if ((daemonParams[LSF_GETPWNAM_RETRY].paramValue != NULL)
@@ -316,7 +316,7 @@ main (int argc, char **argv)
 	}
       else
 	{
-	  ls_syslog (LOG_ERR, I18N (5001, "%s: LSB_JOB_CPULIMIT <%s> in lsf.conf is invalid. Valid values are y|Y or n|N; ignoring the parameter."), fname, daemonParams[LSB_JOB_CPULIMIT].paramValue);	/* catgets 5001 */
+	  ls_syslog (LOG_ERR, I18N (5001, "%s: LSB_JOB_CPULIMIT <%s> in lsf.conf is invalid. Valid values are y|Y or n|N; ignoring the parameter."), __func__, daemonParams[LSB_JOB_CPULIMIT].paramValue);	/* catgets 5001 */
 
 	}
     }
@@ -334,7 +334,7 @@ main (int argc, char **argv)
 	}
       else
 	{
-	  ls_syslog (LOG_ERR, I18N (5002, "%s: LSB_JOB_MEMLIMIT <%s> in lsf.conf is invalid. Valid values are y|Y or n|N; ignoring the parameter."), fname, daemonParams[LSB_JOB_MEMLIMIT].paramValue);	/* catgets 5002 */
+	  ls_syslog (LOG_ERR, I18N (5002, "%s: LSB_JOB_MEMLIMIT <%s> in lsf.conf is invalid. Valid values are y|Y or n|N; ignoring the parameter."), __func__, daemonParams[LSB_JOB_MEMLIMIT].paramValue);	/* catgets 5002 */
 	}
     }
 
@@ -358,7 +358,7 @@ main (int argc, char **argv)
 
   if (logclass & (LC_TRACE | LC_COMM))
     {
-      ls_syslog (LOG_DEBUG, "%s: ls_info() succeed", fname);
+      ls_syslog (LOG_DEBUG, "%s: ls_info() succeed", __func__);
     }
 
 
@@ -371,7 +371,7 @@ main (int argc, char **argv)
 
 
   sinit ();
-  ls_syslog (LOG_INFO, (_i18n_msg_get (ls_catd, NL_SETN, 5041, "%s: (re-)started")), fname);	/* catgets 5041 */
+  ls_syslog (LOG_INFO, (_i18n_msg_get (ls_catd, NL_SETN, 5041, "%s: (re-)started")), __func__);	/* catgets 5041 */
 
 
   QUEUE_INIT (jmQueue);
@@ -434,13 +434,13 @@ main (int argc, char **argv)
 	  if (errno == EINTR)
 	    delay_check = FALSE;
 	  else
-	    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "select");
+	    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "select");
 	  continue;
 	}
 
       if (sbdSleepTime < 0)
 	{
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5004, "%s: Sleep time <%d> is not a non-negative integer; re-life"), fname, sbdSleepTime);	/* catgets 5004 */
+	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5004, "%s: Sleep time <%d> is not a non-negative integer; re-life"), __func__, sbdSleepTime);	/* catgets 5004 */
 	  relife ();
 	}
       timeout.tv_sec = sbdSleepTime;
@@ -480,7 +480,7 @@ main (int argc, char **argv)
       s = chanAccept_ (batchSock, &from);
       if (s == -1)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "chanAccept_");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "chanAccept_");
 	  continue;
 	}
 
@@ -488,7 +488,7 @@ main (int argc, char **argv)
       client = (struct clientNode *) malloc (sizeof (struct clientNode));
       if (!client)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
 	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5006, "%s: Unable to accept connection"));	/* catgets 5006 */
 	  chanClose_ (s);
 	  continue;
@@ -505,7 +505,7 @@ main (int argc, char **argv)
       if (logclass & LC_COMM)
 	ls_syslog (LOG_DEBUG,
 		   "%s: Accepted connection from host <%s> on channel <%d>",
-		   fname, sockAdd2Str_ (&from), client->chanfd);
+		   __func__, sockAdd2Str_ (&from), client->chanfd);
 
       clientIO (&chanmask);
     }
@@ -559,7 +559,7 @@ processMsg (struct clientNode *client)
 
   if (chanDequeue_ (client->chanfd, &buf) < 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_ENO_D, fname, "chanDequeue_",
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_ENO_D, __func__, "chanDequeue_",
 		 cherrno);
       shutDownClient (client);
       return;
@@ -569,7 +569,7 @@ processMsg (struct clientNode *client)
   xdrmem_create (&xdrs, buf->data, buf->len, XDR_DECODE);
   if (!xdr_LSFHeader (&xdrs, &reqHdr))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_LSFHeader");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_LSFHeader");
       shutDownClient (client);
       xdr_destroy (&xdrs);
       chanFreeBuf_ (buf);
@@ -579,11 +579,11 @@ processMsg (struct clientNode *client)
   sbdReqtype = reqHdr.opCode;
 
   if (logclass & (LC_TRACE | LC_COMM))
-    ls_syslog (LOG_DEBUG, "%s: received msg <%d>", fname, sbdReqtype);
+    ls_syslog (LOG_DEBUG, "%s: received msg <%d>", __func__, sbdReqtype);
 
   if (sbdReqtype != PREPARE_FOR_OP)
     if (io_block_ (s) < 0)
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "io_block_");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "io_block_");
 
 
 
@@ -618,7 +618,7 @@ processMsg (struct clientNode *client)
 
 	  if (authMbdRequest (client, &xdrs, &reqHdr) != LSBE_NO_ERROR)
 	    {
-	      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, fname, "authMbdRequest",
+	      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, __func__, "authMbdRequest",
 			 sockAdd2Str_ (&client->from));
 	      shutDownClient (client);
 	      xdr_destroy (&xdrs);
@@ -632,7 +632,7 @@ processMsg (struct clientNode *client)
 	  if (!portok (&client->from))
 	    {
 	      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5010, "%s: Received request %d from bad port <%s>"),	/* catgets 5010 */
-			 fname, sbdReqtype, sockAdd2Str_ (&client->from));
+			 __func__, sbdReqtype, sockAdd2Str_ (&client->from));
 	      shutDownClient (client);
 	      xdr_destroy (&xdrs);
 	      chanFreeBuf_ (buf);
@@ -657,7 +657,7 @@ processMsg (struct clientNode *client)
     {
       if ((cc = authCmdRequest (client, &xdrs, &reqHdr)) != LSBE_NO_ERROR)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, fname, "authCmdRequest",
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_D_FAIL_M, __func__, "authCmdRequest",
 		     sockAdd2Str_ (&client->from), sbdReqtype);
 	  errorBack (client->chanfd, cc, &client->from);
 	  shutDownClient (client);
@@ -726,7 +726,7 @@ processMsg (struct clientNode *client)
       else
 	{
 	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5012, "%s: BATCH_JOB_MSG newBucket failed: %m"),	/* catgets 5012 */
-		     fname);
+		     __func__);
 	}
       break;
     case SBD_JOB_SETUP:
@@ -748,7 +748,7 @@ processMsg (struct clientNode *client)
       break;
     default:
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5013, "%s: Unknown request type <%d>"),	/* catgets 5013 */
-		 fname, sbdReqtype);
+		 __func__, sbdReqtype);
       break;
     }
 
@@ -914,11 +914,11 @@ sinit (void)
   char *myhostname;
 
   if (logclass & (LC_TRACE | LC_HANG))
-    ls_syslog (LOG_DEBUG, "sbatchd/%s: Entering this routine...", fname);
+    ls_syslog (LOG_DEBUG, "sbatchd/%s: Entering this routine...", __func__);
 
   if (getBootTime (&bootTime) == -1)
     {
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5021, "%s: getBootTime() failed; assuming host was not rebooted while sbatchd was down"), fname);	/* catgets 5021 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5021, "%s: getBootTime() failed; assuming host was not rebooted while sbatchd was down"), __func__);	/* catgets 5021 */
       bootTime = 0;
       die (SLAVE_FATAL);
     }
@@ -942,19 +942,19 @@ sinit (void)
   clientList = (struct clientNode *) mkListHeader ();
   if (!jobQueHead || !clientList)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "mkListHeader");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "mkListHeader");
       die (SLAVE_FATAL);
     }
   if ((clusterName = ls_getclustername ()) == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "ls_getclustername");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "ls_getclustername");
       while ((clusterName = ls_getclustername ()) == NULL)
 	millisleep_ (sbdSleepTime * 1000);
     }
 
   if ((masterHost = ls_getmastername ()) == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "ls_getmastername");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "ls_getmastername");
       while ((masterHost = ls_getmastername ()) == NULL)
 	millisleep_ (sbdSleepTime * 1000);
     }
@@ -967,13 +967,13 @@ sinit (void)
   myhostname = ls_getmyhostname ();
   if (myhostname == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "ls_getmyhostname");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "ls_getmyhostname");
       die (SLAVE_FATAL);
     }
 
   while ((myinfo = ls_gethostinfo (NULL, NULL, &myhostname, 1, 0)) == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "ls_gethostinfo");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "ls_gethostinfo");
       millisleep_ (sbdSleepTime * 1000);
     }
 
@@ -987,7 +987,7 @@ sinit (void)
   batchSock = init_ServSock (sbd_port);
   if (batchSock < 0)
     {
-      lsb_mperr (_i18n_printf (I18N_FUNC_FAIL, fname, "init_ServSock"));
+      lsb_mperr (_i18n_printf (I18N_FUNC_FAIL, __func__, "init_ServSock"));
       die (SLAVE_FATAL);
     }
   if (!debug)
@@ -1002,8 +1002,8 @@ sinit (void)
     {
       if (chdir (LSTMPDIR) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "chdir", LSTMPDIR);
-	  lsb_mperr (_i18n_printf (I18N_FUNC_S_FAIL, fname,
+	  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "chdir", LSTMPDIR);
+	  lsb_mperr (_i18n_printf (I18N_FUNC_S_FAIL, __func__,
 				   "chdir", LSTMPDIR));
 	  die (SLAVE_FATAL);
 	}
@@ -1012,7 +1012,7 @@ sinit (void)
 
   if (chanInit_ () < 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "chanInit_");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "chanInit_");
       die (SLAVE_FATAL);
     }
 

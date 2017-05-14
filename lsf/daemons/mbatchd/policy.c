@@ -123,13 +123,13 @@ struct leftTimeTable
 #define CANT_FINISH_BEFORE_DEADLINE(runLimit, deadline, cpuFactor)      \
     ((runLimit)/(cpuFactor) + now_disp > (deadline))
 
-#define REASON_TABLE_COPY(src, dest, fname)                             \
+#define REASON_TABLE_COPY(src, dest, __func__)                             \
     {                                                                   \
         FREEUP (dest->reasonTb);                                        \
         dest->numReasons = src->numReasons;                             \
         if (dest->numReasons > 0) {                                     \
             dest->reasonTb = (int *) my_calloc (dest->numReasons,       \
-                                                sizeof(int), fname);    \
+                                                sizeof(int), __func__);    \
             memcpy((char *)dest->reasonTb, (char *)src->reasonTb,       \
                    sizeof(int) * dest->numReasons);                     \
         }                                                               \
@@ -382,7 +382,7 @@ static int timePJobLimitOk;
 
 int timeCollectPendReason;
 
-#define DUMP_TIMERS(fname)                                              \
+#define DUMP_TIMERS(__func__)                                              \
     {                                                                   \
         if (logclass & LC_PERFM)                                        \
             ls_syslog(LOG_DEBUG,"\
@@ -390,7 +390,7 @@ int timeCollectPendReason;
 timeGetJUsable %d ms timeReadyToDisp %d ms timeCntUQSlots %d ms \
 timeFSQelectPendJob %d ms timePickAJob %d ms timeScheduleAJob %d ms \
 timeCollectPendReason %dms",                                            \
-                      fname,                                            \
+                      __func__,                                            \
                       timeGetQUsable,                                   \
                       timeGetCandHosts,                                 \
                       timeGetJUsable,                                   \
@@ -443,7 +443,7 @@ readyToDisp (struct jData *jpbw, int *numAvailSlots)
 
   if (logclass & (LC_PEND))
     ls_syslog (LOG_DEBUG3,
-	       "%s: jobId=%s processed=%x oldReason=%d newReason=%d", fname,
+	       "%s: jobId=%s processed=%x oldReason=%d newReason=%d", __func__,
 	       lsb_jobid2str (jpbw->jobId), jpbw->processed, jpbw->oldReason,
 	       jpbw->newReason);
 
@@ -464,7 +464,7 @@ readyToDisp (struct jData *jpbw, int *numAvailSlots)
       if (logclass & (LC_PEND))
 	ls_syslog (LOG_DEBUG2,
 		   "%s: Job %s isn't ready for scheduling; newReason=%d",
-		   fname, lsb_jobid2str (jpbw->jobId), jpbw->newReason);
+		   __func__, lsb_jobid2str (jpbw->jobId), jpbw->newReason);
       return FALSE;
     }
 
@@ -523,7 +523,7 @@ readyToDisp (struct jData *jpbw, int *numAvailSlots)
 	  char *timebuf = ctime (&deadline);
 	  timebuf[strlen (timebuf) - 1] = '\0';
 	  ls_syslog (LOG_DEBUG2,
-		     "%s: job <%s> can't finish before deadline: %s", fname,
+		     "%s: job <%s> can't finish before deadline: %s", __func__,
 		     lsb_jobid2str (jpbw->jobId), timebuf);
 	}
       jReason = PEND_QUE_WINDOW_WILL_CLOSE;
@@ -621,7 +621,7 @@ readyToDisp (struct jData *jpbw, int *numAvailSlots)
       *numAvailSlots = 0;
       if (logclass & (LC_PEND))
 	ls_syslog (LOG_DEBUG2,
-		   "%s: Job %s isn't ready for dispatch; newReason=%d", fname,
+		   "%s: Job %s isn't ready for dispatch; newReason=%d", __func__,
 		   lsb_jobid2str (jpbw->jobId), jpbw->newReason);
       return FALSE;
     }
@@ -631,7 +631,7 @@ readyToDisp (struct jData *jpbw, int *numAvailSlots)
   if (logclass & (LC_PEND))
     ls_syslog (LOG_DEBUG3,
 	       "%s: Job %s is ready for dispatch; numSlots=%d numAvailSlots=%d",
-	       fname, lsb_jobid2str (jpbw->jobId), jpbw->numSlots,
+	       __func__, lsb_jobid2str (jpbw->jobId), jpbw->numSlots,
 	       *numAvailSlots);
 
   INC_CNT (PROF_CNT_numReadyJobsPerSession);
@@ -657,7 +657,7 @@ getMinGSlots (struct uData *uPtr, struct qData *qPtr, int *numGAvailSlots)
     if (grpUAcct == NULL)
       {
 	ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7200, "%s: expect a non-NULL uAcct for group %s in queue %s, but got a NULL one, please report."),	/* catgets 7200 */
-		   fname, grp->user, qPtr->queue);
+		   __func__, grp->user, qPtr->queue);
 	continue;
       }
 
@@ -794,7 +794,7 @@ cntUQSlots (struct jData *jpbw, int *numAvailSlots)
       jpbw->newReason = jReason;
       minSlots = 0;
       if (logclass & (LC_PEND))
-	ls_syslog (LOG_DEBUG3, "%s: job=%s reason=%d", fname,
+	ls_syslog (LOG_DEBUG3, "%s: job=%s reason=%d", __func__,
 		   lsb_jobid2str (jpbw->jobId), jpbw->newReason);
     }
   *numAvailSlots = minSlots;
@@ -805,7 +805,7 @@ cntUQSlots (struct jData *jpbw, int *numAvailSlots)
     {
       if (logclass & (LC_SCHED | LC_JLIMIT))
 	ls_syslog (LOG_DEBUG3, "%s: jobId=%s numSlots=%d numAvailSlots=%d",
-		   fname, lsb_jobid2str (jpbw->jobId), jpbw->numSlots,
+		   __func__, lsb_jobid2str (jpbw->jobId), jpbw->numSlots,
 		   *numAvailSlots);
       return (jpbw->numSlots);
     }
@@ -817,7 +817,7 @@ cntUQSlots (struct jData *jpbw, int *numAvailSlots)
       if ((uAcct = getUAcct (jpbw->qPtr->uAcct, jpbw->uPtr)) == NULL)
 	{
 	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7201, "%s: Cannot get userAcct structure for job <%s> in queue <%s>"),	/* catgets 7201 */
-		     fname, lsb_jobid2str (jpbw->jobId), jpbw->qPtr->queue);
+		     __func__, lsb_jobid2str (jpbw->jobId), jpbw->qPtr->queue);
 	  return (jpbw->numSlots);
 	}
     }
@@ -882,7 +882,7 @@ cntUQSlots (struct jData *jpbw, int *numAvailSlots)
     }
   jpbw->numSlots = minSlots;
   if (logclass & (LC_SCHED | LC_JLIMIT))
-    ls_syslog (LOG_DEBUG3, "%s: job=%s numSlots=%d numAvailSlots=%d", fname,
+    ls_syslog (LOG_DEBUG3, "%s: job=%s numSlots=%d numAvailSlots=%d", __func__,
 	       lsb_jobid2str (jpbw->jobId), jpbw->numSlots, *numAvailSlots);
   return (jpbw->numSlots);
 
@@ -904,7 +904,7 @@ getCandHosts (struct jData *jpbw)
 
   if (logclass & (LC_TRACE))
     ls_syslog (LOG_DEBUG2, "%s: Entering this routine for job %s",
-	       fname, lsb_jobid2str (jpbw->jobId));
+	       __func__, lsb_jobid2str (jpbw->jobId));
 
   INC_CNT (PROF_CNT_getCandHosts);
 
@@ -915,7 +915,7 @@ getCandHosts (struct jData *jpbw)
 	{
 	  ls_syslog (LOG_DEBUG1,
 		     "%s: job <%s> got no candidate hosts because numLsbUsable or queue's numUsable is 0",
-		     fname, lsb_jobid2str (jpbw->jobId));
+		     __func__, lsb_jobid2str (jpbw->jobId));
 	}
       return (CAND_NO_HOST);
     }
@@ -952,7 +952,7 @@ getCandHosts (struct jData *jpbw)
 		    {
 		      ls_syslog (LOG_DEBUG2,
 				 "%s: job <%s> got peer's candHost but candHost are not usable to job",
-				 fname, lsb_jobid2str (jpbw->jobId));
+				 __func__, lsb_jobid2str (jpbw->jobId));
 		    }
 		}
 	      return retCode;
@@ -965,7 +965,7 @@ getCandHosts (struct jData *jpbw)
 	      if (logclass & (LC_SCHED | LC_PEND))
 		{
 		  ls_syslog (LOG_DEBUG1, "\
-%s: job <%s> got no candidate hosts because peer has no candidates", fname, lsb_jobid2str (jpbw->jobId));
+%s: job <%s> got no candidate hosts because peer has no candidates", __func__, lsb_jobid2str (jpbw->jobId));
 		}
 
 	      return (CAND_NO_HOST);
@@ -1006,7 +1006,7 @@ getCandHosts (struct jData *jpbw)
     }
 
   jpbw->numCandPtr = numJUsable;
-  jpbw->candPtr = my_calloc (numJUsable, sizeof (struct candHost), fname);
+  jpbw->candPtr = my_calloc (numJUsable, sizeof (struct candHost), __func__);
   for (i = 0; i < numJUsable; i++)
     {
       jpbw->candPtr[i] = jUsable[i];
@@ -1356,10 +1356,10 @@ getJUsable (struct jData *jp, int *numJUsable, int *nProc)
       FREEUP (jReasonTb);
       /* floating host this needs to get resized.
        */
-      jUsable = my_calloc (nhosts, sizeof (struct hData *), fname);
-      candHosts = my_calloc (nhosts, sizeof (struct candHost), fname);
-      jUnusable = my_calloc (nhosts, sizeof (struct hData *), fname);
-      jReasonTb = my_calloc (nhosts + 1, sizeof (int), fname);
+      jUsable = my_calloc (nhosts, sizeof (struct hData *), __func__);
+      candHosts = my_calloc (nhosts, sizeof (struct candHost), __func__);
+      jUnusable = my_calloc (nhosts, sizeof (struct hData *), __func__);
+      jReasonTb = my_calloc (nhosts + 1, sizeof (int), __func__);
     }
 
   FREEUP (jp->reasonTb);
@@ -1431,7 +1431,7 @@ getJUsable (struct jData *jp, int *numJUsable, int *nProc)
 		  timebuf[strlen (timebuf) - 1] = '\0';
 		  ls_syslog (LOG_DEBUG2,
 			     "%s: job <%s> can't finish before deadline <%s> on host %s",
-			     fname, lsb_jobid2str (jp->jobId), timebuf,
+			     __func__, lsb_jobid2str (jp->jobId), timebuf,
 			     jUsable[i]->host);
 		}
 	    }
@@ -1471,7 +1471,7 @@ getJUsable (struct jData *jp, int *numJUsable, int *nProc)
 	      if (logclass & (LC_SCHED | LC_PEND))
 		ls_syslog (LOG_DEBUG2,
 			   "%s: Host %s isn't eligible; reason=%d schedHost=%s hostType=%s",
-			   fname, jUsable[i]->host, jReasonTb[numReasons - 1],
+			   __func__, jUsable[i]->host, jReasonTb[numReasons - 1],
 			   jp->schedHost, jUsable[i]->hostType);
 	    }
 	}
@@ -1542,7 +1542,7 @@ getJUsable (struct jData *jp, int *numJUsable, int *nProc)
 	  jReasonTb[numReasons++] = PEND_HOST_RES_REQ;
 	  if (logclass & (LC_SCHED | LC_PEND))
 	    ls_syslog (LOG_DEBUG2, "%s: Host %s isn't eligible; reason=%d",
-		       fname, thrown[i]->host, jReasonTb[numReasons - 1]);
+		       __func__, thrown[i]->host, jReasonTb[numReasons - 1]);
 	}
     }
 
@@ -1551,9 +1551,9 @@ getJUsable (struct jData *jp, int *numJUsable, int *nProc)
 
   if (logclass & (LC_SCHED))
     {
-      ls_syslog (LOG_DEBUG3, "%s: Got %d hosts", fname, numHosts);
+      ls_syslog (LOG_DEBUG3, "%s: Got %d hosts", __func__, numHosts);
       for (i = 0; i < numHosts; i++)
-	ls_syslog (LOG_DEBUG3, "%s: jUsable[%d]->host = %s", fname, i,
+	ls_syslog (LOG_DEBUG3, "%s: jUsable[%d]->host = %s", __func__, i,
 		   jUsable[i]->host);
     }
 
@@ -1585,7 +1585,7 @@ getJUsable (struct jData *jp, int *numJUsable, int *nProc)
 
 	  if (numAvailSlots == 0 && backfilleeList != NULL)
 	    {
-	      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7204, "%s: job <%s> host <%s> numAvailSlots is 0 and backfilleeList is not NULL!"), fname, lsb_jobid2str (jp->jobId), jUsable[i]->host);	/* catgets 7204 */
+	      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7204, "%s: job <%s> host <%s> numAvailSlots is 0 and backfilleeList is not NULL!"), __func__, lsb_jobid2str (jp->jobId), jUsable[i]->host);	/* catgets 7204 */
 	    }
 
 	  numSlots = MIN (numSlots, jp->numSlots);
@@ -1631,7 +1631,7 @@ getJUsable (struct jData *jp, int *numJUsable, int *nProc)
 		{
 		  ls_syslog (LOG_DEBUG2,
 			     "%s: host: <%s> is not usable to job <%s> because it doesn't satisfy job's job level span requirement",
-			     fname, jUsable[i]->host,
+			     __func__, jUsable[i]->host,
 			     lsb_jobid2str (jp->jobId));
 		}
 	    }
@@ -1646,7 +1646,7 @@ getJUsable (struct jData *jp, int *numJUsable, int *nProc)
 		{
 		  ls_syslog (LOG_DEBUG2,
 			     "%s: host: <%s> is not usable to job <%s> because it doesn't satisfy job's queue level span requirement",
-			     fname, jUsable[i]->host,
+			     __func__, jUsable[i]->host,
 			     lsb_jobid2str (jp->jobId));
 		}
 	    }
@@ -1677,7 +1677,7 @@ getJUsable (struct jData *jp, int *numJUsable, int *nProc)
 
 	  if (logclass & LC_SCHED)
 	    ls_syslog (LOG_DEBUG, "\
-%s: job=%s; The host=%s belonging to the queue=%s is over threshold", fname, lsb_jobid2str (jp->jobId), jUsable[i]->host, jp->qPtr->queue);
+%s: job=%s; The host=%s belonging to the queue=%s is over threshold", __func__, lsb_jobid2str (jp->jobId), jUsable[i]->host, jp->qPtr->queue);
 	}
 
       if (!hReason && overThreshold (jUsable[i]->lsbLoad,
@@ -1687,7 +1687,7 @@ getJUsable (struct jData *jp, int *numJUsable, int *nProc)
 
 	  if (logclass & LC_SCHED)
 	    ls_syslog (LOG_DEBUG, "\
-%s: job=%s the host=%s is over threshold", fname, lsb_jobid2str (jp->jobId), jUsable[i]->host);
+%s: job=%s the host=%s is over threshold", __func__, lsb_jobid2str (jp->jobId), jUsable[i]->host);
 
 	}
 
@@ -1698,14 +1698,14 @@ getJUsable (struct jData *jp, int *numJUsable, int *nProc)
 
 	  if (logclass & (LC_SCHED | LC_PEND))
 	    ls_syslog (LOG_DEBUG2, "%s: Host %s isn't eligible; reason = %d",
-		       fname, jUsable[i]->host, jReasonTb[numReasons - 1]);
+		       __func__, jUsable[i]->host, jReasonTb[numReasons - 1]);
 	  continue;
 	}
 
       if (logclass & (LC_SCHED))
 	ls_syslog (LOG_DEBUG3,
 		   "%s: Got one eligible host %s; numSlots=%d numAvailSlots=%d",
-		   fname, jUsable[i]->host, numSlots, numAvailSlots);
+		   __func__, jUsable[i]->host, numSlots, numAvailSlots);
 
 
       numAvailSlots = MIN (numAvailSlots, numSlots);
@@ -1730,7 +1730,7 @@ getJUsable (struct jData *jp, int *numJUsable, int *nProc)
   if (numReasons)
     {
       int *reasonTb = my_calloc (numReasons + jp->numReasons,
-				 sizeof (int), fname);
+				 sizeof (int), __func__);
       jp->newReason = 0;
 
       for (i = 0; i < numReasons; i++)
@@ -1753,14 +1753,14 @@ getJUsable (struct jData *jp, int *numJUsable, int *nProc)
       if (logclass & (LC_SCHED | LC_PEND))
 	ls_syslog (LOG_DEBUG1,
 		   "%s: Got no eligible host for job %s; numReasons=%d",
-		   fname, lsb_jobid2str (jp->jobId), jp->numReasons);
+		   __func__, lsb_jobid2str (jp->jobId), jp->numReasons);
       return (NULL);
     }
 
   if (logclass & LC_SCHED)
     {
       ls_syslog (LOG_DEBUG2,
-		 "%s: Got %d eligible hosts for job %s; numReasons=%d", fname,
+		 "%s: Got %d eligible hosts for job %s; numReasons=%d", __func__,
 		 *numJUsable, lsb_jobid2str (jp->jobId), jp->numReasons);
     }
 
@@ -2160,7 +2160,7 @@ copyPeerCand (struct jData *jobp, struct jData *jpbw)
 
   jobp->usePeerCand = TRUE;
 
-  REASON_TABLE_COPY (jpbw, jobp, fname);
+  REASON_TABLE_COPY (jpbw, jobp, __func__);
 
   if (logclass & (LC_SCHED))
     {
@@ -2168,10 +2168,10 @@ copyPeerCand (struct jData *jobp, struct jData *jpbw)
       strcpy (tmpJobId, lsb_jobid2str (jpbw->jobId));
       if (jpbw->candPtr == NULL)
 	ls_syslog (LOG_DEBUG2, "%s: Peer <%s> of job <%s> has no candidate",
-		   fname, tmpJobId, lsb_jobid2str (jobp->jobId));
+		   __func__, tmpJobId, lsb_jobid2str (jobp->jobId));
       else
 	ls_syslog (LOG_DEBUG3,
-		   "%s: Job <%s> will use the candidates of peer <%s>", fname,
+		   "%s: Job <%s> will use the candidates of peer <%s>", __func__,
 		   lsb_jobid2str (jobp->jobId), tmpJobId);
     }
 
@@ -2189,7 +2189,7 @@ copyPeerCand (struct jData *jobp, struct jData *jpbw)
     }
 
   jobp->candPtr = my_calloc (jpbw->numCandPtr,
-			     sizeof (struct candHost), fname);
+			     sizeof (struct candHost), __func__);
   for (i = 0; i < jpbw->numCandPtr; i++)
     {
       copyCandHostData (&(jobp->candPtr[i]), &(jpbw->candPtr[i]));
@@ -2376,7 +2376,7 @@ ckPerHULimits (struct qData *qp, struct hData *hp, struct uData *up,
 	  if (logclass & (LC_PEND | LC_JLIMIT))
 	    ls_syslog (LOG_DEBUG2,
 		       "%s: Host %s's JL/U (%d) reached for user %s from the pointview of queue %s; reason=%d",
-		       fname, hp->host, hp->uJobLimit, up->user, qp->queue,
+		       __func__, hp->host, hp->uJobLimit, up->user, qp->queue,
 		       *reason);
 	  return 0;
 	}
@@ -2402,7 +2402,7 @@ ckPerHULimits (struct qData *qp, struct hData *hp, struct uData *up,
 	  if (logclass & LC_JLIMIT)
 	    ls_syslog (LOG_DEBUG2,
 		       "%s: User %s's JL/P (%f) reached on host %s from the pointview of queue %s",
-		       fname, up->user, up->pJobLimit, hp->host, qp->queue);
+		       __func__, up->user, up->pJobLimit, hp->host, qp->queue);
 	  *reason = PEND_USER_PROC_JLIMIT;
 	  *numAvailSlots = 0;
 	  return 0;
@@ -2435,7 +2435,7 @@ ckPerHULimits (struct qData *qp, struct hData *hp, struct uData *up,
 	  if (logclass & LC_JLIMIT)
 	    ls_syslog (LOG_DEBUG2,
 		       "%s: Group %s's JL/P (%f) reached on host %s from the pointview of queue %s",
-		       fname, ugp->user, ugp->pJobLimit, hp->host, qp->queue);
+		       __func__, ugp->user, ugp->pJobLimit, hp->host, qp->queue);
 	  *reason = PEND_UGRP_PROC_JLIMIT;
 	  *numAvailSlots = 0;
 	  return 0;
@@ -2447,7 +2447,7 @@ ckPerHULimits (struct qData *qp, struct hData *hp, struct uData *up,
 
   if (logclass & LC_JLIMIT)
     ls_syslog (LOG_DEBUG3, "%s: q=%s h=%s u=%s numAvail=%d numSlots=%d",
-	       fname, qp->queue, hp->host, up->user,
+	       __func__, qp->queue, hp->host, up->user,
 	       *numAvailSlots, numSlots);
   return numSlots;
 }
@@ -2479,7 +2479,7 @@ getHostJobSlots (struct jData *jp, struct hData *hp, int *numAvailSlots,
 
   if (logclass & (LC_JLIMIT))
     ls_syslog (LOG_DEBUG3, "%s: job=%s, host=%s",
-	       fname, lsb_jobid2str (jp->jobId), hp->host);
+	       __func__, lsb_jobid2str (jp->jobId), hp->host);
   INC_CNT (PROF_CNT_getHostJobSlots);
 
 #define HOST_USABLE(jp, hp)                                             \
@@ -2506,7 +2506,7 @@ getHostJobSlots (struct jData *jp, struct hData *hp, int *numAvailSlots,
 		{
 		  ls_syslog (LOG_DEBUG2,
 			     "%s: job <%s> can't be backfillee of job <%s> because its start time is unknown or is earlier than backfiller's expected finish time",
-			     fname, lsb_jobid2str (job->jobId),
+			     __func__, lsb_jobid2str (job->jobId),
 			     lsb_jobid2str (jp->jobId));
 		}
 	      continue;
@@ -2520,7 +2520,7 @@ getHostJobSlots (struct jData *jp, struct hData *hp, int *numAvailSlots,
 	    }
 	  if (i == job->numCandPtr)
 	    {
-	      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7206, "%s: host <%s> should be in candHost list of job <%s> but is not"), fname, hp->host, lsb_jobid2str (job->jobId));	/* catgets 7206 */
+	      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7206, "%s: host <%s> should be in candHost list of job <%s> but is not"), __func__, hp->host, lsb_jobid2str (job->jobId));	/* catgets 7206 */
 	      continue;
 	    }
 
@@ -2535,7 +2535,7 @@ getHostJobSlots (struct jData *jp, struct hData *hp, int *numAvailSlots,
 	    {
 	      ls_syslog (LOG_DEBUG2,
 			 "%s: got a backfillee job <%s> with <%d> backfill slots on host <%s> for job <%s>",
-			 fname, lsb_jobid2str (job->jobId), backfillSlots,
+			 __func__, lsb_jobid2str (job->jobId), backfillSlots,
 			 hp->host, lsb_jobid2str (jp->jobId));
 	    }
 
@@ -2543,7 +2543,7 @@ getHostJobSlots (struct jData *jp, struct hData *hp, int *numAvailSlots,
 
 	  backfilleeListEntry->hPtr =
 	    (struct hData **) my_malloc (job->numHostPtr *
-					 sizeof (struct hData *), fname);
+					 sizeof (struct hData *), __func__);
 	  for (i = 0; i < job->numHostPtr; i++)
 	    {
 	      backfilleeListEntry->hPtr[i] = job->hPtr[i];
@@ -2559,7 +2559,7 @@ getHostJobSlots (struct jData *jp, struct hData *hp, int *numAvailSlots,
 	      newHPtr =
 		(struct hData **)
 		my_calloc ((job->numHostPtr - backfillSlots),
-			   sizeof (struct hData *), fname);
+			   sizeof (struct hData *), __func__);
 	      removeNOccuranceOfHost (job, hp, backfillSlots, newHPtr);
 	    }
 	  else
@@ -2592,7 +2592,7 @@ getHostJobSlots (struct jData *jp, struct hData *hp, int *numAvailSlots,
 	  if (theBackfilleeList == NULL)
 	    {
 	      ls_syslog (LOG_DEBUG2, "%s: job <%s> can't find any backfillee",
-			 fname, lsb_jobid2str (jp->jobId));
+			 __func__, lsb_jobid2str (jp->jobId));
 	    }
 	}
     }
@@ -2605,7 +2605,7 @@ getHostJobSlots (struct jData *jp, struct hData *hp, int *numAvailSlots,
       jp->newReason = PEND_QUE_PROC_JLIMIT;
       if (logclass & (LC_JLIMIT))
 	ls_syslog (LOG_DEBUG2, "%s: Q's JL/P reached.  Set reason <%d>",
-		   fname, jp->newReason);
+		   __func__, jp->newReason);
       *numAvailSlots = 0;
       return (0);
     }
@@ -2680,7 +2680,7 @@ getHostJobSlots1 (int numNeeded, struct jData *jp, struct hData *hp,
 
   if (logclass & (LC_JLIMIT))
     ls_syslog (LOG_DEBUG3, "%s: job=%s host=%s maxJobs=%d numJobs=%d",
-	       fname, lsb_jobid2str (jp->jobId), hp->host, hp->maxJobs,
+	       __func__, lsb_jobid2str (jp->jobId), hp->host, hp->maxJobs,
 	       hp->numJobs);
 
   INC_CNT (PROF_CNT_getHostJobSlots1);
@@ -2720,7 +2720,7 @@ getHostJobSlots1 (int numNeeded, struct jData *jp, struct hData *hp,
 	  if (logclass & (LC_JLIMIT))
 	    ls_syslog (LOG_DEBUG2,
 		       "%s: rs=%d job=%s host=%s maxJobs=%d numJobs=%d",
-		       fname, jp->newReason, lsb_jobid2str (jp->jobId),
+		       __func__, jp->newReason, lsb_jobid2str (jp->jobId),
 		       hp->host, hp->maxJobs, hp->numJobs);
 	  *numAvailSlots = 0;
 	  return (0);
@@ -2759,7 +2759,7 @@ uJobLimitOk (struct jData *jp, struct hTab *uAcct, int uJobLimit, int disp)
 
   if (logclass & (LC_TRACE | LC_JLIMIT))
     ls_syslog (LOG_DEBUG3, "%s: job=%s, uJobLimit=%d",
-	       fname, lsb_jobid2str (jp->jobId), uJobLimit);
+	       __func__, lsb_jobid2str (jp->jobId), uJobLimit);
   INC_CNT (PROF_CNT_uJobLimitOk);
 
   if (uJobLimit <= 0)
@@ -2777,7 +2777,7 @@ uJobLimitOk (struct jData *jp, struct hTab *uAcct, int uJobLimit, int disp)
 	  if (logclass & (LC_JLIMIT))
 	    ls_syslog (LOG_DEBUG2,
 		       "%s: job=%s, uJobLimit=%d, numRUN=%d, numSSUSP=%d, numUSUSP=%d, numRESERVE=%d",
-		       fname, lsb_jobid2str (jp->jobId), uJobLimit,
+		       __func__, lsb_jobid2str (jp->jobId), uJobLimit,
 		       ap->numRUN, ap->numSSUSP, ap->numUSUSP,
 		       ap->numRESERVE);
 	  return (0);
@@ -2788,7 +2788,7 @@ uJobLimitOk (struct jData *jp, struct hTab *uAcct, int uJobLimit, int disp)
 	  if (logclass & (LC_JLIMIT))
 	    ls_syslog (LOG_DEBUG2,
 		       "%s: job=%s, uJobLimit=%d, numRUN=%d, numSSUSP=%d, numUSUSP=%d, numRESERVE=%d",
-		       fname, lsb_jobid2str (jp->jobId), uJobLimit,
+		       __func__, lsb_jobid2str (jp->jobId), uJobLimit,
 		       ap->numRUN, ap->numSSUSP, ap->numUSUSP,
 		       ap->numRESERVE);
 	  return (0);
@@ -2831,7 +2831,7 @@ pJobLimitOk (struct hData *hp, struct hostAcct *hAcct, float pJobLimit)
       if ((logclass & LC_JLIMIT) && hAcct != NULL)
 	ls_syslog (LOG_DEBUG2,
 		   "%s: host=%s, pJobLimit=%f, numRUN=%d, numSSUSP=%d, numUSUSP=%d, numRESERVE=%d",
-		   fname, hp->host, pJobLimit, hAcct->numRUN, hAcct->numSSUSP,
+		   __func__, hp->host, pJobLimit, hAcct->numRUN, hAcct->numSSUSP,
 		   hAcct->numUSUSP, hAcct->numRESERVE);
       return (0);
     }
@@ -2864,7 +2864,7 @@ hJobLimitOk (struct hData *hp, struct hostAcct *hAcct, int hJobLimit)
       if ((logclass & LC_JLIMIT) && hAcct != NULL)
 	ls_syslog (LOG_DEBUG2,
 		   "%s: host=%s, hJobLimit=%d, numRUN=%d, numSSUSP=%d, numUSUSP=%d, numRESERVE=%d",
-		   fname, hp->host, hJobLimit, hAcct->numRUN, hAcct->numSSUSP,
+		   __func__, hp->host, hJobLimit, hAcct->numRUN, hAcct->numSSUSP,
 		   hAcct->numUSUSP, hAcct->numRESERVE);
       return (0);
     }
@@ -2931,7 +2931,7 @@ hostSlots (int numNeeded, struct jData *jp, struct hData *hp,
   if (logclass & (LC_JLIMIT))
     ls_syslog (LOG_DEBUG3,
 	       "%s: job=%s, host=%s, maxJobs=%d, uJobLimit=%d, pJobLimit=%f, numNeeded=%d",
-	       fname, lsb_jobid2str (jp->jobId), hp->host, hp->maxJobs,
+	       __func__, lsb_jobid2str (jp->jobId), hp->host, hp->maxJobs,
 	       hp->uJobLimit, uData->pJobLimit, numNeeded);
 
   *numAvailSlots = 0;
@@ -3004,7 +3004,7 @@ hostSlots (int numNeeded, struct jData *jp, struct hData *hp,
   if (logclass & (LC_SCHED | LC_JLIMIT))
     ls_syslog (LOG_DEBUG3,
 	       "%s: highJobsHost=%d lowJobsHost=%d lowNonpreemptJobsHost=%d highJobsHostUser=%d lowJobsHostUser=%d lowNonpreemptJobsHostUser=%d",
-	       fname, highJobsHost, lowJobsHost, lowNonpreemptJobsHost,
+	       __func__, highJobsHost, lowJobsHost, lowNonpreemptJobsHost,
 	       highJobsHostUser, lowJobsHostUser, lowNonpreemptJobsHostUser);
 
 
@@ -3023,7 +3023,7 @@ hostSlots (int numNeeded, struct jData *jp, struct hData *hp,
       *numAvailSlots = 0;
       if (logclass & (LC_JLIMIT))
 	ls_syslog (LOG_DEBUG2, "%s: slots=%d numRESERVE=%d",
-		   fname, slots, hp->numRESERVE);
+		   __func__, slots, hp->numRESERVE);
       return (0);
     }
 
@@ -3039,7 +3039,7 @@ hostSlots (int numNeeded, struct jData *jp, struct hData *hp,
       *numAvailSlots = 0;
       if (logclass & (LC_JLIMIT))
 	ls_syslog (LOG_DEBUG2, "%s: slots=%d runJobsHostUser=%d rsvSlots=%d",
-		   fname, slots, runJobsHostUser, rsvSlots);
+		   __func__, slots, runJobsHostUser, rsvSlots);
       return (0);
     }
 
@@ -3058,7 +3058,7 @@ hostSlots (int numNeeded, struct jData *jp, struct hData *hp,
 	  *numAvailSlots = 0;
 	  if (logclass & (LC_JLIMIT))
 	    ls_syslog (LOG_DEBUG2, "%s: slots=%d rsvSlots=%d",
-		       fname, slots, rsvSlots);
+		       __func__, slots, rsvSlots);
 	  return (0);
 	}
     }
@@ -3113,7 +3113,7 @@ hostSlots (int numNeeded, struct jData *jp, struct hData *hp,
       if (logclass & (LC_JLIMIT))
 	ls_syslog (LOG_DEBUG3,
 		   "%s: pJobLimit=%f highJobsHost=%d lowJobsHost=%d lowNonpreemptJobsHost=%d ",
-		   fname, uData->pJobLimit, highJobsHost, lowJobsHost,
+		   __func__, uData->pJobLimit, highJobsHost, lowJobsHost,
 		   lowNonpreemptJobsHost);
 
       if (uData && uData->pJobLimit < INFINIT_FLOAT)
@@ -3129,7 +3129,7 @@ hostSlots (int numNeeded, struct jData *jp, struct hData *hp,
 	      *numAvailSlots = 0;
 	      if (logclass & (LC_JLIMIT))
 		ls_syslog (LOG_DEBUG2,
-			   "%s: pJobLimit=%f slots=%d rsvSlots=%d", fname,
+			   "%s: pJobLimit=%f slots=%d rsvSlots=%d", __func__,
 			   uData->pJobLimit, slots, rsvSlots);
 	      return (0);
 	    }
@@ -3139,7 +3139,7 @@ hostSlots (int numNeeded, struct jData *jp, struct hData *hp,
 
   if (logclass & (LC_JLIMIT))
     ls_syslog (LOG_DEBUG3, "%s: job=%s, host=%s, numAvailSlots=%d, slots=%d",
-	       fname, lsb_jobid2str (jp->jobId), hp->host, *numAvailSlots,
+	       __func__, lsb_jobid2str (jp->jobId), hp->host, *numAvailSlots,
 	       slots);
 
   return (slots);
@@ -3158,7 +3158,7 @@ candHostOk (struct jData *jp, int indx, int *numAvailSlots, int *hReason)
   if (logclass & (LC_SCHED | LC_PEND))
     ls_syslog (LOG_DEBUG3,
 	       "%s: numSlots1=%d numSlots2=%d indx=%d host1=%s host2=%s",
-	       fname, hp->numSlots, jp->candPtr[indx].numSlots, indx,
+	       __func__, hp->numSlots, jp->candPtr[indx].numSlots, indx,
 	       hp->hData->host, jp->candPtr[indx].hData->host);
 
   if (hp->numSlots <= 0)
@@ -3195,7 +3195,7 @@ candHostOk (struct jData *jp, int indx, int *numAvailSlots, int *hReason)
       if (logclass & (LC_SCHED | LC_PEND))
 	ls_syslog (LOG_DEBUG2,
 		   "%s: Candidate <%s> not eligible any more to job <%s>; reason=%d",
-		   fname, hp->hData->host, lsb_jobid2str (jp->jobId),
+		   __func__, hp->hData->host, lsb_jobid2str (jp->jobId),
 		   *hReason);
       *numAvailSlots = 0;
       return 0;
@@ -3280,7 +3280,7 @@ candHostOk (struct jData *jp, int indx, int *numAvailSlots, int *hReason)
 
       if (logclass & LC_SCHED)
 	ls_syslog (LOG_DEBUG, "\
-%s: job=%s the queue's scheduling parameters are over threshold", fname, lsb_jobid2str (jp->jobId));
+%s: job=%s the queue's scheduling parameters are over threshold", __func__, lsb_jobid2str (jp->jobId));
     }
 
   if (!rtReason && overThreshold (hp->hData->lsbLoad,
@@ -3290,7 +3290,7 @@ candHostOk (struct jData *jp, int indx, int *numAvailSlots, int *hReason)
 
       if (logclass & LC_SCHED)
 	ls_syslog (LOG_DEBUG, "\
-%s: job=%s the load of the host is over threshold", fname, lsb_jobid2str (jp->jobId));
+%s: job=%s the load of the host is over threshold", __func__, lsb_jobid2str (jp->jobId));
 
     }
 
@@ -3378,7 +3378,7 @@ allocHosts (struct jData *jp)
     return -1;
 
   hPtr = (struct hData **) my_calloc (jp->numEligProc,
-				      sizeof (struct hData *), fname);
+				      sizeof (struct hData *), __func__);
 
 
   numh = 0;
@@ -3400,7 +3400,7 @@ allocHosts (struct jData *jp)
   if (numh != jp->numEligProc)
     {
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7220, "%s: numh <%d> jp->numEligProc <%d> are not equal"),	/* catgets 7220 */
-		 fname, numh, jp->numEligProc);
+		 __func__, numh, jp->numEligProc);
     }
 
   jp->hPtr = hPtr;
@@ -3409,7 +3409,7 @@ allocHosts (struct jData *jp)
   if (logclass & LC_SCHED)
     {
       ls_syslog (LOG_DEBUG2, "%s: Allocated %d host/processors to job %s",
-		 fname, numh, lsb_jobid2str (jp->jobId));
+		 __func__, numh, lsb_jobid2str (jp->jobId));
     }
 
   return 0;
@@ -3489,13 +3489,13 @@ dispatch_it (struct jData * jp)
 	    case ERR_NO_JOB:
 	      jptr->newReason = PEND_JOB_START_FAIL;
 	      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7221, "%s: Failed to start job <%s> on host <%s>"),	/* catgets 7221 */
-			 fname,
+			 __func__,
 			 lsb_jobid2str (jptr->jobId), jptr->hPtr[0]->host);
 	      return FALSE;
 	    default:
 	      jptr->newReason = PEND_JOB_START_UNKNWN;
 	      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7222, "%s: mbatchd does not know job <%s> is started or not on host <%s> (reply=%d) - assuming job not started"),	/* catgets 7222 */
-			 fname,
+			 __func__,
 			 lsb_jobid2str (jptr->jobId),
 			 jptr->hPtr[0]->host, reply);
 	      return FALSE;
@@ -3523,42 +3523,42 @@ jobStartError (struct jData *jData, sbdReplyType reply)
     case ERR_MEM:
       jData->newReason = PEND_SBD_NO_MEM;
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7223, "%s: Not enough memory on host <%s>; job <%s> rejected"),	/* catgets 7223 */
-		 fname, toHost, lsb_jobid2str (jData->jobId));
+		 __func__, toHost, lsb_jobid2str (jData->jobId));
       break;
 
     case ERR_FORK_FAIL:
       jData->newReason = PEND_SBD_NO_PROCESS;
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7224, "%s: sbatchd on host <%s> was unable to fork; job <%s> rejected"),	/* catgets 7224 */
-		 fname, toHost, lsb_jobid2str (jData->jobId));
+		 __func__, toHost, lsb_jobid2str (jData->jobId));
       break;
 
     case ERR_PID_FAIL:
       jData->newReason = PEND_SBD_GETPID;
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7225, "%s: Failed to get pid on host <%s> for job <%s>"),	/* catgets 7225 */
-		 fname, toHost, lsb_jobid2str (jData->jobId));
+		 __func__, toHost, lsb_jobid2str (jData->jobId));
       break;
 
     case ERR_ROOT_JOB:
       jData->newReason = PEND_SBD_ROOT;
       ls_syslog (LOG_CRIT, I18N (7241, "%s: Root user's job <%s> was rejected by sbatchd on host <%s>"),	/*catgets 7241 */
-		 fname, lsb_jobid2str (jData->jobId), toHost);
+		 __func__, lsb_jobid2str (jData->jobId), toHost);
       break;
 
     case ERR_LOCK_FAIL:
       jData->newReason = PEND_SBD_LOCK;
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7226, "%s: Locking host failed on host <%s> for job <%s>"), fname, toHost, lsb_jobid2str (jData->jobId));	/* catgets 7226 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7226, "%s: Locking host failed on host <%s> for job <%s>"), __func__, toHost, lsb_jobid2str (jData->jobId));	/* catgets 7226 */
       break;
 
     case ERR_JOB_QUOTA:
       jData->newReason = PEND_SBD_JOB_QUOTA;
       ls_syslog (LOG_DEBUG,
 		 "%s: The number of dispatched jobs has reached quota; job <%s> rejected by sbatchd on host <%s>",
-		 fname, lsb_jobid2str (jData->jobId), toHost);
+		 __func__, lsb_jobid2str (jData->jobId), toHost);
       break;
 
     case ERR_NO_USER:
       jData->newReason = PEND_HOST_NO_USER;
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7227, "%s: User <%s/%d> not recognizable by sbatchd on host <%s>; job <%s> rejected"), fname, jData->userName, jData->userId, toHost, lsb_jobid2str (jData->jobId));	/* catgets 7227 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7227, "%s: User <%s/%d> not recognizable by sbatchd on host <%s>; job <%s> rejected"), __func__, jData->userName, jData->userId, toHost, lsb_jobid2str (jData->jobId));	/* catgets 7227 */
       break;
 
     case ERR_NO_FILE:
@@ -3567,7 +3567,7 @@ jobStartError (struct jData *jData, sbdReplyType reply)
 
     case ERR_BAD_REQ:
       jData->newReason = PEND_JOB_START_FAIL;
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7228, "%s: sbatchd on host <%s> complained of bad request; job <%s> rejected"), fname, toHost, lsb_jobid2str (jData->jobId));	/* catgets 7228 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7228, "%s: sbatchd on host <%s> complained of bad request; job <%s> rejected"), __func__, toHost, lsb_jobid2str (jData->jobId));	/* catgets 7228 */
       break;
 
     case ERR_UNREACH_SBD:
@@ -3577,7 +3577,7 @@ jobStartError (struct jData *jData, sbdReplyType reply)
       break;
 
     default:
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7229, "%s: Unknown reply code %d"), fname, reply);	/* catgets 7229 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7229, "%s: Unknown reply code %d"), __func__, reply);	/* catgets 7229 */
       jData->newReason = PEND_JOB_START_FAIL;
     }
 
@@ -3674,7 +3674,7 @@ disp_clean (void)
   time_t t;
 
   if (logclass & (LC_TRACE | LC_SCHED))
-    ls_syslog (LOG_DEBUG2, "%s: Entering this routine...", fname);
+    ls_syslog (LOG_DEBUG2, "%s: Entering this routine...", __func__);
 
   mSchedStage = 0;
   freedSomeReserveSlot = FALSE;
@@ -3709,7 +3709,7 @@ hostPreference (struct jData *jp, int nHosts)
       for (i = 0; i < nHosts; i++)
 	ls_syslog (LOG_DEBUG3,
 		   "%s: before hostPreference1: jp->candPtr[%d]=%s for job <%s>",
-		   fname, i, jp->candPtr[i].hData->host,
+		   __func__, i, jp->candPtr[i].hData->host,
 		   lsb_jobid2str (jp->jobId));
     }
 
@@ -3722,7 +3722,7 @@ hostPreference (struct jData *jp, int nHosts)
       for (i = 0; i < nHosts; i++)
 	ls_syslog (LOG_DEBUG3,
 		   "%s: after hostPreference1: jp->candPtr[%d]=%s for job <%s>",
-		   fname, i, jp->candPtr[i].hData->host,
+		   __func__, i, jp->candPtr[i].hData->host,
 		   lsb_jobid2str (jp->jobId));
     }
 
@@ -3763,7 +3763,7 @@ hostPreference1 (struct jData *jp, int nHosts, struct askedHost *askedPtr,
       if (logclass & LC_SCHED)
 	{
 	  ls_syslog (LOG_DEBUG3,
-		     "%s: No host preference defined for job <%s>", fname,
+		     "%s: No host preference defined for job <%s>", __func__,
 		     lsb_jobid2str (jp->jobId));
 	}
       return;
@@ -3771,8 +3771,8 @@ hostPreference1 (struct jData *jp, int nHosts, struct askedHost *askedPtr,
 
   tmpCandPtr = (struct candHost *) my_calloc (jp->numCandPtr,
 					      sizeof (struct candHost),
-					      fname);
-  flags = (int *) my_calloc (jp->numCandPtr, sizeof (int), fname);
+					      __func__);
+  flags = (int *) my_calloc (jp->numCandPtr, sizeof (int), __func__);
   k = 0;
 
 
@@ -3950,7 +3950,7 @@ copyCandHostData (struct candHost *dst, struct candHost *source)
 	{
 	  ls_syslog (LOG_ERR, I18N (7242, "\
 %s: Duplicating backfillee list failed:%s"),	/* catgets 7242 */
-		     fname, listStrError (listerrno));
+		     __func__, listStrError (listerrno));
 	  mbdDie (MASTER_FATAL);
 	}
 
@@ -3976,7 +3976,7 @@ findBestHosts (struct jData *jp, struct resVal *resValPtr, int needed,
 
   if (logclass & (LC_EXEC))
     ls_syslog (LOG_DEBUG, "%s: the number of candidates for sort is %d",
-	       fname, ncandidates);
+	       __func__, ncandidates);
 
   INC_CNT (PROF_CNT_findBestHost);
 
@@ -3995,9 +3995,9 @@ findBestHosts (struct jData *jp, struct resVal *resValPtr, int needed,
   if (logclass & (LC_EXEC))
     {
       ls_syslog (LOG_DEBUG, "%s: the resVal->nphase's value is %d",
-		 fname, resVal->nphase);
-      ls_syslog (LOG_DEBUG, "%s: the value of needed is %d", fname, needed);
-      ls_syslog (LOG_DEBUG, "%s: the value of ncandidates is %d", fname,
+		 __func__, resVal->nphase);
+      ls_syslog (LOG_DEBUG, "%s: the value of needed is %d", __func__, needed);
+      ls_syslog (LOG_DEBUG, "%s: the value of ncandidates is %d", __func__,
 		 ncandidates);
     }
   for (i = resVal->nphase - 1; i >= 0; i--)
@@ -4011,7 +4011,7 @@ findBestHosts (struct jData *jp, struct resVal *resValPtr, int needed,
 
       if (logclass & (LC_EXEC))
 	ls_syslog (LOG_DEBUG, "%s: the current sort order is %d",
-		   fname, resVal->order[i]);
+		   __func__, resVal->order[i]);
       if ((resVal->order[0] == R15S + 1) && scheRawLoad)
 	getRawLsbLoad (ncandidates, hosts);
 
@@ -4036,10 +4036,10 @@ getRawLsbLoad (int ncandidates, struct candHost *hosts)
   struct hostLoad *newHostLoad;
 
   if (logclass & LC_TRACE)
-    ls_syslog (LOG_DEBUG, "%s: Enter this rountine ...", fname);
+    ls_syslog (LOG_DEBUG, "%s: Enter this rountine ...", __func__);
 
 
-  hostNames = (char **) my_malloc (ncandidates * sizeof (char *), fname);
+  hostNames = (char **) my_malloc (ncandidates * sizeof (char *), __func__);
   for (i = 0; i < ncandidates; i++)
     {
       hostNames[i] = hosts[i].hData->host;
@@ -4058,7 +4058,7 @@ getRawLsbLoad (int ncandidates, struct candHost *hosts)
 
 	      if (logclass & LC_TRACE)
 		ls_syslog (LOG_DEBUG, "%s: host %s R15S raw load is %f",
-			   fname, hDataPtr->host, hDataPtr->lsbLoad[R15S]);
+			   __func__, hDataPtr->host, hDataPtr->lsbLoad[R15S]);
 	    }
 	}
     }
@@ -4102,7 +4102,7 @@ getNumericLoadValue (const struct hData *hp, int lidx)
 
   if (NOT_NUMERIC (allLsInfo->resTable[lidx]))
     {
-      ls_syslog (LOG_ERR, I18N (7243, "%s, instance is not of numeric type."), fname);	/*catgets 7243 */
+      ls_syslog (LOG_ERR, I18N (7243, "%s, instance is not of numeric type."), __func__);	/*catgets 7243 */
       return (-INFINIT_LOAD);
     }
 
@@ -4125,7 +4125,7 @@ getNumericLoadValue (const struct hData *hp, int lidx)
 	}
     }
 
-  ls_syslog (LOG_ERR, I18N (7244, "%s, instance name not found."), fname);	/* catgets 7244 */
+  ls_syslog (LOG_ERR, I18N (7244, "%s, instance name not found."), __func__);	/* catgets 7244 */
   return (-INFINIT_LOAD);
 }
 
@@ -4145,7 +4145,7 @@ sortHosts (int lidx, int numHosts, int ncandidates, struct candHost *hosts,
   static char __func__] = "sortHosts()";
 
   if (logclass & (LC_TRACE))
-    ls_syslog (LOG_DEBUG, "%s, Entering this routine ...", fname);
+    ls_syslog (LOG_DEBUG, "%s, Entering this routine ...", __func__);
 
   if (lidx < 0)
     flip = TRUE;
@@ -4258,7 +4258,7 @@ sortHosts (int lidx, int numHosts, int ncandidates, struct candHost *hosts,
 
   if (logclass & (LC_EXEC))
     {
-      ls_syslog (LOG_DEBUG3, "%s, ncandidates = %d, cutoffs = %d ", fname,
+      ls_syslog (LOG_DEBUG3, "%s, ncandidates = %d, cutoffs = %d ", __func__,
 		 ncandidates, cutoffs);
     }
   swap = TRUE;
@@ -4308,7 +4308,7 @@ sortHosts (int lidx, int numHosts, int ncandidates, struct candHost *hosts,
   if (logclass & (LC_EXEC))
     {
       for (i = 0; i < ncandidates; i++)
-	ls_syslog (LOG_DEBUG2, "%s, host[%d]'s name is %s", fname, i, hosts
+	ls_syslog (LOG_DEBUG2, "%s, host[%d]'s name is %s", __func__, i, hosts
 		   [i].hData->host);
     }
 
@@ -4370,7 +4370,7 @@ isCandHost (char *hostname, struct jData *jp)
 
 	  if (logclass & (LC_SCHED | LC_TRACE))
 	    ls_syslog (LOG_DEBUG, "%s: host <%s> is a candidate host",
-		       fname, hostname);
+		       __func__, hostname);
 	  return (TRUE);
 	}
     }
@@ -4389,7 +4389,7 @@ reserveSlots (struct jData *jp)
   if (jp->jStatus & JOB_STAT_RESERVE)
     {
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7230, "%s: Job <%s> already has slots reserved before"),	/* catgets 7230 */
-		 fname, lsb_jobid2str (jp->jobId));
+		 __func__, lsb_jobid2str (jp->jobId));
       return;
     }
 
@@ -4414,7 +4414,7 @@ reserveSlots (struct jData *jp)
 	}
       if (logclass & (LC_SCHED))
 	ls_syslog (LOG_DEBUG2, "%s: Reserve host %s for job %s",
-		   fname, jp->hPtr[i]->host, lsb_jobid2str (jp->jobId));
+		   __func__, jp->hPtr[i]->host, lsb_jobid2str (jp->jobId));
     }
 
 }
@@ -4458,7 +4458,7 @@ checkSlotReserve (struct jData **jobp, int *continueSched)
   INC_CNT (PROF_CNT_checkSlotReserve);
 
   if (logclass & LC_SCHED)
-    ls_syslog (LOG_DEBUG3, "%s: Entering this routine...", fname);
+    ls_syslog (LOG_DEBUG3, "%s: Entering this routine...", __func__);
 
   *continueSched = TRUE;
   if (!(jpbw->jStatus & JOB_STAT_RESERVE))
@@ -4477,7 +4477,7 @@ checkSlotReserve (struct jData **jobp, int *continueSched)
       if (logclass & (LC_SCHED))
 	ls_syslog (LOG_DEBUG3, "\
 %s: Reserve time is expired; job <%s>, now <%d>, \
-begin reservation time <%d>, queue's slotHoldTime<%d>, jFlags<%x>", fname, lsb_jobid2str (jpbw->jobId), (int) now, (int) jpbw->reserveTime, jpbw->qPtr->slotHoldTime, jpbw->jFlags);
+begin reservation time <%d>, queue's slotHoldTime<%d>, jFlags<%x>", __func__, lsb_jobid2str (jpbw->jobId), (int) now, (int) jpbw->reserveTime, jpbw->qPtr->slotHoldTime, jpbw->jFlags);
 
       freeReserveSlots (jpbw);
       jpbw->reserveTime = 0;
@@ -4520,7 +4520,7 @@ jobStartTime (struct jData *jp)
 
   if (logclass & LC_SCHED)
     ls_syslog (LOG_DEBUG3, "%s: Determine the start time for job %s",
-	       fname, lsb_jobid2str (jp->jobId));
+	       __func__, lsb_jobid2str (jp->jobId));
 
   jp->predictedStartTime = 0;
   needed = jp->shared->jobBill.numProcessors - jp->numEligProc;
@@ -4530,7 +4530,7 @@ jobStartTime (struct jData *jp)
 
   tableSize = 5 * needed;
   eligible = 0;
-  jobTable = my_calloc (tableSize, sizeof (struct leftTimeTable), fname);
+  jobTable = my_calloc (tableSize, sizeof (struct leftTimeTable), __func__);
 
   i = 0;
   for (hPtr = (struct hData *) hostList->back;
@@ -4578,7 +4578,7 @@ jobStartTime (struct jData *jp)
 	  if (jobTable[totalRunJobs].leftTime < 0)
 	    {
 
-	      ls_syslog (LOG_DEBUG, "%s: job <%s> left runtime < 0", fname,
+	      ls_syslog (LOG_DEBUG, "%s: job <%s> left runtime < 0", __func__,
 			 lsb_jobid2str (jpbw->jobId));
 	    }
 	  totalRunJobs++;
@@ -4586,7 +4586,7 @@ jobStartTime (struct jData *jp)
 	  if (logclass & LC_SCHED)
 	    ls_syslog (LOG_DEBUG,
 		       "%s: job=%s, runLimit=%f, runTime=%d, leftTime=%d, slots can be released=%d, needed=%d, totalRunJobs is %d",
-		       fname, lsb_jobid2str (jpbw->jobId), runLimit,
+		       __func__, lsb_jobid2str (jpbw->jobId), runLimit,
 		       jpbw->runTime, jobTable[totalRunJobs - 1].leftTime,
 		       jpbw->numHostPtr, needed, totalRunJobs - 1);
 
@@ -4601,7 +4601,7 @@ jobStartTime (struct jData *jp)
 	{
 	  ls_syslog (LOG_DEBUG1,
 		     "%s: can't find enough jobs whose finish time can be determined and whose slots can be used later by job <%s>",
-		     fname, lsb_jobid2str (jp->jobId));
+		     __func__, lsb_jobid2str (jp->jobId));
 	}
       return;
     }
@@ -4623,7 +4623,7 @@ jobStartTime (struct jData *jp)
 	  if (logclass & LC_SCHED)
 	    ls_syslog (LOG_DEBUG,
 		       "%s: Job %s needs to wait for %d seconds and will start at %s",
-		       fname, lsb_jobid2str (jp->jobId), jobTable[i].leftTime,
+		       __func__, lsb_jobid2str (jp->jobId), jobTable[i].leftTime,
 		       ctime (&jp->predictedStartTime));
 	  break;
 	}
@@ -4637,7 +4637,7 @@ jobStartTime (struct jData *jp)
       if (logclass & LC_SCHED)
 	ls_syslog (LOG_DEBUG,
 		   "%s: Set predictedStartTime even there are no enough slots for job <%s> now",
-		   fname, lsb_jobid2str (jp->jobId));
+		   __func__, lsb_jobid2str (jp->jobId));
     }
 
   FREEUP (jobTable);
@@ -4756,7 +4756,7 @@ scheduleAndDispatchJobs (void)
 		  if (logclass & LC_SCHED)
 		    {
 		      ls_syslog (LOG_DEBUG2, "\
-%s: free reserved slots from job <%s>", fname, lsb_jobid2str (jPtr->jobId));
+%s: free reserved slots from job <%s>", __func__, lsb_jobid2str (jPtr->jobId));
 		    }
 		  continue;
 		}
@@ -4775,7 +4775,7 @@ scheduleAndDispatchJobs (void)
 	{
 	  gettimeofday (&scheduleStartTime, NULL);
 	  ls_syslog (LOG_DEBUG, "\
-%s: begin a new schedule and dispatch session", fname);
+%s: begin a new schedule and dispatch session", __func__);
 	}
 
       mSchedStage |= M_STAGE_INIT;
@@ -4822,7 +4822,7 @@ scheduleAndDispatchJobs (void)
       if (logclass & LC_SCHED)
 	{
 	  ls_syslog (LOG_DEBUG, "\
-%s: Stayed too long in M_STAGE_GOT_LOAD", fname);
+%s: Stayed too long in M_STAGE_GOT_LOAD", __func__);
 	}
       DUMP_CNT ();
       RESET_CNT ();
@@ -4838,7 +4838,7 @@ scheduleAndDispatchJobs (void)
       if (logclass & LC_SCHED)
 	{
 	  ls_syslog (LOG_DEBUG, "\
-%s: now_disp=%d lastSharedResourceUpdateTime=%d diff=%d, mSchedStage=%x", fname, now_disp, lastSharedResourceUpdateTime, now_disp - (lastSharedResourceUpdateTime + msleeptime / sharedResourceUpdFactor), mSchedStage);
+%s: now_disp=%d lastSharedResourceUpdateTime=%d diff=%d, mSchedStage=%x", __func__, now_disp, lastSharedResourceUpdateTime, now_disp - (lastSharedResourceUpdateTime + msleeptime / sharedResourceUpdFactor), mSchedStage);
 	}
 
       resetSharedResource ();
@@ -4862,7 +4862,7 @@ scheduleAndDispatchJobs (void)
   if (logclass & LC_SCHED)
     {
       ls_syslog (LOG_DEBUG, "\
-%s: M_STAGE_RESUME_SUSP tryResumed", fname);
+%s: M_STAGE_RESUME_SUSP tryResumed", __func__);
     }
 
   if (STAY_TOO_LONG)
@@ -4870,7 +4870,7 @@ scheduleAndDispatchJobs (void)
       if (logclass & LC_SCHED)
 	{
 	  ls_syslog (LOG_DEBUG, "\
-%s: Stayed too long in M_STAGE_RESUME_SUSP", fname);
+%s: Stayed too long in M_STAGE_RESUME_SUSP", __func__);
 	}
       DUMP_CNT ();
       RESET_CNT ();
@@ -4893,7 +4893,7 @@ scheduleAndDispatchJobs (void)
   if (logclass & LC_SCHED)
     {
       ls_syslog (LOG_DEBUG, "\
-%s: M_STAGE_LSB_CAND got numLsbUsable=%d", fname, numLsbUsable);
+%s: M_STAGE_LSB_CAND got numLsbUsable=%d", __func__, numLsbUsable);
     }
 
   if (STAY_TOO_LONG)
@@ -4901,7 +4901,7 @@ scheduleAndDispatchJobs (void)
       if (logclass & LC_SCHED)
 	{
 	  ls_syslog (LOG_DEBUG, "\
-%s: Stayed too long in M_STAGE_LSB_CAND", fname);
+%s: Stayed too long in M_STAGE_LSB_CAND", __func__);
 	}
       DUMP_CNT ();
       RESET_CNT ();
@@ -4939,7 +4939,7 @@ scheduleAndDispatchJobs (void)
 		  if (logclass & LC_SCHED)
 		    {
 		      ls_syslog (LOG_DEBUG, "\
-%s: Stayed too long in M_STAGE_QUE_CAND; numQUsable=%d timeGetQUsable %d ms", fname, numQUsable, timeGetQUsable);
+%s: Stayed too long in M_STAGE_QUE_CAND; numQUsable=%d timeGetQUsable %d ms", __func__, numQUsable, timeGetQUsable);
 		      DUMP_CNT ();
 		      RESET_CNT ();
 		    }
@@ -4960,7 +4960,7 @@ scheduleAndDispatchJobs (void)
   if (logclass & LC_SCHED)
     {
       ls_syslog (LOG_DEBUG, "\
-%s M_STAGE_QUE_CAND numQUsable=%d timeGetQUsable %d ms", fname, numQUsable, timeGetQUsable);
+%s M_STAGE_QUE_CAND numQUsable=%d timeGetQUsable %d ms", __func__, numQUsable, timeGetQUsable);
     }
 
   if (LIST_NUM_ENTRIES (jRefList) == 0)
@@ -5024,15 +5024,15 @@ again:
   if (dispRet == DISP_TIME_OUT)
     {
       ls_syslog (LOG_DEBUG, "\
-%s STAY_TOO_LONG 3 loopCount <%d>", fname, loopCount);
-      DUMP_TIMERS (fname);
+%s STAY_TOO_LONG 3 loopCount <%d>", __func__, loopCount);
+      DUMP_TIMERS (__func__);
       DUMP_CNT ();
       RESET_CNT ();
       return -1;
     }
   if (dispRet == DISP_FAIL && STAY_TOO_LONG)
     {
-      DUMP_TIMERS (fname);
+      DUMP_TIMERS (__func__);
       DUMP_CNT ();
       RESET_CNT ();
       return -1;
@@ -5047,8 +5047,8 @@ again:
   if (logclass & LC_SCHED)
     {
       ls_syslog (LOG_DEBUG, "\
-%s out of pickAJob/scheduleAJob loopCount <%d>", fname, loopCount);
-      DUMP_TIMERS (fname);
+%s out of pickAJob/scheduleAJob loopCount <%d>", __func__, loopCount);
+      DUMP_TIMERS (__func__);
       DUMP_CNT ();
       RESET_CNT ();
     }
@@ -5065,7 +5065,7 @@ again:
 	(scheduleFinishTime.tv_usec - scheduleStartTime.tv_usec) / 1000;
       ls_syslog (LOG_DEBUG,
 		 "%s: Completed a schedule and dispatch session seqNo=%d, time used: %d ms",
-		 fname, schedSeqNo, scheduleTime);
+		 __func__, schedSeqNo, scheduleTime);
     }
 
   ++schedSeqNo;
@@ -5086,7 +5086,7 @@ again:
       jR = jR0;
     }
 
-  DUMP_TIMERS (fname);
+  DUMP_TIMERS (__func__);
   DUMP_CNT ();
   RESET_CNT ();
 
@@ -5132,7 +5132,7 @@ checkIfJobIsReady (struct jData *jp)
     {
       ls_syslog (LOG_DEBUG3,
 		 "%s: job=%s processed=%x newReason=%d numSlots=%d numAvailSlots=%d",
-		 fname, lsb_jobid2str (jp->jobId), jp->processed,
+		 __func__, lsb_jobid2str (jp->jobId), jp->processed,
 		 jp->newReason, jp->numSlots, jp->numAvailSlots);
     }
 
@@ -5160,7 +5160,7 @@ scheduleAJob (struct jData *jp, bool_t checkReady, bool_t checkOtherGroup)
       if (logclass & (LC_TRACE | LC_SIGNAL))
 	{
 	  ls_syslog (LOG_DEBUG2, "%s: Sent pending signal <%d> to job %s",
-		     fname, jp->pendEvent.sig, lsb_jobid2str (jp->jobId));
+		     __func__, jp->pendEvent.sig, lsb_jobid2str (jp->jobId));
 	}
     }
 
@@ -5189,10 +5189,10 @@ scheduleAJob (struct jData *jp, bool_t checkReady, bool_t checkOtherGroup)
 	{
 
 	  ls_syslog (LOG_DEBUG2, "%s: Got %d candidate groups for job <%s>",
-		     fname, jp->numOfGroups, lsb_jobid2str (jp->jobId));
+		     __func__, jp->numOfGroups, lsb_jobid2str (jp->jobId));
 
 	  ls_syslog (LOG_DEBUG2, "%s: Got %d candidate hosts for job <%s>",
-		     fname, jp->numCandPtr, lsb_jobid2str (jp->jobId));
+		     __func__, jp->numCandPtr, lsb_jobid2str (jp->jobId));
 	}
       jp->processed |= JOB_STAGE_CAND;
     }
@@ -5204,7 +5204,7 @@ scheduleAJob (struct jData *jp, bool_t checkReady, bool_t checkOtherGroup)
 	{
 	  ls_syslog (LOG_DEBUG1,
 		     "%s: Can't get enough candidate hosts for job <%s>",
-		     fname, lsb_jobid2str (jp->jobId));
+		     __func__, lsb_jobid2str (jp->jobId));
 	}
       jp->processed |= JOB_STAGE_DONE;
       return 0;
@@ -5217,7 +5217,7 @@ scheduleAJob (struct jData *jp, bool_t checkReady, bool_t checkOtherGroup)
     case CAND_HOST_FOUND:
       return 1;
     default:
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7232, "%s: Unknown return code <%d> from getCandHosts() for job <%s>"), fname, ret, lsb_jobid2str (jp->jobId));	/* catgets 7232 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7232, "%s: Unknown return code <%d> from getCandHosts() for job <%s>"), __func__, ret, lsb_jobid2str (jp->jobId));	/* catgets 7232 */
       return 0;
     }
 }
@@ -5249,7 +5249,7 @@ dispatchAJob (struct jData *jp, int dontTryNextCandHost)
 	{
 	  ls_syslog (LOG_DEBUG1,
 		     "%s: Queue %s has a schedule delay (%d) for new job %s; now=%d submitTime=%d",
-		     fname, jp->qPtr->queue, qSchedDelay,
+		     __func__, jp->qPtr->queue, qSchedDelay,
 		     lsb_jobid2str (jp->jobId), (int) now_disp,
 		     (int) jp->shared->jobBill.submitTime);
 	}
@@ -5278,7 +5278,7 @@ dispatchAJob (struct jData *jp, int dontTryNextCandHost)
 	    {
 	      ls_syslog (LOG_DEBUG1,
 			 "%s: job <%s> can't get enough slots, requested(numProcessors)=%d available(numAvailEligProc)=%d",
-			 fname, lsb_jobid2str (jp->jobId),
+			 __func__, lsb_jobid2str (jp->jobId),
 			 jp->shared->jobBill.numProcessors,
 			 jp->numAvailEligProc);
 	    }
@@ -5290,7 +5290,7 @@ dispatchAJob (struct jData *jp, int dontTryNextCandHost)
 		{
 		  ls_syslog (LOG_DEBUG1,
 			     "%s: job <%s> is not allowed to reserve any slots",
-			     fname, lsb_jobid2str (jp->jobId));
+			     __func__, lsb_jobid2str (jp->jobId));
 		}
 	      jp->processed |= JOB_STAGE_DONE;
 	      return DISP_NO_JOB;
@@ -5305,7 +5305,7 @@ dispatchAJob (struct jData *jp, int dontTryNextCandHost)
 		{
 		  ls_syslog (LOG_DEBUG1,
 			     "%s: job <%s> can't get enough slots to reserve and preempt",
-			     fname, lsb_jobid2str (jp->jobId));
+			     __func__, lsb_jobid2str (jp->jobId));
 		}
 	      jp->processed |= JOB_STAGE_DONE;
 	      return DISP_NO_JOB;
@@ -5357,7 +5357,7 @@ dispatchAJob (struct jData *jp, int dontTryNextCandHost)
 		    {
 		      ls_syslog (LOG_DEBUG1,
 				 "%s: dispatching job <%s> to candHost failed and other candHost are not allowed to be tried at this stage",
-				 fname, lsb_jobid2str (jp->jobId));
+				 __func__, lsb_jobid2str (jp->jobId));
 		    }
 		  return DISP_FAIL;
 		}
@@ -5373,7 +5373,7 @@ dispatchAJob (struct jData *jp, int dontTryNextCandHost)
 		    {
 		      ls_syslog (LOG_DEBUG1,
 				 "%s: dispatching job <%s> to candHost failed and other candHost will not be tried due to staying here too long",
-				 fname, lsb_jobid2str (jp->jobId));
+				 __func__, lsb_jobid2str (jp->jobId));
 		    }
 		  return DISP_TIME_OUT;
 		}
@@ -5429,7 +5429,7 @@ dispatchAJob (struct jData *jp, int dontTryNextCandHost)
 		    {
 		      ls_syslog (LOG_DEBUG1,
 				 "%s: job <%s> will not reserve slots because there not enough online host slots for the job",
-				 fname, lsb_jobid2str (jp->jobId));
+				 __func__, lsb_jobid2str (jp->jobId));
 		    }
 		}
 	    }
@@ -5439,7 +5439,7 @@ dispatchAJob (struct jData *jp, int dontTryNextCandHost)
 	      if (logclass & (LC_PEND | LC_SCHED))
 		{
 		  ls_syslog (LOG_DEBUG1, "%s: job <%s> reserved slots",
-			     fname, lsb_jobid2str (jp->jobId));
+			     __func__, lsb_jobid2str (jp->jobId));
 		}
 	      return DISP_RESERVE;
 	    }
@@ -5448,7 +5448,7 @@ dispatchAJob (struct jData *jp, int dontTryNextCandHost)
 	      if (logclass & (LC_PEND | LC_SCHED))
 		{
 		  ls_syslog (LOG_DEBUG1, "%s: job <%s> can't reserve slots",
-			     fname, lsb_jobid2str (jp->jobId));
+			     __func__, lsb_jobid2str (jp->jobId));
 		}
 	      return DISP_NO_JOB;
 	    }
@@ -5484,7 +5484,7 @@ checkIfCandHostIsOk (struct jData *jp)
 	    {
 	      ls_syslog (LOG_DEBUG2,
 			 "%s: job <%s> candidate %s not eligible any more; reason=%d",
-			 fname, lsb_jobid2str (jp->jobId),
+			 __func__, lsb_jobid2str (jp->jobId),
 			 jp->candPtr[i].hData->host, hReason);
 	    }
 	  continue;
@@ -5500,7 +5500,7 @@ checkIfCandHostIsOk (struct jData *jp)
       if (logclass & LC_SCHED)
 	{
 	  ls_syslog (LOG_DEBUG2, "%s: Got a candidate %s/%d/%d",
-		     fname,
+		     __func__,
 		     jp->candPtr[i].hData->host,
 		     jp->candPtr[i].numSlots, jp->candPtr[i].numAvailSlots);
 	}
@@ -5579,7 +5579,7 @@ dispatchToCandHost (struct jData *jp)
       if (logclass & (LC_SCHED | LC_PEND))
 	{
 	  ls_syslog (LOG_DEBUG1, "%s: allocHosts() failed for job <%s>",
-		     fname, lsb_jobid2str (jp->jobId));
+		     __func__, lsb_jobid2str (jp->jobId));
 	}
       return DISP_NO_JOB;
     }
@@ -5589,7 +5589,7 @@ dispatchToCandHost (struct jData *jp)
       if (logclass & (LC_SCHED | LC_PEND))
 	{
 	  ls_syslog (LOG_DEBUG1, "%s: No enough hosts for job %s",
-		     fname, lsb_jobid2str (jp->jobId));
+		     __func__, lsb_jobid2str (jp->jobId));
 	}
       deallocHosts (jp);
       return DISP_NO_JOB;
@@ -5597,7 +5597,7 @@ dispatchToCandHost (struct jData *jp)
   if (logclass & LC_SCHED)
     {
       ls_syslog (LOG_DEBUG2, "%s: Try to dispatch job %s to host %s",
-		 fname, lsb_jobid2str (jp->jobId), jp->hPtr[0]->host);
+		 __func__, lsb_jobid2str (jp->jobId), jp->hPtr[0]->host);
     }
 
   jp->newReason = 0;
@@ -5610,7 +5610,7 @@ dispatchToCandHost (struct jData *jp)
       if (logclass & LC_SCHED)
 	{
 	  ls_syslog (LOG_DEBUG2, "\
-%s: Job %s has been  dispatched to host %s", fname, lsb_jobid2str (jp->jobId), jp->hPtr[0]->host);
+%s: Job %s has been  dispatched to host %s", __func__, lsb_jobid2str (jp->jobId), jp->hPtr[0]->host);
 	}
 
       return DISP_OK;
@@ -5623,7 +5623,7 @@ dispatchToCandHost (struct jData *jp)
 	{
 	  ls_syslog (LOG_DEBUG1,
 		     "%s: Job %s failed to start on host %s; reason=%d",
-		     fname, lsb_jobid2str (jp->jobId), jp->hPtr[0]->host,
+		     __func__, lsb_jobid2str (jp->jobId), jp->hPtr[0]->host,
 		     jp->newReason);
 	}
 
@@ -5656,7 +5656,7 @@ getNumProcs (struct jData *jp)
 
   execCandPtr =
     (struct candHost *) my_malloc (jp->numCandPtr * sizeof (struct candHost),
-				   fname);
+				   __func__);
   for (i = 0; i < jp->numCandPtr; i++)
     {
       execCandPtr[i].hData = NULL;
@@ -5674,7 +5674,7 @@ getNumProcs (struct jData *jp)
       backfillCandPtr =
 	(struct backfillCand *) my_malloc (jp->numCandPtr *
 					   sizeof (struct backfillCand),
-					   fname);
+					   __func__);
       backfillCandPtrIndex = 0;
       for (i = 0; i < jp->numCandPtr; i++)
 	{
@@ -6162,7 +6162,7 @@ schedulerInit ()
 		  strcpy (tmpJobid, lsb_jobid2str (qp->firstJob[i]->jobId));
 		  ls_syslog (LOG_DEBUG3,
 			     "%s: queue <%s> list <%d> firstJob <%s> lastJob <%s>",
-			     fname, qp->queue, i, tmpJobid,
+			     __func__, qp->queue, i, tmpJobid,
 			     lsb_jobid2str (qp->lastJob[i]->jobId));
 		}
 	    }
@@ -6218,11 +6218,11 @@ schedulerInit ()
       || (queueObserverOnPJL == NULL)
       || (queueObserverOnMJL == NULL) || (queueObserverOnSJL == NULL))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "listObserverCreate");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "listObserverCreate");
 
       if (gethostname (myhostp, MAXHOSTNAMELEN) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "gethostname");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "gethostname");
 	  strcpy (myhostp, "localhost");
 	}
       die (MASTER_MEM);
@@ -6300,11 +6300,11 @@ listNumber (struct jData *jList)
   else
     {
 
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7236, "%s: internal error"), fname);	/* catgets 7236 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7236, "%s: internal error"), __func__);	/* catgets 7236 */
 
       if (gethostname (myhostp, MAXHOSTNAMELEN) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "gethostname");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "gethostname");
 	  strcpy (myhostp, "localhost");
 	}
       die (MASTER_FATAL);
@@ -6512,7 +6512,7 @@ backfilleeCreate ()
   static char __func__] = "backfilleeCreate";
   struct backfillee *ent;
 
-  ent = (struct backfillee *) my_malloc (sizeof (struct backfillee), fname);
+  ent = (struct backfillee *) my_malloc (sizeof (struct backfillee), __func__);
   ent->backfilleePtr = NULL;
   ent->indexInCandHostList = 0;
   ent->backfillSlots = 0;
@@ -6528,7 +6528,7 @@ backfilleeCreateByCopy (struct backfillee *bp)
   static char __func__] = "backfilleeCreateByCopy";
   struct backfillee *ent;
 
-  ent = (struct backfillee *) my_malloc (sizeof (struct backfillee), fname);
+  ent = (struct backfillee *) my_malloc (sizeof (struct backfillee), __func__);
   ent->backfilleePtr = bp->backfilleePtr;
   ent->indexInCandHostList = bp->indexInCandHostList;
   ent->backfillSlots = bp->backfillSlots;
@@ -6673,14 +6673,14 @@ freeBackfillSlotsFromBackfillee (struct jData *jp)
 
 	  backfillSlotsDataPtr =
 	    (struct backfillSlotsData *)
-	    my_malloc (sizeof (struct backfillSlotsData), fname);
+	    my_malloc (sizeof (struct backfillSlotsData), __func__);
 	  backfillSlotsDataPtr->hData =
 	    jp->candPtr[backfillee->indexInCandHostList].hData;
 	  backfillSlotsDataPtr->backfillSlots = backfillee->backfillSlots;
 
 	  backfilleeDataPtr =
 	    (struct backfilleeData *)
-	    my_malloc (sizeof (struct backfilleeData), fname);
+	    my_malloc (sizeof (struct backfilleeData), __func__);
 	  backfilleeDataPtr->backfilleePtr = backfillee->backfilleePtr;
 
 	  backfilleeDataOnList =
@@ -6715,7 +6715,7 @@ freeBackfillSlotsFromBackfillee (struct jData *jp)
 
       hPtrCopy =
 	(struct hData **) my_malloc (sizeof (struct hData *) *
-				     job->numHostPtr, fname);
+				     job->numHostPtr, __func__);
       for (i = 0; i < job->numHostPtr; i++)
 	{
 	  hPtrCopy[i] = job->hPtr[i];
@@ -6724,7 +6724,7 @@ freeBackfillSlotsFromBackfillee (struct jData *jp)
 
       tmpHPtr =
 	(struct hData **) my_malloc (job->numHostPtr *
-				     sizeof (struct hData *), fname);
+				     sizeof (struct hData *), __func__);
 
       (void) listIteratorAttach (&slotListIter, backfilleeDataPtr->slotsList);
       for (backfillSlotsDataPtr =
@@ -6747,7 +6747,7 @@ freeBackfillSlotsFromBackfillee (struct jData *jp)
 	    {
 	      ls_syslog (LOG_DEBUG2,
 			 "%s: free <%d> backfill slots on host <%s> of backfillee job <%s> for backfiller job <%s>",
-			 fname, backfillSlotsDataPtr->backfillSlots,
+			 __func__, backfillSlotsDataPtr->backfillSlots,
 			 backfillSlotsDataPtr->hData->host,
 			 lsb_jobid2str (job->jobId),
 			 lsb_jobid2str (jp->jobId));
@@ -6857,7 +6857,7 @@ removeBackfillSlotsFromBackfiller (struct jData *jp)
 	    {
 	      ls_syslog (LOG_DEBUG2,
 			 "%s: remove <%d> backfill slots on host <%s> (borrowed from backfillee job <%s>) from backfiller job <%s>",
-			 fname, backfillSlots, jp->execCandPtr[i].hData->host,
+			 __func__, backfillSlots, jp->execCandPtr[i].hData->host,
 			 lsb_jobid2str (backfillee->backfilleePtr->jobId),
 			 lsb_jobid2str (jp->jobId));
 	    }
@@ -7209,7 +7209,7 @@ setExecHostsAcceptInterval (struct jData *jp)
 	  if (logclass & (LC_SCHED))
 	    {
 	      ls_syslog (LOG_DEBUG2, "\
-%s: qp->reasonTb[1][%s/%d]=%d qp->numUsable=%d", fname, jp->hPtr[i]->host, hostId, qp->reasonTb[1][hostId], qp->numUsable);
+%s: qp->reasonTb[1][%s/%d]=%d qp->numUsable=%d", __func__, jp->hPtr[i]->host, hostId, qp->reasonTb[1][hostId], qp->numUsable);
 	    }
 	}
     }
@@ -7592,7 +7592,7 @@ jobIsReady (struct jData *jp)
   jp->processed |= JOB_STAGE_READY;
   if (logclass & LC_SCHED)
     {
-      ls_syslog (LOG_DEBUG3, "%s: job=%s numSlots=%d numAvailSlots=%d", fname,
+      ls_syslog (LOG_DEBUG3, "%s: job=%s numSlots=%d numAvailSlots=%d", __func__,
 		 lsb_jobid2str (jp->jobId), jp->numSlots, jp->numAvailSlots);
     }
   if (ret)
@@ -7604,7 +7604,7 @@ jobIsReady (struct jData *jp)
     {
       if (logclass & (LC_SCHED | LC_PEND))
 	{
-	  ls_syslog (LOG_DEBUG1, "%s: job <%s> is not ready", fname,
+	  ls_syslog (LOG_DEBUG1, "%s: job <%s> is not ready", __func__,
 		     lsb_jobid2str (jp->jobId));
 	}
       jp->processed |= JOB_STAGE_DONE;
@@ -7618,7 +7618,7 @@ reservePreemptResourcesForHosts (struct jData *jp)
   static char __func__] = "reservePreemptResourcesForHosts";
   struct hData **hosts = (struct hData **) my_calloc (jp->numHostPtr,
 						      sizeof (struct hData *),
-						      fname);
+						      __func__);
   int numh = 0;
   int i;
   for (i = 0; i < jp->numHostPtr; i++)
@@ -7635,7 +7635,7 @@ reservePreemptResourcesForExecCands (struct jData *jp)
   static char __func__] = "reservePreemptResourcesForExecCands";
   struct hData **hosts = (struct hData **) my_calloc (jp->numExecCandPtr,
 						      sizeof (struct hData *),
-						      fname);
+						      __func__);
   int numh = 0;
   int i;
   for (i = 0; i < jp->numExecCandPtr; i++)
@@ -7658,7 +7658,7 @@ reservePreemptResources (struct jData *jp, int numHosts, struct hData **hosts)
     {
       FREEUP (hosts);
       if (logclass & (LC_SCHED))
-	ls_syslog (LOG_DEBUG3, "%s: No resources required; job <%s>", fname,
+	ls_syslog (LOG_DEBUG3, "%s: No resources required; job <%s>", __func__,
 		   lsb_jobid2str (jp->jobId));
       return 0;
     }
@@ -7670,7 +7670,7 @@ reservePreemptResources (struct jData *jp, int numHosts, struct hData **hosts)
       FREEUP (hosts);
       if (logclass & (LC_SCHED))
 	ls_syslog (LOG_DEBUG3, "%s: Failed to reserved resources; job <%s>",
-		   fname, lsb_jobid2str (jp->jobId));
+		   __func__, lsb_jobid2str (jp->jobId));
       return -1;
     }
   if (logclass & (LC_SCHED))
@@ -7679,7 +7679,7 @@ reservePreemptResources (struct jData *jp, int numHosts, struct hData **hosts)
   jp->numRsrcPreemptHPtr = numHosts;
   jp->jStatus |= JOB_STAT_RSRC_PREEMPT_WAIT;
   if (logclass & (LC_SCHED))
-    ls_syslog (LOG_DEBUG3, "%s: Reserved resources; job <%s>", fname,
+    ls_syslog (LOG_DEBUG3, "%s: Reserved resources; job <%s>", __func__,
 	       lsb_jobid2str (jp->jobId));
   return 0;
 }
@@ -7697,7 +7697,7 @@ freeReservePreemptResources (struct jData *jp)
     if (logclass & (LC_SCHED))
       ls_syslog (LOG_DEBUG3,
 		 "%s: Freed reserved resource; job <%s>, res <%s> host <%s>",
-		 fname, lsb_jobid2str (jp->jobId),
+		 __func__, lsb_jobid2str (jp->jobId),
 		 allLsInfo->resTable[resn].name,
 		 jp->rsrcPreemptHPtr[hostn]->host);
   }
@@ -7850,7 +7850,7 @@ handleXor (struct jData *jpbw)
 
   if (logclass & LC_TRACE)
     {
-      ls_syslog (LOG_DEBUG3, "%s: Entering for job <%s>", fname,
+      ls_syslog (LOG_DEBUG3, "%s: Entering for job <%s>", __func__,
 		 lsb_jobid2str (jpbw->jobId));
     }
 
@@ -7872,9 +7872,9 @@ handleXor (struct jData *jpbw)
     {
       ls_syslog (LOG_DEBUG3,
 		 "%s: Before filtering with xor select, the candidate hosts are: ",
-		 fname);
+		 __func__);
       for (i = 0; i < jpbw->numCandPtr; i++)
-	ls_syslog (LOG_DEBUG3, "%s: candPtr[%d]=%s.", fname, i,
+	ls_syslog (LOG_DEBUG3, "%s: candPtr[%d]=%s.", __func__, i,
 		   jpbw->candPtr[i].hData->host);
     }
 
@@ -7897,13 +7897,13 @@ handleXor (struct jData *jpbw)
   jpbw->groupCands =
     (struct groupCandHosts *) my_malloc (numXorExprs *
 					 sizeof (struct groupCandHosts),
-					 fname);
+					 __func__);
   for (j = 0; j < numXorExprs; j++)
     {
       groupCandHostsInit (&jpbw->groupCands[j]);
     }
   indicesOfCandPtr =
-    (int *) my_calloc (jpbw->numCandPtr, sizeof (int), fname);
+    (int *) my_calloc (jpbw->numCandPtr, sizeof (int), __func__);
 
   for (j = 0; j < numXorExprs; j++)
     {
@@ -7924,7 +7924,7 @@ handleXor (struct jData *jpbw)
 
       if (logclass & LC_TRACE)
 	{
-	  ls_syslog (LOG_DEBUG3, "%s: found %d hosts with expr %s", fname,
+	  ls_syslog (LOG_DEBUG3, "%s: found %d hosts with expr %s", __func__,
 		     numCandPtr, resValPtr->xorExprs[j]);
 	}
 
@@ -7933,7 +7933,7 @@ handleXor (struct jData *jpbw)
 
 	  candPtr = (struct candHost *) my_calloc (numCandPtr,
 						   sizeof (struct candHost),
-						   fname);
+						   __func__);
 	  for (i = 0; i < numCandPtr; i++)
 	    {
 	      copyCandHostData (&(candPtr[i]),
@@ -7941,7 +7941,7 @@ handleXor (struct jData *jpbw)
 	      if (logclass & LC_TRACE)
 		ls_syslog (LOG_DEBUG3,
 			   "%s: copy host <%s> to candHosts[%d] with xorRes <%s>.",
-			   fname, candPtr[i].hData->host, i,
+			   __func__, candPtr[i].hData->host, i,
 			   resValPtr->xorExprs[j]);
 	    }
 
@@ -7961,7 +7961,7 @@ handleXor (struct jData *jpbw)
   jpbw->numCandPtr = 0;
   jpbw->candPtr = NULL;
   if (logclass & LC_TRACE)
-    ls_syslog (LOG_DEBUG3, "%s: Exiting, found %d groups", fname, foundGroup);
+    ls_syslog (LOG_DEBUG3, "%s: Exiting, found %d groups", __func__, foundGroup);
   if (foundGroup == 0)
     {
       FREEUP (jpbw->groupCands);
@@ -8001,7 +8001,7 @@ copyCandHostPtr (struct candHost **sourceCandPtr,
     {
       *destCandPtr =
 	(struct candHost *) my_malloc ((*sourceNum) *
-				       sizeof (struct candHost), fname);
+				       sizeof (struct candHost), __func__);
     }
   for (j = 0; j < (*sourceNum); j++)
     copyCandHostData (&((*destCandPtr)[j]), &((*sourceCandPtr)[j]));
@@ -8225,7 +8225,7 @@ groupCandsCopy (struct jData *dest, struct jData *src)
   dest->groupCands =
     (struct groupCandHosts *) my_malloc (dest->numOfGroups *
 					 sizeof (struct groupCandHosts),
-					 fname);
+					 __func__);
   for (i = 0; i < dest->numOfGroups; i++)
     {
       groupCandHostsCopy (&dest->groupCands[i], &src->groupCands[i]);
@@ -8257,7 +8257,7 @@ inEligibleGroupsInit (int **inEligibleGroups, int numGroups)
 
 
   *inEligibleGroups = (int *) my_malloc (GET_INTNUM (numGroups)
-					 * sizeof (int), fname);
+					 * sizeof (int), __func__);
 
   for (j = 0; j < GET_INTNUM (numGroups); j++)
     {
@@ -8277,7 +8277,7 @@ groupCands2CandPtr (int numOfGroups, struct groupCandHosts *gc,
       num += gc[i].numOfMembers;
     }
   *candPtr = (struct candHost *) my_calloc (num, sizeof (struct candHost),
-					    fname);
+					    __func__);
   for (i = 0, num = 0; i < numOfGroups; i++)
     {
       for (j = 0; j < gc[i].numOfMembers; j++)

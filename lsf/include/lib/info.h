@@ -1,8 +1,10 @@
 
 #pragma once
 
+#include "daemons/liblimd/limout.h"
+
 struct masterInfo masterInfo_;
-int masterknown_ = FALSE;
+int masterknown_ = 0; // FALSE
 
 struct hostInfo *expandSHinfo (struct hostInfoReply *);
 struct clusterInfo *expandSCinfo (struct clusterInfoReply *);

@@ -126,7 +126,7 @@ main (int argc, char **argv)
   if (access (pChkpntDir, W_OK | X_OK) < 0)
     {
       fprintf (stderr, "%s : the chkpnt dir %s can not be accessed\n",
-	       fname, pChkpntDir);
+	       __func__, pChkpntDir);
       exit (-1);
     }
 
@@ -157,7 +157,7 @@ main (int argc, char **argv)
   else
     {
       fprintf (stderr, "%s : the .echkpnt file content occurs error: %s\n",
-	       fname, strerror (errno));
+	       __func__, strerror (errno));
       exit (-1);
     }
 
@@ -174,16 +174,16 @@ main (int argc, char **argv)
     {
       sprintf (logMesgBuf,
 	       "%s : the .echkpnt file does not exists during restarting job\n",
-	       fname);
+	       __func__);
       logMesg (logMesgBuf);
     }
 
 #ifdef DEBUG
-  sprintf (logMesgBuf, "%s : the LSB_ECHKPNT_METHOD = %s\n", fname,
+  sprintf (logMesgBuf, "%s : the LSB_ECHKPNT_METHOD = %s\n", __func__,
 	   pMethodName);
   logMesg (logMesgBuf);
   sprintf (logMesgBuf, "%s : the LSB_ECHKPNT_METHOD_DIR = %s\n",
-	   fname, pMethodDir != NULL ? pMethodDir : "");
+	   __func__, pMethodDir != NULL ? pMethodDir : "");
   logMesg (logMesgBuf);
 #endif
 
@@ -192,13 +192,13 @@ main (int argc, char **argv)
       (erestartProgPath, pMethodDir, ERESTART_PROGRAM, pMethodName) == NULL)
     {
       sprintf (logMesgBuf,
-	       "%s : the erestart method(%s) path is not correct\n", fname,
+	       "%s : the erestart method(%s) path is not correct\n", __func__,
 	       pMethodName);
       goto Error;
     }
 
 #ifdef DEBUG
-  sprintf (logMesgBuf, "%s : the erestartProgPath is : %s\n", fname,
+  sprintf (logMesgBuf, "%s : the erestartProgPath is : %s\n", __func__,
 	   erestartProgPath);
   logMesg (logMesgBuf);
 #endif
@@ -219,7 +219,7 @@ main (int argc, char **argv)
       closeLog ();
       execv (erestartProgPath, cargv);
       sprintf (logMesgBuf, "%s : execute the erestart.default fail\n%s\n",
-	       fname, (errno ? strerror (errno) : ""));
+	       __func__, (errno ? strerror (errno) : ""));
       fprintf (stderr, "%s", logMesgBuf);
       exit (-1);
     }
@@ -228,14 +228,14 @@ main (int argc, char **argv)
   myPid = getpid ();
   if (myPid == -1)
     {
-      sprintf (logMesgBuf, "%s : getpid() failed in erestart: %s\n", fname,
+      sprintf (logMesgBuf, "%s : getpid() failed in erestart: %s\n", __func__,
 	       strerror (errno));
       goto Error;
     }
   myPGid = getpgrp ();
   if (myPGid == -1)
     {
-      sprintf (logMesgBuf, "%s : getpgid() failed in erestart: %s\n", fname,
+      sprintf (logMesgBuf, "%s : getpgid() failed in erestart: %s\n", __func__,
 	       strerror (errno));
       goto Error;
     }
@@ -264,12 +264,12 @@ main (int argc, char **argv)
     {
       sprintf (logMesgBuf,
 	       "%s : LSB_CHKFILENAME can not be gotten from environment\n",
-	       fname);
+	       __func__);
       goto Error;
     }
 
 #ifdef DEBUG
-  sprintf (logMesgBuf, "%s : pJobFileName is %s\n", fname, pJobFileName);
+  sprintf (logMesgBuf, "%s : pJobFileName is %s\n", __func__, pJobFileName);
   logMesg (logMesgBuf);
 #endif
 
@@ -278,7 +278,7 @@ main (int argc, char **argv)
   if (iChildPid < 0)
     {
       sprintf (logMesgBuf, "%s : fork() fork a child process fail...\n",
-	       fname);
+	       __func__);
       goto Error;
 
 
@@ -299,7 +299,7 @@ main (int argc, char **argv)
 	  putEnv (ECHKPNT_RESTART_USRCMD, userCmd);
 #ifdef DEBUG
 	  sprintf (logMesgBuf,
-		   "%s : the user command in the job file is %s\n", fname,
+		   "%s : the user command in the job file is %s\n", __func__,
 		   userCmd);
 	  logMesg (logMesgBuf);
 #endif
@@ -309,7 +309,7 @@ main (int argc, char **argv)
 	{
 	  sprintf (logMesgBuf,
 		   "%s : the getUserCmdFromJF() could not get the user command from the job file %s\n",
-		   fname, pJobFileName);
+		   __func__, pJobFileName);
 	  goto Error;
 	}
 
@@ -322,7 +322,7 @@ main (int argc, char **argv)
 	{
 	  sprintf (logMesgBuf,
 		   "%s : the env var LSB_OLD_JOBID  could not gotten from the .echkpnt file\n",
-		   fname);
+		   __func__);
 	  goto Error;
 	}
 
@@ -334,7 +334,7 @@ main (int argc, char **argv)
 	  if (redirectFd (ECHKPNT_DEFAULT_OUTPUT_FILE, 1) == -1)
 	    {
 	      sprintf (logMesgBuf,
-		       "%s : redirect stdout to %s file fail\n%s\n", fname,
+		       "%s : redirect stdout to %s file fail\n%s\n", __func__,
 		       ECHKPNT_DEFAULT_OUTPUT_FILE,
 		       errno ? strerror (errno) : "");
 	      goto Error;
@@ -342,7 +342,7 @@ main (int argc, char **argv)
 	  if (redirectFd (ECHKPNT_DEFAULT_OUTPUT_FILE, 2) == -1)
 	    {
 	      sprintf (logMesgBuf,
-		       "%s : redirect stderr to %s file fail\n%s\n", fname,
+		       "%s : redirect stderr to %s file fail\n%s\n", __func__,
 		       ECHKPNT_DEFAULT_OUTPUT_FILE,
 		       errno ? strerror (errno) : "");
 	      goto Error;
@@ -357,13 +357,13 @@ main (int argc, char **argv)
 	      || (redirectFd (aFileName, 1) == -1))
 	    {
 	      sprintf (logMesgBuf, "%s : redirect the stdout to %s fail\n",
-		       fname, ERESTART_STDOUT_FILE);
+		       __func__, ERESTART_STDOUT_FILE);
 	      logMesg (logMesgBuf);
 
 	      if (redirectFd (ECHKPNT_DEFAULT_OUTPUT_FILE, 1) == -1)
 		{
 		  sprintf (logMesgBuf,
-			   "%s : redirect stdout to %s fail\n%s\n", fname,
+			   "%s : redirect stdout to %s fail\n%s\n", __func__,
 			   ECHKPNT_DEFAULT_OUTPUT_FILE,
 			   errno ? strerror (errno) : "");
 		  goto Error;
@@ -375,12 +375,12 @@ main (int argc, char **argv)
 	      || (redirectFd (aFileName, 2) == -1))
 	    {
 	      sprintf (logMesgBuf, "%s : redirect the stderr to %s fail\n",
-		       fname, ERESTART_STDERR_FILE);
+		       __func__, ERESTART_STDERR_FILE);
 	      logMesg (logMesgBuf);
 	      if (redirectFd (ECHKPNT_DEFAULT_OUTPUT_FILE, 2) == -1)
 		{
 		  fprintf (stderr, "%s : redirect stderr to %s fail\n%s\n",
-			   fname, ECHKPNT_DEFAULT_OUTPUT_FILE,
+			   __func__, ECHKPNT_DEFAULT_OUTPUT_FILE,
 			   errno ? strerror (errno) : "");
 		  goto Error;
 		}
@@ -399,7 +399,7 @@ main (int argc, char **argv)
 
       execv (erestartProgPath, cargv);
       sprintf (logMesgBuf, "%s : the child process execute the %s fail\n",
-	       fname, progName);
+	       __func__, progName);
       fprintf (stderr, "%s", logMesgBuf);
       logMesg (logMesgBuf);
       closeLog ();
@@ -415,14 +415,14 @@ main (int argc, char **argv)
   if (iChildPid < 0)
     {
       sprintf (logMesgBuf, "%s : %s fail, \n%s\n",
-	       fname, "waitpid", errno ? strerror (errno) : "");
+	       __func__, "waitpid", errno ? strerror (errno) : "");
       goto Error;
     }
   else
     {
       if ((WEXITSTATUS (iStatus)) != 0)
 	{
-	  sprintf (logMesgBuf, "%s : the erestart.%s fail\n", fname,
+	  sprintf (logMesgBuf, "%s : the erestart.%s fail\n", __func__,
 		   pMethodName);
 	  fprintf (stderr, "%s", logMesgBuf);
 	  logMesg (logMesgBuf);
@@ -443,7 +443,7 @@ main (int argc, char **argv)
     {
       sprintf (logMesgBuf,
 	       "%s : the environment variable LSB_ACCT_FILE could not be gotten from the .echkpnt file \n",
-	       fname);
+	       __func__);
       goto Error;
     }
   iReValue = getUserCmdFromCmdF (newUserCmd);
@@ -454,20 +454,20 @@ main (int argc, char **argv)
       break;
     case 0:
       pUserCmd = NULL;
-      sprintf (logMesgBuf, "%s : the .restart_cmd does not exist\n", fname);
+      sprintf (logMesgBuf, "%s : the .restart_cmd does not exist\n", __func__);
       logMesg (logMesgBuf);
       break;
     default:
       sprintf (logMesgBuf,
 	       "%s : there are some errors during getting the restart command from .restart_cmd file\n",
-	       fname);
+	       __func__);
       goto Error;
     }
 
 #ifdef DEBUG
   if (pUserCmd != NULL)
     {
-      sprintf (logMesgBuf, "%s : the new user command is %s\n", fname,
+      sprintf (logMesgBuf, "%s : the new user command is %s\n", __func__,
 	       pUserCmd);
       logMesg (logMesgBuf);
     }
@@ -478,12 +478,12 @@ main (int argc, char **argv)
     {
       sprintf (logMesgBuf,
 	       "%s : buildNewJobFile() can not build new job file\n%s\n",
-	       fname, errno ? strerror (errno) : "");
+	       __func__, errno ? strerror (errno) : "");
       goto Error;
     }
 
 #ifdef DEBUG
-  sprintf (logMesgBuf, "%s : the new job file name is %s\n", fname,
+  sprintf (logMesgBuf, "%s : the new job file name is %s\n", __func__,
 	   newJobFileName);
   logMesg (logMesgBuf);
 #endif
@@ -492,7 +492,7 @@ main (int argc, char **argv)
   iChildPid = fork ();
   if (iChildPid < 0)
     {
-      sprintf (logMesgBuf, "%s : fork a child process fail...\n%s\n", fname,
+      sprintf (logMesgBuf, "%s : fork a child process fail...\n%s\n", __func__,
 	       errno ? strerror (errno) : "");
       goto Error;
     }
@@ -513,7 +513,7 @@ main (int argc, char **argv)
 	{
 	  sprintf (logMesgBuf,
 		   "%s : chdir() change current working directory to %s fail\n%s\n",
-		   fname, (pSubCwd == NULL) ? "" : pSubCwd, strerror (errno));
+		   __func__, (pSubCwd == NULL) ? "" : pSubCwd, strerror (errno));
 	  logMesg (logMesgBuf);
 	}
 
@@ -528,7 +528,7 @@ main (int argc, char **argv)
       strcpy (fileName, pCurChar);
 
 #ifdef DEBUG
-      sprintf (logMesgBuf, "%s : the new job file name is %s\n", fname,
+      sprintf (logMesgBuf, "%s : the new job file name is %s\n", __func__,
 	       fileName);
       logMesg (logMesgBuf);
 #endif
@@ -540,7 +540,7 @@ main (int argc, char **argv)
       pStderrFdEnv = getenv (ECHKPNT_STDERR_FD);
       if (pStderrFdEnv == NULL)
 	{
-	  sprintf (logMesgBuf, "%s : env var %s is not defined\n", fname,
+	  sprintf (logMesgBuf, "%s : env var %s is not defined\n", __func__,
 		   ECHKPNT_STDERR_FD);
 	  goto Error;
 	}
@@ -548,7 +548,7 @@ main (int argc, char **argv)
       iStderrFd = strtol (pStderrFdEnv, NULL, 10);
       if (errno != 0)
 	{
-	  sprintf (logMesgBuf, "%s : env variable %s is not correct\n", fname,
+	  sprintf (logMesgBuf, "%s : env variable %s is not correct\n", __func__,
 		   ECHKPNT_STDERR_FD);
 	  goto Error;
 	}
@@ -566,7 +566,7 @@ main (int argc, char **argv)
 
 
       execv (newJobFileName, cargv);
-      sprintf (logMesgBuf, "%s : execute the %s fail\n", fname,
+      sprintf (logMesgBuf, "%s : execute the %s fail\n", __func__,
 	       newJobFileName);
       fprintf (stderr, "%s", logMesgBuf);
       logMesg (logMesgBuf);
@@ -582,12 +582,12 @@ main (int argc, char **argv)
   if (iChildPid < 0)
     {
       sprintf (logMesgBuf, "%s : %s fail, \n%s\n",
-	       fname, "waitpid", errno ? strerror (errno) : "");
+	       __func__, "waitpid", errno ? strerror (errno) : "");
       goto Error;
     }
 
 #ifdef DEBUG
-  sprintf (logMesgBuf, "%s : the real job exit value is %d\n", fname,
+  sprintf (logMesgBuf, "%s : the real job exit value is %d\n", __func__,
 	   WEXITSTATUS (iStatus));
   logMesg (logMesgBuf);
 #endif
@@ -595,7 +595,7 @@ main (int argc, char **argv)
 
   if (unlink (newJobFileName) != 0)
     {
-      sprintf (logMesgBuf, "%s : can not delete the job file %s\n%s\n", fname,
+      sprintf (logMesgBuf, "%s : can not delete the job file %s\n%s\n", __func__,
 	       newJobFileName, strerror (errno));
       logMesg (logMesgBuf);
     }
@@ -628,7 +628,7 @@ getUserCmdFromJF (char *pUserCmd, const char *pJobFileName)
   if (pFile == NULL)
     {
       sprintf (logMesgBuf, "%s : fopen() can not open the %s file\n%s\n",
-	       fname, pJobFileName, strerror (errno));
+	       __func__, pJobFileName, strerror (errno));
       logMesg (logMesgBuf);
       return (-1);
     }
@@ -757,7 +757,7 @@ getUserCmdFromCmdF (char *pNewUserCmd)
     {
       sprintf (logMesgBuf,
 	       "%s : getChkpntDirFile call fail, can not combine the %s with chkpnt dir\n",
-	       fname, ECHKPNT_RESTART_CMD_FILE);
+	       __func__, ECHKPNT_RESTART_CMD_FILE);
       logMesg (logMesgBuf);
       return (-1);
     }
@@ -774,14 +774,14 @@ getUserCmdFromCmdF (char *pNewUserCmd)
       else
 	{
 	  sprintf (logMesgBuf, "%s : fopen() can not open the %s file\n%s\n",
-		   fname, cmdFileName, strerror (errno));
+		   __func__, cmdFileName, strerror (errno));
 	  logMesg (logMesgBuf);
 	  return (-1);
 	}
     }
   else
     {
-      sprintf (logMesgBuf, "%s : the .restart_cmd exists \n", fname);
+      sprintf (logMesgBuf, "%s : the .restart_cmd exists \n", __func__);
       logMesg (logMesgBuf);
     }
 
@@ -813,7 +813,7 @@ getUserCmdFromCmdF (char *pNewUserCmd)
 	{
 	  sprintf (logMesgBuf,
 		   "%s : the .restart_cmd content has some errors : %s\n",
-		   fname, line);
+		   __func__, line);
 	  logMesg (logMesgBuf);
 	  iReValue = -1;
 	  break;
@@ -823,7 +823,7 @@ getUserCmdFromCmdF (char *pNewUserCmd)
   if (unlink (cmdFileName) != 0)
     {
       sprintf (logMesgBuf, "%s : unlink() can not delete the %s file\n%s\n",
-	       fname, cmdFileName, strerror (errno));
+	       __func__, cmdFileName, strerror (errno));
       logMesg (logMesgBuf);
     }
   return (iReValue);
@@ -853,7 +853,7 @@ buildNewJobFile (char *pNewJobFileName, const char *pUserCmd,
   if (pSource == NULL)
     {
       sprintf (logMesgBuf, "%s : fopen() can not open the %s file\n%s\n",
-	       fname, pJobFileName, strerror (errno));
+	       __func__, pJobFileName, strerror (errno));
       logMesg (logMesgBuf);
       return (-1);
     }
@@ -861,7 +861,7 @@ buildNewJobFile (char *pNewJobFileName, const char *pUserCmd,
   if (pDest == NULL)
     {
       sprintf (logMesgBuf, "%s : fopen() can not create the %s file\n%s\n",
-	       fname, pNewJobFileName, strerror (errno));
+	       __func__, pNewJobFileName, strerror (errno));
       logMesg (logMesgBuf);
       return (-1);
     }
@@ -926,7 +926,7 @@ buildNewJobFile (char *pNewJobFileName, const char *pUserCmd,
     {
       sprintf (logMesgBuf,
 	       "%s : chmod() can not change the execute mode of the %s file\n%s\n",
-	       fname, pNewJobFileName, strerror (errno));
+	       __func__, pNewJobFileName, strerror (errno));
       logMesg (logMesgBuf);
       unlink (pNewJobFileName);
       return (-1);

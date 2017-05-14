@@ -45,7 +45,7 @@ xdr_jobSetup (XDR * xdrs, struct jobSetup *jsetup, struct LSFHeader *hdr)
 	xdr_int (xdrs, &jsetup->execUid) &&
 	xdr_int (xdrs, &jsetup->execJobFlag)))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_int");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_int");
       return (FALSE);
     }
 
@@ -68,7 +68,7 @@ xdr_jobSetup (XDR * xdrs, struct jobSetup *jsetup, struct LSFHeader *hdr)
 	xdr_string (xdrs, &sp2, MAXFILENAMELEN) &&
 	xdr_string (xdrs, &sp3, MAXFILENAMELEN)))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_string");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_string");
       return (FALSE);
     }
   if (!xdr_int (xdrs, &jobArrElemId))
@@ -93,7 +93,7 @@ xdr_jobSyslog (XDR * xdrs, struct jobSyslog * slog, struct LSFHeader * hdr)
 
   if (!xdr_int (xdrs, &slog->logLevel))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "xdr_int", "loglevel");
+      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "xdr_int", "loglevel");
       return (FALSE);
     }
 
@@ -106,7 +106,7 @@ xdr_jobSyslog (XDR * xdrs, struct jobSyslog * slog, struct LSFHeader * hdr)
 
   if (!xdr_string (xdrs, &sp1, MAXLINELEN))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_string");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_string");
       return (FALSE);
     }
 
@@ -145,7 +145,7 @@ xdr_jobCard (XDR * xdrs, struct jobCard * jCard, struct LSFHeader * hdr)
       || !xdr_int (xdrs, &jCard->cleanupPid)
       || !xdr_int (xdrs, &jCard->execJobFlag))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr");
       return (FALSE);
     }
 
@@ -161,7 +161,7 @@ xdr_jobCard (XDR * xdrs, struct jobCard * jCard, struct LSFHeader * hdr)
 
   if (!xdr_string (xdrs, &sp1, MAX_LSB_NAME_LEN))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname,
+      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__,
 		 "xdr_string", "execUserName");
       return (FALSE);
     }
@@ -169,7 +169,7 @@ xdr_jobCard (XDR * xdrs, struct jobCard * jCard, struct LSFHeader * hdr)
   if (!xdr_int (xdrs, &jCard->actReasons)
       || !xdr_int (xdrs, &jCard->actSubReasons))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr");
       return (FALSE);
     }
 
@@ -180,7 +180,7 @@ xdr_jobCard (XDR * xdrs, struct jobCard * jCard, struct LSFHeader * hdr)
 
   if (!xdr_arrayElement (xdrs, (char *) &jCard->jobSpecs, hdr, xdr_jobSpecs))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_jobSpecs");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_jobSpecs");
       return (FALSE);
     }
 
@@ -193,13 +193,13 @@ xdr_jobCard (XDR * xdrs, struct jobCard * jCard, struct LSFHeader * hdr)
       || !xdr_int (xdrs, &jCard->maxRusage.stime)
       || !xdr_int (xdrs, &jCard->maxRusage.npids))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_int jRusage");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_int jRusage");
       return (FALSE);
     }
 
   if (!xdr_int (xdrs, (int *) &jCard->actFlags))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_actFlags");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_actFlags");
       return (FALSE);
     }
 

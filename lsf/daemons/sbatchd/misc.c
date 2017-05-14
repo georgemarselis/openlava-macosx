@@ -259,7 +259,7 @@ fcp (char *file1, char *file2, struct hostent *hp)
 
   if (fstat (fd1, &sbuf) < 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "fstat", file1);
+      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "fstat", file1);
       close (fd1);
       return -1;
     }
@@ -267,7 +267,7 @@ fcp (char *file1, char *file2, struct hostent *hp)
   fd2 = myopen_ (file2, O_CREAT | O_TRUNC | O_WRONLY, (int) sbuf.st_mode, hp);
   if (fd2 < 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "creat", file1);
+      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "creat", file1);
       close (fd1);
       return -1;
     }

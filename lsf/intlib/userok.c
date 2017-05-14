@@ -18,7 +18,8 @@
 
 
 // #ifdef __linux__
-#include <netdb.h>  // ruserok()
+#define _POSIX2_VERSION 199212L 
+#include <netdb.h> // ruserok()
 // FIXME FIXME FIXME FIXME alter configure.ac to specify that ruserok() function is mandatory
 // #else
 // 	#error stop compilation if other operating systems found
@@ -359,7 +360,7 @@ userok (int s, struct sockaddr_in *from, char *hostname, struct sockaddr_in *loc
 	{
 		strcpy (savedUser, auth->lsfUserName);
 
-		user_ok = ruserok (hostname, 0, savedUser, savedUser);
+		user_ok = ruserok (hostname, 0, savedUser, savedUser); // FIXME FIXME replace with iruserok() ?
 		if (user_ok == -1)
 		{
 			ls_syslog (LOG_INFO, I18N_FUNC_S_S_FAIL, __func__, "ruserok", hostname, savedUser);

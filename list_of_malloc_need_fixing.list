@@ -1,0 +1,853 @@
+
+======== ./docs/examples/client.c ========
+
+
+======== ./docs/examples/gethostbyaddr.c ========
+
+
+======== ./docs/examples/gethostbyname.c ========
+
+
+======== ./docs/examples/hdr.c ========
+
+
+======== ./docs/examples/msg.c ========
+
+
+======== ./docs/examples/pimme.c ========
+
+
+======== ./docs/examples/qstring.c ========
+
+
+======== ./docs/examples/readevent.c ========
+
+
+======== ./docs/examples/server.c ========
+
+
+======== ./docs/examples/sobufsiz.c ========
+
+
+======== ./lsf/cmdtools/badmin/badmin.c ========
+
+
+======== ./lsf/cmdtools/bbottom/bbot.c ========
+
+
+======== ./lsf/cmdtools/bcheckpoint/echkpnt.c ========
+
+
+======== ./lsf/cmdtools/bcheckpoint/echkpnt.env.c ========
+
+413:      pTableItem = (VAR_TABLE_ITEM_T *) malloc (sizeof (VAR_TABLE_ITEM_T));
+421:      pTableItem->m_pVarPair = (VAR_PAIR_T *) malloc (sizeof (VAR_PAIR_T));
+
+======== ./lsf/cmdtools/bcheckpoint/erestart.c ========
+
+
+======== ./lsf/cmdtools/beligible/beligible.c ========
+
+
+======== ./lsf/cmdtools/bhc/bhc.c ========
+
+
+======== ./lsf/cmdtools/bhist/bhist.c ========
+
+139:      first = (char *) malloc (pos + 1);
+140:      second = (char *) malloc (strlen (inputstr) - pos);
+
+======== ./lsf/cmdtools/bhosts/bhosts.c ========
+
+582:  if ((loadval = (char **) malloc ((lsInfo->numIndx + 1) * sizeof (char *)))
+589:  if ((loadval1 = (char **) malloc ((lsInfo->numIndx + 1) * sizeof (char *)))
+679:      if ((line = (char *) malloc (HEADERLEN)) == NULL)
+834:    if ((names = (char **) malloc ((lsInfo->numIndx + 1) * sizeof (char *)))
+1034:      if ((namTable = (char **) malloc (numRes * sizeof (char *))) == NULL)
+1039:      if ((totalTable = (char **) malloc (numRes * sizeof (char *))) == NULL)
+1044:      if ((rsvTable = (char **) malloc (numRes * sizeof (char *))) == NULL)
+1050:      if ((fmtTable = (char **) malloc (numRes * sizeof (char *))) == NULL)
+
+======== ./lsf/cmdtools/bjobs/bjobs.c ========
+
+
+======== ./lsf/cmdtools/bkill/bkill.c ========
+
+
+======== ./lsf/cmdtools/bmigrate/bmigrate.c ========
+
+
+======== ./lsf/cmdtools/bmigrategroup/bmigrategroup.c ========
+
+
+======== ./lsf/cmdtools/bmodify/bmodify.c ========
+
+
+======== ./lsf/cmdtools/bmove/bmove.c ========
+
+
+======== ./lsf/cmdtools/bparams/bparams.c ========
+
+
+======== ./lsf/cmdtools/bpeek/bpeek.c ========
+
+
+======== ./lsf/cmdtools/bqc/bqc.c ========
+
+
+======== ./lsf/cmdtools/bqueues/bqueues.c ========
+
+
+======== ./lsf/cmdtools/brequeue/brequeue.c ========
+
+
+======== ./lsf/cmdtools/brestart/brestart.c ========
+
+
+======== ./lsf/cmdtools/brun/brun.c ========
+
+
+======== ./lsf/cmdtools/bsub/bsub.c ========
+
+
+======== ./lsf/cmdtools/bswitch/bswitch.c ========
+
+
+======== ./lsf/cmdtools/btop/btop.c ========
+
+
+======== ./lsf/cmdtools/busers/busers.c ========
+
+
+======== ./lsf/cmdtools/lib/err.c ========
+
+
+======== ./lsf/cmdtools/lib/hist.c ========
+
+
+======== ./lsf/cmdtools/lib/job.c ========
+
+363:      if ((temp = (char *) malloc (strlen (job->submit.dependCond) + 30))
+826:	if (!(names = (char **) malloc (lsInfo->nRes * sizeof (char *))))
+
+======== ./lsf/cmdtools/lib/jobid.c ========
+
+
+======== ./lsf/cmdtools/lib/load.c ========
+
+115:      if ((line = (char *) malloc (HEADERLEN)) == NULL)
+170:      if ((line = (char *) malloc (HEADERLEN)) == NULL)
+261:      names = (char **) malloc (namelen * sizeof (char *));
+
+======== ./lsf/cmdtools/lib/misc.c ========
+
+92:  if ((list = (char **) malloc (a_size * sizeof (char *))) == NULL)
+
+======== ./lsf/cmdtools/lib/prt.c ========
+
+
+======== ./lsf/cmdtools/lib/read.event.c ========
+
+1821:  if (!(event = (struct eventRecord *) malloc (sizeof (struct eventRecord))))
+
+======== ./lsf/cmdtools/lib/sig.c ========
+
+
+======== ./lsf/cmdtools/lib/sub.c ========
+
+554:  if ((commandline = (char *) malloc (size)) == NULL)
+769:      if ((argBuf = (char **) malloc (INCREASE * sizeof (char *))) == NULL)
+
+======== ./lsf/cmdtools/lsacct/lsacct.c ========
+
+
+======== ./lsf/cmdtools/lsaddhost/lsaddhost.c ========
+
+
+======== ./lsf/cmdtools/lsadm/limcontrol.c ========
+
+
+======== ./lsf/cmdtools/lsadm/lsadmin.c ========
+
+
+======== ./lsf/cmdtools/lsadm/rescontrol.c ========
+
+
+======== ./lsf/cmdtools/lsadm/startup.c ========
+
+
+======== ./lsf/cmdtools/lseligible/lseligible.c ========
+
+
+======== ./lsf/cmdtools/lshosts/lshosts.c ========
+
+
+======== ./lsf/cmdtools/lshosts/lshosts.print_long.c ========
+
+
+======== ./lsf/cmdtools/lshosts/lshosts.print_wide.c ========
+
+
+======== ./lsf/cmdtools/lshosts/lshosts.usage.c ========
+
+
+======== ./lsf/cmdtools/lshosts/lshosts1.c ========
+
+
+======== ./lsf/cmdtools/lsid/lsid.c ========
+
+
+======== ./lsf/cmdtools/lsinfo/lsinfo.c ========
+
+
+======== ./lsf/cmdtools/lsload/lsload.c ========
+
+252:  if (!(loadval = (char **) malloc (num_loadindex * sizeof (char *))))
+
+======== ./lsf/cmdtools/lsloadadj/lsloadadj.c ========
+
+
+======== ./lsf/cmdtools/lsmon/lsmon.c ========
+
+140:    if (!(loadval = (char **) malloc (num_loadindex * sizeof (char *))))
+
+======== ./lsf/cmdtools/lsplace/lsplace.c ========
+
+
+======== ./lsf/cmdtools/lsrcp/lsrcp.c ========
+
+104:  buf = (char *) malloc (LSRCP_MSGSIZE);
+
+======== ./lsf/cmdtools/lsrmhost/lsrmhost.c ========
+
+
+======== ./lsf/cmdtools/lsrun/lsrun.c ========
+
+
+======== ./lsf/daemons/common/daemons.c ========
+
+
+======== ./lsf/daemons/common/elock.c ========
+
+
+======== ./lsf/daemons/common/mail.c ========
+
+
+======== ./lsf/daemons/common/misc.c ========
+
+
+======== ./lsf/daemons/common/xdr.c ========
+
+
+======== ./lsf/daemons/mbatchd/dep.c ========
+
+
+======== ./lsf/daemons/mbatchd/grp.c ========
+
+
+======== ./lsf/daemons/mbatchd/host.c ========
+
+
+======== ./lsf/daemons/mbatchd/jarray.c ========
+
+
+======== ./lsf/daemons/mbatchd/jgrp.c ========
+
+
+======== ./lsf/daemons/mbatchd/job.c ========
+
+
+======== ./lsf/daemons/mbatchd/main.c ========
+
+
+======== ./lsf/daemons/mbatchd/policy.c ========
+
+
+======== ./lsf/daemons/mbatchd/proxy.c ========
+
+
+======== ./lsf/daemons/mbatchd/queue.c ========
+
+
+======== ./lsf/daemons/mbatchd/requeue.c ========
+
+
+======== ./lsf/daemons/mbatchd/serv.c ========
+
+
+======== ./lsf/daemons/mbatchd/window.c ========
+
+
+======== ./lsf/daemons/mbatchd/comm.c ========
+
+
+======== ./lsf/daemons/mbatchd/init.c ========
+
+
+======== ./lsf/daemons/mbatchd/log.c ========
+
+2025:    if (!(names = (char **) malloc (allLsInfo->numIndx * sizeof (char *))))
+4552:  tmpBuf = (char *) malloc (datalen + strlen (jstr) + 1);
+4565:      jstr_header = (char *) malloc (strlen (jstr) + sizeof (char));
+4589:	  jstr_header = (char *) malloc ((ptr1 - jstr) + sizeof (char));
+
+======== ./lsf/daemons/mbatchd/misc.c ========
+
+
+======== ./lsf/daemons/mbatchd/resource.c ========
+
+
+======== ./lsf/daemons/sbatchd/job.c ========
+
+
+======== ./lsf/daemons/sbatchd/main.c ========
+
+488:      client = (struct clientNode *) malloc (sizeof (struct clientNode));
+
+======== ./lsf/daemons/sbatchd/policy.c ========
+
+
+======== ./lsf/daemons/sbatchd/serv.c ========
+
+
+======== ./lsf/daemons/sbatchd/sig.c ========
+
+
+======== ./lsf/daemons/sbatchd/comm.c ========
+
+688:  if ((request_buf = (char *) malloc (len)) == NULL)
+
+======== ./lsf/daemons/sbatchd/file.c ========
+
+
+======== ./lsf/daemons/sbatchd/misc.c ========
+
+
+======== ./lsf/daemons/sbatchd/xdr.c ========
+
+
+======== ./lsf/daemons/eauthd/eauth.c ========
+
+
+======== ./lsf/daemons/limd/cluster.c ========
+
+
+======== ./lsf/daemons/limd/conf.c ========
+
+1260:    tmp = (sharedResourceInstance *) malloc (sizeof (struct sharedResourceInstance));
+1268:        tmp->hosts = (struct hostNode **) malloc (nHosts * sizeof (struct hostNode *));
+1363:    if ((initValue = (char *) malloc (4 * sizeof (char))) == NULL)
+1969:        clusAdminIds = (uid_t *) malloc (sizeof (uid_t));
+1970:        clusAdminGids = (uid_t *) malloc (sizeof (uid_t));
+1978:        clusAdminNames = (char **) malloc (sizeof (char *));
+2124:    tempAdminIds   = (uid_t *) malloc (tempNAdmins * sizeof (uid_t));
+2125:    tempAdminGids  = (gid_t *) malloc (tempNAdmins * sizeof (gid_t));
+2126:    tempAdminNames = (char **) malloc (tempNAdmins * sizeof (char *));
+3414:    temp = (struct sharedResource *) malloc (sizeof (struct sharedResource));
+3430:        temp1 =(struct sharedResource **) malloc (sizeof (struct sharedResource *));
+3506:            temp = (char **) malloc (numofhosts * sizeof (char *));
+3724:        temp = (struct hostNode **) malloc (nHosts * sizeof (struct hostNode *));
+3764:    if ((temp->hosts =(struct hostNode **) malloc (nHosts * sizeof (struct hostNode *))) == NULL)
+3813:    if ((temp = (struct resourceInstance *) malloc (sizeof (struct resourceInstance))) == NULL) {
+4427:        admins->adminNames = (char **) malloc (numAds * sizeof (char *));
+
+======== ./lsf/daemons/limd/control.c ========
+
+
+======== ./lsf/daemons/limd/info.c ========
+
+521:      if (!(buf = (char *) malloc (len)))
+751:  if ((buf = (char *) malloc (cc)) == NULL)
+
+======== ./lsf/daemons/limd/internal.c ========
+
+
+======== ./lsf/daemons/limd/lim.c ========
+
+
+======== ./lsf/daemons/limd/linux.c ========
+
+
+======== ./lsf/daemons/limd/load.c ========
+
+
+======== ./lsf/daemons/limd/main.c ========
+
+
+======== ./lsf/daemons/limd/misc.c ========
+
+
+======== ./lsf/daemons/limd/policy.c ========
+
+
+======== ./lsf/daemons/limd/rload.c ========
+
+1278:      if ((temp = (char *) malloc (strlen (value) + 1)) == NULL)
+
+======== ./lsf/daemons/limd/xdr.c ========
+
+
+======== ./lsf/daemons/niosd/handler.c ========
+
+223:  connIndexTable = (int *) malloc (maxtasks * sizeof (int));
+1290:	  conn[i].rbuf = (RelayLineBuf *) malloc (sizeof (RelayLineBuf));
+1688:  if ((hostname = (char *) malloc (MAXHOSTNAMELEN * sizeof (char))) == NULL)
+1729:  conn[i].rbuf = (RelayLineBuf *) malloc (sizeof (RelayLineBuf));
+2014:  if ((ptid = (Dead_tid *) malloc (sizeof (Dead_tid))) == NULL)
+2027:  if ((prpid = (Dead_rpid *) malloc (sizeof (Dead_rpid))) == NULL)
+2096:      sigbufp = (struct sigbuf *) malloc (sizeof (struct sigbuf));
+2535:  if ((task = (rtaskInfo_t *) malloc (sizeof (rtaskInfo_t))) == NULL)
+2578:  if ((notice = (taskNotice_t *) malloc (sizeof (taskNotice_t))) == NULL)
+
+======== ./lsf/daemons/niosd/nios.c ========
+
+1982:      reasonTb = (int *) malloc (sizeof (numReasons) * numReasons);
+2232:	if (!(names = (char **) malloc (lsInfo->numIndx * sizeof (char *))))
+
+======== ./lsf/daemons/pimd/linux.c ========
+
+
+======== ./lsf/daemons/pimd/pim.c ========
+
+
+======== ./lsf/daemons/resd/getproc.c ========
+
+
+======== ./lsf/daemons/resd/handler.c ========
+
+
+======== ./lsf/daemons/resd/init.c ========
+
+
+======== ./lsf/daemons/resd/misc.c ========
+
+
+======== ./lsf/daemons/resd/pty.c ========
+
+
+======== ./lsf/daemons/resd/res.c ========
+
+
+======== ./lsf/daemons/resd/rf.c ========
+
+
+======== ./lsf/daemons/resd/tasklog.c ========
+
+237:  acctRec.cmdln = (char *) malloc (l * (sizeof (char)));
+
+======== ./lsf/include/lib/lim.c ========
+
+
+======== ./lsf/intlib/testbitset.c ========
+
+
+======== ./lsf/intlib/admin.c ========
+
+
+======== ./lsf/intlib/bitset.c ========
+
+
+======== ./lsf/intlib/callex.c ========
+
+499:	entry = (struct mallocList *) malloc (sizeof (struct mallocList));
+
+======== ./lsf/intlib/cmdtime.c ========
+
+
+======== ./lsf/intlib/conf.c ========
+
+
+======== ./lsf/intlib/daemon.c ========
+
+
+======== ./lsf/intlib/idx.c ========
+
+
+======== ./lsf/intlib/jidx.c ========
+
+666:  yys = (int *) malloc (yymaxdepth * sizeof (int));
+667:  yyv = (YYSTYPE *) malloc (yymaxdepth * sizeof (YYSTYPE));
+
+======== ./lsf/intlib/link.c ========
+
+
+======== ./lsf/intlib/list.c ========
+
+
+======== ./lsf/intlib/list2.c ========
+
+
+======== ./lsf/intlib/listset.c ========
+
+
+======== ./lsf/intlib/lsftcl.c ========
+
+
+======== ./lsf/intlib/misc.c ========
+
+326:  if ((argv = (char **) malloc (argmax * sizeof (char *))) == NULL)
+
+======== ./lsf/intlib/resourcecmd.c ========
+
+
+======== ./lsf/intlib/resreq.c ========
+
+
+======== ./lsf/intlib/set.c ========
+
+294:	  ptr = (struct listSet *) malloc (sizeof (struct listSet));
+
+======== ./lsf/intlib/userok.c ========
+
+
+======== ./lsf/intlib/window.c ========
+
+
+======== ./lsf/lib/checkpoint/checkpoint.c ========
+
+
+======== ./lsf/lib/liblsbatch/comm.c ========
+
+287:        *rep_buf = (char *) malloc( len );
+
+======== ./lsf/lib/liblsbatch/debug.c ========
+
+
+======== ./lsf/lib/liblsbatch/err.c ========
+
+
+======== ./lsf/lib/liblsbatch/groups.c ========
+
+
+======== ./lsf/lib/liblsbatch/hc.c ========
+
+42:      hostControlReq.name = (char *) malloc (MAXHOSTNAMELEN);
+
+======== ./lsf/lib/liblsbatch/hosts.c ========
+
+158:  request_buf = (char *)malloc( (size_t)cc);
+
+======== ./lsf/lib/liblsbatch/init.c ========
+
+
+======== ./lsf/lib/liblsbatch/jobs.c ========
+
+
+======== ./lsf/lib/liblsbatch/log.c ========
+
+3980:				indexS->jobIds = (int *) malloc (size);
+
+======== ./lsf/lib/liblsbatch/mig.c ========
+
+
+======== ./lsf/lib/liblsbatch/misc.c ========
+
+
+======== ./lsf/lib/liblsbatch/modify.c ========
+
+
+======== ./lsf/lib/liblsbatch/move.c ========
+
+
+======== ./lsf/lib/liblsbatch/msg.c ========
+
+
+======== ./lsf/lib/liblsbatch/params.c ========
+
+76:    request_buf = (char *)malloc( (unsigned long)cc);
+
+======== ./lsf/lib/liblsbatch/peek.c ========
+
+
+======== ./lsf/lib/liblsbatch/qc.c ========
+
+40:      qcReq.name = (char *) malloc (MAXHOSTNAMELEN);
+
+======== ./lsf/lib/liblsbatch/queues.c ========
+
+79:      queueInfoReq.names = (char **) malloc (3 * sizeof (char *));
+157:  request_buf = (char *)malloc ( (unsigned long)cc);
+
+======== ./lsf/lib/liblsbatch/reason.c ========
+
+
+======== ./lsf/lib/liblsbatch/reconfig.c ========
+
+
+======== ./lsf/lib/liblsbatch/resource.c ========
+
+64:      resourceInfoReq.resourceNames =(char **) malloc (sizeof (char *));
+77:      resourceInfoReq.resourceNames = (char **) malloc ((unsigned long)*numResources * sizeof (char *));
+
+======== ./lsf/lib/liblsbatch/rexecv.c ========
+
+70:  commandline = (char *) malloc (size);
+223:      if ((argBuf = (char **) malloc (INCREASE * sizeof (char *))) == NULL)
+
+======== ./lsf/lib/liblsbatch/sig.c ========
+
+
+======== ./lsf/lib/liblsbatch/signals.c ========
+
+
+======== ./lsf/lib/liblsbatch/spool.c ========
+
+764:  buf = (char *) malloc (LSRCP_MSGSIZE);
+1173:  returnValue = (listHeaderPtr_t) malloc (sizeof (listHeader_t));
+1255:  returnValue = (listElementPtr_t) malloc (sizeof (listElement_t));
+1262:  returnValue->elementName = (char *) malloc (strlen (elementName) + 1);
+
+======== ./lsf/lib/liblsbatch/sub.c ========
+
+508:	if ((jf->data = (char *) malloc (size)) == NULL)
+731:	request_buf = (char *) malloc (reqBufSize);
+780:	reply = (struct submitMbdReply *) malloc (sizeof (struct submitMbdReply));
+2523:			ed.data = (char *) malloc (ed.len);
+4252:	lineBuf = (char *) malloc ((size_t)length + 1);
+4405:		xp = (struct xFile *) malloc (NUMXF * sizeof (struct xFile));
+5799:			p = (struct xFile *) malloc (v * sizeof (struct xFile));
+
+======== ./lsf/lib/liblsbatch/switch.c ========
+
+
+======== ./lsf/lib/liblsbatch/users.c ========
+
+61:      if ((userInfoReq.names = (char **) malloc (sizeof (char *))) == NULL)
+76:      if ((userInfoReq.names = (char **) malloc (sizeof (char *))) == NULL)
+
+======== ./lsf/lib/liblsbatch/xdr.c ========
+
+
+======== ./lsf/lib/liblsbatch/conf.c ========
+
+2789:        host.loadSched = (float *)malloc( (unsigned long)info->numIndx * sizeof (float *));
+3111:        toHost->loadSched = (float *)malloc( (unsigned long)(fromHost->nIdx) * sizeof (float *) );
+3112:        toHost->loadStop  = (float *)malloc( (unsigned long)(fromHost->nIdx) * sizeof (float *) );
+5371:    expandAds = (char *)malloc( MAXLINELEN );
+5586:    uConf->users = (struct userInfoEnt *)malloc( (unsigned long)numofusers * sizeof( struct userInfoEnt ) );
+
+======== ./lsf/lib/liblsf/channel.c ========
+
+
+======== ./lsf/lib/liblsf/comm.c ========
+
+
+======== ./lsf/lib/liblsf/conf.c ========
+
+91:        sConf = (struct sharedConf *) malloc (sizeof (struct sharedConf));
+847:        cConf = (struct clusterConf *) malloc (sizeof (struct clusterConf));
+896:    myinfo.resTable = (struct resItem *) malloc( info->nRes * sizeof (struct resItem));
+1279:        admins.adminIds = (uid_t *) malloc( ( unsigned long) numAds * sizeof (uid_t));
+1280:        admins.adminGIds = (gid_t *) malloc( (unsigned long) numAds * sizeof (gid_t));
+1281:        admins.adminNames = (char **) malloc( (unsigned long) numAds * sizeof (char *));
+1909:    newlist = (struct hostInfo *) malloc( (unsigned long) cConf->numHosts * sizeof( struct hostInfo ) );
+2675:    hostTable = (char **) malloc( (unsigned long) numHosts * sizeof (char *));
+2784:    instance[inst].hostList = (char **) malloc (sizeof (char *) * (unsigned long) nHosts);
+3015:    outHosts[0] = (char *) malloc( (unsigned long) size + (unsigned long) in_num);
+
+======== ./lsf/lib/liblsf/confmisc.c ========
+
+
+======== ./lsf/lib/liblsf/conn.c ========
+
+
+======== ./lsf/lib/liblsf/control.c ========
+
+
+======== ./lsf/lib/liblsf/cwd.c ========
+
+
+======== ./lsf/lib/liblsf/debug.c ========
+
+
+======== ./lsf/lib/liblsf/dir.c ========
+
+
+======== ./lsf/lib/liblsf/eauth.c ========
+
+
+======== ./lsf/lib/liblsf/eligible.c ========
+
+545:	tlist = (char **) malloc (( ( unsigned long) nEntry + 1) * sizeof (char *));
+
+======== ./lsf/lib/liblsf/err.c ========
+
+
+======== ./lsf/lib/liblsf/errno.c ========
+
+
+======== ./lsf/lib/liblsf/esub.c ========
+
+153:    buf = (char *) malloc (MSGSIZE + 1);
+
+======== ./lsf/lib/liblsf/host.c ========
+
+
+======== ./lsf/lib/liblsf/i18n.c ========
+
+
+======== ./lsf/lib/liblsf/id.c ========
+
+
+======== ./lsf/lib/liblsf/info.c ========
+
+731:	indicies = (char **) malloc( (lastElement + 1) * sizeof (char *) );
+
+======== ./lsf/lib/liblsf/init.c ========
+
+
+======== ./lsf/lib/liblsf/initenv.c ========
+
+
+======== ./lsf/lib/liblsf/limits.c ========
+
+
+======== ./lsf/lib/liblsf/load.c ========
+
+
+======== ./lsf/lib/liblsf/lsf.c ========
+
+
+======== ./lsf/lib/liblsf/misc.c ========
+
+
+======== ./lsf/lib/liblsf/nioback.c ========
+
+
+======== ./lsf/lib/liblsf/nios.c ========
+
+
+======== ./lsf/lib/liblsf/osal.c ========
+
+
+======== ./lsf/lib/liblsf/pim.c ========
+
+257:    if ((pimInfoBuf = (char *) malloc( (unsigned long) pimInfoLen + 1)) == NULL) {
+385:    activeInPGid = (int *) malloc( (unsigned long)inNPGids * sizeof (int));
+393:    pgidList = (int *) malloc ((inNPGids < PGID_LIST_SIZE ? PGID_LIST_SIZE : (unsigned long)(inNPGids + PGID_LIST_SIZE)) * sizeof (int));
+403:    pidList = (struct pidInfo *) malloc (PID_LIST_SIZE * sizeof (struct pidInfo));
+
+======== ./lsf/lib/liblsf/place.c ========
+
+
+======== ./lsf/lib/liblsf/priority.c ========
+
+
+======== ./lsf/lib/liblsf/queue.c ========
+
+30:    qPtr = (struct lsQueueEntry *) malloc (sizeof (struct lsQueueEntry));
+38:    *head = (struct lsQueue *) malloc (sizeof (struct lsQueue));
+88:    entry = (struct lsQueueEntry *) malloc (sizeof (struct lsQueueEntry));
+147:    entry = (struct lsQueueEntry *) malloc (sizeof (struct lsQueueEntry));
+
+======== ./lsf/lib/liblsf/rcp.c ========
+
+381:    char *szThisHost = (char *) malloc( sizeof(MAXHOSTNAMELEN) + 1 );
+
+======== ./lsf/lib/liblsf/rdwr.c ========
+
+
+======== ./lsf/lib/liblsf/res.c ========
+
+227:    buf = (char *) malloc (bufsize);
+296:    sendBuf = (char *) malloc( bufferSize );
+432:    request = (struct lsRequest *) malloc (sizeof (struct lsRequest));
+538:    header = (struct lsTMsgHdr *) malloc (sizeof (struct lsTMsgHdr));
+1402:    char *host = (char *) malloc( sizeof(MAXHOSTNAMELEN) + 1 );
+
+======== ./lsf/lib/liblsf/resctrl.c ========
+
+
+======== ./lsf/lib/liblsf/reslog.c ========
+
+77:  acctRec = (struct lsfAcctRec *) malloc (sar + 5 * len);
+
+======== ./lsf/lib/liblsf/rex.c ========
+
+
+======== ./lsf/lib/liblsf/rf.c ========
+
+166:  if ((rh = (struct rHosts *) malloc (sizeof (struct rHosts))) == NULL)
+
+======== ./lsf/lib/liblsf/rtask.c ========
+
+
+======== ./lsf/lib/liblsf/rwait.c ========
+
+
+======== ./lsf/lib/liblsf/sig.c ========
+
+
+======== ./lsf/lib/liblsf/so.c ========
+
+
+======== ./lsf/lib/liblsf/sock.c ========
+
+
+======== ./lsf/lib/liblsf/syntax.c ========
+
+
+======== ./lsf/lib/liblsf/syslog.c ========
+
+
+======== ./lsf/lib/liblsf/table.c ========
+
+
+======== ./lsf/lib/liblsf/term.c ========
+
+
+======== ./lsf/lib/liblsf/tid.c ========
+
+38:    if ((tidp = (struct tid *) malloc (sizeof (struct tid))) ==
+183:    *tidArray = (int *) malloc (TID_BNUM * sizeof (int));
+
+======== ./lsf/lib/liblsf/tty.c ========
+
+
+======== ./lsf/lib/liblsf/usleep.c ========
+
+
+======== ./lsf/lib/liblsf/utmp.c ========
+
+
+======== ./lsf/lib/liblsf/wconf.c ========
+
+90:  defNames = (char **) malloc (defsize * sizeof (char *));
+98:  defConds = (char **) malloc (defsize * sizeof (char *));
+528:  conf->confhandle->__func__ = (char *) malloc ((len + 1) * sizeof (char));
+585:	node = (struct confNode *) malloc (sizeof (struct confNode));
+876:	  myLine = (char *) malloc (len * sizeof (char));
+950:		  sp = (char *) malloc (linesize * sizeof (char));
+962:		  longLine = (char *) malloc (linesize * sizeof (char));
+
+======== ./lsf/lib/liblsf/whathost.c ========
+
+
+======== ./lsf/lib/liblsf/words.c ========
+
+
+======== ./lsf/lib/liblsf/xdr.c ========
+
+401:	phostname = (char *) malloc (MAXHOSTNAMELEN);
+
+======== ./lsf/lib/liblsf/xdrlim.c ========
+
+155:        placeRepPtr->placeInfo = (struct placeInfo *) malloc ( placeRepPtr->numHosts * sizeof (struct placeInfo));
+282:        jobXferPtr->placeInfo = (struct placeInfo *) malloc( jobXferPtr->numHosts * sizeof (struct placeInfo));
+339:        hostInfoReply->hostMatrix = (struct shortHInfo *) malloc (shISize + matSize);
+537:        memp = (char *) malloc ((shortLInfo->nRes + shortLInfo->nTypes + shortLInfo->nModels) * MAXLSFNAMELEN + shortLInfo->nRes * sizeof (char *));
+1350:        instance->hostList = (char **) malloc ( (u_long)instance->nHosts * sizeof (char *));
+
+======== ./lsf/lib/liblsf/xdrmisc.c ========
+
+302:        ld->data = (char *) malloc (ld->len);
+351:                auth->k.authToken.data = (void *) malloc (auth->k.authToken.len);
+
+======== ./lsf/lib/liblsf/xdrnio.c ========
+
+
+======== ./lsf/lib/liblsf/xdrres.c ========
+
+
+======== ./lsf/lib/liblsf/xdrrf.c ========
+

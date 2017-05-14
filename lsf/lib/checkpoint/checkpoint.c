@@ -54,7 +54,7 @@ getEchkpntMethodDir (char *pChkpnt_Cmd, const char *pMethodDir, const char *pPro
 
 
     if (pProgramName == NULL) {
-        sprintf (logMesgBuf, "%s : parameter pProgramName is NULL\n", fname);
+        sprintf (logMesgBuf, "%s : parameter pProgramName is NULL\n", __func__);
         fprintf (stderr, "%s", logMesgBuf);
         logMesg (logMesgBuf);
         return NULL;
@@ -75,7 +75,7 @@ getEchkpntMethodDir (char *pChkpnt_Cmd, const char *pMethodDir, const char *pPro
     }
 
     if (initenv_ (aParamList, pConfigPath) < 0) {
-        sprintf (logMesgBuf, "%s : initenv_() call fail\n", fname);
+        sprintf (logMesgBuf, "%s : initenv_() call fail\n", __func__);
         logMesg (logMesgBuf);
     }
 
@@ -87,7 +87,7 @@ getEchkpntMethodDir (char *pChkpnt_Cmd, const char *pMethodDir, const char *pPro
             strcpy (pChkpntBuf, aParamList[LSF_SERVERDIR].paramValue);
         }
         else {
-            sprintf (logMesgBuf, "%s : can't get the LSF_SERVERDIR value\n", fname);
+            sprintf (logMesgBuf, "%s : can't get the LSF_SERVERDIR value\n", __func__);
             fprintf (stderr, "%s", logMesgBuf);
             logMesg (logMesgBuf);
             return NULL;
@@ -106,7 +106,7 @@ getEchkpntMethodDir (char *pChkpnt_Cmd, const char *pMethodDir, const char *pPro
     }
 
     if (access (pChkpntBuf, X_OK) < 0) {
-        sprintf (logMesgBuf, "%s : the %s is not executed \n%s\n", fname, pChkpntBuf, errno ? strerror (errno) : "");
+        sprintf (logMesgBuf, "%s : the %s is not executed \n%s\n", __func__, pChkpntBuf, errno ? strerror (errno) : "");
         fprintf (stderr, "%s", logMesgBuf);
         logMesg (logMesgBuf);
         return NULL;
@@ -115,7 +115,7 @@ getEchkpntMethodDir (char *pChkpnt_Cmd, const char *pMethodDir, const char *pPro
     if (pChkpnt_Cmd == NULL) {
         pChkpntBuf = putstr_ (pChkpntBuf);
         if (pChkpntBuf == NULL) {
-            sprintf (logMesgBuf, "%s : %s malloc dynamic space fail \n%s\n", fname, "putstr_()", strerror (errno));
+            sprintf (logMesgBuf, "%s : %s malloc dynamic space fail \n%s\n", __func__, "putstr_()", strerror (errno));
             fprintf (stderr, "%s", logMesgBuf);
             logMesg (logMesgBuf);
         }
@@ -147,12 +147,12 @@ getChkpntDirFile (char *pPathBuf, const char *pFileName)
         sprintf (pPathBuf, "%s/", pChkpntPath);
 
 #ifdef DEBUG
-        sprintf (logMesgBuf, "%s : the LSB_CHKPNT_DIR is %s\n", fname, pChkpntPath);
+        sprintf (logMesgBuf, "%s : the LSB_CHKPNT_DIR is %s\n", __func__, pChkpntPath);
 #endif
 
     }
     else {
-        sprintf (logMesgBuf, "%s : LSB_CHKPNT_DIR is not defined\n", fname);
+        sprintf (logMesgBuf, "%s : LSB_CHKPNT_DIR is not defined\n", __func__);
         logMesg (logMesgBuf);
         return -1;
     }
@@ -195,7 +195,7 @@ redirectFd (const char *pFileName, int iFileNo)
 
     iFd = open (pFileName, O_WRONLY | O_CREAT | O_APPEND, ECHKPNT_FILE_MODE);
     if (iFd == -1) {
-        sprintf (logMesgBuf, "%s : open() can't open %s file\n%s\n", fname, pFileName, errno ? strerror (errno) : "");
+        sprintf (logMesgBuf, "%s : open() can't open %s file\n%s\n", __func__, pFileName, errno ? strerror (errno) : "");
         logMesg (logMesgBuf);
         return -1;
     }
@@ -204,7 +204,7 @@ redirectFd (const char *pFileName, int iFileNo)
         ireValue = 0;
     }
     else {
-        sprintf (logMesgBuf, "%s : dup2() fail\n%s\n", fname, strerror (errno));
+        sprintf (logMesgBuf, "%s : dup2() fail\n%s\n", __func__, strerror (errno));
         logMesg (logMesgBuf);
         ireValue = -1;
     }

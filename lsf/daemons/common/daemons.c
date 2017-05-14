@@ -59,7 +59,7 @@ rcvJobFile (int chfd, struct lenData *jf)
 
   if ((cc = chanRead_ (chfd, NET_INTADDR_ (&jf->len), NET_INTSIZE_)) != NET_INTSIZE_)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "chanRead_");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "chanRead_");
       return -1;
     }
 
@@ -72,7 +72,7 @@ rcvJobFile (int chfd, struct lenData *jf)
   returnValue = (unsigned long) cc;
   if ( returnValue != jf->len)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "chanRead_");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "chanRead_");
       free (jf->data);
       return -1;
     }
@@ -95,7 +95,7 @@ do_readyOp (XDR *xdrs, int chanfd, struct sockaddr_in *from, struct LSFHeader *r
 
   if (chanAllocBuf_ (&buf, sizeof (struct LSFHeader)) < 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "malloc");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "malloc");
       return (-1);
     }
   initLSFHeader_ (&replyHdr);
@@ -105,7 +105,7 @@ do_readyOp (XDR *xdrs, int chanfd, struct sockaddr_in *from, struct LSFHeader *r
   xdrmem_create (&xdrs2, buf->data, sizeof (struct LSFHeader), XDR_ENCODE);
   if (!xdr_LSFHeader (&xdrs2, &replyHdr))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_LSFHeader");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_LSFHeader");
       xdr_destroy (&xdrs2);
       return (-1);
 
@@ -115,7 +115,7 @@ do_readyOp (XDR *xdrs, int chanfd, struct sockaddr_in *from, struct LSFHeader *r
 
   if (chanEnqueue_ (chanfd, buf) < 0)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "chanEnqueue_");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "chanEnqueue_");
       xdr_destroy (&xdrs2);
       return (-1);
     }
@@ -154,7 +154,7 @@ childRemoveSpoolFile (const char *spoolFile, int options, const struct passwd *p
   if (pwUser == NULL)
     {
       /* catgets 8001 */
-      ls_syslog (LOG_ERR, "catgets 8001: %s: Parameter const struct passwd * pwUser is NULL", fname);
+      ls_syslog (LOG_ERR, "catgets 8001: %s: Parameter const struct passwd * pwUser is NULL", __func__);
       goto Done;
     }
 
@@ -170,7 +170,7 @@ childRemoveSpoolFile (const char *spoolFile, int options, const struct passwd *p
     }
 
   /* catgets 3000 */
-  sprintf (errMsg, "catgets 3000: %s: Unable to remove spool file:\n,\'%s\'\n on host %s\n", fname, dirName, fromHost);
+  sprintf (errMsg, "catgets 3000: %s: Unable to remove spool file:\n,\'%s\'\n on host %s\n", __func__, dirName, fromHost);
 
   if (!(options & FORK_REMOVE_SPOOL_FILE))
     {
@@ -181,7 +181,7 @@ childRemoveSpoolFile (const char *spoolFile, int options, const struct passwd *p
       {
         status = -1;
         /* catgets 3001 */
-        sprintf (errMsg, "catgets 3001: %s: %s failed when trying to delete %s from %s\n",  fname, apiName, dirName, fromHost);
+        sprintf (errMsg, "catgets 3001: %s: %s failed when trying to delete %s from %s\n",  __func__, apiName, dirName, fromHost);
         goto Error;
       }
   }
@@ -214,7 +214,7 @@ childRemoveSpoolFile (const char *spoolFile, int options, const struct passwd *p
       {
         status = -1;
         /* catgets 3001 */
-        sprintf (errMsg, "3001: %s: %s failed when trying to delete %s from %s\n", fname, apiName, dirName, fromHost);
+        sprintf (errMsg, "3001: %s: %s failed when trying to delete %s from %s\n", __func__, apiName, dirName, fromHost);
         goto Error;
       }
   }
@@ -236,11 +236,11 @@ childRemoveSpoolFile (const char *spoolFile, int options, const struct passwd *p
 
       if (logclass & (LC_FILE))
   {
-    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "fork");
+    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "fork");
   }
       status = -1;
       /* catgets 3002 */
-      sprintf (errMsg, "catgets 3002: %s: Unable to fork to remove spool file:\n,\'%s\'\n on host %s\n", fname, dirName, fromHost);
+      sprintf (errMsg, "catgets 3002: %s: Unable to fork to remove spool file:\n,\'%s\'\n on host %s\n", __func__, dirName, fromHost);
       goto Error;
     default:
       status = 0;

@@ -59,7 +59,7 @@ static struct queueInfoEnt **queues = NULL;
 static struct groupInfoEnt *usergroups[MAX_GROUPS];
 static struct groupInfoEnt *hostgroups[MAX_GROUPS];
 
-static struct hTab unknownUsers = { };
+static struct hTab unknownUsers;
 // static struct clusterConf cConf_;
 // static struct sharedConf sConf_;
 

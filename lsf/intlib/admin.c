@@ -472,7 +472,6 @@ checkConf (int verbose, int who)
 static int
 changeUserEUId (void)
 {
-	static char __func__] = "changeUserEUId";
 	uid_t uid;
 
 	uid = getuid ();
@@ -482,7 +481,7 @@ changeUserEUId (void)
 	}
 
 	if( lsfSetXUid(0, -1, uid, -1, seteuid) < 0 ) {
-		ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "setresuid/seteuid", uid);
+		ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "setresuid/seteuid", uid);
 		return -1;
 	}
 

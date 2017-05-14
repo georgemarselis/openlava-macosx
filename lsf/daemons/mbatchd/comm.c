@@ -75,7 +75,7 @@ start_ajob (struct jData * jDataPtr,
   struct lsfAuth *auth = NULL;
 
   if (logclass & (LC_SCHED | LC_EXEC))
-    ls_syslog (LOG_DEBUG2, "%s: job=%s", fname,
+    ls_syslog (LOG_DEBUG2, "%s: job=%s", __func__,
 	       lsb_jobid2str (jDataPtr->jobId));
 
   packJobSpecs (jDataPtr, &jobSpecs);
@@ -110,7 +110,7 @@ start_ajob (struct jData * jDataPtr,
 
   if (readLogJobInfo (&jobSpecs, jDataPtr, &jf, &aux_auth_data) == -1)
     {
-      ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_M, fname,
+      ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_M, __func__,
 		 lsb_jobid2str (jDataPtr->jobId), "readLogJobInfo");
       freeJobSpecs (&jobSpecs);
       return (ERR_NO_FILE);
@@ -141,11 +141,11 @@ start_ajob (struct jData * jDataPtr,
     buflen += strlen (jobSpecs.env[i]);
   buflen = (buflen * 4) / 4;
 
-  request_buf = (char *) my_malloc (buflen, fname);
+  request_buf = (char *) my_malloc (buflen, __func__);
   xdrmem_create (&xdrs, request_buf, buflen, XDR_ENCODE);
   if (!xdr_encodeMsg (&xdrs, (char *) &jobSpecs, &hdr, xdr_jobSpecs, 0, auth))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_encodeMsg");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_encodeMsg");
       xdr_destroy (&xdrs);
       free (request_buf);
       freeJobSpecs (&jobSpecs);
@@ -158,7 +158,7 @@ start_ajob (struct jData * jDataPtr,
   sbdNode.reqCode = MBD_NEW_JOB;
 
   reply = callSBD (toHost, request_buf, XDR_GETPOS (&xdrs), &reply_buf, &hdr,
-		   sndJobFile_, (int *) &jf, hostData, lastHost, fname,
+		   sndJobFile_, (int *) &jf, hostData, lastHost, __func__,
 		   &errcnt, &cc,
 		   CALL_SERVER_NO_WAIT_REPLY | CALL_SERVER_NO_HANDSHAKE,
 		   &sbdNode, &socket);
@@ -216,7 +216,7 @@ switch_job (struct jData * jDataPtr, int options)
 
   if (logclass & (LC_SIGNAL | LC_EXEC))
     ls_syslog (LOG_DEBUG2, "\
-%s: job=%s", fname, lsb_jobid2str (jDataPtr->jobId));
+%s: job=%s", __func__, lsb_jobid2str (jDataPtr->jobId));
 
   packJobSpecs (jDataPtr, &jobSpecs);
 
@@ -235,11 +235,11 @@ switch_job (struct jData * jDataPtr, int options)
     + jobSpecs.nxf * sizeof (struct xFile);
   buflen = (buflen * 4) / 4;
 
-  request_buf = (char *) my_malloc (buflen, fname);
+  request_buf = (char *) my_malloc (buflen, __func__);
   xdrmem_create (&xdrs, request_buf, buflen, XDR_ENCODE);
   if (!xdr_encodeMsg (&xdrs, (char *) &jobSpecs, &hdr, xdr_jobSpecs, 0, auth))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_encodeMsg");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_encodeMsg");
       xdr_destroy (&xdrs);
       free (request_buf);
       freeJobSpecs (&jobSpecs);
@@ -259,7 +259,7 @@ switch_job (struct jData * jDataPtr, int options)
 
 
   reply = callSBD (toHost, request_buf, XDR_GETPOS (&xdrs), &reply_buf, &hdr,
-		   NULL, NULL, HostData, lastHost, fname, &errcnt,
+		   NULL, NULL, HostData, lastHost, __func__, &errcnt,
 		   &cc,
 		   CALL_SERVER_NO_WAIT_REPLY | CALL_SERVER_NO_HANDSHAKE,
 		   &sbdNode, &socket);
@@ -273,7 +273,7 @@ switch_job (struct jData * jDataPtr, int options)
   if (reply != ERR_NO_ERROR)
     {
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5404, "%s: Job <%s>: Illegal reply code <%d> from host <%s>, switch job failed"),	/* catgets 5404 */
-		 fname, lsb_jobid2str (jDataPtr->jobId), reply, toHost);
+		 __func__, lsb_jobid2str (jDataPtr->jobId), reply, toHost);
     }
 
   if (reply_buf)
@@ -315,7 +315,7 @@ signal_job (struct jData * jp,
   if (logclass & LC_SIGNAL)
     {
       ls_syslog (LOG_DEBUG, "\
-%s: Job %s encoded sigValue %d actFlags %x", fname, lsb_jobid2str (jobSig.jobId), jobSig.sigValue, jobSig.actFlags);
+%s: Job %s encoded sigValue %d actFlags %x", __func__, lsb_jobid2str (jobSig.jobId), jobSig.sigValue, jobSig.actFlags);
     }
 
   reqCode = MBD_SIG_JOB;
@@ -323,7 +323,7 @@ signal_job (struct jData * jp,
   hdr.opCode = reqCode;
   if (!xdr_encodeMsg (&xdrs, (char *) &jobSig, &hdr, xdr_jobSig, 0, auth))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_encodeMsg");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_encodeMsg");
       xdr_destroy (&xdrs);
       return (ERR_FAIL);
     }
@@ -344,7 +344,7 @@ signal_job (struct jData * jp,
 		   NULL,
 		   hostData,
 		   lastHost,
-		   fname,
+		   __func__,
 		   &errcnt,
 		   &cc,
 		   CALL_SERVER_NO_WAIT_REPLY | CALL_SERVER_NO_HANDSHAKE,
@@ -366,7 +366,7 @@ signal_job (struct jData * jp,
       break;
 
     default:
-      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5407, "%s: Job <%s>: Illegal reply code <%d> from sbatchd on host <%s>"), fname, lsb_jobid2str (jp->jobId), reply, toHost);	/* catgets 5407 */
+      ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5407, "%s: Job <%s>: Illegal reply code <%d> from sbatchd on host <%s>"), __func__, lsb_jobid2str (jp->jobId), reply, toHost);	/* catgets 5407 */
       reply = ERR_BAD_REPLY;
     }
 
@@ -390,7 +390,7 @@ msg_job (struct jData * jp, struct Buffer * mbuf, struct jobReply * jobReply)
   int cc;
 
   if (logclass & (LC_SIGNAL | LC_EXEC))
-    ls_syslog (LOG_DEBUG2, "%s: job=%s", fname, lsb_jobid2str (jp->jobId));
+    ls_syslog (LOG_DEBUG2, "%s: job=%s", __func__, lsb_jobid2str (jp->jobId));
 
   reply = callSBD (toHost,
 		   mbuf->data,
@@ -399,7 +399,7 @@ msg_job (struct jData * jp, struct Buffer * mbuf, struct jobReply * jobReply)
 		   &hdr,
 		   NULL,
 		   NULL,
-		   hostData, lastHost, fname, &errcnt, &cc, 0, NULL, NULL);
+		   hostData, lastHost, __func__, &errcnt, &cc, 0, NULL, NULL);
 
   if (reply == ERR_NULL || reply == ERR_FAIL || reply == ERR_UNREACH_SBD)
     return (reply);
@@ -456,7 +456,7 @@ probe_slave (struct hData * hData, char sendJobs)
     {
       if ((sbdPackage.numJobs = countNumSpecs (hData)) > 0)
 	sbdPackage.jobs = my_calloc (sbdPackage.numJobs,
-				     sizeof (struct jobSpecs), fname);
+				     sizeof (struct jobSpecs), __func__);
       else
 	{
 	  sbdPackage.numJobs = 0;
@@ -465,7 +465,7 @@ probe_slave (struct hData * hData, char sendJobs)
 
       buflen = sbatchdJobs (&sbdPackage, hData);
       hdr.opCode = MBD_PROBE;
-      request_buf = my_malloc (buflen, fname);
+      request_buf = my_malloc (buflen, __func__);
 
       xdrmem_create (&xdrs, request_buf, buflen, XDR_ENCODE);
 
@@ -473,7 +473,7 @@ probe_slave (struct hData * hData, char sendJobs)
 			  (char *) &sbdPackage,
 			  &hdr, xdr_sbdPackage, 0, auth))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_encodeMsg");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_encodeMsg");
 	  xdr_destroy (&xdrs);
 	  free (request_buf);
 	  for (i = 0; i < sbdPackage.nAdmins; i++)
@@ -496,7 +496,7 @@ probe_slave (struct hData * hData, char sendJobs)
 
       if (!xdr_LSFHeader (&xdrs, &hdr))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_LSFHeader");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_LSFHeader");
 	  xdr_destroy (&xdrs);
 	  return (ERR_FAIL);
 	}
@@ -517,7 +517,7 @@ probe_slave (struct hData * hData, char sendJobs)
 		   NULL,
 		   hData,
 		   lastHost,
-		   fname,
+		   __func__,
 		   &errcnt,
 		   &cc,
 		   CALL_SERVER_NO_WAIT_REPLY | CALL_SERVER_NO_HANDSHAKE,
@@ -575,7 +575,7 @@ rebootSbd (char *host)
   xdrmem_create (&xdrs, request_buf, MSGSIZE, XDR_ENCODE);
   if (!xdr_encodeMsg (&xdrs, NULL, &hdr, NULL, 0, auth))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_encodeMsg");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_encodeMsg");
       xdr_destroy (&xdrs);
       return (ERR_FAIL);
     }
@@ -583,7 +583,7 @@ rebootSbd (char *host)
   if ((hData = getHostData (host)) == NULL)
     {
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5414, "%s: Failed to get hData of host <%s>"),	/* catgets 5414 */
-		 fname, host);
+		 __func__, host);
       return (ERR_FAIL);
     }
 
@@ -593,14 +593,14 @@ rebootSbd (char *host)
 		   &reply_buf,
 		   &hdr,
 		   NULL,
-		   NULL, hData, lastHost, fname, &errcnt, &cc, 0, NULL, NULL);
+		   NULL, hData, lastHost, __func__, &errcnt, &cc, 0, NULL, NULL);
   xdr_destroy (&xdrs);
 
   if (reply == ERR_NULL || reply == ERR_FAIL || reply == ERR_UNREACH_SBD)
     return (reply);
 
   if (reply != ERR_NO_ERROR)
-    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5415, "%s: Illegal reply code <%d> from sbatchd on host <%s>"), fname, reply, host);	/* catgets 5415 */
+    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5415, "%s: Illegal reply code <%d> from sbatchd on host <%s>"), __func__, reply, host);	/* catgets 5415 */
 
   return (reply);
 }
@@ -624,7 +624,7 @@ shutdownSbd (char *host)
   xdrmem_create (&xdrs, request_buf, MSGSIZE, XDR_ENCODE);
   if (!xdr_encodeMsg (&xdrs, (char *) NULL, &hdr, NULL, 0, auth))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_encodeMsg");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_encodeMsg");
       xdr_destroy (&xdrs);
       return (ERR_FAIL);
     }
@@ -632,7 +632,7 @@ shutdownSbd (char *host)
   if ((hData = getHostData (host)) == NULL)
     {
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5417, "%s: Failed to get hData of host <%s>"),	/* catgets 5417 */
-		 fname, host);
+		 __func__, host);
       return (ERR_FAIL);
     }
 
@@ -642,7 +642,7 @@ shutdownSbd (char *host)
 		   &reply_buf,
 		   &hdr,
 		   NULL,
-		   NULL, hData, lastHost, fname, &errcnt, &cc, 0, NULL, NULL);
+		   NULL, hData, lastHost, __func__, &errcnt, &cc, 0, NULL, NULL);
   xdr_destroy (&xdrs);
 
   if (reply == ERR_NULL || reply == ERR_FAIL || reply == ERR_UNREACH_SBD)
@@ -650,7 +650,7 @@ shutdownSbd (char *host)
 
   hStatChange (hData, HOST_STAT_UNREACH);
   if (reply != ERR_NO_ERROR)
-    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5418, "%s: Illegal reply code <%d> from sbatchd on host <%s>"), fname, reply, host);	/* catgets 5418 */
+    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5418, "%s: Illegal reply code <%d> from sbatchd on host <%s>"), __func__, reply, host);	/* catgets 5418 */
 
   return (reply);
 
@@ -733,7 +733,7 @@ callSBD (char *toHost,
     {
       if (sockPtr)
 	{
-	  newSbdNode = my_malloc (sizeof (struct sbdNode), fname);
+	  newSbdNode = my_malloc (sizeof (struct sbdNode), __func__);
 	  memcpy (newSbdNode, sbdPtr, sizeof (struct sbdNode));
 	  newSbdNode->chanfd = *sockPtr;
 	  newSbdNode->lastTime = now;
@@ -776,14 +776,14 @@ callSbdDebug (struct debugReq * pdebug)
 
   if (!xdr_encodeMsg (&xdrs, (char *) &debug, &hdr, xdr_debugReq, 0, NULL))
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_encodeMsg");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_encodeMsg");
       xdr_destroy (&xdrs);
     }
 
   if ((hData = getHostData (pdebug->hostName)) == NULL)
     {
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5424, "%s: Failed to get hData of host <%s>"),	/* catgets 5424 */
-		 fname, pdebug->hostName);
+		 __func__, pdebug->hostName);
       return (ERR_FAIL);
     }
 
@@ -793,7 +793,7 @@ callSbdDebug (struct debugReq * pdebug)
 		   &reply_buf,
 		   &hdr,
 		   NULL,
-		   NULL, hData, lastHost, fname, &errcnt, &cc, 0, NULL, NULL);
+		   NULL, hData, lastHost, __func__, &errcnt, &cc, 0, NULL, NULL);
   xdr_destroy (&xdrs);
 
   if (reply == ERR_NULL || reply == ERR_FAIL || reply == ERR_UNREACH_SBD)

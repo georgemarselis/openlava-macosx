@@ -37,7 +37,7 @@ static void updUAcct (struct jData *, struct uData *, struct hTab **, int, int, 
 static void updHAcct (struct jData *, struct qData *, struct uData *, struct hTab **, int, int, int, int, void (*)(struct hostAcct *, void *), void *);
 static void updHostData (char, struct jData *, int, int, int, int, int);
 static void updUserData1 (struct jData *, struct uData *, int, int, int, int, int, int);
-static void addValue (int *currentValue, int num, struct jData *jp, char *fname, char *counter);
+static void addValue (int *currentValue, int num, struct jData *jp, char *__func__, char *counter);
 static void initUData (struct uData *);
 static void addOneAbs (int *, int, int);
 static struct userAcct *addUAcct (struct hTab **, struct uData *, int, int, int, int, int);
@@ -91,12 +91,12 @@ updCounters (struct jData *jData, int oldStatus, time_t eventTime)
       else if ((oldStatus & (JOB_STAT_RUN | JOB_STAT_WAIT)))
 	{
 	  ls_syslog (LOG_DEBUG2, I18N (7014, "%s: Job %s RWAIT to RUN"),	/* catgets 7014 */
-		     fname, lsb_jobid2str (jData->jobId));
+		     __func__, lsb_jobid2str (jData->jobId));
 	}
       else
 	{
 	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7000, "%s: Job <%s> transited from %d to JOB_STAT_RUN"),	/* catgets 7000 */
-		     fname, lsb_jobid2str (jData->jobId), oldStatus);
+		     __func__, lsb_jobid2str (jData->jobId), oldStatus);
 	}
       break;
 
@@ -122,7 +122,7 @@ updCounters (struct jData *jData, int oldStatus, time_t eventTime)
       else
 	{
 	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7001, "%s: Job <%s> transited from %d to JOB_STAT_SSUSP"),	/* catgets 7001 */
-		     fname, lsb_jobid2str (jData->jobId), oldStatus);
+		     __func__, lsb_jobid2str (jData->jobId), oldStatus);
 	}
       break;
 
@@ -148,7 +148,7 @@ updCounters (struct jData *jData, int oldStatus, time_t eventTime)
       else
 	{
 	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7002, "%s: Job <%s> transited from %d to JOB_STAT_USUSP"),	/* catgets 7002 */
-		     fname, lsb_jobid2str (jData->jobId), oldStatus);
+		     __func__, lsb_jobid2str (jData->jobId), oldStatus);
 	}
       break;
 
@@ -162,7 +162,7 @@ updCounters (struct jData *jData, int oldStatus, time_t eventTime)
 	    {
 	      ls_syslog (LOG_DEBUG,
 			 "%s: last job in the chunk <%s> exits: status WAIT",
-			 fname, lsb_jobid2str (jData->jobId));
+			 __func__, lsb_jobid2str (jData->jobId));
 	    }
 	  updQaccount (jData, -num, 0, -num, 0, 0, 0);
 	  updHostData (TRUE, jData, -1, -1, 0, 0, 0);
@@ -195,7 +195,7 @@ updCounters (struct jData *jData, int oldStatus, time_t eventTime)
       else
 	{
 	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7003, "%s: Job <%s> transited from %x to %x"),	/* catgets 7003 */
-		     fname, lsb_jobid2str (jData->jobId), oldStatus,
+		     __func__, lsb_jobid2str (jData->jobId), oldStatus,
 		     jData->jStatus);
 	}
       break;
@@ -222,7 +222,7 @@ updCounters (struct jData *jData, int oldStatus, time_t eventTime)
       else
 	{
 	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7004, "%s: Job <%s> transited from %d to %d"),	/* catgets 7004 */
-		     fname, lsb_jobid2str (jData->jobId),
+		     __func__, lsb_jobid2str (jData->jobId),
 		     oldStatus, jData->jStatus);
 	}
       break;
@@ -230,17 +230,17 @@ updCounters (struct jData *jData, int oldStatus, time_t eventTime)
       if (oldStatus & JOB_STAT_RUN)
 	{
 	  ls_syslog (LOG_DEBUG2, I18N (7019, "%s: Job %s RUN to RWAIT"),	/* catgets 7019 */
-		     fname, lsb_jobid2str (jData->jobId));
+		     __func__, lsb_jobid2str (jData->jobId));
 	}
       else if (oldStatus & JOB_STAT_PEND)
 	{
 	  ls_syslog (LOG_DEBUG2, I18N (7020, "%s: Job %s PEND to RWAIT"),	/* catgets 7020 */
-		     fname, lsb_jobid2str (jData->jobId));
+		     __func__, lsb_jobid2str (jData->jobId));
 	}
       else
 	{
 	  ls_syslog (LOG_ERR, I18N (7021, "%s: Job %s transited from %d to %d"),	/* catgets 7021 */
-		     fname, lsb_jobid2str (jData->jobId), oldStatus,
+		     __func__, lsb_jobid2str (jData->jobId), oldStatus,
 		     jData->jStatus);
 	}
       break;
@@ -251,7 +251,7 @@ updCounters (struct jData *jData, int oldStatus, time_t eventTime)
 	  break;
 	}
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7004, "%s: Job <%s> transited from %d to %d"),	/* catgets 7004 */
-		 fname, lsb_jobid2str (jData->jobId), oldStatus,
+		 __func__, lsb_jobid2str (jData->jobId), oldStatus,
 		 jData->jStatus);
     }
 }
@@ -372,21 +372,21 @@ updQaccount (struct jData *jp, int numJobs, int numPEND,
   if (logclass & LC_JLIMIT)
     ls_syslog (LOG_DEBUG1,
 	       "%s: Entering with job=%s queue=%s numJobs=%d numPEND=%d numRUN=%d numSSUSP=%d numUSUSP=%d numRESERVE=%d",
-	       fname, lsb_jobid2str (jp->jobId), qp->queue, numJobs, numPEND,
+	       __func__, lsb_jobid2str (jp->jobId), qp->queue, numJobs, numPEND,
 	       numRUN, numSSUSP, numUSUSP, numRESERVE);
 
 
-  addValue (&qp->numJobs, numJobs, jp, fname, "numJobs");
-  addValue (&qp->numPEND, numPEND, jp, fname, "numPEND");
-  addValue (&qp->numRUN, numRUN, jp, fname, "numRUN");
-  addValue (&qp->numSSUSP, numSSUSP, jp, fname, "numSSUSP");
-  addValue (&qp->numUSUSP, numUSUSP, jp, fname, "numUSUSP");
-  addValue (&qp->numRESERVE, numRESERVE, jp, fname, "numRESERVE");
+  addValue (&qp->numJobs, numJobs, jp, __func__, "numJobs");
+  addValue (&qp->numPEND, numPEND, jp, __func__, "numPEND");
+  addValue (&qp->numRUN, numRUN, jp, __func__, "numRUN");
+  addValue (&qp->numSSUSP, numSSUSP, jp, __func__, "numSSUSP");
+  addValue (&qp->numUSUSP, numUSUSP, jp, __func__, "numUSUSP");
+  addValue (&qp->numRESERVE, numRESERVE, jp, __func__, "numRESERVE");
 
   if (logclass & LC_JLIMIT)
     ls_syslog (LOG_DEBUG2,
 	       "%s: job=%s queue=%s numJobs=%d numPEND=%d numRUN=%d numSSUSP=%d numUSUSP=%d numRESERVE=%d",
-	       fname, lsb_jobid2str (jp->jobId), qp->queue, qp->numJobs,
+	       __func__, lsb_jobid2str (jp->jobId), qp->queue, qp->numJobs,
 	       qp->numPEND, qp->numRUN, qp->numSSUSP, qp->numUSUSP,
 	       qp->numRESERVE);
   if (qp->maxJobs == INFINIT_INT)
@@ -398,7 +398,7 @@ updQaccount (struct jData *jp, int numJobs, int numPEND,
   SET_REASON (numSlots <= 0, qp->reasonTb[1][0], PEND_QUE_JOB_LIMIT);
   if (numSlots <= 0 && (logclass & LC_JLIMIT))
     ls_syslog (LOG_DEBUG3, "%s: Q's MAX reached; reason=%d numSlots=%d",
-	       fname, qp->reasonTb[1][0], numSlots);
+	       __func__, qp->reasonTb[1][0], numSlots);
 
   newJob = (numRUN == 0 && numSSUSP == 0 && numUSUSP == 0
 	    && numRESERVE == 0 && numPEND == 0);
@@ -445,26 +445,26 @@ updUAcct (struct jData *jData,
 
   if (*uAcct == NULL)
     {
-      *uAcct = (struct hTab *) my_malloc (sizeof (struct hTab), fname);
+      *uAcct = (struct hTab *) my_malloc (sizeof (struct hTab), __func__);
       h_initTab_ (*uAcct, 4);
     }
 
   if ((foundU = getUAcct (*uAcct, up)) != NULL)
     {
-      addValue (&foundU->numRUN, numRUN, jData, fname, "numRUN");
-      addValue (&foundU->numSSUSP, numSSUSP, jData, fname, "numSSUSP");
-      addValue (&foundU->numUSUSP, numUSUSP, jData, fname, "numUSUSP");
-      addValue (&foundU->numRESERVE, numRESERVE, jData, fname, "numRESERVE");
-      addValue (&foundU->numPEND, numPEND, jData, fname, "numPEND");
+      addValue (&foundU->numRUN, numRUN, jData, __func__, "numRUN");
+      addValue (&foundU->numSSUSP, numSSUSP, jData, __func__, "numSSUSP");
+      addValue (&foundU->numUSUSP, numUSUSP, jData, __func__, "numUSUSP");
+      addValue (&foundU->numRESERVE, numRESERVE, jData, __func__, "numRESERVE");
+      addValue (&foundU->numPEND, numPEND, jData, __func__, "numPEND");
       if (numRESERVE != 0 && !(jData->jStatus & JOB_STAT_PEND))
 	{
-	  addValue (&foundU->numNonPrmptRsv, numRESERVE, jData, fname,
+	  addValue (&foundU->numNonPrmptRsv, numRESERVE, jData, __func__,
 		    "numNonPrmptRsv");
 	}
       if (logclass & LC_JLIMIT)
 	ls_syslog (LOG_DEBUG3,
 		   "%s: job=%s host/queue=%s user=%s RUN=%d SSUSP=%d USUSP=%d RESERVE=%d PEND=%d numNonPrmptRsv=%d",
-		   fname, lsb_jobid2str (jData->jobId),
+		   __func__, lsb_jobid2str (jData->jobId),
 		   ((hp == NULL) ? jData->qPtr->queue : hp->host),
 		   jData->uPtr->user, foundU->numRUN, foundU->numSSUSP,
 		   foundU->numUSUSP, foundU->numRESERVE, foundU->numPEND,
@@ -483,13 +483,13 @@ updUAcct (struct jData *jData,
 
       if (logclass & LC_JLIMIT)
 	ls_syslog (LOG_DEBUG3, "\
-%s: New uAcct for job=%s host/queue=%s user=%s RUN=%d SSUSP=%d USUSP=%d RESERVE=%d, PEND=%d", fname, lsb_jobid2str (jData->jobId), ((hp == NULL) ? jData->qPtr->queue : hp->host), ((jData->uPtr == NULL) ? jData->userName : jData->uPtr->user), foundU->numRUN, foundU->numSSUSP, foundU->numUSUSP, foundU->numRESERVE, foundU->numPEND);
+%s: New uAcct for job=%s host/queue=%s user=%s RUN=%d SSUSP=%d USUSP=%d RESERVE=%d, PEND=%d", __func__, lsb_jobid2str (jData->jobId), ((hp == NULL) ? jData->qPtr->queue : hp->host), ((jData->uPtr == NULL) ? jData->userName : jData->uPtr->user), foundU->numRUN, foundU->numSSUSP, foundU->numUSUSP, foundU->numRESERVE, foundU->numPEND);
     }
   else
     {
 
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7006, "%s: expected one of (numRUN, numSSUSP, numUSUSP, numRESERVE and numPEND) to be non-ZERO, but they are all ZERO"),	/* catgets 7006 */
-		 fname);
+		 __func__);
       return;
     }
 
@@ -501,7 +501,7 @@ updUAcct (struct jData *jData,
       SET_REASON (numSlots <= 0, foundU->reason, PEND_QUE_USR_JLIMIT);
       if (numSlots <= 0 && (logclass & LC_JLIMIT))
 	ls_syslog (LOG_DEBUG3,
-		   "%s: Q's JL/U reached; job=%s queue=%s user=%s", fname,
+		   "%s: Q's JL/U reached; job=%s queue=%s user=%s", __func__,
 		   lsb_jobid2str (jData->jobId), jData->qPtr->queue,
 		   jData->uPtr->user);
 
@@ -515,7 +515,7 @@ updUAcct (struct jData *jData,
 		  PEND_HOST_USR_JLIMIT);
       if (numSlots <= 0 && (logclass & LC_JLIMIT))
 	ls_syslog (LOG_DEBUG3, "%s: H's JL/U reached; job=%s host=%s user=%s",
-		   fname, lsb_jobid2str (jData->jobId), hp->host,
+		   __func__, lsb_jobid2str (jData->jobId), hp->host,
 		   jData->uPtr->user);
     }
 }
@@ -628,7 +628,7 @@ updHAcct (struct jData *jData,
 	  if (logclass & LC_JLIMIT)
 	    ls_syslog (LOG_DEBUG3,
 		       "%s: job=%s user/queue=%s host=%s RUN=%d SSUSP=%d USUSP=%d RESERVE=%d NonPrmptRsv=%d",
-		       fname, lsb_jobid2str (jData->jobId),
+		       __func__, lsb_jobid2str (jData->jobId),
 		       ((qp != NULL) ? qp->queue : up->user), hp->host,
 		       foundH->numRUN, foundH->numSSUSP, foundH->numUSUSP,
 		       foundH->numRESERVE, foundH->numNonPrmptRsv);
@@ -645,7 +645,7 @@ updHAcct (struct jData *jData,
 	  if (logclass & LC_JLIMIT)
 	    ls_syslog (LOG_DEBUG2,
 		       "%s: New hAcct: job=%s user/queue=%s host=%s RUN=%d SSUSP=%d USUSP=%d RESERVE=%d",
-		       fname, lsb_jobid2str (jData->jobId),
+		       __func__, lsb_jobid2str (jData->jobId),
 		       ((qp != NULL) ? qp->queue : up->user), hp->host,
 		       foundH->numRUN, foundH->numSSUSP, foundH->numUSUSP,
 		       foundH->numRESERVE);
@@ -670,7 +670,7 @@ updHAcct (struct jData *jData,
 	      if (numSlots <= 0 && (logclass & (LC_PEND | LC_JLIMIT)))
 		ls_syslog (LOG_DEBUG2,
 			   "%s: Q's JL/P reached. Set reason <%d>; job=%s host=%s queue=%s",
-			   fname, qp->reasonTb[1][hp->hostId],
+			   __func__, qp->reasonTb[1][hp->hostId],
 			   lsb_jobid2str (jData->jobId), hp->host, qp->queue);
 	    }
 	  else
@@ -682,7 +682,7 @@ updHAcct (struct jData *jData,
 	      if (numSlots <= 0 && (logclass & (LC_PEND | LC_JLIMIT)))
 		ls_syslog (LOG_DEBUG2,
 			   "%s: Q's JL/H reached. Set reason <%d>; job=%s host=%s queue=%s",
-			   fname, qp->reasonTb[1][hp->hostId],
+			   __func__, qp->reasonTb[1][hp->hostId],
 			   lsb_jobid2str (jData->jobId), hp->host, qp->queue);
 	    }
 	  if (numSlots > 0
@@ -694,7 +694,7 @@ updHAcct (struct jData *jData,
 	      if (logclass & (LC_PEND | LC_JLIMIT))
 		ls_syslog (LOG_DEBUG2,
 			   "%s: Clear reason <%d>; job=%s host=%s queue=%s",
-			   fname, svReason, lsb_jobid2str (jData->jobId),
+			   __func__, svReason, lsb_jobid2str (jData->jobId),
 			   hp->host, qp->queue);
 	    }
 
@@ -759,14 +759,14 @@ updHAcct (struct jData *jData,
 	    {
 
 	      ls_syslog (LOG_DEBUG2, "\
-%s: U/G's JL/P reached; job=%s host=%s user=%s", fname, lsb_jobid2str (jData->jobId), hp->host, up->user);
+%s: U/G's JL/P reached; job=%s host=%s user=%s", __func__, lsb_jobid2str (jData->jobId), hp->host, up->user);
 
 	    }
 	  else if (numSlots > 0 && (logclass & LC_JLIMIT))
 	    {
 
 	      ls_syslog (LOG_DEBUG, "\
-%s: U/G's JL/P cleared up; job=%s host=%s user=%s", fname, lsb_jobid2str (jData->jobId), hp->host, up->user);
+%s: U/G's JL/P cleared up; job=%s host=%s user=%s", __func__, lsb_jobid2str (jData->jobId), hp->host, up->user);
 	    }
 	}
     }
@@ -895,7 +895,7 @@ updUserData (struct jData *jData, int numJobs, int numPEND,
 	    {
 	      ls_syslog (LOG_DEBUG2,
 			 "%s: Set reason <%d> job=%s user=%s numJobs=%d maxJobs=%d numPEND=%d",
-			 fname, up->reasonTb[1][0],
+			 __func__, up->reasonTb[1][0],
 			 lsb_jobid2str (jData->jobId), up->user, up->numJobs,
 			 up->maxJobs, up->numPEND);
 	    }
@@ -904,7 +904,7 @@ updUserData (struct jData *jData, int numJobs, int numPEND,
 	    {
 	      ls_syslog (LOG_DEBUG2,
 			 "%s: Clear reason <%d> job=%s user=%s numJobs=%d maxJobs=%d numPEND=%d",
-			 fname, svReason, lsb_jobid2str (jData->jobId),
+			 __func__, svReason, lsb_jobid2str (jData->jobId),
 			 up->user, up->numJobs, up->maxJobs, up->numPEND);
 	    }
 	}
@@ -974,14 +974,14 @@ updUserData (struct jData *jData, int numJobs, int numPEND,
 	      if (num <= 0)
 		ls_syslog (LOG_DEBUG2,
 			   "%s: Set reason <%d>; job=%s group=%s numJobs=%d maxJobs=%d numPEND=%d",
-			   fname, ugp->reasonTb[1][0],
+			   __func__, ugp->reasonTb[1][0],
 			   lsb_jobid2str (jData->jobId), ugp->user,
 			   ugp->numJobs, ugp->maxJobs, ugp->numPEND);
 	      else if (svReason == PEND_UGRP_JOB_LIMIT
 		       && (logclass & (LC_PEND | LC_JLIMIT)))
 		ls_syslog (LOG_DEBUG2,
 			   "%s: Clear reason <%d> job=%s group=%s numJobs=%d maxJobs=%d numPEND=%d",
-			   fname, PEND_UGRP_JOB_LIMIT,
+			   __func__, PEND_UGRP_JOB_LIMIT,
 			   lsb_jobid2str (jData->jobId), ugp->user,
 			   ugp->numJobs, ugp->maxJobs, ugp->numPEND);
 	    }
@@ -1004,16 +1004,16 @@ updUserData1 (struct jData *jData, struct uData *up, int numJobs,
 
 
 
-  addValue (&up->numJobs, numJobs, jData, fname, "numJobs");
-  addValue (&up->numPEND, numPEND, jData, fname, "numPEND");
-  addValue (&up->numRUN, numRUN, jData, fname, "numRUN");
-  addValue (&up->numSSUSP, numSSUSP, jData, fname, "numSSUSP");
-  addValue (&up->numUSUSP, numUSUSP, jData, fname, "numUSUSP");
-  addValue (&up->numRESERVE, numRESERVE, jData, fname, "numRESERVE");
+  addValue (&up->numJobs, numJobs, jData, __func__, "numJobs");
+  addValue (&up->numPEND, numPEND, jData, __func__, "numPEND");
+  addValue (&up->numRUN, numRUN, jData, __func__, "numRUN");
+  addValue (&up->numSSUSP, numSSUSP, jData, __func__, "numSSUSP");
+  addValue (&up->numUSUSP, numUSUSP, jData, __func__, "numUSUSP");
+  addValue (&up->numRESERVE, numRESERVE, jData, __func__, "numRESERVE");
 
   if (logclass & LC_JLIMIT)
     ls_syslog (LOG_DEBUG3, "\
-%s: job=%s user/group=%s PEND=%d RUN=%d SSUSP=%d USUSP=%d RESERVE=%d", fname, lsb_jobid2str (jData->jobId), up->user, up->numPEND, up->numRUN, up->numSSUSP, up->numUSUSP, up->numRESERVE);
+%s: job=%s user/group=%s PEND=%d RUN=%d SSUSP=%d USUSP=%d RESERVE=%d", __func__, lsb_jobid2str (jData->jobId), up->user, up->numPEND, up->numRUN, up->numSSUSP, up->numUSUSP, up->numRESERVE);
 
   newJob = (numRUN == 0 && numSSUSP == 0 && numUSUSP == 0 && numRESERVE == 0);
 
@@ -1051,15 +1051,15 @@ updHostData (char updHPart, struct jData *jData, int numJobs, int numRUN,
 		    numUSUSP, numRESERVE, 0, jData->hPtr[i],
 		    (void (*)(struct userAcct *, void *)) NULL, NULL);
 	}
-      addValue (&hp->numJobs, numJobs, jData, fname, "numJobs");
-      addValue (&hp->numRUN, numRUN, jData, fname, "numRUN");
-      addValue (&hp->numSSUSP, numSSUSP, jData, fname, "numSSUSP");
-      addValue (&hp->numUSUSP, numUSUSP, jData, fname, "numUSUSP");
-      addValue (&hp->numRESERVE, numRESERVE, jData, fname, "numRESERVE");
+      addValue (&hp->numJobs, numJobs, jData, __func__, "numJobs");
+      addValue (&hp->numRUN, numRUN, jData, __func__, "numRUN");
+      addValue (&hp->numSSUSP, numSSUSP, jData, __func__, "numSSUSP");
+      addValue (&hp->numUSUSP, numUSUSP, jData, __func__, "numUSUSP");
+      addValue (&hp->numRESERVE, numRESERVE, jData, __func__, "numRESERVE");
       if (logclass & LC_JLIMIT)
 	ls_syslog (LOG_DEBUG3,
 		   "%s: job=%s host=%s RUN=%d SSUSP=%d USUSP=%d RESERVE=%d",
-		   fname, lsb_jobid2str (jData->jobId), hp->host, hp->numRUN,
+		   __func__, lsb_jobid2str (jData->jobId), hp->host, hp->numRUN,
 		   hp->numSSUSP, hp->numUSUSP, hp->numRESERVE);
 
 
@@ -1071,7 +1071,7 @@ updHostData (char updHPart, struct jData *jData, int numJobs, int numRUN,
 	    {
 	      ls_syslog (LOG_DEBUG2,
 			 "%s: Set reason <%d> job=%s host=%s numJobs=%d maxJobs=%d",
-			 fname, hReasonTb[1][hp->hostId],
+			 __func__, hReasonTb[1][hp->hostId],
 			 lsb_jobid2str (jData->jobId), hp->host, hp->numJobs,
 			 hp->maxJobs);
 	    }
@@ -1086,7 +1086,7 @@ updHostData (char updHPart, struct jData *jData, int numJobs, int numRUN,
 	    {
 	      ls_syslog (LOG_DEBUG2,
 			 "%s: Clear reason <%d>; job=%s host=%s numJobs=%d maxJobs=%d",
-			 fname, hReasonTb[1][hp->hostId],
+			 __func__, hReasonTb[1][hp->hostId],
 			 lsb_jobid2str (jData->jobId), hp->host, hp->numJobs,
 			 hp->maxJobs);
 	    }
@@ -1108,14 +1108,14 @@ updHostData (char updHPart, struct jData *jData, int numJobs, int numRUN,
 }
 
 static void
-addValue (int *currentValue, int num, struct jData *jp, char *fname,
+addValue (int *currentValue, int num, struct jData *jp, char *__func__,
 	  char *counter)
 {
   *currentValue += num;
   if (*currentValue >= 0)
     return;
 
-  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7009, "%s: %s is negative; job=%s queue=%s currentValue=%d, num=%d"), fname, counter, lsb_jobid2str (jp->jobId), jp->qPtr->queue, *currentValue, num);	/* catgets 7009 */
+  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7009, "%s: %s is negative; job=%s queue=%s currentValue=%d, num=%d"), __func__, counter, lsb_jobid2str (jp->jobId), jp->qPtr->queue, *currentValue, num);	/* catgets 7009 */
   *currentValue = 0;
 
 }
@@ -1141,7 +1141,7 @@ getUserData (char *user)
       if (uData != NULL)
 	return uData;
 
-      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, fname, "addUserData", user);
+      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, __func__, "addUserData", user);
       return ((struct uData *) NULL);
     }
 
@@ -1151,7 +1151,7 @@ getUserData (char *user)
   if (uData != NULL)
     return uData;
 
-  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, fname, "addUserData", user);
+  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, __func__, "addUserData", user);
   return ((struct uData *) NULL);
 
 }
@@ -1299,7 +1299,7 @@ addUserData (char *username, int maxjobs, float pJobLimit,
     {
       if (filename)
 	ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7013, "%s: %s: User <%s> is multiply defined; retaining old definition"),	/* catgets 7013 */
-		   fname, filename, username);
+		   __func__, filename, username);
       return (struct uData *) userEnt->hData;
     }
   if (config == TRUE)
@@ -1323,14 +1323,14 @@ addUserData (char *username, int maxjobs, float pJobLimit,
 
       if (logclass & (LC_TRACE))
 	ls_syslog (LOG_DEBUG2, "\
-%s: new user <%s> added to the all user set", fname, uData->user);
+%s: new user <%s> added to the all user set", __func__, uData->user);
 
 
       setAddElement (allUsersSet, (void *) uData);
 
 
       BITSET_ITERATOR_ZERO_OUT (&iter);
-      setIteratorAttach (&iter, uGrpAllSet, fname);
+      setIteratorAttach (&iter, uGrpAllSet, __func__);
       for (allUserGrp = (struct uData *) setIteratorBegin (&iter);
 	   allUserGrp != NULL;
 	   allUserGrp = (struct uData *) setIteratorGetNextElement (&iter))
@@ -1346,7 +1346,7 @@ addUserData (char *username, int maxjobs, float pJobLimit,
 	      if (uData->parents == NULL)
 		{
 		  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_EMSG_S,
-			     fname, "setCreate", strBuf,
+			     __func__, "setCreate", strBuf,
 			     setPerror (bitseterrno));
 		  mbdDie (MASTER_MEM);
 		}
@@ -1362,7 +1362,7 @@ addUserData (char *username, int maxjobs, float pJobLimit,
 	      if (uData->ancestors == NULL)
 		{
 		  ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_EMSG_S,
-			     fname, "setCreate", strBuf,
+			     __func__, "setCreate", strBuf,
 			     setPerror (bitseterrno));
 		  mbdDie (MASTER_MEM);
 		}
@@ -1560,7 +1560,7 @@ updResCounters (struct jData *jData, int newStatus)
   if (logclass & (LC_TRACE | LC_JLIMIT))
     ls_syslog (LOG_DEBUG3,
 	       "%s:jobId <%s>,jStatus<%x>, num <%d>, numReq <%d>, newStatus <%x>",
-	       fname, lsb_jobid2str (jData->jobId), jData->jStatus,
+	       __func__, lsb_jobid2str (jData->jobId), jData->jStatus,
 	       jData->numHostPtr, jData->shared->jobBill.maxNumProcessors,
 	       newStatus);
   num = jData->numHostPtr;
@@ -1595,7 +1595,7 @@ updResCounters (struct jData *jData, int newStatus)
       else
 	{
 	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7016, "%s: Job <%s> transited from %x to %x"),	/* catgets 7016 */
-		     fname, lsb_jobid2str (jData->jobId), jData->jStatus,
+		     __func__, lsb_jobid2str (jData->jobId), jData->jStatus,
 		     newStatus);
 	}
       break;
@@ -1626,7 +1626,7 @@ updResCounters (struct jData *jData, int newStatus)
 	{
 	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7016,
 					     "%s: Job <%s> transited from %x to %x"),
-		     fname, lsb_jobid2str (jData->jobId), jData->jStatus,
+		     __func__, lsb_jobid2str (jData->jobId), jData->jStatus,
 		     newStatus);
 	}
       break;
@@ -1665,7 +1665,7 @@ updResCounters (struct jData *jData, int newStatus)
 	{
 	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 7016,
 					     "%s: Job <%s> transited from %x to %x"),
-		     fname, lsb_jobid2str (jData->jobId), jData->jStatus,
+		     __func__, lsb_jobid2str (jData->jobId), jData->jStatus,
 		     newStatus);
 	}
       break;
@@ -1711,7 +1711,7 @@ updHostLeftRusageMem (struct jData *jobP, int order)
   float resMem;
 
   if (logclass & (LC_TRACE))
-    ls_syslog (LOG_DEBUG, "%s: Enter this function ...", fname);
+    ls_syslog (LOG_DEBUG, "%s: Enter this function ...", __func__);
 
   resValPtr =
     getReserveValues (jobP->shared->resValPtr, jobP->qPtr->resValPtr);
@@ -1749,7 +1749,7 @@ updHostLeftRusageMem (struct jData *jobP, int order)
 	      if (logclass & (LC_TRACE | LC_SCHED))
 		ls_syslog (LOG_DEBUG,
 			   "%s: job <%s> reserved mem is %f, execution host <%s>, new leftRusageMem is %f, order is %d",
-			   fname, lsb_jobid2str (jobP->jobId), resMem,
+			   __func__, lsb_jobid2str (jobP->jobId), resMem,
 			   jobP->hPtr[numHost]->host,
 			   jobP->hPtr[numHost]->leftRusageMem, order);
 

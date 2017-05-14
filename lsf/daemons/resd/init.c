@@ -53,26 +53,26 @@ ttyStruct defaultTty = { };
 static void
 initConn2NIOS (void)
 {
-	static  char __func__] = "initConn2NIOS"; // FIXME FIXME change type of all fnames-named-variable to const
+	static  char __func__] = "initConn2NIOS"; // FIXME FIXME change type of all __func__s-named-variable to const
 	conn2NIOS.task_duped = calloc (sysconf (_SC_OPEN_MAX), sizeof (int));
 
 	if ( NULL == conn2NIOS.task_duped )
 	{
-		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "calloc");
 		resExit_ (-1);
 	}
 
 	conn2NIOS.sock->rbuf = malloc (sizeof (struct relaybuf));
 	if ( NULL == conn2NIOS.sock->rbuf)
 	{
-		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "calloc");
 		resExit_ (-1);
 	}
 
 	conn2NIOS.sock->wbuf = malloc (sizeof ( struct relaylinebuf));
 	if ( NULL == conn2NIOS.sock->wbuf)
 	{
-		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "calloc");
 		resExit_ (-1);
 	}
 
@@ -97,7 +97,7 @@ init_res( void )
 	int maxfds = 0;
 
  	if (logclass & (LC_TRACE | LC_HANG)) {
-		ls_syslog (LOG_DEBUG, "%s: Entering this routine...", fname);
+		ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
  	}
 
 	if (!sbdMode)  // FIXME FIXME FIXME FIXME this control code can be made more brief
@@ -127,7 +127,7 @@ init_res( void )
 
 	if ((Myhost = ls_getmyhostname ()) == NULL)
 	{
-		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "ls_getmyhostname");
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "ls_getmyhostname");
 		resExit_ (-1);
 	}
 
@@ -161,7 +161,7 @@ init_res( void )
 	children = calloc (sysconf (_SC_OPEN_MAX), sizeof (struct children *));
 	if( NULL == children )
 	{
-		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "calloc");
 		resExit_ (-1);
 	}
 
@@ -175,7 +175,7 @@ init_res( void )
 	resNotifyList = listCreate ("resNotifyList");
 	if (!resNotifyList)
 	{
-		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "listCreate");
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "listCreate");
 		resExit_ (-1);
 	}
 
@@ -204,14 +204,14 @@ init_AcceptSock (void)
 	memset( &svaddr, 0, sizeof (svaddr)); // FIXME FIXME FIXME FIXME why is memsetting here requried? 
 	if ((accept_sock = socket (AF_INET, SOCK_STREAM, 0)) < 0)
 	{
-		ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "socket", "RES");
+		ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "socket", "RES");
 		resExit_ (1);
 	}
 
 	setsockopt (accept_sock, SOL_SOCKET, SO_REUSEADDR, (char *) &one, sizeof (int));
 
 	if (io_nonblock_ (accept_sock) < 0) {
-		ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "io_nonblock_", accept_sock);
+		ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "io_nonblock_", accept_sock);
 	}
 
 	fcntl (accept_sock, F_SETFD, (fcntl (accept_sock, F_GETFD) | FD_CLOEXEC));
@@ -219,7 +219,7 @@ init_AcceptSock (void)
 	{
 		if ((svaddr.sin_port = atoi (resParams[LSF_RES_PORT].paramValue)) == 0)
 		{
-			ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5307, "%s: LSF_RES_PORT in lsf.conf (%s) must be positive integer; exiting"), fname, resParams[LSF_RES_PORT].paramValue);    /* catgets 5307 */
+			ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5307, "%s: LSF_RES_PORT in lsf.conf (%s) must be positive integer; exiting"), __func__, resParams[LSF_RES_PORT].paramValue);    /* catgets 5307 */
 			resExit_ (1);
 		}
 		svaddr.sin_port = htons (svaddr.sin_port);
@@ -232,7 +232,7 @@ init_AcceptSock (void)
 	{
 		if ((sv = getservbyname ("res", "tcp")) == NULL)
 		{
-			ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5309, "%s: res/tcp: unknown service, exiting"), fname);  /* catgets 5309 */
+			ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5309, "%s: res/tcp: unknown service, exiting"), __func__);  /* catgets 5309 */
 			resExit_ (1);
 		}
 		svaddr.sin_port = sv->s_port;
@@ -242,19 +242,19 @@ init_AcceptSock (void)
 	svaddr.sin_addr.s_addr = INADDR_ANY;
 	if (Bind_ (accept_sock, (struct sockaddr *) &svaddr, sizeof (svaddr)) < 0)
 	{
-		ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "accept_sock", ntohs (svaddr.sin_port));
+		ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "accept_sock", ntohs (svaddr.sin_port));
 		resExit_ (1);
 	}
 
 	if (listen (accept_sock, 1024) < 0) // FIXME FiXME FIXME fixed number here should be replaced appropriatelly
 	{
-		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "listen");
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "listen");
 		resExit_ (1);
 	}
 
 	if ((ctrlSock = TcpCreate_ (TRUE, 0)) < 0)
 	{
-		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "TcpCreate_");
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "TcpCreate_");
 		resExit_ (1);
 	}
 
@@ -262,7 +262,7 @@ init_AcceptSock (void)
 	memset( &ctrlAddr, 0, sizeof (ctrlAddr ) );
 	if (getsockname (ctrlSock, (struct sockaddr *) &ctrlAddr, &len) < 0) // FIXME FIXME verify cast
 	{
-		ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "getsockname", ctrlSock);
+		ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "getsockname", ctrlSock);
 		resExit_ (-1);
 	}
 
@@ -289,7 +289,7 @@ initChildRes (char *envdir)
 
   if ((Myhost = ls_getmyhostname ()) == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "ls_getmyhostname");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "ls_getmyhostname");
 	  resExit_ (-1);
 	}
   client_cnt = child_cnt = 0;
@@ -301,7 +301,7 @@ initChildRes (char *envdir)
   children = calloc (sysconf (_SC_OPEN_MAX), sizeof (struct children *));
   if (!children)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "calloc");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "calloc");
 	  resExit_ (-1);
 	}
   maxfds = sysconf (_SC_OPEN_MAX);
@@ -315,7 +315,7 @@ initChildRes (char *envdir)
 	resNotifyList = listCreate ("resNotifyList");
 	if (!resNotifyList)
 	{
-		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "listCreate");
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "listCreate");
 		resExit_ (-1);
 	}
 	return;
@@ -378,19 +378,19 @@ resParent (int s, struct passwd *pw, struct lsfAuth *auth, struct resConnect *co
   hdr.version = OPENLAVA_VERSION; // FIXME FIXME FIXME FIXME FIXME set in configure.ac
   if (!xdr_resChildInfo (&xdrs, &childInfo, &hdr))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "xdr_resChildInfo");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_resChildInfo");
 	  return (-1);
 	}
   len = XDR_GETPOS (&xdrs);
 
   if (socketpair (AF_UNIX, SOCK_STREAM, 0, hpipe) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "socketpair");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "socketpair");
 	  return (-1);
 	}
   if (socketpair (AF_UNIX, SOCK_STREAM, 0, wrapPipe) < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "socketpair");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "socketpair");
 	  return (-1);
 	}
   sprintf (hndlbuf, "%d:%d", hpipe[1], s);
@@ -424,7 +424,7 @@ resParent (int s, struct passwd *pw, struct lsfAuth *auth, struct resConnect *co
   pid = fork ();
   if (pid < 0)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "fork");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "fork");
 	  close (hpipe[0]);
 	  close (hpipe[1]);
 	  close (wrapPipe[0]);
@@ -439,13 +439,13 @@ resParent (int s, struct passwd *pw, struct lsfAuth *auth, struct resConnect *co
 	  if (debug)
 		{
 		  ls_syslog (LOG_DEBUG2, "%s: executing %s %s %s %s %s %s ",
-			 fname, argv[0], argv[1], argv[2], argv[3], argv[4],
+			 __func__, argv[0], argv[1], argv[2], argv[3], argv[4],
 			 argv[5]);
 		}
 	  else
 		{
 		  ls_syslog (LOG_DEBUG2, "%s: executing %s %s %s %s %s ",
-			 fname, argv[0], argv[1], argv[2], argv[3], argv[4]);
+			 __func__, argv[0], argv[1], argv[2], argv[3], argv[4]);
 		}
 	}
 	  close (hpipe[0]);
@@ -454,12 +454,12 @@ resParent (int s, struct passwd *pw, struct lsfAuth *auth, struct resConnect *co
 
 	  if (dup2 (wrapPipe[1], 0) == -1)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "dup2");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "dup2");
 	  exit (-1);
 	}
 	  close (wrapPipe[1]);
 	  lsfExecX(argv[0], argv, execvp); // FIXME FIXME FIXME FIXME FIXME sanitize argv[0]
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "execv");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "execv");
 	  exit (-1);
 	}
 
@@ -472,7 +472,7 @@ resParent (int s, struct passwd *pw, struct lsfAuth *auth, struct resConnect *co
 	  if ((cc1 = b_write_fix (wrapPipe[0], connReq->eexec.data,
 				  connReq->eexec.len)) != connReq->eexec.len)
 	{
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5333, "%s: Falied in sending data to wrap for user <%s>, length = %d, cc=1%d: %m"), fname, pw->pw_name, connReq->eexec.len, cc1) /* catgets 5333 */
+	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5333, "%s: Falied in sending data to wrap for user <%s>, length = %d, cc=1%d: %m"), __func__, pw->pw_name, connReq->eexec.len, cc1) /* catgets 5333 */
 		;
 	  close (wrapPipe[0]);
 	  close (hpipe[0]);
@@ -483,7 +483,7 @@ resParent (int s, struct passwd *pw, struct lsfAuth *auth, struct resConnect *co
 
   if (write (hpipe[0], (char *) &len, sizeof (len)) != sizeof (len))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "write");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "write");
 	  xdr_destroy (&xdrs);
 	  close (hpipe[0]);
 	  return (-1);
@@ -491,7 +491,7 @@ resParent (int s, struct passwd *pw, struct lsfAuth *auth, struct resConnect *co
 
   if (write (hpipe[0], buf, len) != len)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "write");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "write");
 	  xdr_destroy (&xdrs);
 	  close (hpipe[0]);
 	  return (-1);
@@ -540,18 +540,18 @@ resChild (char *arg, char *envdir)
 
   if (b_read_fix (resHandle, (char *) &len, sizeof (len)) != sizeof (len))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "b_read_fix");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "b_read_fix");
 	  resExit_ (-1);
 	}
   buf = malloc (len);
   if (!buf)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
 	  resExit_ (-1);
 	}
   if (b_read_fix (resHandle, buf, len) != len)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "b_read_fix");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "b_read_fix");
 	  resExit_ (-1);
 	}
 
@@ -566,7 +566,7 @@ resChild (char *arg, char *envdir)
   hdr.version = OPENLAVA_VERSION;
   if (!xdr_resChildInfo (&xdrs, &childInfo, &hdr))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "xdr_resChildInfo");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "xdr_resChildInfo");
 	  resExit_ (-1);
 	}
 

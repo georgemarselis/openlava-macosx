@@ -56,7 +56,7 @@ lsb_mperr (char *msg)
     }
     else {
         /* catgets 3200 */
-        sprintf (err, "catgets 3200: %s: Unknown error", fname);
+        sprintf (err, "catgets 3200: %s: Unknown error", __func__);
     }
 
     lsb_merr2 ("%s: %s\n", msg, err);
@@ -74,7 +74,7 @@ lsb_merr (char *s)
     }
 
     if ((myhostnm = ls_getmyhostname ()) == NULL) {
-        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "ls_getmyhostname");
+        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "ls_getmyhostname");
         if (masterme) {
             die (MASTER_FATAL);
         }
@@ -86,11 +86,11 @@ lsb_merr (char *s)
         {
         if (lsbManager == NULL) {
             /* catgets 8601 */
-            ls_syslog (LOG_ERR, "catgets 8601: %s: LSF administrator name is NULL", fname);
+            ls_syslog (LOG_ERR, "catgets 8601: %s: LSF administrator name is NULL", __func__);
         }
         else
             /* catgets 8602 */
-            ls_syslog (LOG_ERR, "catgets 8602: %s: Bad LSF administrator name \"<%s>\". Please select a valid user name.", fname, lsbManager);
+            ls_syslog (LOG_ERR, "catgets 8602: %s: Bad LSF administrator name \"<%s>\". Please select a valid user name.", __func__, lsbManager);
         if (masterme)
             die (MASTER_FATAL);
         else
@@ -119,7 +119,7 @@ merr_user (char *user, char *host, char *msg, char *type)
 
     if ((myhostnm = ls_getmyhostname ()) == NULL)
         {
-        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "ls_getmyhostname");
+        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "ls_getmyhostname");
         die (MASTER_FATAL);
         }
 
@@ -186,7 +186,7 @@ smail (char *to, char *tohost)
 
     if ((to == NULL) || (tohost == NULL)) {
         /* catgets 8604 */
-        ls_syslog (LOG_ERR, "catgets 8604: %s: Internal error: user name or host name is null", fname); 
+        ls_syslog (LOG_ERR, "catgets 8604: %s: Internal error: user name or host name is null", __func__); 
         return stderr;
     }
 
@@ -201,12 +201,12 @@ smail (char *to, char *tohost)
     }
 
     if (pipe (maild) < 0) {
-        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "pipe", osUserName);
+        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "pipe", osUserName);
         return stderr;
     }
     addr_process (toaddr, osUserName, tohost, daemonParams[LSB_MAILTO].paramValue);
     if (logclass & (LC_TRACE | LC_EXEC)) {
-        ls_syslog (LOG_DEBUG1, "%s: user=%s host=%s toaddr=%s spec=%s", fname, osUserName, tohost, toaddr, daemonParams[LSB_MAILTO].paramValue);
+        ls_syslog (LOG_DEBUG1, "%s: user=%s host=%s toaddr=%s spec=%s", __func__, osUserName, tohost, toaddr, daemonParams[LSB_MAILTO].paramValue);
     }
     switch (pid = fork ())
     {
@@ -228,13 +228,13 @@ smail (char *to, char *tohost)
         sprintf (smcmd, "%s -oi -F%s -f%s %s", sendmailp, "'LSF'", lsbManager, toaddr);
 
         execle ("/bin/sh", "sh", "-c", smcmd, (char *) 0, environ);
-        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "execle", daemonParams[LSB_MAILPROG].paramValue);
+        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "execle", daemonParams[LSB_MAILPROG].paramValue);
         exit (-1);
 
         case -1:
         close (maild[1]);
         close (maild[0]);
-        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "fork", osUserName);
+        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "fork", osUserName);
         return stderr;
         
         default:
@@ -243,7 +243,7 @@ smail (char *to, char *tohost)
     fmail = fdopen (maild[1], "w");
     if (fmail == NULL)
         {
-        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "fdopen", osUserName);
+        ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "fdopen", osUserName);
         close (maild[1]);
         return stderr;
         }
@@ -254,7 +254,7 @@ smail (char *to, char *tohost)
     if (ferror (fmail))
         {
         fclose (fmail);
-        ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, fname, "fprintf", "header", osUserName);
+        ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, __func__, "fprintf", "header", osUserName);
         return stderr;
         }
 

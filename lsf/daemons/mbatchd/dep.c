@@ -678,7 +678,7 @@ evalDepCond (struct dptNode *node, struct jData *jobRec)
 		    if (node->dptJobIdx == NULL)
 		      {
 			ls_syslog (LOG_ERR, "\
-%s: job %s has one to one dependency but dptJobIdx is NULL", fname, lsb_jobid2str (jobRec->jobId));
+%s: job %s has one to one dependency but dptJobIdx is NULL", __func__, lsb_jobid2str (jobRec->jobId));
 			node->value = DP_INVALID;
 			return (node->value);
 		      }
@@ -1112,7 +1112,7 @@ pushStackDep (struct Stack *stack, struct dptNode *node)
 	realloc (stack->nodes, stack->size * 2 * sizeof (struct dptNode *));
       if (!sp)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "realloc");
+	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "realloc");
 	  return (-1);
 	}
       stack->size *= 2;
@@ -1554,7 +1554,7 @@ getCounterOfDep (int type, int *counts)
     default:
 
       ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5501, "%s: dep Type <%d> out of bound"),	/* catgets 5501 */
-		 fname, type);
+		 __func__, type);
       return (0);
     }
 }

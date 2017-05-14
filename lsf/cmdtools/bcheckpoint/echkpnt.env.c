@@ -159,7 +159,7 @@ fileIsExist (const char *pWorkPath)
 
   if (!(S_ISREG (statbuf.st_mode)))
     {
-      fprintf (stderr, "%s : %s is not a regular file\n", fname,
+      fprintf (stderr, "%s : %s is not a regular file\n", __func__,
 	       m_pEnvVarFileName);
       return (-1);
     }

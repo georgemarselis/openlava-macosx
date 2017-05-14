@@ -53,7 +53,7 @@ main (int argc, char **argv)
       exit (-1);
     }
   if (logclass & (LC_TRACE))
-    ls_syslog (LOG_DEBUG, "%s: Entering this routine...", fname);
+    ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
 
   opterr = 0;
   while ((achar = getopt (argc, argv, "VhR:")) != EOF)
@@ -77,7 +77,7 @@ main (int argc, char **argv)
       if (cc >= MAXLISTSIZE)
 	{
 	  fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 1951, "%s: too many hostnames (maximum %d)\n"),	/* catgets  1951  */
-		   fname, MAXLISTSIZE);
+		   __func__, MAXLISTSIZE);
 	  usage (argv[0]);
 	}
 
@@ -89,7 +89,7 @@ main (int argc, char **argv)
 	  if (errno == ERANGE)
 	    {
 	      fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 1952, "%s: invalid format for number of components\n"),	/* catgets 1952 */
-		       fname);
+		       __func__);
 	      usage (argv[0]);
 	    }
 	}

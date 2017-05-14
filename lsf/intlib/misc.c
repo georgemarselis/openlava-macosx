@@ -41,25 +41,24 @@
 int
 hostValue (void)
 {
-  static unsigned char value;
-  char *sp;
+	static unsigned char value;
+	char *sp = NULL;
 
-  if (value)
-	return value;
-
-
-  sp = ls_getmyhostname ();
-  if (sp == NULL)
-	return 50;
-
-  while (*sp != '\0')
-	{
-	  value = value + *sp;
-	  sp++;
+	if (value) {
+		return value;
 	}
 
-  return (int) value;
+	sp = ls_getmyhostname ();
+	if (sp == NULL) {
+		return 50;
+	}
 
+	while (*sp != '\0') {
+		value = value + *sp;
+		sp++;
+	}
+
+	return (int) value;
 }
 
 
@@ -68,100 +67,99 @@ hostValue (void)
 int
 getBootTime (time_t * bootTime)
 {
-  static char __func__] = "getBootTime";
-  FILE *fp;
-  char *paths[] = { "/usr/bin/uptime", "/usr/ucb/uptime", "/bin/uptime",
-	"/usr/bsd/uptime", "/local/bin/uptime"
-  };
-  char dummy[32], str1[32], str2[32], str3[32], str4[32], *c;
-  int i, days, hr, minute;
-  char *oldIFS = NULL;
-  char *envIFS = NULL;
-  int len;
+
+	// FIXME FIXME FIXME getBootTime(): should it have a prettier way of looking up where uptime (1) is?
+
+	FILE *fp;
+	char *paths[] = { "/usr/bin/uptime", "/usr/ucb/uptime", "/bin/uptime", "/usr/bsd/uptime", "/local/bin/uptime" }; 
+	unsigned short locations = 5; // 5 shall be the size of *paths and shall be no more
+	char dummy[32];  // FIXME FI
+	char  str1[32];
+	char  str2[32];
+	char  str3[32];
+	char  str4[32];
+	char  *c = NULL;
+	unsigned int days 	= 0;
+	unsigned int hr   	= 0;
+	unsigned int minute	= 0;
+	char *oldIFS = NULL;
+	char *envIFS = NULL;
+	size_t len = 0;
 
 
-  if ((oldIFS = getenv ("IFS")) != NULL)
-	{
-	  len = strlen (oldIFS);
-	  envIFS = (char *) malloc (len + 8);
-	  if (envIFS == NULL)
-  {
-	ls_syslog (LOG_ERR, "malloc failed at %s", fname );
-	return (-1);
-  }
-	  sprintf (envIFS, "IFS=%s", oldIFS);
-	  putenv ("IFS=");
+	if ((oldIFS = getenv ("IFS")) != NULL) {
+		len = strlen (oldIFS);
+		envIFS = malloc (len + 8);
+
+		if (envIFS == NULL) {
+			ls_syslog (LOG_ERR, "malloc failed at %s", __func__ );
+			return -1;
+		}
+
+		sprintf (envIFS, "IFS=%s", oldIFS);
+		putenv ("IFS=");
 	}
 
-  for (i = 0; i < 5; i++)
-	{
-	  if ((fp = popen (paths[i], "r")))
-  {
-	if (fscanf (fp, "%s %s %s %s %s %s", dummy, dummy,
-		  str1, str2, str3, str4) != 6)
-	  {
-		pclose (fp);
-		continue;
-	  }
+	for( unsigned short i = 0; i < locations; i++) { 
+		if ((fp = popen (paths[i], "r"))) {
+			if (fscanf (fp, "%s %s %s %s %s %s", dummy, dummy, str1, str2, str3, str4) != 6) {
+				pclose (fp);
+				continue;
+			}
 
-	if (!strncmp (str2, "day", 3))
-	  {
-		days = atoi (str1);
-		strcpy (str1, str3);
-		strcpy (str2, str4);
-	  }
-	else
-	  {
-		days = 0;
-	  }
+			if (!strncmp (str2, "day", 3)) {
+				days = atoi (str1);
+				strcpy (str1, str3);
+				strcpy (str2, str4);
+			}
+			else {
+				days = 0;
+			}
 
-	if ((c = strchr (str1, ':')))
-	  {
-		*c = '\0';
-		str1[strlen (c) - 1] = '\0';
-		c++;
-		minute = atoi (c);
-		hr = atoi (str1);
-	  }
-	else
-	  {
-		if (!strncmp (str2, "hr", 2))
-	{
-	  hr = atoi (str1);
-	  minute = 0;
+			if ((c = strchr (str1, ':'))) {
+				*c = '\0';
+				str1[strlen (c) - 1] = '\0';
+				c++;
+				minute = atoi (c);
+				hr = atoi (str1);
+			}
+			else {
+				if (!strncmp (str2, "hr", 2)) {
+					hr = atoi (str1);
+					minute = 0;
+				}
+				else {
+					hr = 0;
+					if (!strncmp (str2, "min", 3)) {
+						minute = atoi (str1);
+					}
+					else {
+						minute = 0;
+					}
+				}
+	  		}
+
+			*bootTime =	time (0) - (days * 60 * 60 * 24 + hr * 60 * 60 + minute * 60);
+			pclose (fp);
+
+			if (envIFS != NULL) {
+				putenv (envIFS);
+				FREEUP (envIFS);
+			}
+
+			return 0;
+		}
+
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "getBootTime", "popen");
 	}
-		else
-	{
-	  hr = 0;
-	  if (!strncmp (str2, "min", 3))
-		minute = atoi (str1);
-	  else
-		minute = 0;
-	}
-	  }
 
-	*bootTime =
-	  time (0) - (days * 60 * 60 * 24 + hr * 60 * 60 + minute * 60);
-	pclose (fp);
 
-	if (envIFS != NULL)
-	  {
+	if (envIFS != NULL) {
 		putenv (envIFS);
 		FREEUP (envIFS);
-	  }
-	return (0);
-  }
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "getBootTime", "popen");
 	}
 
-
-  if (envIFS != NULL)
-	{
-	  putenv (envIFS);
-	  FREEUP (envIFS);
-	}
-
-  return (-1);
+	return -1;
 }
 
 
@@ -170,32 +168,31 @@ static unsigned char cblock[8];
 char *
 encryptPassLSF (char *pass)
 {
-  char *passEnc;
-  if (pass)
-	{
-	  passEnc = strdup (pass);
+	char *passEnc = NULL;
+
+	if (pass) {
+		passEnc = strdup (pass);
 	}
-  else
-	{
-	  passEnc = strdup ("");
+	else {
+		passEnc = strdup ("");
 	}
-  return passEnc;
+
+	return passEnc;
 }
 
 
 char *
 decryptPassLSF (char *pass)
 {
-  char *passEnc;
-  if (pass)
-	{
-	  passEnc = strdup (pass);
+	char *passEnc = NULL;
+	if (pass) {
+		passEnc = strdup (pass);
 	}
-  else
-	{
-	  passEnc = strdup ("");
+	else {
+		passEnc = strdup ("");
 	}
-  return passEnc;
+
+	return passEnc;
 }
 
 
@@ -203,9 +200,10 @@ decryptPassLSF (char *pass)
 char *
 encryptByKey_ (char *key, char *inputStr)
 {
-  if (key != NULL)
-	strncpy ((char *) cblock, key, 8);
-  return (encryptPassLSF (inputStr));
+	if (key != NULL) {
+		strncpy ((char *) cblock, key, 8);
+	}
+	return encryptPassLSF (inputStr);
 }
 
 
@@ -213,9 +211,10 @@ encryptByKey_ (char *key, char *inputStr)
 char *
 decryptByKey_ (char *key, char *inputStr)
 {
-  if (key != NULL)
-	strncpy ((char *) cblock, key, 8);
-  return (decryptPassLSF (inputStr));
+	if (key != NULL) {
+		strncpy ((char *) cblock, key, 8);
+	}
+	return decryptPassLSF (inputStr);
 }
 
 void
@@ -253,10 +252,10 @@ safe_calloc (unsigned number, unsigned size)
 
   if (!number)
 	{
-	  return (NULL);
+	  return NULL;
 	}
   start_address = (void *) calloc (number, size);
-  return (start_address);
+  return start_address;
 
 }
 
@@ -266,23 +265,23 @@ matchName (char *pattern, char *name)
   int i, ip;
 
   if (!pattern || !name)
-	return (FALSE);
+	return FALSE;
 
   ip = (int) strlen (pattern);
   for (i = 0; i < ip && pattern[i] != '['; i++)
 	{
 
 	  if (pattern[i] == '*')
-  return (TRUE);
+  return TRUE;
 
 	  if (name[i] == '\0' || name[i] == '[' || pattern[i] != name[i])
-  return (FALSE);
+  return FALSE;
 	};
 
   if (name[i] == '\0' || name[i] == '[')
-	return (TRUE);
+	return TRUE;
   else
-	return (FALSE);
+	return FALSE;
 
 }
 
@@ -478,7 +477,7 @@ linux_getopt ( int nargc, char * const *nargv, const char *ostr)
 	optopt = linux_optopt;
 	optind = linux_optind;
 	optarg = linux_optarg;
-	return (EOF);
+	return EOF;
   }
 	  if (place[1] && *++place == '-')
   {
@@ -489,7 +488,7 @@ linux_getopt ( int nargc, char * const *nargv, const char *ostr)
 	optind = linux_optind;
 	optarg = linux_optarg;
 
-	return (EOF);
+	return EOF;
   }
 	}
   if ((linux_optopt = (int) *place++) == (int) ':' ||
@@ -503,7 +502,7 @@ linux_getopt ( int nargc, char * const *nargv, const char *ostr)
 	optind = linux_optind;
 	optarg = linux_optarg;
 
-	return (EOF);
+	return EOF;
   }
 	  if (!*place)
   ++linux_optind;
@@ -523,7 +522,7 @@ linux_getopt ( int nargc, char * const *nargv, const char *ostr)
 	  optind = linux_optind;
 	  optarg = linux_optarg;
 
-	  return (BADCH);
+	  return BADCH;
 	}
   if (*++oli != ':')
 	{
@@ -554,7 +553,7 @@ linux_getopt ( int nargc, char * const *nargv, const char *ostr)
 	optind = linux_optind;
 	optarg = linux_optarg;
 
-	return (BADCH);
+	return BADCH;
   }
 	  else
   linux_optarg = nargv[linux_optind];
@@ -565,13 +564,12 @@ linux_getopt ( int nargc, char * const *nargv, const char *ostr)
   optopt = linux_optopt;
   optind = linux_optind;
   optarg = linux_optarg;
-  return (linux_optopt);
+  return linux_optopt;
 }
 
 int
 compareAddrValues (char *rangeStr, char *valueStr)
 {
-  static char __func__] = "compareAddrValues";
   int lowRange = INT_MAX;
   char *lowPtr = NULL;
   int highRange = INT_MAX;
@@ -588,10 +586,10 @@ compareAddrValues (char *rangeStr, char *valueStr)
 	{
 	  if (logclass & LC_TRACE)
   {
-	ls_syslog (LOG_DEBUG3, I18N (5710, "%s: Bad address value <%s>"), /* catgets 5710 */
-		 fname, valueStr);
+	/* catgets 5710 */
+	ls_syslog (LOG_DEBUG3, I18N (5710, "%s: Bad address value <%s>"), __func__, valueStr);
   }
-	  return (FALSE);
+	  return FALSE;
 	}
 
   lowPtr = range;
@@ -619,10 +617,10 @@ compareAddrValues (char *rangeStr, char *valueStr)
   {
 	if (logclass & LC_TRACE)
 	  {
-		ls_syslog (LOG_DEBUG3, I18N (5711, "%s: Bad high range value <%s>"),  /* catgets 5711 */
-	   fname, highPtr);
+		/* catgets 5711 */
+		ls_syslog (LOG_DEBUG3, I18N (5711, "%s: Bad high range value <%s>"), __func__, highPtr);
 	  }
-	return (FALSE);
+	return FALSE;
   }
 	}
 
@@ -638,46 +636,45 @@ compareAddrValues (char *rangeStr, char *valueStr)
   {
 	if (logclass & LC_TRACE)
 	  {
-		ls_syslog (LOG_DEBUG3, I18N (5712, "%s: Bad low range value <%S>"), /* catgets 5712 */
-	   fname, lowPtr);
+		/* catgets 5712 */
+		ls_syslog (LOG_DEBUG3, I18N (5712, "%s: Bad low range value <%S>"), __func__, lowPtr);
 	  }
-	return (FALSE);
+	return FALSE;
   }
 	}
 
   if (logclass & LC_TRACE)
 	{
-	  ls_syslog (LOG_DEBUG3, I18N (5715, "%s: Low <%d> High <%d> Value <%d>"),  /* catgets 5715 */
-	 fname, lowRange, highRange, value);
+		/* catgets 5715 */
+		ls_syslog (LOG_DEBUG3, I18N (5715, "%s: Low <%d> High <%d> Value <%d>"),  __func__, lowRange, highRange, value);
 	}
   if ((lowRange <= value) && (highRange >= value))
 	{
-	  return (TRUE);
+	  return TRUE;
 	}
-  return (FALSE);
+  return FALSE;
 }
 
 int
 withinAddrRange (char *addrRange, char *address)
 {
-  static char __func__] = "withinAddrRange";
   char *nextAddr = NULL;
   char *mark1 = NULL;
   char *ptr1 = NULL;
   char *mark2 = NULL;
   char *ptr2 = NULL;
-  char tempAddrRange[MAXADDRSTRING];
-  char tempAddress[MAXADDRSTRING];
+  char tempAddrRange[MAXADDRSTRING];    // FIXME FIXME change to dynamic?
+  char tempAddress[MAXADDRSTRING];      // FIXME FIXME change to dynamic?
 
 
   if (addrRange == NULL)
 	{
-	  return (TRUE);
+	  return TRUE;
 	}
 
   if ((addrRange[0] == '\0') || (address == NULL) || (address[0] == '\0'))
 	{
-	  return (FALSE);
+	  return FALSE;
 	}
 
   mystrncpy (tempAddrRange, addrRange, sizeof (char) * MAXADDRSTRING);
@@ -700,7 +697,7 @@ withinAddrRange (char *addrRange, char *address)
 
 	if (withinAddrRange (nextAddr, tempAddress) == TRUE)
 	  {
-		return (TRUE);
+		return TRUE;
 	  }
   }
 	}
@@ -708,7 +705,7 @@ withinAddrRange (char *addrRange, char *address)
   if (logclass & LC_TRACE)
 	{
 	  ls_syslog (LOG_DEBUG, I18N (5716, "%s: comparing range <%s> with value <%s>"),  /* catgets 5716 */
-	 fname, tempAddrRange, tempAddress);
+	 __func__, tempAddrRange, tempAddress);
 	}
 
 
@@ -738,14 +735,14 @@ withinAddrRange (char *addrRange, char *address)
 
 	  if (compareAddrValues (mark1, mark2) == FALSE)
   {
-	return (FALSE);
+	return FALSE;
   }
 
 	  mark1 = ptr1;
 	  mark2 = ptr2;
 	}
 
-  return (TRUE);
+  return TRUE;
 }
 
 int
@@ -776,7 +773,7 @@ validateAddrValue (char *rangeStr)
   {
 	if (highPtr[1] != '\0')
 	  {
-		return (FALSE);
+		return FALSE;
 	  }
   }
 	  else
@@ -787,7 +784,7 @@ validateAddrValue (char *rangeStr)
 	  {
 		if (isdigit ((int) *digitCheck) == FALSE)
 	{
-	  return (FALSE);
+	  return FALSE;
 	}
 		digitCheck += sizeof (char);
 	  }
@@ -795,7 +792,7 @@ validateAddrValue (char *rangeStr)
 	highRange = atoi (highPtr);
 	if ((highRange < 0) || (highRange > 255))
 	  {
-		return (FALSE);
+		return FALSE;
 	  }
   }
 	}
@@ -806,7 +803,7 @@ validateAddrValue (char *rangeStr)
   {
 	if (lowPtr[1] != '\0')
 	  {
-		return (FALSE);
+		return FALSE;
 	  }
   }
 	  else
@@ -817,7 +814,7 @@ validateAddrValue (char *rangeStr)
 	  {
 		if (isdigit ((int) *digitCheck) == FALSE)
 	{
-	  return (FALSE);
+	  return FALSE;
 	}
 		digitCheck += sizeof (char);
 	  }
@@ -825,34 +822,34 @@ validateAddrValue (char *rangeStr)
 	lowRange = atoi (lowPtr);
 	if ((lowRange < 0) || (lowRange > 255))
 	  {
-		return (FALSE);
+		return FALSE;
 	  }
   }
 	}
 
   if (lowRange > highRange)
 	{
-	  return (FALSE);
+	  return FALSE;
 	}
-  return (TRUE);
+  return TRUE;
 }
 
 int
 validateAddrRange (char *addrRange)
 {
-  static char __func__] = "validateAddrRange";
+
   char *nextAddr = NULL;
   char *mark1 = NULL;
   char *ptr1 = NULL;
-  char tempAddrRange[MAXADDRSTRING];
-  char debugAddrRange[MAXADDRSTRING];
+  char tempAddrRange[MAXADDRSTRING];    // FIXME FIXME change to dynamic?
+  char debugAddrRange[MAXADDRSTRING];   // FIXME FIXME change to dynamic?
   int match = TRUE;
   int fieldCount = 0;
 
 
   if (addrRange == NULL)
 	{
-	  return (TRUE);
+	  return TRUE;
 	}
 
 
@@ -875,7 +872,7 @@ validateAddrRange (char *addrRange)
 
 	if (validateAddrRange (nextAddr) == FALSE)
 	  {
-		return (FALSE);
+		return FALSE;
 	  }
   }
 	}
@@ -902,16 +899,16 @@ validateAddrRange (char *addrRange)
 	  if (fieldCount >= 4)
   {
 	ls_syslog (LOG_ERR, I18N (5717, "%s: too many fields in address range <%s>"), /* catgets 5717 */
-		 fname, debugAddrRange);
-	return (FALSE);
+		 __func__, debugAddrRange);
+	return FALSE;
   }
 
 
 	  if (validateAddrValue (mark1) == FALSE)
   {
 	ls_syslog (LOG_ERR, I18N (9999, "%s: invalid address range <%s>\n"),  /* catgets 5718 */
-		 fname, debugAddrRange);
-	return (FALSE);
+		 __func__, debugAddrRange);
+	return FALSE;
   }
 	  fieldCount++;
 
@@ -921,10 +918,10 @@ validateAddrRange (char *addrRange)
   if ((fieldCount < 1) || (fieldCount > 4))
 	{
 	  ls_syslog (LOG_ERR, I18N (5718, "%s: invalid address range <%s>\n"),  /* catgets 5718 */
-	 fname, debugAddrRange);
-	  return (FALSE);
+	 __func__, debugAddrRange);
+	  return FALSE;
 	}
-  return (TRUE);
+  return TRUE;
 }
 
 char *

@@ -180,7 +180,7 @@ callLimTcp_ (char *reqbuf, char **rep_buf, int req_size, struct LSFHeader *reply
   struct Buffer rcvbuf = { };
 
   if (logclass & (LC_COMM | LC_TRACE)) {
-    ls_syslog (LOG_DEBUG2, "%s: Entering...req_size=%d", fname, req_size);
+    ls_syslog (LOG_DEBUG2, "%s: Entering...req_size=%d", __func__, req_size);
   }
 
   *rep_buf = NULL;
@@ -204,7 +204,7 @@ contact:
       if (cc < 0)
 	{
 	  ls_syslog (LOG_DEBUG, "\
-%s: failed in connecting to limChans_[TCP]=<%d> <%s>", fname, limchans_[TCP], sockAdd2Str_ (&sockIds_[TCP]));
+%s: failed in connecting to limChans_[TCP]=<%d> <%s>", __func__, limchans_[TCP], sockAdd2Str_ (&sockIds_[TCP]));
 	  if (errno == ECONNREFUSED || errno == ENETUNREACH)
 	    {
 	      if (errno == ECONNREFUSED)
