@@ -49,9 +49,9 @@ fillCell_ (struct inNames **table, char *name, char *level)
 {
     unsigned int size = 0;
 
-    table[0] = malloc (sizeof (struct inNames));
+    table[0] = malloc (sizeof (struct inNames));    // FIXME FIXME replace 0 with enum label
     if ( NULL == table[0] && ENOMEM == errno ) {
-        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "fillCell_()", "malloc");
+        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
         lserrno = LSE_MALLOC;
         return 0;
     }
@@ -64,7 +64,7 @@ fillCell_ (struct inNames **table, char *name, char *level)
     table[0]->name = malloc( size );
     if ( NULL == table[0]->name && ENOMEM == errno ) {
         FREEUP (table[0]);
-        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "fillCell_()", "malloc");
+        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
         lserrno = LSE_MALLOC;
         return 0;
     }
@@ -248,10 +248,10 @@ struct paramConf *
 lsb_readparam (struct lsConf *conf)
 {
     // 
-    char *fname   = NULL;
-    char *cp      = NULL;
-    char *section = NULL;
-    char paramok  = 'a';
+    char *filename = NULL;
+    char *cp       = NULL;
+    char *section  = NULL;
+    char paramok   = 'a';
     size_t lineNum = 0;
 
     lsberrno = LSBE_NO_ERROR;
@@ -282,7 +282,7 @@ lsb_readparam (struct lsConf *conf)
         pConf->param = NULL;
     }
 
-    fname = conf->confhandle->fname;
+    filename = conf->confhandle->fname;
     pConf->param = malloc(sizeof (struct parameterInfo));
     if ( NULL == pConf->param && ENOMEM == errno ) {
         ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", sizeof (struct parameterInfo));
@@ -300,7 +300,7 @@ lsb_readparam (struct lsConf *conf)
         if ((cp = getBeginLine_conf (conf, &lineNum)) == NULL) {
             if (paramok == FALSE) {
                 /* catgets 5056 */
-                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5056, "%s: File %s at line %d: No valid parameters are read"), __func__, fname, lineNum);
+                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5056, "%s: File %s at line %d: No valid parameters are read"), __func__, filename, lineNum);
                 lsberrno = LSBE_CONF_WARNING;
             }
             return pConf;
@@ -309,14 +309,14 @@ lsb_readparam (struct lsConf *conf)
         section = getNextWord_ (&cp);
         if (!section) {
             /* catgets 5057 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5057, "%s: File %s at line %d: Section name expected after Begin; ignoring section"), __func__, fname, lineNum);
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5057, "%s: File %s at line %d: Section name expected after Begin; ignoring section"), __func__, filename, lineNum);
             lsberrno = LSBE_CONF_WARNING;
-            doSkipSection_conf (conf, &lineNum, fname, "unknown");
+            doSkipSection_conf (conf, &lineNum, filename, "unknown");
             continue;
         }
         else {
             if (strcasecmp (section, "parameters") == 0)  {
-                if (do_Param (conf, fname, &lineNum)) {
+                if (do_Param (conf, filename, &lineNum)) {
                     paramok = TRUE;
                 }
                 else if (lsberrno == LSBE_NO_MEM) {
@@ -327,9 +327,9 @@ lsb_readparam (struct lsConf *conf)
                 continue;
             }
             /* catgets 5058 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5058, "%s: File %s at line %d: Invalid section name <%s>; ignoring section"), __func__, fname, lineNum, section);
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5058, "%s: File %s at line %d: Invalid section name <%s>; ignoring section"), __func__, filename, lineNum, section);
             lsberrno = LSBE_CONF_WARNING;
-            doSkipSection_conf (conf, &lineNum, fname, section);
+            doSkipSection_conf (conf, &lineNum, filename, section);
 
             continue;
         }
@@ -337,7 +337,7 @@ lsb_readparam (struct lsConf *conf)
 }
 
 static char
-do_Param (struct lsConf *conf, char *fname, size_t *lineNum)
+do_Param (struct lsConf *conf, char *filename, size_t *lineNum)
 {
     // 
     char *linep;
@@ -401,32 +401,32 @@ do_Param (struct lsConf *conf, char *fname, size_t *lineNum)
 
     linep = getNextLineC_conf (conf, lineNum, TRUE);
     if (logclass & LC_EXEC)  {
-        ls_syslog (LOG_DEBUG, "%s: the linep is %s, and %d \n", __func__, linep, strlen (linep));
+        ls_syslog (LOG_DEBUG, "%s: file %s: the linep is %s, and %d \n", __func__, filename, linep, strlen (linep));
     }
 
     if (!linep) {
-        ls_syslog (LOG_ERR, I18N_FILE_PREMATURE, __func__, fname, *lineNum);
+        ls_syslog (LOG_ERR, I18N_FILE_PREMATURE, __func__, filename, *lineNum);
         lsberrno = LSBE_CONF_WARNING;
         return FALSE;
     }
 
-    if (isSectionEnd (linep, fname, lineNum, "parameters")) {
-        ls_syslog (LOG_WARNING, I18N_EMPTY_SECTION, __func__, fname, *lineNum,  "parameters");
+    if (isSectionEnd (linep, filename, lineNum, "parameters")) {
+        ls_syslog (LOG_WARNING, I18N_EMPTY_SECTION, __func__, filename, *lineNum,  "parameters");
         lsberrno = LSBE_CONF_WARNING;
         return FALSE;
     }
 
     if (strchr (linep, '=') == NULL) {
         /* catgets 5059 */
-        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5059, "%s: File %s at line %d: Vertical parameters section is not implemented yet; use horizontal format; ignoring section"), __func__, fname, *lineNum);
+        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5059, "%s: File %s at line %d: Vertical parameters section is not implemented yet; use horizontal format; ignoring section"), __func__, filename, *lineNum);
         lsberrno = LSBE_CONF_WARNING;
-        doSkipSection_conf (conf, lineNum, fname, "parameters");
+        doSkipSection_conf (conf, lineNum, filename, "parameters");
         return FALSE;
     }
 
-    if (readHvalues_conf (keylist, linep, conf, fname, lineNum, FALSE,  "parameters") < 0) {
+    if (readHvalues_conf (keylist, linep, conf, filename, lineNum, FALSE,  "parameters") < 0) {
         /* catgets 5060 */
-        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5060, "%s: File %s at line %d: Incorrect section; ignored"), __func__, fname, *lineNum);
+        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5060, "%s: File %s at line %d: Incorrect section; ignored"), __func__, filename, *lineNum);
         lsberrno = LSBE_CONF_WARNING;
         freekeyval (keylist);
         return FALSE;
@@ -438,7 +438,7 @@ do_Param (struct lsConf *conf, char *fname, size_t *lineNum)
 /// FIXME FIXME FIXME discover what the values mean and replace them with constant unsigned integers
             if (i == 0) {
                 /* catgets 5061 */
-                ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5061, "%s: Ignore LSB_MANAGER value <%s>; use MANAGERS  defined in cluster file instead"), __func__, keylist[i].val); 
+                ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5061, "%s: Ignore LSB_MANAGER value <%s>; use MANAGERS  defined in cluster file instead"), filename, keylist[i].val); 
                 lsberrno = LSBE_CONF_WARNING;
             }
             else if (i == 1) {
@@ -488,7 +488,7 @@ do_Param (struct lsConf *conf, char *fname, size_t *lineNum)
                 if (value == INFINIT_INT)
                     {
                     /* catgets 5459 */
-                    ls_syslog (LOG_ERR, I18N (5459, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored"), __func__, fname, *lineNum, keylist[i].val, keylist[i].key, INFINIT_INT - 1);
+                    ls_syslog (LOG_ERR, I18N (5459, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored"), __func__, filename, *lineNum, keylist[i].val, keylist[i].key, INFINIT_INT - 1);
                     pConf->param->maxAcctArchiveNum = -1;
                     lsberrno = LSBE_CONF_WARNING;
                     }
@@ -504,7 +504,7 @@ do_Param (struct lsConf *conf, char *fname, size_t *lineNum)
                 if (value == INFINIT_INT)
                     {
                     /* catgets 5459 */
-                    ls_syslog (LOG_ERR, I18N (5459, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored"), __func__, fname, *lineNum, keylist[i].val, keylist[i].key, INFINIT_INT - 1);
+                    ls_syslog (LOG_ERR, I18N (5459, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored"), __func__, filename, *lineNum, keylist[i].val, keylist[i].key, INFINIT_INT - 1);
                     pConf->param->acctArchiveInSize = -1;
                     lsberrno = LSBE_CONF_WARNING;
                     }
@@ -520,7 +520,7 @@ do_Param (struct lsConf *conf, char *fname, size_t *lineNum)
                 if (value == INFINIT_INT)
                     {
                     /* catgets 5459 */
-                    ls_syslog (LOG_ERR, I18N (5459, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored"), __func__, fname, *lineNum, keylist[i].val, keylist[i].key, INFINIT_INT - 1);
+                    ls_syslog (LOG_ERR, I18N (5459, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored"), __func__, filename, *lineNum, keylist[i].val, keylist[i].key, INFINIT_INT - 1);
                     pConf->param->acctArchiveInDays = -1;
                     lsberrno = LSBE_CONF_WARNING;
                     }
@@ -546,7 +546,7 @@ do_Param (struct lsConf *conf, char *fname, size_t *lineNum)
                 if ((value = my_atoi (keylist[i].val, INFINIT_INT, -1)) == INFINIT_INT)
                     {
                     /* catgets 5067 */
-                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5067, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a non-negative integer between 0 and %d; ignored"), __func__, fname, *lineNum, keylist[i].val, keylist[i].key, INFINIT_INT - 1);
+                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5067, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a non-negative integer between 0 and %d; ignored"), __func__, filename, *lineNum, keylist[i].val, keylist[i].key, INFINIT_INT - 1);
                     lsberrno = LSBE_CONF_WARNING;
                     }
                 else if (i == 4) {
@@ -569,16 +569,16 @@ do_Param (struct lsConf *conf, char *fname, size_t *lineNum)
                 else
                     {
                     /* catgets 5068 */
-                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5068, "%s: File %s in section Parameters ending at line %d: unrecognizable value <%s> for the keyword DISABLE_UACCT_MAP; assume user level account mapping is allowed"), __func__, fname, *lineNum, keylist[i].val);
+                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5068, "%s: File %s in section Parameters ending at line %d: unrecognizable value <%s> for the keyword DISABLE_UACCT_MAP; assume user level account mapping is allowed"), __func__, filename, *lineNum, keylist[i].val);
                     pConf->param->disableUAcctMap = FALSE;
                     }
                 }
-            else if (i == 26) {
+            else if (i == 26) { // FIXME FIXME 26 is awfully particular, maybe we should translate this to enum labels?
 
                 int value_ = 0;
                 int mytime = 0;
-                char str[100]; 
-                char *ptr;
+                char str[100]; // FIXME FIXME FIXME 100 is awfully particular 
+                char *ptr = NULL;
 
                 strcpy (str, keylist[i].val);
                 ptr = strchr (str, '/');
@@ -591,7 +591,7 @@ do_Param (struct lsConf *conf, char *fname, size_t *lineNum)
 
                 if (ptr == NULL || value_ == INFINIT_INT || mytime == INFINIT_INT) {
                     /* catgets 5451 */
-                    ls_syslog (LOG_ERR, I18N (5451, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't in format value/time (time in minutes) or value is not positive; ignored"), __func__, fname, *lineNum, keylist[i].val, keylist[i].key);
+                    ls_syslog (LOG_ERR, I18N (5451, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't in format value/time (time in minutes) or value is not positive; ignored"), __func__, filename, *lineNum, keylist[i].val, keylist[i].key);
                     lsberrno = LSBE_CONF_WARNING;
                     continue;
                 }
@@ -604,7 +604,7 @@ do_Param (struct lsConf *conf, char *fname, size_t *lineNum)
                 value = my_atoi (keylist[i].val, INFINIT_INT, 0);
                 if (value == INFINIT_INT) {
                     /* catgets 5459 */
-                    ls_syslog (LOG_ERR, I18N (5459, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored"), __func__, fname, *lineNum, keylist[i].val, keylist[i].key, INFINIT_INT - 1); 
+                    ls_syslog (LOG_ERR, I18N (5459, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored"), __func__, filename, *lineNum, keylist[i].val, keylist[i].key, INFINIT_INT - 1); 
                     lsberrno = LSBE_CONF_WARNING;
                     pConf->param->sharedResourceUpdFactor = INFINIT_INT;
                 }
@@ -621,7 +621,7 @@ do_Param (struct lsConf *conf, char *fname, size_t *lineNum)
                 value_ = (unsigned int) foo;
                 if ((value_ < MAX_JOBID_LOW) || (value_ > MAX_JOBID_HIGH)) {
                     /*catgets 5062 */
-                    ls_syslog (LOG_ERR, I18N (5062, "%s: File%s in section Parameters ending at line %d: maxJobId value %s not in [%d, %d], use default value %d;"), __func__, fname, *lineNum, keylist[i].key, MAX_JOBID_LOW, MAX_JOBID_HIGH, DEF_MAX_JOBID);
+                    ls_syslog (LOG_ERR, I18N (5062, "%s: File %s in section Parameters ending at line %d: maxJobId value %s not in [%d, %d], use default value %d;"), __func__, filename, *lineNum, keylist[i].key, MAX_JOBID_LOW, MAX_JOBID_HIGH, DEF_MAX_JOBID);
                     lsberrno = LSBE_CONF_WARNING;
                     pConf->param->maxJobId = DEF_MAX_JOBID;
                 }
@@ -655,7 +655,7 @@ do_Param (struct lsConf *conf, char *fname, size_t *lineNum)
 
                 if (value == INFINIT_INT) {
                     /* catgets 5071 */
-                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5071, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored"), __func__, fname, *lineNum, keylist[i].val, keylist[i].key, INFINIT_INT - 1);
+                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5071, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored"), __func__, filename, *lineNum, keylist[i].val, keylist[i].key, INFINIT_INT - 1);
                     lsberrno = LSBE_CONF_WARNING;
                 }
                 else {
@@ -702,7 +702,7 @@ do_Param (struct lsConf *conf, char *fname, size_t *lineNum)
                         case 19:
                             if (value < 1 || value >= LSB_MAX_ARRAY_IDX) {
                                 /* catgets 5073 */
-                                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5073, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s is out of range[1-65534]); ignored"), __func__, fname, *lineNum, keylist[i].val, keylist[i].key);
+                                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5073, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s is out of range[1-65534]); ignored"), __func__, filename, *lineNum, keylist[i].val, keylist[i].key);
                                 lsberrno = LSBE_CONF_WARNING;
                             }
                             else { 
@@ -729,7 +729,7 @@ do_Param (struct lsConf *conf, char *fname, size_t *lineNum)
                             }
                             else {
                                 /* catgets 5452 */
-                                ls_syslog (LOG_ERR, I18N (5452, "%s: File%s in section Parameters ending at line %d: invalid value <%s> of <%s> : ignored;"), __func__, fname, *lineNum, keylist[i].val, keylist[i].key);
+                                ls_syslog (LOG_ERR, I18N (5452, "%s: File %s in section Parameters ending at line %d: invalid value <%s> of <%s> : ignored;"), __func__, filename, *lineNum, keylist[i].val, keylist[i].key);
                             }
                         break;
                         case 29:
@@ -737,7 +737,7 @@ do_Param (struct lsConf *conf, char *fname, size_t *lineNum)
                         break;
                         default:
                             /* catgets 5074 */
-                            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5074, "%s: File%s in section Parameters ending at line %d: Impossible cases <%d>."), __func__, fname, *lineNum, i);
+                            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5074, "%s: File %s in section Parameters ending at line %d: Impossible cases <%d>."), __func__, filename, *lineNum, i);
                             lsberrno = LSBE_CONF_WARNING;
                         break;
                     }
@@ -752,7 +752,7 @@ do_Param (struct lsConf *conf, char *fname, size_t *lineNum)
         && pConf->param->jobPriorityTime > 0)
         {
         /* catgets 5453 */
-        ls_syslog (LOG_ERR, I18N (5453, "%s: File%s in section Parameters : MAX_USER_PRIORITY should be defined first so that JOB_PRIORITY_OVER_TIME can be used: job priority control disabled"), __func__, fname);
+        ls_syslog (LOG_ERR, I18N (5453, "%s: File %s in section Parameters : MAX_USER_PRIORITY should be defined first so that JOB_PRIORITY_OVER_TIME can be used: job priority control disabled"), __func__, filename);
         pConf->param->jobPriorityValue = -1;
         pConf->param->jobPriorityTime = -1;
         lsberrno = LSBE_CONF_WARNING;
@@ -853,10 +853,9 @@ checkSpoolDir (char *pSpoolDir)
     char TempPath[MAXPATHLEN];
     char TempNT[MAXPATHLEN];
     char TempUnix[MAXPATHLEN];
-    static char __func__] = "checkSpoolDir";
 
     if (logclass & LC_EXEC) {
-        ls_syslog (LOG_DEBUG, "%s: the JOB_SPOOL_DIR is %s, and %d \n", fname, pSpoolDir, strlen (pSpoolDir));
+        ls_syslog (LOG_DEBUG, "%s: the JOB_SPOOL_DIR is %s, and %d \n", __func__, pSpoolDir, strlen (pSpoolDir));
     }
     if (strlen (pSpoolDir) >= MAXPATHLEN) {
         return -1;
@@ -881,8 +880,7 @@ checkSpoolDir (char *pSpoolDir)
         *pTemp = '\0';
         if (logclass & LC_EXEC)
             {
-            ls_syslog (LOG_DEBUG, "%s: the UNIX's JOB_SPOOL_DIR is %s \n",
-                       fname, TempUnix);
+            ls_syslog (LOG_DEBUG, "%s: the UNIX's JOB_SPOOL_DIR is %s \n", __func__, TempUnix);
             }
 
         if (strlen (TempUnix) > 1)
@@ -896,14 +894,14 @@ checkSpoolDir (char *pSpoolDir)
 
         pTemp = strchr (TempPath, '|');
         pTemp++;
-        while (isspace (*pTemp))
+        while (isspace (*pTemp)) {
             pTemp++;
+        }
 
         strcpy (TempNT, pTemp);
         if (logclass & LC_EXEC)
             {
-            ls_syslog (LOG_DEBUG, "%s: the NT's JOB_SPOOL_DIR is %s \n",
-                       fname, TempNT);
+            ls_syslog (LOG_DEBUG, "%s: the NT's JOB_SPOOL_DIR is %s \n", __func__, TempNT);
             }
 
         if (strlen (TempNT) > 1)
@@ -914,18 +912,15 @@ checkSpoolDir (char *pSpoolDir)
                 {
                 if (TempNT[i] == '\\' && TempNT[i + 1] == '\\')
                     {
-                    ls_syslog (LOG_DEBUG, "%s: NT's JOB_SPOOL_DIR[%d] is ## \n",
-                               fname, i);
+                    ls_syslog (LOG_DEBUG, "%s: NT's JOB_SPOOL_DIR[%d] is ## \n", __func__, i);
                     }
                 else if (TempNT[i] == '\\')
                     {
-                    ls_syslog (LOG_DEBUG, "%s: NT's JOB_SPOOL_DIR[%d] is # \n",
-                               fname, i);
+                    ls_syslog (LOG_DEBUG, "%s: NT's JOB_SPOOL_DIR[%d] is # \n", __func__, i);
                     }
                 else
                     {
-                    ls_syslog (LOG_DEBUG, "%s: NT's JOB_SPOOL_DIR[%d] is %c\n",
-                               fname, i, TempNT[i]);
+                    ls_syslog (LOG_DEBUG, "%s: NT's JOB_SPOOL_DIR[%d] is %c\n", __func__, i, TempNT[i]);
                     }
                 }
 
@@ -952,8 +947,9 @@ checkSpoolDir (char *pSpoolDir)
 
         pTemp = pSpoolDir;
 
-        while (isspace (*pTemp))
+        while (isspace (*pTemp)) {
             pTemp++;
+        }
 
 
         strcpy (pSpoolDir, pTemp);
@@ -981,11 +977,10 @@ lsb_readuser (struct lsConf *conf, int options, struct clusterConf *clusterConf)
 struct userConf *
 lsb_readuser_ex (struct lsConf *conf, int options, struct clusterConf *clusterConf, struct sharedConf *sharedConf)
 {
-    char *fname = NULL;
-    // 
-    char *cp  = NULL;
-    char *section = NULL;
-    size_t lineNum = 0;
+    char *filename  = NULL;
+    char *cp        = NULL;
+    char *section   = NULL;
+    size_t lineNum  = 0;
 
     lsberrno = LSBE_NO_ERROR;
 
@@ -1009,7 +1004,7 @@ lsb_readuser_ex (struct lsConf *conf, int options, struct clusterConf *clusterCo
         return NULL;
     }
 
-    fname = conf->confhandle->fname;
+    filename = conf->confhandle->fname;
 
 
     conf->confhandle->curNode = conf->confhandle->rootNode;
@@ -1059,14 +1054,14 @@ lsb_readuser_ex (struct lsConf *conf, int options, struct clusterConf *clusterCo
         section = getNextWord_ (&cp);
         if (!section)  {
             /* catgets 5082 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5082, "%s: File %s at line %d: Section name expected after Begin; ignoring section"), __func__, fname, lineNum);
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5082, "%s: File %s at line %d: Section name expected after Begin; ignoring section"), __func__, filename, lineNum);
             lsberrno = LSBE_CONF_WARNING;
-            doSkipSection_conf (conf, &lineNum, fname, "unknown");
+            doSkipSection_conf (conf, &lineNum, filename, "unknown");
             continue;
         }
         else {
             if (strcasecmp (section, "user") == 0) {
-                if (do_Users (conf, fname, &lineNum, options) == FALSE) {
+                if (do_Users (conf, filename, &lineNum, options) == FALSE) {
                     if (lsberrno == LSBE_NO_MEM) {
                         lsberrno = LSBE_CONF_FATAL;
                         freeWorkUser (TRUE);
@@ -1078,7 +1073,7 @@ lsb_readuser_ex (struct lsConf *conf, int options, struct clusterConf *clusterCo
             }
             else if (strcasecmp (section, "usergroup") == 0) {
 
-                if (do_Groups (usergroups, conf, fname, &lineNum, &numofugroups, options) == FALSE) {
+                if (do_Groups (usergroups, conf, filename, &lineNum, &numofugroups, options) == FALSE) {
                     if (lsberrno == LSBE_NO_MEM) {
                         lsberrno = LSBE_CONF_FATAL;
                         freeWorkUser (TRUE);
@@ -1089,16 +1084,16 @@ lsb_readuser_ex (struct lsConf *conf, int options, struct clusterConf *clusterCo
                 continue;
             }
             /* catgets 5083 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5083, "%s: File %s at line %d: Invalid section name %s; ignoring section"), __func__, fname, lineNum, section);
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5083, "%s: File %s at line %d: Invalid section name %s; ignoring section"), __func__, filename, lineNum, section);
             lsberrno = LSBE_CONF_WARNING;
-            doSkipSection_conf (conf, &lineNum, fname, section);
+            doSkipSection_conf (conf, &lineNum, filename, section);
             continue;
         }
     }
 }
 
 static char
-do_Users (struct lsConf *conf, char *fname, size_t *lineNum, int options)
+do_Users (struct lsConf *conf, char *filename, size_t *lineNum, int options)
 {
     // 
     char *linep = NULL;
@@ -1128,13 +1123,13 @@ do_Users (struct lsConf *conf, char *fname, size_t *lineNum, int options)
 
     linep = getNextLineC_conf (conf, lineNum, TRUE);
     if (!linep) {
-        ls_syslog (LOG_ERR, I18N_FILE_PREMATURE, __func__, fname, *lineNum);
+        ls_syslog (LOG_ERR, I18N_FILE_PREMATURE, __func__, filename, *lineNum);
         lsberrno = LSBE_CONF_WARNING;
         return FALSE;
     }
 
-    if (isSectionEnd (linep, fname, lineNum, "user")) {
-        ls_syslog (LOG_WARNING, I18N_EMPTY_SECTION, __func__, fname, *lineNum, "user");
+    if (isSectionEnd (linep, filename, lineNum, "user")) {
+        ls_syslog (LOG_WARNING, I18N_EMPTY_SECTION, __func__, filename, *lineNum, "user");
         lsberrno = LSBE_CONF_WARNING;
         return FALSE;
     }
@@ -1142,17 +1137,17 @@ do_Users (struct lsConf *conf, char *fname, size_t *lineNum, int options)
     if (strchr (linep, '=') == NULL) {
         if (!keyMatch (keylist, linep, FALSE)) {
             /* catgets 5086 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5086, "%s: File %s at line %d: Keyword line format error for User section; ignoring section"), __func__, fname, *lineNum);
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5086, "%s: File %s at line %d: Keyword line format error for User section; ignoring section"), __func__, filename, *lineNum);
             lsberrno = LSBE_CONF_WARNING;
-            doSkipSection_conf (conf, lineNum, fname, "user");
+            doSkipSection_conf (conf, lineNum, filename, "user");
             return FALSE;
         }
 
         if (keylist[0].position < 0) {
             /* catgets 5087 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5087, "%s: File %s at line %d: User name required for User section; ignoring section"), __func__, fname, *lineNum);
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5087, "%s: File %s at line %d: User name required for User section; ignoring section"), __func__, filename, *lineNum);
             lsberrno = LSBE_CONF_WARNING;
-            doSkipSection_conf (conf, lineNum, fname, "user");
+            doSkipSection_conf (conf, lineNum, filename, "user");
             return FALSE;
         }
 
@@ -1174,7 +1169,7 @@ do_Users (struct lsConf *conf, char *fname, size_t *lineNum, int options)
 
             isGroupAt = FALSE;
             freekeyval (keylist);
-            if (isSectionEnd (linep, fname, lineNum, "user")) {
+            if (isSectionEnd (linep, filename, lineNum, "user")) {
                 h_delTab_ (tmpUsers);
                 FREEUP (tmpUsers);
                 h_delTab_ (nonOverridableUsers);
@@ -1183,14 +1178,14 @@ do_Users (struct lsConf *conf, char *fname, size_t *lineNum, int options)
             }
             if (mapValues (keylist, linep) < 0) {
                 /* catgets 5089 */
-                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5089, "%s: File %s at line %d: Values do not match keys in User section; ignoring line"), __func__, fname, *lineNum); 
+                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5089, "%s: File %s at line %d: Values do not match keys in User section; ignoring line"), __func__, filename, *lineNum); 
                 lsberrno = LSBE_CONF_WARNING;
                 continue;
             }
             h_addEnt_ (tmpUsers, keylist[0].val, &new);
             if (!new) {
                 /* catgets 5090 */
-                ls_syslog (LOG_ERR, I18N (5090, "%s: File %s at line %d: User name <%s> multiply specified; ignoring line"), __func__, fname, *lineNum, keylist[0].val);
+                ls_syslog (LOG_ERR, I18N (5090, "%s: File %s at line %d: User name <%s> multiply specified; ignoring line"), __func__, filename, *lineNum, keylist[0].val);
                 lsberrno = LSBE_CONF_WARNING;
                 continue;
             }
@@ -1231,14 +1226,15 @@ do_Users (struct lsConf *conf, char *fname, size_t *lineNum, int options)
                 if (unixGrp != NULL) {
                     if (options & (CONF_EXPAND | CONF_NO_EXPAND | CONF_CHECK)) {
 
-                        gp = addUnixGrp (unixGrp, keylist[0].val, fname,
-                                         *lineNum, " in User section", 0);
+                        gp = addUnixGrp (unixGrp, keylist[0].val, filename, *lineNum, " in User section", 0);
 
                         if (gp == NULL)
                             {
-                            if (lsberrno == LSBE_NO_MEM)
+                            if (lsberrno == LSBE_NO_MEM) {
                                 return FALSE;
-                            ls_syslog (LOG_WARNING, I18N (5091, "%s: File %s at line %d: No valid users defined in Unix group <%s>; ignored"), __func__, fname, *lineNum, keylist[0].val); /* catgets 5091 */
+                            }
+                            /* catgets 5091 */
+                            ls_syslog (LOG_WARNING, I18N (5091, "%s: File %s at line %d: No valid users defined in Unix group <%s>; ignored"), __func__, filename, *lineNum, keylist[0].val);
                             lsberrno = LSBE_CONF_WARNING;
                             continue;
                             }
@@ -1246,7 +1242,8 @@ do_Users (struct lsConf *conf, char *fname, size_t *lineNum, int options)
                     }
                 else
                     {
-                    ls_syslog (LOG_WARNING, I18N (5092, "%s: File %s at line %d: Unknown user <%s>; Maybe a windows user or of another domain."), __func__, fname, *lineNum, keylist[0].val);  /* catgets 5092 */
+                    /* catgets 5092 */
+                    ls_syslog (LOG_WARNING, I18N (5092, "%s: File %s at line %d: Unknown user <%s>; Maybe a windows user or of another domain."), __func__, filename, *lineNum, keylist[0].val);  
                     lsberrno = LSBE_CONF_WARNING;
                     }
                 }
@@ -1264,7 +1261,8 @@ do_Users (struct lsConf *conf, char *fname, size_t *lineNum, int options)
 
                 if ((maxjobs = my_atoi (keylist[1].val, INFINIT_INT, -1)) == INFINIT_INT)
                     {
-                    ls_syslog (LOG_ERR, I18N (5093, "%s: File %s at line %d: Invalid value <%s> for key <%s>; %d is assumed"), __func__, fname, *lineNum, keylist[1].val, keylist[1].key, INFINIT_INT);    /* catgets 5093 */
+                    /* catgets 5093 */
+                    ls_syslog (LOG_ERR, I18N (5093, "%s: File %s at line %d: Invalid value <%s> for key <%s>; %d is assumed"), __func__, filename, *lineNum, keylist[1].val, keylist[1].key, INFINIT_INT);
                     lsberrno = LSBE_CONF_WARNING;
                     }
                 }
@@ -1276,13 +1274,13 @@ do_Users (struct lsConf *conf, char *fname, size_t *lineNum, int options)
                 pJobLimit = my_atof( keylist[2].val, INFINIT_FLOAT, -1.0 );
                 if ( fabs( INFINIT_FLOAT - pJobLimit) < 0.00001 ) {
                     /* catgets 5094 */
-                    ls_syslog (LOG_ERR, I18N (5094, "%s: File %s at line %d: Invalid value <%s> for key %s; %f is assumed"), __func__, fname, *lineNum, keylist[2].val, keylist[2].key, INFINIT_FLOAT);
+                    ls_syslog (LOG_ERR, I18N (5094, "%s: File %s at line %d: Invalid value <%s> for key %s; %f is assumed"), __func__, filename, *lineNum, keylist[2].val, keylist[2].key, INFINIT_FLOAT);
                     lsberrno = LSBE_CONF_WARNING;
                 }
             }
             if (!isGroupAt && (!(options & (CONF_EXPAND | CONF_NO_EXPAND)) || options == CONF_NO_CHECK)) {
                 h_addEnt_ (nonOverridableUsers, keylist[0].val, 0);
-                if (!addUser (keylist[0].val, maxjobs, pJobLimit, fname, TRUE) && lsberrno == LSBE_NO_MEM) {
+                if (!addUser (keylist[0].val, maxjobs, pJobLimit, filename, TRUE) && lsberrno == LSBE_NO_MEM) {
                     FREEUP (grpSl);
                     lsberrno = LSBE_NO_MEM;
                     h_delTab_ (tmpUsers);
@@ -1308,19 +1306,19 @@ do_Users (struct lsConf *conf, char *fname, size_t *lineNum, int options)
                     }
 
                 if ((groupMembers = expandGrp (gr__func__, numMembers, USER_GRP)) == NULL) {
-                    ls_syslog (LOG_ERR, I18N_FUNC_FAIL, fname, "expandGrp");
+                    ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, __func__);
                     goto Error;
                 }
 
                 if (strcmp (groupMembers[0], "all") == 0) {
-                    ls_syslog (LOG_ERR, I18N (5096, "%s: File %s at line %d: user group <%s> with no members is ignored"), __func__, fname, *lineNum, keylist[0].val); /* catgets 5096 */
+                    ls_syslog (LOG_ERR, I18N (5096, "%s: File %s at line %d: user group <%s> with no members is ignored"), __func__, filename, *lineNum, keylist[0].val); /* catgets 5096 */
                 }
                 else if (!(options & CONF_NO_EXPAND)) {
                     for ( unsigned int i = 0; i < *numMembers; i++) {
                         if (h_getEnt_ (nonOverridableUsers, groupMembers[i])) {
                             continue;
                         }
-                        addUser (groupMembers[i], maxjobs, pJobLimit, fname, TRUE);
+                        addUser (groupMembers[i], maxjobs, pJobLimit, filename, TRUE);
                     }
                 }
                 else {
@@ -1328,14 +1326,14 @@ do_Users (struct lsConf *conf, char *fname, size_t *lineNum, int options)
                         gr__func__[lastChar + 1] = '@';
                     }
 
-                    addUser (gr__func__, maxjobs, pJobLimit, fname, TRUE);
+                    addUser (gr__func__, maxjobs, pJobLimit, filename, TRUE);
                 }
                 freeSA (groupMembers, *numMembers);
             }
             FREEUP (grpSl);
         }
 
-        ls_syslog (LOG_ERR, I18N_FILE_PREMATURE, __func__, fname, *lineNum);
+        ls_syslog (LOG_ERR, I18N_FILE_PREMATURE, __func__, filename, *lineNum);
         lsberrno = LSBE_CONF_WARNING;
         FREEUP (grpSl);
         h_delTab_ (tmpUsers);
@@ -1347,13 +1345,13 @@ do_Users (struct lsConf *conf, char *fname, size_t *lineNum, int options)
 
     }
     else {
-        ls_syslog (LOG_ERR, I18N_HORI_NOT_IMPLE, __func__, fname, *lineNum, "user");
+        ls_syslog (LOG_ERR, I18N_HORI_NOT_IMPLE, __func__, filename, *lineNum, "user");
         lsberrno = LSBE_CONF_WARNING;
-        doSkipSection_conf (conf, lineNum, fname, "user");
+        doSkipSection_conf (conf, lineNum, filename, "user");
         return FALSE;
     }
 
-Error:
+Error:     // FIXME FIXME FIXME goto label has to go
     h_delTab_ (tmpUsers);
     FREEUP (tmpUsers);
     FREEUP (grpSl);
@@ -1366,7 +1364,7 @@ Error:
 
 
 static char
-do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, char *fname, size_t *lineNum, unsigned int *ngroups, int options)
+do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, char *filename, size_t *lineNum, unsigned int *ngroups, int options)
 {
     // 
 
@@ -1402,13 +1400,13 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, char *fname, size_
 
     linep = getNextLineC_conf (conf, lineNum, TRUE);
     if (!linep) {
-        ls_syslog (LOG_ERR, I18N_FILE_PREMATURE, __func__, fname, *lineNum);
+        ls_syslog (LOG_ERR, I18N_FILE_PREMATURE, __func__, filename, *lineNum);
         lsberrno = LSBE_CONF_WARNING;
         return FALSE;
     }
 
-    if (isSectionEnd (linep, fname, lineNum, HUgroups)) {
-        ls_syslog (LOG_WARNING, I18N_EMPTY_SECTION, __func__, fname, *lineNum, HUgroups);
+    if (isSectionEnd (linep, filename, lineNum, HUgroups)) {
+        ls_syslog (LOG_WARNING, I18N_EMPTY_SECTION, __func__, filename, *lineNum, HUgroups);
         lsberrno = LSBE_CONF_WARNING;
         return FALSE;
     }
@@ -1417,20 +1415,20 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, char *fname, size_
 
         if (!keyMatch (keylist, linep, FALSE)) {
             /* catgets 5101 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5101, "%s: File %s at line %d: Keyword line format error for section <%s>; ignoring section"), __func__, fname, *lineNum, HUgroups);
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5101, "%s: File %s at line %d: Keyword line format error for section <%s>; ignoring section"), __func__, filename, *lineNum, HUgroups);
             lsberrno = LSBE_CONF_WARNING;
-            doSkipSection_conf (conf, lineNum, fname, HUgroups);
+            doSkipSection_conf (conf, lineNum, filename, HUgroups);
             return FALSE;
         }
         while ((linep = getNextLineC_conf (conf, lineNum, TRUE)) != NULL) {
             freekeyval (keylist);
-            if (isSectionEnd (linep, fname, lineNum, HUgroups)) {
+            if (isSectionEnd (linep, filename, lineNum, HUgroups)) {
                 return TRUE;
             }
 
             if (mapValues (keylist, linep) < 0) {
                 /* catgets 5102 */
-                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5102, "%s: File %s at line %d: Values do not match keys in %s section; ignoring line"), __func__, fname, *lineNum, HUgroups);
+                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5102, "%s: File %s at line %d: Values do not match keys in %s section; ignoring line"), __func__, filename, *lineNum, HUgroups);
                 lsberrno = LSBE_CONF_WARNING;
                 continue;
             }
@@ -1441,7 +1439,7 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, char *fname, size_
                 )
                 {
                 /* catgets 5103 */
-                ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5103, "%s: File %s at line %d: Group name <%s> conflicts with reserved word <all/default/others>; ignoring line"), __func__, fname, *lineNum, keylist[0].val);
+                ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5103, "%s: File %s at line %d: Group name <%s> conflicts with reserved word <all/default/others>; ignoring line"), __func__, filename, *lineNum, keylist[0].val);
                 lsberrno = LSBE_CONF_WARNING;
                 continue;
             }
@@ -1469,7 +1467,7 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, char *fname, size_
 
                 if ((pw != NULL) || (chekMembStr (&unknownUsers, keylist[0].val) != NULL)) {
                     /* catgets 5104 */
-                    ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5104, "%s: File %s at line %d: Group name <%s> conflicts with user login name; ignoring line"), __func__, fname, *lineNum, keylist[0].val);
+                    ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5104, "%s: File %s at line %d: Group name <%s> conflicts with user login name; ignoring line"), __func__, filename, *lineNum, keylist[0].val);
                     lsberrno = LSBE_CONF_WARNING;
                     continue;
                 }
@@ -1477,14 +1475,14 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, char *fname, size_
 
             if (options != CONF_NO_CHECK && type == HOST_GRP && isHostName (keylist[0].val)) {
                 /* catgets 5105 */
-                ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5105, "%s: File %s at line %d: Group name <%s> conflicts with host name; ignoring line"), __func__, fname, *lineNum, keylist[0].val);
+                ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5105, "%s: File %s at line %d: Group name <%s> conflicts with host name; ignoring line"), __func__, filename, *lineNum, keylist[0].val);
                 lsberrno = LSBE_CONF_WARNING;
                 continue;
             }
 
             if (options != CONF_NO_CHECK && getGrpData (groups, keylist[0].val, *ngroups)) {
                 /* catgets 5106 */
-                ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5106, "%s: File %s at line %d: Group <%s> is multiply defined; ignoring line"), __func__, fname, *lineNum, keylist[0].val);
+                ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5106, "%s: File %s at line %d: Group <%s> is multiply defined; ignoring line"), __func__, filename, *lineNum, keylist[0].val);
                 lsberrno = LSBE_CONF_WARNING;
                 continue;
             }
@@ -1493,7 +1491,7 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, char *fname, size_
 
                 if (nGrpOverFlow++ == 0) {
                     /* catgets 5107 */
-                    ls_syslog (LOG_WARNING, I18N (5107, "%s: File %s at line %d: The number of configured groups reaches the limit <%d>; ignoring the rest of groups defined"), __func__, fname, *lineNum, MAX_GROUPS);
+                    ls_syslog (LOG_WARNING, I18N (5107, "%s: File %s at line %d: The number of configured groups reaches the limit <%d>; ignoring the rest of groups defined"), __func__, filename, *lineNum, MAX_GROUPS);
                 }
 
                 lsberrno = LSBE_CONF_WARNING;
@@ -1502,13 +1500,13 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, char *fname, size_
 
             if ((type == HOST_GRP) && *ngroups >= MAX_GROUPS) {
                 /* catgets 5113 */
-                ls_syslog (LOG_ERR, I18N (5113, "%s: File %s at line %d: The number of configured host groups reaches the limit <%d>; ignoring the rest of groups defined"), __func__, fname, *lineNum, MAX_GROUPS);
+                ls_syslog (LOG_ERR, I18N (5113, "%s: File %s at line %d: The number of configured host groups reaches the limit <%d>; ignoring the rest of groups defined"), __func__, filename, *lineNum, MAX_GROUPS);
                 lsberrno = LSBE_CONF_WARNING;
                 continue;
             }
             else if ((type == USER_GRP) && (*ngroups >= MAX_GROUPS)) {
                 /* catgets 5107 */
-                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5107, "%s: File %s at line %d: The number of configured user groups reaches the limit <%d>; ignoring the rest of groups defined"), __func__, fname, *lineNum, MAX_GROUPS);
+                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5107, "%s: File %s at line %d: The number of configured user groups reaches the limit <%d>; ignoring the rest of groups defined"), __func__, filename, *lineNum, MAX_GROUPS);
                 lsberrno = LSBE_CONF_WARNING;
                 continue;
             }
@@ -1524,7 +1522,7 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, char *fname, size_
                 }
                 else if (numHosts == 0) {
                     /* catgets 5460 */
-                    ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5460, "%s: File %s at line %d: there are no hosts found to exclude, replaced with \'%s\'"), __func__, fname, *lineNum, outHosts);
+                    ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5460, "%s: File %s at line %d: there are no hosts found to exclude, replaced with \'%s\'"), __func__, filename, *lineNum, outHosts);
                 }
                 else if (numHosts == -1) {
                     lsberrno = LSBE_NO_MEM;
@@ -1536,7 +1534,7 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, char *fname, size_
                         ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5461, "%s: \'%s\': \'%s\' The result is that all the hosts are to be excluded."), __func__, keylist[0].val, keylist[1].val);
                     }
                     /* catgets 5108 */
-                    ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5108, "%s: File %s at line %d: No valid member in group <%s>; ignoring line"), __func__, fname, *lineNum, keylist[0].val);
+                    ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5108, "%s: File %s at line %d: No valid member in group <%s>; ignoring line"), __func__, filename, *lineNum, keylist[0].val);
 
                     lsberrno = LSBE_CONF_WARNING;
                     continue;
@@ -1558,20 +1556,20 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, char *fname, size_
             }
 
             while (!allFlag && (wp = getNextWord_ (&sp)) != NULL) {
-                if (!addMember(gp, wp, type, fname, *lineNum, "", options, TRUE) && lsberrno == LSBE_NO_MEM) {
+                if (!addMember(gp, wp, type, filename, *lineNum, "", options, TRUE) && lsberrno == LSBE_NO_MEM) {
                     return FALSE;
                 }
             }
 
             if (allFlag) {
-                if (!addMember (gp, "all", type, fname, *lineNum, "", options, TRUE) && lsberrno == LSBE_NO_MEM) {
+                if (!addMember (gp, "all", type, filename, *lineNum, "", options, TRUE) && lsberrno == LSBE_NO_MEM) {
                     return FALSE;
                 }
             }
 
             if (gp->memberList == NULL) {
                 /* catgets 5108 */
-                ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5108, "%s: File %s at line %d: No valid member in group <%s>; ignoring line"), __func__, fname, *lineNum, gp->group);
+                ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5108, "%s: File %s at line %d: No valid member in group <%s>; ignoring line"), __func__, filename, *lineNum, gp->group);
                 lsberrno = LSBE_CONF_WARNING;
                 FREEUP (gp->group);
                 FREEUP (gp);
@@ -1580,17 +1578,17 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, char *fname, size_
 
         }
 
-        ls_syslog (LOG_WARNING, I18N_FILE_PREMATURE, __func__, fname, *lineNum);
+        ls_syslog (LOG_WARNING, I18N_FILE_PREMATURE, __func__, filename, *lineNum);
         lsberrno = LSBE_CONF_WARNING;
 
         return TRUE;
 
     }
     else {
-        ls_syslog (LOG_WARNING, I18N_HORI_NOT_IMPLE, __func__, fname, *lineNum, HUgroups);
+        ls_syslog (LOG_WARNING, I18N_HORI_NOT_IMPLE, __func__, filename, *lineNum, HUgroups);
         lsberrno = LSBE_CONF_WARNING;
 
-        doSkipSection_conf (conf, lineNum, fname, HUgroups);
+        doSkipSection_conf (conf, lineNum, filename, HUgroups);
 
         return FALSE;
     }
@@ -1662,7 +1660,7 @@ addGroup (struct groupInfoEnt **groups, char *gname, unsigned int *ngroups, int 
 }
 
 static struct groupInfoEnt *
-addUnixGrp (struct group *unixGrp, char *gname, char *fname, unsigned int lineNum, char *section, int type)
+addUnixGrp (struct group *unixGrp, char *gname, char *filename, unsigned int lineNum, char *section, int type)
 {
     int i = -1;
     struct groupInfoEnt *gp;
@@ -1673,7 +1671,7 @@ addUnixGrp (struct group *unixGrp, char *gname, char *fname, unsigned int lineNu
     }
 
     if (numofugroups >= MAX_GROUPS) {
-        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5131, "addUnixGrp: File %s at line %d: numofugroups <%d> is equal to or greater than MAX_GROUPS <%d>; ignoring the group <%s>"), fname, lineNum, numofugroups, MAX_GROUPS, unixGrp->gr_name);  /* catgets 5131 */
+        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5131, "addUnixGrp: File %s at line %d: numofugroups <%d> is equal to or greater than MAX_GROUPS <%d>; ignoring the group <%s>"), __func__, lineNum, numofugroups, MAX_GROUPS, unixGrp->gr_name);  /* catgets 5131 */
         return NULL;
     }
     if (gname == NULL) {
@@ -1689,7 +1687,7 @@ addUnixGrp (struct group *unixGrp, char *gname, char *fname, unsigned int lineNu
 
     while (unixGrp->gr_mem[++i] != NULL){
         if ((pw = getpwlsfuser_ (unixGrp->gr_mem[i]))) {
-            if (!addMember (gp, unixGrp->gr_mem[i], USER_GRP, fname, lineNum, section, CONF_EXPAND, TRUE)  && lsberrno == LSBE_NO_MEM) {
+            if (!addMember (gp, unixGrp->gr_mem[i], USER_GRP, filename, lineNum, section, CONF_EXPAND, TRUE)  && lsberrno == LSBE_NO_MEM) {
                 return NULL;
             }
             if (logclass & LC_TRACE) {
@@ -1698,7 +1696,7 @@ addUnixGrp (struct group *unixGrp, char *gname, char *fname, unsigned int lineNu
         }
         else {
             /* catgets 5132 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5132, "addUnixGrp: File %s%s at line %d: Bad user name <%s> in group <%s>; ignored"), fname, section, lineNum, unixGrp->gr_mem[i], gname);
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5132, "addUnixGrp: File %s%s at line %d: Bad user name <%s> in group <%s>; ignored"), __func__, section, lineNum, unixGrp->gr_mem[i], gname);
             lsberrno = LSBE_CONF_WARNING;
             continue;
         }
@@ -1714,7 +1712,7 @@ addUnixGrp (struct group *unixGrp, char *gname, char *fname, unsigned int lineNu
 }
 
 static char
-addMember (struct groupInfoEnt *gp, char *word, int grouptype, char *fname, unsigned int lineNum, char *section, int options, int checkAll)
+addMember (struct groupInfoEnt *gp, char *word, int grouptype, char *filename, unsigned int lineNum, char *section, int options, int checkAll)
 {
     // 
     int isHp = FALSE;
@@ -1751,7 +1749,7 @@ addMember (struct groupInfoEnt *gp, char *word, int grouptype, char *fname, unsi
     }
 
     if (myWord == NULL) {
-        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "addMember", "malloc", strlen (cp) + 1);
+        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (cp) + 1);
         lsberrno = LSBE_NO_MEM;
         return FALSE;
     }
@@ -1761,7 +1759,7 @@ addMember (struct groupInfoEnt *gp, char *word, int grouptype, char *fname, unsi
 
         if (gp == subgrpPtr) {
             /* catgets 5134 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5134, "%s: File %s at line %d: Recursive member in Unix group <%s>; ignored"), __func__, fname, lineNum, myWord);
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5134, "%s: File %s at line %d: Recursive member in Unix group <%s>; ignored"), __func__, filename, lineNum, myWord);
             lsberrno = LSBE_CONF_WARNING;
             FREEUP (myWord);
             return FALSE;
@@ -1793,7 +1791,7 @@ addMember (struct groupInfoEnt *gp, char *word, int grouptype, char *fname, unsi
             if (lastChar > 0 && myWord[lastChar] == '/') {
                 grpSl = putstr_ (myWord);
                 if (grpSl == NULL) {
-                    ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "addMember", "malloc", strlen (myWord) + 1);
+                    ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (myWord) + 1);
                     lsberrno = LSBE_NO_MEM;
                     FREEUP (myWord);
                     return FALSE;
@@ -1807,12 +1805,12 @@ addMember (struct groupInfoEnt *gp, char *word, int grouptype, char *fname, unsi
             }
 
             if (unixGrp && (options & CONF_EXPAND) ) {
-                subgrpPtr = addUnixGrp (unixGrp, myWord, fname, lineNum, section, 1);
+                subgrpPtr = addUnixGrp (unixGrp, myWord, filename, lineNum, section, 1);
 
                 if (!subgrpPtr) {
                     if (lsberrno != LSBE_NO_MEM) {
                         /* catgets 5136 */
-                        ls_syslog (LOG_WARNING, I18N (5136, "%s: File %s at line %d: No valid users defined in Unix group <%s>; ignored"), __func__, fname, lineNum, myWord);
+                        ls_syslog (LOG_WARNING, I18N (5136, "%s: File %s at line %d: No valid users defined in Unix group <%s>; ignored"), __func__, filename, lineNum, myWord);
                         lsberrno = LSBE_CONF_WARNING;
                     }
                     FREEUP (myWord);
@@ -1821,7 +1819,7 @@ addMember (struct groupInfoEnt *gp, char *word, int grouptype, char *fname, unsi
             }
             else {
                 /* catgets 5137 */
-                ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5137, "%s: File %s%s at line %d: Unknown user <%s> in group <%s>; Maybe a windows user or of another domain."), __func__, fname, section, lineNum, myWord, gp->group);
+                ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5137, "%s: File %s%s at line %d: Unknown user <%s> in group <%s>; Maybe a windows user or of another domain."), __func__, filename, section, lineNum, myWord, gp->group);
                 lsberrno = LSBE_CONF_WARNING;
                 if (!addMembStr (&unknownUsers, myWord)) {
                     FREEUP (myWord);
@@ -1837,7 +1835,7 @@ addMember (struct groupInfoEnt *gp, char *word, int grouptype, char *fname, unsi
         subgrpPtr = getHGrpData (myWord);
         if (gp == subgrpPtr) {
             /* catgets 5138 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5138, "%s: File %s at line %d: Recursive member in Unix group <%s>; ignored"), __func__, fname, lineNum, myWord);
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5138, "%s: File %s at line %d: Recursive member in Unix group <%s>; ignored"), __func__, filename, lineNum, myWord);
             lsberrno = LSBE_CONF_WARNING;
             FREEUP (myWord);
             return FALSE;
@@ -1849,7 +1847,7 @@ addMember (struct groupInfoEnt *gp, char *word, int grouptype, char *fname, unsi
         else {
             if ((hp = Gethostbyname_ (myWord)) == NULL) {
                 /* catgets 5139 */
-                ls_syslog (LOG_ERR, I18N (5139, "%s: File %s%s at line %d: Bad host/group name <%s> in group <%s>; ignored"), __func__, fname, section, lineNum, myWord, gp->group);
+                ls_syslog (LOG_ERR, I18N (5139, "%s: File %s%s at line %d: Bad host/group name <%s> in group <%s>; ignored"), __func__, filename, section, lineNum, myWord, gp->group);
                 lsberrno = LSBE_CONF_WARNING;
                 FREEUP (myWord);
                 return FALSE;
@@ -1857,14 +1855,14 @@ addMember (struct groupInfoEnt *gp, char *word, int grouptype, char *fname, unsi
             strcpy (name, hp->h_name);
             if (getHostData (name) == NULL && numofhosts != 0) {
                 /* catgets 5140 */
-                ls_syslog (LOG_ERR, I18N (5140, "%s: File %s%s at line %d: Host <%s> is not used by the batch system; ignored"), __func__, fname, section, lineNum, name);
+                ls_syslog (LOG_ERR, I18N (5140, "%s: File %s%s at line %d: Host <%s> is not used by the batch system; ignored"), __func__, filename, section, lineNum, name);
                 lsberrno = LSBE_CONF_WARNING;
                 FREEUP (myWord);
                 return FALSE;
             }
             if (isServerHost (name) == FALSE) {
                 /* catgets 5141 */
-                ls_syslog (LOG_ERR, I18N (5141, "%s: File %s%s at line %d: Host <%s> is not a server; ignored"), __func__, fname, section, lineNum, name);
+                ls_syslog (LOG_ERR, I18N (5141, "%s: File %s%s at line %d: Host <%s> is not a server; ignored"), __func__, filename, section, lineNum, name);
                 lsberrno = LSBE_CONF_WARNING;
                 FREEUP (myWord);
                 return FALSE;
@@ -1889,11 +1887,11 @@ addMember (struct groupInfoEnt *gp, char *word, int grouptype, char *fname, unsi
     if (returnVal) {
         if (isgrp){
             /* catgets 5142 */
-            ls_syslog (LOG_ERR, I18N (5142, "%s: File %s%s at line %d: Group <%s> is multiply defined in group <%s>; ignored"), __func__, fname, section, lineNum, myWord, gp->group);
+            ls_syslog (LOG_ERR, I18N (5142, "%s: File %s%s at line %d: Group <%s> is multiply defined in group <%s>; ignored"), __func__, filename, section, lineNum, myWord, gp->group);
         }
         else {
             /* catgets 5143 */
-            ls_syslog (LOG_ERR, I18N (5143, "%s: File %s%s at line %d: Member <%s> is multiply defined in group <%s>; ignored"), __func__, fname, section, lineNum, myWord, gp->group);
+            ls_syslog (LOG_ERR, I18N (5143, "%s: File %s%s at line %d: Member <%s> is multiply defined in group <%s>; ignored"), __func__, filename, section, lineNum, myWord, gp->group);
         }
         lsberrno = LSBE_CONF_WARNING;
         FREEUP (myWord);
@@ -1908,7 +1906,7 @@ addMember (struct groupInfoEnt *gp, char *word, int grouptype, char *fname, unsi
             gp->memberList = putstr_ (myWord);
         }
         if (gp->memberList == NULL) {
-            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "addMember", "malloc", strlen (myWord) + 1);
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (myWord) + 1);
             lsberrno = LSBE_NO_MEM;
             FREEUP (myWord);
             return FALSE;
@@ -1923,7 +1921,7 @@ addMember (struct groupInfoEnt *gp, char *word, int grouptype, char *fname, unsi
         }
         gp->memberList = (char *)myrealloc( gp->memberList, len * sizeof (char));
         if ( NULL == gp->memberList && ENOMEM == errno ) {
-            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "addMember", "myrealloc", len * sizeof (char));
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "myrealloc", len * sizeof (char));
             lsberrno = LSBE_NO_MEM;
             FREEUP (myWord);
             return FALSE;
@@ -2082,9 +2080,10 @@ freeGroupInfo (struct groupInfoEnt *gp)
 }
 
 static char
-addUser (char *username, int maxjobs, float pJobLimit, char *fname, int override)
+addUser (char *username, int maxjobs, float pJobLimit, char *filename, int override)
 {
-    struct userInfoEnt *up, **tmpUsers;
+    struct userInfoEnt *up        = NULL;
+    struct userInfoEnt **tmpUsers = NULL;
 
     if (username == NULL) {
         return FALSE;
@@ -2096,7 +2095,7 @@ addUser (char *username, int maxjobs, float pJobLimit, char *fname, int override
             initUserInfo (up);
             up->user = putstr_ (username);
             if (up->user == NULL) {
-                ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "addUser", "malloc", strlen (username) + 1);
+                ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "%s", "malloc", __func__, strlen (username));
                 lsberrno = LSBE_NO_MEM;
                 return FALSE;
             }
@@ -2105,9 +2104,9 @@ addUser (char *username, int maxjobs, float pJobLimit, char *fname, int override
             return TRUE;
         }
         else {
-            if (fname) {
+            if (filename) {
                 /* catgets 5147 */
-                ls_syslog (LOG_ERR, I18N (5147, "addUser: %s: User <%s> is multiply defined; retaining old definition"), fname, username);
+                ls_syslog (LOG_ERR, I18N (5147, "%s: %s: User <%s> is multiply defined; retaining old definition"), __func__, filename, username);
                 lsberrno = LSBE_CONF_WARNING;
             }
             return FALSE;
@@ -2121,9 +2120,9 @@ addUser (char *username, int maxjobs, float pJobLimit, char *fname, int override
             else {
                 usersize *= 2;
             }
-            tmpUsers = (struct userInfoEnt **) myrealloc(users, usersize * sizeof (struct userInfoEnt *));
+            tmpUsers = myrealloc(users, usersize * sizeof (struct userInfoEnt *));
             if ( NULL == tmpUsers && ENOMEM == errno ) {
-                ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "addUser", "myrealloc", usersize * sizeof (struct userInfoEnt *));
+                ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "myrealloc", usersize * sizeof (struct userInfoEnt *));
                 lsberrno = LSBE_NO_MEM;
                 return FALSE;
             }
@@ -2134,7 +2133,7 @@ addUser (char *username, int maxjobs, float pJobLimit, char *fname, int override
 
         users[numofusers] = malloc (sizeof (struct userInfoEnt));
         if ( NULL == users[numofusers] ) {
-            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "addUser", "malloc", sizeof (struct userInfoEnt));
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", sizeof (struct userInfoEnt));
             lsberrno = LSBE_NO_MEM;
             return FALSE;
         }
@@ -2157,11 +2156,13 @@ addUser (char *username, int maxjobs, float pJobLimit, char *fname, int override
 static char
 isInGrp (char *word, struct groupInfoEnt *gp, int grouptype, int checkAll)
 {
-    char *tmp, *str;
+    char *tmp = NULL;
+    char *str = NULL;
     struct groupInfoEnt *sub_gp = NULL;
 
-    if (word == NULL || gp == NULL || gp->memberList == NULL)
+    if (word == NULL || gp == NULL || gp->memberList == NULL) {
         return FALSE;
+    }
 
     if (word[0] == '~')
         {
@@ -2170,9 +2171,9 @@ isInGrp (char *word, struct groupInfoEnt *gp, int grouptype, int checkAll)
 
     tmp = gp->memberList;
 
-    if (!strcmp (tmp, "all") && checkAll == TRUE)
-
+    if (!strcmp (tmp, "all") && checkAll == TRUE) {
         return TRUE;
+    }
 
     while ((str = getNextWord_ (&tmp)) != NULL)
         {
@@ -2187,10 +2188,12 @@ isInGrp (char *word, struct groupInfoEnt *gp, int grouptype, int checkAll)
                 return TRUE;
             }
 
-        if (grouptype == USER_GRP)
+        if (grouptype == USER_GRP) {
             sub_gp = getUGrpData (str);
-        else
+        }
+        else {
             sub_gp = getHGrpData (str);
+        }
 
         if (isInGrp (word, sub_gp, grouptype, FALSE))
 
@@ -2204,15 +2207,15 @@ isInGrp (char *word, struct groupInfoEnt *gp, int grouptype, int checkAll)
 static char **
 expandGrp (char *word, unsigned int *num, int grouptype)
 {
-    char *tmp;
-    char *str;
+    char *tmp = NULL;
+    char *str =  NULL;
     unsigned int sub_num = 0;
     unsigned int n = 0;
     char **sub_list = NULL;
     char **list     = NULL;
     char **tempList = NULL;
-    struct groupInfoEnt *gp;
-    struct groupInfoEnt *sub_gp;
+    struct groupInfoEnt *gp = NULL;
+    struct groupInfoEnt *sub_gp = NULL;
 
     if (word == NULL || num == NULL) {
         return NULL;
@@ -2228,13 +2231,13 @@ expandGrp (char *word, unsigned int *num, int grouptype)
     if (gp == NULL) {
         list = malloc (sizeof (char *));
         if ( NULL == list && ENOMEM == errno ) {
-            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "expandGrp", "malloc", sizeof (char *));
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", sizeof (char *));
             lsberrno = LSBE_NO_MEM;
             return NULL;
         }
 
         if ((list[0] = putstr_ (word)) == NULL) {
-            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "expandGrp", "malloc", strlen (word) + 1);
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (word) + 1);
             lsberrno = LSBE_NO_MEM;
             return NULL;
         }
@@ -2243,15 +2246,15 @@ expandGrp (char *word, unsigned int *num, int grouptype)
     else {
         tmp = gp->memberList;
         if (!strcmp (tmp, "all")){
-            tempList = (char **) myrealloc (list, sizeof (char *));
+            tempList = myrealloc (list, sizeof (char *));
             if ( NULL == tempList && ENOMEM == errno ) {
-                ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "expandGrp", "myrealloc", sizeof (char *));
+                ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "myrealloc", sizeof (char *));
                 lsberrno = LSBE_NO_MEM;
                 return NULL;
             }
             list = tempList;
             if ((list[0] = putstr_ ("all")) == NULL) {
-                ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "expandGrp", "malloc", strlen ("all") + 1);
+                ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen ("all") + 1);
                 lsberrno = LSBE_NO_MEM;
                 return NULL;
             }
@@ -2271,16 +2274,16 @@ expandGrp (char *word, unsigned int *num, int grouptype)
             }
 
             if (sub_gp == NULL) {
-                tempList = (char **) myrealloc(list, (n + 1) * sizeof (char *));
+                tempList = myrealloc(list, (n + 1) * sizeof (char *));
                 if ( NULL == tempList && ENOMEM == errno ) {
-                    ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "expandGrp", "myrealloc", (n + 1) * sizeof (char *));
+                    ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "myrealloc", (n + 1) * sizeof (char *));
                     lsberrno = LSBE_NO_MEM;
                     return NULL;
                 }
 
                 list = tempList;
                 if ((list[n] = putstr_ (str)) == NULL) {
-                    ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "expandGrp", "malloc", strlen (str) + 1);
+                    ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (str) + 1);
                     lsberrno = LSBE_NO_MEM;
                     return NULL;
                 }
@@ -2297,15 +2300,15 @@ expandGrp (char *word, unsigned int *num, int grouptype)
                 if (sub_num) {
                     if (!strcmp (sub_list[0], "all")) {
 
-                        tempList = (char **) myrealloc(list, sizeof (char *));
+                        tempList = myrealloc(list, sizeof (char *));
                         if ( NULL == tempList && ENOMEM == errno ) {
-                            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "expandGrp", "myrealloc", sizeof (char *));
+                            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "myrealloc", sizeof (char *));
                             lsberrno = LSBE_NO_MEM;
                             return NULL;
                         }
                         list = tempList;
                         if ((list[0] = putstr_ ("all")) == NULL) {
-                            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "expandGrp", "malloc", strlen ("all") + 1);
+                            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen ("all") + 1);
                             lsberrno = LSBE_NO_MEM;
                             return NULL;
                         }
@@ -2317,7 +2320,7 @@ expandGrp (char *word, unsigned int *num, int grouptype)
 
                     list = (char **) myrealloc(list, (n + sub_num) * sizeof (char *));
                     if ( NULL == list && ENOMEM == errno ) {
-                        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M,  "expandGrp", "realloc", (n + sub_num) * sizeof (char *));
+                        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M,  __func__, "realloc", (n + sub_num) * sizeof (char *));
                         lsberrno = LSBE_NO_MEM;
                         return NULL;
                     }
@@ -2341,9 +2344,9 @@ lsb_readhost (struct lsConf *conf, struct lsInfo *info, int options, struct clus
 {
     // 
     struct lsInfo myinfo;
-    char *fname;
-    char *cp;
-    char *section;
+    char *filename = NULL;
+    char *cp       = NULL;
+    char *section  = NULL;
     char hostok;
     char hgroupok = 'a';
     char hpartok  = 'a';
@@ -2372,7 +2375,7 @@ lsb_readhost (struct lsConf *conf, struct lsInfo *info, int options, struct clus
 
     if ((options != CONF_NO_CHECK) && uConf == NULL)  {
         /* catgets 5446 */
-        ls_syslog (LOG_INFO, (_i18n_msg_get (ls_catd, NL_SETN, 5446, "%s: default user will be used.")), __func__);
+        ls_syslog (LOG_INFO, (_i18n_msg_get (ls_catd, NL_SETN, 5446, "%s: default user will be used.")), __func__);  // FIXME FIXME __func__ here is wrong. it should be filename, but it is not init'ed yet
         if (setDefaultUser ()) {
             ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "setDefaultUser");
             return NULL;
@@ -2385,7 +2388,7 @@ lsb_readhost (struct lsConf *conf, struct lsInfo *info, int options, struct clus
     myinfo.resTable = malloc( (size_t)info->nRes * sizeof (struct resItem));
     if (info->nRes && NULL == myinfo.resTable && ENOMEM == errno ) {
         assert( info->nRes );
-        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", (size_t)info->nRes * sizeof (struct resItem));
+        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", info->nRes * sizeof (struct resItem));
         lsberrno = LSBE_CONF_FATAL;
         return NULL;
     }
@@ -2420,7 +2423,7 @@ lsb_readhost (struct lsConf *conf, struct lsInfo *info, int options, struct clus
         return NULL;
     }
 
-    fname = conf->confhandle->fname;
+    filename = conf->confhandle->fname;
     conf->confhandle->curNode = conf->confhandle->rootNode;
     conf->confhandle->lineCount = 0;
 
@@ -2428,7 +2431,7 @@ lsb_readhost (struct lsConf *conf, struct lsInfo *info, int options, struct clus
         if ((cp = getBeginLine_conf (conf, lineNum)) == NULL) {
             if (!hostok) {
                 /* catgets 5165 */
-                ls_syslog (LOG_ERR, I18N (5165, "%s: Host section missing or invalid."), __func__);
+                ls_syslog (LOG_ERR, I18N (5165, "%s: Host section missing or invalid."), filename);
                 lsberrno = LSBE_CONF_WARNING;
             }
 
@@ -2473,14 +2476,14 @@ lsb_readhost (struct lsConf *conf, struct lsInfo *info, int options, struct clus
         section = getNextWord_ (&cp);
         if (!section) {
             /* catgets 5169 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5169, "%s: File %s at line %d: Section name expected after Begin; ignoring section"), __func__, fname, &lineNum);
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5169, "%s: File %s at line %d: Section name expected after Begin; ignoring section"), __func__, filename, &lineNum);
             lsberrno = LSBE_CONF_WARNING;
-            doSkipSection_conf (conf, lineNum, fname, "unknown");
+            doSkipSection_conf (conf, lineNum, filename, "unknown");
             continue;
         }
         else {
             if (strcasecmp (section, "host") == 0) {
-                if (do_Hosts_(conf, fname, lineNum, &myinfo, options)) {
+                if (do_Hosts_(conf, filename, lineNum, &myinfo, options)) {
                     hostok = TRUE;
                 }
                 else if (lsberrno == LSBE_NO_MEM) {
@@ -2494,7 +2497,7 @@ lsb_readhost (struct lsConf *conf, struct lsInfo *info, int options, struct clus
             }
             else if (strcasecmp (section, "hostgroup") == 0) {
 
-                if (do_Groups(hostgroups, conf, fname, lineNum, &numofhgroups, options)) {
+                if (do_Groups(hostgroups, conf, filename, lineNum, &numofhgroups, options)) {
                     hgroupok = TRUE;
                 }
                 else if (lsberrno == LSBE_NO_MEM) {
@@ -2507,16 +2510,17 @@ lsb_readhost (struct lsConf *conf, struct lsInfo *info, int options, struct clus
                 continue;
             }
             else {
-                ls_syslog (LOG_ERR, I18N (5170, "%s: File %s at line %d: Invalid section name <%s>; ignoring section"), __func__, fname, lineNum, section);    /* catgets 5170 */
+                /* catgets 5170 */
+                ls_syslog (LOG_ERR, I18N (5170, "%s: File %s at line %d: Invalid section name <%s>; ignoring section"), __func__, filename, lineNum, section);
                 lsberrno = LSBE_CONF_WARNING;
-                doSkipSection_conf (conf, lineNum, fname, section);
+                doSkipSection_conf (conf, lineNum, filename, section);
             }
         }
     }
 }
 
 static char
-do_Hosts_ (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *info, int options)
+do_Hosts_ (struct lsConf *conf, char *filename, size_t *lineNum, struct lsInfo *info, int options)
 {
 
 #define HKEY_HNAME info->numIndx
@@ -2552,7 +2556,7 @@ do_Hosts_ (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
     FREEUP (keylist);
     keylist = malloc ((unsigned long)(HKEY_DISPATCH_WINDOW + 2) * sizeof (struct keymap));
     if ( NULL == keylist && ENOMEM == errno ){
-        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
+        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
         return FALSE;
     }
 
@@ -2570,37 +2574,37 @@ do_Hosts_ (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
     initHostInfoEnt ((struct hostInfoEnt *)&host);
     linep = getNextLineC_conf (conf, lineNum, TRUE);
     if (!linep) {
-        ls_syslog (LOG_ERR, I18N_FILE_PREMATURE, __func__, fname, *lineNum);
+        ls_syslog (LOG_ERR, I18N_FILE_PREMATURE, __func__, filename, *lineNum);
         lsberrno = LSBE_CONF_WARNING;
         return FALSE;
     }
 
-    if (isSectionEnd (linep, fname, lineNum, "host")) {
-        ls_syslog (LOG_WARNING, I18N_EMPTY_SECTION, __func__, fname, *lineNum, "host");
+    if (isSectionEnd (linep, filename, lineNum, "host")) {
+        ls_syslog (LOG_WARNING, I18N_EMPTY_SECTION, __func__, filename, *lineNum, "host");
         lsberrno = LSBE_CONF_WARNING;
         return FALSE;
     }
 
     if (strchr (linep, '=') != NULL) {
-        ls_syslog (LOG_ERR, I18N_HORI_NOT_IMPLE, __func__, fname, *lineNum, "host");
+        ls_syslog (LOG_ERR, I18N_HORI_NOT_IMPLE, __func__, filename, *lineNum, "host");
         lsberrno = LSBE_CONF_WARNING;
-        doSkipSection_conf (conf, lineNum, fname, "host");
+        doSkipSection_conf (conf, lineNum, filename, "host");
         return FALSE;
     }
 
     if (!keyMatch (keylist, linep, FALSE)) {
         /* catgets 5174 */
-        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5174, "%s: File %s at line %d: Keyword line format error for Host section; ignoring section"), __func__, fname, *lineNum);
+        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5174, "%s: File %s at line %d: Keyword line format error for Host section; ignoring section"), __func__, filename, *lineNum);
         lsberrno = LSBE_CONF_WARNING;
-        doSkipSection_conf (conf, lineNum, fname, "host");
+        doSkipSection_conf (conf, lineNum, filename, "host");
         return FALSE;
     }
 
     if (keylist[HKEY_HNAME].position < 0) {
         /* catgets 5175 */
-        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5175, "%s: File %s at line %d: Hostname required for Host section; ignoring section"), __func__, fname, *lineNum);
+        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5175, "%s: File %s at line %d: Hostname required for Host section; ignoring section"), __func__, filename, *lineNum);
         lsberrno = LSBE_CONF_WARNING;
-        doSkipSection_conf (conf, lineNum, fname, "host");
+        doSkipSection_conf (conf, lineNum, filename, "host");
         return FALSE;
     }
 
@@ -2620,8 +2624,8 @@ do_Hosts_ (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
         FREEUP (hostList);
         return FALSE;
     }
-    h_initTab_ (tmpHosts, 32);
-    h_initTab_ ((hTab *)nonOverridableHosts, 32);
+    h_initTab_ (tmpHosts, 32);                      // FIXME FIXME 32 seems awfully specific
+    h_initTab_ ((hTab *)nonOverridableHosts, 32);   // FIXME FIXME 32 seems awfully specific
     while ((linep = getNextLineC_conf (conf, lineNum, TRUE)) != NULL) {
 
         freekeyval (keylist);
@@ -2629,7 +2633,7 @@ do_Hosts_ (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
         isTypeOrModel    = FALSE;
         numSelectedHosts = 0;
 
-        if (isSectionEnd (linep, fname, lineNum, "host")) {
+        if (isSectionEnd (linep, filename, lineNum, "host")) {
             FREEUP (hostList);
             h_delTab_ ((hTab *)nonOverridableHosts);
             FREEUP (nonOverridableHosts);
@@ -2642,7 +2646,7 @@ do_Hosts_ (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
 
         if (mapValues (keylist, linep) < 0) {
             /* catgets 5177 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5177, "%s: File %s at line %d: Values do not match keys in Host section; ignoring line"), __func__, fname, *lineNum);
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5177, "%s: File %s at line %d: Values do not match keys in Host section; ignoring line"), __func__, filename, *lineNum);
             lsberrno = LSBE_CONF_WARNING;
             continue;
         }
@@ -2673,7 +2677,7 @@ do_Hosts_ (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
 
                     if( total2 == (unsigned int) info->nTypes ) {
                         /* catgets 5178 */
-                        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5178, "%s: File %s at line %d: Invalid host/type/model name <%s>; ignoring line"), __func__, fname, *lineNum, keylist[HKEY_HNAME].val);
+                        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5178, "%s: File %s at line %d: Invalid host/type/model name <%s>; ignoring line"), __func__, filename, *lineNum, keylist[HKEY_HNAME].val);
                         lsberrno = LSBE_CONF_WARNING;
                         continue;
                     }
@@ -2693,7 +2697,7 @@ do_Hosts_ (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
 
                 if (!numSelectedHosts) {
                     /* catgets 5179 */
-                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5179, "%s: File %s at line %d: no server hosts of type/model <%s> are known by LSF; ignoring line"), __func__, fname, *lineNum, keylist[HKEY_HNAME].val);
+                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5179, "%s: File %s at line %d: no server hosts of type/model <%s> are known by LSF; ignoring line"), __func__, filename, *lineNum, keylist[HKEY_HNAME].val);
                     lsberrno = LSBE_CONF_WARNING;
                     continue;
                 }
@@ -2715,7 +2719,7 @@ do_Hosts_ (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
         h_addEnt_ (tmpHosts, hostname, &new);
         if (!new) {
             /* catgets 5180 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5180, "%s: File %s at line %d: Host name <%s> multiply specified; ignoring line"), __func__, fname, *lineNum, keylist[HKEY_HNAME].val );
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5180, "%s: File %s at line %d: Host name <%s> multiply specified; ignoring line"), __func__, filename, *lineNum, keylist[HKEY_HNAME].val );
             lsberrno = LSBE_CONF_WARNING;
             continue;
         }
@@ -2732,7 +2736,7 @@ do_Hosts_ (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
             // if ( fabs( INFINIT_INT - host.maxJobs) < 0.00001 ) {
             if ( ( INFINIT_INT - host.maxJobs) < 0.00001 ) {
                 /* catgets 5183 */
-                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5183, "%s: File %s at line %d: Invalid value <%s> for key <%s>; %d is assumed"), __func__, fname, *lineNum, keylist[HKEY_MXJ].val, keylist[HKEY_MXJ].key, INFINIT_INT);
+                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5183, "%s: File %s at line %d: Invalid value <%s> for key <%s>; %d is assumed"), __func__, filename, *lineNum, keylist[HKEY_MXJ].val, keylist[HKEY_MXJ].key, INFINIT_INT);
                 lsberrno = LSBE_CONF_WARNING;
             }
         }
@@ -2744,7 +2748,7 @@ do_Hosts_ (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
             // if ( fabs( INFINIT_INT - host.userJobLimit ) < 0.00001 ) {
             if ( ( INFINIT_INT - host.userJobLimit ) < 0.00001 ) {
                 /* catgets 5183 */
-                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5183, "%s: File %s at line %d: Invalid value <%s> for key <%s>; %d is assumed"), __func__, fname, *lineNum, keylist[HKEY_UJOB_LIMIT].val, keylist[HKEY_UJOB_LIMIT].key, INFINIT_INT);
+                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5183, "%s: File %s at line %d: Invalid value <%s> for key <%s>; %d is assumed"), __func__, filename, *lineNum, keylist[HKEY_UJOB_LIMIT].val, keylist[HKEY_UJOB_LIMIT].key, INFINIT_INT);
                 lsberrno = LSBE_CONF_WARNING;
             }
         }
@@ -2752,7 +2756,7 @@ do_Hosts_ (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
         if (keylist[HKEY_RUN_WINDOW].position >= 0) {
 
             if (strcmp (keylist[HKEY_RUN_WINDOW].val, "")) {
-                host.windows = parsewindow (keylist[HKEY_RUN_WINDOW].val, fname, lineNum, "Host");
+                host.windows = parsewindow (keylist[HKEY_RUN_WINDOW].val, filename, lineNum, "Host");
 
                 if(  lserrno == LSE_CONF_SYNTAX) {
                      lserrno  = LSE_NO_ERR;
@@ -2765,7 +2769,7 @@ do_Hosts_ (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
 
             if (strcmp (keylist[HKEY_DISPATCH_WINDOW].val, "")) {
                 FREEUP (host.windows);
-                host.windows = parsewindow (keylist[HKEY_DISPATCH_WINDOW].val, fname, lineNum, "Host");
+                host.windows = parsewindow (keylist[HKEY_DISPATCH_WINDOW].val, filename, lineNum, "Host");
 
                 if (lserrno == LSE_CONF_SYNTAX) {
                     lserrno = LSE_NO_ERR;
@@ -2780,7 +2784,7 @@ do_Hosts_ (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
             // if ( fabs( INFINIT_INT - host.mig ) < 0.00001 ) {
             if ( ( INFINIT_INT - host.mig ) < 0.00001 ) {
                 /* catgets 5186 */
-                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5186, "%s: File %s at line %d: Invalid value <%s> for key <%s>; no MIG threshold is assumed"), __func__, fname, *lineNum, keylist[HKEY_MIG].val, keylist[HKEY_MIG].key);
+                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5186, "%s: File %s at line %d: Invalid value <%s> for key <%s>; no MIG threshold is assumed"), __func__, filename, *lineNum, keylist[HKEY_MIG].val, keylist[HKEY_MIG].key);
                 lsberrno = LSBE_CONF_WARNING;
             }
         }
@@ -2789,7 +2793,7 @@ do_Hosts_ (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
         host.loadSched = (float *)malloc( (unsigned long)info->numIndx * sizeof (float *));
         if (info->numIndx && ( NULL == host.loadSched && ENOMEM == errno ) ) {
             assert( info->numIndx >= 0 );
-            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", (unsigned long)info->numIndx * sizeof (float *));
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", info->numIndx * sizeof (float *));
             lsberrno = LSBE_NO_MEM;
             freekeyval (keylist);
             FREEUP (hostList);
@@ -2808,7 +2812,7 @@ do_Hosts_ (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
         host.loadStop = malloc( (unsigned long)info->numIndx * sizeof (float *));
         if (info->numIndx && ( NULL == host.loadStop && ENOMEM == errno ) ) {
             assert( info->numIndx >= 0 );
-            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", (unsigned long)info->numIndx * sizeof (float *));
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", info->numIndx * sizeof (float *));
             lsberrno = LSBE_NO_MEM;
             freekeyval (keylist);
             FREEUP (hostList);
@@ -2823,7 +2827,7 @@ do_Hosts_ (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
             return (char)returnCode;
         }
 
-        getThresh (info, keylist, host.loadSched, host.loadStop, fname, lineNum, " in section Host ending");
+        getThresh (info, keylist, host.loadSched, host.loadStop, filename, lineNum, " in section Host ending");
         host.nIdx = info->numIndx;
         if (options == CONF_NO_CHECK) {
             host.host = hostname;
@@ -2861,14 +2865,14 @@ do_Hosts_ (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
             if (total == cConf->numHosts) {
                 num = 0;
                 /* catgets 5189 */
-                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5189, "%s: File %s at line %d: Can't find the information of host <%s>"), __func__, fname, *lineNum, hostname);
+                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5189, "%s: File %s at line %d: Can't find the information of host <%s>"), __func__, filename, *lineNum, hostname);
                 lsberrno = LSBE_CONF_WARNING;
                 freeHostInfoEnt (&host);
             }
             else if (cConf->hosts[total].isServer != TRUE) {
                 num = 0;
                 /* catgets 5190 */
-                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5190, "%s: File %s at line %d: Host <%s> is not a server;ignoring"), __func__, fname, *lineNum, hostname);
+                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5190, "%s: File %s at line %d: Host <%s> is not a server;ignoring"), __func__, filename, *lineNum, hostname);
                 lsberrno = LSBE_CONF_WARNING;
                 freeHostInfoEnt ( &host);
             }
@@ -2917,7 +2921,7 @@ do_Hosts_ (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
 
     }
 
-    ls_syslog (LOG_ERR, I18N_FILE_PREMATURE, __func__, fname, *lineNum);
+    ls_syslog (LOG_ERR, I18N_FILE_PREMATURE, __func__, filename, *lineNum);
     lsberrno = LSBE_CONF_WARNING;
     returnCode = TRUE;
 
@@ -2927,7 +2931,7 @@ do_Hosts_ (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
 
 
 static void
-getThresh (struct lsInfo *info, struct keymap *keylist, float loadSched[], float loadStop[], char *fname, size_t *lineNum, char *section)
+getThresh (struct lsInfo *info, struct keymap *keylist, float loadSched[], float loadStop[], char *filename, size_t *lineNum, char *section)
 {
 
     char *stop;
@@ -2955,20 +2959,20 @@ getThresh (struct lsInfo *info, struct keymap *keylist, float loadSched[], float
         }
         if (*keylist[i].val != '\0' && (loadSched[i] = my_atof (keylist[i].val, INFINIT_LOAD, -INFINIT_LOAD)) >= INFINIT_LOAD) {
             /* catgets 5192 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5192, "%s: File %s%s at line %d: Value <%s> of loadSched <%s> isn't a float number between %1.1f and %1.1f; ignored"), __func__, fname, section, *lineNum, keylist[i].val, keylist[i].key, -INFINIT_LOAD, INFINIT_LOAD);
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5192, "%s: File %s%s at line %d: Value <%s> of loadSched <%s> isn't a float number between %1.1f and %1.1f; ignored"), __func__, filename, section, *lineNum, keylist[i].val, keylist[i].key, -INFINIT_LOAD, INFINIT_LOAD);
             lsberrno = LSBE_CONF_WARNING;
             if (info->resTable[i].orderType == DECR)
                 loadSched[i] = -INFINIT_LOAD;
             }
         if (*keylist[i].val != '\0' && loadSched[i] < 0 && loadSched[i] > -INFINIT_LOAD) {
             /* catgets 5193 */
-            ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5193, "%s: File %s%s at line %d: Warning: Value <%s> of loadSched <%s> is not a non-negative number"), __func__, fname, section, *lineNum, keylist[i].val, keylist[i].key);
+            ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5193, "%s: File %s%s at line %d: Warning: Value <%s> of loadSched <%s> is not a non-negative number"), __func__, filename, section, *lineNum, keylist[i].val, keylist[i].key);
             lsberrno = LSBE_CONF_WARNING;
         }
 
         if (i == UT && loadSched[i] > 1.0 && loadSched[i] < INFINIT_LOAD ) {
             /* catgets 5447 */
-            ls_syslog (LOG_INFO, (_i18n_msg_get (ls_catd, NL_SETN, 5447, "%s: File %s %s at line %d: For load index <%s>, loadSched <%2.2f> is greater than 1; assumming <%5.1f%%>")), __func__, fname, section, *lineNum, keylist[i].key, loadSched[i], loadSched[i]);
+            ls_syslog (LOG_INFO, (_i18n_msg_get (ls_catd, NL_SETN, 5447, "%s: File %s %s at line %d: For load index <%s>, loadSched <%2.2f> is greater than 1; assumming <%5.1f%%>")), __func__, filename, section, *lineNum, keylist[i].key, loadSched[i], loadSched[i]);
             lsberrno = LSBE_CONF_WARNING;
             loadSched[i] /= 100.0;
         }
@@ -2980,7 +2984,7 @@ getThresh (struct lsInfo *info, struct keymap *keylist, float loadSched[], float
         loadStop[i] = my_atof (stop, INFINIT_LOAD, -INFINIT_LOAD);
         if ( fabs(INFINIT_LOAD - loadStop[i]) < 0.000001 ) {
             /* catgets 5194 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5194, "%s: File %s%s at line %d: Value <%s> of loadStop <%s> isn't a float number between %1.1f and %1.1f; ignored"), __func__, fname, section, *lineNum, stop, keylist[i].key, -INFINIT_LOAD, INFINIT_LOAD);
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5194, "%s: File %s%s at line %d: Value <%s> of loadStop <%s> isn't a float number between %1.1f and %1.1f; ignored"), __func__, filename, section, *lineNum, stop, keylist[i].key, -INFINIT_LOAD, INFINIT_LOAD);
             lsberrno = LSBE_CONF_WARNING;
             if (info->resTable[i].orderType == DECR) {
                 loadStop[i] = -INFINIT_LOAD;
@@ -2990,20 +2994,20 @@ getThresh (struct lsInfo *info, struct keymap *keylist, float loadSched[], float
 
         if (loadStop[i] < 0 && loadStop[i] > -INFINIT_LOAD) {
             /* catgets 5195 */
-            ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5195, "%s: File %s%s at line %d: Warning: Value <%s> of loadStop <%s> is not a non-negative number"), __func__, fname, section, *lineNum, stop, keylist[i].key);
+            ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5195, "%s: File %s%s at line %d: Warning: Value <%s> of loadStop <%s> is not a non-negative number"), __func__, filename, section, *lineNum, stop, keylist[i].key);
             lsberrno = LSBE_CONF_WARNING;
         }
 
         if (i == UT && loadStop[i] > 1.0 && loadSched[i] < INFINIT_LOAD) {
             /* catgets 5440 */
-            ls_syslog (LOG_INFO, (_i18n_msg_get (ls_catd, NL_SETN, 5440, "%s: File %s%s at line %d: For load index <%s>, loadStop <%2.2f> is greater than 1; assumming <%5.1f%%>")), __func__, fname, section, *lineNum, keylist[i].key, loadStop[i], loadStop[i]);
+            ls_syslog (LOG_INFO, (_i18n_msg_get (ls_catd, NL_SETN, 5440, "%s: File %s%s at line %d: For load index <%s>, loadStop <%2.2f> is greater than 1; assumming <%5.1f%%>")), __func__, filename, section, *lineNum, keylist[i].key, loadStop[i], loadStop[i]);
             lsberrno = LSBE_CONF_WARNING;
             loadStop[i] /= 100.0;
         }
 
         if ((loadSched[i] > loadStop[i]) && info->resTable[i].orderType == INCR) {
             /* catgets 5196 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5196, "%s: File %s%s at line %d: For load index <%s>, loadStop <%2.2f> is lower than loadSched <%2.2f>; swapped"), __func__, fname, section, *lineNum, keylist[i].key, loadStop[i], loadSched[i]);
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5196, "%s: File %s%s at line %d: For load index <%s>, loadStop <%2.2f> is lower than loadSched <%2.2f>; swapped"), __func__, filename, section, *lineNum, keylist[i].key, loadStop[i], loadSched[i]);
             lsberrno = LSBE_CONF_WARNING;
             swap = loadSched[i];
             loadSched[i] = loadStop[i];
@@ -3012,7 +3016,7 @@ getThresh (struct lsInfo *info, struct keymap *keylist, float loadSched[], float
 
         if ((loadStop[i] > loadSched[i]) && info->resTable[i].orderType == DECR) {
             /* catgets 5197 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5197, "%s: File %s%s at line %d: For load index <%s>, loadStop <%2.2f> is higher than loadSched <%2.2f>; swapped"), __func__, fname, section, *lineNum, keylist[i].key, loadStop[i], loadSched[i]);
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5197, "%s: File %s%s at line %d: For load index <%s>, loadStop <%2.2f> is higher than loadSched <%2.2f>; swapped"), __func__, filename, section, *lineNum, keylist[i].key, loadStop[i], loadSched[i]);
             lsberrno = LSBE_CONF_WARNING;
             swap = loadSched[i];
             loadSched[i] = loadStop[i];
@@ -3043,7 +3047,7 @@ addHostEnt (struct hostInfoEnt *hp, struct hostInfo *hostInfo, size_t *override)
         }
         tmpHosts = (struct hostInfoEnt **) myrealloc(hosts, hostsize * sizeof (struct hostInfoEnt *));
         if ( NULL == tmpHosts && ENOMEM == errno ) {
-            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "addHostEnt", "realloc", hostsize * sizeof (struct hostInfoEnt *));
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "realloc", hostsize * sizeof (struct hostInfoEnt *));
             lsberrno = LSBE_NO_MEM;
             freeHostInfoEnt( hp );
             return FALSE;
@@ -3073,14 +3077,14 @@ addHostEnt (struct hostInfoEnt *hp, struct hostInfo *hostInfo, size_t *override)
     else {
         host = malloc( sizeof (struct hostInfoEnt));
         if ( NULL == host && ENOMEM == errno ) {
-            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "addHostEnt", "malloc", sizeof (struct hostInfoEnt));
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", sizeof (struct hostInfoEnt));
             lsberrno = LSBE_NO_MEM;
             return FALSE;
         }
     }
     initHostInfoEnt( host );
     if (copyHostInfo (host, hp) < 0) {
-        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "addHostEnt", "copyHostInfo");
+        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, __func__);
         FREEUP (host);
         return FALSE;
     }
@@ -3101,20 +3105,20 @@ copyHostInfo (struct hostInfoEnt *toHost, struct hostInfoEnt *fromHost)
 {
     memcpy (toHost, fromHost, sizeof (struct hostInfoEnt));
     if ((toHost->host = putstr_ (fromHost->host)) == NULL) {
-        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "copyHostInfo", "malloc", strlen (fromHost->host) + 1);
+        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (fromHost->host) + 1);
         lsberrno = LSBE_NO_MEM;
         return -1;
     }
 
     if( fromHost->nIdx ) {
         assert( fromHost->nIdx >= 0 );
-        toHost->loadSched = (float *)malloc( (unsigned long)(fromHost->nIdx) * sizeof (float *) );
-        toHost->loadStop  = (float *)malloc( (unsigned long)(fromHost->nIdx) * sizeof (float *) );
+        toHost->loadSched = malloc( (unsigned long)(fromHost->nIdx) * sizeof (float *) );
+        toHost->loadStop  = malloc( (unsigned long)(fromHost->nIdx) * sizeof (float *) );
         if(  ( NULL == toHost->loadSched && ENOMEM == errno )  ||
              ( NULL == toHost->loadStop  && ENOMEM == errno ) ||
              ( fromHost->windows && (toHost->windows = putstr_ (fromHost->windows)) == NULL)
         ) {
-            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "copyHostInfo", "malloc");
+            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
             lsberrno = LSBE_NO_MEM;
             FREEUP (toHost->host);
             FREEUP (toHost->loadSched);
@@ -3158,7 +3162,7 @@ initThresholds (struct lsInfo *info, float loadSched[], float loadStop[])
 
 
 static char *
-parseGroups (char *linep, char *fname, size_t *lineNum, char *section, int groupType, int options)
+parseGroups (char *linep, char *filename, size_t *lineNum, char *section, int groupType, int options)
 {
     
     char *str       = NULL;
@@ -3196,7 +3200,7 @@ return NULL;}
 
     if (groupType == USER_GRP && numofugroups >= MAX_GROUPS) {
         /* catgets 5245 */
-        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5245, "%s: File %s%s at line %d: number of %s group <%d> is equal to or greater than MAX_GROUPS <%d>; ignored the group <%s>"), __func__, fname, section, *lineNum, (groupType == USER_GRP) ? "user" : "host", (groupType == USER_GRP) ? numofugroups : numofhgroups, MAX_GROUPS, linep); 
+        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5245, "%s: File %s%s at line %d: number of %s group <%d> is equal to or greater than MAX_GROUPS <%d>; ignored the group <%s>"), __func__, filename, section, *lineNum, (groupType == USER_GRP) ? "user" : "host", (groupType == USER_GRP) ? numofugroups : numofhgroups, MAX_GROUPS, linep); 
         return NULL;
     }
 
@@ -3247,7 +3251,7 @@ return NULL;}
 
         if (returnVal) {
             /* catgets 5246 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5246, "%s: File %s%s at line %d: %s group <%s> is multiply defined; ignored"), __func__, fname, section, *lineNum, groupName, myWord);
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5246, "%s: File %s%s at line %d: %s group <%s> is multiply defined; ignored"), __func__, filename, section, *lineNum, groupName, myWord);
             lsberrno = LSBE_CONF_WARNING;
             FREEUP (myWord);
             continue;
@@ -3257,7 +3261,7 @@ return NULL;}
             size_t lastChar = 0;
 
             if (options == CONF_NO_CHECK) {
-                if (!addMember (mygp, myWord, USER_GRP, fname, *lineNum, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
+                if (!addMember (mygp, myWord, USER_GRP, filename, *lineNum, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
 
                     failReturn (mygp, strlen (myWord) + 1);
                 }
@@ -3266,7 +3270,7 @@ return NULL;}
             }
             pw = getpwlsfuser_ (myWord);
             if (pw != NULL) {
-                if (!addMember (mygp, myWord, USER_GRP, fname, *lineNum, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
+                if (!addMember (mygp, myWord, USER_GRP, filename, *lineNum, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
                     freeGroupInfo (mygp);
                     FREEUP (mygp);
                     FREEUP (myWord);
@@ -3287,7 +3291,7 @@ return NULL;}
 
             gp = getUGrpData (myWord);
             if (gp != NULL) {
-                if (!addMember (mygp, myWord, USER_GRP, fname, *lineNum, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
+                if (!addMember (mygp, myWord, USER_GRP, filename, *lineNum, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
                     freeGroupInfo (mygp);
                     FREEUP (mygp);
                     FREEUP (myWord);
@@ -3308,17 +3312,17 @@ return NULL;}
             if (unixGrp != NULL) {
                 if (options & CONF_EXPAND) {
                     assert( *lineNum <= INT_MAX );
-                    gp = addUnixGrp (unixGrp, grpSl, fname, *lineNum, section, 0);
+                    gp = addUnixGrp (unixGrp, grpSl, filename, *lineNum, section, 0);
                     if (gp == NULL) {
                         /* catgets 5247 */
-                        ls_syslog (LOG_WARNING, I18N (5247, "%s: File %s at line %d: No valid users defined in Unix group <%s>; ignoring"), __func__, fname, *lineNum, myWord);
+                        ls_syslog (LOG_WARNING, I18N (5247, "%s: File %s at line %d: No valid users defined in Unix group <%s>; ignoring"), __func__, filename, *lineNum, myWord);
                         lsberrno = LSBE_CONF_WARNING;
                         FREEUP (myWord);
                         continue;
                     }
                 }
 
-                if (!addMember (mygp, myWord, USER_GRP, fname, *lineNum, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
+                if (!addMember (mygp, myWord, USER_GRP, filename, *lineNum, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
                     freeGroupInfo (mygp);
                     FREEUP (mygp);
                     FREEUP (myWord);
@@ -3326,7 +3330,7 @@ return NULL;}
                 }
             }
             else if (strcmp (myWord, "all") == 0) {
-                if (!addMember (mygp, myWord, USER_GRP, fname, *lineNum, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
+                if (!addMember (mygp, myWord, USER_GRP, filename, *lineNum, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
                     freeGroupInfo (mygp);
                     FREEUP (mygp);
                     FREEUP (myWord);
@@ -3335,9 +3339,9 @@ return NULL;}
             }
             else {
                 /* catgets 5248 */
-                ls_syslog (LOG_WARNING, I18N (5248, "%s: File %s%s at line %d: Unknown user or user group <%s>; Maybe a windows user or of another domain"), __func__, fname, section, *lineNum, myWord);
+                ls_syslog (LOG_WARNING, I18N (5248, "%s: File %s, section %s at line %d: Unknown user or user group <%s>; Maybe a windows user or of another domain"), __func__, filename, section, *lineNum, myWord);
                 lsberrno = LSBE_CONF_WARNING;
-                if (!addMember (mygp, myWord, USER_GRP, fname, *lineNum, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
+                if (!addMember (mygp, myWord, USER_GRP, filename, *lineNum, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
                     freeGroupInfo (mygp);
                     FREEUP (mygp);
                     FREEUP (myWord);
@@ -3361,7 +3365,7 @@ return NULL;}
                 if (length > 2 && myWord[length - 1] >= '0' && myWord[length - 1] <= '9' && myWord[length - 2] == '+') {
                     if (myWord[length - 3] == '+') {
                         /* catgets 5251 */
-                        ls_syslog (LOG_ERR, I18N (5251, "%s: File %s%s at line %d: Host <%s> is specified with bad host preference expression; ignored"), __func__, fname, section, *lineNum, hostName);   
+                        ls_syslog (LOG_ERR, I18N (5251, "%s: File %s section %s at line %d: Host <%s> is specified with bad host preference expression; ignored"), __func__, filename, section, *lineNum, hostName);   
                         FREEUP (myWord);
                         continue;
                     }
@@ -3384,7 +3388,7 @@ return NULL;}
                         }
                         else {
                             /* catgets 5252 */
-                            ls_syslog (LOG_ERR, I18N (5252, "%s: File %s%s at line %d: Host <%s> is specified with bad host preference expression; ignored"), __func__, fname, section, *lineNum, hostName);   
+                            ls_syslog (LOG_ERR, I18N (5252, "%s: File %s%s at line %d: Host <%s> is specified with bad host preference expression; ignored"), __func__, filename, section, *lineNum, hostName);   
                             FREEUP (myWord);
                             badPref = TRUE;
                             break;
@@ -3396,9 +3400,9 @@ return NULL;}
                     *sp = '\0';
                 }
                 else {
-                    char *function_name = malloc( strlen(__func__)  + 1);
-                    strcpy( function_name, __func__ );
-                    if (parseQFirstHost(myWord, &haveFirst, function_name, lineNum, fname, section)) {
+                    char *function_name = malloc( strlen(filename)  + 1);
+                    strcpy( function_name, filename );
+                    if (parseQFirstHost(myWord, &haveFirst, function_name, lineNum, filename, section)) {
                         free( function_name );
                         continue;
                     }
@@ -3450,7 +3454,7 @@ return NULL;}
                 if (!strcmp (myWord, "others")) {
                     if (hasAllOthers == TRUE) {
                         /* catgets 5253 */
-                        ls_syslog (LOG_ERR, I18N (5253, "%s: File %s%s at line %d: More than one <others> or host group with <all> as its member specified; <%s> is ignored"), __func__, fname, section, *lineNum, hostName);  
+                        ls_syslog (LOG_ERR, I18N (5253, "%s: File %s section %s at line %d: More than one <others> or host group with <all> as its member specified; <%s> is ignored"), __func__, filename, section, *lineNum, hostName);  
                         FREEUP (myWord);
                         continue;
                     }
@@ -3469,16 +3473,16 @@ return NULL;}
                 gp = getHGrpData (myWord);
                 if (groupType == HOST_GRP && strcmp (myWord, "all") != 0 && checkAllOthers (myWord, &hasAllOthers)) {
                     /* catgets 5255 */
-                    ls_syslog (LOG_ERR, I18N (5255, "%s: File %s%s at line %d: More than one host group with <all> as its members or <others> specified; <%s> is ignored"), __func__, fname, section, *lineNum, hostName); 
+                    ls_syslog (LOG_ERR, I18N (5255, "%s: File %s section %s at line %d: More than one host group with <all> as its members or <others> specified; <%s> is ignored"), __func__, filename, section, *lineNum, hostName); 
                     lsberrno = LSBE_CONF_WARNING;
                     FREEUP (myWord);
                     continue;
                 }
                 if ((options & CONF_NO_EXPAND) == 0) {
-                    returnVal = addMember (mygp, myWord, HOST_GRP, fname, *lineNum, section, options, checkAll);
+                    returnVal = addMember (mygp, myWord, HOST_GRP, filename, *lineNum, section, options, checkAll);
                 }
                 else {
-                    returnVal = addMember (mygp, cpWord, HOST_GRP, fname, *lineNum, section, options, checkAll);
+                    returnVal = addMember (mygp, cpWord, HOST_GRP, filename, *lineNum, section, options, checkAll);
                 }
                 if (!returnVal) {
                     FREEUP (myWord);
@@ -3499,14 +3503,14 @@ return NULL;}
             }
             else {
                 if ((Gethostbyname_ (myWord)) == NULL) {
-                    ls_syslog (LOG_ERR, "%s: File %s%s at line %d: Host name <%s> cannot be found; ignored", __func__, fname, section, *lineNum, myWord);
+                    ls_syslog (LOG_ERR, "%s: File %s section %s at line %d: Host name <%s> cannot be found; ignored", __func__, filename, section, *lineNum, myWord);
                     lsberrno = LSBE_CONF_WARNING;
                     FREEUP (myWord);
                     continue;
                 }
                 if (getHostData (myWord) == NULL && numofhosts != 0) {
                     /* catgets 5257 */
-                    ls_syslog (LOG_ERR, I18N (5257, "%s: File %s%s at line %d: Host <%s> is not used by the batch system; ignored"), __func__, fname, section, *lineNum, myWord);  
+                    ls_syslog (LOG_ERR, I18N (5257, "%s: File %s section %s at line %d: Host <%s> is not used by the batch system; ignored"), __func__, filename, section, *lineNum, myWord);  
                     lsberrno = LSBE_CONF_WARNING;
                     FREEUP (myWord);
                     continue;
@@ -3514,7 +3518,7 @@ return NULL;}
 
                 if (isServerHost (myWord) == FALSE) {
                     /* catgets 5258 */
-                    ls_syslog (LOG_ERR, I18N (5258, "%s: File %s%s at line %d: Host <%s> is not a server; ignored"), __func__, fname, section, *lineNum, myWord);  
+                    ls_syslog (LOG_ERR, I18N (5258, "%s: File %s section %s at line %d: Host <%s> is not a server; ignored"), __func__, filename, section, *lineNum, myWord);  
                     lsberrno = LSBE_CONF_WARNING;
                     FREEUP (myWord);
                     continue;
@@ -3527,20 +3531,20 @@ return NULL;}
                     returnVal = isInGrp (cpWord, mygp, groupType, checkAll);
                 }
                 if (returnVal) {
-                    ls_syslog (LOG_ERR, I18N (5259, "%s: File %s%s at line %d: Host name <%s> is multiply defined; ignored"), __func__, fname, section, *lineNum, myWord); /* catgets 5259 */
+                    ls_syslog (LOG_ERR, I18N (5259, "%s: File %s section %s at line %d: Host name <%s> is multiply defined; ignored"), __func__, filename, section, *lineNum, myWord); /* catgets 5259 */
                     lsberrno = LSBE_CONF_WARNING;
                     FREEUP (myWord);
                     continue;
                 }
                 if ((options & CONF_NO_EXPAND) == 0) {
-                    returnVal = addMember (mygp, myWord, HOST_GRP, fname, *lineNum, section, options, checkAll);
+                    returnVal = addMember (mygp, myWord, HOST_GRP, filename, *lineNum, section, options, checkAll);
                 }
                 else {
                     if( strchr (cpWord, '+')) {
-                        returnVal = addMember (mygp, myWord, HOST_GRP, fname, *lineNum, section, options, checkAll);
+                        returnVal = addMember (mygp, myWord, HOST_GRP, filename, *lineNum, section, options, checkAll);
                     }
                     else {
-                        returnVal = addMember (mygp, cpWord, HOST_GRP, fname, *lineNum, section, options, checkAll);
+                        returnVal = addMember (mygp, cpWord, HOST_GRP, filename, *lineNum, section, options, checkAll);
                     }
                 }
 
@@ -3587,8 +3591,7 @@ return NULL;}
         if (hasNone) {
             if (hostGroup[0] != '\000') {
                 /* catgets 5260 */
-                ls_syslog (LOG_ERR, I18N (5260, "%s: file <%s> line <%d> host names <%s> should not be specified together with \"none\", ignored"), __func__, fname, *lineNum,
-                           hostGroup);
+                ls_syslog (LOG_ERR, I18N (5260, "%s: file <%s> line <%d> host names <%s> should not be specified together with \"none\", ignored"), __func__, filename, *lineNum, hostGroup);
                 lsberrno = LSBE_CONF_WARNING;
                 }
             strcpy (hostGroup, "none");
@@ -3603,9 +3606,9 @@ lsb_readqueue (struct lsConf *conf, struct lsInfo *info, int options, struct sha
 {
     
     struct lsInfo myinfo;
-    char *fname;
-    char *cp;
-    char *section;
+    char *filename = NULL;
+    char *cp = NULL;
+    char *section = NULL;
     char queueok;
     size_t *lineNum = 0;
     int j = 0;
@@ -3645,7 +3648,7 @@ lsb_readqueue (struct lsConf *conf, struct lsInfo *info, int options, struct sha
     myinfo = *info;
     sConf = sharedConf;
     assert( info->nRes >= 0);
-    myinfo.resTable = calloc( (unsigned long)info->nRes, sizeof (struct resItem) );
+    myinfo.resTable = calloc( info->nRes, sizeof (struct resItem) );
     if (info->nRes && NULL == myinfo.resTable && ENOMEM == errno ) {
         lsberrno = LSBE_CONF_FATAL;
         return NULL;
@@ -3695,7 +3698,7 @@ lsb_readqueue (struct lsConf *conf, struct lsInfo *info, int options, struct sha
     queuesize = 0;
     maxFactor = 0.0;
     maxHName = NULL;
-    fname = conf->confhandle->fname;
+    filename = conf->confhandle->fname;
     conf->confhandle->curNode = conf->confhandle->rootNode;
     conf->confhandle->lineCount = 0;
     queueok = FALSE;
@@ -3704,7 +3707,7 @@ lsb_readqueue (struct lsConf *conf, struct lsInfo *info, int options, struct sha
 
         if ((cp = getBeginLine_conf (conf, lineNum)) == NULL) {
             if (!queueok) {
-                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5271, "%s: Queue section missing or invalid."), __func__);    /* catgets 5271 */
+                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5271, "%s: Queue section missing or invalid."), filename);    /* catgets 5271 */
                 lsberrno = LSBE_CONF_WARNING;
             }
 
@@ -3732,14 +3735,14 @@ lsb_readqueue (struct lsConf *conf, struct lsInfo *info, int options, struct sha
 
         section = getNextWord_ (&cp);
         if (!section) {
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5273, "%s: File %s at line %d: Section name expected after Begin; ignoring section"), __func__, fname, lineNum);  /* catgets 5273 */
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5273, "%s: File %s at line %d: Section name expected after Begin; ignoring section"), __func__, filename, lineNum);  /* catgets 5273 */
             lsberrno = LSBE_CONF_WARNING;
-            doSkipSection_conf (conf, lineNum, fname, "unknown");
+            doSkipSection_conf (conf, lineNum, filename, "unknown");
         }
         else {
 
             if (strcasecmp (section, "Queue") == 0) {
-                if (do_Queues (conf, fname, lineNum, &myinfo, options)) {
+                if (do_Queues (conf, filename, lineNum, &myinfo, options)) {
                     queueok = TRUE;
                 }
                 else if (lsberrno == LSBE_NO_MEM) {
@@ -3755,16 +3758,16 @@ lsb_readqueue (struct lsConf *conf, struct lsInfo *info, int options, struct sha
                 continue;
             }
             else {
-                ls_syslog (LOG_ERR, I18N (5274, "%s: File %s at line %d: Invalid section name <%s>; ignoring section"), __func__, fname, lineNum, section);    /* catgets 5274 */
+                ls_syslog (LOG_ERR, I18N (5274, "%s: File %s at line %d: Invalid section name <%s>; ignoring section"), __func__, filename, lineNum, section);    /* catgets 5274 */
                 lsberrno = LSBE_CONF_WARNING;
-                doSkipSection_conf (conf, lineNum, fname, section);
+                doSkipSection_conf (conf, lineNum, filename, section);
             }
         }
     }
 }
 
 static char
-do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *info, int options)
+do_Queues (struct lsConf *conf, char *filename, size_t *lineNum, struct lsInfo *info, int options)
 {
 
 #define QKEY_NAME                   info->numIndx + 0
@@ -3896,37 +3899,37 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
 
     linep = getNextLineC_conf (conf, lineNum, TRUE);
     if (!linep) {
-        ls_syslog (LOG_ERR, I18N_FILE_PREMATURE, __func__, fname, *lineNum);
+        ls_syslog (LOG_ERR, I18N_FILE_PREMATURE, __func__, filename, *lineNum);
         lsberrno = LSBE_CONF_WARNING;
         return FALSE;
     }
 
-    if (isSectionEnd (linep, fname, lineNum, "Queue")) {
-        ls_syslog (LOG_WARNING, I18N_EMPTY_SECTION, __func__, fname, (size_t) *lineNum,  "queue");
+    if (isSectionEnd (linep, filename, lineNum, "Queue")) {
+        ls_syslog (LOG_WARNING, I18N_EMPTY_SECTION, __func__, filename, (size_t) *lineNum,  "queue");
         lsberrno = LSBE_CONF_WARNING;
         return FALSE;
     }
 
     if (strchr (linep, '=') == NULL) {
         /* catgets 5277 */
-        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5277, "%s: File %s at line %d: Vertical Queue section not implented yet; use horizontal format; ignoring section"), __func__, fname, *lineNum);
+        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5277, "%s: File %s at line %d: Vertical Queue section not implented yet; use horizontal format; ignoring section"), __func__, filename, *lineNum);
         lsberrno = LSBE_CONF_WARNING;
-        doSkipSection_conf (conf, lineNum, fname, "Queue");
+        doSkipSection_conf (conf, lineNum, filename, "Queue");
         return FALSE;
     }
     else {
-        char *function_name = malloc( strlen(__func__ )  + 1 );
-        strcpy( function_name, __func__ );
-        retval = readHvalues_conf (keylist, linep, conf, fname, lineNum, FALSE, "Queue");
+        char *function_name = malloc( strlen(filename )  + 1 );
+        strcpy( function_name, filename );
+        retval = readHvalues_conf (keylist, linep, conf, filename, lineNum, FALSE, "Queue");
         if (retval < 0) {
             if (retval == -2) {
                 lsberrno = LSBE_CONF_WARNING;
                 /* catgets 5463 */
-                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5463, "%s: Parameter error in %s(%d); remaining parameters in this section will be either ignored or set to default values."), __func__, fname, *lineNum);
+                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5463, "%s: Parameter error in %s(%d); remaining parameters in this section will be either ignored or set to default values."), __func__, filename, *lineNum);
             }
             else {
                 /* catgets 5278 */
-                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5278, "%s: File %s at line %d: Incorrect section; ignoring this Queue section"), __func__, fname, *lineNum);
+                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5278, "%s: File %s at line %d: Incorrect section; ignoring this Queue section"), __func__, filename, *lineNum);
                 lsberrno = LSBE_CONF_WARNING;
                 freekeyval (keylist);
                 return FALSE;
@@ -3935,7 +3938,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
 
         if (keylist[QKEY_NAME].val == NULL) {
             /* catgets 5279 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5279, "%s: File %s in section Queue ending at line %d: Queue name is not given; ignoring section"), __func__, fname, *lineNum);
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5279, "%s: File %s in section Queue ending at line %d: Queue name is not given; ignoring section"), __func__, filename, *lineNum);
             lsberrno = LSBE_CONF_WARNING;
             freekeyval (keylist);
             return FALSE;
@@ -3943,7 +3946,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
 
         if (strcmp (keylist[QKEY_NAME].val, "default") == 0) {
             /* catgets 5280 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5280, "%s: File %s in section Queue ending at line %d: Queue name <%s> is a reserved word; ignoring the queue section"), __func__, fname, *lineNum, keylist[QKEY_NAME].val);
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5280, "%s: File %s in section Queue ending at line %d: Queue name <%s> is a reserved word; ignoring the queue section"), __func__, filename, *lineNum, keylist[QKEY_NAME].val);
             lsberrno = LSBE_CONF_WARNING;
             freekeyval (keylist);
             return FALSE;
@@ -3951,7 +3954,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
 
         if (getQueueData (keylist[QKEY_NAME].val)) {
             /* catgets 5281 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5281, "%s: File %s in section Queue ending at line %d: Duplicate queue name <%s>; ignoring section"), __func__, fname, *lineNum, keylist[QKEY_NAME].val);
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5281, "%s: File %s in section Queue ending at line %d: Duplicate queue name <%s>; ignoring section"), __func__, filename, *lineNum, keylist[QKEY_NAME].val);
             lsberrno = LSBE_CONF_WARNING;
             freekeyval (keylist);
             return FALSE;
@@ -3969,7 +3972,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
             queue.priority = my_atoi (keylist[QKEY_PRIORITY].val, INFINIT_INT, 0);
             if (INFINIT_INT == queue.priority ) {
                 /* catgets 5284 */
-                ls_syslog (LOG_ERR, I18N (5284, "%s: File %s in section Queue ending at line %d: Priority value <%s> isn't a positive integer between 1 and %d; ignored"), __func__, fname, *lineNum, keylist[QKEY_PRIORITY].val, INFINIT_INT - 1);
+                ls_syslog (LOG_ERR, I18N (5284, "%s: File %s in section Queue ending at line %d: Priority value <%s> isn't a positive integer between 1 and %d; ignored"), __func__, filename, *lineNum, keylist[QKEY_PRIORITY].val, INFINIT_INT - 1);
                 lsberrno = LSBE_CONF_WARNING;
             }
         }
@@ -3980,7 +3983,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
         if (keylist[QKEY_NICE].val != NULL && strcmp (keylist[QKEY_NICE].val, "")) {
             if (my_atoi (keylist[QKEY_NICE].val, INFINIT_SHORT, -INFINIT_SHORT) == INFINIT_INT) {
                 /* catgets 5285 */
-                ls_syslog (LOG_ERR, I18N (5285, "%s: File %s in section Queue ending at line %d: Nice value <%s> must be an integer; ignored"), __func__, fname, *lineNum, keylist[QKEY_NICE].val);
+                ls_syslog (LOG_ERR, I18N (5285, "%s: File %s in section Queue ending at line %d: Nice value <%s> must be an integer; ignored"), __func__, filename, *lineNum, keylist[QKEY_NICE].val);
                 lsberrno = LSBE_CONF_WARNING;
             }
             else
@@ -3992,7 +3995,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
             queue.userJobLimit = my_atoi (keylist[QKEY_UJOB_LIMIT].val, INFINIT_INT, -1);
             if ( INFINIT_INT == queue.userJobLimit ) {
                 /* catgets 5286 */
-                ls_syslog (LOG_ERR, I18N (5286, "%s: File %s in section Queue ending at line %d: UJOB_LIMIT value <%s> isn't a non-negative integer between 0 and %d; ignored"), __func__, fname, *lineNum, keylist[QKEY_UJOB_LIMIT].val, INFINIT_INT - 1);
+                ls_syslog (LOG_ERR, I18N (5286, "%s: File %s in section Queue ending at line %d: UJOB_LIMIT value <%s> isn't a non-negative integer between 0 and %d; ignored"), __func__, filename, *lineNum, keylist[QKEY_UJOB_LIMIT].val, INFINIT_INT - 1);
                 lsberrno = LSBE_CONF_WARNING;
                 }
             }
@@ -4002,7 +4005,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
             queue.procJobLimit = my_atof (keylist[QKEY_PJOB_LIMIT].val, INFINIT_FLOAT, -1.0);
             if( fabs (INFINIT_FLOAT - queue.procJobLimit ) < 0.0000001 ) {
                 /* catgets 5287 */
-                ls_syslog (LOG_ERR, I18N (5287, "%s: File %s in section Queue ending at line %d: PJOB_LIMIT value <%s> isn't a non-negative integer between 0 and %f; ignored"), __func__, fname, *lineNum, keylist[QKEY_PJOB_LIMIT].val, INFINIT_FLOAT - 1);
+                ls_syslog (LOG_ERR, I18N (5287, "%s: File %s in section Queue ending at line %d: PJOB_LIMIT value <%s> isn't a non-negative integer between 0 and %f; ignored"), __func__, filename, *lineNum, keylist[QKEY_PJOB_LIMIT].val, INFINIT_FLOAT - 1);
                 lsberrno = LSBE_CONF_WARNING;
             }
         }
@@ -4011,12 +4014,10 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
         if (keylist[QKEY_QJOB_LIMIT].val != NULL
             && strcmp (keylist[QKEY_QJOB_LIMIT].val, ""))
             {
-            if ((queue.maxJobs = my_atoi (keylist[QKEY_QJOB_LIMIT].val,
-                                          INFINIT_INT, -1)) == INFINIT_INT)
+            if ((queue.maxJobs = my_atoi (keylist[QKEY_QJOB_LIMIT].val, INFINIT_INT, -1)) == INFINIT_INT)
                 {
-                ls_syslog (LOG_ERR, I18N (5289, "%s: File %s in section Queue ending at line %d: QJOB_LIMIT value <%s> isn't a non-negative integer between 0 and %d; ignored"),    /* catgets 5289 */
-                           __func__, fname, *lineNum,
-                           keylist[QKEY_QJOB_LIMIT].val, INFINIT_INT - 1);
+                /* catgets 5289 */
+                ls_syslog (LOG_ERR, I18N (5289, "%s: File %s in section Queue ending at line %d: QJOB_LIMIT value <%s> isn't a non-negative integer between 0 and %d; ignored"), __func__, filename, *lineNum, keylist[QKEY_QJOB_LIMIT].val, INFINIT_INT - 1);
                 lsberrno = LSBE_CONF_WARNING;
                 }
             }
@@ -4024,13 +4025,13 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
         if (keylist[QKEY_HJOB_LIMIT].val != NULL && strcmp (keylist[QKEY_HJOB_LIMIT].val, "")) {
             if ((queue.hostJobLimit = my_atoi (keylist[QKEY_HJOB_LIMIT].val, INFINIT_INT, -1)) == INFINIT_INT) {
                 /* catgets 5290 */
-                ls_syslog (LOG_ERR, I18N (5290, "%s: File %s in section Queue ending at line %d: HJOB_LIMIT value <%s> isn't a non-negative integer between 0 and %d; ignored"), __func__, fname, *lineNum, keylist[QKEY_HJOB_LIMIT].val, INFINIT_INT - 1);
+                ls_syslog (LOG_ERR, I18N (5290, "%s: File %s in section Queue ending at line %d: HJOB_LIMIT value <%s> isn't a non-negative integer between 0 and %d; ignored"), __func__, filename, *lineNum, keylist[QKEY_HJOB_LIMIT].val, INFINIT_INT - 1);
                 lsberrno = LSBE_CONF_WARNING;
             }
         }
 
         if (keylist[QKEY_RUN_WINDOW].val != NULL && strcmp (keylist[QKEY_RUN_WINDOW].val, "")) {
-            queue.windows = parsewindow (keylist[QKEY_RUN_WINDOW].val, fname, lineNum, "Queue");
+            queue.windows = parsewindow (keylist[QKEY_RUN_WINDOW].val, filename, lineNum, "Queue");
 
             if (lserrno == LSE_CONF_SYNTAX) {
                 lserrno = LSE_NO_ERR;
@@ -4039,7 +4040,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
         }
 
         if (keylist[QKEY_DISPATCH_WINDOW].val != NULL && strcmp (keylist[QKEY_DISPATCH_WINDOW].val, "")) {
-            queue.windowsD = parsewindow (keylist[QKEY_DISPATCH_WINDOW].val, fname, lineNum, "Queue");
+            queue.windowsD = parsewindow (keylist[QKEY_DISPATCH_WINDOW].val, filename, lineNum, "Queue");
 
             if (lserrno == LSE_CONF_SYNTAX) {
                 lserrno = LSE_NO_ERR;
@@ -4060,7 +4061,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
                      (keylist[QKEY_DEFAULT_HOST_SPEC].val)) == NULL)
                     {
                     /* catgets 5292 */
-                    ls_syslog (LOG_ERR, I18N (5292, "%s: File %s in section Queue ending at line %d: Invalid value <%s> for %s; ignored"), __func__, fname, *lineNum, keylist[QKEY_DEFAULT_HOST_SPEC].val, keylist[QKEY_DEFAULT_HOST_SPEC].key);
+                    ls_syslog (LOG_ERR, I18N (5292, "%s: File %s in section Queue ending at line %d: Invalid value <%s> for %s; ignored"), __func__, filename, *lineNum, keylist[QKEY_DEFAULT_HOST_SPEC].val, keylist[QKEY_DEFAULT_HOST_SPEC].key);
                     lsberrno = LSBE_CONF_WARNING;
                     }
                 }
@@ -4070,10 +4071,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
                 putstr_ (keylist[QKEY_DEFAULT_HOST_SPEC].val);
                 if (queue.defaultHostSpec == NULL)
                     {
-                    ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__,
-                               "malloc",
-                               strlen (keylist[QKEY_DEFAULT_HOST_SPEC].val) +
-                               1);
+                    ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (keylist[QKEY_DEFAULT_HOST_SPEC].val) + 1);
                     lsberrno = LSBE_NO_MEM;
                     freekeyval (keylist);
                     freeQueueInfo (&queue);
@@ -4082,7 +4080,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
                 }
             }
 
-        if (parseCpuAndRunLimit (keylist, &queue, fname, lineNum, function_name, info, options) == FALSE && lsberrno == LSBE_NO_MEM) {
+        if (parseCpuAndRunLimit (keylist, &queue, filename, lineNum, function_name, info, options) == FALSE && lsberrno == LSBE_NO_MEM) {
             freekeyval (keylist);
             freeQueueInfo (&queue);
             return FALSE;
@@ -4091,19 +4089,19 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
         if (keylist[QKEY_FILELIMIT].val != NULL && strcmp (keylist[QKEY_FILELIMIT].val, "")) {
             if ((queue.rLimits[LSF_RLIMIT_FSIZE] = my_atoi (keylist[QKEY_FILELIMIT].val, INFINIT_INT, 0)) == INFINIT_INT) {
                 /* catgets 5295 */
-                ls_syslog (LOG_ERR, I18N (5295, "%s: File %s in section Queue ending at line %d: FILELIMIT value <%s> isn't a positive integer between 0 and %d; ignored"), __func__, fname, *lineNum, keylist[QKEY_FILELIMIT].val, INFINIT_INT);
+                ls_syslog (LOG_ERR, I18N (5295, "%s: File %s in section Queue ending at line %d: FILELIMIT value <%s> isn't a positive integer between 0 and %d; ignored"), __func__, filename, *lineNum, keylist[QKEY_FILELIMIT].val, INFINIT_INT);
                 lsberrno = LSBE_CONF_WARNING;
             }
         }
 
         if (keylist[QKEY_DATALIMIT].val != NULL && strcmp (keylist[QKEY_DATALIMIT].val, "")) {
-            parseDefAndMaxLimits (keylist[QKEY_DATALIMIT], &queue.defLimits[LSF_RLIMIT_DATA], &queue.rLimits[LSF_RLIMIT_DATA], fname, lineNum, function_name );
+            parseDefAndMaxLimits (keylist[QKEY_DATALIMIT], &queue.defLimits[LSF_RLIMIT_DATA], &queue.rLimits[LSF_RLIMIT_DATA], filename, lineNum, function_name );
         }
 
         if (keylist[QKEY_STACKLIMIT].val != NULL && strcmp (keylist[QKEY_STACKLIMIT].val, "")) {
             if ((queue.rLimits[LSF_RLIMIT_STACK] = my_atoi (keylist[QKEY_STACKLIMIT].val,INFINIT_INT, 0)) == INFINIT_INT) {
                 /* catgets 5297 */
-                ls_syslog (LOG_ERR, I18N (5297, "%s: File %s in section Queue ending at line %d: STACKLIMIT value <%s> isn't a positive integer between 0 and %d; ignored"), __func__, fname, *lineNum, keylist[QKEY_STACKLIMIT].val, INFINIT_INT);
+                ls_syslog (LOG_ERR, I18N (5297, "%s: File %s in section Queue ending at line %d: STACKLIMIT value <%s> isn't a positive integer between 0 and %d; ignored"), __func__, filename, *lineNum, keylist[QKEY_STACKLIMIT].val, INFINIT_INT);
                 lsberrno = LSBE_CONF_WARNING;
             }
         }
@@ -4111,31 +4109,31 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
         if (keylist[QKEY_CORELIMIT].val != NULL && strcmp (keylist[QKEY_CORELIMIT].val, "")) {
             if ((queue.rLimits[LSF_RLIMIT_CORE] = my_atoi (keylist[QKEY_CORELIMIT].val, INFINIT_INT, -1)) == INFINIT_INT) {
                 /* catgets 5298 */
-                ls_syslog (LOG_ERR, I18N (5298, "%s: File %s in section Queue ending at line %d: CORELIMIT value <%s> isn't a non-negative integer between -1 and %d; ignored"), __func__, fname, *lineNum, keylist[QKEY_CORELIMIT].val, INFINIT_INT);
+                ls_syslog (LOG_ERR, I18N (5298, "%s: File %s in section Queue ending at line %d: CORELIMIT value <%s> isn't a non-negative integer between -1 and %d; ignored"), __func__, filename, *lineNum, keylist[QKEY_CORELIMIT].val, INFINIT_INT);
                 lsberrno = LSBE_CONF_WARNING;
             }
         }
 
         if (keylist[QKEY_MEMLIMIT].val != NULL && strcmp (keylist[QKEY_MEMLIMIT].val, "")) {
-            parseDefAndMaxLimits (keylist[QKEY_MEMLIMIT], &queue.defLimits[LSF_RLIMIT_RSS], &queue.rLimits[LSF_RLIMIT_RSS], fname, lineNum, function_name);
+            parseDefAndMaxLimits (keylist[QKEY_MEMLIMIT], &queue.defLimits[LSF_RLIMIT_RSS], &queue.rLimits[LSF_RLIMIT_RSS], filename, lineNum, function_name);
         }
 
 
         if (keylist[QKEY_SWAPLIMIT].val != NULL && strcmp (keylist[QKEY_SWAPLIMIT].val, "")) {
             if ((queue.rLimits[LSF_RLIMIT_SWAP] = my_atoi (keylist[QKEY_SWAPLIMIT].val, INFINIT_INT, 0)) == INFINIT_INT) {
                 /* catgets 5300 */
-                ls_syslog (LOG_ERR, I18N (5300, "%s: File %s in section Queue ending at line %d: SWAPLIMIT value <%s> isn't a positive integer between 0 and %d; ignored"), __func__, fname, *lineNum, keylist[QKEY_SWAPLIMIT].val, INFINIT_INT);
+                ls_syslog (LOG_ERR, I18N (5300, "%s: File %s in section Queue ending at line %d: SWAPLIMIT value <%s> isn't a positive integer between 0 and %d; ignored"), __func__, filename, *lineNum, keylist[QKEY_SWAPLIMIT].val, INFINIT_INT);
                 lsberrno = LSBE_CONF_WARNING;
             }
         }
 
         if (keylist[QKEY_PROCESSLIMIT].val != NULL && strcmp (keylist[QKEY_PROCESSLIMIT].val, "")) {
-            parseDefAndMaxLimits (keylist[QKEY_PROCESSLIMIT], &queue.defLimits[LSF_RLIMIT_PROCESS], &queue.rLimits[LSF_RLIMIT_PROCESS], fname, lineNum, function_name);
+            parseDefAndMaxLimits (keylist[QKEY_PROCESSLIMIT], &queue.defLimits[LSF_RLIMIT_PROCESS], &queue.rLimits[LSF_RLIMIT_PROCESS], filename, lineNum, function_name);
         }
 
 
         if (keylist[QKEY_PROCLIMIT].val != NULL && strcmp (keylist[QKEY_PROCLIMIT].val, "")) {
-            if (parseProcLimit(keylist[QKEY_PROCLIMIT].val, &queue, fname, lineNum, function_name) == FALSE) {
+            if (parseProcLimit(keylist[QKEY_PROCLIMIT].val, &queue, filename, lineNum, function_name) == FALSE) {
                 lsberrno = LSBE_CONF_WARNING;
             }
         }
@@ -4143,18 +4141,18 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
         if (keylist[QKEY_USERS].val != NULL && !searchAll (keylist[QKEY_USERS].val)) {
 
             assert( *lineNum <= UINT_MAX );
-            queue.userList = parseGroups (keylist[QKEY_USERS].val, fname, lineNum, " in section  Queue ending", USER_GRP, options);
+            queue.userList = parseGroups (keylist[QKEY_USERS].val, filename, lineNum, " in section  Queue ending", USER_GRP, options);
             if (queue.userList == NULL) {
                 if (lsberrno == LSBE_NO_MEM) {
-                    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "parseGroups");
+                    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, filename, "parseGroups");
                 }
                 else if (numofugroups >= MAX_GROUPS) {
                     /* catgets 5304 */
-                    ls_syslog (LOG_ERR, I18N (5304, "%s: File %s in section Queue ending at line %d:  Number of user group <%d> is equal to or greater than MAX_GROUPS <%d>; ignoring the queue for <%s>; ignoring the queue"), __func__, fname, *lineNum, numofugroups, MAX_GROUPS, queue.queue);
+                    ls_syslog (LOG_ERR, I18N (5304, "%s: File %s in section Queue ending at line %d:  Number of user group <%d> is equal to or greater than MAX_GROUPS <%d>; ignoring the queue for <%s>; ignoring the queue"), __func__, filename, *lineNum, numofugroups, MAX_GROUPS, queue.queue);
                 }
                 else {
                     /* catgets 5305 */
-                    ls_syslog (LOG_ERR, I18N (5305, "%s: File %s in section Queue ending at line %d: No valid user or user group specified in USERS for <%s>; ignoring the queue"), __func__, fname, *lineNum, queue.queue);   
+                    ls_syslog (LOG_ERR, I18N (5305, "%s: File %s in section Queue ending at line %d: No valid user or user group specified in USERS for <%s>; ignoring the queue"), __func__, filename, *lineNum, queue.queue);   
                 }
                 freekeyval (keylist);
                 freeQueueInfo (&queue);
@@ -4169,7 +4167,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
             while (subString != NULL) {
                 if (strcmp (keylist[QKEY_HOSTS].val, "none") == 0) {
                     /* catgets 5307 */
-                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5307, "%s: File %s in section Queue at line %d: \"none\" specified , queue ignored"), __func__, fname, *lineNum);
+                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5307, "%s: File %s in section Queue at line %d: \"none\" specified , queue ignored"), __func__, filename, *lineNum);
                     lsberrno = LSBE_CONF_WARNING;
                     freekeyval (keylist);
                     freeQueueInfo (&queue);
@@ -4188,13 +4186,13 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
                     ls_syslog (LOG_DEBUG, "resolveBatchNegHosts: for do_Queues the string is replaced with \'%s\'", outHosts);
                 }
                 else if (numHosts == 0) {
-                    ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5460, "%s: File %s at line %d: there are no hosts found to exclude, replaced with \'%s\'"), __func__, fname, *lineNum, outHosts); /* catgets 5460 */
+                    ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5460, "%s: File %s at line %d: there are no hosts found to exclude, replaced with \'%s\'"), __func__, filename, *lineNum, outHosts); /* catgets 5460 */
                 }
                 else {
                     if (numHosts == -3) {
-                        ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5461, "%s: \'%s\' The result is that all the hosts are to be excluded."), __func__, keylist[QKEY_HOSTS].val); /* catgets 5461 */
+                        ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5461, "%s: \'%s\' The result is that all the hosts are to be excluded."), filename, keylist[QKEY_HOSTS].val); /* catgets 5461 */
                     }
-                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5310, "%s: File %s in section Queue ending at line %d: No valid hosts or host group specified in HOSTS for <%s>; ignoring the queue"), __func__, fname, *lineNum, queue.queue);   /* catgets 5310 */
+                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5310, "%s: File %s in section Queue ending at line %d: No valid hosts or host group specified in HOSTS for <%s>; ignoring the queue"), __func__, filename, *lineNum, queue.queue);   /* catgets 5310 */
 
                     lsberrno = LSBE_CONF_WARNING;
                     freekeyval (keylist);
@@ -4206,14 +4204,14 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
             }
 
             assert( *lineNum < UINT_MAX );
-            queue.hostList = parseGroups (keylist[QKEY_HOSTS].val, fname, lineNum, " in section  Queue ending", HOST_GRP, options);
+            queue.hostList = parseGroups (keylist[QKEY_HOSTS].val, filename, lineNum, " in section  Queue ending", HOST_GRP, options);
             if (queue.hostList == NULL) {
                 if (lsberrno == LSBE_NO_MEM) {
-                    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "parseGroups");
+                    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, filename, "parseGroups");
                 }
                 else {
                     /* catgets 5310 */
-                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5310, "%s: File %s in section Queue ending at line %d: No valid hosts or host group specified in HOSTS for <%s>; ignoring the queue"), __func__, fname, *lineNum, queue.queue);
+                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5310, "%s: File %s in section Queue ending at line %d: No valid hosts or host group specified in HOSTS for <%s>; ignoring the queue"), __func__, filename, *lineNum, queue.queue);
                 }
                 freekeyval (keylist);
                 freeQueueInfo (&queue);
@@ -4226,7 +4224,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
             {
             if (strlen (keylist[QKEY_CHKPNT].val) >= MAXLINELEN)
                 {
-                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5439, "%s: File %s in section Queue ending at line %d: CHKPNT of the queue <%s> is too long <%s>; ignoring"), __func__, fname, *lineNum, queue.queue, keylist[QKEY_CHKPNT].val);  /* catgets 5439 */
+                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5439, "%s: File %s in section Queue ending at line %d: CHKPNT of the queue <%s> is too long <%s>; ignoring"), __func__, filename, *lineNum, queue.queue, keylist[QKEY_CHKPNT].val);  /* catgets 5439 */
                 lsberrno = LSBE_CONF_WARNING;
                 }
             else
@@ -4245,8 +4243,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
 
                 if (queue.chkpntDir == NULL)
                     {
-                    ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc",
-                               strlen (keylist[QKEY_CHKPNT].val) + 1);
+                    ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, filename, "malloc", strlen (keylist[QKEY_CHKPNT].val) + 1);
                     lsberrno = LSBE_NO_MEM;
                     freekeyval (keylist);
                     freeQueueInfo (&queue);
@@ -4256,7 +4253,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
                 if (chkpntPrd < 0)
                     {
 
-                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5441, "%s: File %s in section Queue ending at line %d:  options for CHKPNT of the queue <%s> is invalid ; ignoring"), __func__, fname, *lineNum, queue.queue);    /* catgets 5441 */
+                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5441, "%s: File %s in section Queue ending at line %d:  options for CHKPNT of the queue <%s> is invalid ; ignoring"), __func__, filename, *lineNum, queue.queue);    /* catgets 5441 */
                     ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5442, "%s: invalid checkpoint period"), __func__);    /* catgets 5442 */
                     lsberrno = LSBE_CONF_WARNING;
                     freekeyval (keylist);
@@ -4281,18 +4278,18 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
                     strcasecmp (keylist[QKEY_RERUNNABLE].val, "no") != 0)
                     {
                     /* catgets 5445 */
-                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5445, "%s: File %s in section Queue ending at line %d:  options for RERUNNABLE of the queue <%s> is not y|yes|n|no; ignoring"), __func__, fname, *lineNum, queue.queue, keylist[QKEY_RERUNNABLE].val);
+                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5445, "%s: File %s in section Queue ending at line %d:  options for RERUNNABLE of the queue <%s> is not y|yes|n|no; ignoring"), __func__, filename, *lineNum, queue.queue, keylist[QKEY_RERUNNABLE].val);
                     lsberrno = LSBE_CONF_WARNING;
                     }
                 queue.qAttrib &= ~Q_ATTRIB_RERUNNABLE;
                 }
             }
 
-        addBinaryAttributes (fname, lineNum, &queue, &keylist[QKEY_EXCLUSIVE],               Q_ATTRIB_EXCLUSIVE, "EXCLUSIVE");
-        addBinaryAttributes (fname, lineNum, &queue, &keylist[QKEY_BACKFILL],                Q_ATTRIB_BACKFILL, "BACKFILL");
-        addBinaryAttributes (fname, lineNum, &queue, &keylist[QKEY_IGNORE_DEADLINE],         Q_ATTRIB_IGNORE_DEADLINE, "IGNORE_DEADLINE");
-        addBinaryAttributes (fname, lineNum, &queue, &keylist[QKEY_ENQUE_INTERACTIVE_AHEAD], Q_ATTRIB_ENQUE_INTERACTIVE_AHEAD, "ENQUE_INTERACTIVE_AHEAD");
-        addBinaryAttributes (fname, lineNum, &queue, &keylist[QKEY_ROUND_ROBIN_POLICY],      Q_ATTRIB_ROUND_ROBIN, "ROUND_ROBIN_POLICY");
+        addBinaryAttributes (filename, lineNum, &queue, &keylist[QKEY_EXCLUSIVE],               Q_ATTRIB_EXCLUSIVE, "EXCLUSIVE");
+        addBinaryAttributes (filename, lineNum, &queue, &keylist[QKEY_BACKFILL],                Q_ATTRIB_BACKFILL, "BACKFILL");
+        addBinaryAttributes (filename, lineNum, &queue, &keylist[QKEY_IGNORE_DEADLINE],         Q_ATTRIB_IGNORE_DEADLINE, "IGNORE_DEADLINE");
+        addBinaryAttributes (filename, lineNum, &queue, &keylist[QKEY_ENQUE_INTERACTIVE_AHEAD], Q_ATTRIB_ENQUE_INTERACTIVE_AHEAD, "ENQUE_INTERACTIVE_AHEAD");
+        addBinaryAttributes (filename, lineNum, &queue, &keylist[QKEY_ROUND_ROBIN_POLICY],      Q_ATTRIB_ROUND_ROBIN, "ROUND_ROBIN_POLICY");
 
         if (keylist[QKEY_INTERACTIVE].val != NULL)
             {
@@ -4309,7 +4306,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
                      (strcasecmp (keylist[QKEY_INTERACTIVE].val, "y") != 0))
                 {
                 /* catgets 5311 */
-                ls_syslog (LOG_ERR, I18N (5311, " %s: File %s in section Queue ending at line %d: INTERACTIVE value <%s> isn't one of 'Y', 'y', 'N', 'n' or 'ONLY'; ignored"), __func__, fname, *lineNum, keylist[QKEY_INTERACTIVE].val);
+                ls_syslog (LOG_ERR, I18N (5311, " %s: File %s in section Queue ending at line %d: INTERACTIVE value <%s> isn't one of 'Y', 'y', 'N', 'n' or 'ONLY'; ignored"), __func__, filename, *lineNum, keylist[QKEY_INTERACTIVE].val);
                 lsberrno = LSBE_CONF_WARNING;
                 }
             }
@@ -4319,7 +4316,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
             if ((queue.acceptIntvl = my_atoi (keylist[QKEY_JOB_ACCEPT_INTERVAL].val, INFINIT_INT, -1)) == INFINIT_INT)
                 {
                 /* catgets 5313 */
-                ls_syslog (LOG_ERR, I18N (5313, "%s: File %s in section Queue ending at line %d: JOB_ACCEPT_INTERVAL value <%s> isn't an integer greater than -1; ignored"), __func__, fname, *lineNum, keylist[QKEY_JOB_ACCEPT_INTERVAL].val);    
+                ls_syslog (LOG_ERR, I18N (5313, "%s: File %s in section Queue ending at line %d: JOB_ACCEPT_INTERVAL value <%s> isn't an integer greater than -1; ignored"), __func__, filename, *lineNum, keylist[QKEY_JOB_ACCEPT_INTERVAL].val);    
                 lsberrno = LSBE_CONF_WARNING;
                 }
             }
@@ -4329,7 +4326,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
             if ((queue.schedDelay = my_atoi (keylist[QKEY_NEW_JOB_SCHED_DELAY].val, INFINIT_INT, -1)) == INFINIT_INT)
                 {
                 /* catgets 5315 */
-                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5315, "%s: File %s in section Queue ending at line %d: NEW_JOB_SCHED_DELAY value <%s> isn't an integer greater than -1; ignored"), __func__, fname, *lineNum, keylist[QKEY_NEW_JOB_SCHED_DELAY].val);
+                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5315, "%s: File %s in section Queue ending at line %d: NEW_JOB_SCHED_DELAY value <%s> isn't an integer greater than -1; ignored"), __func__, filename, *lineNum, keylist[QKEY_NEW_JOB_SCHED_DELAY].val);
                 lsberrno = LSBE_CONF_WARNING;
                 }
             }
@@ -4343,7 +4340,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
                     queue.qAttrib |= Q_ATTRIB_EXCLUSIVE;
                 else
                     {
-                    ls_syslog (LOG_ERR, I18N (5317, "%s: File %s in section Queue ending at line %d: POLICIES value <%s> unrecognizable; ignored"), __func__, fname, *lineNum, word);  /* catgets 5317 */
+                    ls_syslog (LOG_ERR, I18N (5317, "%s: File %s in section Queue ending at line %d: POLICIES value <%s> unrecognizable; ignored"), __func__, filename, *lineNum, word);  /* catgets 5317 */
                     lsberrno = LSBE_CONF_WARNING;
                     }
                 }
@@ -4353,15 +4350,14 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
             {
             if (strlen (keylist[QKEY_DESCRIPTION].val) > 10 * MAXLINELEN)
                 {
-                ls_syslog (LOG_ERR, I18N (5338, "%s: File %s in section Queue ending at line %d: Too many characters in DESCRIPTION of the queue; truncated"), __func__, fname, *lineNum); /* catgets 5338 */
+                ls_syslog (LOG_ERR, I18N (5338, "%s: File %s in section Queue ending at line %d: Too many characters in DESCRIPTION of the queue; truncated"), __func__, filename, *lineNum); /* catgets 5338 */
                 lsberrno = LSBE_CONF_WARNING;
                 keylist[QKEY_DESCRIPTION].val[10 * MAXLINELEN - 1] = '\0';
                 }
             queue.description = putstr_ (keylist[QKEY_DESCRIPTION].val);
             if (queue.description == NULL)
                 {
-                ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc",
-                           strlen (keylist[QKEY_DESCRIPTION].val) + 1);
+                ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (keylist[QKEY_DESCRIPTION].val) + 1);
                 lsberrno = LSBE_NO_MEM;
                 freekeyval (keylist);
                 freeQueueInfo (&queue);
@@ -4372,31 +4368,30 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
         if (keylist[QKEY_MIG].val != NULL && strcmp (keylist[QKEY_MIG].val, ""))
             {
 
-            if ((queue.mig = my_atoi (keylist[QKEY_MIG].val,
-                                      INFINIT_INT / 60, -1)) == INFINIT_INT)
+            if ((queue.mig = my_atoi (keylist[QKEY_MIG].val, INFINIT_INT / 60, -1)) == INFINIT_INT)
                 {
-                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5340, "%s: File %s in section Queue ending at line %d: Invalid value <%s> for MIG; no MIG threshold is assumed"),  /* catgets 5340 */
-                           __func__, fname, *lineNum, keylist[QKEY_MIG].val);
+                /* catgets 5340 */
+                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5340, "%s: File %s in section Queue ending at line %d: Invalid value <%s> for MIG; no MIG threshold is assumed"), __func__, filename, *lineNum, keylist[QKEY_MIG].val);
                 lsberrno = LSBE_CONF_WARNING;
                 }
             }
 
         if (keylist[QKEY_ADMINISTRATORS].val != NULL && strcmp (keylist[QKEY_ADMINISTRATORS].val, "")) {
             if (options & CONF_NO_CHECK) { 
-                queue.admins = parseAdmins (keylist[QKEY_ADMINISTRATORS].val, options, fname, lineNum); // FIXME fix above line
+                queue.admins = parseAdmins (keylist[QKEY_ADMINISTRATORS].val, options, filename, lineNum); // FIXME fix above line
             }
             else {
                 queue.admins = putstr_ (keylist[QKEY_ADMINISTRATORS].val);
             }
             if (queue.admins == NULL)  {
-                ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (keylist[QKEY_ADMINISTRATORS].val) + 1);
+                ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, filename, "malloc", strlen (keylist[QKEY_ADMINISTRATORS].val) + 1);
                 lsberrno = LSBE_NO_MEM;
                 freekeyval (keylist);
                 freeQueueInfo (&queue);
                 return FALSE;
             }
             if (queue.admins[0] == '\0') {
-                ls_syslog (LOG_ERR, I18N (5343, "%s: File %s in section Queue ending at line %d: No valid administrators <%s> specified for queue <%s>;ignoring"), __func__, fname, *lineNum, keylist[QKEY_ADMINISTRATORS].val, queue.queue);  /* catgets 5343 */
+                ls_syslog (LOG_ERR, I18N (5343, "%s: File %s in section Queue ending at line %d: No valid administrators <%s> specified for queue <%s>;ignoring"), __func__, filename, *lineNum, keylist[QKEY_ADMINISTRATORS].val, queue.queue);  /* catgets 5343 */
                 lsberrno = LSBE_CONF_WARNING;
                 FREEUP (queue.admins);
             }
@@ -4407,7 +4402,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
             {
             if (strlen (keylist[QKEY_PRE_EXEC].val) >= MAXLINELEN)
                 {
-                ls_syslog (LOG_ERR, I18N (5344, "%s: File %s in section Queue ending at line %d: PRE_EXEC of the queue <%s> is too long <%s>; ignoring"), __func__, fname, *lineNum, queue.queue, keylist[QKEY_PRE_EXEC].val); /* catgets 5344 */
+                ls_syslog (LOG_ERR, I18N (5344, "%s: File %s in section Queue ending at line %d: PRE_EXEC of the queue <%s> is too long <%s>; ignoring"), __func__, filename, *lineNum, queue.queue, keylist[QKEY_PRE_EXEC].val); /* catgets 5344 */
                 lsberrno = LSBE_CONF_WARNING;
                 }
             else {
@@ -4424,7 +4419,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
 
         if (keylist[QKEY_PRE_POST_EXEC_USER].val != NULL && strcmp (keylist[QKEY_PRE_POST_EXEC_USER].val, "")) {
             if (strlen (keylist[QKEY_PRE_POST_EXEC_USER].val) >= MAXLINELEN) {
-                ls_syslog (LOG_ERR, I18N (5352, "%s: User name %s in section Queue ending at line %d: PRE_POST_EXEC_USER of the queue <%s> is too long <%s>; ignoring"), __func__, fname, *lineNum, queue.queue, keylist[QKEY_PRE_POST_EXEC_USER].val);    /* catgets 5352 */
+                ls_syslog (LOG_ERR, I18N (5352, "%s: User name %s in section Queue ending at line %d: PRE_POST_EXEC_USER of the queue <%s> is too long <%s>; ignoring"), __func__, filename, *lineNum, queue.queue, keylist[QKEY_PRE_POST_EXEC_USER].val);    /* catgets 5352 */
                 lsberrno = LSBE_CONF_WARNING;
             }
             else {
@@ -4441,7 +4436,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
 
         if (keylist[QKEY_POST_EXEC].val != NULL && strcmp (keylist[QKEY_POST_EXEC].val, "")) {
             if (strlen (keylist[QKEY_POST_EXEC].val) >= MAXLINELEN) {
-                ls_syslog (LOG_ERR, I18N (5347, "%s: File %s in section Queue ending at line %d: POST_EXEC of the queue <%s> is too long <%s>; ignoring"), __func__, fname, *lineNum, queue.queue, keylist[QKEY_POST_EXEC].val);   /* catgets 5347 */
+                ls_syslog (LOG_ERR, I18N (5347, "%s: File %s in section Queue ending at line %d: POST_EXEC of the queue <%s> is too long <%s>; ignoring"), __func__, filename, *lineNum, queue.queue, keylist[QKEY_POST_EXEC].val);   /* catgets 5347 */
                 lsberrno = LSBE_CONF_WARNING;
             }
             else {
@@ -4458,10 +4453,10 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
 
         if (keylist[QKEY_REQUEUE_EXIT_VALUES].val != NULL && strcmp (keylist[QKEY_REQUEUE_EXIT_VALUES].val, "")) {
             if (strlen (keylist[QKEY_REQUEUE_EXIT_VALUES].val) >= MAXLINELEN) {
-                ls_syslog (LOG_ERR, I18N (5350, "%s: File %s in section Queue ending at line %d: REQUEUE_EXIT_VALUES  of the queue <%s> is too long <%s>; ignoring"), __func__, fname, *lineNum, queue.queue, keylist[QKEY_REQUEUE_EXIT_VALUES].val);  /* catgets 5350 */
+                ls_syslog (LOG_ERR, I18N (5350, "%s: File %s in section Queue ending at line %d: REQUEUE_EXIT_VALUES  of the queue <%s> is too long <%s>; ignoring"), __func__, filename, *lineNum, queue.queue, keylist[QKEY_REQUEUE_EXIT_VALUES].val);  /* catgets 5350 */
                 lsberrno = LSBE_CONF_WARNING;
             }
-            else if (!checkRequeEValues (&queue, keylist[QKEY_REQUEUE_EXIT_VALUES].val, fname, lineNum) && lsberrno == LSBE_NO_MEM) {
+            else if (!checkRequeEValues (&queue, keylist[QKEY_REQUEUE_EXIT_VALUES].val, filename, lineNum) && lsberrno == LSBE_NO_MEM) {
                 freekeyval (keylist);
                 freeQueueInfo (&queue);
                 return FALSE;
@@ -4483,7 +4478,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
         }
 
         if (keylist[QKEY_SLOT_RESERVE].val != NULL && strcmp (keylist[QKEY_SLOT_RESERVE].val, "")) {
-            getReserve (keylist[QKEY_SLOT_RESERVE].val, &queue, fname, *lineNum);
+            getReserve (keylist[QKEY_SLOT_RESERVE].val, &queue, filename, *lineNum);
         }
 
         if (keylist[QKEY_RESUME_COND].val != NULL && strcmp (keylist[QKEY_RESUME_COND].val, "")) {
@@ -4522,7 +4517,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
         }
 
         if (keylist[QKEY_JOB_CONTROLS].val != NULL && strcmp (keylist[QKEY_JOB_CONTROLS].val, "") && 
-                parseSigActCmd (&queue, keylist[QKEY_JOB_CONTROLS].val, fname, lineNum, "in section Queue ending") < 0 ) {
+                parseSigActCmd (&queue, keylist[QKEY_JOB_CONTROLS].val, filename, lineNum, "in section Queue ending") < 0 ) {
             lsberrno = LSBE_CONF_WARNING;
             freekeyval (keylist);
             freeQueueInfo (&queue);
@@ -4530,7 +4525,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
         }
 
         if (keylist[QKEY_TERMINATE_WHEN].val != NULL && strcmp (keylist[QKEY_TERMINATE_WHEN].val, "") && 
-                terminateWhen (&queue, keylist[QKEY_TERMINATE_WHEN].val, fname, lineNum, "in section Queue ending") < 0 ) {
+                terminateWhen (&queue, keylist[QKEY_TERMINATE_WHEN].val, filename, lineNum, "in section Queue ending") < 0 ) {
             lsberrno = LSBE_CONF_WARNING;
             freekeyval (keylist);
             freeQueueInfo (&queue);
@@ -4538,7 +4533,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
         }
 
         assert( info->numIndx >= 0 );
-        queue.loadSched = calloc( (unsigned long)info->numIndx, sizeof (float *));
+        queue.loadSched = calloc( info->numIndx, sizeof (float *));
         if (info->numIndx && NULL == queue.loadSched && ENOMEM == errno) {
             lsberrno = LSBE_NO_MEM;
             freekeyval (keylist);
@@ -4546,7 +4541,7 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
             return FALSE;
         }
         assert( info->numIndx >=0 );
-        queue.loadStop = calloc( (unsigned long)info->numIndx, sizeof (float *));
+        queue.loadStop = calloc( info->numIndx, sizeof (float *));
         if (info->numIndx && NULL == queue.loadStop && ENOMEM == errno ) {
             lsberrno = LSBE_NO_MEM;
             freekeyval (keylist);
@@ -4554,9 +4549,9 @@ do_Queues (struct lsConf *conf, char *fname, size_t *lineNum, struct lsInfo *inf
             return FALSE;
         }
 
-        getThresh (info, keylist, queue.loadSched, queue.loadStop, fname, lineNum, " in section Queue ending");
+        getThresh (info, keylist, queue.loadSched, queue.loadStop, filename, lineNum, " in section Queue ending");
         queue.nIdx = info->numIndx;
-        if (!addQueue (&queue, fname, *lineNum) && lsberrno == LSBE_NO_MEM) {
+        if (!addQueue (&queue, filename, *lineNum) && lsberrno == LSBE_NO_MEM) {
             freekeyval (keylist);
             freeQueueInfo (&queue);
             return FALSE;
@@ -4663,7 +4658,7 @@ freeQueueInfo (struct queueInfoEnt *qp)
 }
 
 char
-checkRequeEValues (struct queueInfoEnt *qp, char *word, char *fname, size_t *lineNum)
+checkRequeEValues (struct queueInfoEnt *qp, char *word, char *filename, size_t *lineNum)
 {
 #define NORMAL_EXIT 0
 #define EXCLUDE_EXIT 1
@@ -4690,8 +4685,9 @@ checkRequeEValues (struct queueInfoEnt *qp, char *word, char *fname, size_t *lin
                 }
             if (found == TRUE)
                 {
-                if (fname)
-                    ls_syslog (LOG_ERR, I18N (5376, "%s: File %s in section Queue ending at line %d: requeue exit value <%s> for queue <%s> is repeated; ignoring"), __func__, fname, *lineNum, sp, qp->queue);    /* catgets 5376 */
+                if (filename) {      // FIXME FIXME FIXME FIXME this section is suspcet; coudl be a !filename
+                    ls_syslog (LOG_ERR, I18N (5376, "%s: File %s in section Queue ending at line %d: requeue exit value <%s> for queue <%s> is repeated; ignoring"), __func__, filename, *lineNum, sp, qp->queue);    /* catgets 5376 */
+                }
                 lsberrno = LSBE_CONF_WARNING;
                 continue;
                 }
@@ -4714,24 +4710,26 @@ checkRequeEValues (struct queueInfoEnt *qp, char *word, char *fname, size_t *lin
             }
         else
             {
-            if (fname)
-                ls_syslog (LOG_ERR, I18N (5377, "%s: File %s in section Queue ending at line %d: requeue exit values <%s> for queue <%s> is not an interger between 0-255; ignored"), __func__, fname, *lineNum, sp, qp->queue);   /* catgets 5377 */
+            if (filename) {     // FIXME FIXME FIXME FIXME this section is suspcet; coudl be a !filename
+                ls_syslog (LOG_ERR, I18N (5377, "%s: File %s in section Queue ending at line %d: requeue exit values <%s> for queue <%s> is not an interger between 0-255; ignored"), __func__, filename, *lineNum, sp, qp->queue);   /* catgets 5377 */
+            }
             lsberrno = LSBE_CONF_WARNING;
             }
         }
     if (numEValues == 0)
         {
-        if (fname)
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5378, "%s: File %s in section Queue ending at line %d: No valid requeue exit values <%s> for queue <%s>; ignoring"), __func__, fname, *lineNum, cp, qp->queue);   /* catgets 5378 */
+        if (!filename) {       // FIXME FIXME FIXME FIXME this section is suspcet; coudl be a !filename
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5378, "%s: File %s in section Queue ending at line %d: No valid requeue exit values <%s> for queue <%s>; ignoring"), __func__, filename, *lineNum, cp, qp->queue);   /* catgets 5378 */
+        }
         lsberrno = LSBE_CONF_WARNING;
         return FALSE;
         }
     qp->requeueEValues = putstr_ (exitValues);
     if (qp->requeueEValues == NULL)
         {
-        if (fname)
-            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc",
-                       strlen (exitValues) + 1);
+        if (!filename) {       // FIXME FIXME FIXME FIXME this section is suspcet; coudl be a !filename
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (exitValues) + 1);
+        }
         lsberrno = LSBE_NO_MEM;
         return FALSE;
         }
@@ -4746,8 +4744,9 @@ a_getNextWord_ (char **line)
     word = getNextWord_ (line);
     if (word && (wordp = strchr (word, '('))) {
         *(wordp + 1) = '\0';
-        while (**line != '(')
+        while (**line != '(') {
             (*line)--;
+        }
         (*line)++;
         }
     else if (word && (wordp = strchr (word, ')')))
@@ -4755,8 +4754,9 @@ a_getNextWord_ (char **line)
         if (wordp != word)
             {
             wordp--;
-            while (isspace (*wordp))
+            while (isspace (*wordp)) {
                 wordp--;
+            }
             *(wordp + 1) = '\0';
             while (**line != ')')
                 (*line)--;
@@ -4766,12 +4766,12 @@ a_getNextWord_ (char **line)
 }
 
 static char
-addQueue (struct queueInfoEnt *qp, char *fname, unsigned int lineNum)
+addQueue (struct queueInfoEnt *qp, char *filename, unsigned int lineNum)
 {
     
-    struct queueInfoEnt **tmpQueues;
+    struct queueInfoEnt **tmpQueues = NULL;
 
-    assert( *fname );
+    assert( *filename );
     assert( lineNum );
 
     if (qp == NULL) {
@@ -4786,9 +4786,9 @@ addQueue (struct queueInfoEnt *qp, char *fname, unsigned int lineNum)
             queuesize *= 2;
         }
         //assert( queuesize >= 0 );
-        tmpQueues = (struct queueInfoEnt **) myrealloc(queues, (unsigned long)queuesize * sizeof (struct queueInfoEnt *));
+        tmpQueues = myrealloc(queues, queuesize * sizeof (struct queueInfoEnt *));
         if( NULL == tmpQueues && ENOMEM == errno ) {
-            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "myrealloc", (unsigned long)queuesize * sizeof (struct queueInfoEnt *));
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "myrealloc", queuesize * sizeof (struct queueInfoEnt *));
             lsberrno = LSBE_NO_MEM;
             freeQueueInfo (qp);
             return FALSE;
@@ -4942,12 +4942,12 @@ resetHConf (struct hostConf *hConf1)
 }
 
 static void
-checkCpuLimit (char **hostSpec, double **cpuFactor, int useSysDefault, char *fname, size_t *lineNum, char *pname, struct lsInfo *info, int options)
+checkCpuLimit (char **hostSpec, double **cpuFactor, int useSysDefault, char *filename, size_t *lineNum, char *pname, struct lsInfo *info, int options)
 {
     if( ( *hostSpec ) && ( *cpuFactor == NULL ) && ( options != CONF_NO_CHECK ) && ( (*cpuFactor = getModelFactor (*hostSpec, info)) == NULL) && ( (*cpuFactor = getHostFactor (*hostSpec)) == NULL) ) {
         if (useSysDefault == TRUE) {
             /* catgets 5383 */
-            ls_syslog (LOG_ERR, I18N (5383, "%s: File %s in section Queue end at line %ld: Invalid DEFAULT_HOST_SPEC <%s>; ignored"), pname, fname, *lineNum, pConf->param->defaultHostSpec);
+            ls_syslog (LOG_ERR, I18N (5383, "[%s] %s: File %s in section Queue end at line %ld: Invalid DEFAULT_HOST_SPEC <%s>; ignored"), __func__, pname, filename, *lineNum, pConf->param->defaultHostSpec);
 
             lsberrno = LSBE_CONF_WARNING;
             FREEUP (pConf->param->defaultHostSpec);
@@ -4955,7 +4955,7 @@ checkCpuLimit (char **hostSpec, double **cpuFactor, int useSysDefault, char *fna
         }
         else {
             /* catgets 5384 */
-            ls_syslog (LOG_ERR, I18N (5384, "%s: File %s in section Queue end at line %ld: Invalid host_spec <%s>; ignored"), pname, fname, *lineNum, *hostSpec);
+            ls_syslog (LOG_ERR, I18N (5384, "[%s] %s: File %s in section Queue end at line %ld: Invalid host_spec <%s>; ignored"), __func__, pname, filename, *lineNum, *hostSpec);
             lsberrno = LSBE_CONF_WARNING;
             FREEUP (*hostSpec);
         }
@@ -4963,7 +4963,7 @@ checkCpuLimit (char **hostSpec, double **cpuFactor, int useSysDefault, char *fna
 }
 
 static int
-parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, char *fname, size_t *lineNum, char *pname, struct lsInfo *info, int options)
+parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, char *filename, size_t *lineNum, char *pname, struct lsInfo *info, int options)
 {
     struct keymap key;
     int limit = 0; 
@@ -4988,7 +4988,7 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, char *fnam
 
     if (maxLimit != NULL) {
         
-        retValue = parseLimitAndSpec (defaultLimit, &limit, &spec, hostSpec, key.key, qp, fname, lineNum, pname);
+        retValue = parseLimitAndSpec (defaultLimit, &limit, &spec, hostSpec, key.key, qp, filename, lineNum, pname);
         
         if (retValue == 0) {
             if (limit >= 0) {
@@ -5003,7 +5003,7 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, char *fnam
         maxLimit = defaultLimit;
     }
 
-    retValue = parseLimitAndSpec (maxLimit, &limit, &spec, hostSpec, key.key, qp, fname, lineNum, pname);
+    retValue = parseLimitAndSpec (maxLimit, &limit, &spec, hostSpec, key.key, qp, filename, lineNum, pname);
     if (retValue == 0) {
         if (limit >= 0) {
             qp->rLimits[LSF_RLIMIT_CPU] = limit;
@@ -5016,7 +5016,7 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, char *fnam
     if (sp && strlen (sp) != 0) {
         lsberrno = LSBE_CONF_WARNING;
         /* catgets 5464 */
-        ls_syslog (LOG_ERR, I18N (5464, "%s: File %s in section Queue ending at line %d: CPULIMIT for queue has extra parameters: %s; These parameters will be ignored."), pname, fname, *lineNum, sp); 
+        ls_syslog (LOG_ERR, I18N (5464, "%s: File %s in section Queue ending at line %d: CPULIMIT for queue has extra parameters: %s; These parameters will be ignored."), pname, filename, *lineNum, sp); 
         lsberrno = LSBE_CONF_WARNING;
     }
 
@@ -5032,7 +5032,7 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, char *fnam
 
     if (maxLimit != NULL) {
 
-        retValue = parseLimitAndSpec (defaultLimit, &limit, &spec, hostSpec, key.key, qp, fname, lineNum, pname);
+        retValue = parseLimitAndSpec (defaultLimit, &limit, &spec, hostSpec, key.key, qp, filename, lineNum, pname);
         if (retValue == 0) {
             if (limit >= 0) {
                 qp->defLimits[LSF_RLIMIT_RUN] = limit;
@@ -5046,7 +5046,7 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, char *fnam
         maxLimit = defaultLimit;
     }
 
-    retValue = parseLimitAndSpec (maxLimit, &limit, &spec, hostSpec, key.key, qp, fname, lineNum, pname);
+    retValue = parseLimitAndSpec (maxLimit, &limit, &spec, hostSpec, key.key, qp, filename, lineNum, pname);
     if (retValue == 0) {
         if (limit >= 0) {
             qp->rLimits[LSF_RLIMIT_RUN] = limit;
@@ -5059,24 +5059,24 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, char *fnam
     if (sp && strlen (sp) != 0) {
         lsberrno = LSBE_CONF_WARNING;
         /* catgets 5464 */
-        ls_syslog (LOG_ERR, I18N (5464, "%s: File %s in section Queue ending at line %d: RUNLIMIT for queue has extra parameters: %s; These parameters will be ignored."), pname, fname, *lineNum, sp); 
+        ls_syslog (LOG_ERR, I18N (5464, "%s: File %s in section Queue ending at line %d: RUNLIMIT for queue has extra parameters: %s; These parameters will be ignored."), pname, filename, *lineNum, sp); 
         lsberrno = LSBE_CONF_WARNING;
     }
 
     if (qp->defLimits[LSF_RLIMIT_CPU] != INFINIT_INT && qp->rLimits[LSF_RLIMIT_CPU] != INFINIT_INT && qp->defLimits[LSF_RLIMIT_CPU] > qp->rLimits[LSF_RLIMIT_CPU]) {
         /* catgets 5111 */
-        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5111, "%s: File %s in section Queue at line %d: The default CPULIMIT %d should not be greater than the max CPULIMIT %d; ignoring the default CPULIMIT and using max CPULIMIT also as default CPULIMIT"), pname, fname, *lineNum, qp->defLimits[LSF_RLIMIT_CPU], qp->rLimits[LSF_RLIMIT_CPU]);
+        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5111, "%s: File %s in section Queue at line %d: The default CPULIMIT %d should not be greater than the max CPULIMIT %d; ignoring the default CPULIMIT and using max CPULIMIT also as default CPULIMIT"), pname, filename, *lineNum, qp->defLimits[LSF_RLIMIT_CPU], qp->rLimits[LSF_RLIMIT_CPU]);
         qp->defLimits[LSF_RLIMIT_CPU] = qp->rLimits[LSF_RLIMIT_CPU];
     }
 
     if (qp->defLimits[LSF_RLIMIT_RUN] != INFINIT_INT && qp->rLimits[LSF_RLIMIT_RUN] != INFINIT_INT && qp->defLimits[LSF_RLIMIT_RUN] > qp->rLimits[LSF_RLIMIT_RUN]) {
         /* catgets 5110 */
-        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5110, "%s: File %s in section Queue at line %d: The default RUNLIMIT %d should not be greater than the max RUNLIMIT %d; ignoring the default RUNLIMIT and using max RUNLIMIT also as default RUNLIMIT"), pname, fname, *lineNum, qp->defLimits[LSF_RLIMIT_RUN], qp->rLimits[LSF_RLIMIT_RUN]);
+        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5110, "%s: File %s in section Queue at line %d: The default RUNLIMIT %d should not be greater than the max RUNLIMIT %d; ignoring the default RUNLIMIT and using max RUNLIMIT also as default RUNLIMIT"), pname, filename, *lineNum, qp->defLimits[LSF_RLIMIT_RUN], qp->rLimits[LSF_RLIMIT_RUN]);
         qp->defLimits[LSF_RLIMIT_RUN] = qp->rLimits[LSF_RLIMIT_RUN];
     }
 
     if (hostSpec != NULL) {
-        checkCpuLimit (&hostSpec, &cpuFactor, useSysDefault, fname, lineNum, pname, info, options);
+        checkCpuLimit (&hostSpec, &cpuFactor, useSysDefault, filename, lineNum, pname, info, options);
     }
 
     if (cpuFactor == NULL && options & CONF_RETURN_HOSTSPEC) {
@@ -5084,7 +5084,7 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, char *fnam
             
             hostSpec = putstr_ (qp->defaultHostSpec);
             if (hostSpec && hostSpec[0]) {
-                checkCpuLimit (&hostSpec, &cpuFactor, useSysDefault, fname, lineNum, pname, info, options);
+                checkCpuLimit (&hostSpec, &cpuFactor, useSysDefault, filename, lineNum, pname, info, options);
                 }
             }
         }
@@ -5095,7 +5095,7 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, char *fnam
             hostSpec = putstr_ (pConf->param->defaultHostSpec);
             useSysDefault = TRUE;
             if (hostSpec && hostSpec[0]) {
-                checkCpuLimit (&hostSpec, &cpuFactor, useSysDefault, fname, lineNum, pname, info, options);
+                checkCpuLimit (&hostSpec, &cpuFactor, useSysDefault, filename, lineNum, pname, info, options);
                 }
             }
         }
@@ -5116,7 +5116,7 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, char *fnam
     }
 
     if (hostSpec && ((qp->hostSpec = putstr_ (hostSpec)) == NULL)) {
-        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "parseCpuAndRunLimit", "malloc", strlen (hostSpec) + 1);
+        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (hostSpec) + 1);
         lsberrno = LSBE_NO_MEM;
         FREEUP (hostSpec);
         cpuFactor = NULL;
@@ -5166,7 +5166,7 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, char *fnam
 }
 
 static int
-parseProcLimit (char *word, struct queueInfoEnt *qp, char *fname, size_t *lineNum, char *pname )
+parseProcLimit (char *word, struct queueInfoEnt *qp, char *filename, size_t *lineNum, char *pname )
 {
     char *sp = NULL;
     char *curWord = NULL;
@@ -5196,13 +5196,13 @@ parseProcLimit (char *word, struct queueInfoEnt *qp, char *fname, size_t *lineNu
             }
             if ((values[i] = my_atoi (curWord, INFINIT_INT, 0)) == INFINIT_INT) {
                 /* catgets 5302 */
-                ls_syslog (LOG_ERR, I18N (5302, "%s: File %s in section Queue ending at line %d: PROCLIMIT value <%s> isn't a positive integer; ignored"), pname, fname, *lineNum, curWord);
+                ls_syslog (LOG_ERR, I18N (5302, "%s: File %s in section Queue ending at line %d: PROCLIMIT value <%s> isn't a positive integer; ignored"), pname, filename, *lineNum, curWord);
                 return FALSE;
             }
         }
         if (getNextWord_ (&sp) != NULL) {
             /* catgets 5371 */
-            ls_syslog (LOG_ERR, I18N (5371, "%s: File %s in section Queue ending at line %d: PROCLIMIT has too many parameters; ignored. PROCLIMIT=[minimum [default]] maximum"), pname, fname, *lineNum);
+            ls_syslog (LOG_ERR, I18N (5371, "%s: File %s in section Queue ending at line %d: PROCLIMIT has too many parameters; ignored. PROCLIMIT=[minimum [default]] maximum"), pname, filename, *lineNum);
             return FALSE;
         }
         
@@ -5215,7 +5215,7 @@ parseProcLimit (char *word, struct queueInfoEnt *qp, char *fname, size_t *lineNu
             case 2:
                 if (values[0] > values[1]) {
                     /* catgets 5370 */
-                    ls_syslog (LOG_ERR, I18N (5370, "%s: File %s in section Queue ending at line %d: PROCLIMIT values <%d %d> are not valid; ignored. PROCLIMIT values must satisfy the following condition: 1 <= minimum <= maximum"), pname, fname, *lineNum, values[0], values[1]);
+                    ls_syslog (LOG_ERR, I18N (5370, "%s: File %s in section Queue ending at line %d: PROCLIMIT values <%d %d> are not valid; ignored. PROCLIMIT values must satisfy the following condition: 1 <= minimum <= maximum"), pname, filename, *lineNum, values[0], values[1]);
                     return FALSE;
                 }
                 else {
@@ -5227,7 +5227,7 @@ parseProcLimit (char *word, struct queueInfoEnt *qp, char *fname, size_t *lineNu
             case 3:
                 if (!(values[0] <= values[1] && values[1] <= values[2])) {
                     /* catgets 5374 */
-                    ls_syslog (LOG_ERR, I18N (5374, "%s: File %s in section Queue ending at line %d: PROCLIMIT value <%d %d %d> is not valid; ignored. PROCLIMIT values must satisfy the following condition: 1 <= minimum <= default <= maximum"), __func__, fname, *lineNum, values[0], values[1], values[2]);
+                    ls_syslog (LOG_ERR, I18N (5374, "%s: File %s in section Queue ending at line %d: PROCLIMIT value <%d %d %d> is not valid; ignored. PROCLIMIT values must satisfy the following condition: 1 <= minimum <= default <= maximum"), filename, filename, *lineNum, values[0], values[1], values[2]);
                     return FALSE;
                 }
                 else {
@@ -5245,7 +5245,7 @@ parseProcLimit (char *word, struct queueInfoEnt *qp, char *fname, size_t *lineNu
 }
 
 static int
-parseLimitAndSpec (char *word, int *limit, char **spec, char *hostSpec, char *param, struct queueInfoEnt *qp, char *fname, size_t *lineNum, char *pname )
+parseLimitAndSpec (char *word, int *limit, char **spec, char *hostSpec, char *param, struct queueInfoEnt *qp, char *filename, size_t *lineNum, char *pname )
 {
     int limitVal = -1;
     char *sp = NULL;
@@ -5266,7 +5266,7 @@ parseLimitAndSpec (char *word, int *limit, char **spec, char *hostSpec, char *pa
 
     if (*spec && hostSpec && strcmp (*spec, hostSpec) != 0) {
         /* catgets 5382 */
-        ls_syslog (LOG_ERR, I18N (5382, "%s: File %s in section Queue at line %d: host_spec for %s is multiply defined; ignoring <%s> and retaining last host_spec <%s>"), __func__, fname, *lineNum, param, *spec, hostSpec);
+        ls_syslog (LOG_ERR, I18N (5382, "%s: File %s in section Queue at line %d: host_spec for %s is multiply defined; ignoring <%s> and retaining last host_spec <%s>"), __func__, filename, *lineNum, param, *spec, hostSpec);
         lsberrno = LSBE_CONF_WARNING;
         FREEUP (*spec);
     }
@@ -5278,7 +5278,7 @@ parseLimitAndSpec (char *word, int *limit, char **spec, char *hostSpec, char *pa
     limitVal = my_atoi (word, INFINIT_INT / 60 + 1, -1);
     if (limitVal == INFINIT_INT) {
         /* catgets 5386 */
-        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5386, "%s: File %s in section Queue at line %d: Value <%s> of %s isn't a positive integer between 0 and %d; ignored."), __func__, fname, *lineNum, word, param, INFINIT_INT / 60);
+        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5386, "%s: File %s in section Queue at line %d: Value <%s> of %s isn't a positive integer between 0 and %d; ignored."), __func__, filename, *lineNum, word, param, INFINIT_INT / 60);
         lsberrno = LSBE_CONF_WARNING;
         sp = NULL;
     }
@@ -5292,7 +5292,7 @@ parseLimitAndSpec (char *word, int *limit, char **spec, char *hostSpec, char *pa
 
         if (limitVal == INFINIT_INT) {
             /* catgets 5386 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5386, "%s: File %s in section Queue at line %d: Value <%s> of %s isn't a positive integer between 0 and %d; ignored."), __func__, fname, *lineNum, word, param, INFINIT_INT / 60);
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5386, "%s: File %s in section Queue at line %d: Value <%s> of %s isn't a positive integer between 0 and %d; ignored."), __func__, filename, *lineNum, word, param, INFINIT_INT / 60);
             lsberrno = LSBE_CONF_WARNING;
             *limit = -1;
         }
@@ -5352,7 +5352,7 @@ getHostFactor (char *host)
 }
 
 static char *
-parseAdmins (char *admins, int options, char *fname, size_t *lineNum)
+parseAdmins (char *admins, int options, char *filename, size_t *lineNum)
 {
     
     char *expandAds;
@@ -5364,13 +5364,13 @@ parseAdmins (char *admins, int options, char *fname, size_t *lineNum)
     unsigned int len = 0;
 
     if (admins == NULL) {
-        ls_syslog (LOG_ERR, I18N_NULL_POINTER, __func__, "admins");
+        ls_syslog (LOG_ERR, I18N_NULL_POINTER, filename, "admins");
         return NULL;
     }
 
     expandAds = (char *)malloc( MAXLINELEN );
     if ( NULL == expandAds && ENOMEM == errno ) {
-        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", MAXLINELEN);
+        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, filename, "malloc", MAXLINELEN);
         lsberrno = LSBE_NO_MEM;
         return NULL;
     }
@@ -5388,7 +5388,7 @@ parseAdmins (char *admins, int options, char *fname, size_t *lineNum)
             }
             else {
                 if ((putIntoList (&expandAds, &len, "all", I18N_IN_QUEUE_ADMIN)) == NULL) {
-                        ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "expandGrp");
+                        ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, filename);
                         FREEUP (expandAds);
                         lsberrno = LSBE_NO_MEM;
                         return NULL;
@@ -5398,7 +5398,7 @@ parseAdmins (char *admins, int options, char *fname, size_t *lineNum)
         }
         else if ((pw = getpwlsfuser_ (word))) {
             if ((putIntoList(&expandAds, &len, pw->pw_name, I18N_IN_QUEUE_ADMIN)) == NULL) {
-                    ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "expandGrp");
+                    ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, filename);
                     FREEUP (expandAds);
                     lsberrno = LSBE_NO_MEM;
                     return NULL;
@@ -5410,7 +5410,7 @@ parseAdmins (char *admins, int options, char *fname, size_t *lineNum)
                 char **groupMembers = NULL;
                 unsigned int numMembers = 0;
                 if ((groupMembers = expandGrp (uGrp->group, &numMembers, USER_GRP)) == NULL) {
-                        ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "expandGrp");
+                        ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, filename);
                         FREEUP (expandAds);
                         lsberrno = LSBE_NO_MEM;
                         return NULL;
@@ -5419,7 +5419,7 @@ parseAdmins (char *admins, int options, char *fname, size_t *lineNum)
                     for ( unsigned int i = 0; i < numMembers; i++) {
                         if (putIntoList (&expandAds, &len, groupMembers[i], I18N_IN_QUEUE_ADMIN) == NULL) {
                             FREEUP (groupMembers);
-                            ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "expandGrp");
+                            ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, filename);
                             FREEUP (expandAds);
                             lsberrno = LSBE_NO_MEM;
                             return NULL;
@@ -5431,7 +5431,7 @@ parseAdmins (char *admins, int options, char *fname, size_t *lineNum)
             }
             else {
                 if (putIntoList(&expandAds, &len, uGrp->group, I18N_IN_QUEUE_ADMIN) == NULL) {
-                        ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "expandGrp");
+                        ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, filename);
                         FREEUP (expandAds);
                         lsberrno = LSBE_NO_MEM;
                         return NULL;
@@ -5445,7 +5445,7 @@ parseAdmins (char *admins, int options, char *fname, size_t *lineNum)
                 int i = 0;
                 while (unixGrp->gr_mem[i] != NULL) {
                     if (putIntoList (&expandAds, &len, unixGrp->gr_mem[i++], I18N_IN_QUEUE_ADMIN) == NULL) {
-                            ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "expandGrp");
+                            ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, filename);
                             FREEUP (expandAds);
                             lsberrno = LSBE_NO_MEM;
                             return NULL;
@@ -5455,7 +5455,7 @@ parseAdmins (char *admins, int options, char *fname, size_t *lineNum)
             }
             else {
                 if (putIntoList (&expandAds, &len, word, I18N_IN_QUEUE_ADMIN) == NULL) {
-                        ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "expandGrp");
+                        ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, filename);
                         FREEUP (expandAds);
                         lsberrno = LSBE_NO_MEM;
                         return NULL;
@@ -5465,10 +5465,10 @@ parseAdmins (char *admins, int options, char *fname, size_t *lineNum)
         }
         else {
             /* catgets 5390 */
-            ls_syslog (LOG_WARNING, I18N (5390, "%s: File %s at line %d: Unknown user or user group name <%s>; Maybe a windows user or of another domain."), __func__, fname, *lineNum, word); 
+            ls_syslog (LOG_WARNING, I18N (5390, "%s: File %s at line %d: Unknown user or user group name <%s>; Maybe a windows user or of another domain."), __func__, filename, *lineNum, word); 
             
             if ((putIntoList (&expandAds, &len, word, I18N_IN_QUEUE_ADMIN)) == NULL) {
-                    ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "expandGrp");
+                    ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, filename);
                     FREEUP (expandAds);
                     lsberrno = LSBE_NO_MEM;
                     return NULL;
@@ -5482,7 +5482,6 @@ parseAdmins (char *admins, int options, char *fname, size_t *lineNum)
 static char *
 putIntoList (char **list, unsigned int *len, char *string, char *listName)
 {
-    static char __func__] = "putIntoList";
     char *sp;
     unsigned long length = *len;
 
@@ -5496,7 +5495,7 @@ putIntoList (char **list, unsigned int *len, char *string, char *listName)
     sp = putstr_ (listName);
     if (isInList (*list, string) == TRUE) {
         /* catgets 5392 */
-        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5392, "%s: %s is repeatedly specified %s; ignoring"), fname, string, sp);  
+        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5392, "%s: %s is repeatedly specified %s; ignoring"), __func__, string, sp);  
         FREEUP (sp);
         return *list;
     }
@@ -5504,7 +5503,7 @@ putIntoList (char **list, unsigned int *len, char *string, char *listName)
     if (length <= strlen (*list) + strlen (string) + 2) {
         char *temp = (char *) myrealloc (*list, 2 * length);
         if ( NULL == temp && ENOMEM == errno ) {
-            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "myrealloc", 2 * length);
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "myrealloc", 2 * length);
             FREEUP (*list);
             lsberrno = LSBE_NO_MEM;
             return NULL;
@@ -5544,8 +5543,10 @@ isInList (char *list, char *string)
 static int
 setDefaultHost (struct lsInfo *info)
 {
-    size_t *override = (size_t *) TRUE;
+    size_t *override = NULL;
     struct hostInfoEnt *host = NULL;
+
+    *override = TRUE;
     
     if (handleHostMem ()) {
         return -1;
@@ -5563,7 +5564,7 @@ setDefaultHost (struct lsInfo *info)
         }
 
         if (addHostEnt( host, &cConf->hosts[i], override) == FALSE) {
-            ls_syslog (LOG_ERR, I18N_FUNC_FAIL, "setDefaultHost", "addHostEnt");
+            ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "addHostEnt" );
             return -1;
         }
     }
@@ -5573,20 +5574,23 @@ setDefaultHost (struct lsInfo *info)
 static int
 setDefaultUser (void)
 {
+    char *functionName = malloc( strlen(  __func__ ) + 1);
+
+    strcpy( functionName, __func__ ); 
 
     if (handleUserMem ()) {
         return -1;
     }
 
-    if (!addUser("default", INFINIT_INT, INFINIT_FLOAT, "setDefaultUser", TRUE)) {
+    if (!addUser( "default", INFINIT_INT, INFINIT_FLOAT, functionName, TRUE)) {
         return FALSE;
     }
 
     assert( numofusers > 0 );
-    uConf->users = (struct userInfoEnt *)malloc( (unsigned long)numofusers * sizeof( struct userInfoEnt ) );
+    uConf->users = malloc( numofusers * sizeof( struct userInfoEnt ) );
     if(  0 == numofusers || ( NULL == uConf->users  && ENOMEM == errno ) ) {
         //assert( numofusers >= 0 );
-        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "setDefaultUser", "malloc", (unsigned long)numofusers * sizeof (struct userInfoEnt));
+        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", numofusers * sizeof (struct userInfoEnt));
         lsberrno = LSBE_CONF_FATAL;
         freeWorkUser (TRUE);
         freeUConf (uConf, FALSE);
@@ -5608,7 +5612,7 @@ handleUserMem (void)
     if (uConf == NULL) {
         uConf = malloc (sizeof (struct userConf));
         if (NULL == uConf && ENOMEM == errno ) {
-            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "handleUserMem", "malloc", sizeof (struct userConf));
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", sizeof (struct userConf));
             lsberrno = LSBE_CONF_FATAL;
             return -1;
         }
@@ -5633,7 +5637,7 @@ handleHostMem (void)
     if (hConf == NULL) {
         hConf = malloc (sizeof (struct hostConf));
         if( NULL == hConf && ENOMEM == errno ) {
-            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "handleHostMem", "malloc", sizeof (struct hostConf));
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", sizeof (struct hostConf));
             lsberrno = LSBE_CONF_FATAL;
             return -1;
         }
@@ -5652,11 +5656,12 @@ handleHostMem (void)
 }
 
 int
-parseSigActCmd (struct queueInfoEnt *qp, char *linep, char *fname, size_t *lineNum, char *section)
+parseSigActCmd (struct queueInfoEnt *qp, char *linep, char *filename, size_t *lineNum, char *section)
 {
     
-    char *actClass, *sigActCmd;
-    int actClassValue;
+    char *actClass  = NULL;
+    char *sigActCmd = NULL;
+    int actClassValue = 0;
 
     while (isspace (*linep)) {
         linep++;
@@ -5664,8 +5669,9 @@ parseSigActCmd (struct queueInfoEnt *qp, char *linep, char *fname, size_t *lineN
 
     while (linep != NULL && linep[0] != '\0') {
         if ((actClass = getNextWord1_ (&linep)) == NULL) {
-            if (fname) {
-                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5408, "%s:File %s %s at line %d: SUSPEND, RESUME or TERMINATE is missing"), __func__, fname, section, *lineNum);  /* catgets 5408 */
+            if (filename) {
+                /* catgets 5408 */
+                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5408, "%s:File %s %s at line %d: SUSPEND, RESUME or TERMINATE is missing"), __func__, filename, section, *lineNum);
             }
             lsberrno = LSBE_CONF_WARNING;
             return -1;
@@ -5680,8 +5686,8 @@ parseSigActCmd (struct queueInfoEnt *qp, char *linep, char *fname, size_t *lineN
             actClassValue = 2;
         }
         else {
-            if (fname) {
-                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5409, "%s:File %s %s at line %d: wrong KEYWORD"), __func__, fname, section, *lineNum);    /* catgets 5409 */
+            if (filename) {
+                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5409, "%s:File %s %s at line %d: wrong KEYWORD"), __func__, filename, section, *lineNum);    /* catgets 5409 */
             }
             lsberrno = LSBE_CONF_WARNING;
             return -2;
@@ -5692,8 +5698,8 @@ parseSigActCmd (struct queueInfoEnt *qp, char *linep, char *fname, size_t *lineN
         }
 
         if (*linep != '[') {
-            if (fname) {
-                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5410, "%s:File %s %s at line %d: '[' is missing"), __func__, fname, section, *lineNum);   /* catgets 5410 */
+            if (filename) {
+                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5410, "%s:File %s %s at line %d: '[' is missing"), __func__, filename, section, *lineNum);   /* catgets 5410 */
             }
             lsberrno = LSBE_CONF_WARNING;
             return -3;
@@ -5709,9 +5715,9 @@ parseSigActCmd (struct queueInfoEnt *qp, char *linep, char *fname, size_t *lineN
             linep++;
         }
         if ((linep == NULL || linep[0] == '\0') || (*linep != ']')) {
-            if (fname) {
+            if (filename) {
                 /* catgets 5411 */
-                ls_syslog (LOG_ERR, I18N (5411, "%s:File %s %s at line %d: ']' is missing"), __func__, fname, section, *lineNum);
+                ls_syslog (LOG_ERR, I18N (5411, "%s:File %s %s at line %d: ']' is missing"), __func__, filename, section, *lineNum);
             }
             lsberrno = LSBE_CONF_WARNING;
             return -5;
@@ -5728,9 +5734,9 @@ parseSigActCmd (struct queueInfoEnt *qp, char *linep, char *fname, size_t *lineN
         }
         else if (actClassValue == 1) {
             if (strcmp (sigActCmd, "CHKPNT") == 0) {
-                if (fname) {
+                if (filename) {
                     /* catgets 5412 */
-                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5412, "%s: File %s %s at line %d: 'CHKPNT' is not valid in RESUME"), __func__, fname, section, *lineNum);
+                    ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5412, "%s: File %s %s at line %d: 'CHKPNT' is not valid in RESUME"), __func__, filename, section, *lineNum);
                 }
                 return -7;
             }
@@ -5759,11 +5765,11 @@ parseSigActCmd (struct queueInfoEnt *qp, char *linep, char *fname, size_t *lineN
 
 
 int
-terminateWhen (struct queueInfoEnt *qp, char *linep, char *fname, size_t *lineNum, char *section)
+terminateWhen (struct queueInfoEnt *qp, char *linep, char *filename, size_t *lineNum, char *section)
 {
     
 
-    char *sigName;
+    char *sigName = NULL;
     while (isspace (*linep)) {
         linep++;
     }
@@ -5781,9 +5787,9 @@ terminateWhen (struct queueInfoEnt *qp, char *linep, char *fname, size_t *lineNu
                 qp->sigMap[-sigNameToValue_ ("SIG_SUSP_WINDOW")] = -10;
             }
             else {
-                if (fname) {
+                if (filename) {
                     /* catgets 5413 */
-                    ls_syslog (LOG_ERR, I18N (5413, "%s:File %s %s at line %d: LOAD or WINDOW is missing"), __func__, fname, section, *lineNum);
+                    ls_syslog (LOG_ERR, I18N (5413, "%s:File %s %s at line %d: LOAD or WINDOW is missing"), __func__, filename, section, *lineNum);
                 }
                 lsberrno = LSBE_CONF_WARNING;
                 return -1;
@@ -5825,8 +5831,8 @@ checkAllOthers (char *word, int *hasAllOthers)
 static int
 getReserve (char *reserve, struct queueInfoEnt *qp, char *filename, unsigned int lineNum)
 {
-    static char __func__] = "getReserve";
-    char *sp, *cp;
+    char *sp = NULL;
+    char *cp = NULL;
     
     if ((sp = strstr (reserve, "MAX_RESERVE_TIME")) != NULL)
         {
@@ -5835,13 +5841,13 @@ getReserve (char *reserve, struct queueInfoEnt *qp, char *filename, unsigned int
             sp++;
         if (*sp == '\0')
             {
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5431, "%s: File %s in section Queue ending at line %d: MAX_RESERVE_TIME is specified without period time; ignoring SLOT_RESERVE"), fname, filename, lineNum);  /* catgets 5431 */
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5431, "%s: File %s in section Queue ending at line %d: MAX_RESERVE_TIME is specified without period time; ignoring SLOT_RESERVE"), __func__, filename, lineNum);  /* catgets 5431 */
             lsberrno = LSBE_CONF_WARNING;
             return -1;
             }
         if (*sp != '[')
             {
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5432, "%s: File %s in section Queue ending at line %d: MAX_RESERVE_TIME <%s> is specified without '['; ignoring SLOT_RESERVE"), fname, filename, lineNum, reserve);    /* catgets 5432 */
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5432, "%s: File %s in section Queue ending at line %d: MAX_RESERVE_TIME <%s> is specified without '['; ignoring SLOT_RESERVE"), __func__, filename, lineNum, reserve);    /* catgets 5432 */
             lsberrno = LSBE_CONF_WARNING;
             return -1;
             }
@@ -5850,7 +5856,7 @@ getReserve (char *reserve, struct queueInfoEnt *qp, char *filename, unsigned int
             sp++;
         if (*sp == '\0' || (*sp != ']' && *sp != ' '))
             {
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5433, "%s: File %s in section Queue ending at line %d: MAX_RESERVE_TIME is specified without ']'; ignoring SLOT_RESERVE"), fname, filename, lineNum);  /* catgets 5433 */
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5433, "%s: File %s in section Queue ending at line %d: MAX_RESERVE_TIME is specified without ']'; ignoring SLOT_RESERVE"), __func__, filename, lineNum);  /* catgets 5433 */
             lsberrno = LSBE_CONF_WARNING;
             return -1;
             }
@@ -5860,7 +5866,7 @@ getReserve (char *reserve, struct queueInfoEnt *qp, char *filename, unsigned int
                 sp++;
             if (*sp != ']')
                 {
-                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5434, "%s: File %s in section Queue ending at line %d: MAX_RESERV_TIME is specified without ']';ignoring SLOT_RESERVE"), fname, filename, lineNum);    /* catgets 5434 */
+                ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5434, "%s: File %s in section Queue ending at line %d: MAX_RESERV_TIME is specified without ']';ignoring SLOT_RESERVE"), __func__, filename, lineNum);    /* catgets 5434 */
                 lsberrno = LSBE_CONF_WARNING;
                 return -1;
                 }
@@ -5869,7 +5875,7 @@ getReserve (char *reserve, struct queueInfoEnt *qp, char *filename, unsigned int
         qp->slotHoldTime = my_atoi (cp, INFINIT_INT, 0);
         if (qp->slotHoldTime == INFINIT_INT)
             {
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5435, "%s: File %s in section Queue ending at line %d: Value <%s> of MAX_RESERV_TIME for queue <%s> isn't an integer between 1 and %d; ignored."), fname, filename, lineNum, cp, qp->queue, INFINIT_INT);  /* catgets 5435 */
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5435, "%s: File %s in section Queue ending at line %d: Value <%s> of MAX_RESERV_TIME for queue <%s> isn't an integer between 1 and %d; ignored."), __func__, filename, lineNum, cp, qp->queue, INFINIT_INT);  /* catgets 5435 */
             lsberrno = LSBE_CONF_WARNING;
             *sp = ']';
             return -1;
@@ -5880,7 +5886,7 @@ getReserve (char *reserve, struct queueInfoEnt *qp, char *filename, unsigned int
         {
         if (qp->slotHoldTime == INFINIT_INT)
             {
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5436, "%s: File %s in section Queue ending at line %d: BACKFILL is specified without MAX_RESERV_TIME for SLOT_RESERVE; ignoring"), fname, filename, lineNum);  /* catgets 5436 */
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5436, "%s: File %s in section Queue ending at line %d: BACKFILL is specified without MAX_RESERV_TIME for SLOT_RESERVE; ignoring"), __func__, filename, lineNum);  /* catgets 5436 */
             lsberrno = LSBE_CONF_WARNING;
             return -1;
             }
@@ -6069,8 +6075,9 @@ freeUnixGrp (struct group *unixGrp)
         {
         FREEUP (unixGrp->gr_name);
         FREEUP (unixGrp->gr_passwd);
-        for (count = 0; unixGrp->gr_mem[count]; count++)
+        for (count = 0; unixGrp->gr_mem[count]; count++) {
             FREEUP (unixGrp->gr_mem[count]);
+        }
         FREEUP (unixGrp->gr_mem);
         FREEUP (unixGrp);
         unixGrp = NULL;
@@ -6101,7 +6108,7 @@ copyUnixGrp (struct group *unixGrp)
     }
     
     assert( count + 1 >= 0 );
-    unixGrpCopy->gr_mem = (char **)calloc( sizeof (char *), (unsigned long)(count + 1) );
+    unixGrpCopy->gr_mem = calloc( sizeof (char *), (count + 1) );
     if ( NULL == unixGrpCopy->gr_mem && ENOMEM == errno ) {
         goto errorCleanup;
     }
@@ -6113,7 +6120,7 @@ copyUnixGrp (struct group *unixGrp)
     
     return unixGrpCopy;
     
-errorCleanup:
+errorCleanup: // FIXME FIXME FIXME remove goto label
     freeUnixGrp (unixGrpCopy);
     unixGrpCopy = NULL;
     return NULL;
@@ -6161,7 +6168,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
     inTable = (struct inNames **)calloc ( (unsigned long)cConf->numHosts, sizeof (struct inNames *));
     if( NULL == inTable && ENOMEM == errno ) {
         if (result > -2) {
-            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "resolveBatchNegHosts()", "malloc");
+            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
             result = -1;
         }
 
@@ -6186,14 +6193,14 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
     }
     else {
         inTableSize  = cConf->numHosts;
-        printf( "we done goodfedup in resolveBatchNegHosts()\n");
+        fprintf( stderr, "we done goodfedup in %s\n", __func__);
     }
 
     // assert( cConf->numHosts >= 0 );
-    outTable = (char **)calloc( (unsigned long)cConf->numHosts, sizeof (char *));
+    outTable = (char **)calloc(  cConf->numHosts, sizeof (char *));
     if( NULL == outTable && ENOMEM == errno ) {
         if (result > -2) {
-            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "resolveBatchNegHosts()", "malloc");
+            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
             result = -1;
         }
 
@@ -6218,12 +6225,12 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
     }
     else {
         outTableSize = cConf->numHosts;
-        printf( "we done goofedup again! in resolveBatchNegHosts()\n");
+        fprintf( stderr, "we done goofedup again in %s\n", __func__ );
     }
     
     if (!buffer || !inTable || !outTable) {
         if (result > -2) {
-            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "resolveBatchNegHosts()", "malloc");
+            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
             result = -1;
         }
 
@@ -6252,7 +6259,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
             if (word[1] == '\0') {
                 result = -2;
                 if (result > -2) {
-                    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "resolveBatchNegHosts()", "malloc");
+                    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
                     result = -1;
                 }
 
@@ -6282,7 +6289,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
                 char **grpMembers = expandGrp (word, &num, HOST_GRP);
                 if (!grpMembers) {
                     if (result > -2) {
-                        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "resolveBatchNegHosts()", "malloc");
+                        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
                         result = -1;
                     }
 
@@ -6315,7 +6322,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
                     word--;
                     freeSA (grpMembers, num);
                     /* catgets 5905 */
-                    ls_syslog (LOG_ERR, I18N (5905, "%s: host/group name \"%s\" is ignored."), "resolveBatchNegHosts()", word);
+                    ls_syslog (LOG_ERR, I18N (5905, "%s: host/group name \"%s\" is ignored."), __func__, word);
                     lsberrno = LSBE_CONF_WARNING;
                     continue;
                 }
@@ -6326,7 +6333,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
                         freeSA (grpMembers, num);
                         result = -3;
                         if (result > -2) {
-                            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "resolveBatchNegHosts()", "malloc");
+                            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
                             result = -1;
                         }
 
@@ -6354,7 +6361,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
                     if (!outTable[neg_num]) {
                         freeSA (grpMembers, num);
                         if (result > -2) {
-                            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "resolveBatchNegHosts()", "malloc");
+                            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
                             result = -1;
                         }
 
@@ -6384,7 +6391,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
                         outTable = realloc (outTable, (unsigned long)(cConf->numHosts + neg_num) * sizeof (char *));
                         if ( NULL == outTable && ENOMEM == errno ) {
                                 if (result > -2) {
-                                    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "resolveBatchNegHosts()", "malloc");
+                                    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
                                     result = -1;
                                 }
 
@@ -6415,7 +6422,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
                 outTable[neg_num] = strdup (word);
                 if (!outTable[neg_num]) {
                         if (result > -2) {
-                            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "resolveBatchNegHosts()", "malloc");
+                            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
                             result = -1;
                         }
 
@@ -6445,7 +6452,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
                     outTable = realloc (outTable, (unsigned long)(cConf->numHosts + neg_num) * sizeof (char *));
                     if ( NULL == outTable && ENOMEM == errno ) {
                             if (result > -2) {
-                                ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "resolveBatchNegHosts()", "malloc");
+                                ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
                                 result = -1;
                             }
 
@@ -6484,7 +6491,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
                 if (strlen (ptr_level) && !isdigit (ptr_level[0])) {
                     result = -2;
                         if (result > -2) {
-                            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "resolveBatchNegHosts()", "malloc");
+                            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
                             result = -1;
                         }
 
@@ -6511,7 +6518,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
                 ptr_level = strdup (ptr_level);
                 if (!ptr_level) {
                         if (result > -2) {
-                            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "resolveBatchNegHosts()", "malloc");
+                            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
                             result = -1;
                         }
 
@@ -6547,7 +6554,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
                     inTable = realloc (inTable, (unsigned long)(cConf->numHosts + miniTableSize) * sizeof (struct inNames *));
                     if ( NULL == inTable && ENOMEM == errno ) {
                             if (result > -2) {
-                                ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "resolveBatchNegHosts()", "malloc");
+                                ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
                                 result = -1;
                             }
 
@@ -6577,7 +6584,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
 
                 if (expandWordAll (&size, &in_num, inTable, ptr_level) == FALSE) {
                         if (result > -2) {
-                            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "resolveBatchNegHosts()", "malloc");
+                            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
                             result = -1;
                         }
 
@@ -6606,7 +6613,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
                 char **grpMembers = expandGrp (word, &num, HOST_GRP);
                 if (!grpMembers) {
                         if (result > -2) {
-                            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "resolveBatchNegHosts()", "malloc");
+                            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
                             result = -1;
                         }
 
@@ -6641,7 +6648,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
                         inTable = realloc (inTable, (unsigned long)(cConf->numHosts +  miniTableSize) * sizeof (struct inNames *));
                         if ( NULL == inTable && ENOMEM == errno ) {
                                 if (result > -2) {
-                                    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "resolveBatchNegHosts()", "malloc");
+                                    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
                                     result = -1;
                                 }
 
@@ -6670,7 +6677,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
                     //}
                     if (expandWordAll (&size, &in_num, inTable, ptr_level) == FALSE) {
                             if (result > -2) {
-                                ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "resolveBatchNegHosts()", "malloc");
+                                ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
                                 result = -1;
                             }
 
@@ -6699,7 +6706,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
                         cur_size = fillCell_ (&inTable[in_num], grpMembers[j], ptr_level);
                         if (!cur_size) {
                                 if (result > -2) {
-                                    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "resolveBatchNegHosts()", "malloc");
+                                    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
                                     result = -1;
                                 }
 
@@ -6730,7 +6737,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
                             inTable =  realloc (inTable, (unsigned long)(cConf->numHosts + in_num) * sizeof (struct inNames *));
                             if ( NULL == inTable && ENOMEM == errno ) {
                                     if (result > -2) {
-                                        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "resolveBatchNegHosts()", "malloc");
+                                        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
                                         result = -1;
                                     }
 
@@ -6765,7 +6772,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
                 cur_size = fillCell_ (&inTable[in_num], word, ptr_level);
                 if (!cur_size) {
                         if (result > -2) {
-                            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "resolveBatchNegHosts()", "malloc");
+                            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
                             result = -1;
                         }
 
@@ -6796,7 +6803,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
                     inTable = realloc (inTable, (unsigned long)(cConf->numHosts +  in_num) * sizeof (struct inNames *));
                     if ( NULL == inTable && ENOMEM == errno ) {
                             if (result > -2) {
-                                ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "resolveBatchNegHosts()", "malloc");
+                                ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
                                 result = -1;
                             }
 
@@ -6869,7 +6876,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
         
         result = -3;
         if (result > -2) {
-            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "resolveBatchNegHosts()", "malloc");
+            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
             result = -1;
         }
         for ( unsigned int j = 0; j < in_num; j++) {
@@ -6896,7 +6903,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
     outHosts[0] = malloc ( (unsigned long)(size + in_num ) );
     if ( NULL == outHosts[0] && ENOMEM == errno ) {
         if (result > -2) {
-            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "resolveBatchNegHosts()", "malloc");
+            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
             result = -1;
         }
 
@@ -6990,7 +6997,7 @@ checkJobAttaDir (char *path)
 
 
 static int
-parseDefAndMaxLimits (struct keymap key, int *defaultVal, int *maxVal, char *fname, size_t *lineNum, char *pname)
+parseDefAndMaxLimits (struct keymap key, int *defaultVal, int *maxVal, char *filename, size_t *lineNum, char *pname)
 {
     
     char *sp;
@@ -7009,7 +7016,7 @@ parseDefAndMaxLimits (struct keymap key, int *defaultVal, int *maxVal, char *fna
         *defaultVal = my_atoi (defaultLimit, INFINIT_INT, 0);
         if (INFINIT_INT == *defaultVal ) {
             /* catgets 5387 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5387, "%s: File %s in section Queue at line %d: Default value <%s> of %s isn't a positive integer between 0 and %d; ignored."), pname, fname, *lineNum, defaultLimit, key.key, INFINIT_INT);
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5387, "[%s] %s: File %s in section Queue at line %d: Default value <%s> of %s isn't a positive integer between 0 and %d; ignored."), __func__, pname, filename, *lineNum, defaultLimit, key.key, INFINIT_INT);
             lsberrno = LSBE_CONF_WARNING;
         }
         
@@ -7020,7 +7027,7 @@ parseDefAndMaxLimits (struct keymap key, int *defaultVal, int *maxVal, char *fna
     
     if ((*maxVal = my_atoi (maxLimit, INFINIT_INT, 0)) == INFINIT_INT) {
         /* catgets 5388 */
-        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5388, "%s: File %s in section Queue at line %d: Maximum value <%s> of %s isn't a positive integer between 0 and %d; ignored."), pname, fname, *lineNum, maxLimit, key.key, INFINIT_INT);
+        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5388, "[%s] %s: File %s in section Queue at line %d: Maximum value <%s> of %s isn't a positive integer between 0 and %d; ignored."), __func__, pname, filename, *lineNum, maxLimit, key.key, INFINIT_INT);
         lsberrno = LSBE_CONF_WARNING;
     }
     
@@ -7028,7 +7035,7 @@ parseDefAndMaxLimits (struct keymap key, int *defaultVal, int *maxVal, char *fna
     
     if ((*defaultVal != INFINIT_INT) && (*maxVal != INFINIT_INT) && (*defaultVal > *maxVal)) {
         /* catgets 5112 */
-        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5112, "%s: File %s in section Queue at line %d: The default %s %d should not be greater than the max %d; ignoring the default and using max value also as default %s"), pname, fname, *lineNum, key.key, *defaultVal, *maxVal, key.key);
+        ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5112, "[%s] %s: File %s in section Queue at line %d: The default %s %d should not be greater than the max %d; ignoring the default and using max value also as default %s"), __func__, pname, filename, *lineNum, key.key, *defaultVal, *maxVal, key.key);
         *defaultVal = *maxVal;
     }
     return 0;
@@ -7037,7 +7044,7 @@ parseDefAndMaxLimits (struct keymap key, int *defaultVal, int *maxVal, char *fna
 
 
 static int
-parseQFirstHost (char *myWord, int *haveFirst, char *pname, size_t *lineNum, char *fname, char *section)
+parseQFirstHost (char *myWord, int *haveFirst, char *pname, size_t *lineNum, char *filename, char *section)
 {
     struct groupInfoEnt *gp;
     int needCheck = TRUE;
@@ -7047,7 +7054,7 @@ parseQFirstHost (char *myWord, int *haveFirst, char *pname, size_t *lineNum, cha
         
         if (*haveFirst) {
             /* catgets 5439 */
-            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5439, "%s: File %s%s ending at line %d : Multiple first execution hosts specified:<%s>; ignored."), pname, fname, section, *lineNum, myWord);
+            ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5439, "[%s] %s: File %s%s ending at line %d : Multiple first execution hosts specified:<%s>; ignored."), __func__, pname, filename, section, *lineNum, myWord);
             lsberrno = LSBE_CONF_WARNING;
             FREEUP (myWord);
             return 1;
@@ -7057,7 +7064,7 @@ parseQFirstHost (char *myWord, int *haveFirst, char *pname, size_t *lineNum, cha
             if (!strcmp (myWord, "others"))
                 {
                 /* catgets 5900 */
-                ls_syslog (LOG_ERR, I18N (5900, "%s: File %s%s ending at line %d : \"others\" specified as first execution host; ignored."), pname, fname, section, *lineNum);
+                ls_syslog (LOG_ERR, I18N (5900, "[%s] %s: File %s%s ending at line %d : \"others\" specified as first execution host; ignored."), __func__, pname, filename, section, *lineNum);
                 lsberrno = LSBE_CONF_WARNING;
                 FREEUP (myWord);
                 return 1;
@@ -7065,7 +7072,7 @@ parseQFirstHost (char *myWord, int *haveFirst, char *pname, size_t *lineNum, cha
             if (!strcmp (myWord, "all"))
                 {
                 /* catgets 5901 */
-                ls_syslog (LOG_ERR, I18N (5901, "%s: File %s%s ending at line %d : \"all\" specified as first execution host; ignored."), pname, fname, section, *lineNum);
+                ls_syslog (LOG_ERR, I18N (5901, "[%s] %s: File %s%s ending at line %d : \"all\" specified as first execution host; ignored."), __func__, pname, filename, section, *lineNum);
                 lsberrno = LSBE_CONF_WARNING;
                 FREEUP (myWord);
                 return 1;
@@ -7075,13 +7082,13 @@ parseQFirstHost (char *myWord, int *haveFirst, char *pname, size_t *lineNum, cha
             if (gp != NULL)
                 {
                 /* catgets 5902 */
-                ls_syslog (LOG_ERR, I18N (5902, "%s: File %s%s ending at line %d : host group <%s> specified as first execution host; ignored."), pname, fname, section, *lineNum, myWord);
+                ls_syslog (LOG_ERR, I18N (5902, "[%s] %s: File %s%s ending at line %d : host group <%s> specified as first execution host; ignored."),__func__, pname, filename, section, *lineNum, myWord);
                 lsberrno = LSBE_CONF_WARNING;
                 FREEUP (myWord);
                 return 1;
             }
             /* catgets 5904 */
-            ls_syslog (LOG_ERR, I18N (5904, "%s: File %s%s ending at line %d : Invalid first execution host <%s>, not a valid host name; ignored."),  pname, fname, section, *lineNum, myWord);
+            ls_syslog (LOG_ERR, I18N (5904, "[%s] %s: File %s%s ending at line %d : Invalid first execution host <%s>, not a valid host name; ignored."), __func__, pname, filename, section, *lineNum, myWord);
             lsberrno = LSBE_CONF_WARNING;
             FREEUP (myWord);
             return 1;
