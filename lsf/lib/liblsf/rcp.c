@@ -101,11 +101,11 @@ parseXferArg (char *arg, char **userName, char **hostName, char **fName)
     else
         {
             free (freeup_tmp);
-            return (-1);
+            return -1;
         }
 
     free (freeup_tmp);
-    return (0);
+    return 0;
 }
 
 int
@@ -119,117 +119,114 @@ doXferRcp (lsRcpXfer * lsXfer, int option)
         int local_errno = 0;
         // int n = 0 ;
         int status = 0;
-        char __func__] = "doXferRcp";
 
         if ((lsXfer->iOptions & O_APPEND) || (option & SPOOL_BY_LSRCP)) {
                 
                 if (logclass & (LC_FILE)) {
-                        ls_syslog (LOG_DEBUG, "%s: using %s to copy '%s' to '%s'", fname, RSHCMD, lsXfer->ppszHostFnames[0], lsXfer->ppszDestFnames[0]);
+                        ls_syslog (LOG_DEBUG, "%s: using %s to copy '%s' to '%s'", __func__, RSHCMD, lsXfer->ppszHostFnames[0], lsXfer->ppszDestFnames[0]);
                 }
                 
                 if (pipe (rcpp) < 0) {
-                        return (-1);
+                        return -1;
                 }
 
                 switch (pid = fork ()) {
 
                         case 0:
-                                close (rcpp[0]);
+                            close (rcpp[0]);
 
-                                if (rcpp[1])
-                                {
-                                        if (logclass & (LC_FILE))
-                                                ls_syslog (LOG_DEBUG, "%s: child: re-directing stdout, stderr", fname);
-                                        
-                                        close (STDOUT_FILENO);
-                                        close (STDERR_FILENO);
-                                        
-                                        if (dup2 (rcpp[1], STDOUT_FILENO) < 0)
-                                                return (-1);
+                            if (rcpp[1])
+                            {
+                                    if (logclass & (LC_FILE))
+                                            ls_syslog (LOG_DEBUG, "%s: child: re-directing stdout, stderr", __func__);
+                                    
+                                    close (STDOUT_FILENO);
+                                    close (STDERR_FILENO);
+                                    
+                                    if (dup2 (rcpp[1], STDOUT_FILENO) < 0)
+                                            return -1;
 
-                                        if (dup2 (rcpp[1], STDERR_FILENO) < 0)
-                                                return (-1);
+                                    if (dup2 (rcpp[1], STDERR_FILENO) < 0)
+                                            return -1;
 
-                                        close (rcpp[1]);
-                                }
+                                    close (rcpp[1]);
+                            }
 
-                                if ((sourceFh = open (lsXfer->ppszHostFnames[0], O_RDONLY, 0)) < 0) {
-                                        return (-1);
-                                }
-                                else {
-                                        close (STDIN_FILENO);
-                                        
-                                        if (dup2 (sourceFh, STDIN_FILENO)) {
-                                                return (-1);
-                                        }
+                            if ((sourceFh = open (lsXfer->ppszHostFnames[0], O_RDONLY, 0)) < 0) {
+                                    return -1;
+                            }
+                            else {
+                                    close (STDIN_FILENO);
+                                    
+                                    if (dup2 (sourceFh, STDIN_FILENO)) {
+                                            return -1;
+                                    }
 
-                                        close (sourceFh);
-                                }
+                                    close (sourceFh);
+                            }
 
-                                if ((option & SPOOL_BY_LSRCP)) {
-                                        sprintf (szRshDest, "cat > %s", lsXfer->ppszDestFnames[0]);
-                                }
-                                else {
-                                        sprintf (szRshDest, "cat >>! %s", lsXfer->ppszDestFnames[0]);
-                                }
-                                
-                                execlp (RSHCMD, RSHCMD, lsXfer->szDest, szRshDest, NULL);
-                                
-                                return (-1);
-                                
-                                // break;
+                            if ((option & SPOOL_BY_LSRCP)) {
+                                    sprintf (szRshDest, "cat > %s", lsXfer->ppszDestFnames[0]);
+                            }
+                            else {
+                                    sprintf (szRshDest, "cat >>! %s", lsXfer->ppszDestFnames[0]);
+                            }
+                            
+                            execlp (RSHCMD, RSHCMD, lsXfer->szDest, szRshDest, NULL);
+                            
+                            return -1;
+                            
+                            break;
 
                         case -1:
                         
-                                if (logclass & (LC_FILE)) {
-                                        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "fork");
-                                }
-                                
-                                close (rcpp[0]);
-                                close (rcpp[1]);
-                                return (-1);
+                            if (logclass & (LC_FILE)) {
+                                    ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "fork");
+                            }
+                            
+                            close (rcpp[0]);
+                            close (rcpp[1]);
+                            return -1;
 
-                                // break;   // FIXME FIXME FIXME no breat at the end of this case
-                                                        //      attach debugger to see if adding the break is 
-                                                        //      correct behaviour.
-
+                        break;
                         default:
-                                close (rcpp[1]); 
-                                // FIXME FIXME FIXME FIXME FIXME 
-                                //
-                                //  DANGER WARNING DANGER: BREAK STATEMENT MISSING
-                                //
-                                // 
+                            close (rcpp[1]); 
+                            // FIXME FIXME FIXME FIXME FIXME 
+                            //
+                            //  DANGER WARNING DANGER: BREAK STATEMENT MISSING
+                            //
+                            // 
 
-                                ssize_t cc = read (rcpp[0], errMsg, 1024);
-                                ssize_t i = 0;
-                                for ( i = cc; cc > 0;) {
+                            ssize_t cc = read (rcpp[0], errMsg, 1024);
+                            ssize_t i = 0;
+                            for ( i = cc; cc > 0;) {
 
-                                        assert( 1024 - i >= 0 );
-                                        cc = read (rcpp[0], errMsg + i, (size_t)(1024 - i));
-                                        if (cc > 0) {
-                                                i += cc;
-                                        }
-                                }
+                                    assert( 1024 - i >= 0 );
+                                    cc = read (rcpp[0], errMsg + i, (size_t)(1024 - i));
+                                    if (cc > 0) {
+                                            i += cc;
+                                    }
+                            }
 
-                                local_errno = errno;
-                                close (rcpp[0]);
+                            local_errno = errno;
+                            close (rcpp[0]);
 
-                                if (waitpid (pid, 0, 0) < 0 && errno != ECHILD) {
-                                        return (-1);
-                                }
+                            if (waitpid (pid, 0, 0) < 0 && errno != ECHILD) {
+                                    return -1;
+                            }
 
-                                if (cc < 0) {
-                                        fprintf (stderr, "%s\n", strerror (local_errno));
-                                        return (-1);
-                                }
+                            if (cc < 0) {
+                                    fprintf (stderr, "%s\n", strerror (local_errno));
+                                    return -1;
+                            }
 
-                                if (i > 0) {
-                                        fprintf (stderr, "%s: %s", RSHCMD, errMsg);
-                                        return (-1);
-                                }
-                                
-                                return (0);
+                            if (i > 0) {
+                                    fprintf (stderr, "%s: %s", RSHCMD, errMsg);
+                                    return -1;
+                            }
+                            
+                            return 0;
+                        break;
                 }
         
         } else {
@@ -239,33 +236,36 @@ doXferRcp (lsRcpXfer * lsXfer, int option)
                 }
 
                 switch (pid = fork ()) {
-                        case 0:
-                                execlp ("rcp", "rcp", "-p", lsXfer->szSourceArg, lsXfer->szDestArg, NULL);
-                                ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "execlp");
-                                exit (-1);
-                        // break;
+                    case 0:
+                        execlp ("rcp", "rcp", "-p", lsXfer->szSourceArg, lsXfer->szDestArg, NULL);
+                        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "execlp");
+                        exit (-1);
+                    // break;
 
-                        case -1:
-                                if (logclass & (LC_FILE))
-                                ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "fork");
-                                return (-1);
-                        // break;
+                    case -1:
+                        if (logclass & (LC_FILE)) {
+                            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "fork");
+                        }
+                        return -1;
+                    break;
 
                 default:
-                        while( wait (&status) < 0) { // SEEME SEEME SEEME this needs looking after
-                                if (errno != EINTR)
+                    while( wait (&status) < 0) { // SEEME SEEME SEEME this needs looking after
+                            if (errno != EINTR) {
                                 break;
-                        }
+                            }
+                    }
 
-                        if (WIFEXITED (status))  {
-                                if (WEXITSTATUS (status) == 0) {
-                                        return 0;
-                                }
-                        }
-                        return (-1);
+                    if (WIFEXITED (status))  {
+                            if (WEXITSTATUS (status) == 0) {
+                                    return 0;
+                            }
+                    }
+                    return -1;
+                break;
                 }
 
-                // return (-1);
+                // return -1;
         }
 }
 
@@ -274,7 +274,7 @@ createXfer (lsRcpXfer * lsXfer)
 {
     lsXfer->iNumFiles = 1;
     lsXfer->iOptions = 0;
-    return (0);
+    return 0;
 }
 
 
@@ -295,7 +295,7 @@ destroyXfer (lsRcpXfer * lsXfer)
             free (lsXfer->ppszHostFnames[i]);
             free (lsXfer->ppszDestFnames[i]);
         }
-    return (0);
+    return 0;
 
 }
 
@@ -309,27 +309,26 @@ equivalentXferFile (lsRcpXfer * lsXfer, char *szLocalFile, char *szRemoteFile, s
     char *szFileName1, *szFileName2;
 
     if (logclass & (LC_FILE))
-        ls_syslog (LOG_DEBUG, "equivalentXferFile(), ls_getmnthost() for '%s'",
-                     szLocalFile);
+        ls_syslog (LOG_DEBUG, "equivalentXferFile(), ls_getmnthost() for '%s'", szLocalFile);
 
     hostlist[0] = szRhost;
     hostinfo = ls_gethostinfo ((char *) NULL, (size_t *) NULL, (char **) hostlist, 1, 0);
     if (hostinfo == (struct hostInfo *) NULL)
         {
-            return (-1);
+            return -1;
         }
     else
         {
             if (strcmp (hostinfo->hostType, "NTX86") == 0
             || strcmp (hostinfo->hostType, "NTALPHA") == 0)
         {
-            return (1);
+            return 1;
         }
         }
 
     if ((pszH = ls_getmnthost (szLocalFile)) == NULL)
         {
-            return (-1);
+            return -1;
         }
 
     strcpy (szHost1, pszH);
@@ -341,35 +340,38 @@ equivalentXferFile (lsRcpXfer * lsXfer, char *szLocalFile, char *szRemoteFile, s
 
     if ((pszH = ls_rgetmnthost (szRhost, szRemoteFile)) == NULL)
         {
-            return (-1);
+            return -1;
         }
 
     strcpy (szHost2, pszH);
 
     szFileName1 = strrchr (lsXfer->ppszHostFnames[0], '/');
     szFileName2 = strrchr (lsXfer->ppszDestFnames[0], '/');
-    if (szFileName1 == NULL)
+    if (szFileName1 == NULL) {
         szFileName1 = lsXfer->ppszHostFnames[0];
-    else
+    }
+    else {
         szFileName1++;
-    if (szFileName2 == NULL)
+    }
+    if (szFileName2 == NULL) {
         szFileName2 = lsXfer->ppszDestFnames[0];
-    else
+    }
+    else {
         szFileName2++;
+    }
     if (psLstat->st_ino == psRstat->st_ino
             && (strcmp (szFileName1, szFileName2) == 0)
             && equalHost_ (szHost1, szHost2))
         {
-            return (0);
+            return 0;
         }
-    return (1);
+    return 1;
 
 }
 
 int
 copyFile (lsRcpXfer * lsXfer, char *buf, int option)
 {
-    char __func__] = "copyFile";
     int s             = 0;
     int lfd           = 0;
     int rfd           = 0;
@@ -406,7 +408,7 @@ copyFile (lsRcpXfer * lsXfer, char *buf, int option)
 
     if (strcmp (lsXfer->szHostUser, lsXfer->szDestUser) != 0) {
         /* catgets 6050 */
-        ls_syslog (LOG_ERR, I18N (6050, "%s: %s does not support account mapping using rcp"), fname, "RES");
+        ls_syslog (LOG_ERR, I18N (6050, "%s: %s does not support account mapping using rcp"), __func__, "RES");
         return -1;
     }
 
@@ -434,7 +436,7 @@ copyFile (lsRcpXfer * lsXfer, char *buf, int option)
         }
 
         if (mystat_ (lsXfer->ppszHostFnames[0], &sLstat, lsXfer->pheHost) < 0) {
-            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "mystat_");
+            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "mystat_");
             return -1;
         }
 
@@ -478,7 +480,7 @@ copyFile (lsRcpXfer * lsXfer, char *buf, int option)
                     ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "copyFile", "write", ret);
                     close (lfd);
                     close (rfd);
-                    return (-1);
+                    return -1;
                 }
             }
         }
@@ -497,7 +499,7 @@ copyFile (lsRcpXfer * lsXfer, char *buf, int option)
         }
 
         if (mystat_ (lsXfer->ppszHostFnames[0], &sLstat, lsXfer->pheHost) < 0) {
-            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "mystat_");
+            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "mystat_");
             return -1;
         }
 
@@ -515,7 +517,7 @@ copyFile (lsRcpXfer * lsXfer, char *buf, int option)
             }
 
             if ( -1 == iRetVal ) {
-                ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "equivalentXferFile");
+                ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "equivalentXferFile");
                 ls_rfterminate (lsXfer->szDest);
 
                 return -1;
@@ -574,7 +576,7 @@ copyFile (lsRcpXfer * lsXfer, char *buf, int option)
                 close (lfd);
                 ls_rclose (rfd);
                 ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_MM, "copyFIle", "ls_rwrite", ret);
-                return (-1);
+                return -1;
             }
         }
     }
@@ -628,7 +630,7 @@ copyFile (lsRcpXfer * lsXfer, char *buf, int option)
 
         if ((lfd = ls_ropen (lsXfer->szHost, lsXfer->ppszHostFnames[0], O_RDONLY, 0)) == -1) {
             ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, "copyFile", "ls_ropen");
-            return (-1);
+            return -1;
         }
 
         if (logclass & (LC_FILE)) {
@@ -640,7 +642,7 @@ copyFile (lsRcpXfer * lsXfer, char *buf, int option)
         if( -1 == rfd ) {
             ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "copyFile", "myopen_");
             ls_rclose (lfd);
-            return (-1);
+            return -1;
         }
 
         if (logclass & (LC_FILE)) {
@@ -654,7 +656,7 @@ copyFile (lsRcpXfer * lsXfer, char *buf, int option)
                     ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "copyFile", "write", ret);
                     ls_rclose (lfd);
                     close (rfd);
-                    return (-1);
+                    return -1;
                 }
             }
         }
@@ -673,10 +675,10 @@ copyFile (lsRcpXfer * lsXfer, char *buf, int option)
             }
             
             lserrno = LSE_FILE_SYS;
-            return (-1);
+            return -1;
     }
 
-    return (0);
+    return 0;
 
 }
 
@@ -730,124 +732,121 @@ rmDirAndFilesEx (char *dir, int recur)
         }
 
     closedir (dirp);
-    return (rmdir (dir));
+    return rmdir (dir);
 }
 
 int
 createSpoolSubDir (const char *spoolFileFullPath)
 {
-        char *pEnd1;
-        char *pEnd2;
-        char *pBegin;
-        DIR *pDir;
-        char subDirectory1[MAXFILENAMELEN];
-        char subDirectory2[MAXFILENAMELEN];
-        long len = 0;
-        int returnValue = 0;
-        mode_t previousUmask = 0;
+    char *pEnd1  = NULL;
+    char *pEnd2  = NULL;
+    char *pBegin = NULL;
+    DIR *pDir    = NULL;
+    char subDirectory1[MAXFILENAMELEN];
+    char subDirectory2[MAXFILENAMELEN];
+    long len = 0;
+    int returnValue = 0;
+    mode_t previousUmask = 0;
 
-        if (spoolFileFullPath == NULL) {
-                returnValue = -1;
-                umask (previousUmask);
-                return (returnValue);
+    if (spoolFileFullPath == NULL) {
+            returnValue = -1;
+            umask (previousUmask);
+            return returnValue;
 
+    }
+    else {
+            
+        pBegin = (char *) spoolFileFullPath;
+        if ((pEnd1 = strrchr (spoolFileFullPath, '/')) == NULL) {
+                pEnd1 = (char *) spoolFileFullPath;
         }
-        else {
-                
-                pBegin = (char *) spoolFileFullPath;
-                if ((pEnd1 = strrchr (spoolFileFullPath, '/')) == NULL) {
-                        pEnd1 = (char *) spoolFileFullPath;
-                }
-                if ((pEnd2 = strrchr (spoolFileFullPath, '\\')) == NULL) {
-                        pEnd2 = (char *) spoolFileFullPath;
-                }
-
-                len = (pEnd2 > pEnd1) ? pEnd2 - spoolFileFullPath : pEnd1 - spoolFileFullPath;
-                previousUmask = umask (000);
-
-                if (len <= 0) {
-                        umask (previousUmask);
-                        return (returnValue);
-
-                }
-
-                strncpy (subDirectory1, pBegin, len);
-                subDirectory1[len] = '\0';
-
-
-
-            if ((pDir = opendir (subDirectory1)) == NULL)
-                {
-                    pBegin = (char *) &subDirectory1;
-
-                    if ((pEnd1 = strrchr (pBegin, '/')) == NULL)
-                {
-                    pEnd1 = (char *) pBegin;
-                }
-
-                    if ((pEnd2 = strrchr (pBegin, '\\')) == NULL)
-                {
-                    pEnd2 = (char *) pBegin;
-                }
-
-                    len = (pEnd2 > pEnd1) ? pEnd2 - pBegin : pEnd1 - pBegin;
-
-                    if (len == 0)
-                {
-
-                    if (mkdir (subDirectory1, 0755) != 0)
-                        {
-                            returnValue = -1;
-                                umask (previousUmask);
-                                return (returnValue);
-                        }
-                    else
-                        {
-                            returnValue = 0;
-                        }
-                        umask (previousUmask);
-                        return (returnValue);
-
-                }
-                    else
-                {
-                    strncpy (subDirectory2, pBegin, len);
-                    subDirectory2[len] = '\0';
-
-                    if ((pDir = opendir (subDirectory2)) == NULL)
-                        {
-                            if (mkdir (subDirectory2, 0777) != 0)
-                        {
-                            returnValue = -1;
-                                umask (previousUmask);
-                                return (returnValue);
-                        }
-                        }
-                    else
-                        {
-                            returnValue = 0;
-                            closedir (pDir);
-                        }
-
-                    if (mkdir (subDirectory1, 0755) != 0)
-                        {
-                            returnValue = -1;
-                        }
-                    else
-                        {
-                            returnValue = 0;
-                        }
-                umask (previousUmask);
-                return (returnValue);
-
-                }
-                }
-            else
-                {
-                    closedir (pDir);
-                }
+        if ((pEnd2 = strrchr (spoolFileFullPath, '\\')) == NULL) {
+                pEnd2 = (char *) spoolFileFullPath;
         }
 
-        return -1;
+        len = (pEnd2 > pEnd1) ? pEnd2 - spoolFileFullPath : pEnd1 - spoolFileFullPath;
+        previousUmask = umask (000);
 
+        if (len <= 0) {
+                umask (previousUmask);
+                return returnValue;
+
+        }
+
+        strncpy (subDirectory1, pBegin, len);
+        subDirectory1[len] = '\0';
+
+        if ((pDir = opendir (subDirectory1)) == NULL)
+            {
+                pBegin = (char *) &subDirectory1;
+
+                if ((pEnd1 = strrchr (pBegin, '/')) == NULL)
+            {
+                pEnd1 = (char *) pBegin;
+            }
+
+                if ((pEnd2 = strrchr (pBegin, '\\')) == NULL)
+            {
+                pEnd2 = (char *) pBegin;
+            }
+
+                len = (pEnd2 > pEnd1) ? pEnd2 - pBegin : pEnd1 - pBegin;
+
+                if (len == 0)
+            {
+
+                if (mkdir (subDirectory1, 0755) != 0)
+                    {
+                        returnValue = -1;
+                            umask (previousUmask);
+                            return returnValue;
+                    }
+                else
+                    {
+                        returnValue = 0;
+                    }
+                    umask (previousUmask);
+                    return returnValue;
+
+            }
+                else
+            {
+                strncpy (subDirectory2, pBegin, len);
+                subDirectory2[len] = '\0';
+
+                if ((pDir = opendir (subDirectory2)) == NULL)
+                    {
+                        if (mkdir (subDirectory2, 0777) != 0)
+                    {
+                        returnValue = -1;
+                            umask (previousUmask);
+                            return returnValue;
+                    }
+                    }
+                else
+                    {
+                        returnValue = 0;
+                        closedir (pDir);
+                    }
+
+                if (mkdir (subDirectory1, 0755) != 0)
+                    {
+                        returnValue = -1;
+                    }
+                else
+                    {
+                        returnValue = 0;
+                    }
+            umask (previousUmask);
+            return returnValue;
+
+            }
+        }
+        else
+            {
+                closedir (pDir);
+            }
+    }
+
+    return -1;
 }

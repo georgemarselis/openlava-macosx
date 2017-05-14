@@ -34,7 +34,7 @@
   */
 
 struct lsConf *
-ls_getconf (char *fname)
+ls_getconf (char *filename)
 {
 	unsigned long oldLineNum = 0; 
 	unsigned long beginLineNum = 0;
@@ -53,17 +53,17 @@ ls_getconf (char *fname)
 	FILE *fp = NULL;
 
 	lserrno = LSE_NO_ERR;
-	if (fname == NULL)
+	if (filename == NULL)
 	{
 		/* catgets 6000 */
-		ls_syslog (LOG_ERR, "%s: %s.", "ls_getconf", I18N (6000, "Null filename"));
+		ls_syslog (LOG_ERR, "%s: %s.", __func__, I18N (6000, "Null filename"));
 		lserrno = LSE_NO_FILE;
 		return NULL;
 	}
 
 	conf = malloc( sizeof( struct lsConf ) );
 	if (conf == NULL) {
-		ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "ls_getconf", "malloc", sizeof( struct lsConf ) );
+		ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", sizeof( struct lsConf ) );
 		lserrno = LSE_MALLOC;
 		return NULL;
 	}
@@ -87,30 +87,28 @@ ls_getconf (char *fname)
 	  return NULL;
 	}
   defsize = 5;
-  defNames = (char **) malloc (defsize * sizeof (char *));
+  defNames = malloc (defsize * sizeof (char *));
   if (defNames == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "ls_getconf",
-		 "malloc", sizeof (defsize * sizeof (char *)));
+	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, filename, "malloc", sizeof (defsize * sizeof (char *)));
 	  lserrno = LSE_MALLOC;
 	  goto Error;
 	}
   defConds = (char **) malloc (defsize * sizeof (char *));
   if (defConds == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "ls_getconf",
-		 "malloc", sizeof (defsize * sizeof (char *)));
+	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, filename, "malloc", sizeof (defsize * sizeof (char *)));
 	  lserrno = LSE_MALLOC;
 	  goto Error;
 	}
   numDefs = 0;
 
-  fp = fopen (fname, "r");
+  fp = fopen (filename, "r");
   if (fp == NULL)
 	{
 
-	  ls_syslog (LOG_ERR, "%s: %s <%s>.", "ls_getconf", I18N (6001, "Can't open configuration file"),   /* catgets 6001 */
-		 fname);
+		/* catgets 6001 */
+	  ls_syslog (LOG_ERR, "%s: %s <%s>.", __func__, I18N (6001, "Can't open configuration file"), filename);
 	  lserrno = LSE_NO_FILE;
 	  goto Error;
 	}
@@ -133,37 +131,40 @@ ls_getconf (char *fname)
 
 		  if (word == NULL)
 		{
-		  ls_syslog (LOG_ERR, "%s: %s(%d): %s.", "ls_getconf", fname, lineNum, I18N (6002, "Both macro and condition name expected after #define"));    /* catgets 6002 */
+		  ls_syslog (LOG_ERR, "%s: %s(%d): %s.", __func__, filename, lineNum, I18N (6002, "Both macro and condition name expected after #define"));    /* catgets 6002 */
 		  goto Error;
 		}
 
 		  word1 = putstr_ (word);
 		  if (word1 == NULL)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "ls_getconf",
-				 "malloc", strlen (word) + 1);
+		  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (word) + 1);
 		  lserrno = LSE_MALLOC;
 		  goto Error;
 		}
 
-		  while (isspace (*linep))
-		linep++;
+		  while (isspace (*linep)) {
+				linep++;
+		  }
 		  word = linep;
 
 		  if (*word != '\0')
 		{
-		  if ((ptr = strchr (word, '#')) != NULL)
-			*ptr = '\0';
+			if ((ptr = strchr (word, '#')) != NULL) {
+				*ptr = '\0';
+			}
 
-		  i = strlen (word) - 1;
-		  while (isspace (word[i]))
-			i--;
+			  i = strlen (word) - 1;
+			  while (isspace (word[i])) {
+				i--;
+			}
 		  word[i + 1] = '\0';
 		}
 
 		  if (*word == '\0')
 		{
-		  ls_syslog (LOG_ERR, "ls_getconf: %s(%d): %s", fname, lineNum, I18N (6003, "Both macro and condition name expected after #define."));  /* catgets 6003 */
+			/* catgets 6003 */
+		  ls_syslog (LOG_ERR, "%s: %s(%d): %s", __func__, filename, lineNum, I18N (6003, "Both macro and condition name expected after #define."));
 		  FREEUP (word1);
 		  goto Error;
 		}
@@ -180,28 +181,23 @@ ls_getconf (char *fname)
 
 		  if (numDefs == defsize)
 		{
-		  tmpPtr = (char **) myrealloc (defNames,
-						defsize * 2 *
-						sizeof (char *));
-		  if (tmpPtr != NULL)
-			defNames = tmpPtr;
+		  tmpPtr = myrealloc (defNames, defsize * 2 * sizeof (char *));
+		  	if (tmpPtr != NULL) {
+				defNames = tmpPtr;
+			}
 		  else
 			{
-			  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, "ls_getconf",
-				 "realloc", defsize * 2 * sizeof (char *));
+			  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__, "realloc", defsize * 2 * sizeof (char *));
 			  FREEUP (word1);
 			  lserrno = LSE_MALLOC;
 			  goto Error;
 			}
-		  tmpPtr = (char **) myrealloc (defConds,
-						defsize * 2 *
-						sizeof (char *));
+		  tmpPtr = myrealloc (defConds, defsize * 2 * sizeof (char *));
 		  if (tmpPtr != NULL)
 			defConds = tmpPtr;
 		  else
 			{
-			  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, "ls_getconf",
-				 "realloc", defsize * 2 * sizeof (char *));
+			  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__, "realloc", defsize * 2 * sizeof (char *));
 			  FREEUP (word1);
 			  lserrno = LSE_MALLOC;
 			  goto Error;
@@ -211,8 +207,7 @@ ls_getconf (char *fname)
 		  defNames[numDefs] = putstr_ (word1);
 		  if (defNames[numDefs] == NULL)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, "ls_getconf",
-				 "malloc", strlen (word1) + 1);
+		  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__, "malloc", strlen (word1) + 1);
 		  FREEUP (word1);
 		  lserrno = LSE_MALLOC;
 		  goto Error;
@@ -220,8 +215,7 @@ ls_getconf (char *fname)
 		  defConds[numDefs] = putstr_ (word);
 		  if (defConds[numDefs] == NULL)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, "ls_getconf",
-				 "malloc", strlen (word) + 1);
+		  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__, "malloc", strlen (word) + 1);
 		  FREEUP (defNames[numDefs]);
 		  FREEUP (word1);
 		  lserrno = LSE_MALLOC;
@@ -252,14 +246,14 @@ ls_getconf (char *fname)
 
 		  if (*word == '\0')
 		{
-		  ls_syslog (LOG_ERR, "ls_getconf: %s(%d): %s.", fname, lineNum, I18N (6004, "Condition name expected after #if."));    /* catgets 6004 */
+			/* catgets 6004 */
+		  ls_syslog (LOG_ERR, "%s: %s(%d): %s.", __func__, filename, lineNum, I18N (6004, "Condition name expected after #if."));    
 		  goto Error;
 		}
 
 		  if ((node = newNode ()) == NULL)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, "ls_getconf",
-				 "malloc", sizeof (struct confNode));
+		  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__, "malloc", sizeof (struct confNode));
 		  lserrno = LSE_MALLOC;
 		  goto Error;
 		}
@@ -283,8 +277,7 @@ ls_getconf (char *fname)
 		}
 		  if (!flag || node->cond == NULL)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, "ls_getconf",
-				 "malloc", sizeof (word));
+		  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__, "malloc", sizeof (word));
 		  lserrno = LSE_MALLOC;
 		  goto Error;
 		}
@@ -303,12 +296,11 @@ ls_getconf (char *fname)
 	  else if (strcasecmp (cp, "elif") == 0)
 		{
 
-
-
 		  temp = popStack (blockStack);
 		  if (temp == NULL)
 		{
-		  ls_syslog (LOG_ERR, I18N (6007, "ls_getconf: %s(%d): If-less elif."), fname, lineNum);    /*catgets 6007 */
+			 /*catgets 6007 */
+		  ls_syslog (LOG_ERR, I18N (6007, "%s: %s(%d): If-less elif."), __func__, filename, lineNum);
 		  goto Error;
 		}
 		  PUSH_STACK (blockStack, temp);
@@ -330,14 +322,14 @@ ls_getconf (char *fname)
 
 		  if (*word == '\0')
 		{
-		  ls_syslog (LOG_ERR, "ls_getconf: %s(%d): %s.", fname, lineNum, I18N (6005, "Condition name expected after #elif."));  /* catgets 6005 */
+			/* catgets 6005 */
+		  ls_syslog (LOG_ERR, "%s: %s(%d): %s.", __func__, filename, lineNum, I18N (6005, "Condition name expected after #elif."));  
 		  goto Error;
 		}
 
 		  if ((node = newNode ()) == NULL)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, "ls_getconf",
-				 "malloc", sizeof (struct confNode));
+		  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__,  "malloc", sizeof (struct confNode));
 		  lserrno = LSE_MALLOC;
 		  goto Error;
 		}
@@ -361,7 +353,7 @@ ls_getconf (char *fname)
 		}
 		  if (!flag || node->cond == NULL)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, "ls_getconf", "malloc");
+		  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "malloc");
 		  lserrno = LSE_MALLOC;
 		  goto Error;
 		}
@@ -381,8 +373,8 @@ ls_getconf (char *fname)
 		  temp = popStack (blockStack);
 		  if (temp == NULL)
 		{
-		  ls_syslog (LOG_ERR, I18N (6008, "ls_getconf: %s(%d): If-less else."), /*catgets 6008 */
-				 fname, lineNum);
+			/*catgets 6008 */
+		  ls_syslog (LOG_ERR, I18N (6008, "%s: %s(%d): If-less else."), __func__, filename, lineNum);
 		  goto Error;
 		}
 		  PUSH_STACK (blockStack, temp);
@@ -399,7 +391,8 @@ ls_getconf (char *fname)
 		  temp = popStack (blockStack);
 		  if (temp == NULL)
 		{
-		  ls_syslog (LOG_ERR, I18N (6009, "ls_getconf: %s(%d): If-less endif."), fname, lineNum);   /* catgets 6009 */
+			/* catgets 6009 */
+		  ls_syslog (LOG_ERR, I18N (6009, "%s: %s(%d): If-less endif."), __func__, filename, lineNum);
 		  goto Error;
 		}
 		  PUSH_STACK (blockStack, temp);
@@ -418,21 +411,17 @@ ls_getconf (char *fname)
 	  lines = NULL;
 	  for (;;)
 	{
-	  lines =
-		(char **) myrealloc (lines, (numLines + 1) * sizeof (char *));
+	  lines = myrealloc (lines, (numLines + 1) * sizeof (char *));
 	  if (lines == NULL)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, "ls_getconf",
-			 "malloc", (numLines + 1) * sizeof (char *));
+		  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__, "malloc", (numLines + 1) * sizeof (char *));
 		  lserrno = LSE_MALLOC;
 		  goto Error;
 		}
-	  lines[numLines] =
-		(char *) malloc ((strlen (sp) + 1) * sizeof (char));
+	  lines[numLines] = malloc ((strlen (sp) + 1) * sizeof (char));
 	  if (lines[numLines] == NULL)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, "ls_getconf",
-			 "malloc", (strlen (sp) + 1) * sizeof (char));
+		  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__, "malloc", (strlen (sp) + 1) * sizeof (char));
 		  lserrno = LSE_MALLOC;
 		  goto Error;
 		}
@@ -445,8 +434,7 @@ ls_getconf (char *fname)
 		{
 		  if ((node = newNode ()) == NULL)
 		{
-		  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, "ls_getconf",
-				 "malloc", sizeof (struct confNode));
+		  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__, "malloc", sizeof (struct confNode));
 		  lserrno = LSE_MALLOC;
 		  goto Error;
 		}
@@ -475,9 +463,7 @@ ls_getconf (char *fname)
 
 		  if ((node = newNode ()) == NULL)
 			{
-			  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL,
-				 "ls_getconf", "malloc",
-				 sizeof (struct confNode));
+			  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__, "malloc", sizeof (struct confNode));
 			  lserrno = LSE_MALLOC;
 			  goto Error;
 			}
@@ -489,18 +475,21 @@ ls_getconf (char *fname)
 	  node->beginLineNum = beginLineNum;
 	  node->numLines = numLines;
 	  node->lines = lines;
-	  if (prev != NULL)
-	linkNode (prev, node);
+	  if (prev != NULL) {
+			linkNode (prev, node);
+	  }
 	  prev = node;
 
-	  if (rootNode == NULL)
-	rootNode = node;
+	  if (rootNode == NULL) {
+			rootNode = node;
+	  }
 	}
 
   temp = popStack (blockStack);
   if (temp != NULL)
 	{
-	  ls_syslog (LOG_ERR, "ls_getconf: %s(%d): %s endif.", fname, lineNum, I18N (6006, "Missing")); /* catgets 6006 */
+		/* catgets 6006 */
+	  ls_syslog (LOG_ERR, "%s: %s(%d): %s endif.", __func__, filename, lineNum, I18N (6006, "Missing")); 
 	  goto Error;
 	}
 
@@ -513,35 +502,32 @@ ls_getconf (char *fname)
   FREEUP (defConds);
   freeStack (blockStack);
   freeStack (ptrStack);
-  conf->confhandle =
-	(struct confHandle *) malloc (sizeof (struct confHandle));
+  conf->confhandle =  malloc (sizeof (struct confHandle));
   if (conf->confhandle == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, "ls_getconf",
-		 "malloc", sizeof (struct confHandle));
+	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__, "malloc", sizeof (struct confHandle));
 	  fclose (fp);
 	  lserrno = LSE_MALLOC;
 	  return NULL;
 	}
-  len = strlen (fname);
+  len = strlen (filename);
   conf->confhandle->rootNode = rootNode;
-  conf->confhandle->fname = (char *) malloc ((len + 1) * sizeof (char));
+  conf->confhandle->fname = malloc ((len + 1) * sizeof (char));
   if (conf->confhandle->fname == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, "ls_getconf",
-		 "malloc", (len + 1) * sizeof (char));
+	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__, "malloc", (len + 1) * sizeof (char));
 	  fclose (fp);
 	  lserrno = LSE_MALLOC;
 	  return NULL;
 	}
-  strcpy (conf->confhandle->fname, fname);
+  strcpy (conf->confhandle->fname, filename);
   conf->confhandle->curNode = rootNode;
   conf->confhandle->lineCount = 0;
   conf->confhandle->ptrStack = initStack ();
   fclose (fp);
   return conf;
 
-Error:
+Error: // FIXME FIXME FIXME remove goto label
 
 	for( i = 0; i < numDefs; i++)
 	{
@@ -556,7 +542,7 @@ Error:
 
 	if (conf->confhandle == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, "ls_getconf", "malloc", sizeof( struct confHandle ) );
+	  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__, "malloc", sizeof( struct confHandle ) );
 		if (fp) {
 			fclose (fp);
 		}
@@ -564,11 +550,11 @@ Error:
 	  return NULL;
 	}
 
-	conf->confhandle->rootNode = rootNode;
-	conf->confhandle->fname = NULL;
-	conf->confhandle->curNode = NULL;
+	conf->confhandle->rootNode  = rootNode;
+	conf->confhandle->fname 	= NULL;
+	conf->confhandle->curNode   = NULL;
 	conf->confhandle->lineCount = 0;
-	conf->confhandle->ptrStack = NULL;
+	conf->confhandle->ptrStack  = NULL;
 	ls_freeconf (conf);
 	if (fp) {
 		fclose (fp);
@@ -582,7 +568,7 @@ newNode( void )
 {
 	struct confNode *node = NULL;
 
-	node = (struct confNode *) malloc (sizeof (struct confNode));
+	node = malloc (sizeof (struct confNode));
 	if (node == NULL) {
 		return NULL;
 	}
@@ -633,7 +619,7 @@ pushStack (struct pStack *stack, struct confNode *node)
 	if( stack->size == (size_t) stack->top + 1) { // FIXME FIXME FIXME this cast is probably right, but needs to be checked
 		sp = myrealloc (stack->nodes, stack->size * 2 * sizeof (struct confNode *));
 		if (sp == NULL) {
-			ls_syslog( LOG_ERR, I18N_FUNC_FAIL, "pushStack", "malloc" );
+			ls_syslog( LOG_ERR, I18N_FUNC_FAIL, __func__, "malloc" );
 			return -1;
 		}
 		stack->size *= 2;
@@ -797,8 +783,6 @@ linkNode (struct confNode *prev, struct confNode *node)
 
 void ls_freeconf (struct lsConf *conf)
 {
-	size_t i = 0;
-
 	if (conf == NULL) {
 		return;
 	}
@@ -806,7 +790,7 @@ void ls_freeconf (struct lsConf *conf)
 	FREEUP (conf->confhandle->fname);
 	freeStack (conf->confhandle->ptrStack);
 	FREEUP (conf->confhandle);
-	for (i = 0; i < conf->numConds; i++) {
+	for (size_t i = 0; i < conf->numConds; i++) {
 		FREEUP (conf->conds[i]);
 	}
 	FREEUP (conf->conds);
@@ -819,8 +803,6 @@ void ls_freeconf (struct lsConf *conf)
 void
 freeNode (struct confNode *node)
 {
-	size_t i = 0;
-
 	if (node == NULL) {
 		return;
 	}
@@ -829,7 +811,7 @@ freeNode (struct confNode *node)
 	freeNode (node->rightPtr);
 	freeNode (node->fwPtr);
 	FREEUP (node->cond);
-	for( i = 0; i < node->numLines; i++ ) {
+	for( size_t i = 0; i < node->numLines; i++ ) {
 		FREEUP (node->lines[i]);
 	}
 	FREEUP (node->lines);
@@ -848,38 +830,38 @@ getNextLine_conf (struct lsConf *conf, int confFormat)
 char *
 getNextLineC_conf (struct lsConf *conf, size_t *LineCount, int confFormat)
 {
-  static char *longLine = NULL;
-  static char *myLine = NULL;
-  char *sp, *cp, *line;
-  unsigned long len = 0;
-  unsigned long linesize = 0;
-  int toBeContinue;
-  int isUNCPath = 0;
+	static char *longLine = NULL;
+	static char *myLine = NULL;
+	char *sp, *cp, *line;
+	unsigned long len = 0;
+	unsigned long linesize = 0;
+	int toBeContinue;
+	int isUNCPath = 0;
 
-  if (conf == NULL)
-	return NULL;
-
-  FREEUP (longLine);
-
-  if (confFormat)
-	{
-	  do
-	{
-	  line = readNextLine (conf, LineCount);
-	  if (line == NULL)
+	if (conf == NULL) { 
 		return NULL;
+	}
 
+	FREEUP (longLine);
 
-	  toBeContinue = 0;
-	  FREEUP (myLine);
-	  len = strlen (line) + 1;
-	  myLine = (char *) malloc (len * sizeof (char));
-	  if (myLine == NULL)
-		return NULL;
+	if (confFormat) {
+		do {
+			line = readNextLine (conf, LineCount);
+			if (line == NULL) {
+				return NULL;
+			}
 
-	  sp = line;
-	  cp = myLine;
-	  while (sp != &(line[len - 1]))
+			toBeContinue = 0;
+			FREEUP (myLine);
+			len = strlen (line) + 1;
+			myLine = malloc (len * sizeof (char));
+			if (myLine == NULL) {
+				return NULL;
+			}
+
+			sp = line;
+			cp = myLine;
+			while (sp != &(line[len - 1]))
 		{
 		  if (*sp == '#')
 		{
@@ -897,9 +879,9 @@ getNextLineC_conf (struct lsConf *conf, size_t *LineCount, int confFormat)
 		  else
 			{
 
-			  if (!isUNCPath && *(sp + 1) == '\\'
-			  && !isspace (*(sp + 2)))
-			isUNCPath = 1;
+			  if (!isUNCPath && *(sp + 1) == '\\' && !isspace (*(sp + 2))) {
+					isUNCPath = 1;
+			  }
 			  if (!isspace (*(sp + 1)))
 			{
 			  *cp = *sp;
@@ -948,8 +930,9 @@ getNextLineC_conf (struct lsConf *conf, size_t *LineCount, int confFormat)
 		{
 		  linesize += strlen (myLine);
 		  sp = (char *) malloc (linesize * sizeof (char));
-		  if (sp == NULL)
-			return longLine;
+			if (sp == NULL) {
+				return longLine;
+			}
 
 		  strcpy (sp, longLine);
 		  strcat (sp, myLine);
@@ -1031,8 +1014,9 @@ readNextLine (struct lsConf *conf, size_t *lineNum)
 	  conf->confhandle->curNode = node->fwPtr;
 	  conf->confhandle->lineCount = 0;
 	  line = readNextLine (conf, lineNum);
-	  if (line)
-	return line;
+		if (line) {
+			return line;
+		}
 	  else
 	{
 	  prev = popStack (conf->confhandle->ptrStack);

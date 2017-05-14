@@ -69,9 +69,6 @@ namestofilter_ (char **indxs )
 struct hostLoad *
 ls_loadinfo (char *resreq, size_t *numhosts, int options, char *fromhost, char **hostlist, size_t listsize, char ***indxnamelist)
 {
-    static char __func__] = "ls_loadinfo";
-
-
     int isClus          = 0;
     char *indexfilter   = NULL;
     unsigned long *num  = 0;
@@ -82,7 +79,7 @@ ls_loadinfo (char *resreq, size_t *numhosts, int options, char *fromhost, char *
     *initialValueofNum = 1;
 
     if (logclass & (LC_TRACE)) {
-        ls_syslog (LOG_DEBUG, "%s: Entering this routine...", fname);
+        ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
     }
 
     if (!indxnamelist) {
@@ -235,8 +232,7 @@ ls_loadinfo (char *resreq, size_t *numhosts, int options, char *fromhost, char *
         }
 
         if (logclass & (LC_TRACE)) {
-            ls_syslog (LOG_DEBUG, "%s: loadReq.ofWhat=%d loadReq.numHosts=%1.0ld loadReq..numPrefs=%1.0ld", 
-                    fname, loadReq.ofWhat, loadReq.numHosts, loadReq.numPrefs);
+            ls_syslog (LOG_DEBUG, "%s: loadReq.ofWhat=%d loadReq.numHosts=%1.0ld loadReq..numPrefs=%1.0ld", __func__, loadReq.ofWhat, loadReq.numHosts, loadReq.numPrefs);
         }
 
     return (loadinfo_ (resreq, &loadReq, fromhost, num, indxnamelist));
@@ -264,13 +260,12 @@ ls_loadofhosts (char *resreq, size_t *numhosts, int options, char *fromhost, cha
 struct hostLoad *
 loadinfo_ (char *resReq, struct decisionReq *loadReqPtr, char *fromhost, unsigned long *numHosts, char ***outnlist)
 {
-    static char __func__] = "loadinfo_";
     static struct loadReply loadReply;
     char *hname;
     int options = 0;
 
     if (logclass & (LC_TRACE)) {
-        ls_syslog (LOG_DEBUG, "%s: Entering this routine...", fname);
+        ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
     }
 
     if (loadReqPtr->numHosts <= 0) {

@@ -32,7 +32,6 @@
 int
 niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus, int terWhiPendStatus)
 {
-    static char __func__] = "niosCallback_";
     int s;
     struct niosConnect conn;
     struct {
@@ -49,7 +48,7 @@ niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus,
 
     if ((s = TcpCreate_ (FALSE, 0)) < 0) {
         if (logclass & LC_EXEC) {
-            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "tcpCreate");
+            ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "tcpCreate");
         }
         
         return (-1);
@@ -66,7 +65,7 @@ niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus,
     if (b_connect_ (s, (struct sockaddr *) from, sizeof (struct sockaddr_in), (unsigned int)resTimeout) < 0)
     {
         if (logclass & LC_EXEC) {
-            ls_syslog (LOG_DEBUG, "%s: connect(s=%d,%s,len=%d) failed: %m", fname, s, sockAdd2Str_ (from), sizeof (struct sockaddr_in));
+            ls_syslog (LOG_DEBUG, "%s: connect(s=%d,%s,len=%d) failed: %m", __func__, s, sockAdd2Str_ (from), sizeof (struct sockaddr_in));
         }
         closesocket (s);
         
@@ -81,7 +80,7 @@ niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus,
     }
 
     if (logclass & LC_TRACE) {
-        ls_syslog (LOG_DEBUG, "%s: exitStatus <%d> terWhiPendStatus <%d>", fname, exitStatus, terWhiPendStatus);
+        ls_syslog (LOG_DEBUG, "%s: exitStatus <%d> terWhiPendStatus <%d>", __func__, exitStatus, terWhiPendStatus);
     }
 
     initLSFHeader_ (&reqHdr);
@@ -101,7 +100,7 @@ niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus,
     if (writeEncodeMsg_ (s, (char *) &reqBuf, sizeof (reqBuf), &reqHdr, (char *) &conn, nb_write_fix, xdr_niosConnect, 0) < 0) {
         if (logclass & LC_EXEC) {
             /* catgets 6201 */
-            ls_syslog (LOG_ERR, I18N (6201, "%s: writeEncodeMsg_(%d,%d) RES2NIOS_connect failed: %M"), fname, s, rpid);
+            ls_syslog (LOG_ERR, I18N (6201, "%s: writeEncodeMsg_(%d,%d) RES2NIOS_connect failed: %M"), __func__, s, rpid);
         }
       
         closesocket (s);

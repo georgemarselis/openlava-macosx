@@ -953,12 +953,10 @@ chanDequeue_ (int chfd, struct Buffer **buf)
 long
 chanReadNonBlock_ (int chfd, char *buf, size_t len, int timeout)
 {
-    static char __func__] = "chanReadNonBlock_";
-
     if (io_nonblock_ ((int)channels[chfd].handle) < 0)
     {
         lserrno = LSE_FILE_SYS;
-        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "io_nonblock_");
+        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "io_nonblock_");
         return (-1);
     }
 
@@ -986,7 +984,6 @@ int
 chanRpc_ (int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *outhdr, int timeout)
 {
     
-    const char __func__] = "chanRpc_";
     long cc;
     
     XDR xdrs;
@@ -994,13 +991,14 @@ chanRpc_ (int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *out
     struct LSFHeader hdrBuf;
     struct timeval timeval, *timep = NULL;
 
-    if (logclass & LC_COMM)
-        ls_syslog (LOG_DEBUG1, "%s: Entering ... chfd=%d", fname, chfd);
+    if (logclass & LC_COMM) {
+        ls_syslog (LOG_DEBUG1, "%s: Entering ... chfd=%d", __func__, chfd);
+    }
 
     if (in)
     {
         if (logclass & LC_COMM) {
-            ls_syslog (LOG_DEBUG1, "%s: sending %d bytes", fname, in->len);
+            ls_syslog (LOG_DEBUG1, "%s: sending %d bytes", __func__, in->len);
         }
 
         // FIXME fix chanWrite to return size_t, take out cast
@@ -1014,7 +1012,7 @@ chanRpc_ (int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *out
             unsigned int nlen = htonl (buf->len);
 
             if (logclass & LC_COMM) {
-                ls_syslog (LOG_DEBUG1, "%s: sending %d extra bytes", fname, nlen);
+                ls_syslog (LOG_DEBUG1, "%s: sending %d extra bytes", __func__, nlen);
             }
 
             if (chanWrite_ (chfd, NET_INTADDR_ (&nlen), NET_INTSIZE_) != NET_INTSIZE_) {
@@ -1033,7 +1031,7 @@ chanRpc_ (int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *out
     }
 
     if (logclass & LC_COMM) {
-        ls_syslog (LOG_DEBUG2, "%s: waiting for reply timeout=%d ms", fname, timeout);
+        ls_syslog (LOG_DEBUG2, "%s: waiting for reply timeout=%d ms", __func__, timeout);
     }
     if (timeout > 0)
     {
@@ -1063,7 +1061,7 @@ chanRpc_ (int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *out
     }
 
     if (logclass & LC_COMM) {
-        ls_syslog (LOG_DEBUG2, "%s: reading reply header", fname);
+        ls_syslog (LOG_DEBUG2, "%s: reading reply header", __func__);
     }
 
     xdrmem_create (&xdrs, (char *) &hdrBuf, sizeof (struct LSFHeader), XDR_DECODE);      // FIXME FIXME FIXME FIXME FIXME (char *) &hdrBuf ; does the char need to be there?
@@ -1084,7 +1082,7 @@ chanRpc_ (int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *out
     }
 
     if (logclass & LC_COMM) {
-        ls_syslog (LOG_DEBUG2, "%s: reading reply size=%d", fname, outhdr->length);
+        ls_syslog (LOG_DEBUG2, "%s: reading reply size=%d", __func__, outhdr->length);
     }
     out->len = outhdr->length;
 
@@ -1104,7 +1102,7 @@ chanRpc_ (int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *out
         {
             FREEUP (out->data);
             if (logclass & LC_COMM) {
-                ls_syslog (LOG_DEBUG2, "%s: read only %d bytes", fname, cc);
+                ls_syslog (LOG_DEBUG2, "%s: read only %d bytes", __func__, cc);
             }
 
             lserrno = LSE_MSG_SYS;
@@ -1116,7 +1114,7 @@ chanRpc_ (int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *out
     }
 
     if (logclass & LC_COMM) {
-        ls_syslog (LOG_DEBUG1, "%s: Leaving...repy_size=%d", fname, out->len);
+        ls_syslog (LOG_DEBUG1, "%s: Leaving...repy_size=%d", __func__, out->len);
     }
 
     return (0);

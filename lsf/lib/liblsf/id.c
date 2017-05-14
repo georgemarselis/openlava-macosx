@@ -31,11 +31,11 @@ initIdLibDefaults (IDLIB_INFO_T * idLib)
 static int
 initIdLib (IDLIB_INFO_T * idLib)
 {
-  static char __func__] = "initIdLib";
+
   int retcode = -1;
-  char *serverDir;
+  char *serverDir = NULL;
   char *libPath = NULL;
-#define LIB_FORMAT_STR "%s/%s"
+// #define LIB_FORMAT_STR "%s/%s"
 
   idLib->initialized = TRUE;
 
@@ -45,7 +45,7 @@ initIdLib (IDLIB_INFO_T * idLib)
       if (logclass & LC_TRACE)
     {
       ls_syslog (LOG_DEBUG, "%s: No id library found, using defaults",
-             fname);
+             __func__);
     }
       initIdLibDefaults (idLib);
       retcode = 0;
@@ -55,14 +55,14 @@ initIdLib (IDLIB_INFO_T * idLib)
   libPath = malloc (strlen (serverDir) + strlen (IDLIB_SO_NAME) + 2);
   if (libPath == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, fname, "malloc");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
       goto cleanup;
     }
 
-    sprintf (libPath, LIB_FORMAT_STR, serverDir, IDLIB_SO_NAME);
+    sprintf (libPath, "%s/%s", serverDir, IDLIB_SO_NAME);
 
     if (logclass & LC_TRACE) {
-        ls_syslog (LOG_DEBUG, "%s: Loading library from path %s", fname, libPath);
+        ls_syslog (LOG_DEBUG, "%s: Loading library from path %s", __func__, libPath);
     }
 
   idLib->handle = soOpen_ (libPath);
@@ -71,7 +71,7 @@ initIdLib (IDLIB_INFO_T * idLib)
       if (logclass & LC_TRACE)
     {
       ls_syslog (LOG_DEBUG,
-             "%s: No id library loaded (%k), using defaults", fname);
+             "%s: No id library loaded (%k), using defaults", __func__);
     }
       initIdLibDefaults (idLib);
       retcode = 0;
@@ -83,7 +83,7 @@ initIdLib (IDLIB_INFO_T * idLib)
   if (idLib->getLSFUser_ == NULL)
     {
       /* catgets 6351 */
-      ls_syslog (LOG_ERR, "6351: %s: Error loading symbol %s from library %s: %k", fname, GET_LSF_USER, libPath);
+      ls_syslog (LOG_ERR, "6351: %s: Error loading symbol %s from library %s: %k", __func__, GET_LSF_USER, libPath);
       goto cleanup;
     }
   idLib->getLSFUserByName_ = (GET_LSF_USER_BY_NAME_FN_T)
@@ -91,7 +91,7 @@ initIdLib (IDLIB_INFO_T * idLib)
   if (idLib->getLSFUserByName_ == NULL)
     {
       /* catgets 6351 */
-      ls_syslog (LOG_ERR, "6351: %s: Error loading symbol %s from library %s: %k", fname, GET_LSF_USER_BY_NAME, libPath);
+      ls_syslog (LOG_ERR, "6351: %s: Error loading symbol %s from library %s: %k", __func__, GET_LSF_USER_BY_NAME, libPath);
       goto cleanup;
     }
   idLib->getLSFUserByUid_ = (GET_LSF_USER_BY_UID_FN_T)
@@ -99,7 +99,7 @@ initIdLib (IDLIB_INFO_T * idLib)
   if (idLib->getLSFUserByUid_ == NULL)
     {
       /* catgets 6351 */
-      ls_syslog (LOG_ERR, "6351: %s: Error loading symbol %s from library %s: %k", fname, GET_LSF_USER_BY_UID, libPath);
+      ls_syslog (LOG_ERR, "6351: %s: Error loading symbol %s from library %s: %k", __func__, GET_LSF_USER_BY_UID, libPath);
       goto cleanup;
     }
   idLib->getOSUserName_ = (GET_OS_USER_NAME_FN_T)
@@ -107,7 +107,7 @@ initIdLib (IDLIB_INFO_T * idLib)
   if (idLib->getOSUserName_ == NULL)
     {
         /* catgets 6351 */
-      ls_syslog (LOG_ERR, "6351: %s: Error loading symbol %s from library %s: %k", fname, GET_OS_USER_NAME, libPath);
+      ls_syslog (LOG_ERR, "6351: %s: Error loading symbol %s from library %s: %k", __func__, GET_OS_USER_NAME, libPath);
       goto cleanup;
     }
     
@@ -116,7 +116,7 @@ initIdLib (IDLIB_INFO_T * idLib)
     idLib->getOSUid_ = (GET_OS_UID_FN_T) soSym_ (idLib->handle, "getOSUid_");
     if ( NULL == idLib->getOSUid_ ) {
         /* catgets 6351 */
-        ls_syslog (LOG_ERR, "6351: %s: Error loading symbol %s from library %s: %k", fname, GET_OS_UID, libPath);
+        ls_syslog (LOG_ERR, "6351: %s: Error loading symbol %s from library %s: %k", __func__, GET_OS_UID, libPath);
         goto cleanup;
     }
 
@@ -178,8 +178,7 @@ getLSFUser_ (char *lsfUserName, unsigned int lsfUserNameSize)
 }
 
 int
-getLSFUserByName_ (const char *osUserName,
-           char *lsfUserName, unsigned int lsfUserNameSize)
+getLSFUserByName_ (const char *osUserName, char *lsfUserName, unsigned int lsfUserNameSize)
 {
   int rc = 0;
 
@@ -203,7 +202,7 @@ getLSFUserByName_ (const char *osUserName,
 int
 getLSFUserByUid_ (uid_t uid, char *lsfUserName, unsigned int lsfUserNameSize)
 {
-  int rc;
+  int rc = 0;
 
   if (!checkInit (&idLib_))
     {
@@ -270,6 +269,8 @@ struct passwd *getpwlsfuser_ (const char *lsfUserName)
   struct passwd *pw;
   char osUserName[MAXLSFNAMELEN];
 
+  memset ( osUserName, 0, strlen( osUserName ) );
+
   if (getOSUserName_ (lsfUserName, osUserName, sizeof (osUserName)) < 0)
     {
       lserrno = LSE_INTERNAL;
@@ -288,8 +289,10 @@ struct passwd *getpwlsfuser_ (const char *lsfUserName)
 struct passwd *
 getpwdirlsfuser_ (const char *lsfUserName)
 {
-  struct passwd *pw;
+  struct passwd *pw = NULL;
   char osUserName[MAXLSFNAMELEN];
+
+  memset ( osUserName, 0, strlen( osUserName ) );
 
   if (getOSUserName_ (lsfUserName, osUserName, sizeof (osUserName)) < 0)
     {
@@ -309,7 +312,7 @@ getpwdirlsfuser_ (const char *lsfUserName)
 static int
 defGetLSFUser (char *lsfUserName, unsigned int lsfUserNameSize)
 {
-  struct passwd *pw;
+  struct passwd *pw = NULL;
 
   lsfUserName[0] = '\0';
 
@@ -328,8 +331,7 @@ defGetLSFUser (char *lsfUserName, unsigned int lsfUserNameSize)
 }
 
 static int
-defGetLSFUserByName (const char *osUserName, char *lsfUserName,
-             unsigned int lsfUserNameSize)
+defGetLSFUserByName (const char *osUserName, char *lsfUserName, unsigned int lsfUserNameSize)
 {
   lsfUserName[0] = '\0';
 
@@ -343,10 +345,9 @@ defGetLSFUserByName (const char *osUserName, char *lsfUserName,
 }
 
 static int
-defGetLSFUserByUid (uid_t uid, char *lsfUserName,
-            unsigned int lsfUserNameSize)
+defGetLSFUserByUid (uid_t uid, char *lsfUserName, unsigned int lsfUserNameSize)
 {
-  struct passwd *pw;
+  struct passwd *pw = NULL;
 
   lsfUserName[0] = '\0';
 
@@ -365,8 +366,7 @@ defGetLSFUserByUid (uid_t uid, char *lsfUserName,
 }
 
 static int
-defGetOSUserName (const char *lsfUserName,
-          char *osUserName, unsigned int osUserNameSize)
+defGetOSUserName (const char *lsfUserName, char *osUserName, unsigned int osUserNameSize)
 {
   osUserName[0] = '\0';
 
@@ -382,7 +382,7 @@ defGetOSUserName (const char *lsfUserName,
 static int
 defGetOSUid (const char *lsfUserName, uid_t * uid)
 {
-  struct passwd *pw;
+  struct passwd *pw = NULL;
 
   if ((pw = getpwnam (lsfUserName)) == NULL)
     {

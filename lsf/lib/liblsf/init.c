@@ -50,14 +50,14 @@ ls_initrex (int num, int options)
             lsfSetXUid(0, getuid(), getuid(), -1, setuid);
         }
 
-        return (-1);
+        return -1;
     }
 
     inithostsock_ ();
     lsQueueInit_ (&requestQ, lsReqCmp_, NULL);
     if (requestQ == NULL) {
             lserrno = LSE_MALLOC;
-            return (-1);
+            return -1;
     }
 
     res_addr_.sin_family = AF_INET;
@@ -95,7 +95,7 @@ ls_initrex (int num, int options)
                 lsfSetXUid(0, getuid(), getuid(), -1, setuid);
             }
 
-            return (-1);
+            return -1;
         }
     }
 
@@ -108,17 +108,16 @@ ls_initrex (int num, int options)
             if (!(options & KEEPUID)) {
                 lsfSetXUid(0, getuid(), getuid(), -1, setuid);
             }
-            return (i);
+            return i;
     }
     else {
-            return (num);
+            return num;
     }
 }
 
 int
 opensocks_ (int num)
 {
-    static char __func__] = "opensocks_";
     int s;
     int nextdescr;
     int i;
@@ -126,18 +125,16 @@ opensocks_ (int num)
     totsockets_ = (num <= 0 || num > MAXCONNECT) ? LSF_DEFAULT_SOCKS : num;
 
     if (logclass & LC_COMM)
-        ls_syslog (LOG_DEBUG, "%s: try to allocate num <%d> of socks", fname,
-                 num);
+        ls_syslog (LOG_DEBUG, "%s: try to allocate num <%d> of socks", __func__, num);
 
     nextdescr = FIRST_RES_SOCK;
     for (i = 0; i < totsockets_; i++)
         {
             if ((s = CreateSock_ (SOCK_STREAM)) < 0)
     {
-        if (logclass & LC_COMM)
-            ls_syslog (LOG_DEBUG,
-                     "%s: CreateSock_ failed, iter:<%d> %s",
-                     fname, i, strerror (errno));
+        if (logclass & LC_COMM) {
+            ls_syslog (LOG_DEBUG, "%s: CreateSock_ failed, iter:<%d> %s",  __func__, i, strerror (errno));
+        }
         totsockets_ = i;
         if (i > 0)
             {
@@ -145,7 +142,7 @@ opensocks_ (int num)
             }
         else
             {
-                return (-1);
+                return -1;
             }
     }
 
@@ -153,25 +150,24 @@ opensocks_ (int num)
     {
         if (dup2 (s, nextdescr) < 0)
             {
-                if (logclass & LC_COMM)
-        ls_syslog (LOG_DEBUG,
-                 "%s: dup2() failed, old:<%d>, new<%d>, iter:<%d>  %s",
-                 fname, s, nextdescr, i, strerror (errno));
+                if (logclass & LC_COMM) {
+                    ls_syslog (LOG_DEBUG, "%s: dup2() failed, old:<%d>, new<%d>, iter:<%d>  %s", __func__, s, nextdescr, i, strerror (errno));
+                }
                 close (s);
                 lserrno = LSE_SOCK_SYS;
                 totsockets_ = i;
                 if (i > 0)
         break;
                 else
-        return (-1);
+        return -1;
             }
 
 #if defined(FD_CLOEXEC)
-        fcntl (nextdescr, F_SETFD, (fcntl (nextdescr, F_GETFD)
-                            | FD_CLOEXEC));
+        fcntl (nextdescr, F_SETFD, (fcntl (nextdescr, F_GETFD) | FD_CLOEXEC));
 #else
 #if defined(FIOCLEX)
-        (void) ioctl (nextdescr, FIOCLEX, (char *) NULL);
+        // (void) ioctl (nextdescr, FIOCLEX, (char *) NULL);
+        ioctl (nextdescr, FIOCLEX, (char *) NULL);
 #endif
 #endif
 
@@ -182,10 +178,11 @@ opensocks_ (int num)
 
     currentsocket_ = FIRST_RES_SOCK;
 
-    if (logclass & LC_COMM)
-        ls_syslog (LOG_DEBUG, "%s: returning num=<%d>", fname, totsockets_);
+    if (logclass & LC_COMM) {
+        ls_syslog (LOG_DEBUG, "%s: returning num=<%d>", __func__, totsockets_);
+    }
 
-    return (totsockets_);
+    return totsockets_;
 
 }
 
@@ -194,7 +191,7 @@ opensocks_ (int num)
 int
 ls_fdbusy (int fd)
 {
-    sTab hashSearchPtr = { };
+    sTab hashSearchPtr;
     hEnt *hEntPtr      = 0;
 
     assert (limchans_[PRIMARY] >= 0 );
@@ -220,7 +217,7 @@ ls_fdbusy (int fd)
         assert( pfd[0] >= 0);
         assert( pfd[1] >= 0 );
         if (fd == pfd[0] || fd == pfd[1])  {
-            return (TRUE);
+            return TRUE;
         }
 
         hEntPtr = h_nextEnt_ (&hashSearchPtr);
@@ -256,13 +253,12 @@ lsfSetXUid (int flag, uid_t ruid, uid_t euid, uid_t suid, int (*func) ())
             printf( "wtf am i doing here? lsfSetXUid()\n");
     }
 
-    return (rtrn);
+    return rtrn;
 }
 
 void
 lsfExecLog (const char *cmd)
 {
-    static char __func__] = "lsfExecLog";
     char *lsfUserName   = malloc( sizeof( char ) * MAXLSFNAMELEN + 1 );
 
     if (genParams_[LSF_MLS_LOG].paramValue &&
@@ -272,7 +268,7 @@ lsfExecLog (const char *cmd)
 
             getLSFUser_ (lsfUserName, sizeof (lsfUserName));
             /* catgets 6259 */
-            syslog (LOG_INFO, "catgets 6259: %s: user - %s cmd - '%s'", fname, lsfUserName, cmd);
+            syslog (LOG_INFO, "catgets 6259: %s: user - %s cmd - '%s'", __func__, lsfUserName, cmd);
 
         }
     free(  lsfUserName );
@@ -282,5 +278,5 @@ lsfExecLog (const char *cmd)
 int
 lsfExecX (char *path, char **argv, int (*func) ())
 {
-    return (func (path, argv));
+    return func (path, argv);
 }

@@ -1300,7 +1300,7 @@ xdr_lsResourceInfo (XDR * xdrs, struct lsSharedResourceInfo *lsResourceInfo, str
         lsResourceInfo->nInstances   = 0;
     }
  
-    if (!(xdr_var_string (xdrs, &lsResourceInfo->resourceName) &&  xdr_int (xdrs, &lsResourceInfo->nInstances))) {
+    if (!(xdr_var_string (xdrs, &lsResourceInfo->resourceName) &&  xdr_u_int (xdrs, &lsResourceInfo->nInstances))) {
         return FALSE;
     }
     
@@ -1314,7 +1314,7 @@ xdr_lsResourceInfo (XDR * xdrs, struct lsSharedResourceInfo *lsResourceInfo, str
         }
     }
     
-    for ( int i = 0; i < lsResourceInfo->nInstances; i++) {
+    for ( unsigned int i = 0; i < lsResourceInfo->nInstances; i++) {
         status = xdr_arrayElement (xdrs, (char *) &lsResourceInfo->instances[i], hdr, xdr_lsResourceInstance); // FIXME FIXME FIXME fatal error: incompatible pointer types passing 'struct lsSharedResourceInfo *' to parameter of type 'char *'
         if (!status) {
             lsResourceInfo->nInstances = i;
@@ -1340,7 +1340,7 @@ xdr_lsResourceInstance (XDR * xdrs, struct lsSharedResourceInstance *instance, s
         instance->nHosts = 0;
     }
     
-    if (!(xdr_var_string (xdrs, &instance->value) && xdr_int (xdrs, &instance->nHosts))) {
+    if (!(xdr_var_string (xdrs, &instance->value) && xdr_u_int (xdrs, &instance->nHosts))) {
         return FALSE;
     }
     

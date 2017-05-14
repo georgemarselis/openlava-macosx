@@ -36,7 +36,7 @@ usePath(char *path)
 int
 mychdir_( char *path, struct hostent *hp )
 {
-	sTab hashSearchPtr = { };
+	sTab hashSearchPtr;
 	hEnt *hashEntryPtr = NULL;
 	static char first = TRUE;
 	char *goodpath = path;
@@ -326,7 +326,7 @@ getMap_ (void)
 #ifndef __CYGWIN__
 
 	char *domain = NULL;
-	struct ypall_callback incallback = { };
+	struct ypall_callback incallback;
 	int i = 0;
 
 	h_initTab_ (&hashTab, 64);		// FIXME FIXME FIXME FIXME wtf is hashTab from?
@@ -465,7 +465,7 @@ mountNet_ (struct hostent *hp)
 int
 myopen_ (char *filename, int flags, int mode, struct hostent *hp)
 {
-	char *fnamebuf = malloc( sizeof( char ) * MAXFILENAMELEN + 1 );
+	char *__func__buf = malloc( sizeof( char ) * MAXFILENAMELEN + 1 );
 	char *mp = NULL;
 	int i = 0;
 
@@ -493,8 +493,8 @@ myopen_ (char *filename, int flags, int mode, struct hostent *hp)
 		return (open (usePath (filename), flags, mode));
 	}
 
-	sprintf (fnamebuf, "%s%s", mp, filename);			/// FIXME FIXME FIXME FIXME FIXME this neeeds to go under the debugger and see what is the difference with the return at the end of the function
-	i = open (usePath (fnamebuf), flags, mode);
+	sprintf (__func__buf, "%s%s", mp, filename);			/// FIXME FIXME FIXME FIXME FIXME this neeeds to go under the debugger and see what is the difference with the return at the end of the function
+	i = open (usePath (__func__buf), flags, mode);
 	if (i >= 0) {
 		return i;
 	}
@@ -506,7 +506,7 @@ myopen_ (char *filename, int flags, int mode, struct hostent *hp)
 FILE *
 myfopen_ (char *filename, char *type, struct hostent * hp)
 {
-  char fnamebuf[MAXFILENAMELEN];
+  char __func__buf[MAXFILENAMELEN];
   FILE *fp;
   char *mp;
 
@@ -526,8 +526,8 @@ myfopen_ (char *filename, char *type, struct hostent * hp)
   if ((mp = mountNet_ (hp)) == NULL)
 	return (fopen (usePath (filename), type));
 
-  sprintf (fnamebuf, "%s%s", mp, filename);
-  fp = fopen (usePath (fnamebuf), type);
+  sprintf (__func__buf, "%s%s", mp, filename);
+  fp = fopen (usePath (__func__buf), type);
   if (fp != NULL)
 	return fp;
 
@@ -538,7 +538,7 @@ myfopen_ (char *filename, char *type, struct hostent * hp)
 int
 mystat_ (char *filename, struct stat *sbuf, struct hostent *hp)
 {
-  char fnamebuf[MAXFILENAMELEN];
+  char __func__buf[MAXFILENAMELEN];
   int i;
   char *mp;
 
@@ -558,8 +558,8 @@ mystat_ (char *filename, struct stat *sbuf, struct hostent *hp)
   if ((mp = mountNet_ (hp)) == NULL)
 	return (stat (usePath (filename), sbuf));
 
-  sprintf (fnamebuf, "%s%s", mp, filename);
-  i = stat (usePath (fnamebuf), sbuf);
+  sprintf (__func__buf, "%s%s", mp, filename);
+  i = stat (usePath (__func__buf), sbuf);
   if (i >= 0)
 	return i;
 
@@ -570,7 +570,7 @@ mystat_ (char *filename, struct stat *sbuf, struct hostent *hp)
 int
 mychmod_ (char *filename, mode_t mode, struct hostent *hp)
 {
-  char fnamebuf[MAXFILENAMELEN];
+  char __func__buf[MAXFILENAMELEN];
   int i;
   char *mp;
 
@@ -590,8 +590,8 @@ mychmod_ (char *filename, mode_t mode, struct hostent *hp)
   if ((mp = mountNet_ (hp)) == NULL)
 	return (chmod (usePath (filename), mode));
 
-  sprintf (fnamebuf, "%s%s", mp, filename);
-  i = chmod (usePath (fnamebuf), mode);
+  sprintf (__func__buf, "%s%s", mp, filename);
+  i = chmod (usePath (__func__buf), mode);
   if (i >= 0)
 	return i;
 
@@ -602,7 +602,7 @@ mychmod_ (char *filename, mode_t mode, struct hostent *hp)
 void
 myexecv_ (char *filename, char **argv, struct hostent *hp)
 {
-  char fnamebuf[MAXFILENAMELEN];
+  char __func__buf[MAXFILENAMELEN];
   char *mp;
 
   if (!hp || filename[0] != '/' || AM_NEVER)
@@ -635,8 +635,8 @@ myexecv_ (char *filename, char **argv, struct hostent *hp)
 	  return;
 	}
 
-  sprintf (fnamebuf, "%s%s", mp, filename);
-  lsfExecX( usePath (fnamebuf), argv , execv );
+  sprintf (__func__buf, "%s%s", mp, filename);
+  lsfExecX( usePath (__func__buf), argv , execv );
 
   lsfExecX( usePath (filename), argv , execv );
 
@@ -645,7 +645,7 @@ myexecv_ (char *filename, char **argv, struct hostent *hp)
 int
 myunlink_ (char *filename, struct hostent *hp, int doMount)
 {
-  char fnamebuf[MAXFILENAMELEN];
+  char __func__buf[MAXFILENAMELEN];
   int i;
   char *mp;
 
@@ -670,8 +670,8 @@ myunlink_ (char *filename, struct hostent *hp, int doMount)
 	  return (1);
 	}
 
-	  sprintf (fnamebuf, "%s%s", mp, filename);
-	  i = unlink (usePath (fnamebuf));
+	  sprintf (__func__buf, "%s%s", mp, filename);
+	  i = unlink (usePath (__func__buf));
 	  if (i >= 0)
 	return i;
 	}
@@ -682,7 +682,7 @@ myunlink_ (char *filename, struct hostent *hp, int doMount)
 int
 mymkdir_ (char *filename, mode_t mode, struct hostent *hp)
 {
-  char fnamebuf[MAXFILENAMELEN];
+  char __func__buf[MAXFILENAMELEN];
   int i;
   char *mp;
 
@@ -702,8 +702,8 @@ mymkdir_ (char *filename, mode_t mode, struct hostent *hp)
   if ((mp = mountNet_ (hp)) == NULL)
 	return (mkdir (usePath (filename), mode));
 
-  sprintf (fnamebuf, "%s%s", mp, filename);
-  i = mkdir (usePath (fnamebuf), mode);
+  sprintf (__func__buf, "%s%s", mp, filename);
+  i = mkdir (usePath (__func__buf), mode);
   if (i >= 0)
 	return i;
 
@@ -714,7 +714,7 @@ mymkdir_ (char *filename, mode_t mode, struct hostent *hp)
 int
 myrename_ (char *from, char *to, struct hostent *hp)
 {
-  char fnamebuf[MAXFILENAMELEN];
+  char __func__buf[MAXFILENAMELEN];
   char tnamebuf[MAXFILENAMELEN];
   int i;
   char *mp;
@@ -737,16 +737,16 @@ myrename_ (char *from, char *to, struct hostent *hp)
 	return (rename (from, to));
 
   if (from[0] == '/')
-	sprintf (fnamebuf, "%s%s", mp, from);
+	sprintf (__func__buf, "%s%s", mp, from);
   else
-	strcpy (fnamebuf, from);
+	strcpy (__func__buf, from);
 
   if (to[0] == '/')
 	sprintf (tnamebuf, "%s%s", mp, to);
   else
 	strcpy (tnamebuf, to);
 
-  i = rename (fnamebuf, tnamebuf);
+  i = rename (__func__buf, tnamebuf);
   if (i >= 0)
 	return i;
 

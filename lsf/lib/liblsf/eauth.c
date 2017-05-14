@@ -46,7 +46,7 @@ getAuth_ (struct lsfAuth *auth, char *host)
 
   if (getLSFUser_ (auth->lsfUserName, sizeof (auth->lsfUserName)) < 0)
     {
-      ls_syslog (LOG_DEBUG, I18N_FUNC_FAIL_MM, "getAuth", "getLSFUser_");
+      ls_syslog (LOG_DEBUG, I18N_FUNC_FAIL_MM, __func__, "getLSFUser_");
       lserrno = LSE_BADUSER;
       return -1;
     }
@@ -67,7 +67,7 @@ getAuth_ (struct lsfAuth *auth, char *host)
         auth->kind = CLIENT_SETUID;
     }
 
-  return (0);
+  return 0;
 }
 
 #define EAUTHNAME "eauth"
@@ -99,7 +99,7 @@ getEAuth (struct eauth *eauth, char *host)
       }
 
       lserrno = LSE_EAUTH;
-      return (-1);
+      return -1;
     }
 
     if (ld.len == 0) {
@@ -109,7 +109,7 @@ getEAuth (struct eauth *eauth, char *host)
         }
         FREEUP (ld.data);
         lserrno = LSE_EAUTH;
-        return (-1);
+        return -1;
     }
 
     if (ld.len > EAUTH_SIZE) {
@@ -120,7 +120,7 @@ getEAuth (struct eauth *eauth, char *host)
 
         FREEUP (ld.data);
         lserrno = LSE_EAUTH;
-        return (-1);
+        return -1;
     }
 
     memcpy (eauth->data, ld.data, ld.len);
@@ -137,7 +137,7 @@ getEAuth (struct eauth *eauth, char *host)
         ls_syslog (LOG_DEBUG, "runEAuth: <%s> got len=%d", path, ld.len);
     }
 
-  return (0);
+  return 0;
 
 }
 
@@ -157,14 +157,13 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
 
     static int connected = FALSE;
     static int in[2], out[2];
-    static char __func__] = "verifyEAuth/lib.eauth.c";
 
     if (logclass & LC_TRACE) {
-        ls_syslog (LOG_DEBUG, "%s ...", fname);
+        ls_syslog (LOG_DEBUG, "%s ...", __func__);
     }
 
     if (!(genParams_[LSF_AUTH].paramValue && !strcmp (genParams_[LSF_AUTH].paramValue, AUTH_PARAM_EAUTH))) {
-        return (-1);
+        return -1;
     }
 
     // FIXME FIXME 
@@ -190,7 +189,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
     ls_strcat (path, sizeof (path), EAUTHNAME);
 
     if (logclass & (LC_AUTH | LC_TRACE)) {
-        ls_syslog (LOG_DEBUG, "%s: <%s> path <%s> connected=%d", fname, uData, path, connected);
+        ls_syslog (LOG_DEBUG, "%s: <%s> path <%s> connected=%d", __func__, uData, path, connected);
     }
 
     if (connected)
@@ -207,7 +206,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
         if ((cc = select (out[0] + 1, &mask, NULL, NULL, &tv)) > 0) 
         {
             if (logclass & (LC_AUTH | LC_TRACE)) {
-               ls_syslog (LOG_DEBUG, "%s: <%s> got exception", fname, uData);
+               ls_syslog (LOG_DEBUG, "%s: <%s> got exception", __func__, uData);
             }
 
             connected = FALSE;
@@ -217,12 +216,12 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
         else
        {
            if (cc < 0) {
-               ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "select", uData);
+               ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "select", uData);
            }
        }
     
         if (logclass & (LC_AUTH | LC_TRACE)) {
-           ls_syslog (LOG_DEBUG, "%s: <%s> select returned cc=%d", fname, uData, cc);
+           ls_syslog (LOG_DEBUG, "%s: <%s> select returned cc=%d", __func__, uData, cc);
        }
 
     }
@@ -234,21 +233,21 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
 
         if ((user = getLSFAdmin ()) == NULL)
         {
-           return (-1);
+           return -1;
         }
     
         if (pipe (in) < 0)
         {
-          ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "pipe(in)", uData);
+          ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "pipe(in)", uData);
           lserrno = LSE_SOCK_SYS;
-          return (-1);
+          return -1;
         }
 
         if (pipe (out) < 0)
         {
-            ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "pipe(out)", uData);
+            ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "pipe(out)", uData);
             lserrno = LSE_SOCK_SYS;
-            return (-1);
+            return -1;
         }
 
 
@@ -259,7 +258,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
 
             if ((pw = getpwlsfuser_ (user)) == (struct passwd *) NULL)
             {
-                ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "getpwlsfuser_", user);
+                ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "getpwlsfuser_", user);
                 exit (-1);
             }
 
@@ -267,7 +266,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
             // [s]uid_t type. if yes, try to see if there is an alternative to passing -1.
             if (lsfSetXUid(0, pw->pw_uid, pw->pw_uid, (int) -1, setuid)  < 0)
             {
-              ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, fname, "setuid", (int) pw->pw_uid);
+              ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "setuid", (int) pw->pw_uid);
               exit (-1);
             }
 
@@ -280,13 +279,13 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
             close (in[1]);
             if (dup2 (in[0], 0) == -1)
             {
-                ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "dup2(in[0])", uData);
+                ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "dup2(in[0])", uData);
             }
 
             close (out[0]);
             if (dup2 (out[1], 1) == -1)
             {
-                ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "dup2(out[1])", uData);
+                ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "dup2(out[1])", uData);
             }
 
             for ( int i = 3; i < sysconf (_SC_OPEN_MAX); i++){
@@ -298,7 +297,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
             myargv[2] = NULL;
 
             lsfExecX( myargv[0], myargv, execvp);
-            ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "execvp", myargv[0]);
+            ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "execvp", myargv[0]);
             exit (-1);
         }
 
@@ -307,11 +306,11 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
 
         if (pid == -1)
         {
-            ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, fname, "fork", path);
+            ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "fork", path);
             close (in[1]);
             close (out[0]);
             lserrno = LSE_FORK;
-            return (-1);
+            return -1;
         }
 
         connected = TRUE;
@@ -328,15 +327,15 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
     if (cc != (long) uData_length)
     {
         /* catgets 5513 */
-        ls_syslog (LOG_ERR, "5513: %s: b_write_fix <%s> failed, cc=%d, i=%d: %ld", fname, uData, cc, uData_length);
+        ls_syslog (LOG_ERR, "5513: %s: b_write_fix <%s> failed, cc=%d, i=%d: %ld", __func__, uData, cc, uData_length);
         CLOSEHANDLE (in[1]);
         CLOSEHANDLE (out[0]);
         connected = FALSE;
-        return (-1);
+        return -1;
     }
     
     if (logclass & (LC_AUTH | LC_TRACE)) {
-        ls_syslog (LOG_DEBUG, "5514: %s: b_write_fix <%s> ok, cc=%d, i=%d", fname, uData, cc, uData_length);
+        ls_syslog (LOG_DEBUG, "5514: %s: b_write_fix <%s> ok, cc=%d, i=%d", __func__, uData, cc, uData_length);
     }
 
     // FIXME investigate the type of auth->k.eauth.len and figure out if len
@@ -346,58 +345,58 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
     if ( cc != (long) auth->k.eauth.len)
     {
          /* catgets 5515 */
-        ls_syslog (LOG_ERR, "5515: %s: b_write_fix <%s> failed, eauth.len=%d, cc=%d", fname, uData, auth->k.eauth.len, cc);
+        ls_syslog (LOG_ERR, "5515: %s: b_write_fix <%s> failed, eauth.len=%d, cc=%d", __func__, uData, auth->k.eauth.len, cc);
         CLOSEHANDLE (in[1]);
         CLOSEHANDLE (out[0]);
         connected = FALSE;
-        return (-1);
+        return -1;
     }
 
     if (logclass & (LC_AUTH | LC_TRACE)) {
-        ls_syslog (LOG_DEBUG, "5516: %s: b_write_fix <%s> ok, eauth.len=%d, eauth.data=%.*s cc=%d:", fname, uData, auth->k.eauth.len, auth->k.eauth.len, auth->k.eauth.data, cc);
+        ls_syslog (LOG_DEBUG, "5516: %s: b_write_fix <%s> ok, eauth.len=%d, eauth.data=%.*s cc=%d:", __func__, uData, auth->k.eauth.len, auth->k.eauth.len, auth->k.eauth.data, cc);
     }
 
     cc = (long) b_read_fix (out[0], &ok, 1);
     if ( cc != 1) {
         /* catgets 5517 */
-        ls_syslog (LOG_ERR, "5517: %s: b_read_fix <%s> failed, cc=%d: %ld", fname, uData, cc);
+        ls_syslog (LOG_ERR, "5517: %s: b_read_fix <%s> failed, cc=%d: %ld", __func__, uData, cc);
         CLOSEHANDLE (in[1]);
         CLOSEHANDLE (out[0]);
         connected = FALSE;
-        return (-1);
+        return -1;
     }
 
     if (ok != '1') {
         /* catgets 5518 */
-        ls_syslog (LOG_ERR, "5518: %s: eauth <%s> len=%d failed, rc=%c", fname, uData, auth->k.eauth.len, ok);
-        return (-1);
+        ls_syslog (LOG_ERR, "5518: %s: eauth <%s> len=%d failed, rc=%c", __func__, uData, auth->k.eauth.len, ok);
+        return -1;
     }
 
-  return (0);
+  return 0;
 }
 
 static char *
 getLSFAdmin (void)
 {
   static char admin[MAXLSFNAMELEN];
-  static char __func__] = "getLSFAdmin";
   char *mycluster;
   struct clusterInfo *clusterInfo;
   struct passwd *pw;
   char *lsfUserName;
 
-  if (admin[0] != '\0')
-    return admin;
+    if (admin[0] != '\0') {
+        return admin;
+    }
 
   if ((mycluster = ls_getclustername ()) == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "ls_getclustername");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "ls_getclustername");
       return NULL;
     }
   if ((clusterInfo = ls_clusterinfo (NULL, NULL, NULL, 0, 0)) == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, fname, "ls_clusterinfo");
-      return (NULL);
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "ls_clusterinfo");
+      return NULL;
     }
 
   lsfUserName = (clusterInfo->nAdmins == 0 ? clusterInfo->managerName :
@@ -406,8 +405,8 @@ getLSFAdmin (void)
   if ((pw = getpwlsfuser_ (lsfUserName)) == NULL)
     {
       ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M,
-         fname, "getpwlsfuser_", lsfUserName);
-      return (NULL);
+         __func__, "getpwlsfuser_", lsfUserName);
+      return NULL;
     }
 
   strcpy (admin, lsfUserName);

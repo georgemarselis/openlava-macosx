@@ -18,59 +18,51 @@
 
 #include <unistd.h>
 
+#include "lib/info.h"
 #include "lib/lib.h"
 #include "lib/lim.h"
-#include "lib/xdr.h"
 #include "lib/lproto.h"
+#include "lib/xdr.h"
 #include "lib/xdrlim.h"
 
-struct masterInfo masterInfo_ = { };
-int masterknown_ = FALSE;
-
-static struct hostInfo *expandSHinfo (struct hostInfoReply *);
-static struct clusterInfo *expandSCinfo (struct clusterInfoReply *);
-static int copyAdmins_ (struct clusterInfo *, struct shortCInfo *);
-static int getname_ (enum limReqCode limReqCode, char *name, size_t namesize);
 
 char *
 ls_getclustername (void)
 {
 
-	static char __func__] = "ls_getclustername";
 	char *clName = malloc( sizeof( char ) * MAXLSFNAMELEN + 1 ); // FIXME FIXME FIXME FIXME dynamic memory allocation and management
 
 	if (logclass & (LC_TRACE)) {
-		ls_syslog (LOG_DEBUG, "%s: Entering this routine...", fname);
+		ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
 	}
 
-	if( NULL == clName ) { // FIXME FIXME refactor
+	if( NULL == clName ) {
 		if ( getname_ (LIM_GET_CLUSNAME, clName, MAXLSFNAMELEN) < 0) {
 			return NULL;
 		}
 	}
 
-  return (clName);
-
+	return clName;
 }
 
 unsigned int
 expandList1_ (char ***tolist, unsigned int num, unsigned int *bitmMaps, char **keys)
 {
 
-  unsigned int ii = 0;
-  unsigned int jj = 0;
-  int isSet = 0;
-  char **temp = NULL;
+	unsigned int ii = 0;
+	unsigned int jj = 0;
+	int isSet = 0;
+	char **temp = NULL;
 
 	if (num <= 0) {
 		return 0;
 	}
 
 	// FIXME num is checked above. cast ok
-	temp = (char **) calloc ( (unsigned long) num, sizeof (char *));
+	temp = calloc ( num, sizeof (char *) + 1);
 	if (  NULL == temp && ENOMEM == errno ) {
 		lserrno = LSE_MALLOC;
-		return (0);
+		return 0;
 	}
 
 	for (ii = 0, jj = 0; ii < num; ii++) {
@@ -89,14 +81,14 @@ expandList1_ (char ***tolist, unsigned int num, unsigned int *bitmMaps, char **k
 	  *tolist = NULL;
 	}
 
-	return (jj);
+	return jj;
 }
 
 unsigned int
 expandList_ (char ***tolist, unsigned int mask, char **keys)
 {
 	unsigned int lastElementCounter = 0;
-	char *temp[32];
+	char *temp[32];							// FIXME FIXME FIXME 32 element array looks awfuly particular. why?
 
 	for ( unsigned int i = 0, j = 0; i < 32; i++) {
 		if (mask & (1 << i)) {
@@ -111,7 +103,7 @@ expandList_ (char ***tolist, unsigned int mask, char **keys)
 		if (!*tolist) {
 
 			lserrno = LSE_MALLOC;
-			return (0);
+			return 0;
 		}
 		
 		for ( unsigned int i = 0; i < lastElementCounter; i++) {
@@ -122,10 +114,10 @@ expandList_ (char ***tolist, unsigned int mask, char **keys)
 		*tolist = NULL;
 	}
 	
-	return (lastElementCounter);
+	return lastElementCounter;
 }
 
-static int
+int
 copyAdmins_ (struct clusterInfo *clusPtr, struct shortCInfo *clusShort)
 {
 
@@ -134,8 +126,8 @@ copyAdmins_ (struct clusterInfo *clusPtr, struct shortCInfo *clusShort)
 	}
 
 	// check already done above
-	clusPtr->adminIds = calloc ( (unsigned long) clusShort->nAdmins, sizeof (int));
-	clusPtr->admins = calloc ( (unsigned long) clusShort->nAdmins, sizeof (char *));
+	clusPtr->adminIds = calloc( clusShort->nAdmins, sizeof (int));
+	clusPtr->admins   = calloc(  clusShort->nAdmins, sizeof (char *));
 
 	if (!clusPtr->admins || !clusPtr->adminIds) {
 		goto errReturn;
@@ -159,15 +151,15 @@ copyAdmins_ (struct clusterInfo *clusPtr, struct shortCInfo *clusShort)
 	
 	return 0;
 
-errReturn:
+errReturn: 	// FIXME FIXME FIXME 
 	FREEUP (clusPtr->admins);
 	FREEUP (clusPtr->adminIds);
 	lserrno = LSE_MALLOC;
-	return (-1);
+	return -1;
 
 }
 
-static struct clusterInfo *
+struct clusterInfo *
 expandSCinfo (struct clusterInfoReply *clusterInfoReply)
 {
 	static unsigned int nClusters = 0;
@@ -199,7 +191,7 @@ expandSCinfo (struct clusterInfoReply *clusterInfoReply)
 	if (!clusterInfoPtr) {
 		nClusters = 0;
 		lserrno = LSE_MALLOC;
-		return (NULL);
+		return NULL;
 	}
 
 		nClusters = clusterInfoReply->nClusters;
@@ -264,11 +256,11 @@ expandSCinfo (struct clusterInfoReply *clusterInfoReply)
 			}
 
 			FREEUP (clusterInfoPtr);
-			return ((struct clusterInfo *) NULL);
+			return (struct clusterInfo *) NULL;
 		}
 	}
 	
-	return (clusterInfoPtr);
+	return clusterInfoPtr;
 
 }
 
@@ -278,7 +270,8 @@ ls_clusterinfo (char *resReq, unsigned int *numclusters, char **clusterList, int
 	struct clusterInfoReq clusterInfoReq;
 	static struct clusterInfoReply clusterInfoReply;
 	struct shortLsInfo shortlsInfo;
-	int count, ret_val;
+	int count = 0;
+	int ret_val = 0;
 
 	if (listsize != 0 && clusterList == NULL)
 	{
@@ -287,7 +280,7 @@ ls_clusterinfo (char *resReq, unsigned int *numclusters, char **clusterList, int
 	}
 
 	if (initenv_ (NULL, NULL) < 0) {
-		return (NULL);
+		return NULL;
 	}
 
 	for (count = 0; count < listsize; count++) {
@@ -295,11 +288,11 @@ ls_clusterinfo (char *resReq, unsigned int *numclusters, char **clusterList, int
 		
 		if (ret_val <= 0) {
 			if (ret_val < 0) {
-				return (NULL);
+				return NULL;
 			}
 
 			lserrno = LSE_BAD_CLUSTER;
-			return (NULL);
+			return NULL;
 		}
 	}
 
@@ -316,14 +309,14 @@ ls_clusterinfo (char *resReq, unsigned int *numclusters, char **clusterList, int
 
 	clusterInfoReply.shortLsInfo = &shortlsInfo;
 	if (callLim_ (LIM_GET_CLUSINFO, &clusterInfoReq, xdr_clusterInfoReq, &clusterInfoReply, xdr_clusterInfoReply, NULL, 0, NULL) < 0) { 
-		return (NULL);
+		return NULL;
 	}
 
 	if (numclusters != NULL) {
 		*numclusters = clusterInfoReply.nClusters;
 	}
 	
-	return (expandSCinfo (&clusterInfoReply));
+	return expandSCinfo (&clusterInfoReply);
 
 }
 
@@ -344,7 +337,7 @@ ls_getmastername (void)
  * only.
  */
 char *
-ls_getmastername2 (void)
+ls_getmastername2( void )
 {
 	static char master[MAXHOSTNAMELEN];
 
@@ -355,13 +348,13 @@ ls_getmastername2 (void)
 	return master;
 }
 
-static int
+int
 getname_ (enum limReqCode limReqCode, char *name, size_t namesize)
 {
-	int options;
+	int options = 0;
 
 	if (initenv_ (NULL, NULL) < 0) {
-		return (-1);
+		return -1;
 	}
 
 	if (limReqCode == LIM_GET_CLUSNAME) 
@@ -390,7 +383,7 @@ getname_ (enum limReqCode limReqCode, char *name, size_t namesize)
 	 /* no data to send */
 	 /* host LSF_SERVER_HOSTS */
 	if (callLim_ (limReqCode, NULL, NULL, &masterInfo_, xdr_masterInfo, NULL, options, NULL) < 0) {
-		return (-1);
+		return -1;
 	}
 
 	if (memcmp (&sockIds_[MASTER].sin_addr, &masterInfo_.addr, sizeof (in_addr_t))) {
@@ -400,52 +393,58 @@ getname_ (enum limReqCode limReqCode, char *name, size_t namesize)
 		limchans_[TCP] = -1;
 	}
 
-  memcpy (&sockIds_[MASTER].sin_addr, &masterInfo_.addr, sizeof (in_addr_t));
-  memcpy (&sockIds_[TCP].sin_addr, &masterInfo_.addr, sizeof (in_addr_t));
-  sockIds_[TCP].sin_port = masterInfo_.portno;
-  masterknown_ = TRUE;
-  strncpy (name, masterInfo_.hostName, namesize);
-  name[namesize - 1] = '\0';
+	memcpy (&sockIds_[MASTER].sin_addr, &masterInfo_.addr, sizeof (in_addr_t));
+	memcpy (&sockIds_[TCP].sin_addr, &masterInfo_.addr, sizeof (in_addr_t));
+	sockIds_[TCP].sin_port = masterInfo_.portno;
+	masterknown_ = TRUE;
+	strncpy (name, masterInfo_.hostName, namesize);
+	name[namesize - 1] = '\0';
 
-  return 0;
+	return 0;
 }
 
 char *
 ls_gethosttype (char *hostname)
 {
-  struct hostInfo *hostinfo;
-  static char hostType[MAXLSFNAMELEN];
+	struct hostInfo *hostinfo = NULL;
+	static char hostType[MAXLSFNAMELEN];
 
-  if (hostname == NULL)
-	if ((hostname = ls_getmyhostname ()) == NULL)
-	  return (NULL);
+	memset( hostType , 0, strlen( hostType) );
 
-  hostinfo = ls_gethostinfo ("-", NULL, &hostname, 1, 0);
-  if (hostinfo == NULL)
-	return (NULL);
+	if (hostname == NULL) {
+		if ((hostname = ls_getmyhostname ()) == NULL) {
+			return NULL;
+		}
+	}
 
-  strcpy (hostType, hostinfo[0].hostType);
-  return (hostType);
+	hostinfo = ls_gethostinfo ("-", NULL, &hostname, 1, 0);
+	if (hostinfo == NULL) {
+		return NULL;
+	}
 
+	strcpy (hostType, hostinfo[0].hostType);
+	return hostType;
 }
 
 char *
 ls_gethostmodel (char *hostname)
 {
-  struct hostInfo *hostinfo;
-  static char hostModel[MAXLSFNAMELEN];
+	struct hostInfo *hostinfo = NULL;
+	static char hostModel[MAXLSFNAMELEN];
 
-  if (hostname == NULL)
-	if ((hostname = ls_getmyhostname ()) == NULL)
-	  return (NULL);
+	if (hostname == NULL) {
+		if ((hostname = ls_getmyhostname ()) == NULL) {
+			return NULL;
+		}
+	}
 
-  hostinfo = ls_gethostinfo ("-", NULL, &hostname, 1, 0);
-  if (hostinfo == NULL)
-	return (NULL);
+	hostinfo = ls_gethostinfo ("-", NULL, &hostname, 1, 0);
+	if (hostinfo == NULL) {
+		return NULL;
+	}
 
-  strcpy (hostModel, hostinfo[0].hostModel);
-  return hostModel;
-
+	strcpy (hostModel, hostinfo[0].hostModel);
+	return hostModel;
 }
 
 
@@ -461,56 +460,54 @@ ls_gethostmodel (char *hostname)
 float *
 ls_gethostfactor (char *hostname)
 {
-	struct hostInfo *hostinfo;
-	static float cpufactor;
+	struct hostInfo *hostinfo = NULL;
+	static float cpufactor    = 0.0F;
 
 	if (hostname == NULL) {
 		if ((hostname = ls_getmyhostname ()) == NULL) {
-			return (NULL);
+			return NULL;
 		}
 	}
 
 	hostinfo = ls_gethostinfo ("-", NULL, &hostname, 1, 0);
 	if (hostinfo == NULL) {
-		return (NULL);
+		return NULL;
 	}
 
 	cpufactor = hostinfo->cpuFactor;
-	return (&cpufactor);
-
+	return &cpufactor;
 }
 
 float *
 ls_getmodelfactor (char *modelname)
 {
-	static float cpuf;
+	static float cpuf = 0.0F;
 	struct stringLen str;
 
 	if (!modelname) {
-		return (ls_gethostfactor (NULL));
+		return ls_gethostfactor (NULL);
 	}
 
 	if (initenv_ (NULL, NULL) < 0) {
-		return (NULL);
+		return NULL;
 	}
 
 	str.name = modelname;
 	str.len = MAXLSFNAMELEN;
 	if (callLim_ (LIM_GET_CPUF, &str, xdr_stringLen, &cpuf, xdr_float, NULL, 0, NULL) < 0) {
-		return (NULL);
+		return NULL;
 	}
 	
-	return (&cpuf);
-
+	return &cpuf;
 }
 
-static struct hostInfo *
+struct hostInfo *
 expandSHinfo (struct hostInfoReply *hostInfoReply)
 {
 	static unsigned long nHost  = 0;
 	static struct hostInfo *hostInfoPtr = NULL;
 	unsigned long final_counter = 0;
-	struct shortLsInfo *lsInfoPtr;
+	struct shortLsInfo *lsInfoPtr = NULL;
 
 	if (hostInfoPtr)
 	{
@@ -525,7 +522,7 @@ expandSHinfo (struct hostInfoReply *hostInfoReply)
 	if (!hostInfoPtr) {
 		nHost = 0;
 		lserrno = LSE_MALLOC;
-		return (NULL);
+		return NULL;
 	}
 
 	nHost = hostInfoReply->nHost;
@@ -573,28 +570,27 @@ expandSHinfo (struct hostInfoReply *hostInfoReply)
 		FREEUP (hostInfoPtr);
 		lserrno = LSE_MALLOC;
 		
-		return ((struct hostInfo *) NULL);
+		return (struct hostInfo *) NULL;
 	}
 
-	return (hostInfoPtr);
+	return hostInfoPtr;
 }
 
 struct hostInfo *
 ls_gethostinfo (char *resReq, size_t *numhosts, char **hostlist, size_t listsize, int options)
 {
-	static char __func__] = "ls_gethostinfo";
-	char *hname;
+	char *hname = NULL;
 	int cc = 0;
 	struct shortLsInfo lsInfo;
 	struct decisionReq hostInfoReq;
 	static struct hostInfoReply hostInfoReply;
 	
 	if (logclass & (LC_TRACE)) {
-		ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", fname);
+		ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", __func__);
 	}
 
 	if ((hname = ls_getmyhostname ()) == NULL) {
-		return (NULL);
+		return NULL;
 	}
 
 	if (listsize) {
@@ -643,7 +639,7 @@ ls_gethostinfo (char *resReq, size_t *numhosts, char **hostlist, size_t listsize
 				free (hostInfoReq.preferredHosts[j]);
 			}
 			free (hostInfoReq.preferredHosts);
-			return (NULL);
+			return NULL;
 		}
 		
 		hostInfoReq.ofWhat = OF_HOSTS;
@@ -686,23 +682,24 @@ ls_gethostinfo (char *resReq, size_t *numhosts, char **hostlist, size_t listsize
 		*numhosts = hostInfoReply.nHost;
 	}
   
-	return (expandSHinfo (&hostInfoReply));
+	return expandSHinfo (&hostInfoReply);
 
 }
 
 struct lsInfo *
 ls_info (void)
 {
-  static struct lsInfo lsInfo;
+	static struct lsInfo lsInfo;
 
-  if (initenv_ (NULL, NULL) < 0)
-	return NULL;
+	if (initenv_ (NULL, NULL) < 0) {
+		return NULL;
+	}
 
-  if (callLim_ (LIM_GET_INFO,
-		NULL, NULL, &lsInfo, xdr_lsInfo, NULL, _USE_TCP_, NULL) < 0)
-	return NULL;
+	if (callLim_ (LIM_GET_INFO, NULL, NULL, &lsInfo, xdr_lsInfo, NULL, _USE_TCP_, NULL) < 0) {
+		return NULL;
+	}
 
-  return &lsInfo;
+	return &lsInfo;
 }
 
 
@@ -742,25 +739,26 @@ ls_indexnames (struct lsInfo *lsInfo)
 		}
 	}
   indicies[lastElement] = NULL;
-  return (indicies);
+  return indicies;
 
 }
 
 int
 ls_isclustername (char *name)
 {
-  char *clname;
+  char *clname = NULL;
 
-  clname = ls_getclustername ();
-  if (clname && strcmp (clname, name) == 0)
-	return (1);
-  return (0);
+	clname = ls_getclustername ();
+	if (clname && strcmp (clname, name) == 0) {
+		return 1;
+	}
+
+	return 0;
 }
 
 struct lsSharedResourceInfo *
 ls_sharedresourceinfo (char **resources, unsigned int *numResources, char *hostName, int options)
 {
-	static char __func__] = "ls_sharedresourceinfo";
 	static struct resourceInfoReq resourceInfoReq;
 	static struct resourceInfoReply resourceInfoReply;
 	static struct LSFHeader replyHdr;
@@ -771,7 +769,7 @@ ls_sharedresourceinfo (char **resources, unsigned int *numResources, char *hostN
 	assert( options >= 0 );
 
 	if (logclass & (LC_TRACE)) {
-		ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", fname);
+		ls_syslog (LOG_DEBUG1, "%s: Entering this routine...", __func__);
 	}
 
 	if (first == TRUE)
@@ -793,7 +791,7 @@ ls_sharedresourceinfo (char **resources, unsigned int *numResources, char *hostN
 	if (numResources == NULL || (resources == NULL && *numResources > 0))
 	{
 		lserrno = LSE_BAD_ARGS;
-		return (NULL);
+		return NULL;
 	}
 
 	if (*numResources == 0 && resources == NULL)
@@ -801,7 +799,7 @@ ls_sharedresourceinfo (char **resources, unsigned int *numResources, char *hostN
 		if( ( resourceInfoReq.resourceNames = malloc( sizeof( resourceInfoReq.resourceNames ) ) ) == NULL)
 		{
 			lserrno = LSE_MALLOC;
-			return (NULL);
+			return NULL;
 		}
 		resourceInfoReq.resourceNames[0] = "";
 		resourceInfoReq.numResourceNames = 1;
@@ -811,7 +809,7 @@ ls_sharedresourceinfo (char **resources, unsigned int *numResources, char *hostN
 		resourceInfoReq.resourceNames = malloc( *numResources * sizeof( resourceInfoReq.resourceNames ) );
 		if( NULL == resourceInfoReq.resourceNames && ENOMEM == errno ) {
 			lserrno = LSE_MALLOC;
-			return (NULL);
+			return NULL;
 		}
 
 		for ( unsigned int i = 0; i < *numResources; i++)
@@ -824,7 +822,7 @@ ls_sharedresourceinfo (char **resources, unsigned int *numResources, char *hostN
 				FREEUP (resourceInfoReq.resourceNames);
 				lserrno = LSE_BAD_RESOURCE;
 				*numResources = i;
-				return (NULL);
+				return NULL;
 			}
 			resourceInfoReq.numResourceNames = *numResources;
 		}
@@ -835,7 +833,7 @@ ls_sharedresourceinfo (char **resources, unsigned int *numResources, char *hostN
 		if( ( strlen (hostName) > MAXHOSTNAMELEN - 1 ) || ( Gethostbyname_ (hostName) == NULL ) )
 		{
 			lserrno = LSE_BAD_HOST;
-			return (NULL);
+			return NULL;
 		}
 
 		resourceInfoReq.hostName = putstr_ (hostName);
@@ -848,7 +846,7 @@ ls_sharedresourceinfo (char **resources, unsigned int *numResources, char *hostN
 	if (resourceInfoReq.hostName == NULL)
 	{
 		lserrno = LSE_MALLOC;
-		return (NULL);
+		return NULL;
 	}
 	cc = callLim_ (LIM_GET_RESOUINFO, &resourceInfoReq, xdr_resourceInfoReq,
 				&resourceInfoReply, xdr_resourceInfoReply, NULL, _USE_TCP_,
@@ -862,6 +860,6 @@ ls_sharedresourceinfo (char **resources, unsigned int *numResources, char *hostN
 
 	*numResources = resourceInfoReply.numResources;
  	
- 	return (resourceInfoReply.resources);
+ 	return resourceInfoReply.resources;
 }
 
