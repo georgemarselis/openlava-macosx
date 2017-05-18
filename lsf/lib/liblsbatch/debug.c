@@ -39,9 +39,9 @@ lsb_debugReq (struct debugReq *pdebug, char *host)
   char *reply_buf   = NULL;
   mbdReqType mbdReqtype = 0;
   int cc = 0;
-  XDR xdrs = { };
-  struct LSFHeader hdr  = { };
-  struct lsfAuth auth   = { };
+  XDR xdrs;
+  struct LSFHeader hdr;
+  struct lsfAuth auth;
   
 
   debug.opCode   = pdebug->opCode;
@@ -107,7 +107,7 @@ lsb_debugReq (struct debugReq *pdebug, char *host)
   if (debug.opCode == MBD_DEBUG || debug.opCode == MBD_TIMING)
     {
       assert( XDR_GETPOS (&xdrs) <= INT_MAX );
-      if ((cc = callmbd (NULL, request_buf, (int)XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL)) == -1)
+      if ((cc = callmbd (NULL, request_buf, XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL)) == -1)
 	{
 	  xdr_destroy (&xdrs);
 	  return (-1);
@@ -116,7 +116,7 @@ lsb_debugReq (struct debugReq *pdebug, char *host)
   else
     {
       assert( XDR_GETPOS( &xdrs) <= INT_MAX );
-      if ((cc = cmdCallSBD_ (debug.hostName, request_buf, (int)XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL)) == -1)
+      if ((cc = cmdCallSBD_ (debug.hostName, request_buf, XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL)) == -1)
 	{
 	  xdr_destroy (&xdrs);
 	  return (-1);

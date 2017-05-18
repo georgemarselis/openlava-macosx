@@ -28,19 +28,19 @@
 char *
 lsb_peekjob (LS_LONG_INT jobid)
 {
-  static char __func__] = "lsb_peekjob";
-  struct jobPeekReq jobPeekReq;
-  mbdReqType mbdReqtype;
-  XDR xdrs;
-  char request_buf[MSGSIZE];
-  char *reply_buf;
-  int cc;
-  struct LSFHeader hdr;
-  static struct jobPeekReply jobPeekReply;
-  struct lsfAuth auth;
-  struct jobInfoEnt *jInfo;
-  char *pSpoolDirUnix = NULL;
-  char lsfUserName[MAXLINELEN];
+
+	struct jobPeekReq jobPeekReq;
+	mbdReqType mbdReqtype;
+	XDR xdrs;
+	char request_buf[MSGSIZE];
+	char *reply_buf = NULL;
+	int cc  = 0;
+	struct LSFHeader hdr;
+	static struct jobPeekReply jobPeekReply;
+	struct lsfAuth auth;
+	struct jobInfoEnt *jInfo = NULL;
+	char *pSpoolDirUnix = NULL;
+	char lsfUserName[MAXLINELEN];
 
 
   if (jobid <= 0)
@@ -70,7 +70,7 @@ lsb_peekjob (LS_LONG_INT jobid)
     }
 
     assert( XDR_GETPOS (&xdrs) <= INT_MAX );
-  cc = callmbd (NULL, request_buf, (int)XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL);
+  cc = callmbd (NULL, request_buf, XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL);
   if (-1 == cc )
     {
       xdr_destroy (&xdrs);
