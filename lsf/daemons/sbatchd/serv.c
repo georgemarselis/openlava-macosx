@@ -38,14 +38,14 @@ void
 do_newjob (XDR * xdrs, int chfd, struct LSFHeader *reqHdr)
 {
   static char __func__] = "do_newjob()";
-  char reply_buf[MSGSIZE];
+  char reply_buf[MSGSIZE]; // FIXME FIXME FIXME MSGSIZE size is awfuly particular. Why MSGSIZE;
   XDR xdrs2;
   struct jobSpecs jobSpecs;
   struct jobReply jobReply;
-  struct jobCard *jp;
+  struct jobCard *jp = NULL;
   sbdReplyType reply;
   struct LSFHeader replyHdr;
-  char *replyStruct;
+  char *replyStruct = NULL;
   struct lsfAuth *auth = NULL;
 
   memset (&jobReply, 0, sizeof (struct jobReply));
@@ -75,13 +75,11 @@ do_newjob (XDR * xdrs, int chfd, struct LSFHeader *reqHdr)
   jp = (struct jobCard *) calloc (1, sizeof (struct jobCard));
   if (jp == NULL)
     {
-      ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_M, __func__,
-		 lsb_jobid2str (jobSpecs.jobId), "calloc");
+      ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_M, __func__, lsb_jobid2str (jobSpecs.jobId), "calloc");
       reply = ERR_MEM;
       goto sendReply;
     }
-  memcpy ((char *) &jp->jobSpecs, (char *) &jobSpecs,
-	  sizeof (struct jobSpecs));
+  memcpy ((char *) &jp->jobSpecs, (char *) &jobSpecs, sizeof (struct jobSpecs)); // FIXME FIXME FIXME are the casts necessary?
 
   jp->jobSpecs.jStatus &= ~JOB_STAT_MIG;
   jp->jobSpecs.startTime = now;

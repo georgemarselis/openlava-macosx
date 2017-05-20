@@ -687,7 +687,7 @@ checkResumeByLoad (LS_LONG_INT jobId, int num, struct thresholds thresholds, str
             resume = FALSE;
             *reason = SUSP_LOAD_UNAVAIL;
             }
-        else if (LS_ISLOCKEDU (loads[j].status) && !(jAttrib & Q_ATTRIB_EXCLUSIVE))
+        else if (LS_ISLOCKEDU (loads[j].status) && !(jAttrib & QUEUE_ATTRIB_EXCLUSIVE))
             {
             resume = FALSE;
             *reason = SUSP_HOST_LOCK;
@@ -720,7 +720,7 @@ checkResumeByLoad (LS_LONG_INT jobId, int num, struct thresholds thresholds, str
             else
                 {
                 resume = FALSE;
-                *reason = SUSP_QUE_RESUME_COND;
+                *reason = SUSP_QUEUE_RESUME_COND;
                 if ((logclass & (LC_SCHED | LC_EXEC)) && !resume) {
                     ls_syslog (LOG_DEBUG2, "%s: Can't resume job %s; reason=%x", __func__, lsb_jobid2str (jobId), *reason);
                 }

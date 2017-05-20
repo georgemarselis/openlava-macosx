@@ -26,19 +26,19 @@
 #include "lsbatch.h"
 #include "mbd/proxy.h"
 
-#define  DEF_CLEAN_PERIOD     3600
-#define  DEF_MAX_RETRY        5
-#define  DEF_MAXSBD_FAIL      3
-#define  DEF_ACCEPT_INTVL     1
-#define  DEF_PRIO             1
-#define  DEF_NICE             0
-#define  DEF_SCHED_DELAY      10
-#define  DEF_Q_SCHED_DELAY    0
-#define  MAX_INTERNAL_JOBID   299999999999999LL
-#define  DEF_MAX_JOB_NUM      1000
-#define  DEF_EXCLUSIVE        FALSE
-#define  DEF_EVENT_WATCH_TIME 60
-#define  DEF_COND_CHECK_TIME  600
+#define DEF_CLEAN_PERIOD     3600
+#define DEF_MAX_RETRY        5
+#define DEF_MAXSBD_FAIL      3
+#define DEF_ACCEPT_INTVL     1
+#define DEF_PRIO             1
+#define DEF_NICE             0
+#define DEF_SCHED_DELAY      10
+#define DEF_QUEUE_SCHED_DELAY    0
+#define MAX_INTERNAL_JOBID   299999999999999LL // FIXME FIXME FIXME FIXME what's that LL at the end there?
+#define DEF_MAX_JOB_NUM      1000
+#define DEF_EXCLUSIVE        FALSE
+#define DEF_EVENT_WATCH_TIME 60
+#define DEF_COND_CHECK_TIME  600
 #define DEF_MAX_SBD_CONNS     774
 #define DEF_SCHED_STAY        3
 #define DEF_FRESH_PERIOD     15
@@ -64,10 +64,10 @@ typedef enum
   ALLJLIST
 } jlistno_t;
 
-#define  DEF_USR1_SC    0
-#define  DEF_USR1_ST    64000
-#define  DEF_USR2_SC    0
-#define  DEF_USR2_ST    64000
+#define DEF_USR1_SC    0
+#define DEF_USR1_ST    64000
+#define DEF_USR2_SC    0
+#define DEF_USR2_ST    64000
 
 
 #define BAD_LOAD     1
@@ -105,7 +105,7 @@ typedef enum
 
 #define M_STAGE_GOT_LOAD    0x0001
 #define M_STAGE_LSB_CAND    0x0002
-#define M_STAGE_QUE_CAND    0x0004
+#define M_STAGE_QUEUE_CAND    0x0004
 #define M_STAGE_REPLAY      0x0008
 #define M_STAGE_INIT        0x0010
 #define M_STAGE_RESUME_SUSP 0x0020
@@ -170,9 +170,9 @@ struct objPRMO *pRMOPtr;
 #define PRMO_AVAILABLEBYPREEMPT         0x0004
 #define PRMO_PREEMPTINGRUNJOB           0x0008
 
-#define  JOB_PREEMPT_WAIT(s)  ((s)->jStatus & JOB_STAT_RSRC_PREEMPT_WAIT)
+#define JOB_PREEMPT_WAIT(s)  ((s)->jStatus & JOB_STAT_RSRC_PREEMPT_WAIT)
 
-#define  MARKED_WILL_BE_PREEMPTED(s)  ((s)->jFlags & JFLAG_WILL_BE_PREEMPTED)
+#define MARKED_WILL_BE_PREEMPTED(s)  ((s)->jFlags & JFLAG_WILL_BE_PREEMPTED)
 
 #define FORALL_PRMPT_RSRCS(resn) if (pRMOPtr != NULL) { \
     int _pRMOindex;                                     \
@@ -232,7 +232,7 @@ struct rqHistory
   time_t lasttime;
 };
 
-#define  JOB_PEND(s)  (((s)->jStatus & JOB_STAT_PEND) && !((s)->jStatus & JOB_STAT_PSUSP))
+#define JOB_PEND(s)  (((s)->jStatus & JOB_STAT_PEND) && !((s)->jStatus & JOB_STAT_PSUSP))
 
 
 struct groupCandHosts
@@ -243,11 +243,11 @@ struct groupCandHosts
 };
 
 
-struct jData
+struct jData // FIXME FIXME FIXME FIXME FIXME needs checking over
 {
   struct jData *forw;
   struct jData *back;
-  int userId;
+  uid_t userId;
   char *userName;
   struct uData *uPtr;
   LS_LONG_INT jobId;
@@ -272,8 +272,8 @@ struct jData
   int numExecCandPtr;
   int numEligProc;
   int numAvailEligProc;
-  int numSlots;
-  int numAvailSlots;
+  int numSlots;         // size_t maybe?
+  int numAvailSlots;    // size_t maybe?
   char usePeerCand;
   time_t reserveTime;
   int slotHoldTime;
@@ -377,7 +377,7 @@ struct jData
 
 #define JOB_RUNSLOT_NONPRMPT(Job) \
     (   ((Job)->jFlags & JFLAG_URGENT) \
-     || ((Job)->qPtr->qAttrib & Q_ATTRIB_BACKFILL) \
+     || ((Job)->qPtr->qAttrib & QUEUE_ATTRIB_BACKFILL) \
     )
 
 #define JOB_RSVSLOT_NONPRMPT(Job) \
@@ -715,12 +715,12 @@ typedef enum
 
 } dptType;
 
-#define  DP_FALSE     0
-#define  DP_TRUE      1
-#define  DP_INVALID  -1
-#define  DP_REJECT   -2
+#define DP_FALSE     0
+#define DP_TRUE      1
+#define DP_INVALID  -1
+#define DP_REJECT   -2
 
-#define  ARRAY_DEP_ONE_TO_ONE 1
+#define ARRAY_DEP_ONE_TO_ONE 1
 
 struct jobIdx
 {
@@ -1324,7 +1324,7 @@ void log_jobForce (struct jData *, int, char *);
 time_t eventTime;
 void log_jobattrset (struct jobAttrInfoEnt *, int);
 
-#define  REPLACE_1ST_CMD_ONLY  (0x1)
+#define REPLACE_1ST_CMD_ONLY  (0x1)
 int stripJobStarter (char *, int *, char *);
 
 sbdReplyType start_job (struct jData *, struct qData *,
@@ -1422,7 +1422,7 @@ long schedSeqNo;
 #define RUN_LIMIT_OF_JOB(jp) LIMIT_OF_JOB(jp, LSF_RLIMIT_RUN)
 #define CPU_LIMIT_OF_JOB(jp) LIMIT_OF_JOB(jp, LSF_RLIMIT_CPU)
 
-#define IGNORE_DEADLINE(qp) ((qp)->qAttrib & Q_ATTRIB_IGNORE_DEADLINE)
+#define IGNORE_DEADLINE(qp) ((qp)->qAttrib & QUEUE_ATTRIB_IGNORE_DEADLINE)
 #define HAS_RUN_WINDOW(qp) (((qp)->windows != NULL) && \
                             (qp)->windows[0] != '\0')
 

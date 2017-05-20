@@ -74,17 +74,17 @@ struct leftTimeTable
 
 #define OUT_SCHED_RS(reason)                    \
     ((reason) == PEND_HOST_JOB_LIMIT            \
-     || (reason) ==  PEND_QUE_JOB_LIMIT         \
-     || (reason) ==  PEND_QUE_USR_JLIMIT        \
-     || (reason) == PEND_QUE_PROC_JLIMIT        \
-     || (reason) == PEND_QUE_HOST_JLIMIT        \
+     || (reason) ==  PEND_QUEUE_JOB_LIMIT         \
+     || (reason) ==  PEND_QUEUE_USR_JLIMIT        \
+     || (reason) == PEND_QUEUE_PROC_JLIMIT        \
+     || (reason) == PEND_QUEUE_HOST_JLIMIT        \
      || (reason) == PEND_USER_JOB_LIMIT         \
      || (reason) == PEND_UGRP_JOB_LIMIT         \
      || (reason) == PEND_USER_PROC_JLIMIT       \
      || (reason) == PEND_UGRP_PROC_JLIMIT       \
      || (reason) == PEND_HOST_USR_JLIMIT)
 
-#define QUEUE_IS_BACKFILL(qPtr) ((qPtr)->qAttrib & Q_ATTRIB_BACKFILL)
+#define QUEUE_IS_BACKFILL(qPtr) ((qPtr)->qAttrib & QUEUE_ATTRIB_BACKFILL)
 
 #define JOB_HAS_RUN_LIMIT(jp)                                   \
     ((jp)->shared->jobBill.rLimits[LSF_RLIMIT_RUN] > 0 ||       \
@@ -93,16 +93,16 @@ struct leftTimeTable
 #define JOB_CAN_BACKFILL(jp) (QUEUE_IS_BACKFILL((jp)->qPtr) &&  \
                               JOB_HAS_RUN_LIMIT(jp))
 
-#define HAS_BACKFILL_POLICY (qAttributes & Q_ATTRIB_BACKFILL)
+#define HAS_BACKFILL_POLICY (qAttributes & QUEUE_ATTRIB_BACKFILL)
 
-#define Q_H_REASON_NOT_DUE_TO_LIMIT(qhreason)   \
-    ((qhreason) != PEND_QUE_PROC_JLIMIT &&      \
-     (qhreason) != PEND_QUE_HOST_JLIMIT &&      \
+#define QUEUE_H_REASON_NOT_DUE_TO_LIMIT(qhreason)   \
+    ((qhreason) != PEND_QUEUE_PROC_JLIMIT &&      \
+     (qhreason) != PEND_QUEUE_HOST_JLIMIT &&      \
      (qhreason) != PEND_HOST_JOB_LIMIT)
-#define HOST_UNUSABLE_TO_JOB_DUE_TO_Q_H_REASON(qhreason, jp)    \
+#define HOST_UNUSABLE_TO_JOB_DUE_TO_QUEUE_H_REASON(qhreason, jp)    \
     (qhreason &&                                                \
-     (Q_H_REASON_NOT_DUE_TO_LIMIT(qhreason) ||                  \
-      (!Q_H_REASON_NOT_DUE_TO_LIMIT(qhreason) &&                \
+     (QUEUE_H_REASON_NOT_DUE_TO_LIMIT(qhreason) ||                  \
+      (!QUEUE_H_REASON_NOT_DUE_TO_LIMIT(qhreason) &&                \
        !QUEUE_IS_BACKFILL(jp->qPtr))))
 
 #define HOST_UNUSABLE_DUE_TO_H_REASON(hreason)                          \
@@ -137,7 +137,7 @@ struct leftTimeTable
 
 #define QUEUE_SCHED_DELAY(jpbw)                         \
     (((jpbw)->qPtr->schedDelay == INFINIT_INT) ?        \
-     DEF_Q_SCHED_DELAY : (jpbw)->qPtr->schedDelay)
+     DEF_QUEUE_SCHED_DELAY : (jpbw)->qPtr->schedDelay)
 
 
 #define END_OF_JOB_LIST(jp, listNum) ((jp) == jDataList[listNum])
@@ -503,17 +503,17 @@ readyToDisp (struct jData *jpbw, int *numAvailSlots)
     }
   else if (!(jpbw->qPtr->qStatus & QUEUE_STAT_ACTIVE))
     {
-      jReason = PEND_QUE_INACT;
+      jReason = PEND_QUEUE_INACT;
     }
   else if (!(jpbw->qPtr->qStatus & QUEUE_STAT_RUN))
     {
-      jReason = PEND_QUE_WINDOW;
+      jReason = PEND_QUEUE_WINDOW;
     }
   else if ((jpbw->qPtr->maxJobs != INFINIT_INT)
 	   && (jpbw->numSlots = jpbw->qPtr->maxJobs - jpbw->qPtr->numJobs
 	       + jpbw->qPtr->numPEND) <= 0)
     {
-      jReason = PEND_QUE_JOB_LIMIT;
+      jReason = PEND_QUEUE_JOB_LIMIT;
     }
   else if ((deadline = jpbw->qPtr->runWinCloseTime) > 0 &&
 	   jobCantFinshBeforeDeadline (jpbw, deadline))
@@ -526,7 +526,7 @@ readyToDisp (struct jData *jpbw, int *numAvailSlots)
 		     "%s: job <%s> can't finish before deadline: %s", __func__,
 		     lsb_jobid2str (jpbw->jobId), timebuf);
 	}
-      jReason = PEND_QUE_WINDOW_WILL_CLOSE;
+      jReason = PEND_QUEUE_WINDOW_WILL_CLOSE;
     }
 
 
@@ -597,7 +597,7 @@ readyToDisp (struct jData *jpbw, int *numAvailSlots)
       (jpbw->shared->jobBill.maxNumProcessors < jpbw->qPtr->minProcLimit ||
        jpbw->shared->jobBill.numProcessors > jpbw->qPtr->procLimit))
     {
-      jReason = PEND_QUE_PROCLIMIT;
+      jReason = PEND_QUEUE_PROCLIMIT;
     }
 
 
@@ -718,9 +718,9 @@ cntUQSlots (struct jData *jpbw, int *numAvailSlots)
 	  && numQueue < jpbw->shared->jobBill.numProcessors))
     {
       if (jpbw->shared->jobBill.maxNumProcessors == 1)
-	jReason = PEND_QUE_JOB_LIMIT;
+	jReason = PEND_QUEUE_JOB_LIMIT;
       else
-	jReason = PEND_QUE_PJOB_LIMIT;
+	jReason = PEND_QUEUE_PJOB_LIMIT;
     }
   minSlots = numQueue;
   if (up->maxJobs == INFINIT_INT)
@@ -781,9 +781,9 @@ cntUQSlots (struct jData *jpbw, int *numAvailSlots)
       if (num < jpbw->shared->jobBill.numProcessors)
 	{
 	  if (jpbw->shared->jobBill.maxNumProcessors == 1)
-	    jReason = PEND_QUE_USR_JLIMIT;
+	    jReason = PEND_QUEUE_USR_JLIMIT;
 	  else
-	    jReason = PEND_QUE_USR_PJLIMIT;
+	    jReason = PEND_QUEUE_USR_PJLIMIT;
 
 	}
       minSlots = MIN (minSlots, num);
@@ -801,7 +801,7 @@ cntUQSlots (struct jData *jpbw, int *numAvailSlots)
   jpbw->numSlots = minSlots;
   if (NON_PRMPT_Q (jpbw->qPtr->qAttrib)
       || numQueue < jpbw->shared->jobBill.numProcessors
-      || jReason == PEND_QUE_USR_JLIMIT || jReason == PEND_QUE_USR_PJLIMIT)
+      || jReason == PEND_QUEUE_USR_JLIMIT || jReason == PEND_QUEUE_USR_PJLIMIT)
     {
       if (logclass & (LC_SCHED | LC_JLIMIT))
 	ls_syslog (LOG_DEBUG3, "%s: jobId=%s numSlots=%d numAvailSlots=%d",
@@ -1001,7 +1001,7 @@ getCandHosts (struct jData *jpbw)
 	       numJUsable * QUEUE_LEVEL_SPAN_PTILE (jpbw) <
 	       jpbw->shared->jobBill.numProcessors)
 	{
-	  addReason (jpbw, 0, PEND_QUE_SPREAD_TASK);
+	  addReason (jpbw, 0, PEND_QUEUE_SPREAD_TASK);
 	}
     }
 
@@ -1189,7 +1189,7 @@ getQUsable (struct qData *qp)
   qp->numUsable = 0;
   qp->numSlots = 0;
   qp->numReasons = 0;
-  qp->qAttrib &= ~Q_ATTRIB_NO_HOST_TYPE;
+  qp->qAttrib &= ~QUEUE_ATTRIB_NO_HOST_TYPE;
 
   if (OUT_SCHED_RS (qp->reasonTb[1][0]))
     {
@@ -1212,7 +1212,7 @@ getQUsable (struct qData *qp)
 
       if (!isHostQMember (hPtr, qp))
 	{
-	  hReason = PEND_HOST_QUE_MEMB;
+	  hReason = PEND_HOST_QUEUE_MEMB;
 	  goto next;
 	}
 
@@ -1253,11 +1253,11 @@ getQUsable (struct qData *qp)
       if (qp->resValPtr
 	  && !getHostsByResReq (qp->resValPtr,
 				&j, &hPtr, NULL, NULL, &overRideFromType))
-	hReason = PEND_HOST_QUE_RESREQ;
+	hReason = PEND_HOST_QUEUE_RESREQ;
 
       if (overRideFromType == TRUE)
 	{
-	  qp->qAttrib |= Q_ATTRIB_NO_HOST_TYPE;
+	  qp->qAttrib |= QUEUE_ATTRIB_NO_HOST_TYPE;
 	}
       if (hReason)
 	goto next;
@@ -1377,7 +1377,7 @@ getJUsable (struct jData *jp, int *numJUsable, int *nProc)
       if (HOST_UNUSABLE_TO_JOB_DUE_TO_H_REASON (hReasonTb[1][i], jp))
 	continue;
 
-      if (HOST_UNUSABLE_TO_JOB_DUE_TO_Q_H_REASON
+      if (HOST_UNUSABLE_TO_JOB_DUE_TO_QUEUE_H_REASON
 	  (jp->qPtr->reasonTb[1][i], jp))
 	continue;
 
@@ -1448,7 +1448,7 @@ getJUsable (struct jData *jp, int *numJUsable, int *nProc)
 
   num = numHosts;
   if ((!jp->qPtr->resValPtr
-       || !(jp->qPtr->qAttrib & Q_ATTRIB_NO_HOST_TYPE))
+       || !(jp->qPtr->qAttrib & QUEUE_ATTRIB_NO_HOST_TYPE))
       && !jp->shared->resValPtr && jp->numAskedPtr == 0)
     {
 
@@ -1617,7 +1617,7 @@ getJUsable (struct jData *jp, int *numJUsable, int *nProc)
 				  &resource, jp);
 	  if (num < 1)
 	    {
-	      hReason = resource + PEND_HOST_QUE_RUSAGE;
+	      hReason = resource + PEND_HOST_QUEUE_RUSAGE;
 	    }
 	  numSlots = MIN (numSlots, num);
 	}
@@ -1666,7 +1666,7 @@ getJUsable (struct jData *jp, int *numJUsable, int *nProc)
 
       if (!hReason && !isHostQMember (jUsable[i], jp->qPtr))
 	{
-	  hReason = PEND_HOST_QUE_MEMB;
+	  hReason = PEND_HOST_QUEUE_MEMB;
 	}
 
 
@@ -2253,9 +2253,9 @@ userJobLimitOk (struct jData *jp, int disp, int *numAvailSlots)
   if (numSlots == 0)
     {
       if (jp->shared->jobBill.maxNumProcessors > 1)
-	jp->newReason = PEND_QUE_USR_PJLIMIT;
+	jp->newReason = PEND_QUEUE_USR_PJLIMIT;
       else
-	jp->newReason = PEND_QUE_USR_JLIMIT;
+	jp->newReason = PEND_QUEUE_USR_JLIMIT;
 
       *numAvailSlots = 0;
       return 0;
@@ -2602,7 +2602,7 @@ getHostJobSlots (struct jData *jp, struct hData *hp, int *numAvailSlots,
   timePJobLimitOk += tmpVal;
   if (numNeeded > numSlots)
     {
-      jp->newReason = PEND_QUE_PROC_JLIMIT;
+      jp->newReason = PEND_QUEUE_PROC_JLIMIT;
       if (logclass & (LC_JLIMIT))
 	ls_syslog (LOG_DEBUG2, "%s: Q's JL/P reached.  Set reason <%d>",
 		   __func__, jp->newReason);
@@ -2616,7 +2616,7 @@ getHostJobSlots (struct jData *jp, struct hData *hp, int *numAvailSlots,
   timeHJobLimitOk += tmpVal;
   if (numNeeded > numSlots1)
     {
-      jp->newReason = PEND_QUE_HOST_JLIMIT;
+      jp->newReason = PEND_QUEUE_HOST_JLIMIT;
       *numAvailSlots = 0;
       return (0);
     }
@@ -3178,7 +3178,7 @@ candHostOk (struct jData *jp, int indx, int *numAvailSlots, int *hReason)
       *hReason = hReasonTb[1][hp->hData->hostId];
     }
   else
-    if (HOST_UNUSABLE_TO_JOB_DUE_TO_Q_H_REASON
+    if (HOST_UNUSABLE_TO_JOB_DUE_TO_QUEUE_H_REASON
 	(jp->qPtr->reasonTb[1][hp->hData->hostId], jp))
     {
       *hReason = jp->qPtr->reasonTb[1][hp->hData->hostId];
@@ -3234,7 +3234,7 @@ candHostOk (struct jData *jp, int indx, int *numAvailSlots, int *hReason)
 	&& jp->qPtr->resValPtr && jp->qPtr->resValPtr->maxNumHosts == 1
 	&& nSlots < jp->shared->jobBill.numProcessors)
     {
-      rtReason = PEND_QUE_NO_SPAN;
+      rtReason = PEND_QUEUE_NO_SPAN;
     }
 
 
@@ -3245,7 +3245,7 @@ candHostOk (struct jData *jp, int indx, int *numAvailSlots, int *hReason)
 			      &resource, jp);
       if (num < 1)
 	{
-	  rtReason = resource + PEND_HOST_QUE_RUSAGE;
+	  rtReason = resource + PEND_HOST_QUEUE_RUSAGE;
 	}
       else
 	{
@@ -3317,10 +3317,10 @@ candHostOk (struct jData *jp, int indx, int *numAvailSlots, int *hReason)
 	  jp->qPtr->numUsable -= hp->hData->numCPUs;
 	}
     }
-  else if (rtReason == PEND_QUE_PROC_JLIMIT
-	   || rtReason == PEND_QUE_HOST_JLIMIT
-	   || rtReason == PEND_HOST_QUE_RUSAGE
-	   || rtReason == PEND_QUE_NO_SPAN)
+  else if (rtReason == PEND_QUEUE_PROC_JLIMIT
+	   || rtReason == PEND_QUEUE_HOST_JLIMIT
+	   || rtReason == PEND_HOST_QUEUE_RUSAGE
+	   || rtReason == PEND_QUEUE_NO_SPAN)
     {
       *hReason = rtReason;
       jp->qPtr->reasonTb[1][hp->hData->hostId] = rtReason;
@@ -4908,7 +4908,7 @@ scheduleAndDispatchJobs (void)
       return -1;
     }
 
-  if (!(mSchedStage & M_STAGE_QUE_CAND))
+  if (!(mSchedStage & M_STAGE_QUEUE_CAND))
     {
       if (numLsbUsable > 0)
 	{
@@ -4939,7 +4939,7 @@ scheduleAndDispatchJobs (void)
 		  if (logclass & LC_SCHED)
 		    {
 		      ls_syslog (LOG_DEBUG, "\
-%s: Stayed too long in M_STAGE_QUE_CAND; numQUsable=%d timeGetQUsable %d ms", __func__, numQUsable, timeGetQUsable);
+%s: Stayed too long in M_STAGE_QUEUE_CAND; numQUsable=%d timeGetQUsable %d ms", __func__, numQUsable, timeGetQUsable);
 		      DUMP_CNT ();
 		      RESET_CNT ();
 		    }
@@ -4947,7 +4947,7 @@ scheduleAndDispatchJobs (void)
 		}
 	    }
 	}
-      mSchedStage |= M_STAGE_QUE_CAND;
+      mSchedStage |= M_STAGE_QUEUE_CAND;
     }
 
   if (numQUsable <= 0)
@@ -4960,7 +4960,7 @@ scheduleAndDispatchJobs (void)
   if (logclass & LC_SCHED)
     {
       ls_syslog (LOG_DEBUG, "\
-%s M_STAGE_QUE_CAND numQUsable=%d timeGetQUsable %d ms", __func__, numQUsable, timeGetQUsable);
+%s M_STAGE_QUEUE_CAND numQUsable=%d timeGetQUsable %d ms", __func__, numQUsable, timeGetQUsable);
     }
 
   if (LIST_NUM_ENTRIES (jRefList) == 0)
@@ -4984,7 +4984,7 @@ again:
       jPtr = jR->job;
       assert (jPtr->uPtr->numPEND > 0);
 
-      if (!(jPtr->qPtr->qAttrib & Q_ATTRIB_ROUND_ROBIN))
+      if (!(jPtr->qPtr->qAttrib & QUEUE_ATTRIB_ROUND_ROBIN))
 	{
 	  /* this is a fcfs queue so just dequeue the first
 	   * job on the priority list and try to run it.
@@ -5324,7 +5324,7 @@ dispatchAJob (struct jData *jp, int dontTryNextCandHost)
 		   && jp->qPtr->resValPtr
 		   && (jp->qPtr->resValPtr->pTile != INFINIT_INT))
 	    {
-	      addReason (jp, 0, PEND_QUE_SPREAD_TASK);
+	      addReason (jp, 0, PEND_QUEUE_SPREAD_TASK);
 	    }
 	}
 
@@ -5414,7 +5414,7 @@ dispatchAJob (struct jData *jp, int dontTryNextCandHost)
 		  if (hasresources == TRUE && allocHosts (jp) >= 0)
 		    {
 
-		      if (qAttributes & Q_ATTRIB_BACKFILL)
+		      if (qAttributes & QUEUE_ATTRIB_BACKFILL)
 			{
 			  jobStartTime (jp);
 			}
@@ -6014,7 +6014,7 @@ removeCandHost (struct jData *jp, int i)
 static bool_t
 schedulerObserverSelect (void *extra, LIST_EVENT_T * event)
 {
-  if (mSchedStage & M_STAGE_QUE_CAND)
+  if (mSchedStage & M_STAGE_QUEUE_CAND)
     {
       return TRUE;
     }
@@ -7301,7 +7301,7 @@ checkHostUsableToSpan (struct jData *jp, struct hData *host, int isJobLevel,
     {
       hasSpanPtile = HAS_QUEUE_LEVEL_SPAN_PTILE (jp);
       hasSpanHosts = HAS_QUEUE_LEVEL_SPAN_HOSTS (jp);
-      reason = PEND_QUE_NO_SPAN;
+      reason = PEND_QUEUE_NO_SPAN;
     }
   if (hasSpanPtile)
     {

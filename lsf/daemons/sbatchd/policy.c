@@ -27,58 +27,63 @@
 #define ABS(a) ((a) < 0 ? -(a) : (a))
 #endif
 
-static void tryResume (struct hostLoad *myload);
-static void tryStop (char *myhostnm, struct hostLoad *myload);
-void jobSuspendAction (struct jobCard *jp, int sigValue, int suspReasosns,
-		       int suspSubReasons);
-static int shouldStop (struct hostLoad *loadV, struct jobCard *jobCard,
-		       int *reasons, int *subreasons, int num, int *stopmore);
-static int shouldStop1 (struct hostLoad *);
-static int shouldResume (struct hostLoad *, struct jobCard *, int);
-static int jobResumeAction (struct jobCard *jp, int sigValue, int suspReason);
-static void tryChkpntMig (void);
 
-static int rmJobBufFilesPid (struct jobCard *);
-static int cleanupMigJob (struct jobCard *);
+// extern char *exitFileSuffix (int sigValue);
+// extern int sbdlog_newstatus (struct jobCard *jp);
+// extern int jobSigLog (struct jobCard *jp, int finishStatus);
+// extern int lsbMemEnforce;
+// extern int lsbJobMemLimit;
+// extern int lsbJobCpuLimit;
 
-static int getTclHostData (struct hostLoad *, struct tclHostData *, int);
-static void ruLimits (struct jobCard *);
 
-static void sigActEnd (struct jobCard *jobCard);
-static void chkpntEnd (struct jobCard *, int, bool_t *);
-static void initTclHostData (struct tclHostData *);
+
+void tryResume (struct hostLoad *myload);
+void tryStop (char *myhostnm, struct hostLoad *myload);
+void jobSuspendAction (struct jobCard *jp, int sigValue, int suspReasosns, int suspSubReasons);
+int shouldStop (struct hostLoad *loadV, struct jobCard *jobCard, int *reasons, int *subreasons, int num, int *stopmore);
+int shouldStop1 (struct hostLoad *);
+int shouldResume (struct hostLoad *, struct jobCard *, int);
+int jobResumeAction (struct jobCard *jp, int sigValue, int suspReason);
+void tryChkpntMig (void);
+
+int rmJobBufFilesPid (struct jobCard *);
+int cleanupMigJob (struct jobCard *);
+
+int getTclHostData (struct hostLoad *, struct tclHostData *, int);
+void ruLimits (struct jobCard *);
+
+void sigActEnd (struct jobCard *jobCard);
+void chkpntEnd (struct jobCard *, int, bool_t *);
+void initTclHostData (struct tclHostData *);
 
 void suspendActEnd (struct jobCard *jobCard, int w_status);
 void resumeActEnd (struct jobCard *jobCard, int w_status);
-extern char *exitFileSuffix (int sigValue);
-extern int sbdlog_newstatus (struct jobCard *jp);
-extern int jobSigLog (struct jobCard *jp, int finishStatus);
 
-extern int lsbMemEnforce;
-extern int lsbJobMemLimit;
-extern int lsbJobCpuLimit;
+
+
 void
 job_checking (void)
 {
-  static char __func__] = "job_checking";
-  struct jobCard *jobCard, *nextJob;
-  struct hostLoad *myload, savedLoad;
-  char *myhostnm;
-  static time_t last_check;
-  static time_t last_preem;
-  char preempted = FALSE;
-  int i, cc;
+	struct jobCard *jobCard = NULL;
+	struct jobCard *nextJob = NULL;
+	struct hostLoad *myload = NULL;
+	struct hostLoad savedLoad;
+	char *myhostnm = NULL;
+	static time_t last_check;
+	static time_t last_preem;
+	char preempted = FALSE;
+	int i = 0;
+	int cc = 0;
 
+	if (last_check == 0) {
+		last_check = now;
+	}
 
-
-  if (last_check == 0)
-    last_check = now;
-  if (jobcnt <= 0)
-    {
-      last_preem = 0;
-      last_check = now;
-      return;
-    }
+	if (jobcnt <= 0) {
+		last_preem = 0;
+		last_check = now;
+		return;
+	}
 
   checkFinish ();
 
@@ -289,7 +294,7 @@ job_checking (void)
 
 }
 
-static void
+void
 tryChkpntMig (void)
 {
   char migrating = FALSE;
@@ -356,7 +361,7 @@ tryChkpntMig (void)
     }
 }
 
-static void
+void
 tryResume (struct hostLoad *myload)
 {
   char __func__] = "tryResume";
@@ -441,7 +446,7 @@ tryResume (struct hostLoad *myload)
 
 }
 
-static void
+void
 tryStop (char *myhostnm, struct hostLoad *myload)
 {
   static char __func__] = "tryStop";
@@ -541,7 +546,7 @@ tryStop (char *myhostnm, struct hostLoad *myload)
 
 }
 
-static int
+int
 shouldStop (struct hostLoad *loadV,
 	    struct jobCard *jobCard, int *reasons, int *subreasons, int num,
 	    int *stopmore)
@@ -601,7 +606,7 @@ shouldStop (struct hostLoad *loadV,
 	  return FALSE;
 	}
       if (LS_ISLOCKEDU (load->status)
-	  && !(jobCard->jobSpecs.jAttrib & Q_ATTRIB_EXCLUSIVE))
+	  && !(jobCard->jobSpecs.jAttrib & QUEUE_ATTRIB_EXCLUSIVE))
 	{
 	  *reasons = SUSP_HOST_LOCK;
 	  *stopmore = TRUE;
@@ -751,7 +756,7 @@ shouldStop (struct hostLoad *loadV,
 	      && evalResReq (jobCard->stopCondVal->selectStr,
 			     &tclHostData, DFT_FROMTYPE) == 1)
 	    {
-	      *reasons |= SUSP_QUE_STOP_COND;
+	      *reasons |= SUSP_QUEUE_STOP_COND;
 	      break;
 	    }
 	}
@@ -780,7 +785,7 @@ shouldStop (struct hostLoad *loadV,
 
 }
 
-static int
+int
 shouldStop1 (struct hostLoad *loadV)
 {
   int rcnt = 0;
@@ -808,7 +813,7 @@ shouldStop1 (struct hostLoad *loadV)
 
 }
 
-static int
+int
 shouldResume (struct hostLoad *loadV, struct jobCard *jp, int num)
 {
   static char __func__] = "shouldResume";
@@ -968,7 +973,7 @@ job_resume (struct jobCard *jp)
 }
 
 
-static int
+int
 jobResumeAction (struct jobCard *jp, int sigValue, int suspReason)
 {
   static char __func__] = "jobResumeAction";
@@ -1065,7 +1070,7 @@ jobSuspendAction (struct jobCard *jp, int sigValue, int suspReasons,
 }
 
 
-static void
+void
 sigActEnd (struct jobCard *jobCard)
 {
   int w_status;
@@ -1154,7 +1159,7 @@ sigActEnd (struct jobCard *jobCard)
 }
 
 
-static void
+void
 chkpntEnd (struct jobCard *jobCard, int w_status, bool_t * freed)
 {
   static char __func__] = "chkpntEnd()";
@@ -1296,7 +1301,7 @@ resumeActEnd (struct jobCard *jobCard, int w_status)
 }
 
 
-static int
+int
 rmJobBufFilesPid (struct jobCard *jp)
 {
   static char __func__] = "rmJobBufFilesPid()";
@@ -1329,7 +1334,7 @@ rmJobBufFilesPid (struct jobCard *jp)
 }
 
 
-static int
+int
 cleanupMigJob (struct jobCard *jp)
 {
   static char __func__] = "cleanupMigJob()";
@@ -1420,7 +1425,7 @@ checkFinish (void)
     }
 }
 
-static int
+int
 getTclHostData (struct hostLoad *load, struct tclHostData *tclHostData,
 		int freeMem)
 {
@@ -1518,7 +1523,7 @@ getTclHostData (struct hostLoad *load, struct tclHostData *tclHostData,
 
 }
 
-static void
+void
 ruLimits (struct jobCard *jobCard)
 {
   struct rlimit rlimit;
@@ -1607,7 +1612,7 @@ ruLimits (struct jobCard *jobCard)
     }
 }
 
-static void
+void
 initTclHostData (struct tclHostData *tclHostData)
 {
   if (tclHostData == NULL)

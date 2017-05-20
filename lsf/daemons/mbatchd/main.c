@@ -123,7 +123,7 @@ int maxJobPerSession = INFINIT_INT;
 int maxUserPriority = -1;
 int jobPriorityValue = -1;
 int jobPriorityTime = -1;
-static int jobPriorityUpdIntvl = -1;
+ int jobPriorityUpdIntvl = -1;
 
 int nSbdConnections = 0;
 int maxSbdConnections = DEF_MAX_SBD_CONNS;
@@ -140,35 +140,32 @@ int schedule;
 int scheRawLoad;
 int lsbModifyAllJobs = FALSE;
 
-static int schedule1;
-static struct jData *jobData = NULL;
-static time_t lastSchedTime = 0;
-static time_t nextSchedTime = 0;
+ int schedule1;
+ struct jData *jobData = NULL;
+ time_t lastSchedTime = 0;
+ time_t nextSchedTime = 0;
 
+// FIXME FIXME FIXME FIXME the following 10 lines go to main.h
 void setJobPriUpdIntvl (void);
-static void updateJobPriorityInPJL (void);
-static void houseKeeping (int *);
-static void periodicCheck (void);
-static int authRequest (struct lsfAuth *, XDR *, struct LSFHeader *,
-			struct sockaddr_in *, struct sockaddr_in *,
-			char *, int);
-static int processClient (struct clientNode *, int *);
+void updateJobPriorityInPJL (void);
+void houseKeeping (int *);
+void periodicCheck (void);
+int authRequest (struct lsfAuth *, XDR *, struct LSFHeader *, struct sockaddr_in *, struct sockaddr_in *, char *, int);
+int processClient (struct clientNode *, int *);
 
-static void clientIO (struct Masks *);
-static int forkOnRequest (mbdReqType);
-static void shutdownSbdConnections (void);
-static void processSbdNode (struct sbdNode *, int);
-static void setNextSchedTimeWhenJobFinish (void);
-static void acceptConnection (int);
+void clientIO (struct Masks *);
+int forkOnRequest (mbdReqType);
+void shutdownSbdConnections (void);
+void processSbdNode (struct sbdNode *, int);
+void setNextSchedTimeWhenJobFinish (void);
+void acceptConnection (int);
 
-extern void chanInactivate_ (int);
-extern void chanActivate_ (int);
-extern int do_chunkStatusReq (XDR *, int, struct sockaddr_in *, int *,
-			      struct LSFHeader *);
-extern int do_setJobAttr (XDR *, int, struct sockaddr_in *, char *,
-			  struct LSFHeader *, struct lsfAuth *);
-extern void chanCloseAllBut_ (int);
-extern int initLimSock_ (void);
+// extern void chanInactivate_ (int);
+// extern void chanActivate_ (int);
+// extern int do_chunkStatusReq (XDR *, int, struct sockaddr_in *, int *, struct LSFHeader *);
+// extern int do_setJobAttr (XDR *, int, struct sockaddr_in *, char *, struct LSFHeader *, struct lsfAuth *);
+// extern void chanCloseAllBut_ (int);
+// extern int initLimSock_ (void);
 
 int
 main (int argc, char **argv)
@@ -186,6 +183,7 @@ main (int argc, char **argv)
 
   saveDaemonDir_ (argv[0]);
 
+  // FIXME FIXME FIXME FIXME get a real help loop for 
   opterr = 0;
   while ((cc = getopt (argc, argv, "hVd:12C")) != EOF)
     {
@@ -207,8 +205,7 @@ main (int argc, char **argv)
 	  return -1;
 	case 'h':
 	default:
-	  fprintf (stderr, "\
-%s: mbatchd [-h] [-V] [-C] [-d env_dir] [-1 |-2]\n", __func__);
+	  fprintf (stderr, "%s: [-h] [-V] [-C] [-d env_dir] [-1 |-2]\n", argv[0] );
 	  return -1;
 	}
     }
@@ -216,10 +213,7 @@ main (int argc, char **argv)
   if (initenv_ (daemonParams, env_dir) < 0)
     {
 
-      ls_openlog ("mbatchd",
-		  daemonParams[LSF_LOGDIR].paramValue,
-		  (debug > 1 || lsb_CheckMode),
-		  daemonParams[LSF_LOG_MASK].paramValue);
+      ls_openlog ( argv[0], daemonParams[LSF_LOGDIR].paramValue, (debug > 1 || lsb_CheckMode), daemonParams[LSF_LOG_MASK].paramValue);
       ls_syslog (LOG_ERR, "%s initenv() failed", __func__);
       if (!lsb_CheckMode)
 	mbdDie (MASTER_FATAL);
@@ -236,22 +230,19 @@ main (int argc, char **argv)
 
   if (debug < 2 && !lsb_CheckMode)
     {
-      for (i = sysconf (_SC_OPEN_MAX); i >= 3; i--)
-	close (i);
+      for (i = sysconf (_SC_OPEN_MAX); i >= 3; i--) {
+          close (i);
+        }
     }
 
-  getLogClass_ (daemonParams[LSB_DEBUG_MBD].paramValue,
-		daemonParams[LSB_TIME_MBD].paramValue);
+  getLogClass_ (daemonParams[LSB_DEBUG_MBD].paramValue,	daemonParams[LSB_TIME_MBD].paramValue);
 
   if (lsb_CheckMode)
-    ls_openlog ("mbatchd", daemonParams[LSF_LOGDIR].paramValue, TRUE,
-		"LOG_WARN");
+    ls_openlog ("mbatchd", daemonParams[LSF_LOGDIR].paramValue, TRUE, "LOG_WARN");
   else if (debug > 1)
-    ls_openlog ("mbatchd", daemonParams[LSF_LOGDIR].paramValue, TRUE,
-		daemonParams[LSF_LOG_MASK].paramValue);
+    ls_openlog ("mbatchd", daemonParams[LSF_LOGDIR].paramValue, TRUE, daemonParams[LSF_LOG_MASK].paramValue);
   else
-    ls_openlog ("mbatchd", daemonParams[LSF_LOGDIR].paramValue, FALSE,
-		daemonParams[LSF_LOG_MASK].paramValue);
+    ls_openlog ("mbatchd", daemonParams[LSF_LOGDIR].paramValue, FALSE, daemonParams[LSF_LOG_MASK].paramValue);
 
   if (logclass)
     ls_syslog (LOG_DEBUG, "%s: logclass=%x", __func__, logclass);
@@ -452,9 +443,9 @@ main (int argc, char **argv)
       nready = chanSelect_ (&sockmask, &chanmask, &timeout);
       if (nready < 0)
 	{
-	  if (errno != EINTR)
-	    ls_syslog (LOG_ERR, "\
-%s: Ohmygosh.. select() failed %m", __func__);
+	  if (errno != EINTR) {
+	    ls_syslog (LOG_ERR, "%s: Ohmygosh.. select() failed %m", __func__);
+    }
 	  continue;
 	}
 
@@ -498,7 +489,7 @@ main (int argc, char **argv)
     }				/* for (;;) */
 }
 
-static void
+ void
 acceptConnection (int socket)
 {
   int s;
@@ -541,7 +532,7 @@ acceptConnection (int socket)
 %s: Accepted connection from host %s on channel %d", __func__, client->fromHost, client->chanfd);
 }
 
-static void
+ void
 clientIO (struct Masks *chanmask)
 {
   struct clientNode *cliPtr;
@@ -602,7 +593,7 @@ clientIO (struct Masks *chanmask)
     }
 }
 
-static int
+ int
 processClient (struct clientNode *client, int *needFree)
 {
   static char __func__] = "processClient()";
@@ -754,7 +745,7 @@ processClient (struct clientNode *client, int *needFree)
 	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "NEW_BUCKET");
 	}
       break;
-    case BATCH_QUE_CTRL:
+    case BATCH_QUEUE_CTRL:
       TIMEIT (0,
 	      do_queueControlReq (&xdrs, s, &from, client->fromHost, &reqHdr,
 				  &auth), "do_queueControlReq()");
@@ -847,7 +838,7 @@ processClient (struct clientNode *client, int *needFree)
       TIMEIT (3, do_groupInfoReq (&xdrs, s, &from, &reqHdr),
 	      "do_groupInfoReq()");
       break;
-    case BATCH_QUE_INFO:
+    case BATCH_QUEUE_INFO:
       TIMEIT (3, do_queueInfoReq (&xdrs, s, &from, &reqHdr),
 	      "do_queueInfoReq()");
       break;
@@ -916,7 +907,7 @@ shutDownClient (struct clientNode *client)
   free (client);
 }
 
-static void
+ void
 houseKeeping (int *hsKeeping)
 {
 #define SCHED  1
@@ -984,7 +975,7 @@ houseKeeping (int *hsKeeping)
   *hsKeeping = FALSE;
 }
 
-static void
+ void
 periodicCheck (void)
 {
   char *myhostnm;
@@ -1116,7 +1107,7 @@ child_handler (int sig)
 }
 
 
-static int
+ int
 authRequest (struct lsfAuth *auth,
 	     XDR * xdrs,
 	     struct LSFHeader *reqHdr,
@@ -1129,7 +1120,7 @@ authRequest (struct lsfAuth *auth,
   if (!(reqType == BATCH_JOB_SUB
 	|| reqType == BATCH_JOB_PEEK
 	|| reqType == BATCH_JOB_SIG
-	|| reqType == BATCH_QUE_CTRL
+	|| reqType == BATCH_QUEUE_CTRL
 	|| reqType == BATCH_RECONFIG
 	|| reqType == BATCH_JOB_MIG
 	|| reqType == BATCH_HOST_CTRL
@@ -1189,14 +1180,14 @@ authRequest (struct lsfAuth *auth,
 }
 
 
-static int
+ int
 forkOnRequest (mbdReqType req)
 {
   if (daemonParams[MBD_DONT_FORK].paramValue)
     return 0;
 
   if (req == BATCH_JOB_INFO
-      || req == BATCH_QUE_INFO
+      || req == BATCH_QUEUE_INFO
       || req == BATCH_HOST_INFO
       || req == BATCH_GRP_INFO
       || req == BATCH_RESOURCE_INFO
@@ -1209,7 +1200,7 @@ forkOnRequest (mbdReqType req)
   return 0;
 }
 
-static void
+ void
 shutdownSbdConnections (void)
 {
   struct clientNode *cliPtr;
@@ -1274,7 +1265,7 @@ shutdownSbdConnections (void)
     }
 }
 
-static void
+ void
 processSbdNode (struct sbdNode *sbdPtr, int exception)
 {
 
@@ -1325,7 +1316,7 @@ setNextSchedTimeUponNewJob (struct jData *jPtr)
     }
 }
 
-static void
+ void
 setNextSchedTimeWhenJobFinish (void)
 {
   time_t newTime;

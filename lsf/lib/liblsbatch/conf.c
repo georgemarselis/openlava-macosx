@@ -29,7 +29,7 @@
 #include "libint/intlibout.h"
 #include "lsb/conf.h"
 
-#define   NL_SETN     13
+#define  NL_SETN     13
 
 static void
 freeSA (char **list, unsigned int num)
@@ -4260,7 +4260,7 @@ do_Queues (struct lsConf *conf, char *filename, size_t *lineNum, struct lsInfo *
                     freeQueueInfo (&queue);
                     return FALSE;
                     }
-                queue.qAttrib |= Q_ATTRIB_CHKPNT;
+                queue.qAttrib |= QUEUE_ATTRIB_CHKPNT;
                 queue.chkpntPeriod = chkpntPrd * 60;
                 }
             }
@@ -4270,7 +4270,7 @@ do_Queues (struct lsConf *conf, char *filename, size_t *lineNum, struct lsInfo *
             if (strcasecmp (keylist[QKEY_RERUNNABLE].val, "y") == 0
                 || strcasecmp (keylist[QKEY_RERUNNABLE].val, "yes") == 0)
                 {
-                queue.qAttrib |= Q_ATTRIB_RERUNNABLE;
+                queue.qAttrib |= QUEUE_ATTRIB_RERUNNABLE;
                 }
             else
                 {
@@ -4281,26 +4281,26 @@ do_Queues (struct lsConf *conf, char *filename, size_t *lineNum, struct lsInfo *
                     ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5445, "%s: File %s in section Queue ending at line %d:  options for RERUNNABLE of the queue <%s> is not y|yes|n|no; ignoring"), __func__, filename, *lineNum, queue.queue, keylist[QKEY_RERUNNABLE].val);
                     lsberrno = LSBE_CONF_WARNING;
                     }
-                queue.qAttrib &= ~Q_ATTRIB_RERUNNABLE;
+                queue.qAttrib &= ~QUEUE_ATTRIB_RERUNNABLE;
                 }
             }
 
-        addBinaryAttributes (filename, lineNum, &queue, &keylist[QKEY_EXCLUSIVE],               Q_ATTRIB_EXCLUSIVE, "EXCLUSIVE");
-        addBinaryAttributes (filename, lineNum, &queue, &keylist[QKEY_BACKFILL],                Q_ATTRIB_BACKFILL, "BACKFILL");
-        addBinaryAttributes (filename, lineNum, &queue, &keylist[QKEY_IGNORE_DEADLINE],         Q_ATTRIB_IGNORE_DEADLINE, "IGNORE_DEADLINE");
-        addBinaryAttributes (filename, lineNum, &queue, &keylist[QKEY_ENQUE_INTERACTIVE_AHEAD], Q_ATTRIB_ENQUE_INTERACTIVE_AHEAD, "ENQUE_INTERACTIVE_AHEAD");
-        addBinaryAttributes (filename, lineNum, &queue, &keylist[QKEY_ROUND_ROBIN_POLICY],      Q_ATTRIB_ROUND_ROBIN, "ROUND_ROBIN_POLICY");
+        addBinaryAttributes (filename, lineNum, &queue, &keylist[QKEY_EXCLUSIVE],               QUEUE_ATTRIB_EXCLUSIVE, "EXCLUSIVE");
+        addBinaryAttributes (filename, lineNum, &queue, &keylist[QKEY_BACKFILL],                QUEUE_ATTRIB_BACKFILL, "BACKFILL");
+        addBinaryAttributes (filename, lineNum, &queue, &keylist[QKEY_IGNORE_DEADLINE],         QUEUE_ATTRIB_IGNORE_DEADLINE, "IGNORE_DEADLINE");
+        addBinaryAttributes (filename, lineNum, &queue, &keylist[QKEY_ENQUE_INTERACTIVE_AHEAD], QUEUE_ATTRIB_ENQUE_INTERACTIVE_AHEAD, "ENQUE_INTERACTIVE_AHEAD");
+        addBinaryAttributes (filename, lineNum, &queue, &keylist[QKEY_ROUND_ROBIN_POLICY],      QUEUE_ATTRIB_ROUND_ROBIN, "ROUND_ROBIN_POLICY");
 
         if (keylist[QKEY_INTERACTIVE].val != NULL)
             {
             if (strcasecmp (keylist[QKEY_INTERACTIVE].val, "n") == 0 ||
                 strcasecmp (keylist[QKEY_INTERACTIVE].val, "no") == 0)
                 {
-                queue.qAttrib |= Q_ATTRIB_NO_INTERACTIVE;
+                queue.qAttrib |= QUEUE_ATTRIB_NO_INTERACTIVE;
                 }
             else if (strcasecmp (keylist[QKEY_INTERACTIVE].val, "only") == 0)
                 {
-                queue.qAttrib |= Q_ATTRIB_ONLY_INTERACTIVE;
+                queue.qAttrib |= QUEUE_ATTRIB_ONLY_INTERACTIVE;
                 }
             else if ((strcasecmp (keylist[QKEY_INTERACTIVE].val, "yes") != 0) &&
                      (strcasecmp (keylist[QKEY_INTERACTIVE].val, "y") != 0))
@@ -4337,7 +4337,7 @@ do_Queues (struct lsConf *conf, char *filename, size_t *lineNum, struct lsInfo *
             while ((word = getNextWord_ (&sp)) != NULL)
                 {
                 if (strcasecmp (word, "EXCLUSIVE") == 0)
-                    queue.qAttrib |= Q_ATTRIB_EXCLUSIVE;
+                    queue.qAttrib |= QUEUE_ATTRIB_EXCLUSIVE;
                 else
                     {
                     ls_syslog (LOG_ERR, I18N (5317, "%s: File %s in section Queue ending at line %d: POLICIES value <%s> unrecognizable; ignored"), __func__, filename, *lineNum, word);  /* catgets 5317 */
@@ -5890,7 +5890,7 @@ getReserve (char *reserve, struct queueInfoEnt *qp, char *filename, unsigned int
             lsberrno = LSBE_CONF_WARNING;
             return -1;
             }
-        qp->qAttrib |= Q_ATTRIB_BACKFILL;
+        qp->qAttrib |= QUEUE_ATTRIB_BACKFILL;
         }
     return 0;
     

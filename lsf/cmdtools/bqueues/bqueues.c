@@ -142,10 +142,12 @@ main (int argc, char **argv)
       return -1;
     }
 
-  if (lflag)
-    prtQueuesLong (numQueues, queueInfo);
-  else
-    prtQueuesShort (numQueues, queueInfo);
+	if (lflag) {
+		prtQueuesLong (numQueues, queueInfo);
+	}
+	else {
+		prtQueuesShort (numQueues, queueInfo);
+	}
 
   return 0;
 }
@@ -178,8 +180,9 @@ prtQueuesLong (int numQueues, struct queueInfoEnt *queueInfo)
   for (i = 0; i < numQueues; i++)
     {
       qp = &(queueInfo[i]);
-      if (qp->qAttrib & Q_ATTRIB_DEFAULT)
-	numDefaults++;
+		if (qp->qAttrib & QUEUE_ATTRIB_DEFAULT) {
+			numDefaults++;
+		}
     }
 
   for (i = 0; i < numQueues; i++)
@@ -244,7 +247,7 @@ prtQueuesLong (int numQueues, struct queueInfoEnt *queueInfo)
       printf ("%s: %s\n", _i18n_msg_get (ls_catd, NL_SETN, 1210, "QUEUE"), qp->queue);	/* catgets  1210  */
 
       printf ("  -- %s", qp->description);
-      if (qp->qAttrib & Q_ATTRIB_DEFAULT)
+      if (qp->qAttrib & QUEUE_ATTRIB_DEFAULT)
 	{
 	  if (numDefaults == 1)
 	    printf ("  %s.\n\n", _i18n_msg_get (ls_catd, NL_SETN, 1211, "This is the default queue"));	/* catgets  1211  */
@@ -351,23 +354,23 @@ prtQueuesLong (int numQueues, struct queueInfoEnt *queueInfo)
 	    exit (-1);
 	}
 
-      if ((qp->qAttrib & Q_ATTRIB_EXCLUSIVE)
-	  || (qp->qAttrib & Q_ATTRIB_BACKFILL)
-	  || (qp->qAttrib & Q_ATTRIB_IGNORE_DEADLINE)
-	  || (qp->qAttrib & Q_ATTRIB_ONLY_INTERACTIVE)
-	  || (qp->qAttrib & Q_ATTRIB_NO_INTERACTIVE))
+      if ((qp->qAttrib & QUEUE_ATTRIB_EXCLUSIVE)
+	  || (qp->qAttrib & QUEUE_ATTRIB_BACKFILL)
+	  || (qp->qAttrib & QUEUE_ATTRIB_IGNORE_DEADLINE)
+	  || (qp->qAttrib & QUEUE_ATTRIB_ONLY_INTERACTIVE)
+	  || (qp->qAttrib & QUEUE_ATTRIB_NO_INTERACTIVE))
 	{
 
 	  printf ("\n%s:", _i18n_msg_get (ls_catd, NL_SETN, 1219, "SCHEDULING POLICIES"));	/* catgets  1219  */
-	  if (qp->qAttrib & Q_ATTRIB_BACKFILL)
+	  if (qp->qAttrib & QUEUE_ATTRIB_BACKFILL)
 	    printf ("  %s", (_i18n_msg_get (ls_catd, NL_SETN, 1223, "BACKFILL")));	/* catgets  1223  */
-	  if (qp->qAttrib & Q_ATTRIB_IGNORE_DEADLINE)
+	  if (qp->qAttrib & QUEUE_ATTRIB_IGNORE_DEADLINE)
 	    printf ("  %s", (_i18n_msg_get (ls_catd, NL_SETN, 1224, "IGNORE_DEADLINE")));	/* catgets  1224  */
-	  if (qp->qAttrib & Q_ATTRIB_EXCLUSIVE)
+	  if (qp->qAttrib & QUEUE_ATTRIB_EXCLUSIVE)
 	    printf ("  %s", (_i18n_msg_get (ls_catd, NL_SETN, 1225, "EXCLUSIVE")));	/* catgets  1225  */
-	  if (qp->qAttrib & Q_ATTRIB_NO_INTERACTIVE)
+	  if (qp->qAttrib & QUEUE_ATTRIB_NO_INTERACTIVE)
 	    printf ("  %s", (_i18n_msg_get (ls_catd, NL_SETN, 1226, "NO_INTERACTIVE")));	/* catgets  1226  */
-	  if (qp->qAttrib & Q_ATTRIB_ONLY_INTERACTIVE)
+	  if (qp->qAttrib & QUEUE_ATTRIB_ONLY_INTERACTIVE)
 	    printf ("  %s", (_i18n_msg_get (ls_catd, NL_SETN, 1227, "ONLY_INTERACTIVE")));	/* catgets  1227  */
 	  printf ("\n");
 	}
@@ -425,16 +428,16 @@ prtQueuesLong (int numQueues, struct queueInfoEnt *queueInfo)
 	printf ("%s:  %s\n", (_i18n_msg_get (ls_catd, NL_SETN, 1246, "STOP_COND")), qp->stopCond);	/* catgets  1246  */
       if (strcmp (qp->jobStarter, " ") != 0)
 	printf ("%s:  %s\n", (_i18n_msg_get (ls_catd, NL_SETN, 1247, "JOB_STARTER")), qp->jobStarter);	/* catgets  1247  */
-      if (qp->qAttrib & Q_ATTRIB_RERUNNABLE)
+      if (qp->qAttrib & QUEUE_ATTRIB_RERUNNABLE)
 	printf ("RERUNNABLE :  yes\n");
 
-      if (qp->qAttrib & Q_ATTRIB_CHKPNT)
+      if (qp->qAttrib & QUEUE_ATTRIB_CHKPNT)
 	{
 	  printf ((_i18n_msg_get (ls_catd, NL_SETN, 1261, "CHKPNTDIR : %s\n")), qp->chkpntDir);	/* catgets  1261  */
 	  printf ((_i18n_msg_get (ls_catd, NL_SETN, 1262, "CHKPNTPERIOD : %d\n")), qp->chkpntPeriod);	/* catgets  1262  */
 	}
 
-      if (qp->qAttrib & Q_ATTRIB_ROUND_ROBIN)
+      if (qp->qAttrib & QUEUE_ATTRIB_ROUND_ROBIN)
 	printf ("ROUND_ROBIN_SCHEDULING:  yes\n");
 
       printf ("\n");

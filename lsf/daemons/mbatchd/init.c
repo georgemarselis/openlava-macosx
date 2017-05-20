@@ -689,7 +689,7 @@ readQueueConf (int mbdInitFlags)
 	    }
 	  else
 	    {
-	      qp->qAttrib |= Q_ATTRIB_DEFAULT;
+	      qp->qAttrib |= QUEUE_ATTRIB_DEFAULT;
 	      numDefQue++;
 	    }
 	}
@@ -708,7 +708,7 @@ readQueueConf (int mbdInitFlags)
       ls_syslog (LOG_WARNING, "\
 %s: Using the default queue <default> provided by lsb.queues ", __FUNCTION__);
 
-      qp->qAttrib |= Q_ATTRIB_DEFAULT;
+      qp->qAttrib |= QUEUE_ATTRIB_DEFAULT;
       FREEUP (defaultQueues);
       defaultQueues = safeSave ("default");
       qp->flags |= QUEUE_UPDATE;
@@ -729,7 +729,7 @@ createDefQueue (void)
   FREEUP (defaultQueues);
   defaultQueues = safeSave ("default");
   qp = initQData ();
-  qp->qAttrib |= Q_ATTRIB_DEFAULT;
+  qp->qAttrib |= QUEUE_ATTRIB_DEFAULT;
   qp->description =
     safeSave
     ("This is the default queue provided by the batch system. Jobs are scheduled with very loose control.");
@@ -2642,14 +2642,14 @@ addQData (struct queueConf *queueConf, int mbdInitFlags)
 	  qPtr->chkpntDir = safeSave (queue->chkpntDir);
 	}
 
-      if (queue->qAttrib & Q_ATTRIB_CHKPNT)
-	qPtr->qAttrib |= Q_ATTRIB_CHKPNT;
+      if (queue->qAttrib & QUEUE_ATTRIB_CHKPNT)
+	qPtr->qAttrib |= QUEUE_ATTRIB_CHKPNT;
 
-      if (queue->qAttrib & Q_ATTRIB_RERUNNABLE)
-	qPtr->qAttrib |= Q_ATTRIB_RERUNNABLE;
+      if (queue->qAttrib & QUEUE_ATTRIB_RERUNNABLE)
+	qPtr->qAttrib |= QUEUE_ATTRIB_RERUNNABLE;
 
-      if (qPtr->qAttrib & Q_ATTRIB_BACKFILL)
-	qAttributes |= Q_ATTRIB_BACKFILL;
+      if (qPtr->qAttrib & QUEUE_ATTRIB_BACKFILL)
+	qAttributes |= QUEUE_ATTRIB_BACKFILL;
     }
 }
 
@@ -3478,7 +3478,7 @@ parseQHosts (struct qData *qp, char *hosts)
 	      qp->askedPtr[i].hData = returnHosts[i].hData;
 	      qp->askedPtr[i].priority = returnHosts[i].priority;
 	      if (qp->askedPtr[i].priority > 0)
-		qp->qAttrib |= Q_ATTRIB_HOST_PREFER;
+		qp->qAttrib |= QUEUE_ATTRIB_HOST_PREFER;
 	    }
 
 	  qp->numAskedPtr = numReturnHosts;
@@ -3610,7 +3610,7 @@ parseFirstHostErr (int returnErr, char *__func__, char *hosts, struct qData *qp,
 	      qp->askedPtr[i].hData = returnHosts[i].hData;
 	      qp->askedPtr[i].priority = returnHosts[i].priority;
 	      if (qp->askedPtr[i].priority > 0)
-		qp->qAttrib |= Q_ATTRIB_HOST_PREFER;
+		qp->qAttrib |= QUEUE_ATTRIB_HOST_PREFER;
 	    }
 	}
       else

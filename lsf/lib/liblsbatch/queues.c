@@ -76,7 +76,7 @@ lsb_queueinfo (char **queues, unsigned int *numQueues, char *hosts, char *users,
   if ((queueInfoReq.options & ALL_QUEUE)
       || (queueInfoReq.options & DFT_QUEUE))
     {
-      queueInfoReq.names = (char **) malloc (3 * sizeof (char *));
+      queueInfoReq.names = malloc (3 * sizeof (char *));
       if ( NULL == queueInfoReq.names && ENOMEM == errno )
 	{
 	  lsberrno = LSBE_NO_MEM;
@@ -89,7 +89,7 @@ lsb_queueinfo (char **queues, unsigned int *numQueues, char *hosts, char *users,
   else
     {
       assert( *numQueues >= 0);
-      queueInfoReq.names = (char **) calloc ((unsigned long )*numQueues + 2, sizeof (char *));
+      queueInfoReq.names = calloc( *numQueues + 2, sizeof (char *));
       if ( NULL == queueInfoReq.names && ENOMEM == errno )
 	{
 	  lsberrno = LSBE_NO_MEM;
@@ -151,7 +151,7 @@ lsb_queueinfo (char **queues, unsigned int *numQueues, char *hosts, char *users,
   queueInfoReq.resReq = "";
 
 
-  mbdReqtype = BATCH_QUE_INFO;
+  mbdReqtype = BATCH_QUEUE_INFO;
   assert( cc >= 0);
   cc = (int)(sizeof (struct infoReq) + (unsigned long)cc * MAXHOSTNAMELEN + (unsigned long)cc + 100);
   request_buf = (char *)malloc ( (unsigned long)cc);

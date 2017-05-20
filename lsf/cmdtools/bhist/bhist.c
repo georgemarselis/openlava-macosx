@@ -643,7 +643,7 @@ getEventStatus (struct eventRecord *event)
 											       event->
 											       ld));
       if ((event->reasons == PEND_SBD_JOB_REQUEUE
-	   || event->reasons == PEND_QUE_PRE_FAIL
+	   || event->reasons == PEND_QUEUE_PRE_FAIL
 	   || event->reasons == PEND_JOB_PRE_EXEC) && WEXITSTATUS (wStatus))
 	{
 	  char *sp;

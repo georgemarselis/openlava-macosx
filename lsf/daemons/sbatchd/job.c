@@ -34,63 +34,56 @@
 #define MAX_PREEXEC_ENVS  ((MAXLINELEN + 1)/3 + 2)
 
 
-extern char **environ;
+// extern char **environ;
+// extern int lsbStdoutDirect;
+// extern void osConvertPath_ (char *pathname);
+// extern int sbdlog_newstatus (struct jobCard *jp);
+// extern void copyJUsage (struct jRusage *to, struct jRusage *from);
+// extern int jRunSuspendAct (struct jobCard *jp, int sigValue, int jState, int reasons, int subReasons, logType logFlag);
+// extern int resumeJob (struct jobCard *jp, int sigValue, int suspendReasons, logType logFlag);
+// extern int getpwnamRetry;
+// extern int lsbMemEnforce;
+// extern char *yybuff;
+// extern int lsbJobCpuLimit;
+// extern int lsbJobMemLimit;
+// extern void ls_closelog_ext (void);
+// extern int cpHostent (struct hostent *, const struct hostent *);
 
-extern int lsbStdoutDirect;
-static void shouldCopyFromLsbatch (struct jobCard *jp,
-				   int *cpyStdoutFromLsbatch,
-				   int *cpyStderrFromLsbatch);
-static int isLink (char *filename);
 
-static void getJobTmpDir (char *tmpDirName, struct jobCard *jobCardPtr);
-static void createJobTmpDir (struct jobCard *jobCardPtr);
+void shouldCopyFromLsbatch (struct jobCard *jp, int *cpyStdoutFromLsbatch, int *cpyStderrFromLsbatch);
+int isLink (char *filename);
 
-static void execJob (struct jobCard *jobCardPtr, int chfd);
-static int finishJob (struct jobCard *jobCardPtr);
-static int setLimits (struct jobSpecs *jobSpecsPtr);
-static int mysetLimits (struct jobSpecs *jobSpecsPtr);
-static int send_results (struct jobCard *);
-static int sendNotification (struct jobCard *);
-static int setPGid (struct jobCard *jc);
-static char *getLoginShell (char *jfDada, char *jobFile,
-			    struct hostent *hp, int readFile);
-static int createTmpJobFile (struct jobSpecs *jobSpecsPtr,
-			     struct hostent *hp, char *stdinFile);
-static void runQPre (struct jobCard *);
+void getJobTmpDir (char *tmpDirName, struct jobCard *jobCardPtr);
+void createJobTmpDir (struct jobCard *jobCardPtr);
 
-static void collectPreStatus (struct jobCard *, int, char *);
-static int requeueJob (struct jobCard *);
-static char **execArgs (struct jobSpecs *jp, char **execArgv);
-static void jobFinishRusage (struct jobCard *jp);
-static void initJRusage (struct jRusage *);
-static int getJobVersion (struct jobSpecs *);
+void execJob (struct jobCard *jobCardPtr, int chfd);
+int finishJob (struct jobCard *jobCardPtr);
+int setLimits (struct jobSpecs *jobSpecsPtr);
+int mysetLimits (struct jobSpecs *jobSpecsPtr);
+int send_results (struct jobCard *);
+int sendNotification (struct jobCard *);
+int setPGid (struct jobCard *jc);
+char *getLoginShell (char *jfDada, char *jobFile, struct hostent *hp, int readFile);
+int createTmpJobFile (struct jobSpecs *jobSpecsPtr, struct hostent *hp, char *stdinFile);
+void runQPre (struct jobCard *);
 
-extern void osConvertPath_ (char *pathname);
-extern int sbdlog_newstatus (struct jobCard *jp);
-extern void copyJUsage (struct jRusage *to, struct jRusage *from);
-extern int jRunSuspendAct (struct jobCard *jp, int sigValue, int jState,
-			   int reasons, int subReasons, logType logFlag);
-extern int resumeJob (struct jobCard *jp, int sigValue,
-		      int suspendReasons, logType logFlag);
-static int sbdStartupStopJob (struct jobCard *jp, int reasons,
-			      int subReasons);
+void collectPreStatus (struct jobCard *, int, char *);
+int requeueJob (struct jobCard *);
+char **execArgs (struct jobSpecs *jp, char **execArgv);
+void jobFinishRusage (struct jobCard *jp);
+void initJRusage (struct jRusage *);
+int getJobVersion (struct jobSpecs *);
 
-static int chPrePostUser (struct jobCard *jp);
-static void sbdChildCloseChan (int execptChan);
-static int REShasPTYfix (char *);
-static void setJobArrayEnv (char *, int);
-extern int getpwnamRetry;
+int sbdStartupStopJob (struct jobCard *jp, int reasons, int subReasons);
+
+int chPrePostUser (struct jobCard *jp);
+void sbdChildCloseChan (int execptChan);
+int REShasPTYfix (char *);
+void setJobArrayEnv (char *, int);
 struct passwd *my_getpwnam (const char *name, char *caller);
-extern int lsbMemEnforce;
-extern char *yybuff;
-extern int lsbJobCpuLimit;
-extern int lsbJobMemLimit;
-
-static void updateJUsage (struct jobCard *, const struct jRusage *);
-static void copyPidInfo (struct jobCard *, const struct jRusage *);
-static void writePidInfoFile (const struct jobCard *, const struct jRusage *);
-extern void ls_closelog_ext (void);
-extern int cpHostent (struct hostent *, const struct hostent *);
+void updateJUsage (struct jobCard *, const struct jRusage *);
+void copyPidInfo (struct jobCard *, const struct jRusage *);
+void writePidInfoFile (const struct jobCard *, const struct jRusage *);
 
 
 struct passwd *
@@ -110,7 +103,7 @@ my_getpwnam (const char *name, char *caller)
   return (pw);
 }
 
-static void
+void
 sbdChildCloseChan (int exceptChan)
 {
   struct clientNode *cliPtr, *nextClient;
@@ -185,7 +178,7 @@ job_exec (struct jobCard *jobCardPtr, int chfd)
 
 
 
-static int
+int
 sendNotification (struct jobCard *jobCardPtr)
 {
   static char __func__] = "sendNotification";
@@ -251,7 +244,7 @@ getJobTmpDir (char *tmpDirName, struct jobCard *jPtr)
   strcat (tmpDirName, ".tmpdir");
 }
 
-static void
+void
 createJobTmpDir (struct jobCard *jobCardPtr)
 {
   char tmpDirName[MAXFILENAMELEN];
@@ -279,7 +272,7 @@ createJobTmpDir (struct jobCard *jobCardPtr)
     }
 }
 
-static void
+void
 execJob (struct jobCard *jobCardPtr, int chfd)
 {
   static char __func__] = "execJob";
@@ -520,7 +513,7 @@ LSF: Unable to find login shell for job %s.\n", lsb_jobid2str (jobSpecsPtr->jobI
 
 
 
-static char **
+char **
 execArgs (struct jobSpecs *jp, char **execArgv)
 {
   int i = 0;
@@ -979,13 +972,13 @@ setJobEnv (struct jobCard *jp)
 }
 
 
-static int
+int
 setLimits (struct jobSpecs *jobSpecsPtr)
 {
   return (mysetLimits (jobSpecsPtr));
 }
 
-static int
+int
 mysetLimits (struct jobSpecs *jobSpecsPtr)
 {
   struct rlimit rlimit;
@@ -1175,7 +1168,7 @@ unlockHosts (struct jobCard *jp, int num)
   if (jp == NULL || num <= 0)
     return;
 
-  if (jp->jobSpecs.jAttrib & Q_ATTRIB_EXCLUSIVE)
+  if (jp->jobSpecs.jAttrib & QUEUE_ATTRIB_EXCLUSIVE)
     {
       for (i = 0; i < num; i++)
 	{
@@ -1189,12 +1182,12 @@ unlockHosts (struct jobCard *jp, int num)
 		       lsb_jobid2str (jp->jobSpecs.jobId),
 		       "unlockHost_", jp->jobSpecs.toHosts[i]);
 	}
-      jp->jobSpecs.jAttrib &= ~Q_ATTRIB_EXCLUSIVE;
+      jp->jobSpecs.jAttrib &= ~QUEUE_ATTRIB_EXCLUSIVE;
     }
 
 }
 
-static int
+int
 finishJob (struct jobCard *jobCard)
 {
   static char __func__] = "finishJob";
@@ -1255,7 +1248,7 @@ finishJob (struct jobCard *jobCard)
     }
 
   if ((!jobCard->mbdRestarted)
-      && (!((jobCard->jobSpecs.reasons == PEND_QUE_PRE_FAIL)
+      && (!((jobCard->jobSpecs.reasons == PEND_QUEUE_PRE_FAIL)
 	    && (jobCard->jobSpecs.jStatus == JOB_STAT_PEND))))
     {
       if (rmJobBufFiles (jobCard) != 0)
@@ -1402,7 +1395,7 @@ rmvJobStarterStr (char *line, char *jobStarter)
 }
 
 
-static int
+int
 isLink (char *filename)
 {
   static char __func__] = "isLink";
@@ -1439,7 +1432,7 @@ isLink (char *filename)
   return returnValue;
 }
 
-static void
+void
 shouldCopyFromLsbatch (struct jobCard *jp,
 		       int *cpyStdoutFromLsbatch, int *cpyStderrFromLsbatch)
 {
@@ -1491,7 +1484,7 @@ shouldCopyFromLsbatch (struct jobCard *jp,
 }
 
 
-static int
+int
 send_results (struct jobCard *jp)
 {
   static char __func__] = "send_results()";
@@ -2371,7 +2364,7 @@ addJob (struct jobSpecs *jobSpecs, int mbdVersion)
       die (SLAVE_FATAL);
     }
 
-  if (jp->jobSpecs.jAttrib & Q_ATTRIB_EXCLUSIVE)
+  if (jp->jobSpecs.jAttrib & QUEUE_ATTRIB_EXCLUSIVE)
     if (lockHosts (jp) < 0)
       {
 	ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5421, "%s: lockHosts() failed for job <%s>; Host used by the job will not be locked"), __func__, lsb_jobid2str (jp->jobSpecs.jobId));	/* catgets 5421 */
@@ -2509,7 +2502,7 @@ renewJobStat (struct jobCard *jp)
 }
 
 
-static int
+int
 sbdStartupStopJob (struct jobCard *jp, int reasons, int subReasons)
 {
   int sigValue = 0;
@@ -2661,7 +2654,7 @@ refreshJob (struct jobSpecs *jobSpecs)
       saveSpecs (&jp->jobSpecs, jobSpecs);
 
       jp->jobSpecs.jAttrib = jobSpecs->jAttrib;
-      if (jp->jobSpecs.jAttrib & Q_ATTRIB_EXCLUSIVE)
+      if (jp->jobSpecs.jAttrib & QUEUE_ATTRIB_EXCLUSIVE)
 	{
 	  if (lockHosts (jp) < 0)
 	    {
@@ -3062,7 +3055,7 @@ setRunLimit (struct jobCard *jp, int initRunTime)
 
 }
 
-static int
+int
 setPGid (struct jobCard *jc)
 {
   static char __func__] = "setPGid()";
@@ -3080,7 +3073,7 @@ setPGid (struct jobCard *jc)
 
 
 
-static char *
+char *
 getLoginShell (char *jfData, char *jobFile, struct hostent *hp, int readFile)
 {
   static char shellPath[MAXFILENAMELEN];
@@ -3154,7 +3147,7 @@ getLoginShell (char *jfData, char *jobFile, struct hostent *hp, int readFile)
 
 }
 
-static int
+int
 createTmpJobFile (struct jobSpecs *jobSpecsPtr, struct hostent *hp,
 		  char *stdinFile)
 {
@@ -3527,7 +3520,7 @@ We are unable to start your job %s %s.\nThe error is: %s", lsb_jobid2str (jobCar
   return -1;
 }
 
-static void
+void
 runQPre (struct jobCard *jp)
 {
   static char *__func__ = "runQPre";
@@ -3588,7 +3581,7 @@ runQPre (struct jobCard *jp)
     {
       ls_syslog (LOG_ERR, "\
 %s: Fork to run pre-exec for job <%d> failed: %m", __func__, jp->jobSpecs.jobId);
-      jobSetupStatus (JOB_STAT_PEND, PEND_QUE_PRE_FAIL, jp);
+      jobSetupStatus (JOB_STAT_PEND, PEND_QUEUE_PRE_FAIL, jp);
     }
 
   collectPreStatus (jp, pid, "runQPre");
@@ -3712,7 +3705,7 @@ runQPost (struct jobCard *jp)
 /* chPrePostUser()
  * Change the userid to the execution user.
  */
-static int
+int
 chPrePostUser (struct jobCard *jp)
 {
   uid_t prepostUid;
@@ -3833,7 +3826,7 @@ postJobSetup (struct jobCard *jp)
   if (initPaths (jp, hp, NULL) < 0)
     {
       if (!(jp->jobSpecs.jStatus & JOB_STAT_PRE_EXEC)
-	  && jp->jobSpecs.reasons != PEND_QUE_PRE_FAIL)
+	  && jp->jobSpecs.reasons != PEND_QUEUE_PRE_FAIL)
 	{
 
 	  chuser (batchId);
@@ -3893,7 +3886,7 @@ runUPre (struct jobCard *jp)
   jp->jobSpecs.jStatus &= ~JOB_STAT_PRE_EXEC;
 }
 
-static void
+void
 collectPreStatus (struct jobCard *jp, int pid, char *context)
 {
   static char __func__] = "collectPreStatus()";
@@ -3938,13 +3931,13 @@ collectPreStatus (struct jobCard *jp, int pid, char *context)
 	  if (!strcmp (context, "runUPre"))
 	    jobSetupStatus (JOB_STAT_PEND, PEND_JOB_PRE_EXEC, jp);
 	  else
-	    jobSetupStatus (JOB_STAT_PEND, PEND_QUE_PRE_FAIL, jp);
+	    jobSetupStatus (JOB_STAT_PEND, PEND_QUEUE_PRE_FAIL, jp);
 	}
     }
 }
 
 
-static int
+int
 requeueJob (struct jobCard *jp)
 {
   static char __func__] = "requeueJob";
@@ -4148,7 +4141,7 @@ updateRUsageFromSuper (struct jobCard *jp, char *mbuf)
 
 }
 
-static void
+void
 updateJUsage (struct jobCard *jPtr, const struct jRusage *jRusage)
 {
   static char __func__] = "updateJUsage";
@@ -4210,7 +4203,7 @@ updateJUsage (struct jobCard *jPtr, const struct jRusage *jRusage)
 
 }
 
-static void
+void
 copyPidInfo (struct jobCard *jPtr, const struct jRusage *jRusage)
 {
   static char __func__] = "copyPidInfo";
@@ -4260,7 +4253,7 @@ copyPidInfo (struct jobCard *jPtr, const struct jRusage *jRusage)
 
 }
 
-static void
+void
 writePidInfoFile (const struct jobCard *jPtr, const struct jRusage *jRusage)
 {
   static char __func__] = "writePidInfoFile";
@@ -4298,7 +4291,7 @@ writePidInfoFile (const struct jobCard *jPtr, const struct jRusage *jRusage)
 
 
 
-static void
+void
 jobFinishRusage (struct jobCard *jp)
 {
   static char __func__] = "jobFinishRusage()";
@@ -4542,7 +4535,7 @@ freeThresholds (struct thresholds *thresholds)
 
 }
 
-static void
+void
 initJRusage (struct jRusage *jRusage)
 {
   jRusage->mem = -1;
@@ -4556,7 +4549,7 @@ initJRusage (struct jRusage *jRusage)
 }
 
 
-static int
+int
 getJobVersion (struct jobSpecs *jobSpecs)
 {
   int i, version;
@@ -4592,7 +4585,7 @@ lockHosts (struct jobCard *jp)
   int i;
 
 
-  if (!(jp->jobSpecs.jAttrib & Q_ATTRIB_EXCLUSIVE))
+  if (!(jp->jobSpecs.jAttrib & QUEUE_ATTRIB_EXCLUSIVE))
     return 0;
 
   for (i = 0; i < jp->jobSpecs.numToHosts; i++)
@@ -4614,7 +4607,7 @@ lockHosts (struct jobCard *jp)
 }
 
 
-static int
+int
 REShasPTYfix (char *resPath)
 {
   FILE *fp;
@@ -4640,7 +4633,7 @@ REShasPTYfix (char *resPath)
 
 }
 
-static void
+void
 setJobArrayEnv (char *jobName, int jobIndex)
 {
   static char __func__] = "setJobArrayEnv";

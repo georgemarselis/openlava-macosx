@@ -17,7 +17,7 @@
  */
 
 #include "mbd.h"
-#define NL_SETN         10
+// #define NL_SETN         10
 
 #define SUSP_CAN_PREEMPT_FOR_RSRC(s) !((s)->jStatus & JOB_STAT_USUSP)
 
@@ -223,7 +223,7 @@ newJob (struct submitReq *subReq, struct submitMbdReply *Reply, int chan,
       if (!(subReq->options & SUB_CHKPNT_DIR))
 	{
 	  struct qData *qp = getQueueData (subReq->queue);
-	  if (qp && (qp->qAttrib & Q_ATTRIB_CHKPNT))
+	  if (qp && (qp->qAttrib & QUEUE_ATTRIB_CHKPNT))
 	    {
 	      subReq->options |= SUB_CHKPNTABLE;
 	      subReq->options2 |= SUB2_QUEUE_CHKPNT;
@@ -236,7 +236,7 @@ newJob (struct submitReq *subReq, struct submitMbdReply *Reply, int chan,
       if (!(subReq->options & SUB_RERUNNABLE))
 	{
 	  struct qData *qp = getQueueData (subReq->queue);
-	  if (qp && (qp->qAttrib & Q_ATTRIB_RERUNNABLE))
+	  if (qp && (qp->qAttrib & QUEUE_ATTRIB_RERUNNABLE))
 	    {
 	      subReq->options |= SUB_RERUNNABLE;
 	      subReq->options2 |= SUB2_QUEUE_RERUNNABLE;
@@ -770,8 +770,8 @@ queueOk (char *queuename, struct jData *job, int *errReqIndx,
 
   if (!userJobLimitOk (job, 0, errReqIndx))
     {
-      if (job->newReason == PEND_QUE_USR_JLIMIT
-	  || job->newReason == PEND_QUE_USR_PJLIMIT)
+      if (job->newReason == PEND_QUEUE_USR_JLIMIT
+	  || job->newReason == PEND_QUEUE_USR_PJLIMIT)
 	return (LSBE_UJOB_LIMIT);
       else
 	return (LSBE_USER_JLIMIT);
@@ -793,7 +793,7 @@ acceptJob (struct qData *qp,
   if (!(qp->qStatus & QUEUE_STAT_OPEN))
     return (LSBE_QUEUE_CLOSED);
   if ((jp->shared->jobBill.options & SUB_EXCLUSIVE)
-      && !(qp->qAttrib & Q_ATTRIB_EXCLUSIVE))
+      && !(qp->qAttrib & QUEUE_ATTRIB_EXCLUSIVE))
     return (LSBE_EXCLUSIVE);
 
 
@@ -812,10 +812,10 @@ acceptJob (struct qData *qp,
     }
 
   if ((jp->shared->jobBill.options & SUB_INTERACTIVE)
-      && (qp->qAttrib & Q_ATTRIB_NO_INTERACTIVE))
+      && (qp->qAttrib & QUEUE_ATTRIB_NO_INTERACTIVE))
     return (LSBE_NO_INTERACTIVE);
   if (!(jp->shared->jobBill.options & SUB_INTERACTIVE)
-      && (qp->qAttrib & Q_ATTRIB_ONLY_INTERACTIVE))
+      && (qp->qAttrib & QUEUE_ATTRIB_ONLY_INTERACTIVE))
     return (LSBE_ONLY_INTERACTIVE);
 
 
@@ -1081,9 +1081,9 @@ selectJobs (struct jobInfoReq *jobInfoReq, struct jData ***jobDataList,
 	    if (jpbw->jStatus & JOB_STAT_PEND)
 	      {
 		if (!(jpbw->qPtr->qStatus & QUEUE_STAT_RUN))
-		  jpbw->newReason = PEND_QUE_WINDOW;
+		  jpbw->newReason = PEND_QUEUE_WINDOW;
 		if (!(jpbw->qPtr->qStatus & QUEUE_STAT_ACTIVE))
-		  jpbw->newReason = PEND_QUE_INACT;
+		  jpbw->newReason = PEND_QUEUE_INACT;
 	      }
 	    else if (jpbw->jStatus & JOB_STAT_ZOMBIE)
 	      jpbw->newReason |= EXIT_ZOMBIE;
@@ -2426,12 +2426,12 @@ packJobSpecs (struct jData *jDataPtr, struct jobSpecs *jobSpecs)
 
   jobSpecs->jAttrib = 0;
 
-  if (((qp->qAttrib & Q_ATTRIB_EXCLUSIVE) &&
+  if (((qp->qAttrib & QUEUE_ATTRIB_EXCLUSIVE) &&
        (jDataPtr->shared->jobBill.options & SUB_EXCLUSIVE)) ||
       (IS_START (jDataPtr->jStatus) &&
        (jDataPtr->shared->jobBill.options & SUB_EXCLUSIVE)))
     {
-      jobSpecs->jAttrib |= Q_ATTRIB_EXCLUSIVE;
+      jobSpecs->jAttrib |= QUEUE_ATTRIB_EXCLUSIVE;
     }
 
   if (jDataPtr->jFlags & JFLAG_URGENT)
@@ -3081,7 +3081,7 @@ statusJob (struct statusReq *statusReq, struct hostent *hp, int *schedule)
 
   if (jpbw->hPtr == NULL || !equalHost_ (hp->h_name, jpbw->hPtr[0]->host)
       || (statusReq->seq < jpbw->nextSeq
-	  && (jpbw->nextSeq - statusReq->seq) < MAX_SEQ_NUM / 2))
+	  && (jpbw->nextSeq - statusReq->seq) < MAX_SEQUEUE_NUM / 2))
     {
 
       ls_syslog (LOG_DEBUG,
@@ -3090,7 +3090,7 @@ statusJob (struct statusReq *statusReq, struct hostent *hp, int *schedule)
       return (LSBE_NO_ERROR);
     }
   jpbw->nextSeq = statusReq->seq++;
-  if (jpbw->nextSeq >= MAX_SEQ_NUM || (statusReq->newStatus & JOB_STAT_PEND))
+  if (jpbw->nextSeq >= MAX_SEQUEUE_NUM || (statusReq->newStatus & JOB_STAT_PEND))
     jpbw->nextSeq = 1;
 
 
@@ -3315,7 +3315,7 @@ handleJobJCCA:
 	}
       jpbw->exitStatus = statusReq->exitStatus;
       if (jpbw->jStatus & JOB_STAT_PRE_EXEC
-	  || statusReq->reason == PEND_QUE_PRE_FAIL)
+	  || statusReq->reason == PEND_QUEUE_PRE_FAIL)
 	{
 	  jpbw->newReason = statusReq->reason;
 
@@ -3406,7 +3406,7 @@ handleJobJCCA:
 
 	      jpbw->dispTime += MIN (1800, (jpbw->dispCount / 3)
 				     * msleeptime);
-	      if ((statusReq->reason != PEND_QUE_PRE_FAIL) &&
+	      if ((statusReq->reason != PEND_QUEUE_PRE_FAIL) &&
 		  (statusReq->reason != PEND_JOB_PRE_EXEC))
 		{
 		  jpbw->initFailCount++;
@@ -3720,7 +3720,7 @@ jStatusChange (struct jData *jData,
       listRemoveEntry ((LIST_T *) jDataList[SJL], (LIST_ENTRY_T *) jData);
 
       if (jData->newReason == PEND_JOB_PRE_EXEC
-	  || jData->newReason == PEND_QUE_PRE_FAIL
+	  || jData->newReason == PEND_QUEUE_PRE_FAIL
 	  || jData->newReason == PEND_SBD_JOB_REQUEUE)
 
 	jData->startTime = 0;
@@ -4625,7 +4625,7 @@ switchAJob (struct jobSwitchReq *switchReq,
 	      job->shared->jobBill.options &= ~SUB_CHKPNT_DIR;
 	      job->shared->jobBill.options &= ~SUB_CHKPNT_PERIOD;
 	      job->shared->jobBill.options2 &= ~SUB2_QUEUE_CHKPNT;
-	      if (qtp->qAttrib & Q_ATTRIB_CHKPNT)
+	      if (qtp->qAttrib & QUEUE_ATTRIB_CHKPNT)
 		{
 
 		  char dir[MAXLINELEN];
@@ -4651,7 +4651,7 @@ switchAJob (struct jobSwitchReq *switchReq,
 	      job->newSub->options &= ~SUB_CHKPNT_DIR;
 	      job->newSub->options &= ~SUB_CHKPNT_PERIOD;
 	      job->newSub->options2 &= ~SUB2_QUEUE_CHKPNT;
-	      if (qtp->qAttrib & Q_ATTRIB_CHKPNT)
+	      if (qtp->qAttrib & QUEUE_ATTRIB_CHKPNT)
 		{
 
 		  char dir[MAXLINELEN];
@@ -4689,7 +4689,7 @@ switchAJob (struct jobSwitchReq *switchReq,
 
 	      job->shared->jobBill.options &= ~SUB_RERUNNABLE;
 	      job->shared->jobBill.options2 &= ~SUB2_QUEUE_RERUNNABLE;
-	      if (qtp->qAttrib & Q_ATTRIB_RERUNNABLE)
+	      if (qtp->qAttrib & QUEUE_ATTRIB_RERUNNABLE)
 		{
 
 		  job->shared->jobBill.options |= SUB_RERUNNABLE;
@@ -4702,7 +4702,7 @@ switchAJob (struct jobSwitchReq *switchReq,
 
 	      job->newSub->options &= ~SUB_RERUNNABLE;
 	      job->newSub->options2 &= ~SUB2_QUEUE_RERUNNABLE;
-	      if (qtp->qAttrib & Q_ATTRIB_RERUNNABLE)
+	      if (qtp->qAttrib & QUEUE_ATTRIB_RERUNNABLE)
 		{
 
 		  job->newSub->options |= SUB_RERUNNABLE;
@@ -5156,7 +5156,7 @@ inPendJobList (struct jData *job, int listno, time_t requeueTime)
 	    }
 
 
-	  if (job->qPtr->qAttrib & Q_ATTRIB_ENQUE_INTERACTIVE_AHEAD)
+	  if (job->qPtr->qAttrib & QUEUE_ATTRIB_ENQUE_INTERACTIVE_AHEAD)
 	    {
 
 	      if ((job->shared->jobBill.options & SUB_INTERACTIVE)
@@ -6685,7 +6685,7 @@ handleJParameters (struct jData *jpbw, struct jData *job,
 		      jpbw->shared->jobBill.chkpntDir = safeSave ("");
 
 
-		      if (qp->qAttrib & Q_ATTRIB_CHKPNT)
+		      if (qp->qAttrib & QUEUE_ATTRIB_CHKPNT)
 			{
 			  char dir[MAXLINELEN];
 			  char jobIdStr[20];
@@ -6723,7 +6723,7 @@ handleJParameters (struct jData *jpbw, struct jData *job,
 			~SUB2_QUEUE_RERUNNABLE;
 
 
-		      if (qp->qAttrib & Q_ATTRIB_RERUNNABLE)
+		      if (qp->qAttrib & QUEUE_ATTRIB_RERUNNABLE)
 			{
 			  jpbw->shared->jobBill.options |= SUB_RERUNNABLE;
 			  jpbw->shared->jobBill.options2 |=
@@ -9547,7 +9547,7 @@ setNewSub (struct jData *jpbw, struct jData *job,
 	  FREEUP (newSub->chkpntDir);
 
 
-	  if (qp->qAttrib & Q_ATTRIB_CHKPNT)
+	  if (qp->qAttrib & QUEUE_ATTRIB_CHKPNT)
 	    {
 	      char dir[MAXLINELEN];
 	      char jobIdStr[20];
@@ -9579,7 +9579,7 @@ setNewSub (struct jData *jpbw, struct jData *job,
 	  newSub->options2 &= ~SUB2_QUEUE_RERUNNABLE;
 
 
-	  if (qp->qAttrib & Q_ATTRIB_RERUNNABLE)
+	  if (qp->qAttrib & QUEUE_ATTRIB_RERUNNABLE)
 	    {
 	      newSub->options |= SUB_RERUNNABLE;
 	      newSub->options2 |= SUB2_QUEUE_RERUNNABLE;

@@ -18,7 +18,7 @@
 
 #include "mbd.h"
 
-#define NL_SETN         10
+// #define NL_SETN         10
 
 #define SAFE_JID_GAP 100
 #define NULL_RES     "NRR"
@@ -481,7 +481,7 @@ replay_switchjob (char *filename, int lineNum)
 	{
 
 
-	  if (qfp->qAttrib & Q_ATTRIB_CHKPNT)
+	  if (qfp->qAttrib & QUEUE_ATTRIB_CHKPNT)
 	    {
 	      jp->shared->jobBill.options &= ~SUB_CHKPNT_DIR;
 	      jp->shared->jobBill.options &= ~SUB_CHKPNT_PERIOD;
@@ -490,7 +490,7 @@ replay_switchjob (char *filename, int lineNum)
 
 	  FREEUP (jp->shared->jobBill.chkpntDir);
 
-	  if (qtp->qAttrib & Q_ATTRIB_CHKPNT)
+	  if (qtp->qAttrib & QUEUE_ATTRIB_CHKPNT)
 	    {
 
 	      char dir[MAXPATHLEN];
@@ -522,7 +522,7 @@ replay_switchjob (char *filename, int lineNum)
 	  jp->shared->jobBill.options2 &= ~SUB2_QUEUE_RERUNNABLE;
 
 
-	  if (qtp->qAttrib & Q_ATTRIB_RERUNNABLE)
+	  if (qtp->qAttrib & QUEUE_ATTRIB_RERUNNABLE)
 	    {
 	      jp->shared->jobBill.options |= SUB_RERUNNABLE;
 	      jp->shared->jobBill.options2 |= SUB2_QUEUE_RERUNNABLE;

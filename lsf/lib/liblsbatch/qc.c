@@ -87,7 +87,7 @@ lsb_queuecontrol (char *queue, int opCode)
 
 
 
-  mbdReqtype = BATCH_QUE_CTRL;
+  mbdReqtype = BATCH_QUEUE_CTRL;
   xdrmem_create (&xdrs, request_buf, MSGSIZE, XDR_ENCODE);
   initLSFHeader_ (&hdr);
   hdr.opCode = mbdReqtype;
