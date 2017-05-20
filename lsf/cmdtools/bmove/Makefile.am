@@ -10,9 +10,7 @@ AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -I$(top_srcdir)/lsf/include
 
 SUBDIRS = 
 
-bin_PROGRAMS = badmin bkill bparams brestart btop bbot bmgroup \
-bpeek brun busers bhosts bmig bqueues bsub bjobs bmod \
-brequeue bswitch bhist
+bin_PROGRAMS = bmove
 
 COMMONSTUFF = ../lib/liblsbatch.a ../../lsf/lib/liblsf.a ../../lsf/intlib/liblsfint.a -lm
 

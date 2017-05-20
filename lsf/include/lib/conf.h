@@ -144,7 +144,6 @@ struct admins *getAdmins_ (char *line, char *fname, size_t *lineNum, char *secNa
 struct admins *liblsf_getAdmins (char *line, char *fname, size_t *lineNum, char *secName, int lookupAdmins);
 
 // static 
-int parse_time (char *, float *, int *);
 int validWindow (char *, char *);
 
 // static 

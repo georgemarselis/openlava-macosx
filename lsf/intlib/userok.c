@@ -17,13 +17,17 @@
  */
 
 
-// #ifdef __linux__
-#define _POSIX2_VERSION 199212L 
+#define _GNU_SOURCE  // This is necessary so that we don't get an error for using ruserok()
+					 // 	undef'ed at the end.
+
+#ifdef __linux__
 #include <netdb.h> // ruserok()
+#elif defined __APPLE__
+#include <unistd.h>
 // FIXME FIXME FIXME FIXME alter configure.ac to specify that ruserok() function is mandatory
-// #else
-// 	#error stop compilation if other operating systems found
-// #endif
+#else
+	#error stop compilation if other operating systems found
+#endif
 
 #include "lib/lproto.h"
 #include "libint/intlibout.h"
@@ -218,6 +222,8 @@ userok (int s, struct sockaddr_in *from, char *hostname, struct sockaddr_in *loc
 	int user_ok = 0;
 	char *authKind = NULL;
 
+	assert( localAddr );
+
 	if (debug)
 	{
 		char lsfUserName[MAXLSFNAMELEN];
@@ -375,11 +381,14 @@ userok (int s, struct sockaddr_in *from, char *hostname, struct sockaddr_in *loc
 
 int shostOk (char *fromHost, int options)
 {
+	assert( fromHost );
+	assert( options );
 	return 1;
 }
 
 
 int hostIsLocal (char *hname)
 {
+	assert( hname );
 	return 1;
 }

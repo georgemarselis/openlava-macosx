@@ -1,4 +1,10 @@
 CFLAGS="$CFLAGS -Wall -Wextra -Wfatal-errors -Werror -Wformat=2 -Wno-format-extra-args -Wno-format-zero-length -Winit-self -Wimplicit-int -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wunused-parameter "
 CFLAGS=+"-pedantic-errors -ansi"
 
-CFLAGS = -Wall -Wextra -Wfatal-errors -Werror -Wformat=2 -Wno-format-extra-args -Wno-format-zero-length -Winit-self -Wimplicit-int -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wunused-parameter -std=c99 -D_POSIX_C_SOURCE=200112L -D_XOPEN_SOURCE=700 -pedantic-errors
+CFLAGS = -Wall -Wextra -Wfatal-errors -Werror -Wformat=2 -Wno-format-extra-args -Wno-format-zero-length -Winit-self -Wimplicit-int -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wunused-parameter -std=c99 -D_POSIX_SOURCE -D_POSIX_C_SOURCE=200112L -D_XOPEN_SOURCE=700 -pedantic-errors
+
+FEATURE_TEST_MACROS(7)    Linux Programmer's Manual   FEATURE_TEST_MACROS(7)
+http://man7.org/linux/man-pages/man7/feature_test_macros.7.html
+
+of particular interest is _LARGEFILE64_SOURCE
+
