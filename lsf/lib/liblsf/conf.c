@@ -2012,10 +2012,12 @@ char *parsewindow (char *linep, char *filename, size_t *lineNum, char *section)
 
 int validWindow (char *wordpair, char *context)
 {
-	int oday, cday;
-	float ohour, chour;
-	char *sp;
-	char *word;
+	unsigned int oday = 0;
+	unsigned int cday = 0;
+	float ohour = 0.0F;
+	float chour = 0.0F;
+	char *sp = NULL;
+	char *word = NULL;
 
 	sp = strchr (wordpair, '-');
 	if (!sp)
@@ -2059,7 +2061,7 @@ int validWindow (char *wordpair, char *context)
  Why on earth is this function parsing time?
  there are standard functions to do that with
  */
-int parse_time (char *word, float *hour, int *day)
+int parse_time (char *word, float *hour, unsigned int *day)
 {
 
 	float min = 0.0;

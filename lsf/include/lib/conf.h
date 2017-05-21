@@ -189,4 +189,4 @@ int mapValues (struct keymap *keyList, char *line);
 // FIXME also found in lproto.h, should be in lib/conf.h
 // int putInLists (char *word, struct admins *admins, unsigned integer *numAds, char *forWhat);
 int isInlist (char **adminNames, char *userName, unsigned int actAds);
-int parse_time (char *word, float *hour, int *day);
+int parse_time (char *word, float *hour, unsigned int *day);
