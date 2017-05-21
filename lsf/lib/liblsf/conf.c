@@ -26,8 +26,7 @@
 
 // #define NL_SETN 42
 
-int initResTable_ (void);
-int getClusAdmins (char *line, char *filename, size_t *lineNum, char *secName, int lookupAdmins);
+
 
 int
 initResTable_ (void)
@@ -210,8 +209,7 @@ struct sharedConf *ls_readshared (char *filename)
 		}
 }
 
-char
-do_Index (FILE * fp, size_t *lineNum, char *filename)
+char do_Index (FILE * fp, size_t *lineNum, char *filename)
 {
 	const short structArraySize = 4;
 	int *returnValue[4] = {0, 0, 0, 0};
@@ -283,8 +281,7 @@ do_Index (FILE * fp, size_t *lineNum, char *filename)
 	return TRUE;
 }
 
-char
-setIndex (struct keymap *keyList, char *filename, size_t lineNum)
+char setIndex (struct keymap *keyList, char *filename, size_t lineNum)
 {
 	unsigned int resIdx = 0;
 
@@ -338,8 +335,7 @@ setIndex (struct keymap *keyList, char *filename, size_t lineNum)
 	return TRUE;
 }
 
-char
-do_HostTypes (FILE * fp, size_t *lineNum, char *filename)
+char do_HostTypes (FILE * fp, size_t *lineNum, char *filename)
 {
 	struct keymap keyList[] = {
 		{0, "    " , NULL, "TYPENAME"},
@@ -434,8 +430,7 @@ addHostType (char *type)
 	return TRUE;
 }
 
-char
-do_HostModels (FILE * fp, size_t *lineNum, char *filename)
+char do_HostModels (FILE * fp, size_t *lineNum, char *filename)
 {
 	char *linep;
 	struct keymap keyList[] = {
@@ -519,8 +514,7 @@ do_HostModels (FILE * fp, size_t *lineNum, char *filename)
 	return TRUE;
 }
 
-char
-addHostModel (char *model, char *arch, double factor)
+char addHostModel (char *model, char *arch, double factor)
 {
 	if (model == NULL) {
 		return FALSE;
@@ -567,8 +561,7 @@ addHostModel (char *model, char *arch, double factor)
  3. debugging and profing to make sure nothing spills out of bounds or rolls over
 
  */
-char
-do_Resources (FILE * fp, size_t *lineNum, char *filename)
+char do_Resources (FILE * fp, size_t *lineNum, char *filename)
 {
 	int nres = 0;
 	char *linep;
@@ -793,8 +786,7 @@ do_Resources (FILE * fp, size_t *lineNum, char *filename)
 	return TRUE;
 }
 
-int
-resNameDefined (char *name) { // FIXME FIXME FIXME only INT_MAX nRes can be here.
+int resNameDefined (char *name) { // FIXME FIXME FIXME only INT_MAX nRes can be here.
 
 	if (name == NULL) {
 		return -1;
@@ -810,8 +802,7 @@ resNameDefined (char *name) { // FIXME FIXME FIXME only INT_MAX nRes can be here
 	return -1;
 }
 
-struct clusterConf *
-ls_readcluster_ex (char *filename, struct lsInfo *info, int lookupAdmins)
+struct clusterConf *ls_readcluster_ex (char *filename, struct lsInfo *info, int lookupAdmins)
 {
 	struct lsInfo myinfo;
 	char *word = NULL;
@@ -1023,14 +1014,12 @@ ls_readcluster_ex (char *filename, struct lsInfo *info, int lookupAdmins)
 	}
 }
 
-struct clusterConf *
-ls_readcluster (char *filename, struct lsInfo *info)
+struct clusterConf *ls_readcluster (char *filename, struct lsInfo *info)
 {
 	return ls_readcluster_ex (filename, info, TRUE);
 }
 
-void
-freeClusterInfo (struct clusterInfo *cls)
+void freeClusterInfo (struct clusterInfo *cls)
 {
 
 	if (cls != NULL) {
@@ -1052,8 +1041,7 @@ freeClusterInfo (struct clusterInfo *cls)
 	}
 }
 
-void
-initClusterInfo (struct clusterInfo *cls)
+void initClusterInfo (struct clusterInfo *cls)
 {
 	if (cls != NULL)
 		{
@@ -1076,8 +1064,8 @@ initClusterInfo (struct clusterInfo *cls)
 		}
 }
 
-void
-freeHostInfo (struct hostInfo *host)
+
+void freeHostInfo (struct hostInfo *host)
 {
 	if (host != NULL) {
 		FREEUP (host->hostType);
@@ -1091,8 +1079,8 @@ freeHostInfo (struct hostInfo *host)
 	}
 }
 
-void
-initHostInfo (struct hostInfo *host)
+
+void initHostInfo (struct hostInfo *host)
 {
 	if (host != NULL)
 		{
@@ -1115,8 +1103,7 @@ initHostInfo (struct hostInfo *host)
 		}
 }
 
-char
-do_Manager (FILE * fp, char *filename, size_t *lineNum, char *secName, int lookupAdmins)
+char do_Manager (FILE * fp, char *filename, size_t *lineNum, char *secName, int lookupAdmins)
 {
 	char *linep = NULL;
 	struct keymap keyList1[] = {
@@ -1200,8 +1187,7 @@ do_Manager (FILE * fp, char *filename, size_t *lineNum, char *secName, int looku
 	return TRUE;
 }
 
-int
-getClusAdmins (char *line, char *filename, size_t *lineNum, char *secName, int lookupAdmins)
+int getClusAdmins (char *line, char *filename, size_t *lineNum, char *secName, int lookupAdmins)
 {
 	struct admins *admins;
 	static char lastSecName[40];
@@ -1881,8 +1867,7 @@ liblsf_putThreshold (int indx, struct hostInfo *host, long position, char *val, 
 
 }
 
-char
-addHost (struct hostInfo *host, char *filename, size_t *lineNum)
+char addHost (struct hostInfo *host, char *filename, size_t *lineNum)
 {
 	struct hostInfo *newlist;
 
@@ -1935,8 +1920,7 @@ addHost (struct hostInfo *host, char *filename, size_t *lineNum)
 	return TRUE;
 }
 
-void
-initkeylist (struct keymap keyList[], int m, int n, struct lsInfo *info)
+void initkeylist (struct keymap keyList[], int m, int n, struct lsInfo *info)
 {
 
 	for ( int i = 0; i < m - 1; i++) {
@@ -1971,8 +1955,7 @@ initkeylist (struct keymap keyList[], int m, int n, struct lsInfo *info)
 		}
 }
 
-void
-freekeyval (struct keymap keylist[])
+void freekeyval (struct keymap keylist[])
 {
 	for ( int cc = 0; NULL != keylist[cc].key; cc++) {
 		if ( NULL != keylist[cc].val ) {
@@ -1981,8 +1964,7 @@ freekeyval (struct keymap keylist[])
 	}
 }
 
-char *
-parsewindow (char *linep, char *filename, size_t *lineNum, char *section)
+char *parsewindow (char *linep, char *filename, size_t *lineNum, char *section)
 {
 	char *sp, *windows, *word, *save;
 
@@ -2028,8 +2010,7 @@ parsewindow (char *linep, char *filename, size_t *lineNum, char *section)
 
 }
 
-int
-validWindow (char *wordpair, char *context)
+int validWindow (char *wordpair, char *context)
 {
 	int oday, cday;
 	float ohour, chour;
@@ -2078,8 +2059,7 @@ validWindow (char *wordpair, char *context)
  Why on earth is this function parsing time?
  there are standard functions to do that with
  */
-int
-parse_time (char *word, float *hour, int *day)
+int parse_time (char *word, float *hour, int *day)
 {
 
 	float min = 0.0;
@@ -2168,8 +2148,7 @@ parse_time (char *word, float *hour, int *day)
 	return 0;
 }
 
-char
-do_Cluster (FILE * fp, size_t *lineNum, char *filename)
+char do_Cluster (FILE * fp, size_t *lineNum, char *filename)
 {
 	char *linep;
 	struct keymap keyList[] = {
@@ -2266,20 +2245,19 @@ do_Cluster (FILE * fp, size_t *lineNum, char *filename)
 }
 
 
-/*#define EXINTERVAL              0
- #define ELIMARGS                1
- #define PROBE_TIMEOUT           2
- #define ELIM_POLL_INTERVAL      3
- #define HOST_INACTIVITY_LIMIT   4
- #define MASTER_INACTIVITY_LIMIT 5
- #define RETRY_LIMIT             6
- #define ADJUST_DURATION         7
- #define LSF_ELIM_DEBUG          8
- #define LSF_ELIM_BLOCKTIME      9
- #define LSF_ELIM_RESTARTS       10*/
+#define EXINTERVAL              0
+#define ELIMARGS                1
+#define PROBE_TIMEOUT           2
+#define ELIM_POLL_INTERVAL      3
+#define HOST_INACTIVITY_LIMIT   4
+#define MASTER_INACTIVITY_LIMIT 5
+#define RETRY_LIMIT             6
+#define ADJUST_DURATION         7
+#define LSF_ELIM_DEBUG          8
+#define LSF_ELIM_BLOCKTIME      9
+#define LSF_ELIM_RESTARTS       10
 
-char
-do_Clparams (FILE * clfp, char *lsfile, size_t *lineNum)
+char do_Clparams (FILE * clfp, char *lsfile, size_t *lineNum)
 {
 	char *linep;
 	struct keymap keyList[] = {
@@ -2321,8 +2299,7 @@ do_Clparams (FILE * clfp, char *lsfile, size_t *lineNum)
 	}
 }
 
-void
-freeKeyList (struct keymap *keyList)
+void freeKeyList (struct keymap *keyList)
 {
 	for ( int i = 0; keyList[i].key != NULL; i++) {
 		if (keyList[i].position != -1) {
@@ -2332,8 +2309,7 @@ freeKeyList (struct keymap *keyList)
 }
 
 
-int
-validType (char *type)
+int validType (char *type)
 {
 	if (type == NULL)  {
 		return -1;
@@ -2361,8 +2337,7 @@ validType (char *type)
 #define RKEY_RESOURCE_NAME  0
 #define RKEY_LOCATION    1
 
-int
-doResourceMap (FILE * fp, char *lsfile, size_t *lineNum)
+int doResourceMap (FILE * fp, char *lsfile, size_t *lineNum)
 {
 
 	char *linep;
@@ -2490,8 +2465,8 @@ doResourceMap (FILE * fp, char *lsfile, size_t *lineNum)
 
 }
 
-int
-liblsf_addResourceMap (char *resName, char *location, char *lsfile, size_t lineNum)
+
+int liblsf_addResourceMap (char *resName, char *location, char *lsfile, size_t lineNum)
 {
 	struct lsSharedResourceInfo *resource;
 	int i, j, numHosts = 0, first = TRUE, error;
@@ -2659,8 +2634,8 @@ liblsf_addResourceMap (char *resName, char *location, char *lsfile, size_t lineN
 
 }
 
-int
-liblsf_parseHostList (char *hostList, char *lsfile, size_t lineNum, char ***hosts)
+
+int liblsf_parseHostList (char *hostList, char *lsfile, size_t lineNum, char ***hosts)
 {
 	char *host = NULL;
 	char *sp = NULL;
@@ -2715,8 +2690,8 @@ liblsf_parseHostList (char *hostList, char *lsfile, size_t lineNum, char ***host
 
 }
 
-struct lsSharedResourceInfo *
-liblsf_addResource (char *resName, int nHosts, char **hosts, char *value, char *filename, size_t lineNum)
+
+struct lsSharedResourceInfo *liblsf_addResource (char *resName, int nHosts, char **hosts, char *value, char *filename, size_t lineNum)
 {
 	int nRes;
 	struct lsSharedResourceInfo *resInfo;
@@ -2758,8 +2733,7 @@ liblsf_addResource (char *resName, int nHosts, char **hosts, char *value, char *
 
 }
 
-int
-liblsf_addHostInstance (struct lsSharedResourceInfo *sharedResource, unsigned int nHosts, char **hostNames, char *value)
+int liblsf_addHostInstance (struct lsSharedResourceInfo *sharedResource, unsigned int nHosts, char **hostNames, char *value)
 {
 	
 	int inst = 0;
@@ -2816,8 +2790,8 @@ liblsf_addHostInstance (struct lsSharedResourceInfo *sharedResource, unsigned in
 	
 }
 
-int
-convertNegNotation_ (char **value, struct HostsArray *array)
+
+int convertNegNotation_ (char **value, struct HostsArray *array)
 {
 	char *buffer = strdup (value[0]);
 	char *sp1 = strstr (buffer, "all ");
@@ -2905,8 +2879,8 @@ clean_up: // FIXME FIXME FIXME remove goto label
 	
 }
 
-void
-freeSA_ (char **list, unsigned int num)
+
+void freeSA_ (char **list, unsigned int num)
 {
 	if (list == NULL || num <= 0) {
 		return;
@@ -2918,8 +2892,8 @@ freeSA_ (char **list, unsigned int num)
 	FREEUP (list);
 }
 
-int
-resolveBaseNegHosts (char *inHosts, char **outHosts, struct HostsArray *array)
+
+int resolveBaseNegHosts (char *inHosts, char **outHosts, struct HostsArray *array)
 {
 	unsigned int in_num     = 0;
 	unsigned int neg_num    = 0;

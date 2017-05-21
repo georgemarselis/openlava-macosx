@@ -930,7 +930,6 @@ void ls_perror (char *usrMsg);
 
 struct lsConf *ls_getconf (char *);
 void ls_freeconf (struct lsConf *);
-struct sharedConf *ls_readshared (char *);
 struct clusterConf *ls_readcluster (char *, struct lsInfo *);
 struct clusterConf *ls_readcluster_ex (char *, struct lsInfo *, int);
 

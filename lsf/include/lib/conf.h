@@ -122,7 +122,6 @@ char addHostType (char *);
 char addHostModel (char *model, char *arch, double factor);
 // static 
 char setIndex    (struct keymap *keyList, char *fname, size_t lineNum);
-char addHost     (struct hostInfo *host,  char *fname, size_t *lineNum);
 
 int resNameDefined (char *);
 
@@ -139,6 +138,7 @@ void liblsf_putThreshold (int indx, struct hostInfo *host, long position, char *
 
 // static 
 int wgetClusAdmins (char *line, char *lsfile, size_t *lineNum, char *secName);
+int getClusAdmins (char *line, char *filename, size_t *lineNum, char *secName, int lookupAdmins);
 // static 
 struct admins *getAdmins_ (char *line, char *fname, size_t *lineNum, char *secName, int lookupAdmins);
 struct admins *liblsf_getAdmins (char *line, char *fname, size_t *lineNum, char *secName, int lookupAdmins);
@@ -168,6 +168,7 @@ struct sharedResource *addResource (char *resName, unsigned int nHosts, char **h
 int liblsf_addHostInstance(struct lsSharedResourceInfo *sharedResource, unsigned int nHosts, char **hostNames, char *value);
 // static 
 int addHostInstance (struct sharedResource *sharedResource, unsigned int nHosts, char **hostNames, char *value, int resourceMap);
+char addHost (struct hostInfo *host, char *filename, size_t *lineNum);
 
 int convertNegNotation_ (char **, struct HostsArray *);
 int resolveBaseNegHosts (char *, char **, struct HostsArray *);
@@ -188,3 +189,4 @@ int mapValues (struct keymap *keyList, char *line);
 // FIXME also found in lproto.h, should be in lib/conf.h
 // int putInLists (char *word, struct admins *admins, unsigned integer *numAds, char *forWhat);
 int isInlist (char **adminNames, char *userName, unsigned int actAds);
+int parse_time (char *word, float *hour, int *day);
