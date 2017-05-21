@@ -17,88 +17,95 @@
  */
 
 #include "cmdtools/cmdtools.h"
+#include "cmdtools/cmd.h"
+#include "libint/lsi18n.h"
 
-#define NL_SETN 8
+// #define NL_SETN 8
 
 
-void
-usage (char *cmd)
+void usage (char *cmd)
 {
-  fprintf (stderr, I18N_Usage);
-  fprintf (stderr, ": %s [-h] [-V] jobId | \"jobId[index]\" [position]\n",
-	   cmd);
-  exit (-1);
+	fprintf (stderr, "%s\n", _i18n_msg_get(ls_catd, 33, 5000, "Usage") );
+	fprintf (stderr, ": %s [-h] [-V] jobId | \"jobId[index]\" [position]\n", cmd);
+	exit (-1);
 }
 
 void
 bmove (int argc, char **argv, int opCode)
 {
-  int position, reqPos;
-  LS_LONG_INT jobId = 0;
-  int achar;
+	int position = 0;
+	int reqPos   = 0;
+	LS_LONG_INT jobId = 0;
+	int achar    = 0;
 
-  if (lsb_init (argv[0]) < 0)
-    {
-      lsb_perror ("lsb_init");
-      exit (-1);
-    }
+	if (lsb_init (argv[0]) < 0)
+		{
+			lsb_perror ("lsb_init");
+			exit (-1);
+		}
 
-  opterr = 0;
-  while ((achar = getopt (argc, argv, "hV")) != EOF)
-    {
-      switch (achar)
+	opterr = 0;
+	while ((achar = getopt (argc, argv, "hV")) != EOF) {
+			switch (achar)
 	{
 	case 'V':
-	  fputs (_LS_VERSION_, stderr);
-	  exit (0);
+		fputs (_LS_VERSION_, stderr);
+		exit (0);
+	break;
 	case 'h':
 	default:
-	  usage (argv[0]);
+		usage (argv[0]);
+	break;
 	}
-    }
-  if (argc == optind)
-    {
-      fprintf (stderr, "%s.\n", (_i18n_msg_get (ls_catd, NL_SETN, 852, "Job ID must be specified")));	/* catgets  852  */
-      usage (argv[0]);
-    }
-  if (optind < argc - 2)
-    {
-      fprintf (stderr, "%s.\n", (_i18n_msg_get (ls_catd, NL_SETN, 853, "Command syntax error: too many arguments")));	/* catgets  853  */
-      usage (argv[0]);
-    }
+		}
+	if (argc == optind)
+		{
+			/* catgets  852  */
+			fprintf (stderr, "%s.\n", (_i18n_msg_get (ls_catd, NL_SETN, 852, "Job ID must be specified")));
+			usage (argv[0]);
+		}
+	if (optind < argc - 2)
+		{
+			/* catgets  853  */
+			fprintf (stderr, "%s.\n", (_i18n_msg_get (ls_catd, NL_SETN, 853, "Command syntax error: too many arguments")));
+			usage (argv[0]);
+		}
 
-  if (getOneJobId (argv[optind], &jobId, 0))
-    {
-      usage (argv[0]);
-    }
+	if (getOneJobId (argv[optind], &jobId, 0))
+		{
+			usage (argv[0]);
+		}
 
-  position = 1;
-  if (optind == argc - 2)
-    {
-      if (!isint_ (argv[++optind]) || atoi (argv[optind]) <= 0)
+	position = 1;
+	if (optind == argc - 2)
+		{
+			if (!isint_ (argv[++optind]) || atoi (argv[optind]) <= 0)
 	{
-	  fprintf (stderr, "%s: %s.\n", argv[optind], I18N (854, "Position value must be a positive integer"));	/* catgets854 */
-	  usage (argv[0]);
+		/* catgets854 */
+		fprintf (stderr, "%s: %s.\n", argv[optind], I18N (854, "Position value must be a positive integer"));
+		usage (argv[0]);
 	}
-      position = atoi (argv[optind]);
-    }
+			position = atoi (argv[optind]);
+		}
 
-  reqPos = position;
-  if (lsb_movejob (jobId, &position, opCode) < 0)
-    {
-      lsb_perror (lsb_jobid2str (jobId));
-      exit (-1);
-    }
+	reqPos = position;
+	if (lsb_movejob (jobId, &position, opCode) < 0)
+		{
+			lsb_perror (lsb_jobid2str (jobId));
+			exit (-1);
+		}
 
-  if (position != reqPos)
-    fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 855, "Warning: position value <%d> is beyond movable range.\n")),	/* catgets  855  */
-	     reqPos);
-  if (opCode == TO_TOP)
-    fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 856, "Job <%s> has been moved to position %d from top.\n")),	/* catgets  856  */
-	     lsb_jobid2str (jobId), position);
-  else
-    fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 857, "Job <%s> has been moved to position %d from bottom.\n")),	/* catgets  857  */
-	     lsb_jobid2str (jobId), position);
-
-  exit (0);
+	if (position != reqPos) {
+		/* catgets  855  */
+		fprintf (stderr, "%s\n", (_i18n_msg_get (ls_catd, NL_SETN, 855, "Warning: position value <%d> is beyond movable range.\n")), reqPos);
+	}
+	if (opCode == TO_TOP) {
+		/* catgets  856  */
+		fprintf (stderr, "%s\n", (_i18n_msg_get (ls_catd, NL_SETN, 856, "Job <%s> has been moved to position %d from top.\n")), lsb_jobid2str (jobId), position);
+	}
+	else {
+		/* catgets  857  */
+		fprintf (stderr, "%s\n", (_i18n_msg_get (ls_catd, NL_SETN, 857, "Job <%s> has been moved to position %d from bottom.\n")), lsb_jobid2str (jobId), position);
+	}
+	exit (0);
 }
