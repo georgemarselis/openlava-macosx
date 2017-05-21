@@ -37,11 +37,9 @@ static char logMesgBuf[MAXLINELEN];
 
 #define LSF_SERVERDIR    0
 
-char *
-getEchkpntMethodDir (char *pChkpnt_Cmd, const char *pMethodDir, const char *pProgramName, const char *pMethodName)
+char *getEchkpntMethodDir (char *pChkpnt_Cmd, const char *pMethodDir, const char *pProgramName, const char *pMethodName)
 {
 
-    static char __func__] = "getEchkpntMethodDir()";
     char tmp_chkpnt_cmd[MAXPATHLEN];
     char *pConfigPath = NULL;
     char *pChkpntBuf = NULL;
@@ -133,9 +131,8 @@ int
 getChkpntDirFile (char *pPathBuf, const char *pFileName)
 {
 
-    static char __func__] = "getChkpntDirFile()";
     char *pChkpntPath = NULL;
-    unsigned long iIndex;
+    unsigned long iIndex = 0;
 
     if (pPathBuf == NULL) {
         return -1;
@@ -184,8 +181,6 @@ getChkpntDirFile (char *pPathBuf, const char *pFileName)
 int
 redirectFd (const char *pFileName, int iFileNo)
 {
-
-    static char __func__] = "redirectFd()";
     int iFd;
     int ireValue = -1;
 
