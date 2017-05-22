@@ -99,7 +99,6 @@ AC_CONFIG_FILES([Makefile po/Makefile.in
                 lsf/Makefile
                 lsf/cmdtools/Makefile
                 lsf/cmdtools/badmin/Makefile
-                lsf/cmdtools/bbot/Makefile
                 lsf/cmdtools/bbottom/Makefile
                 lsf/cmdtools/bcheckpoint/Makefile
                 lsf/cmdtools/beligible/Makefile
