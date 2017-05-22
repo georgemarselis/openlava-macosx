@@ -22,17 +22,14 @@
 
 #include "cmdtools/cmdtools.h"
 
-#define NL_SETN 8
+// #define NL_SETN 8
 
 
-extern char *myGetOpt (int nargc, char **nargv, char *ostr);
-extern int getConfirm (char *);
-
-static void ctrlHost (char *, int, int);
-static int doConfirm (int, char *);
-static int exitrc;
-static char *opStr;
-static struct hostInfoEnt *getHostList (int *numHosts, char **inputHosts);
+void ctrlHost (char *, int, int);
+int doConfirm (int, char *);
+int exitrc;
+char *opStr;
+struct hostInfoEnt *getHostList (int *numHosts, char **inputHosts);
 
 int
 bhc (int argc, char *argv[], int opCode)
@@ -126,7 +123,7 @@ bhc (int argc, char *argv[], int opCode)
 
 }
 
-static void
+void
 ctrlHost (char *host, int hStatus, int opCode)
 {
 
@@ -163,7 +160,7 @@ ctrlHost (char *host, int hStatus, int opCode)
 
 }
 
-static int
+int
 doConfirm (int opCode, char *host)
 {
   char msg[MAXLINELEN];
@@ -177,7 +174,7 @@ doConfirm (int opCode, char *host)
 
 }
 
-static struct hostInfoEnt *
+struct hostInfoEnt *
 getHostList (int *numHosts, char **inputHosts)
 {
   static struct hostInfoEnt *hostInfo = NULL;

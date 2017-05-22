@@ -130,5 +130,5 @@ char *prtDash (int);
 int searchEventFile (struct histReq *, int *);
 int bmsg (int, char **);
 
-void bmove (int, char **, int);
+void bmove (int argc, char **argv, int opCode);
 

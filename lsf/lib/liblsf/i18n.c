@@ -29,8 +29,7 @@ static int I18nInitFlag = 0;
 */
 LS_CATD ls_catd;
 
-int
-_i18n_init (int modId)
+int _i18n_init (int modId)
 {
 
   assert( modId );
@@ -42,8 +41,7 @@ _i18n_init (int modId)
 
 }
 
-int
-_i18n_end ( void )
+int _i18n_end ( void )
 {
   return (0);
 }

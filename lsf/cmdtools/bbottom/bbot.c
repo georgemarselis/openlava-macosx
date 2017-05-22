@@ -17,6 +17,7 @@
  */
 
 #include "cmdtools/cmdtools.h"
+#include "libint/lsi18n.h"
 
 #define NL_SETN 8
 

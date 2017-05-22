@@ -25,15 +25,16 @@
 #include "lib/mls.h"
 
 
-#define BADCH   ":"
-
+// #define BADCH   ":"
 // extern int errLineNum_;
 
-static int changeUserEUId (void);
+const char BADCH = ":";
 
 
-void
-parseAndDo (char *cmdBuf, int (*func)() ) // FIXME FIXME FIXME replace with parser
+
+
+
+void parseAndDo (char *cmdBuf, int (*func)() ) // FIXME FIXME FIXME replace with parser
 {
 
 	const unsigned int MAX_ARG = 100;
@@ -103,8 +104,7 @@ parseAndDo (char *cmdBuf, int (*func)() ) // FIXME FIXME FIXME replace with pars
 	return;
 }
 
-int
-adminCmdIndex (char *cmd, char *cmdList[])
+int adminCmdIndex (char *cmd, char *cmdList[])
 {
 	static char quit[] = "quit";
 
@@ -121,8 +121,7 @@ adminCmdIndex (char *cmd, char *cmdList[])
 	return -1;
 }
 
-void
-cmdsUsage (char *cmd, char *cmdList[], char *cmdInfo[])
+void cmdsUsage (char *cmd, char *cmdList[], char *cmdInfo[])
 {
 
 	static char intCmds[] = " ";
@@ -145,8 +144,7 @@ cmdsUsage (char *cmd, char *cmdList[], char *cmdInfo[])
 }
 
 
-void
-oneCmdUsage (int i, char *cmdList[], char *cmdSyntax[])
+void oneCmdUsage (int i, char *cmdList[], char *cmdSyntax[])
 {
 	fprintf (stderr, "5000 Usage");
 	fprintf (stderr, ":    %-12.12s%s\n", cmdList[i], cmdSyntax[i]);
@@ -156,8 +154,7 @@ oneCmdUsage (int i, char *cmdList[], char *cmdSyntax[])
 }
 
 
-void
-cmdHelp (int argc, char **argv, char *cmdList[], char *cmdInfo[],  char *cmdSyntax[])
+void cmdHelp (int argc, char **argv, char *cmdList[], char *cmdInfo[],  char *cmdSyntax[])
 {
 
 	static char intCmds[] = " ";
@@ -206,8 +203,7 @@ cmdHelp (int argc, char **argv, char *cmdList[], char *cmdInfo[],  char *cmdSynt
 	return;
 }
 
-char *
-myGetOpt (int nargc, char **nargv, char *ostr)
+char *myGetOpt (int nargc, char **nargv, char *ostr)
 {
 	// char svstr[256];
 	char *svstr   = malloc( sizeof( char ) * 256 + 1 ); // FIXME FIXME FIXME FIXME throw at debugger, might need larger allocation
@@ -281,8 +277,7 @@ myGetOpt (int nargc, char **nargv, char *ostr)
 	return BADCH;
 }
 
-int
-getConfirm (char *msg)
+int getConfirm (char *msg)
 {
 	char answer[MAXLINELEN]; // convert to dynamic allocation
 	int i = 0;
@@ -309,8 +304,7 @@ getConfirm (char *msg)
 	return (answer[i] == 'Y' || answer[i] == 'y');
 }
 
-int
-checkConf (int verbose, int who)
+int checkConf (int verbose, int who)
 {
 	char confCheckBuf[] = "RECONFIG_CHECK=TRUE";
 	struct config_param *plp = NULL;
@@ -324,7 +318,7 @@ checkConf (int verbose, int who)
 
 	if (lsfParams[LSF_ENVDIR].paramValue == NULL)
 	{
-		lsfEnvDir = getenv ("LSF_ENVDIR");
+		lsfEnvDir = getenv ("LSF_ENVDIR"); // FIXME FIXME FIXME FIXME remove environmental variable
 		cc = initenv_ (lsfParams, lsfEnvDir);
 	}
 
@@ -469,12 +463,9 @@ checkConf (int verbose, int who)
 	return 0;
 }
 
-static int
-changeUserEUId (void)
+int changeUserEUId (void)
 {
-	uid_t uid;
-
-	uid = getuid ();
+	uid_t uid getuid ();
 
 	if (uid == 0) {
 		return 0;

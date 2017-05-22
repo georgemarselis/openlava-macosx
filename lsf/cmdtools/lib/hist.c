@@ -22,13 +22,12 @@
 
 #include "cmdtools/cmdtools.h"
 
-#define NL_SETN 8
+// #define NL_SETN 8
 
-static int eventMatched = FALSE;
+int eventMatched = FALSE;
 
 void displayEvent (struct eventRec *, struct histReq *);
-static int isRequested (char *, char **);
-extern char *myGetOpt (int nargc, char **, char *);
+int isRequested (char *, char **);
 
 
 int

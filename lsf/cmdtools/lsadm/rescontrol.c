@@ -26,24 +26,21 @@
 #include "lsf.h"
 #include "lsi18n.h"
 
-#define MAX_CONN 20
-#define NUM_TRY 2
+// #define MAX_CONN 20
+// #define NUM_TRY 2
 
-#define NL_SETN 25
+const unsigned int MAX_CONN = 20;
+const unsigned int NUM_TRY  = 2;
 
-static void ctrlAllRes (int opCode, int data);
-static void resGroupControl (char **hosts, int numHosts, int opCode,
-			     int data, int ask);
-static void resControl (char *host, int opCode, int data, int ask);
+// #define NL_SETN 25
 
-static int exitrc, fFlag;
-static char opStr[MAXLINELEN];
+void ctrlAllRes (int opCode, int data);
+void resGroupControl (char **hosts, int numHosts, int opCode,int data, int ask);
+void resControl (char *host, int opCode, int data, int ask);
 
-
-extern char isint_ (char *word);
-extern int getConfirm (char *);
-extern char *myGetOpt (int nargc, char **nargv, char *ostr);
-extern void millisleep_ (int);
+int exitrc;
+int fFlag;
+char opStr[MAXLINELEN];
 
 
 int
@@ -105,7 +102,7 @@ resCtrl (int argc, char **argv, int opCode)
 }
 
 
-static void
+void
 ctrlAllRes (int opCode, int data)
 {
   int i, j, num, ask = 0;
@@ -140,7 +137,7 @@ ctrlAllRes (int opCode, int data)
 
 }
 
-static void
+void
 resGroupControl (char **hosts, int numHosts, int opCode, int data, int ask)
 {
   pid_t pid;
@@ -243,7 +240,7 @@ resGroupControl (char **hosts, int numHosts, int opCode, int data, int ask)
 
 }
 
-static void
+void
 resControl (char *host, int opCode, int data, int ask)
 {
   char msg[512];
