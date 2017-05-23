@@ -222,7 +222,7 @@ xdr_time_t (XDR *xdrs, time_t *t)
 #ifdef __LINUX__
 	return xdr_long( xdrs, t );
 #elif defined(__APPLE__)
-	return xdr_long( xdrs, (int *)t ); // FIXME FIXME FIXME FIXME we got to revisit this
+	return xdr_long( xdrs, t ); // FIXME FIXME FIXME FIXME we got to revisit this
 #else
 	#error
 #endif
