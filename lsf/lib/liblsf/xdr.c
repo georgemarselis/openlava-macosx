@@ -177,7 +177,7 @@ xdr_arrayElement (XDR * xdrs, char *data, struct LSFHeader * hdr, bool_t (*xdr_f
 	  nextElementOffset = XDR_GETPOS (xdrs) - pos;
 	  XDR_SETPOS (xdrs, pos);
 	  assert( nextElementOffset <= INT_MAX );
-		if (!xdr_int (xdrs, (int *)&nextElementOffset)) {
+		if (!xdr_int (xdrs, (int *)&nextElementOffset)) { // FIXME FIXME FIXME FIXME we got to revisit this
 			return FALSE;
 		}
 	}
@@ -222,7 +222,7 @@ xdr_time_t (XDR *xdrs, time_t *t)
 #ifdef __LINUX__
 	return xdr_long( xdrs, t );
 #elif defined(__APPLE__)
-	return xdr_long( xdrs, t ); // FIXME FIXME FIXME FIXME we got to revisit this
+	return xdr_long( xdrs, (int *)t ); // FIXME FIXME FIXME FIXME we got to revisit this
 #else
 	#error
 #endif

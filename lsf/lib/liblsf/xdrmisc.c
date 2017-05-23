@@ -52,7 +52,7 @@ xdr_LSFlong (XDR * xdrs, long *l)
 
     assert( longNum.high <= INT_MAX);
     assert ( longNum.low <= INT_MAX);
-    if (!(xdr_long (xdrs, &longNum.high) && xdr_long (xdrs, &longNum.low))) {
+    if (!(xdr_long (xdrs, (int *)&longNum.high) && xdr_long (xdrs, (int *)&longNum.low))) { // FIXME FIXME FIXME FIXME we got to revisit this
         return FALSE;
     }
     
@@ -212,24 +212,24 @@ bool_t
 xdr_lsfRusage (XDR *xdrs, struct lsfRusage *lsfRu)
 {
     assert( lsfRu->ru_utime <= __DBL_MAX__ && lsfRu->ru_utime >= __DBL_MIN__ );
-    if( !(xdr_long   (xdrs, &lsfRu->ru_utime)     &&
-          xdr_long   (xdrs, &lsfRu->ru_stime)     &&
-          xdr_long   (xdrs, &lsfRu->ru_maxrss)    &&
-          xdr_long   (xdrs, &lsfRu->ru_ixrss)     &&
+    if( !(xdr_long   (xdrs, (int *)&lsfRu->ru_utime)     && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, (int *)&lsfRu->ru_stime)     && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, (int *)&lsfRu->ru_maxrss)    && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, (int *)&lsfRu->ru_ixrss)     && // FIXME FIXME FIXME FIXME we got to revisit this
           xdr_double (xdrs, &lsfRu->ru_ismrss)    &&
-          xdr_long   (xdrs, &lsfRu->ru_idrss)     &&
-          xdr_long   (xdrs, &lsfRu->ru_isrss)     &&
-          xdr_long   (xdrs, &lsfRu->ru_minflt)    &&
-          xdr_long   (xdrs, &lsfRu->ru_majflt)    &&
-          xdr_long   (xdrs, &lsfRu->ru_nswap)     &&
-          xdr_long   (xdrs, &lsfRu->ru_inblock)   &&
-          xdr_long   (xdrs, &lsfRu->ru_oublock)   &&
+          xdr_long   (xdrs, (int *)&lsfRu->ru_idrss)     && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, (int *)&lsfRu->ru_isrss)     && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, (int *)&lsfRu->ru_minflt)    && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, (int *)&lsfRu->ru_majflt)    && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, (int *)&lsfRu->ru_nswap)     && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, (int *)&lsfRu->ru_inblock)   && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, (int *)&lsfRu->ru_oublock)   && // FIXME FIXME FIXME FIXME we got to revisit this
           xdr_double (xdrs, &lsfRu->ru_ioch)      &&
-          xdr_long   (xdrs, &lsfRu->ru_msgsnd)    &&
-          xdr_long   (xdrs, &lsfRu->ru_msgrcv)    &&
-          xdr_long   (xdrs, &lsfRu->ru_nsignals)  &&
-          xdr_long   (xdrs, &lsfRu->ru_nvcsw)     &&
-          xdr_long   (xdrs, &lsfRu->ru_nivcsw)    &&
+          xdr_long   (xdrs, (int *)&lsfRu->ru_msgsnd)    && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, (int *)&lsfRu->ru_msgrcv)    && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, (int *)&lsfRu->ru_nsignals)  && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, (int *)&lsfRu->ru_nvcsw)     && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, (int *)&lsfRu->ru_nivcsw)    && // FIXME FIXME FIXME FIXME we got to revisit this
           xdr_double (xdrs, &lsfRu->ru_exutime)))
     {
         return FALSE;
@@ -255,7 +255,7 @@ xdr_var_string (XDR *xdrs, char **astring)
         *astring = NULL;
         
         assert( len <= INT_MAX);
-        if (!xdr_int (xdrs, (int *)&len) || ((*astring = malloc (len + 1)) == NULL)) {
+        if (!xdr_int (xdrs, (int *)&len) || (( astring = malloc (len + 1)) == NULL)) { // FIXME FIXME FIXME FIXME we got to revisit this
             return FALSE;
         }
         
@@ -266,8 +266,8 @@ xdr_var_string (XDR *xdrs, char **astring)
         len = strlen (*astring);
     }
 
-    assert( len + 1 <= INT_MAX );
-    if (!xdr_string( xdrs, astring, (unsigned int)(len + 1) )) {
+    assert( len <= INT_MAX );
+    if (!xdr_string( xdrs, astring, (unsigned int)(len) )) {  // FIXME FIXME FIXME FIXME we got to revisit this
 
         if (xdrs->x_op == XDR_DECODE) {
             FREEUP (*astring);

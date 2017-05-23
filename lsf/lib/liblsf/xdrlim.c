@@ -107,9 +107,9 @@ xdr_decisionReq (XDR * xdrs, struct decisionReq * decisionReqPtr, struct LSFHead
     if (    !xdr_enum   (xdrs, (enum_t *)&decisionReqPtr->ofWhat)    ||
             !xdr_int    (xdrs, &decisionReqPtr->options)   ||
             !xdr_string (xdrs, &sp1, MAXLSFNAMELEN)        ||
-            !xdr_u_long (xdrs, &decisionReqPtr->numHosts)  ||
+            !xdr_u_long (xdrs, (unsigned int *)&decisionReqPtr->numHosts)  ||   // FIXME FIXME FIXME FIXME we got to revisit this
             !xdr_string (xdrs, &sp2, MAXLINELEN)           ||
-            !xdr_u_long (xdrs, &decisionReqPtr->numPrefs))
+            !xdr_u_long (xdrs, (unsigned int *)&decisionReqPtr->numPrefs))
         {
         return FALSE;
         }
@@ -142,7 +142,7 @@ xdr_placeReply (XDR * xdrs, struct placeReply *placeRepPtr,struct LSFHeader * hd
     static char *memp;
     
     assert( placeRepPtr->numHosts <= INT_MAX );            // leave it in case we ever pass over 32,600 hosts :D
-    if (!xdr_u_long (xdrs, &placeRepPtr->numHosts)) {
+    if (!xdr_u_long (xdrs, (unsigned int *) &placeRepPtr->numHosts)) { // FIXME FIXME FIXME FIXME we got to revisit this
         return FALSE;
     }
     
@@ -152,7 +152,7 @@ xdr_placeReply (XDR * xdrs, struct placeReply *placeRepPtr,struct LSFHeader * hd
         }
         
         assert(placeRepPtr->numHosts >= 0);
-        placeRepPtr->placeInfo = (struct placeInfo *) malloc ( placeRepPtr->numHosts * sizeof (struct placeInfo));
+        placeRepPtr->placeInfo = malloc ( placeRepPtr->numHosts * sizeof (struct placeInfo));
         if (!placeRepPtr->placeInfo) {
             return FALSE;
         }
@@ -161,7 +161,7 @@ xdr_placeReply (XDR * xdrs, struct placeReply *placeRepPtr,struct LSFHeader * hd
     
     
     for (size_t i = 0; i < placeRepPtr->numHosts; i++) {
-        status = xdr_arrayElement (xdrs, (char *) &placeRepPtr->placeInfo[i], hdr, xdr_placeInfo);
+        status = xdr_arrayElement (xdrs, (char *) &placeRepPtr->placeInfo[i], hdr, xdr_placeInfo); // FIXME FIXME FIXME FIXME we got to revisit this
         if (XDR_DECODE == xdrs->x_op && !status )  {
             FREEUP (memp);
             return FALSE;
