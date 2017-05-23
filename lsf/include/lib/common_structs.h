@@ -102,7 +102,7 @@ struct migReq
 
 struct jobInfoReply
 {
-	u_short port;
+	unsigned short port;
 	char padding1[2];
 	int status;
 	int reasons;

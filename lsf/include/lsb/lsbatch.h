@@ -914,8 +914,8 @@ struct submig
 #define LSB_MAX_ARRAY_IDX   0x0FFFF  // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
 #define LSB_MAX_SEDJOB_RUNID    (0x0F)
 #define LSB_JOBID(array_jobId, array_idx) (((LS_UNS_LONG_INT)array_idx << 32UL) | array_jobId) // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
-#define LSB_ARRAY_IDX(jobId) (((jobId) == -1UL) ? (0) : (u_long)(((LS_UNS_LONG_INT)jobId >> 32UL) & LSB_MAX_ARRAY_IDX)) // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
-#define LSB_ARRAY_JOBID(jobId) (((jobId) == -1UL) ? (-1) : (u_long)(jobId & LSB_MAX_ARRAY_JOBID)) // FIXME FIXME FIXME FIXME FIXME this needs to be unrolled.
+#define LSB_ARRAY_IDX(jobId) (((jobId) == -1UL) ? (0) : (unsigned long)(((LS_UNS_LONG_INT)jobId >> 32UL) & LSB_MAX_ARRAY_IDX)) // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
+#define LSB_ARRAY_JOBID(jobId) (((jobId) == -1UL) ? (-1) : (unsigned long)(jobId & LSB_MAX_ARRAY_JOBID)) // FIXME FIXME FIXME FIXME FIXME this needs to be unrolled.
 
 
 #define JGRP_ACTIVE        1
@@ -934,7 +934,7 @@ struct submig
 
 struct jobAttrInfoEnt
 {
-    u_short port;
+    unsigned short port;
     char hostname[MAXHOSTNAMELEN];
     char padding[6];
     LS_LONG_INT jobId;
@@ -960,7 +960,7 @@ struct jobInfoHead
 
 struct jobInfoEnt
 {
-    u_short port;
+    unsigned short port;
     char padding[2];
     int status;
     int reasons;
@@ -1979,10 +1979,10 @@ struct lsbSharedResourceInfo *lsb_sharedresourceinfo (char **, unsigned int *, c
 
 int lsb_runjob (struct runJobRequest *);
 
-char *lsb_jobid2str  ( u_long ) ;
-char *lsb_jobidinstr  ( u_long ) ;
-void jobId32To64 (LS_LONG_INT *, unsigned int jobId, unsigned int jobArrElemId ) ; // FIXME FIXME FIXME FIXME unsigned int to u_long or u_int64_t
-void jobId64To32 (LS_LONG_INT, unsigned int *jobId, unsigned int *jobArrElemId ) ; // FIXME FIXME FIXME FIXME unsigned int to u_long or u_int64_t
+char *lsb_jobid2str  ( unsigned long ) ;
+char *lsb_jobidinstr  ( unsigned long ) ;
+void jobId32To64 (LS_LONG_INT *, unsigned int jobId, unsigned int jobArrElemId ) ; // FIXME FIXME FIXME FIXME unsigned int to unsigned long or u_int64_t
+void jobId64To32 (LS_LONG_INT, unsigned int *jobId, unsigned int *jobArrElemId ) ; // FIXME FIXME FIXME FIXME unsigned int to unsigned long or u_int64_t
 int lsb_setjobattr (int, struct jobAttrInfoEnt *);
 
 LS_LONG_INT lsb_rexecv (int, char **, char **, int *, int);

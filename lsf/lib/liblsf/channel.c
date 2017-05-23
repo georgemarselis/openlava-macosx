@@ -37,7 +37,7 @@ the following constant is not used in this file.
 See if it needs moving to the libint header file. 
 */
 
-// FINALLY FOUND where it is used: libint/lsi18n.h:847
+// FIXME FIXME FINALLY FOUND where it is used: libint/lsi18n.h:847
 #define NL_SETN   23
 
 /*#define CLOSEIT(i) {                    \
@@ -89,7 +89,7 @@ chanInit_ (void)
 }
 
 int
-chanServSocket_ (int type, u_short port, int backlog, int options)
+chanServSocket_ (int type, unsigned short port, int backlog, int options)
 {
     int ch = 0;
     int s  = 0;
@@ -555,7 +555,7 @@ chanRcvDgram_ (int chfd, char *buf, int len, struct sockaddr_in *peer, int timeo
 /* chanOpen_()
 */
 int
-chanOpen_ (u_int iaddr, u_short port, int options)
+chanOpen_ (unsigned int iaddr, unsigned short port, int options)
 {
     int i      = 0;
     int cc     = 0;
@@ -574,7 +574,7 @@ chanOpen_ (u_int iaddr, u_short port, int options)
 
     memset ((char *) &addr, 0, sizeof (addr));
     addr.sin_family = AF_INET;
-    memcpy ((char *) &addr.sin_addr, (char *) &iaddr, sizeof (u_int));
+    memcpy ((char *) &addr.sin_addr, (char *) &iaddr, sizeof (unsigned int));
     addr.sin_port = port;
 
     newOpt = 0;

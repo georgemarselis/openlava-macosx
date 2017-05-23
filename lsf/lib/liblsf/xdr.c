@@ -211,9 +211,15 @@ xdr_array_string (XDR * xdrs, char **astring, unsigned int maxlen, unsigned int 
 }
 
 bool_t
-xdr_time_t (XDR * xdrs, time_t * t)
+xdr_time_t (XDR *xdrs, time_t *t)
 {
+#ifdef __LINUX__
 	return xdr_long( xdrs, t );
+#elif defined( __APPLE__ )
+	#undef __LP64__
+	return xdr_long( xdrs, t );
+#endif
+
 }
 
 int

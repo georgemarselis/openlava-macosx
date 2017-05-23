@@ -19,7 +19,7 @@
 #include "lib/lib.h"
 #include "lsb/sig.h"
 
-#define SIGEMT  SIGBUS
+// #define SIGEMT  SIGBUS
 // #define SIGLOST SIGIO
 // #define SIGIOT  SIGABRT
 
@@ -115,14 +115,14 @@ sig_encode (int sig)
 	if (i == NSIG_MAP)  // FIXME FIXME FIXME the cast has to go; does sig below need to be negative at any point? if no, remove cast, change function param
 	{
 		if (sig >= (int) NSIG_MAP) {
-			return (sig);
+			return sig;
 		}
 		else {
-			return (0);
+			return 0;
 		}
 	}
 	else {
-		return (i);
+		return i;
 	}
 }
 
@@ -134,16 +134,16 @@ sig_decode (int sig)
 
 	if (sig >= (int) NSIG_MAP)  // FIXME FIXME FIXME the cast has to go; does sig below need to be negative at any point? if no, remove cast, change function param
 	{
-		if (sig < _NSIG) {  // FIXME FIXME FIXME _NSIG is linux perticular
-			return (sig);
+		if (sig < NSIG) {  // NSIG is in <signal.h>
+			return sig;
 		}
 		else
 		{
-			return (0);
+			return 0;
 		}
 	}
 
-	return (sig_map[sig]);
+	return sig_map[sig];
 }
 
 int
@@ -161,11 +161,11 @@ getSigVal (char *sigString)
 
 	if (isint_ (sigString) == TRUE)
 	{
-		if ((sigVal = atoi (sigString)) > _NSIG) {
+		if ((sigVal = atoi (sigString)) > NSIG) {
 			return -1;
 		}
 		else {
-			return (sigVal);
+			return sigVal;
 		}
 	}
 
@@ -173,7 +173,7 @@ getSigVal (char *sigString)
 	{
 		sprintf (sigSig, "%s%s", "SIG", sigSymbol[i]);
 		if ((strcmp (sigSymbol[i], sigString) == 0) || (strcmp (sigSig, sigString) == 0)) {
-			return (sig_map[i]);
+			return sig_map[i];
 		}
 	}
 	return -1;
@@ -189,24 +189,24 @@ getSigSymbolList (void)
 		strcat (list, sigSymbol[i]);
 		strcat (list, " ");
 	}
-	return (list);
+	return list;
 
 }
 
-SIGFUNCTYPE
-Signal_ (int sig, void (*handler) (int))
+SIGFUNCTYPE Signal_ (int sig, void (*handler) (int))
 {
-  struct sigaction act, oact;
+	struct sigaction act, oact;
 
-  act.sa_handler = handler;
-  act.sa_flags = 0;
-  sigemptyset (&act.sa_mask);
-  sigaddset (&act.sa_mask, sig);
-  if (sigaction (sig, &act, &oact) == -1)
-	{
-	  oact.sa_handler = (void (*)()) SIG_ERR;
+	act.sa_handler = handler;
+	act.sa_flags = 0;
+	sigemptyset (&act.sa_mask);
+	sigaddset (&act.sa_mask, sig);
+
+	if (sigaction (sig, &act, &oact) == -1) {
+		oact.sa_handler = (void (*)()) SIG_ERR;
 	}
-  return (oact.sa_handler);
+
+	return oact.sa_handler;
 }
 
 char *
@@ -220,14 +220,14 @@ getSigSymbol (int sig)
 		strcpy (symbol, sigSymbol[sig]);
 	}
 	
-	return (symbol);
+	return symbol;
 }
 
 int
-blockALL_SIGS_ (sigset_t * newMask, sigset_t * oldMask)
+blockALL_SIGS_ (sigset_t *newMask, sigset_t *oldMask)
 {
-  sigfillset (newMask);
-  sigdelset (newMask, SIGTRAP);
-  sigdelset (newMask, SIGEMT);
-  return (sigprocmask (SIG_BLOCK, newMask, oldMask));
+	sigfillset (newMask);
+	sigdelset (newMask, SIGTRAP);
+	sigdelset (newMask, SIGEMT);
+	return sigprocmask (SIG_BLOCK, newMask, oldMask);
 }

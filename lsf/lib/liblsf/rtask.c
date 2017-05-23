@@ -237,7 +237,7 @@ ls_rtaske (char *host, char **argv, int options, char **envp)
 			}
 		}
 
-	  for (d = 1; d < _NSIG; d++) { // FIXME FIXME FIXME FIXME replace with appropriate signal
+	  for (d = 1; d < NSIG; d++) { // NSIG is in <signal.h>
 		Signal_ (d, SIG_DFL);
 	}
 

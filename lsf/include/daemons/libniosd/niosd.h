@@ -143,5 +143,5 @@ int heartbeatInterval;
 int jobStatusInterval;
 int pendJobTimeout;
 int msgInterval;
-u_long jobId;
+unsigned long jobId;
 

@@ -102,7 +102,7 @@ int chanInit_ (void);
 #define chanSend_  chanEnqueue_
 #define chanRecv_  chanDequeue_
 
-int chanOpen_ (u_int, u_short, int);
+int chanOpen_ (unsigned int, unsigned short, int);
 int chanEnqueue_ (int chfd, struct Buffer *buf);
 int chanDequeue_ (int chfd, struct Buffer **buf);
 
@@ -111,7 +111,7 @@ int chanClose_ (int chfd);
 void chanCloseAll_ (void);
 int chanSock_ (unsigned int chfd);
 
-int chanServSocket_ (int, u_short, int, int);
+int chanServSocket_ (int, unsigned short, int, int);
 int chanAccept_ (int, struct sockaddr_in *);
 
 int chanClientSocket_ (int, int, int);

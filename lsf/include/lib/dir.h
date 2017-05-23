@@ -25,7 +25,7 @@ char chosenPath[MAXPATHLEN];
 // struct config_param genParams_[]; // FIXME FIXME FIXME commended line out, cuz compiler was complaining. no obvious side-effects. revisit
 
 // static int putin_ (unsigned long status, char *inkey, int inkeylen, char *inval, int invallen, void *indata);
-int putin_( int instatus, char *inkey, int inkeylen, char *inval, int invallen, char *indata);
+int putin_( unsigned long instatus, char *inkey, int inkeylen, char *inval, int invallen, void *indata);
 int getMap_( void );
 
 static int tryPwd (char *path, char *pwdpath);

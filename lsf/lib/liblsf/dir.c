@@ -347,7 +347,7 @@ int
 // FIXME FIXME one below is probably for MacOS
 // see more:	http://www-personal.umich.edu/~saarela/programming/2005/06/dumping-nis-database-programmatically.html
 // putin_ (unsigned long instatus, char *inkey, int inkeylen, char *inval, int invallen, void *indata)
-putin_ ( int instatus, char *inkey, int inkeylen, char *inval, int invallen, char *indata)
+putin_ ( unsigned long instatus, char *inkey, int inkeylen, char *inval, int invallen, void *indata)
 
 {
 
@@ -365,7 +365,7 @@ putin_ ( int instatus, char *inkey, int inkeylen, char *inval, int invallen, cha
 
 #ifndef __CYGWIN__
 
-	if( 0 != ypprot_err( instatus ) ) {
+	if( 0 != ypprot_err( (int) instatus ) ) { // FIXME FIXME FIXME cast has to go
 		return TRUE;
 	}
 #endif

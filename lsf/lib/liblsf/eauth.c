@@ -16,6 +16,7 @@
  *
  */
 
+
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <limits.h>
@@ -34,10 +35,13 @@
 #include "lib/init.h"
 #include "lib/eauth.h"
 #include "lib/rdwr.h"
+#include "lsb/sig.h"    // NSIG 
 #include "daemons/libniosd/niosd.h"
 #include "daemons/libresd/resout.h"
 
 // #define NL_SETN 23
+
+// #define _DARWIN_C_SOURCE
 
 int
 getAuth_ (struct lsfAuth *auth, char *host)
@@ -270,7 +274,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
               exit (-1);
             }
 
-            for ( int i = 1; i < _NSIG; i++) {  // FIXME FIXME FIXME FIXME _NSIG exists on linux, but does it exist in MacOS, as well?
+            for ( int i = 1; i < NSIG; i++) {  // NSIG is in <signal.h>
                 Signal_ (i, SIG_DFL);
             }
 

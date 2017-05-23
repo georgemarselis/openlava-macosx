@@ -1313,7 +1313,7 @@ sendSig_ (char *host, pid_t rid, int sig, int options)
         }
     }
     
-    if (sig >= _NSIG || sig < 0) {  // FIXME FIXME FIXME substitute _NSIG for appropriate signal or appropriate way of fixing it
+    if (sig >= NSIG || sig < 0) {  // NSIG is in <signal.h>
         lserrno = LSE_BAD_ARGS;
         return -1;
     }

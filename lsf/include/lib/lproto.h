@@ -197,7 +197,7 @@ void sw_remtty (int);
 void sw_loctty (int);
 
 
-int niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus, int terWhiPendStatus);
+int niosCallback_ (struct sockaddr_in *from, unsigned short port, int rpid, int exitStatus, int terWhiPendStatus);
 
 int sig_encode (int);
 int sig_decode (int);

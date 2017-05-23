@@ -57,7 +57,7 @@ struct lsTMsgHdr
 struct tid
 {
     bool_t isEOF;
-    u_short taskPort;
+    unsigned short taskPort;
     char padding[2];
     int rtid;
     int sock;
@@ -766,17 +766,17 @@ int Socket_ (int, int, int);
 int get_nonstd_desc_ (int);
 int TcpCreate_ (int, int);
 int opensocks_ (int);
-ls_svrsock_t *svrsockCreate_ (u_short, int, struct sockaddr_in *, int);
+ls_svrsock_t *svrsockCreate_ (unsigned short, int, struct sockaddr_in *, int);
 int svrsockAccept_ (ls_svrsock_t *, int);
 char *svrsockToString_ (ls_svrsock_t *);
 void svrsockDestroy_ (ls_svrsock_t *);
-int TcpConnect_ (char *, u_short, struct timeval *);
+int TcpConnect_ (char *, unsigned short, struct timeval *);
 
 char *getMsgBuffer_ (int fd, size_t *bufferSize);
 
 int expSyntax_ (char *);
 
-int tid_register (pid_t taskid, int socknum, u_short taskPort, char *host, bool_t doTaskInfo);
+int tid_register (pid_t taskid, int socknum, unsigned short taskPort, char *host, bool_t doTaskInfo);
 int tid_remove (pid_t taskid);
 struct tid *tid_find (pid_t taskid);
 struct tid *tidFindIgnoreConn_(pid_t taskid);

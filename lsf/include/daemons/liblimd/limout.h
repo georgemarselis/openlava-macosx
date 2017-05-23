@@ -247,7 +247,7 @@ struct clusterInfoReply
 struct masterInfo
 {
     char padding[2];
-    u_short portno;
+    unsigned short portno;
     char hostName[MAXHOSTNAMELEN];
     in_addr_t addr;
 

@@ -325,7 +325,7 @@ struct resChildInfo
   struct lsfAuth *lsfAuth;
   struct passwd *pw;
   struct hostent *host;
-  u_short parentPort;
+  unsigned short parentPort;
   int currentRESSN;
   int res_status;
 };
@@ -405,7 +405,7 @@ struct resSignal
 
 struct resCmdBill
 {
-	u_short retport;
+	unsigned short retport;
 	char padding1[2];
 	pid_t rpid;
 	int filemask;
@@ -551,7 +551,7 @@ void display_masks (fd_set *, fd_set *, fd_set *);
 
 long b_write_fix  (int s, char *buf, size_t len);
 
-int lsbJobStart (char **, u_short, char *, int);
+int lsbJobStart (char **, unsigned short, char *, int);
 
 void childAcceptConn (int, struct passwd *, struct lsfAuth *, struct resConnect *, struct hostent *);
 
