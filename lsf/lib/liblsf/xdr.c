@@ -17,15 +17,18 @@
  *
  */
 
-// #ifdef __APPLE__
-// #undef __LP64__
-// #endif
-
 #include <limits.h>
+#include <rpc/types.h>
+#include <rpc/xdr.h>
 
 #include "lib/lib.h"
 #include "lib/xdr.h"
 #include "lib/lproto.h"
+
+// // <rpc/xdr.h> defines an __LP64__ type
+// #ifdef __APPLE__
+// #undef __LP64__
+// #endif
 
 /* encodeHdr()
  * Pack the header into 16 4 unsigned integers,
@@ -138,7 +141,7 @@ xdr_arrayElement (XDR * xdrs, char *data, struct LSFHeader * hdr, bool_t (*xdr_f
   va_list ap;
   unsigned int nextElementOffset = 0; 
   unsigned int pos = 0;
-  char *cp;
+  char *cp = NULL;
 
   va_start (ap, xdr_func);
 
@@ -151,20 +154,22 @@ xdr_arrayElement (XDR * xdrs, char *data, struct LSFHeader * hdr, bool_t (*xdr_f
   else
 	{
 		assert( nextElementOffset <= INT_MAX );
-	  if (!xdr_int (xdrs, (int *)&nextElementOffset))
-  return (FALSE);
+		if (!xdr_int (xdrs, (int *)&nextElementOffset)) {
+			return FALSE;
+		}
 	}
 
   cp = va_arg (ap, char *);
   if (cp)
 	{
-	  if (!(*xdr_func) (xdrs, data, hdr, cp))
-  return (FALSE);
+		if (!(*xdr_func) (xdrs, data, hdr, cp))
+			return FALSE;
 	}
   else
 	{
-	  if (!(*xdr_func) (xdrs, data, hdr))
-  return (FALSE);
+		if (!(*xdr_func) (xdrs, data, hdr)) {
+			return FALSE;
+		}
 	}
 
   if (xdrs->x_op == XDR_ENCODE)
@@ -172,13 +177,14 @@ xdr_arrayElement (XDR * xdrs, char *data, struct LSFHeader * hdr, bool_t (*xdr_f
 	  nextElementOffset = XDR_GETPOS (xdrs) - pos;
 	  XDR_SETPOS (xdrs, pos);
 	  assert( nextElementOffset <= INT_MAX );
-	  if (!xdr_int (xdrs, (int *)&nextElementOffset))
-  return (FALSE);
+		if (!xdr_int (xdrs, (int *)&nextElementOffset)) {
+			return FALSE;
+		}
 	}
 
 
   XDR_SETPOS (xdrs, pos + nextElementOffset);
-  return (TRUE);
+  return TRUE;
 }
 
 bool_t
@@ -197,12 +203,12 @@ xdr_array_string (XDR * xdrs, char **astring, unsigned int maxlen, unsigned int 
 		for (unsigned int j = 0; j < i; j++) {
 		  FREEUP (astring[j]);
 		}
-		return (FALSE);
+		return FALSE;
 	  }
 	}
 	else {
 	  if (!xdr_string (xdrs, &astring[i], maxlen)) {
-		return (FALSE);
+		return FALSE;
 	  }
 	}
   }
@@ -215,11 +221,11 @@ xdr_time_t (XDR *xdrs, time_t *t)
 {
 #ifdef __LINUX__
 	return xdr_long( xdrs, t );
-#elif defined( __APPLE__ )
-	#undef __LP64__
-	return xdr_long( xdrs, t );
+#elif defined(__APPLE__)
+	return xdr_long( xdrs, (int *)t ); // FIXME FIXME FIXME FIXME we got to revisit this
+#else
+	#error
 #endif
-
 }
 
 int
@@ -353,7 +359,7 @@ xdr_lsfLimit (XDR * xdrs, struct lsfLimit * limits, struct LSFHeader *hdr)
   xdr_u_int (xdrs, (unsigned int *) &limits->rlim_maxl) &&
   xdr_u_int (xdrs, (unsigned int *) &limits->rlim_maxh)))
 	return FALSE;
-  return (TRUE);
+  return TRUE;
 }
 
 bool_t
@@ -366,7 +372,7 @@ xdr_portno (XDR * xdrs, u_short * portno)
 		*portno = 0;
  	}
 
-	sp = (char *) portno;
+	sp = (char *) portno; // FIXME FIXME FIXME now to sure about this cast
 
 	return xdr_bytes( xdrs, &sp, &len, len );
 }
@@ -382,7 +388,7 @@ xdr_address (XDR * xdrs, u_int * addr)
 		*addr = 0;
 	}
 
-	sp = (char *) addr;
+	sp = (char *) addr; // FIXME FIXME FIXME now to sure about this cast
 
 	return xdr_bytes( xdrs, &sp, &len, len );
 }
@@ -406,7 +412,7 @@ xdr_debugReq (XDR * xdrs, struct debugReq * debugReq, struct LSFHeader *hdr)
   {
 	phostname = (char *) malloc (MAXHOSTNAMELEN);
 	if (phostname == NULL)
-	  return (FALSE);
+	  return FALSE;
   }
 	  debugReq->hostName = phostname;
 	  phostname[0] = '\0';
