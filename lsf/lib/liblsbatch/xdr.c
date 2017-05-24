@@ -173,7 +173,7 @@ xdr_submitReq (XDR *xdrs, struct submitReq *submitReq, struct LSFHeader *hdr)
     if (! ( xdr_time_t (xdrs, &submitReq->submitTime)   &&
             xdr_time_t (xdrs, &submitReq->beginTime)    &&
             xdr_time_t (xdrs, &submitReq->termTime)     &&
-            xdr_u_int  (xdrs, &submitReq->umask)        &&
+            xdr_u_int  (xdrs, (unsigned int *)&submitReq->umask)        && // FIXME FIXME FIXME FIXME we need to revisit this
             xdr_int    (xdrs, &submitReq->sigValue)     &&
             xdr_int    (xdrs, &submitReq->restartPid)   &&
             xdr_time_t (xdrs, &submitReq->chkpntPeriod) &&
@@ -525,8 +525,8 @@ xdr_parameterInfo (XDR *xdrs, struct parameterInfo *paramInfo, struct LSFHeader 
     		return FALSE;
   		}
 
-  if (!(xdr_long (xdrs, &(paramInfo->mbatchdInterval)) &&
-  			xdr_long (xdrs, &(paramInfo->sbatchdInterval)) &&
+  if (!(xdr_long (xdrs, (int *)&(paramInfo->mbatchdInterval)) && // FIXME FIXME FIXME FIXME we need to revisit this
+  			xdr_long (xdrs, (int *)&(paramInfo->sbatchdInterval)) &&
   			xdr_int (xdrs, &(paramInfo->jobAcceptInterval)) &&
   			xdr_int (xdrs, &(paramInfo->maxDispRetries)) &&
 			xdr_int (xdrs, &(paramInfo->maxSbdRetries)) &&
@@ -596,13 +596,15 @@ xdr_jobInfoHead (XDR *xdrs, struct jobInfoHead *jobInfoHead, struct LSFHeader *h
 {
     static char **hostNames      = NULL;
     static unsigned long numJobs = 0;
-    static unsigned int numHosts         = 0;
+    static unsigned int numHosts = 0;
     static LS_LONG_INT *jobIds   = NULL;
-    char *sp                     = NULL; unsigned int *jobArrIds              = NULL; unsigned int *jobArrElemIds          = NULL;
+    char *sp                     = NULL;
+    unsigned int *jobArrIds      = NULL; 
+    unsigned int *jobArrElemIds  = NULL;
 
     assert( hdr->length );
 
-    if (!(xdr_u_long (xdrs, &(jobInfoHead->numJobs)) && xdr_u_int (xdrs, &(jobInfoHead->numHosts)))) 
+    if (!(xdr_u_long (xdrs, (unsigned int *)&(jobInfoHead->numJobs)) && xdr_u_int (xdrs, (unsigned int *)&(jobInfoHead->numHosts)))) // FIXME FIXME FIXME FIXME we need to revisit this
     {
         return FALSE;
     }
@@ -927,7 +929,7 @@ xdr_jobInfoReply (XDR *xdrs, struct jobInfoReply *jobInfoReply, struct LSFHeader
       return FALSE;
     }
 
-    if (!xdr_time_t (xdrs, &jobInfoReply->reserveTime) || !xdr_u_long (xdrs, &jobInfoReply->jobPid)) {
+    if (!xdr_time_t (xdrs, &jobInfoReply->reserveTime) || !xdr_u_long (xdrs, (unsigned int *)&jobInfoReply->jobPid)) { // FIXME FIXME FIXME FIXME we have to revisit this.
         return FALSE;
     }
 
@@ -1401,12 +1403,12 @@ xdr_hostInfoEnt (XDR *xdrs, struct hostInfoEnt *hostInfoEnt, struct LSFHeader *h
     if ( ! (xdr_string (xdrs, &sp, MAXHOSTNAMELEN)        &&
             xdr_double (xdrs, &hostInfoEnt->cpuFactor)    &&
             xdr_string (xdrs, &wp, MAXLINELEN)            &&
-            xdr_u_long (xdrs, &hostInfoEnt->userJobLimit) &&
-            xdr_u_long (xdrs, &hostInfoEnt->maxJobs)      &&
-            xdr_u_long (xdrs, &hostInfoEnt->numJobs)      &&
-            xdr_u_long (xdrs, &hostInfoEnt->numRUN)       &&
-            xdr_u_long (xdrs, &hostInfoEnt->numSSUSP)     &&
-            xdr_u_long (xdrs, &hostInfoEnt->numUSUSP)     &&
+            xdr_u_long (xdrs, (unsigned int *)&hostInfoEnt->userJobLimit) && // FIXME FIXME FIXME FIXME we have to revisit this.
+            xdr_u_long (xdrs, (unsigned int *)&hostInfoEnt->maxJobs)      && // FIXME FIXME FIXME FIXME we have to revisit this.
+            xdr_u_long (xdrs, (unsigned int *)&hostInfoEnt->numJobs)      && // FIXME FIXME FIXME FIXME we have to revisit this.
+            xdr_u_long (xdrs, (unsigned int *)&hostInfoEnt->numRUN)       && // FIXME FIXME FIXME FIXME we have to revisit this.
+            xdr_u_long (xdrs, (unsigned int *)&hostInfoEnt->numSSUSP)     && // FIXME FIXME FIXME FIXME we have to revisit this.
+            xdr_u_long (xdrs, (unsigned int *)&hostInfoEnt->numUSUSP)     && // FIXME FIXME FIXME FIXME we have to revisit this.
             xdr_int    (xdrs, &hostInfoEnt->hStatus)      &&
             xdr_int    (xdrs, &hostInfoEnt->attr)         &&
             xdr_int    (xdrs, &hostInfoEnt->mig))
