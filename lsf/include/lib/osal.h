@@ -18,9 +18,6 @@
 
 #pragma once
 
-// #ifndef LSF_LIB_OSAL_H
-// #define LSF_LIB_OSAL_H
-
 #include <errno.h>
 #include <pwd.h>
 #include <signal.h>
@@ -33,7 +30,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
- #include "lsf.h"
+#include "lsf.h"
 
 typedef int LS_ULONG_T;
 typedef int LS_ID_T;

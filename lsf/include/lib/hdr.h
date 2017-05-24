@@ -18,9 +18,6 @@
 
 #pragma once
 
-// #ifndef LSF_LIB_HDR_H
-// #define LSF_LIB_HDR_H
-
 #include <rpc/types.h>
 #ifndef __XDR_HEADER__
 #include <rpc/xdr.h>
