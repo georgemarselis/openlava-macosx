@@ -29,12 +29,13 @@
 #include "lib/osal.h"
 #include "lib/xdr.h"
 #include "lsf.h"
+#include "config.h"
 
 // #ifndef _BSD
 // #define _BSD
 // #endif
 
-typedef gid_t GETGROUPS_T;
+// typedef gid_t GETGROUPS_T;
 
 /* LOL
 *
@@ -75,7 +76,7 @@ char child_go;
 char res_interrupted;
 char *gobuf;
 char allow_accept;
-extern char magic_str[]; // FIXME FIXME FIXME FIXME FIXME attach specific header!
+// extern char magic_str[]; // FIXME FIXME FIXME FIXME FIXME attach specific header!
 int child_res_port;
 int parent_res_port;
 fd_set readmask, writemask, exceptmask;
@@ -197,28 +198,34 @@ struct config_param resParams[] = {
     { "LSF_INTERACTIVE_STDERR", NULL },
     { "NO_HOSTS_FILE",          NULL },
     { "LSB_SHAREDIR",           NULL },
-    {NULL,                      NULL}  
+    { NULL,                     NULL }  
 };
 
-
-
-struct relaylinebuf
-{
-#ifndef LINE_BUFSIZ       // this is not supposed to be here, but once removed
-#define LINE_BUFSIZ 4096  // compiler throws error
+#ifdef LINE_BUFSIZ
+#error
+#else
+#define LINE_BUFSIZ 4096  // FIXME FIXME FIXME FIXME 
 #endif
-  char buf[LINE_BUFSIZ + sizeof (struct LSFHeader) + 1];
-  char *bp;
-  int bcount;
+// const unsigned short LINE_BUFSIZ = 4096;
+
+struct relaylinebuf// FIXME FIXME FIXME FIXME struct relaylinebuf and struct relaybuf are identical; should be consolidated
+{
+	char *bp;
+	// char buf[ LINE_BUFSIZ + sizeof (struct LSFHeader)];
+	char buf[ LINE_BUFSIZ * sizeof (struct LSFHeader) ]; // FIXME FIXME FIXME FIXME must create a pseudo-constructor which allocates the correct size
+	int bcount;
+	char padding1[4];
 };
 
 // typedef struct relaylinebuf RelayLineBuf;
 
-struct relaybuf
+struct relaybuf // FIXME FIXME FIXME FIXME struct relaylinebuf and struct relaybuf are identical; should be consolidated
 {
-	char buf[BUFSIZ + sizeof (struct LSFHeader)];
 	char *bp;
+	// char buf[ LINE_BUFSIZ + sizeof (struct LSFHeader)];
+	char buf[ LINE_BUFSIZ * sizeof (struct LSFHeader)]; // FIXME FIXME FIXME FIXME must create a pseudo-constructor which allocates the correct size
 	int bcount;
+	char padding1[4];
 };
 
 // typedef struct relaybuf RelayBuf;
@@ -226,10 +233,11 @@ struct relaybuf
 struct channel
 {
 	int fd;
-	struct relaybuf *rbuf;
 	int rcount;
-	struct relaybuf *wbuf;
 	int wcount;
+	char padding1[ 4 ];
+	struct relaybuf *rbuf;
+	struct relaybuf *wbuf;
 };
 
 // typedef struct channel Channel;
@@ -248,11 +256,11 @@ struct outputchannel
 struct niosChannel
 {
 	int fd;
-	struct relaybuf *rbuf;
 	int rcount;
-	struct relaylinebuf *wbuf;
 	int wcount;
 	int opCode;
+	struct relaybuf *rbuf;
+	struct relaylinebuf *wbuf;
 };
 
 // struct nioschannel niosChannel;  // FIXME FIXME FIXME remove typedef from struct
@@ -260,74 +268,74 @@ struct niosChannel
 
 typedef struct ttystruct
 {
-  struct termios attr;
-  struct winsize ws;
+	struct termios attr;
+	struct winsize ws;
 #    if defined(hpux) || defined(__hpux)
-  struct ltchars hp_ltchars;
+	struct ltchars hp_ltchars;
 #    endif
 } ttyStruct;    // FIXME FIXME FIXME remove typedef from struct
 
 
 struct client
 {
-  int client_sock;
-  pid_t ruid;
-  pid_t gid;
-  char *username;
-  char *clntdir;
-  char *homedir;
-  ttyStruct tty;
-  char **env;
-  int ngroups;
-  GETGROUPS_T groups[NGROUPS_MAX];
-  struct hostent hostent;
-  struct lenData eexec;
+	pid_t ruid;
+	gid_t gid;
+	int client_sock;
+	int ngroups;
+	char *username;
+	char *clntdir;
+	char *homedir;
+	char **env;
+	ttyStruct tty;
+	GETGROUPS_T groups[NGROUPS_MAX];
+	char padding1[4];
+	struct hostent hostent;
+	struct lenData eexec;
 };
 
 struct child
 {
-	struct client *backClnPtr;
+	char username[MAXLSFNAMELEN];
+	char fromhost[MAXHOSTNAMELEN];
+	char slavepty[sizeof (PTY_TEMPLATE)];
+	char padding1[5];
 	pid_t rpid;
 	pid_t pid;
-
 	int refcnt;
 	int info;
 	int stdio;
-	struct outputchannel *std_out;
-	struct outputchannel *std_err;
-
-	struct niosChannel *remsock;
 	int rexflag;
+	int endstdin;
+	int sent_eof;
+	int sent_status;
 	char server;
 	char c_eof;
 	char running;
 	char sigchild;
 	LS_WAIT_T wait;
-	struct sigStatusUsage *sigStatRu;
-	int endstdin;
-	struct relaybuf *i_buf;
 	int stdin_up;
-
-	char slavepty[sizeof (PTY_TEMPLATE)];
-
+	char *cwd;
 	char **cmdln;
 	time_t dpTime;
-	char *cwd;
-	char username[MAXLSFNAMELEN];
-	char fromhost[MAXHOSTNAMELEN];
-	int sent_eof;
-	int sent_status;
+	struct relaybuf *i_buf;
+	struct client *backClnPtr;
+	struct sigStatusUsage *sigStatRu;
+	struct outputchannel *std_out;
+	struct outputchannel *std_err;
+	struct niosChannel *remsock;
 };
 
 struct resChildInfo
 {
-  struct resConnect *resConnect;
-  struct lsfAuth *lsfAuth;
-  struct passwd *pw;
-  struct hostent *host;
-  unsigned short parentPort;
-  int currentRESSN;
-  int res_status;
+	unsigned short parentPort;
+	char padding1[2];
+	int currentRESSN;
+	int res_status;
+	char padding[4];
+	struct resConnect *resConnect;
+	struct lsfAuth *lsfAuth;
+	struct passwd *pw;
+	struct hostent *host;
 };
 
 
@@ -335,16 +343,18 @@ struct resChildInfo
 // typedef 
 struct taggedConn
 {
-	struct niosChannel *sock;
 	int rtag;
 	int wtag;
-	int *task_duped;
 	int num_duped;
+	char padding1[4];
+	int *task_duped;
+	struct niosChannel *sock;
 }; //taggedConn_t;
 
 typedef struct resNotice
 {
-	struct resNotice *forw, *back;
+	struct resNotice *forw;
+	struct resNotice *back;
 	pid_t rpid;
 	int retsock;
 	int opCode;
@@ -411,8 +421,8 @@ struct resCmdBill
 	int filemask;
 	int priority;
 	int options;
-	// char cwd[MAXPATHLEN];
-	char *cwd;
+	char cwd[MAXPATHLEN]; // FIXME FIXME FIXME FIXME turn into dynamic allocation
+	// char *cwd;
 	char padding2[4];
 	char **argv;
 	struct lsfLimit lsfLimits[LSF_RLIM_NLIMITS];  // this should be changed to a pointer
@@ -512,19 +522,23 @@ unsigned int globCurrentSN;
 
 // #define LSB_UTMP           0
 
-#define SIG_NT_CTRLC        2000
-#define SIG_NT_CTRLBREAK    2001
+// #define SIG_NT_CTRLC        2000
+// #define SIG_NT_CTRLBREAK    2001
 
-struct config_param resParams[];
-extern struct config_param resConfParams[]; // FIXME FIXME FIXME FIXME FIXME attach specific header!
+const unsigned short SIG_NT_CTRLC     = 2000;
+const unsigned short SIG_NT_CTRLBREAK = 2001;
 
-#define RES_REPLYBUF_LEN   4096
+// struct config_param resParams[];
+// extern struct config_param resConfParams[]; // FIXME FIXME FIXME FIXME FIXME attach specific header!
+// #define RES_REPLYBUF_LEN   4096
+// #define RESS_LOGBIT         0x00000001
 
-#define RESS_LOGBIT         0x00000001
+const unsigned short RES_REPLYBUF_LEN = 4096;
+int RESS_LOGBIT = 0x00000001;
 
 void init_res (void);
 void resExit_ (int exitCode);
-long  nb_write_fix (int s, char *buf, size_t len);
+// long nb_write_fix (int s, char *buf, size_t len);
 int ptymaster (char *);
 int ptyslave (char *);
 void doacceptconn (void);
@@ -549,7 +563,7 @@ void child_handler_ext (void);
 void getMaskReady (fd_set * rm, fd_set * wm, fd_set * em);
 void display_masks (fd_set *, fd_set *, fd_set *);
 
-long b_write_fix  (int s, char *buf, size_t len);
+// long b_write_fix  (int s, char *buf, size_t len);
 
 int lsbJobStart (char **, unsigned short, char *, int);
 
@@ -585,10 +599,4 @@ void dumpChild (struct child *, int, char *);
 
 unsigned int  getCurrentSN( void );
 unsigned int  setCurrentSN( unsigned int currentSN );
-
-
-
-
-
-
 

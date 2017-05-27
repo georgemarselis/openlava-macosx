@@ -49,9 +49,11 @@ typedef struct lsLimitT_
 typedef struct lsProcStartT_
 {
   int numHds;
+  char padding1[4];
   int *flgHds;
   LS_HANDLE_T *handles;
   int priority;
+  char padding2[4];
   char *lsfName;
   char *userName;
   char *projName;
@@ -83,9 +85,10 @@ typedef struct lsProcessT_
   LS_HANDLE_T hdProc;
   LS_ID_T idProcGrp;
   LS_HANDLE_T hdProcGrp;
+  int misc;
+  char padding[4];
   char *userName;
   char *wrkDir;
-  int misc;
 } LS_PROCESS_T;
 
 #define MSCAVA_PROC_LS      (0x00000001)

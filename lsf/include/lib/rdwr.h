@@ -21,8 +21,8 @@
 #include <sys/time.h>
 
 void unblocksig (int sig);
-int  b_connect_ (int s, struct sockaddr *name, socklen_t namelen, unsigned int timeout);
-int  rd_select_ (int rd, struct timeval *timeout);
-int  b_accept_  (int s, struct sockaddr *addr, socklen_t * addrlen);
-long nb_read_timeout (int s, char *buf, size_t len, int timeout);
+// int  b_connect_ (int s, struct sockaddr *name, socklen_t namelen, unsigned int timeout);
+// int  rd_select_ (int rd, struct timeval *timeout);
+// int  b_accept_  (int s, struct sockaddr *addr, socklen_t * addrlen);
+// long nb_read_timeout (int s, char *buf, size_t len, int timeout);
 void alarmer_ (void);

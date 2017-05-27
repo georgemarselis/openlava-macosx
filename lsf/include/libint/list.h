@@ -84,6 +84,7 @@ typedef enum _listEventType
 
 struct _listEvent
 {
+	char padding[4];
 	LIST_EVENT_TYPE_T type;
 	LIST_ENTRY_T *entry;
 };

@@ -65,8 +65,7 @@ struct submitReq
 struct jobSwitchReq
 {
   char *queue;
-  char padding[4];
-  long jobId;
+  unsigned long jobId;
 
 };
 

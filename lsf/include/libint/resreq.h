@@ -71,7 +71,6 @@ struct resVal
     char **xorExprs;
 };
 
-int getValPair (char **resReq, int *val1, int *val2);
 struct sections
 {
     char *select;
@@ -100,8 +99,6 @@ int getTimeVal (char **, float *);
 void freeResVal (struct resVal *);
 void initResVal (struct resVal *);
 
-extern char isanumber_ (char *);
-
 hTab resNameTbl = { NULL, 0, 0 };
 hTab keyNameTbl = { NULL, 0, 0 };
 
@@ -111,14 +108,15 @@ hTab keyNameTbl = { NULL, 0, 0 };
 #define KEY_DECAY       4
 #define NUM_KEYS        5
 
-#define ALLOC_STRING( buffer, buffer_len, req_len) {     \
+// FIXME FIXME FIXME FIXME FIXME turn ALLOC_STRING macro into a function
+#define ALLOC_STRING( buffer, buffer_len, req_len) {    \
         if (buffer == NULL || buffer_len < req_len) {   \
             FREEUP(buffer);                             \
             buffer = malloc(req_len);                   \
             buffer_len = req_len;                       \
         }                                               \
     }
-
+// FIXME FIXME FIXME FIXME FIXME turn REALLOC_STRING macro into a function
 #define REALLOC_STRING(buffer, buffer_len, req_len) {   \
         if (buffer == NULL) {                           \
             buffer = malloc(req_len);                   \

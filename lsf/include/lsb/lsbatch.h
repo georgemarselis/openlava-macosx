@@ -278,7 +278,7 @@ struct msgMap
 {
 	int number;
 	char padding[4];
-	char *message;
+	const char *message;
 };
 
 struct msgMap pendMsg[] = {
@@ -760,9 +760,9 @@ struct msgMap pendMsg[] = {
 #define LSBE_NUM_ERR             131
 
 
-
-#define PREPARE_FOR_OP          1024
-#define READY_FOR_OP            1023
+// Duplicates from <daemons/daemonout.h>
+// #define PREPARE_FOR_OP          1024
+// #define READY_FOR_OP            1023
 
 
 #define SUB_JOB_NAME       0x01
@@ -816,20 +816,28 @@ struct msgMap pendMsg[] = {
 #define DEL_NUMPRO        INFINIT_INT
 #define DEFAULT_NUMPRO    INFINIT_INT -1
 
-struct xFile
-{
+
+// #define XF_OP_SUB2EXEC         0x1
+// #define XF_OP_EXEC2SUB         0x2
+// #define XF_OP_SUB2EXEC_APPEND  0x4
+// #define XF_OP_EXEC2SUB_APPEND  0x8
+// #define XF_OP_URL_SOURCE       0x10
+enum XF_OP_OPTIONS {
+	XF_OP_SUB2EXEC = 0x1,
+	XF_OP_EXEC2SUB = 0x2,
+	XF_OP_SUB2EXEC_APPEND = 0x4,
+	XF_OP_EXEC2SUB_APPEND = 0x8,
+	XF_OP_URL_SOURCE = 0x10 
+};
+
+struct xFile {
 	char *subFn;
 	char *execFn;
 	int options;
-#define XF_OP_SUB2EXEC         0x1
-#define XF_OP_EXEC2SUB         0x2
-#define XF_OP_SUB2EXEC_APPEND  0x4
-#define XF_OP_EXEC2SUB_APPEND  0x8
-#define XF_OP_URL_SOURCE       0x10
+	char padding[4];
 };
 
-struct submit
-{
+struct submit {
     int options;
     int options2;
     unsigned int numAskedHosts;
@@ -1158,6 +1166,7 @@ struct loadInfoEnt
 {
   char *hostName;
   int status;
+  char padding[4];
   float *load;
 };
 
@@ -1240,9 +1249,10 @@ struct jobNewLog
   time_t beginTime;
   time_t termTime;
   uid_t userId;
-  char padding3[4];
+  char padding2[4];
   unsigned long jobId;
   float hostFactor;
+  char padding3[4];
   char *queue;
   char *fromHost;
   char *cwd;
@@ -1259,7 +1269,6 @@ struct jobNewLog
   char *hostSpec;
   char *jobName;
   char *command;
-  char padding2[4];
   char *preExecCmd;
   char *mailUser;
   char *projectName;
@@ -1322,7 +1331,6 @@ struct jobModLog
     int rLimits[LSF_RLIM_NLIMITS];
     char padding[4];
     struct xFile *xf;
-
 };
 
 
@@ -1536,15 +1544,15 @@ struct jobFinishLog
     int jobId;
     uid_t userId;
     int options;
-	size_t numProcessors;
     int jStatus;
-    size_t numAskedHosts;
-    size_t numExHosts;
     int exitStatus;
-    size_t maxNumProcessors;
     int idx;
     int maxRMem;
     int maxRSwap;
+	size_t numProcessors;
+    size_t numAskedHosts;
+    size_t numExHosts;
+    size_t maxNumProcessors;
     char queue       [MAX_LSB_NAME_LEN];
     char userName    [MAX_LSB_NAME_LEN];
     char fromHost    [MAXHOSTNAMELEN];

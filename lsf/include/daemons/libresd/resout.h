@@ -110,7 +110,7 @@ struct resConnect
 
 // typedef struct relaybuf RelayBuf;
 
-#define LINE_BUFSIZ 4096
+// #define LINE_BUFSIZ 4096
 
 // struct relaylinebuf
 // {
@@ -165,10 +165,14 @@ struct resSignal {
 
 #define SETTERMSIG(x,y) (x).w_termsig = (y)
 #define SETSTOPSIG(x,y) (x).w_stopsig = (y)
+
+#ifdef LS_TERMS
 #define LS_WTERMSIG WTERMSIG
 #define LS_WIFEXITED WIFEXITED
 #define LS_WEXITSTATUS WEXITSTATUS
 #define LS_WSTOPSIG WSTOPSIG
 #define LS_WIFSTOPPED WIFSTOPPED
 #define LS_WIFSIGNALED WIFSIGNALED
+#endif
+
 #endif

@@ -283,22 +283,22 @@ char *getNextLine_conf (struct lsConf *, int);
 char *nextline_ (FILE *);
 void subNewLine_ (char *);
 
-void doSkipSection (FILE *fp, size_t *lineNum, char *fname, char *unknown);
-int keyMatch (struct keymap *keyList, char *line, int exact);
-int mapValues (struct keymap *keyList, char *line);
-int readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *fname, size_t *lineNum, int boolean, char *newindex);
-char *getNextValue (char **line);
-int putValue (struct keymap *keyList, char *key, char *value);
-char *getBeginLine (FILE *fp, size_t *lineNum);
+// void doSkipSection (FILE *fp, size_t *lineNum, char *fname, char *unknown);
+// int keyMatch (struct keymap *keyList, char *line, int exact);
+// int mapValues (struct keymap *keyList, char *line);
+// int readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *fname, size_t *lineNum, int boolean, char *newindex);
+// char *getNextValue (char **line);
+// int putValue (struct keymap *keyList, char *key, char *value);
+// char *getBeginLine (FILE *fp, size_t *lineNum);
 int putInLists (char *word, struct admins *admins, unsigned int *numAds, char *forWhat);
-int isInlist (char **adminNames, char *userName, unsigned int actAds);
+// int isInlist (char **adminNames, char *userName, unsigned int actAds);
 
 void doSkipSection_conf (struct lsConf *conf, size_t *lineNum, char *lsfile, char *sectionName);
 char *getBeginLine_conf (struct lsConf *conf, size_t *lineNum);
 
 void defaultAllHandlers (void);
 
-long  nb_write_fix (int s, char *buf, size_t len);
+// long  nb_write_fix (int s, char *buf, size_t len);
 long  nb_read_timeout (int s, char *buf, size_t len, int timeout);
 int   b_write_timeout (int, char *, int, int);
 int   detectTimeout_ (int, int);
@@ -306,7 +306,7 @@ int   b_connect_ (int s, struct sockaddr *name, socklen_t namelen, unsigned int 
 int   rd_select_ (int, struct timeval *);
 int   b_accept_ (int, struct sockaddr *, socklen_t *);
 int   blockSigs_ (int, sigset_t *, sigset_t *);
-long  b_write_fix  (int s, char *buf, size_t len);
+// long  b_write_fix  (int s, char *buf, size_t len);
 
 int writeEncodeHdr_ (int s, struct LSFHeader *sendHdr, long (*)());
 
@@ -337,7 +337,6 @@ unsigned int expandList_ (char ***tolist, unsigned int mask, char **keys);
 unsigned int expandList1_ (char ***tolist, unsigned int num, unsigned int *bitmMaps, char **keys);
 
 int osInit_ (void);
-char *osPathName_ (char *);
 char *osPathName_ (char *);
 char *osHomeEnvVar_ (void);
 int osProcAlive_ (int);

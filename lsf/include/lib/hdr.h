@@ -32,13 +32,14 @@
  */
 struct LSFHeader
 {
-    size_t length;
-    short opCode;
-    unsigned short version;
-    unsigned short reserved0;
-    char   padding[2];
-    unsigned short   reserved;
-    pid_t  refCode; 
+	unsigned short version;
+	unsigned short reserved0;
+	unsigned short reserved;
+	char paddin1[2];
+	size_t length;
+	short opCode;
+	char   padding2[2];
+	pid_t  refCode; 
 
 };
 
@@ -49,15 +50,14 @@ struct LSFHeader
 
 struct stringLen
 {
-    char *name;
-    size_t len;
-
+	char *name;
+	size_t len;
 };
 
 struct lenData
 {
-  size_t len;
-  char *data;
+	size_t len;
+	char *data;
 };
 
 #define AUTH_HOST_NT  0x01
@@ -66,21 +66,21 @@ struct lenData
 #define EAUTH_SIZE 4096
 struct lsfAuth
 {
-    uid_t uid;
-    uid_t gid;
-    char lsfUserName[MAXLSFNAMELEN];
-    enum { CLIENT_SETUID, CLIENT_IDENT, CLIENT_DCE, CLIENT_EAUTH } kind;
-    int options;
+	uid_t uid;
+	uid_t gid;
+	char lsfUserName[MAXLSFNAMELEN];
+	enum { CLIENT_SETUID, CLIENT_IDENT, CLIENT_DCE, CLIENT_EAUTH } kind;
+	int options;
 
-    union authBody {
-        struct eauth {
-            size_t len;
-            char data[EAUTH_SIZE];
-        } eauth;
-        int filler;
-    
-        struct lenData authToken;
-    } k;
+	union authBody {
+		struct eauth {
+			size_t len;
+			char data[EAUTH_SIZE];
+		} eauth;
+		int filler;
+	
+		struct lenData authToken;
+	} k;
 };
 
 

@@ -37,16 +37,16 @@ enum chanType
   CH_TYPE_NAMEDPIPE
 };
 
-#define CHAN_OP_PPORT  		0x01
-#define CHAN_OP_CONNECT		0x02
-#define CHAN_OP_RAW		0x04
-#define CHAN_OP_NONBLOCK        0x10
-#define CHAN_OP_CLOEXEC         0x20
-#define CHAN_OP_SOREUSE         0x40
+#define CHAN_OP_PPORT    0x01
+#define CHAN_OP_CONNECT  0x02
+#define CHAN_OP_RAW      0x04
+#define CHAN_OP_NONBLOCK 0x10
+#define CHAN_OP_CLOEXEC  0x20
+#define CHAN_OP_SOREUSE  0x40
 
 
-#define CHAN_MODE_BLOCK 	0x01
-#define CHAN_MODE_NONBLOCK 	0x02
+#define CHAN_MODE_BLOCK   0x01
+#define CHAN_MODE_NONBLOCK  0x02
 
 #define CLOSECD(c) { chanClose_((c)); (c) = -1; }
 
@@ -54,13 +54,13 @@ enum chanType
 
 struct Buffer
 {
-  long pos;
-  size_t len;
-  int stashed;
-  char padding[4];
-  char *data;
-  struct Buffer *forw;
-  struct Buffer *back;
+	long pos;
+	size_t len;
+	int stashed;
+	char padding[4];
+	char *data;
+	struct Buffer *forw;
+	struct Buffer *back;
 };
 
 struct Masks
@@ -73,28 +73,43 @@ struct Masks
 
 struct chanData
 {
-  enum chanType type;
-  enum chanState state;
-  enum chanState prestate;
-  unsigned int handle;
-  unsigned int chanerr;
-  char padding[4];
-  struct Buffer *send;
-  struct Buffer *recv;
+	enum chanType type;
+	enum chanState state;
+	enum chanState prestate;
+	unsigned int handle;
+	unsigned int chanerr;
+	char padding[4];
+	struct Buffer *send;
+	struct Buffer *recv;
 };
 
-#define  CHANE_NOERR      0
-#define  CHANE_CONNECTED  1
-#define  CHANE_NOTCONN    2
-#define  CHANE_SYSCALL    3
-#define  CHANE_INTERNAL   4
-#define  CHANE_NOCHAN     5
-#define  CHANE_MALLOC     6
-#define  CHANE_BADHDR     7
-#define  CHANE_BADCHAN    8
-#define  CHANE_BADCHFD    9
-#define  CHANE_NOMSG      10
-#define  CHANE_CONNRESET  11
+// #define  CHANE_NOERR      0
+// #define  CHANE_CONNECTED  1
+// #define  CHANE_NOTCONN    2
+// #define  CHANE_SYSCALL    3
+// #define  CHANE_INTERNAL   4
+// #define  CHANE_NOCHAN     5
+// #define  CHANE_MALLOC     6
+// #define  CHANE_BADHDR     7
+// #define  CHANE_BADCHAN    8
+// #define  CHANE_BADCHFD    9
+// #define  CHANE_NOMSG      10
+// #define  CHANE_CONNRESET  11
+
+enum CHANGE {
+	CHANE_NOERR = 0,
+	CHANE_CONNECTED,
+	CHANE_NOTCONN,
+	CHANE_SYSCALL,
+	CHANE_INTERNAL,
+	CHANE_NOCHAN,
+	CHANE_MALLOC,
+	CHANE_BADHDR,
+	CHANE_BADCHAN,
+	CHANE_BADCHFD,
+	CHANE_NOMSG,
+	CHANE_CONNRESET
+};
 
 int chanInit_ (void);
 
@@ -134,8 +149,22 @@ int chanAllocBuf_ (struct Buffer **buf, int size);
 int chanFreeBuf_ (struct Buffer *buf);
 int chanFreeStashedBuf_ (struct Buffer *buf);
 int chanSetMode_ (unsigned int chfd, int mode );
-int chanSetMode_ (unsigned int chfd, int mode );
 
 unsigned int cherrno;
 unsigned int chanIndex;
 
+unsigned int cherrno = 0;
+unsigned int chanIndex = 0;
+const unsigned int INVALID_HANDLE = 0;
+
+size_t chanMaxSize;
+struct chanData *channels;
+
+int findAFreeChannel (void);
+struct Buffer *newBuf (void);
+void doread (int, struct Masks *);
+void dowrite (int, struct Masks *);
+void enqueueTail_ (struct Buffer *, struct Buffer *);
+void dequeue_ (struct Buffer *);
+
+int chanOpenSock_ (int s, int options);

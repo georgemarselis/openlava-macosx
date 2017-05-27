@@ -46,6 +46,7 @@ typedef struct windows windows_t;
 struct dayhour
 {
   short day;
+  char padding[2];
   float hour;
 };
 

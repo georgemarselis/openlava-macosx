@@ -41,9 +41,9 @@
 
 #define DEF_COMMITTED_RUN_TIME_FACTOR 0.0  // FIXME FIXME FIXME why is this here?
 
-extern struct config_param lsbParams[];  // FIXME FIXME FIXME FIXME FIXME put in specific header
-int initenv_ (struct config_param *, char *);
-int sig_encode (int);
+// extern struct config_param lsbParams[];  // FIXME FIXME FIXME FIXME FIXME put in specific header
+// int initenv_ (struct config_param *, char *);
+// int sig_encode (int);
 
 
 #define DEFAULT_API_CONNTIMEOUT 10

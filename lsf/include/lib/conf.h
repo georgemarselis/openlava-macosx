@@ -47,8 +47,8 @@ struct clusterConf *cConf = NULL;
 
 struct builtIn
 {
-    char *name;
-    char *des;
+    const char *name;
+    const char *des;
     enum valueType valuetype;
     enum orderType ordertype;
     int flags;
@@ -56,7 +56,7 @@ struct builtIn
 }; 
 
 // static 
-struct builtIn builtInRes[24] = {
+struct builtIn builtInRes[] = {
     {"r15s",   "15-second CPU run queue length",             LS_NUMERIC, INCR, TYPE1 | RESF_RELEASE, 15},
     {"r1m",    "1-minute CPU run queue length (alias: cpu)", LS_NUMERIC, INCR, TYPE1 | RESF_RELEASE, 15},
     {"r15m",   "15-minute CPU run queue length",             LS_NUMERIC, INCR, TYPE1 | RESF_RELEASE, 15},
@@ -184,9 +184,7 @@ int keyMatch (struct keymap *keyList, char *line, int exact);
 int isSectionEnd (char *linep, char *lsfile, size_t *lineNum, char *sectionName);
 char *getBeginLine (FILE *fp, size_t *lineNum);
 int readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *lsfile, size_t *lineNum, int exact, char *section);
-void doSkipSection (FILE *fp, size_t *lineNum, char *lsfile, char *sectionName);
 int mapValues (struct keymap *keyList, char *line);
 // FIXME also found in lproto.h, should be in lib/conf.h
 // int putInLists (char *word, struct admins *admins, unsigned integer *numAds, char *forWhat);
-int isInlist (char **adminNames, char *userName, unsigned int actAds);
 int parse_time (char *word, float *hour, unsigned int *day);

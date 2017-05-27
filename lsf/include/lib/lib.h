@@ -658,7 +658,7 @@ hTab conn_table;
 char **environ;
 
 void initconntbl_ (void);
-void inithostsock_ (void);
+// void inithostsock_ (void);
 int connected_ (char *, int, int, int);
 void hostIndex_ (char *, int);
 int gethostbysock_ (int, char *);
@@ -712,9 +712,9 @@ int lsRGetRusage (int, struct jRusage *, int);
 int lsGetRProcRusage (char *, int, struct jRusage *, int);
 LS_REQUEST_T *lsGetIRProcRusage_ (char *, int, int, struct jRusage *, appCompletionHandler, void *);
 
-int initenv_ (struct config_param *, char *);
+// int initenv_ (struct config_param *, char *);
 int readconfenv_ (struct config_param *, struct config_param *, char *);
-int ls_readconfenv (struct config_param *, char *);
+// int ls_readconfenv (struct config_param *, char *);
 
 int callLim_ (enum limReqCode, void *, bool_t (*)(), void *, bool_t (*)(), char *, int, struct LSFHeader *);
 int initLimSock_ (void);
@@ -723,25 +723,25 @@ void err_return_ (enum limReplyCode);
 
 struct hostLoad *loadinfo_ (char *resReq, struct decisionReq *loadReqPtr, char *fromhost, unsigned long *numHosts, char ***outnlist);
 
-struct hostent *Gethostbyname_ (char *);
+// struct hostent *Gethostbyname_ (char *);
 short getRefNum_ (void);
-unsigned int isint_ (char *);
-char islongint_ (char *);
-int isdigitstr_ (char *);
-LS_LONG_INT atoi64_ (char *);
-char *chDisplay_ (char *);
+// unsigned int isint_ (char *);
+// char islongint_ (char *);
+// int isdigitstr_ (char *);
+// LS_LONG_INT atoi64_ (char *);
+// char *chDisplay_ (char *);
 void strToLower_ (char *);
-void initLSFHeader_ (struct LSFHeader *);
-int isMasterCrossPlatform (void);
-int isAllowCross (char *);
+// void initLSFHeader_ (struct LSFHeader *);
+// int isMasterCrossPlatform (void);
+// int isAllowCross (char *);
 
 char **placement_ (char *resReq, struct decisionReq *placeReqPtr, char *fromhost, size_t *num);
 
-int sig_encode (int);
-int sig_decode (int);
-int getSigVal (char *);
-char *getSigSymbolList (void);
-char *getSigSymbol (int);
+// int sig_encode (int);
+// int sig_decode (int);
+// int getSigVal (char *);
+// char *getSigSymbolList (void);
+// char *getSigSymbol (int);
 
 struct svrsock
 {
@@ -764,7 +764,7 @@ int CreateSock_ (int);
 int CreateSockEauth_ (int);
 int Socket_ (int, int, int);
 int get_nonstd_desc_ (int);
-int TcpCreate_ (int, int);
+// int TcpCreate_ (int, int);
 int opensocks_ (int);
 ls_svrsock_t *svrsockCreate_ (unsigned short, int, struct sockaddr_in *, int);
 int svrsockAccept_ (ls_svrsock_t *, int);
@@ -774,7 +774,7 @@ int TcpConnect_ (char *, unsigned short, struct timeval *);
 
 char *getMsgBuffer_ (int fd, size_t *bufferSize);
 
-int expSyntax_ (char *);
+// int expSyntax_ (char *);
 
 int tid_register (pid_t taskid, int socknum, unsigned short taskPort, char *host, bool_t doTaskInfo);
 int tid_remove (pid_t taskid);
@@ -791,6 +791,6 @@ void ls_errlog (FILE * fd, const char *fmt, ...)
 #endif
 ;
 
-void ls_verrlog (FILE * fd, const char *fmt, va_list ap);
+// void ls_verrlog (FILE * fd, const char *fmt, va_list ap);
 int isPamBlockWait;
 

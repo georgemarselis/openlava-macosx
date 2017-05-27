@@ -22,8 +22,9 @@
 
 typedef struct
 {
-  char *name;
-  int clientData;
+	char *name;
+	int clientData;
+	char padding[4];
 } attribFunc;
 
 
@@ -49,40 +50,40 @@ typedef struct
 
 struct tclHostData
 {
-  int maxCpus;
-  int maxMem;
-  int maxSwap;
-  int maxTmp;
-  int nDisks;
-  int rexPriority;
-  int ignDedicatedResource;
-  int numResPairs;
-  int flag;
-  int overRideFromType;
-  int *status;
-  unsigned int *resBitMaps;
-  unsigned int *DResBitMaps;
-  short hostInactivityCount;
-  char padding1[6];
-  char *hostName;
-  char *hostType;
-  char *hostModel;
-  char *fromHostType;
-  char *fromHostModel;
-  float cpuFactor;
-  char padding2[4];
-  float *loadIndex;
-  struct resPair *resPairs;
+	int maxCpus;
+	int maxMem;
+	int maxSwap;
+	int maxTmp;
+	int nDisks;
+	int rexPriority;
+	int ignDedicatedResource;
+	int numResPairs;
+	int flag;
+	int overRideFromType;
+	int *status;
+	unsigned int *resBitMaps;
+	unsigned int *DResBitMaps;
+	short hostInactivityCount;
+	char padding1[6];
+	char *hostName;
+	char *hostType;
+	char *hostModel;
+	char *fromHostType;
+	char *fromHostModel;
+	float cpuFactor;
+	char padding2[4];
+	float *loadIndex;
+	struct resPair *resPairs;
 };
 
 struct tclLsInfo
 {
-  unsigned int numIndx;
-  unsigned int nRes;
-  int *stringResBitMaps;
-  int *numericResBitMaps;
-  char **resName;
-  char **indexNames;
+	unsigned int numIndx;
+	unsigned int nRes;
+	int *stringResBitMaps;
+	int *numericResBitMaps;
+	char **resName;
+	char **indexNames;
 };
 
 int initTcl (struct tclLsInfo *);

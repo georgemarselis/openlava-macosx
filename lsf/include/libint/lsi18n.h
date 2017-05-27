@@ -21,66 +21,112 @@
 #include <sys/types.h>
 
 
-#define LS_CATD int
+// #define LS_CATD int
 
-#define I18N_CAT_MIN        1
-#define I18N_CAT_LIM        1
-#define I18N_CAT_PIM        2
-#define I18N_CAT_RES        3
-#define I18N_CAT_MBD        4
-#define I18N_CAT_SBD        5
-#define I18N_CAT_CMD        6
-#define I18N_CAT_MAX        6
+// #define I18N_CAT_MIN        1
+// #define I18N_CAT_LIM        1
+// #define I18N_CAT_PIM        2
+// #define I18N_CAT_RES        3
+// #define I18N_CAT_MBD        4
+// #define I18N_CAT_SBD        5
+// #define I18N_CAT_CMD        6
+// #define I18N_CAT_MAX        6
 
+enum I18N_CAT {
+	I18N_CAT_MIN = 1,
+	I18N_CAT_LIM = 1,
+	I18N_CAT_PIM = 2,
+	I18N_CAT_RES = 3,
+	I18N_CAT_MBD = 4,
+	I18N_CAT_SBD = 5,
+	I18N_CAT_CMD = 6,
+	I18N_CAT_MAX = 6
+};
 
-#define MOD_LSBATCH         4
-#define MOD_LSB_BACC        5
-#define MOD_LSB_BHIST       6
-#define MOD_LSB_BSTATS      7
-#define MOD_LSB_CMD         8
-#define MOD_LSBD_MBD        10
-#define MOD_LSBD_SBD        11
-#define MOD_LSBD_MISC       12
-#define MOD_LSB_LIB         13
-#define MOD_LSF             21
-#define MOD_LSF_INTLIB      22
-#define MOD_LSF_LIB         23
-#define MOD_LSF_LIM         24
-#define MOD_LSF_LSADM       25
-#define MOD_LSF_LSTOOLS     27
-#define MOD_LSF_PIM         28
-#define MOD_LSF_RES         29
-#define MOD_MISC            33
-#define MOD_TIME_FORMAT     35
+// #define MOD_LSBATCH         4
+// #define MOD_LSB_BACC        5
+// #define MOD_LSB_BHIST       6
+// #define MOD_LSB_BSTATS      7
+// #define MOD_LSB_CMD         8
+// #define MOD_LSBD_MBD        10
+// #define MOD_LSBD_SBD        11
+// #define MOD_LSBD_MISC       12
+// #define MOD_LSB_LIB         13
+// #define MOD_LSF             21
+// #define MOD_LSF_INTLIB      22
+// #define MOD_LSF_LIB         23
+// #define MOD_LSF_LIM         24
+// #define MOD_LSF_LSADM       25
+// #define MOD_LSF_LSTOOLS     27
+// #define MOD_LSF_PIM         28
+// #define MOD_LSF_RES         29
+// #define MOD_MISC            33
+// #define MOD_TIME_FORMAT     35
 
-#define MAX_I18N_CTIME_STRING   80
-#define MIN_CTIME_FORMATID      0
-#define CTIME_FORMAT_DEFAULT    0
-#define CTIME_FORMAT_a_b_d_T_Y  1
-#define CTIME_FORMAT_b_d_T_Y    2
-#define CTIME_FORMAT_a_b_d_T    3
-#define CTIME_FORMAT_b_d_H_M    4
-#define CTIME_FORMAT_m_d_Y      5
-#define CTIME_FORMAT_H_M_S      6
-#define MAX_CTIME_FORMATID      6
+enum MOD {
+	MOD_LSBATCH     = 4,
+	MOD_LSB_BACC    = 5,
+	MOD_LSB_BHIST   = 6,
+	MOD_LSB_BSTATS  = 7,
+	MOD_LSB_CMD     = 8,
+	MOD_LSBD_MBD    = 10,
+	MOD_LSBD_SBD    = 11,
+	MOD_LSBD_MISC   = 12,
+	MOD_LSB_LIB     = 13,
+	MOD_LSF         = 21,
+	MOD_LSF_INTLIB  = 22,
+	MOD_LSF_LIB     = 23,
+	MOD_LSF_LIM     = 24,
+	MOD_LSF_LSADM   = 25,
+	MOD_LSF_LSTOOLS = 27,
+	MOD_LSF_PIM     = 28,
+	MOD_LSF_RES     = 29,
+	MOD_MISC        = 33,
+	MOD_TIME_FORMAT = 35
+};
 
-#define I18N_CATFILE        "lsf"
+// #define MAX_I18N_CTIME_STRING   80
+// #define MIN_CTIME_FORMATID      0
+// #define CTIME_FORMAT_DEFAULT    0
+// #define CTIME_FORMAT_a_b_d_T_Y  1
+// #define CTIME_FORMAT_b_d_T_Y    2
+// #define CTIME_FORMAT_a_b_d_T    3
+// #define CTIME_FORMAT_b_d_H_M    4
+// #define CTIME_FORMAT_m_d_Y      5
+// #define CTIME_FORMAT_H_M_S      6
+// #define MAX_CTIME_FORMATID      6
 
-#undef  NL_SETN
+enum CTIME_ENUM {
+	MAX_I18N_CTIME_STRING  = 80,
+	MIN_CTIME_FORMATID     = 0,
+	CTIME_FORMAT_DEFAULT   = 0,
+	CTIME_FORMAT_a_b_d_T_Y = 1,
+	CTIME_FORMAT_b_d_T_Y   = 2,
+	CTIME_FORMAT_a_b_d_T   = 3,
+	CTIME_FORMAT_b_d_H_M   = 4,
+	CTIME_FORMAT_m_d_Y     = 5,
+	CTIME_FORMAT_H_M_S     = 6,
+	MAX_CTIME_FORMATID     = 6
+};
+
+// #define I18N_CATFILE        "lsf"
+const char I18N_CATFILE[] = "lsf";
+
+#ifdef NL_SETN
+#error
+#endif
+
 #define I18N(msgID, msg)   (_i18n_msg_get(ls_catd, NL_SETN, msgID, msg))
 
 #define I18N_m(msgID, msg) (_i18n_msg_get(ls_catd, 33, msgID, msg))
 
-// int ls_catd;
-LS_CATD ls_catd;
 int    _i18n_end         ( void );
-char  *_i18n_ctime       ( LS_CATD, int, const time_t * );
-char  *_i18n_msg_get     ( LS_CATD, int typeofError, int catgetsNumber, char *errorMessage );
-char **_i18n_msgArray_get( LS_CATD, int, int *, char ** );
-void   _i18n_ctime_init  ( LS_CATD );
+char  *_i18n_ctime       ( int, int, const time_t * );
+char  *_i18n_msg_get     ( int, int typeofError, int catgetsNumber, char *errorMessage );
+char **_i18n_msgArray_get( int, int, int *, char ** );
+void   _i18n_ctime_init  ( int );
 
 int   _i18n_init   ( int );
-char *_i18n_ctime  (LS_CATD, int, const time_t *);
 char *_i18n_printf (const char *, ...);
 // #ifdef  I18N_COMPILE
 // #else
