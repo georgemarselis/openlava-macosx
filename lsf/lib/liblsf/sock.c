@@ -82,7 +82,7 @@ CreateSock_ (int protocol)
 
 
 		if (!isroot) {
-			closesocket (s);
+			close (s);
 			lserrno = LSE_SOCK_SYS;
 			return -1;
 		}
@@ -91,7 +91,7 @@ CreateSock_ (int protocol)
 			if (logclass & LC_COMM) {
 				ls_syslog (LOG_DEBUG, "%s: bind failed, %s", __func__, strerror (errno));
 			}
-			closesocket (s);
+			close (s);
 			lserrno = LSE_SOCK_SYS;
 			return -1;
 		}
@@ -107,7 +107,7 @@ CreateSock_ (int protocol)
 		if (logclass & LC_COMM) {
 			ls_syslog (LOG_DEBUG, "%s: went through all , %s", __func__, strerror (errno));
 		}
-	  closesocket (s);
+	  close (s);
 	  lserrno = LSE_SOCK_SYS;
 	  return -1;
 	}
@@ -180,7 +180,7 @@ CreateSockEauth_ (int protocol)
 
 	  if (!isroot)
   {
-	closesocket (s);
+	close (s);
 	lserrno = LSE_SOCK_SYS;
 	return -1;
   }
@@ -190,7 +190,7 @@ CreateSockEauth_ (int protocol)
 			if (logclass & LC_COMM) {
 				ls_syslog (LOG_DEBUG, "%s: bind failed, %s", __func__, strerror (errno));
 			}
-	closesocket (s);
+	close (s);
 	lserrno = LSE_SOCK_SYS;
 	return -1;
   }
@@ -207,7 +207,7 @@ CreateSockEauth_ (int protocol)
 		if (logclass & LC_COMM) {
 			ls_syslog (LOG_DEBUG, "%s: went through all , %s", __func__, strerror (errno));
 		}
-	  closesocket (s);
+	  close (s);
 	  lserrno = LSE_SOCK_SYS;
 	  return -1;
 	}
@@ -407,7 +407,7 @@ svrsockCreate_ (u_short port, int backlog, struct sockaddr_in * addr, int option
 	}
   if (listen (acceptSock, 5) < 0)
 	{
-	  (void) closesocket (acceptSock);
+	  (void) close (acceptSock);
 	  lserrno = LSE_SOCK_SYS;
 	  free (svrsock->localAddr);
 	  free (svrsock);
@@ -420,7 +420,7 @@ svrsockCreate_ (u_short port, int backlog, struct sockaddr_in * addr, int option
 	  if (getsockname (acceptSock, (struct sockaddr *) svrAddr, &length) < 0)
   {
 	lserrno = LSE_SOCK_SYS;
-	(void) closesocket (acceptSock);
+	(void) close (acceptSock);
 	free (svrsock->localAddr);
 	free (svrsock);
 	return NULL;
@@ -534,7 +534,7 @@ TcpConnect_ (char *hostname, u_short port, struct timeval *timeout)
   if (io_nonblock_ (sock) < 0)
 	{
 	  lserrno = LSE_MISC_SYS;
-	  closesocket (sock);
+	  close (sock);
 	  return -1;
 	}
 
@@ -542,7 +542,7 @@ TcpConnect_ (char *hostname, u_short port, struct timeval *timeout)
 	  && errno != EINPROGRESS)
 	{
 	  lserrno = LSE_CONN_SYS;
-	  closesocket (sock);
+	  close (sock);
 	  return -1;
 	}
 
@@ -558,13 +558,13 @@ TcpConnect_ (char *hostname, u_short port, struct timeval *timeout)
 	  continue;
 	}
 	lserrno = LSE_SELECT_SYS;
-	closesocket (sock);
+	close (sock);
 	return -1;
   }
 	  else if (nwRdy == 0)
   {
 	lserrno = LSE_TIME_OUT;
-	closesocket (sock);
+	close (sock);
 	return -1;
   }
 	  break;

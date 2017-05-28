@@ -267,7 +267,7 @@ getServerMsg (int serverSock, struct LSFHeader *replyHdr, char **rep_buf)
 		else {
 			lsberrno = LSBE_XDR;
 		}
-		closesocket (serverSock);
+		close (serverSock);
 		xdr_destroy (&xdrs);
 		return -1;
 	}
@@ -277,7 +277,7 @@ getServerMsg (int serverSock, struct LSFHeader *replyHdr, char **rep_buf)
 	lsb_mbd_version = replyHdr->version;
 	if (len > 0) {
 		if (len > MAXMSGLEN) {
-			closesocket (serverSock);
+			close (serverSock);
 			lsberrno = LSBE_PROTOCOL;
 			if (logclass & LC_COMM) {
 				ls_syslog (LOG_DEBUG1, "%s: mbatchd's reply header length <%d> is greater than <%d>", __func__, len, MAXMSGLEN);
@@ -286,7 +286,7 @@ getServerMsg (int serverSock, struct LSFHeader *replyHdr, char **rep_buf)
 		}
 		*rep_buf = malloc( len + 1 );
 		if ( NULL == *rep_buf && ENOMEM == errno ) {
-			closesocket (serverSock);
+			close (serverSock);
 			lsberrno = LSBE_NO_MEM;
 			if (logclass & LC_TRACE) {
 				// ls_syslog (LOG_DEBUG1, "call_server: malloc (%d) failed:%m", len, );
@@ -297,7 +297,7 @@ getServerMsg (int serverSock, struct LSFHeader *replyHdr, char **rep_buf)
 		}
 
 		if (b_read_fix (serverSock, *rep_buf, len) == -1) {
-			closesocket (serverSock);
+			close (serverSock);
 			free (*rep_buf);
 			*rep_buf = NULL;
 			lsberrno = LSBE_SYS_CALL;

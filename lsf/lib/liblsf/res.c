@@ -133,7 +133,7 @@ ls_connect (char *host)
 
 
     if (getAuth_ (&auth, official) == -1){
-        closesocket (s);
+        close (s);
         return -1;
     }
 
@@ -145,7 +145,7 @@ ls_connect (char *host)
     reqBuf = malloc(5 * size * sizeof (reqBuf) );  // FIXME FIXME why 5?
     if (NULL == reqBuf && ENOMEM == errno ) {
         lserrno = LSE_MALLOC;
-          CLOSESOCKET (s);
+          close (s);
 
         if (connReq.eexec.len > 0) {
             free (connReq.eexec.data);
@@ -203,7 +203,7 @@ lsConnWait_ (char *host)
         FD_SET (s, &connection_ok_);
         if (ackReturnCode_ (s) < 0)
         {
-            closesocket (s);
+            close (s);
             _lostconnection_ (host);
             return -1;
         }
@@ -314,7 +314,7 @@ rsetenv_ (char *host, char **envp, int option )
 
         FD_SET (s, &connection_ok_);
         if (ackReturnCode_ (s) < 0) {
-            closesocket (s);
+            close (s);
             _lostconnection_ (host);
             free (sendBuf);
             return -1;
@@ -335,7 +335,7 @@ rsetenv_ (char *host, char **envp, int option )
     if (callRes_ (s, resCmdOption, (char *) &envMsg, sendBuf, bufferSize,
     xdr_resSetenv, 0, 0, NULL) == -1)
     {
-      closesocket (s);
+      close (s);
       _lostconnection_ (host);
       free (sendBuf);
       return -1;
@@ -345,7 +345,7 @@ rsetenv_ (char *host, char **envp, int option )
 
     if (option == RSETENV_SYNCH) {
         if (ackReturnCode_ (s) < 0) {
-            closesocket (s);
+            close (s);
             _lostconnection_ (host);
             return -1;
         }
@@ -391,7 +391,7 @@ ls_chdir (char *host, char *dir)
 
         FD_SET (s, &connection_ok_);
         if (ackReturnCode_ (s) < 0) {
-            closesocket (s);
+            close (s);
             _lostconnection_ (host);
             return -1;
         }
@@ -408,7 +408,7 @@ ls_chdir (char *host, char *dir)
   if (callRes_ (s, RES_CHDIR, (char *) &chReq, (char *) &buf,
     sizeof (buf), xdr_resChdir, 0, 0, NULL) == -1)
     {
-      closesocket (s);
+      close (s);
       _lostconnection_ (host);
       return -1;
     }
@@ -891,7 +891,7 @@ callRes_ (int s, enum resCmd cmd, char *data, char *reqBuf, size_t reqLen, bool_
       return -1;
     }
 
-  closesocket (*rd);
+  close (*rd);
   *rd = t;
 
   sigprocmask (SIG_SETMASK, &oldMask, NULL);
@@ -952,7 +952,7 @@ do_rstty1_ (char *host, int async)
       FD_SET (s, &connection_ok_);
       if (ackReturnCode_ (s) < 0)
   {
-    closesocket (s);
+    close (s);
     _lostconnection_ (host);
     return -1;
   }
@@ -960,7 +960,7 @@ do_rstty1_ (char *host, int async)
 
   if (do_rstty2_ (s, io_fd, redirect, async) == -1)
     {
-      closesocket (s);
+      close (s);
       _lostconnection_ (host);
       return -1;
     }
@@ -969,7 +969,7 @@ do_rstty1_ (char *host, int async)
     {
       if (ackReturnCode_ (s) < 0)
   {
-    closesocket (s);
+    close (s);
     _lostconnection_ (host);
     return -1;
   }
@@ -1095,7 +1095,7 @@ lsIRGetRusage_ (pid_t rpid, struct jRusage * ru, appCompletionHandler appHandler
         FD_SET (s, &connection_ok_);
         
         if (ackReturnCode_ (s) < 0) {
-            closesocket (s);
+            close (s);
             _lostconnection_ (host);
             return NULL;
         }
@@ -1111,7 +1111,7 @@ lsIRGetRusage_ (pid_t rpid, struct jRusage * ru, appCompletionHandler appHandler
 
     if (callRes_ (s, RES_RUSAGE, (char *) &rusageReq, (char *) &requestBuf, sizeof (requestBuf), xdr_resGetRusage, 0, 0, NULL) == -1) // FIXME FIXME FIXME char for data? really?
     {
-        closesocket (s);
+        close (s);
         _lostconnection_ (host);
         
         return NULL;
@@ -1158,7 +1158,7 @@ lsGetRProcRusage (char *host, int pid, struct jRusage *ru, int options)
         FD_SET (s, &connection_ok_);
         
         if (ackReturnCode_ (s) < 0) {
-            closesocket (s);
+            close (s);
             _lostconnection_ (host);
             return -1;
         }
@@ -1175,7 +1175,7 @@ lsGetRProcRusage (char *host, int pid, struct jRusage *ru, int options)
     }
     callResResult = callRes_ (s, RES_RUSAGE, (char *) &rusageReq, (char *) &requestBuf, sizeof (requestBuf), xdr_resGetRusage, 0, 0, NULL); // FIXME FIXME FIXME char for data? really?
     if ( -1 == callResResult )  {
-      closesocket (s);
+      close (s);
       _lostconnection_ (host);
       return -1;
     }
@@ -1231,7 +1231,7 @@ lsGetIRProcRusage_ (char *host, int tid, pid_t pid, struct jRusage * ru, appComp
       FD_SET (s, &connection_ok_);
       if (ackReturnCode_ (s) < 0)
   {
-    closesocket (s);
+    close (s);
     _lostconnection_ (host);
     return NULL;
   }
@@ -1243,7 +1243,7 @@ lsGetIRProcRusage_ (char *host, int tid, pid_t pid, struct jRusage * ru, appComp
   if (callRes_ (s, RES_RUSAGE, (char *)&rusageReq, (char *)&requestBuf, // FIXME FIXME FIXME this is wrong, yo. data as char?
     sizeof (requestBuf), xdr_resGetRusage, 0, 0, NULL) == -1)
     {
-      closesocket (s);
+      close (s);
       _lostconnection_ (host);
       return NULL;
     }
@@ -1307,7 +1307,7 @@ sendSig_ (char *host, pid_t rid, int sig, int options)
     if (!FD_ISSET (s, &connection_ok_)) {
         FD_SET (s, &connection_ok_);
         if (ackReturnCode_ (s) < 0) {
-            closesocket (s);
+            close (s);
             _lostconnection_ (host);
             return -1;
         }
@@ -1335,7 +1335,7 @@ sendSig_ (char *host, pid_t rid, int sig, int options)
 
     resCallReturnValue = callRes_ (s, RES_RKILL, (char *) &killReq, (char *) &buf, sizeof (buf), xdr_resRKill, 0, 0, NULL);
     if ( -1 == resCallReturnValue ) {
-        closesocket (s);
+        close (s);
         _lostconnection_ (host);
         return -1;
     }
@@ -1346,7 +1346,7 @@ sendSig_ (char *host, pid_t rid, int sig, int options)
             return -1;
         }
 
-        closesocket (s);
+        close (s);
         _lostconnection_ (host);
         return -1;
     }

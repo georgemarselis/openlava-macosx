@@ -61,7 +61,7 @@ ls_rexecve (char *host, char **argv, int options, char **envp)
       FD_SET (s, &connection_ok_);
       if (ackReturnCode_ (s) < 0)
 	{
-	  closesocket (s);
+	  close (s);
 	  _lostconnection_ (host);
 	  return (-1);
 	}
@@ -93,7 +93,7 @@ ls_rexecve (char *host, char **argv, int options, char **envp)
 
   if (mygetwd_ (cmdmsg.cwd) == 0)
     {
-      closesocket (s);
+      close (s);
       _lostconnection_ (host);
       lserrno = LSE_WDIR;
       return (-1);
@@ -110,7 +110,7 @@ ls_rexecve (char *host, char **argv, int options, char **envp)
 
   if ((retsock = TcpCreate_ (TRUE, 0)) < 0)
     {
-      closesocket (s);
+      close (s);
       _lostconnection_ (host);
       return (-1);
     }
@@ -118,8 +118,8 @@ ls_rexecve (char *host, char **argv, int options, char **envp)
   len = sizeof (sin);
   if (getsockname (retsock, (struct sockaddr *) &sin, &len) < 0)
     {
-      (void) closesocket (retsock);
-      closesocket (s);
+      (void) close (retsock);
+      close (s);
       _lostconnection_ (host);
       lserrno = LSE_SOCK_SYS;
       return (-1);
@@ -135,8 +135,8 @@ ls_rexecve (char *host, char **argv, int options, char **envp)
   timeout.tv_sec = resTimeout;
   if (sendCmdBill_ (s, (enum resCmd) RES_EXEC, &cmdmsg, &retsock, &timeout) == -1)
     {
-      closesocket (retsock);
-      closesocket (s);
+      close (retsock);
+      close (s);
       _lostconnection_ (host);
       return (-1);
     }
@@ -214,7 +214,7 @@ ls_startserver (char *host, char **server, int options)
       FD_SET (s, &connection_ok_);
       if (ackReturnCode_ (s) < 0)
 	{
-	  closesocket (s);
+	  close (s);
 	  _lostconnection_ (host);
 	  return (-1);
 	}
@@ -233,7 +233,7 @@ ls_startserver (char *host, char **server, int options)
 
   if (mygetwd_ (cmdmsg.cwd) == 0)
     {
-      closesocket (s);
+      close (s);
       _lostconnection_ (host);
       lserrno = LSE_WDIR;
       return (-1);
@@ -241,7 +241,7 @@ ls_startserver (char *host, char **server, int options)
 
   if ((retsock = TcpCreate_ (TRUE, 0)) < 0)
     {
-      closesocket (s);
+      close (s);
       _lostconnection_ (host);
       return (-1);
     }
@@ -249,8 +249,8 @@ ls_startserver (char *host, char **server, int options)
   len = sizeof (sin);
   if (getsockname (retsock, (struct sockaddr *) &sin, &len) < 0)
     {
-      closesocket (retsock);
-      closesocket (s);
+      close (retsock);
+      close (s);
       _lostconnection_ (host);
       lserrno = LSE_SOCK_SYS;
       return (-1);
@@ -268,23 +268,23 @@ ls_startserver (char *host, char **server, int options)
   if (sendCmdBill_ (s, (enum resCmd) RES_SERVER, &cmdmsg, &retsock, &timeout)
       == -1)
     {
-      closesocket (retsock);
-      closesocket (s);
+      close (retsock);
+      close (s);
       _lostconnection_ (host);
       return (-1);
     }
 
   if (ackReturnCode_ (s) < 0)
     {
-      closesocket (retsock);
-      closesocket (s);
+      close (retsock);
+      close (s);
       _lostconnection_ (host);
       return (-1);
     }
 
   if (retsock <= 2 && (retsock = get_nonstd_desc_ (retsock)) < 0)
     {
-      closesocket (s);
+      close (s);
       _lostconnection_ (host);
       lserrno = LSE_SOCK_SYS;
       return (-1);

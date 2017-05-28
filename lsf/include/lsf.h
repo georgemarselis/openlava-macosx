@@ -84,23 +84,36 @@ typedef unsigned long LS_UNS_LONG_INT; // FIXME FIXME FIXME FIXME FIXME untypede
 /*
  * This is our current version.
  */
-#define OPENLAVA_VERSION   20  // FIXME FIXME FIXME FIXME FIXME move to configure.ac
+// #define OPENLAVA_VERSION   20  // FIXME FIXME FIXME FIXME FIXME move to configure.ac
+const unsigned short OPENLAVA_VERSION = 20;
 
-#define LSF_DEFAULT_SOCKS       15
-#define MAXLINELEN              512
-#define MAXLSFNAMELEN           128
-#define MAXSRES                 32
-#define MAXRESDESLEN            256
-#define NBUILTINDEX             11
-#define MAXTYPES                128
-#define MAXMODELS               128
-#define MAXTYPES_31             25
-#define MAXMODELS_31            30
+// #define LSF_DEFAULT_SOCKS       15
+// #define MAXLINELEN              512
+// #define MAXLSFNAMELEN           128
+// #define MAXSRES                 32
+// #define MAXRESDESLEN            256
+// #define NBUILTINDEX             11
+// #define MAXTYPES                128
+// #define MAXMODELS               128
+// #define MAXTYPES_31             25
+// #define MAXMODELS_31            30
+enum LSF_CONSTANTS {
+	LSF_DEFAULT_SOCKS = 15,
+	MAXLINELEN    = 512,
+	MAXLSFNAMELEN = 128,
+	MAXSRES       = 32,
+	MAXRESDESLEN  = 256,
+	NBUILTINDEX   = 11,
+	MAXTYPES      = 128,
+	MAXMODELS     = 128,
+	MAXTYPES_31   = 25,
+	MAXMODELS_31  = 30
+};
 //#define MAXFILENAMELEN          4096
 const unsigned int MAXFILENAMELEN = 4096;   // FIXME FIXME FIXME FIXME value of MAXFILENAMELEN must be set by configure script
 
 // #define FIRST_RES_SOCK  20
-static const unsigned int FIRST_RES_SOCK = 20;
+// static const unsigned int FIRST_RES_SOCK = 20;
 
 #ifdef HAVE_UNION_WAIT
 	#define LS_WAIT_T      union wait
@@ -111,8 +124,7 @@ static const unsigned int FIRST_RES_SOCK = 20;
 	#define LS_STATUS(s)   (s)
 #endif
 
-typedef enum
-{
+typedef enum {
 		R15S,
 		R1M,
 		R15M,
@@ -135,7 +147,7 @@ typedef enum
 #define INFINIT_LOAD    (float) (0x7fffffff)
 #define INFINIT_FLOAT   (float) (0x7fffffff)
 
-#define INFINIT_INT    0x7fffffff
+#define INFINIT_INT         0x7fffffff
 #define INFINIT_LONG_INT    0x7fffffff
 
 #define INFINIT_SHORT  0x7fff
@@ -646,106 +658,108 @@ struct hostEntryLog
 /*
  * openlava error numbers
  */
-#define LSE_NO_ERR              0
-#define LSE_BAD_XDR             1
-#define LSE_MSG_SYS             2
-#define LSE_BAD_ARGS            3
-#define LSE_MASTR_UNKNW         4
-#define LSE_LIM_DOWN            5
-#define LSE_PROTOC_LIM          6
-#define LSE_SOCK_SYS            7
-#define LSE_ACCEPT_SYS          8
-#define LSE_BAD_TASKF           9
-#define LSE_NO_HOST             10
-#define LSE_NO_ELHOST           11
-#define LSE_TIME_OUT            12
-#define LSE_NIOS_DOWN           13
-#define LSE_LIM_DENIED          14
-#define LSE_LIM_IGNORE          15
-#define LSE_LIM_BADHOST         16
-#define LSE_LIM_ALOCKED         17
-#define LSE_LIM_NLOCKED         18
-#define LSE_LIM_BADMOD          19
-#define LSE_SIG_SYS             20
-#define LSE_BAD_EXP             21
-#define LSE_NORCHILD            22
-#define LSE_MALLOC              23
-#define LSE_LSFCONF             24
-#define LSE_BAD_ENV             25
-#define LSE_LIM_NREG            26
-#define LSE_RES_NREG            27
-#define LSE_RES_NOMORECONN      28
-#define LSE_BADUSER             29
-#define LSE_RES_ROOTSECURE      30
-#define LSE_RES_DENIED          31
-#define LSE_BAD_OPCODE          32
-#define LSE_PROTOC_RES          33
-#define LSE_RES_CALLBACK        34
-#define LSE_RES_NOMEM           35
-#define LSE_RES_FATAL           36
-#define LSE_RES_PTY             37
-#define LSE_RES_SOCK            38
-#define LSE_RES_FORK            39
-#define LSE_NOMORE_SOCK         40
-#define LSE_WDIR                41
-#define LSE_LOSTCON             42
-#define LSE_RES_INVCHILD        43
-#define LSE_RES_KILL            44
-#define LSE_PTYMODE             45
-#define LSE_BAD_HOST            46
-#define LSE_PROTOC_NIOS         47
-#define LSE_WAIT_SYS            48
-#define LSE_SETPARAM            49
-#define LSE_RPIDLISTLEN         50
-#define LSE_BAD_CLUSTER         51
-#define LSE_RES_VERSION         52
-#define LSE_EXECV_SYS           53
-#define LSE_RES_DIR             54
-#define LSE_RES_DIRW            55
-#define LSE_BAD_SERVID          56
-#define LSE_NLSF_HOST           57
-#define LSE_UNKWN_RESNAME       58
-#define LSE_UNKWN_RESVALUE      59
-#define LSE_TASKEXIST           60
-#define LSE_BAD_TID             61
-#define LSE_TOOMANYTASK         62
-#define LSE_LIMIT_SYS           63
-#define LSE_BAD_NAMELIST        64
-#define LSE_LIM_NOMEM           65
-#define LSE_NIO_INIT            66
-#define LSE_CONF_SYNTAX         67
-#define LSE_FILE_SYS            68
-#define LSE_CONN_SYS            69
-#define LSE_SELECT_SYS          70
-#define LSE_EOF                 71
-#define LSE_ACCT_FORMAT         72
-#define LSE_BAD_TIME            73
-#define LSE_FORK                74
-#define LSE_PIPE                75
-#define LSE_ESUB                76
-#define LSE_EAUTH               77
-#define LSE_NO_FILE             78
-#define LSE_NO_CHAN             79
-#define LSE_BAD_CHAN            80
-#define LSE_INTERNAL            81
-#define LSE_PROTOCOL            82
-#define LSE_MISC_SYS            83
-#define LSE_RES_RUSAGE          84
-#define LSE_NO_RESOURCE         85
-#define LSE_BAD_RESOURCE        86
-#define LSE_RES_PARENT          87
-#define LSE_I18N_SETLC          88
-#define LSE_I18N_CATOPEN        89
-#define LSE_I18N_NOMEM          90
-#define LSE_NO_MEM              91
-#define LSE_FILE_CLOSE          92
-#define LSE_MASTER_LIM_DOWN     93
-#define LSE_MLS_INVALID         94
-#define LSE_MLS_CLEARANCE       95
-#define LSE_MLS_RHOST           96
-#define LSE_MLS_DOMINATE        97
-#define LSE_HOST_EXIST          98
-#define LSE_NERR                99
+enum OPENLAVA_ERROR_NUMBERS {
+	LSE_NO_ERR         = 0,
+	LSE_BAD_XDR,
+	LSE_MSG_SYS,
+	LSE_BAD_ARGS,
+	LSE_MASTR_UNKNW,
+	LSE_LIM_DOWN,
+	LSE_PROTOC_LIM,
+	LSE_SOCK_SYS,
+	LSE_ACCEPT_SYS,
+	LSE_BAD_TASKF,
+	LSE_NO_HOST,
+	LSE_NO_ELHOST,
+	LSE_TIME_OUT,
+	LSE_NIOS_DOWN,
+	LSE_LIM_DENIED,
+	LSE_LIM_IGNORE,
+	LSE_LIM_BADHOST,
+	LSE_LIM_ALOCKED,
+	LSE_LIM_NLOCKED,
+	LSE_LIM_BADMOD,
+	LSE_SIG_SYS,
+	LSE_BAD_EXP,
+	LSE_NORCHILD,
+	LSE_MALLOC,
+	LSE_LSFCONF,
+	LSE_BAD_ENV,
+	LSE_LIM_NREG,
+	LSE_RES_NREG,
+	LSE_RES_NOMORECONN,
+	LSE_BADUSER,
+	LSE_RES_ROOTSECURE,
+	LSE_RES_DENIED,
+	LSE_BAD_OPCODE,
+	LSE_PROTOC_RES,
+	LSE_RES_CALLBACK,
+	LSE_RES_NOMEM,
+	LSE_RES_FATAL,
+	LSE_RES_PTY,
+	LSE_RES_SOCK,
+	LSE_RES_FORK,
+	LSE_NOMORE_SOCK,
+	LSE_WDIR,
+	LSE_LOSTCON,
+	LSE_RES_INVCHILD,
+	LSE_RES_KILL,
+	LSE_PTYMODE,
+	LSE_BAD_HOST,
+	LSE_PROTOC_NIOS,
+	LSE_WAIT_SYS,
+	LSE_SETPARAM,
+	LSE_RPIDLISTLEN,
+	LSE_BAD_CLUSTER,
+	LSE_RES_VERSION,
+	LSE_EXECV_SYS,
+	LSE_RES_DIR,
+	LSE_RES_DIRW,
+	LSE_BAD_SERVID,
+	LSE_NLSF_HOST,
+	LSE_UNKWN_RESNAME,
+	LSE_UNKWN_RESVALUE,
+	LSE_TASKEXIST,
+	LSE_BAD_TID,
+	LSE_TOOMANYTASK,
+	LSE_LIMIT_SYS,
+	LSE_BAD_NAMELIST,
+	LSE_LIM_NOMEM,
+	LSE_NIO_INIT,
+	LSE_CONF_SYNTAX,
+	LSE_FILE_SYS,
+	LSE_CONN_SYS,
+	LSE_SELECT_SYS,
+	LSE_EOF,
+	LSE_ACCT_FORMAT,
+	LSE_BAD_TIME,
+	LSE_FORK,
+	LSE_PIPE,
+	LSE_ESUB,
+	LSE_EAUTH,
+	LSE_NO_FILE,
+	LSE_NO_CHAN,
+	LSE_BAD_CHAN,
+	LSE_INTERNAL,
+	LSE_PROTOCOL,
+	LSE_MISC_SYS,
+	LSE_RES_RUSAGE,
+	LSE_NO_RESOURCE,
+	LSE_BAD_RESOURCE,
+	LSE_RES_PARENT,
+	LSE_I18N_SETLC,
+	LSE_I18N_CATOPEN,
+	LSE_I18N_NOMEM,
+	LSE_NO_MEM,
+	LSE_FILE_CLOSE,
+	LSE_MASTER_LIM_DOWN,
+	LSE_MLS_INVALID,
+	LSE_MLS_CLEARANCE,
+	LSE_MLS_RHOST,
+	LSE_MLS_DOMINATE,
+	LSE_HOST_EXIST,
+	LSE_NERR
+};
 
 #define LSE_ISBAD_RESREQ(s)     (((s) == LSE_BAD_EXP)                   \
 								 || ((s) == LSE_UNKWN_RESNAME)          \
@@ -821,7 +835,8 @@ struct hostEntryLog
 #define LOG_DEBUG2  LOG_DEBUG + 2
 #define LOG_DEBUG3  LOG_DEBUG + 3
 
-#define LSF_NIOS_REQUEUE        127
+// #define LSF_NIOS_REQUEUE        127
+const unsigned short LSF_NIOS_REQUEUE = 127;
 
 typedef void (*SIGFUNCTYPE) (int);
 
@@ -848,16 +863,16 @@ typedef void (*SIGFUNCTYPE) (int);
 
 typedef struct stat LS_STAT_T;
 #define LSTMPDIR        lsTmpDir_
-#define LSDEVNULL       "/dev/null"
-#define LSETCDIR        "/fix/me/no/such/place"
-/* #define LSETCDIR        SYSCONFDIR */
-#define closesocket close
-#define CLOSESOCKET(s) close((s))
-#define SOCK_CALL_FAIL(c) ((c) < 0 )
-#define SOCK_INVALID(c) ((c) < 0 )
-#define CLOSEHANDLE close
-#define SOCK_READ_FIX  b_read_fix
-#define SOCK_WRITE_FIX b_write_fix
+// #define LSDEVNULL       "/dev/null"
+const char LSDEVNULL[] = "/dev/null";
+// #define LSETCDIR        "/fix/me/no/such/place"
+const char LSETCDIR[] = "/fix/me/no/such/place";
+
+#define LSETCDIR           SYSCONFDIR
+#define SOCK_CALL_FAIL(c)  ((c) < 0 )
+#define SOCK_INVALID(c)    ((c) < 0 )
+#define SOCK_READ_FIX      b_read_fix
+#define SOCK_WRITE_FIX     b_write_fix
 #define NB_SOCK_READ_FIX   nb_read_fix
 #define NB_SOCK_WRITE_FIX  nb_write_fix
 
@@ -866,7 +881,7 @@ typedef struct stat LS_STAT_T;
 int lserrno;
 int masterLimDown;
 int ls_nerr;
-extern char *ls_errmsg[];  // FIXME FIXME FIXME FIXME FIXME put in specific header
+// char *ls_errmsg[];  // FIXME FIXME FIXME FIXME FIXME put in specific header
 int logclass;
 int timinglevel;
 

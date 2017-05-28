@@ -63,7 +63,7 @@ ls_rescontrol (char *host, int opCode, int data)
       cc = rd_select_ (s, &timeout);
       if (cc <= 0)
 	{
-	  closesocket (s);
+	  close (s);
 	  _lostconnection_ (host);
 	  lserrno = LSE_TIME_OUT;
 	  return (-1);
@@ -71,7 +71,7 @@ ls_rescontrol (char *host, int opCode, int data)
 
       if (ackReturnCode_ (s) < 0)
 	{
-	  closesocket (s);
+	  close (s);
 	  _lostconnection_ (host);
 	  return (-1);
 	}
@@ -91,7 +91,7 @@ ls_rescontrol (char *host, int opCode, int data)
   if (callRes_ (s, RES_CONTROL, (char *) &ctrl, (char *) &buf,
 		sizeof (buf), xdr_resControl, 0, 0, NULL) == -1)
     {
-      closesocket (s);
+      close (s);
       _lostconnection_ (host);
       return (-1);
     }
@@ -100,7 +100,7 @@ ls_rescontrol (char *host, int opCode, int data)
   cc = rd_select_ (s, &timeout);
   if (cc <= 0)
     {
-      closesocket (s);
+      close (s);
       _lostconnection_ (host);
       lserrno = LSE_TIME_OUT;
       return (-1);
@@ -108,7 +108,7 @@ ls_rescontrol (char *host, int opCode, int data)
 
   if (ackReturnCode_ (s) < 0)
     {
-      closesocket (s);
+      close (s);
       _lostconnection_ (host);
       return (-1);
     }
@@ -145,7 +145,7 @@ oneResDebug (struct debugReq *pdebug, char *hostname)
       FD_SET (s, &connection_ok_);
       if (ackReturnCode_ (s) < 0)
 	{
-	  closesocket (s);
+	  close (s);
 	  _lostconnection_ (hostname);
 	  return (-1);
 	}
@@ -161,14 +161,14 @@ oneResDebug (struct debugReq *pdebug, char *hostname)
   if (callRes_ (s, RES_DEBUGREQ, (char *) &debugData, (char *) &buf,
 		sizeof (buf), xdr_debugReq, 0, 0, NULL) == -1)
     {
-      closesocket (s);
+      close (s);
       _lostconnection_ (hostname);
       return (-1);
     }
 
   if (ackReturnCode_ (s) < 0)
     {
-      closesocket (s);
+      close (s);
       _lostconnection_ (hostname);
       return (-1);
     }

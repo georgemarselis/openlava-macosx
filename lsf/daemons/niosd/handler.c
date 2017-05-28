@@ -35,167 +35,22 @@
 #include "daemons/libniosd/niosd.h"
 #include "daemons/libniosd/handler.h"
 
-#define NL_SETN         29
-typedef struct dead_tid
-{
-  int tid;
-  struct dead_tid *next;
-} Dead_tid;
 
-
-typedef struct dead_rpid
-{
-  int rpid;
-  LS_WAIT_T status;
-  struct rusage ru;
-  struct dead_rpid *next;
-} Dead_rpid;
-
-int requeued = 0;
-
-static int do_newconnect (int);
-static int get_connect (int, struct LSFHeader *);
-static int get_status (int, struct LSFHeader *, LS_WAIT_T *);
-static void setMask (fd_set *);
-static int bury_task (LS_WAIT_T, struct rusage *, int);
-static int do_setstdin (int, int);
-static int flush_buffer (void);
-static int check_timeout_task (void);
-static void add_list (struct nioInfo *, int, int, LS_WAIT_T *);
-static int deliver_signal (int);
-static int flush_sigbuf (void);
-static int flush_databuf (void);
-static int flush_eof (void);
-static int deliver_eof (void);
-static int sendUpdatetty ();
-static void checkHeartbeat (int nready);
-static int sendHeartbeat (void);
-void checkJobStatus (int numTries);
-JOB_STATUS getJobStatus (LS_LONG_INT jid, struct jobInfoEnt **job,
-			 struct jobInfoHead **jobHead);
-
-int JobStateInfo (LS_LONG_INT jid);
-
-#define MAXLOOP 10000
-
-#define CHECK_PERIOD     4
-
-static Dead_rpid *dead_rpid;
-
-static fd_set socks_bit;
-static fd_set ncon_bit;
-
-
-#define C_CONNECTED(cent)                                               \
-    ((cent).rpid && ((cent).sock.fd != -1) && ((cent).rtime == 0))
-
-#define DISCONNECT(id) {if (conn[id].rpid > 0)          \
-            connIndexTable[conn[id].rpid-1] = -1;       \
-        closesocket(conn[id].sock.fd);                  \
-        conn[id].sock.fd = -1;                          \
-        conn[id].rpid = 0;                              \
-        FD_CLR(id, &socks_bit);}
-LIST_T *notifyList;
-
-typedef struct taskNotice
-{
-  struct taskNotice *forw, *back;
-  int tid;
-  int opCode;
-} taskNotice_t;
-
-typedef struct rtaskInfo
-{
-  struct rtaskInfo *forw, *back;
-  int tid;
-  time_t rtime;
-  int eof;
-  int dead;
-} rtaskInfo_t;
-
-#define MAX_READ_RETRY         5
-
-bool_t compareTaskId (rtaskInfo_t *, int *, int);
-static rtaskInfo_t *getTask (LIST_T *, int);
-static rtaskInfo_t *addTask (LIST_T *);
-static void removeTask (LIST_T *, rtaskInfo_t *);
-static int addNotifyList (LIST_T *, int, int);
-static int addTaskList (int, int);
-static int notify_task (int, int);
-static int readResMsg (int);
-static int getFirstFreeIndex (void);
-
-struct connInfo
-{
-  Channel sock;
-  int rpid;
-  time_t rtime;
-  int bytesWritten;
-  int eof;
-  int dead;
-
-
-  RelayLineBuf *rbuf;
-  LIST_T *taskList;
-  int rtag;
-  int wtag;
-  char *hostname;
-
-  Dead_tid *deadtid;
-};
-
-static struct connInfo *conn;
-static struct nioEvent *ioTable;
-static struct nioEvent *ioTable1;
-static struct nioInfo abortedTasks;
-
-static struct
-{
-  int empty;
-  int length;
-  fd_set socks;
-  char buf[BUFSIZ + LSF_HEADER_LEN];
-} writeBuf;
-
-struct sigbuf
-{
-  int sigval;
-  struct sigbuf *next;
-};
-
-static struct sigbuf *sigBuf;
-static int lastConn = 0;
-
-static int maxfds;
-static int maxtasks;
-static int *connIndexTable;
-static int count_unconn = 0;
-static int acceptSock;
-static int sendEof;
-
-static int nioDebug = 0;
-static time_t lastCheckTime = 0;
-
-extern int msgInterval;
-
-extern char *getTimeStamp ();
-extern void kill_self (int, int);
-
-extern int JobStateInfo (LS_LONG_INT jid);
 
 int
 ls_niosetdebug (int debug)
 {
-  if (debug > 0)
-    nioDebug = debug;
-  return 0;
+	if (debug > 0) {
+		nioDebug = debug;
+	}
+	return 0;
 }
 
 int
 ls_nioinit (int sock)
 {
   int i;
-  char listname[56];
+  char listname[56]; // FIXME FIXME FIXME FIXME 56 is awfully specific
 
 
 #ifdef RLIMIT_NOFILE
@@ -232,9 +87,9 @@ ls_nioinit (int sock)
 
   acceptSock = sock;
 
-  conn = (struct connInfo *) calloc (maxfds, sizeof (struct connInfo));
-  ioTable = (struct nioEvent *) calloc (maxfds, sizeof (struct nioEvent));
-  ioTable1 = (struct nioEvent *) calloc (maxfds, sizeof (struct nioEvent));
+  conn     = calloc (maxfds, sizeof (struct connInfo));
+  ioTable  = calloc (maxfds, sizeof (struct nioEvent));
+  ioTable1 = calloc (maxfds, sizeof (struct nioEvent));
   if (conn == NULL || ioTable == NULL || ioTable1 == NULL)
     {
       lserrno = LSE_MALLOC;
@@ -288,7 +143,7 @@ ls_nioselect (int nfds, fd_set * readfds, fd_set * writefds,
 	      fd_set * exceptfds, struct nioInfo **tasks,
 	      struct timeval *timeout)
 {
-  static char __func__] = "ls_nioselect()";
+  char __func__] = "ls_nioselect()";
   fd_set rmask, wmask, emask, devNullMask;
   int nready = 0;
   int naborted = 0;
@@ -298,14 +153,14 @@ ls_nioselect (int nfds, fd_set * readfds, fd_set * writefds,
   struct timeval timeval;
   taskNotice_t *notice, *nextNotice;
   rtaskInfo_t *task;
-  static int previousIndex = -1;
+  int previousIndex = -1;
 
   struct timeval *tvp, tv1;
-  static struct nioInfo readyTaskList;
-  static int brokenSelectFlag = 0;
-  static int checkedBrokenSelect = 0;
-  static dev_t devNullDeviceNumber = 0;
-  static fd_set stderrFlag;
+  struct nioInfo readyTaskList;
+  int brokenSelectFlag = 0;
+  int checkedBrokenSelect = 0;
+  dev_t devNullDeviceNumber = 0;
+  fd_set stderrFlag;
 
   if (conn == NULL)
     {
@@ -724,7 +579,7 @@ ls_nioselect (int nfds, fd_set * readfds, fd_set * writefds,
 
 }
 
-static int
+int
 check_timeout_task ()
 {
   LS_WAIT_T status;
@@ -847,7 +702,7 @@ ls_nioremovetask (int tid)
   return (-1);
 }
 
-static void
+void
 add_list (struct nioInfo *list, int tid, int ioType, LS_WAIT_T * status)
 {
   list->ioTask[list->num].tid = tid;
@@ -957,7 +812,7 @@ ls_niowrite (char *buf, int len)
     }
 }
 
-static int
+int
 flush_buffer ()
 {
   int retVal;
@@ -974,7 +829,7 @@ flush_buffer ()
   return (0);
 }
 
-static int
+int
 flush_databuf ()
 {
   int i, cc, empty;
@@ -1026,7 +881,7 @@ flush_databuf ()
   return (0);
 }
 
-static int
+int
 flush_eof ()
 {
   int retVal;
@@ -1068,10 +923,10 @@ ls_nioclose (void)
     }
 }
 
-static int
+int
 deliver_eof ()
 {
-  static char __func__] = "deliver_eof()";
+  char __func__] = "deliver_eof()";
   struct LSFHeader reqHdr, buf;
   XDR xdrs;
   LS_WAIT_T status;
@@ -1139,7 +994,7 @@ deliver_eof ()
 int
 ls_nioread (int tid, char *buf, int len)
 {
-  static char __func__] = "ls_nioread()";
+  char __func__] = "ls_nioread()";
   int index, cc;
   LS_WAIT_T status;
 
@@ -1206,7 +1061,7 @@ ls_nioread (int tid, char *buf, int len)
 int
 ls_nionewtask (int tid, int sock)
 {
-  static char __func__] = "ls_nionewtask()";
+  char __func__] = "ls_nionewtask()";
   int i;
   LS_WAIT_T status;
   rtaskInfo_t *task;
@@ -1329,7 +1184,7 @@ ls_nionewtask (int tid, int sock)
   return (-1);
 }
 
-static int
+int
 do_setstdin (int tid, int stdinOn)
 {
   int i, gotError;
@@ -1659,10 +1514,10 @@ ls_niostatus (int tid, int *status, struct rusage *rusage)
     }
 }
 
-static int
+int
 do_newconnect (int s)
 {
-  static char __func__] = "do_newconnect()";
+  char __func__] = "do_newconnect()";
   int newsock;
   int i;
   socklen_t len;
@@ -1787,7 +1642,7 @@ do_newconnect (int s)
 int
 doAcceptResCallback_ (int s, struct niosConnect *connReq)
 {
-  static char __func__] = "doAcceptResCallback_()";
+  char __func__] = "doAcceptResCallback_()";
   struct sockaddr_in from;
   socklen_t fromlen;
   int newsock;
@@ -1831,7 +1686,7 @@ doAcceptResCallback_ (int s, struct niosConnect *connReq)
 
 }
 
-static void
+void
 setMask (fd_set * rmask)
 {
   int i;
@@ -1850,7 +1705,7 @@ setMask (fd_set * rmask)
 }
 
 
-static int
+int
 get_connect (int indx, struct LSFHeader *msgHdr)
 {
   XDR xdrs;
@@ -1872,10 +1727,10 @@ get_connect (int indx, struct LSFHeader *msgHdr)
 }
 
 
-static int
+int
 get_status (int indx, struct LSFHeader *msgHdr, LS_WAIT_T * statusp)
 {
-  static char __func__] = "get_status()";
+  char __func__] = "get_status()";
   LS_WAIT_T status;
   struct niosStatus st;
   char buf[MSGSIZE];
@@ -1987,7 +1842,7 @@ get_status (int indx, struct LSFHeader *msgHdr, LS_WAIT_T * statusp)
   return (0);
 }
 
-static int
+int
 bury_task (LS_WAIT_T status, struct rusage *ru, int rpid)
 {
   Dead_rpid *prpid, *p1, *p2;
@@ -2059,7 +1914,7 @@ bury_task (LS_WAIT_T status, struct rusage *ru, int rpid)
 int
 ls_niokill (int sigval)
 {
-  static char __func__] = "ls_niokill()";
+  char __func__] = "ls_niokill()";
   int retVal;
   sigset_t newMask, oldMask;
   extern int usepty;
@@ -2136,7 +1991,7 @@ ls_niokill (int sigval)
   return (0);
 }
 
-static int
+int
 flush_sigbuf ()
 {
   int retVal;
@@ -2167,7 +2022,7 @@ flush_sigbuf ()
   return (0);
 }
 
-static int
+int
 deliver_signal (int sigval)
 {
   struct resSignal sig;
@@ -2242,10 +2097,10 @@ compareTaskId (rtaskInfo_t * task, int *tid, int hint)
     return FALSE;
 }
 
-static int
+int
 readResMsg (int connIndex)
 {
-  static char __func__] = "readResMsg()";
+  char __func__] = "readResMsg()";
   int cc;
   LS_WAIT_T status;
   int retry_count;
@@ -2297,14 +2152,14 @@ READ_RETRY:
 int
 ls_niodump (LS_HANDLE_T outputFile, int tid, int options, char *taggingFormat)
 {
-  static char __func__] = "ls_niodump()";
+  char __func__] = "ls_niodump()";
   int index, cc = 0, len;
   int tagLen = 0;
   int nc = 0;
   char tagStr[128], *p, *endbuf;
-  static int errDisplayflag = 0;
-  static int previousTag = -1;
-  static int hasNewLine = 1;
+  int errDisplayflag = 0;
+  int previousTag = -1;
+  int hasNewLine = 1;
   int manualNewLine = FALSE;
 
   if (conn == NULL)
@@ -2504,7 +2359,7 @@ ls_niodump (LS_HANDLE_T outputFile, int tid, int options, char *taggingFormat)
   return nc;
 }
 
-static rtaskInfo_t *
+rtaskInfo_t *
 getTask (LIST_T * taskList, int tid)
 {
   rtaskInfo_t *task;
@@ -2523,7 +2378,7 @@ getTask (LIST_T * taskList, int tid)
   return task;
 }
 
-static rtaskInfo_t *
+rtaskInfo_t *
 addTask (LIST_T * taskList)
 {
   rtaskInfo_t *task;
@@ -2546,7 +2401,7 @@ addTask (LIST_T * taskList)
   return task;
 }
 
-static void
+void
 removeTask (LIST_T * taskList, rtaskInfo_t * task)
 {
   if (!taskList || !task || LIST_IS_EMPTY (taskList)
@@ -2559,7 +2414,7 @@ removeTask (LIST_T * taskList, rtaskInfo_t * task)
   FREEUP (task);
 }
 
-static int
+int
 addNotifyList (LIST_T * list, int tid, int opCode)
 {
   taskNotice_t *notice;
@@ -2592,10 +2447,10 @@ addNotifyList (LIST_T * list, int tid, int opCode)
   return 0;
 }
 
-static int
+int
 addTaskList (int tid, int connIndex)
 {
-  static char __func__] = "addTaskList()";
+  char __func__] = "addTaskList()";
   int i;
   time_t rtime;
   rtaskInfo_t *task;
@@ -2670,10 +2525,10 @@ addTaskList (int tid, int connIndex)
   return 0;
 }
 
-static int
+int
 notify_task (int tid, int opCode)
 {
-  static char __func__] = "notify_task()";
+  char __func__] = "notify_task()";
   struct LSFHeader reqHdr, buf;
   XDR xdrs;
   LS_WAIT_T status;
@@ -2758,7 +2613,7 @@ notify_task (int tid, int opCode)
   return (0);
 }
 
-static int
+int
 getFirstFreeIndex (void)
 {
   int i;
@@ -2775,16 +2630,16 @@ getFirstFreeIndex (void)
   return i;
 }
 
-static int
+int
 sendUpdatetty ()
 {
-  static char __func__] = "sendUpdatetty";
+  char __func__] = "sendUpdatetty";
   int i, iofd, redirect;
   char buf[MSGSIZE];
 #ifndef TIOCGWINSZ
   char *cp;
 #endif
-  static struct resStty tty;
+  struct resStty tty;
 
   if (logclass & LC_TRACE)
     {
@@ -2865,7 +2720,7 @@ sendUpdatetty ()
 void
 checkHeartbeat (int nready)
 {
-  static char __func__] = "checkHeartbeat()";
+  char __func__] = "checkHeartbeat()";
   time_t now;
 
 
@@ -2908,10 +2763,10 @@ checkHeartbeat (int nready)
 }
 
 
-static int
+int
 sendHeartbeat (void)
 {
-  static char __func__] = "sendHeartbeat()";
+  char __func__] = "sendHeartbeat()";
   struct LSFHeader reqHdr, buf;
   XDR xdrs;
   sigset_t newMask, oldMask;
@@ -2962,7 +2817,7 @@ sendHeartbeat (void)
 void
 checkJobStatus (int numTries)
 {
-  static char __func__] = "checkJobStatus()";
+  char __func__] = "checkJobStatus()";
   struct jobInfoEnt *job = NULL;
   struct jobInfoHead *jobHead = NULL;
   int jobGone = FALSE;
@@ -3033,7 +2888,7 @@ checkJobStatus (int numTries)
 void
 checkPendingJobStatus (int s)
 {
-  static char __func__] = "checkPendingJobStatus()";
+  char __func__] = "checkPendingJobStatus()";
   int ready;
   int lastPendJobCheck;
   int lastMsgCheck;
@@ -3103,7 +2958,7 @@ JOB_STATUS
 getJobStatus (LS_LONG_INT jid, struct jobInfoEnt ** job,
 	      struct jobInfoHead ** jobHead)
 {
-  static char __func__] = "getJobStatus()";
+  char __func__] = "getJobStatus()";
   struct jobInfoEnt *jobInfo = NULL;
   struct jobInfoHead *jobInfoHead = NULL;
   JOB_STATUS retval = JOB_STATUS_UNKNOWN;

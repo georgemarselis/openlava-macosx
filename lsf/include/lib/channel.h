@@ -124,7 +124,7 @@ int chanDequeue_ (int chfd, struct Buffer **buf);
 int chanSelect_ (struct Masks *, struct Masks *, struct timeval *timeout);
 int chanClose_ (int chfd);
 void chanCloseAll_ (void);
-int chanSock_ (unsigned int chfd);
+unsigned long chanSock_ (unsigned int chfd);
 
 int chanServSocket_ (int, unsigned short, int, int);
 int chanAccept_ (int, struct sockaddr_in *);

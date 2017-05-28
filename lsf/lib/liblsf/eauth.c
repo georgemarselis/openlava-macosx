@@ -332,8 +332,8 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
     {
         /* catgets 5513 */
         ls_syslog (LOG_ERR, "5513: %s: b_write_fix <%s> failed, cc=%d, i=%d: %ld", __func__, uData, cc, uData_length);
-        CLOSEHANDLE (in[1]);
-        CLOSEHANDLE (out[0]);
+        close (in[1]);
+        close (out[0]);
         connected = FALSE;
         return -1;
     }
@@ -350,8 +350,8 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
     {
          /* catgets 5515 */
         ls_syslog (LOG_ERR, "5515: %s: b_write_fix <%s> failed, eauth.len=%d, cc=%d", __func__, uData, auth->k.eauth.len, cc);
-        CLOSEHANDLE (in[1]);
-        CLOSEHANDLE (out[0]);
+        close (in[1]);
+        close (out[0]);
         connected = FALSE;
         return -1;
     }
@@ -364,8 +364,8 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
     if ( cc != 1) {
         /* catgets 5517 */
         ls_syslog (LOG_ERR, "5517: %s: b_read_fix <%s> failed, cc=%d: %ld", __func__, uData, cc);
-        CLOSEHANDLE (in[1]);
-        CLOSEHANDLE (out[0]);
+        close (in[1]);
+        close (out[0]);
         connected = FALSE;
         return -1;
     }

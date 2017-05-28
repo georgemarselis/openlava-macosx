@@ -124,10 +124,9 @@ die (int sig)
         }
 
     assert( batchSock <= INT_MAX );
-    shutdown ((int)chanSock_ ( (uint)batchSock), 2);
+    shutdown ( chanSock_ ( batchSock), 2);
 
     exit (sig);
-
 }
 
 int

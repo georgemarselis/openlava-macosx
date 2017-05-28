@@ -39,8 +39,8 @@
 
 #define NL_SETN     29
 
-extern void child_channel_clear (struct child *, struct outputchannel *);
-extern char **environ;
+// extern void child_channel_clear (struct child *, struct outputchannel *);
+// extern char **environ;
 
 int rexecPriority = 0;
 
@@ -105,17 +105,17 @@ struct config_param resConfParams[] = {
 #define P_(s) ()
 #endif
 
-static void put_mask P_ ((char *, fd_set *));
-static void periodic P_ ((int));
-static void usage P_ ((char *));
-static void initSignals (void);
-static void houseKeeping (void);
-static void blockSignals (void);
-static void unblockSignals (void);
+void put_mask P_ ((char *, fd_set *));
+void periodic P_ ((int));
+void usage P_ ((char *));
+void initSignals (void);
+void houseKeeping (void);
+void blockSignals (void);
+void unblockSignals (void);
 
 #undef P_
 
-static void
+void
 usage (char *cmd)
 {
 	fprintf (stderr, "I18N_Usage"); // FIXME FIXME replace I18N_usage with actual help screen
@@ -570,8 +570,8 @@ main (int argc, char **argv)
 	  parent_res_port = INVALID_FD;
 	  child_go = 1;
 	  allow_accept = 0;
-	  closesocket (child_res_port);
-	  closesocket (accept_sock);
+	  close (child_res_port);
+	  close (accept_sock);
 	  accept_sock = INVALID_FD;
 	}
 
@@ -673,7 +673,7 @@ main (int argc, char **argv)
 
 }
 
-static void
+void
 initSignals ()
 {
   Signal_ (SIGCHLD, (SIGFUNCTYPE) child_handler);
@@ -839,7 +839,7 @@ display_masks (fd_set * rm, fd_set * wm, fd_set * em)
   fputs ("\n", stdout);
 }
 
-static void
+void
 put_mask (char *name, fd_set * mask)
 {
   fputs (name, stdout);
@@ -851,7 +851,7 @@ printf ("0x%8.8x ", (int) mask->fds_bits[0]);
   fputs ("  ", stdout);
 }
 
-static void
+void
 periodic (int signum)
 {
 	static char __func__] = "res/periodic";
@@ -913,7 +913,7 @@ periodic (int signum)
 
 }
 
-static void
+void
 houseKeeping (void)
 {
 	static char __func__] = "houseKeeping";
@@ -1092,7 +1092,7 @@ houseKeeping (void)
 
 }
 
-static void
+void
 unblockSignals (void)
 {
   sigset_t sigMask;
@@ -1102,7 +1102,7 @@ unblockSignals (void)
   sigprocmask (SIG_SETMASK, &sigMask, NULL);
 }
 
-static void
+void
 blockSignals (void)
 {
   sigset_t sigMask;

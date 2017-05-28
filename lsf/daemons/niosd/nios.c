@@ -37,147 +37,12 @@
 #include "res/nios.h"
 #include "res/res.h"
 #include "res/resout.h"
-#include "daemons/libniosd/hanlder.h"
-
-#define NL_SETN         29
-
-extern LS_LONG_INT atoi64_ (char *ptr);
-extern int requeued;
-static void serv (char **, int);
-static void PassSig (int);
-
-static void exSuspend (struct lslibNiosHdr *);
-static void do_newtask (void);
-static void emusig (int, int);
-static void reset_uid (void);
-static void conin (int);
-static void setStdout (struct lslibNiosHdr *);
-static void setStdin (struct lslibNiosHdr *);
-static void getStdin (struct lslibNiosHdr *);
-static void rtask (struct lslibNiosHdr *);
-static void rwait (struct lslibNiosHdr *);
-static void exExit (struct lslibNiosHdr *);
-static void remOn (struct lslibNiosHdr *);
-static void remOff (struct lslibNiosHdr *);
-static int die (void);
-static int acceptCallBack (int);
-
-static int cmpJobStates (struct jobInfoEnt *);
-static int printJobSuspend (LS_LONG_INT);
-void prtJobStateMsg (struct jobInfoEnt *, struct jobInfoHead *);
-char *get_status (struct jobInfoEnt *);
-struct loadIndexLog *initLoadIndex (void);
-void prtLine (char *);
-void JobExitInfo (void);
-void checkPendingJobStatus (int s);
-JOB_STATUS getJobStatus (LS_LONG_INT jid, struct jobInfoEnt **job,
-			 struct jobInfoHead **jobHead);
-int JobStateInfo (LS_LONG_INT);
-
-static int niosPid;
-#define ERR_SYSTEM      122
-
-#define MIN_CPU_TIME 0.0001
-#define BLANKLEN   22
-#define WIDTH      80
-static int cursor = 0;
-
-int chfd;
-int ppid;
-int usepty;
-int niosSyncTasks = 0;
-int lineBuffered = 1;
-char *taggingFormat = (char *) NULL;
-int stdoutSync = 0;
-int heartbeatInterval = 0;
-int jobStatusInterval = 0;
-int standalone = FALSE;
-int niosSbdMode = FALSE;
-LS_LONG_INT jobId = -1;
-int pendJobTimeout = 0;
-int msgInterval = 0;
-
-void kill_self (int, int);
-char *getTimeStamp (void);
-
-static fd_set nios_rmask, nios_wmask;
-static int endstdin;
-static int io_fd;
-static int directecho = FALSE;
-static int inbg;
-static int remon;
-static char buf[BUFSIZ];
-
-static int stdinBufEmptyEvent = 0;
-#define STDIN_FD  0
-#define STDOUT_FD 1
-#define STDERR_FD 2
-
-static int exit_sig = 0;
-static int exit_status = 0;
-static int got_eof = FALSE;
-static int got_status = FALSE;
-static int callbackAccepted = FALSE;
-static int sent_tstp = FALSE;
-static int msgEnabled = FALSE;
-static int standaloneTaskDone = 0;
-
-static int forwardTSTP = 0;
-static void
-myHandler (int sig)
-{
-  if (sig == SIGUSR2 && !niosSbdMode)
-    {
-      PassSig (SIGTSTP);
-      forwardTSTP = 1;
-    }
-}
-
-int ls_niosetdebug (int);
-
-static int niosDebug = 0;
-static int maxtasks;
-static int maxfds;
-
-static struct config_param niosParams[] = {
-#define LSF_NIOS_DEBUG 0
-  {"LSF_NIOS_DEBUG", NULL},
-#define LSF_PTY 1
-  {"LSF_ENABLE_PTY", NULL},
-#define LSB_INTERACT_MSG_ENH 2
-  {"LSB_INTERACT_MSG_ENH", NULL},
-#define LSB_INTERACT_MSG_INTVAL 3
-  {"LSB_INTERACT_MSG_INTVAL", NULL},
-#define LSF_NIOS_RES_HEARTBEAT 4
-  {"LSF_NIOS_RES_HEARTBEAT", NULL},
-#define LSF_NIOS_JOBSTATUS_INTERVAL 5
-  {"LSF_NIOS_JOBSTATUS_INTERVAL", NULL},
-#define LSB_INTERACT_MSG_EXITTIME 6
-  {"LSB_INTERACT_MSG_EXITTIME", NULL},
-  {NULL, NULL}
-};
-
-#define MSG_POLLING_INTR 60
-
-extern void checkJobStatus (int numTries);
-
-#define NIOS_MAX_TASKTBL       10024
-
-#define MAX_TRY_TIMES           20
-
-
-
-
-static void
-signalBufEmpty (int dummy)
-{
-
-}
+#include "daemons/libniosd/handler.h"
 
 int
 main (int argc, char **argv)
 {
-  static char __func__] = "nios/main()";
+  char __func__] = "nios/main()";
   ushort port;
   int asock;
   socklen_t len;
@@ -345,7 +210,7 @@ main (int argc, char **argv)
       if (getsockname (asock, (struct sockaddr *) &sin, &len) < 0)
 	{
 	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "getsockname");
-	  (void) closesocket (asock);
+	  (void) close (asock);
 	  exit (-1);
 	}
       port = sin.sin_port;
@@ -353,13 +218,13 @@ main (int argc, char **argv)
       if (write (chfd, &port, sizeof (port)) < 0)
 	{
 	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "write");
-	  (void) closesocket (asock);
+	  (void) close (asock);
 	  exit (-1);
 	}
       if ((maxfds = ls_nioinit (asock)) < 0)
 	{
 	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "ls_nioinit");
-	  closesocket (asock);
+	  close (asock);
 	  exit (-1);
 	}
     }
@@ -385,8 +250,7 @@ main (int argc, char **argv)
 
 	  if ((asock = TcpCreate_ (TRUE, atoi (argv[2]))) < 0)
 	    {
-	      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__,
-			 "tcpCreate", "-p");
+	      ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "tcpCreate", "-p");
 	      exit (-1);
 	    }
 
@@ -398,8 +262,7 @@ main (int argc, char **argv)
 
 	  if (niosDebug)
 	    {
-	      ls_syslog (LOG_DEBUG, "%s: Nios running in sbdMode mode",
-			 __func__);
+	      ls_syslog (LOG_DEBUG, "%s: Nios running in sbdMode mode", __func__);
 	    }
 
 
@@ -422,9 +285,7 @@ main (int argc, char **argv)
 		      if (isint_
 			  (niosParams[LSB_INTERACT_MSG_INTVAL].paramValue))
 			{
-			  msgInterval =
-			    atoi (niosParams[LSB_INTERACT_MSG_INTVAL].
-				  paramValue);
+			  msgInterval = atoi (niosParams[LSB_INTERACT_MSG_INTVAL].paramValue);
 			}
 		    }
 
@@ -435,8 +296,8 @@ main (int argc, char **argv)
 
 		  if ((sp = getenv ("LSB_JOBID")) == NULL)
 		    {
-		      ls_syslog (LOG_ERR, I18N (5803, "%s: LSB_JOBID is not defined %M"),	/* catgets 5803 */
-				 __func__);
+		    	/* catgets 5803 */
+		      ls_syslog (LOG_ERR, I18N (5803, "%s: LSB_JOBID is not defined %M"),  __func__);
 		      exit (-1);
 		    }
 
@@ -511,10 +372,10 @@ main (int argc, char **argv)
   exit (0);
 }
 
-static void
+void
 serv (char **argv, int asock)
 {
-  static char __func__] = "nios/serv()";
+  char __func__] = "nios/serv()";
   fd_set rmask, wmask;
   int nready;
   int i, cc;
@@ -522,7 +383,7 @@ serv (char **argv, int asock)
   char *bp = NULL;
   int *tid_list;
   struct nioInfo *tasks;
-  static int first = 1;
+  int first = 1;
   struct finishStatus *taskStatus;
   int oldState = JOB_STAT_RUN;
   int isResumed = 0;
@@ -593,10 +454,8 @@ serv (char **argv, int asock)
 	    {
 	      if (niosDebug)
 		{
-		  ls_syslog (LOG_DEBUG, "\
-%s: Nios ls_niotasks returned 0, got_eof=%d", __func__, got_eof);
-		  ls_syslog (LOG_DEBUG, "\
-%s: Nios exit_sig=%d exit_status=%d. exiting", __func__, exit_sig, exit_status);
+		  ls_syslog (LOG_DEBUG, "%s: Nios ls_niotasks returned 0, got_eof=%d", __func__, got_eof);
+		  ls_syslog (LOG_DEBUG, "%s: Nios exit_sig=%d exit_status=%d. exiting", __func__, exit_sig, exit_status);
 		}
 	      PassSig (SIGKILL);
 	      die ();
@@ -658,13 +517,11 @@ serv (char **argv, int asock)
 		    {
 		      if (tasks->ioTask[i].type == NIO_STDERR)
 			{
-			  ls_syslog (LOG_DEBUG, "\
-%s: Nios Got stderr from connection <%d>", __func__, tasks->ioTask[i].tid);
+			  ls_syslog (LOG_DEBUG, "%s: Nios Got stderr from connection <%d>", __func__, tasks->ioTask[i].tid);
 			}
 		      else
 			{
-			  ls_syslog (LOG_DEBUG, "\
-%s: Nios Got stdout from connection <%d>", __func__, tasks->ioTask[i].tid);
+			  ls_syslog (LOG_DEBUG, "%s: Nios Got stdout from connection <%d>", __func__, tasks->ioTask[i].tid);
 			}
 		    }
 
@@ -695,19 +552,16 @@ serv (char **argv, int asock)
 		    {
 		      dumpOption = lineBuffered;
 		    }
-		  if (ls_niodump (outputFd, tasks->ioTask[i].tid,
-				  dumpOption, taggingFormat) < 0)
+		  if (ls_niodump (outputFd, tasks->ioTask[i].tid, dumpOption, taggingFormat) < 0)
 		    {
-		      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M,
-				 __func__, "ls_niodump");
+		      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "ls_niodump");
 		      ls_niokill (SIGKILL);
 		      die ();
 		    }
 		  break;
 		case NIO_EOF:
 		  if (niosDebug)
-		    ls_syslog (LOG_DEBUG, "\
-%s: Nios got EOF from remote task standalone=%d got_status=%d", __func__, standalone, got_status);
+		    ls_syslog (LOG_DEBUG, "%s: Nios got EOF from remote task standalone=%d got_status=%d", __func__, standalone, got_status);
 		  taskStatus[tasks->ioTask[i].tid].got_eof = 1;
 		  if (taskStatus[tasks->ioTask[i].tid].got_status
 		      && !taskStatus[tasks->ioTask[i].tid].sendSignal)
@@ -728,8 +582,7 @@ serv (char **argv, int asock)
 
 		case NIO_STATUS:
 		  if (niosDebug)
-		    ls_syslog (LOG_DEBUG, "\
-%s: Nios Got status <%#x> from task remote", __func__, tasks->ioTask[i].status);
+		    ls_syslog (LOG_DEBUG, "%s: Nios Got status <%#x> from task remote", __func__, tasks->ioTask[i].status);
 		  taskStatus[tasks->ioTask[i].tid].got_status = TRUE;
 
 		  if (REX_FATAL_ERROR (tasks->ioTask[i].status))
@@ -810,8 +663,7 @@ serv (char **argv, int asock)
 		case NIO_IOERR:
 		  if (standalone)
 		    {
-		      ls_syslog (LOG_ERR, I18N (5806, "\
-%s: Nios IO_ERR while reading from remote task"),	/* catgets 5806 */
+		      ls_syslog (LOG_ERR, I18N (5806, "%s: Nios IO_ERR while reading from remote task"),	/* catgets 5806 */
 				 __func__);
 
 		      if ((jobStatusInterval > 0) && niosSbdMode)
@@ -835,8 +687,7 @@ serv (char **argv, int asock)
 		  if (requeued && niosSbdMode && standalone)
 		    {
 		      if (niosDebug)
-			ls_syslog (LOG_DEBUG, "\
-%s: Nios got REQUEUE from remote task standalone=%d got_status=%d", __func__, standalone, got_status);
+			ls_syslog (LOG_DEBUG, "%s: Nios got REQUEUE from remote task standalone=%d got_status=%d", __func__, standalone, got_status);
 		      fprintf (stderr, I18N (803, "<<Job has been requeued, waiting for dispatch......>>\n"));	/* catgets 803 */
 		      if (usepty && io_fd >= 0 && isatty (io_fd))
 			{
@@ -887,8 +738,7 @@ serv (char **argv, int asock)
 
 	      if (niosDebug)
 		{
-		  ls_syslog (LOG_DEBUG, "\
-%s: Nios NIOS2RES_STDIN <%d> bytes to remote task", __func__, readCount);
+		  ls_syslog (LOG_DEBUG, "%s: Nios NIOS2RES_STDIN <%d> bytes to remote task", __func__, readCount);
 		}
 
 	      if ((cc = ls_niowrite (bp, readCount)) < 0)
@@ -920,8 +770,7 @@ serv (char **argv, int asock)
 	      {
 		if (niosDebug)
 		  {
-		    ls_syslog (LOG_DEBUG, "\
-%s: Nios got <EOF> NIOS2RES_EOF for all current remote tasks", __func__);
+		    ls_syslog (LOG_DEBUG, "%s: Nios got <EOF> NIOS2RES_EOF for all current remote tasks", __func__);
 		  }
 		ls_nioclose ();
 		FD_CLR (STDIN_FD, &nios_rmask);
@@ -974,7 +823,7 @@ serv (char **argv, int asock)
     }
 }
 
-static int
+int
 die (void)
 {
   if (niosDebug)
@@ -991,12 +840,11 @@ die (void)
 void
 kill_self (int exit_sig, int exit_stat)
 {
-  static char __func__] = "kill_self()";
+  char __func__] = "kill_self()";
 
   if (niosDebug)
     {
-      ls_syslog (LOG_DEBUG, "\
-%s: Nios kill_self, exit_sig=%d exit_stat=%d", __func__, exit_sig, exit_stat);
+      ls_syslog (LOG_DEBUG, "%s: Nios kill_self, exit_sig=%d exit_stat=%d", __func__, exit_sig, exit_stat);
     }
 
   if (usepty && io_fd >= 0 && isatty (io_fd))
@@ -1040,16 +888,14 @@ kill_self (int exit_sig, int exit_stat)
 
 #if defined(SIGXCPU)
 	case SIGXCPU:
-	  ls_syslog (LOG_ERR, I18N (5807, "\
-%s: Nios receives signal SIGXCPU, exit\n"),	/* catgets 5807 */
+	  ls_syslog (LOG_ERR, I18N (5807, "%s: Nios receives signal SIGXCPU, exit\n"),	/* catgets 5807 */
 		     __func__);
 	  exit (exit_stat);
 	  break;
 #endif
 #if defined(SIGXFSZ)
 	case SIGXFSZ:
-	  ls_syslog (LOG_ERR, I18N (5808, "\
-%s: Nios receives signal SIGXFSZ, exit"),	/* catgets 5808 */
+	  ls_syslog (LOG_ERR, I18N (5808, "%s: Nios receives signal SIGXFSZ, exit"),	/* catgets 5808 */
 		     __func__);
 	  exit (exit_stat);
 	  break;
@@ -1070,8 +916,7 @@ kill_self (int exit_sig, int exit_stat)
 
 	  Signal_ (exit_sig, SIG_DFL);
 	  kill (getpid (), exit_sig);
-	  ls_syslog (LOG_ERR, I18N (5809, "\
-%s: Nios does not die at sig %d: errno %d"),	/* catgets 5809 */
+	  ls_syslog (LOG_ERR, I18N (5809, "%s: Nios does not die at sig %d: errno %d"),	/* catgets 5809 */
 		     __func__, exit_sig, errno);
 	  exit (-1);
 	}
@@ -1086,12 +931,12 @@ kill_self (int exit_sig, int exit_stat)
 }
 
 
-static void
+void
 do_newtask (void)
 {
-  static char __func__] = "do_newtask()";
+  char __func__] = "do_newtask()";
   struct lslibNiosHdr hdr;
-  static int first = 1;
+  int first = 1;
   if (first)
     {
       if (first == 1)
@@ -1201,17 +1046,16 @@ do_newtask (void)
       break;
 
     default:
-      ls_syslog (LOG_ERR, I18N (5812, "\
-%s: No such service provided by NIOS code = %d"),	/* catgets 5812 */
+      ls_syslog (LOG_ERR, I18N (5812, "%s: No such service provided by NIOS code = %d"),	/* catgets 5812 */
 		 __func__, hdr.opCode);
     }
 }
 
 
-static void
+void
 rtask (struct lslibNiosHdr *hdr)
 {
-  static char __func__] = "rtask()";
+  char __func__] = "rtask()";
   struct lslibNiosRTask req;
 
   if (b_read_fix (chfd, (char *) &req.r, sizeof (req.r)) != sizeof (req.r))
@@ -1243,7 +1087,7 @@ rtask (struct lslibNiosHdr *hdr)
 }
 
 
-static void
+void
 rwait (struct lslibNiosHdr *hdr)
 {
   int retVal;
@@ -1299,7 +1143,7 @@ rwait (struct lslibNiosHdr *hdr)
     }
 }
 
-static void
+void
 remOn (struct lslibNiosHdr *hdr)
 {
   if (!endstdin)
@@ -1317,7 +1161,7 @@ remOn (struct lslibNiosHdr *hdr)
     }
 }
 
-static void
+void
 remOff (struct lslibNiosHdr *hdr)
 {
   FD_CLR (STDIN_FD, &nios_rmask);
@@ -1334,7 +1178,7 @@ remOff (struct lslibNiosHdr *hdr)
     }
 }
 
-static void
+void
 exExit (struct lslibNiosHdr *hdr)
 {
   if (usepty && io_fd >= 0 && isatty (io_fd))
@@ -1347,12 +1191,12 @@ exExit (struct lslibNiosHdr *hdr)
   exit (0);
 }
 
-static void
+void
 setStdout (struct lslibNiosHdr *hdr)
 {
-  static struct lslibNiosStdout req;
+  struct lslibNiosStdout req;
   int err;
-  static int first = TRUE;
+  int first = TRUE;
 
   err = 0;
 
@@ -1401,13 +1245,13 @@ setStdout (struct lslibNiosHdr *hdr)
     }
 }
 
-static void
+void
 setStdin (struct lslibNiosHdr *hdr)
 {
-  static char __func__] = "setStdin()";
-  static struct lslibNiosStdin req;
+  char __func__] = "setStdin()";
+  struct lslibNiosStdin req;
   int i, err;
-  static int first = TRUE;
+  int first = TRUE;
 
   err = 0;
 
@@ -1459,14 +1303,14 @@ setStdin (struct lslibNiosHdr *hdr)
     }
 }
 
-static void
+void
 getStdin (struct lslibNiosHdr *hdr)
 {
-  static char __func__] = "nios/getStdin()";
+  char __func__] = "nios/getStdin()";
   int retVal;
-  static struct lslibNiosStdin req;
-  static struct lslibNiosGetStdinReply reply;
-  static int first = TRUE;
+  struct lslibNiosStdin req;
+  struct lslibNiosGetStdinReply reply;
+  int first = TRUE;
 
   if (first)
     {
@@ -1510,10 +1354,10 @@ getStdin (struct lslibNiosHdr *hdr)
 }
 
 
-static void
+void
 emusig (int tid, int st)
 {
-  static char __func__] = "emusig()";
+  char __func__] = "emusig()";
   SIGFUNCTYPE handle;
   LS_WAIT_T status = *((LS_WAIT_T *) & st);
 
@@ -1574,8 +1418,7 @@ emusig (int tid, int st)
 
 	  if (niosDebug)
 	    {
-	      ls_syslog (LOG_DEBUG, "\
-%s: Nios remote signaled exit_sig=<%d> exit_status=<%d>", __func__, exit_sig, exit_status);
+	      ls_syslog (LOG_DEBUG, "%s: Nios remote signaled exit_sig=<%d> exit_status=<%d>", __func__, exit_sig, exit_status);
 	    }
 
 	}
@@ -1586,8 +1429,7 @@ emusig (int tid, int st)
 
 	  if (niosDebug)
 	    {
-	      ls_syslog (LOG_DEBUG, "\
-%s: Nios signaled exit_sig=<%d> sending SIGUSR1 to oparent", __func__, LS_WTERMSIG (status));
+	      ls_syslog (LOG_DEBUG, "%s: Nios signaled exit_sig=<%d> sending SIGUSR1 to oparent", __func__, LS_WTERMSIG (status));
 	    }
 
 	  kill (ppid, SIGUSR1);
@@ -1595,16 +1437,15 @@ emusig (int tid, int st)
     }
 }
 
-static void
+void
 PassSig (int signo)
 {
-  static char __func__] = "PassSig()";
+  char __func__] = "PassSig()";
   sigset_t omask, nmask;
 
   if (niosDebug)
     {
-      ls_syslog (LOG_DEBUG, "\
-%s: Nios NIOS2RES_SIGNAL delivering signal = <%d> to remote tasks.", __func__, signo);
+      ls_syslog (LOG_DEBUG, "%s: Nios NIOS2RES_SIGNAL delivering signal = <%d> to remote tasks.", __func__, signo);
     }
 
 
@@ -1648,7 +1489,7 @@ PassSig (int signo)
 }
 
 
-static void
+void
 exSuspend (struct lslibNiosHdr *hdr)
 {
   if (remon && usepty && io_fd >= 0 && isatty (io_fd))
@@ -1667,7 +1508,7 @@ exSuspend (struct lslibNiosHdr *hdr)
     ls_remtty (io_fd, usepty == 1 ? TRUE : FALSE);
 }
 
-static void
+void
 conin (int signo)
 {
   PassSig (signo);
@@ -1679,10 +1520,10 @@ conin (int signo)
     }
 }
 
-static void
+void
 reset_uid (void)
 {
-  static char __func__] = "nios/reset_uid()";
+  char __func__] = "nios/reset_uid()";
   int ruid = getuid ();
 
   if (geteuid () == 0)
@@ -1699,10 +1540,10 @@ reset_uid (void)
 }
 
 
-static int
+int
 acceptCallBack (int asock)
 {
-  static char __func__] = "nios/acceptCallBack()";
+  char __func__] = "nios/acceptCallBack()";
   int sock;
   char *sp;
   struct niosConnect connReq;
@@ -1716,8 +1557,7 @@ acceptCallBack (int asock)
 
   if ((sp = getenv ("LSB_JOBID")) == NULL)
     {
-      ls_syslog (LOG_ERR, "\
-%s: LSB_JOBID is not defined", __func__);
+      ls_syslog (LOG_ERR, "%s: LSB_JOBID is not defined", __func__);
       exit (-1);
     }
 
@@ -1785,14 +1625,14 @@ acceptCallBack (int asock)
 		}
 	    }
 
-	  closesocket (sock);
+	  close (sock);
 	}
     }
 
 
   if (!(niosSbdMode))
     {
-      closesocket (asock);
+      close (asock);
     }
 
 
@@ -1809,18 +1649,15 @@ acceptCallBack (int asock)
 	{
 	  struct hostent *hp;
 
-	  hp = Gethostbyaddr_ (&sin.sin_addr.s_addr,
-			       sizeof (in_addr_t), AF_INET);
+	  hp = Gethostbyaddr_ (&sin.sin_addr.s_addr, sizeof (in_addr_t), AF_INET);
 	  if (hp == NULL)
 	    {
-	      ls_syslog (LOG_ERR, "\
-%s: gethostbyaddr() failed for %s", __func__, sockAdd2Str_ (&sin));
+	      ls_syslog (LOG_ERR, "%s: gethostbyaddr() failed for %s", __func__, sockAdd2Str_ (&sin));
 
 	    }
 	  else
 	    {
-	      fprintf (stderr, "\
-<<Starting on %s>>\r\n", hp->h_name);
+	      fprintf (stderr, "<<Starting on %s>>\r\n", hp->h_name);
 	    }
 	}
     }
@@ -1842,9 +1679,8 @@ acceptCallBack (int asock)
     }
   else
     {
-      ls_syslog (LOG_ERR, I18N (5816, "\
-%s: usepty specified but TTY not detected\r\n"),	/* catgets 5816 */
-		 __func__);
+    	/* catgets 5816 */
+      ls_syslog (LOG_ERR, I18N (5816, "%s: usepty specified but TTY not detected\r\n"),	__func__);
       exit (-1);
     }
 
@@ -1860,7 +1696,7 @@ acceptCallBack (int asock)
 char *
 getTimeStamp (void)
 {
-  static char timeStamp[64];
+  char timeStamp[64];
   time_t t;
 
   t = time (NULL);
@@ -1920,12 +1756,12 @@ JobStateInfo (LS_LONG_INT jid)
 int
 cmpJobStates (struct jobInfoEnt *job)
 {
-  static char __func__] = "cmpJobStates()";
-  static int status = JOB_STAT_UNKWN;
-  static int *reasonTb = NULL;
-  static int numReasons = 0;
-  static int reasons = 0;
-  static int subreasons = 0;
+  char __func__] = "cmpJobStates()";
+  int status = JOB_STAT_UNKWN;
+  int *reasonTb = NULL;
+  int numReasons = 0;
+  int reasons = 0;
+  int subreasons = 0;
   int stat = 0;
   int i;
 
@@ -2077,7 +1913,7 @@ prtJobStateMsg (struct jobInfoEnt *job, struct jobInfoHead *jInfoH)
 {
   char prline[MSGSIZE] = "";
   time_t doneTime;
-  static struct loadIndexLog *loadIndex = NULL;
+  struct loadIndexLog *loadIndex = NULL;
   char *pendReasons = NULL;
 
   if (loadIndex == NULL)
@@ -2210,14 +2046,14 @@ get_status (struct jobInfoEnt *job)
 struct loadIndexLog *
 initLoadIndex (void)
 {
-  static char __func__] = "initLoadIndex()";
+  char __func__] = "initLoadIndex()";
   int i;
   struct lsInfo *lsInfo;
-  static struct loadIndexLog loadIndex;
-  static char *defNames[] = { "r15s", "r1m", "r15m", "ut", "pg", "io", "ls",
+  struct loadIndexLog loadIndex;
+  char *defNames[] = { "r15s", "r1m", "r15m", "ut", "pg", "io", "ls",
     "it", "swp", "mem", "tmp"
   };
-  static char **names;
+  char **names;
 
   TIMEIT (1, (lsInfo = ls_info ()), "ls_info");
   if (lsInfo == NULL)
@@ -2320,3 +2156,22 @@ printJobSuspend (LS_LONG_INT jid)
     }
 
 }
+
+
+void
+myHandler (int sig)
+{
+  if (sig == SIGUSR2 && !niosSbdMode)
+    {
+      PassSig (SIGTSTP);
+      forwardTSTP = 1;
+    }
+}
+
+
+void
+signalBufEmpty (int dummy)
+{
+	return;
+}
+

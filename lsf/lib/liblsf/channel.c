@@ -41,7 +41,7 @@ See if it needs moving to the libint header file.
 // #define NL_SETN 23
 
 /*#define CLOSEIT(i) { \
-CLOSESOCKET(channels[i].handle); \
+close(channels[i].handle); \
 channels[i].state = CH_DISC; \
 channels[i].handle = INVALID_HANDLE; }
 */
@@ -591,7 +591,7 @@ chanOpen_ (unsigned int iaddr, unsigned short port, int options)
 
     if (io_nonblock_ ((int)channels[i].handle) < 0)
     {
-        CLOSESOCKET((int)channels[i].handle);
+        close((int)channels[i].handle);
         channels[i].state = CH_DISC;
         channels[i].handle = INVALID_HANDLE;
         cherrno = CHANE_SYSCALL;
@@ -619,7 +619,7 @@ chanOpen_ (unsigned int iaddr, unsigned short port, int options)
 //                ls_syslog (LOG_ERR, I18N (5003, "chanOpen: connect() failed, laddr=%s, addr=%s"), sockAdd2Str_ ((struct sockaddr_in *) &laddr), sockAdd2Str_ ((struct sockaddr_in *) &addr)); 
             }
 
-            CLOSESOCKET((int)channels[i].handle);
+            close((int)channels[i].handle);
             channels[i].state = CH_DISC;
             channels[i].handle = INVALID_HANDLE;
             cherrno = CHANE_SYSCALL;
@@ -635,7 +635,7 @@ chanOpen_ (unsigned int iaddr, unsigned short port, int options)
 
     if (!channels[i].send || !channels[i].recv)
     {
-        CLOSESOCKET((int)channels[i].handle);
+        close((int)channels[i].handle);
         channels[i].state = CH_DISC;
         channels[i].handle = INVALID_HANDLE;
         FREEUP (channels[i].send);
@@ -677,7 +677,7 @@ chanOpenSock_ (int s, int options)
     channels[i].recv = newBuf ();
     if (!channels[i].send || !channels[i].recv)
     {
-        CLOSESOCKET((int)channels[i].handle);
+        close((int)channels[i].handle);
         channels[i].state = CH_DISC;
         channels[i].handle = INVALID_HANDLE;
         FREEUP (channels[i].send);
@@ -1114,8 +1114,7 @@ chanRpc_ (int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *out
     return 0;
 }
 
-int
-chanSock_ (unsigned int chfd)
+unsigned long chanSock_ (unsigned int chfd)
 {
     if ( chfd > chanMaxSize)
     {
@@ -1285,13 +1284,15 @@ doread (int chfd, struct Masks *chanmask)
 void
 dowrite (int chfd, struct Masks *chanmask)
 {
-    long cc;
-    struct Buffer *sendbuf;
+    long cc = 0;
+    struct Buffer *sendbuf = NULL;
     
-    if (channels[chfd].send->forw == channels[chfd].send)
+    if (channels[chfd].send->forw == channels[chfd].send) {
         return;
-    else
+    }
+    else {
         sendbuf = channels[chfd].send->forw;
+    }
 
     // paranoid
     assert( sendbuf->pos >= 0 );
@@ -1318,7 +1319,7 @@ dowrite (int chfd, struct Masks *chanmask)
 struct Buffer *
 newBuf (void)
 {
-    struct Buffer *newbuf;
+    struct Buffer *newbuf = NULL;
 
     newbuf = calloc (1, sizeof (struct Buffer));
     if (!newbuf){
@@ -1326,7 +1327,8 @@ newBuf (void)
     }
 
     newbuf->forw = newbuf->back = newbuf;
-    newbuf->len = newbuf->pos = 0;
+    newbuf->len = 0;
+    newbuf->pos = 0;
     newbuf->data = NULL;
     newbuf->stashed = FALSE;
 

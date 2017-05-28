@@ -118,7 +118,8 @@ int sharedResConfigured_;
 
 #define XDR_DECODE_SIZE_(a) (a)
 
-#define LS_EXEC_T "LS_EXEC_T"
+// #define LS_EXEC_T "LS_EXEC_T"
+const char LS_EXEC_T[] = "LS_EXEC_T";
 
 
 #define GET_INTNUM(i) ((i)/INTEGER_BITS + 1)
@@ -303,7 +304,7 @@ long  nb_read_timeout (int s, char *buf, size_t len, int timeout);
 int   b_write_timeout (int, char *, int, int);
 int   detectTimeout_ (int, int);
 int   b_connect_ (int s, struct sockaddr *name, socklen_t namelen, unsigned int timeout);
-int   rd_select_ (int, struct timeval *);
+int   rd_select_ (long s, struct timeval *);
 int   b_accept_ (int, struct sockaddr *, socklen_t *);
 int   blockSigs_ (int, sigset_t *, sigset_t *);
 // long  b_write_fix  (int s, char *buf, size_t len);

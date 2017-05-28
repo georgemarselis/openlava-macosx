@@ -19,42 +19,73 @@
 #pragma once
 
 
-#define RF_SERVERD "_rf_Server_"
+#define ABS(i) ((i) < 0 ? -(i) : (i))
+
+struct rHosts
+{
+	int sock;
+	int nopen;
+	time_t atime;
+	char *hname; 
+	struct rHosts *next;
+} *rHosts = NULL;
+
+struct rfTab
+{
+	int fd;
+	char padding[4];
+	struct rHosts *host;
+} *ft = NULL;
 
 typedef enum
 {
-  RF_OPEN,
-  RF_READ,
-  RF_WRITE,
-  RF_CLOSE,
-  RF_STAT,
-  RF_GETMNTHOST,
-  RF_LSEEK,
-  RF_FSTAT,
-  RF_UNLINK,
-  RF_TERMINATE
+	RF_OPEN,
+	RF_READ,
+	RF_WRITE,
+	RF_CLOSE,
+	RF_STAT,
+	RF_GETMNTHOST,
+	RF_LSEEK,
+	RF_FSTAT,
+	RF_UNLINK,
+	RF_TERMINATE
 } rfCmd;
-
 
 struct ropenReq
 {
-  char *fn;
-  int flags;
-  int mode;
+	char *fn;
+	int flags;
+	int mode;
 };
 
 
 struct rrdwrReq
 {
-  int fd;
-  char padding[4];
-  size_t len;
+	int fd;
+	char padding[4];
+	size_t len;
 };
 
 struct rlseekReq
 {
-  int fd;
-  int whence;
-  off_t offset;
+	int fd;
+	int whence;
+	off_t offset;
 };
+
+
+int nrh = 0;
+int rxFlags = 0;
+int maxnrh = RF_MAXHOSTS;
+// #define RF_SERVERD "_rf_Server_"
+const char RF_SERVERD[] = "_rf_Server_";
+
+struct rHosts *rhConnect (char *host);
+struct rHosts *allocRH   (void);
+struct rHosts *rhFind    (char *host);
+int            ls_ropen  (char *host, char *fn, int flags, int mode);
+int            ls_rclose (int fd);
+int            ls_rwrite (int fd, char *buf, size_t len);
+int            ls_rread  (int fd, char *buf, size_t len)
+int          rhTerminate (char *host);
 

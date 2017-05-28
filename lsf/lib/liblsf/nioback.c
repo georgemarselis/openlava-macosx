@@ -51,7 +51,7 @@ niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus,
             ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "tcpCreate");
         }
         
-        return (-1);
+        return -1;
     }
 
     if (genParams_[LSF_RES_TIMEOUT].paramValue) {
@@ -67,16 +67,16 @@ niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus,
         if (logclass & LC_EXEC) {
             ls_syslog (LOG_DEBUG, "%s: connect(s=%d,%s,len=%d) failed: %m", __func__, s, sockAdd2Str_ (from), sizeof (struct sockaddr_in));
         }
-        closesocket (s);
+        close (s);
         
-        return (-1);
+        return -1;
     }
 
     fcntl (s, F_SETFD, fcntl (s, F_GETFD) | FD_CLOEXEC);
     setsockopt (s, SOL_SOCKET, SO_LINGER, (char *) &linstr, sizeof (linstr));
 
     if (rpid == 0) {
-        return (s);
+        return s;
     }
 
     if (logclass & LC_TRACE) {
@@ -103,9 +103,9 @@ niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus,
             ls_syslog (LOG_ERR, I18N (6201, "%s: writeEncodeMsg_(%d,%d) RES2NIOS_connect failed: %M"), __func__, s, rpid);
         }
       
-        closesocket (s);
-        return (-1);
+        close (s);
+        return -1;
     }
 
-  return (s);
+  return s;
 }

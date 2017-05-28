@@ -94,7 +94,7 @@ ls_rtaske (char *host, char **argv, int options, char **envp)
 		FD_SET (s, &connection_ok_);
 		if (ackReturnCode_ (s) < 0)
 		{
-			closesocket (s);
+			close (s);
 			_lostconnection_ (host);
 			sigprocmask (SIG_SETMASK, &oldMask, NULL);
 			return (-1);
@@ -153,7 +153,7 @@ ls_rtaske (char *host, char **argv, int options, char **envp)
 	{
 	  lserrno = LSE_SOCK_SYS;
 	  sigprocmask (SIG_SETMASK, &oldMask, NULL);
-	  closesocket (s);
+	  close (s);
 	  return (-1);
 	}
 
@@ -261,7 +261,7 @@ ls_rtaske (char *host, char **argv, int options, char **envp)
 	strcpy (cmdmsg.cwd, rexcwd_);
   else if (mygetwd_ (cmdmsg.cwd) == 0)
 	{
-	  closesocket (s);
+	  close (s);
 	  _lostconnection_ (host);
 	  lserrno = LSE_WDIR;
 	  sigprocmask (SIG_SETMASK, &oldMask, NULL);
@@ -279,7 +279,7 @@ ls_rtaske (char *host, char **argv, int options, char **envp)
 
   if (sendCmdBill_ (s, (enum resCmd) RES_EXEC, &cmdmsg, NULL, NULL) == -1)
 	{
-	  closesocket (s);
+	  close (s);
 	  _lostconnection_ (host);
 	  sigprocmask (SIG_SETMASK, &oldMask, NULL);
 	  return (-1);
@@ -290,7 +290,7 @@ ls_rtaske (char *host, char **argv, int options, char **envp)
 
 	  if ((taskPort = getTaskPort (s)) == 0)
 	{
-	  closesocket (s);
+	  close (s);
 	  _lostconnection_ (host);
 	  sigprocmask (SIG_SETMASK, &oldMask, NULL);
 	  return (-1);
@@ -300,7 +300,7 @@ ls_rtaske (char *host, char **argv, int options, char **envp)
   len = sizeof (sin);
   if (getpeername (s, (struct sockaddr *) &sin, &len) < 0)
 	{
-	  closesocket (s);
+	  close (s);
 	  _lostconnection_ (host);
 	  lserrno = LSE_SOCK_SYS;
 	  sigprocmask (SIG_SETMASK, &oldMask, NULL);
@@ -316,7 +316,7 @@ ls_rtaske (char *host, char **argv, int options, char **envp)
   if (b_write_fix (cli_nios_fd[0], (char *) &taskReq, sizeof (taskReq))
 	  != sizeof (taskReq))
 	{
-	  closesocket (s);
+	  close (s);
 	  _lostconnection_ (host);
 	  lserrno = LSE_MSG_SYS;
 	  sigprocmask (SIG_SETMASK, &oldMask, NULL);
@@ -325,7 +325,7 @@ ls_rtaske (char *host, char **argv, int options, char **envp)
 
   if (tid_register (rpid, s, taskPort, host, options & REXF_TASKINFO) == -1)
 	{
-	  closesocket (s);
+	  close (s);
 	  _lostconnection_ (host);
 	  lserrno = LSE_MALLOC;
 	  sigprocmask (SIG_SETMASK, &oldMask, NULL);
@@ -392,7 +392,7 @@ lsRGetpidAsync_ (int taskid, int *pid)
 	  FD_SET (s, &connection_ok_);
 	  if (ackReturnCode_ (s) < 0)
 	{
-	  closesocket (s);
+	  close (s);
 	  _lostconnection_ (host);
 	  return (NULL);
 	}
@@ -404,7 +404,7 @@ lsRGetpidAsync_ (int taskid, int *pid)
   if (callRes_ (s, RES_GETPID, (char *) &pidReq, (char *) &buf,
 		sizeof (buf), xdr_resGetpid, 0, 0, NULL) == -1)
 	{
-	  closesocket (s);
+	  close (s);
 	  _lostconnection_ (host);
 	  return (NULL);
 	}
@@ -456,7 +456,7 @@ lsRGetpid_ (int taskid, int options)
 	  FD_SET (s, &connection_ok_);
 	  if (ackReturnCode_ (s) < 0)
 	{
-	  closesocket (s);
+	  close (s);
 	  _lostconnection_ (host);
 	  return (-1);
 	}
@@ -468,7 +468,7 @@ lsRGetpid_ (int taskid, int options)
   if (callRes_ (s, RES_GETPID, (char *) &pidReq, (char *) &buf,
 		sizeof (buf), xdr_resGetpid, 0, 0, NULL) == -1)
 	{
-	  closesocket (s);
+	  close (s);
 	  _lostconnection_ (host);
 	  return (-1);
 	}
@@ -517,7 +517,7 @@ lsRGetpgrp_ (int sock, int taskid, pid_t pid)
 	  FD_SET (s, &connection_ok_);
 	  if (ackReturnCode_ (s) < 0)
 	{
-	  closesocket (s);
+	  close (s);
 	  _lostconnection_ (host);
 	  return (-1);
 	}
@@ -529,7 +529,7 @@ lsRGetpgrp_ (int sock, int taskid, pid_t pid)
   if (callRes_ (s, RES_GETPID, (char *) &pidReq, (char *) &buf,
 		sizeof (buf), xdr_resGetpid, 0, 0, NULL) == -1)
 	{
-	  closesocket (s);
+	  close (s);
 	  _lostconnection_ (host);
 	  return (-1);
 	}

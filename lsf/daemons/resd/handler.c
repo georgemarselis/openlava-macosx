@@ -47,8 +47,9 @@
 #include "libint/userok.h"
 
 
-#define NL_SETN         29
-#define CHILD_DELETED     2
+// #define NL_SETN         29
+// #define CHILD_DELETED     2
+const unsigned short CHILD_DELETED = 2;
 
 void child_channel_clear (struct child *, struct outputchannel *);
 static void declare_eof_condition (struct child *, int );
