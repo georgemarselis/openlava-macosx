@@ -31,13 +31,13 @@
 int
 initResTable_ (void)
 {
-	struct resItem *resTable;
-	unsigned int i;
+	struct resItem *resTable = NULL;
+	unsigned int i = 0;
 
 	resTable = malloc (1000 * sizeof (struct resItem) + 1 * sizeof( struct resItem ) ); // FIXME FIXME FIXME FIXME '1000' is awfuly partifular
 	if (!resTable)
 		{
-		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
+		ls_syslog (LOG_ERR, "%s: %s() failed", __func__, "malloc");
 		return -1;
 		}
 	i = 0;
@@ -67,14 +67,17 @@ struct sharedConf *ls_readshared (char *filename)
 	FILE *fp = NULL;
 	char *cp = NULL;
 	char *word = NULL;
-	char modelok, resok, clsok, typeok;
+	char modelok;
+	char resok;
+	char clsok;
+	char typeok;
 	size_t lineNum = 0;
 
 	lserrno = LSE_NO_ERR;
 	if (__func__ == NULL)
 		{
 		/* catgets 5050 */
-		ls_syslog (LOG_ERR, (_i18n_msg_get(ls_catd, NL_SETN, 5050, "%s: filename is NULL")), __func__);
+		ls_syslog (LOG_ERR, "catgets 5050: %s: filename is NULL", __func__);
 		lserrno = LSE_NO_FILE;
 		return NULL;
 		}
@@ -89,7 +92,7 @@ struct sharedConf *ls_readshared (char *filename)
 	if (sConf == NULL) {
 		sConf = malloc (sizeof (struct sharedConf));
 		if (NULL == sConf && ENOMEM == errno ) {
-			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
+			ls_syslog (LOG_ERR, "%s: %s() failed", __func__, "malloc");
 			lserrno = LSE_MALLOC;
 			return NULL;
 		}
@@ -104,9 +107,9 @@ struct sharedConf *ls_readshared (char *filename)
 	}
 
 	modelok = FALSE;
-	resok = FALSE;
-	clsok = FALSE;
-	typeok = FALSE;
+	resok   = FALSE;
+	clsok   = FALSE;
+	typeok  = FALSE;
 
 	if (initResTable_() < 0) {
 		lserrno = LSE_MALLOC;
