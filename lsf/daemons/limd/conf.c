@@ -760,28 +760,43 @@ resNameDefined (char *name)
     return (-1);
 }
 
-#define RKEY_RESOURCENAME 0
-#define RKEY_TYPE         1
-#define RKEY_INTERVAL     2
-#define RKEY_INCREASING   3
-#define RKEY_RELEASE      4
-#define RKEY_DESCRIPTION  5
-
 char
-doresources (FILE * fp, uint *lineNum, char *lsfile)
+doresources (FILE * fp, uint *lineNum, char *lsfile) // FIXME FIXME FIXME FIXME FIXME duplicated function from lsf/lib/liblsf/conf.c . Must de-dup.
 {
-    char *linep = NULL;
-    struct keymap keyList[] = {
-            {0, "    ", NULL, "RESOURCENAME"},
-            {0, "    ", NULL, "TYPE"},
-            {0, "    ", NULL, "INTERVAL"},
-            {0, "    ", NULL, "INCREASING"},
-            {0, "    ", NULL, "RELEASE"},
-            {0, "    ", NULL, "DESCRIPTION"},
-            {0, "    ", NULL, NULL}
-    };
+
     int nres = 0;
     int resIdx = 0;
+    char *linep = NULL;
+
+    char resource[] = "resource";
+    char keylist[5][] = {
+        "RESOURCENAME",
+        "TYPE",
+        "INTERVAL",
+        "INCREASING",
+        "RELEASE",
+        "DESCRIPTION"
+    };
+
+    enum {
+        RESOURCENAME = 0,
+        TYPE,
+        INTERVAL,
+        INCREASING,
+        RELEASE,
+        DESCRIPTION
+    };
+
+    struct keymap keyList[] = {
+        { 0, "    " , NULL, keylist[RESOURCENAME] },
+        { 0, "    " , NULL, keylist[TYPE] },
+        { 0, "    " , NULL, keylist[INTERVAL] },
+        { 0, "    " , NULL, keylist[INCREASING] },
+        { 0, "    " , NULL, keylist[RELEASE] },
+        { 0, "    " , NULL, keylist[DESCRIPTION] },
+        { 0, "    " , NULL, NULL}
+    };
+
 
     linep = getNextLineC_ (fp, lineNum, TRUE);
     if (!linep) {

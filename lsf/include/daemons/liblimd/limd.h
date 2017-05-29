@@ -438,7 +438,6 @@ int readCluster (int);
 void reCheckRes (void);
 int reCheckClass (void);
 void setMyClusterName (void);
-int resNameDefined (char *);
 struct sharedResource *inHostResourcs (char *);
 struct resourceInstance *isInHostList (struct sharedResource *, char *);
 struct hostNode *initHostNode (void);

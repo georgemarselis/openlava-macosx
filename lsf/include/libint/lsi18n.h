@@ -132,7 +132,7 @@ int   _i18n_init   ( int );
 char *_i18n_printf (const char *, ...);
 // #ifdef  I18N_COMPILE
 // #else
-// #define  _i18n_msg_get(catd,setID,msgID,msgStr)  (msgStr)
+#define  _i18n_msg_get(catd,setID,msgID,msgStr)  (msgStr)
 // #define  _i18n_msgArray_get(catd,setID,msgID_Array,msgArray) (msgArray)
 // #endif
 

@@ -28,7 +28,7 @@ typedef struct
 } attribFunc;
 
 
-#define   CPUFACTOR  (nRes + numIndx)
+#define   CPUFACTOR_ (nRes + numIndx)
 #define   NDISK      (nRes + numIndx + 1)
 #define   REXPRI     (nRes + numIndx + 2)
 #define   MAXCPUS_   (nRes + numIndx + 3)

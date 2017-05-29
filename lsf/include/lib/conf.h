@@ -93,15 +93,15 @@ struct HostsArray
 struct keymap {
     int position;
     char padding1[4];
-    char *key;
+    const char *key;
     char *val;
 };
 
-// static const int builtInRes_ID[] = {
-//   1300, 1301, 1302, 1303, 1304, 1305, 1306, 1307, 1308, 1309,
-//   1310, 1311, 1312, 1313, 1314, 1315, 1316, 1317, 1318, 1319,
-//   1320, 1321
-// };
+const int builtInRes_ID[] = { // FIXME FIXME FIXME FIXME careful when compiling with the -Wkitchen-sink
+    1300, 1301, 1302, 1303, 1304, 1305, 1306, 1307, 1308, 1309,
+    1310, 1311, 1312, 1313, 1314, 1315, 1316, 1317, 1318, 1319,
+    1320, 1321
+};
 
 //
 // Function prototypes
@@ -123,7 +123,7 @@ char addHostModel (char *model, char *arch, double factor);
 // static 
 char setIndex    (struct keymap *keyList, char *fname, size_t lineNum);
 
-int resNameDefined (char *);
+unsigned int resNameDefined (char *);
 
 void initClusterInfo (struct clusterInfo *);
 void freeClusterInfo (struct clusterInfo *);

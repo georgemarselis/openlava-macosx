@@ -95,7 +95,7 @@ numericValue( ClientData clientData, Tcl_Interp *interp, Tcl_Value * args, Tcl_V
 		return TCL_OK;
 	}
 
-  if (*indx == CPUFACTOR)
+  if (*indx == CPUFACTOR_)
 	{
 	  runTimeDataQueried = FALSE;
 	  resultPtr->type = TCL_DOUBLE;
@@ -552,7 +552,7 @@ initTcl( struct tclLsInfo *tclLsInfo )
 	numIndx = tclLsInfo->numIndx;
 	nRes = tclLsInfo->nRes;
 
-	attrFuncTable[4].clientData = CPUFACTOR;
+	attrFuncTable[4].clientData = CPUFACTOR_;
 	attrFuncTable[5].clientData = NDISK;
 	attrFuncTable[6].clientData = REXPRI;
 	attrFuncTable[7].clientData = MAXCPUS_;
