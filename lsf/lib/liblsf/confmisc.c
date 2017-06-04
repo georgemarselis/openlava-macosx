@@ -34,11 +34,11 @@ getNextValue (char **line)
 int
 keyMatch (struct keymap *keyList, char *line, int exact)
 {
+	char *sp       = line;
+	char *word     = NULL;
+	int pos        = 0;
+	int found      = FALSE;
 	unsigned int i = 0;
-	int found = FALSE;
-	int pos = 0;
-	char *sp = line;
-	char *word;
 
 
   i = 0;
@@ -89,11 +89,10 @@ keyMatch (struct keymap *keyList, char *line, int exact)
 }
 
 int
-isSectionEnd (char *linep, char *lsfile, size_t *lineNum, char *sectionName)
+isSectionEnd (char *linep, const char *lsfile, size_t *lineNum, const char *sectionName) // FIX
 {
-  char *word;
+  char *word  = getNextWord_ (&linep);
 
-  word = getNextWord_ (&linep);
   if (strcasecmp (word, "end") != 0) {
 	return FALSE;
   }
@@ -114,33 +113,68 @@ isSectionEnd (char *linep, char *lsfile, size_t *lineNum, char *sectionName)
 
 }
 
+
+// DELETEME duplicated code found in intlib/conf.c
+// char *
+// getBeginLine (FILE * fp, size_t *lineNum)
+// {
+// 	char *sp;
+// 	char *wp;
+
+// 	for (;;)
+// 	{
+// 		sp = getNextLineC_ (fp, lineNum, TRUE);
+// 		if (!sp) {
+// 			return NULL;
+// 		}
+
+// 		wp = getNextWord_ (&sp);
+// 		if (wp && (strcasecmp (wp, "begin") == 0)) {
+// 			return sp;
+// 		}
+// 	}
+
+// }
 char *
-getBeginLine (FILE * fp, size_t *lineNum)
+getBeginLine (FILE *fp, size_t *lineNum)
 {
-  char *sp;
-  char *wp;
+	char *sp = NULL;
+	char *wp = NULL;
+	const char begin[] = "begin";
 
-	for (;;)
-	{
-		sp = getNextLineC_ (fp, lineNum, TRUE);
-		if (!sp) {
-			return NULL;
-		}
+	// for (;;)
+	// {
+	// 	sp = getNextLineC_ (fp, lineNum, TRUE);
+	// 	if (!sp) {
+	// 		return NULL;
+	// 	}
 
-		wp = getNextWord_ (&sp);
-		if (wp && (strcasecmp (wp, "begin") == 0)) {
+	// 	wp = getNextWord_ (&sp);
+	// 	if (wp && (strcasecmp (wp, "begin") == 0)) {
+	// 		return sp;
+	// 	}
+	// }
+	// FIXME FIXME refactoring to avoid infinite loop
+	do {
+		sp = getNextLineC_( fp, lineNum, TRUE);
+
+		wp = getNextWord_( &sp );
+		if (wp && (strcasecmp( wp, begin ) == 0)) {
 			return sp;
 		}
-	}
+	} while( sp )
 
+	return NULL;
 }
 
+
 int
-readHvalues (struct keymap *keyList, char *linep, FILE * fp, char *lsfile, size_t *lineNum, int exact, char *section)
+readHvalues (struct keymap *keyList, char *linep, FILE * fp, const char *lsfile, size_t *lineNum, int exact, const char *section)
 {
-	char *key;
-	char *value;
-	char *sp, *sp1;
+	char *key   = NULL;
+	char *value = NULL;
+	char *sp    = NULL;
+	char *sp1   = NULL;
 	char error = FALSE;
 	int i = 0;
 
@@ -238,7 +272,7 @@ readHvalues (struct keymap *keyList, char *linep, FILE * fp, char *lsfile, size_
 // }
 
 void
-doSkipSection (FILE * fp, size_t *lineNum, char *lsfile, char *sectionName)
+doSkipSection (FILE * fp, size_t *lineNum, const char *lsfile, const char *sectionName)
 {
 	char *word = NULL;
 	char *cp = NULL;
@@ -264,78 +298,98 @@ doSkipSection (FILE * fp, size_t *lineNum, char *lsfile, char *sectionName)
 }
 
 int
-mapValues (struct keymap *keyList, char *line)
+mapValues (struct keymap *keyList, char *line) // FIXME FIXME should char *line be const char * ?
 {
-	long pos = 0;
-	char *value;
-	int i = 0;
-	int found;
-	int numv = 0;
+	long pos       = 0;
+	char *value    = NULL;
+	int found      = 0; // FALSE
+	int numv        = 0;
+	unsigned int i = 0;
 
+	while (keyList[i].key != NULL) {
+
+		FREEUP (keyList[i].val);
+		if (keyList[i].position != -1) {
+			numv++;
+		}
+
+		i++;
+	}
+
+	while ((value = getNextValue (&line)) != NULL)
+	{
+		i = 0;
+		found = FALSE;
+		while (keyList[i].key != NULL)
+		{
+			if (keyList[i].position != pos)
+			{
+				i++;
+				continue;
+			}
+			if (strcmp (value, "-") == 0) {
+				keyList[i].val = putstr_ ("");
+			}
+			else
+			{
+				if (keyList[i].val != NULL) {
+					FREEUP (keyList[i].val);
+				}
+				keyList[i].val = putstr_ (value);
+			}
+			found = TRUE;
+			break;
+		}
+		if (!found) {
+			i = 0;
+			while (keyList[i].key != NULL) {
+				if (keyList[i].val != NULL) {
+					free (keyList[i].val);
+					keyList[i].val = NULL;
+				}
+
+				i++;
+			}
+			return -1;
+			// goto fail;
+		}
+		pos++;
+	}
+
+	if (pos != numv) {
+		i = 0;
 		while (keyList[i].key != NULL) {
-
-			FREEUP (keyList[i].val);
-			if (keyList[i].position != -1) {
-				numv++;
+			if (keyList[i].val != NULL) {
+				free (keyList[i].val);
+				keyList[i].val = NULL;
 			}
 
 			i++;
 		}
-
-  while ((value = getNextValue (&line)) != NULL)
-	{
-	  i = 0;
-	  found = FALSE;
-	  while (keyList[i].key != NULL)
-	{
-	  if (keyList[i].position != pos)
-		{
-		  i++;
-		  continue;
-		}
-		if (strcmp (value, "-") == 0) {
-			keyList[i].val = putstr_ ("");
-		}
-	  else
-		{
-			if (keyList[i].val != NULL) {
-				FREEUP (keyList[i].val);
-			}
-		  keyList[i].val = putstr_ (value);
-		}
-	  found = TRUE;
-	  break;
-	}
-		if (!found) {
-			goto fail;
-		}
-	  pos++;
+		return -1;
+		// goto fail;
 	}
 
-	if (pos != numv) {
-		goto fail;
-	}
+	return 0;
 
-  return 0;
+// fail: // FIXME FIXME FIXME remove goto from function
+//   i = 0;
+//   while (keyList[i].key != NULL)
+// 	{
+// 	  if (keyList[i].val != NULL)
+// 	{
+// 	  free (keyList[i].val);
+// 	  keyList[i].val = NULL;
+// 	}
 
-fail: // FIXME FIXME FIXME remove goto from function
-  i = 0;
-  while (keyList[i].key != NULL)
-	{
-	  if (keyList[i].val != NULL)
-	{
-	  free (keyList[i].val);
-	  keyList[i].val = NULL;
-	}
-
-	  i++;
-	}
-  return -1;
+// 	  i++;
+// 	}
+//   return -1;
 
 }
 
 int
-putInLists (char *word, struct admins *admins, unsigned int *numAds, char *forWhat)
+putInLists (char *word, struct admins *admins, unsigned int *numAds, const char *forWhat)
 {
 	struct passwd *pw = NULL;
 	char **tempNames  = NULL; 
@@ -405,7 +459,7 @@ putInLists (char *word, struct admins *admins, unsigned int *numAds, char *forWh
 }
 
 int
-isInlist (char **adminNames, char *userName, unsigned int actAds)
+isInlist ( const char **adminNames, const char *userName, unsigned int actAds)
 {
 
 	if ( 0 == actAds) {
@@ -424,7 +478,7 @@ isInlist (char **adminNames, char *userName, unsigned int actAds)
 }
 
 char *
-getBeginLine_conf (struct lsConf *conf, size_t *lineNum)
+getBeginLine_conf (const struct lsConf *conf, size_t *lineNum)
 {
 	char *sp = NULL;
 	char *wp = NULL;
@@ -451,7 +505,7 @@ getBeginLine_conf (struct lsConf *conf, size_t *lineNum)
 }
 
 void
-doSkipSection_conf (struct lsConf *conf, size_t *lineNum, char *lsfile, char *sectionName)
+doSkipSection_conf (const struct lsConf *conf, size_t *lineNum, const char *lsfile, const char *sectionName)
 {
 	char *word = NULL;
 	char *cp   = NULL;

@@ -91,7 +91,7 @@ struct HostsArray
 };
 
 struct keymap {
-    int position;
+    unsigned int position;
     char padding1[4];
     const char *key;
     char *val;
@@ -181,7 +181,7 @@ int putValue (struct keymap *keyList, char *key, char *value);
 int isInlist (char **adminNames, char *userName, unsigned int actAds);
 char *getNextValue (char **line);
 int keyMatch (struct keymap *keyList, char *line, int exact);
-int isSectionEnd (char *linep, char *lsfile, size_t *lineNum, char *sectionName);
+int isSectionEnd (char *linep, const char *lsfile, const size_t *lineNum, const char *sectionName);
 char *getBeginLine (FILE *fp, size_t *lineNum);
 int readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *lsfile, size_t *lineNum, int exact, char *section);
 int mapValues (struct keymap *keyList, char *line);

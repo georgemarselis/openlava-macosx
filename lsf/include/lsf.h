@@ -350,15 +350,15 @@ struct lsInfo
 {
 	unsigned int nTypes;
 	unsigned int nModels;
-	unsigned int modelRefs[MAXMODELS];
+	unsigned int modelRefs[MAXMODELS];         // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
 	unsigned int nRes;
 	unsigned int numIndx;
 	unsigned int numUsrIndx;
-	char hostTypes[MAXTYPES][MAXLSFNAMELEN];
-	char hostModels[MAXMODELS][MAXLSFNAMELEN];
-	char hostArchs[MAXMODELS][MAXLSFNAMELEN];
+	char hostTypes[MAXTYPES][MAXLSFNAMELEN];   // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
+	char hostModels[MAXMODELS][MAXLSFNAMELEN]; // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
+	char hostArchs[MAXMODELS][MAXLSFNAMELEN];  // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
 	char paddin1[4];
-	double cpuFactor[MAXMODELS];
+	double cpuFactor[MAXMODELS];               // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
 	struct resItem *resTable;
 };
 
@@ -405,9 +405,8 @@ struct hostInfo
 		float *busyThreshold;
 		unsigned long numIndx;
 		char **resources;
-		// char hostName[MAXHOSTNAMELEN]; /* FIXME FIXME FIXME this should be converted to char *hostName */
-		char *hostName; // FIXME FIXME FIXME this should be converted to char *hostName 
-
+		// char hostName[MAXHOSTNAMELEN];
+		char *hostName;
 };
 
 	

@@ -34,22 +34,33 @@
   */
 
 struct lsConf *
-ls_getconf (char *filename)
+ls_getconf ( const char *filename)
 {
-	unsigned long oldLineNum = 0; 
-	unsigned long beginLineNum = 0;
-	unsigned long i = 0;
-	unsigned long numDefs = 0;
-	long offset = 0;
-	size_t lineNum = 0;
-	size_t len = 0;
-	unsigned long numLines = 0;
-	unsigned long defsize = 0;
-	char *linep = NULL, *sp = NULL, *word = NULL, *word1 = NULL, *cp = NULL, **lines = NULL, *ptr = NULL;
-	char flag = 'a', **tmpPtr = NULL, **defNames = NULL, **defConds = NULL;
+	unsigned int i      = 0;
+	size_t defsize      = 0;
+	size_t numDefs      = 0;
+	size_t numLines     = 0;
+	size_t oldLineNum   = 0; 
+	size_t beginLineNum = 0;
+	size_t lineNum      = 0;
+	size_t len          = 0;
+	long offset         = 0;
+	char flag           = 'a';
+	char *linep         = NULL;
+	char *sp            = NULL;
+	char *word          = NULL;
+	char *word1         = NULL;
+	char *cp            = NULL;
+	char *ptr           = NULL;
+	char **lines        = NULL;
+	char **tmpPtr       = NULL;
+	char **defNames     = NULL;
+	char **defConds     = NULL;
 	struct lsConf *conf = NULL;
+	struct confNode *temp = NULL;
+	struct confNode *node = NULL,;
+	struct confNode *prev = NULL;
 	struct confNode *rootNode = NULL;
-	struct confNode *temp = NULL, *node = NULL, *prev = NULL;
 	FILE *fp = NULL;
 
 	lserrno = LSE_NO_ERR;
@@ -171,12 +182,14 @@ ls_getconf (char *filename)
 
 		  for (i = 0; i < numDefs; i++)
 		{
-		  if (!strcmp (defNames[i], word))
-			break;
+			if (!strcmp (defNames[i], word)) {
+				break;
+			}
 		}
 
-		  if (i < numDefs)
-		word = defConds[i];
+			if (i < numDefs) {
+				word = defConds[i];
+			}
 
 
 		  if (numDefs == defsize)
@@ -193,9 +206,10 @@ ls_getconf (char *filename)
 			  goto Error;
 			}
 		  tmpPtr = myrealloc (defConds, defsize * 2 * sizeof (char *));
-		  if (tmpPtr != NULL)
-			defConds = tmpPtr;
-		  else
+		  	if (tmpPtr != NULL) {
+				defConds = tmpPtr;
+		  	}
+			else
 			{
 			  ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__, "realloc", defsize * 2 * sizeof (char *));
 			  FREEUP (word1);
@@ -229,18 +243,21 @@ ls_getconf (char *filename)
 	  else if (strcasecmp (cp, "if") == 0)
 		{
 
-		  while (isspace (*linep))
-		linep++;
+			while (isspace (*linep)) {
+				linep++;
+			}
 		  word = linep;
 
 		  if (*word != '\0')
 		{
-		  if ((ptr = strchr (word, '#')) != NULL)
-			*ptr = '\0';
+			if ((ptr = strchr (word, '#')) != NULL) {
+				*ptr = '\0';
+			}
 
 		  i = strlen (word) - 1;
-		  while (isspace (word[i]))
-			i--;
+		  	while (isspace (word[i])) {
+				i--;
+		  	}
 		  word[i + 1] = '\0';
 		}
 
@@ -260,8 +277,9 @@ ls_getconf (char *filename)
 
 		  for (i = 0; i < numDefs; i++)
 		{
-		  if (!strcmp (defNames[i], word))
-			break;
+		  	if (!strcmp (defNames[i], word)) {
+				break;
+		  	}
 		}
 
 		  if (i < numDefs)
@@ -282,14 +300,16 @@ ls_getconf (char *filename)
 		  goto Error;
 		}
 
-		  if (prev != NULL)
-		linkNode (prev, node);
+			if (prev != NULL) {
+				linkNode (prev, node);
+			}
 		  prev = node;
 		  PUSH_STACK (blockStack, node);
 		  PUSH_STACK (ptrStack, node);
 
-		  if (rootNode == NULL)
-		rootNode = node;
+			if (rootNode == NULL) {
+				rootNode = node;
+			}
 
 		  continue;
 		}
@@ -311,12 +331,14 @@ ls_getconf (char *filename)
 
 		  if (*word != '\0')
 		{
-		  if ((ptr = strchr (word, '#')) != NULL)
-			*ptr = '\0';
+			if ((ptr = strchr (word, '#')) != NULL) {
+				*ptr = '\0';
+			}
 
 		  i = strlen (word) - 1;
-		  while (isspace (word[i]))
-			i--;
+			while (isspace (word[i])) {
+				i--;
+			}
 		  word[i + 1] = '\0';
 		}
 
@@ -336,8 +358,9 @@ ls_getconf (char *filename)
 
 		  for (i = 0; i < numDefs; i++)
 		{
-		  if (!strcmp (defNames[i], word))
-			break;
+			if (!strcmp (defNames[i], word)) {
+				break;
+			}
 		}
 
 		  if (i < numDefs)
@@ -409,7 +432,7 @@ ls_getconf (char *filename)
 	  beginLineNum = lineNum;
 	  numLines = 0;
 	  lines = NULL;
-	  for (;;)
+	  for (;;)	// FIXME FIXME FIXME FIXME FIXME put terminating conditions instead of infinite loop
 	{
 	  lines = myrealloc (lines, (numLines + 1) * sizeof (char *));
 	  if (lines == NULL)
@@ -966,6 +989,10 @@ getNextLineC_conf (struct lsConf *conf, size_t *LineCount, int confFormat)
 				return line;
 			}
 	}
+
+	fprintf( stderr, "%s: you are not suppposed to be here!", __func__ );
+	ls_syslog( LSE_ERR, "%s: you are not suppposed to be here!", __func__ );
+	return NULL;
 }
 
 static char *
@@ -1042,8 +1069,9 @@ readNextLine (struct lsConf *conf, size_t *lineNum)
 	  conf->confhandle->curNode = node->fwPtr;
 	  conf->confhandle->lineCount = 0;
 	  line = readNextLine (conf, lineNum);
-	  if (line)
-		return line;
+		if (line) {
+			return line;
+		}
 	  else
 		{
 		  prev = popStack (conf->confhandle->ptrStack);
