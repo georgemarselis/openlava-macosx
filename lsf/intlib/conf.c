@@ -36,7 +36,7 @@ getNextValue (char **line)
 }
 
 int
-keyMatch (struct keymap *keyList, char *line, int exact)
+keyMatch (struct keymap *keyList, const char *line, int exact)
 {
 	char *sp   = line;
 	char *word = NULL;
@@ -262,7 +262,7 @@ readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *lsfile, size_t
 }
 
 int
-putValue (struct keymap *keyList, char *key, char *value)
+putValue (struct keymap *keyList, const char *key, const char *value)
 {
 	unsigned int i = 0;
 
@@ -425,7 +425,7 @@ return 0;
 }
 
 int
-putInLists (char *word, struct admins *admins, unsigned int *numAds, char *forWhat)
+putInLists (char *word, struct admins *admins, unsigned int *numAds, const char *forWhat)
 {
 	struct passwd *pw = NULL;
 	char **tempNames  = NULL;
@@ -491,7 +491,7 @@ putInLists (char *word, struct admins *admins, unsigned int *numAds, char *forWh
 }
 
 int
-isInlist (char **adminNames, char *userName, unsigned int actAds)
+isInlist (char **adminNames, const char *userName, unsigned int actAds)
 {
 
 	if (actAds == 0) {

@@ -1217,7 +1217,7 @@ do_Users (struct lsConf *conf, const char *filename, size_t *lineNum, int option
 			gp = getUGrpData (keylist[0].val);
 			pw = getpwlsfuser_ (keylist[0].val);
 
-			if ((options != CONF_NO_CHECK) && !gp && (grpSl || (strcmp (keylist[0].val, "default") && !pw))) {
+			if ((options != CONF_NO_CHECK) && !gp && (grpSl || (strcmp (keylist[0].val, defaultLabel) && !pw))) {
 				if (grpSl) {
 					unixGrp = mygetgrnam (grpSl);
 					grpSl[lastChar] = '/';
@@ -1375,8 +1375,8 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filena
 	};
 
 	struct keymap keylist[] = {
-		{GROUP_NAME,   "    ", GROUP_NAME,   NULL },
-		{GROUP_MEMBER, "    ", GROUP_MEMBER, NULL },
+		{GROUP_NAME,   "    ", "GROUP_NAME",   NULL },
+		{GROUP_MEMBER, "    ", "GROUP_MEMBER", NULL },
 		{-1,            "    ", NULL, NULL }
 	};
 
@@ -1441,7 +1441,7 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filena
 			}
 
 			if (    strcmp (keylist[GROUP_NAME].val, "all")     == 0 || 
-					strcmp (keylist[GROUP_NAME].val, "default") == 0 || 
+					strcmp (keylist[GROUP_NAME].val, defaultLabel) == 0 || 
 					strcmp (keylist[GROUP_NAME].val, "others")  == 0
 				)
 				{
@@ -2553,12 +2553,12 @@ char
 do_Hosts_ (struct lsConf *conf, const char *filename, size_t *lineNum, struct lsInfo *info, int options)
 {
 
-#define HKEY_HNAME info->numIndx
-#define HKEY_MXJ info->numIndx+1
-#define HKEY_RUN_WINDOW info->numIndx+2
-#define HKEY_MIG info->numIndx+3
-#define HKEY_UJOB_LIMIT info->numIndx+4
-#define HKEY_DISPATCH_WINDOW info->numIndx+5
+// #define HKEY_HNAME info->numIndx
+// #define HKEY_MXJ info->numIndx+1
+// #define HKEY_RUN_WINDOW info->numIndx+2
+// #define HKEY_MIG info->numIndx+3
+// #define HKEY_UJOB_LIMIT info->numIndx+4
+// #define HKEY_DISPATCH_WINDOW info->numIndx+5
 
 	struct keymap *keylist = NULL;
 //   
@@ -2571,35 +2571,57 @@ do_Hosts_ (struct lsConf *conf, const char *filename, size_t *lineNum, struct ls
 	int returnCode          = FALSE;
 	int copyCPUFactor       = FALSE;
 	size_t *override        = 0;
-	struct hostent *hp      = NULL;
-	struct hTab *tmpHosts;
 	struct hostInfoEnt host;
-	struct hostInfo *hostList;
-	struct htab *nonOverridableHosts = NULL;
-	struct hostInfo *hostInfo;
+	struct hostent  *hp                  = NULL;
+	struct hTab     *tmpHosts            = NULL;
+	struct hostInfo *hostInfo            = NULL;
+	struct hostInfo *hostList            = NULL;
+	struct htab     *nonOverridableHosts = NULL;
+
+	enum state { 
+		HKEY_HNAME, 
+		HKEY_MXJ, 
+		HKEY_RUN_WINDOW, 
+		HKEY_MIG, 
+		HKEY_UJOB_LIMIT,
+		HKEY_DISPATCH_WINDOW
+	};
+
+	struct keymap keylist[] = {
+		{ HKEY_HNAME,           "    ", "HKEY_HNAME",           NULL },
+		{ HKEY_MXJ,             "    ", "HKEY_MXJ",             NULL },
+		{ HKEY_RUN_WINDOW,      "    ", "HKEY_RUN_WINDOW",      NULL },
+		{ HKEY_MIG,             "    ", "HKEY_MIG",             NULL },
+		{ HKEY_UJOB_LIMIT,      "    ", "HKEY_UJOB_LIMIT",      NULL },
+		{ HKEY_DISPATCH_WINDOW, "    ", "HKEY_DISPATCH_WINDOW", NULL },
+		{ -1,                   "    ", NULL, NULL }
+	};
+
+	const char host[] = "host";
+	const char default_[] = defaultLabel; 
 
 
 	if (conf == NULL) {
 		return FALSE;
 	}
 
-	FREEUP (keylist);
-	keylist = malloc ((unsigned long)(HKEY_DISPATCH_WINDOW + 2) * sizeof (struct keymap));
-	if ( NULL == keylist && ENOMEM == errno ){
-		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
-		return FALSE;
-	}
+	// FREEUP (keylist);
+	// keylist = malloc ((unsigned long)(HKEY_DISPATCH_WINDOW + 2) * sizeof (struct keymap));
+	// if ( NULL == keylist && ENOMEM == errno ){
+	// 	ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
+	// 	return FALSE;
+	// }
 
-	assert( HKEY_HNAME + 1 <= INT_MAX );
-	assert( HKEY_DISPATCH_WINDOW + 2 <= INT_MAX );
-	initkeylist (keylist, (int)HKEY_HNAME + 1, (int)(HKEY_DISPATCH_WINDOW + 2), info);
-	keylist[HKEY_HNAME].key               = "HOST_NAME";
-	keylist[HKEY_MXJ].key                 = "MXJ";
-	keylist[HKEY_RUN_WINDOW].key          = "RUN_WINDOW";
-	keylist[HKEY_MIG].key                 = "MIG";
-	keylist[HKEY_UJOB_LIMIT].key          = "JL/U";
-	keylist[HKEY_DISPATCH_WINDOW].key     = "DISPATCH_WINDOW";
-	keylist[HKEY_DISPATCH_WINDOW + 1].key = NULL;
+	// assert( HKEY_HNAME + 1 <= INT_MAX );
+	// assert( HKEY_DISPATCH_WINDOW + 2 <= INT_MAX );
+	// initkeylist (keylist, (int)HKEY_HNAME + 1, (int)(HKEY_DISPATCH_WINDOW + 2), info);
+	// keylist[HKEY_HNAME].key               = "HOST_NAME";
+	// keylist[HKEY_MXJ].key                 = "MXJ";
+	// keylist[HKEY_RUN_WINDOW].key          = "RUN_WINDOW";
+	// keylist[HKEY_MIG].key                 = "MIG";
+	// keylist[HKEY_UJOB_LIMIT].key          = "JL/U";
+	// keylist[HKEY_DISPATCH_WINDOW].key     = "DISPATCH_WINDOW";
+	// keylist[HKEY_DISPATCH_WINDOW + 1].key = NULL;
 
 	initHostInfoEnt ((struct hostInfoEnt *)&host);
 	linep = getNextLineC_conf (conf, lineNum, TRUE);
@@ -2609,16 +2631,16 @@ do_Hosts_ (struct lsConf *conf, const char *filename, size_t *lineNum, struct ls
 		return FALSE;
 	}
 
-	if (isSectionEnd (linep, filename, lineNum, "host")) {
-		ls_syslog (LOG_WARNING, I18N_EMPTY_SECTION, __func__, filename, *lineNum, "host");
+	if (isSectionEnd (linep, filename, lineNum, host)) {
+		ls_syslog (LOG_WARNING, I18N_EMPTY_SECTION, __func__, filename, *lineNum, host);
 		lsberrno = LSBE_CONF_WARNING;
 		return FALSE;
 	}
 
 	if (strchr (linep, '=') != NULL) {
-		ls_syslog (LOG_ERR, I18N_HORI_NOT_IMPLE, __func__, filename, *lineNum, "host");
+		ls_syslog (LOG_ERR, I18N_HORI_NOT_IMPLE, __func__, filename, *lineNum, host);
 		lsberrno = LSBE_CONF_WARNING;
-		doSkipSection_conf (conf, lineNum, filename, "host");
+		doSkipSection_conf (conf, lineNum, filename, host);
 		return FALSE;
 	}
 
@@ -2626,7 +2648,7 @@ do_Hosts_ (struct lsConf *conf, const char *filename, size_t *lineNum, struct ls
 		/* catgets 5174 */
 		ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5174, "%s: File %s at line %d: Keyword line format error for Host section; ignoring section"), __func__, filename, *lineNum);
 		lsberrno = LSBE_CONF_WARNING;
-		doSkipSection_conf (conf, lineNum, filename, "host");
+		doSkipSection_conf (conf, lineNum, filename, host);
 		return FALSE;
 	}
 
@@ -2634,7 +2656,7 @@ do_Hosts_ (struct lsConf *conf, const char *filename, size_t *lineNum, struct ls
 		/* catgets 5175 */
 		ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5175, "%s: File %s at line %d: Hostname required for Host section; ignoring section"), __func__, filename, *lineNum);
 		lsberrno = LSBE_CONF_WARNING;
-		doSkipSection_conf (conf, lineNum, filename, "host");
+		doSkipSection_conf (conf, lineNum, filename, host);
 		return FALSE;
 	}
 
@@ -2663,7 +2685,7 @@ do_Hosts_ (struct lsConf *conf, const char *filename, size_t *lineNum, struct ls
 		isTypeOrModel    = FALSE;
 		numSelectedHosts = 0;
 
-		if (isSectionEnd (linep, filename, lineNum, "host")) {
+		if (isSectionEnd (linep, filename, lineNum, host)) {
 			FREEUP (hostList);
 			h_delTab_ ((hTab *)nonOverridableHosts);
 			FREEUP (nonOverridableHosts);
@@ -2681,7 +2703,7 @@ do_Hosts_ (struct lsConf *conf, const char *filename, size_t *lineNum, struct ls
 			continue;
 		}
 
-		if (strcmp (keylist[HKEY_HNAME].val, "default") != 0) {
+		if (strcmp (keylist[HKEY_HNAME].val, default_ ) != 0) {
 
 			hp = Gethostbyname_ (keylist[HKEY_HNAME].val);
 			if (!hp && options != CONF_NO_CHECK) {
@@ -2744,7 +2766,7 @@ do_Hosts_ (struct lsConf *conf, const char *filename, size_t *lineNum, struct ls
 			}
 		}
 		else {
-			strcpy (hostname, "default");
+			strcpy (hostname, default_ );
 		}
 		h_addEnt_ (tmpHosts, hostname, &new);
 		if (!new) {
@@ -2866,7 +2888,7 @@ do_Hosts_ (struct lsConf *conf, const char *filename, size_t *lineNum, struct ls
 			copyCPUFactor = FALSE;
 			h_addEnt_ ( (hTab *)nonOverridableHosts, hostname, &new);
 		}
-		else if (strcmp (hostname, "default") == 0) {
+		else if (strcmp (hostname, default_ ) == 0) {
 			num = 0;
 			for ( unsigned int i = 0; i < cConf->numHosts; i++) {
 				if (cConf->hosts[i].isServer != TRUE) {
@@ -2961,10 +2983,10 @@ do_Hosts_ (struct lsConf *conf, const char *filename, size_t *lineNum, struct ls
 
 
 void
-getThresh (struct lsInfo *info, struct keymap *keylist, float loadSched[], float loadStop[], char *filename, size_t *lineNum, char *section)
+getThresh (struct lsInfo *info, struct keymap *keylist, float loadSched[], float loadStop[], const char *filename, size_t *lineNum, const char *section)
 {
 
-	char *stop;
+	char *stop = NULL;
 	float swap = 0;
 
 	initThresholds (info, loadSched, loadStop);
@@ -3059,7 +3081,7 @@ getThresh (struct lsInfo *info, struct keymap *keylist, float loadSched[], float
 int
 addHostEnt (struct hostInfoEnt *hp, struct hostInfo *hostInfo, size_t *override)
 {
-	struct hostInfoEnt *host;
+	struct hostInfoEnt *host = NULL;
 	bool_t bExists = FALSE;
 	unsigned int ihost = 0;
 
@@ -3188,30 +3210,33 @@ initThresholds (struct lsInfo *info, float loadSched[], float loadStop[])
 			loadStop[i] = -INFINIT_LOAD;
 		}
 	}
+
+	return;
 }
 
 
 char *
-parseGroups (char *linep, char *filename, size_t *lineNum, char *section, int groupType, int options)
+parseGroups (char *linep, const char *filename, size_t *lineNum, const char *section, int groupType, int options)
 {
 	
-	char *str       = NULL;
-	char *word      = NULL;
-	char *myWord    = NULL;
-	char *groupName = NULL;
-	char *grpSl     = NULL;
-	struct group *unixGrp;
-	struct groupInfoEnt *gp, *mygp = NULL;
+	char *str                    = NULL;
+	char *word                   = NULL;
+	char *myWord                 = NULL;
+	char *groupName              = NULL;
+	char *grpSl                  = NULL;
+	char *hostGroup              = NULL;
+	struct group        *unixGrp = NULL;
+	struct groupInfoEnt *gp      = NULL;
+	struct groupInfoEnt *mygp    = NULL;
+	struct passwd       *pw      = NULL;
 
-	struct passwd *pw;
 	unsigned int len = 0;
 	int hasAllOthers = FALSE;
-	int checkAll = TRUE;
+	int checkAll     = TRUE;
+	int haveFirst    = FALSE;
+	bool_t hasNone   = FALSE;
+	char returnVal   = FALSE;
 	char hostName[MAXHOSTNAMELEN];
-	char *hostGroup = NULL;
-	bool_t hasNone = FALSE;
-	int haveFirst = FALSE;
-	char returnVal = FALSE;
 
 #define failReturn(mygp, size)  {                                       \
 ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, "malloc", size); \
@@ -3636,12 +3661,12 @@ lsb_readqueue (struct lsConf *conf, struct lsInfo *info, int options, struct sha
 {
 	
 	struct lsInfo myinfo;
-	char *filename = NULL;
-	char *cp = NULL;
-	char *section = NULL;
 	char queueok;
+	char *filename  = NULL;
+	char *cp        = NULL;
+	char *section   = NULL;
 	size_t *lineNum = 0;
-	int j = 0;
+	int j           = 0;
 
 	lsberrno = LSBE_NO_ERROR;
 
@@ -3800,59 +3825,119 @@ char
 do_Queues (struct lsConf *conf, char *filename, size_t *lineNum, struct lsInfo *info, int options)
 {
 
-#define QKEY_NAME                   info->numIndx + 0
-#define QKEY_PRIORITY               info->numIndx + 1
-#define QKEY_NICE                   info->numIndx + 2
-#define QKEY_UJOB_LIMIT             info->numIndx + 3
-#define QKEY_PJOB_LIMIT             info->numIndx + 4
-#define QKEY_RUN_WINDOW             info->numIndx + 5
-#define QKEY_CPULIMIT               info->numIndx + 6
-#define QKEY_FILELIMIT              info->numIndx + 7
-#define QKEY_DATALIMIT              info->numIndx + 8
-#define QKEY_STACKLIMIT             info->numIndx + 9
-#define QKEY_CORELIMIT              info->numIndx + 10
-#define QKEY_MEMLIMIT               info->numIndx + 11
-#define QKEY_RUNLIMIT               info->numIndx + 12
-#define QKEY_USERS                  info->numIndx + 13
-#define QKEY_HOSTS                  info->numIndx + 14
-#define QKEY_EXCLUSIVE              info->numIndx + 15
-#define QKEY_DESCRIPTION            info->numIndx + 16
-#define QKEY_MIG                    info->numIndx + 17
-#define QKEY_QJOB_LIMIT             info->numIndx + 18
-#define QKEY_POLICIES               info->numIndx + 19
-#define QKEY_DISPATCH_WINDOW        info->numIndx + 20
-#define QKEY_USER_SHARES            info->numIndx + 21
-#define QKEY_DEFAULT_HOST_SPEC      info->numIndx + 22
-#define QKEY_PROCLIMIT              info->numIndx + 23
-#define QKEY_ADMINISTRATORS         info->numIndx + 24
-#define QKEY_PRE_EXEC               info->numIndx + 25
-#define QKEY_POST_EXEC              info->numIndx + 26
-#define QKEY_REQUEUE_EXIT_VALUES    info->numIndx + 27
-#define QKEY_HJOB_LIMIT             info->numIndx + 28
-#define QKEY_RES_REQ                info->numIndx + 29
-#define QKEY_SLOT_RESERVE           info->numIndx + 30
-#define QKEY_RESUME_COND            info->numIndx + 31
-#define QKEY_STOP_COND              info->numIndx + 32
-#define QKEY_JOB_STARTER            info->numIndx + 33
-#define QKEY_SWAPLIMIT              info->numIndx + 34
-#define QKEY_PROCESSLIMIT           info->numIndx + 35
-#define QKEY_JOB_CONTROLS           info->numIndx + 36
-#define QKEY_TERMINATE_WHEN         info->numIndx + 37
-#define QKEY_NEW_JOB_SCHED_DELAY    info->numIndx + 38
-#define QKEY_INTERACTIVE            info->numIndx + 39
-#define QKEY_JOB_ACCEPT_INTERVAL    info->numIndx + 40
-#define QKEY_BACKFILL               info->numIndx + 41
-#define QKEY_IGNORE_DEADLINE        info->numIndx + 42
-#define QKEY_CHKPNT                 info->numIndx + 43
-#define QKEY_RERUNNABLE             info->numIndx + 44
-#define QKEY_ENQUE_INTERACTIVE_AHEAD info->numIndx +45
-#define QKEY_ROUND_ROBIN_POLICY     info->numIndx + 46
-#define QKEY_PRE_POST_EXEC_USER     info->numIndx + 47
-#define KEYMAP_SIZE                 info->numIndx + 49
+// #define QKEY_NAME                   info->numIndx + 0
+// #define QKEY_PRIORITY               info->numIndx + 1
+// #define QKEY_NICE                   info->numIndx + 2
+// #define QKEY_UJOB_LIMIT             info->numIndx + 3
+// #define QKEY_PJOB_LIMIT             info->numIndx + 4
+// #define QKEY_RUN_WINDOW             info->numIndx + 5
+// #define QKEY_CPULIMIT               info->numIndx + 6
+// #define QKEY_FILELIMIT              info->numIndx + 7
+// #define QKEY_DATALIMIT              info->numIndx + 8
+// #define QKEY_STACKLIMIT             info->numIndx + 9
+// #define QKEY_CORELIMIT              info->numIndx + 10
+// #define QKEY_MEMLIMIT               info->numIndx + 11
+// #define QKEY_RUNLIMIT               info->numIndx + 12
+// #define QKEY_USERS                  info->numIndx + 13
+// #define QKEY_HOSTS                  info->numIndx + 14
+// #define QKEY_EXCLUSIVE              info->numIndx + 15
+// #define QKEY_DESCRIPTION            info->numIndx + 16
+// #define QKEY_MIG                    info->numIndx + 17
+// #define QKEY_QJOB_LIMIT             info->numIndx + 18
+// #define QKEY_POLICIES               info->numIndx + 19
+// #define QKEY_DISPATCH_WINDOW        info->numIndx + 20
+// #define QKEY_USER_SHARES            info->numIndx + 21
+// #define QKEY_DEFAULT_HOST_SPEC      info->numIndx + 22
+// #define QKEY_PROCLIMIT              info->numIndx + 23
+// #define QKEY_ADMINISTRATORS         info->numIndx + 24
+// #define QKEY_PRE_EXEC               info->numIndx + 25
+// #define QKEY_POST_EXEC              info->numIndx + 26
+// #define QKEY_REQUEUE_EXIT_VALUES    info->numIndx + 27
+// #define QKEY_HJOB_LIMIT             info->numIndx + 28
+// #define QKEY_RES_REQ                info->numIndx + 29
+// #define QKEY_SLOT_RESERVE           info->numIndx + 30
+// #define QKEY_RESUME_COND            info->numIndx + 31
+// #define QKEY_STOP_COND              info->numIndx + 32
+// #define QKEY_JOB_STARTER            info->numIndx + 33
+// #define QKEY_SWAPLIMIT              info->numIndx + 34
+// #define QKEY_PROCESSLIMIT           info->numIndx + 35
+// #define QKEY_JOB_CONTROLS           info->numIndx + 36
+// #define QKEY_TERMINATE_WHEN         info->numIndx + 37
+// #define QKEY_NEW_JOB_SCHED_DELAY    info->numIndx + 38
+// #define QKEY_INTERACTIVE            info->numIndx + 39
+// #define QKEY_JOB_ACCEPT_INTERVAL    info->numIndx + 40
+// #define QKEY_BACKFILL               info->numIndx + 41
+// #define QKEY_IGNORE_DEADLINE        info->numIndx + 42
+// #define QKEY_CHKPNT                 info->numIndx + 43
+// #define QKEY_RERUNNABLE             info->numIndx + 44
+// #define QKEY_ENQUE_INTERACTIVE_AHEAD info->numIndx +45
+// #define QKEY_ROUND_ROBIN_POLICY     info->numIndx + 46
+// #define QKEY_PRE_POST_EXEC_USER     info->numIndx + 47
+// #define KEYMAP_SIZE                 info->numIndx + 49
+
+
+	// FREEUP (keylist);
+	// assert( KEYMAP_SIZE >= 0 );
+	// keylist = calloc( KEYMAP_SIZE, sizeof (struct keymap));
+	// if( NULL == keylist && ENOMEM == errno ) {
+	// 	return FALSE;
+	// }
+
+	// assert( QKEY_NAME + 1 <= INT_MAX );
+	// assert( KEYMAP_SIZE <= INT_MAX );
+	// initkeylist (keylist, (int)(QKEY_NAME + 1), (int)KEYMAP_SIZE, info);
+
+	// keylist[QKEY_NAME].key                    = "QUEUE_NAME";
+	// keylist[QKEY_PRIORITY].key                = "PRIORITY";
+	// keylist[QKEY_NICE].key                    = "NICE";
+	// keylist[QKEY_UJOB_LIMIT].key              = "UJOB_LIMIT";
+	// keylist[QKEY_PJOB_LIMIT].key              = "PJOB_LIMIT";
+	// keylist[QKEY_RUN_WINDOW].key              = "RUN_WINDOW";
+	// keylist[QKEY_CPULIMIT].key                = "CPULIMIT";
+	// keylist[QKEY_FILELIMIT].key               = "FILELIMIT";
+	// keylist[QKEY_DATALIMIT].key               = "DATALIMIT";
+	// keylist[QKEY_STACKLIMIT].key              = "STACKLIMIT";
+	// keylist[QKEY_CORELIMIT].key               = "CORELIMIT";
+	// keylist[QKEY_MEMLIMIT].key                = "MEMLIMIT";
+	// keylist[QKEY_RUNLIMIT].key                = "RUNLIMIT";
+	// keylist[QKEY_USERS].key                   = "USERS";
+	// keylist[QKEY_HOSTS].key                   = "HOSTS";
+	// keylist[QKEY_EXCLUSIVE].key               = "EXCLUSIVE";
+	// keylist[QKEY_DESCRIPTION].key             = "DESCRIPTION";
+	// keylist[QKEY_MIG].key                     = "MIG";
+	// keylist[QKEY_QJOB_LIMIT].key              = "QJOB_LIMIT";
+	// keylist[QKEY_POLICIES].key                = "POLICIES";
+	// keylist[QKEY_DISPATCH_WINDOW].key         = "DISPATCH_WINDOW";
+	// keylist[QKEY_USER_SHARES].key             = "USER_SHARES";
+	// keylist[QKEY_DEFAULT_HOST_SPEC].key       = "DEFAULT_HOST_SPEC";
+	// keylist[QKEY_PROCLIMIT].key               = "PROCLIMIT";
+	// keylist[QKEY_ADMINISTRATORS].key          = "ADMINISTRATORS";
+	// keylist[QKEY_PRE_EXEC].key                = "PRE_EXEC";
+	// keylist[QKEY_POST_EXEC].key               = "POST_EXEC";
+	// keylist[QKEY_REQUEUE_EXIT_VALUES].key     = "REQUEUE_EXIT_VALUES";
+	// keylist[QKEY_HJOB_LIMIT].key              = "HJOB_LIMIT";
+	// keylist[QKEY_RES_REQ].key                 = "RES_REQ";
+	// keylist[QKEY_SLOT_RESERVE].key            = "SLOT_RESERVE";
+	// keylist[QKEY_RESUME_COND].key             = "RESUME_COND";
+	// keylist[QKEY_STOP_COND].key               = "STOP_COND";
+	// keylist[QKEY_JOB_STARTER].key             = "JOB_STARTER";
+	// keylist[QKEY_SWAPLIMIT].key               = "SWAPLIMIT";
+	// keylist[QKEY_PROCESSLIMIT].key            = "PROCESSLIMIT";
+	// keylist[QKEY_JOB_CONTROLS].key            = "JOB_CONTROLS";
+	// keylist[QKEY_TERMINATE_WHEN].key          = "TERMINATE_WHEN";
+	// keylist[QKEY_NEW_JOB_SCHED_DELAY].key     = "NEW_JOB_SCHED_DELAY";
+	// keylist[QKEY_INTERACTIVE].key             = "INTERACTIVE";
+	// keylist[QKEY_JOB_ACCEPT_INTERVAL].key     = "JOB_ACCEPT_INTERVAL";
+	// keylist[QKEY_BACKFILL].key                = "BACKFILL";
+	// keylist[QKEY_IGNORE_DEADLINE].key         = "IGNORE_DEADLINE";
+	// keylist[QKEY_CHKPNT].key                  = "CHKPNT";
+	// keylist[QKEY_RERUNNABLE].key              = "RERUNNABLE";
+	// keylist[QKEY_ENQUE_INTERACTIVE_AHEAD].key = "ENQUE_INTERACTIVE_AHEAD";
+	// keylist[QKEY_ROUND_ROBIN_POLICY].key      = "ROUND_ROBIN_POLICY";
+	// keylist[QKEY_PRE_POST_EXEC_USER].key      = "PRE_POST_EXEC_USER";
+	// keylist[KEYMAP_SIZE - 1].key              = NULL;
 
 	
-	struct keymap *keylist;
-	struct queueInfoEnt queue;
 	char *linep = NULL;
 	char *sp    = NULL;
 	char *word  = NULL;
@@ -3860,72 +3945,119 @@ do_Queues (struct lsConf *conf, char *filename, size_t *lineNum, struct lsInfo *
 	char *originalString = NULL;
 	char *subString      = NULL;
 
+	enum {
+		QKEY_NAME = info->numIndx,
+		QKEY_PRIORITY,
+		QKEY_NICE,
+		QKEY_UJOB_LIMIT,
+		QKEY_PJOB_LIMIT,
+		QKEY_RUN_WINDOW,
+		QKEY_CPULIMIT,
+		QKEY_FILELIMIT,
+		QKEY_DATALIMIT,
+		QKEY_STACKLIMIT,
+		QKEY_CORELIMIT,
+		QKEY_MEMLIMIT,
+		QKEY_RUNLIMIT,
+		QKEY_USERS,
+		QKEY_HOSTS,
+		QKEY_EXCLUSIVE,
+		QKEY_DESCRIPTION,
+		QKEY_MIG,
+		QKEY_QJOB_LIMIT,
+		QKEY_POLICIES,
+		QKEY_DISPATCH_WINDOW,
+		QKEY_USER_SHARES,
+		QKEY_DEFAULT_HOST_SPEC,
+		QKEY_PROCLIMIT,
+		QKEY_ADMINISTRATORS,
+		QKEY_PRE_EXEC,
+		QKEY_POST_EXEC,
+		QKEY_REQUEUE_EXIT_VALUES,
+		QKEY_HJOB_LIMIT,
+		QKEY_RES_REQ,
+		QKEY_SLOT_RESERVE,
+		QKEY_RESUME_COND,
+		QKEY_STOP_COND,
+		QKEY_JOB_STARTER,
+		QKEY_SWAPLIMIT,
+		QKEY_PROCESSLIMIT,
+		QKEY_JOB_CONTROLS,
+		QKEY_TERMINATE_WHEN,
+		QKEY_NEW_JOB_SCHED_DELAY,
+		QKEY_INTERACTIVE,
+		QKEY_JOB_ACCEPT_INTERVAL,
+		QKEY_BACKFILL,
+		QKEY_IGNORE_DEADLINE,
+		QKEY_CHKPNT,
+		QKEY_RERUNNABLE,
+		QKEY_ENQUE_INTERACTIVE_AHEAD,
+		QKEY_ROUND_ROBIN_POLICY,
+		QKEY_PRE_POST_EXEC_USER
+	};
+
+	struct keymap *keylist = {
+		{ QKEY_NAME,                    "    ", "QKEY_NAME",                    NULL },
+		{ QKEY_PRIORITY,                "    ", "QKEY_PRIORITY",                NULL },
+		{ QKEY_NICE,                    "    ", "QKEY_NICE",                    NULL },
+		{ QKEY_UJOB_LIMIT,              "    ", "QKEY_UJOB_LIMIT",              NULL },
+		{ QKEY_PJOB_LIMIT,              "    ", "QKEY_PJOB_LIMIT",              NULL },
+		{ QKEY_RUN_WINDOW,              "    ", "QKEY_RUN_WINDOW",              NULL },
+		{ QKEY_CPULIMIT,                "    ", "QKEY_CPULIMIT",                NULL },
+		{ QKEY_FILELIMIT,               "    ", "QKEY_FILELIMIT",               NULL },
+		{ QKEY_DATALIMIT,               "    ", "QKEY_DATALIMIT",               NULL },
+		{ QKEY_STACKLIMIT,              "    ", "QKEY_STACKLIMIT",              NULL },
+		{ QKEY_CORELIMIT,               "    ", "QKEY_CORELIMIT",               NULL },
+		{ QKEY_MEMLIMIT,                "    ", "QKEY_MEMLIMIT",                NULL },
+		{ QKEY_RUNLIMIT,                "    ", "QKEY_RUNLIMIT",                NULL },
+		{ QKEY_USERS,                   "    ", "QKEY_USERS",                   NULL },
+		{ QKEY_HOSTS,                   "    ", "QKEY_HOSTS",                   NULL },
+		{ QKEY_EXCLUSIVE,               "    ", "QKEY_EXCLUSIVE",               NULL },
+		{ QKEY_DESCRIPTION,             "    ", "QKEY_DESCRIPTION",             NULL },
+		{ QKEY_MIG,                     "    ", "QKEY_MIG",                     NULL },
+		{ QKEY_QJOB_LIMIT,              "    ", "QKEY_QJOB_LIMIT",              NULL },
+		{ QKEY_POLICIES,                "    ", "QKEY_POLICIES",                NULL },
+		{ QKEY_DISPATCH_WINDOW,         "    ", "QKEY_DISPATCH_WINDOW",         NULL },
+		{ QKEY_USER_SHARES,             "    ", "QKEY_USER_SHARES",             NULL },
+		{ QKEY_DEFAULT_HOST_SPEC,       "    ", "QKEY_DEFAULT_HOST_SPEC",       NULL },
+		{ QKEY_PROCLIMIT,               "    ", "QKEY_PROCLIMIT",               NULL },
+		{ QKEY_ADMINISTRATORS,          "    ", "QKEY_ADMINISTRATORS",          NULL },
+		{ QKEY_PRE_EXEC,                "    ", "QKEY_PRE_EXEC",                NULL },
+		{ QKEY_POST_EXEC,               "    ", "QKEY_POST_EXEC",               NULL },
+		{ QKEY_REQUEUE_EXIT_VALUES,     "    ", "QKEY_REQUEUE_EXIT_VALUES",     NULL },
+		{ QKEY_HJOB_LIMIT,              "    ", "QKEY_HJOB_LIMIT",              NULL },
+		{ QKEY_RES_REQ,                 "    ", "QKEY_RES_REQ",                 NULL },
+		{ QKEY_SLOT_RESERVE,            "    ", "QKEY_SLOT_RESERVE",            NULL },
+		{ QKEY_RESUME_COND,             "    ", "QKEY_RESUME_COND",             NULL },
+		{ QKEY_STOP_COND,               "    ", "QKEY_STOP_COND",               NULL },
+		{ QKEY_JOB_STARTER,             "    ", "QKEY_JOB_STARTER",             NULL },
+		{ QKEY_SWAPLIMIT,               "    ", "QKEY_SWAPLIMIT",               NULL },
+		{ QKEY_PROCESSLIMIT,            "    ", "QKEY_PROCESSLIMIT",            NULL },
+		{ QKEY_JOB_CONTROLS,            "    ", "QKEY_JOB_CONTROLS",            NULL },
+		{ QKEY_TERMINATE_WHEN,          "    ", "QKEY_TERMINATE_WHEN",          NULL },
+		{ QKEY_NEW_JOB_SCHED_DELAY,     "    ", "QKEY_NEW_JOB_SCHED_DELAY",     NULL },
+		{ QKEY_INTERACTIVE,             "    ", "QKEY_INTERACTIVE",             NULL },
+		{ QKEY_JOB_ACCEPT_INTERVAL,     "    ", "QKEY_JOB_ACCEPT_INTERVAL",     NULL },
+		{ QKEY_BACKFILL,                "    ", "QKEY_BACKFILL",                NULL },
+		{ QKEY_IGNORE_DEADLINE,         "    ", "QKEY_IGNORE_DEADLINE",         NULL },
+		{ QKEY_CHKPNT,                  "    ", "QKEY_CHKPNT",                  NULL },
+		{ QKEY_RERUNNABLE,              "    ", "QKEY_RERUNNABLE",              NULL },
+		{ QKEY_ENQUE_INTERACTIVE_AHEAD, "    ", "QKEY_ENQUE_INTERACTIVE_AHEAD", NULL },
+		{ QKEY_ROUND_ROBIN_POLICY,      "    ", "QKEY_ROUND_ROBIN_POLICY",      NULL },
+		{ QKEY_PRE_POST_EXEC_USER,      "    ", "QKEY_PRE_POST_EXEC_USER",      NULL },
+		{ -1, "    ", NULL, NULL }
+	};
+
+	const char queueLabel[]   = "Queue";
+	const char defaultLabel[] = "default";
+
+	struct queueInfoEnt queue;
+
 	if (conf == NULL) {
 		return FALSE;
 	}
 
-	FREEUP (keylist);
-	assert( KEYMAP_SIZE >= 0 );
-	keylist = calloc( KEYMAP_SIZE, sizeof (struct keymap));
-	if( NULL == keylist && ENOMEM == errno ) {
-		return FALSE;
-	}
-
-	assert( QKEY_NAME + 1 <= INT_MAX );
-	assert( KEYMAP_SIZE <= INT_MAX );
-	initkeylist (keylist, (int)(QKEY_NAME + 1), (int)KEYMAP_SIZE, info);
-
-	keylist[QKEY_NAME].key                    = "QUEUE_NAME";
-	keylist[QKEY_PRIORITY].key                = "PRIORITY";
-	keylist[QKEY_NICE].key                    = "NICE";
-	keylist[QKEY_UJOB_LIMIT].key              = "UJOB_LIMIT";
-	keylist[QKEY_PJOB_LIMIT].key              = "PJOB_LIMIT";
-	keylist[QKEY_RUN_WINDOW].key              = "RUN_WINDOW";
-	keylist[QKEY_CPULIMIT].key                = "CPULIMIT";
-	keylist[QKEY_FILELIMIT].key               = "FILELIMIT";
-	keylist[QKEY_DATALIMIT].key               = "DATALIMIT";
-	keylist[QKEY_STACKLIMIT].key              = "STACKLIMIT";
-	keylist[QKEY_CORELIMIT].key               = "CORELIMIT";
-	keylist[QKEY_MEMLIMIT].key                = "MEMLIMIT";
-	keylist[QKEY_RUNLIMIT].key                = "RUNLIMIT";
-	keylist[QKEY_USERS].key                   = "USERS";
-	keylist[QKEY_HOSTS].key                   = "HOSTS";
-	keylist[QKEY_EXCLUSIVE].key               = "EXCLUSIVE";
-	keylist[QKEY_DESCRIPTION].key             = "DESCRIPTION";
-	keylist[QKEY_MIG].key                     = "MIG";
-	keylist[QKEY_QJOB_LIMIT].key              = "QJOB_LIMIT";
-	keylist[QKEY_POLICIES].key                = "POLICIES";
-	keylist[QKEY_DISPATCH_WINDOW].key         = "DISPATCH_WINDOW";
-	keylist[QKEY_USER_SHARES].key             = "USER_SHARES";
-	keylist[QKEY_DEFAULT_HOST_SPEC].key       = "DEFAULT_HOST_SPEC";
-	keylist[QKEY_PROCLIMIT].key               = "PROCLIMIT";
-	keylist[QKEY_ADMINISTRATORS].key          = "ADMINISTRATORS";
-	keylist[QKEY_PRE_EXEC].key                = "PRE_EXEC";
-	keylist[QKEY_POST_EXEC].key               = "POST_EXEC";
-	keylist[QKEY_REQUEUE_EXIT_VALUES].key     = "REQUEUE_EXIT_VALUES";
-	keylist[QKEY_HJOB_LIMIT].key              = "HJOB_LIMIT";
-	keylist[QKEY_RES_REQ].key                 = "RES_REQ";
-	keylist[QKEY_SLOT_RESERVE].key            = "SLOT_RESERVE";
-	keylist[QKEY_RESUME_COND].key             = "RESUME_COND";
-	keylist[QKEY_STOP_COND].key               = "STOP_COND";
-	keylist[QKEY_JOB_STARTER].key             = "JOB_STARTER";
-	keylist[QKEY_SWAPLIMIT].key               = "SWAPLIMIT";
-	keylist[QKEY_PROCESSLIMIT].key            = "PROCESSLIMIT";
-	keylist[QKEY_JOB_CONTROLS].key            = "JOB_CONTROLS";
-	keylist[QKEY_TERMINATE_WHEN].key          = "TERMINATE_WHEN";
-	keylist[QKEY_NEW_JOB_SCHED_DELAY].key     = "NEW_JOB_SCHED_DELAY";
-	keylist[QKEY_INTERACTIVE].key             = "INTERACTIVE";
-	keylist[QKEY_JOB_ACCEPT_INTERVAL].key     = "JOB_ACCEPT_INTERVAL";
-	keylist[QKEY_BACKFILL].key                = "BACKFILL";
-	keylist[QKEY_IGNORE_DEADLINE].key         = "IGNORE_DEADLINE";
-	keylist[QKEY_CHKPNT].key                  = "CHKPNT";
-	keylist[QKEY_RERUNNABLE].key              = "RERUNNABLE";
-	keylist[QKEY_ENQUE_INTERACTIVE_AHEAD].key = "ENQUE_INTERACTIVE_AHEAD";
-	keylist[QKEY_ROUND_ROBIN_POLICY].key      = "ROUND_ROBIN_POLICY";
-	keylist[QKEY_PRE_POST_EXEC_USER].key      = "PRE_POST_EXEC_USER";
-	keylist[KEYMAP_SIZE - 1].key              = NULL;
-
-	initQueueInfo (&queue);
+	initQueueInfo (&queue);	// important!
 
 	linep = getNextLineC_conf (conf, lineNum, TRUE);
 	if (!linep) {
@@ -3934,8 +4066,8 @@ do_Queues (struct lsConf *conf, char *filename, size_t *lineNum, struct lsInfo *
 		return FALSE;
 	}
 
-	if (isSectionEnd (linep, filename, lineNum, "Queue")) {
-		ls_syslog (LOG_WARNING, I18N_EMPTY_SECTION, __func__, filename, (size_t) *lineNum,  "queue");
+	if (isSectionEnd (linep, filename, lineNum, queueLabel)) {
+		ls_syslog (LOG_WARNING, I18N_EMPTY_SECTION, __func__, filename, *lineNum, queueLabel);
 		lsberrno = LSBE_CONF_WARNING;
 		return FALSE;
 	}
@@ -3944,13 +4076,13 @@ do_Queues (struct lsConf *conf, char *filename, size_t *lineNum, struct lsInfo *
 		/* catgets 5277 */
 		ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5277, "%s: File %s at line %d: Vertical Queue section not implented yet; use horizontal format; ignoring section"), __func__, filename, *lineNum);
 		lsberrno = LSBE_CONF_WARNING;
-		doSkipSection_conf (conf, lineNum, filename, "Queue");
+		doSkipSection_conf (conf, lineNum, filename, queueLabel);
 		return FALSE;
 	}
 	else {
 		char *function_name = malloc( strlen(filename )  + 1 );
 		strcpy( function_name, filename );
-		retval = readHvalues_conf (keylist, linep, conf, filename, lineNum, FALSE, "Queue");
+		retval = readHvalues_conf (keylist, linep, conf, filename, lineNum, FALSE, queueLabel);
 		if (retval < 0) {
 			if (retval == -2) {
 				lsberrno = LSBE_CONF_WARNING;
@@ -3974,7 +4106,7 @@ do_Queues (struct lsConf *conf, char *filename, size_t *lineNum, struct lsInfo *
 			return FALSE;
 		}
 
-		if (strcmp (keylist[QKEY_NAME].val, "default") == 0) {
+		if (strcmp (keylist[QKEY_NAME].val, defaultLabel) == 0) {
 			/* catgets 5280 */
 			ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5280, "%s: File %s in section Queue ending at line %d: Queue name <%s> is a reserved word; ignoring the queue section"), __func__, filename, *lineNum, keylist[QKEY_NAME].val);
 			lsberrno = LSBE_CONF_WARNING;
@@ -4061,7 +4193,7 @@ do_Queues (struct lsConf *conf, char *filename, size_t *lineNum, struct lsInfo *
 		}
 
 		if (keylist[QKEY_RUN_WINDOW].val != NULL && strcmp (keylist[QKEY_RUN_WINDOW].val, "")) {
-			queue.windows = parsewindow (keylist[QKEY_RUN_WINDOW].val, filename, lineNum, "Queue");
+			queue.windows = parsewindow (keylist[QKEY_RUN_WINDOW].val, filename, lineNum, queueLabel);
 
 			if (lserrno == LSE_CONF_SYNTAX) {
 				lserrno = LSE_NO_ERR;
@@ -4070,7 +4202,7 @@ do_Queues (struct lsConf *conf, char *filename, size_t *lineNum, struct lsInfo *
 		}
 
 		if (keylist[QKEY_DISPATCH_WINDOW].val != NULL && strcmp (keylist[QKEY_DISPATCH_WINDOW].val, "")) {
-			queue.windowsD = parsewindow (keylist[QKEY_DISPATCH_WINDOW].val, filename, lineNum, "Queue");
+			queue.windowsD = parsewindow (keylist[QKEY_DISPATCH_WINDOW].val, filename, lineNum, queueLabel);
 
 			if (lserrno == LSE_CONF_SYNTAX) {
 				lserrno = LSE_NO_ERR;
@@ -4249,8 +4381,7 @@ do_Queues (struct lsConf *conf, char *filename, size_t *lineNum, struct lsInfo *
 			}
 		}
 
-		if (keylist[QKEY_CHKPNT].val != NULL
-			&& strcmp (keylist[QKEY_CHKPNT].val, ""))
+		if (keylist[QKEY_CHKPNT].val != NULL && strcmp (keylist[QKEY_CHKPNT].val, ""))
 			{
 			if (strlen (keylist[QKEY_CHKPNT].val) >= MAXLINELEN)
 				{
@@ -4492,7 +4623,7 @@ do_Queues (struct lsConf *conf, char *filename, size_t *lineNum, struct lsInfo *
 				return FALSE;
 			}
 			else {
-				printf( "we done goofed up at do_Queues()");
+				printf( "we done goofed up at %s()", __func__);
 			}
 		}
 
@@ -4649,18 +4780,22 @@ initQueueInfo (struct queueInfoEnt *qp)
 	qp->suspendActCmd = NULL;
 	qp->resumeActCmd = NULL;
 	qp->terminateActCmd = NULL;
-	for (i = 0; i < LSB_SIG_NUM; i++)
+	for (i = 0; i < LSB_SIG_NUM; i++) {
 		qp->sigMap[i] = 0;
+	}
 
 	qp->chkpntPeriod = -1;
 	qp->chkpntDir = NULL;
+
+	return;
 }
 
 void
 freeQueueInfo (struct queueInfoEnt *qp)
 {
-	if (qp == NULL)
+	if (qp == NULL) {
 		return;
+	}
 
 	FREEUP (qp->queue);
 	FREEUP (qp->description);
@@ -4685,19 +4820,33 @@ freeQueueInfo (struct queueInfoEnt *qp)
 	FREEUP (qp->suspendActCmd);
 	FREEUP (qp->resumeActCmd);
 	FREEUP (qp->terminateActCmd);
+
+	return;
 }
 
 char
-checkRequeEValues (struct queueInfoEnt *qp, char *word, char *filename, size_t *lineNum)
+checkRequeEValues (struct queueInfoEnt *qp, char *word, const char *filename, size_t *lineNum)
 {
-#define NORMAL_EXIT 0
-#define EXCLUDE_EXIT 1
+// #define NORMAL_EXIT 0
+// #define EXCLUDE_EXIT 1
+	union exit_status {
+		NORMAL_EXIT,
+		EXCLUDE_EXIT
+	}
 	
-	char *sp, *cp, exitValues[MAXLINELEN];
-	int numEValues = 0, exitV, i, found, mode = NORMAL_EXIT;
+	int numEValues = 0;
+	int exitV      = 0;
+	int i          = 0;
+	int found      = 0; // FALSE
+	int mode       = NORMAL_EXIT;
 	int exitInts[400];
+	char *sp = NULL;
+	char *cp = NULL;
+	char exitValues[MAXLINELEN];
 
-	exitValues[0] = '\0';
+	memset( exitInts, 0, 400 );
+	memset( exitValues, 0, MAXLINELEN );
+
 	cp = word;
 
 	while ((sp = a_getNextWord_ (&word)) != NULL)
@@ -4763,14 +4912,16 @@ checkRequeEValues (struct queueInfoEnt *qp, char *word, char *filename, size_t *
 		lsberrno = LSBE_NO_MEM;
 		return FALSE;
 		}
-	return TRUE;
 
+	return TRUE;
 }
 
 char *
 a_getNextWord_ (char **line)
 {
-	char *wordp, *word;
+	char *wordp = NULL;
+	char *word  = NULL;
+
 	word = getNextWord_ (line);
 	if (word && (wordp = strchr (word, '('))) {
 		*(wordp + 1) = '\0';
@@ -4796,7 +4947,7 @@ a_getNextWord_ (char **line)
 }
 
 char
-addQueue (struct queueInfoEnt *qp, char *filename, unsigned int lineNum)
+addQueue (struct queueInfoEnt *qp, const char *filename, unsigned int lineNum)
 {
 	
 	struct queueInfoEnt **tmpQueues = NULL;
@@ -4862,6 +5013,8 @@ freeWorkUser (int freeAll)
 	}
 	FREEUP (users);
 	numofusers = 0;
+
+	return;
 }
 
 void
@@ -4883,6 +5036,8 @@ freeWorkHost (int freeAll)
 		FREEUP (hostgroups[i]);
 	}
 	numofhgroups = 0;
+
+	return;
 }
 
 void
@@ -4896,6 +5051,8 @@ freeWorkQueue (int freeAll)
 	}
 	FREEUP (queues);
 	numofqueues = 0;
+
+	return;
 }
 
 void
@@ -4918,6 +5075,8 @@ freeUConf (struct userConf *uConf1, int freeAll)
 
 	FREEUP (uConf1->users);
 	uConf1->numUsers = 0;
+
+	return;
 }
 
 void
@@ -4939,6 +5098,8 @@ freeHConf (struct hostConf *hConf1, int freeAll)
 	}
 	FREEUP (hConf1->hgroups);
 	hConf1->numHgroups = 0;
+
+	return;
 }
 
 void
@@ -4951,6 +5112,8 @@ freeQConf (struct queueConf *qConf1, int freeAll)
 	}
 	FREEUP (qConf1->queues);
 	qConf1->numQueues = 0;
+
+	return;
 }
 
 void
@@ -4960,19 +5123,23 @@ resetUConf (struct userConf *uConf1)
 	uConf1->numUsers = 0;
 	uConf1->ugroups = NULL;
 	uConf1->users = NULL;
+
+	return;
 }
 
 void
 resetHConf (struct hostConf *hConf1)
 {
-	hConf1->numHosts = 0;
+	hConf1->numHosts   = 0;
 	hConf1->numHgroups = 0;
-	hConf1->hosts = NULL;
-	hConf1->hgroups = NULL;   
+	hConf1->hosts      = NULL;
+	hConf1->hgroups    = NULL;
+
+	return;   
 }
 
 void
-checkCpuLimit (char **hostSpec, double **cpuFactor, int useSysDefault, char *filename, size_t *lineNum, char *pname, struct lsInfo *info, int options)
+checkCpuLimit (char **hostSpec, double **cpuFactor, int useSysDefault, const char *filename, size_t *lineNum, char *pname, struct lsInfo *info, int options)
 {
 	if( ( *hostSpec ) && ( *cpuFactor == NULL ) && ( options != CONF_NO_CHECK ) && ( (*cpuFactor = getModelFactor (*hostSpec, info)) == NULL) && ( (*cpuFactor = getHostFactor (*hostSpec)) == NULL) ) {
 		if (useSysDefault == TRUE) {
@@ -4993,7 +5160,7 @@ checkCpuLimit (char **hostSpec, double **cpuFactor, int useSysDefault, char *fil
 }
 
 int
-parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, char *filename, size_t *lineNum, char *pname, struct lsInfo *info, int options)
+parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char *filename, size_t *lineNum, char *pname, struct lsInfo *info, int options)
 {
 	struct keymap key;
 	int limit = 0; 
@@ -5196,7 +5363,7 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, char *file
 }
 
 int
-parseProcLimit (char *word, struct queueInfoEnt *qp, char *filename, size_t *lineNum, char *pname )
+parseProcLimit (char *word, struct queueInfoEnt *qp, const char *filename, size_t *lineNum, char *pname )
 {
 	char *sp = NULL;
 	char *curWord = NULL;
@@ -5275,7 +5442,7 @@ parseProcLimit (char *word, struct queueInfoEnt *qp, char *filename, size_t *lin
 }
 
 int
-parseLimitAndSpec (char *word, int *limit, char **spec, char *hostSpec, char *param, struct queueInfoEnt *qp, char *filename, size_t *lineNum, char *pname )
+parseLimitAndSpec (char *word, int *limit, char **spec, char *hostSpec, char *param, struct queueInfoEnt *qp, const char *filename, size_t *lineNum, char *pname )
 {
 	int limitVal = -1;
 	char *sp = NULL;
@@ -5510,9 +5677,9 @@ parseAdmins (char *admins, int options, char *filename, size_t *lineNum)
 }
 
 char *
-putIntoList (char **list, unsigned int *len, char *string, char *listName)
+putIntoList (char **list, unsigned int *len, const char *string, const char *listName)
 {
-	char *sp;
+	char *sp = NULL;
 	unsigned long length = *len;
 
 	if ( NULL == string) {
@@ -5552,9 +5719,10 @@ putIntoList (char **list, unsigned int *len, char *string, char *listName)
 
 
 int
-isInList (char *list, char *string)
+isInList ( const char *list, const char *string)
 {
-	char *sp, *word;
+	char *sp   = NULL; 
+	char *word = NULL;
 	
 	if (list == NULL || string == NULL || list[0] == '\0' || string[0] == '\0') {
 		return FALSE;
@@ -5562,7 +5730,7 @@ isInList (char *list, char *string)
 	
 	sp = list;
 	while ((word = getNextWord_ (&sp)) != NULL) {
-		if (strcmp (string, word) == 0) {
+		if (strcmp (word, string ) == 0) {
 			return TRUE;
 		}
 	}
@@ -5594,7 +5762,8 @@ setDefaultHost (struct lsInfo *info)
 		}
 
 		if (addHostEnt( host, &cConf->hosts[i], override) == FALSE) {
-			ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "addHostEnt" );
+			const char addHostEnt[] = "addHostEnt";
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, addHostEnt );
 			return -1;
 		}
 	}
@@ -5612,7 +5781,7 @@ setDefaultUser (void)
 		return -1;
 	}
 
-	if (!addUser( "default", INFINIT_INT, INFINIT_FLOAT, functionName, TRUE)) {
+	if (!addUser( defaultLabel, INFINIT_INT, INFINIT_FLOAT, functionName, TRUE)) {
 		return FALSE;
 	}
 
@@ -5686,7 +5855,7 @@ handleHostMem (void)
 }
 
 int
-parseSigActCmd (struct queueInfoEnt *qp, char *linep, char *filename, size_t *lineNum, char *section)
+parseSigActCmd (struct queueInfoEnt *qp, char *linep, const char *filename, size_t *lineNum, const char *section)
 {
 	
 	char *actClass  = NULL;
@@ -5795,11 +5964,10 @@ parseSigActCmd (struct queueInfoEnt *qp, char *linep, char *filename, size_t *li
 
 
 int
-terminateWhen (struct queueInfoEnt *qp, char *linep, char *filename, size_t *lineNum, char *section)
+terminateWhen (struct queueInfoEnt *qp, char *linep, const char *filename, size_t *lineNum, const char *section)
 {
-	
-
 	char *sigName = NULL;
+
 	while (isspace (*linep)) {
 		linep++;
 	}
@@ -5836,9 +6004,9 @@ terminateWhen (struct queueInfoEnt *qp, char *linep, char *filename, size_t *lin
 int
 checkAllOthers (char *word, int *hasAllOthers)
 {
-	char **grpHosts;
-	unsigned int numHosts = 0;
 	int returnCode = 0;
+	unsigned int numHosts = 0;
+	char **grpHosts = NULL;
    
 	grpHosts = expandGrp (word, &numHosts, HOST_GRP);
 	if (grpHosts == NULL && lsberrno == LSBE_NO_MEM) {
@@ -5859,7 +6027,7 @@ checkAllOthers (char *word, int *hasAllOthers)
 }
 
 int
-getReserve (char *reserve, struct queueInfoEnt *qp, char *filename, unsigned int lineNum)
+getReserve (char *reserve, struct queueInfoEnt *qp, const char *filename, unsigned int lineNum)
 {
 	char *sp = NULL;
 	char *cp = NULL;
@@ -5927,7 +6095,7 @@ getReserve (char *reserve, struct queueInfoEnt *qp, char *filename, unsigned int
 }
 
 int
-isServerHost (char *hostName)
+isServerHost ( const char *hostName)
 {
 	if( hostName == NULL ) {
 		return FALSE;
@@ -5954,7 +6122,7 @@ mygetgrnam (const char *name)
 	struct mygroup {
 		struct group gr_entry;
 		struct mygroup *gr_next;
-	} *mygrhead, *mygrentry, *tmpgrentry;
+	} *mygrhead = NULL, *mygrentry = NULL, *tmpgrentry = NULL;
 	
 	
 	freeUnixGrp (grretentry);
@@ -6099,21 +6267,19 @@ errorCleanup:
 void
 freeUnixGrp (struct group *unixGrp)
 {
-	int count;
-	
 	if (unixGrp)
 		{
 		FREEUP (unixGrp->gr_name);
 		FREEUP (unixGrp->gr_passwd);
-		for (count = 0; unixGrp->gr_mem[count]; count++) {
+		for ( unsigned int count = 0; unixGrp->gr_mem[count]; count++) {
 			FREEUP (unixGrp->gr_mem[count]);
 		}
 		FREEUP (unixGrp->gr_mem);
 		FREEUP (unixGrp);
 		unixGrp = NULL;
-		}
+	}
 	
-	
+	return;
 }
 
 
@@ -6158,7 +6324,7 @@ errorCleanup: // FIXME FIXME FIXME remove goto label
 }
 
 void
-addBinaryAttributes (char *confFile, size_t *lineNum, struct queueInfoEnt *queue, struct keymap *keylist, unsigned int attrib, char *attribName)
+addBinaryAttributes ( const char *confFile, size_t *lineNum, struct queueInfoEnt *queue, struct keymap *keylist, unsigned int attrib, const char *attribName)
 {
 	if (keylist->val != NULL) {
 		
@@ -6174,10 +6340,12 @@ addBinaryAttributes (char *confFile, size_t *lineNum, struct queueInfoEnt *queue
 			
 		}
 	}
+
+	return;
 }
 
 int
-resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
+resolveBatchNegHosts ( const char *inHosts, char **outHosts, int isQueue)
 {
 	struct inNames **inTable = NULL;
 	char **outTable  = NULL;
@@ -6227,7 +6395,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
 	}
 
 	// assert( cConf->numHosts >= 0 );
-	outTable = (char **)calloc(  cConf->numHosts, sizeof (char *));
+	outTable = calloc(  cConf->numHosts, sizeof (char *));
 	if( NULL == outTable && ENOMEM == errno ) {
 		if (result > -2) {
 			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
@@ -7004,7 +7172,7 @@ resolveBatchNegHosts (char *inHosts, char **outHosts, int isQueue)
 
 
 int
-checkJobAttaDir (char *path)
+checkJobAttaDir ( const char *path)
 {
 	struct stat statBuf;
 	unsigned long len = strlen (path);
@@ -7027,7 +7195,7 @@ checkJobAttaDir (char *path)
 
 
 int
-parseDefAndMaxLimits (struct keymap key, int *defaultVal, int *maxVal, char *filename, size_t *lineNum, char *pname)
+parseDefAndMaxLimits (struct keymap key, int *defaultVal, int *maxVal, const char *filename, size_t *lineNum, const char *pname)
 {
 	
 	char *sp;
@@ -7074,7 +7242,7 @@ parseDefAndMaxLimits (struct keymap key, int *defaultVal, int *maxVal, char *fil
 
 
 int
-parseQFirstHost (char *myWord, int *haveFirst, char *pname, size_t *lineNum, char *filename, char *section)
+parseQFirstHost (char *myWord, int *haveFirst, const char *pname, size_t *lineNum, const char *filename, const char *section)
 {
 	struct groupInfoEnt *gp;
 	int needCheck = TRUE;
@@ -7130,9 +7298,10 @@ parseQFirstHost (char *myWord, int *haveFirst, char *pname, size_t *lineNum, cha
 }
 
 int
-chkFirstHost (char *host, int *needChk)
+chkFirstHost ( const char *host, int *needChk)
 {
-#define FIRST_HOST_TOKEN '!'
+// #define FIRST_HOST_TOKEN '!'
+	char FIRST_HOST_TOKEN = '!';
 	unsigned long len = 0;
 	
 	len = strlen (host);

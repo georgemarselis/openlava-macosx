@@ -46,17 +46,19 @@ limd_readShared (void)
 	char indxok  = TRUE;
 	char typeok  = FALSE;
 	unsigned int lineNum = 0;
+	const char filename = "lsf.shared";
 	const char configCheckSum[] = "configCheckSum";
+	const char readonly[] = "r";
 
 	initResTable ();
 
-	sprintf (lsfile, "%s/lsf.shared", limParams[LSF_CONFDIR].paramValue); // FIXME FIXME FIXME FIXME replace string with var from configure.ac
+	sprintf (lsfile, "%s/%s", limParams[LSF_CONFDIR].paramValue, filename);
 
 	if (configCheckSum (lsfile, &lsfSharedCkSum) < 0) {
 		ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, configCheckSum);
 		return -1;
 	}
-	fp = confOpen (lsfile, "r");
+	fp = confOpen (lsfile, readonly );
 	if (!fp) {
 		/* catgets 5200 */
 		ls_syslog (LOG_ERR, "catgets 5200: %s: Can't open configuration file <%s>: file pointer returns as NULL", __func__, lsfile);
@@ -162,21 +164,24 @@ limd_readShared (void)
 char
 doindex (FILE * fp, unsigned int *lineNum, char *lsfile)
 {
-	char *linep;
-	struct keymap keyList[] = {
-		{ 0, "    ", "INTERVAL",    NULL },
-		{ 1, "    ", "INCREASING",  NULL },
-		{ 2, "    ", "DESCRIPTION", NULL },
-		{ 3, "    ", "NAME",        NULL},
-		{ 0, "    ", NULL,          NULL}
-	};
+	char *linep = NULL;
 
 	enum {
 		INTERVAL,
 		INCREASING,
 		DESCRIPTION,
 		NAME
-	}
+	};
+
+	struct keymap keyList[] = {
+		{  INTERVAL,    "    ", "INTERVAL",    NULL },
+		{  INCREASING,  "    ", "INCREASING",  NULL },
+		{  DESCRIPTION, "    ", "DESCRIPTION", NULL },
+		{  NAME,        "    ", "NAME",        NULL },
+		{ -1,           "    ", NULL,          NULL }
+	};
+
+	const char newinded[] = "newindex";
 
 	linep = getNextLineC_ (fp, lineNum, TRUE);
 	if (!linep)
@@ -187,7 +192,7 @@ doindex (FILE * fp, unsigned int *lineNum, char *lsfile)
 		return TRUE;
 		}
 
-	if (isSectionEnd (linep, lsfile, lineNum, "newindex"))
+	if (isSectionEnd (linep, lsfile, lineNum, newindex ))
 		{
 		/* catgets 5209 */
 		ls_syslog (LOG_WARNING, "5209, %s: %s(%d): empty section", __func__, lsfile, *lineNum);
@@ -201,15 +206,16 @@ doindex (FILE * fp, unsigned int *lineNum, char *lsfile)
 			/* catgets 5210 */
 			ls_syslog (LOG_ERR, "5210: %s: %s(%d): keyword line format error for section newindex; ignoring section", __func__, lsfile, *lineNum);
 			lim_CheckError = WARNING_ERR;
-			doSkipSection (fp, lineNum, lsfile, "newindex");
+			doSkipSection (fp, lineNum, lsfile, newindex );
 			return TRUE;
 			}
 
 
 		while ((linep = getNextLineC_ (fp, lineNum, TRUE)) != NULL)
 			{
-			if (isSectionEnd (linep, lsfile, lineNum, "newindex"))
+			if (isSectionEnd (linep, lsfile, lineNum, newindex )) {
 				return TRUE;
+			}
 			if (mapValues (keyList, linep) < 0)
 				{
 				/* catgets 5211 */
@@ -228,7 +234,7 @@ doindex (FILE * fp, unsigned int *lineNum, char *lsfile)
 			}
 		}
 	else {
-		if (readHvalues (keyList, linep, fp, lsfile, lineNum, TRUE, "newindex") < 0) {
+		if (readHvalues (keyList, linep, fp, lsfile, lineNum, TRUE, newindex) < 0) {
 			return TRUE;
 		}
 		if (!setIndex (keyList, lsfile, *lineNum)) {
@@ -245,7 +251,7 @@ doindex (FILE * fp, unsigned int *lineNum, char *lsfile)
 }
 
 char
-lim_setIndex (struct keymap *keyList, char *lsfile, size_t linenum)
+lim_setIndex (struct keymap *keyList, const char *lsfile, size_t linenum)
 {
 	// called by doindex( ) 
 
@@ -256,7 +262,7 @@ lim_setIndex (struct keymap *keyList, char *lsfile, size_t linenum)
 		INCREASING,
 		DESCRIPTION,
 		NAME
-	}
+	};
 
 
 	if (strlen (keyList[NAME].val) >= MAXLSFNAMELEN)
@@ -355,7 +361,7 @@ lim_setIndex (struct keymap *keyList, char *lsfile, size_t linenum)
 }
 
 char
-doclist (FILE * fp, unsigned int *lineNum, char *lsfile)
+doclist (FILE * fp, unsigned int *lineNum, const char *lsfile)
 {
 	char *linep   = NULL;
 	char *servers = NULL;
@@ -364,13 +370,15 @@ doclist (FILE * fp, unsigned int *lineNum, char *lsfile)
 	enum {
 		CLUSTERNAME
 		SERVERS
-	}
+	};
 
 	struct keymap keyList[] = {
-		{0, "    ", "CLUSTERNAME", NULL },
-		{1, "    ", "SERVERS",     NULL},
-		{0, "    ", NULL,          NULL}
+		{ CLUSTERNAME, "    ", "CLUSTERNAME", NULL },
+		{ SERVERS,     "    ", "SERVERS",     NULL },
+		{ -1,          "    ", NULL,          NULL }
 	};
+
+	const char cluster[] = "cluster";
 
 	linep = getNextLineC_ (fp, lineNum, TRUE);
 	if (!linep)
@@ -380,7 +388,7 @@ doclist (FILE * fp, unsigned int *lineNum, char *lsfile)
 		return FALSE;
 		}
 
-	if (isSectionEnd (linep, lsfile, lineNum, "cluster")) {
+	if (isSectionEnd (linep, lsfile, lineNum, cluster )) {
 		return FALSE;
 	}
 
@@ -390,21 +398,21 @@ doclist (FILE * fp, unsigned int *lineNum, char *lsfile)
 			{
 			/* catgets 5223 */
 			ls_syslog (LOG_ERR, "5223: %s: %s(%d): keyword line format error for section cluster; ignoring section", __func__, lsfile, *lineNum);
-			doSkipSection (fp, lineNum, lsfile, "cluster");
+			doSkipSection (fp, lineNum, lsfile, cluster );
 			return FALSE;
 			}
 
 		if (keyList[0].position == -1) {
 			/* catgets 5224 */
 			ls_syslog (LOG_ERR, "5224: %s: %s(%d): keyword line: key %s is missing in section cluster; ignoring section", __func__, lsfile, *lineNum, keyList[0].key);
-			doSkipSection (fp, lineNum, lsfile, "cluster");
+			doSkipSection (fp, lineNum, lsfile, cluster );
 			return FALSE;
 		}
 
 
 		while ((linep = getNextLineC_ (fp, lineNum, TRUE)) != NULL)
 			{
-			if (isSectionEnd (linep, lsfile, lineNum, "cluster")) {
+			if (isSectionEnd (linep, lsfile, lineNum, cluster )) {
 				return TRUE;
 			}
 			if (mapValues (keyList, linep) < 0)
@@ -447,33 +455,34 @@ doclist (FILE * fp, unsigned int *lineNum, char *lsfile)
 		{
 		/* catgets 5227 */
 		ls_syslog (LOG_ERR, "5227: %s: %s(%d): horizontal cluster section not implemented yet, ignoring section", __func__, lsfile, *lineNum);
-		doSkipSection (fp, lineNum, lsfile, "cluster");
+		doSkipSection (fp, lineNum, lsfile, cluster );
 		return FALSE;
 		}
 
-	ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, lsfile, *lineNum, "cluster");
+	ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, lsfile, *lineNum, cluster );
 	return FALSE;
 }
 
 char
-dotypelist (FILE * fp, unsigned int *lineNum, char *lsfile)
+dotypelist (FILE * fp, unsigned int *lineNum, const char *lsfile)
 {
 	char *linep = NULL;
-	const char HostType[] = "HostType";
-
-	struct keymap keyList[] = {
-		{0, "    ", NULL, "TYPENAME"},
-		{0, "    ", NULL, NULL}
-	};
 
 	enum {
 		TYPENAME
 	};
 
+	struct keymap keyList[] = {
+		{ TYPENAME, "    ", "TYPENAME", NULL },
+		{ 0, "    ", NULL, NULL }
+	};
+
+	const char HostType[] = "HostType";
+
 	linep = getNextLineC_ (fp, lineNum, TRUE);
 	if (!linep)
 		{
-		ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, lsfile, *lineNum, "HostType");
+		ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, lsfile, *lineNum, HostType);
 		return FALSE;
 		}
 
@@ -556,7 +565,7 @@ dotypelist (FILE * fp, unsigned int *lineNum, char *lsfile)
 }
 
 char
-dohostmodel (FILE * fp, unsigned int *lineNum, char *lsfile)
+dohostmodel (FILE * fp, unsigned int *lineNum, const char *lsfile)
 {
 	char *linep = NULL;
 	char *sp    = NULL;
@@ -573,11 +582,13 @@ dohostmodel (FILE * fp, unsigned int *lineNum, char *lsfile)
 	};
 
 	struct keymap keyList[] = {
-		{0, "    ", NULL, "MODELNAME",    NULL },
-		{1, "    ", NULL, "CPUFACTOR",    NULL },
-		{2, "    ", NULL, "ARCHITECTURE", NULL },
-		{0, "    ", NULL, NULL}
+		{ MODELNAME,    "    ", "MODELNAME",    NULL },
+		{ CPUFACTOR,    "    ", "CPUFACTOR",    NULL },
+		{ ARCHITECTURE, "    ", "ARCHITECTURE", NULL },
+		{ -1,           "    ", NULL, NULL}
 	};
+
+	const char HostModel[] = "HostModel";
 
 	if (first) {
 		for ( int i = 0; i < MAXMODELS; ++i) {
@@ -591,11 +602,11 @@ dohostmodel (FILE * fp, unsigned int *lineNum, char *lsfile)
 
 	linep = getNextLineC_ (fp, lineNum, TRUE);
 	if (!linep) {
-		ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, lsfile, *lineNum, "hostmodel");
+		ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, lsfile, *lineNum, HostModel);
 		return FALSE;
 	}
 
-	if (isSectionEnd (linep, lsfile, lineNum, "hostmodel")) {
+	if (isSectionEnd (linep, lsfile, lineNum, HostModel )) {
 		return FALSE;
 	}
 
@@ -624,13 +635,13 @@ dohostmodel (FILE * fp, unsigned int *lineNum, char *lsfile)
 			{
 			/* catgets 5237 */
 			ls_syslog (LOG_ERR, "5237: %s: %s(%d): keyword line format error for section hostmodel, ignoring section", __func__, lsfile, *lineNum);
-			doSkipSection (fp, lineNum, lsfile, "dohostmodel");
+			doSkipSection (fp, lineNum, lsfile, __func__ );
 			return FALSE;
 			}
 
 		while ((linep = getNextLineC_ (fp, lineNum, TRUE)) != NULL)
 			{
-			if (isSectionEnd (linep, lsfile, lineNum, "hostmodel"))
+			if (isSectionEnd (linep, lsfile, lineNum, HostModel ))
 				{
 				return TRUE;
 				}
@@ -697,7 +708,7 @@ dohostmodel (FILE * fp, unsigned int *lineNum, char *lsfile)
 				if (floatp == NULL)
 					{
 					ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", sizeof (float));
-					doSkipSection (fp, lineNum, lsfile, "HostModel");
+					doSkipSection (fp, lineNum, lsfile, HostModel );
 					return FALSE;
 					}
 				*floatp = (float)atof (keyList[CPUFACTOR].val);
@@ -717,11 +728,11 @@ dohostmodel (FILE * fp, unsigned int *lineNum, char *lsfile)
 		{
 		/* catgets 5244 */
 		ls_syslog (LOG_ERR, "5244: %s: %s(%d): horizontal HostModel section not implemented yet, ignoring section", __func__, lsfile, *lineNum);
-		doSkipSection (fp, lineNum, lsfile, "HostModel");
+		doSkipSection (fp, lineNum, lsfile, HostModel);
 		return FALSE;
 		}
 
-	ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, lsfile, *lineNum, "HostModel");
+	ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, lsfile, *lineNum, HostModel );
 	return FALSE;
 }
 
@@ -758,10 +769,11 @@ initResTable (void)
 	allInfo.nRes = i;
 	allInfo.resTable = resTable;
 
+	return;
 }
 
 int
-resNameDefined (char *name)
+resNameDefined ( const char *name)
 {
 
 	for ( unsigned int i = 0; i < allInfo.nRes; i++) {
@@ -800,13 +812,13 @@ doresources (FILE * fp, unsigned int *lineNum, char *lsfile) // FIXME FIXME FIXM
 	};
 
 	struct keymap keyList[] = {
-		{ 0, "    " , NULL, keylist[RESOURCENAME] },
-		{ 0, "    " , NULL, keylist[TYPE] },
-		{ 0, "    " , NULL, keylist[INTERVAL] },
-		{ 0, "    " , NULL, keylist[INCREASING] },
-		{ 0, "    " , NULL, keylist[RELEASE] },
-		{ 0, "    " , NULL, keylist[DESCRIPTION] },
-		{ 0, "    " , NULL, NULL}
+		{  RESOURCENAME, "    " , keylist[RESOURCENAME], NULL },
+		{  TYPE,         "    " , keylist[TYPE],         NULL },
+		{  INTERVAL,     "    " , keylist[INTERVAL],     NULL },
+		{  INCREASING,   "    " , keylist[INCREASING],   NULL },
+		{  RELEASE,      "    " , keylist[RELEASE],      NULL },
+		{  DESCRIPTION,  "    " , keylist[DESCRIPTION],  NULL },
+		{ -1,            "    " , NULL, NULL}
 	};
 
 	const char resource[] = "resource";
@@ -814,11 +826,11 @@ doresources (FILE * fp, unsigned int *lineNum, char *lsfile) // FIXME FIXME FIXM
 
 	linep = getNextLineC_ (fp, lineNum, TRUE);
 	if (!linep) {
-		ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, lsfile, *lineNum, "resource");
+		ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, lsfile, *lineNum, resource );
 		return FALSE;
 	}
 
-	if (isSectionEnd (linep, lsfile, lineNum, "resource")) {
+	if (isSectionEnd (linep, lsfile, lineNum, resource ) ) {
 		return FALSE;
 	}
 
@@ -827,13 +839,13 @@ doresources (FILE * fp, unsigned int *lineNum, char *lsfile) // FIXME FIXME FIXM
 		if (!keyMatch (keyList, linep, FALSE)) {
 			/* catgets 5248 */
 			ls_syslog (LOG_ERR, "5248: %s: %s(%d): keyword line format error for section resource, ignoring section", __func__, lsfile, *lineNum);
-			doSkipSection (fp, lineNum, lsfile, "resource");
+			doSkipSection (fp, lineNum, lsfile, resource);
 			return FALSE;
 		}
 
 		while ((linep = getNextLineC_ (fp, lineNum, TRUE)) != NULL) {
 
-			if (isSectionEnd (linep, lsfile, lineNum, "resource")) {
+			if (isSectionEnd (linep, lsfile, lineNum, resource )) {
 				return TRUE;
 			}
 
@@ -1058,7 +1070,7 @@ doresources (FILE * fp, unsigned int *lineNum, char *lsfile) // FIXME FIXME FIXM
 		}
 
 
-	ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, lsfile, *lineNum, "resource");
+	ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, lsfile, *lineNum, resource );
 	return FALSE;
 
 }
@@ -1077,10 +1089,12 @@ chkUIdxAndSetDfltRunElim (void)
 			}
 		}
 	}
+
+	return;
 }
 
 int
-doresourcemap (FILE * fp, char *lsfile, unsigned int *lineNum)
+doresourcemap (FILE * fp, const char *lsfile, unsigned int *lineNum)
 {
 	int isDefault = 0;
 	char *linep = NULL;
@@ -1093,9 +1107,9 @@ doresourcemap (FILE * fp, char *lsfile, unsigned int *lineNum)
 	};
 
 	struct keymap keyList[] = {
-		{0, "    ", NULL, "RESOURCENAME"},
-		{1, "    ", NULL, "LOCATION"},
-		{0, "    ", NULL, NULL}
+		{ RESOURCENAME, "    ", "RESOURCENAME", NULL },
+		{ LOCATION,     "    ", "LOCATION",     NULL },
+		{ -1,           "    ", NULL, NULL}
 	};
 
 	const char resourceMap[] = "resourceMap";
@@ -1269,13 +1283,13 @@ doresourcemap (FILE * fp, char *lsfile, unsigned int *lineNum)
 
 
 int
-addSharedResourceInstance (unsigned int nHosts, char **hosts, char *resName)
+addSharedResourceInstance (unsigned int nHosts, char **hosts, const char *resName)
 {
-	struct sharedResourceInstance *tmp = NULL;
+	int resNo             = 0;
+	int firstFlag         = 1;
+	unsigned int cnt      = 0;
 	struct hostNode *hPtr = NULL;
-	int firstFlag = 1;
-	unsigned int cnt = 0;
-	int resNo = 0;
+	struct sharedResourceInstance *tmp = NULL;
 
 	const char malloc[] = "malloc";
 
@@ -1336,12 +1350,8 @@ addSharedResourceInstance (unsigned int nHosts, char **hosts, char *resName)
 }
 
 int
-addResourceMap (char *resName, char *location, char *lsfile, size_t lineNum, int *isDefault)
+addResourceMap ( const char *resName, const char *location, const char *lsfile, size_t lineNum, int *isDefault)
 {
-	struct sharedResource *resource = NULL;
-	struct hostNode *hPtr = NULL;
-	unsigned int numHosts   = 0;
-	unsigned int numCycle   = 0;
 	int defaultWord = FALSE;
 	int first       = TRUE;
 	int error       = 0;
@@ -1353,6 +1363,10 @@ addResourceMap (char *resName, char *location, char *lsfile, size_t lineNum, int
 	char *instance  = NULL;
 	char *initValue = NULL;
 	char **hosts    = NULL;
+	unsigned int numHosts   = 0;
+	unsigned int numCycle   = 0;
+	struct hostNode *hPtr = NULL;
+	struct sharedResource *resource = NULL;
 
 	int i = 0;
 
@@ -1586,13 +1600,13 @@ addResourceMap (char *resName, char *location, char *lsfile, size_t lineNum, int
 
 
 unsigned int
-parseHostList (char *hostList, char *lsfile, unsigned int lineNum, char ***hosts, int *hasDefault)
+parseHostList ( const char *hostList, const char *lsfile, unsigned int lineNum, char ***hosts, int *hasDefault)
 {
 	char *host       = NULL;
 	char *sp         = NULL;
 	char *hostName   = NULL;
 	char **hostTable = NULL;
-	unsigned int numHosts    = 0;
+	unsigned int numHosts = 0;
 
 	if (hostList == NULL) {
 		return 0;
@@ -1643,9 +1657,9 @@ parseHostList (char *hostList, char *lsfile, unsigned int lineNum, char ***hosts
 }
 
 char *
-validLocationHost (char *hostName)
+validLocationHost ( const char *hostName)
 {
-	int num;
+	int num = 0;
 
 	if (!strcmp (hostName, "default") || !strcmp (hostName, "others") || !strcmp (hostName, "all")) {
 		return hostName;
@@ -1685,6 +1699,8 @@ initResItem (struct resItem *resTable)
 	resTable->orderType = NA;
 	resTable->flags = RESF_GLOBAL;
 	resTable->interval = 0;
+
+	return;
 }
 
 int
@@ -1817,15 +1833,19 @@ readCluster2 (struct clusterNode *clPtr) // FIXME FIXME FIXME FIXME move to clus
 	int Error  = FALSE;
 	unsigned int lineNum = 0;
 
-	sprintf (fileName, "%s/lsf.cluster.%s", limParams[LSF_CONFDIR].paramValue, clPtr->clName); // FIXME FIXME FIXME FIXME filename is expressed as a const string here, move to configure.ac
+	const char lsf_cluster[] = "lsf.cluster";
+	const char readonly[]    = "r";
+
+	sprintf (fileName, "%s/%s.%s", limParams[LSF_CONFDIR].paramValue, lsf_cluster, clPtr->clName); // FIXME FIXME FIXME FIXME filename is expressed as a const string here, move to configure.ac
 
 	if (configCheckSum (fileName, &clPtr->checkSum) < 0)
 	{
 		return -1;
 	}
-	if ((clfp = confOpen (fileName, "r")) == NULL)
+	if ((clfp = confOpen (fileName, readonly )) == NULL)
 	{
-		ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "confOpen", fileName);
+		const char confOpen[] = "confOpen";
+		ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, confOpen, fileName);
 		return -1;
 	}
 
@@ -1856,10 +1876,11 @@ readCluster2 (struct clusterNode *clPtr) // FIXME FIXME FIXME FIXME move to clus
 		word = getNextWord_ (&cp);
 		if (!word)
 		{
+			const char unknown[] = "unknown";
 			/* catgets 5286 */
 			ls_syslog (LOG_ERR, "5286: %s: %s(%d): Keyword expected after Begin. Ignoring section", __func__, fileName, lineNum);
 			lim_CheckError = WARNING_ERR;
-			doSkipSection (clfp, &lineNum, fileName, "unknown");
+			doSkipSection (clfp, &lineNum, fileName, unknown);
 		}
 		else if (strcasecmp (word, "clusteradmins") == 0)
 		{
@@ -1940,66 +1961,58 @@ adjIndx (void)
 
 
 		if ((temp = realloc (shortInfo.resName, (shortInfo.nRes + 1) * sizeof (char *))) == NULL)
-			{
+		{
 			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
 			lim_Exit (__func__);
-			}
+		}
 		shortInfo.resName = temp;
 		if ((shortInfo.resName[shortInfo.nRes] = putstr_ (tmpTable.name)) == NULL)
-			{
+		{
 			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
 			lim_Exit (__func__);
-			}
+		}
 		SET_BIT (shortInfo.nRes, shortInfo.numericResBitMaps);
 		shortInfo.nRes++;
 
 		if (tmpTable.flags & RESF_DYNAMIC)
-			{
+		{
 
 			for (unsigned int k = NBUILTINDEX; k < allInfo.numIndx; k++)
-				{
+			{
 				if (strcasecmp (li[k].name, tmpTable.name) != 0) {
 					continue;
 				}
 				FREEUP (li[k].name);
 				for (unsigned int j = k; j < allInfo.numIndx - 1; j++)
-					{
+				{
 					memcpy (&li[j], &li[j + 1], sizeof (struct liStruct));
-					}
-				break;
 				}
+				break;
+			}
 
 
 
 			for (hPtr = myClusterPtr->hostList; hPtr != NULL; hPtr = hPtr->nextPtr)
-				{
+			{
 				for (unsigned int j =  resNo; j < allInfo.numIndx - 1; j++)
 					hPtr->busyThreshold[j] = hPtr->busyThreshold[j + 1];
-				}
+			}
 			allInfo.numUsrIndx--;
 			allInfo.numIndx--;
-			}
 		}
 
+	} // end for ( unsigned int i = 0; i < numHostResources; i++)
+
+	return;
 }
 
 int
-lim_domanager (FILE * fp, char *lsfile, unsigned int *lineNum, char *secName) // function name (only) replicated liblsf/conf.c
+lim_domanager (FILE * fp, const char *lsfile, unsigned int *lineNum, const char *secName) // function name (only) replicated liblsf/conf.c
 {
 	char *linep = NULL;
 	struct keymap *keyList = NULL;
 
 	char clustermanager[]  = "clustermanager";
-
-	struct keymap keyList1[] = {
-		{0, "    ", NULL, "MANAGER"},
-		{0, "    ", NULL, NULL}
-	};
-
-	struct keymap keyList2[] = {
-		{0, "    ", NULL, "ADMINISTRATORS"},
-		{0, "    ", NULL, NULL}
-	};
 
 	enum managers {
 		MANAGERS
@@ -2008,6 +2021,17 @@ lim_domanager (FILE * fp, char *lsfile, unsigned int *lineNum, char *secName) //
 	enum administrators {
 		ADMINISTRATORS
 	};
+
+	struct keymap keyList1[] = {
+		{ MANAGER, "    ", NULL, "MANAGER" },
+		{ -1, "    ", NULL, NULL }
+	};
+
+	struct keymap keyList2[] = {
+		{ ADMINISTRATORS, "    ", NULL, "ADMINISTRATORS" },
+		{ -1, "    ", NULL, NULL}
+	};
+
 
 
 	if (lim_debug > 0 && lim_debug < 3)
@@ -2019,7 +2043,8 @@ lim_domanager (FILE * fp, char *lsfile, unsigned int *lineNum, char *secName) //
 		clusAdminGids = malloc (sizeof (uid_t));
 		if (getLSFUser_ (lsfUserName, sizeof (lsfUserName)) < 0)
 		{
-			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "getLSFUser_");
+			const char getLSFUser[] = "getLSFUser_";
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, getLSFUser );
 			return FALSE;
 		}
 		clusAdminIds[ADMINISTRATORS]   = getuid ();
@@ -2107,7 +2132,7 @@ lim_domanager (FILE * fp, char *lsfile, unsigned int *lineNum, char *secName) //
 }
 
 int
-lim_getClusAdmins (char *line, char *lsfile, unsigned int *lineNum, char *secName) // function name (only)is replicated in liblsf/conf.c
+lim_getClusAdmins (char *line, const char *lsfile, unsigned int *lineNum, const char *secName) // function name (only)is replicated in liblsf/conf.c
 {
 	int count = 0;
 	struct admins *admins = NULL;
@@ -2186,35 +2211,35 @@ lim_setAdmins (struct admins *admins, int mOrA)
 		return -1;
 	}
 	if (mOrA == M_THEN_A) {
-		workNAdmins = nClusAdmins;
-		workAdminIds = clusAdminIds;
-		workAdminGids = clusAdminGids;
+		workNAdmins    = nClusAdmins;
+		workAdminIds   = clusAdminIds;
+		workAdminGids  = clusAdminGids;
 		workAdminNames = clusAdminNames;
 	}
 	else {
-		workNAdmins = admins->nAdmins;
-		workAdminIds = admins->adminIds;
-		workAdminGids = admins->adminGIds;
+		workNAdmins    = admins->nAdmins;
+		workAdminIds   = admins->adminIds;
+		workAdminGids  = admins->adminGIds;
 		workAdminNames = admins->adminNames;
 	}
 
 	for ( unsigned int i = 0; i < workNAdmins; i++) {
-		tempAdminIds[i] = workAdminIds[i];
-		tempAdminGids[i] = workAdminGids[i];
+		tempAdminIds[i]   = workAdminIds[i];
+		tempAdminGids[i]  = workAdminGids[i];
 		tempAdminNames[i] = putstr_ (workAdminNames[i]);
 	}
 	tempNAdmins = workNAdmins;
 	if (mOrA == M_THEN_A) {
-		workNAdmins = admins->nAdmins;
-		workAdminIds = admins->adminIds;
-		workAdminGids = admins->adminGIds;
+		workNAdmins    = admins->nAdmins;
+		workAdminIds   = admins->adminIds;
+		workAdminGids  = admins->adminGIds;
 		workAdminNames = admins->adminNames;
 	}
 	else if (mOrA == A_THEN_M)
 		{
-		workNAdmins = nClusAdmins;
-		workAdminIds = clusAdminIds;
-		workAdminGids = clusAdminGids;
+		workNAdmins    = nClusAdmins;
+		workAdminIds   = clusAdminIds;
+		workAdminGids  = clusAdminGids;
 		workAdminNames = clusAdminNames;
 		}
 	else {
@@ -2225,8 +2250,8 @@ lim_setAdmins (struct admins *admins, int mOrA)
 		if (isInlist (tempAdminNames, workAdminNames[i], tempNAdmins)) {
 			continue;
 		}
-		tempAdminIds[tempNAdmins] = workAdminIds[i];
-		tempAdminGids[tempNAdmins] = workAdminGids[i];
+		tempAdminIds[tempNAdmins]   = workAdminIds[i];
+		tempAdminGids[tempNAdmins]  = workAdminGids[i];
 		tempAdminNames[tempNAdmins] = putstr_ (workAdminNames[i]);
 		tempNAdmins++;
 	}
@@ -2239,9 +2264,9 @@ lim_setAdmins (struct admins *admins, int mOrA)
 		FREEUP (clusAdminGids);
 		FREEUP (clusAdminNames);
 		}
-	nClusAdmins = tempNAdmins;
-	clusAdminIds = tempAdminIds;
-	clusAdminGids = tempAdminGids;
+	nClusAdmins    = tempNAdmins;
+	clusAdminIds   = tempAdminIds;
+	clusAdminGids  = tempAdminGids;
 	clusAdminNames = tempAdminNames;
 
 
@@ -2251,7 +2276,7 @@ lim_setAdmins (struct admins *admins, int mOrA)
 
 
 int
-doclparams (FILE * clfp, char *lsfile, unsigned int *lineNum)
+doclparams (FILE * clfp, const char *lsfile, unsigned int *lineNum)
 {
 	char *linep = NULL;
 	int warning = FALSE;
@@ -2283,18 +2308,18 @@ doclparams (FILE * clfp, char *lsfile, unsigned int *lineNum)
 	};
 
 	struct keymap keyList[] = {
-		{  0, "    ", "EXINTERVAL"             , NULL },
-		{  1, "    ", "ELIMARGS"               , NULL },
-		{  2, "    ", "PROBE_TIMEOUT"          , NULL },
-		{  3, "    ", "ELIM_POLL_INTERVAL"     , NULL },
-		{  4, "    ", "HOST_INACTIVITY_LIMIT"  , NULL },
-		{  5, "    ", "MASTER_INACTIVITY_LIMIT", NULL },
-		{  6, "    ", "RETRY_LIMIT"            , NULL },
-		{  8, "    ", "ADJUST_DURATION"        , NULL },
-		{  9, "    ", "LSF_ELIM_DEBUG"         , NULL },
-		{ 10, "    ", "LSF_ELIM_BLOCKTIME"     , NULL },
-		{ 11, "    ", "LSF_ELIM_RESTARTS"      , NULL },
-		{ 0, "    ", NULL, NULL                , NULL }
+		{ EXINTERVAL,              "    ", "EXINTERVAL"             , NULL },
+		{ ELIMARGS,                "    ", "ELIMARGS"               , NULL },
+		{ PROBE_TIMEOUT,           "    ", "PROBE_TIMEOUT"          , NULL },
+		{ ELIM_POLL_INTERVAL,      "    ", "ELIM_POLL_INTERVAL"     , NULL },
+		{ HOST_INACTIVITY_LIMIT,   "    ", "HOST_INACTIVITY_LIMIT"  , NULL },
+		{ MASTER_INACTIVITY_LIMIT, "    ", "MASTER_INACTIVITY_LIMIT", NULL },
+		{ RETRY_LIMIT,             "    ", "RETRY_LIMIT"            , NULL },
+		{ ADJUST_DURATION,         "    ", "ADJUST_DURATION"        , NULL },
+		{ LSF_ELIM_DEBUG,          "    ", "LSF_ELIM_DEBUG"         , NULL },
+		{ LSF_ELIM_BLOCKTIME,      "    ", "LSF_ELIM_BLOCKTIME"     , NULL },
+		{ LSF_ELIM_RESTARTS,       "    ", "LSF_ELIM_RESTARTS"      , NULL },
+		{ -1, "    ", NULL, NULL }
 	};
 
 	const char parameters[] = "parameters";
@@ -2517,6 +2542,8 @@ doclparams (FILE * clfp, char *lsfile, unsigned int *lineNum)
 
 		return 0;
 		}
+
+	return 255;
 }
 
 // struct keymap *
@@ -2598,22 +2625,26 @@ doclparams (FILE * clfp, char *lsfile, unsigned int *lineNum)
 void
 setMyClusterName (void)
 {
-	struct keymap *keyList;
-	FILE *fp;
+	FILE *fp      = NULL;
+	char found    = FALSE;
+	char *lp      = NULL;
+	char *cp      = NULL;
+	char *hname   = NULL;
+	char *cluster = NULL;
+	unsigned int lineNum = 0;
 	char clusterFile[MAXFILENAMELEN];
-	char *cluster;
-	char found = FALSE;
-	char *lp;
-	char *cp;
-	char *hname;
-	unsigned int lineNum;
 
-	if ((hname = ls_getmyhostname ()) == NULL)
-		lim_Exit ("setMyClusterName/ls_getmyhostname failed");
+	struct keymap *keyList = NULL;
 
-	ls_syslog (LOG_DEBUG, "setMyClusterName: searching cluster files ...");
+	const char lsf_cluster[] = "lsf.cluster";
+
+	if ((hname = ls_getmyhostname ()) == NULL) {
+		lim_Exit ("%s: ls_getmyhostname failed", __func__ );
+	}
+
+	ls_syslog (LOG_DEBUG, "%s: searching cluster files ...", __func__ );
 	cluster = myClusterPtr->clName;
-	sprintf (clusterFile, "%s/lsf.cluster.%s", limParams[LSF_CONFDIR].paramValue, cluster);
+	sprintf (clusterFile, "%s/%s.%s", limParams[LSF_CONFDIR].paramValue, lsf_cluster, cluster);
 	fp = confOpen (clusterFile, "r");
 
 	if (!fp)
@@ -2627,13 +2658,13 @@ setMyClusterName (void)
 
 	lineNum = 0;
 
-	for (;;)
+	for (;;) // FIXME FIXME FIXME FIXME replace infinute loop with terminating condition
 		{
 		if ((lp = getBeginLine (fp, &lineNum)) == NULL)
 			{
 			if (!found)
 				{
-				ls_syslog (LOG_DEBUG, "setMyClusterName: Local host %s not defined in cluster file %s", hname, clusterFile);
+				ls_syslog (LOG_DEBUG, "%s: Local host %s not defined in cluster file %s", __func__, hname, clusterFile);
 				}
 			break;
 			}
@@ -2720,8 +2751,7 @@ setMyClusterName (void)
 				{
 				if (!found)
 					{
-					ls_syslog (LOG_ERR, "%\
-							   s: %s(%d): Invalid hostname %s in section host, host ignored", __func__, clusterFile, lineNum, keyList[HOSTNAME].val);
+					ls_syslog (LOG_ERR, "%s: %s(%d): Invalid hostname %s in section host, host ignored", __func__, clusterFile, lineNum, keyList[HOSTNAME].val);
 					lim_CheckError = WARNING_ERR;
 					}
 				freeKeyList (keyList);
@@ -2732,8 +2762,7 @@ setMyClusterName (void)
 				{
 				if (!found)
 					{
-					ls_syslog (LOG_DEBUG, "\
-							   setMyClusterName: local host %s belongs to cluster %s", hname, cluster);
+					ls_syslog (LOG_DEBUG, "%s: local host %s belongs to cluster %s", __func__, hname, cluster);
 					found = TRUE;
 					strcpy (myClusterName, cluster);
 					freeKeyList (keyList);
@@ -2755,36 +2784,36 @@ setMyClusterName (void)
 
 endfile:
 
-	if (!found)
-		{
-		ls_syslog (LOG_ERR, "\
-				   %s: unable to find the cluster file containing local host %s", __func__, hname);
-		lim_Exit ("setMyClusterName");
-		}
+	if (!found) {
+		ls_syslog (LOG_ERR, " %s: unable to find the cluster file containing local host %s", __func__, hname);
+		lim_Exit ( __func__ );
+	}
+
+	return;
 }
 
 void
 freeKeyList (struct keymap *keyList)
 {
-	int i;
-
-	for (i = 0; keyList[i].key != NULL; i++)
-		if (keyList[i].position != -1)
+	for ( unsigned int i = 0; keyList[i].key != NULL; i++) {
+		if (keyList[i].position != -1) {
 			FREEUP (keyList[i].val);
+		}
+	}
 }
 
 
 int
-dohosts (FILE * clfp, struct clusterNode *clPtr, char *lsfile, unsigned int *lineNum)
+dohosts (FILE * clfp, struct clusterNode *clPtr, const char *lsfile, unsigned int *lineNum)
 {
-	struct hostEntry hostEntry;
 	char *sp     = NULL;
 	char *cp     = NULL;
 	char *word   = NULL;
 	char *window = NULL;
 	char *linep  = NULL;
+	int ignoreR  = FALSE;
 	int n = 0;
-	int ignoreR = FALSE;
+	struct hostEntry hostEntry;
 
 
 	enum {
@@ -2801,17 +2830,17 @@ dohosts (FILE * clfp, struct clusterNode *clPtr, char *lsfile, unsigned int *lin
 	};
 
 	struct keymap keyList[] = {
-		{  0, "    " , "HOSTNAME",                NULL },
-		{  1, "    " , "MODEL",                   NULL },
-		{  2, "    " , "TYPE",                    NULL },
-		{  3, "    " , "ND",                      NULL },
-		{  4, "    " , "RESOURCES",               NULL },
-		{  5, "    " , "RUNWINDOW",               NULL },
-		{  6, "    " , "REXPRI0",                 NULL },
-		{  7, "    " , "SERVER0",                 NULL },
-		{  8, "    " , "R",                       NULL },
-		{  9, "    " , "S",                       NULL },
-		{  0, "    " , NULL, NULL }
+		{  HOSTNAME,  "    " , "HOSTNAME",  NULL },
+		{  MODEL,     "    " , "MODEL",     NULL },
+		{  TYPE,      "    " , "TYPE",      NULL },
+		{  ND,        "    " , "ND",        NULL },
+		{  RESOURCES, "    " , "RESOURCES", NULL },
+		{  RUNWINDOW, "    " , "RUNWINDOW", NULL },
+		{  REXPRI0,   "    " , "REXPRI0",   NULL },
+		{  SERVER0,   "    " , "SERVER0",   NULL },
+		{  R,         "    " , "R",         NULL },
+		{  S,         "    " , "S",         NULL },
+		{  -1,        "    " , NULL, NULL }
 	};
 
 	const char host[] = "host";
@@ -3145,7 +3174,7 @@ archNameToNo (const char *archName)
 }
 
 int
-modelNameToNo (char *modelName)
+modelNameToNo ( const char *modelName)
 {
 	for ( unsigned int i = 0; i < allInfo.nModels; i++) {
 		if (strcmp (allInfo.hostModels[i], modelName) == 0) {
@@ -3157,7 +3186,7 @@ modelNameToNo (char *modelName)
 }
 
 struct hostNode *
-addHost_ (struct clusterNode *clPtr, struct hostEntry *hEntPtr,  char *window, char *fileName, unsigned int *lineNumPtr)
+addHost_ (struct clusterNode *clPtr, struct hostEntry *hEntPtr,  char *window, const char *fileName, unsigned int *lineNumPtr)
 {
 	struct hostNode *hPtr = NULL;
 	struct hostent *hp    = NULL;
@@ -3469,7 +3498,7 @@ initHostNode (void)
 	struct hostNode *hPtr = calloc (1, sizeof (struct hostNode));
 	if (hPtr == NULL)
 		{
-		ls_syslog (LOG_ERR, "%s: malloc failed %m", __func__);
+		ls_syslog (LOG_ERR, "%s: malloc failed", __func__);
 		return NULL;
 		}
 
@@ -3526,14 +3555,17 @@ freeHostNodes (struct hostNode *hPtr, int allList)
 		next = hPtr->nextPtr;
 		FREEUP (hPtr);
 
-		if (allList == TRUE)
+		if (allList == TRUE) {
 			hPtr = next;
 		}
+	}
+
+	return;
 }
 
 
 struct sharedResource *
-addResource (char *resName, unsigned int nHosts, char **hosts, char *value, char *fileName, unsigned int lineNum, int resourceMap)
+addResource ( const char *resName, unsigned int nHosts, char **hosts, char *value, const char *fileName, unsigned int lineNum, int resourceMap)
 {
 
 	struct sharedResource *temp   = NULL;
@@ -3701,11 +3733,11 @@ addHostInstance (struct sharedResource *sharedResource, unsigned int nHosts, cha
 }
 
 char **
-getValidHosts (char *hostName, unsigned int *numHost, struct sharedResource *resource)
+getValidHosts ( const char *hostName, unsigned int *numHost, struct sharedResource *resource)
 {
-	int num = 0;
-	char **temp = NULL;
-	struct hostNode *hPtr;
+	int num               = 0;
+	char **temp           = NULL;
+	struct hostNode *hPtr = NULL;
 
 	assert( *numHost );
 	if (temp == NULL)
@@ -3787,9 +3819,9 @@ getValidHosts (char *hostName, unsigned int *numHost, struct sharedResource *res
 int
 addHostNodeIns (struct resourceInstance *instance, unsigned int nHosts, char **hostNames)
 {
-	int resNo;
-	struct hostNode *hPtr;
-	struct resourceInstance **temp;
+	int resNo                      = 0;
+	struct hostNode *hPtr          = NULL;
+	struct resourceInstance **temp = NULL;
 
 	if ((resNo = resNameDefined (instance->resName)) < 0)
 		{
@@ -3836,7 +3868,7 @@ addHostNodeIns (struct resourceInstance *instance, unsigned int nHosts, char **h
 }
 
 struct resourceInstance *
-isInHostNodeIns (char *resName, unsigned int numInstances, struct resourceInstance **instances)
+isInHostNodeIns ( const char *resName, unsigned int numInstances, struct resourceInstance **instances)
 {
 	if (numInstances <= 0 || instances == NULL) {
 		return NULL;
@@ -3852,8 +3884,8 @@ isInHostNodeIns (char *resName, unsigned int numInstances, struct resourceInstan
 int
 addHostList (struct resourceInstance *resourceInstance, unsigned int nHosts, char **hostNames)
 {
-	struct hostNode **temp;
-	struct hostNode *hostPtr;
+	struct hostNode *hostPtr = NULL;
+	struct hostNode **temp   = NULL;
 
 	if (resourceInstance == NULL || nHosts <= 0 || hostNames == NULL) {
 		return -1;
@@ -3888,8 +3920,9 @@ struct resourceInstance *
 addInstance (struct sharedResource *sharedResource, unsigned int nHosts, char **hostNames, char *value)
 {
 	int resNo = 0;
-	struct resourceInstance **insPtr, *temp;
-	struct hostNode *hPtr;
+	struct hostNode *hPtr            = NULL;
+	struct resourceInstance *temp    = NULL;
+	struct resourceInstance **insPtr = NULL; 
 
 	if (nHosts <= 0 || hostNames == NULL) {
 		return NULL;
@@ -4221,14 +4254,15 @@ findClusterServers ( const char *clName)
 	unsigned int lineNum = 0;
 
 	char fileName[MAXFILENAMELEN];
-	const char ENOSERVER = "ENOSERVER";
-	const char confileName[] = "/lsf.cluster.";
+	const char lsf_cluster[] = "lsf.cluster";
+	const char ENOSERVER[]   = "ENOSERVER";
+	const char readonly[]    = "r";
 	
 	servers = malloc( sizeof( char ) * MAXLINELEN + 1 ); // FIXME FIXME FIXME FIXME memory management
 	memset( servers, 0, sizeof( char ) * MAXLINELEN + 1 );
 	strcpy( servers, ENOSERVER );
-	assert( strlen( limParams[LSF_CONFDIR].paramValue ) + strlen( confileName ) + strlen( clName ) =< MAXFILENAMELEN );
-	sprintf (fileName, "%s%s%s", limParams[LSF_CONFDIR].paramValue, confileName ,clName); // FIXME FIXME FIXME FIXME const struct parameter; should be moved to configure.ac
+	assert( strlen( limParams[LSF_CONFDIR].paramValue ) + strlen( lsf_cluster ) + strlen( clName ) =< MAXFILENAMELEN );
+	sprintf (fileName, "%s/%s.%s", limParams[LSF_CONFDIR].paramValue, lsf_cluster ,clName); // FIXME FIXME FIXME FIXME const struct parameter; should be moved to configure.ac
 
 	if ((clfp = confOpen (fileName, "r")) == NULL)
 	{
@@ -4898,7 +4932,7 @@ getExtResourcesValDefault ( const char *resName)  // FIXME FIXME FIXME FIXME sup
 
 
 char *
-getExtResourcesVal (char *resName)
+getExtResourcesVal( const char *resName )
 {
 	
 	assert( *resName );
@@ -4964,7 +4998,7 @@ initTypeModel (struct hostNode *me)
 }
 
 char *
-stripIllegalChars (char *str)
+stripIllegalChars ( const char *str)
 {
 	char *c = str;
 	char *p = str;
@@ -5257,4 +5291,6 @@ rmMigrantHost (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr, u
 	}
 	
 	xdr_destroy (&xdrs2);
+
+	return;
 }
