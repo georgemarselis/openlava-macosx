@@ -32,7 +32,7 @@ getNextValue (char **line)
 }
 
 int
-keyMatch (struct keymap *keyList, char *line, int exact)
+keyMatch (struct keymap *keyList, const char *line, int exact)
 {
 	char *sp       = line;
 	char *word     = NULL;
@@ -41,76 +41,75 @@ keyMatch (struct keymap *keyList, char *line, int exact)
 	unsigned int i = 0;
 
 
-  i = 0;
-  while (keyList[i].key != NULL)
+	i = 0;
+	while (keyList[i].key != NULL)
 	{
-	  keyList[i].position = -1;
-	  i++;
+		keyList[i].position = -1;
+		i++;
 	}
 
-  while ((word = getNextWord_ (&sp)) != NULL)
+	while ((word = getNextWord_ (&sp)) != NULL)
 	{
-	  i = 0;
-	  found = FALSE;
-	  while (keyList[i].key != NULL)
-	{
-	  if (strcasecmp (word, keyList[i].key) == 0)
+		i = 0;
+		found = FALSE;
+		while (keyList[i].key != NULL)
 		{
-		  	if (keyList[i].position != -1) {
-				return FALSE;
+			if (strcasecmp (word, keyList[i].key) == 0)
+			{
+				if (keyList[i].position != -1) {
+					return FALSE;
+				}
+				found = TRUE;
+				keyList[i].position = pos;
+				break;
 			}
-		  found = TRUE;
-		  keyList[i].position = pos;
-		  break;
+			i++;
 		}
-	  i++;
-	}
 		if (!found) {
 			return FALSE;
 		}
 
-	  pos++;
+		pos++;
 	}
 
 	if (!exact) {
 		return TRUE;
 	}
 
-  i = 0;
+	i = 0;
 	while (keyList[i].key != NULL)
 	{
 		if (keyList[i].position == -1) {
 			return FALSE;
 		}
-	  i++;
+		i++;
 	}
 
-  return TRUE;
+	return TRUE;
 }
 
 int
 isSectionEnd (char *linep, const char *lsfile, size_t *lineNum, const char *sectionName) // FIX
 {
-  char *word  = getNextWord_ (&linep);
+	char *word  = getNextWord_ (&linep);
 
-  if (strcasecmp (word, "end") != 0) {
-	return FALSE;
-  }
-
-  word = getNextWord_ (&linep);
-  if (!word) {
-	  /* catgets 5400 */
-	  ls_syslog (LOG_ERR, "5400: %s(%d): section %s ended without section name, ignored", lsfile, *lineNum, sectionName);
-	  return TRUE;
+	if (strcasecmp (word, "end") != 0) {
+		return FALSE;
 	}
 
-  if (strcasecmp (word, sectionName) != 0) {
-	/* catgets 5401 */
-	ls_syslog (LOG_ERR, "5401: %s(%d): section %s ended with wrong section name %s,ignored", lsfile, *lineNum, sectionName, word);    
-  }
+	word = getNextWord_ (&linep);
+	if (!word) {
+		/* catgets 5400 */
+		ls_syslog (LOG_ERR, "5400: %s(%d): section %s ended without section name, ignored", lsfile, *lineNum, sectionName);
+		return TRUE;
+	}
 
-  return TRUE;
+	if (strcasecmp (word, sectionName) != 0) {
+		/* catgets 5401 */
+		ls_syslog (LOG_ERR, "5401: %s(%d): section %s ended with wrong section name %s,ignored", lsfile, *lineNum, sectionName, word);    
+	}
 
+	return TRUE;
 }
 
 
@@ -118,21 +117,21 @@ isSectionEnd (char *linep, const char *lsfile, size_t *lineNum, const char *sect
 // char *
 // getBeginLine (FILE * fp, size_t *lineNum)
 // {
-// 	char *sp;
-// 	char *wp;
+//  char *sp;
+//  char *wp;
 
-// 	for (;;)
-// 	{
-// 		sp = getNextLineC_ (fp, lineNum, TRUE);
-// 		if (!sp) {
-// 			return NULL;
-// 		}
+//  for (;;)
+//  {
+//      sp = getNextLineC_ (fp, lineNum, TRUE);
+//      if (!sp) {
+//          return NULL;
+//      }
 
-// 		wp = getNextWord_ (&sp);
-// 		if (wp && (strcasecmp (wp, "begin") == 0)) {
-// 			return sp;
-// 		}
-// 	}
+//      wp = getNextWord_ (&sp);
+//      if (wp && (strcasecmp (wp, "begin") == 0)) {
+//          return sp;
+//      }
+//  }
 
 // }
 char *
@@ -144,15 +143,15 @@ getBeginLine (FILE *fp, size_t *lineNum)
 
 	// for (;;)
 	// {
-	// 	sp = getNextLineC_ (fp, lineNum, TRUE);
-	// 	if (!sp) {
-	// 		return NULL;
-	// 	}
+	//  sp = getNextLineC_ (fp, lineNum, TRUE);
+	//  if (!sp) {
+	//      return NULL;
+	//  }
 
-	// 	wp = getNextWord_ (&sp);
-	// 	if (wp && (strcasecmp (wp, "begin") == 0)) {
-	// 		return sp;
-	// 	}
+	//  wp = getNextWord_ (&sp);
+	//  if (wp && (strcasecmp (wp, "begin") == 0)) {
+	//      return sp;
+	//  }
 	// }
 	// FIXME FIXME refactoring to avoid infinite loop
 	do {
@@ -222,7 +221,7 @@ readHvalues (struct keymap *keyList, char *linep, FILE * fp, const char *lsfile,
 
 			i = 0;
 			while (keyList[i].key != NULL) {
-			  	if (keyList[i].val == NULL) {
+				if (keyList[i].val == NULL) {
 					/* catgets 5405 */
 					ls_syslog (LOG_ERR, "5405: %s: %s(%d): required keyword %s is missing in section %s, ignoring the section", __func__, lsfile, *lineNum, keyList[i].key, section);  
 					error = TRUE;
@@ -303,7 +302,7 @@ mapValues (struct keymap *keyList, char *line) // FIXME FIXME should char *line 
 	long pos       = 0;
 	char *value    = NULL;
 	int found      = 0; // FALSE
-	int numv        = 0;
+	int numv       = 0;
 	unsigned int i = 0;
 
 	while (keyList[i].key != NULL) {
@@ -375,15 +374,15 @@ mapValues (struct keymap *keyList, char *line) // FIXME FIXME should char *line 
 // fail: // FIXME FIXME FIXME remove goto from function
 //   i = 0;
 //   while (keyList[i].key != NULL)
-// 	{
-// 	  if (keyList[i].val != NULL)
-// 	{
-// 	  free (keyList[i].val);
-// 	  keyList[i].val = NULL;
-// 	}
+//  {
+//    if (keyList[i].val != NULL)
+//  {
+//    free (keyList[i].val);
+//    keyList[i].val = NULL;
+//  }
 
-// 	  i++;
-// 	}
+//    i++;
+//  }
 //   return -1;
 
 }
@@ -514,28 +513,29 @@ doSkipSection_conf (const struct lsConf *conf, size_t *lineNum, const char *lsfi
 		return;
 	}
 
-  while ((cp = getNextLineC_conf (conf, lineNum, TRUE)) != NULL)
+	while ((cp = getNextLineC_conf (conf, lineNum, TRUE)) != NULL)
 	{
-	  word = getNextWord_ (&cp);
-	  if (strcasecmp (word, "end") == 0)
-	{
-	  word = getNextWord_ (&cp);
-	  if (!word)
+		word = getNextWord_ (&cp);
+		if (strcasecmp (word, "end") == 0)
 		{
+			word = getNextWord_ (&cp);
+			if (!word)
+			{
 		   /* catgets 5419 */
-		  ls_syslog (LOG_ERR, "5419: %s(%d): Section ended without section name, ignored", lsfile, *lineNum);
-		}
-	  else
-		{
-			if (strcasecmp (word, sectionName) != 0) {
-			/* catgets 5420 */
-			  ls_syslog (LOG_ERR, "5420: %s(%d): Section %s ended with wrong section name: %s, ignored", lsfile, *lineNum, sectionName, word);
+				ls_syslog (LOG_ERR, "5419: %s(%d): Section ended without section name, ignored", lsfile, *lineNum);
 			}
+			else
+			{
+				if (strcasecmp (word, sectionName) != 0) {
+			/* catgets 5420 */
+					ls_syslog (LOG_ERR, "5420: %s(%d): Section %s ended with wrong section name: %s, ignored", lsfile, *lineNum, sectionName, word);
+				}
+			}
+			return;
 		}
-	  return;
-	}
 	}
 
-  ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, lsfile, *lineNum, sectionName);
+	ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, lsfile, *lineNum, sectionName);
 
+	return;
 }
