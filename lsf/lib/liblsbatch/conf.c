@@ -51,7 +51,8 @@ fillCell_ (struct inNames **table, const char *name, const char *level)
 
 	table[0] = malloc (sizeof (struct inNames));    // FIXME FIXME replace 0 with enum label
 	if ( NULL == table[0] && ENOMEM == errno ) {
-		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
+		const char malloc[] = "malloc";
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, malloc);
 		lserrno = LSE_MALLOC;
 		return 0;
 	}
@@ -61,23 +62,25 @@ fillCell_ (struct inNames **table, const char *name, const char *level)
 	if (level) {
 		size += strlen (level) + 1;
 	}
-	table[0]->name = malloc( size );
-	if ( NULL == table[0]->name && ENOMEM == errno ) {
-		FREEUP (table[0]);
-		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
+	table[0]->name = malloc( size ); // FIXME FIXME FIXME find what table[0] is and replace it with enum label
+	if ( NULL == table[0]->name && ENOMEM == errno ) { // FIXME FIXME FIXME find what table[0] is and replace it with enum label
+		FREEUP (table[0]);           // FIXME FIXME FIXME find what table[0] is and replace it with enum label
+		const char malloc[] = "malloc";
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, malloc);
 		lserrno = LSE_MALLOC;
 		return 0;
 	}
 
 	strcpy(table[0]->name, name);
 	if (level) {
-		strcat (table[0]->name, "+");
-		strcat (table[0]->name, level);
+		const char plus = "+"
+		strcat (table[0]->name, plus );   // FIXME FIXME FIXME find what table[0] is and replace it with enum label
+		strcat (table[0]->name, level); // FIXME FIXME FIXME find what table[0] is and replace it with enum label
 	}
 
 	if (level) {
-		table[0]->prf_level = strchr (table[0]->name, '+') + 1;
-		*(table[0]->prf_level - 1) = 0;
+		table[0]->prf_level = strchr (table[0]->name, '+') + 1; // FIXME FIXME FIXME find what table[0] is and replace it with enum label
+		*(table[0]->prf_level - 1) = 0; // FIXME FIXME FIXME find what table[0] is and replace it with enum label
 	}
 	else {
 		table[0]->prf_level = NULL;
@@ -340,13 +343,14 @@ lsb_readparam (struct lsConf *conf)
 	}
 }
 
+
 char
 do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
 {
-	char *linep = NULL;
 	int value   = 0;
+	char *linep = NULL;
 
-	enum state {
+	enum state { // 36 items
 		LSB_MANAGER, DEFAULT_QUEUE, DEFAULT_HOST_SPEC, DEFAULT_PROJECT, JOB_ACCEPT_INTERVAL,
 		PG_SUSP_IT, MBD_SLEEP_TIME, CLEAN_PERIOD, MAX_RETRY, SBD_SLEEP_TIME, MAX_JOB_NUM,
 		RETRY_INTERVAL, MAX_SBD_FAIL, RUSAGE_UPDATE_RATE, RUSAGE_UPDATE_PERCENT, COND_CHECK_TIME,
@@ -356,46 +360,87 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
 		SLOT_RESOURCE_RESERVE, MAX_JOBID, MAX_ACCT_ARCHIVE_FILE, ACCT_ARCHIVE_SIZE, ACCT_ARCHIVE_AGE 
 	};
 
-	struct keymap keylist[] = {
-        { LSB_MANAGER,                   "    ", "LSB_MANAGER",                    NULL },
-        { DEFAULT_QUEUE,                 "    ", "DEFAULT_QUEUE",                 NULL },
-        { DEFAULT_HOST_SPEC,             "    ", "DEFAULT_HOST_SPEC",             NULL },
-        { DEFAULT_PROJECT,               "    ", "DEFAULT_PROJECT",               NULL },
-        { JOB_ACCEPT_INTERVAL,           "    ", "JOB_ACCEPT_INTERVAL",           NULL },
-        { PG_SUSP_IT,                    "    ", "PG_SUSP_IT",                    NULL },
-        { MBD_SLEEP_TIME,                "    ", "MBD_SLEEP_TIME",                NULL },
-        { CLEAN_PERIOD,                  "    ", "CLEAN_PERIOD",                  NULL },
-        { MAX_RETRY,                     "    ", "MAX_RETRY",                     NULL },
-        { SBD_SLEEP_TIME,                "    ", "SBD_SLEEP_TIME",                NULL },
-        { MAX_JOB_NUM,                   "    ", "MAX_JOB_NUM",                   NULL },
-        { RETRY_INTERVAL,                "    ", "RETRY_INTERVAL",                NULL },
-        { MAX_SBD_FAIL,                  "    ", "MAX_SBD_FAIL",                  NULL },
-        { RUSAGE_UPDATE_RATE,            "    ", "RUSAGE_UPDATE_RATE",            NULL }, //* control how often sbatchd
-        { RUSAGE_UPDATE_PERCENT,         "    ", "RUSAGE_UPDATE_PERCENT",         NULL }, //* report job rusage to mbd
-        { COND_CHECK_TIME,               "    ", "COND_CHECK_TIME",               NULL }, //* time to check conditions
-        { MAX_SBD_CONNS,                 "    ", "MAX_SBD_CONNS",                 NULL }, //* Undocumented parameter for
-                                                                                          //* specifying how many sbd
-                                                                                          //* connections to keep around
-        { MAX_SCHED_STAY,                "    ", "MAX_SCHED_STAY",                NULL },
-        { FRESH_PERIOD,                  "    ", "FRESH_PERIOD",                  NULL },
-        { MAX_JOB_ARRAY_SIZE,            "    ", "MAX_JOB_ARRAY_SIZE",            NULL },
-        { DISABLE_UACCT_MAP,             "    ", "DISABLE_UACCT_MAP",             NULL },
-        { JOB_TERMINATE_INTERVAL,        "    ", "JOB_TERMINATE_INTERVAL",        NULL },
-        { JOB_RUN_TIMES,                 "    ", "JOB_RUN_TIMES",                 NULL },
-        { JOB_DEP_LAST_SUB,              "    ", "JOB_DEP_LAST_SUB",              NULL },
-        { JOB_SPOOL_DIR,                 "    ", "JOB_SPOOL_DIR",                 NULL },
-        { MAX_USER_PRIORITY,             "    ", "MAX_USER_PRIORITY",             NULL },
-        { JOB_PRIORITY_OVER_TIME,        "    ", "JOB_PRIORITY_OVER_TIME",        NULL },
-        { SHARED_RESOURCE_UPDATE_FACTOR, "    ", "SHARED_RESOURCE_UPDATE_FACTOR", NULL },
-        { SCHE_RAW_LOAD,                 "    ", "SCHE_RAW_LOAD",                 NULL },
-        { PRE_EXEC_DELAY,                "    ", "PRE_EXEC_DELAY",                NULL },
-        { SLOT_RESOURCE_RESERVE,         "    ", "SLOT_RESOURCE_RESERVE",         NULL },
-        { MAX_JOBID,                     "    ", "MAX_JOBID",                     NULL },
-        { MAX_ACCT_ARCHIVE_FILE,         "    ", "MAX_ACCT_ARCHIVE_FILE",         NULL },
-        { ACCT_ARCHIVE_SIZE,             "    ", "ACCT_ARCHIVE_SIZE",             NULL },
-        { ACCT_ARCHIVE_AGE,              "    ", "ACCT_ARCHIVE_AGE",              NULL },
+	const char *keylist[36] { 
+		"LSB_MANAGER",                            //  0
+		"DEFAULT_QUEUE",                          //  1
+		"DEFAULT_HOST_SPEC",                      //  2
+		"DEFAULT_PROJECT",                        //  3
+		"JOB_ACCEPT_INTERVAL",                    //  4
+		"PG_SUSP_IT",                             //  5
+		"MBD_SLEEP_TIME",                         //  6
+		"CLEAN_PERIOD",                           //  7
+		"MAX_RETRY",                              //  8
+		"SBD_SLEEP_TIME",                         //  9
+		"MAX_JOB_NUM",                            // 10
+		"RETRY_INTERVAL",                         // 11
+		"MAX_SBD_FAIL",                           // 12
+		"RUSAGE_UPDATE_RATE",                     // 13
+		"RUSAGE_UPDATE_PERCENT",                  // 14
+		"COND_CHECK_TIME",                        // 15
+		"MAX_SBD_CONNS",                          // 16
+		"MAX_SCHED_STAY",                         // 17
+		"FRESH_PERIOD",                           // 18
+		"MAX_JOB_ARRAY_SIZE",                     // 19
+		"DISABLE_UACCT_MAP",                      // 20
+		"JOB_TERMINATE_INTERVAL",                 // 21
+		"JOB_RUN_TIMES",                          // 22
+		"JOB_DEP_LAST_SUB",                       // 23
+		"JOB_SPOOL_DIR",                          // 24
+		"MAX_USER_PRIORITY",                      // 25
+		"JOB_PRIORITY_OVER_TIME",                 // 26
+		"SHARED_RESOURCE_UPDATE_FACTOR",          // 27
+		"SCHE_RAW_LOAD",                          // 28
+		"PRE_EXEC_DELAY",                         // 29
+		"SLOT_RESOURCE_RESERVE",                  // 30
+		"MAX_JOBID",                              // 31
+		"MAX_ACCT_ARCHIVE_FILE",                  // 32
+		"ACCT_ARCHIVE_SIZE",                      // 33
+		"ACCT_ARCHIVE_AGE",                       // 34
+		NULL
+	};
+
+	struct keymap keyList[36] = {
+        { LSB_MANAGER,                   "    ", keylist[LSB_MANAGER],                   NULL },
+        { DEFAULT_QUEUE,                 "    ", keylist[DEFAULT_QUEUE],                 NULL },
+        { DEFAULT_HOST_SPEC,             "    ", keylist[DEFAULT_HOST_SPEC],             NULL },
+        { DEFAULT_PROJECT,               "    ", keylist[DEFAULT_PROJECT],               NULL },
+        { JOB_ACCEPT_INTERVAL,           "    ", keylist[JOB_ACCEPT_INTERVAL],           NULL },
+        { PG_SUSP_IT,                    "    ", keylist[PG_SUSP_IT],                    NULL },
+        { MBD_SLEEP_TIME,                "    ", keylist[MBD_SLEEP_TIME],                NULL },
+        { CLEAN_PERIOD,                  "    ", keylist[CLEAN_PERIOD],                  NULL },
+        { MAX_RETRY,                     "    ", keylist[MAX_RETRY],                     NULL },
+        { SBD_SLEEP_TIME,                "    ", keylist[SBD_SLEEP_TIME],                NULL },
+        { MAX_JOB_NUM,                   "    ", keylist[MAX_JOB_NUM],                   NULL },
+        { RETRY_INTERVAL,                "    ", keylist[RETRY_INTERVAL],                NULL },
+        { MAX_SBD_FAIL,                  "    ", keylist[MAX_SBD_FAIL],                  NULL },
+        { RUSAGE_UPDATE_RATE,            "    ", keylist[RUSAGE_UPDATE_RATE],            NULL }, //* control how often sbatchd
+        { RUSAGE_UPDATE_PERCENT,         "    ", keylist[RUSAGE_UPDATE_PERCENT],         NULL }, //* report job rusage to mbd
+        { COND_CHECK_TIME,               "    ", keylist[COND_CHECK_TIME],               NULL }, //* time to check conditions
+        { MAX_SBD_CONNS,                 "    ", keylist[MAX_SBD_CONNS],                 NULL }, //* Undocumented parameter for
+                                                                                                 //* specifying how many sbd
+                                                                                                 //* connections to keep around
+        { MAX_SCHED_STAY,                "    ", keylist[MAX_SCHED_STAY],                NULL },
+        { FRESH_PERIOD,                  "    ", keylist[FRESH_PERIOD],                  NULL },
+        { MAX_JOB_ARRAY_SIZE,            "    ", keylist[MAX_JOB_ARRAY_SIZE],            NULL },
+        { DISABLE_UACCT_MAP,             "    ", keylist[DISABLE_UACCT_MAP],             NULL },
+        { JOB_TERMINATE_INTERVAL,        "    ", keylist[JOB_TERMINATE_INTERVAL],        NULL },
+        { JOB_RUN_TIMES,                 "    ", keylist[JOB_RUN_TIMES],                 NULL },
+        { JOB_DEP_LAST_SUB,              "    ", keylist[JOB_DEP_LAST_SUB],              NULL },
+        { JOB_SPOOL_DIR,                 "    ", keylist[JOB_SPOOL_DIR],                 NULL },
+        { MAX_USER_PRIORITY,             "    ", keylist[MAX_USER_PRIORITY],             NULL },
+        { JOB_PRIORITY_OVER_TIME,        "    ", keylist[JOB_PRIORITY_OVER_TIME],        NULL },
+        { SHARED_RESOURCE_UPDATE_FACTOR, "    ", keylist[SHARED_RESOURCE_UPDATE_FACTOR], NULL },
+        { SCHE_RAW_LOAD,                 "    ", keylist[SCHE_RAW_LOAD],                 NULL },
+        { PRE_EXEC_DELAY,                "    ", keylist[PRE_EXEC_DELAY],                NULL },
+        { SLOT_RESOURCE_RESERVE,         "    ", keylist[SLOT_RESOURCE_RESERVE],         NULL },
+        { MAX_JOBID,                     "    ", keylist[MAX_JOBID],                     NULL },
+        { MAX_ACCT_ARCHIVE_FILE,         "    ", keylist[MAX_ACCT_ARCHIVE_FILE],         NULL },
+        { ACCT_ARCHIVE_SIZE,             "    ", keylist[ACCT_ARCHIVE_SIZE],             NULL },
+        { ACCT_ARCHIVE_AGE,              "    ", keylist[ACCT_ARCHIVE_AGE],              NULL },
         { -1,                            "    ", NULL, NULL }
 	};
+
+	const char *parameters[] = "parameters"
 
 	if (conf == NULL) {
 		return FALSE;
@@ -412,8 +457,8 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
 		return FALSE;
 	}
 
-	if (isSectionEnd (linep, filename, lineNum, "parameters")) {
-		ls_syslog (LOG_WARNING, I18N_EMPTY_SECTION, __func__, filename, *lineNum,  "parameters");
+	if (isSectionEnd (linep, filename, lineNum, parameters )) {
+		ls_syslog (LOG_WARNING, I18N_EMPTY_SECTION, __func__, filename, *lineNum, parameters );
 		lsberrno = LSBE_CONF_WARNING;
 		return FALSE;
 	}
@@ -422,55 +467,58 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
 		/* catgets 5059 */
 		ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5059, "%s: File %s at line %d: Vertical parameters section is not implemented yet; use horizontal format; ignoring section"), __func__, filename, *lineNum);
 		lsberrno = LSBE_CONF_WARNING;
-		doSkipSection_conf (conf, lineNum, filename, "parameters");
+		doSkipSection_conf (conf, lineNum, filename, parameters );
 		return FALSE;
 	}
 
-	if (readHvalues_conf (keylist, linep, conf, filename, lineNum, FALSE,  "parameters") < 0) {
+	if (readHvalues_conf (keyList, linep, conf, filename, lineNum, FALSE, parameters ) < 0) {
 		/* catgets 5060 */
 		ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5060, "%s: File %s at line %d: Incorrect section; ignored"), __func__, filename, *lineNum);
 		lsberrno = LSBE_CONF_WARNING;
-		freekeyval (keylist);
+		freekeyval (keyList);
 		return FALSE;
 	}
 
-	for ( unsigned int i = 0; keylist[i].key != NULL; i++) {
+	for ( unsigned int i = 0; keyList[i].key != NULL; i++) {
 
-	   if (keylist[i].val != NULL && strcmp (keylist[i].val, "")) {
-			if (i == 0) {
+	   if (keyList[i].val != NULL && strcmp (keyList[i].val, "")) {
+			if (i == LSB_MANAGER) { // i == 0
 				/* catgets 5061 */
-				ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5061, "%s: Ignore LSB_MANAGER value <%s>; use MANAGERS  defined in cluster file instead"), filename, keylist[i].val); 
+				ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5061, "%s: Ignore LSB_MANAGER value <%s>; use MANAGERS  defined in cluster file instead"), filename, keyList[i].val); 
 				lsberrno = LSBE_CONF_WARNING;
 			}
-			else if (i == 1) {
-				pConf->param->defaultQueues = putstr_ (keylist[i].val);
+			else if (i == DEFAULT_QUEUE) { // i == 1
+				pConf->param->defaultQueues = putstr_ (keyList[i].val);
 				if (pConf->param->defaultQueues == NULL) {
-					ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__,  "malloc", strlen (keylist[i].val) + 1);
+					const char malloc[] = "malloc";
+					ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, malloc, strlen (keyList[i].val) + 1);
 					lsberrno = LSBE_NO_MEM;
-					freekeyval (keylist);
+					freekeyval (keyList);
 					return FALSE;
 				}
 			}
-			else if (i == 2) {
-				pConf->param->defaultHostSpec = putstr_ (keylist[i].val);
+			else if (i == DEFAULT_HOST_SPEC ) { // i == 2
+				pConf->param->defaultHostSpec = putstr_ (keyList[i].val);
 				if (pConf->param->defaultHostSpec == NULL) {
-					ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (keylist[i].val) + 1);
+					const char malloc[] = "malloc";
+					ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, malloc, strlen (keyList[i].val) + 1);
 					lsberrno = LSBE_NO_MEM;
-					freekeyval (keylist);
+					freekeyval (keyList);
 					return FALSE;
 				}
 			}
-			else if (i == 24)
+			else if (i == JOB_SPOOL_DIR ) // i == 24
 				{
 
-				if (checkSpoolDir (keylist[i].val) == 0)
+				if (checkSpoolDir (keyList[i].val) == 0)
 					{
-					pConf->param->pjobSpoolDir = putstr_ (keylist[i].val);
+					pConf->param->pjobSpoolDir = putstr_ (keyList[i].val);
 					if (pConf->param->pjobSpoolDir == NULL)
 						{
-						ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__,"malloc", strlen (keylist[i].val) + 1);
+						const char malloc[] = "malloc";
+						ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, malloc, strlen (keyList[i].val) + 1);
 						lsberrno = LSBE_NO_MEM;
-						freekeyval (keylist);
+						freekeyval (keyList);
 						return FALSE;
 						}
 					}
@@ -482,14 +530,14 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
 					lsberrno = LSBE_CONF_WARNING;
 					}
 				}
-			else if (i == 32)
+			else if (i == MAX_ACCT_ARCHIVE_FILE ) // i == 32
 				{
 
-				value = my_atoi (keylist[i].val, INFINIT_INT, 0);
+				value = my_atoi (keyList[i].val, INFINIT_INT, 0);
 				if (value == INFINIT_INT)
 					{
 					/* catgets 5459 */
-					ls_syslog (LOG_ERR, I18N (5459, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored"), __func__, filename, *lineNum, keylist[i].val, keylist[i].key, INFINIT_INT - 1);
+					ls_syslog (LOG_ERR, I18N (5459, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored"), __func__, filename, *lineNum, keyList[i].val, keyList[i].key, INFINIT_INT - 1);
 					pConf->param->maxAcctArchiveNum = -1;
 					lsberrno = LSBE_CONF_WARNING;
 					}
@@ -498,14 +546,14 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
 					pConf->param->maxAcctArchiveNum = value;
 					}
 				}
-			else if (i == 33)
+			else if (i == ACCT_ARCHIVE_SIZE ) // i == 33
 				{
 
-				value = my_atoi (keylist[i].val, INFINIT_INT, 0);
+				value = my_atoi (keyList[i].val, INFINIT_INT, 0);
 				if (value == INFINIT_INT)
 					{
 					/* catgets 5459 */
-					ls_syslog (LOG_ERR, I18N (5459, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored"), __func__, filename, *lineNum, keylist[i].val, keylist[i].key, INFINIT_INT - 1);
+					ls_syslog (LOG_ERR, I18N (5459, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored"), __func__, filename, *lineNum, keyList[i].val, keyList[i].key, INFINIT_INT - 1);
 					pConf->param->acctArchiveInSize = -1;
 					lsberrno = LSBE_CONF_WARNING;
 					}
@@ -514,14 +562,14 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
 					pConf->param->acctArchiveInSize = value;
 					}
 				}
-			else if (i == 34)
+			else if (i == ACCT_ARCHIVE_AGE) // i == 34
 				{
 
-				value = my_atoi (keylist[i].val, INFINIT_INT, 0);
+				value = my_atoi (keyList[i].val, INFINIT_INT, 0);
 				if (value == INFINIT_INT)
 					{
 					/* catgets 5459 */
-					ls_syslog (LOG_ERR, I18N (5459, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored"), __func__, filename, *lineNum, keylist[i].val, keylist[i].key, INFINIT_INT - 1);
+					ls_syslog (LOG_ERR, I18N (5459, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored"), __func__, filename, *lineNum, keyList[i].val, keyList[i].key, INFINIT_INT - 1);
 					pConf->param->acctArchiveInDays = -1;
 					lsberrno = LSBE_CONF_WARNING;
 					}
@@ -531,57 +579,61 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
 					}
 				}
 
-			else if (i == 3)
+			else if (i == DEFAULT_PROJECT ) // i == 3
 				{
-				pConf->param->defaultProject = putstr_ (keylist[i].val);
+				pConf->param->defaultProject = putstr_ (keyList[i].val);
 				if (pConf->param->defaultProject == NULL)
 					{
-					ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (keylist[i].val) + 1);
+					const char malloc[] = "malloc";
+					ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, malloc, strlen (keyList[i].val) + 1);
 					lsberrno = LSBE_NO_MEM;
-					freekeyval (keylist);
+					freekeyval (keyList);
 					return FALSE;
 					}
 				}
-			else if (i == 4 || i == 5)
+			else if (i == JOB_ACCEPT_INTERVAL || i == PG_SUSP_IT ) // i == 4 || i == 5
 				{
-				if ((value = my_atoi (keylist[i].val, INFINIT_INT, -1)) == INFINIT_INT)
+				if ((value = my_atoi( keyList[i].val, INFINIT_INT, -1 ) ) == INFINIT_INT)
 					{
 					/* catgets 5067 */
-					ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5067, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a non-negative integer between 0 and %d; ignored"), __func__, filename, *lineNum, keylist[i].val, keylist[i].key, INFINIT_INT - 1);
+					ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5067, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a non-negative integer between 0 and %d; ignored"), __func__, filename, *lineNum, keyList[i].val, keyList[i].key, INFINIT_INT - 1);
 					lsberrno = LSBE_CONF_WARNING;
 					}
-				else if (i == 4) {
+				else if (i == JOB_ACCEPT_INTERVAL) { // i == 4
 					pConf->param->jobAcceptInterval = value;
 				}
-				else {
+				else { // PG_SUSP_IT , i == 5
 					pConf->param->pgSuspendIt = value;
 				}
 			}
-			else if (i == 20)
+			else if (i == DISABLE_UACCT_MAP ) // i == 20
 				{
-				if (strcasecmp (keylist[i].val, "Y") == 0)
+				const char Y[] = "Y";
+				const char N[] = "N";
+
+				if (strcasecmp (keyList[i].val, Y) == 0)
 					{
 					pConf->param->disableUAcctMap = TRUE;
 					}
-				else if (strcasecmp (keylist[i].val, "N") == 0)
+				else if (strcasecmp (keyList[i].val, N ) == 0)
 					{
 					pConf->param->disableUAcctMap = FALSE;
 					}
 				else
 					{
 					/* catgets 5068 */
-					ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5068, "%s: File %s in section Parameters ending at line %d: unrecognizable value <%s> for the keyword DISABLE_UACCT_MAP; assume user level account mapping is allowed"), __func__, filename, *lineNum, keylist[i].val);
+					ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5068, "%s: File %s in section Parameters ending at line %d: unrecognizable value <%s> for the keyword DISABLE_UACCT_MAP; assume user level account mapping is allowed"), __func__, filename, *lineNum, keyList[i].val);
 					pConf->param->disableUAcctMap = FALSE;
 					}
 				}
-			else if (i == 26) { // FIXME FIXME 26 is awfully particular, maybe we should translate this to enum labels?
+			else if (i == JOB_PRIORITY_OVER_TIME ) { // i == 26
 
 				int value_ = 0;
 				int mytime = 0;
 				char str[100]; // FIXME FIXME FIXME 100 is awfully particular 
 				char *ptr = NULL;
 
-				strcpy (str, keylist[i].val);
+				strcpy (str, keyList[i].val);
 				ptr = strchr (str, '/');
 				if (ptr != NULL)  {
 					*ptr = 0x0;
@@ -592,7 +644,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
 
 				if (ptr == NULL || value_ == INFINIT_INT || mytime == INFINIT_INT) {
 					/* catgets 5451 */
-					ls_syslog (LOG_ERR, I18N (5451, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't in format value/time (time in minutes) or value is not positive; ignored"), __func__, filename, *lineNum, keylist[i].val, keylist[i].key);
+					ls_syslog (LOG_ERR, I18N (5451, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't in format value/time (time in minutes) or value is not positive; ignored"), __func__, filename, *lineNum, keyList[i].val, keyList[i].key);
 					lsberrno = LSBE_CONF_WARNING;
 					continue;
 				}
@@ -601,11 +653,11 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
 				pConf->param->jobPriorityTime = mytime;
 
 			}
-			else if (i == 27) {
-				value = my_atoi (keylist[i].val, INFINIT_INT, 0);
+			else if (i == SHARED_RESOURCE_UPDATE_FACTOR ) { // i == 27
+				value = my_atoi (keyList[i].val, INFINIT_INT, 0);
 				if (value == INFINIT_INT) {
 					/* catgets 5459 */
-					ls_syslog (LOG_ERR, I18N (5459, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored"), __func__, filename, *lineNum, keylist[i].val, keylist[i].key, INFINIT_INT - 1); 
+					ls_syslog (LOG_ERR, I18N (5459, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored"), __func__, filename, *lineNum, keyList[i].val, keyList[i].key, INFINIT_INT - 1); 
 					lsberrno = LSBE_CONF_WARNING;
 					pConf->param->sharedResourceUpdFactor = INFINIT_INT;
 				}
@@ -613,16 +665,16 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
 					pConf->param->sharedResourceUpdFactor = value;
 				}
 			}
-			else if (i == 31) {
+			else if (i == MAX_JOBID ) { // i == 31
 				int foo = 0;
 				unsigned int value_ = 0;
 
-				foo = my_atoi (keylist[i].val, INFINIT_INT, 0);
+				foo = my_atoi (keyList[i].val, INFINIT_INT, 0);
 				assert( foo >= 0 );
-				value_ = (unsigned int) foo;
+				value_ = (unsigned int) foo;  // FIXME FIXME FIXME check out if we can get rid of the cast
 				if ((value_ < MAX_JOBID_LOW) || (value_ > MAX_JOBID_HIGH)) {
 					/*catgets 5062 */
-					ls_syslog (LOG_ERR, I18N (5062, "%s: File %s in section Parameters ending at line %d: maxJobId value %s not in [%d, %d], use default value %d;"), __func__, filename, *lineNum, keylist[i].key, MAX_JOBID_LOW, MAX_JOBID_HIGH, DEF_MAX_JOBID);
+					ls_syslog (LOG_ERR, I18N (5062, "%s: File %s in section Parameters ending at line %d: maxJobId value %s not in [%d, %d], use default value %d;"), __func__, filename, *lineNum, keyList[i].key, MAX_JOBID_LOW, MAX_JOBID_HIGH, DEF_MAX_JOBID);
 					lsberrno = LSBE_CONF_WARNING;
 					pConf->param->maxJobId = DEF_MAX_JOBID;
 				}
@@ -630,99 +682,101 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
 					pConf->param->maxJobId = value_;
 				}
 			}
-			else if (i == 28)  {
-				if (strcasecmp (keylist[i].val, "Y") == 0) {
+			else if (i == SCHE_RAW_LOAD )  { // i == 28
+				const char Y[] = "Y";
+				if (strcasecmp (keyList[i].val, Y ) == 0) {
 					pConf->param->scheRawLoad = TRUE;
 				}
 				else {
 					pConf->param->scheRawLoad = FALSE;
 				}
 			}
-			else if (i == 30) {
-				if (strcasecmp (keylist[i].val, "Y") == 0)  {
+			else if (i == SLOT_RESOURCE_RESERVE ) { i // i == 30
+				const char Y[] = "Y";
+				if (strcasecmp (keyList[i].val, Y ) == 0)  {
 					pConf->param->slotResourceReserve = TRUE;
 				}
 				else {
 					pConf->param->slotResourceReserve = FALSE;
 				}
 			}
-			else if (i > 5) {
-				if (i < 23) {
-					value = my_atoi (keylist[i].val, INFINIT_INT, 0);
+			else if (i > PG_SUSP_IT ) { // i > 5
+				if (i < JOB_DEP_LAST_SUB ) { // i < 23 
+					value = my_atoi (keyList[i].val, INFINIT_INT, 0);
 				}
 				else {
-					value = atoi (keylist[i].val);
+					value = atoi (keyList[i].val);
 				}
 
 				if (value == INFINIT_INT) {
 					/* catgets 5071 */
-					ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5071, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored"), __func__, filename, *lineNum, keylist[i].val, keylist[i].key, INFINIT_INT - 1);
+					ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5071, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored"), __func__, filename, *lineNum, keyList[i].val, keyList[i].key, INFINIT_INT - 1);
 					lsberrno = LSBE_CONF_WARNING;
 				}
 				else {
-					switch (i) {
-						case 6:
+					switch( i ) {
+						case MBD_SLEEP_TIME: // i == 6
 							pConf->param->mbatchdInterval = value;
 						break;
-						case 7:
+						case CLEAN_PERIOD: // i == 7
 							pConf->param->cleanPeriod = value;
 						break;
-						case 8:
+						case MAX_RETRY: // i == 8 // u
 							pConf->param->maxDispRetries = value;
 						break;
-						case 9:
+						case SBD_SLEEP_TIME: // i == 9
 							pConf->param->sbatchdInterval = value;
 						break;
-						case 10:
+						case MAX_JOB_NUM: // i == 10
 							pConf->param->maxNumJobs = value;
 						break;
-						case 11:
+						case RETRY_INTERVAL: // i == 11
 							pConf->param->retryIntvl = value;
 						break;
-						case 12:
+						case MAX_SBD_FAIL: // i == 12
 							pConf->param->maxSbdRetries = value;
 						break;
-						case 13:
+						case RUSAGE_UPDATE_RATE: // i == 13
 							pConf->param->rusageUpdateRate = value;
 						break;
-						case 14:
+						case RUSAGE_UPDATE_PERCENT: // i == 14
 							pConf->param->rusageUpdatePercent = value;
 						break;
-						case 15:
+						case COND_CHECK_TIME: // i == 15
 							pConf->param->condCheckTime = value;
 						break;
-						case 16:
+						case MAX_SBD_CONNS: // i == 16
 							pConf->param->maxSbdConnections = value;
 						break;
-						case 17:
+						case MAX_SCHED_STAY: // i == 17
 							pConf->param->maxSchedStay = value;
 						break;
-						case 18:
+						case FRESH_PERIOD: // i == 18
 							pConf->param->freshPeriod = value;
 						break;
-						case 19:
+						case MAX_JOB_ARRAY_SIZE: // i == 19
 							if (value < 1 || value >= LSB_MAX_ARRAY_IDX) {
 								/* catgets 5073 */
-								ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5073, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s is out of range[1-65534]); ignored"), __func__, filename, *lineNum, keylist[i].val, keylist[i].key);
+								ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5073, "%s: File %s in section Parameters ending at line %d: Value <%s> of %s is out of range[1-65534]); ignored"), __func__, filename, *lineNum, keyList[i].val, keyList[i].key);
 								lsberrno = LSBE_CONF_WARNING;
 							}
 							else { 
 								pConf->param->maxJobArraySize = value;
 							}
 						break;
-						case 21:
+						case JOB_TERMINATE_INTERVAL: // i == 21
 							pConf->param->jobTerminateInterval = value;
 						break;
-						case 22:
+						case JOB_RUN_TIMES: // i == 22
 							assert( value >= 0);
-							pConf->param->jobRunTimes = (unsigned int )value;
+							pConf->param->jobRunTimes = (unsigned int )value;  // FIXME FIXME FIXME see the cast can be done away
 						break;
-						case 23:
+						case JOB_DEP_LAST_SUB: // i == 23
 							assert( value >= 0);
-							pConf->param->jobDepLastSub = (unsigned int) value;
+							pConf->param->jobDepLastSub = (unsigned int) value; // FIXME FIXME FIXME see the cast can be done away
 						break;
-						case 25:
-							value = my_atoi (keylist[i].val, INFINIT_INT, -1);
+						case MAX_USER_PRIORITY: // i == 25
+							value = my_atoi (keyList[i].val, INFINIT_INT, -1);
 							if (value != INFINIT_INT) {
 								if (value > 0) {
 									pConf->param->maxUserPriority = value;
@@ -730,10 +784,10 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
 							}
 							else {
 								/* catgets 5452 */
-								ls_syslog (LOG_ERR, I18N (5452, "%s: File %s in section Parameters ending at line %d: invalid value <%s> of <%s> : ignored;"), __func__, filename, *lineNum, keylist[i].val, keylist[i].key);
+								ls_syslog (LOG_ERR, I18N (5452, "%s: File %s in section Parameters ending at line %d: invalid value <%s> of <%s> : ignored;"), __func__, filename, *lineNum, keyList[i].val, keyList[i].key);
 							}
 						break;
-						case 29:
+						case PRE_EXEC_DELAY: // i == 29
 							pConf->param->preExecDelay = value;
 						break;
 						default:
@@ -752,13 +806,13 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
 		&& pConf->param->jobPriorityValue > 0
 		&& pConf->param->jobPriorityTime > 0)
 		{
-		/* catgets 5453 */
-		ls_syslog (LOG_ERR, I18N (5453, "%s: File %s in section Parameters : MAX_USER_PRIORITY should be defined first so that JOB_PRIORITY_OVER_TIME can be used: job priority control disabled"), __func__, filename);
-		pConf->param->jobPriorityValue = -1;
-		pConf->param->jobPriorityTime = -1;
-		lsberrno = LSBE_CONF_WARNING;
+			/* catgets 5453 */
+			ls_syslog (LOG_ERR, I18N (5453, "%s: File %s in section Parameters : MAX_USER_PRIORITY should be defined first so that JOB_PRIORITY_OVER_TIME can be used: job priority control disabled"), __func__, filename);
+			pConf->param->jobPriorityValue = -1;
+			pConf->param->jobPriorityTime = -1;
+			lsberrno = LSBE_CONF_WARNING;
 		}
-	freekeyval (keylist);
+	freekeyval (keyList);
 	return TRUE;
 }
 
@@ -782,7 +836,7 @@ my_atof (char *arg, float upBound, float botBound)
 {
 	float num = 0;
 
-#error check to see if there is a better implementation of atof
+	// FIXME FIXME FIXME FIXME check to see if there is a better implementation of atof
 
 	if (!isanumber_ (arg)) {
 		return INFINIT_FLOAT;
