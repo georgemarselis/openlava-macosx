@@ -20,10 +20,10 @@
 #include <pwd.h>
 #include <strings.h>
 
-
 #include "lib/lib.h"
 #include "lib/lproto.h"
 #include "lib/confmisc.h"
+
 
 char *
 getNextValue (char **line)

@@ -2337,7 +2337,7 @@ doclparams (FILE * clfp, const char *lsfile, unsigned int *lineNum)
 	if (strchr (linep, '=') == NULL) {
 		/* catgets 5298 */
 		ls_syslog (LOG_ERR, "5298: %s: %s(%d): vertical section not supported, ignoring section", __func__, lsfile, *lineNum);
-		doSkipSection (clfp, lineNum, lsfile, "parameters");
+		doSkipSection (clfp, lineNum, lsfile, parameters);
 		return -1;
 	}
 	else {
@@ -2564,7 +2564,7 @@ doclparams (FILE * clfp, const char *lsfile, unsigned int *lineNum)
 // 	};
 
 
-// #define  HOSTNAME    allInfo.numIndx
+// #define  HOSTNAME    allInfo.numIndx     // FIXME FIXME FIXME FIXME FIXME find out if allInfo.numIndx was a global parapemeter list
 // #define  MODEL        allInfo.numIndx+1
 // #define  TYPE         allInfo.numIndx+2
 // #define  ND           allInfo.numIndx+3
@@ -4166,10 +4166,9 @@ lim_addHostModel ( const char *model, const char *arch, double factor) // duplic
 	}
 
 	strcpy (allInfo.hostModels[allInfo.nModels], model);
-	strcpy (allInfo.hostArchs[allInfo.nModels], arch ? arch : "");
+	strcpy (allInfo.hostArchs[allInfo.nModels], arch ? arch : "\0" );
 	allInfo.cpuFactor[allInfo.nModels] = factor;
-	shortInfo.hostModels[shortInfo.nModels] =
-	allInfo.hostModels[allInfo.nModels];
+	shortInfo.hostModels[shortInfo.nModels] = allInfo.hostModels[allInfo.nModels];
 	allInfo.nModels++;
 	shortInfo.nModels++;
 	return TRUE;

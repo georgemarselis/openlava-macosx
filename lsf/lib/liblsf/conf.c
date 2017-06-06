@@ -16,7 +16,6 @@
  *
  */
 
-
 #include <ctype.h>
 #include <grp.h>
 #include <pwd.h>
@@ -27,7 +26,7 @@
 
 // #define NL_SETN 42
 
-const int NEGATIVERESULT = 1;
+// const int NEGATIVERESULT = 1;
 
 int
 initResTable_ (void)
@@ -313,6 +312,8 @@ char do_Index (FILE * fp, size_t *lineNum, const char *filename)
 char lsf_setIndex (struct keymap *keyList, const char *filename, size_t lineNum)
 {
 	unsigned int resIdx = 0;
+
+	const int NEGATIVERESULT = 1;
 
 	enum {
 		INTERVAL,
@@ -877,6 +878,8 @@ char do_Resources (FILE * fp, size_t *lineNum, const char *filename)
 }
 
 unsigned int resNameDefined ( const char *name) { // FIXME FIXME FIXME only INT_MAX nRes can be here.
+
+	const int NEGATIVERESULT = 1; // FIXME FIXME FIXME FIXME FIXME global enum with all the lserrno values in it
 
 	if (name == NULL) {
 		return -1;

@@ -887,114 +887,114 @@ getNextLineC_conf (struct lsConf *conf, size_t *LineCount, int confFormat)
 			sp = line;
 			cp = myLine;
 			while (sp != &(line[len - 1]))
+		{
+		  if (*sp == '#')
+		{
+		  break;
+		}
+		  else if (*sp == '\\')
+		{
+
+		  if (sp == &(line[len - 2]))
 			{
-			  if (*sp == '#')
-			  {
-				  break;
-			  }
-			  else if (*sp == '\\')
-			  {
 
-				  if (sp == &(line[len - 2]))
-				  {
-
-					  sp++;
-					  toBeContinue = 1;
-				  }
-				  else
-				  {
-
-					  if (!isUNCPath && *(sp + 1) == '\\' && !isspace (*(sp + 2))) {
-						isUNCPath = 1;
-					}
-					if (!isspace (*(sp + 1)))
-					{
-					  *cp = *sp;
-					  sp++;
-					  cp++;
-				  }
-				  else
-				  {
-					  sp++;
-					  sp++;
-				  }
-			  }
-		  }
-		  else if (isspace (*sp))
-		  {
-
-			  *cp = ' ';
 			  sp++;
-			  cp++;
-		  }
+			  toBeContinue = 1;
+			}
 		  else
-		  {
+			{
+
+			  if (!isUNCPath && *(sp + 1) == '\\' && !isspace (*(sp + 2))) {
+					isUNCPath = 1;
+			  }
+			  if (!isspace (*(sp + 1)))
+			{
 			  *cp = *sp;
 			  sp++;
 			  cp++;
-		  }
-	  }
+			}
+			  else
+			{
+			  sp++;
+			  sp++;
+			}
+			}
+		}
+		  else if (isspace (*sp))
+		{
+
+		  *cp = ' ';
+		  sp++;
+		  cp++;
+		}
+		  else
+		{
+		  *cp = *sp;
+		  sp++;
+		  cp++;
+		}
+		}
 	  *cp = '\0';
 
 	  if (!toBeContinue)
-	  {
+		{
 		  while (cp != myLine && *(--cp) == ' ');
 
 		  if (cp == myLine && (*cp == ' ' || *cp == '\0'))
-		  {
-			  *cp = '\0';
-		  }
+		{
+		  *cp = '\0';
+		}
 		  else
-			*(++cp) = '\0';
-	}
-
-	if (!(myLine[0] == '\0' && !longLine))
-	{
-
-	  if (longLine)
-	  {
-		  linesize += strlen (myLine);
-		  sp = (char *) malloc (linesize * sizeof (char));
-		  if (sp == NULL) {
-			return longLine;
+		*(++cp) = '\0';
 		}
 
-		strcpy (sp, longLine);
-		strcat (sp, myLine);
-		FREEUP (longLine);
-		longLine = sp;
+	  if (!(myLine[0] == '\0' && !longLine))
+		{
+
+		  if (longLine)
+		{
+		  linesize += strlen (myLine);
+		  sp = (char *) malloc (linesize * sizeof (char));
+			if (sp == NULL) {
+				return longLine;
+			}
+
+		  strcpy (sp, longLine);
+		  strcat (sp, myLine);
+		  FREEUP (longLine);
+		  longLine = sp;
+		}
+		  else
+		{
+		  linesize = strlen (myLine) + 1;
+		  longLine = (char *) malloc (linesize * sizeof (char));
+		  strcpy (longLine, myLine);
+		}
+		}
+
 	}
-	else
+	  while ((myLine[0] == '\0' && !longLine) || toBeContinue);
+
+
+	  return longLine;
+	}
+  else
 	{
-	  linesize = strlen (myLine) + 1;
-	  longLine = (char *) malloc (linesize * sizeof (char));
-	  strcpy (longLine, myLine);
-  }
-}
-
-}
-while ((myLine[0] == '\0' && !longLine) || toBeContinue);
-
-
-return longLine;
-}
-else
-{
-  do
-  {
+	  do
+	{
 	  line = readNextLine (conf, LineCount);
-	  if (line == NULL) {
-		return NULL;
+		if (line == NULL) {
+			return NULL;
+		}
 	}
-}
-while (line[0] == '\0'); {
-	return line;
-}
-}
+			while (line[0] == '\0'); {
+				return line;
+			}
+	}
 
-fprintf( stderr, "%s: you are not suppposed to be here!", __func__ );
-ls_syslog( LSE_ERR, "%s: you are not suppposed to be here!", __func__ );
-return NULL;
+	fprintf( stderr, "%s: you are not suppposed to be here!", __func__ );
+	ls_syslog( LSE_ERR, "%s: you are not suppposed to be here!", __func__ );
+	return NULL;
 }
 
 static char *
