@@ -853,42 +853,42 @@ void
 initParameterInfo (struct parameterInfo *param)
 {
 	if (param != NULL) {
-		param->defaultQueues = NULL;
-		param->defaultHostSpec = NULL;
-		param->mbatchdInterval = INFINIT_INT;
-		param->sbatchdInterval = INFINIT_INT;
+		param->defaultQueues     = NULL;
+		param->defaultHostSpec   = NULL;
+		param->mbatchdInterval   = INFINIT_INT;
+		param->sbatchdInterval   = INFINIT_INT;
 		param->jobAcceptInterval = INFINIT_INT;
-		param->maxDispRetries = INFINIT_INT;
-		param->maxSbdRetries = INFINIT_INT;
-		param->cleanPeriod = INFINIT_INT;
-		param->maxNumJobs = INFINIT_INT;
-		param->pgSuspendIt = INFINIT_INT;
-		param->defaultProject = NULL;
+		param->maxDispRetries    = INFINIT_INT;
+		param->maxSbdRetries     = INFINIT_INT;
+		param->cleanPeriod       = INFINIT_INT;
+		param->maxNumJobs        = INFINIT_INT;
+		param->pgSuspendIt       = INFINIT_INT;
+		param->defaultProject    = NULL;
 
-		param->retryIntvl = INFINIT_INT;
-		param->rusageUpdateRate = INFINIT_INT;
-		param->rusageUpdatePercent = INFINIT_INT;
-		param->condCheckTime = INFINIT_INT;
-		param->maxSbdConnections = INFINIT_INT;
-		param->maxSchedStay = INFINIT_INT;
-		param->freshPeriod = INFINIT_INT;
-		param->maxJobArraySize = INFINIT_INT;
-		param->jobTerminateInterval = INFINIT_INT;
-		param->disableUAcctMap = FALSE;
-		param->jobRunTimes = INFINIT_INT;
-		param->jobDepLastSub = 0;
-		param->pjobSpoolDir = NULL;
-		param->maxUserPriority = -1;
-		param->jobPriorityValue = -1;
-		param->jobPriorityTime = -1;
+		param->retryIntvl              = INFINIT_INT;
+		param->rusageUpdateRate        = INFINIT_INT;
+		param->rusageUpdatePercent     = INFINIT_INT;
+		param->condCheckTime           = INFINIT_INT;
+		param->maxSbdConnections       = INFINIT_INT;
+		param->maxSchedStay            = INFINIT_INT;
+		param->freshPeriod             = INFINIT_INT;
+		param->maxJobArraySize         = INFINIT_INT;
+		param->jobTerminateInterval    = INFINIT_INT;
+		param->disableUAcctMap         = FALSE;
+		param->jobRunTimes             = INFINIT_INT;
+		param->jobDepLastSub           = 0;
+		param->pjobSpoolDir            = NULL;
+		param->maxUserPriority         = -1;
+		param->jobPriorityValue        = -1;
+		param->jobPriorityTime         = -1;
 		param->sharedResourceUpdFactor = INFINIT_INT;
-		param->scheRawLoad = 0;
-		param->preExecDelay = INFINIT_INT;
-		param->slotResourceReserve = FALSE;
-		param->maxJobId = INFINIT_INT;
-		param->maxAcctArchiveNum = -1;
-		param->acctArchiveInDays = -1;
-		param->acctArchiveInSize = -1;
+		param->scheRawLoad             = 0;
+		param->preExecDelay            = INFINIT_INT;
+		param->slotResourceReserve     = FALSE;
+		param->maxJobId                = INFINIT_INT;
+		param->maxAcctArchiveNum       = -1;
+		param->acctArchiveInDays       = -1;
+		param->acctArchiveInSize       = -1;
 	}
 }
 
@@ -1008,7 +1008,7 @@ checkSpoolDir ( const char *pSpoolDir)
 
 
 		strcpy (pSpoolDir, pTemp);
-		if (pSpoolDir[0] != '/')
+		if (pSpoolDir[0] != '/') // figure out if the path starts with '/' or '\' (distinguish between *nix and Windows)
 			{
 
 			if ((pSpoolDir[0] != '\\') || (pSpoolDir[1] != '\\'))
