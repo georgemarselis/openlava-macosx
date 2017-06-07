@@ -94,7 +94,7 @@ int
 isSectionEnd (char *linep, const char *lsfile, const size_t *lineNum, const char *sectionName)
 {
 	char *word = NULL;
-	char *buff = malloc( sizeof(char) * 1024 + 1 );
+	char *buff = malloc( sizeof(char) * 1024 + 1 ); // FIXME FIXME FIXME 1024 is awfuly particular
 	char end[] = "end";
 
 	word = getNextWord_ (&linep);

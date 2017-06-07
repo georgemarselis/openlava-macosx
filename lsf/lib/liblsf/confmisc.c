@@ -137,8 +137,8 @@ isSectionEnd (char *linep, const char *lsfile, size_t *lineNum, const char *sect
 char *
 getBeginLine (FILE *fp, size_t *lineNum)
 {
-	char *sp = NULL;
-	char *wp = NULL;
+	char *sp           = NULL;
+	char *wp           = NULL;
 	const char begin[] = "begin";
 
 	// for (;;)
@@ -170,12 +170,12 @@ getBeginLine (FILE *fp, size_t *lineNum)
 int
 readHvalues (struct keymap *keyList, char *linep, FILE * fp, const char *lsfile, size_t *lineNum, int exact, const char *section)
 {
-	char *key   = NULL;
-	char *value = NULL;
-	char *sp    = NULL;
-	char *sp1   = NULL;
-	char error = FALSE;
-	int i = 0;
+	char *key      = NULL;
+	char *value    = NULL;
+	char *sp       = NULL;
+	char *sp1      = NULL;
+	char error     = FALSE;
+	unsigned int i = 0;
 
 	sp = linep;
 	key = getNextWord_ (&linep);
@@ -274,7 +274,7 @@ void
 doSkipSection (FILE * fp, size_t *lineNum, const char *lsfile, const char *sectionName)
 {
 	char *word = NULL;
-	char *cp = NULL;
+	char *cp   = NULL;
 
 	while ((cp = getNextLineC_ (fp, lineNum, TRUE)) != NULL) {
 		word = getNextWord_ (&cp);
@@ -315,7 +315,7 @@ mapValues (struct keymap *keyList, char *line) // FIXME FIXME should char *line 
 		i++;
 	}
 
-	while ((value = getNextValue (&line)) != NULL)
+	while ((value = getNextValue (&line)) != NULL) // FIXME FIXME FIXME why are we passing the address of the address of the line?
 	{
 		i = 0;
 		found = FALSE;
@@ -416,7 +416,7 @@ putInLists (char *word, struct admins *admins, unsigned int *numAds, const char 
 	// a specific UID?
 	if( NULL == pw )  // FIXME FIXME FIXME FIXME this is definatelly wrong
 	{
-		fprintf( stderr, "confmisc.c: error: pw is NULL" );
+		fprintf( stderr, "%s: error: pw is NULL", __func__ );
 		exit( EXIT_FAILURE );
 	}
 	admins->adminIds[admins->nAdmins]   = pw->pw_uid;
@@ -426,7 +426,7 @@ putInLists (char *word, struct admins *admins, unsigned int *numAds, const char 
 
 	if (admins->nAdmins >= *numAds)
 	{
-		*numAds *= 2; 
+		*numAds    *= 2; 
 		tempIds     = realloc (admins->adminIds,   *numAds * sizeof (int));
 		tempGids    = realloc (admins->adminGIds,  *numAds * sizeof (int));
 		tempNames   = realloc (admins->adminNames, *numAds * sizeof (char *));
@@ -486,20 +486,29 @@ getBeginLine_conf (const struct lsConf *conf, size_t *lineNum)
 		return NULL;
 	}
 
-	for (;;)
-	{
-		sp = getNextLineC_conf (conf, lineNum, TRUE);
-		if (sp == NULL) {
-			return NULL;
-		}
+	// for (;;)
+	// {
+	// 	sp = getNextLineC_conf (conf, lineNum, TRUE);
+	// 	if (sp == NULL) {
+	// 		return NULL;
+	// 	}
 
+	// 	wp = getNextWord_ (&sp);
+	// 	if (wp && (strcasecmp (wp, "begin") == 0)) {
+	// 		return sp;
+	// 	}
+	// }
+	do
+	{
+		const char begin[] = "begin";
+		sp = getNextLineC_conf (conf, lineNum, TRUE);
+		if( !sp ) { break; }
 		wp = getNextWord_ (&sp);
-		if (wp && (strcasecmp (wp, "begin") == 0)) {
+		if (wp && (strcasecmp (wp, begin) == 0)) {
 			return sp;
 		}
-	}
+	} while( NULL != sp )
 
-	fprintf( stderr, "%s: you are not supposed to be here!\n", __func__);
 	return NULL;
 }
 

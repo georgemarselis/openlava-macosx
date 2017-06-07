@@ -27,7 +27,9 @@ lsb_reconfig ( unsigned int configFlag)
 	int cc = 0;
 	unsigned int tmp = 0;
 	char *reply_buf  = NULL;
+
 	char request_buf[MSGSIZE];
+
 	struct LSFHeader hdr;
 	struct lsfAuth auth;
 	mbdReqType mbdReqtype;
@@ -72,5 +74,7 @@ lsb_reconfig ( unsigned int configFlag)
 		return -1;
 	}
 
+	fprintf( stderr, "%s: you are not supposed to be here\n", __func__ );
+	ls_syslog( LOG_ERR, "%s: you are not supposed to be here", __func__ );
 	return 255;
 }

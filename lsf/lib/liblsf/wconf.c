@@ -36,7 +36,7 @@
 struct lsConf *
 ls_getconf ( const char *filename)
 {
-	unsigned int i      = 0;
+	// unsigned int i      = 0;
 	size_t defsize      = 0;
 	size_t numDefs      = 0;
 	size_t numLines     = 0;
@@ -105,7 +105,7 @@ ls_getconf ( const char *filename)
 		lserrno = LSE_MALLOC;
 		goto Error;
 	}
-	defConds = (char **) malloc (defsize * sizeof (char *));
+	defConds = malloc (defsize * sizeof (char *));
 	if (defConds == NULL)
 	{
 		ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, filename, "malloc", sizeof (defsize * sizeof (char *)));
@@ -137,12 +137,14 @@ ls_getconf ( const char *filename)
 
 			if (strcasecmp (cp, "define") == 0)
 			{
+				unsigned int i = 0;
 
 				word = getNextWord_ (&linep);
 
 				if (word == NULL)
 				{
-		  ls_syslog (LOG_ERR, "%s: %s(%d): %s.", __func__, filename, lineNum, I18N (6002, "Both macro and condition name expected after #define"));    /* catgets 6002 */
+					/* catgets 6002 */
+					ls_syslog (LOG_ERR, "%s: %s(%d): %s.", __func__, filename, lineNum, I18N (6002, "Both macro and condition name expected after #define"));
 					goto Error;
 				}
 
@@ -174,7 +176,7 @@ ls_getconf ( const char *filename)
 
 				if (*word == '\0')
 				{
-			/* catgets 6003 */
+					/* catgets 6003 */
 					ls_syslog (LOG_ERR, "%s: %s(%d): %s", __func__, filename, lineNum, I18N (6003, "Both macro and condition name expected after #define."));
 					FREEUP (word1);
 					goto Error;
@@ -242,6 +244,7 @@ ls_getconf ( const char *filename)
 			}
 			else if (strcasecmp (cp, "if") == 0)
 			{
+				unsigned int i = 0;
 
 				while (isspace (*linep)) {
 					linep++;
@@ -263,7 +266,7 @@ ls_getconf ( const char *filename)
 
 				if (*word == '\0')
 				{
-			/* catgets 6004 */
+					/* catgets 6004 */
 					ls_syslog (LOG_ERR, "%s: %s(%d): %s.", __func__, filename, lineNum, I18N (6004, "Condition name expected after #if."));    
 					goto Error;
 				}
@@ -295,7 +298,8 @@ ls_getconf ( const char *filename)
 				}
 				if (!flag || node->cond == NULL)
 				{
-					ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__, "malloc", sizeof (word));
+					const char malloc[ ] = "malloc";
+					ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__, malloc, sizeof (word));
 					lserrno = LSE_MALLOC;
 					goto Error;
 				}
@@ -319,7 +323,7 @@ ls_getconf ( const char *filename)
 				temp = popStack (blockStack);
 				if (temp == NULL)
 				{
-			 /*catgets 6007 */
+					/*catgets 6007 */
 					ls_syslog (LOG_ERR, I18N (6007, "%s: %s(%d): If-less elif."), __func__, filename, lineNum);
 					goto Error;
 				}
@@ -331,7 +335,8 @@ ls_getconf ( const char *filename)
 
 				if (*word != '\0')
 				{
-					if ((ptr = strchr (word, '#')) != NULL) {
+					const char pount = '#';
+					if ((ptr = strchr (word, pound )) != NULL) {
 						*ptr = '\0';
 					}
 
@@ -344,7 +349,7 @@ ls_getconf ( const char *filename)
 
 				if (*word == '\0')
 				{
-			/* catgets 6005 */
+					/* catgets 6005 */
 					ls_syslog (LOG_ERR, "%s: %s(%d): %s.", __func__, filename, lineNum, I18N (6005, "Condition name expected after #elif."));  
 					goto Error;
 				}
@@ -383,8 +388,9 @@ ls_getconf ( const char *filename)
 
 				prev = popStack (ptrStack);
 				prev->tag = NODE_LEFT_DONE;
-				if (prev != NULL)
+				if (prev != NULL) {
 					linkNode (prev, node);
+				}
 				prev = node;
 				PUSH_STACK (ptrStack, node);
 
@@ -472,11 +478,12 @@ ls_getconf ( const char *filename)
 				cp = word;
 				cp++;
 
-				if (strcasecmp (cp, "define") == 0
-					|| strcasecmp (cp, "if") == 0
-					|| strcasecmp (cp, "elif") == 0
-					|| strcasecmp (cp, "else") == 0
-					|| strcasecmp (cp, "endif") == 0)
+				if (   strcasecmp (cp, "define") == 0
+					|| strcasecmp (cp, "if"    ) == 0
+					|| strcasecmp (cp, "elif"  ) == 0
+					|| strcasecmp (cp, "else"  ) == 0
+					|| strcasecmp (cp, "endif" ) == 0
+					)
 				{
 					fseek (fp, offset, SEEK_SET);
 					assert( oldLineNum <= UINT_MAX );
@@ -688,23 +695,26 @@ addCond( struct lsConf *conf, char *cond )
 		}
 	}
 
-	if( i < conf->numConds )
+	if( i < conf->numConds ) {
 		return TRUE;
+	}
 
 	newlist = malloc( ( conf->numConds + 1 ) * sizeof( char  ) + 1 );
 	if (newlist == NULL) {
 		return FALSE;
 	}
 	values = malloc( ( conf->numConds + 1 ) * sizeof( int ) );
+
 	if (values == NULL) {
 		return FALSE;
 	}
-	for (i = 0; i < conf->numConds; i++)
-	{
+	for (i = 0; i < conf->numConds; i++) {
 		newlist[i] = conf->conds[i];
 		values[i] = conf->values[i];
 	}
+
 	newlist[conf->numConds] = putstr_ (cond);
+
 	if (newlist[conf->numConds] == NULL) {
 		return FALSE;
 	}
@@ -852,12 +862,12 @@ getNextLine_conf (struct lsConf *conf, int confFormat)
 char *
 getNextLineC_conf (struct lsConf *conf, size_t *LineCount, int confFormat)
 {
-	char *sp = NULL;
-	char *cp = NULL;
-	char *line = NULL;
-	int toBeContinue;
-	int isUNCPath = 0;
-	unsigned long len = 0;
+	char *sp               = NULL;
+	char *cp               = NULL;
+	char *line             = NULL;
+	int toBeContinue       = 0;
+	int isUNCPath          = 0;
+	unsigned long len      = 0;
 	unsigned long linesize = 0;
 
 	static char *longLine = NULL;
@@ -887,109 +897,108 @@ getNextLineC_conf (struct lsConf *conf, size_t *LineCount, int confFormat)
 			sp = line;
 			cp = myLine;
 			while (sp != &(line[len - 1]))
-		{
-		  if (*sp == '#')
-		{
-		  break;
-		}
-		  else if (*sp == '\\')
-		{
+			{
+				if (*sp == '#')
+				{
+					break;
+				}
+				else if (*sp == '\\')
+				{
 
-		  if (sp == &(line[len - 2]))
+					if (sp == &(line[len - 2]))
+					{
+
+						sp++;
+						toBeContinue = 1;
+					}
+					else
+					{
+
+						if (!isUNCPath && *(sp + 1) == '\\' && !isspace (*(sp + 2))) {
+							isUNCPath = 1;
+						}
+						if (!isspace (*(sp + 1)))
+						{
+							*cp = *sp;
+							sp++;
+							cp++;
+						}
+						else
+						{
+							sp++;
+							sp++;
+						}
+					}
+				}
+				else if (isspace (*sp))
+				{
+					*cp = ' ';
+					sp++;
+					cp++;
+				}
+				else
+				{
+					*cp = *sp;
+					sp++;
+					cp++;
+				}
+			}
+			*cp = '\0';
+
+			if (!toBeContinue)
+			{
+				while (cp != myLine && *(--cp) == ' ');
+
+				if (cp == myLine && (*cp == ' ' || *cp == '\0'))
+				{
+					*cp = '\0';
+				}
+				else
+					*(++cp) = '\0';
+			}
+
+			if (!(myLine[0] == '\0' && !longLine))
 			{
 
-			  sp++;
-			  toBeContinue = 1;
-			}
-		  else
-			{
+				if (longLine)
+				{
+					linesize += strlen (myLine);
+					sp = malloc (linesize * sizeof (char));
+					if (sp == NULL) {
+						return longLine;
+					}
 
-			  if (!isUNCPath && *(sp + 1) == '\\' && !isspace (*(sp + 2))) {
-					isUNCPath = 1;
-			  }
-			  if (!isspace (*(sp + 1)))
-			{
-			  *cp = *sp;
-			  sp++;
-			  cp++;
-			}
-			  else
-			{
-			  sp++;
-			  sp++;
-			}
-			}
-		}
-		  else if (isspace (*sp))
-		{
-
-		  *cp = ' ';
-		  sp++;
-		  cp++;
-		}
-		  else
-		{
-		  *cp = *sp;
-		  sp++;
-		  cp++;
-		}
-		}
-	  *cp = '\0';
-
-	  if (!toBeContinue)
-		{
-		  while (cp != myLine && *(--cp) == ' ');
-
-		  if (cp == myLine && (*cp == ' ' || *cp == '\0'))
-		{
-		  *cp = '\0';
-		}
-		  else
-		*(++cp) = '\0';
-		}
-
-	  if (!(myLine[0] == '\0' && !longLine))
-		{
-
-		  if (longLine)
-		{
-		  linesize += strlen (myLine);
-		  sp = (char *) malloc (linesize * sizeof (char));
-			if (sp == NULL) {
-				return longLine;
+					strcpy (sp, longLine);
+					strcat (sp, myLine);
+					FREEUP (longLine);
+					longLine = sp;
+				}
+				else
+				{
+					linesize = strlen (myLine) + 1;
+					longLine = malloc (linesize * sizeof (char));
+					strcpy (longLine, myLine);
+				}
 			}
 
-		  strcpy (sp, longLine);
-		  strcat (sp, myLine);
-		  FREEUP (longLine);
-		  longLine = sp;
 		}
-		  else
-		{
-		  linesize = strlen (myLine) + 1;
-		  longLine = (char *) malloc (linesize * sizeof (char));
-		  strcpy (longLine, myLine);
-		}
-		}
+		while ((myLine[0] == '\0' && !longLine) || toBeContinue);
 
+
+		return longLine;
 	}
-	  while ((myLine[0] == '\0' && !longLine) || toBeContinue);
-
-
-	  return longLine;
-	}
-  else
+	else
 	{
-	  do
-	{
-	  line = readNextLine (conf, LineCount);
-		if (line == NULL) {
-			return NULL;
-		}
-	}
-			while (line[0] == '\0'); {
-				return line;
+		do
+		{
+			line = readNextLine (conf, LineCount);
+			if (line == NULL) {
+				return NULL;
 			}
+		}
+		while (line[0] == '\0'); {
+			return line;
+		}
 	}
 
 	fprintf( stderr, "%s: you are not suppposed to be here!", __func__ );

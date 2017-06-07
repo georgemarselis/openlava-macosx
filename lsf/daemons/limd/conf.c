@@ -173,12 +173,20 @@ doindex (FILE * fp, unsigned int *lineNum, char *lsfile)
 		NAME
 	};
 
+	const char *keylist[] = {
+		"INTERVAL",
+		"INCREASING",
+		"DESCRIPTION",
+		"NAME",
+		NULL
+	};
+
 	struct keymap keyList[] = {
-		{  INTERVAL,    "    ", "INTERVAL",    NULL },
-		{  INCREASING,  "    ", "INCREASING",  NULL },
-		{  DESCRIPTION, "    ", "DESCRIPTION", NULL },
-		{  NAME,        "    ", "NAME",        NULL },
-		{ -1,           "    ", NULL,          NULL }
+		{  INTERVAL,    "    ", keylist[ INTERVAL ],    NULL },
+		{  INCREASING,  "    ", keylist[ INCREASING ],  NULL },
+		{  DESCRIPTION, "    ", keylist[ DESCRIPTION ], NULL },
+		{  NAME,        "    ", keylist[ NAME ],        NULL },
+		{ -1,           "    ", NULL, NULL }
 	};
 
 	const char newinded[] = "newindex";
@@ -372,10 +380,16 @@ doclist (FILE * fp, unsigned int *lineNum, const char *lsfile)
 		SERVERS
 	};
 
+	const char *keylist[ ] = {
+		"CLUSTERNAME",
+		"SERVERS",
+		NULL
+	};
+
 	struct keymap keyList[] = {
-		{ CLUSTERNAME, "    ", "CLUSTERNAME", NULL },
-		{ SERVERS,     "    ", "SERVERS",     NULL },
-		{ -1,          "    ", NULL,          NULL }
+		{ CLUSTERNAME, "    ", keylist[ CLUSTERNAME ], NULL },
+		{ SERVERS,     "    ", keylist[ SERVERS ],     NULL },
+		{ -1,          "    ", NULL, NULL }
 	};
 
 	const char cluster[] = "cluster";
@@ -472,9 +486,14 @@ dotypelist (FILE * fp, unsigned int *lineNum, const char *lsfile)
 		TYPENAME
 	};
 
+	const char *keylist [ ] = {
+		"TYPENAME",
+		NULL
+	};
+
 	struct keymap keyList[] = {
-		{ TYPENAME, "    ", "TYPENAME", NULL },
-		{ 0, "    ", NULL, NULL }
+		{ TYPENAME, "    ", keylist[ TYPENAME ], NULL },
+		{ -1,       "    ", NULL, NULL }
 	};
 
 	const char HostType[] = "HostType";
@@ -581,10 +600,17 @@ dohostmodel (FILE * fp, unsigned int *lineNum, const char *lsfile)
 		ARCHITECTURE
 	};
 
+	const char *keylist [ ] = {
+		"MODELNAME",
+		"CPUFACTOR",
+		"ARCHITECTURE",
+		NULL
+	};
+
 	struct keymap keyList[] = {
-		{ MODELNAME,    "    ", "MODELNAME",    NULL },
-		{ CPUFACTOR,    "    ", "CPUFACTOR",    NULL },
-		{ ARCHITECTURE, "    ", "ARCHITECTURE", NULL },
+		{ MODELNAME,    "    ", keylist[MODELNAME],    NULL },
+		{ CPUFACTOR,    "    ", keylist[CPUFACTOR],    NULL },
+		{ ARCHITECTURE, "    ", keylist[ARCHITECTURE], NULL },
 		{ -1,           "    ", NULL, NULL}
 	};
 
@@ -619,15 +645,15 @@ dohostmodel (FILE * fp, unsigned int *lineNum, const char *lsfile)
 		{
 		shortInfo.nModels = 2;
 		}
-
-	strcpy (allInfo.hostModels[0], "UNKNOWN_AUTO_DETECT");
-	strcpy (allInfo.hostArchs[0], "UNKNOWN_AUTO_DETECT");
-	allInfo.cpuFactor[0] = 1;
-	shortInfo.hostModels[0] = allInfo.hostModels[0];
-	strcpy (allInfo.hostModels[1], "DEFAULT");
-	strcpy (allInfo.hostArchs[1], "");
-	allInfo.cpuFactor[1] = 1;
-	shortInfo.hostModels[1] = allInfo.hostModels[1];
+ 
+	strcpy (allInfo.hostModels[0], "UNKNOWN_AUTO_DETECT"); // FIXME FIXME FIXME FIXME where is 0 from ?
+	strcpy (allInfo.hostArchs[0], "UNKNOWN_AUTO_DETECT");  // FIXME FIXME FIXME FIXME where is 0 from ?
+	allInfo.cpuFactor[0] = 1;                              // FIXME FIXME FIXME FIXME where is 0 from ?
+	shortInfo.hostModels[0] = allInfo.hostModels[0];       // FIXME FIXME FIXME FIXME where is 0 from ?
+	strcpy (allInfo.hostModels[1], "DEFAULT");             // FIXME FIXME FIXME FIXME where is 1 from ?
+	strcpy (allInfo.hostArchs[1], "");                     // FIXME FIXME FIXME FIXME where is 1 from ?
+	allInfo.cpuFactor[1] = 1;                              // FIXME FIXME FIXME FIXME where is 1 from ?
+	shortInfo.hostModels[1] = allInfo.hostModels[1];       // FIXME FIXME FIXME FIXME where is 1 from ?
 
 	if (strchr (linep, '=') == NULL)
 		{
@@ -793,15 +819,6 @@ doresources (FILE * fp, unsigned int *lineNum, char *lsfile) // FIXME FIXME FIXM
 	int resIdx = 0;
 	char *linep = NULL;
 
-	const char keylist[5][] = {
-		"RESOURCENAME",
-		"TYPE",
-		"INTERVAL",
-		"INCREASING",
-		"RELEASE",
-		"DESCRIPTION"
-	};
-
 	enum {
 		RESOURCENAME = 0,
 		TYPE,
@@ -809,6 +826,16 @@ doresources (FILE * fp, unsigned int *lineNum, char *lsfile) // FIXME FIXME FIXM
 		INCREASING,
 		RELEASE,
 		DESCRIPTION
+	};
+
+	const char *keylist[] = {
+		"RESOURCENAME",
+		"TYPE",
+		"INTERVAL",
+		"INCREASING",
+		"RELEASE",
+		"DESCRIPTION",
+		NULL
 	};
 
 	struct keymap keyList[] = {
@@ -1106,9 +1133,17 @@ doresourcemap (FILE * fp, const char *lsfile, unsigned int *lineNum)
 		LOCATION
 	};
 
+	const char *keylist[] = {
+		"RESOURCENAME",
+		"LOCATION",
+		NULL
+	};
+
+
+
 	struct keymap keyList[] = {
-		{ RESOURCENAME, "    ", "RESOURCENAME", NULL },
-		{ LOCATION,     "    ", "LOCATION",     NULL },
+		{ RESOURCENAME, "    ", keylist[RESOURCENAME], NULL },
+		{ LOCATION,     "    ", keylist[LOCATION],     NULL },
 		{ -1,           "    ", NULL, NULL}
 	};
 
@@ -2022,14 +2057,22 @@ lim_domanager (FILE * fp, const char *lsfile, unsigned int *lineNum, const char 
 		ADMINISTRATORS
 	};
 
+	const char *keylist[] = {
+		"MANAGERS",
+		"ADMINISTRATORS",
+		NULL
+	};
+
+
+
 	struct keymap keyList1[] = {
-		{ MANAGER, "    ", NULL, "MANAGER" },
-		{ -1, "    ", NULL, NULL }
+		{ MANAGERS, "    ", NULL, keylist[MANAGERS] },
+		{ -1,       "    ", NULL, NULL }
 	};
 
 	struct keymap keyList2[] = {
-		{ ADMINISTRATORS, "    ", NULL, "ADMINISTRATORS" },
-		{ -1, "    ", NULL, NULL}
+		{ ADMINISTRATORS, "    ", NULL, keylist[ADMINISTRATORS] },
+		{ -1,             "    ", NULL, NULL}
 	};
 
 
@@ -2307,19 +2350,34 @@ doclparams (FILE * clfp, const char *lsfile, unsigned int *lineNum)
 		LSF_ELIM_RESTARTS
 	};
 
+	const char *keylist[ ] {
+		"EXINTERVAL",
+		"ELIMARGS",
+		"PROBE_TIMEOUT",
+		"ELIM_POLL_INTERVAL",
+		"HOST_INACTIVITY_LIMIT",
+		"MASTER_INACTIVITY_LIMIT",
+		"RETRY_LIMIT",
+		"ADJUST_DURATION",
+		"LSF_ELIM_DEBUG",
+		"LSF_ELIM_BLOCKTIME",
+		"LSF_ELIM_RESTARTS",
+		NULL
+	}
+
 	struct keymap keyList[] = {
-		{ EXINTERVAL,              "    ", "EXINTERVAL"             , NULL },
-		{ ELIMARGS,                "    ", "ELIMARGS"               , NULL },
-		{ PROBE_TIMEOUT,           "    ", "PROBE_TIMEOUT"          , NULL },
-		{ ELIM_POLL_INTERVAL,      "    ", "ELIM_POLL_INTERVAL"     , NULL },
-		{ HOST_INACTIVITY_LIMIT,   "    ", "HOST_INACTIVITY_LIMIT"  , NULL },
-		{ MASTER_INACTIVITY_LIMIT, "    ", "MASTER_INACTIVITY_LIMIT", NULL },
-		{ RETRY_LIMIT,             "    ", "RETRY_LIMIT"            , NULL },
-		{ ADJUST_DURATION,         "    ", "ADJUST_DURATION"        , NULL },
-		{ LSF_ELIM_DEBUG,          "    ", "LSF_ELIM_DEBUG"         , NULL },
-		{ LSF_ELIM_BLOCKTIME,      "    ", "LSF_ELIM_BLOCKTIME"     , NULL },
-		{ LSF_ELIM_RESTARTS,       "    ", "LSF_ELIM_RESTARTS"      , NULL },
-		{ -1, "    ", NULL, NULL }
+		{ EXINTERVAL,              "    ", keylist[ EXINTERVAL ]             , NULL },
+		{ ELIMARGS,                "    ", keylist[ ELIMARGS ]               , NULL },
+		{ PROBE_TIMEOUT,           "    ", keylist[ PROBE_TIMEOUT ]          , NULL },
+		{ ELIM_POLL_INTERVAL,      "    ", keylist[ ELIM_POLL_INTERVAL ]     , NULL },
+		{ HOST_INACTIVITY_LIMIT,   "    ", keylist[ HOST_INACTIVITY_LIMIT ]  , NULL },
+		{ MASTER_INACTIVITY_LIMIT, "    ", keylist[ MASTER_INACTIVITY_LIMIT ], NULL },
+		{ RETRY_LIMIT,             "    ", keylist[ RETRY_LIMIT ]            , NULL },
+		{ ADJUST_DURATION,         "    ", keylist[ ADJUST_DURATION ]        , NULL },
+		{ LSF_ELIM_DEBUG,          "    ", keylist[ LSF_ELIM_DEBUG ]         , NULL },
+		{ LSF_ELIM_BLOCKTIME,      "    ", keylist[ LSF_ELIM_BLOCKTIME ]     , NULL },
+		{ LSF_ELIM_RESTARTS,       "    ", keylist[ LSF_ELIM_RESTARTS ]      , NULL },
+		{ -1,                      "    ", NULL, NULL }
 	};
 
 	const char parameters[] = "parameters";
@@ -2818,29 +2876,43 @@ dohosts (FILE * clfp, struct clusterNode *clPtr, const char *lsfile, unsigned in
 
 	enum {
 		HOSTNAME = 0,
-		MODEL    ,
-		TYPE     ,
-		ND       ,
+		MODEL,
+		TYPE,
+		ND,
 		RESOURCES,
 		RUNWINDOW,
-		REXPRI0  ,
-		SERVER0  ,
-		R        ,
+		REXPRI0,
+		SERVER0,
+		R,
 		S
 	};
 
+	const char *keylist[ ] = {
+		"HOSTNAME",
+		"MODEL",
+		"TYPE",
+		"ND",
+		"RESOURCES",
+		"RUNWINDOW",
+		"REXPRI0",
+		"SERVER0",
+		"R",
+		"S",
+		NULL
+	};
+
 	struct keymap keyList[] = {
-		{  HOSTNAME,  "    " , "HOSTNAME",  NULL },
-		{  MODEL,     "    " , "MODEL",     NULL },
-		{  TYPE,      "    " , "TYPE",      NULL },
-		{  ND,        "    " , "ND",        NULL },
-		{  RESOURCES, "    " , "RESOURCES", NULL },
-		{  RUNWINDOW, "    " , "RUNWINDOW", NULL },
-		{  REXPRI0,   "    " , "REXPRI0",   NULL },
-		{  SERVER0,   "    " , "SERVER0",   NULL },
-		{  R,         "    " , "R",         NULL },
-		{  S,         "    " , "S",         NULL },
-		{  -1,        "    " , NULL, NULL }
+		{ HOSTNAME,  "    " , keylist[ HOSTNAME ],  NULL },
+		{ MODEL,     "    " , keylist[ MODEL ],     NULL },
+		{ TYPE,      "    " , keylist[ TYPE ],      NULL },
+		{ ND,        "    " , keylist[ ND ],        NULL },
+		{ RESOURCES, "    " , keylist[ RESOURCES ], NULL },
+		{ RUNWINDOW, "    " , keylist[ RUNWINDOW ], NULL },
+		{ REXPRI0,   "    " , keylist[ REXPRI0 ],   NULL },
+		{ SERVER0,   "    " , keylist[ SERVER0 ],   NULL },
+		{ R,         "    " , keylist[ R ],         NULL },
+		{ S,         "    " , keylist[ S ],         NULL },
+		{ -1,        "    " , NULL, NULL }
 	};
 
 	const char host[] = "host";
@@ -4729,18 +4801,19 @@ confOpen ( const char *filename, char *type)
 float
 mykey (void)
 {
-	int sum = 0;
+	int sum          = 0;
+	unsigned int i   = 0;
+	float key        = 0.0f;
 	char *myhostname = ls_getmyhostname ();
-	unsigned int i = 0;
-	float key = 0.0f;
 	
 	for (i = 0; myhostname[i] != 0; i++) {
 		sum += myhostname[i];
 	}
 	
 	i = sum % 'z';
-	if (i < 'A')
+	if (i < 'A') {
 		i += 'A';
+	}
 	
 	key = (float) i / (float) 'Z';
 	
