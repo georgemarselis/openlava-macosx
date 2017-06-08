@@ -19,8 +19,7 @@
 #pragma once
 
 #include "lsf.h"
-#include "lib/conf.h"
-#include "lib/channel.h"
+// #include "lib/conf.h"
 #include "lib/hdr.h"
 #include "lib/table.h"
 #include "lib/xdrrf.h"
@@ -30,7 +29,8 @@
 #include "daemons/libresd/resout.h"
  
 
-#define BIND_RETRY_TIMES 100
+// #define BIND_RETRY_TIMES 100
+const unsigned short BIND_RETRY_TIMES = 100;
 
 struct admins
 {
@@ -88,10 +88,10 @@ int sharedResConfigured_;
 #define FD_IS_VALID(x)  ((x) >= 0 && (x) < sysconf(_SC_OPEN_MAX) )
 #define FD_NOT_VALID(x) ( ! FD_IS_VALID(x))
 
-#define AUTH_IDENT      "ident"
-#define AUTH_PARAM_DCE  "dce"
-#define AUTH_PARAM_EAUTH  "eauth"
-#define AUTOMOUNT_LAST_STR "AMFIRST"
+#define AUTH_IDENT          "ident"
+#define AUTH_PARAM_DCE      "dce"
+#define AUTH_PARAM_EAUTH    "eauth"
+#define AUTOMOUNT_LAST_STR  "AMFIRST"
 #define AUTOMOUNT_NEVER_STR "AMNEVER"
 
 #define FREEUP(pointer)   if (pointer != NULL) {  \
@@ -263,12 +263,10 @@ int writetaskfile_ (char *, hTab *, hTab *, hTab *, hTab *);
 
 int expSyntax_ (char *);
 
-char *getNextWord_ (char **);
 char *getNextWord1_ (char **line);
 char *getNextWordSet (char **, const char *);
 char *getline_ (FILE * fp, int *);
 char *getThisLine_ (FILE * fp, int *LineCount);
-char *getNextValueQ_ (char **, char, char);
 int stripQStr (char *q, char *str);
 int addQStr (FILE *, char *str);
 struct pStack *initStack (void);
@@ -290,7 +288,7 @@ void subNewLine_ (char *);
 int putInLists (char *word, struct admins *admins, unsigned int *numAds, char *forWhat);
 // int isInlist (char **adminNames, char *userName, unsigned int actAds);
 
-void doSkipSection_conf (struct lsConf *conf, size_t *lineNum, char *lsfile, char *sectionName);
+// void doSkipSection_conf (struct lsConf *conf, size_t *lineNum, char *lsfile, char *sectionName);
 char *getBeginLine_conf (struct lsConf *conf, size_t *lineNum);
 
 void defaultAllHandlers (void);
@@ -326,8 +324,8 @@ void ls_openlog (const char *, const char *, int, char *);
 void ls_closelog (void);
 int ls_setlogmask (int maskpri);
 
-void initkeylist (struct keymap *keyList, int, int, struct lsInfo *);
-void freekeyval (struct keymap *keyList);
+// void initkeylist (struct keymap *keyList, int, int, struct lsInfo *);
+// void freekeyval (struct keymap *keyList);
 char *parsewindow (char *val, char *fname, size_t *lineNum, char *host);
 
 unsigned int expandList_ (char ***tolist, unsigned int mask, char **keys);

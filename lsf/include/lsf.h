@@ -23,7 +23,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <dirent.h>
-#include <errno.h>
+#include <errno.h>      // FIXME FIXME FIXME FIXME openflava needs its own error.h
 #include <fcntl.h>
 #include <grp.h>
 #include <limits.h>
@@ -69,8 +69,10 @@
 typedef long LS_LONG_INT; // FIXME FIXME FIXME FIXME FIXME  untypedef, leave to compiler to deal with
 typedef unsigned long LS_UNS_LONG_INT; // FIXME FIXME FIXME FIXME FIXME untypedef, leave to compiler to deal with
 
-// #define LS_LONG_FORMAT ("%ld") // FIXME FIXME FIXME FIXME 
-#define _OPENLAVA_PROJECT_ "openlava project 2.0" // FIXME FIXME FIXME FIXME FIXME move to configure.ac
+// #define LS_LONG_FORMAT ("%ld") 
+// #define _OPENLAVA_PROJECT_ "openlava project 2.0" // FIXME FIXME FIXME FIXME FIXME move to configure.ac
+const char _OPENLAVA_PROJECT_[] = "openlava project 2.0";
+
 
 /*
  * This is our identifier printed out by all daemons and commands.
@@ -141,33 +143,49 @@ typedef enum {
 } lsindx_t;
 
 #ifndef MAXFLOAT
-	#define MAXFLOAT        3.40282347e+38F
+	#define MAXFLOAT        3.40282347e+38F // FIXME FIXME FIXME FIXME turn into constant
 #endif
 
-#define INFINIT_LOAD    (float) (0x7fffffff)
-#define INFINIT_FLOAT   (float) (0x7fffffff)
+#define INFINIT_LOAD    (float) (0x7fffffff) // FIXME FIXME FIXME FIXME turn into constant
+#define INFINIT_FLOAT   (float) (0x7fffffff) // FIXME FIXME FIXME FIXME turn into constant
 
-#define INFINIT_INT         0x7fffffff
-#define INFINIT_LONG_INT    0x7fffffff
+#define INFINIT_INT         0x7fffffff // FIXME FIXME FIXME FIXME turn into constant
+#define INFINIT_LONG_INT    0x7fffffff // FIXME FIXME FIXME FIXME turn into constant
 
-#define INFINIT_SHORT  0x7fff
+#define INFINIT_SHORT  0x7fff // FIXME FIXME FIXME FIXME  turn into constant
 
-#define DEFAULT_RLIMIT     -1
+// #define DEFAULT_RLIMIT     -1
+const short DEFAULT_RLIMIT = -1;
 
-#define LSF_RLIMIT_CPU      0
-#define LSF_RLIMIT_FSIZE    1
-#define LSF_RLIMIT_DATA     2
-#define LSF_RLIMIT_STACK    3
-#define LSF_RLIMIT_CORE     4
-#define LSF_RLIMIT_RSS      5
-#define LSF_RLIMIT_NOFILE   6
-#define LSF_RLIMIT_OPEN_MAX 7
-#define LSF_RLIMIT_VMEM     8
-#define LSF_RLIMIT_SWAP     LSF_RLIMIT_VMEM
-#define LSF_RLIMIT_RUN      9
-#define LSF_RLIMIT_PROCESS  10
-#define LSF_RLIM_NLIMITS    11
+// #define LSF_RLIMIT_CPU      0
+// #define LSF_RLIMIT_FSIZE    1
+// #define LSF_RLIMIT_DATA     2
+// #define LSF_RLIMIT_STACK    3
+// #define LSF_RLIMIT_CORE     4
+// #define LSF_RLIMIT_RSS      5
+// #define LSF_RLIMIT_NOFILE   6
+// #define LSF_RLIMIT_OPEN_MAX 7
+// #define LSF_RLIMIT_VMEM     8
+// #define LSF_RLIMIT_SWAP     LSF_RLIMIT_VMEM
+// #define LSF_RLIMIT_RUN      9
+// #define LSF_RLIMIT_PROCESS  10
+// #define LSF_RLIM_NLIMITS    11
 
+enum LSF_RLIMIT {
+	LSF_RLIMIT_CPU = 0,
+	LSF_RLIMIT_FSIZE,
+	LSF_RLIMIT_DATA,
+	LSF_RLIMIT_STACK,
+	LSF_RLIMIT_CORE,
+	LSF_RLIMIT_RSS,
+	LSF_RLIMIT_NOFILE,
+	LSF_RLIMIT_OPEN_MAX,
+	LSF_RLIMIT_VMEM,
+	LSF_RLIMIT_SWAP = LSF_RLIMIT_VMEM,
+	LSF_RLIMIT_RUN,
+	LSF_RLIMIT_PROCESS,
+	LSF_RLIM_NLIMITS
+};
 
 #define LSF_NULL_MODE    0
 #define LSF_LOCAL_MODE   1
@@ -179,26 +197,49 @@ typedef enum {
 #define RF_CMD_RXFLAGS 2
 
 
-#define STATUS_TIMEOUT        125
-#define STATUS_IOERR          124
-#define STATUS_EXCESS         123
-#define STATUS_REX_NOMEM      122
-#define STATUS_REX_FATAL      121
-#define STATUS_REX_CWD        120
-#define STATUS_REX_PTY        119
-#define STATUS_REX_SP         118
-#define STATUS_REX_FORK       117
-#define STATUS_REX_TOK        116
-#define STATUS_REX_UNKNOWN    115
-#define STATUS_REX_NOVCL      114
-#define STATUS_REX_NOSYM      113
-#define STATUS_REX_VCL_INIT   112
-#define STATUS_REX_VCL_SPAWN  111
-#define STATUS_REX_EXEC       110
-#define STATUS_REX_MLS_INVAL  109
-#define STATUS_REX_MLS_CLEAR  108
-#define STATUS_REX_MLS_RHOST  107
-#define STATUS_REX_MLS_DOMIN  106
+// #define STATUS_TIMEOUT        125
+// #define STATUS_IOERR          124
+// #define STATUS_EXCESS         123
+// #define STATUS_REX_NOMEM      122
+// #define STATUS_REX_FATAL      121
+// #define STATUS_REX_CWD        120
+// #define STATUS_REX_PTY        119
+// #define STATUS_REX_SP         118
+// #define STATUS_REX_FORK       117
+// #define STATUS_REX_TOK        116
+// #define STATUS_REX_UNKNOWN    115
+// #define STATUS_REX_NOVCL      114
+// #define STATUS_REX_NOSYM      113
+// #define STATUS_REX_VCL_INIT   112
+// #define STATUS_REX_VCL_SPAWN  111
+// #define STATUS_REX_EXEC       110
+// #define STATUS_REX_MLS_INVAL  109
+// #define STATUS_REX_MLS_CLEAR  108
+// #define STATUS_REX_MLS_RHOST  107
+// #define STATUS_REX_MLS_DOMIN  106
+
+enum STATUS_REX {
+	STATUS_REX_MLS_DOMIN = 106,
+	STATUS_REX_MLS_RHOST = 107,
+	STATUS_REX_MLS_CLEAR = 108,
+	STATUS_REX_MLS_INVAL = 109,
+	STATUS_REX_EXEC      = 110,
+	STATUS_REX_VCL_SPAWN = 111,
+	STATUS_REX_VCL_INIT  = 112,
+	STATUS_REX_NOSYM     = 113,
+	STATUS_REX_NOVCL     = 114,
+	STATUS_REX_UNKNOWN   = 115,
+	STATUS_REX_TOK       = 116,
+	STATUS_REX_FORK      = 117,
+	STATUS_REX_SP        = 118,
+	STATUS_REX_PTY       = 119,
+	STATUS_REX_CWD       = 120,
+	STATUS_REX_FATAL     = 121,
+	STATUS_REX_NOMEM     = 122,
+	STATUS_EXCESS        = 123,
+	STATUS_IOERR         = 124,
+	STATUS_TIMEOUT       = 125
+};
 
 #define REX_FATAL_ERROR(s)     (((s) == STATUS_REX_NOVCL)               \
 								|| ((s) == STATUS_REX_NOSYM)            \
@@ -223,16 +264,16 @@ typedef enum {
 #define   REXF_TTYASYNC 0x00000080
 #define   REXF_STDERR   0x00000100
 
-#define EXACT         0x01
-#define OK_ONLY       0x02
-#define NORMALIZE     0x04
-#define LOCALITY      0x08
-#define IGNORE_RES    0x10
-#define LOCAL_ONLY    0x20
-#define DFT_FROMTYPE  0x40
-#define ALL_CLUSTERS  0x80
-#define EFFECTIVE     0x100
-#define RECV_FROM_CLUSTERS 0x200
+#define EXACT                0x01
+#define OK_ONLY              0x02
+#define NORMALIZE            0x04
+#define LOCALITY             0x08
+#define IGNORE_RES           0x10
+#define LOCAL_ONLY           0x20
+#define DFT_FROMTYPE         0x40
+#define ALL_CLUSTERS         0x80
+#define EFFECTIVE            0x100
+#define RECV_FROM_CLUSTERS   0x200
 #define NEED_MY_CLUSTER_NAME 0x400
 
 #define SEND_TO_CLUSTERS   0x400
@@ -261,6 +302,13 @@ struct connectEnt
 {
 	char *hostname;
 	int csock[2];
+};
+
+
+enum LSFERRORS { // FIXME FIXME FIXME FIXME FIXME global enum with all the lserrno values in it
+	ENOERROR,
+	ENEGATIVERESULT,
+	KEYNULL
 };
 
 #define INTEGER_BITS       32
@@ -380,33 +428,33 @@ struct clusterInfo
 	char **hostTypes;
 	char **hostModels;
 	char **admins;
-	char clusterName[MAXLSFNAMELEN];
-	char masterName[MAXHOSTNAMELEN];
-	char managerName[MAXLSFNAMELEN];
+	char *clusterName;
+	char *masterName;
+	char *managerName;
 
 };
 
 struct hostInfo
 {
-		int rexPriority;
-		unsigned int maxCpus;
-		unsigned int maxMem;
-		unsigned int maxSwap;
-		unsigned int maxTmp;
-		unsigned int nDisks;
-		unsigned int nRes;
-		char isServer;
-		char padding1[3];
-		char *hostModel;
-		char *windows;
-		char *hostType;
-		float cpuFactor;
-		char padding2[4];
-		float *busyThreshold;
-		unsigned long numIndx;
-		char **resources;
-		// char hostName[MAXHOSTNAMELEN];
-		char *hostName;
+	int rexPriority;
+	unsigned int maxCpus;
+	unsigned int maxMem;
+	unsigned int maxSwap;
+	unsigned int maxTmp;
+	unsigned int nDisks;
+	unsigned int nRes;
+	char isServer;
+	char padding1[3];
+	char *hostModel;
+	char *windows;
+	char *hostType;
+	float cpuFactor;
+	char padding2[4];
+	float *busyThreshold;
+	unsigned long numIndx;
+	char **resources;
+	// char hostName[MAXHOSTNAMELEN];
+	char *hostName;
 };
 
 	
@@ -946,8 +994,8 @@ void ls_perror (char *usrMsg);
 
 struct lsConf *ls_getconf (char *);
 void ls_freeconf (struct lsConf *);
-struct clusterConf *ls_readcluster (char *, struct lsInfo *);
-struct clusterConf *ls_readcluster_ex (char *, struct lsInfo *, int);
+// struct clusterConf *ls_readcluster (char *, struct lsInfo *);
+// struct clusterConf *ls_readcluster_ex (char *, struct lsInfo *, int);
 
 int ls_initdebug (char *appName);
 void ls_syslog (int level, const char *fmt, ...);

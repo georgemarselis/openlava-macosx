@@ -47,6 +47,8 @@ struct clusterConf *cConf = NULL;
 
 struct builtIn
 {
+    short counter;
+    char padding1[6];   
     const char *name;
     const char *des;
     enum valueType valuetype;
@@ -57,30 +59,30 @@ struct builtIn
 
 // static 
 struct builtIn builtInRes[] = { // FIXME FIXME FIXME find out where this LS_NUMERIC comes from
-    { "r15s",   "15-second CPU run queue length",             LS_NUMERIC, INCR, TYPE1 | RESF_RELEASE, 15},
-    { "r1m",    "1-minute CPU run queue length (alias: cpu)", LS_NUMERIC, INCR, TYPE1 | RESF_RELEASE, 15},
-    { "r15m",   "15-minute CPU run queue length",             LS_NUMERIC, INCR, TYPE1 | RESF_RELEASE, 15},
-    { "ut",     "1-minute CPU utilization (0.0 to 1.0)",      LS_NUMERIC, INCR, TYPE1, 15},
-    { "pg",     "Paging rate (pages/second)",                 LS_NUMERIC, INCR, TYPE1, 15},
-    { "io",     "Disk IO rate (Kbytes/second)",               LS_NUMERIC, INCR, TYPE1, 15},
-    { "ls",     "Number of login sessions (alias: login)",    LS_NUMERIC, INCR, TYPE1, 30},
-    { "it",     "Idle time (minutes) (alias: idle)",          LS_NUMERIC, DECR, TYPE1, 30},
-    { "tmp",    "Disk space in /tmp (Mbytes)",                LS_NUMERIC, DECR, TYPE1, 120},
-    { "swp",    "Available swap space (Mbytes) (alias: swap)",LS_NUMERIC, DECR, TYPE1, 15},
-    { "mem",    "Available memory (Mbytes)",                  LS_NUMERIC, DECR, TYPE1, 15},
-    { "ncpus",  "Number of CPUs",                             LS_NUMERIC, DECR, TYPE2, 0},
-    { "ndisks", "Number of local disks",                      LS_NUMERIC, DECR, TYPE2, 0},
-    { "maxmem", "Maximum memory (Mbytes)",                    LS_NUMERIC, DECR, TYPE2, 0},
-    { "maxswp", "Maximum swap space (Mbytes)",                LS_NUMERIC, DECR, TYPE2, 0},
-    { "maxtmp", "Maximum /tmp space (Mbytes)",                LS_NUMERIC, DECR, TYPE2, 0},
-    { "cpuf",   "CPU factor",                                 LS_NUMERIC, DECR, TYPE2, 0},
-    { "type",   "Host type",                                  LS_STRING,  NA,   TYPE2, 0},
-    { "model",  "Host model",                                 LS_STRING,  NA,   TYPE2, 0},
-    { "status", "Host status",                                LS_STRING,  NA,   TYPE2, 0},
-    { "rexpri", "Remote execution priority",                  LS_NUMERIC, NA,   TYPE2, 0},
-    { "server", "LSF server host",                            LS_BOOLEAN, NA,   TYPE2, 0},
-    { "hname",  "Host name",                                  LS_STRING,  NA,   TYPE2, 0},
-    {NULL,      NULL,                                         LS_NUMERIC, INCR, TYPE1, 0}
+    {  0, "      ",  "r15s",   "15-second CPU run queue length",              LS_NUMERIC, INCR, TYPE1 | RESF_RELEASE, 15 },
+    {  1, "      ",  "r1m",    "1-minute CPU run queue length (alias: cpu)",  LS_NUMERIC, INCR, TYPE1 | RESF_RELEASE, 15 },
+    {  2, "      ",  "r15m",   "15-minute CPU run queue length",              LS_NUMERIC, INCR, TYPE1 | RESF_RELEASE, 15 },
+    {  3, "      ",  "ut",     "1-minute CPU utilization (0.0 to 1.0)",       LS_NUMERIC, INCR, TYPE1, 15  },
+    {  4, "      ",  "pg",     "Paging rate (pages/second)",                  LS_NUMERIC, INCR, TYPE1, 15  },
+    {  5, "      ",  "io",     "Disk IO rate (Kbytes/second)",                LS_NUMERIC, INCR, TYPE1, 15  },
+    {  6, "      ",  "ls",     "Number of login sessions (alias: login)",     LS_NUMERIC, INCR, TYPE1, 30  },
+    {  7, "      ",  "it",     "Idle time (minutes) (alias: idle)",           LS_NUMERIC, DECR, TYPE1, 30  },
+    {  8, "      ",  "tmp",    "Disk space in /tmp (Mbytes)",                 LS_NUMERIC, DECR, TYPE1, 120 },
+    {  9, "      ",  "swp",    "Available swap space (Mbytes) (alias: swap)", LS_NUMERIC, DECR, TYPE1, 15  },
+    { 10, "      ",  "mem",    "Available memory (Mbytes)",                   LS_NUMERIC, DECR, TYPE1, 15  },
+    { 11, "      ",  "ncpus",  "Number of CPUs",                              LS_NUMERIC, DECR, TYPE2, 0   },
+    { 12, "      ",  "ndisks", "Number of local disks",                       LS_NUMERIC, DECR, TYPE2, 0   },
+    { 13, "      ",  "maxmem", "Maximum memory (Mbytes)",                     LS_NUMERIC, DECR, TYPE2, 0   },
+    { 14, "      ",  "maxswp", "Maximum swap space (Mbytes)",                 LS_NUMERIC, DECR, TYPE2, 0   },
+    { 15, "      ",  "maxtmp", "Maximum /tmp space (Mbytes)",                 LS_NUMERIC, DECR, TYPE2, 0   },
+    { 16, "      ",  "cpuf",   "CPU factor",                                  LS_NUMERIC, DECR, TYPE2, 0   },
+    { 18, "      ",  "type",   "Host type",                                   LS_STRING,  NA,   TYPE2, 0   },
+    { 19, "      ",  "model",  "Host model",                                  LS_STRING,  NA,   TYPE2, 0   },
+    { 20, "      ",  "status", "Host status",                                 LS_STRING,  NA,   TYPE2, 0   },
+    { 21, "      ",  "rexpri", "Remote execution priority",                   LS_NUMERIC, NA,   TYPE2, 0   },
+    { 22, "      ",  "server", "LSF server host",                             LS_BOOLEAN, NA,   TYPE2, 0   },
+    { 23, "      ",  "hname",  "Host name",                                   LS_STRING,  NA,   TYPE2, 0   },
+    { -1, "      ",  NULL,      NULL,                                         LS_NUMERIC, INCR, TYPE1, 0   }
 };
 
 struct HostsArray
@@ -107,21 +109,21 @@ const int builtInRes_ID[] = { // FIXME FIXME FIXME FIXME careful when compiling 
 // Function prototypes
 ////////////////////////////////////////////////////////
 
-char do_Cluster     (FILE *fp, size_t *lineNum, char *fname);
-char do_HostTypes   (FILE *fp, size_t *lineNum, char *fname);
-char do_HostModels  (FILE *fp, size_t *lineNum, char *fname);
-char do_Resources   (FILE *fp, size_t *lineNum, char *fname);
-char do_Index       (FILE *fp, size_t *lineNum, char *fname);
-char do_Manager     (FILE *fp, char *fname,   size_t *lineNum, char *clustermanager, int lookupAdmins);
-char do_Hosts       (FILE *fp, char *fname,   size_t *lineNum, struct lsInfo *myInfo);
-char do_Clparams    (FILE *fp, char *fname,   size_t *lineNum);
+char do_Cluster     (FILE *fp, size_t *lineNum, const char *fname);
+char do_HostTypes   (FILE *fp, size_t *lineNum, const char *fname);
+char do_HostModels  (FILE *fp, size_t *lineNum, const char *fname);
+char do_Resources   (FILE *fp, size_t *lineNum, const char *fname);
+char do_Index       (FILE *fp, size_t *lineNum, const char *fname);
+char do_Manager     (FILE *fp, const char *fname, size_t *lineNum, char const *clustermanager, int lookupAdmins);
+char do_Hosts       (FILE *fp, const char *fname, size_t *lineNum, struct lsInfo *myInfo);
+char do_Clparams    (FILE *fp, const char *fname, size_t *lineNum);
 
 // static 
 char addHostType (char *);
 // static 
 char addHostModel (char *model, char *arch, double factor);
 // static 
-char setIndex    (struct keymap *keyList, char *fname, size_t lineNum);
+char setIndex    (struct keymap *keyList, const char *fname, size_t lineNum);
 
 unsigned int resNameDefined (char *);
 
@@ -137,11 +139,11 @@ void liblsf_putThreshold (int indx, struct hostInfo *host, long position, char *
 
 
 // static 
-int wgetClusAdmins (char *line, char *lsfile, size_t *lineNum, char *secName);
-int getClusAdmins (char *line, char *filename, size_t *lineNum, char *secName, int lookupAdmins);
+int wgetClusAdmins (char *line, const char *lsfile,   size_t *lineNum, char *secName);
+int getClusAdmins  (char *line, const char *filename, size_t *lineNum, char *secName, int lookupAdmins);
 // static 
-struct admins *getAdmins_ (char *line, char *fname, size_t *lineNum, char *secName, int lookupAdmins);
-struct admins *liblsf_getAdmins (char *line, char *fname, size_t *lineNum, char *secName, int lookupAdmins);
+struct admins *getAdmins_       (char *line, const char *fname, size_t *lineNum, char *secName, int lookupAdmins);
+struct admins *liblsf_getAdmins (char *line, const char *fname, size_t *lineNum, char *secName, int lookupAdmins);
 
 // static 
 int validWindow (char *, char *);
@@ -152,37 +154,38 @@ int setAdmins (struct admins *, int);
 void freeKeyList (struct keymap *keyList);
 // static 
 int validType (char *type);
-int doResourceMap (FILE *fp, char *lsfile, size_t *lineNum);
+int doResourceMap (FILE *fp, const char *lsfile, size_t *lineNum);
 // static 
-int addResourceMap (char *resName, char *location, char *lsfile, size_t lineNum, int *isDefault);
-int liblsf_addResourceMap (char *resName, char *location, char *lsfile, size_t lineNum);
+int addResourceMap        (char *resName, char *location, const char *lsfile, size_t lineNum, int *isDefault);
+int liblsf_addResourceMap (char *resName, char *location, const char *lsfile, size_t lineNum);
 
 // static 
-unsigned int parseHostList (char *hostList, char *lsfile, size_t lineNum, char ***hosts, int *isDefault);
-int liblsf_parseHostList (char *hostList, char *lsfile, size_t lineNum, char ***hosts);
+unsigned int parseHostList ( char *hostList, const char *lsfile, size_t lineNum, char ***hosts, int *isDefault);
+int liblsf_parseHostList   ( char *hostList, const char *lsfile, size_t lineNum, char ***hosts);
 //  was : 
 // static struct lsSharedResourceInfo *addResource (char *resName, int nHosts, char **hosts, char *value, char *fileName, size_t lineNum);
-struct lsSharedResourceInfo *liblsf_addResource (char *resName, int nHosts, char **hosts, char *value, char *fileName, size_t lineNum);
+struct lsSharedResourceInfo *liblsf_addResource (char *resName, int nHosts, char **hosts, char *value, const char *fileName, size_t lineNum);
 // static 
-struct sharedResource *addResource (char *resName, unsigned int nHosts, char **hosts, char *value, char *fileName, size_t lineNum, int resourceMap);
+struct sharedResource *addResource (char *resName, unsigned int nHosts, char **hosts, char *value, const char *fileName, size_t lineNum, int resourceMap);
 int liblsf_addHostInstance(struct lsSharedResourceInfo *sharedResource, unsigned int nHosts, char **hostNames, char *value);
 // static 
 int addHostInstance (struct sharedResource *sharedResource, unsigned int nHosts, char **hostNames, char *value, int resourceMap);
-char addHost (struct hostInfo *host, char *filename, size_t *lineNum);
+char addHost (struct hostInfo *host, const char *filename, size_t *lineNum);
 
 int convertNegNotation_ (char **, struct HostsArray *);
 int resolveBaseNegHosts (char *, char **, struct HostsArray *);
 
 void freeSA_ (char **list, unsigned int num);
 
-int putValue (struct keymap *keyList, char *key, char *value);
-int isInlist (char **adminNames, char *userName, unsigned int actAds);
+int putValue (struct keymap *keyList, const char *key, char *value);
+int isInlist (char **adminNames, const char *userName, unsigned int actAds);
 char *getNextValue (char **line);
 int keyMatch (struct keymap *keyList, char *line, int exact);
 int isSectionEnd (char *linep, const char *lsfile, const size_t *lineNum, const char *sectionName);
 char *getBeginLine (FILE *fp, size_t *lineNum);
-int readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *lsfile, size_t *lineNum, int exact, char *section);
+int readHvalues (struct keymap *keyList, char *linep, FILE *fp, const char *lsfile, size_t *lineNum, int exact, const char *section);
 int mapValues (struct keymap *keyList, char *line);
 // FIXME also found in lproto.h, should be in lib/conf.h
 // int putInLists (char *word, struct admins *admins, unsigned integer *numAds, char *forWhat);
 int parse_time (char *word, float *hour, unsigned int *day);
+struct clusterConf *ls_readcluster_ex ( const char *filename, struct lsInfo *info, int lookupAdmins);

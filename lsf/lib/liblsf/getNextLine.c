@@ -130,7 +130,7 @@ getNextLineC_conf (struct lsConf *conf, size_t *LineCount, int confFormat)
 		}
 	}
 
-	fprintf( stderr, "%s: you are not suppposed to be here!", __func__ );
+	fprintf( stderr, "%s: you are not suppposed to be here!\n", __func__ );
 	ls_syslog( LSE_ERR, "%s: you are not suppposed to be here!", __func__ );
 	return NULL;
 }
@@ -145,13 +145,13 @@ getNextLineC_conf (struct lsConf *conf, size_t *LineCount, int confFormat)
 char *
 getNextLineD_ (FILE * fp, size_t *LineCount, int confFormat)
 {
+	int cin           = 0;
+	int oneChar       = 0;
+	int cinBslash     = 0;
+	int quotes        = 0;
+	size_t lpos       = 0;
+	size_t linesize   = MAXLINELEN;
 	static char *line = NULL;
-	int cin         = 0;
-	int oneChar     = 0;
-	int cinBslash   = 0;
-	int quotes      = 0;
-	size_t lpos     = 0;
-	size_t linesize = MAXLINELEN;
 	
 	lserrno = LSE_NO_ERR;
 	oneChar = -1;
@@ -274,12 +274,12 @@ getNextLineD_ (FILE * fp, size_t *LineCount, int confFormat)
 }
 
 char *
-getNextLineC_ (FILE * fp, size_t *LineCount, int confFormat)
+getNextLineC_ (FILE * fp, size_t *lineCount, int confFormat)
 {
 	char *nextLine = NULL;
 	char *sp =     = NULL;
 
-	nextLine = getNextLineD_ (fp, LineCount, confFormat);
+	nextLine = getNextLineD_ (fp, lineCount, confFormat);
 
 	if (nextLine == NULL) {
 		return NULL;
@@ -291,7 +291,7 @@ getNextLineC_ (FILE * fp, size_t *LineCount, int confFormat)
 		}
 	}
 
-	return getNextLineC_ (fp, LineCount, confFormat);
+	return getNextLineC_ (fp, lineCount, confFormat);
 
 }
 

@@ -154,7 +154,7 @@ isSectionEnd (char *linep, const char *lsfile, const size_t *lineNum, const char
 // }
 
 int
-readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *lsfile, size_t *lineNum, int exact, char *section)
+readHvalues (struct keymap *keyList, char *linep, FILE *fp, const char *lsfile, size_t *lineNum, int exact, char *section)
 {
 	char *key   = NULL;
 	char *value = NULL;

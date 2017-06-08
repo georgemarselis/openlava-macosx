@@ -18,11 +18,16 @@
 
 #pragma once
 
-#define NODE_LEFT_DONE  1
-#define NODE_ALL_DONE   2
-#define NODE_PASED      3
+// #define NODE_LEFT_DONE  1
+// #define NODE_ALL_DONE   2
+// #define NODE_PASED      3
 
-char *getNextValueQ_( char **line, char ch1, char ch2 );
+enum NODE {
+	NODE_LEFT_DONE = 1,
+	NODE_ALL_DONE,
+	NODE_PASED
+};
+
 char *getNextValueQ_( char **line, char ch1, char ch2 );
 char *getNextWord_( char **line );
 char *getNextLineC_( FILE * p, size_t *LineCount, int confFormat );

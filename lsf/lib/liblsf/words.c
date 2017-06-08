@@ -24,7 +24,7 @@ char *
 getNextLine_ (FILE * fp, int confFormat)
 {
   size_t *zeroLineCount = 0;
-  return (getNextLineC_ (fp, zeroLineCount, confFormat));
+  return getNextLineC_ (fp, zeroLineCount, confFormat);
 }
 
 char *
@@ -46,7 +46,7 @@ getNextWord_ (char **line)
   }
 
   *wordp = '\0';
-  return (word);
+  return word;
 }
 
 char *
@@ -70,7 +70,7 @@ getNextWord1_ (char **line)
 
 
   *wordp = '\0';
-  return (word);
+  return word;
 
 }
 
@@ -108,7 +108,7 @@ getNextWordSet (char **line, const char *set)
 
 
   *wordp = '\0';
-  return (word);
+  return word;
 
 }
 
@@ -217,7 +217,7 @@ stripQStr (char *q, char *str)
 	}
 	
 	if (*q == '\0') {
-		return (-1);
+		return -1;
 	}
 
 	for (q++; *q != '\0'; q++, str++) {
@@ -239,7 +239,7 @@ stripQStr (char *q, char *str)
 		return -1;
 	}
 
-	return (q - fr + 1); // FIXME FIXME FIXME ascii gymnastics must go
+	return q - fr + 1; // FIXME FIXME FIXME ascii gymnastics must go
 }
 
 int
@@ -275,13 +275,13 @@ addQStr (FILE * log_fp, char *str)
 char *
 getNextLineD_ (FILE * fp, size_t *LineCount, int confFormat)
 {
+	int cin           = 0;
+	int oneChar       = 0;
+	int cinBslash     = 0;
+	int quotes        = 0;
+	size_t lpos       = 0;
+	size_t linesize   = MAXLINELEN;
 	static char *line = NULL;
-	int cin         = 0;
-	int oneChar     = 0;
-	int cinBslash   = 0;
-	int quotes      = 0;
-	size_t lpos     = 0;
-	size_t linesize = MAXLINELEN;
 	
 	lserrno = LSE_NO_ERR;
 	oneChar = -1;
@@ -397,19 +397,19 @@ getNextLineD_ (FILE * fp, size_t *LineCount, int confFormat)
 	if ((cin != EOF) || (oneChar == 1) || (cin == EOF && lpos > 0))
 	{
 		line[++lpos] = '\0';
-		return (line);
+		return line;
 	}
 
 	return NULL;
 }
 
 char *
-getNextLineC_ (FILE * fp, size_t *LineCount, int confFormat)
+getNextLineC_ (FILE *fp, size_t *lineCount, int confFormat)
 {
-	char *nextLine;
-	char *sp;
+	char *sp       = NULL;
+	char *nextLine = NULL;
 
-	nextLine = getNextLineD_ (fp, LineCount, confFormat);
+	nextLine = getNextLineD_ (fp, lineCount, confFormat);
 
 	if (nextLine == NULL) {
 		return NULL;
@@ -417,11 +417,11 @@ getNextLineC_ (FILE * fp, size_t *LineCount, int confFormat)
 
 	for (sp = nextLine; *sp != '\0'; sp++) {
 		if (*sp != ' ') {
-			return (nextLine);
+			return nextLine;
 		}
 	}
 
-	return (getNextLineC_ (fp, LineCount, confFormat));
+	return getNextLineC_ (fp, lineCount, confFormat);
 
 }
 
@@ -450,8 +450,8 @@ subNewLine_ (char *instr)
 char *
 nextline_ (FILE * fp)
 {
+	char *p          = NULL;
 	static char *buf = NULL;
-	char *p = NULL;
 
 	buf = malloc( BUFSIZ * sizeof( char ) + 1);
 	while( fgets( buf, BUFSIZ, fp ) ) {
@@ -471,5 +471,5 @@ nextline_ (FILE * fp)
 		break;
 	}
 
-	return (p);
-}               /* nextline_() */
+	return p;
+} 

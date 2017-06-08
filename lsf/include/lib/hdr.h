@@ -27,11 +27,8 @@
 
 #include "lsf.h"
 
-/* openlava 2.0 header breaks compatibility with
- * 1.0 but offers more flexibility and room for growth.
- */
-struct LSFHeader
-{
+// openlava 2.0 header breaks compatibility with 1.0 but offers more flexibility and room for growth
+struct LSFHeader { // FIXME FIXME FIXME FIXME FIXME ensure compatibility with Platform LSF
 	unsigned short version;
 	unsigned short reserved0;
 	unsigned short reserved;
@@ -46,7 +43,8 @@ struct LSFHeader
 /* always use this macro to size up memory buffers
  * for protocol header.
  */
-#define LSF_HEADER_LEN (sizeof(struct LSFHeader))
+// #define LSF_HEADER_LEN (sizeof(struct LSFHeader))
+const unsigned int LSF_HEADER_LEN = sizeof( struct LSFHeader ) ;
 
 struct stringLen
 {
@@ -60,10 +58,14 @@ struct lenData
 	char *data;
 };
 
-#define AUTH_HOST_NT  0x01
-#define AUTH_HOST_UX  0x02
+// #define AUTH_HOST_NT  0x01
+// #define AUTH_HOST_UX  0x02
 
-#define EAUTH_SIZE 4096
+const unsigned short int AUTH_HOST_NT = 0x01;
+const unsigned short int AUTH_HOST_UX = 0x02;
+
+#define EAUTH_SIZE 4096 // FIXME FIXME FIXME FIXME FIXME set value from configure.ac
+// const unsigned int EAUTH_SIZE = 4096;
 struct lsfAuth
 {
 	uid_t uid;

@@ -36,9 +36,8 @@ getHostType (void)
 int
 limd_readShared (void)
 {
-	FILE *fp = NULL;
-	char *cp = NULL;
-	char lsfile[MAXFILENAMELEN];
+	FILE *fp     = NULL;
+	char *cp     = NULL;
 	char *word   = NULL;
 	char modelok = FALSE;
 	char resok   = FALSE;
@@ -46,6 +45,7 @@ limd_readShared (void)
 	char indxok  = TRUE;
 	char typeok  = FALSE;
 	unsigned int lineNum = 0;
+	char lsfile[MAXFILENAMELEN];
 	const char filename = "lsf.shared";
 	const char configCheckSum[] = "configCheckSum";
 	const char readonly[] = "r";
@@ -798,18 +798,10 @@ initResTable (void)
 	return;
 }
 
-int
-resNameDefined ( const char *name)
-{
+//
+// int resNameDefined ( const char *name) { } lived here . now lives in lsf/lib/liblsf/conf.c . Requiescat in Pace
+// 
 
-	for ( unsigned int i = 0; i < allInfo.nRes; i++) {
-		if (strcmp (name, allInfo.resTable[i].name) == 0) {
-			assert( i <= INT_MAX );
-			return (int)i;
-		}
-	}
-	return -1;
-}
 
 char
 doresources (FILE * fp, unsigned int *lineNum, char *lsfile) // FIXME FIXME FIXME FIXME FIXME duplicated function from lsf/lib/liblsf/conf.c . Must de-dup.
@@ -825,7 +817,8 @@ doresources (FILE * fp, unsigned int *lineNum, char *lsfile) // FIXME FIXME FIXM
 		INTERVAL,
 		INCREASING,
 		RELEASE,
-		DESCRIPTION
+		DESCRIPTION,
+		NULLKEY
 	};
 
 	const char *keylist[] = {
@@ -839,13 +832,13 @@ doresources (FILE * fp, unsigned int *lineNum, char *lsfile) // FIXME FIXME FIXM
 	};
 
 	struct keymap keyList[] = {
-		{  RESOURCENAME, "    " , keylist[RESOURCENAME], NULL },
-		{  TYPE,         "    " , keylist[TYPE],         NULL },
-		{  INTERVAL,     "    " , keylist[INTERVAL],     NULL },
-		{  INCREASING,   "    " , keylist[INCREASING],   NULL },
-		{  RELEASE,      "    " , keylist[RELEASE],      NULL },
-		{  DESCRIPTION,  "    " , keylist[DESCRIPTION],  NULL },
-		{ -1,            "    " , NULL, NULL}
+		{ RESOURCENAME, "    " , keylist[RESOURCENAME], NULL },
+		{ TYPE,         "    " , keylist[TYPE],         NULL },
+		{ INTERVAL,     "    " , keylist[INTERVAL],     NULL },
+		{ INCREASING,   "    " , keylist[INCREASING],   NULL },
+		{ RELEASE,      "    " , keylist[RELEASE],      NULL },
+		{ DESCRIPTION,  "    " , keylist[DESCRIPTION],  NULL },
+		{ KEYNULL,      "    " , NULL, NULL}
 	};
 
 	const char resource[] = "resource";

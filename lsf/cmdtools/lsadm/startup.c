@@ -489,7 +489,7 @@ startupRemoteHost ( const char *host, int opCode, int ask)
 int
 execDaemon ( uid_t uid, char **myargv)
 {
-    pid_t childpid = -1;
+    pid_t childpid   = 0;
     LS_WAIT_T status = FALSE;
 
     if ((childpid = fork ()) < 0) {
@@ -517,7 +517,6 @@ execDaemon ( uid_t uid, char **myargv)
     lsfExecvp (myargv[0], myargv);
     perror (myargv[0]);
     exit (-2);
-
 
     return 255;
 }
