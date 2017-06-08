@@ -20,3 +20,5 @@
 
 
 // #define NL_SETN   23
+void doSkipSection(FILE *fp, size_t *lineNum, char *lsfile, char *sectionName);
+void doSkipSection_conf (const struct lsConf *conf, size_t *lineNum, const char *lsfile, const char *sectionName)

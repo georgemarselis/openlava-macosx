@@ -56,31 +56,31 @@ struct builtIn
 }; 
 
 // static 
-struct builtIn builtInRes[] = {
-    {"r15s",   "15-second CPU run queue length",             LS_NUMERIC, INCR, TYPE1 | RESF_RELEASE, 15},
-    {"r1m",    "1-minute CPU run queue length (alias: cpu)", LS_NUMERIC, INCR, TYPE1 | RESF_RELEASE, 15},
-    {"r15m",   "15-minute CPU run queue length",             LS_NUMERIC, INCR, TYPE1 | RESF_RELEASE, 15},
-    {"ut",     "1-minute CPU utilization (0.0 to 1.0)",      LS_NUMERIC, INCR, TYPE1, 15},
-    {"pg",     "Paging rate (pages/second)",                 LS_NUMERIC, INCR, TYPE1, 15},
-    {"io",     "Disk IO rate (Kbytes/second)",               LS_NUMERIC, INCR, TYPE1, 15},
-    {"ls",     "Number of login sessions (alias: login)",    LS_NUMERIC, INCR, TYPE1, 30},
-    {"it",     "Idle time (minutes) (alias: idle)",          LS_NUMERIC, DECR, TYPE1, 30},
-    {"tmp",    "Disk space in /tmp (Mbytes)",                LS_NUMERIC, DECR, TYPE1, 120},
-    {"swp",    "Available swap space (Mbytes) (alias: swap)",LS_NUMERIC, DECR, TYPE1, 15},
-    {"mem",    "Available memory (Mbytes)",                  LS_NUMERIC, DECR, TYPE1, 15},
-    {"ncpus",  "Number of CPUs",                             LS_NUMERIC, DECR, TYPE2, 0},
-    {"ndisks", "Number of local disks",                      LS_NUMERIC, DECR, TYPE2, 0},
-    {"maxmem", "Maximum memory (Mbytes)",                    LS_NUMERIC, DECR, TYPE2, 0},
-    {"maxswp", "Maximum swap space (Mbytes)",                LS_NUMERIC, DECR, TYPE2, 0},
-    {"maxtmp", "Maximum /tmp space (Mbytes)",                LS_NUMERIC, DECR, TYPE2, 0},
-    {"cpuf",   "CPU factor",                                 LS_NUMERIC, DECR, TYPE2, 0},
-    {"type",   "Host type",                                  LS_STRING,  NA,   TYPE2, 0},
-    {"model",  "Host model",                                 LS_STRING,  NA,   TYPE2, 0},
-    {"status", "Host status",                                LS_STRING,  NA,   TYPE2, 0},
-    {"rexpri", "Remote execution priority",                  LS_NUMERIC, NA,   TYPE2, 0},
-    {"server", "LSF server host",                            LS_BOOLEAN, NA,   TYPE2, 0},
-    {"hname",  "Host name",                                  LS_STRING,  NA,   TYPE2, 0},
-    {NULL,     NULL,                                         LS_NUMERIC, INCR, TYPE1, 0}
+struct builtIn builtInRes[] = { // FIXME FIXME FIXME find out where this LS_NUMERIC comes from
+    { "r15s",   "15-second CPU run queue length",             LS_NUMERIC, INCR, TYPE1 | RESF_RELEASE, 15},
+    { "r1m",    "1-minute CPU run queue length (alias: cpu)", LS_NUMERIC, INCR, TYPE1 | RESF_RELEASE, 15},
+    { "r15m",   "15-minute CPU run queue length",             LS_NUMERIC, INCR, TYPE1 | RESF_RELEASE, 15},
+    { "ut",     "1-minute CPU utilization (0.0 to 1.0)",      LS_NUMERIC, INCR, TYPE1, 15},
+    { "pg",     "Paging rate (pages/second)",                 LS_NUMERIC, INCR, TYPE1, 15},
+    { "io",     "Disk IO rate (Kbytes/second)",               LS_NUMERIC, INCR, TYPE1, 15},
+    { "ls",     "Number of login sessions (alias: login)",    LS_NUMERIC, INCR, TYPE1, 30},
+    { "it",     "Idle time (minutes) (alias: idle)",          LS_NUMERIC, DECR, TYPE1, 30},
+    { "tmp",    "Disk space in /tmp (Mbytes)",                LS_NUMERIC, DECR, TYPE1, 120},
+    { "swp",    "Available swap space (Mbytes) (alias: swap)",LS_NUMERIC, DECR, TYPE1, 15},
+    { "mem",    "Available memory (Mbytes)",                  LS_NUMERIC, DECR, TYPE1, 15},
+    { "ncpus",  "Number of CPUs",                             LS_NUMERIC, DECR, TYPE2, 0},
+    { "ndisks", "Number of local disks",                      LS_NUMERIC, DECR, TYPE2, 0},
+    { "maxmem", "Maximum memory (Mbytes)",                    LS_NUMERIC, DECR, TYPE2, 0},
+    { "maxswp", "Maximum swap space (Mbytes)",                LS_NUMERIC, DECR, TYPE2, 0},
+    { "maxtmp", "Maximum /tmp space (Mbytes)",                LS_NUMERIC, DECR, TYPE2, 0},
+    { "cpuf",   "CPU factor",                                 LS_NUMERIC, DECR, TYPE2, 0},
+    { "type",   "Host type",                                  LS_STRING,  NA,   TYPE2, 0},
+    { "model",  "Host model",                                 LS_STRING,  NA,   TYPE2, 0},
+    { "status", "Host status",                                LS_STRING,  NA,   TYPE2, 0},
+    { "rexpri", "Remote execution priority",                  LS_NUMERIC, NA,   TYPE2, 0},
+    { "server", "LSF server host",                            LS_BOOLEAN, NA,   TYPE2, 0},
+    { "hname",  "Host name",                                  LS_STRING,  NA,   TYPE2, 0},
+    {NULL,      NULL,                                         LS_NUMERIC, INCR, TYPE1, 0}
 };
 
 struct HostsArray
@@ -174,8 +174,6 @@ int convertNegNotation_ (char **, struct HostsArray *);
 int resolveBaseNegHosts (char *, char **, struct HostsArray *);
 
 void freeSA_ (char **list, unsigned int num);
-
-void doSkipSection(FILE *fp, size_t *lineNum, char *lsfile, char *sectionName);
 
 int putValue (struct keymap *keyList, char *key, char *value);
 int isInlist (char **adminNames, char *userName, unsigned int actAds);

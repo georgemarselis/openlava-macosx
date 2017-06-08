@@ -21,8 +21,9 @@
 #include <pwd.h>
 #include <strings.h>
 
-#include "lib/lproto.h"
 #include "lib/conf.h"
+#include "lib/confmisc.h"
+#include "lib/lproto.h"
 
 // #define NL_SETN 42
 
@@ -89,6 +90,8 @@ ls_readshared ( const char *filename)
 	char typeok    = 'a';
 	size_t lineNum = 0;
 
+	const char READONLY[] = "r";
+
 	lserrno = LSE_NO_ERR;  // lserror is global
 	if( filename == NULL) {
 		/* catgets 5050 */
@@ -130,7 +133,7 @@ ls_readshared ( const char *filename)
 		lserrno = LSE_MALLOC;
 		return NULL;
 	}
-	fp = fopen ( filename, "r");
+	fp = fopen ( filename, READONLY );
 	if (fp == NULL) {
 		/* catgets 5052 */
 		ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5052, "%s: Can't open configuration file <%s>.")) , __func__, filename);
