@@ -852,12 +852,12 @@ freeNode (struct confNode *node)
 	return;
 }
 
-char *
-getNextLine_conf (struct lsConf *conf, int confFormat)
-{
-	size_t *dummy = 0;
-	return getNextLineC_conf (conf, dummy, confFormat);
-}
+// char *
+// getNextLine_conf (struct lsConf *conf, int confFormat)
+// {
+// 	size_t *dummy = 0;
+// 	return getNextLineC_conf (conf, dummy, confFormat);
+// }
 
 char *
 getNextLineC_conf (struct lsConf *conf, size_t *LineCount, int confFormat)

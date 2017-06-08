@@ -18,16 +18,14 @@
 
 #pragma once
 
-#define NL_SETN   23
+// #define NL_SETN   23
 
-static char *readNextLine (struct lsConf *conf, size_t *lineNum);
+char *readNextLine (struct lsConf *conf, size_t *lineNum);
 char *getNextLineC_conf (struct lsConf *conf, size_t *LineCount, int confFormat);
-char *getNextLine_conf (struct lsConf *conf, int confFormat);
-char *getNextLine_conf (struct lsConf *conf, int confFormat);
 void ls_freeconf (struct lsConf *conf);
-static char linkNode (struct confNode *prev, struct confNode *node);
-static char checkCond (struct lsConf *conf, char *cond);
-static char addCond( struct lsConf *conf, char *cond );
+char linkNode (struct confNode *prev, struct confNode *node);
+char checkCond (struct lsConf *conf, char *cond);
+char addCond( struct lsConf *conf, char *cond );
 void freeStack (struct pStack *stack);
 struct confNode *popStack( struct pStack *stack );
 int pushStack (struct pStack *stack, struct confNode *node);

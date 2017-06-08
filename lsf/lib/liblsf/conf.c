@@ -169,7 +169,7 @@ ls_readshared ( const char *filename)
 		if (!word)
 			{
 			/* catgets 5057 */
-			char unknown_section[] = "unknown";
+			const char unknown_section[] = "unknown";
 			ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5057, "%s: %s(%d): Section name expected after Begin; ignoring section")), __func__, filename, lineNum);
 			doSkipSection (fp, &lineNum, filename, unknown_section);
 			continue;

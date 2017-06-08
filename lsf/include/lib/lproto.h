@@ -263,8 +263,6 @@ int writetaskfile_ (char *, hTab *, hTab *, hTab *, hTab *);
 
 int expSyntax_ (char *);
 
-char *getNextLineC_ (FILE *fp, size_t *lineNum, int confFormat);
-char *getNextLine_ (FILE *, int);
 char *getNextWord_ (char **);
 char *getNextWord1_ (char **line);
 char *getNextWordSet (char **, const char *);
@@ -278,9 +276,7 @@ int pushStack (struct pStack *, struct confNode *);
 struct confNode *popStack (struct pStack *);
 void freeStack (struct pStack *);
 
-char *getNextLineD_ (FILE *fp, size_t *lineNum, int truefalse);
-char *getNextLineC_conf (struct lsConf *conf, size_t *lineNum, int confFormat);
-char *getNextLine_conf (struct lsConf *, int);
+
 char *nextline_ (FILE *);
 void subNewLine_ (char *);
 
