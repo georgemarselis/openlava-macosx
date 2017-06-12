@@ -424,71 +424,8 @@ return 0;
 
 }
 
-int
-putInLists (char *word, struct admins *admins, unsigned int *numAds, const char *forWhat)
-{
-	struct passwd *pw = NULL;
-	char **tempNames  = NULL;
-	gid_t *tempGids   = NULL;
-	uid_t *tempIds    = NULL;
-	// int i = 0;
-
-	if( !( pw = getpwnam( word ) ) ) {
-		ls_syslog (LOG_ERR, "%s: <%s> is not a valid user name; ignored", __func__, word);
-		return 0;
-	}
-
-	if( isInlist( admins->adminNames, pw->pw_name, admins->nAdmins ) )
-	{
-		/* catgets 5411  */
-		ls_syslog (LOG_WARNING, _i18n_msg_get (ls_catd, NL_SETN, 5411, "%s: Duplicate user name <%s> %s; ignored"), __func__, word, forWhat);
-		return 0;
-	}
-
-	admins->adminIds[admins->nAdmins] = pw->pw_uid;
-	admins->adminGIds[admins->nAdmins] = pw->pw_gid;
-	admins->adminNames[admins->nAdmins] = putstr_ (pw->pw_name);
-	admins->nAdmins += 1;
-
-	if (logclass & LC_TRACE) {
-		ls_syslog (LOG_DEBUG, "putInLists: uid %d gid %d name <%s>", pw->pw_uid, pw->pw_gid, pw->pw_name);
-	}
-
-  	if (admins->nAdmins >= *numAds)
-	{
-		*numAds   *= 2;
-		tempIds   = realloc(admins->adminIds,   *numAds * sizeof( uid_t ) );
-		tempGids  = realloc(admins->adminGIds,  *numAds * sizeof( gid_t ) );
-		tempNames = realloc(admins->adminNames, *numAds * sizeof( char * ) );
-
-		if (tempIds == NULL || tempGids == NULL || tempNames == NULL)
-  		{
-			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "realloc");
-			FREEUP (tempIds);
-			FREEUP (tempGids);
-			FREEUP (tempNames);
-
-			FREEUP (admins->adminIds);
-			FREEUP (admins->adminGIds);
-			for ( unsigned int i = 0; i < admins->nAdmins; i++) {
-				FREEUP (admins->adminNames[i]);
-			}
-
-			FREEUP (admins->adminNames);
-			admins->nAdmins = 0;
-			lserrno = LSE_MALLOC;
-			return -1;
-  		}
-		else
-		{
-			admins->adminIds = tempIds;
-			admins->adminGIds = tempGids;
-			admins->adminNames = tempNames;
-  		}
-	}
-
-	return 0;
-}
+// int putInLists (char *word, struct admins *admins, unsigned int *numAds, const char *forWhat)
+// 			used to live here. Moved over to lib/liblsf/conf/putInLists.c
 
 int
 isInlist (char **adminNames, const char *userName, unsigned int actAds)

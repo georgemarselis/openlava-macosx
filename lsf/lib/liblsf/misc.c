@@ -132,7 +132,7 @@ atoi64_ (char *word)
 }
 
 unsigned int
-isint_ (char *word)
+isint_ ( const char *word)
 {
 	char **eptr;
 	long number;

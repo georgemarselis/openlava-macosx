@@ -28,14 +28,13 @@
 
 #include "checkpoint/checkpoint.h"
 
-extern char *putstr_ (const char *);
-extern int initenv_ (struct config_param *, char *);
 
 static FILE *m_pLogFile = NULL;
 static char *m_pMessageHeader = NULL;
 static char logMesgBuf[MAXLINELEN];
 
-#define LSF_SERVERDIR    0
+// #define LSF_SERVERDIR    0
+const unsigned int LSF_SERVERDIR = 0
 
 char *getEchkpntMethodDir (char *pChkpnt_Cmd, const char *pMethodDir, const char *pProgramName, const char *pMethodName)
 {
@@ -45,7 +44,8 @@ char *getEchkpntMethodDir (char *pChkpnt_Cmd, const char *pMethodDir, const char
     char *pChkpntBuf = NULL;
 
 
-    struct config_param aParamList[] = {
+    struct config_param aParamList[] = { // FIXME FIXME FIXME FIXME FIXME No. Look at lsf/lib/liblsf/misc.c on how do define something liek this. 
+                                         // also, get rid of struct config_param
         {"LSF_SERVERDIR", NULL},
         {NULL, NULL}
     };

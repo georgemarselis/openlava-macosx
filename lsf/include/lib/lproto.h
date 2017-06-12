@@ -218,9 +218,9 @@ int do_rstty_ (int, int, int);
 
 char isanumber_ (char *);
 char islongint_ (char *);
-unsigned int isint_ (char *);
+// unsigned int isint_ (char *);
 int isdigitstr_ (char *);
-char *putstr_ (const char *);
+// char *putstr_ (const char *);
 int ls_strcat (char *, int, char *);
 char *mygetwd_ (char *);
 char *chDisplay_ (char *);
@@ -285,7 +285,7 @@ void subNewLine_ (char *);
 // char *getNextValue (char **line);
 // int putValue (struct keymap *keyList, char *key, char *value);
 // char *getBeginLine (FILE *fp, size_t *lineNum);
-int putInLists (char *word, struct admins *admins, unsigned int *numAds, char *forWhat);
+// int putInLists (char *word, struct admins *admins, unsigned int *numAds, char *forWhat);
 // int isInlist (char **adminNames, char *userName, unsigned int actAds);
 
 // void doSkipSection_conf (struct lsConf *conf, size_t *lineNum, char *lsfile, char *sectionName);
@@ -326,7 +326,7 @@ int ls_setlogmask (int maskpri);
 
 // void initkeylist (struct keymap *keyList, int, int, struct lsInfo *);
 // void freekeyval (struct keymap *keyList);
-char *parsewindow (char *val, char *fname, size_t *lineNum, char *host);
+// char *parsewindow (char *val, char *fname, size_t *lineNum, char *host);
 
 unsigned int expandList_ (char ***tolist, unsigned int mask, char **keys);
 unsigned int expandList1_ (char ***tolist, unsigned int num, unsigned int *bitmMaps, char **keys);

@@ -27,7 +27,6 @@
 #include "echkpnt.lib.h"
 #include "echkpnt.env.h"
 
-extern char *putstr_ (const char *);
 
 static int fillTable_ ();
 static int addNewVarToFile_ (const char *, const char *);

@@ -19,14 +19,14 @@
 #include "libint/intlibout.h"
 #include "lib/lproto.h"
 
-#define NL_SETN      22
+// #define NL_SETN      22
 
 // FIXME enter variable names
-static void prtOneInstance (char *, struct lsSharedResourceInstance *);
-static int makeShare (char *, char ***, char ***, char ***, int (*)(struct resItem *));
-static int isStaticSharedResource (struct resItem *);
-static int isDynamicSharedResource (struct resItem *);
-static void prtTableHeader ();
+void prtOneInstance (char *, struct lsSharedResourceInstance *);
+int makeShare (char *, char ***, char ***, char ***, int (*)(struct resItem *));
+int isStaticSharedResource (struct resItem *);
+int isDynamicSharedResource (struct resItem *);
+void prtTableHeader ();
 int getResourceNames (int argc, char **argv, int optind, char **resourceNames);
 
 
@@ -164,7 +164,7 @@ displayShareResource (int argc, char **argv, int index, int flag, int extflag)
 	return;
 }
 
-static void
+void
 prtTableHeader ()
 {
 	char *res = NULL;
@@ -187,7 +187,7 @@ prtTableHeader ()
 	return;
 }
 
-static void
+void
 prtOneInstance (char *name, struct lsSharedResourceInstance *instance)
 {
 	unsigned int currentPos = 0;
@@ -231,7 +231,7 @@ makeShareField (char *hostname, int flag, char ***nameTable, char ***valueTable,
 	}
 }
 
-static int
+int
 makeShare (char *hostname, char ***nameTable, char ***valueTable, char ***formatTable, int (*resourceSelect) (struct resItem *))
 {
 	static unsigned int first = TRUE;
@@ -356,7 +356,7 @@ makeShare (char *hostname, char ***nameTable, char ***valueTable, char ***format
 	return( nRes );
 }
 
-static int
+int
 isStaticSharedResource (struct resItem *resEnt)
 {
   return ((!(resEnt->flags & RESF_DYNAMIC)) &&
@@ -364,7 +364,7 @@ isStaticSharedResource (struct resItem *resEnt)
 	   (resEnt->valueType & LS_NUMERIC)));
 }
 
-static int
+int
 isDynamicSharedResource (struct resItem *resEnt)
 {
   return (resEnt->flags & RESF_DYNAMIC);

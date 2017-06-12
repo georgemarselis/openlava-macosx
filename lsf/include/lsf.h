@@ -100,16 +100,16 @@ const unsigned short OPENLAVA_VERSION = 20;
 // #define MAXTYPES_31             25
 // #define MAXMODELS_31            30
 enum LSF_CONSTANTS {
-	LSF_DEFAULT_SOCKS = 15,
-	MAXLINELEN    = 512,
-	MAXLSFNAMELEN = 128,
-	MAXSRES       = 32,
-	MAXRESDESLEN  = 256,
-	NBUILTINDEX   = 11,
-	MAXTYPES      = 128,
-	MAXMODELS     = 128,
-	MAXTYPES_31   = 25,
-	MAXMODELS_31  = 30
+    LSF_DEFAULT_SOCKS = 15,
+    MAXLINELEN    = 512,
+    MAXLSFNAMELEN = 128,
+    MAXSRES       = 32,
+    MAXRESDESLEN  = 256,
+    NBUILTINDEX   = 11,
+    MAXTYPES      = 128,
+    MAXMODELS     = 128,
+    MAXTYPES_31   = 25,
+    MAXMODELS_31  = 30
 };
 //#define MAXFILENAMELEN          4096
 const unsigned int MAXFILENAMELEN = 4096;   // FIXME FIXME FIXME FIXME value of MAXFILENAMELEN must be set by configure script
@@ -118,32 +118,32 @@ const unsigned int MAXFILENAMELEN = 4096;   // FIXME FIXME FIXME FIXME value of 
 // static const unsigned int FIRST_RES_SOCK = 20;
 
 #ifdef HAVE_UNION_WAIT
-	#define LS_WAIT_T      union wait
-	#define LS_STATUS(s)   ((s).w_status)
+    #define LS_WAIT_T      union wait
+    #define LS_STATUS(s)   ((s).w_status)
 #else
-	#define LS_WAIT_INT
-	#define LS_WAIT_T      int
-	#define LS_STATUS(s)   (s)
+    #define LS_WAIT_INT
+    #define LS_WAIT_T      int
+    #define LS_STATUS(s)   (s)
 #endif
 
 typedef enum {
-		R15S,
-		R1M,
-		R15M,
-		UT,
-		PG,
-		IO,
-		LS,
-		IT,
-		TMP,
-		SWP,
-		MEM,
-		USR1,
-		USR2
+        R15S,
+        R1M,
+        R15M,
+        UT,
+        PG,
+        IO,
+        LS,
+        IT,
+        TMP,
+        SWP,
+        MEM,
+        USR1,
+        USR2
 } lsindx_t;
 
 #ifndef MAXFLOAT
-	#define MAXFLOAT        3.40282347e+38F // FIXME FIXME FIXME FIXME turn into constant
+    #define MAXFLOAT        3.40282347e+38F // FIXME FIXME FIXME FIXME turn into constant
 #endif
 
 #define INFINIT_LOAD    (float) (0x7fffffff) // FIXME FIXME FIXME FIXME turn into constant
@@ -172,19 +172,19 @@ const short DEFAULT_RLIMIT = -1;
 // #define LSF_RLIM_NLIMITS    11
 
 enum LSF_RLIMIT {
-	LSF_RLIMIT_CPU = 0,
-	LSF_RLIMIT_FSIZE,
-	LSF_RLIMIT_DATA,
-	LSF_RLIMIT_STACK,
-	LSF_RLIMIT_CORE,
-	LSF_RLIMIT_RSS,
-	LSF_RLIMIT_NOFILE,
-	LSF_RLIMIT_OPEN_MAX,
-	LSF_RLIMIT_VMEM,
-	LSF_RLIMIT_SWAP = LSF_RLIMIT_VMEM,
-	LSF_RLIMIT_RUN,
-	LSF_RLIMIT_PROCESS,
-	LSF_RLIM_NLIMITS
+    LSF_RLIMIT_CPU = 0,
+    LSF_RLIMIT_FSIZE,
+    LSF_RLIMIT_DATA,
+    LSF_RLIMIT_STACK,
+    LSF_RLIMIT_CORE,
+    LSF_RLIMIT_RSS,
+    LSF_RLIMIT_NOFILE,
+    LSF_RLIMIT_OPEN_MAX,
+    LSF_RLIMIT_VMEM,
+    LSF_RLIMIT_SWAP = LSF_RLIMIT_VMEM,
+    LSF_RLIMIT_RUN,
+    LSF_RLIMIT_PROCESS,
+    LSF_RLIM_NLIMITS
 };
 
 #define LSF_NULL_MODE    0
@@ -219,40 +219,40 @@ enum LSF_RLIMIT {
 // #define STATUS_REX_MLS_DOMIN  106
 
 enum STATUS_REX {
-	STATUS_REX_MLS_DOMIN = 106,
-	STATUS_REX_MLS_RHOST = 107,
-	STATUS_REX_MLS_CLEAR = 108,
-	STATUS_REX_MLS_INVAL = 109,
-	STATUS_REX_EXEC      = 110,
-	STATUS_REX_VCL_SPAWN = 111,
-	STATUS_REX_VCL_INIT  = 112,
-	STATUS_REX_NOSYM     = 113,
-	STATUS_REX_NOVCL     = 114,
-	STATUS_REX_UNKNOWN   = 115,
-	STATUS_REX_TOK       = 116,
-	STATUS_REX_FORK      = 117,
-	STATUS_REX_SP        = 118,
-	STATUS_REX_PTY       = 119,
-	STATUS_REX_CWD       = 120,
-	STATUS_REX_FATAL     = 121,
-	STATUS_REX_NOMEM     = 122,
-	STATUS_EXCESS        = 123,
-	STATUS_IOERR         = 124,
-	STATUS_TIMEOUT       = 125
+    STATUS_REX_MLS_DOMIN = 106,
+    STATUS_REX_MLS_RHOST = 107,
+    STATUS_REX_MLS_CLEAR = 108,
+    STATUS_REX_MLS_INVAL = 109,
+    STATUS_REX_EXEC      = 110,
+    STATUS_REX_VCL_SPAWN = 111,
+    STATUS_REX_VCL_INIT  = 112,
+    STATUS_REX_NOSYM     = 113,
+    STATUS_REX_NOVCL     = 114,
+    STATUS_REX_UNKNOWN   = 115,
+    STATUS_REX_TOK       = 116,
+    STATUS_REX_FORK      = 117,
+    STATUS_REX_SP        = 118,
+    STATUS_REX_PTY       = 119,
+    STATUS_REX_CWD       = 120,
+    STATUS_REX_FATAL     = 121,
+    STATUS_REX_NOMEM     = 122,
+    STATUS_EXCESS        = 123,
+    STATUS_IOERR         = 124,
+    STATUS_TIMEOUT       = 125
 };
 
 #define REX_FATAL_ERROR(s)     (((s) == STATUS_REX_NOVCL)               \
-								|| ((s) == STATUS_REX_NOSYM)            \
-								|| ((s) == STATUS_REX_NOMEM)            \
-								|| ((s) == STATUS_REX_FATAL)            \
-								|| ((s) == STATUS_REX_CWD)              \
-								|| ((s) == STATUS_REX_PTY)              \
-								|| ((s) == STATUS_REX_VCL_INIT)         \
-								|| ((s) == STATUS_REX_VCL_SPAWN)        \
-								|| ((s) == STATUS_REX_MLS_INVAL)        \
-								|| ((s) == STATUS_REX_MLS_CLEAR)        \
-								|| ((s) == STATUS_REX_MLS_RHOST)        \
-								|| ((s) == STATUS_REX_MLS_DOMIN))
+                                || ((s) == STATUS_REX_NOSYM)            \
+                                || ((s) == STATUS_REX_NOMEM)            \
+                                || ((s) == STATUS_REX_FATAL)            \
+                                || ((s) == STATUS_REX_CWD)              \
+                                || ((s) == STATUS_REX_PTY)              \
+                                || ((s) == STATUS_REX_VCL_INIT)         \
+                                || ((s) == STATUS_REX_VCL_SPAWN)        \
+                                || ((s) == STATUS_REX_MLS_INVAL)        \
+                                || ((s) == STATUS_REX_MLS_CLEAR)        \
+                                || ((s) == STATUS_REX_MLS_RHOST)        \
+                                || ((s) == STATUS_REX_MLS_DOMIN))
 
 #define   REXF_USEPTY   0x00000001
 #define   REXF_CLNTDIR  0x00000002
@@ -300,15 +300,15 @@ enum STATUS_REX {
 
 struct connectEnt
 {
-	char *hostname;
-	int csock[2];
+    char *hostname;
+    int csock[2];
 };
 
 
 enum LSFERRORS { // FIXME FIXME FIXME FIXME FIXME global enum with all the lserrno values in it
-	ENOERROR,
-	ENEGATIVERESULT,
-	KEYNULL
+    ENOERROR,
+    ENEGATIVERESULT,
+    KEYNULL
 };
 
 #define INTEGER_BITS       32
@@ -348,21 +348,21 @@ enum LSFERRORS { // FIXME FIXME FIXME FIXME FIXME global enum with all the lserr
 
 struct placeInfo
 {
-	int numtask;
-	char padding[4];
-	char *hostName;
+    int numtask;
+    char padding[4];
+    char *hostName;
 };
 
 struct hostLoad
 {
-		char *hostName;
-		float *status;
-		float *loadIndex;
+        char *hostName;
+        float *status;
+        float *loadIndex;
 };
 
 enum valueType
 {
-	LS_BOOLEAN, LS_NUMERIC, LS_STRING, LS_EXTERNAL
+    LS_BOOLEAN, LS_NUMERIC, LS_STRING, LS_EXTERNAL
 };
 
 #define BOOLEAN  LS_BOOLEAN
@@ -372,7 +372,7 @@ enum valueType
 
 enum orderType
 {
-	INCR, DECR, NA
+    INCR, DECR, NA
 };
 
 #define RESF_BUILTIN     0x01
@@ -385,29 +385,29 @@ enum orderType
 
 struct resItem
 {
-	enum valueType valueType;
-	enum orderType orderType;
-	int flags;
-	int interval;
-	char name[MAXLSFNAMELEN];
-	char des[MAXRESDESLEN];
+    enum valueType valueType;
+    enum orderType orderType;
+    int flags;
+    int interval;
+    char name[MAXLSFNAMELEN];
+    char des[MAXRESDESLEN];
 
 };
 
 struct lsInfo
 {
-	unsigned int nTypes;
-	unsigned int nModels;
-	unsigned int modelRefs[MAXMODELS];         // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
-	unsigned int nRes;
-	unsigned int numIndx;
-	unsigned int numUsrIndx;
-	char hostTypes[MAXTYPES][MAXLSFNAMELEN];   // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
-	char hostModels[MAXMODELS][MAXLSFNAMELEN]; // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
-	char hostArchs[MAXMODELS][MAXLSFNAMELEN];  // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
-	char paddin1[4];
-	double cpuFactor[MAXMODELS];               // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
-	struct resItem *resTable;
+    unsigned int nTypes;
+    unsigned int nModels;
+    unsigned int modelRefs[MAXMODELS];         // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
+    unsigned int nRes;
+    unsigned int numIndx;
+    unsigned int numUsrIndx;
+    char hostTypes[MAXTYPES][MAXLSFNAMELEN];   // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
+    char hostModels[MAXMODELS][MAXLSFNAMELEN]; // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
+    char hostArchs[MAXMODELS][MAXLSFNAMELEN];  // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
+    char paddin1[4];
+    double cpuFactor[MAXMODELS];               // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
+    struct resItem *resTable;
 };
 
 #define CLUST_STAT_OK             0x01
@@ -415,49 +415,49 @@ struct lsInfo
 
 struct clusterInfo
 {
-	uid_t *adminIds;
-	uid_t managerId;
-	unsigned int status;
-	unsigned int nTypes;
-	unsigned int nModels;
-	unsigned int numServers;
-	unsigned int numClients;
-	unsigned int nRes;
-	unsigned int nAdmins;
-	char **resources;
-	char **hostTypes;
-	char **hostModels;
-	char **admins;
-	char *clusterName;
-	char *masterName;
-	char *managerName;
+    uid_t *adminIds;
+    uid_t managerId;
+    unsigned int status;
+    unsigned int nTypes;
+    unsigned int nModels;
+    unsigned int numServers;
+    unsigned int numClients;
+    unsigned int nRes;
+    unsigned int nAdmins;
+    char **resources;
+    char **hostTypes;
+    char **hostModels;
+    char **admins;
+    char *clusterName;
+    char *masterName;
+    char *managerName;
 
 };
 
 struct hostInfo
 {
-	int rexPriority;
-	unsigned int maxCpus;
-	unsigned int maxMem;
-	unsigned int maxSwap;
-	unsigned int maxTmp;
-	unsigned int nDisks;
-	unsigned int nRes;
-	char isServer;
-	char padding1[3];
-	char *hostModel;
-	char *windows;
-	char *hostType;
-	float cpuFactor;
-	char padding2[4];
-	float *busyThreshold;
-	unsigned long numIndx;
-	char **resources;
-	// char hostName[MAXHOSTNAMELEN];
-	char *hostName;
+    int rexPriority;
+    unsigned int maxCpus;
+    unsigned int maxMem;
+    unsigned int maxSwap;
+    unsigned int maxTmp;
+    unsigned int nDisks;
+    unsigned int nRes;
+    char isServer;
+    char padding1[3];
+    char *hostModel;
+    char *windows;
+    char *hostType;
+    float cpuFactor;
+    char padding2[4];
+    float *busyThreshold;
+    unsigned long numIndx;
+    char **resources;
+    // char hostName[MAXHOSTNAMELEN];
+    char *hostName;
 };
 
-	
+    
 
 /*
  * This data structure is built when reading the lsf.cluster file and
@@ -465,67 +465,68 @@ struct hostInfo
  */
 struct hostEntry
 {
-	int numIndx;
-	int rcv;
-	int nDisks;
-	int nRes;
-	int rexPriority;
-	char hostName[MAXHOSTNAMELEN];
-	char hostModel[MAXLSFNAMELEN];
-	char hostType[MAXLSFNAMELEN];
-	float cpuFactor;
-	float *busyThreshold;
-	char *window;
-	char **resList;
-	
+    int rexPriority;
+    int rcv;
+    unsigned int numIndx;
+    unsigned int nDisks;
+    unsigned int nRes;
+    char padding1[4];
+    char *hostName; // [MAXHOSTNAMELEN];
+    char *hostModel; // [MAXLSFNAMELEN];
+    char *hostType;  // [MAXLSFNAMELEN];
+    char *window;
+    char **resList;
+    float cpuFactor;
+    char padding2[4];
+    float *busyThreshold;   
 };
 
 struct config_param
 {
-	const char *paramName;
-	char *paramValue;
+    const char *paramName;
+    char *paramValue;
 };
 
 // FIXME FIXME FIXME FIXME this struct needs to be profiled for issues
 //      with time
 struct lsfRusage
 {
-	struct timeval ru_utime; /* user CPU time used */
-	struct timeval ru_stime; /* system CPU time used */
-	// time_t ru_utime;
-	// suseconds_t ru_stime;
-	char   padding[8];
-	long   ru_maxrss;
-	time_t ru_ixrss;
-	double ru_ismrss;
-	long   ru_idrss;
-	long   ru_isrss;
-	long   ru_minflt;
-	long   ru_majflt;
-	long   ru_nswap;
-	long   ru_inblock;
-	long   ru_oublock;
-	double ru_ioch;
-	long   ru_msgsnd;
-	long   ru_msgrcv;
-	long   ru_nsignals;
-	long   ru_nvcsw;
-	long   ru_nivcsw;
-	double ru_exutime;
+    struct timeval ru_utime; /* user CPU time used */
+    struct timeval ru_stime; /* system CPU time used */
+    // time_t ru_utime;
+    // suseconds_t ru_stime;
+    char   padding[8];
+    long   ru_maxrss;
+    time_t ru_ixrss;
+    double ru_ismrss;
+    long   ru_idrss;
+    long   ru_isrss;
+    long   ru_minflt;
+    long   ru_majflt;
+    long   ru_nswap;
+    long   ru_inblock;
+    long   ru_oublock;
+    double ru_ioch;
+    long   ru_msgsnd;
+    long   ru_msgrcv;
+    long   ru_nsignals;
+    long   ru_nvcsw;
+    long   ru_nivcsw;
+    double ru_exutime;
 };
 
 struct lsfAcctRec
 {
-	int pid;
-	int exitStatus;
-	time_t dispTime;
-	time_t termTime;
-	char *username;
-	char *fromHost;
-	char *execHost;
-	char *cwd;
-	char *cmdln;
-	struct lsfRusage lsfRu;
+    int pid;
+    int exitStatus;
+    time_t dispTime;
+    time_t termTime;
+    char *username;
+    char *fromHost;
+    char *execHost;
+    char *cwd;
+    char *cmdln;
+    struct lsfRusage lsfRu;
 };
 
 
@@ -541,131 +542,132 @@ struct lsfAcctRec
 
 enum nioType
 {
-	NIO_STATUS,
-	NIO_STDOUT,
-	NIO_EOF,
-	NIO_IOERR,
-	NIO_REQUEUE,
-	NIO_STDERR
+    NIO_STATUS,
+    NIO_STDOUT,
+    NIO_EOF,
+    NIO_IOERR,
+    NIO_REQUEUE,
+    NIO_STDERR
 };
 
 struct nioEvent
 {
-	int tid;
-	enum nioType type;
-	int status;
+    int tid;
+    enum nioType type;
+    int status;
 };
 
 struct nioInfo
 {
-	int num;
-	char padding[4];
-	struct nioEvent *ioTask;
+    int num;
+    char padding[4];
+    struct nioEvent *ioTask;
 };
 
 struct confNode
 {
-	char tag;
-	char padding[7];
-	char *cond;
-	char **lines;
-	unsigned long beginLineNum;
-	unsigned long numLines;
-	struct confNode *leftPtr;
-	struct confNode *rightPtr;
-	struct confNode *fwPtr;
+    char tag;
+    char padding[7];
+    char *cond;
+    char **lines;
+    unsigned long beginLineNum;
+    unsigned long numLines;
+    struct confNode *leftPtr;
+    struct confNode *rightPtr;
+    struct confNode *fwPtr;
 };
 
 struct pStack
 {
-	ssize_t top;
-	size_t size;
-	struct confNode **nodes;
+    ssize_t top;
+    size_t size;
+    struct confNode **nodes;
 };
 
 struct confHandle
 {
-	char *fname;
-	size_t lineCount;
-	struct confNode *curNode;
-	struct confNode *rootNode;
-	struct pStack *ptrStack;
+    char *fname;
+    size_t lineCount;
+    struct confNode *curNode;
+    struct confNode *rootNode;
+    struct pStack *ptrStack;
 };
 
 struct lsConf
 {
-	size_t numConds;
-	int *values;
-	char **conds;
-	struct confHandle *confhandle;
+    size_t numConds;
+    int *values;
+    char **conds;
+    struct confHandle *confhandle;
  
 };
 
 struct sharedConf
 {
-	struct lsInfo *lsinfo;
-	char *clusterName;
-	char *servers;
+    struct lsInfo *lsinfo;
+    char *clusterName;
+    char *servers;
 };
 
 typedef struct lsSharedResourceInstance
 {
-	unsigned int nHosts;
-	char padding[4];
-	char *value;
-	char **hostList;
+    unsigned int nHosts;
+    char padding[4];
+    char *value;
+    char **hostList;
 
 } LS_SHARED_RESOURCE_INST_T;
 
 typedef struct lsSharedResourceInfo
 {
-	unsigned int nInstances;
-	char padding[4];
-	char *resourceName;
-	LS_SHARED_RESOURCE_INST_T *instances;
+    unsigned int nInstances;
+    char padding[4];
+    char *resourceName;
+    LS_SHARED_RESOURCE_INST_T *instances;
 } LS_SHARED_RESOURCE_INFO_T;
 
 struct clusterConf
 {
-	int numShareRes;
-	unsigned int numHosts;
-	LS_SHARED_RESOURCE_INFO_T *shareRes;
-	struct hostInfo *hosts;
-	struct clusterInfo *clinfo;
+    int numShareRes;
+    unsigned int numHosts;
+    LS_SHARED_RESOURCE_INFO_T *shareRes;
+    struct hostInfo *hosts;
+    struct clusterInfo *clinfo;
 };
 
 /*
  * Maximum number of processes reported by PIM and read by the PIM library.
  */
-#define MAX_PROC_ENT (2 * 1024)
+// #define MAX_PROC_ENT (2 * 1024)           // FIXME FIXME FIXME FIXME FIXME set by configuration
+const unsigned int MAX_PROC_ENT = 2 * 1024;  // FIXME FIXME FIXME FIXME FIXME set by configuration
 
 struct pidInfo
 {
-	int pid;
-	int ppid;
-	int pgid;
-	int jobid;
+    pid_t pid;
+    pid_t ppid;
+    pid_t pgid;
+    unsigned int jobid;
 };
 
 struct jRusage
 {
-	int mem;
-	int swap;
-	int utime;
-	int stime;
-	int npids;
-	int npgids;
-	int *pgid;
-	struct pidInfo *pidInfo;
+    size_t mem;
+    size_t swap;
+    time_t utime;
+    time_t stime;
+    unsigned int npids;
+    unsigned int npgids;
+    gid_t *pgid; // FIXME FIXME FIXME FIXME maybe wrong
+    struct pidInfo *pidInfo;
 };
 
 typedef enum
 {
-	EV_LIM_START,
-	EV_LIM_SHUTDOWN,
-	EV_ADD_HOST,
-	EV_REMOVE_HOST,
-	EV_EVENT_LAST
+    EV_LIM_START,
+    EV_LIM_SHUTDOWN,
+    EV_ADD_HOST,
+    EV_REMOVE_HOST,
+    EV_EVENT_LAST
 } event_t;
 
 /*
@@ -673,11 +675,11 @@ typedef enum
  */
 struct lsEventRec
 {
-	event_t event;
-	uint16_t version; // FIXME um, why 16-bit int? 
-	char padding[2];
-	time_t etime;
-	void *record;
+    event_t event;
+    uint16_t version; // FIXME um, why 16-bit int? 
+    char padding[2];
+    time_t etime;
+    void *record;
 };
 
 /*
@@ -688,208 +690,247 @@ struct lsEventRec
  */
 struct hostEntryLog
 {
-	int   rcv;
-	int   nDisks;
-	int   numIndx;
-	int   nRes;
-	int   rexPriority;
-	char  hostName[MAXHOSTNAMELEN];
-	char  hostModel[MAXLSFNAMELEN];
-	char  hostType[MAXLSFNAMELEN];
-	float cpuFactor;
-	float *busyThreshold;
-	char  **resList;
-	char  *window;
+    int   rcv;
+    unsigned int   nDisks;
+    unsigned int   numIndx;
+    unsigned int   nRes;
+    int   rexPriority;
+    char padding1[4];
+    char  *hostName;  // [MAXHOSTNAMELEN];
+    char  *hostModel; // [MAXLSFNAMELEN];
+    char  *hostType;  // [MAXLSFNAMELEN];
+    float cpuFactor;
+    char padding2[4];
+    float *busyThreshold;
+    char  **resList;
+    char  *window;
 };
 
 /*
  * openlava error numbers
  */
 enum OPENLAVA_ERROR_NUMBERS {
-	LSE_NO_ERR         = 0,
-	LSE_BAD_XDR,
-	LSE_MSG_SYS,
-	LSE_BAD_ARGS,
-	LSE_MASTR_UNKNW,
-	LSE_LIM_DOWN,
-	LSE_PROTOC_LIM,
-	LSE_SOCK_SYS,
-	LSE_ACCEPT_SYS,
-	LSE_BAD_TASKF,
-	LSE_NO_HOST,
-	LSE_NO_ELHOST,
-	LSE_TIME_OUT,
-	LSE_NIOS_DOWN,
-	LSE_LIM_DENIED,
-	LSE_LIM_IGNORE,
-	LSE_LIM_BADHOST,
-	LSE_LIM_ALOCKED,
-	LSE_LIM_NLOCKED,
-	LSE_LIM_BADMOD,
-	LSE_SIG_SYS,
-	LSE_BAD_EXP,
-	LSE_NORCHILD,
-	LSE_MALLOC,
-	LSE_LSFCONF,
-	LSE_BAD_ENV,
-	LSE_LIM_NREG,
-	LSE_RES_NREG,
-	LSE_RES_NOMORECONN,
-	LSE_BADUSER,
-	LSE_RES_ROOTSECURE,
-	LSE_RES_DENIED,
-	LSE_BAD_OPCODE,
-	LSE_PROTOC_RES,
-	LSE_RES_CALLBACK,
-	LSE_RES_NOMEM,
-	LSE_RES_FATAL,
-	LSE_RES_PTY,
-	LSE_RES_SOCK,
-	LSE_RES_FORK,
-	LSE_NOMORE_SOCK,
-	LSE_WDIR,
-	LSE_LOSTCON,
-	LSE_RES_INVCHILD,
-	LSE_RES_KILL,
-	LSE_PTYMODE,
-	LSE_BAD_HOST,
-	LSE_PROTOC_NIOS,
-	LSE_WAIT_SYS,
-	LSE_SETPARAM,
-	LSE_RPIDLISTLEN,
-	LSE_BAD_CLUSTER,
-	LSE_RES_VERSION,
-	LSE_EXECV_SYS,
-	LSE_RES_DIR,
-	LSE_RES_DIRW,
-	LSE_BAD_SERVID,
-	LSE_NLSF_HOST,
-	LSE_UNKWN_RESNAME,
-	LSE_UNKWN_RESVALUE,
-	LSE_TASKEXIST,
-	LSE_BAD_TID,
-	LSE_TOOMANYTASK,
-	LSE_LIMIT_SYS,
-	LSE_BAD_NAMELIST,
-	LSE_LIM_NOMEM,
-	LSE_NIO_INIT,
-	LSE_CONF_SYNTAX,
-	LSE_FILE_SYS,
-	LSE_CONN_SYS,
-	LSE_SELECT_SYS,
-	LSE_EOF,
-	LSE_ACCT_FORMAT,
-	LSE_BAD_TIME,
-	LSE_FORK,
-	LSE_PIPE,
-	LSE_ESUB,
-	LSE_EAUTH,
-	LSE_NO_FILE,
-	LSE_NO_CHAN,
-	LSE_BAD_CHAN,
-	LSE_INTERNAL,
-	LSE_PROTOCOL,
-	LSE_MISC_SYS,
-	LSE_RES_RUSAGE,
-	LSE_NO_RESOURCE,
-	LSE_BAD_RESOURCE,
-	LSE_RES_PARENT,
-	LSE_I18N_SETLC,
-	LSE_I18N_CATOPEN,
-	LSE_I18N_NOMEM,
-	LSE_NO_MEM,
-	LSE_FILE_CLOSE,
-	LSE_MASTER_LIM_DOWN,
-	LSE_MLS_INVALID,
-	LSE_MLS_CLEARANCE,
-	LSE_MLS_RHOST,
-	LSE_MLS_DOMINATE,
-	LSE_HOST_EXIST,
-	LSE_NERR
+    LSE_NO_ERR         = 0,
+    LSE_BAD_XDR,
+    LSE_MSG_SYS,
+    LSE_BAD_ARGS,
+    LSE_MASTR_UNKNW,
+    LSE_LIM_DOWN,
+    LSE_PROTOC_LIM,
+    LSE_SOCK_SYS,
+    LSE_ACCEPT_SYS,
+    LSE_BAD_TASKF,
+    LSE_NO_HOST,
+    LSE_NO_ELHOST,
+    LSE_TIME_OUT,
+    LSE_NIOS_DOWN,
+    LSE_LIM_DENIED,
+    LSE_LIM_IGNORE,
+    LSE_LIM_BADHOST,
+    LSE_LIM_ALOCKED,
+    LSE_LIM_NLOCKED,
+    LSE_LIM_BADMOD,
+    LSE_SIG_SYS,
+    LSE_BAD_EXP,
+    LSE_NORCHILD,
+    LSE_MALLOC,
+    LSE_LSFCONF,
+    LSE_BAD_ENV,
+    LSE_LIM_NREG,
+    LSE_RES_NREG,
+    LSE_RES_NOMORECONN,
+    LSE_BADUSER,
+    LSE_RES_ROOTSECURE,
+    LSE_RES_DENIED,
+    LSE_BAD_OPCODE,
+    LSE_PROTOC_RES,
+    LSE_RES_CALLBACK,
+    LSE_RES_NOMEM,
+    LSE_RES_FATAL,
+    LSE_RES_PTY,
+    LSE_RES_SOCK,
+    LSE_RES_FORK,
+    LSE_NOMORE_SOCK,
+    LSE_WDIR,
+    LSE_LOSTCON,
+    LSE_RES_INVCHILD,
+    LSE_RES_KILL,
+    LSE_PTYMODE,
+    LSE_BAD_HOST,
+    LSE_PROTOC_NIOS,
+    LSE_WAIT_SYS,
+    LSE_SETPARAM,
+    LSE_RPIDLISTLEN,
+    LSE_BAD_CLUSTER,
+    LSE_RES_VERSION,
+    LSE_EXECV_SYS,
+    LSE_RES_DIR,
+    LSE_RES_DIRW,
+    LSE_BAD_SERVID,
+    LSE_NLSF_HOST,
+    LSE_UNKWN_RESNAME,
+    LSE_UNKWN_RESVALUE,
+    LSE_TASKEXIST,
+    LSE_BAD_TID,
+    LSE_TOOMANYTASK,
+    LSE_LIMIT_SYS,
+    LSE_BAD_NAMELIST,
+    LSE_LIM_NOMEM,
+    LSE_NIO_INIT,
+    LSE_CONF_SYNTAX,
+    LSE_FILE_SYS,
+    LSE_CONN_SYS,
+    LSE_SELECT_SYS,
+    LSE_EOF,
+    LSE_ACCT_FORMAT,
+    LSE_BAD_TIME,
+    LSE_FORK,
+    LSE_PIPE,
+    LSE_ESUB,
+    LSE_EAUTH,
+    LSE_NO_FILE,
+    LSE_NO_CHAN,
+    LSE_BAD_CHAN,
+    LSE_INTERNAL,
+    LSE_PROTOCOL,
+    LSE_MISC_SYS,
+    LSE_RES_RUSAGE,
+    LSE_NO_RESOURCE,
+    LSE_BAD_RESOURCE,
+    LSE_RES_PARENT,
+    LSE_I18N_SETLC,
+    LSE_I18N_CATOPEN,
+    LSE_I18N_NOMEM,
+    LSE_NO_MEM,
+    LSE_FILE_CLOSE,
+    LSE_MASTER_LIM_DOWN,
+    LSE_MLS_INVALID,
+    LSE_MLS_CLEARANCE,
+    LSE_MLS_RHOST,
+    LSE_MLS_DOMINATE,
+    LSE_HOST_EXIST,
+    LSE_NERR
 };
 
 #define LSE_ISBAD_RESREQ(s)     (((s) == LSE_BAD_EXP)                   \
-								 || ((s) == LSE_UNKWN_RESNAME)          \
-								 || ((s) == LSE_UNKWN_RESVALUE))
+                                 || ((s) == LSE_UNKWN_RESNAME)          \
+                                 || ((s) == LSE_UNKWN_RESVALUE))
 
 #define LSE_SYSCALL(s)          (((s) == LSE_SELECT_SYS)        \
-								 || ((s) == LSE_CONN_SYS)       \
-								 || ((s) == LSE_FILE_SYS)       \
-								 || ((s) == LSE_MSG_SYS)        \
-								 || ((s) == LSE_SOCK_SYS)       \
-								 || ((s) == LSE_ACCEPT_SYS)     \
-								 || ((s) == LSE_SIG_SYS)        \
-								 || ((s) == LSE_WAIT_SYS)       \
-								 || ((s) == LSE_EXECV_SYS)      \
-								 || ((s) == LSE_LIMIT_SYS)      \
-								 || ((s) == LSE_PIPE)           \
-								 || ((s) == LSE_ESUB)           \
-								 || ((s) == LSE_MISC_SYS))
-
+                                 || ((s) == LSE_CONN_SYS)       \
+                                 || ((s) == LSE_FILE_SYS)       \
+                                 || ((s) == LSE_MSG_SYS)        \
+                                 || ((s) == LSE_SOCK_SYS)       \
+                                 || ((s) == LSE_ACCEPT_SYS)     \
+                                 || ((s) == LSE_SIG_SYS)        \
+                                 || ((s) == LSE_WAIT_SYS)       \
+                                 || ((s) == LSE_EXECV_SYS)      \
+                                 || ((s) == LSE_LIMIT_SYS)      \
+                                 || ((s) == LSE_PIPE)           \
+                                 || ((s) == LSE_ESUB)           \
+                                 || ((s) == LSE_MISC_SYS))
+/*
 #define TIMEIT(level,func,name)                                         \
-	{ if (timinglevel > level) {                                        \
-			struct timeval before, after;                               \
-			struct timezone tz;                                         \
-			gettimeofday(&before, &tz);                                 \
-			func;                                                       \
-			gettimeofday(&after, &tz);                                  \
-			ls_syslog(LOG_INFO,"L%d %s %d ms",level,name,               \
-						(time_t)((after.tv_sec - before.tv_sec)*1000 +       \
-							(after.tv_usec-before.tv_usec)/1000));      \
-		} else                                                          \
-			func;                                                       \
-	}
+    { if (timinglevel > level) {                                        \
+            struct timeval before, after;                               \
+            struct timezone tz;                                         \
+            gettimeofday(&before, &tz);                                 \
+            func;                                                       \
+            gettimeofday(&after, &tz);                                  \
+            ls_syslog(LOG_INFO,"L%d %s %d ms",level,name,               \
+                        (time_t)((after.tv_sec - before.tv_sec)*1000 +       \
+                            (after.tv_usec-before.tv_usec)/1000));      \
+        } else                                                          \
+            func;                                                       \
+    }
 
+*/
 
+/*
 #define TIMEVAL(level,func,val)                                 \
-	{ if (timinglevel > level) {                                \
-			struct timeval before, after;                       \
-			struct timezone tz;                                 \
-			gettimeofday(&before, &tz);                         \
-			func;                                               \
-			gettimeofday(&after, &tz);                          \
-			val = (int)((after.tv_sec - before.tv_sec)*1000 +   \
-						(after.tv_usec-before.tv_usec)/1000);   \
-		} else {                                                \
-			func;                                               \
-			val = 0;                                            \
-		}                                                       \
-	}
+    { if (timinglevel > level) {                                \
+            struct timeval before, after;                       \
+            struct timezone tz;                                 \
+            gettimeofday(&before, &tz);                         \
+            func;                                               \
+            gettimeofday(&after, &tz);                          \
+            val = (int)((after.tv_sec - before.tv_sec)*1000 +   \
+                        (after.tv_usec-before.tv_usec)/1000);   \
+        } else {                                                \
+            func;                                               \
+            val = 0;                                            \
+        }                                                       \
+    }
 
-#define LC_SCHED    0x00000001
-#define LC_EXEC     0x00000002
-#define LC_TRACE    0x00000004
-#define LC_COMM     0x00000008
-#define LC_XDR      0x00000010
-#define LC_CHKPNT   0x00000020
-#define LC_FILE     0x00000080
-#define LC_AUTH     0x00000200
-#define LC_HANG     0x00000400
-#define LC_SIGNAL   0x00001000
-#define LC_PIM      0x00004000
-#define LC_SYS      0x00008000
-#define LC_JLIMIT   0x00010000
-#define LC_PEND     0x00080000
-#define LC_LOADINDX 0x00200000
-#define LC_JGRP     0x00400000
-#define LC_JARRAY   0x00800000
-#define LC_MPI      0x01000000
-#define LC_ELIM     0x02000000
-#define LC_M_LOG    0x04000000
-#define LC_PERFM    0x08000000
+*/
 
-#define LOG_DEBUG1  LOG_DEBUG + 1
-#define LOG_DEBUG2  LOG_DEBUG + 2
-#define LOG_DEBUG3  LOG_DEBUG + 3
+// #define LC_SCHED    0x00000001
+// #define LC_EXEC     0x00000002
+// #define LC_TRACE    0x00000004
+// #define LC_COMM     0x00000008
+// #define LC_XDR      0x00000010
+// #define LC_CHKPNT   0x00000020
+// #define LC_FILE     0x00000080
+// #define LC_AUTH     0x00000200
+// #define LC_HANG     0x00000400
+// #define LC_SIGNAL   0x00001000
+// #define LC_PIM      0x00004000
+// #define LC_SYS      0x00008000
+// #define LC_JLIMIT   0x00010000
+// #define LC_PEND     0x00080000
+// #define LC_LOADINDX 0x00200000
+// #define LC_JGRP     0x00400000
+// #define LC_JARRAY   0x00800000
+// #define LC_MPI      0x01000000
+// #define LC_ELIM     0x02000000
+// #define LC_M_LOG    0x04000000
+// #define LC_PERFM    0x08000000
+
+enum LC {
+    LC_SCHED    = 0x00000001,
+    LC_EXEC     = 0x00000002,
+    LC_TRACE    = 0x00000004,
+    LC_COMM     = 0x00000008,
+    LC_XDR      = 0x00000010,
+    LC_CHKPNT   = 0x00000020,
+    LC_FILE     = 0x00000080,
+    LC_AUTH     = 0x00000200,
+    LC_HANG     = 0x00000400,
+    LC_SIGNAL   = 0x00001000,
+    LC_PIM      = 0x00004000,
+    LC_SYS      = 0x00008000,
+    LC_JLIMIT   = 0x00010000,
+    LC_PEND     = 0x00080000,
+    LC_LOADINDX = 0x00200000,
+    LC_JGRP     = 0x00400000,
+    LC_JARRAY   = 0x00800000,
+    LC_MPI      = 0x01000000,
+    LC_ELIM     = 0x02000000,
+    LC_M_LOG    = 0x04000000,
+    LC_PERFM    = 0x08000000,
+    LC_KEYNULL  = 0xFFFFFFF
+};
+
+// #define LOG_DEBUG1  LOG_DEBUG + 1
+// #define LOG_DEBUG2  LOG_DEBUG + 2
+// #define LOG_DEBUG3  LOG_DEBUG + 3
+
+enum LOGDEBUG {
+    LOG_DEBUG1 = LOG_DEBUG + 1,
+    LOG_DEBUG2,
+    LOG_DEBUG3,
+    LOG_DEBUG_KEYNULL
+};
 
 // #define LSF_NIOS_REQUEUE        127
 const unsigned short LSF_NIOS_REQUEUE = 127;
 
 typedef void (*SIGFUNCTYPE) (int);
 
-#ifndef MSGSIZE
-#define MSGSIZE   8192
-#endif
+// #ifndef MSGSIZE
+// #define MSGSIZE   8192
+// #endif
+const unsigned int MSGSIZE = 8192;
 
 #ifdef __CYGWIN__
 #define NICE_LEAST -19
@@ -906,34 +947,36 @@ typedef void (*SIGFUNCTYPE) (int);
 #endif
 #endif
 
-#define BSD_NICE
+#define BSD_NICE                                        // FIXME FIXME FIXME FIXME FIXME set in configure.ac
 
 typedef struct stat LS_STAT_T;
-#define LSTMPDIR        lsTmpDir_
+#define LSTMPDIR        lsTmpDir_                       // FIXME FIXME FIXME FIXME FIXME set in configure.ac
 // #define LSDEVNULL       "/dev/null"
-const char LSDEVNULL[] = "/dev/null";
+const char LSDEVNULL[] = "/dev/null";                   // FIXME FIXME FIXME FIXME FIXME set in configure.ac
 // #define LSETCDIR        "/fix/me/no/such/place"
-const char LSETCDIR[] = "/fix/me/no/such/place";
+const char LSETCDIR[] = "/fix/me/no/such/place";        // FIXME FIXME FIXME FIXME FIXME set in configure.ac
 
-#define LSETCDIR           SYSCONFDIR
+// #define LSETCDIR           SYSCONFDIR
 #define SOCK_CALL_FAIL(c)  ((c) < 0 )
 #define SOCK_INVALID(c)    ((c) < 0 )
-#define SOCK_READ_FIX      b_read_fix
-#define SOCK_WRITE_FIX     b_write_fix
-#define NB_SOCK_READ_FIX   nb_read_fix
-#define NB_SOCK_WRITE_FIX  nb_write_fix
+// #define SOCK_READ_FIX      b_read_fix
+// #define SOCK_WRITE_FIX     b_write_fix
+// #define NB_SOCK_READ_FIX   nb_read_fix
+// #define NB_SOCK_WRITE_FIX  nb_write_fix
 
-#define LSF_NSIG NSIG
+#define LSF_NSIG NSIG                                   // FIXME FIXME FIXME FIXME FIXME set in configure.ac
 
 int lserrno;
 int masterLimDown;
-int ls_nerr;
+int ls_nerr;           // FIXME FIXME FIXME FIXME FIXME too many different types of lserrno
 // char *ls_errmsg[];  // FIXME FIXME FIXME FIXME FIXME put in specific header
 int logclass;
 int timinglevel;
 
-int lsf_lim_version;
-int lsf_res_version;
+// int lsf_lim_version; // FIXME FIXME FIXME FIXME FIXME set in configure.ac
+// int lsf_res_version; // FIXME FIXME FIXME FIXME FIXME set in configure.ac
+unsigned int LSF_LIM_VERSION; // FIXME FIXME FIXME FIXME FIXME set in configure.ac
+unsigned int LSF_RES_VERSION; // FIXME FIXME FIXME FIXME FIXME set in configure.ac
 
 int ls_initrex (int, int);
 int ls_readconfenv (struct config_param *, char *);
@@ -1071,11 +1114,11 @@ int freeHostEntryLog (struct hostEntryLog **);
 
 struct extResInfo
 {
-	char *name;
-	char *type;
-	char *interval;
-	char *increasing;
-	char *des;
+    char *name;
+    char *type;
+    char *interval;
+    char *increasing;
+    char *des;
 };
 
 #ifndef __CYGWIN__

@@ -29,33 +29,11 @@
 #include <tcl.h>
 // #endif
 
-
-static struct tclHostData *hPtr;
-static struct Tcl_Interp *globinterp;
-static char overRideFromType;
-static char runTimeDataQueried;
-static int numIndx;
-static int nRes;
-static struct tclLsInfo *myTclLsInfo;
-/* Arrays holding symbols used in resource requirement
- * expressions.
- */
-static int *ar;
-static int *ar2;
-static int *ar4;
-
-int numericValue( ClientData clientData, Tcl_Interp *interp, Tcl_Value * args, Tcl_Value * resultPtr );
-int booleanValue (ClientData clientData, Tcl_Interp *interp, Tcl_Value *args, Tcl_Value *resultPtr);
-int stringValue( ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[] );
-static int copyTclLsInfo( struct tclLsInfo *tclLsInfo );
-static char *getResValue( unsigned int resNo );
-static int definedCmd (ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
-
 /* numericValue()
  * Evaluate host or shared resource numerica value.
  */
 int
-numericValue( ClientData clientData, Tcl_Interp *interp, Tcl_Value * args, Tcl_Value * resultPtr )
+numericValue( void *clientData, Tcl_Interp *interp, Tcl_Value * args, Tcl_Value * resultPtr )
 {
 	int *indx   = NULL;
 	char *value = NULL;
@@ -65,7 +43,8 @@ numericValue( ClientData clientData, Tcl_Interp *interp, Tcl_Value * args, Tcl_V
 	assert( interp );
 	assert( args );
 
-	indx = clientData; 			// FIXME ClientData is void *, but I am not sure where that came from
+	indx = clientData; 			// FIXME ClientData is void *, but it is a bit of wtf why.
+								// google "ClientData void *)says it has to do with TCL
 
 	if (logclass & LC_TRACE) {
 		ls_syslog (LOG_DEBUG3, "numericValue: *indx = %d", *indx);
@@ -170,7 +149,7 @@ numericValue( ClientData clientData, Tcl_Interp *interp, Tcl_Value * args, Tcl_V
  * Evaluate host based on shared resource bool.
  */
 int
-booleanValue (ClientData clientData, Tcl_Interp *interp, Tcl_Value *args, Tcl_Value *resultPtr)
+booleanValue (void *clientData, Tcl_Interp *interp, Tcl_Value *args, Tcl_Value *resultPtr)
 {
 	char *value = NULL;
 	int  *idx   = NULL ;
@@ -230,7 +209,7 @@ booleanValue (ClientData clientData, Tcl_Interp *interp, Tcl_Value *args, Tcl_Va
  */
 //int
 int
-stringValue( ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[] )
+stringValue( void *clientData, Tcl_Interp *interp, int argc, const char *argv[] )
 {
 	// int code     = 0;
 	int *indx    = NULL;
@@ -437,11 +416,12 @@ stringValue( ClientData clientData, Tcl_Interp *interp, int argc, const char *ar
 	  return TCL_ERROR;
 	}
 
-  return TCL_OK;
+	return TCL_OK;
 }
 
-static int
-definedCmd (ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[])
+int
+// definedCmd (void *clientData, Tcl_Interp *interp, int argc, const char *argv[])
+definedCmd ( void *clientData, Tcl_Interp *interp, int argc, const char *argv[])
 {
 	unsigned int resNo  = 0;
 	int hasRes = FALSE;
@@ -461,7 +441,7 @@ definedCmd (ClientData clientData, Tcl_Interp *interp, int argc, const char *arg
 	indx = clientData; // FIXME FIXME wtf is clientData?
 
 	if (logclass & LC_TRACE) {
-		ls_syslog (LOG_DEBUG3, "definedCmd: argv0 %s argv1 %s indx %d", argv[0], argv[1], *indx);
+		ls_syslog (LOG_DEBUG3, "%s: argv[0]: %s; argv[1]: %s; indx: %d", __func__, argv[0], argv[1], *indx);
 	}
 
 	overRideFromType = TRUE;
@@ -506,7 +486,6 @@ definedCmd (ClientData clientData, Tcl_Interp *interp, int argc, const char *arg
 	}
 
 	return TCL_OK;
-
 }
 
 /* initTcl()
@@ -522,19 +501,19 @@ initTcl( struct tclLsInfo *tclLsInfo )
 	attribFunc *funcPtr = NULL;
 
 	static attribFunc attrFuncTable[] = {
-		{"cpu",    R1M},
-		{"login",  LS},
-		{"idle",   IT},
-		{"swap",   SWP},
-		{"cpuf",   0},
-		{"ndisks", 0},
-		{"rexpri", 0},
-		{"ncpus",  0},
-		{"maxmem", 0},
-		{"maxswp", 0},
-		{"maxtmp", 0},
-		{"server", 0},
-		{NULL,    -1}
+		{ "cpu",    R1M },
+		{ "login",  LS  },
+		{ "idle",   IT  },
+		{ "swap",   SWP },
+		{ "cpuf",   0   },
+		{ "ndisks", 0   },
+		{ "rexpri", 0   },
+		{ "ncpus",  0   },
+		{ "maxmem", 0   },
+		{ "maxswp", 0   },
+		{ "maxtmp", 0   },
+		{ "server", 0   },
+		{ NULL,    -1   }
 	};
 
 	if (myTclLsInfo)
@@ -566,19 +545,20 @@ initTcl( struct tclLsInfo *tclLsInfo )
 	/* The math functions are invoked by the interpreter
 	* while evaluating the expression. The expression itself
 	* is made of symbols R15S, R1M etc which we define
-	* her as functions together with input (ClientData)
+	* her as functions together with input (void *)
 	* that tcl has to pass them.
 	*/
 	ar = calloc (tclLsInfo->numIndx + tclLsInfo->nRes, sizeof (int));
 
-  	for( i = 0; i < tclLsInfo->numIndx; i++ )
+	for( i = 0; i < tclLsInfo->numIndx; i++ )
 	{
 		if (logclass & LC_TRACE) {
 			ls_syslog (LOG_DEBUG3, "initTcl:indexNames=%s, i =%d", tclLsInfo->indexNames[i], i);
 		}
 
 		ar[i] = i;
-  		Tcl_CreateMathFunc( globinterp, tclLsInfo->indexNames[i], 0, NULL, numericValue, (ClientData) & ar[i] ); // FIXME FIXME FIXME FIXME where on earth did this come from? what is its value
+		// Tcl_CreateMathFunc( globinterp, tclLsInfo->indexNames[i], 0, NULL, numericValue, (void *) & ar[i] ); // FIXME FIXME FIXME FIXME where on earth did void *come from? what is its value
+		Tcl_CreateMathFunc( globinterp, tclLsInfo->indexNames[i], 0, NULL, numericValue, (void *) & ar[i] );
 	}
 
 	for( unsigned int resNo = 0; resNo < tclLsInfo->nRes; resNo++ )
@@ -594,7 +574,7 @@ initTcl( struct tclLsInfo *tclLsInfo )
 		}
 
 		ar[i] = resNo + tclLsInfo->numIndx; // FIXME FIXME FIXME FIXME FIXME this is a subscript overflow.
-		Tcl_CreateMathFunc (globinterp, tclLsInfo->resName[resNo], 0, NULL, numericValue, (ClientData) & ar[i]);
+		Tcl_CreateMathFunc (globinterp, tclLsInfo->resName[resNo], 0, NULL, numericValue, (void *) & ar[i]);
 		i++;
 	}
 
@@ -605,7 +585,7 @@ initTcl( struct tclLsInfo *tclLsInfo )
 			ls_syslog (LOG_DEBUG3, "initTcl:indexNames=%s, i =%d", funcPtr->name, funcPtr->clientData);
 		}
 
-		Tcl_CreateMathFunc (globinterp, funcPtr->name, 0, NULL, numericValue, (ClientData) & funcPtr->clientData);
+		Tcl_CreateMathFunc (globinterp, funcPtr->name, 0, NULL, numericValue, (void *) & funcPtr->clientData);
 	}
 
 	i = 0;
@@ -625,21 +605,21 @@ initTcl( struct tclLsInfo *tclLsInfo )
 		ar2[i] = resNo; // FIXME FIXME possible array subscript over-run. check with debugger, to see the 
 						// 		values i takes; remove from global and substitute with a for loop declaring
 						// 		multiple local variables
-		Tcl_CreateMathFunc (globinterp, tclLsInfo->resName[resNo], 0, NULL, booleanValue, (ClientData) & ar2[i]);
+		Tcl_CreateMathFunc (globinterp, tclLsInfo->resName[resNo], 0, NULL, booleanValue, (void *) & ar2[i]);
 		++i;
 	}
 
 	ar3[0] = HOSTTYPE;
-	Tcl_CreateCommand (globinterp, "type", stringValue, (ClientData) & ar3[0], NULL);
+	Tcl_CreateCommand (globinterp, "type", stringValue, (void *) & ar3[0], NULL);
 	ar3[1] = HOSTMODEL;
-	Tcl_CreateCommand (globinterp, "model", stringValue, (ClientData) & ar3[1], NULL);
+	Tcl_CreateCommand (globinterp, "model", stringValue, (void *) & ar3[1], NULL);
 	ar3[2] = HOSTSTATUS;
-	Tcl_CreateCommand (globinterp, "status", stringValue, (ClientData) & ar3[2], NULL);
+	Tcl_CreateCommand (globinterp, "status", stringValue, (void *) & ar3[2], NULL);
 	ar3[3] = HOSTNAME;
-	Tcl_CreateCommand (globinterp, "hname", stringValue, (ClientData) & ar3[3], NULL);
+	Tcl_CreateCommand (globinterp, "hname", stringValue, (void *) & ar3[3], NULL);
 
 	ar3[4] = DEFINEDFUNCTION;
-	Tcl_CreateCommand (globinterp, "defined", definedCmd, (ClientData) & ar3[4], NULL);
+	Tcl_CreateCommand (globinterp, "defined", definedCmd, (void *) & ar3[4], NULL);
 
 	i = 0;
 	ar4 = calloc (tclLsInfo->nRes, sizeof( int ) );  // suspect for overflow
@@ -653,7 +633,7 @@ initTcl( struct tclLsInfo *tclLsInfo )
 		}
 
 		ar4[i] = resNo + LAST_STRING;
-		Tcl_CreateCommand (globinterp, tclLsInfo->resName[resNo], stringValue, (ClientData) & ar4[i], NULL);
+		Tcl_CreateCommand (globinterp, tclLsInfo->resName[resNo], stringValue, (void *) & ar4[i], NULL);
 		++i;
 	}
 
@@ -736,7 +716,7 @@ evalResReq (char *resReq, struct tclHostData *hPtr2, char useFromType)
 
 /* getResValue()
  */
-static char *
+char *
 getResValue ( unsigned int resNo)
 {
 
@@ -762,7 +742,7 @@ getResValue ( unsigned int resNo)
 
 /* copyTcllsInfo()
  */
-static int
+int
 copyTclLsInfo( struct tclLsInfo *tclLsInfo )
 {
 

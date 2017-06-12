@@ -18,5 +18,6 @@
 
 #pragma once
  
-char *putstr_( const char *s );
-int replace1stCmd_ (const char *oldCmdArgs, const char *newCmdArgs, char *outCmdArgs, size_t outLen);
+char *putstr_       ( const char *s );
+int replace1stCmd_  ( const char *oldCmdArgs, const char *newCmdArgs, char *outCmdArgs, size_t outLen);
+unsigned int isint_ ( const char *word);

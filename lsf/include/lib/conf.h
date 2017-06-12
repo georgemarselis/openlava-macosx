@@ -135,18 +135,18 @@ void freeHostInfo (struct hostInfo *);
 void initResTable (void);
 // static 
 void putThreshold (int indx, struct hostEntry *hostEntryPtr, int position, char *val, float def);
-void liblsf_putThreshold (int indx, struct hostInfo *host, long position, char *val, float def);
+void liblsf_putThreshold ( unsigned int indx, struct hostInfo *host, long position, const char *val, float def);
 
 
 // static 
 int wgetClusAdmins (char *line, const char *lsfile,   size_t *lineNum, char *secName);
 int getClusAdmins  (char *line, const char *filename, size_t *lineNum, char *secName, int lookupAdmins);
 // static 
-struct admins *getAdmins_       (char *line, const char *fname, size_t *lineNum, char *secName, int lookupAdmins);
-struct admins *liblsf_getAdmins (char *line, const char *fname, size_t *lineNum, char *secName, int lookupAdmins);
+struct admins *getAdmins_       (char *line, const char *fname, size_t *lineNum, const char *secName, int lookupAdmins);
+struct admins *liblsf_getAdmins (char *line, const char *fname, size_t *lineNum, const char *secName, int lookupAdmins);
 
 // static 
-int validWindow (char *, char *);
+int validWindow ( const char *wordpair, const char *context);
 
 // static 
 int setAdmins (struct admins *, int);
@@ -187,5 +187,10 @@ int readHvalues (struct keymap *keyList, char *linep, FILE *fp, const char *lsfi
 int mapValues (struct keymap *keyList, char *line);
 // FIXME also found in lproto.h, should be in lib/conf.h
 // int putInLists (char *word, struct admins *admins, unsigned integer *numAds, char *forWhat);
-int parse_time (char *word, float *hour, unsigned int *day);
+int parse_time ( const char *word, float *hour, unsigned int *day);
 struct clusterConf *ls_readcluster_ex ( const char *filename, struct lsInfo *info, int lookupAdmins);
+
+int ls_setAdmins (struct admins *admins, int mOrA);
+void freekeyval (struct keymap keylist[]);
+char *parsewindow (char *linep, const char *filename, size_t *lineNum, const char *section);
+
