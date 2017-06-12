@@ -1,77 +1,90 @@
 int
 addResourceMap_limd ( const char *resName, const char *location, const char *lsfile, size_t lineNum, int *isDefault)
 {
-	int defaultWord = FALSE;
-	int first       = TRUE;
-	int error       = 0;
-	int resNo       = 0;
-	int dynamic     = 0;
-	char *sp        = NULL;
-	char *cp        = NULL;
-	char ssp        = 'a';
-	char *instance  = NULL;
-	char *initValue = NULL;
-	char **hosts    = NULL;
-	unsigned int numHosts   = 0;
-	unsigned int numCycle   = 0;
-	struct hostNode *hPtr = NULL;
-	struct sharedResource *resource = NULL;
+	int resNo                             = 0;
+	int dynamic                           = 0;
+	int defaultWord                       = FALSE;
+	int kek                               = FALSE;
+	int error                             = FALSE; // no error
+	int first                             = TRUE;
+	char *cp                              = NULL;
+	char *sp                              = NULL;
+	char *ssp                             = NULL;
+	char *instance                        = NULL;
+	char *tempHost                        = NULL;
+	char *initValue                       = malloc( MAXFILENAMELEN * sizeof(char) );
+	char externalResourceFlag[]           = "!";
+	unsigned int numCycle                 = 0;
+	unsigned int numHosts                 = 0;
+	char *instance                        = NULL;
+	char **hosts                          = NULL;
+	struct hostNode *hPtr                 = NULL;
+	struct lsSharedResourceInfo *resource = NULL;
 
-	int i = 0;
-
-	*isDefault = FALSE;
+	assert( isDefault ); // FIXME FIXME FIXME, so effectively similarly named functions are one and the same and I just have to merge them. Noice.
+	memset( initValue, 0, strlen( initValue ) ) ; // is this the same value as MAXFILENAMELEN * sizeof(char)?
 
 	if (resName == NULL || location == NULL) {
-		/* catgets 5382 */
-		ls_syslog (LOG_ERR, "5382: %s: %s(%d): Resource name <%s> location <%s>", __func__, lsfile, lineNum,resName ? resName : "NULL", (location ? location : "NULL"));
+
+		lsferrno = ENORESNAME;	// lsferrno is a global reference
+		if( NULL == location ) {
+			lsferrno |=  lsferr | ENOLOCATION;
+		}
+		/* catgets 5203/5382 */
+		ls_syslog (LOG_ERR, "catgets 5203/5382: %s: %s(%d): Resource name \"%s\", location \"%s\"", __func__, lsfile, lineNum, (resName ? resName : "NULL"), (location ? location : "NULL"));
 		return -1;
 	}
 
 	if ((resNo = resNameDefined (resName)) < 0) {
 		/* catgets 5275 */
-		ls_syslog (LOG_ERR, "5275: %s: %s(%d): Resource name <%s> not defined", __func__, lsfile, lineNum, resName);
+		ls_syslog (LOG_ERR, "catgets 5275: %s: %s(%d): Resource name <%s> not defined", __func__, lsfile, lineNum, resName);
 		return -1;
 	}
 
-	dynamic = (allInfo.resTable[resNo].flags & RESF_DYNAMIC);
+	dynamic = (allInfo.resTable[resNo].flags & RESF_DYNAMIC); // NOT THE SAME
+	resource = inHostResourcs (resName); // NOT THE SAME
 
-	resource = inHostResourcs (resName);
+	if (!strcmp (location, "!"))
+		{
+		// initValue[0] = '\0';
+		strcmp( tempHost, externalResourceFlag, strlen( externalResourceFlag ) ); // FIXME FIXME FIXME FIXME see if this strcmp is correct
+		hosts = &tempHost;
+		if ((resource = liblsf_addResource (resName, 1, hosts, initValue, lsfile, lineNum)) == NULL) { // FIXME FIXME FIXME FIXME liblsf_addResource(): one more function to investigate for duplicity
+			const char liblsfAddResourceString[] = "liblsf_addResource";
+			if ((numHosts = liblsf_parseHostList (cp, lsfile, lineNum, &hosts)) <= 0) // FIXME FIXME FIXME FIXME liblsf_parseHostList(): one more function to investigate for duplicity
+			/* catgets 5209 */
+			ls_syslog (LOG_ERR, "catgets 5209: %s: %s(%d): %s() failed; ignoring the instance <%s>", __func__, lsfile, lineNum, liblsfAddResourceString, "!");
+			return -1;
+		}
+		return 0;
+	} // NOT THE SAME // NOW THE SAME
+
 	sp = location;
-
-
-	i = 0;
-	while (*sp != '\0') {
+	while (*sp != '\0') { // FIXME FIXME FIXME FIXME FIXME United Soviets of KEKistan... use bison; don't code your own parser. PLEASE.
 		if (*sp == '[') {
-			i++;
+			++kek;
 		}
 		else if (*sp == ']') {
-			i--;
+			--kek;
 		}
 		sp++;
 	}
-	if (i != 0) {
-		/* catgets 5383 */
-		ls_syslog (LOG_ERR, "5383: %s: %s(%d): number of '[' is not match that of ']' in <%s> for resource <%s>; ignoring", __func__, lsfile, lineNum, location, resName);
+	sp = location;
+
+	if( kek ) {
+		/* catgets 5204/5383 */
+		ls_syslog (LOG_ERR, "catgets 5383: %s: %s(%d): number of '[' is not match that of ']' in <%s> for resource <%s>; ignoring", __func__, lsfile, lineNum, location, resName);
 		return -1;
 	}
-
-	if ((initValue = malloc (4 * sizeof (char))) == NULL)
-		{
-		ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "malloc");
-		return -1;
-		}
-	sp = location;
 
 	while (sp != NULL && sp[0] != '\0') {
 		for ( unsigned int j = 0; j < numHosts; j++) {
 			FREEUP (hosts[j]);
 		}
 		FREEUP (hosts);
-		numHosts = 0;
-		error = FALSE;
 		instance = sp;
-		initValue[0] = '\0';
 		defaultWord = FALSE;
+		// initValue[0] = '\0';
 		while (*sp == ' ' && *sp != '\0') {
 			sp++;
 		}
@@ -102,7 +115,7 @@ addResourceMap_limd ( const char *resName, const char *location, const char *lsf
 			strcpy (initValue, sp);
 			if (!isdigitstr_ (initValue)  && allInfo.resTable[resNo].valueType == LS_NUMERIC) {
 				/* catgets 5386 */
-				ls_syslog (LOG_ERR, "5386: %s: %s(%d): Invalid characters (%s) used as NUMERIC resource value; ignoring", __func__, lsfile, lineNum, initValue);
+				ls_syslog (LOG_ERR, "catgets 5386: %s: %s(%d): Invalid characters (%s) used as NUMERIC resource value; ignoring", __func__, lsfile, lineNum, initValue);
 				FREEUP (initValue);
 				return -1;
 			}

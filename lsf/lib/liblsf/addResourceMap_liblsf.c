@@ -1,21 +1,27 @@
 
-int liblsf_addResourceMap ( const char *resName, const char *location, const char *lsfile, size_t lineNum)
+int liblsf_addResourceMap ( const char *resName, const char *location, const char *lsfile, size_t lineNum, int *isDefault )
 {
+	int resNo                             = 0;
+	int dynamic                           = 0;
+	int defaultWord                       = FALSE;
 	int kek                               = FALSE;
 	int error                             = FALSE; // no error
 	int first                             = TRUE;
-	unsigned int numHosts                 = 0;
-	char *sp                              = NULL;
 	char *cp                              = NULL;
+	char *sp                              = NULL;
 	char *ssp                             = NULL;
 	char *instance                        = NULL;
 	char *tempHost                        = NULL;
-	char initValue                        = malloc( MAXFILENAMELEN * sizeof(char) );
+	char *initValue                       = malloc( MAXFILENAMELEN * sizeof(char) );
 	char externalResourceFlag[]           = "!";
+	unsigned int numCycle                 = 0;
+	unsigned int numHosts                 = 0;
+	char *instance                        = NULL;
 	char **hosts                          = NULL;
+	struct hostNode *hPtr                 = NULL;
 	struct lsSharedResourceInfo *resource = NULL;
 
-	const char liblsf_addResource[] = "liblsf_addResource";
+	assert( isDefault ); // FIXME FIXME FIXME, so effectively similarly named functions are one and the same and I just have to merge them. Noice.
 	memset( initValue, 0, strlen( initValue ) ) ; // is this the same value as MAXFILENAMELEN * sizeof(char)?
 
 	if (resName == NULL || location == NULL) {
@@ -24,27 +30,36 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 		if( NULL == location ) {
 			lsferrno |=  lsferr | ENOLOCATION;
 		}
-		/* catgets 5203 */
-		ls_syslog (LOG_ERR, "5203: %s: %s(%d): Resource name \"%s\", location \"%s\"", __func__, lsfile, lineNum, (resName ? resName : "NULL"), (location ? location : "NULL"));
+		/* catgets 5203/5382 */
+		ls_syslog (LOG_ERR, "catgets 5203/5382: %s: %s(%d): Resource name \"%s\", location \"%s\"", __func__, lsfile, lineNum, (resName ? resName : "NULL"), (location ? location : "NULL"));
 		return -1;
 	}
+
+	if ((resNo = resNameDefined (resName)) < 0) {
+		/* catgets 5275 */
+		ls_syslog (LOG_ERR, "catgets 5275: %s: %s(%d): Resource name <%s> not defined", __func__, lsfile, lineNum, resName);
+		return -1;
+	}
+
+	dynamic = (allInfo.resTable[resNo].flags & RESF_DYNAMIC); // NOT THE SAME
+	resource = inHostResourcs_e (resName); // NOT THE SAME
 
 	if (!strcmp (location, "!"))
 		{
 		// initValue[0] = '\0';
-		tempHost = (char *) externalResourceFlag; // FIXME FIXME FIXME is this cast justified?
+		strcmp( tempHost, externalResourceFlag, strlen( externalResourceFlag ) ); // FIXME FIXME FIXME FIXME see if this strcmp is correct
 		hosts = &tempHost;
-		if ((resource = liblsf_addResource (resName, 1, hosts, initValue, lsfile, lineNum)) == NULL) {
+		if ((resource = liblsf_addResource (resName, 1, hosts, initValue, lsfile, lineNum)) == NULL) { // FIXME FIXME FIXME FIXME liblsf_addResource(): one more function to investigate for duplicity
+			const char liblsfAddResourceString[] = "liblsf_addResource";
+			if ((numHosts = liblsf_parseHostList (cp, lsfile, lineNum, &hosts)) <= 0) // FIXME FIXME FIXME FIXME liblsf_parseHostList(): one more function to investigate for duplicity
 			/* catgets 5209 */
-			ls_syslog (LOG_ERR, I18N (5209, "%s: %s(%d): %s() failed; ignoring the instance <%s>"), __func__, lsfile, lineNum, liblsf_addResource, "!");
+			ls_syslog (LOG_ERR, "catgets 5209: %s: %s(%d): %s() failed; ignoring the instance <%s>", __func__, lsfile, lineNum, liblsfAddResourceString, "!");
 			return -1;
 		}
 		return 0;
-	}
+	} // NOT THE SAME // NOW THE SAME
 
-	resource = NULL;
 	sp = location;
-
 	while (*sp != '\0') { // FIXME FIXME FIXME FIXME FIXME United Soviets of KEKistan... use bison; don't code your own parser. PLEASE.
 		if (*sp == '[') {
 			++kek;
@@ -55,9 +70,10 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 		sp++;
 	}
 	sp = location;
+
 	if( kek ) {
-		/* catgets 5204 */
-		ls_syslog (LOG_ERR, "catgets 5204: %s: %s(%d): number of '[' is not match that of ']' in <%s> for resource <%s>; ignoring")), __func__, lsfile, lineNum, location, resName);
+		/* catgets 5204/5204 */
+		ls_syslog (LOG_ERR, "catgets 5204/5383: %s: %s(%d): number of '[' is not match that of ']' in <%s> for resource <%s>; ignoring", __func__, lsfile, lineNum, location, resName);
 		return -1;
 	}
 
@@ -66,9 +82,8 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 			FREEUP (hosts[j]);
 		}
 		FREEUP (hosts);
-		numHosts = 0;
-		error = FALSE;
 		instance = sp;
+		defaultWord = FALSE;
 		// initValue[0] = '\0';
 		while (*sp == ' ' && *sp != '\0') {
 			sp++;
@@ -106,62 +121,56 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 		if (*sp != '[' && *sp != '\0')
 			{
 			/* catgets 5205 */
-			ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5205, "%s: %s(%d): Bad character <%c> in instance; ignoring")), __func__, lsfile, lineNum, *sp);
+			ls_syslog (LOG_ERR, "catgets 5205: %s: %s(%d): Bad character <%c> in instance; ignoring", __func__, lsfile, lineNum, *sp);
 			sp++;
 			}
 		if (isspace (*sp)) {
 			sp++;
 		}
-		if (*sp == '[')
-			{
+		if (*sp == '[')	{
 			sp++;
 			cp = sp;
 			while (*sp != ']' && *sp != '\0') {
 				sp++;
 			}
-			if (*sp == '\0')
-				{
+			if (*sp == '\0') {
 				/* catgets 5206 */
-				ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5206, "%s: %s(%d): Bad format for instance <%s>; ignoring the instance")), __func__, lsfile, lineNum, instance);
+				ls_syslog (LOG_ERR, "catgets 5206: %s: %s(%d): Bad format for instance <%s>; ignoring the instance", __func__, lsfile, lineNum, instance);
 				return -1;
-				}
-			if (error == TRUE)
-				{
+			}
+			if (error == TRUE) {
 				sp++;
 				ssp = *sp;
 				*sp = '\0';
 				/* catgets 5207 */
-				ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5207, "%s: %s(%d): Bad format for instance <%s>; ignoringthe instance")), __func__, lsfile, lineNum, instance);
+				ls_syslog (LOG_ERR, "catgets: 5207: %s: %s(%d): Bad format for instance <%s>; ignoringthe instance", __func__, lsfile, lineNum, instance);
 				*sp = ssp;
 				continue;
-				}
+			}
 			*sp = '\0';
 			sp++;
-			if ((numHosts = liblsf_parseHostList (cp, lsfile, lineNum, &hosts)) <= 0)
+			if ((numHosts = liblsf_parseHostList (cp, lsfile, lineNum, &hosts)) <= 0) // FIXME FIXME FIXME FIXME liblsf_addHostInstance(): one more function to investigate for duplicity
 				{
 				/* catgets 5208 */
-				ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5208, "%s: %s(%d): %s(%s) failed; ignoring the instance <%s%s>")), __func__, lsfile, lineNum, "parseHostList", cp, instance, "]");
+				ls_syslog (LOG_ERR, "catgets 5208: %s: %s(%d): %s(%s) failed; ignoring the instance <%s%s>", __func__, lsfile, lineNum, "parseHostList", cp, instance, "]");
 				continue;
-				}
-
-			if (resource == NULL)
-				{
-				if ((resource = liblsf_addResource (resName, numHosts, hosts, initValue, lsfile, lineNum)) == NULL)
-					/* catgets 5209 */
-					ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5209, "%s: %s(%d): %s() failed; ignoring the instance <%s>")), __func__, lsfile, lineNum, liblsf_addResource, instance);
-				}
-			else
-				{
-				if (liblsf_addHostInstance (resource, numHosts, hosts, initValue) < 0)
-					/* catgets 5210 */
-					ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5210, "%s: %s(%d): %s() failed; ignoring the instance <%s>")), __func__, lsfile, lineNum, __func__, instance);
-				}
-			continue;
 			}
-		else
-			{
+
+			if (resource == NULL) {
+				if ((resource = liblsf_addResource (resName, numHosts, hosts, initValue, lsfile, lineNum)) == NULL) // FIXME FIXME FIXME FIXME liblsf_addResource(): one more function to investigate for duplicity
+					/* catgets 5209 */
+					ls_syslog (LOG_ERR, "catgets 5209: %s: %s(%d): %s() failed; ignoring the instance <%s>", __func__, lsfile, lineNum, liblsfAddResourceString, instance);
+			}
+			else {
+				if (liblsf_addHostInstance (resource, numHosts, hosts, initValue) < 0) // FIXME FIXME FIXME FIXME liblsf_addHostInstance(): one more function to investigate for duplicity
+					/* catgets 5210 */
+					ls_syslog (LOG_ERR, "catgets 5210: %s: %s(%d): %s() failed; ignoring the instance <%s>", __func__, lsfile, lineNum, liblsfAddResourceString, instance);
+			}
+			continue;
+		}
+		else {
 			/* catgets 5211 */
-			ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5211, "%s: %s(%d): No <[>  for instance in <%s>; ignoring")), __func__, lsfile, lineNum, location);
+			ls_syslog (LOG_ERR, "catgets 5211: %s: %s(%d): No <[>  for instance in <%s>; ignoring", __func__, lsfile, lineNum, location);
 			while (*sp != ']' && *sp != '\0') {
 				sp++;
 			}
@@ -169,12 +178,13 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 				return -1;
 			}
 			sp++;
-			}
 		}
+	}
 	for ( unsigned int j = 0; j < numHosts; j++) {
 		FREEUP (hosts[j]);
 	}
+
+	free( initValue );
 	FREEUP (hosts);
 	return 0;
-
 }
