@@ -22,6 +22,7 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 	struct lsSharedResourceInfo *resource = NULL;
 
 	assert( isDefault ); // FIXME FIXME FIXME, so effectively similarly named functions are one and the same and I just have to merge them. Noice.
+
 	memset( initValue, 0, strlen( initValue ) ) ; // is this the same value as MAXFILENAMELEN * sizeof(char)?
 
 	if (resName == NULL || location == NULL) {
@@ -89,6 +90,7 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 			sp++;
 		}
 		if (*sp == '\0') {
+			FREEUP (initValue);
 			if (first == TRUE) {
 				return -1;
 			}
@@ -97,7 +99,7 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 			}
 		}
 		cp = sp;
-		while (isalnum (*cp)) {
+		while( isalnum (*cp) ) {
 			cp++;
 		}
 		if (cp != sp)
