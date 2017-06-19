@@ -365,10 +365,10 @@ enum valueType
     LS_BOOLEAN, LS_NUMERIC, LS_STRING, LS_EXTERNAL
 };
 
-#define BOOLEAN  LS_BOOLEAN
-#define NUMERIC  LS_NUMERIC
-#define STRING   LS_STRING
-#define EXTERNAL LS_EXTERNAL
+// #define BOOLEAN  LS_BOOLEAN
+// #define NUMERIC  LS_NUMERIC
+// #define STRING   LS_STRING
+// #define EXTERNAL LS_EXTERNAL
 
 enum orderType
 {

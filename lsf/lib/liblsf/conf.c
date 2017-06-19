@@ -2848,15 +2848,15 @@ struct lsSharedResourceInfo *liblsf_addResource ( const char *resName, int nHost
 	int nRes = 0;
 	struct lsSharedResourceInfo *resInfo = NULL;
 
-	assert( NULL != filename ); // FIXME FIXME FIXME these asserts got to go
-	assert( 0 != lineNum );     // FIXME FIXME FIXME these asserts got to go
+	assert( filename ); // FIXME FIXME FIXME these asserts got to go
+	assert( lineNum );  // FIXME FIXME FIXME these asserts got to go
 
 	if (resName == NULL || hosts == NULL) {
 		return NULL;
 	}
 
-	assert( cConf->numShareRes >= 0 ); // FIXME is numShareRes always >= 0 ?
-	resInfo = myrealloc (cConf->shareRes, sizeof (struct lsSharedResourceInfo) *( cConf->numShareRes + 1 ));
+	assert( cConf->numShareRes >= 0 ); // FIXME is numShareRes always >= 0 ? // FIXME FIXME FIXME FIXME where is cConf from and what doe sit do?
+	resInfo = myreallocok (cConf->shareRes, sizeof (struct lsSharedResourceInfo) *( cConf->numShareRes + 1 ));
 	if (NULL == resInfo && ENOMEM == errno ) {
 		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "myrealloc");
 		return NULL;
@@ -2865,25 +2865,23 @@ struct lsSharedResourceInfo *liblsf_addResource ( const char *resName, int nHost
 	cConf->shareRes = resInfo;
 	nRes = cConf->numShareRes;
 
-	if ((resInfo[nRes].resourceName = putstr_ (resName)) == NULL)
-		{
+	if ((resInfo[nRes].resourceName = putstr_ (resName)) == NULL) {
 		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
 		return NULL;
-		}
+	}
 
 	resInfo[nRes].nInstances = 0;
 	resInfo[nRes].instances = NULL;
-	if (liblsf_addHostInstance (resInfo + nRes, nHosts, hosts, value) < 0)
-		{
+	if (liblsf_addHostInstance (resInfo + nRes, nHosts, hosts, value) < 0) {
 		free (resInfo[nRes].resourceName);
 		return NULL;
-		}
+	}
 
 	cConf->numShareRes++;
 
 	return resInfo + nRes;
-
 }
+
 
 int liblsf_addHostInstance (struct lsSharedResourceInfo *sharedResource, unsigned int nHosts, char **hostNames, char *value)
 {
@@ -3188,28 +3186,8 @@ int resolveBaseNegHosts ( const char *inHosts, char **outHosts, struct HostsArra
 	FREEUP (save);
 	
 	assert( counter <= INT_MAX);
-	return (int) counter;
+	return (int) counter; // FIXME FIXME FIXME FIXME remove the cast
 }
 
-
-unsigned int
-resNameDefined ( const char *name ) { // FIXME FIXME FIXME only INT_MAX nRes can be here.
-
-
-	if (name == NULL) {
-		lserrno = ENEGATIVERESULT;
-		return INT_U_MAX;
-	}
-
-	assert( lsinfo.nRes > 0 );
-	for (unsigned int i = 0; i < lsinfo.nRes; i++) {
-		if (strcmp (name, lsinfo.resTable[i].name) == 0) {
-			assert( i <= INT_MAX );
-			return i;
-		}
-	}
-
-	fprintf( stderr, "%s: you are not supposed to be here!\n", __func__ );
-	ls_syslog( LOG_ERR, "%s: you are not supposed to be here!\n", __func__ );
-	return 0;
-}
+// unsigned int resNameDefined ( const char *name ) used to live here;
+//            moved to lsf/lib/liblsf/resNameDefined.

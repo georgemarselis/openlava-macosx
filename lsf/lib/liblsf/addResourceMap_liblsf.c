@@ -1,5 +1,5 @@
 
-int liblsf_addResourceMap ( const char *resName, const char *location, const char *lsfile, size_t lineNum, int *isDefault )
+int addResourceMap_liblsf( const char *resName, const char *location, const char *lsfile, size_t lineNum, int *isDefault )
 {
 	int resNo                             = 0;
 	int dynamic                           = 0;
@@ -22,7 +22,6 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 	struct lsSharedResourceInfo *resource = NULL;
 
 	assert( isDefault ); // FIXME FIXME FIXME, so effectively similarly named functions are one and the same and I just have to merge them. Noice.
-
 	memset( initValue, 0, strlen( initValue ) ) ; // is this the same value as MAXFILENAMELEN * sizeof(char)?
 
 	if (resName == NULL || location == NULL) {
@@ -36,17 +35,34 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 		return -1;
 	}
 
-	if ((resNo = resNameDefined (resName)) < 0) {
+	resNo = resNameDefined (resName); // FIXME FIXME FIXME  (slow?) see if the resName is defined in the global catalog
+	if ( resNo == INT_U_MAX ) { 
 		/* catgets 5275 */
 		ls_syslog (LOG_ERR, "catgets 5275: %s: %s(%d): Resource name <%s> not defined", __func__, lsfile, lineNum, resName);
 		return -1;
 	}
 
-	dynamic = (allInfo.resTable[resNo].flags & RESF_DYNAMIC); // NOT THE SAME
-	resource = inHostResourcs_e (resName); // NOT THE SAME
+	
+#error was here, continue figuring out what the frackey frak does RESF_DYNAMIC have to do with anything; if it does change the error text below where needed
 
-	if (!strcmp (location, "!"))
-		{
+	dynamic = (allInfo.resTable[resNo].flags & RESF_DYNAMIC); // is this about dynamic hosts?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	resource = inHostResources (resName);  // FIXME FIXME FIXME looking up the resname and returning context in struct format
+
+	if (!strcmp (location, "!")) {
 		// initValue[0] = '\0';
 		strcmp( tempHost, externalResourceFlag, strlen( externalResourceFlag ) ); // FIXME FIXME FIXME FIXME see if this strcmp is correct
 		hosts = &tempHost;
@@ -61,7 +77,7 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 	} // NOT THE SAME // NOW THE SAME
 
 	sp = location;
-	while (*sp != '\0') { // FIXME FIXME FIXME FIXME FIXME United Soviets of KEKistan... use bison; don't code your own parser. PLEASE.
+	while ( sp != NULL ) { // FIXME FIXME FIXME FIXME FIXME United Soviets of KEKistan... use bison; don't code your own parser. PLEASE.
 		if (*sp == '[') {
 			++kek;
 		}
@@ -70,15 +86,15 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 		}
 		sp++;
 	}
-	sp = location;
 
 	if( kek ) {
-		/* catgets 5204/5204 */
+		/* catgets 5204/5383 */
 		ls_syslog (LOG_ERR, "catgets 5204/5383: %s: %s(%d): number of '[' is not match that of ']' in <%s> for resource <%s>; ignoring", __func__, lsfile, lineNum, location, resName);
 		return -1;
 	}
 
-	while (sp != NULL && sp[0] != '\0') {
+	sp = location;
+	while (sp != NULL ) {
 		for ( unsigned int j = 0; j < numHosts; j++) {
 			FREEUP (hosts[j]);
 		}

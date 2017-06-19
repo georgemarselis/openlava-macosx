@@ -5939,8 +5939,8 @@ putIntoList (char **list, unsigned int *len, const char *string, const char *lis
 		return *list;
 	}
 
-	if (length <= strlen (*list) + strlen (string) + 2) {
-		char *temp = (char *) myrealloc (*list, 2 * length);
+	if ( length <= strlen (*list) + strlen (string) + 2) {
+		char *temp = myrealloc (*list, 2 * length);
 		if ( NULL == temp && ENOMEM == errno ) {
 			ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "myrealloc", 2 * length);
 			FREEUP (*list);

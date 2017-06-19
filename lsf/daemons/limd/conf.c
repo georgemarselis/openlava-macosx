@@ -3849,22 +3849,9 @@ isInHostList (struct sharedResource *sharedResource, const char *hostName)
 	return NULL;
 }
 
-struct sharedResource *
-inHostResourcs ( const char *resName)
-{
-	if (numHostResources <= 0) {
-		return NULL;
-	}
-	
-	for ( unsigned int i = 0; i < numHostResources; i++) {
-		if (strcmp (hostResources[i]->resourceName, resName) == 0) {
-			return hostResources[i];
-		}
-	}
-	return NULL;
-	
-}
-
+// struct sharedResource *inHostResourcs ( const char *resName) used to live here
+// 		since there are no referneces for it in the limd source code, it was moved to 
+//      its own file under lsf/lib/liblsf/inHostResourcess
 int
 validResource (const char *resName)
 {

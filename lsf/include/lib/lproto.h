@@ -1,4 +1,4 @@
-/* $Id: lproto.h 397 2007-11-26 19:04:00Z mblack $
+FFR/* $Id: lproto.h 397 2007-11-26 19:04:00Z mblack $
  * Copyright (C) 2007 Platform Computing Inc
  *
  * This program is free software; you can redistribute it and/or modify
@@ -34,11 +34,11 @@ const unsigned short BIND_RETRY_TIMES = 100;
 
 struct admins
 {
-  char padding[4];
-  unsigned int nAdmins;
-  uid_t *adminIds;
-  gid_t *adminGIds;
-  char **adminNames;
+	char padding[4];
+	unsigned int nAdmins;
+	uid_t *adminIds;
+	gid_t *adminGIds;
+	char **adminNames;
 };
 
 
@@ -46,31 +46,31 @@ void putMaskLevel (int, char **);
 
 struct resPair
 {
-  char *name;
-  char *value;
+	const char *name;
+	char *value;
 };
 
 struct sharedResource
 {
-  char *resourceName;
-  unsigned int numInstances;
-  char padding1[4];
-  struct resourceInstance **instances;
+	char *resourceName;
+	unsigned int numInstances;
+	char padding1[4];
+	struct resourceInstance **instances;
 };
 
 struct resourceInfoReq
 {
-  unsigned int numResourceNames;
-  int options;
-  char *hostName;
-  char **resourceNames;
+	unsigned int numResourceNames;
+	int options;
+	char *hostName;
+	char **resourceNames;
 };
 
 struct resourceInfoReply
 {
-    unsigned int numResources;
-    unsigned int badResource;
-    struct lsSharedResourceInfo *resources;
+	unsigned int numResources;
+	unsigned int badResource;
+	struct lsSharedResourceInfo *resources;
 };
 
 
@@ -95,20 +95,20 @@ int sharedResConfigured_;
 #define AUTOMOUNT_NEVER_STR "AMNEVER"
 
 #define FREEUP(pointer)   if (pointer != NULL) {  \
-                              free(pointer);      \
-                              pointer = NULL;     \
-                          }
+							  free(pointer);      \
+							  pointer = NULL;     \
+						  }
 
 #define STRNCPY(str1, str2, len)  { strncpy(str1, str2, len); \
-                                    str1[len -1] = '\0';  \
-                                  }
+									str1[len -1] = '\0';  \
+								  }
 
 #define IS_UNC(a) \
-        ((a!=NULL) && (*a == '\\') && (*(a+1) == '\\') ? TRUE : FALSE)
+		((a!=NULL) && (*a == '\\') && (*(a+1) == '\\') ? TRUE : FALSE)
 
 #define TRIM_LEFT(sp) if (sp != NULL) { \
-                          while (isspace(*(sp))) (sp)++; \
-                      }
+						  while (isspace(*(sp))) (sp)++; \
+					  }
 #define TRIM_RIGHT(sp)     while (isspace(*(sp+strlen(sp)-1))) *(sp+strlen(sp)-1)='\0';
 
 #define ALIGNWORD_(s)    (((s)&0xfffffffc) + 4)
@@ -124,21 +124,21 @@ const char LS_EXEC_T[] = "LS_EXEC_T";
 
 #define GET_INTNUM(i) ((i)/INTEGER_BITS + 1)
 #define SET_BIT(bitNo, integers)           \
-    integers[(bitNo)/INTEGER_BITS] |= (1<< (bitNo)%INTEGER_BITS);
+	integers[(bitNo)/INTEGER_BITS] |= (1<< (bitNo)%INTEGER_BITS);
 #define CLEAR_BIT(bitNo, integers)           \
-    integers[(bitNo)/INTEGER_BITS] &= ~(1<< (bitNo)%INTEGER_BITS);
+	integers[(bitNo)/INTEGER_BITS] &= ~(1<< (bitNo)%INTEGER_BITS);
 #define TEST_BIT(bitNo, integers, isSet)  \
    {  \
-      if (integers[(bitNo)/INTEGER_BITS] & (1<<(bitNo)%INTEGER_BITS))  \
-          isSet = 1;         \
-      else                   \
-          isSet = 0;         \
+	  if (integers[(bitNo)/INTEGER_BITS] & (1<<(bitNo)%INTEGER_BITS))  \
+		  isSet = 1;         \
+	  else                   \
+		  isSet = 0;         \
    }
 
 #define FOR_EACH_WORD_IN_SPACE_DELIMITED_STRING(String, Word) \
-    if ((String) != NULL) { \
-        char *Word; \
-        while (((Word) = getNextWord_(&String)) != NULL) { \
+	if ((String) != NULL) { \
+		char *Word; \
+		while (((Word) = getNextWord_(&String)) != NULL) { \
 
 #define END_FOR_EACH_WORD_IN_SPACE_DELIMITED_STRING }}
 
