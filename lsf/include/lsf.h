@@ -355,9 +355,9 @@ struct placeInfo
 
 struct hostLoad
 {
-        char *hostName;
-        float *status;
-        float *loadIndex;
+    char *hostName;
+    float *status;
+    float *loadIndex;
 };
 
 enum valueType
@@ -375,13 +375,41 @@ enum orderType
     INCR, DECR, NA
 };
 
-#define RESF_BUILTIN     0x01
-#define RESF_DYNAMIC     0x02
-#define RESF_GLOBAL      0x04
-#define RESF_SHARED      0x08
-#define RESF_EXTERNAL    0x10
-#define RESF_RELEASE     0x20
-#define RESF_DEFINED_IN_RESOURCEMAP  0x40
+enum RESF {
+
+// copied from https://www.ibm.com/support/knowledgecenter/en/SSWRJV_10.1.0/api_reference/group__defs__ls__info.html
+    RESF_BUILTIN                = 0x01,
+    RESF_DYNAMIC                = 0x02, // ability of this resource to be dynamic or not
+    RESF_GLOBAL                 = 0x04,
+    RESF_SHARED                 = 0x08,
+    RESF_LIC                    = 0x10,
+    RESF_EXTERNAL               = 0x20,
+    RESF_RELEASE                = 0x40,
+    RESF_DEFINED_IN_RESOURCEMAP = 0x80,
+    RESF_NON_CONSUMABLE         = 0x100,
+    RESF_REDEFINABLE            = 0x200,
+    RESF_ESRES                  = 0x400,
+    RESF_MEGA_CRITERIA          = 0x800,
+    RESF_APPEARS_IN_RESOURCEMAP = 0x8000,
+
+// original
+    // RESF_BUILTIN                = 0x01,
+    // RESF_DYNAMIC                = 0x02, // ability of this resource to be dynamic or not
+    // RESF_GLOBAL                 = 0x04,
+    // RESF_SHARED                 = 0x08,
+    // RESF_EXTERNAL               = 0x10,
+    // RESF_RELEASE                = 0x20,
+    // RESF_DEFINED_IN_RESOURCEMAP = 0x40,
+    RESF_KEYNULL                = 0xFFFF
+};
+
+// #define RESF_BUILTIN     0x01
+// #define RESF_DYNAMIC     0x02
+// #define RESF_GLOBAL      0x04
+// #define RESF_SHARED      0x08
+// #define RESF_EXTERNAL    0x10
+// #define RESF_RELEASE     0x20
+// #define RESF_DEFINED_IN_RESOURCEMAP  0x40
 
 struct resItem
 {

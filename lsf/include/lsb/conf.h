@@ -22,8 +22,8 @@
 #include "lib/table.h"
 #include "lsb/lsbatch.h"
 
-#define TYPE1  RESF_BUILTIN | RESF_DYNAMIC | RESF_GLOBAL
-#define TYPE2  RESF_BUILTIN | RESF_GLOBAL
+// #define TYPE1  RESF_BUILTIN | RESF_DYNAMIC | RESF_GLOBAL
+// #define TYPE2  RESF_BUILTIN | RESF_GLOBAL
 
 #define USEREQUIVALENT "userequivalent"
 #define USERMAPPING    "usermap"
@@ -79,8 +79,8 @@ static bool_t initUnknownUsers = FALSE;
 
 char *getNextWord1_ (char **);
 
-#define TYPE1  RESF_BUILTIN | RESF_DYNAMIC | RESF_GLOBAL
-#define TYPE2  RESF_BUILTIN | RESF_GLOBAL
+// #define TYPE1  RESF_BUILTIN | RESF_DYNAMIC | RESF_GLOBAL
+// #define TYPE2  RESF_BUILTIN | RESF_GLOBAL
 
 static char do_Param  (struct lsConf *conf, char *fname, size_t *lineNumber);
 static char do_Users  (struct lsConf *conf, char *fname, size_t *lineNumber, int option);

@@ -24,10 +24,10 @@
 #define M_THEN_A  1
 #define A_THEN_M  2
 #define M_OR_A    3
-#define TYPE1  RESF_BUILTIN | RESF_DYNAMIC | RESF_GLOBAL
-#define TYPE2  RESF_BUILTIN | RESF_GLOBAL
-#define TYPE3  RESF_BUILTIN | RESF_GLOBAL | RESF_LIC
-#define DEF_REXPRIORITY 0
+
+
+// #define DEF_REXPRIORITY 0
+const unsined int DEF_REXPRIORITY = 0
 
 
 // #define NL_SETN 42
@@ -56,6 +56,13 @@ struct builtIn
     int flags;
     int interval;
 }; 
+
+// #define TYPE1  RESF_BUILTIN | RESF_DYNAMIC | RESF_GLOBAL
+// #define TYPE2  RESF_BUILTIN | RESF_GLOBAL
+// #define TYPE3  RESF_BUILTIN | RESF_GLOBAL | RESF_LIC
+const unsigned int TYPE1 = RESF_BUILTIN | RESF_DYNAMIC | RESF_GLOBAL; // the following three declerations belong in liblsf/conf.h
+const unsigned int TYPE2 = RESF_BUILTIN | RESF_GLOBAL;
+const unsigned int TYPE3 = RESF_BUILTIN | RESF_GLOBAL | RESF_LIC;
 
 // static 
 struct builtIn builtInRes[] = { // FIXME FIXME FIXME find out where this LS_NUMERIC comes from

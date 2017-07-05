@@ -1,5 +1,5 @@
 
-int addResourceMap_liblsf( const char *resName, const char *location, const char *lsfile, size_t lineNum, int *isDefault )
+int addResourceMap( const char *resName, const char *location, const char *lsfile, size_t lineNum, int *isDefault )
 {
 	int resNo                             = 0;
 	int dynamic                           = 0;
@@ -42,24 +42,7 @@ int addResourceMap_liblsf( const char *resName, const char *location, const char
 		return -1;
 	}
 
-	
-#error was here, continue figuring out what the frackey frak does RESF_DYNAMIC have to do with anything; if it does change the error text below where needed
-
-	dynamic = (allInfo.resTable[resNo].flags & RESF_DYNAMIC); // is this about dynamic hosts?
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	dynamic = (allInfo.resTable[resNo].flags & RESF_DYNAMIC); // is resource dynamically configured or not? // FIXME FIXME FIXME FIXMEE does not appear anywhere else
 	resource = inHostResources (resName);  // FIXME FIXME FIXME looking up the resname and returning context in struct format
 
 	if (!strcmp (location, "!")) {
@@ -74,7 +57,7 @@ int addResourceMap_liblsf( const char *resName, const char *location, const char
 			return -1;
 		}
 		return 0;
-	} // NOT THE SAME // NOW THE SAME
+	}
 
 	sp = location;
 	while ( sp != NULL ) { // FIXME FIXME FIXME FIXME FIXME United Soviets of KEKistan... use bison; don't code your own parser. PLEASE.
@@ -102,10 +85,10 @@ int addResourceMap_liblsf( const char *resName, const char *location, const char
 		instance = sp;
 		defaultWord = FALSE;
 		// initValue[0] = '\0';
-		while (*sp == ' ' && *sp != '\0') {
+		while ( isblack(sp) && sp != NULL ) {
 			sp++;
 		}
-		if (*sp == '\0') {
+		if ( sp ==  NULL ) {
 			FREEUP (initValue);
 			if (first == TRUE) {
 				return -1;
@@ -118,8 +101,9 @@ int addResourceMap_liblsf( const char *resName, const char *location, const char
 		while( isalnum (*cp) ) {
 			cp++;
 		}
-		if (cp != sp)
-			{
+
+		if (cp != sp) {
+			unsigned long lsize = 0;
 			ssp = cp[0];
 			cp[0] = '\0';
 			strcpy (initValue, sp);
