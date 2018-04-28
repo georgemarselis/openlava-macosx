@@ -27,7 +27,7 @@
 
 
 // #define DEF_REXPRIORITY 0
-const unsined int DEF_REXPRIORITY = 0
+const unsigned int DEF_REXPRIORITY = 0;
 
 
 // #define NL_SETN 42
@@ -167,11 +167,11 @@ int addResourceMap        (char *resName, char *location, const char *lsfile, si
 int liblsf_addResourceMap (char *resName, char *location, const char *lsfile, size_t lineNum);
 
 // static 
-unsigned int parseHostList ( char *hostList, const char *lsfile, size_t lineNum, char ***hosts, int *isDefault);
-int liblsf_parseHostList   ( char *hostList, const char *lsfile, size_t lineNum, char ***hosts);
+unsigned int parseHostList ( const char *hostList, const char *lsfile, size_t lineNum, char ***hosts, int *isDefault);
+int liblsf_parseHostList   ( const char *hostList, const char *lsfile, size_t lineNum, char ***hosts);
 //  was : 
 // static struct lsSharedResourceInfo *addResource (char *resName, int nHosts, char **hosts, char *value, char *fileName, size_t lineNum);
-struct lsSharedResourceInfo *liblsf_addResource (char *resName, int nHosts, char **hosts, char *value, const char *fileName, size_t lineNum);
+struct lsSharedResourceInfo *liblsf_addResource ( const char *resName, unsigned long nHosts, char **hosts, char *value, const char *fileName, size_t lineNum);
 // static 
 struct sharedResource *addResource (char *resName, unsigned int nHosts, char **hosts, char *value, const char *fileName, size_t lineNum, int resourceMap);
 int liblsf_addHostInstance(struct lsSharedResourceInfo *sharedResource, unsigned int nHosts, char **hostNames, char *value);
@@ -180,7 +180,8 @@ int addHostInstance (struct sharedResource *sharedResource, unsigned int nHosts,
 char addHost (struct hostInfo *host, const char *filename, size_t *lineNum);
 
 int convertNegNotation_ (char **, struct HostsArray *);
-int resolveBaseNegHosts (char *, char **, struct HostsArray *);
+// int resolveBaseNegHosts (char *, char **, struct HostsArray *);
+int resolveBaseNegHosts ( const char *inHosts, char **outHosts, struct HostsArray *array); // correct invocation
 
 void freeSA_ (char **list, unsigned int num);
 

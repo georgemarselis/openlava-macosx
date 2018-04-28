@@ -22,12 +22,14 @@
 #include <stdio.h>
 #include <strings.h>
 
+#include "lsf.h"
 #include "lib/conf.h"
 #include "lib/confmisc.h"
 #include "lib/lproto.h"
 #include "lib/words.h"
 #include "lib/putInLists.h"
 #include "lib/misc.h"
+#include "lib/err.h"
 
 // #define NL_SETN 42
 
@@ -2803,7 +2805,7 @@ int liblsf_parseHostList (const char *hostList, const char *lsfile, size_t lineN
 		return -1;
 	}
 
-	sp = hostList;
+	sp = hostList; // assignment to char from const, look up solution later
 	while ( NULL != (host = getNextWord_ (&sp)) ) {
 		numHosts++;
 	}
@@ -2815,7 +2817,7 @@ int liblsf_parseHostList (const char *hostList, const char *lsfile, size_t lineN
 		return -1;
 	}
 
-	sp = hostList;
+	sp = hostList;  // assignment to char from const, look up solution later
 	numHosts = 0;
 	while ((host = getNextWord_ (&sp)) != NULL) {
 
@@ -2843,7 +2845,7 @@ int liblsf_parseHostList (const char *hostList, const char *lsfile, size_t lineN
 }
 
 
-struct lsSharedResourceInfo *liblsf_addResource ( const char *resName, int nHosts, char **hosts, char *value, const char *filename, size_t lineNum)
+struct lsSharedResourceInfo *liblsf_addResource ( const char *resName, unsigned long nHosts, char **hosts, char *value, const char *filename, size_t lineNum)
 {
 	int nRes = 0;
 	struct lsSharedResourceInfo *resInfo = NULL;
@@ -2856,7 +2858,7 @@ struct lsSharedResourceInfo *liblsf_addResource ( const char *resName, int nHost
 	}
 
 	assert( cConf->numShareRes >= 0 ); // FIXME is numShareRes always >= 0 ? // FIXME FIXME FIXME FIXME where is cConf from and what doe sit do?
-	resInfo = myreallocok (cConf->shareRes, sizeof (struct lsSharedResourceInfo) *( cConf->numShareRes + 1 ));
+	resInfo = myrealloc( cConf->shareRes, sizeof (struct lsSharedResourceInfo) *( cConf->numShareRes + 1 ));
 	if (NULL == resInfo && ENOMEM == errno ) {
 		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "myrealloc");
 		return NULL;
@@ -2936,7 +2938,7 @@ int liblsf_addHostInstance (struct lsSharedResourceInfo *sharedResource, unsigne
 	
 	sharedResource->nInstances++;
 
-	lsferrno = ENOHOSTADDED;
+	lserrno = ENOHOSTADDED; // FIXME change lserrno to lsferrno
 	return 0;
 }
 
@@ -2948,9 +2950,9 @@ int convertNegNotation_ (char **value, struct HostsArray *array)
 	char *ptr      = NULL;
 	char *save     = NULL;
 	char *outHosts = NULL;
+	char *buffer   = strdup (value[0]); // FIXME FIXME FIXME find out what value[0] is, create a union and mark the array subscript appropriatelly
 	char *sp1      = strstr (buffer, "all ");
 	char *sp2      = sp1;
-	char *buffer   = strdup (value[0]); // FIXME FIXME FIXME find out what value[0] is, create a union and mark the array subscript appropriatelly
 	
 	if (!buffer) {
 		lserrno = LSE_MALLOC;
@@ -2989,7 +2991,7 @@ int convertNegNotation_ (char **value, struct HostsArray *array)
 		FREEUP (buffer);
 		FREEUP (outHosts);
 	
-		return result;s
+		return result;
 	}
 
 	ls_syslog (LOG_DEBUG, "%s: the original string is \'%s\'", __func__, value[0]);  // FIXME FIXME FIXME FIXME wrap this around debug conditional
@@ -3053,7 +3055,7 @@ void freeSA_ (char **list, unsigned int num)
 	}
 	FREEUP (list);
 
-	return
+	return;
 }
 
 
