@@ -403,14 +403,6 @@ enum RESF {
     RESF_KEYNULL                = 0xFFFF
 };
 
-// #define RESF_BUILTIN     0x01
-// #define RESF_DYNAMIC     0x02
-// #define RESF_GLOBAL      0x04
-// #define RESF_SHARED      0x08
-// #define RESF_EXTERNAL    0x10
-// #define RESF_RELEASE     0x20
-// #define RESF_DEFINED_IN_RESOURCEMAP  0x40
-
 struct resItem
 {
     enum valueType valueType;
