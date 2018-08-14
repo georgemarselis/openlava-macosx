@@ -79,9 +79,6 @@ bool_t initUnknownUsers = FALSE;
 
 char *getNextWord1_ (char **);
 
-// #define TYPE1  RESF_BUILTIN | RESF_DYNAMIC | RESF_GLOBAL
-// #define TYPE2  RESF_BUILTIN | RESF_GLOBAL
-
 char do_Param  (struct lsConf *conf, char *fname, size_t *lineNumber);
 char do_Users  (struct lsConf *conf, char *fname, size_t *lineNumber, int option);
 char do_Hosts_ (struct lsConf *conf, char *fname, size_t *lineNumber, struct lsInfo *info, int options);
