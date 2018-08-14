@@ -89,6 +89,8 @@ AC_FUNC_STRTOD
 AC_FUNC_WAIT3
 AC_CHECK_FUNCS([alarm atexit dup2 endgrent getcwd gethostbyaddr gethostbyname gethostname getpagesize gettimeofday inet_ntoa isascii memmove memset mkdir pow putenv rmdir select socket stime strcasecmp strchr strdup strerror strncasecmp strpbrk strrchr strstr strtol utime])
 
+CFLAGS+=" -Wall -Wextra -Wfatal-errors -Werror -Wformat=2 -Wno-format-extra-args -Wno-format-zero-length -Winit-self -Wimplicit-int -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wunused-parameter -std=c99 -D_POSIX_SOURCE -D_POSIX_C_SOURCE=200112L -D_XOPEN_SOURCE=700 -pedantic-errors"
+
 AC_CONFIG_FILES([Makefile po/Makefile.in
                 config/Makefile
                 docs/examples/Makefile
