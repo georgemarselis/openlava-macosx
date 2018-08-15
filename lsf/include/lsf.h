@@ -66,8 +66,8 @@
 #define FALSE 0
 #endif
 
-typedef long LS_LONG_INT; // FIXME FIXME FIXME FIXME FIXME  untypedef, leave to compiler to deal with
-typedef unsigned long LS_UNS_LONG_INT; // FIXME FIXME FIXME FIXME FIXME untypedef, leave to compiler to deal with
+// typedef long LS_LONG_INT; // FIXME FIXME FIXME FIXME FIXME  untypedef, leave to compiler to deal with
+// typedef unsigned long LS_UNS_LONG_INT; // FIXME FIXME FIXME FIXME FIXME untypedef, leave to compiler to deal with
 
 // #define LS_LONG_FORMAT ("%ld") 
 // #define _OPENLAVA_PROJECT_ "openlava project 2.0" // FIXME FIXME FIXME FIXME FIXME move to configure.ac
@@ -99,6 +99,9 @@ const unsigned short OPENLAVA_VERSION = 20;
 // #define MAXMODELS               128
 // #define MAXTYPES_31             25
 // #define MAXMODELS_31            30
+
+static int lsferrno = 0;
+
 enum LSF_CONSTANTS {
     LSF_DEFAULT_SOCKS = 15,
     MAXLINELEN    = 512,

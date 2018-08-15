@@ -7,11 +7,11 @@
 
 struct submitMbdReply
 {
-    char *queue;
-    char *badJobName;
+    const char *queue;
+    const char *badJobName;
     int badReqIndx;
     char padding[4];
-    long jobId;
+    unsigned long jobId;
 };
 
 
@@ -73,7 +73,7 @@ struct jobMoveReq
 {
   unsigned int opCode;
   int position;
-  long jobId;
+   unsigned long jobId;
 };
 
 struct jobPeekReply
@@ -84,7 +84,7 @@ struct jobPeekReply
 
 struct modifyReq
 {
-	LS_LONG_INT jobId;
+	unsigned long jobId;
 	char *jobIdStr;
 	int delOptions;
 	int delOptions2;
@@ -93,7 +93,7 @@ struct modifyReq
 
 struct migReq
 {
-	long jobId;
+	 unsigned long jobId;
 	int options;
 	unsigned int numAskedHosts;
 	char **askedHosts;
@@ -134,7 +134,7 @@ struct jobInfoReply
 	struct submitReq *jobBill;
 	struct jRusage runRusage;
 	int counter[NUM_JGRP_COUNTERS]; // FIXME FIXME what is this NUM_JGRP_COUNTERS ? make it configurable from configure.ac
-	long jobId; 					// FIXME FIXME FIXME this must change to u_int64_t ( unsigned long, 64 bits )
+	 unsigned long jobId; 					// FIXME FIXME FIXME this must change to u_int64_t ( unsigned long, 64 bits )
 	char **toHosts;
 };
 
@@ -143,7 +143,7 @@ struct signalReq
   int sigValue;
   int actFlags;
   time_t chkPeriod;
-  long jobId;
+   unsigned long jobId;
 };
 
 struct groupInfoReply
@@ -155,7 +155,7 @@ struct groupInfoReply
 
 struct jobPeekReq
 {
-  long jobId;
+   unsigned long jobId;
 };
 
 struct infoReq
@@ -178,7 +178,7 @@ struct queueInfoReply
 
 struct jobInfoReq
 {
-  long jobId;
+   unsigned long jobId;
   int options;
   char padding[4];
   char *userName;

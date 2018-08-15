@@ -816,6 +816,146 @@ struct msgMap pendMsg[] = {
 #define DEL_NUMPRO        INFINIT_INT
 #define DEFAULT_NUMPRO    INFINIT_INT -1
 
+#define LSB_CHKPERIOD_NOCHNG -1
+
+#define LSB_CHKPNT_KILL  0x1
+#define LSB_CHKPNT_FORCE 0x2
+#define LSB_CHKPNT_COPY  0x3
+#define LSB_CHKPNT_MIG   0x4
+#define LSB_CHKPNT_STOP  0x8
+#define LSB_KILL_REQUEUE 0x10
+
+#define ALL_USERS       "all"
+#define ALL_JOB         0x0001
+#define DONE_JOB        0x0002
+#define PEND_JOB        0x0004
+#define SUSP_JOB        0x0008
+#define CUR_JOB         0x0010
+#define LAST_JOB        0x0020
+#define RUN_JOB         0x0040
+#define JOBID_ONLY      0x0080
+#define HOST_NAME       0x0100
+#define NO_PEND_REASONS 0x0200
+#define JGRP_ARRAY_INFO 0x1000
+#define JOBID_ONLY_ALL  0x02000
+#define ZOMBIE_JOB      0x04000
+
+#define JGRP_NODE_JOB    1
+#define JGRP_NODE_GROUP  2
+#define JGRP_NODE_ARRAY  3
+
+#define LSB_MAX_ARRAY_JOBID 0x0FFFFFFFF // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
+#define LSB_MAX_ARRAY_IDX   0x0FFFF  // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
+#define LSB_MAX_SEDJOB_RUNID    (0x0F)
+#define LSB_JOBID(array_jobId, array_idx) (((LS_UNS_LONG_INT)array_idx << 32UL) | array_jobId) // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
+#define LSB_ARRAY_IDX(jobId) (((jobId) == -1UL) ? (0) : (unsigned long)(((LS_UNS_LONG_INT)jobId >> 32UL) & LSB_MAX_ARRAY_IDX)) // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
+#define LSB_ARRAY_JOBID(jobId) (((jobId) == -1UL) ? (-1) : (unsigned long)(jobId & LSB_MAX_ARRAY_JOBID)) // FIXME FIXME FIXME FIXME FIXME this needs to be unrolled.
+
+
+#define JGRP_ACTIVE        1
+#define JGRP_UNDEFINED     -1
+
+#define JGRP_COUNT_NJOBS   0
+#define JGRP_COUNT_PEND    1
+#define JGRP_COUNT_NPSUSP  2
+#define JGRP_COUNT_NRUN    3
+#define JGRP_COUNT_NSSUSP  4
+#define JGRP_COUNT_NUSUSP  5
+#define JGRP_COUNT_NEXIT   6
+#define JGRP_COUNT_NDONE   7
+
+#define NUM_JGRP_COUNTERS 8
+
+#define ALL_QUEUE       0x01
+#define DFT_QUEUE       0x02
+#define CHECK_HOST      0x80
+#define CHECK_USER      0x100
+#define SORT_HOST       0x200
+
+#define LSB_SIG_NUM               23
+
+
+#define ACT_NO              0
+#define ACT_START           1
+#define ACT_DONE            3
+#define ACT_FAIL            4
+
+#define H_ATTR_CHKPNTABLE  0x1
+
+
+#define DEF_MAX_JOBID   999999
+#define MAX_JOBID_LOW   999999
+#define MAX_JOBID_HIGH 9999999
+
+#define USER_GRP          0x1
+#define HOST_GRP          0x2
+#define GRP_RECURSIVE     0x8
+#define GRP_ALL           0x10
+#define GRP_SHARES        0x40
+
+#define RUNJOB_OPT_NORMAL     0x01
+#define RUNJOB_OPT_NOSTOP     0x02
+#define RUNJOB_OPT_PENDONLY   0x04
+#define RUNJOB_OPT_FROM_BEGIN 0x08
+
+#define REQUEUE_DONE   0x1
+#define REQUEUE_EXIT   0x2
+#define REQUEUE_RUN    0x4
+
+#define TO_TOP            1
+#define TO_BOTTOM         2
+
+#define QUEUE_OPEN        1
+#define QUEUE_CLOSED      2
+#define QUEUE_ACTIVATE    3
+#define QUEUE_INACTIVATE  4
+
+#define HOST_OPEN         1
+#define HOST_CLOSE        2
+#define HOST_REBOOT       3
+#define HOST_SHUTDOWN     4
+
+#define MBD_RESTART       0
+#define MBD_RECONFIG      1
+#define MBD_CKCONFIG      2
+
+
+#define MAXFILENAMELEN          4096 // FIXME FIXME FIXME re-introduced from lsf.h, cuz gcc was complaining
+
+
+#define LSF_JOBIDINDEX_FILENAME "lsb.events.index"       // FIXME FIXME FIXME is this approprate ? should it be named like that?
+#define LSF_JOBIDINDEX_FILETAG "#LSF_JOBID_INDEX_FILE" 
+
+
+#define LSB_MAX_SD_LENGTH 128
+
+
+#define CONF_NO_CHECK       0x00
+#define CONF_CHECK          0x01
+#define CONF_EXPAND         0X02
+#define CONF_RETURN_HOSTSPEC    0X04
+#define CONF_NO_EXPAND      0X08
+
+
+
+#define IS_PEND(s)  (((s) & JOB_STAT_PEND) || ((s) & JOB_STAT_PSUSP))
+
+#define IS_START(s)  (((s) & JOB_STAT_RUN) || ((s) & JOB_STAT_SSUSP) \
+               || ((s) & JOB_STAT_USUSP))
+
+#define IS_FINISH(s) (((s) & JOB_STAT_DONE) || ((s) & JOB_STAT_EXIT))
+
+#define IS_SUSP(s) (((s) & JOB_STAT_PSUSP) || ((s) & JOB_STAT_SSUSP) \
+                             ||  ((s) & JOB_STAT_USUSP))
+
+#define IS_POST_DONE(s) ( ( (s) & JOB_STAT_PDONE) == JOB_STAT_PDONE )
+#define IS_POST_ERR(s) ( ( (s) & JOB_STAT_PERR) == JOB_STAT_PERR )
+#define IS_POST_FINISH(s) ( IS_POST_DONE(s) || IS_POST_ERR(s) )
+
+#define PRINT_SHORT_NAMELIST  0x01
+#define PRINT_LONG_NAMELIST   0x02
+#define PRINT_MCPU_HOSTS      0x04
+
 
 // #define XF_OP_SUB2EXEC         0x1
 // #define XF_OP_EXEC2SUB         0x2
@@ -878,79 +1018,29 @@ struct submitReply
   char *badJobName;
   int badReqIndx;
   char padding[4];
-  LS_LONG_INT badJobId;
+  unsigned long badJobId;
 };
 
 struct submig
 {
-  LS_LONG_INT jobId;
+  unsigned long jobId;
   int options;
   unsigned int numAskedHosts;
   char **askedHosts;
 };
 
 
-#define LSB_CHKPERIOD_NOCHNG -1
-
-#define LSB_CHKPNT_KILL  0x1
-#define LSB_CHKPNT_FORCE 0x2
-#define LSB_CHKPNT_COPY  0x3
-#define LSB_CHKPNT_MIG   0x4
-#define LSB_CHKPNT_STOP  0x8
-#define LSB_KILL_REQUEUE 0x10
-
-#define ALL_USERS       "all"
-#define ALL_JOB         0x0001
-#define DONE_JOB        0x0002
-#define PEND_JOB        0x0004
-#define SUSP_JOB        0x0008
-#define CUR_JOB         0x0010
-#define LAST_JOB        0x0020
-#define RUN_JOB         0x0040
-#define JOBID_ONLY      0x0080
-#define HOST_NAME       0x0100
-#define NO_PEND_REASONS 0x0200
-#define JGRP_ARRAY_INFO 0x1000
-#define JOBID_ONLY_ALL  0x02000
-#define ZOMBIE_JOB      0x04000
-
-#define JGRP_NODE_JOB    1
-#define JGRP_NODE_GROUP  2
-#define JGRP_NODE_ARRAY  3
-
-#define LSB_MAX_ARRAY_JOBID 0x0FFFFFFFF // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
-#define LSB_MAX_ARRAY_IDX   0x0FFFF  // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
-#define LSB_MAX_SEDJOB_RUNID    (0x0F)
-#define LSB_JOBID(array_jobId, array_idx) (((LS_UNS_LONG_INT)array_idx << 32UL) | array_jobId) // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
-#define LSB_ARRAY_IDX(jobId) (((jobId) == -1UL) ? (0) : (unsigned long)(((LS_UNS_LONG_INT)jobId >> 32UL) & LSB_MAX_ARRAY_IDX)) // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
-#define LSB_ARRAY_JOBID(jobId) (((jobId) == -1UL) ? (-1) : (unsigned long)(jobId & LSB_MAX_ARRAY_JOBID)) // FIXME FIXME FIXME FIXME FIXME this needs to be unrolled.
-
-
-#define JGRP_ACTIVE        1
-#define JGRP_UNDEFINED     -1
-
-#define JGRP_COUNT_NJOBS   0
-#define JGRP_COUNT_PEND    1
-#define JGRP_COUNT_NPSUSP  2
-#define JGRP_COUNT_NRUN    3
-#define JGRP_COUNT_NSSUSP  4
-#define JGRP_COUNT_NUSUSP  5
-#define JGRP_COUNT_NEXIT   6
-#define JGRP_COUNT_NDONE   7
-
-#define NUM_JGRP_COUNTERS 8
-
 struct jobAttrInfoEnt
 {
     unsigned short port;
     char hostname[MAXHOSTNAMELEN];
     char padding[6];
-    LS_LONG_INT jobId;
+    unsigned long jobId;
 };
 
 struct jobAttrSetLog
 {
-  int jobId;
+  unsigned long jobId;
   int idx;
   int uid;
   int port;
@@ -961,7 +1051,7 @@ struct jobInfoHead
 {
   unsigned int numHosts;
   char padding[4];
-  LS_LONG_INT *jobIds;
+  unsigned long *jobIds;
   unsigned long numJobs;
   char **hostNames;
 };
@@ -1006,7 +1096,7 @@ struct jobInfoEnt
     int counter[NUM_JGRP_COUNTERS];
     struct submit submit;
     struct jRusage runRusage;
-    LS_LONG_INT jobId;
+    unsigned long jobId;
 };
 
 struct userInfoEnt
@@ -1023,15 +1113,6 @@ struct userInfoEnt
     unsigned int numRESERVE;
     char padding[4];
 };
-
-#define ALL_QUEUE       0x01
-#define DFT_QUEUE       0x02
-#define CHECK_HOST      0x80
-#define CHECK_USER      0x100
-#define SORT_HOST       0x200
-
-#define LSB_SIG_NUM               23
-
 
 
 struct queueInfoEnt
@@ -1087,12 +1168,6 @@ struct queueInfoEnt
     char *chkpntDir;
 };
 
-#define ACT_NO              0
-#define ACT_START           1
-#define ACT_DONE            3
-#define ACT_FAIL            4
-
-#define H_ATTR_CHKPNTABLE  0x1
 struct hostInfoEnt
 {
     int hStatus;
@@ -1117,10 +1192,6 @@ struct hostInfoEnt
     float *realLoad;
     double cpuFactor;
 };
-
-#define DEF_MAX_JOBID   999999
-#define MAX_JOBID_LOW   999999
-#define MAX_JOBID_HIGH 9999999
 
 struct parameterInfo
 {
@@ -1164,63 +1235,33 @@ struct parameterInfo
 
 struct loadInfoEnt
 {
-  char *hostName;
+  const char *hostName;
   int status;
   char padding[4];
   float *load;
 };
 
-#define USER_GRP          0x1
-#define HOST_GRP          0x2
-#define GRP_RECURSIVE     0x8
-#define GRP_ALL           0x10
-#define GRP_SHARES        0x40
 
 struct groupInfoEnt
 {
-  char *group;
-  char *memberList;
+  const char *group;
+  const char *memberList;
 };
 
-#define RUNJOB_OPT_NORMAL     0x01
-#define RUNJOB_OPT_NOSTOP     0x02
-#define RUNJOB_OPT_PENDONLY   0x04
-#define RUNJOB_OPT_FROM_BEGIN 0x08
 struct runJobRequest
 {
   int options;
   unsigned int numHosts;
-  LS_LONG_INT jobId;
-  char **hostname;
+  unsigned long jobId;
+  const char **hostname;
 };
-
-#define REQUEUE_DONE   0x1
-#define REQUEUE_EXIT   0x2
-#define REQUEUE_RUN    0x4
 
 struct jobrequeue
 {
-  LS_LONG_INT jobId;
+  unsigned long jobId;
   int status;
   int options;
 };
-
-#define TO_TOP            1
-#define TO_BOTTOM         2
-
-#define QUEUE_OPEN        1
-#define QUEUE_CLOSED      2
-#define QUEUE_ACTIVATE    3
-#define QUEUE_INACTIVATE  4
-
-#define HOST_OPEN         1
-#define HOST_CLOSE        2
-#define HOST_REBOOT       3
-#define HOST_SHUTDOWN     4
-
-#define MBD_RESTART       0
-#define MBD_RECONFIG      1
-#define MBD_CKCONFIG      2
 
 struct logSwitchLog
 {
@@ -1336,9 +1377,9 @@ struct jobModLog
 
 struct jobStartLog
 {
-  int jobId;
+  unsigned long jobId;
   int jStatus;
-  int jobPid;
+  pid_t jobPid;
   int jobPGid;
   float hostFactor;
   int numExHosts;
@@ -1351,8 +1392,8 @@ struct jobStartLog
 
 struct jobStartAcceptLog
 {
-  int jobId;
-  int jobPid;
+  unsigned long jobId;
+  pid_t jobPid;
   int jobPGid;
   int idx;
 };
@@ -1360,10 +1401,10 @@ struct jobStartAcceptLog
 
 struct jobExecuteLog
 {
-    int jobId;
+    unsigned long jobId;
     int execUid;
     int jobPGid;
-    int jobPid;
+    pid_t jobPid;
     int idx;
     char padding[4];
     char *execHome;
@@ -1374,7 +1415,7 @@ struct jobExecuteLog
 
 struct jobStatusLog
 {
-    int jobId;
+    unsigned long jobId;
     int jStatus;
     int reason;
     int subreasons;
@@ -1392,7 +1433,7 @@ struct jobStatusLog
 struct sbdJobStatusLog
 {
     char padding[4];
-    int jobId;
+    unsigned long jobId;
     int jStatus;
     int reasons;
     int subreasons;
@@ -1409,7 +1450,7 @@ struct sbdJobStatusLog
 struct jobSwitchLog
 {
   uid_t userId;
-  int jobId;
+  unsigned long jobId;
   char queue[MAX_LSB_NAME_LEN];
   int idx;
   char userName[MAX_LSB_NAME_LEN];
@@ -1418,16 +1459,16 @@ struct jobSwitchLog
 struct jobMoveLog
 {
   uid_t userId;
-  int jobId;
+  unsigned long jobId;
   int position;
   int base;
   int idx;
-  char userName[MAX_LSB_NAME_LEN];
+  char *userName; // [MAX_LSB_NAME_LEN];
 };
 
 struct chkpntLog
 {
-    int jobId;
+    unsigned long jobId;
     int chkperiod;
     int pid;
     int ok;
@@ -1438,19 +1479,19 @@ struct chkpntLog
 
 struct jobRequeueLog
 {
-  int jobId;
+  unsigned long jobId;
   int idx;
 };
 
 struct jobCleanLog
 {
-  int jobId;
+  unsigned long jobId;
   int idx;
 };
 
 struct sigactLog
 {
-    int jobId;
+    unsigned long jobId;
     int pid;
     int jStatus;
     int reasons;
@@ -1464,11 +1505,11 @@ struct sigactLog
 
 struct migLog
 {
-    int jobId;
+    unsigned long jobId;
     int numAskedHosts;
     uid_t userId;
     int idx;
-    char userName[MAX_LSB_NAME_LEN];
+    char *userName; // [MAX_LSB_NAME_LEN];
     char padding[4];
     char **askedHosts;
 };
@@ -1476,7 +1517,7 @@ struct migLog
 struct signalLog
 {
     uid_t userId;
-    int jobId;
+    unsigned long jobId;
     int runCount;
     int idx;
     char userName[MAX_LSB_NAME_LEN];
@@ -1486,9 +1527,9 @@ struct signalLog
 struct queueCtrlLog
 {
   int opCode;
-  char queue[MAX_LSB_NAME_LEN];
+  char *queue; // [MAX_LSB_NAME_LEN];
   int userId;
-  char userName[MAX_LSB_NAME_LEN];
+  char *userName; // [MAX_LSB_NAME_LEN];
 };
 
 struct newDebugLog
@@ -1497,7 +1538,7 @@ struct newDebugLog
   int level;
   int logclass;
   int turnOff;
-  char logFileName[MAXLSFNAMELEN];
+  char *logFileName; //[MAXLSFNAMELEN];
   int userId;
 };
 
@@ -1527,7 +1568,7 @@ struct mbdDieLog
 struct unfulfillLog
 {
     char padding[4];
-    int jobId;
+    unsigned long jobId;
     int notSwitched;
     int sig;
     int sig1;
@@ -1537,11 +1578,9 @@ struct unfulfillLog
     time_t chkPeriod;
 };
 
-#define MAXFILENAMELEN          4096 // FIXME FIXME FIXME re-introduced from lsf.h, cuz gcc was complaining
-
 struct jobFinishLog
 {
-    int jobId;
+    unsigned long jobId;
     uid_t userId;
     int options;
     int jStatus;
@@ -1593,7 +1632,7 @@ struct loadIndexLog
 struct jobMsgLog
 {
     uid_t usrId;
-    int jobId;
+    unsigned long jobId;
     int msgId;
     int type;
     int idx;
@@ -1606,7 +1645,7 @@ struct jobMsgLog
 struct jobMsgAckLog
 {
     uid_t usrId;
-    int jobId;
+    unsigned long jobId;
     int msgId;
     int type;
     int idx;
@@ -1621,7 +1660,7 @@ struct jobForceRequestLog
   int userId;
   int numExecHosts;
   char **execHosts;
-  int jobId;
+  unsigned long jobId;
   int idx;
   int options;
   char userName[MAX_LSB_NAME_LEN];
@@ -1630,29 +1669,29 @@ struct jobForceRequestLog
 // from union eventLog @ include/lsb/log.h
 struct newJobLog
 {
-    LS_LONG_INT jobId;
-    LS_LONG_INT rjobId;
+    unsigned long jobId;
+    unsigned long rjobId;
     uid_t userId;
     int flags;
     int nproc;
     int sigval;
-    int chkperiod;
+    int chkperiod; // not sure if chkperiod should be an int
     int restartpid;
     int mailUserId;
     int umask;
     int numUsHosts;
-    int limits[MAX_NRLIMITS];
-    char queue[MAXQUEUENAMELEN];
-    char resReq[MAXLINELEN];
-    char fromHost[MAXHOSTNAMELEN];
-    char cwd[MAXPATHLEN];
-    char chkdir[MAXFILENAMELEN];
-    char inFile[MAXFILENAMELEN];
-    char outFile[MAXFILENAMELEN];
-    char errFile[MAXFILENAMELEN];
-    char jobFile[MAXFILENAMELEN];
-    char jobName[MAXJOBDESPLEN];
-    char command[MAXJOBDESPLEN];
+    int limits[MAX_NRLIMITS]; // these subscribts got to go
+    char *queue; // [MAXQUEUENAMELEN];
+    char *resReq;
+    char *fromHost;
+    char *cwd;
+    char *chkdir;
+    char *inFile;
+    char *outFile;
+    char *errFile;
+    char *jobFile;
+    char *jobName;
+    char *command;
     char padding[4];
     time_t submitTime;
     time_t startTime;
@@ -1662,9 +1701,9 @@ struct newJobLog
 
 struct startJobLog
 {
-  LS_LONG_INT jobId;
+  unsigned long jobId;
   int status;
-  int jobPid;
+  pid_t jobPid;
   int jobPGid;
   int numExHosts;
   char **execHosts;
@@ -1672,7 +1711,7 @@ struct startJobLog
 
 struct newStatusLog
 {
-  int jobId;
+  unsigned long jobId;
   int status;
   int reasons;
   float cpuTime;
@@ -1690,7 +1729,7 @@ struct switchJobLog
 {
   uid_t userId;
   char padding[4];
-  LS_LONG_INT jobId;
+  unsigned long jobId;
   char queue[MAXQUEUENAMELEN];
 };
 
@@ -1700,7 +1739,7 @@ struct moveJobLog
   int pos;
   int top;
   char padding[4];
-  LS_LONG_INT jobId;
+  unsigned long jobId;
 };
 
 struct paramsLog
@@ -1711,7 +1750,7 @@ struct paramsLog
 
 struct finishJobLog
 {
-  LS_LONG_INT jobId;
+  unsigned long jobId;
   uid_t userId;
   int flags;
   int nproc;
@@ -1805,9 +1844,6 @@ struct eventLogHandle
 };
 
 
-#define LSF_JOBIDINDEX_FILENAME "lsb.events.index"       // FIXME FIXME FIXME is this approprate ? should it be named like that?
-#define LSF_JOBIDINDEX_FILETAG "#LSF_JOBID_INDEX_FILE" 
-
 struct jobIdIndexS
 {
     int totalRows;
@@ -1816,11 +1852,11 @@ struct jobIdIndexS
     float version;
     time_t lastUpdate;
     time_t timeStamp;
-    LS_LONG_INT minJobId;
-    LS_LONG_INT maxJobId;
+    unsigned long minJobId;
+    unsigned long maxJobId;
     FILE *fp;
-    int *jobIds;
-    char fileName[MAXFILENAMELEN];
+    unsigned long *jobIds;
+    char *fileName; //[MAXFILENAMELEN];
   };
 
 struct sortIntList
@@ -1831,7 +1867,6 @@ struct sortIntList
   struct sortIntList *back;
 };
 
-#define LSB_MAX_SD_LENGTH 128
 struct lsbMsgHdr
 {
     uid_t usrId;
@@ -1840,7 +1875,7 @@ struct lsbMsgHdr
     char padding[4];
     char  *src;
     char  *dest;
-    LS_LONG_INT jobId;
+    unsigned long jobId;
 };
 
 struct lsbMsg
@@ -1848,14 +1883,6 @@ struct lsbMsg
   struct lsbMsgHdr *header;
   char *msg;
 };
-
-
-#define CONF_NO_CHECK       0x00
-#define CONF_CHECK          0x01
-#define CONF_EXPAND         0X02
-#define CONF_RETURN_HOSTSPEC    0X04
-#define CONF_NO_EXPAND      0X08
-
 struct paramConf
 {
   struct parameterInfo *param;
@@ -1877,7 +1904,7 @@ struct hostConf
     struct groupInfoEnt *hgroups;
 };
 
-typedef struct lsbSharedResourceInstance
+typedef struct lsbSharedResourceInstance // FIXME FIXME typedef has to go
 {
   unsigned int nHosts;
   char padding[4];
@@ -1887,7 +1914,7 @@ typedef struct lsbSharedResourceInstance
 
 } LSB_SHARED_RESOURCE_INST_T;
 
-typedef struct lsbSharedResourceInfo
+typedef struct lsbSharedResourceInfo // FIXME FIXME typedef has to go
 {
   char *resourceName;
   unsigned int nInstances;
@@ -1903,27 +1930,9 @@ struct queueConf
 };
 
 
-#define IS_PEND(s)  (((s) & JOB_STAT_PEND) || ((s) & JOB_STAT_PSUSP))
-
-#define IS_START(s)  (((s) & JOB_STAT_RUN) || ((s) & JOB_STAT_SSUSP) \
-               || ((s) & JOB_STAT_USUSP))
-
-#define IS_FINISH(s) (((s) & JOB_STAT_DONE) || ((s) & JOB_STAT_EXIT))
-
-#define IS_SUSP(s) (((s) & JOB_STAT_PSUSP) || ((s) & JOB_STAT_SSUSP) \
-                             ||  ((s) & JOB_STAT_USUSP))
-
-#define IS_POST_DONE(s) ( ( (s) & JOB_STAT_PDONE) == JOB_STAT_PDONE )
-#define IS_POST_ERR(s) ( ( (s) & JOB_STAT_PERR) == JOB_STAT_PERR )
-#define IS_POST_FINISH(s) ( IS_POST_DONE(s) || IS_POST_ERR(s) )
-
 int lsberrno;
 
 int lsb_mbd_version;
-
-#define PRINT_SHORT_NAMELIST  0x01
-#define PRINT_LONG_NAMELIST   0x02
-#define PRINT_MCPU_HOSTS      0x04
 
 
 // Ice Age Relic
@@ -1943,10 +1952,10 @@ void updateClusterConf (struct clusterConf *);
 
 
 int lsb_init (char *appName);
-int lsb_openjobinfo (LS_LONG_INT, char *, char *, char *, char *, int);
-struct jobInfoHead *lsb_openjobinfo_a (LS_LONG_INT, char *, char *, char *, char *, int);
+int lsb_openjobinfo (unsigned long jobId, char *, char *, char *, char *, int);
+struct jobInfoHead *lsb_openjobinfo_a (unsigned long, char *, char *, char *, char *, int);
 struct jobInfoEnt *lsb_readjobinfo (int *);
-LS_LONG_INT lsb_submit (struct submit *, struct submitReply *);
+unsigned long lsb_submit (struct submit *, struct submitReply *);
 
 
 void lsb_closejobinfo (void);
@@ -1954,29 +1963,29 @@ void lsb_closejobinfo (void);
 int lsb_hostcontrol (char *, int);
 struct queueInfoEnt *lsb_queueinfo (char **queues, unsigned int *numQueues, char *host, char *userName, int options);
 int lsb_reconfig (int);
-int lsb_signaljob (LS_LONG_INT, int);
-int lsb_msgjob (LS_LONG_INT, char *);
-int lsb_chkpntjob (LS_LONG_INT, time_t, int);
-int lsb_deletejob (LS_LONG_INT, int, int);
-int lsb_forcekilljob (LS_LONG_INT);
-int lsb_requeuejob (struct jobrequeue *);
+int lsb_signaljob (unsigned long jobId, int signal);
+int lsb_msgjob (unsigned long jobId, char *message);
+int lsb_chkpntjob (unsigned long jobId, time_t, int);
+int lsb_deletejob (unsigned long jobId, int, int);
+int lsb_forcekilljob (unsigned long jobId);
+int lsb_requeuejob (struct jobrequeue *newQueue);
 char *lsb_sysmsg (void);
 void lsb_perror (char *);
 char *lsb_sperror (char *);
-char *lsb_peekjob (LS_LONG_INT);
+char *lsb_peekjob (unsigned long jobId);
 
 int lsb_mig (struct submig *, int *badHostIdx);
 
 struct hostInfoEnt *lsb_hostinfo (char **, unsigned int *);
 struct hostInfoEnt *lsb_hostinfo_ex (char **, unsigned int *, char *, int);
-int lsb_movejob (LS_LONG_INT jobId, int *, int);
-int lsb_switchjob (LS_LONG_INT jobId, char *queue);
+int lsb_movejob (unsigned long jobId, int *, int);
+int lsb_switchjob (unsigned long jobId, char *queue);
 int lsb_queuecontrol (char *, int);
 struct userInfoEnt *lsb_userinfo (char **, unsigned int *);
 struct groupInfoEnt *lsb_hostgrpinfo (char **groups, unsigned int *numGroups, int options);
 struct groupInfoEnt *lsb_usergrpinfo (char **groups, unsigned int *numGroups, int options);
 struct parameterInfo *lsb_parameterinfo (char **, unsigned int *, int);
-LS_LONG_INT lsb_modify (struct submit *, struct submitReply *, LS_LONG_INT);
+unsigned long lsb_modify (struct submit *, struct submitReply *, unsigned long);
 float *getCpuFactor (char *, int);
 // char *lsb_suspreason (int, int, struct loadIndexLog *);
 // char *lsb_pendreason (int, int *, struct jobInfoHead *, struct loadIndexLog *);
@@ -1989,11 +1998,11 @@ int lsb_runjob (struct runJobRequest *);
 
 char *lsb_jobid2str  ( unsigned long ) ;
 char *lsb_jobidinstr  ( unsigned long ) ;
-void jobId32To64 (LS_LONG_INT *, unsigned int jobId, unsigned int jobArrElemId ) ; // FIXME FIXME FIXME FIXME unsigned int to unsigned long or u_int64_t
-void jobId64To32 (LS_LONG_INT, unsigned int *jobId, unsigned int *jobArrElemId ) ; // FIXME FIXME FIXME FIXME unsigned int to unsigned long or u_int64_t
+void jobId32To64 (unsigned long *, unsigned long jobId, unsigned int jobArrElemId ) ; // FIXME FIXME FIXME FIXME unsigned int to unsigned long or u_int64_t
+void jobId64To32 (unsigned long, unsigned int *jobId, unsigned int *jobArrElemId ) ; // FIXME FIXME FIXME FIXME unsigned int to unsigned long or u_int64_t
 int lsb_setjobattr (int, struct jobAttrInfoEnt *);
 
-LS_LONG_INT lsb_rexecv (int, char **, char **, int *, int);
+unsigned long lsb_rexecv (int, char **, char **, int *, int);
 int lsb_catch (const char *, int (*)(void *));
 void lsb_throw (const char *, void *);
 

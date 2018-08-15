@@ -239,7 +239,7 @@ void getLSFAdmins_ (void);
 bool_t isLSFAdmin_ (const char *name);
 int isAllowCross (char *paramValue);
 int isMasterCrossPlatform (void);
-LS_LONG_INT atoi64_ (char *);
+long atoi64_ (char *);
 
 void stripDomain_ (char *);
 int equalHost_ (const char *, const char *);
