@@ -28,7 +28,8 @@ int addResourceMap( const char *resName, const char *location, const char *lsfil
 
 		lsferrno = ENORESNAME;	// lsferrno is a global reference
 		if( NULL == location ) {
-			lsferrno |=  lsferr | ENOLOCATION;
+			// lsferrno |=  lsferr | ENOLOCATION; // original, but lsferr does not really exist
+			lsferrno |= ENOLOCATION;
 		}
 		/* catgets 5203/5382 */
 		ls_syslog (LOG_ERR, "catgets 5203/5382: %s: %s(%d): Resource name \"%s\", location \"%s\"", __func__, lsfile, lineNum, (resName ? resName : "NULL"), (location ? location : "NULL"));

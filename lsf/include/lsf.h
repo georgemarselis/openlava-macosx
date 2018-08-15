@@ -58,6 +58,7 @@
 #include <rpcsvc/ypclnt.h>
 #endif
 
+// FIXME FIXME FIXME FIXME these have to go
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -101,6 +102,7 @@ const unsigned short OPENLAVA_VERSION = 20;
 // #define MAXMODELS_31            30
 
 static int lsferrno = 0;
+static int ENOLOCATION = 0x0FFF;
 
 enum LSF_CONSTANTS {
     LSF_DEFAULT_SOCKS = 15,

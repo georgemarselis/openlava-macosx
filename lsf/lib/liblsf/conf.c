@@ -2624,7 +2624,8 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 
 		lsferrno = ENORESNAME;	// lsferrno is a global reference
 		if( NULL == location ) {
-			lsferrno |=  lsferr | ENOLOCATION;
+			// lsferrno |=  lsferr | ENOLOCATION; // original, but lsferr does not really exist
+			lsferrno |= ENOLOCATION;
 		}
 		/* catgets 5203 */
 		ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5203, "%s: %s(%d): Resource name <%s> location <%s>")), __func__, lsfile, lineNum, (resName ? resName : "NULL"), (location ? location : "NULL"));
