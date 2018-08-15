@@ -2618,7 +2618,7 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 	char **hosts                          = NULL;
 	struct lsSharedResourceInfo *resource = NULL;
 
-	const char liblsf_addResource[] = "liblsf_addResource";
+	// const char liblsf_addResourceMap[] = "liblsf_addResourceMap";
 
 	if (resName == NULL || location == NULL) {
 
@@ -2647,7 +2647,7 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 		}
 
 	resource = NULL;
-	sp = location;
+	sp = (char *)location; // FIXME FIXME FIXME FIXME this cast oughta be verified
 
 	i = 0;
 	while (*sp != '\0')
@@ -2660,7 +2660,7 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 		}
 		sp++;
 		}
-	sp = location;
+	sp = (char *)location; // FIXME FIXME FIXME FIXME this cast oughta be verified
 	if (i != 0)
 		{
 		/* catgets 5204 */
@@ -2695,10 +2695,10 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 		}
 		if (cp != sp)
 			{
-			ssp = cp[0];
-			cp[0] = '\0';
+			ssp = cp;
+			cp = NULL;
 			strcpy (initValue, sp);
-			cp[0] = ssp;
+			cp = ssp;
 			if (isspace (*cp)) {
 				cp++;
 			}
@@ -2727,7 +2727,7 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 			while (*sp != ']' && *sp != '\0') {
 				sp++;
 			}
-			if (*sp == '\0')
+			if ( *sp == '\0') // FIXME FIXME yeah this probably attempts to check if the first char is replaced by nothing
 				{
 				/* catgets 5206 */
 				ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5206, "%s: %s(%d): Bad format for instance <%s>; ignoring the instance")), __func__, lsfile, lineNum, instance);
@@ -2736,11 +2736,11 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 			if (error == TRUE)
 				{
 				sp++;
-				ssp = *sp;
-				*sp = '\0';
+				ssp = sp;
+				sp = NULL; // FIXME FIXME FIXME probable segfault
 				/* catgets 5207 */
 				ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5207, "%s: %s(%d): Bad format for instance <%s>; ignoringthe instance")), __func__, lsfile, lineNum, instance);
-				*sp = ssp;
+				sp = ssp;
 				continue;
 				}
 			*sp = '\0';
@@ -2806,7 +2806,7 @@ int liblsf_parseHostList (const char *hostList, const char *lsfile, size_t lineN
 		return -1;
 	}
 
-	sp = hostList; // assignment to char from const, look up solution later
+	sp = (char *)hostList; // FIXME FIXME FIXME FIXME make sure that the cast is correct, investigate memory
 	while ( NULL != (host = getNextWord_ (&sp)) ) {
 		numHosts++;
 	}
@@ -2818,7 +2818,7 @@ int liblsf_parseHostList (const char *hostList, const char *lsfile, size_t lineN
 		return -1;
 	}
 
-	sp = hostList;  // assignment to char from const, look up solution later
+	sp = (char *)hostList; // FIXME FIXME FIXME FIXME make sure that the cast is correct, investigate memory
 	numHosts = 0;
 	while ((host = getNextWord_ (&sp)) != NULL) {
 
@@ -2899,8 +2899,7 @@ int liblsf_addHostInstance (struct lsSharedResourceInfo *sharedResource, unsigne
 	instance = myrealloc (sharedResource->instances, sizeof (struct lsSharedResourceInstance) * ( sharedResource->nInstances + 1));
 	
 	if (NULL == instance ) {
-		char myrealloc[] = "myrealloc";
-		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, myrealloc );
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "myrealloc" );
 		return -1;
 	}
 	
@@ -2917,7 +2916,6 @@ int liblsf_addHostInstance (struct lsSharedResourceInfo *sharedResource, unsigne
 	instance[inst].nHosts = nHosts;
 	instance[inst].hostList = malloc (sizeof (char *) * nHosts);
 	if( NULL == instance[inst].hostList && ENOMEM == errno ) {
-		char mallocString[] = "malloc";
 		ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc");
 		free (instance[inst].value);
 		return -1;
