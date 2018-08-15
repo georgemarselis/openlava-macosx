@@ -120,6 +120,7 @@ const unsigned int MAXFILENAMELEN = 4096;   // FIXME FIXME FIXME FIXME value of 
 // #define FIRST_RES_SOCK  20
 // static const unsigned int FIRST_RES_SOCK = 20;
 
+// FIXME FIXME FIXME FIXME HAVE_UNION_WAIT must be moved to configure.ac
 #ifdef HAVE_UNION_WAIT
     #define LS_WAIT_T      union wait
     #define LS_STATUS(s)   ((s).w_status)
