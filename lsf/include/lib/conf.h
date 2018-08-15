@@ -53,22 +53,26 @@ struct builtIn
     const char *des;
     enum valueType valuetype;
     enum orderType ordertype;
-    int flags;
-    int interval;
+    unsigned int flags;
+    const unsigned int interval;
 }; 
 
-// #define TYPE1  RESF_BUILTIN | RESF_DYNAMIC | RESF_GLOBAL
-// #define TYPE2  RESF_BUILTIN | RESF_GLOBAL
-// #define TYPE3  RESF_BUILTIN | RESF_GLOBAL | RESF_LIC
-const unsigned int TYPE1 = RESF_BUILTIN | RESF_DYNAMIC | RESF_GLOBAL; // the following three declerations belong in liblsf/conf.h
-const unsigned int TYPE2 = RESF_BUILTIN | RESF_GLOBAL;
-const unsigned int TYPE3 = RESF_BUILTIN | RESF_GLOBAL | RESF_LIC;
+// enum RESF resides in lsf.h
+#define TYPE0 RESF_BUILTIN | RESF_DYNAMIC | RESF_GLOBAL | RESF_RELEASE
+#define TYPE1 RESF_BUILTIN | RESF_DYNAMIC | RESF_GLOBAL
+#define TYPE2 RESF_BUILTIN | RESF_GLOBAL
+#define TYPE3 RESF_BUILTIN | RESF_GLOBAL | RESF_LIC
+// enum RESF TYPE00;
+// unsigned int TYPE0 = RESF_BUILTIN | RESF_DYNAMIC | RESF_GLOBAL | RESF_RELEASE;
+// unsigned int TYPE1 = RESF_BUILTIN | RESF_DYNAMIC | RESF_GLOBAL;
+// unsigned int TYPE2 = RESF_BUILTIN | RESF_GLOBAL;
+// unsigned int TYPE3 = RESF_BUILTIN | RESF_GLOBAL | RESF_LIC;
 
 // static 
 struct builtIn builtInRes[] = { // FIXME FIXME FIXME find out where this LS_NUMERIC comes from
-    {  0, "      ",  "r15s",   "15-second CPU run queue length",              LS_NUMERIC, INCR, TYPE1 | RESF_RELEASE, 15 },
-    {  1, "      ",  "r1m",    "1-minute CPU run queue length (alias: cpu)",  LS_NUMERIC, INCR, TYPE1 | RESF_RELEASE, 15 },
-    {  2, "      ",  "r15m",   "15-minute CPU run queue length",              LS_NUMERIC, INCR, TYPE1 | RESF_RELEASE, 15 },
+    {  0, "      ",  "r15s",   "15-second CPU run queue length",              LS_NUMERIC, INCR, TYPE0, 15  },
+    {  1, "      ",  "r1m",    "1-minute CPU run queue length (alias: cpu)",  LS_NUMERIC, INCR, TYPE0, 15  },
+    {  2, "      ",  "r15m",   "15-minute CPU run queue length",              LS_NUMERIC, INCR, TYPE0, 15  },
     {  3, "      ",  "ut",     "1-minute CPU utilization (0.0 to 1.0)",       LS_NUMERIC, INCR, TYPE1, 15  },
     {  4, "      ",  "pg",     "Paging rate (pages/second)",                  LS_NUMERIC, INCR, TYPE1, 15  },
     {  5, "      ",  "io",     "Disk IO rate (Kbytes/second)",                LS_NUMERIC, INCR, TYPE1, 15  },
@@ -163,8 +167,8 @@ void freeKeyList (struct keymap *keyList);
 int validType (char *type);
 int doResourceMap (FILE *fp, const char *lsfile, size_t *lineNum);
 // static 
-int addResourceMap        (char *resName, char *location, const char *lsfile, size_t lineNum, int *isDefault);
-int liblsf_addResourceMap (char *resName, char *location, const char *lsfile, size_t lineNum);
+int addResourceMap        ( const char *resName, const char *location, const char *lsfile, size_t lineNum, int *isDefault);
+int liblsf_addResourceMap ( const char *resName, const char *location, const char *lsfile, size_t lineNum);
 
 // static 
 unsigned int parseHostList ( const char *hostList, const char *lsfile, size_t lineNum, char ***hosts, int *isDefault);
