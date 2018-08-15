@@ -13,12 +13,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
- *
+ *w
  */
 
 #pragma once
 
-#include <tcl.h>
+// FIXME FIXME FIXME FIXME tcl/tcl.h must be moved to a variable in configure.ac
+#include <tcl/tcl.h>
 #include <sys/types.h>
 
 struct tclHostData *hPtr;
