@@ -22,9 +22,6 @@
 #include "lib/table.h"
 #include "lsb/lsbatch.h"
 
-// #define TYPE1  RESF_BUILTIN | RESF_DYNAMIC | RESF_GLOBAL
-// #define TYPE2  RESF_BUILTIN | RESF_GLOBAL
-
 #define USEREQUIVALENT "userequivalent"
 #define USERMAPPING    "usermap"
 
