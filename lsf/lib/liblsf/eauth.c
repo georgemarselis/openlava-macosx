@@ -16,7 +16,6 @@
  *
  */
 
-
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <limits.h>
@@ -274,7 +273,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
               exit (-1);
             }
 
-            for ( int i = 1; i < NSIG; i++) {  // NSIG is in <signal.h>
+            for ( int i = 1; i < NSIG_; i++) {  // NSIG is in <signal.h>
                 Signal_ (i, SIG_DFL);
             }
 
