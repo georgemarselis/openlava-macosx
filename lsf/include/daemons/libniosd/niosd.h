@@ -30,7 +30,7 @@
 // #define LSB_INTERACT_MSG_EXITTIME 6
 #define WAIT_BLOCK(o) (!((o) & WNOHANG))
 
-union NIOS_PARAMS {
+enum NIOS_PARAMS {
   LSF_NIOS_DEBUG = 0,
   LSF_PTY,
   LSB_INTERACT_MSG_ENH,
@@ -58,7 +58,7 @@ enum filedescriptors { // FIXME FIXME FIXME eliminate need for this enum
 	STDIN_FD = 0,
 	STDOUT_FD,
 	STDERR_FD
-}
+};
 
 // extern void checkJobStatus (int numTries);
 
@@ -71,7 +71,7 @@ const unsigned int MAX_TRY_TIMES = 20;
 // #define ERR_SYSTEM      122
 const unsigned short ERR_SYSTEM = 122;
 // #define MIN_CPU_TIME 0.0001
-const unsigned float MIN_CPU_TIME = 0.0001f;
+const float MIN_CPU_TIME = 0.0001f;
 // #define BLANKLEN   22
 const unsigned short BLANKLEN = 22;
 // #define WIDTH      80
@@ -79,38 +79,6 @@ const unsigned short WIDTH = 80;
 
 // extern LS_LONG_INT atoi64_ (char *ptr);
 // extern int requeued;
-void serv (char **, int);
-void PassSig (int);
-
-void exSuspend (struct lslibNiosHdr *);
-void do_newtask (void);
-void emusig (int, int);
-void reset_uid (void);
-void conin (int);
-void setStdout (struct lslibNiosHdr *);
-void setStdin (struct lslibNiosHdr *);
-void getStdin (struct lslibNiosHdr *);
-void rtask (struct lslibNiosHdr *);
-void rwait (struct lslibNiosHdr *);
-void exExit (struct lslibNiosHdr *);
-void remOn (struct lslibNiosHdr *);
-void remOff (struct lslibNiosHdr *);
-int die (void);
-int acceptCallBack (int);
-
-int cmpJobStates (struct jobInfoEnt *);
-int printJobSuspend (LS_LONG_INT);
-void prtJobStateMsg (struct jobInfoEnt *, struct jobInfoHead *);
-char *get_status (struct jobInfoEnt *);
-struct loadIndexLog *initLoadIndex (void);
-void prtLine (char *);
-void JobExitInfo (void);
-void checkPendingJobStatus (int s);
-JOB_STATUS getJobStatus (LS_LONG_INT jid, struct jobInfoEnt **job, struct jobInfoHead **jobHead);
-int JobStateInfo (LS_LONG_INT);
-int ls_niosetdebug (int);
-void kill_self (int, int);
-char *getTimeStamp (void);
 
 pid_t niosPid;
 
@@ -126,7 +94,7 @@ int heartbeatInterval = 0;
 int jobStatusInterval = 0;
 int standalone = FALSE;
 int niosSbdMode = FALSE;
-LS_LONG_INT jobId = -1;
+unsigned long jobId = 0;
 int pendJobTimeout = 0;
 int msgInterval = 0;
 
@@ -281,3 +249,35 @@ struct finishStatus
 	int sendSignal;
 };
 
+void serv (char **, int);
+void PassSig (int);
+
+void exSuspend (struct lslibNiosHdr *);
+void do_newtask (void);
+void emusig (int, int);
+void reset_uid (void);
+void conin (int);
+void setStdout (struct lslibNiosHdr *);
+void setStdin (struct lslibNiosHdr *);
+void getStdin (struct lslibNiosHdr *);
+void rtask (struct lslibNiosHdr *);
+void rwait (struct lslibNiosHdr *);
+void exExit (struct lslibNiosHdr *);
+void remOn (struct lslibNiosHdr *);
+void remOff (struct lslibNiosHdr *);
+int die (void);
+int acceptCallBack (int);
+
+int cmpJobStates (struct jobInfoEnt *);
+int printJobSuspend ( unsigned long jobId );
+void prtJobStateMsg (struct jobInfoEnt *, struct jobInfoHead *);
+char *get_status (struct jobInfoEnt *);
+struct loadIndexLog *initLoadIndex (void);
+void prtLine (char *);
+void JobExitInfo (void);
+void checkPendingJobStatus (int s);
+JOB_STATUS getJobStatus ( unsigned long jobId, struct jobInfoEnt **job, struct jobInfoHead **jobHead);
+int JobStateInfo ( unsigned long jobId );
+int ls_niosetdebug (int);
+void kill_self (int, int);
+char *getTimeStamp (void);
