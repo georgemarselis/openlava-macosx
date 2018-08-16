@@ -38,7 +38,7 @@ struct admins
 	unsigned int nAdmins;
 	uid_t *adminIds;
 	gid_t *adminGIds;
-	char **adminNames;
+	char **adminNames; // FIXME FIXME FIXME FIXME locate all instances of struct, see how char **adminNames gets malloc'ed
 };
 
 

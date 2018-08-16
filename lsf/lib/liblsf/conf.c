@@ -1145,20 +1145,20 @@ void freeClusterInfo (struct clusterInfo *cls) // FIXME FIXME move to cluster.c 
 
 	if (cls != NULL) {
 		for ( unsigned int i = 0; i < cls->nRes; i++) {
-			FREEUP (cls->resources[i]);
+			free( (char *) cls->resources[i] );
 		}
 		for ( unsigned int i = 0; i < cls->nTypes; i++) {
-			FREEUP (cls->hostTypes[i]);
+			free( (char *) cls->hostTypes[i] );
 		}
 		for ( unsigned int i = 0; i < cls->nModels; i++) {
-			FREEUP (cls->hostModels[i]);
+			free( (char *) cls->hostModels[i] );
 		}
 		for ( unsigned int i = 0; i < cls->nAdmins; i++) {
-			FREEUP (cls->admins[i]);
+			free( (char *) cls->admins[i]);
 		}
 
-		FREEUP (cls->admins);
-		FREEUP (cls->adminIds);
+		free( (char *)cls->admins);
+		free( (char *)cls->adminIds);
 	}
 
 	return;
@@ -1366,11 +1366,11 @@ ls_setAdmins (struct admins *admins, int mOrA)
 	uid_t tempNAdmins     = 0;
 	uid_t *tempAdminIds   = NULL;
 	uid_t *workAdminIds   = NULL;
-	char **tempAdminNames = NULL;
-	char **workAdminNames = NULL;
+	const char **tempAdminNames = NULL;
+	const char **workAdminNames = NULL;
 	const char mallocString[]   = "malloc";
 
-	tempNAdmins = admins->nAdmins + clinfo.nAdmins;
+	tempNAdmins = admins->nAdmins + clinfo.nAdmins; // include/lib/conf.h: struct clusterInfo clinfo;
 	if( tempNAdmins ) {
 		tempAdminIds   =  malloc ( tempNAdmins * sizeof ( tempAdminIds ) );
 		tempAdminNames =  malloc ( tempNAdmins * sizeof ( *tempAdminNames ) + 1 ); // FIXME FIXME FIXME FIXME FIXME certain malloc failure
@@ -1387,15 +1387,15 @@ ls_setAdmins (struct admins *admins, int mOrA)
 		return -1;
 	}
 
-	if (mOrA == M_THEN_A) {
+	if (mOrA == M_THEN_A) { // if true, use the command-line provided info
 		workNAdmins = clinfo.nAdmins;
 		workAdminIds = clinfo.adminIds;
 		workAdminNames = clinfo.admins;
 	}
-	else {
+	else { // otherwise, use what is in memory
 		workNAdmins = admins->nAdmins;
 		workAdminIds = admins->adminIds;
-		workAdminNames = admins->adminNames;
+		workAdminNames = (const char **)admins->adminNames; // FIXME FIXME FIXME FIXME this needs verification
 	}
 
 	for ( unsigned int i = 0; i < workNAdmins; i++) {
@@ -1406,11 +1406,11 @@ ls_setAdmins (struct admins *admins, int mOrA)
 			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, mallocString );
 
 			for ( unsigned int k = 0; k < i; k++) {
-				FREEUP (tempAdminNames[k]);
+				free( (char *)tempAdminNames[k]);
 			}
 
-			FREEUP (tempAdminIds);
-			FREEUP (tempAdminNames);
+			free( (char *) tempAdminIds );
+			free( (char *) tempAdminNames );
 			return -1;
 			}
 	}
@@ -1419,7 +1419,7 @@ ls_setAdmins (struct admins *admins, int mOrA)
 	if (mOrA == M_THEN_A) {
 		workNAdmins = admins->nAdmins;
 		workAdminIds = admins->adminIds;
-		workAdminNames = admins->adminNames;
+		workAdminNames = (const char **) admins->adminNames;
 	}
 	else if (mOrA == A_THEN_M) {
 		workNAdmins = clinfo.nAdmins;
@@ -1441,11 +1441,11 @@ ls_setAdmins (struct admins *admins, int mOrA)
 		if ((tempAdminNames[tempNAdmins] = putstr_ (workAdminNames[i])) == NULL) {
 			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, mallocString );
 			for ( unsigned int k = 0; k < tempNAdmins; k++) {
-				FREEUP (tempAdminNames[k]);
+				free( (char *) tempAdminNames[k] );
 			}
 
-			FREEUP (tempAdminIds);
-			FREEUP (tempAdminNames);
+			free( (char *) tempAdminIds );
+			free( (char *) tempAdminNames );
 			return -1;
 		}
 
@@ -1454,7 +1454,7 @@ ls_setAdmins (struct admins *admins, int mOrA)
 
 	if (clinfo.nAdmins > 0) {
 		for ( unsigned int i = 0; i < clinfo.nAdmins; i++) {
-			FREEUP (clinfo.admins[i]);
+			free( (char *) clinfo.admins[i]);
 		}
 
 		FREEUP (clinfo.adminIds);

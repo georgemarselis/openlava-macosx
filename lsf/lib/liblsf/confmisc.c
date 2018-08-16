@@ -23,6 +23,9 @@
 #include "lib/lib.h"
 #include "lib/lproto.h"
 #include "lib/confmisc.h"
+#include "lib/words.h"
+#include "lib/conf.h"
+#include "lib/misc.h"
 
 
 char *
@@ -34,17 +37,18 @@ getNextValue (char **line)
 int
 keyMatch (struct keymap *keyList, const char *line, int exact)
 {
-	char *sp       = line;
 	char *word     = NULL;
 	int pos        = 0;
 	int found      = FALSE;
 	unsigned int i = 0;
+	char *sp       = NULL;
 
+	sp = malloc( strlen(line)*sizeof( char ) + 1 );
+	strcpy( sp, line );
 
-	i = 0;
 	while (keyList[i].key != NULL)
 	{
-		keyList[i].position = -1;
+		keyList[i].position = strlen( keyList[i].key ) + 10; // strlen( keyList[i].key ) is already an upper bound.
 		i++;
 	}
 
@@ -56,7 +60,7 @@ keyMatch (struct keymap *keyList, const char *line, int exact)
 		{
 			if (strcasecmp (word, keyList[i].key) == 0)
 			{
-				if (keyList[i].position != -1) {
+				if ( keyList[i].position != strlen( keyList[i].key ) + 10 ) {
 					return FALSE;
 				}
 				found = TRUE;
@@ -79,11 +83,13 @@ keyMatch (struct keymap *keyList, const char *line, int exact)
 	i = 0;
 	while (keyList[i].key != NULL)
 	{
-		if (keyList[i].position == -1) {
+		if (keyList[i].position == strlen( keyList[i].key ) + 10) { // strlen( keyList[i].key ) is already an upper bound
 			return FALSE;
 		}
 		i++;
 	}
+
+	sp = NULL; free( sp );
 
 	return TRUE;
 }
@@ -161,7 +167,7 @@ getBeginLine (FILE *fp, size_t *lineNum)
 		if (wp && (strcasecmp( wp, begin ) == 0)) {
 			return sp;
 		}
-	} while( sp )
+	} while( sp );
 
 	return NULL;
 }
@@ -308,7 +314,7 @@ mapValues (struct keymap *keyList, char *line) // FIXME FIXME should char *line 
 	while (keyList[i].key != NULL) {
 
 		FREEUP (keyList[i].val);
-		if (keyList[i].position != -1) {
+		if (keyList[i].position != strlen( keyList[i].key ) + 10 ) {
 			numv++;
 		}
 

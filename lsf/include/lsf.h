@@ -450,13 +450,13 @@ struct clusterInfo
     unsigned int numClients;
     unsigned int nRes;
     unsigned int nAdmins;
-    char **resources;
-    char **hostTypes;
-    char **hostModels;
-    char **admins;
-    char *clusterName;
-    char *masterName;
-    char *managerName;
+    const char **resources;
+    const char **hostTypes;
+    const char **hostModels;
+    const char **admins;
+    const char *clusterName;
+    const char *masterName;
+    const char *managerName;
 
 };
 
@@ -497,10 +497,10 @@ struct hostEntry
     unsigned int nDisks;
     unsigned int nRes;
     char padding1[4];
-    char *hostName; // [MAXHOSTNAMELEN];
-    char *hostModel; // [MAXLSFNAMELEN];
-    char *hostType;  // [MAXLSFNAMELEN];
-    char *window;
+    const char *hostName; // [MAXHOSTNAMELEN];
+    const char *hostModel; // [MAXLSFNAMELEN];
+    const char *hostType;  // [MAXLSFNAMELEN];
+    const char *window;
     char **resList;
     float cpuFactor;
     char padding2[4];
