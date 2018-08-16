@@ -860,7 +860,7 @@ freeNode (struct confNode *node)
 // }
 
 char *
-getNextLineC_conf (struct lsConf *conf, size_t *LineCount, int confFormat)
+getNextLineC_conf( const struct lsConf *conf, size_t *LineCount, int confFormat)
 {
 	char *sp               = NULL;
 	char *cp               = NULL;

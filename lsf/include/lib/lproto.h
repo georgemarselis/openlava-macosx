@@ -289,7 +289,6 @@ void subNewLine_ (char *);
 // int isInlist (char **adminNames, char *userName, unsigned int actAds);
 
 // void doSkipSection_conf (struct lsConf *conf, size_t *lineNum, char *lsfile, char *sectionName);
-char *getBeginLine_conf (struct lsConf *conf, size_t *lineNum);
 
 void defaultAllHandlers (void);
 

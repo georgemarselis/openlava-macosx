@@ -26,6 +26,7 @@
 #include "lib/words.h"
 #include "lib/conf.h"
 #include "lib/misc.h"
+#include "lib/wconf.h"
 
 
 char *
@@ -447,7 +448,7 @@ getBeginLine_conf (const struct lsConf *conf, size_t *lineNum)
 		if (wp && (strcasecmp (wp, begin) == 0)) {
 			return sp;
 		}
-	} while( NULL != sp )
+	} while( NULL != sp );
 
 	return NULL;
 }

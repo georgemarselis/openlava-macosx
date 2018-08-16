@@ -21,7 +21,7 @@
 // #define NL_SETN   23
 
 char *readNextLine (struct lsConf *conf, size_t *lineNum);
-char *getNextLineC_conf (struct lsConf *conf, size_t *LineCount, int confFormat);
+char *getNextLineC_conf (const struct lsConf *conf, size_t *LineCount, int confFormat);
 void ls_freeconf (struct lsConf *conf);
 char linkNode (struct confNode *prev, struct confNode *node);
 char checkCond (struct lsConf *conf, char *cond);
