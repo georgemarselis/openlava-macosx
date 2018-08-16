@@ -67,7 +67,7 @@ void saveDaemonDir_ (char *);
 char *getDaemonPath_ (char *, char *);
 int mychdir_ (char *, struct hostent *);
 int myopen_ (char *, int, int, struct hostent *);
-FILE *myfopen_ (char *, char *, struct hostent *);
+FILE *myfopen_ (const char *filename, const char *type, struct hostent * hp);
 int mystat_ (char *, struct stat *, struct hostent *);
 int mychmod_ (char *, mode_t, struct hostent *);
 int mymkdir_ (char *, mode_t, struct hostent *);

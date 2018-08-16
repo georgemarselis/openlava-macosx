@@ -23,13 +23,14 @@
 #include "lib/lib.h"
 #include "lib/lproto.h"
 #include "lib/dir.h"
+#include "lib/misc.h"
 
 
 
 char *
-usePath(char *path)
+usePath( const char *path)
 {
-	strcpy( chosenPath, path );
+	strcpy( chosenPath, path ); 
 	return chosenPath;
 }
 
@@ -229,7 +230,7 @@ tryPwd (char *path, char *pwdpath)
 		return -1;
 	}
 
-#error  // FIXME FIXME FIXME FIXME FIXME this code is kinda crazy
+//#error  // FIXME FIXME FIXME FIXME FIXME this code is kinda crazy
 	strcpy (filename, pwdpath);
 	sp = strchr (filename + 1, '/');
 	if (sp != NULL) {
@@ -314,33 +315,10 @@ tryPwd (char *path, char *pwdpath)
 }
 
 int
-getMap_ (void)
-{
-#ifndef __CYGWIN__
-
-	char *domain = NULL;
-	struct ypall_callback incallback;
-	int i = 0;
-
-	h_initTab_ (&hashTab, 64);		// FIXME FIXME FIXME FIXME wtf is hashTab from?
-									// FIXME FIXME FIXME FIXME also why is the value of 64 is important here?
-	incallback.foreach = &putin_;
-
-	if ((i = yp_get_default_domain (&domain)) != 0) {
-		return i;
-	}
-
-	return yp_all( domain, "auto.master", &incallback );
-#else
-	return 0;
-#endif
-}
-
-int
 // FIXME FIXME one below is probably for MacOS
 // see more:	http://www-personal.umich.edu/~saarela/programming/2005/06/dumping-nis-database-programmatically.html
 // putin_ (unsigned long instatus, char *inkey, int inkeylen, char *inval, int invallen, void *indata)
-putin_ ( unsigned long instatus, char *inkey, int inkeylen, char *inval, int invallen, void *indata)
+putin_ ( int instatus, char *inkey, int inkeylen, char *inval, int invallen, char *indata)
 
 {
 
@@ -372,6 +350,30 @@ putin_ ( unsigned long instatus, char *inkey, int inkeylen, char *inval, int inv
 	h_addEnt_( &hashTab, inkey, 0 );
 
 	return FALSE;
+}
+
+
+int
+getMap_ (void)
+{
+#ifndef __CYGWIN__
+
+	char *domain = NULL;
+	struct ypall_callback incallback;  // NIS/YP programming guide
+	int i = 0;
+
+	h_initTab_ (&hashTab, 64);		// FIXME FIXME FIXME FIXME wtf is hashTab from?
+									// FIXME FIXME FIXME FIXME also why is the value of 64 is important here?
+	incallback.foreach = &putin_;
+
+	if ((i = yp_get_default_domain (&domain)) != 0) {
+		return i;
+	}
+
+	return yp_all( domain, "auto.master", &incallback );
+#else
+	return 0;
+#endif
 }
 
 int
@@ -497,32 +499,34 @@ myopen_ (char *filename, int flags, int mode, struct hostent *hp)
 }
 
 FILE *
-myfopen_ (char *filename, char *type, struct hostent * hp)
+myfopen_ (const char *filename, const char *type, struct hostent *hp)
 {
-	char filenamebuf[MAXFILENAMELEN];
-	FILE *fp = NULl;
+	char *filenamebuf = malloc( MAXFILENAMELEN*sizeof(char) + 1 ) ;
+	FILE *fp = NULL;
 	char *mp = NULL;
 
+	memset( filenamebuf, ' ', MAXFILENAMELEN*sizeof(char) + 1 );
+
 	if (!hp || filename[0] != '/' || AM_NEVER) {
-		return fopen (usePath (filename), type);
+		return fopen (usePath ( filename), type); // FIXME FIXME FIXME fix cast or call to function
 	}
 
 	if (AM_LAST) {
-		if ((fp = fopen (usePath (filename), type)) != NULL) {
+		if ((fp = fopen (usePath ( filename), type)) != NULL) {  // FIXME FIXME FIXME fix cast or call to function
 			return fp;
 		}
 	}
 
 	if (strstr (filename, "/net/") == filename) { // FIXME FIXME FIXME FIXME FIXME const UNIX file path reference: change it to variable, investigate use
-		return fopen (usePath (filename), type);
+		return fopen (usePath (filename), type); // FIXME FIXME FIXME fix cast or call to function
 	}
 
 	if (strstr (filename, "/tmp_mnt/") == filename) { // FIXME FIXME FIXME FIXME FIXME const UNIX file path reference: change it to variable, investigate use
-		return fopen (usePath (filename), type);
+		return fopen (usePath ( filename), type); // FIXME FIXME FIXME fix cast or call to function
 	}
 
 	if ((mp = mountNet_ (hp)) == NULL) {
-		return fopen (usePath (filename), type);
+		return fopen (usePath ( filename), type); // FIXME FIXME FIXME fix cast or call to function
 	}
 
 	sprintf (filenamebuf, "%s%s", mp, filename);
