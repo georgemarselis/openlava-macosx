@@ -18,47 +18,6 @@
 
 #pragma once
 
-#define RESETFACTOR     2
-#define RESETLIMIT      1.5
-#define DEFAULT_SLOTS   11
-
-/* Double linked list addressed by each
- * hash table slot.
- */
-struct hLinks
-{
-  struct hLinks *fwPtr;
-  struct hLinks *bwPtr;
-};
-
-/* This is a slot entry the table
- */
-typedef struct hEnt
-{
-  struct hLinks *fwPtr;
-  struct hLinks *bwPtr;
-  void *hData;
-  char *keyname;
-} hEnt;
-
-/* This is the hash table itself.
- */
-typedef struct hTab
-{
-  struct hLinks *slotPtr;
-  long numEnts;
-  size_t size;
-} hTab;
-
-
-typedef struct sTab
-{
-  size_t nIndex;
-  hEnt *hEntPtr;
-  hTab *tabPtr;
-  struct hLinks *hList;
-} sTab;
-
 #define HTAB_ZERO_OUT(HashTab) \
 { \
     (HashTab)->numEnts = 0; \
@@ -73,7 +32,7 @@ typedef struct sTab
     (Entry) = h_firstEnt_((HashTab), &__searchPtr__); \
     for ((Entry) = h_firstEnt_((HashTab), &__searchPtr__); \
          (Entry); (Entry) = h_nextEnt_(&__searchPtr__)) { \
-	 (Key)   = (char *) (Entry)->keyname;
+   (Key)   = (char *) (Entry)->keyname;
 
 #define END_FOR_EACH_HTAB_ENTRY  }}
 
@@ -85,25 +44,72 @@ typedef struct sTab
     for (__hashEnt__ = h_firstEnt_((HashTab), &__searchPtr__); \
          __hashEnt__; __hashEnt__ = h_nextEnt_(&__searchPtr__)) { \
         (Data) = (Type *) __hashEnt__->hData; \
-	(Key)   = (char *) __hashEnt__->keyname;
+  (Key)   = (char *) __hashEnt__->keyname;
 
 #define END_FOR_EACH_HTAB_DATA  }}
+
+// #define RESETFACTOR     2
+// #define RESETLIMIT      1.5
+// #define DEFAULT_SLOTS   11
+unsigned int DEFAULT_SLOTS = 11;
+unsigned int RESETFACTOR   = 2;
+float        RESETLIMIT    = 1.500;
+
+/* Double linked list addressed by each
+ * hash table slot.
+ */
+struct hLinks
+{
+  struct hLinks *fwPtr;
+  struct hLinks *bwPtr;
+} hLinks;
+
+/* This is a slot entry the table
+ */
+// typedef 
+struct hEnt
+{
+  struct hLinks *fwPtr;
+  struct hLinks *bwPtr;
+  void *hData;
+  const char *keyname;
+} hEnt;
+
+/* This is the hash table itself.
+ */
+// typedef 
+struct hTab
+{
+  struct hLinks *slotPtr;
+  long numEnts;
+  size_t size;
+} hTab;
+
+
+//typedef 
+struct sTab
+{
+  size_t nIndex;
+  struct hEnt *hEntPtr;
+  struct hTab *tabPtr;
+  struct hLinks *hList;
+} sTab;
+
 
 typedef void (*HTAB_DATA_DESTROY_FUNC_T) (void *);
 
 void insList_ (struct hLinks *, struct hLinks *);
 void remList_ (struct hLinks *);
 void initList_ (struct hLinks *);
-void h_initTab_ (hTab * tabPtr, unsigned long numSlots);
-void h_freeTab_ (hTab *, void (*destroy) (void *));
-int h_TabEmpty_ (hTab *);
-void h_delTab_ (hTab *);
-hEnt *h_getEnt_ (hTab *tabPtr, const char *key);
-hEnt *h_addEnt_ (hTab *, const char *, int *);
-void h_delEnt_ (hTab *, hEnt *);
-void h_rmEnt_ (hTab *, hEnt *);
-hEnt *h_firstEnt_ (hTab *, sTab *);
-hEnt *h_nextEnt_ (sTab *);
-void h_freeRefTab_ (hTab *);
-void h_delRef_ (hTab *, hEnt *);
-
+void h_initTab_ ( struct hTab *tabPtr, unsigned long numSlots);
+void h_freeTab_ ( struct hTab *, void (*destroy) (void *));
+int h_TabEmpty_ ( struct hTab *);
+void h_delTab_ ( struct hTab *);
+struct hEnt *h_getEnt_ ( struct hTab *tabPtr, const char *key);
+struct hEnt *h_addEnt_ ( struct hTab *, const char *, int *);
+void h_delEnt_ ( struct hTab *, struct hEnt *);
+void h_rmEnt_ ( struct hTab *, struct hEnt *);
+struct hEnt *h_firstEnt_ ( struct hTab *, struct sTab *);
+struct hEnt *h_nextEnt_ ( struct sTab *);
+void h_freeRefTab_ ( struct hTab *);
+void h_delRef_ ( struct hTab *, struct hEnt *);

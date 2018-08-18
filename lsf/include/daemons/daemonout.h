@@ -182,12 +182,12 @@ struct lenDataList
 
 
 void initTab (struct hTab *tabPtr);
-hEnt *addMemb (struct hTab *tabPtr, long member);
+struct hEnt *addMemb (struct hTab *tabPtr, long member);
 char remvMemb (struct hTab *tabPtr, long member);
-hEnt *chekMemb (struct hTab *tabPtr, long member);
-hEnt *addMembStr (struct hTab *tabPtr, char *member);
+struct hEnt *chekMemb (struct hTab *tabPtr, long member);
+struct hEnt *addMembStr (struct hTab *tabPtr, char *member);
 char remvMembStr (struct hTab *tabPtr, char *member);
-hEnt *chekMembStr (struct hTab *tabPtr, char *member);
+struct hEnt *chekMembStr (struct hTab *tabPtr, char *member);
 void convertRLimit (int *pRLimits, int toKb);
 int limitIsOk_ (int *rLimits);
 

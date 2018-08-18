@@ -202,7 +202,7 @@ struct jobInfoEnt *initJobInfo (void);
 char read_jobrequeue (struct eventRec *);
 int matchJobId (struct bhistReq *, LS_LONG_INT);
 
-hEnt *chekMemb (struct hTab *tabPtr, LS_LONG_INT member);
+struct hEnt *chekMemb (struct hTab *tabPtr, LS_LONG_INT member);
 void parse_event (struct eventRec *, struct bhistReq *);
 int bhistReqInit (struct bhistReq *);
 

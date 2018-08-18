@@ -42,7 +42,7 @@ initTab (struct hTab *tabPtr)
 
 }
 
-hEnt *
+struct hEnt *
 addMemb (struct hTab *tabPtr, LS_LONG_INT member)  // FIXME FIXME FIXME replae LS_LONG_INT with 64-bit integer
 {
 	char *memberStr = malloc( sizeof (char ) * sizeof( LS_LONG_INT ) * 8 + 1 );
@@ -92,7 +92,7 @@ remvMemb (struct hTab *tabPtr, LS_LONG_INT member)
 	return FALSE;
 }
 
-hEnt *
+struct hEnt *
 chekMemb (struct hTab * tabPtr, LS_LONG_INT member)
 {
 		hEnt *ent = NULL;
@@ -107,7 +107,7 @@ chekMemb (struct hTab * tabPtr, LS_LONG_INT member)
 		return ent;
 }
 
-hEnt *
+struct hEnt *
 addMembStr (struct hTab * tabPtr, char *memberStr)
 {
 	hEnt *ent = NULL;
@@ -146,7 +146,7 @@ remvMembStr (struct hTab *tabPtr, char *memberStr)
 	return FALSE;
 }
 
-hEnt *
+struct hEnt *
 chekMembStr (struct hTab * tabPtr, char *memberStr)
 {
 	hEnt *ent = NULL;

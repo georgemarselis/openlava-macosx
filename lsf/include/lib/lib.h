@@ -21,6 +21,7 @@
 #include "daemons/liblimd/limout.h"
 #include "daemons/libpimd/pimd.h"
 #include "daemons/libresd/resd.h"
+#include "lib/conn.h"
 #include "lib/hdr.h"
 #include "lib/lproto.h"
 #include "lib/mls.h"
@@ -29,46 +30,7 @@
 #include "lsb/lsb.h"
 #include "lsf.h"
 
-struct taskMsg
-{
-    char *inBuf;
-    char *outBuf;
-    size_t len;
-};
-
-struct lsQueue *requestQ;
-unsigned int requestSN;
-
-enum lsTMsgType
-{
-    LSTMSG_DATA,
-    LSTMSG_IOERR,
-    LSTMSG_EOF
-};
-
-struct lsTMsgHdr
-{
-    enum lsTMsgType type;
-    char padding[4];
-    char *msgPtr;
-    size_t len;
-};
-
-struct tid
-{
-    bool_t isEOF;
-    unsigned short taskPort;
-    char padding[2];
-    int rtid;
-    int sock;
-    int refCount;
-    int pid;
-    char *host;
-    struct lsQueue *tMsgQ;
-    struct tid *link;
-};
-
-// #define getpgrp(n)  getpgrp()
+#define getpgrp(n)  getpgrp()
 
 #ifndef LOG_PRIMASK
 #define LOG_PRIMASK     0xf
@@ -162,26 +124,42 @@ struct tid
 
 // from include/daemons/libpimd/pimd.h
 
-#define PIM_API_TREAT_JID_AS_PGID 0x1
-#define PIM_API_UPDATE_NOW        0x2
-
 #define PIM_SLEEP_TIME 3
 #define PIM_UPDATE_INTERVAL 30
 
-#define LSF_PIM_INFODIR     0
-#define LSF_PIM_SLEEPTIME   1
-#define LSF_LIM_DEBUG       2
-// #define LSF_LOGDIR          3
-#define LSF_PIM_SLEEPTIME_UPDATE 4
+// #define LSF_PIM_INFODIR     0
+// #define LSF_PIM_SLEEPTIME   1
+// #define LSF_LIM_DEBUG       2
+// // #define LSF_LOGDIR          3
+// #define LSF_PIM_SLEEPTIME_UPDATE 4
 
 struct config_param pimParams[] = {
     { "LSF_PIM_INFODIR",          NULL },
     { "LSF_PIM_SLEEPTIME",        NULL },
     { "LSF_LIM_DEBUG",            NULL },
-    { "LSF_LOGDIR",               NULL },
+    { NULL,                       NULL },
     { "LSF_PIM_SLEEPTIME_UPDATE", NULL },
     { NULL,                       NULL }
 };
+
+enum LSF_PIM {
+    LSF_PIM_INFODIR          = 0,
+    LSF_PIM_SLEEPTIME        = 1,
+    LSF_PIM_SLEEPTIME_UPDATE = 4
+} LSF_PIM;
+
+
+// #define PIM_API_TREAT_JID_AS_PGID 0x1
+// #define PIM_API_UPDATE_NOW        0x2
+enum PIM_API {
+    PIM_API_TREAT_JID_AS_PGID = 0x1,
+    PIM_API_UPDATE_NOW        = 0x2
+} PIM_API;
+
+
+enum LSF_LIM {
+    LSF_LIM_DEBUG = 2
+} LSF_LIM;
 
 #define PGID_LIST_SIZE  16
 #define PID_LIST_SIZE   64
@@ -209,6 +187,7 @@ enum {
     RES_TIMING 
 } debug_t;
 
+// FIXME FIXME FIXME FIXME FIXME "this shit has to be fixed and all the defines gone"
 
 #define LSF_RES_DEBUG                 0
 // #define LSF_SERVERDIR                 1
@@ -391,7 +370,7 @@ enum {
 } daemonStatus;
 
 struct config_param daemonParams[] = {
-//    { "LSB_DEBUG",                    NULL },
+    { "LSB_DEBUG",                    NULL },
     { "LSB_CONFDIR",                  NULL },
     { "LSF_SERVERDIR",                NULL },
     { "LSF_LOGDIR",                   NULL },
@@ -623,8 +602,6 @@ enum {
 
 #define NOCODE 10000
 
-#define MAXCONNECT    256
-
 #define RSIG_ID_ISTID   0x01
 
 #define RSIG_ID_ISPID   0x02
@@ -635,46 +612,16 @@ enum {
 #define RID_ISPID       0x02
 
 #define NO_SIGS (~(sigmask(SIGTRAP) | sigmask(SIGEMT)))
-#define SET_LSLIB_NIOS_HDR(hdr,opcode,l) \
-        { (hdr).opCode = (opcode); (hdr).len = (l); }
+#define SET_LSLIB_NIOS_HDR(hdr,opcode,l) { (hdr).opCode = (opcode); (hdr).len = (l); }
 
 #define CLOSEFD(s) if ((s) >= 0) {close((s)); (s) = -1;}
 
-struct sockaddr_in limSockId_;
-struct sockaddr_in limTcpSockId_;
-char rootuid_;
-struct sockaddr_in res_addr_;
-fd_set connection_ok_;
-int currentsocket_;
-int totsockets_;
-// extern int cli_nios_fd[]; // FIXME FIXME FIXME FIXME FIXME put in specific header
-short nios_ok_;
-struct masterInfo masterInfo_;
-int masterknown_;
-char *indexfilter_;
-char *stripDomains_;
-hTab conn_table;
 
-char **environ;
-
-void initconntbl_ (void);
-// void inithostsock_ (void);
-int connected_ (char *, int, int, int);
-void hostIndex_ (char *, int);
-int gethostbysock_ (int, char *);
-int _isconnected_ (char *, int *);
-int _getcurseqno_ (char *);
-void _setcurseqno_ (char *hostname, unsigned int currentSN);
-void _lostconnection_ (char *);
-int _findmyconnections_ (struct connectEnt **);
-
-int setLockOnOff_ (int, time_t, char *hname);
-
+// FIXME FIXME FIXME FIXME what we have here is a chicken-and-egg problem
 typedef struct lsRequest LS_REQUEST_T;
 typedef struct lsRequest requestType;
-typedef int (*requestCompletionHandler) (requestType *);
-typedef int (*appCompletionHandler) (LS_REQUEST_T *, void *);
-
+typedef int (*requestCompletionHandler) (struct lsRequest *requestType);
+typedef int (*appCompletionHandler) (struct lsRequest *requestType, void *);
 
 struct lsRequest
 {
@@ -691,6 +638,90 @@ struct lsRequest
     void *replyBuf;
     void *appExtra;
 };
+
+
+struct taskMsg
+{
+    char *inBuf;
+    char *outBuf;
+    size_t len;
+};
+
+struct lsQueue *requestQ;
+unsigned int requestSN;
+
+enum lsTMsgType
+{
+    LSTMSG_DATA,
+    LSTMSG_IOERR,
+    LSTMSG_EOF
+};
+
+struct lsTMsgHdr
+{
+    enum lsTMsgType type;
+    char padding[4];
+    char *msgPtr;
+    size_t len;
+};
+
+struct tid
+{
+    bool_t isEOF;
+    unsigned short taskPort;
+    char padding[2];
+    int rtid;
+    int sock;
+    int refCount;
+    int pid;
+    char *host;
+    struct lsQueue *tMsgQ;
+    struct tid *link;
+};
+
+struct svrsock
+{
+    int sockfd;
+    int port;
+    struct sockaddr_in *localAddr;
+    int backlog;
+    int options;
+};
+
+// #define LS_CSO_ASYNC_NT       (0x0001)
+// #define LS_CSO_PRIVILEGE_PORT (0x0002)
+enum LS_CSO {
+    LS_CSO_ASYNC_NT       = 0x0001,
+    LS_CSO_PRIVILEGE_PORT = 0x0002
+} LS_CSO;
+
+struct sockaddr_in limSockId_;
+struct sockaddr_in limTcpSockId_;
+char rootuid_;
+struct sockaddr_in res_addr_;
+fd_set connection_ok_;
+int currentsocket_;
+int totsockets_;
+// extern int cli_nios_fd[]; // FIXME FIXME FIXME FIXME FIXME put in specific header
+short nios_ok_;
+struct masterInfo masterInfo_;
+int masterknown_;
+char *indexfilter_;
+char *stripDomains_;
+struct hTab conn_table;
+
+char **environ;
+
+void initconntbl_ (void);
+// void inithostsock_ (void);
+// int gethostbysock_ (int, char *);
+// int _isconnected_ (char *, int *);
+// int _getcurseqno_ (char *);
+void _setcurseqno_ ( const char *hostname, unsigned int currentSN);
+void _lostconnection_ (char *);
+int _findmyconnections_ (struct connectEnt **);
+
+int setLockOnOff_ (int, time_t, char *hname);
 
 struct lsRequest *lsReqHandCreate_ (int, int, int, void *, requestCompletionHandler, appCompletionHandler, void *);
 void lsReqHandDestroy_ (struct lsRequest *);
@@ -737,26 +768,14 @@ void strToLower_ (char *);
 
 char **placement_ (char *resReq, struct decisionReq *placeReqPtr, char *fromhost, size_t *num);
 
-// int sig_encode (int);
+// int sig_encode (int);    
 // int sig_decode (int);
 // int getSigVal (char *);
 // char *getSigSymbolList (void);
 // char *getSigSymbol (int);
 
-struct svrsock
-{
-    int sockfd;
-    int port;
-    struct sockaddr_in *localAddr;
-    int backlog;
-    int options;
-};
+// typedef struct svrsock struct svrsock;
 
-typedef struct svrsock ls_svrsock_t;
-
-
-#define LS_CSO_ASYNC_NT       (0x0001)
-#define LS_CSO_PRIVILEGE_PORT (0x0002)
 
 int setLSFChanSockOpt_ (int newOpt);
 
@@ -766,10 +785,10 @@ int Socket_ (int, int, int);
 int get_nonstd_desc_ (int);
 // int TcpCreate_ (int, int);
 int opensocks_ (int);
-ls_svrsock_t *svrsockCreate_ (unsigned short, int, struct sockaddr_in *, int);
-int svrsockAccept_ (ls_svrsock_t *, int);
-char *svrsockToString_ (ls_svrsock_t *);
-void svrsockDestroy_ (ls_svrsock_t *);
+struct svrsock *svrsockCreate_ (unsigned short, int, struct sockaddr_in *, int);
+int svrsockAccept_ (struct svrsock *, int);
+char *svrsockToString_ (struct svrsock *);
+void svrsockDestroy_ (struct svrsock *);
 int TcpConnect_ (char *, unsigned short, struct timeval *);
 
 char *getMsgBuffer_ (int fd, size_t *bufferSize);

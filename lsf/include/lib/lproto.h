@@ -27,15 +27,6 @@
 #include "daemons/libpimd/pimd.h"
 #include "daemons/libresd/resd.h"
 #include "daemons/libresd/resout.h"
- 
-
-// #define BIND_RETRY_TIMES 100
-
-#define HOST_ATTR_SERVER        (0x00000001)
-#define HOST_ATTR_CLIENT        (0x00000002)
-#define HOST_ATTR_NOT_LOCAL     (0x00000004)
-#define HOST_ATTR_NOT_READY     (0xffffffff)
-
 
 #define VALID_IO_ERR(x) ((x) == EWOULDBLOCK || (x) == EINTR || (x) == EAGAIN)
 #define BAD_IO_ERR(x)   ( ! VALID_IO_ERR(x))
@@ -44,16 +35,11 @@
 #define FD_IS_VALID(x)  ((x) >= 0 && (x) < sysconf(_SC_OPEN_MAX) )
 #define FD_NOT_VALID(x) ( ! FD_IS_VALID(x))
 
-#define AUTH_IDENT          "ident"
-#define AUTH_PARAM_DCE      "dce"
-#define AUTH_PARAM_EAUTH    "eauth"
-#define AUTOMOUNT_LAST_STR  "AMFIRST"
-#define AUTOMOUNT_NEVER_STR "AMNEVER"
 
 #define FREEUP(pointer)   if (pointer != NULL) {  \
 							  free(pointer);      \
 							  pointer = NULL;     \
-						  }
+						  } // FIXME FIXME FIXME FIXME this macro has to go
 
 #define STRNCPY(str1, str2, len)  { strncpy(str1, str2, len); \
 									str1[len -1] = '\0';  \
@@ -73,10 +59,6 @@
 #define NET_INTSIZE_ 4
 
 #define XDR_DECODE_SIZE_(a) (a)
-
-// #define LS_EXEC_T "LS_EXEC_T"
-const char LS_EXEC_T[] = "LS_EXEC_T";
-
 
 #define GET_INTNUM(i) ((i)/INTEGER_BITS + 1)
 #define SET_BIT(bitNo, integers)           \
@@ -98,26 +80,73 @@ const char LS_EXEC_T[] = "LS_EXEC_T";
 
 #define END_FOR_EACH_WORD_IN_SPACE_DELIMITED_STRING }}
 
-#define LSF_LIM_ERESOURCE_OBJECT        "liblimvcl.so"
-#define LSF_LIM_ERESOURCE_VERSION       "lim_vcl_get_eres_version"
-#define LSF_LIM_ERESOURCE_DEFINE        "lim_vcl_get_eres_def"
-#define LSF_LIM_ERESOURCE_LOCATION      "lim_vcl_get_eres_loc"
-#define LSF_LIM_ERESOURCE_VALUE         "lim_vcl_get_eres_val"
-#define LSF_LIM_ERES_TYPE "!"
 
-#define LSF_O_RDONLY    00000
-#define LSF_O_WRONLY    00001
-#define LSF_O_RDWR      00002
-#define LSF_O_NDELAY    00004
-#define LSF_O_NONBLOCK  00010
-#define LSF_O_APPEND    00020
-#define LSF_O_CREAT     00040
-#define LSF_O_TRUNC     00100
-#define LSF_O_EXCL      00200
-#define LSF_O_NOCTTY    00400
+// #define HOST_ATTR_SERVER        (0x00000001)
+// #define HOST_ATTR_CLIENT        (0x00000002)
+// #define HOST_ATTR_NOT_LOCAL     (0x00000004)
+// #define HOST_ATTR_NOT_READY     (0xffffffff)
+unsigned long HOST_ATTR_SERVER    = 0x00000001;
+unsigned long HOST_ATTR_CLIENT    = 0x00000002;
+unsigned long HOST_ATTR_NOT_LOCAL = 0x00000004;
+unsigned long HOST_ATTR_NOT_READY = 0xffffffff;
 
-#define LSF_O_CREAT_DIR 04000
+// #define AUTH_IDENT          "ident"
+// #define AUTH_PARAM_DCE      "dce"
+// #define AUTH_PARAM_EAUTH    "eauth"
+// #define AUTOMOUNT_LAST_STR  "AMFIRST"
+// #define AUTOMOUNT_NEVER_STR "AMNEVER"
+const char AUTH_IDENT[]          = "ident";
+const char AUTH_PARAM_DCE[]      = "dce";
+const char AUTH_PARAM_EAUTH[]    = "eauth";
+const char AUTOMOUNT_LAST_STR[]  = "AMFIRST";
+const char AUTOMOUNT_NEVER_STR[] = "AMNEVER";
 
+
+// #define LSF_LIM_ERESOURCE_OBJECT        "liblimvcl.so"
+// #define LSF_LIM_ERESOURCE_VERSION       "lim_vcl_get_eres_version"
+// #define LSF_LIM_ERESOURCE_DEFINE        "lim_vcl_get_eres_def"
+// #define LSF_LIM_ERESOURCE_LOCATION      "lim_vcl_get_eres_loc"
+// #define LSF_LIM_ERESOURCE_VALUE         "lim_vcl_get_eres_val"
+// #define LSF_LIM_ERES_TYPE "!"
+const char LSF_LIM_ERESOURCE_OBJECT[]   =  "liblimvcl.so";
+const char LSF_LIM_ERESOURCE_VERSION[]  = "lim_vcl_get_eres_version";
+const char LSF_LIM_ERESOURCE_DEFINE[]   = "lim_vcl_get_eres_def";
+const char LSF_LIM_ERESOURCE_LOCATION[] = "lim_vcl_get_eres_loc";
+const char LSF_LIM_ERESOURCE_VALUE[]    = "lim_vcl_get_eres_val";
+const char LSF_LIM_ERES_TYPE[]          = "!";
+
+
+// #define LSF_O_RDONLY    00000
+// #define LSF_O_WRONLY    00001
+// #define LSF_O_RDWR      00002
+// #define LSF_O_NDELAY    00004
+// #define LSF_O_NONBLOCK  00010
+// #define LSF_O_APPEND    00020
+// #define LSF_O_CREAT     00040
+// #define LSF_O_TRUNC     00100
+// #define LSF_O_EXCL      00200
+// #define LSF_O_NOCTTY    00400
+// #define LSF_O_CREAT_DIR 04000
+enum {
+	LSF_O_RDONLY    = 00000,
+	LSF_O_WRONLY    = 00001,
+	LSF_O_RDWR      = 00002,
+	LSF_O_NDELAY    = 00004,
+	LSF_O_NONBLOCK  = 00010,
+	LSF_O_APPEND    = 00020,
+	LSF_O_CREAT     = 00040,
+	LSF_O_TRUNC     = 00100,
+	LSF_O_EXCL      = 00200,
+	LSF_O_NOCTTY    = 00400,
+	LSF_O_CREAT_DIR = 04000
+} LSF_O;
+
+// #define LS_EXEC_T "LS_EXEC_T"
+const char LS_EXEC_T[] = "LS_EXEC_T";
+
+char *lsTmpDir_ = NULL;
+
+// #define BIND_RETRY_TIMES 100
 const unsigned short BIND_RETRY_TIMES = 100;
 
 struct admins
@@ -130,19 +159,17 @@ struct admins
 };
 
 
-void putMaskLevel (int, char **);
-
 struct resPair
 {
 	const char *name;
-	char *value;
+	const char *value;
 };
 
 struct sharedResource
 {
-	char *resourceName;
+	const char *resourceName;
 	unsigned int numInstances;
-	char padding1[4];
+	const char padding1[4];
 	struct resourceInstance **instances;
 };
 
@@ -150,7 +177,7 @@ struct resourceInfoReq
 {
 	unsigned int numResourceNames;
 	int options;
-	char *hostName;
+	const char *hostname;
 	char **resourceNames;
 };
 
@@ -163,6 +190,7 @@ struct resourceInfoReply
 
 int sharedResConfigured_;
 
+void putMaskLevel (int, char **);
 
 /* FIXME FIXME FIXME : int resCmd bellow may be not int! */
 int lsResMsg_ (int, int resCmd, char *, char *, int, bool_t (*)(), int *, struct timeval *);
@@ -172,11 +200,9 @@ int resRC2LSErr_ (int);
 int ackReturnCode_ (int);
 
 
-int getConnectionNum_ (char *hostName);
 void inithostsock_ (void);
 
 int initenv_ (struct config_param *, char *);
-char *lsTmpDir_;
 short getMasterCandidateNoByName_ (char *);
 char *getMasterCandidateNameByNo_ (short);
 int getNumMasterCandidates_ ();
@@ -246,7 +272,7 @@ void stripDomain_ (char *);
 int equalHost_ (const char *, const char *);
 char *sockAdd2Str_ (struct sockaddr_in *);
 
-struct hostent *Gethostbyname_ (char *);
+struct hostent *Gethostbyname_ ( const char *hostname );
 struct hostent *Gethostbyaddr_ (in_addr_t *, socklen_t, int);
 int getAskedHosts_ (char *optarg_, char ***askedHosts, unsigned int *numAskedHosts, unsigned long *badIdx, int checkHost);
 int lockHost_ (time_t, char *);
@@ -256,11 +282,11 @@ int lsfRu2Str (FILE *, struct lsfRusage *);
 int str2lsfRu (char *, struct lsfRusage *, int *);
 void lsfRusageAdd_ (struct lsfRusage *, struct lsfRusage *);
 
-void inserttask_ (char *, hTab *);
-int deletetask_ (char *, hTab *);
-long listtask_ (char ***taskList, hTab *tasktb, int sortflag);
-int readtaskfile_ (char *, hTab *, hTab *, hTab *, hTab *, char);
-int writetaskfile_ (char *, hTab *, hTab *, hTab *, hTab *);
+void inserttask_ (char *, struct hTab *);
+int deletetask_ (char *, struct hTab *);
+long listtask_ (char ***taskList, struct hTab *tasktb, int sortflag);
+int readtaskfile_ (char *, struct hTab *, struct hTab *, struct hTab *, struct hTab *, char);
+int writetaskfile_ (char *, struct hTab *, struct hTab *, struct hTab *, struct hTab *);
 
 int expSyntax_ (char *);
 

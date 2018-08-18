@@ -36,12 +36,14 @@ static char listok;
 char *
 ls_resreq (char *task)
 {
-  static char resreq[MAXLINELEN];
+	static char resreq[MAXLINELEN];
 
-  if (!ls_eligible (task, resreq, LSF_LOCAL_MODE))
-	return (NULL);
-  else
-	return (resreq);
+	if (!ls_eligible (task, resreq, LSF_LOCAL_MODE)) {
+		return (NULL);
+	}
+	else {
+		return (resreq);
+	}
 
 }
 
@@ -49,38 +51,45 @@ ls_resreq (char *task)
 int
 ls_eligible (char *task, char *resreqstr, char mode)
 {
-  hEnt *mykey;
-  char *p;
+  struct hEnt *mykey NULL;
+  char *p = NULL;
 
-  resreqstr[0] = '\0';
-  if (!listok)
-	if (inittasklists_ () < 0)
-	  return FALSE;
+  assert( strlen( resreqstr ) > 0 ); // initiall
 
-  lserrno = LSE_NO_ERR;
-
-  if (!task)
-	return FALSE;
-
-  if ((p = getenv ("LSF_TRS")) == NULL)
-	{
-	  if ((p = strrchr (task, '/')) == NULL)
-	p = task;
-	  else
-	p++;
+	if (!listok) {
+		if (inittasklists_ () < 0) {
+			return FALSE;
+		}
 	}
-  else
-	p = task;
 
-  if (mode == LSF_REMOTE_MODE && h_getEnt_ (&ltask_table, (char *) p) != NULL)
+	lserrno = LSE_NO_ERR;
+
+	if (!task) {
+		return FALSE;
+	}
+
+	if ((p = getenv ("LSF_TRS")) == NULL)
+	{
+		if ((p = strrchr (task, '/')) == NULL) {
+			p = task;
+		}
+		else {
+			p++;
+		}
+	}
+	else {
+		p = task;
+	}
+
+	if (mode == LSF_REMOTE_MODE && h_getEnt_ (&ltask_table, (char *) p) != NULL)
 	{
 	  return (FALSE);
 	}
 
-  if ((mykey = h_getEnt_ (&rtask_table, (char *) p)) != NULL)
+	if ((mykey = h_getEnt_ (&rtask_table, (char *) p)) != NULL) // FIXME FIXME FIXME this cast may not be neded here
 	{
-	  if (mykey->hData)
-	strcpy (resreqstr, (char *) mykey->hData);
+		if (mykey->hData)
+			strncpy (resreqstr, mykey.hData, strlen( mykey->hData ) ); // FIXME FIXME use strlen form, to protect from buffer overruns
 	}
 
   return (mode == LSF_REMOTE_MODE || mykey != NULL);

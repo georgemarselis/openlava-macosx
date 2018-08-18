@@ -99,8 +99,8 @@ int getTimeVal (char **, float *);
 void freeResVal (struct resVal *);
 void initResVal (struct resVal *);
 
-hTab resNameTbl = { NULL, 0, 0 };
-hTab keyNameTbl = { NULL, 0, 0 };
+struct hTab resNameTbl = { NULL, 0, 0 };
+struct hTab keyNameTbl = { NULL, 0, 0 };
 
 #define KEY_DURATION    1
 #define KEY_HOSTS       2

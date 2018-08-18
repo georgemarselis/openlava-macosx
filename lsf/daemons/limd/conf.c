@@ -2921,7 +2921,7 @@ typeNameToNo (const char *typeName)
 	for ( unsigned int i = 0; i < allInfo.nTypes; i++) {
 		if (strcmp (allInfo.hostTypes[i], typeName) == 0) {
 			assert( i <= INT_MAX );
-			return (int)i;
+			return inti;
 		}
 	}
 	return -1;
@@ -2942,7 +2942,7 @@ archNameToNo (const char *archName)
 		if (strcmp (allInfo.hostArchs[i], archName) == 0)
 		{
 			assert( i <= INT_MAX );
-			return (int)i;
+			return inti;
 		}
 	}
 	if ((p = strchr (archName, '_')) != NULL)
@@ -2987,7 +2987,7 @@ archNameToNo (const char *archName)
 
 	if (best_pos) {
 		assert( best_pos <= INT_MAX );
-		return (int)best_pos;
+		return intbest_pos;
 	}
 
 	return -1;
@@ -2999,7 +2999,7 @@ modelNameToNo ( const char *modelName)
 	for ( unsigned int i = 0; i < allInfo.nModels; i++) {
 		if (strcmp (allInfo.hostModels[i], modelName) == 0) {
 			assert( i <= INT_MAX );
-			return (int)i;        }
+			return inti;        }
 	}
 
 	return -1;
@@ -3858,7 +3858,7 @@ validResource (const char *resName)
 	for ( unsigned int i = 0; i < shortInfo.nRes; i++) {
 		if (strcmp (shortInfo.resName[i], resName) == 0) {
 			assert( i <= INT_MAX );
-			return (int)i;
+			return inti;
 		}
 	}
 
@@ -3871,7 +3871,7 @@ validLoadIndex (const char *resName)
 	for ( unsigned int i = 0; i < allInfo.numIndx; i++) {
 		if (strcmp (li[i].name, resName) == 0) {
 			assert( i <= INT_MAX );
-			return (int)i;
+			return inti;
 		}
 	}
 
@@ -3885,7 +3885,7 @@ validHostType (const char *hType)
 	for ( unsigned int i = 0; i < shortInfo.nTypes; i++) {
 		if (strcmp (shortInfo.hostTypes[i], hType) == 0) {
 			assert( i <= INT_MAX );
-			return (int)i;
+			return inti;
 		}
 	}
 	return -1;
@@ -3897,7 +3897,7 @@ validHostModel (const char *hModel)
 	for ( unsigned int i = 0; i < allInfo.nModels; i++) {
 		if (strcmp (allInfo.hostModels[i], hModel) == 0) {
 			assert( i <= INT_MAX );
-			return (int)i;
+			return inti;
 		}
 	}
 	return -1;

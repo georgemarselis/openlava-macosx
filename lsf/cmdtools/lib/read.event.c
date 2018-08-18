@@ -1678,7 +1678,7 @@ matchJobId (struct bhistReq *Req, unsigned long jobId)
 						)
 				)
 			{
-				return TRUE;
+			return TRUE;
 		}
 	}
 

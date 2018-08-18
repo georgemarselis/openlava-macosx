@@ -474,7 +474,7 @@ getModelFactor_r (char *hostModel, float *cpuFactor)
   return (-1);
 }
 
-hEnt *
+struct hEnt *
 findHost (char *hname)
 {
   hEnt *e;

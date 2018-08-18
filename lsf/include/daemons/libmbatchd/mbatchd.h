@@ -987,7 +987,7 @@ float *getHostFactor (char *host);
 float *getModelFactor (char *hostModel);
 int getModelFactor_r (char *hostModel, float *cpuFactor);
 void checkHWindow (void);
-hEnt *findHost (char *hname);
+struct hEnt *findHost (char *hname);
 void renewJob (struct jData *oldjob);
 void getTclHostData (struct tclHostData *,
 			    struct hData *, struct hData *);

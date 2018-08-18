@@ -24,7 +24,7 @@
 #include "lib/lproto.h"
 #include "lib/table.h"
 
-static hEnt *h_findEnt (const char *, struct hLinks *);
+static struct hEnt *h_findEnt (const char *, struct hLinks *);
 static unsigned int getAddr (hTab *, const char *);
 static void resetTab (hTab *);
 static size_t getClosestPrime (unsigned long x);
@@ -146,7 +146,7 @@ h_delTab_ (hTab *tabPtr)
  * Get an entry from the hash table based on
  * a given key.
  */
-hEnt *
+struct hEnt *
 h_getEnt_ (hTab *tabPtr, const char *key)
 {
     if (tabPtr->numEnts == 0) {
@@ -160,7 +160,7 @@ h_getEnt_ (hTab *tabPtr, const char *key)
 /* h_addEnt_()
  * Add an entry to a previously created hash table.
  */
-hEnt *
+struct hEnt *
 h_addEnt_ (hTab *tabPtr, const char *key, int *newPtr)
 {
     hEnt *hEntPtr;
@@ -235,7 +235,7 @@ h_rmEnt_ (hTab * tabPtr, hEnt * hEntPtr)
  * Get the first element from the hash table.
  * Starting the iteration on the table itself.
  */
-hEnt *
+struct hEnt *
 h_firstEnt_ (hTab * tabPtr, sTab * sPtr)
 {
 
@@ -259,7 +259,7 @@ h_firstEnt_ (hTab * tabPtr, sTab * sPtr)
  * Get the next entry from the hash table till it is
  * empty.
  */
-hEnt *
+struct hEnt *
 h_nextEnt_ (sTab * sPtr)
 {
     struct hLinks *hList;
