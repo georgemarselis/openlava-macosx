@@ -34,6 +34,7 @@
 #include "lib/init.h"
 #include "lib/eauth.h"
 #include "lib/rdwr.h"
+#include "lib/misc.h"
 #include "lsb/sig.h"    // NSIG 
 #include "daemons/libniosd/niosd.h"
 #include "daemons/libresd/resout.h"
@@ -41,6 +42,9 @@
 // #define NL_SETN 23
 
 // #define _DARWIN_C_SOURCE
+
+const static char EAUTHNAME[] = "eauth";
+
 
 int
 getAuth_ (struct lsfAuth *auth, char *host)
@@ -73,7 +77,6 @@ getAuth_ (struct lsfAuth *auth, char *host)
   return 0;
 }
 
-#define EAUTHNAME "eauth"
 
 static int
 getEAuth (struct eauth *eauth, char *host)
@@ -85,7 +88,7 @@ getEAuth (struct eauth *eauth, char *host)
     memset (path, 0, sizeof (path));
     ls_strcat (path, sizeof (path), genParams_[LSF_SERVERDIR].paramValue);
     ls_strcat (path, sizeof (path), "/");
-    ls_strcat (path, sizeof (path), EAUTHNAME);
+    ls_strcat (path, sizeof (path), EAUTHNAME); 
     argv[0] = path;
     argv[1] = "-c";
     argv[2] = host;
@@ -189,7 +192,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
     memset (path, 0, sizeof (path));
     ls_strcat (path, sizeof (path), genParams_[LSF_SERVERDIR].paramValue);
     ls_strcat (path, sizeof (path), "/");
-    ls_strcat (path, sizeof (path), EAUTHNAME);
+    ls_strcat (path, sizeof (path), EAUTHNAME); // FIXME FIXME FIXME fix function call, pointer to *
 
     if (logclass & (LC_AUTH | LC_TRACE)) {
         ls_syslog (LOG_DEBUG, "%s: <%s> path <%s> connected=%d", __func__, uData, path, connected);
@@ -273,8 +276,8 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
               exit (-1);
             }
 
-            for ( int i = 1; i < NSIG_; i++) {  // NSIG is in <signal.h>
-                Signal_ (i, SIG_DFL);
+            for ( int i = 1; i < SIGRTMAX; i++) {  // NSIG is in a linux thing. SIGRTMAX is POSIX compliant // FIXME FIXME FIXME FIXME see if this works in other opearting systems
+                Signal_ (i, SIG_DFL);               // IF you get stuck here and try to throw the kitchen sink on it in order to compile, disregard -D__SIGNAL_H if you see it in <signal.h>
             }
 
             alarm (0);
