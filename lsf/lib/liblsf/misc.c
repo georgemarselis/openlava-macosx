@@ -20,32 +20,7 @@
 #include "lib/lproto.h"
 #include "lib/misc.h"
 
-#define BADCH   ":"
-#define NL_SETN   23
 
-#define MAXFLOAT_LOCAL  3.40282347e+38F
-
-/*
-#define fprintf(errMsg, fmt, msg1, msg2)   \
-	{                                           \
-		if (errMsg == NULL) {                   \
-			fprintf(stderr, fmt, msg1, msg2);   \
-		} \
-		else {                                    \
-			sprintf(*errMsg, fmt, msg1, msg2);   \
-		} \
-	}*/
-
-
-static struct LSFAdmins
-{
-	unsigned int numAdmins;
-	char padding[4];
-	char **names;
-
-} LSFAdmins;
-
-bool_t isLSFAdmin (const char *);
 
 char
 isanumber_ (char *word)
@@ -679,7 +654,7 @@ isLSFAdmin_ (const char *name)
 }
 
 int
-ls_strcat (char *trustedBuffer, int bufferLength, char *strToAdd)
+ls_strcat (char *trustedBuffer, int bufferLength, const char *strToAdd)
 {
   int start = (int) strlen (trustedBuffer);
   int remainder = bufferLength - start;

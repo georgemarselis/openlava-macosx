@@ -17,7 +17,34 @@
  */
 
 #pragma once
- 
+
+#define BADCH   ":"
+// #define NL_SETN   23
+
+#define MAXFLOAT_LOCAL  3.40282347e+38F
+
+/*
+#define fprintf(errMsg, fmt, msg1, msg2)   \
+	{                                           \
+		if (errMsg == NULL) {                   \
+			fprintf(stderr, fmt, msg1, msg2);   \
+		} \
+		else {                                    \
+			sprintf(*errMsg, fmt, msg1, msg2);   \
+		} \
+	}*/
+
+
+static struct LSFAdmins
+{
+	unsigned int numAdmins;
+	char padding[4];
+	char **names;
+
+} LSFAdmins;
+
+bool_t isLSFAdmin (const char *);
 char *putstr_       ( const char *s );
 int replace1stCmd_  ( const char *oldCmdArgs, const char *newCmdArgs, char *outCmdArgs, size_t outLen);
 unsigned int isint_ ( const char *word);
+int ls_strcat       (char *trustedBuffer, int bufferLength, const char *strToAdd);

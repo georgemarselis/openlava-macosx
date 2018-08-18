@@ -30,56 +30,12 @@
  
 
 // #define BIND_RETRY_TIMES 100
-const unsigned short BIND_RETRY_TIMES = 100;
-
-struct admins
-{
-	char padding[4];
-	unsigned int nAdmins;
-	uid_t *adminIds;
-	gid_t *adminGIds;
-	char **adminNames; // FIXME FIXME FIXME FIXME locate all instances of struct, see how char **adminNames gets malloc'ed
-};
-
-
-void putMaskLevel (int, char **);
-
-struct resPair
-{
-	const char *name;
-	char *value;
-};
-
-struct sharedResource
-{
-	char *resourceName;
-	unsigned int numInstances;
-	char padding1[4];
-	struct resourceInstance **instances;
-};
-
-struct resourceInfoReq
-{
-	unsigned int numResourceNames;
-	int options;
-	char *hostName;
-	char **resourceNames;
-};
-
-struct resourceInfoReply
-{
-	unsigned int numResources;
-	unsigned int badResource;
-	struct lsSharedResourceInfo *resources;
-};
-
 
 #define HOST_ATTR_SERVER        (0x00000001)
 #define HOST_ATTR_CLIENT        (0x00000002)
 #define HOST_ATTR_NOT_LOCAL     (0x00000004)
 #define HOST_ATTR_NOT_READY     (0xffffffff)
 
-int sharedResConfigured_;
 
 #define VALID_IO_ERR(x) ((x) == EWOULDBLOCK || (x) == EINTR || (x) == EAGAIN)
 #define BAD_IO_ERR(x)   ( ! VALID_IO_ERR(x))
@@ -149,14 +105,6 @@ const char LS_EXEC_T[] = "LS_EXEC_T";
 #define LSF_LIM_ERESOURCE_VALUE         "lim_vcl_get_eres_val"
 #define LSF_LIM_ERES_TYPE "!"
 
-/* FIXME FIXME FIXME : int resCmd bellow may be not int! */
-int lsResMsg_ (int, int resCmd, char *, char *, int, bool_t (*)(), int *, struct timeval *);
-int expectReturnCode_ (int s, pid_t seqno, struct LSFHeader *repHdr);
-int ackAsyncReturnCode_ (int, struct LSFHeader *);
-int resRC2LSErr_ (int);
-int ackReturnCode_ (int);
-
-
 #define LSF_O_RDONLY    00000
 #define LSF_O_WRONLY    00001
 #define LSF_O_RDWR      00002
@@ -169,6 +117,60 @@ int ackReturnCode_ (int);
 #define LSF_O_NOCTTY    00400
 
 #define LSF_O_CREAT_DIR 04000
+
+const unsigned short BIND_RETRY_TIMES = 100;
+
+struct admins
+{
+	char padding[4];
+	unsigned int nAdmins;
+	uid_t *adminIds;
+	gid_t *adminGIds;
+	char **adminNames; // FIXME FIXME FIXME FIXME locate all instances of struct, see how char **adminNames gets malloc'ed
+};
+
+
+void putMaskLevel (int, char **);
+
+struct resPair
+{
+	const char *name;
+	char *value;
+};
+
+struct sharedResource
+{
+	char *resourceName;
+	unsigned int numInstances;
+	char padding1[4];
+	struct resourceInstance **instances;
+};
+
+struct resourceInfoReq
+{
+	unsigned int numResourceNames;
+	int options;
+	char *hostName;
+	char **resourceNames;
+};
+
+struct resourceInfoReply
+{
+	unsigned int numResources;
+	unsigned int badResource;
+	struct lsSharedResourceInfo *resources;
+};
+
+int sharedResConfigured_;
+
+
+/* FIXME FIXME FIXME : int resCmd bellow may be not int! */
+int lsResMsg_ (int, int resCmd, char *, char *, int, bool_t (*)(), int *, struct timeval *);
+int expectReturnCode_ (int s, pid_t seqno, struct LSFHeader *repHdr);
+int ackAsyncReturnCode_ (int, struct LSFHeader *);
+int resRC2LSErr_ (int);
+int ackReturnCode_ (int);
+
 
 int getConnectionNum_ (char *hostName);
 void inithostsock_ (void);
@@ -221,7 +223,6 @@ char islongint_ (char *);
 // unsigned int isint_ (char *);
 int isdigitstr_ (char *);
 // char *putstr_ (const char *);
-int ls_strcat (char *, int, char *);
 char *mygetwd_ (char *);
 char *chDisplay_ (char *);
 void initLSFHeader_ (struct LSFHeader *);

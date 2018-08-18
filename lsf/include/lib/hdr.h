@@ -70,7 +70,7 @@ struct lsfAuth
 {
 	uid_t uid;
 	uid_t gid;
-	char lsfUserName[MAXLSFNAMELEN];
+	char lsfUserName[MAXLSFNAMELEN]; // FIXME FIXME FIXME change to pointer
 	enum { CLIENT_SETUID, CLIENT_IDENT, CLIENT_DCE, CLIENT_EAUTH } kind;
 	int options;
 
