@@ -10,6 +10,8 @@
 // extern char remvMemb (struct hTab *tabPtr, LS_LONG_INT member);
 // extern int matchName (char *, char *);
 
+struct eventRecord *lastEvent = NULL;
+
 void inJobList (struct jobRecord *pred, struct jobRecord *entry);
 void offJobList (struct jobRecord *entry);
 void insertModEvent (struct eventRec *log, hEnt * ent);
