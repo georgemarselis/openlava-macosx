@@ -20,24 +20,7 @@
 #include "lib/lib.h"
 #include "lib/lproto.h"
 #include "lib/table.h"
-
-extern void initTab (struct hTab *tabPtr);
-extern hEnt *addMemb (struct hTab *tabPtr, LS_LONG_INT member);
-extern char remvMemb (struct hTab *tabPtr, LS_LONG_INT member);
-extern int matchName (char *, char *);
-
-static void inJobList (struct jobRecord *pred, struct jobRecord *entry);
-static void offJobList (struct jobRecord *entry);
-static void insertModEvent (struct eventRec *log, hEnt * ent);
-static struct jobRecord *createJobRec (int);
-
-#define GET_JOBID(jobId, idx) ((Req.options & OPT_ARRAY_INFO)) ? (jobId): LSB_JOBID((jobId), (idx))
-
-#define NL_SETN  6
-
-extern struct jobRecord *jobRecordList;
-extern struct eventLogHandle *eLogPtr;
-extern float version;
+#include "cmdtools/lib/read.event.h"
 
 static void
 inJobList (struct jobRecord *pred, struct jobRecord *entry)
@@ -608,23 +591,25 @@ check_host (struct bhistReq *Req, struct jobRecord *jobRecord)
 struct jobRecord *
 read_startjob (struct eventRec *log)
 {
-  static char __func__] = "read_startjob";
-  struct jobRecord *jobRecord;
-  struct jobStartLog *jobStartLog;
-  int i;
-  LS_LONG_INT jobId;
-  hEnt *ent;
+  const char __func__[] = "read_startjob";
+  struct jobRecord *jobRecord = NULLs;
+  struct jobStartLog *jobStartLog = NULL;
+  int = 0 ;
+  unsigned long jobId = 0;
+  struct hEnt *ent = 0;
 
-  if (log->type == EVENT_JOB_EXECUTE)
+  if (log->type == EVENT_JOB_EXECUTE) {
     jobId =
       (Req.options & OPT_ARRAY_INFO) ? log->eventLog.jobExecuteLog.
       jobId : LSB_JOBID (log->eventLog.jobExecuteLog.jobId,
 			 log->eventLog.jobExecuteLog.idx);
-  else
+  }
+  else {
     jobId =
       (Req.options & OPT_ARRAY_INFO) ? log->eventLog.jobStartLog.
       jobId : LSB_JOBID (log->eventLog.jobStartLog.jobId,
 			 log->eventLog.jobStartLog.idx);
+  }
 
   if ((ent = chekMemb (&jobIdHT, jobId)) == NULL)
     {
