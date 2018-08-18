@@ -30,7 +30,7 @@ struct hTab conn_table;
 // typedef
 struct _hostSock {
 	int   socket;
-	char  padding[4];
+	const char  padding[4];
 	const char *hostname;
 	struct _hostSock *next;
 };
