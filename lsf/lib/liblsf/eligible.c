@@ -20,6 +20,7 @@
 #include <strings.h>
 #include <unistd.h>
 
+#include "lsb/sub.h"
 #include "lib/lib.h"
 #include "lib/lproto.h"
 #include "lib/table.h"
@@ -321,7 +322,7 @@ readtaskfile_ (char *filename, struct hTab *minusListl, struct hTab *minusListr,
 }
 
 int
-writetaskfile_ (char *filename, hTab * minusListl, hTab * minusListr, hTab * localList, hTab * remoteList)
+writetaskfile_ (char *filename, struct hTab * minusListl, struct hTab * minusListr, struct hTab *localList, struct hTab * remoteList)
 {
 	char **tlist;
 	long num = 0;
@@ -403,12 +404,12 @@ ls_insertltask (char *task)
 }
 
 void
-inserttask_ (char *taskstr, hTab * tasktb)
+inserttask_ (char *taskstr, struct hTab * tasktb)
 {
   int succ;
   char *task;
   char *resreq;
-  hEnt *hEntPtr;
+  struct hEnt *hEntPtr;
   int *oldcp;
   char *p;
   int taskResSep;
@@ -466,7 +467,7 @@ ls_deleteltask (char *task)
 int
 deletetask_ (char *taskstr, hTab * tasktb)
 {
-  hEnt *hEntPtr;
+  struct hEnt *hEntPtr;
   char *sp;
   char *task;
   char *p;
@@ -524,7 +525,7 @@ long
 listtask_ (char ***taskList, hTab *tasktb, int sortflag)
 {
   static char **tlist;
-  hEnt *hEntPtr;
+  struct hEnt *hEntPtr;
   struct hLinks *hashLinks;
   char buf[MAXLINELEN];
   char *p;

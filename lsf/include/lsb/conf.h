@@ -74,8 +74,6 @@ char *maxHName    = NULL;
 bool_t initUnknownUsers = FALSE;
 
 
-char *getNextWord1_ (char **);
-
 char do_Param  (struct lsConf *conf, char *fname, size_t *lineNumber);
 char do_Users  (struct lsConf *conf, char *fname, size_t *lineNumber, int option);
 char do_Hosts_ (struct lsConf *conf, char *fname, size_t *lineNumber, struct lsInfo *info, int options);

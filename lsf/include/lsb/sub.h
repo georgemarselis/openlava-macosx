@@ -21,6 +21,7 @@
 
 #include "lsf.h"
 #include "lsb/lsb.h"
+#include "lib/words.h"
 
 
 #define LSF_NIOSDIR 0
@@ -44,18 +45,17 @@ typedef enum spoolOptions
 LSB_SPOOL_INFO_T *copySpoolFile (const char *srcFilePath, spoolOptions_t option);
 int removeSpoolFile (const char *hostName, const char *destinFileFullPath);
 
-static int optionFlag = FALSE;
-static char *optionFileName; // [MAXLSFNAMELEN]; // FIXME FIXME FIXME change to dynamic allocation
+int optionFlag = FALSE;
+char *optionFileName; // [MAXLSFNAMELEN]; // FIXME FIXME FIXME change to dynamic allocation
 //char *loginShell;
 
-static char *additionEsubInfo = NULL;
-static hTab *bExceptionTab;
-
+char *additionEsubInfo = NULL;
+struct hTab *bExceptionTab;
 int mySubUsage_ (void *);
 int bExceptionTabInit (void);
 void subUsage_ (int, char **);
-static char *niosArgv[5];
-static char *niosPath; // [MAXFILENAMELEN]; // FIXME FIXME FIXME change to dynamic allocation
+ char *niosArgv[5];
+char *niosPath; // [MAXFILENAMELEN]; // FIXME FIXME FIXME change to dynamic allocation
 
 const char *defaultSpoolDir;
 void sub_perror (char *usrMsg);
@@ -118,22 +118,22 @@ struct submit *parseOptFile_ (char *filename, struct submit *req, char **errMsg)
 void trimSpaces (char *str);
 int parseXF (struct submit *, char *, char **);
 int checkLimit (int limit, int factor);
-LS_LONG_INT send_batch (struct submitReq *, struct lenData *, struct submitReply *, struct lsfAuth *);
+long  send_batch (struct submitReq *, struct lenData *, struct submitReply *, struct lsfAuth *);
 int dependCondSyntax (char *);
 int createJobInfoFile (struct submit *, struct lenData *);
-LS_LONG_INT subRestart (struct submit *jobSubReq, struct submitReq *submitReq, struct submitReply *submitRep, struct lsfAuth *auth);
-LS_LONG_INT subJob (struct submit *jobSubReq, struct submitReq *submitReq, struct submitReply *submitRep, struct lsfAuth *auth);
+long subRestart (struct submit *jobSubReq, struct submitReq *submitReq, struct submitReply *submitRep, struct lsfAuth *auth);
+long subJob (struct submit *jobSubReq, struct submitReq *submitReq, struct submitReply *submitRep, struct lsfAuth *auth);
 int getUserInfo (struct submitReq *, struct submit *);
 char *acctMapGet (int *, char *);
 int xdrSubReqSize (struct submitReq *req);
-void postSubMsg (struct submit *, LS_LONG_INT, struct submitReply *);
+void postSubMsg (struct submit *, long, struct submitReply *);
 int readOptFile (char *filename, char *childLine);
 const LSB_SPOOL_INFO_T *chUserCopySpoolFile (const char *srcFile, spoolOptions_t fileType);
 
 
 // nios
 int createNiosSock (struct submitReq *);
-void startNios (struct submitReq *, int, LS_LONG_INT) __attribute__ ((noreturn));
+void startNios (struct submitReq *, int, long) __attribute__ ((noreturn));
 
 
 int parseLine (char *line, int *embedArgc, char ***embedArgv, int option);
