@@ -22,32 +22,30 @@
 #include "../../lsf/lib/lsi18n.h"
 #define NL_SETN         10
 
-extern void addHost (struct hostInfo *lsf,
-		     struct hData *thPtr, char *filename, int override);
+// extern void addHost (struct hostInfo *lsf, struct hData *thPtr, const char *filename, int override);
 
-static void initHostStat (void);
-static void hostJobs (struct hData *, int);
-static void hostQueues (struct hData *, int);
-static void copyHostInfo (struct hData *, struct hostInfoEnt *);
-static int getAllHostInfoEnt (struct hostDataReply *, struct hData **,
-			      struct infoReq *);
-static int returnHostInfo (struct hostDataReply *, int, struct hData **,
-			   struct infoReq *);
+void initHostStat (void);
+void hostJobs (struct hData *, int);
+void hostQueues (struct hData *, int);
+void copyHostInfo (struct hData *, struct hostInfoEnt *);
+int getAllHostInfoEnt (struct hostDataReply *, struct hData **, struct infoReq *);
+int returnHostInfo (struct hostDataReply *, int, struct hData **, struct infoReq *);
 
-static struct resPair *getResPairs (struct hData *);
-static int hasResReserve (struct resVal *);
+struct resPair *getResPairs (struct hData *);
+int hasResReserve (struct resVal *);
 
-static void addMigrantHost (struct hostInfo *);
-static int rmMigrantHost (void);
-static void migrantHostJobs (struct hData *);
+void addMigrantHost (struct hostInfo *);
+int rmMigrantHost (void);
+void migrantHostJobs (struct hData *);
 
-typedef enum
+// typedef 
+enum hostChange
 {
   OK_UNREACH,
   UNREACH_OK,
   UNREACH_UNAVAIL,
   UNAVAIL_OK
-} hostChange;
+} ;
 
 int
 checkHosts (struct infoReq *hostsReqPtr, struct hostDataReply *hostsReplyPtr)
@@ -63,8 +61,7 @@ checkHosts (struct infoReq *hostsReqPtr, struct hostDataReply *hostsReplyPtr)
 
   hostsReplyPtr->numHosts = 0;
   hostsReplyPtr->nIdx = allLsInfo->numIndx;
-  hostsReplyPtr->hosts = my_calloc (numofhosts (),
-				    sizeof (struct hostInfoEnt), __func__);
+  hostsReplyPtr->hosts = my_calloc (numofhosts (), sizeof (struct hostInfoEnt), __func__);
 
   for (i = 0; i < allLsInfo->nRes; i++)
     {
@@ -311,8 +308,8 @@ static int
 getAllHostInfoEnt (struct hostDataReply *hostsReplyPtr,
 		   struct hData **hDList, struct infoReq *hostReq)
 {
-  sTab hashSearchPtr;
-  hEnt *hashEntryPtr;
+struct sTab hashSearchPtr;
+  struct hEnt *hashEntryPtr;
   struct hData *hData;
   struct hostInfoEnt *hInfo;
   int numHosts = 0;
@@ -347,7 +344,7 @@ getAllHostInfoEnt (struct hostDataReply *hostsReplyPtr,
 struct hData *
 getHostData (char *host)
 {
-  hEnt *hostEnt;
+  struct hEnt *hostEnt;
   struct hostent *hp;
 
   hostEnt = h_getEnt_ (&hostTab, host);
@@ -371,7 +368,7 @@ getHostData (char *host)
 struct hData *
 getHostData2 (char *host)
 {
-  hEnt *hostEnt;
+  struct hEnt *hostEnt;
   struct hData *hData;
   struct hostent *hp;
   char *pHostName;
@@ -477,7 +474,7 @@ getModelFactor_r (char *hostModel, float *cpuFactor)
 struct hEnt *
 findHost (char *hname)
 {
-  hEnt *e;
+  struct hEnt *e;
 
   e = h_getEnt_ (&hostTab, hname);
   return e;
@@ -487,7 +484,7 @@ void
 pollSbatchds (int mbdRunFlag)
 {
   static struct sTab stab;
-  hEnt *ent;
+  struct hEnt *ent;
   struct hData *hPtr;
   int num;
   int maxprobes;
@@ -866,8 +863,8 @@ checkHWindow (void)
   struct dayhour dayhour;
   windows_t *wp;
   char windOpen;
-  sTab hashSearchPtr;
-  hEnt *hashEntryPtr;
+struct sTab hashSearchPtr;
+  struct hEnt *hashEntryPtr;
 
   hashEntryPtr = h_firstEnt_ (&hostTab, &hashSearchPtr);
   while (hashEntryPtr)
@@ -968,7 +965,7 @@ getLsbHostNames (char ***hostNames)
   int i;
   struct sTab stab;
   struct hData *hData;
-  hEnt *hent;
+  struct hEnt *hent;
 
   numHosts = 0;
   FREEUP (hosts);

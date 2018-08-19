@@ -592,7 +592,7 @@ dohostmodel (FILE * fp, unsigned int *lineNum, const char *lsfile)
 	char first  = TRUE;
 	float *floatp = 0.0f;
 	int new = 0;
-	hEnt *hashEntPtr = NULL;
+	struct hEnt *hashEntPtr = NULL;
 
 	enum {
 		MODELNAME,
@@ -4938,13 +4938,13 @@ hosed:         // FIXME FIXME FIXME FIXME remove goto label
 /* addHostByTab()
  */
 int
-addHostByTab (hTab * tab)
+addHostByTab ( struct hTab * tab)
 {
 	struct hostEntry hPtr;
 	struct hostEntryLog *hLog = NULL;
 	struct hostNode *node     = NULL;
-	hEnt *e                   = NULL;
-	sTab stab;
+	struct hEnt *e            = NULL;
+	struct sTab stab;
 	
 	for (e = h_firstEnt_ (tab, &stab); e != NULL; e = h_nextEnt_ (&stab)) {
 		unsigned int cc = 0;

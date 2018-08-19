@@ -24,17 +24,6 @@
 #include "lib/lproto.h"
 #include "lib/table.h"
 
-static struct hEnt *h_findEnt (const char *, struct hLinks *);
-static unsigned int getAddr (hTab *, const char *);
-static void resetTab (hTab *);
-static size_t getClosestPrime (unsigned long x);
-
-static unsigned long primes[] = {       // FIXME FIXME why the fuck are these primes here?
-                                        // and why the fuck don't we just generate them?
-    101, 1009, 5009, 10007, 20011, 50021, 100003,
-    200003, 500009, 1030637
-};
-
 /* insList_()
  * Add the elemPtr in the list at destPtr address.
  */
@@ -93,9 +82,9 @@ h_initTab_ (hTab * tabPtr, unsigned long numSlots)
 void
 h_freeTab_ (hTab * tabPtr, void (*freeFunc) (void *))
 {
-    struct hLinks *hTabEnd;
-    struct hLinks *slotPtr;
-    hEnt *hEntPtr;
+    struct hLinks *hTabEnd = NULL;
+    struct hLinks *slotPtr = NULL;
+    struct hEnt *hEntPtr = NULL;
 
     slotPtr = tabPtr->slotPtr;
     hTabEnd = &(slotPtr[tabPtr->size]);
@@ -163,9 +152,9 @@ h_getEnt_ (hTab *tabPtr, const char *key)
 struct hEnt *
 h_addEnt_ (hTab *tabPtr, const char *key, int *newPtr)
 {
-    hEnt *hEntPtr;
-    char *keyPtr = (char *)key;
-    struct hLinks *hList;
+    struct hEnt *hEntPtr = NULL;
+    char *keyPtr = key;
+    struct hLinks *hList = NULL;
 
     hList = &(tabPtr->slotPtr[getAddr (tabPtr, keyPtr)]);
     hEntPtr = h_findEnt ((char *) keyPtr, hList);
@@ -262,8 +251,8 @@ h_firstEnt_ (hTab * tabPtr, sTab * sPtr)
 struct hEnt *
 h_nextEnt_ (sTab * sPtr)
 {
-    struct hLinks *hList;
-    hEnt *hEntPtr;
+    struct hLinks *hList = NULL;
+    struct hEnt *hEntPtr = NULL;
 
     hEntPtr = sPtr->hEntPtr;
 
@@ -309,7 +298,7 @@ getAddr (hTab * tabPtr, const char *key)
 static hEnt *
 h_findEnt (const char *key, struct hLinks *hList)
 {
-    hEnt *hEntPtr;
+    struct hEnt *hEntPtr = NULL;
 
     for (hEntPtr = (hEnt *) hList->bwPtr;
              hEntPtr != (hEnt *) hList;
@@ -333,7 +322,7 @@ resetTab (hTab * tabPtr)
     unsigned int slot = 0;
     struct hLinks *lastSlotPtr;
     struct hLinks *lastList;
-    hEnt *hEntPtr;
+    struct hEnt *hEntPtr = NULL;
 
     lastSlotPtr = tabPtr->slotPtr;
     lastSize = tabPtr->size;
@@ -374,7 +363,7 @@ void
 h_freeRefTab_ (hTab * tabPtr)
 {
     struct hLinks *hTabEnd, *slotPtr;
-    hEnt *hEntPtr;
+    struct hEnt *hEntPtr = NULL;
 
     slotPtr = tabPtr->slotPtr;
     hTabEnd = &(slotPtr[tabPtr->size]);

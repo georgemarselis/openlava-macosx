@@ -37,8 +37,8 @@ usePath( const char *path)
 int
 mychdir_( char *path, struct hostent *hp )
 {
-	sTab hashSearchPtr;
-	hEnt *hashEntryPtr = NULL;
+	struct sTab hashSearchPtr;
+	struct hEnt *hashEntryPtr = NULL;
 	static char first = TRUE;
 	char *goodpath = path;
 	char *sp = NULL;

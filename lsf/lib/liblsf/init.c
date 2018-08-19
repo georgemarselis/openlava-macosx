@@ -191,8 +191,8 @@ opensocks_ (int num)
 int
 ls_fdbusy (int fd)
 {
-    sTab hashSearchPtr;
-    hEnt *hEntPtr      = 0;
+    struct sTab hashSearchPtr;
+    struct hEnt *hEntPtr      = 0;
 
     assert (limchans_[PRIMARY] >= 0 );
     assert (limchans_[MASTER] >= 0 );

@@ -28,10 +28,10 @@
 
 // FIXME FIXME FIXME the task table might need a bit of test cases and
 //    making sure it contains correct values
-static hTab rtask_table;
-static hTab ltask_table;
+struct hTab rtask_table;
+struct hTab ltask_table;
 
-static char listok;
+char listok;
 
 char *
 ls_resreq (char *task)
@@ -51,7 +51,7 @@ ls_resreq (char *task)
 int
 ls_eligible (char *task, char *resreqstr, char mode)
 {
-  struct hEnt *mykey NULL;
+  struct hEnt *mykey = NULL;
   char *p = NULL;
 
   assert( strlen( resreqstr ) > 0 ); // initiall
@@ -89,7 +89,7 @@ ls_eligible (char *task, char *resreqstr, char mode)
 	if ((mykey = h_getEnt_ (&rtask_table, (char *) p)) != NULL) // FIXME FIXME FIXME this cast may not be neded here
 	{
 		if (mykey->hData)
-			strncpy (resreqstr, mykey.hData, strlen( mykey->hData ) ); // FIXME FIXME use strlen form, to protect from buffer overruns
+			strncpy (resreqstr, mykey->hData, strlen( mykey->hData ) ); // FIXME FIXME use strlen form, to protect from buffer overruns
 	}
 
   return (mode == LSF_REMOTE_MODE || mykey != NULL);
@@ -151,7 +151,7 @@ inittasklists_ (void)
 // readtaskfile_ : read in the tasks to be done from a file.
 //	FIXME FIXME: there is parsing in here, needs to be replaced by BNF and bison'ed away
 int
-readtaskfile_ (char *filename, hTab *minusListl, hTab *minusListr, hTab *localList, hTab *remoteList, char useMinus)
+readtaskfile_ (char *filename, struct hTab *minusListl, struct hTab *minusListr, struct hTab *localList, struct hTab *remoteList, char useMinus)
 {
 	enum phase { ph_begin, ph_remote, ph_local } phase; // FIXME kinda wierd, but ok.
 	FILE *fp   = NULL;

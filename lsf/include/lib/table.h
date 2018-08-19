@@ -28,7 +28,7 @@
 
 #define FOR_EACH_HTAB_ENTRY(Key, Entry, HashTab) \
 { \
-    sTab __searchPtr__; \
+struct sTab __searchPtr__; \
     (Entry) = h_firstEnt_((HashTab), &__searchPtr__); \
     for ((Entry) = h_firstEnt_((HashTab), &__searchPtr__); \
          (Entry); (Entry) = h_nextEnt_(&__searchPtr__)) { \
@@ -38,8 +38,8 @@
 
 #define FOR_EACH_HTAB_DATA(Type, Key, Data, HashTab) \
 { \
-    sTab __searchPtr__; \
-    hEnt *__hashEnt__; \
+struct sTab __searchPtr__; \
+    struct hEnt *__hashEnt__; \
     __hashEnt__ = h_firstEnt_((HashTab), &__searchPtr__); \
     for (__hashEnt__ = h_firstEnt_((HashTab), &__searchPtr__); \
          __hashEnt__; __hashEnt__ = h_nextEnt_(&__searchPtr__)) { \
@@ -97,6 +97,17 @@ struct sTab
 
 
 typedef void (*HTAB_DATA_DESTROY_FUNC_T) (void *);
+
+static unsigned long primes[] = {       // FIXME FIXME why the fuck are these primes here?
+                                        // and why the fuck don't we just generate them?
+    101, 1009, 5009, 10007, 20011, 50021, 100003,
+    200003, 500009, 1030637
+};
+
+struct hEnt *h_findEnt (const char *, struct hLinks *);
+unsigned int getAddr (struct hTab *, const char *);
+void resetTab ( struct hTab *);
+size_t getClosestPrime (unsigned long x);
 
 void insList_ (struct hLinks *, struct hLinks *);
 void remList_ (struct hLinks *);
