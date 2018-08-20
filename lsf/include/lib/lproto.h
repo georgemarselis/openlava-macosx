@@ -282,11 +282,10 @@ int lsfRu2Str (FILE *, struct lsfRusage *);
 int str2lsfRu (char *, struct lsfRusage *, int *);
 void lsfRusageAdd_ (struct lsfRusage *, struct lsfRusage *);
 
-void inserttask_ (char *, struct hTab *);
-int deletetask_ (char *, struct hTab *);
-long listtask_ (char ***taskList, struct hTab *tasktb, int sortflag);
-int readtaskfile_ (char *, struct hTab *, struct hTab *, struct hTab *, struct hTab *, char);
-int writetaskfile_ (char *, struct hTab *, struct hTab *, struct hTab *, struct hTab *);
+// void inserttask_ (char *, struct hTab *);
+// int deletetask_ (char *, struct hTab *);
+// long listtask_ (char ***taskList, struct hTab *tasktb, int sortflag);
+
 
 int expSyntax_ (char *);
 

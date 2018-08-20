@@ -18,5 +18,19 @@
 
 #pragma once
 
-static int tcomp_ (const void *tlist1, const void *tlist2);
-static long inittasklists_ (void);
+char *ls_resreq      ( const char *task);
+int   ls_eligible    ( const char *task, const char *resreqstr, const char mode);
+long  inittasklists_ ( void );
+int   readtaskfile_  ( const char *filename, struct hTab *minusListl, struct hTab *minusListr, struct hTab *localList, struct hTab *remoteList, const char useMinus);
+int   writetaskfile_ ( const char *filename, struct hTab *minusListl, struct hTab *minusListr, struct hTab *localList, struct hTab *remoteList);
+int   ls_insertrtask ( const char *task );
+int   ls_insertltask ( const char *task );
+void  inserttask_    ( const char *taskstr, struct hTab *tasktb);
+int   ls_deletertask ( const char *task );
+int   ls_deleteltask ( const char *task );
+int   deletetask_    ( const char *taskstr, struct hTab *tasktb );
+long  ls_listrtask   ( char ***taskList, int sortflag );
+long  ls_listltask   ( char ***taskList, int sortflag );
+long  listtask_      ( char ***taskList, struct hTab *tasktb, int sortflag );
+int   tcomp_         ( const void *tlist1, const void *tlist2 );
+
