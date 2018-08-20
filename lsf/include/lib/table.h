@@ -62,7 +62,7 @@ struct hLinks
 {
   struct hLinks *fwPtr;
   struct hLinks *bwPtr;
-} hLinks;
+};// hLinks;
 
 /* This is a slot entry the table
  */
@@ -73,7 +73,7 @@ struct hEnt
   struct hLinks *bwPtr;
   void *hData;
   const char *keyname;
-} hEnt;
+};// hEnt;
 
 /* This is the hash table itself.
  */
@@ -83,7 +83,7 @@ struct hTab
   struct hLinks *slotPtr;
   long numEnts;
   size_t size;
-} hTab;
+}; // hTab;
 
 
 //typedef 
@@ -93,7 +93,7 @@ struct sTab
   struct hEnt *hEntPtr;
   struct hTab *tabPtr;
   struct hLinks *hList;
-} sTab;
+}; // sTab;
 
 
 typedef void (*HTAB_DATA_DESTROY_FUNC_T) (void *);

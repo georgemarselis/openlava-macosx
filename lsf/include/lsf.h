@@ -1017,16 +1017,8 @@ struct hostLoad *ls_loadofhosts (char *resreq, size_t *numhosts, int options, ch
 struct hostLoad *ls_loadoftype  (char *resreq, size_t *numhosts, int options, char *fromhost, char *hosttype);
 struct hostLoad *ls_loadinfo    (char *resreq, size_t *numhosts, int options, char *fromhost, char **hostlist, size_t listsize, char ***indxnamelist);
 int ls_loadadj  (char *resreq, struct placeInfo *hostlist, size_t listsize);
-// int ls_eligible (char *task, char *resreqstr, char mode);
-// char *ls_resreq (char *task);
-// int ls_insertrtask (char *task);
-// int ls_insertltask (char *task);
-// int ls_deletertask (char *task);
-// int ls_deleteltask (char *task);
-// long ls_listrtask (char ***taskList, int sortflag);
-// long ls_listltask (char ***taskList, int sortflag);
+
 char **ls_findmyconnections (void);
-// int ls_isconnected (char *hostName);
 int ls_lostconnection (void);
 char *ls_getclustername (void);
 struct clusterInfo *ls_clusterinfo (char *resReq, unsigned int *numclusters, char **clusterList, int listsize, int options);
