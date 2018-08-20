@@ -52,7 +52,7 @@ ls_resreq ( const char *task)
 
 
 int
-ls_eligible ( const char *task, const char *resreqstr, const char mode)
+ls_eligible ( const char *task, char *resreqstr, const char mode)
 {
 	struct hEnt *mykey = NULL;
 	char *p = NULL;
@@ -65,7 +65,7 @@ ls_eligible ( const char *task, const char *resreqstr, const char mode)
 		}
 	}
 
-	lserrno = LSE_NO_ERR;
+	// lserrno = LSE_NO_ERR; // we are not throwing lserrno if an error happens below, why are we setting it to no error here, then?
 
 	if (!task) {
 		return FALSE;
@@ -74,25 +74,25 @@ ls_eligible ( const char *task, const char *resreqstr, const char mode)
 	if ((p = getenv ("LSF_TRS")) == NULL) // FIXME FIXME FIXME FIXME replace "LSF_TRS" with a variable from a hash and an enum subscript
 	{
 		if ((p = strrchr (task, '/')) == NULL) {
-			p = task;
+			p = (char *) task; // cast is fine, we are just putting the pointer in the hash, not altering contents
 		}
 		else {
 			p++;
 		}
 	}
 	else {
-		p = task;
+		p = (char *) task; // cast is fine, we are just putting the pointer in the hash, not altering contents
 	}
 
-  if (mode == LSF_REMOTE_MODE && h_getEnt_ (&ltask_table, (char *) p) != NULL)
-  {
-  	return FALSE;
-  }
+	if (mode == LSF_REMOTE_MODE && h_getEnt_ (&ltask_table, (char *) p) != NULL)
+	{
+		return FALSE;
+	}
 
 	if ((mykey = h_getEnt_ (&rtask_table, (char *) p)) != NULL) // FIXME FIXME FIXME this cast may not be neded here
 	{
 		if (mykey->hData)
-			strncpy (resreqstr, mykey->hData, strlen( mykey->hData ) );
+			strncpy (resreqstr, mykey->hData, strlen( mykey->hData ) ); // copying, not altering
 	}
 
 	return mode == LSF_REMOTE_MODE || mykey != NULL;
@@ -416,7 +416,7 @@ inserttask_ ( const char *taskstr, struct hTab *tasktb)
 	char *resreq = NULL;
 	struct hEnt *hEntPtr = NULL;
 	int *oldcp = NULL;
-	char *p = NULLs;
+	char *p = NULL;
 	int taskResSep = 0;
 
 	if ((p = getenv ("LSF_TRS")) != NULL) { // FIXME FIXME FIXME FIXME replace "LSF_TRS" with a variable from a hash and an enum subscript
@@ -475,7 +475,7 @@ ls_deleteltask ( const char *task)
 }
 
 int
-deletetask_ ( const char *taskstr, hTab * tasktb)
+deletetask_ ( const char *taskstr, struct hTab * tasktb)
 {
 	struct hEnt *hEntPtr = NULL;
 	char *sp = 0;
@@ -529,17 +529,17 @@ ls_listltask (char ***taskList, int sortflag)
 
 
 long
-listtask_ (char ***taskList, hTab *tasktb, int sortflag)
+listtask_ (char ***taskList, struct hTab *tasktb, int sortflag)
 {
 	static char **tlist;
 	struct hEnt *hEntPtr = NULL;
-	struct hLinks *hashLinks = NULLs;
-	char buf[MAXLINELEN];
+	struct hLinks *hashLinks = NULL;
+	char buff[MAXLINELEN];
 	char *p = NULL;
 	unsigned long index = 0;
 	long nEntry;
 
-	memset( buff, 0, MAXLINELEN )
+	memset( buff, 0, MAXLINELEN );
 
 
 	nEntry = tasktb->numEnts;
@@ -567,22 +567,21 @@ listtask_ (char ***taskList, hTab *tasktb, int sortflag)
 	for ( size_t listindex = 0; index < tasktb->size; index++)
 	{
 		hashLinks = &(tasktb->slotPtr[index]);
-		// for (hEntPtr = (hEnt *) hashLinks->bwPtr; hEntPtr != (hEnt *) hashLinks; hEntPtr = (hEnt *) ((struct hLinks *) hEntPtr)->bwPtr)
-		for (hEntPtr = hashLinks->bwPtr; hEntPtr != hashLinks; hEntPtr = ((struct hLinks *) hEntPtr)->bwPtr)
+		for (hEntPtr = ( struct hEnt *) hashLinks->bwPtr; hEntPtr != ( struct hEnt *) hashLinks; hEntPtr = ( struct hEnt *) ((struct hLinks *) hEntPtr)->bwPtr)
 		{
-			strcpy (buf, hEntPtr->keyname);
+			strcpy (buff, hEntPtr->keyname);
 			if (hEntPtr->hData != NULL) {
-				size_t tasklen = strlen (buf);
+				size_t tasklen = strlen (buff);
 
 				if ((p = getenv ("LSF_TRS")) != NULL) { // FIXME FIXME FIXME FIXME replace "LSF_TRS" with a variable from a hash and an enum subscript
-					buf[tasklen] = *p;
+					buff[tasklen] = *p;
 				}
 				else {
-					buf[tasklen] = '/'; // FIXME FIXME FIXME FIXME replace "LSF_TRS" with a variable from a hash and an enum subscript
+					buff[tasklen] = '/'; // FIXME FIXME FIXME FIXME replace "LSF_TRS" with a variable from a hash and an enum subscript
 				}
-				strcpy (buf + tasklen + 1, (char *) hEntPtr->hData);
+				strcpy (buff + tasklen + 1, (char *) hEntPtr->hData);
 
-				tlist[listindex] = putstr_ (buf);
+				tlist[listindex] = putstr_ (buff);
 				listindex++;
 			}
 		}
