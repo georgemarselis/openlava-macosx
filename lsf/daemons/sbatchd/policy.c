@@ -402,7 +402,7 @@ tryResume (struct hostLoad *myload)
 	{
 	  int numh;
 	  struct hostLoad *load;
-	  NAMELIST *hostList;
+	  char *hostList // was NAMELIST;
 
 	  numh = jobCard->jobSpecs.numToHosts;
 	  hostList = lsb_compressStrList (jobCard->jobSpecs.toHosts, numh);
@@ -486,7 +486,7 @@ tryStop (char *myhostnm, struct hostLoad *myload)
 	{
 	  struct hostLoad *load;
 	  int numh;
-	  NAMELIST *hostList;
+	  char *hostList // was NAMELIST;
 
 	  numh = jobCard->jobSpecs.numToHosts;
 	  hostList = lsb_compressStrList (jobCard->jobSpecs.toHosts, numh);

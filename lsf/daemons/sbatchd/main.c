@@ -22,106 +22,12 @@
 #include <arpa/inet.h>
 #include "sbd.h"
 
-#include "../../lsf/lib/lsi18n.h"
-#define NL_SETN		11
-
-extern void do_sbdDebug (XDR * xdrs, int chfd, struct LSFHeader *reqHdr);
-
-void sinit (void);
-void init_sstate (void);
-static void processMsg (struct clientNode *);
-static void clientIO (struct Masks *);
-static void houseKeeping (void);
-static int authCmdRequest (struct clientNode *client, XDR * xdrs,
-			   struct LSFHeader *reqHdr);
-static int isLSFAdmin (struct lsfAuth *auth);
-#ifdef INTER_DAEMON_AUTH
-static int authMbdRequest (struct clientNode *, XDR *, struct LSFHeader *);
-#endif
-static int get_new_master (struct sockaddr_in *from);
-
-extern void do_modifyjob (XDR *, int, struct LSFHeader *);
-
-time_t bootTime = 0;
-
-char errbuf[MAXLINELEN];
-
-char *lsbManager = NULL;
-int debug = 0;
-int lsb_CheckMode = 0;
-int lsb_CheckError = 0;
-uid_t batchId = 0;
-int managerId = 0;
-char masterme = FALSE;
-char master_unknown = TRUE;
-char myStatus = 0;
-char need_checkfinish = FALSE;
-int failcnt = 0;
-ushort sbd_port;
-ushort mbd_port;
-int sbdSleepTime = DEF_SSLEEPTIME;
-int msleeptime = DEF_MSLEEPTIME;
-int retryIntvl = DEF_RETRY_INTVL;
-int preemPeriod = DEF_PREEM_PERIOD;
-int pgSuspIdleT = DEF_PG_SUSP_IT;
-int rusageUpdateRate = DEF_RUSAGE_UPDATE_RATE;
-int rusageUpdatePercent = DEF_RUSAGE_UPDATE_PERCENT;
-
-int jobTerminateInterval = DEF_JTERMINATE_INTERVAL;
-char psbdJobSpoolDir[MAXPATHLEN];
-
-time_t now;
-int connTimeout;
-int readTimeout;
-
-int batchSock;
-
-int mbdPid = 0;
-short mbdExitVal = MASTER_NULL;
-int mbdExitCnt = 0;
-int jobcnt = 0;
-int maxJobs = 0;
-int urgentJob = 0;
-int uJobLimit = 0;
-float myFactor = 0.0;
-
-int statusChan = -1;
-
-windows_t *host_week[8];
-time_t host_windEdge = 0;
-char host_active = TRUE;
-
-char delay_check = FALSE;
-char *env_dir = NULL;
-
-char *masterHost;
-char *clusterName;
-struct jobCard *jobQueHead;
-struct lsInfo *allLsInfo;
-struct clientNode *clientList;
-struct bucket *jmQueue;
-struct tclLsInfo *tclLsInfo;
-
-#define CLEAN_TIME (12*60*60)
-
-extern int initenv_ (struct config_param *, char *);
-
-#define CHECK_MBD_TIME 30
-static char mbdStartedBySbd = FALSE;
-
-int getpwnamRetry = 1;
-int lsbMemEnforce = FALSE;
-int lsbJobCpuLimit = -1;
-int lsbJobMemLimit = -1;
-int lsbStdoutDirect = FALSE;
-
-int sbdLogMask;
+#include "lib/lsi18n.h"
 
 
 int
 main (int argc, char **argv)
 {
-  static char __func__] = "sbatchd/main";
   int nready, i;
   sigset_t oldsigmask, newmask;
   struct timeval timeout;
