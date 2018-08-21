@@ -133,8 +133,8 @@ typedef enum
 
 struct thresholds
 {
-    uint nThresholds;
-    uint nIdx;
+    unsigned int nThresholds;
+    unsigned int nIdx;
     float **loadStop;
     float **loadSched;
 };
@@ -142,7 +142,7 @@ struct thresholds
 struct jobSpecs
 {
     short nice;
-    ushort niosPort;
+    unsigned short niosPort;
     int jStatus;
     int options;
     int priority;
@@ -158,13 +158,13 @@ struct jobSpecs
     pid_t jobPGid;
     pid_t restartPid;
     pid_t execUid;
-    uint numEnv;
-    uint reasons;
-    uint subreasons;
-    uint numToHosts;
-    uint umask;
-    uint nxf;
-    uint maxNumProcessors;
+    unsigned int numEnv;
+    unsigned int reasons;
+    unsigned int subreasons;
+    unsigned int numToHosts;
+    unsigned int umask;
+    unsigned int nxf;
+    unsigned int maxNumProcessors;
     int sigMap     [LSB_SIG_NUM];
     char jobName   [MAXLINELEN];
     char userName  [MAX_LSB_NAME_LEN];
@@ -211,7 +211,7 @@ struct jobSpecs
     char execUsername   [MAX_LSB_NAME_LEN];
     float lastCpuTime;
     char padding1[4];
-    LS_LONG_INT jobId;
+    unsigned long jobId;
     char **env;
     char **toHosts;
     struct thresholds thresholds;
@@ -229,8 +229,8 @@ struct statusReq
     int sigValue;
     int actStatus;
     int exitStatus;
-    uint numExecHosts;
-    uint msgId;
+    unsigned int numExecHosts;
+    unsigned int msgId;
     pid_t jobPid;
     pid_t jobPGid;
     pid_t actPid;
@@ -242,7 +242,7 @@ struct statusReq
     char *queuePreCmd;
     char *queuePostCmd;
     char **execHosts;
-    LS_LONG_INT jobId;
+    unsigned long jobId;
     struct lsfRusage lsfRusage;
     struct jRusage runRusage;
     sbdReplyType sbdReply;
@@ -251,7 +251,7 @@ struct statusReq
 
 struct chunkStatusReq
 {
-    uint numStatusReqs;
+    unsigned int numStatusReqs;
     char padding1[4];
     struct statusReq **statusReqs;
 };
@@ -262,13 +262,13 @@ struct sbdPackage
     int retryIntvl;
     int preemPeriod;
     int pgSuspIdleT;
-    uint maxJobs;
-    uint numJobs;
-    uint uJobLimit;
-    uint rusageUpdateRate;
-    uint rusageUpdatePercent;
-    uint jobTerminateInterval;
-    uint nAdmins;
+    unsigned int maxJobs;
+    unsigned int numJobs;
+    unsigned int uJobLimit;
+    unsigned int rusageUpdateRate;
+    unsigned int rusageUpdatePercent;
+    unsigned int jobTerminateInterval;
+    unsigned int nAdmins;
     pid_t managerId;
     pid_t mbdPid;
     time_t sbdSleepTime;
@@ -286,8 +286,8 @@ struct jobSig
   int subReasons;
   char *actCmd;
   time_t chkPeriod;
-  LS_LONG_INT jobId;
-  LS_LONG_INT newJobId;
+  unsigned long jobId;
+  unsigned long newJobId;
 };
 
 struct jobReply
@@ -300,7 +300,7 @@ struct jobReply
     int actValue;
     int actStatus;
     char padding1[4];
-    LS_LONG_INT jobId;
+    unsigned long jobId;
 };
 
 
@@ -318,7 +318,7 @@ struct proto
   int msgId;
   int type;
   int instance;
-  LS_LONG_INT jobId;
+  unsigned long jobId;
   int (*sndfnc) (int, char *, int);
   int (*rcvfnc) (int, char *, int);
 };
@@ -424,8 +424,8 @@ uid_t batchId;
 int debug;
 int lsb_CheckMode;
 int lsb_CheckError;
-ushort mbd_port;
-ushort sbd_port;
+unsigned short mbd_port;
+unsigned short sbd_port;
 int batchSock;
 char masterme;
 char *masterHost;
@@ -469,8 +469,8 @@ void releaseElogLock (void);
 struct listEntry *tmpListHeader (struct listEntry *listHeader);
 struct tclLsInfo *getTclLsInfo (void);
 struct resVal *checkThresholdCond (char *);
-uint *getResMaps (uint nRes, char **resource);
-int checkResumeByLoad (LS_LONG_INT jobId, int num, struct thresholds thresholds, struct hostLoad *loads, uint *reason, uint *subreasons, int jAttrib, struct resVal *resumeCondVal, struct tclHostData *tclHostData);
+unsigned int *getResMaps (unsigned int nRes, char **resource);
+int checkResumeByLoad (unsigned long jobId, int num, struct thresholds thresholds, struct hostLoad *loads, unsigned int *reason, unsigned int *subreasons, int jAttrib, struct resVal *resumeCondVal, struct tclHostData *tclHostData);
 void closeExceptFD (int);
 void freeLsfHostInfo (struct hostInfo *, int);
 void copyLsfHostInfo (struct hostInfo *, struct hostInfo *);
@@ -483,7 +483,7 @@ int initTcl (struct tclLsInfo *);
 
 int fileExist (char *file, uid_t uid, struct hostent *);
 void freeWeek (windows_t **);
-void errorBack (uint chan, ushort replyCode, struct sockaddr_in *from);
+void errorBack (unsigned int chan, unsigned short replyCode, struct sockaddr_in *from);
 
 int init_ServSock (u_short port);
 int server_reply (int, char *, int);
@@ -507,6 +507,6 @@ float normalizeRq_ (float rawql, float cpuFactor, int nprocs);
 
 void daemon_doinit (void);
 
-void scaleByFactor (uint *h32, uint *l32, float cpuFactor);
+void scaleByFactor (unsigned int *h32, unsigned int *l32, float cpuFactor);
 int execNqsi (u_long, int, int, int *, char *, int, char *);
 void doDaemonHang (char *);

@@ -116,7 +116,7 @@ const char I18N_CATFILE[] = "lsf";
 #error
 #endif
 
-typedef int ls_catd;
+typedef int ls_catd; // FIXME FIXME FIXME FIXME FIXME remove.
 
 #define I18N(msgID, msg)   (_i18n_msg_get(ls_catd, NL_SETN, msgID, msg))
 

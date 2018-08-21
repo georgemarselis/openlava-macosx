@@ -983,7 +983,7 @@ const char LSETCDIR[] = "/fix/me/no/such/place";        // FIXME FIXME FIXME FIX
 // #define NB_SOCK_READ_FIX   nb_read_fix
 // #define NB_SOCK_WRITE_FIX  nb_write_fix
 
-#define LSF_NSIG NSIG                                   // FIXME FIXME FIXME FIXME FIXME set in configure.ac
+// #define LSF_NSIG NSIG                                   // FIXME FIXME FIXME FIXME FIXME set in configure.ac
 
 int lserrno;
 int masterLimDown;

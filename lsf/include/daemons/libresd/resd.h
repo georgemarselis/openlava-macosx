@@ -558,7 +558,7 @@ int deliver_notifications (LIST_T *);
 
 void term_handler (int);
 void sigHandler (int);
-void child_handler (void);
+void child_handler_res (void);
 void child_handler_ext (void);
 void getMaskReady (fd_set * rm, fd_set * wm, fd_set * em);
 void display_masks (fd_set *, fd_set *, fd_set *);
@@ -571,7 +571,7 @@ void childAcceptConn (int, struct passwd *, struct lsfAuth *, struct resConnect 
 
 void resChild (char *, char *);
 int resParent (int, struct passwd *, struct lsfAuth *, struct resConnect *, struct hostent *);
-bool_t isLSFAdmin (const char *);
+bool_t isLSFAdmin_resd (const char *);
 
 bool_t xdr_resChildInfo (XDR *, struct resChildInfo *, struct LSFHeader *);
 

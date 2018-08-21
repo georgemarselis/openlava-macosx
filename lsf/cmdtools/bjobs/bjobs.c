@@ -23,7 +23,7 @@
 #include <pwd.h>
 #include <netdb.h>
 #include <errno.h>
-#
+
 #include "cmdtools/cmdtools.h"
 #include "lsb/lsb.h"
 
@@ -442,7 +442,7 @@ displayJobs (struct jobInfoEnt *job, struct jobInfoHead *jInfoH,
   static struct loadIndexLog *loadIndex = NULL;
   char *exec_host = "";
   char *jobName, *pos;
-  NAMELIST *hostList = NULL;
+  char *hostList = NULL // was NAMELIST;
   char tmpBuf[MAXLINELEN];
   char osUserName[MAXLINELEN];
   int i = 0;

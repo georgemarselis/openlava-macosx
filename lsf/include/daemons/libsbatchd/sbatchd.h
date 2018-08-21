@@ -32,11 +32,12 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "daemonout.h"
-#include "daemons.h"
+#include "daemons/daemonout.h"
+#include "daemons/daemons.h"
 #include "lib/osal.h"
 #include "lib/rf.h"
 #include "lsb/lsb.h"
+#include "lib/channel.h"
 
 #define NULLFILE "/dev/null"
 #define JOBFILEEXT ""
@@ -50,7 +51,8 @@ enum
 
 struct jobCard
 {
-  struct jobCard *forw, *back;
+  struct jobCard *forw;
+  struct jobCard *back;
   gid_t execGid;
   char execUsername[MAX_LSB_NAME_LEN];
   int notReported;
@@ -142,13 +144,13 @@ struct clientNode
   int chanfd;
   struct sockaddr_in from;
   int jobType;
-  LS_LONG_INT jobId;
+  unsigned long jobId;
   struct jobCard *jp;
 };
 
 struct jobSetup
 {
-  LS_LONG_INT jobId;
+  unsigned long jobId;
   int jStatus;
   float cpuTime;
   int w_status;
@@ -226,6 +228,78 @@ struct bucket *jmQueue;
 
 int statusChan;
 
+time_t bootTime = 0;
+
+char errbuf[MAXLINELEN];
+
+char *lsbManager = NULL;
+int debug = 0;
+int lsb_CheckMode = 0;
+int lsb_CheckError = 0;
+uid_t batchId = 0;
+int managerId = 0;
+char masterme = FALSE;
+char master_unknown = TRUE;
+char myStatus = 0;
+char need_checkfinish = FALSE;
+int failcnt = 0;
+unsigned short sbd_port;
+unsigned short mbd_port;
+int sbdSleepTime = DEF_SSLEEPTIME;
+int msleeptime = DEF_MSLEEPTIME;
+int retryIntvl = DEF_RETRY_INTVL;
+int preemPeriod = DEF_PREEM_PERIOD;
+int pgSuspIdleT = DEF_PG_SUSP_IT;
+int rusageUpdateRate = DEF_RUSAGE_UPDATE_RATE;
+int rusageUpdatePercent = DEF_RUSAGE_UPDATE_PERCENT;
+
+int jobTerminateInterval = DEF_JTERMINATE_INTERVAL;
+char psbdJobSpoolDir[MAXPATHLEN];
+
+time_t now;
+int connTimeout;
+int readTimeout;
+
+int batchSock;
+
+int mbdPid = 0;
+short mbdExitVal = MASTER_NULL;
+int mbdExitCnt = 0;
+int jobcnt = 0;
+int maxJobs = 0;
+int urgentJob = 0;
+int uJobLimit = 0;
+float myFactor = 0.0;
+
+int statusChan = -1;
+
+windows_t *host_week[8];
+time_t host_windEdge = 0;
+char host_active = TRUE;
+
+char delay_check = FALSE;
+char *env_dir = NULL;
+
+char *masterHost;
+char *clusterName;
+struct jobCard *jobQueHead;
+struct lsInfo *allLsInfo;
+struct clientNode *clientList;
+struct bucket *jmQueue;
+struct tclLsInfo *tclLsInfo;
+
+#define CLEAN_TIME (12*60*60)
+
+#define CHECK_MBD_TIME 30
+char mbdStartedBySbd = FALSE;
+
+int getpwnamRetry = 1;
+int lsbMemEnforce = FALSE;
+int lsbJobCpuLimit = -1;
+int lsbJobMemLimit = -1;
+int lsbStdoutDirect = FALSE;
+
+int sbdLogMask;
 
 void start_master (void);
 void shutDownClient (struct clientNode *);
@@ -281,8 +355,6 @@ void sbdChild (char *, char *);
 int initJobCard (struct jobCard *jp, struct jobSpecs *jobSpecs, int *);
 void freeThresholds (struct thresholds *);
 void saveThresholds (struct jobSpecs *, struct thresholds *);
-void unlockHosts (struct jobCard *, int);
-int lockHosts (struct jobCard *);
 
 void job_checking (void);
 int job_resume (struct jobCard *);
@@ -299,10 +371,8 @@ void execRestart (struct jobCard *jobCardPtr, struct hostent *hp);
 int rmJobBufFiles (struct jobCard *);
 void writePreJobFail (struct jobCard *jp);
 
-int appendJobFile (struct jobCard *jobCard, char *header,
-			  struct hostent *hp, char *errMsg);
-int initPaths (struct jobCard *jp, struct hostent *fromHp,
-		      struct lenData *jf);
+int appendJobFile (struct jobCard *jobCard, char *header, struct hostent *hp, char *errMsg);
+int initPaths (struct jobCard *jp, struct hostent *fromHp, struct lenData *jf);
 int rcpFile (struct jobSpecs *, struct xFile *, char *, int, char *);
 void delCredFiles (void);
 void jobFileExitStatus (struct jobCard *jobCard);
@@ -311,7 +381,7 @@ int isAbsolutePathExec (const char *);
 
 void milliSleep (int msec);
 char window_ok (struct jobCard *jobPtr);
-void child_handler (int);
+void child_handler_sbatchd (int);
 void shout_err (struct jobCard *jobPtr, char *);
 int fcp (char *, char *, struct hostent *);
 int rmDir (char *);
@@ -323,11 +393,25 @@ bool_t xdr_jobSyslog (XDR *, struct jobSyslog *, struct LSFHeader *);
 bool_t xdr_jobCard (XDR *, struct jobCard *, struct LSFHeader *);
 int sizeofJobCard (struct jobCard *);
 
-int jobSigStart (struct jobCard *jp, int sigValue, int actFlags,
-			int actPeriod, logType logFlag);
+int jobSigStart (struct jobCard *jp, int sigValue, int actFlags, int actPeriod, logType logFlag);
 int jobact (struct jobCard *, int, char *, int, int);
 int jobsig (struct jobCard *jobTable, int sig, int forkKill);
 int sbdread_jobstatus (struct jobCard *jp);
 int sbdCheckUnreportedStatus ();
 void exeActCmd (struct jobCard *jp, char *actCmd, char *exitFile);
 void exeChkpnt (struct jobCard *jp, int chkFlags, char *exitFile);
+
+// #define NL_SETN    11
+void sinit (void);
+void init_sstate (void);
+void processMsg (struct clientNode *);
+void clientIO (struct Masks *);
+void houseKeeping (void);
+int authCmdRequest (struct clientNode *client, XDR * xdrs, struct LSFHeader *reqHdr);
+int isLSFAdmin_sbatchd (struct lsfAuth *auth); // FIXME FIXME FIXME FIXME there is a second isLSFAdmin in daemons/libresd/resd.h. Consolidate, if possible
+
+#ifdef INTER_DAEMON_AUTH
+int authMbdRequest (struct clientNode *, XDR *, struct LSFHeader *);
+#endif
+int get_new_master (struct sockaddr_in *from);
+

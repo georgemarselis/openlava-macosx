@@ -21,6 +21,8 @@
 // #ifndef LSF_LIB_RCP_H
 // #define LSF_LIB_RCP_H
 
+#include <sys/stat.h>
+
 typedef struct rcpXfer
 {
     int iOptions;
@@ -56,20 +58,25 @@ typedef struct rcpXfer
 
 #define LSRCP_MSGSIZE   1048576
 
-extern int mystat_ (char *, struct stat *, struct hostent *);
-extern int myopen_ (char *, int, int, struct hostent *);
-extern char *usePath (char *path);
-extern int parseXferArg (char *arg, char **userName, char **hostName,
-			 char **fName);
-extern int createXfer (lsRcpXfer * lsXfer);
-extern int destroyXfer (lsRcpXfer * lsXfer);
-extern int copyFile (lsRcpXfer * lsXfer, char *buf, int option);
-extern int equivalentXferFile (lsRcpXfer * lsXfer, char *szLocalFile,
-			       char *szRemoteFile, struct stat *psLstat,
-			       struct stat *psRstat, char *szRhost);
-extern int doXferRcp (lsRcpXfer * lsXfer, int option);
-extern int rmDirAndFiles (char *dir);
-extern int rmDirAndFilesEx (char *, int);
-extern int createSpoolSubDir (const char *spoolFileFullPath);
+// extern int mystat_ (char *, struct stat *, struct hostent *);
+// extern int myopen_ (char *, int, int, struct hostent *);
+// extern char *usePath (char *path);
+// extern int parseXferArg (char *arg, char **userName, char **hostName, char **fName);
+// extern int createXfer (lsRcpXfer * lsXfer);
+// extern int destroyXfer (lsRcpXfer * lsXfer);
+// extern int copyFile (lsRcpXfer * lsXfer, char *buf, int option);
+// extern int equivalentXferFile (lsRcpXfer * lsXfer, char *szLocalFile, char *szRemoteFile, struct stat *psLstat, struct stat *psRstat, char *szRhost);
+// extern int doXferRcp (lsRcpXfer * lsXfer, int option);
+// extern int rmDirAndFiles (char *dir);
+// extern int rmDirAndFilesEx (char *, int);
+// extern int createSpoolSubDir (const char *spoolFileFullPath);
 
-// #endif
+int parseXferArg(char *arg, char **userName, char **hostName, char **fName);
+int doXferRcp(lsRcpXfer *lsXfer, int option);
+int createXfer(lsRcpXfer *lsXfer);
+int destroyXfer(lsRcpXfer *lsXfer);
+int equivalentXferFile(lsRcpXfer *lsXfer, char *szLocalFile, char *szRemoteFile, struct stat *psLstat, struct stat *psRstat, char *szRhost);
+int copyFile(lsRcpXfer *lsXfer, char *buf, int option);
+int rmDirAndFiles(char *dir);
+int rmDirAndFilesEx(char *dir, int recur);
+int createSpoolSubDir(const char *spoolFileFullPath);

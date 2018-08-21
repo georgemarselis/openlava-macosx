@@ -625,7 +625,7 @@ void
 newPRMO (char *nameList)
 {
 
-	NAMELIST *nameListPtr = 0;
+	NAMELIST *nameListPtr = NULL;
 	// int i = 0;
 	int index = 0;
 	int addedNum = 0;
@@ -854,7 +854,7 @@ checkOrTakeAvailableByPreemptPRHQValue (int index, float value, struct hData *hP
 void
 addRunJobUsedPRHQValue (int index, float value, struct hData *hPtr, struct qData *qPtr)
 {
-	struct qPRValues *qPRVPtr = NULLs;
+	struct qPRValues *qPRVPtr = NULL;
 
 	if ((qPRVPtr = addQPRValues (index, hPtr, qPtr)) == NULL)
 	{

@@ -28,16 +28,17 @@ struct rHosts
 	time_t atime;
 	char *hname; 
 	struct rHosts *next;
-} *rHosts = NULL;
+}; //*rHosts = NULL;
 
 struct rfTab
 {
 	int fd;
 	char padding[4];
 	struct rHosts *host;
-} *ft = NULL;
+};// *ft = NULL;
 
-typedef enum
+// typedef
+enum rfCmd
 {
 	RF_OPEN,
 	RF_READ,
@@ -49,7 +50,7 @@ typedef enum
 	RF_FSTAT,
 	RF_UNLINK,
 	RF_TERMINATE
-} rfCmd;
+};// rfCmd;
 
 struct ropenReq
 {
@@ -86,6 +87,6 @@ struct rHosts *rhFind    (char *host);
 int            ls_ropen  (char *host, char *fn, int flags, int mode);
 int            ls_rclose (int fd);
 int            ls_rwrite (int fd, char *buf, size_t len);
-int            ls_rread  (int fd, char *buf, size_t len)
+int            ls_rread  (int fd, char *buf, size_t len);
 int          rhTerminate (char *host);
 

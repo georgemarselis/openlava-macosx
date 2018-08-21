@@ -53,7 +53,7 @@ struct sTab __searchPtr__; \
 // #define DEFAULT_SLOTS   11
 unsigned int DEFAULT_SLOTS = 11;
 unsigned int RESETFACTOR   = 2;
-float        RESETLIMIT    = 1.500;
+float        RESETLIMIT    = 1.500f;
 
 /* Double linked list addressed by each
  * hash table slot.

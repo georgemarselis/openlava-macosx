@@ -29,6 +29,7 @@ struct idxList
   int start;
   int end;
   int step;
+  char padding[4];
   struct idxList *next;
 };
 int idxparse (struct idxList **, int *);

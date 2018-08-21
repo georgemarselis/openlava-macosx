@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include "libint/bitset.h"
+
 #define BADCH   ":"
 // #define NL_SETN   23
 
@@ -38,13 +40,13 @@
 static struct LSFAdmins
 {
 	unsigned int numAdmins;
-	char padding[4];
+	const char padding[4];
 	char **names;
 
 } LSFAdmins;
 
-bool_t isLSFAdmin (const char *);
+bool_t isLSFAdmin   ( const char *);
 char *putstr_       ( const char *s );
 int replace1stCmd_  ( const char *oldCmdArgs, const char *newCmdArgs, char *outCmdArgs, size_t outLen);
 unsigned int isint_ ( const char *word);
-int ls_strcat       (char *trustedBuffer, int bufferLength, const char *strToAdd);
+int ls_strcat       ( char *trustedBuffer, int bufferLength, const char *strToAdd);

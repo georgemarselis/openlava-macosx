@@ -257,7 +257,7 @@ void *myrealloc (void *ptr, size_t size);
 char *getNextToken (char **sp);
 int getValPair (char **resReq, int *val1, int *val2);
 char *my_getopt (int nargc, char **nargv, char *ostr, char **errMsg);
-int putEnv (char *env, char *val);
+int putEnv ( const char *env, const char *val);
 int Bind_ (int sockfd, struct sockaddr *myaddr, socklen_t addrlen);
 char *getCmdPathName_ (const char *cmdStr, size_t *cmdLen);
 

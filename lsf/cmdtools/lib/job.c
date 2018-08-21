@@ -435,7 +435,7 @@ prtJobStart (struct jobInfoEnt *job, int prtFlag, int jobPid, int tFormat)
 
 
   int i = 0;
-  NAMELIST *hostList = NULL;
+  char *hostList = NULL // was NAMELIST;
 
 
   if (lsbParams[LSB_SHORT_HOSTLIST].paramValue && job->numExHosts > 1
@@ -560,7 +560,7 @@ prtJobReserv (struct jobInfoEnt *job)
 
 
   int i = 0;
-  NAMELIST *hostList = NULL;
+  char *hostList = NULL // was NAMELIST;
 
   if (lsbParams[LSB_SHORT_HOSTLIST].paramValue && job->numExHosts > 1
       && strcmp (lsbParams[LSB_SHORT_HOSTLIST].paramValue, "1") == 0)
