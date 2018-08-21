@@ -28,8 +28,13 @@
 #include "lib/rdwr.h"
 #include "daemons/libresd/resd.h"
 #include "lib/channel.h"
+#include "lib/host.h"
 
-
+/**************************************************************
+ * this file must be compiled together with host.c cuz there is
+ * sockAdd2Str_() to resolve
+ *
+ */
 
 /* FIXME FIXME
 the following constant is not used in this file. 
@@ -73,12 +78,12 @@ chanInit_ (void)
         fprintf( stderr, "%s: you are not supposed to be here\n", __func__ );
     }
 
-    channels = calloc ( chanMaxSize, sizeof (struct chanData));
+    channels = calloc ( chanMaxSize, sizeof (struct chanData)); // channels is global, located in <channel.h>
     if (channels == NULL) {
         return -1;
     }
 
-    chanIndex = 0;
+    chanIndex = 0; // chanIndex is global, located in <channel.h>
 
     return 0;
 }
@@ -345,10 +350,9 @@ chanConnect_ (int chfd, struct sockaddr_in *peer, int timeout)
         return -1;
     }
 
-    if (logclass & (LC_COMM | LC_TRACE))
-        ls_syslog (LOG_DEBUG2,
-            "chanConnect_: Connecting chan=%d to peer %s timeout %d", chfd,
-            sockAdd2Str_ (peer), timeout);
+    if (logclass & (LC_COMM | LC_TRACE)) {
+        ls_syslog (LOG_DEBUG2, "%s: Connecting chan=%d to peer %s timeout %d", __func__, chfd, sockAdd2Str_ (peer), timeout);
+    }
 
     if (channels[chfd].type == CH_TYPE_UDP)
     {

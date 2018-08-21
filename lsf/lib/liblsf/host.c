@@ -27,16 +27,16 @@
 #include "lib/lib.h"
 #include "lib/lproto.h"
 #include "lib/table.h"
+#include "lib/host.h"
+#include "lib/initenv.h"
+#include "lib/words.h"
 
-#define MAX_HOSTALIAS 64
-/* #define MAX_HOSTIPS   32 */
 
-static hTab *nameTab;
-static hTab *addrTab;
-
-static int mkHostTab (void);
-static void stripDomain (char *);
-static void addHost2Tab (const char *, in_addr_t **, char **);
+/**************************************************************
+ * this file must be compiled together with channel.c cuz there is
+ * sockAdd2Str_() to resolve
+ *
+ */
 
 
 /* ls_getmyhostname()
@@ -44,23 +44,25 @@ static void addHost2Tab (const char *, in_addr_t **, char **);
 char *
 ls_getmyhostname (void)
 {
-    static char hname[MAXHOSTNAMELEN];
-    struct hostent *hp;
+	char hname[MAXHOSTNAMELEN];
+	struct hostent *hp = NULL;
 
-    if (hname[0] != 0)
-        return hname;
+	memset( hname, '\0', MAXHOSTNAMELEN );
 
-    gethostname (hname, MAXHOSTNAMELEN);
-    hp = Gethostbyname_ (hname);
-    if (hp == NULL)
-        {
-            hname[0] = 0;
-            return NULL;
-        }
+// YOUR CACHING MECHANISM IS BAD AND YOU SHOULD FEEL BAD
+	// if (hname[0] != 0){
+	//     return hname;
+	// }
 
-    strcpy (hname, hp->h_name);
+	gethostname (hname, MAXHOSTNAMELEN);
+	hp = Gethostbyname_ (hname);
+	if (hp == NULL)  {
+			return NULL;
+	}
 
-    return hname;
+	// strcpy (hname, hp->h_name);
+
+	return hp->h_name;
 }
 
 /* Gethostbyname_()
@@ -68,64 +70,66 @@ ls_getmyhostname (void)
 struct hostent *
 Gethostbyname_ (char *hname)
 {
-    // int cc;
-    hEnt *e;
-    struct hostent *hp;
-    char lsfHname[MAXHOSTNAMELEN];
+	// int cc;
+	struct hEnt *e = NULL;
+	struct hostent *hp = NULL;
+	char lsfHname[MAXHOSTNAMELEN];
 
-    if (strlen (hname) >= MAXHOSTNAMELEN) {
-        lserrno = LSE_BAD_HOST;
-        return NULL;
-    }
+	memset( lsfHname, '\0', MAXHOSTNAMELEN );
 
-    strcpy (lsfHname, hname);
-        /* openlava strips all hostnames
-         * of their domain names.
-         */
-    stripDomain (lsfHname);
+	if (strlen (hname) >= MAXHOSTNAMELEN) {
+		lserrno = LSE_BAD_HOST;
+		return NULL;
+	}
 
-        /* This is always somewhat controversial
-         * should we have an explicit libray init
-         * call host_cache_init() or doing the
-         * initialization as part of the first call...
-         */
-    if (nameTab == NULL) {
-        mkHostTab ();
-    }
+	strcpy (lsfHname, hname);
+		/* openlava strips all hostnames
+		 * of their domain names.
+		 */
+	stripDomain (lsfHname);
 
-    e = h_getEnt_ (nameTab, lsfHname);
-    if (e) {
-        hp = e->hData;
-        return hp;
-    }
+		/* This is always somewhat controversial
+		 * should we have an explicit libray init
+		 * call host_cache_init() or doing the
+		 * initialization as part of the first call...
+		 */
+	if (nameTab == NULL) {
+		mkHostTab ();
+	}
 
-    hp = gethostbyname (lsfHname);
-    if ( NULL == hp ) {
-        lserrno = LSE_BAD_HOST;
-        return NULL;
-    }
-    stripDomain (hp->h_name);
-    /* add the new host to the host hash table
-     */
-    addHost2Tab (hp->h_name, (in_addr_t **) hp->h_addr_list, hp->h_aliases);
+	e = h_getEnt_ (nameTab, lsfHname);
+	if (e) {
+		hp = e->hData;
+		return hp;
+	}
+
+	hp = gethostbyname (lsfHname);
+	if ( NULL == hp ) {
+		lserrno = LSE_BAD_HOST;
+		return NULL;
+	}
+	stripDomain (hp->h_name);
+	/* add the new host to the host hash table
+	 */
+	addHost2Tab (hp->h_name, (in_addr_t **) hp->h_addr_list, hp->h_aliases);
 
 /*    if (0) {
-            dybag should we write a command
-             * to dump the cache sooner or later.
-             
-            cc = 0;
-            while (hp->h_addr_list[cc]) {
-                    char *p;
-                    struct in_addr a;
-                    memcpy (&a, hp->h_addr_list[cc], sizeof (a));
-                    p = inet_ntoa (a);
-                    fprintf (stderr, "%s\n", p);  could be closed 
-                    ++cc;
-                }
-        }
+			dybag should we write a command
+			 * to dump the cache sooner or later.
+			 
+			cc = 0;
+			while (hp->h_addr_list[cc]) {
+					char *p;
+					struct in_addr a;
+					memcpy (&a, hp->h_addr_list[cc], sizeof (a));
+					p = inet_ntoa (a);
+					fprintf (stderr, "%s\n", p);  could be closed 
+					++cc;
+				}
+		}
 */
 
-        return hp;
+		return hp;
 }
 
 /* Gethostbyaddr_()
@@ -133,57 +137,59 @@ Gethostbyname_ (char *hname)
 struct hostent *
 Gethostbyaddr_ (in_addr_t * addr, socklen_t len, int type)
 {
-    struct hostent *hp;
-    static char ipbuf[32];
-    hEnt *e;
+	struct hostent *hp = NULL;
+	struct hEnt *e = NULL;
+	char ipbuf[32]; // FIXME FIXME FIXME FIXME get rid of the 32; why 32 chars?
 
-    /* addrTab is built together with
-     * nameTab.
-     */
-    if (nameTab == NULL)
-        mkHostTab ();
+	memset( ipbuf, '\0', 32 ); // FIXME FIXME FIXME FIXME get rid of the 32; why 32 chars?s
 
-    sprintf (ipbuf, "%u", *addr);
+	/* addrTab is built together with
+	 * nameTab.
+	 */
+	if (nameTab == NULL) {
+		mkHostTab ();
+	}
 
-    e = h_getEnt_ (addrTab, ipbuf);
-    if (e)
-        {
-            hp = e->hData;
-            return hp;
-        }
+	sprintf (ipbuf, "%u", *addr);
 
-    hp = gethostbyaddr (addr, len, type);
-    if (hp == NULL)
-        {
-            lserrno = LSE_BAD_HOST;
-            return NULL;
-        }
-    stripDomain (hp->h_name);
+	e = h_getEnt_ (addrTab, ipbuf);
+	if (e)
+		{
+			hp = e->hData;
+			return hp;
+		}
 
-    addHost2Tab (hp->h_name, (in_addr_t **) hp->h_addr_list, hp->h_aliases);
-    return hp;
+	hp = gethostbyaddr (addr, len, type);
+	if (hp == NULL)
+		{
+			lserrno = LSE_BAD_HOST;
+			return NULL;
+		}
+	stripDomain (hp->h_name);
+
+	addHost2Tab (hp->h_name, (in_addr_t **) hp->h_addr_list, hp->h_aliases);
+	return hp;
 }
 
-#define ISBOUNDARY(h1, h2, len)  ( (h1[len]=='.' || h1[len]=='\0') && \
-                                                                (h2[len]=='.' || h2[len]=='\0') )
+#define ISBOUNDARY(h1, h2, len)  ( (h1[len]=='.' || h1[len]=='\0') && (h2[len]=='.' || h2[len]=='\0') )
 
 int
 equalHost_ (const char *host1, const char *host2)
 {
-        size_t len;
+		size_t len = 0;
 
-        if (strlen (host1) > strlen (host2)) {
-                len = strlen (host2);
-        }
-        else {
-                len = strlen (host1);
-        }
+		if (strlen (host1) > strlen (host2)) {
+			len = strlen (host2);
+		}
+		else {
+			len = strlen (host1);
+		}
 
-        if ((strncasecmp (host1, host2, len) == 0) && ISBOUNDARY (host1, host2, len)) {
-                return TRUE;
-        }
+		if ((strncasecmp (host1, host2, len) == 0) && ISBOUNDARY (host1, host2, len)) {
+				return TRUE;
+		}
 
-        return FALSE;
+		return FALSE;
 }
 
 /* sockAdd2Str_()
@@ -191,187 +197,191 @@ equalHost_ (const char *host1, const char *host2)
 char *
 sockAdd2Str_ (struct sockaddr_in *from)
 {
-    static char adbuf[24];
+	static char adbuf[24]; // FIXME FIXME FIXME not having the "static" qualifier 
 
-    sprintf (adbuf, "\
-%s:%hu", inet_ntoa (from->sin_addr), ntohs (from->sin_port));
-    return adbuf;
+	sprintf (adbuf, "%s:%hu", inet_ntoa (from->sin_addr), ntohs (from->sin_port));
+	return adbuf;
 }
 
 /* stripDomain()
  */
-static void
+void
 stripDomain (char *name)
 {
-    char *p;
+	char *p = NULL;
 
-    if ((p = strchr (name, '.')))
-        *p = 0;
+	if ((p = strchr (name, '.'))) {
+		*p = 0;
+	}
+
+	return;
 }
 
 /* mkHostTab()
  */
-static int
+int
 mkHostTab (void)
 {
-    static char fbuf[BUFSIZ];
-    char *buf;
-    FILE *fp;
+	FILE *fp = NULL;
+	char *buf = NULL;
+	char fbuf[BUFSIZ];
 
-    if (nameTab)
-        {
-            assert (addrTab);
-            return -1;
-        }
+	memset( fbuf, '\0', BUFSIZ ); // BUFSIZ is a GNU C lib macro https://www.gnu.org/software/libc/manual/html_node/Controlling-Buffering.html
 
-    nameTab = calloc (1, sizeof (hTab));
-    addrTab = calloc (1, sizeof (hTab));
+	if (nameTab){
+		assert (addrTab);
+		return -1;
+	}
 
-    h_initTab_ (nameTab, 101);
-    h_initTab_ (addrTab, 101);
+	nameTab = calloc (1, sizeof (struct hTab));
+	addrTab = calloc (1, sizeof (struct hTab));
 
-    if (initenv_ (NULL, NULL) < 0)
-        return -1;
+	h_initTab_ (nameTab, 101);
+	h_initTab_ (addrTab, 101);
 
-    if (genParams_[NO_HOSTS_FILE].paramValue)
-        return -1;
+	if (initenv_ (NULL, NULL) < 0) {
+		return -1;
+	}
 
-    sprintf (fbuf, "%s/hosts", genParams_[LSF_CONFDIR].paramValue);
+	if (genParams_[NO_HOSTS_FILE].paramValue) {
+		return -1;
+	}
 
-    if ((fp = fopen (fbuf, "r")) == NULL)
-        return -1;
+	sprintf (fbuf, "%s/hosts", genParams_[LSF_CONFDIR].paramValue); // FIXME FIXME FIXME FIXME move "hosts" configure.ac
 
-    while ((buf = nextline_ (fp)))
-        {
-            char *addrstr;
-            char *name;
-            char *p;
-            char *alias[MAX_HOSTALIAS];
-            in_addr_t *addr[2];
-            in_addr_t x;
-            int cc;
+	if ((fp = fopen (fbuf, "r")) == NULL)
+		return -1;
 
-            memset (alias, 0, sizeof (char *) * MAX_HOSTALIAS);
+	while ((buf = nextline_ (fp))) {
+		char *addrstr = NULL;
+		char *name = NULL;
+		char *p = NULL;
+		char *alias[MAX_HOSTALIAS];
+		in_addr_t *addr[2];
+		in_addr_t x;
+		int cc = 0;;
 
-            addrstr = getNextWord_ (&buf);
-            if (addrstr == NULL)
-        continue;
+		memset (alias, 0, sizeof (char *) * MAX_HOSTALIAS);
 
-            x = inet_addr (addrstr);
-            addr[0] = &x;
-            addr[1] = NULL;
+		addrstr = getNextWord_ (&buf);
+		if (addrstr == NULL) {
+			continue;
+		}
 
-            name = getNextWord_ (&buf);
-            if (name == NULL)
-        continue;
+		x = inet_addr (addrstr);
+		addr[0] = &x;
+		addr[1] = NULL;
 
-            cc = 0;
-            while ((p = getNextWord_ (&buf)) && cc < MAX_HOSTALIAS)
-        {
-            alias[cc] = strdup (p);
-            ++cc;
-        }
-            /* multihomed hosts are
-             * listed multiple times
-             * in the host file each time
-             * with the same name but different
-             * addr.
-             *
-             * 192.168.7.1 jumbo
-             * 192.168.7.4 jumbo
-             *     ...
-             */
-            addHost2Tab (name, addr, alias);
+		name = getNextWord_ (&buf);
+		if (name == NULL) {
+			continue;
+		}
 
-            cc = 0;
-            while (alias[cc])
-        {
-            FREEUP (alias[cc]);
-            ++cc;
-        }
+		cc = 0;
+		while ((p = getNextWord_ (&buf)) && cc < MAX_HOSTALIAS) {
+			alias[cc] = strdup (p);
+			++cc;
+		}
+		/* multihomed hosts are
+		 * listed multiple times
+		 * in the host file each time
+		 * with the same name but different
+		 * addr.
+		 *
+		 * 192.168.7.1 jumbo
+		 * 192.168.7.4 jumbo
+		 *     ...
+		 */
+		addHost2Tab (name, addr, alias);
 
-        }               /* while() */
+		cc = 0;
+		while (alias[cc]) {
+			FREEUP (alias[cc]);
+			++cc;
+		}
 
-    fclose (fp);
+	}               /* while() */
 
-    return 0;
+	fclose (fp);
+
+	return 0;
 }
 
 /* addHost2Tab()
  */
-static void
+void
 addHost2Tab (const char *hname, in_addr_t ** addrs, char **aliases)
 {
-    struct hostent *hp;
-    char ipbuf[32];
-    hEnt *e;
-    hEnt *e2;
-    int new;
-    unsigned long cc;
+	struct hostent *hp = NULL;
+	char ipbuf[32] = NULL;
+	struct hEnt *e = NULL;
+	struct hEnt *e2 = NULL;
+	int new = 0;
+	unsigned long cc = 0;;
 
-    /* add the host to the table by its name
-     * if it exists already we must be processing
-     * another ipaddr for it.
-     */
-    e = h_addEnt_ (nameTab, hname, &new);
-    if (new)
-        {
-            hp = calloc (1, sizeof (struct hostent));
-            hp->h_name = strdup (hname);
-            hp->h_addrtype = AF_INET;
-            hp->h_length = 4;
-            e->hData = hp;
-        }
-    else
-        {
-            hp = (struct hostent *) e->hData;
-        }
+	/* add the host to the table by its name
+	 * if it exists already we must be processing
+	 * another ipaddr for it.
+	 */
+	e = h_addEnt_ (nameTab, hname, &new);
+	if (new)
+		{
+			hp = calloc (1, sizeof (struct hostent));
+			hp->h_name = strdup (hname);
+			hp->h_addrtype = AF_INET;
+			hp->h_length = 4;
+			e->hData = hp;
+		}
+	else
+		{
+			hp = (struct hostent *) e->hData;
+		}
 
-        cc = 0;
-        while (aliases[cc]) {
-                ++cc;
-        }
+		cc = 0;
+		while (aliases[cc]) {
+				++cc;
+		}
 
-        hp->h_aliases = calloc(cc + 1, sizeof (char *));
-        cc = 0;
-        
-        while (aliases[cc]) {
-            hp->h_aliases[cc] = strdup (aliases[cc]);
-            ++cc;
-        }
+		hp->h_aliases = calloc(cc + 1, sizeof (char *));
+		cc = 0;
+		
+		while (aliases[cc]) {
+			hp->h_aliases[cc] = strdup (aliases[cc]);
+			++cc;
+		}
 
-        cc = 0;
-        while (addrs[cc]) {
-                ++cc;
-        }
+		cc = 0;
+		while (addrs[cc]) {
+				++cc;
+		}
 
-        hp->h_addr_list = calloc (cc + 1, sizeof (char *));
-        cc = 0;
-        
-        while (addrs[cc]) {
-            hp->h_addr_list[cc] = calloc (1, sizeof (in_addr_t));
-            memcpy (hp->h_addr_list[cc], addrs[cc], sizeof (in_addr_t));
-            /* now hash the host by its addr,
-             * there can be N addrs but each
-             * must be unique...
-             */
-            sprintf (ipbuf, "%u", *(addrs[cc]));
-            e2 = h_addEnt_ (addrTab, ipbuf, &new);
-            /* If new is false it means this IP
-             * is configured for another host already,
-             * confusion is waiting down the road as
-             * Gethostbyadrr_() will always return the
-             * first configured host.
-             * 192.168.1.4 joe
-             * 192.168.1.4 banana
-             * when banana will call the library will
-             * always tell you joe called.
-             */
-            if (new)
-        e2->hData = hp;
+		hp->h_addr_list = calloc (cc + 1, sizeof (char *));
+		cc = 0;
+		
+		while (addrs[cc]) {
+			hp->h_addr_list[cc] = calloc (1, sizeof (in_addr_t));
+			memcpy (hp->h_addr_list[cc], addrs[cc], sizeof (in_addr_t));
+			/* now hash the host by its addr,
+			 * there can be N addrs but each
+			 * must be unique...
+			 */
+			sprintf (ipbuf, "%u", *(addrs[cc]));
+			e2 = h_addEnt_ (addrTab, ipbuf, &new);
+			/* If new is false it means this IP
+			 * is configured for another host already,
+			 * confusion is waiting down the road as
+			 * Gethostbyadrr_() will always return the
+			 * first configured host.
+			 * 192.168.1.4 joe
+			 * 192.168.1.4 banana
+			 * when banana will call the library will
+			 * always tell you joe called.
+			 */
+			if (new)
+		e2->hData = hp;
 
-            ++cc;         /* nexte */
-        }
+			++cc;         /* nexte */
+		}
 }
 
 /* getAskedHosts_()
@@ -382,103 +392,103 @@ addHost2Tab (const char *hname, in_addr_t ** addrs, char **aliases)
 int
 getAskedHosts_ (char *optarg_, char ***askedHosts, unsigned int *numAskedHosts, unsigned long *badIdx, int checkHost)
 {
-    unsigned long  num = 64;
-    char *word;
-    char *hname;
-    char **tmp;
-    int foundBadHost = FALSE;
-    static char **hlist = NULL;
-    static unsigned long nhlist = 0;
-    char host[MAXHOSTNAMELEN];
+	unsigned long  num = 64;
+	char *word;
+	char *hname;
+	char **tmp;
+	int foundBadHost = FALSE;
+	static char **hlist = NULL;
+	static unsigned long nhlist = 0;
+	char host[MAXHOSTNAMELEN];
 
-        if (hlist)
-        {
-                for ( unsigned long i = 0; i < nhlist; i++) {
-                        free (hlist[i]);
-                }
-                free (hlist);
-                hlist = NULL;
-        }
+		if (hlist)
+		{
+				for ( unsigned long i = 0; i < nhlist; i++) {
+						free (hlist[i]);
+				}
+				free (hlist);
+				hlist = NULL;
+		}
 
-        nhlist = 0;
-        hlist = calloc (num, sizeof (char *) );
-        if ( NULL == hlist )   {
-            lserrno = LSE_MALLOC;
-            return (-1);
-        }
+		nhlist = 0;
+		hlist = calloc (num, sizeof (char *) );
+		if ( NULL == hlist )   {
+			lserrno = LSE_MALLOC;
+			return (-1);
+		}
 
-    *badIdx = 0;
+	*badIdx = 0;
 
-    while ((word = getNextWord_ (&optarg_)) != NULL)
-        {
-            strncpy (host, word, sizeof (host));
-            if (ls_isclustername (host) <= 0)
-        {
-            if (checkHost == FALSE)
-                {
-                    hname = host;
-                }
-            else
-                {
-                    if (Gethostbyname_ (host) == NULL)
-                {
-                    if (!foundBadHost)
-                        {
-                            foundBadHost = TRUE;
-                            *badIdx = nhlist;
-                        }
-                    hname = host;
-                }
-                    else
-                {
-                    hname = host;
-                }
-                }
-        }
-            else
-        hname = host;
+	while ((word = getNextWord_ (&optarg_)) != NULL)
+		{
+			strncpy (host, word, sizeof (host));
+			if (ls_isclustername (host) <= 0)
+		{
+			if (checkHost == FALSE)
+				{
+					hname = host;
+				}
+			else
+				{
+					if (Gethostbyname_ (host) == NULL)
+				{
+					if (!foundBadHost)
+						{
+							foundBadHost = TRUE;
+							*badIdx = nhlist;
+						}
+					hname = host;
+				}
+					else
+				{
+					hname = host;
+				}
+				}
+		}
+			else
+		hname = host;
 
-            if ((hlist[nhlist] = putstr_ (hname)) == NULL)
-        {
-            lserrno = LSE_MALLOC;
-            goto Error;
-        }
+			if ((hlist[nhlist] = putstr_ (hname)) == NULL)
+		{
+			lserrno = LSE_MALLOC;
+			goto Error;
+		}
 
-            nhlist++;
-            if (nhlist == num)
-        {
-            if ((tmp = realloc( hlist, 2 * num * sizeof( tmp ) ) ) == NULL)
-                {
-                    lserrno = LSE_MALLOC;
-                    goto Error;
-                }
-            hlist = tmp;
-            num = 2 * num;
-        }
-        }
+			nhlist++;
+			if (nhlist == num)
+		{
+			if ((tmp = realloc( hlist, 2 * num * sizeof( tmp ) ) ) == NULL)
+				{
+					lserrno = LSE_MALLOC;
+					goto Error;
+				}
+			hlist = tmp;
+			num = 2 * num;
+		}
+		}
 
-        assert( nhlist <= UINT_MAX );
-    *numAskedHosts = nhlist;
-    *askedHosts = hlist;
+		assert( nhlist <= UINT_MAX );
+	*numAskedHosts = nhlist;
+	*askedHosts = hlist;
 
-    if (foundBadHost)
-        {
-            lserrno = LSE_BAD_HOST;
-            return (-1);
-        }
+	if (foundBadHost)
+		{
+			lserrno = LSE_BAD_HOST;
+			return (-1);
+		}
 
-    return (0);
+	return (0);
 
 // FIXME FIXME FIXME FIXME 
 // GOTOS GOT TO GO
 Error:
 
-        for (unsigned long i = 0; i < nhlist; i++) {
-                free (hlist[i]);
-        }
+		for (unsigned long i = 0; i < nhlist; i++) {
+				free (hlist[i]);
+		}
 
-        free (hlist);
-        hlist = NULL;
-        nhlist = 0;
-        return (-1);
+		free (hlist);
+		hlist = NULL;
+		nhlist = 0;
+		return (-1);
 }

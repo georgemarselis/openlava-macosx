@@ -19,11 +19,13 @@
 
 #pragma once
 
-char *getTempDir_ (void);
-int parseLine (char *line, char **keyPtr, char **valuePtr);
-int matchEnv (char *, struct config_param *);
-int setConfEnv (char *, char *, struct config_param *);
-int initenv_ (struct config_param *userEnv, char *pathname);
-
-
 static size_t errLineNum_ = 0;
+
+char *getTempDir_(void);
+int initenv_(struct config_param *userEnv, char *pathname);
+int ls_readconfenv(struct config_param *paramList, char *confPath);
+int readconfenv_(struct config_param *pList1, struct config_param *pList2, char *confPath);
+int parseLine(char *line, char **keyPtr, char **valuePtr);
+int matchEnv(char *name, struct config_param *paramList);
+int setConfEnv(char *name, char *value, struct config_param *paramList);
+

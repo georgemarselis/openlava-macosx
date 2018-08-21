@@ -998,7 +998,6 @@ unsigned int LSF_LIM_VERSION; // FIXME FIXME FIXME FIXME FIXME set in configure.
 unsigned int LSF_RES_VERSION; // FIXME FIXME FIXME FIXME FIXME set in configure.ac
 
 int ls_initrex (int, int);
-int ls_readconfenv (struct config_param *, char *);
 int ls_connect (char *);
 int ls_rexecv (char *, char **, int);
 int ls_rexecve (char *, char **, int, char **);
@@ -1018,14 +1017,13 @@ struct hostLoad *ls_loadoftype  (char *resreq, size_t *numhosts, int options, ch
 struct hostLoad *ls_loadinfo    (char *resreq, size_t *numhosts, int options, char *fromhost, char **hostlist, size_t listsize, char ***indxnamelist);
 int ls_loadadj  (char *resreq, struct placeInfo *hostlist, size_t listsize);
 
-char **ls_findmyconnections (void);
+// char **ls_findmyconnections (void);
 int ls_lostconnection (void);
 char *ls_getclustername (void);
 struct clusterInfo *ls_clusterinfo (char *resReq, unsigned int *numclusters, char **clusterList, int listsize, int options);
 struct lsSharedResourceInfo *ls_sharedresourceinfo (char **resources, unsigned int *numResources, char *hostName, int options);
 char *ls_getmastername (void);
 char *ls_getmastername2 (void);
-char *ls_getmyhostname (void);
 struct hostInfo *ls_gethostinfo (char *resReq, size_t *numhosts, char **hostlist, size_t listsize, int options);
 char *ls_getISVmode (void);
 
@@ -1104,11 +1102,6 @@ struct lsfAcctRec *ls_getacctrec (FILE *, int *);
 int ls_putacctrec (FILE *, struct lsfAcctRec *);
 int getBEtime (char *, char, time_t *);
 
-
-long nb_write_fix (int s, char *buf, size_t len);
-long nb_read_fix  (int s, char *buf, size_t len);
-long b_read_fix   (int s, char *buf, size_t len);
-long b_write_fix  (int s, char *buf, size_t len);
 
 /*
  * openlava add host

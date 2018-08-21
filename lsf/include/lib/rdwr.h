@@ -26,9 +26,16 @@ const unsigned short IO_TIMEOUT = 2000;
 
 #define US_DIFF(t1, t2) ((t1->tv_sec - t2->tv_sec) * 1000000 + t1->tv_usec - t2->tv_usec )
 
-// int  b_connect_ (int s, struct sockaddr *name, socklen_t namelen, unsigned int timeout);
-// int  rd_select_ (int rd, struct timeval *timeout);
-// int  b_accept_  (int s, struct sockaddr *addr, socklen_t * addrlen);
-// long nb_read_timeout (int s, char *buf, size_t len, int timeout);
-void unblocksig (int sig);
-void alarmer_ (void);
+long nb_write_fix(int s, char *buf, size_t len);
+long nb_read_fix(int s, char *buf, size_t len);
+long b_read_fix(int s, char *buf, size_t len);
+long b_write_fix(int s, char *buf, size_t len);
+void unblocksig(int sig);
+int b_connect_(int s, struct sockaddr *name, socklen_t namelen, unsigned int timeout);
+int rd_select_(long rd, struct timeval *timeout);
+int b_accept_(int s, struct sockaddr *addr, socklen_t *addrlen);
+int detectTimeout_(int s, int recv_timeout);
+void alarmer_(void);
+int blockSigs_(int sig, sigset_t *blockMask, sigset_t *oldMask);
+long nb_read_timeout(int s, char *buf, size_t len, int timeout);
+

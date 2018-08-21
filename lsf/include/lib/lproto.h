@@ -190,187 +190,185 @@ struct resourceInfoReply
 
 int sharedResConfigured_;
 
-void putMaskLevel (int, char **);
+// void putMaskLevel (int, char **);
 
-/* FIXME FIXME FIXME : int resCmd bellow may be not int! */
-int lsResMsg_ (int, int resCmd, char *, char *, int, bool_t (*)(), int *, struct timeval *);
-int expectReturnCode_ (int s, pid_t seqno, struct LSFHeader *repHdr);
-int ackAsyncReturnCode_ (int, struct LSFHeader *);
-int resRC2LSErr_ (int);
-int ackReturnCode_ (int);
-
-
-void inithostsock_ (void);
-
-int initenv_ (struct config_param *, char *);
-short getMasterCandidateNoByName_ (char *);
-char *getMasterCandidateNameByNo_ (short);
-int getNumMasterCandidates_ ();
-int initMasterList_ ();
-int getIsMasterCandidate_ ();
-void freeupMasterCandidate_ (int);
-char *resetLSFUsreDomain (char *);
+// /* FIXME FIXME FIXME : int resCmd bellow may be not int! */
+// int lsResMsg_ (int, int resCmd, char *, char *, int, bool_t (*)(), int *, struct timeval *);
+// int expectReturnCode_ (int s, pid_t seqno, struct LSFHeader *repHdr);
+// int ackAsyncReturnCode_ (int, struct LSFHeader *);
+// int resRC2LSErr_ (int);
+// int ackReturnCode_ (int);
 
 
-int runEsub_ (struct lenData *, char *);
-int runEexec_ (char *, int, struct lenData *, char *);
-int runEClient_ (struct lenData *, char **);
-char *runEGroup_ (char *, char *);
-
-int getAuth_ (struct lsfAuth *, char *);
-int verifyEAuth_ (struct lsfAuth *, struct sockaddr_in *);
-int putEauthClientEnvVar (char *);
-int putEauthServerEnvVar (char *);
-
-void sw_remtty (int);
-void sw_loctty (int);
+// int initenv_ (struct config_param *, char *);
+// short getMasterCandidateNoByName_ (char *);
+// char *getMasterCandidateNameByNo_ (short);
+// int getNumMasterCandidates_ ();
+// int initMasterList_ ();
+// int getIsMasterCandidate_ ();
+// void freeupMasterCandidate_ (int);
+// char *resetLSFUsreDomain (char *);
 
 
-int niosCallback_ (struct sockaddr_in *from, unsigned short port, int rpid, int exitStatus, int terWhiPendStatus);
+// int runEsub_ (struct lenData *, char *);
+// int runEexec_ (char *, int, struct lenData *, char *);
+// int runEClient_ (struct lenData *, char **);
+// char *runEGroup_ (char *, char *);
 
-int sig_encode (int);
-int sig_decode (int);
-int getSigVal (char *);
-char *getSigSymbolList (void);
-char *getSigSymbol (int);
-void (*Signal_ (int, void (*)(int))) (int);
-int blockALL_SIGS_ (sigset_t *, sigset_t *);
+// int getAuth_ (struct lsfAuth *, char *);
+// int verifyEAuth_ (struct lsfAuth *, struct sockaddr_in *);
+// int putEauthClientEnvVar (char *);
+// int putEauthServerEnvVar (char *);
 
-int TcpCreate_ (int, int);
-
-int Termios_ (XDR *, struct termios *);
-int decodeTermios_ (XDR *, struct termios *);
-int rstty_ (char *host);
-int rstty_async_ (char *host);
-int do_rstty_ (int, int, int);
-
-char isanumber_ (char *);
-char islongint_ (char *);
-// unsigned int isint_ (char *);
-int isdigitstr_ (char *);
-// char *putstr_ (const char *);
-char *mygetwd_ (char *);
-char *chDisplay_ (char *);
-void initLSFHeader_ (struct LSFHeader *);
-struct group *mygetgrnam (const char *name);
-void *myrealloc (void *ptr, size_t size);
-char *getNextToken (char **sp);
-int getValPair (char **resReq, int *val1, int *val2);
-char *my_getopt (int nargc, char **nargv, char *ostr, char **errMsg);
-int putEnv ( const char *env, const char *val);
-int Bind_ (int sockfd, struct sockaddr *myaddr, socklen_t addrlen);
-char *getCmdPathName_ (const char *cmdStr, size_t *cmdLen);
-
-char *getLowestDir_ (const char *filePath);
-void getLSFAdmins_ (void);
-bool_t isLSFAdmin_ (const char *name);
-int isAllowCross (char *paramValue);
-int isMasterCrossPlatform (void);
-long atoi64_ (char *);
-
-void stripDomain_ (char *);
-int equalHost_ (const char *, const char *);
-char *sockAdd2Str_ (struct sockaddr_in *);
-
-struct hostent *Gethostbyname_ ( const char *hostname );
-struct hostent *Gethostbyaddr_ (in_addr_t *, socklen_t, int);
-int getAskedHosts_ (char *optarg_, char ***askedHosts, unsigned int *numAskedHosts, unsigned long *badIdx, int checkHost);
-int lockHost_ (time_t, char *);
-int unlockHost_ (char *);
-
-int lsfRu2Str (FILE *, struct lsfRusage *);
-int str2lsfRu (char *, struct lsfRusage *, int *);
-void lsfRusageAdd_ (struct lsfRusage *, struct lsfRusage *);
-
-int expSyntax_ (char *);
-
-char *getNextWord1_ (char **line);
-char *getNextWordSet (char **, const char *);
-char *getline_ (FILE * fp, int *);
-char *getThisLine_ (FILE * fp, int *LineCount);
-int stripQStr (char *q, char *str);
-int addQStr (FILE *, char *str);
-struct pStack *initStack (void);
-int pushStack (struct pStack *, struct confNode *);
-struct confNode *popStack (struct pStack *);
-void freeStack (struct pStack *);
+// void sw_remtty (int);
+// void sw_loctty (int);
 
 
-char *nextline_ (FILE *);
-void subNewLine_ (char *);
+// int niosCallback_ (struct sockaddr_in *from, unsigned short port, int rpid, int exitStatus, int terWhiPendStatus);
 
-// void doSkipSection (FILE *fp, size_t *lineNum, char *fname, char *unknown);
-// int keyMatch (struct keymap *keyList, char *line, int exact);
-// int mapValues (struct keymap *keyList, char *line);
-// int readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *fname, size_t *lineNum, int boolean, char *newindex);
-// char *getNextValue (char **line);
-// int putValue (struct keymap *keyList, char *key, char *value);
-// char *getBeginLine (FILE *fp, size_t *lineNum);
-// int putInLists (char *word, struct admins *admins, unsigned int *numAds, char *forWhat);
-// int isInlist (char **adminNames, char *userName, unsigned int actAds);
+// int sig_encode (int);
+// int sig_decode (int);
+// int getSigVal (char *);
+// char *getSigSymbolList (void);
+// char *getSigSymbol (int);
+// void (*Signal_ (int, void (*)(int))) (int);
+// int blockALL_SIGS_ (sigset_t *, sigset_t *);
 
-// void doSkipSection_conf (struct lsConf *conf, size_t *lineNum, char *lsfile, char *sectionName);
+// int TcpCreate_ (int, int);
 
-void defaultAllHandlers (void);
+// int Termios_ (XDR *, struct termios *);
+// int decodeTermios_ (XDR *, struct termios *);
+// int rstty_ (char *host);
+// int rstty_async_ (char *host);
+// int do_rstty_ (int, int, int);
 
-// long  nb_write_fix (int s, char *buf, size_t len);
-long  nb_read_timeout (int s, char *buf, size_t len, int timeout);
-int   b_write_timeout (int, char *, int, int);
-int   detectTimeout_ (int, int);
-int   b_connect_ (int s, struct sockaddr *name, socklen_t namelen, unsigned int timeout);
-int   rd_select_ (long s, struct timeval *);
-int   b_accept_ (int, struct sockaddr *, socklen_t *);
-int   blockSigs_ (int, sigset_t *, sigset_t *);
-// long  b_write_fix  (int s, char *buf, size_t len);
+// char isanumber_ (char *);
+// char islongint_ (char *);
+// // unsigned int isint_ (char *);
+// int isdigitstr_ (char *);
+// // char *putstr_ (const char *);
+// char *mygetwd_ (char *);
+// char *chDisplay_ (char *);
+// void initLSFHeader_ (struct LSFHeader *);
+// struct group *mygetgrnam (const char *name);
+// void *myrealloc (void *ptr, size_t size);
+// char *getNextToken (char **sp);
+// int getValPair (char **resReq, int *val1, int *val2);
+// char *my_getopt (int nargc, char **nargv, char *ostr, char **errMsg);
+// int putEnv ( const char *env, const char *val);
+// int Bind_ (int sockfd, struct sockaddr *myaddr, socklen_t addrlen);
+// char *getCmdPathName_ (const char *cmdStr, size_t *cmdLen);
 
-int writeEncodeHdr_ (int s, struct LSFHeader *sendHdr, long (*)());
+// char *getLowestDir_ (const char *filePath);
+// void getLSFAdmins_ (void);
+// bool_t isLSFAdmin_ (const char *name);
+// int isAllowCross (char *paramValue);
+// int isMasterCrossPlatform (void);
+// long atoi64_ (char *);
 
-int io_nonblock_ (int);
-int io_block_ (int);
+// void stripDomain_ (char *);
+// int equalHost_ (const char *, const char *);
+// char *sockAdd2Str_ (struct sockaddr_in *);
 
-void millisleep_ (int);
+// struct hostent *Gethostbyname_ ( const char *hostname );
+// struct hostent *Gethostbyaddr_ (in_addr_t *, socklen_t, int);
+// int getAskedHosts_ (char *optarg_, char ***askedHosts, unsigned int *numAskedHosts, unsigned long *badIdx, int checkHost);
+// int lockHost_ (time_t, char *);
+// int unlockHost_ (char *);
 
-void rlimitEncode_ (struct lsfLimit *, struct rlimit *, int);
-void rlimitDecode_ (struct lsfLimit *, struct rlimit *, int);
+// int lsfRu2Str (FILE *, struct lsfRusage *);
+// int str2lsfRu (char *, struct lsfRusage *, int *);
+// void lsfRusageAdd_ (struct lsfRusage *, struct lsfRusage *);
 
-void verrlog_ (int level, FILE * fp, const char *fmt, va_list ap);
+// int expSyntax_ (char *);
 
-int errnoEncode_ (int);
-int errnoDecode_ (int);
-
-int getLogClass_ (char *, char *);
-int getLogMask (char **, char *);
-void ls_openlog (const char *, const char *, int, char *);
-void ls_closelog (void);
-int ls_setlogmask (int maskpri);
-
-// void initkeylist (struct keymap *keyList, int, int, struct lsInfo *);
-// void freekeyval (struct keymap *keyList);
-// char *parsewindow (char *val, char *fname, size_t *lineNum, char *host);
-
-unsigned int expandList_ (char ***tolist, unsigned int mask, char **keys);
-unsigned int expandList1_ (char ***tolist, unsigned int num, unsigned int *bitmMaps, char **keys);
-
-int osInit_ (void);
-char *osPathName_ (char *);
-char *osHomeEnvVar_ (void);
-int osProcAlive_ (int);
-void osConvertPath_ (char *);
-
-void xdr_lsffree (bool_t (*)(), char *, struct LSFHeader *);
-
-int createUtmpEntry (char *, pid_t, char *);
-int removeUtmpEntry (pid_t);
-
-int createSpoolSubDir (const char *);
+// char *getNextWord1_ (char **line);
+// char *getNextWordSet (char **, const char *);
+// char *getline_ (FILE * fp, int *);
+// char *getThisLine_ (FILE * fp, int *LineCount);
+// int stripQStr (char *q, char *str);
+// int addQStr (FILE *, char *str);
+// struct pStack *initStack (void);
+// int pushStack (struct pStack *, struct confNode *);
+// struct confNode *popStack (struct pStack *);
+// void freeStack (struct pStack *);
 
 
-struct passwd *getpwlsfuser_ (const char *lsfUserName);
-struct passwd *getpwdirlsfuser_ (const char *lsfUserName);
+// char *nextline_ (FILE *);
+// void subNewLine_ (char *);
 
-int getLSFUser_ (char *lsfUserName, unsigned int lsfUserNameSize);
-int getLSFUserByName_ (const char *osUserName, char *lsfUserName, unsigned int lsfUserNameSize);
-int getLSFUserByUid_ (uid_t uid, char *lsfUserName, unsigned int lsfUserNameSize);
-int getOSUserName_ (const char *lsfUserName, char *osUserName, unsigned int osUserNameSize);
-int getOSUid_ (const char *lsfUserName, uid_t * uid);
+// // void doSkipSection (FILE *fp, size_t *lineNum, char *fname, char *unknown);
+// // int keyMatch (struct keymap *keyList, char *line, int exact);
+// // int mapValues (struct keymap *keyList, char *line);
+// // int readHvalues (struct keymap *keyList, char *linep, FILE *fp, char *fname, size_t *lineNum, int boolean, char *newindex);
+// // char *getNextValue (char **line);
+// // int putValue (struct keymap *keyList, char *key, char *value);
+// // char *getBeginLine (FILE *fp, size_t *lineNum);
+// // int putInLists (char *word, struct admins *admins, unsigned int *numAds, char *forWhat);
+// // int isInlist (char **adminNames, char *userName, unsigned int actAds);
+
+// // void doSkipSection_conf (struct lsConf *conf, size_t *lineNum, char *lsfile, char *sectionName);
+
+// void defaultAllHandlers (void);
+
+// // long  nb_write_fix (int s, char *buf, size_t len);
+// long  nb_read_timeout (int s, char *buf, size_t len, int timeout);
+// int   b_write_timeout (int, char *, int, int);
+// int   detectTimeout_ (int, int);
+// int   b_connect_ (int s, struct sockaddr *name, socklen_t namelen, unsigned int timeout);
+// int   rd_select_ (long s, struct timeval *);
+// int   b_accept_ (int, struct sockaddr *, socklen_t *);
+// int   blockSigs_ (int, sigset_t *, sigset_t *);
+// // long  b_write_fix  (int s, char *buf, size_t len);
+
+// int writeEncodeHdr_ (int s, struct LSFHeader *sendHdr, long (*)());
+
+// int io_nonblock_ (int);
+// int io_block_ (int);
+
+// void millisleep_ (int);
+
+// void rlimitEncode_ (struct lsfLimit *, struct rlimit *, int);
+// void rlimitDecode_ (struct lsfLimit *, struct rlimit *, int);
+
+// void verrlog_ (int level, FILE * fp, const char *fmt, va_list ap);
+
+// int errnoEncode_ (int);
+// int errnoDecode_ (int);
+
+// int getLogClass_ (char *, char *);
+// int getLogMask (char **, char *);
+// void ls_openlog (const char *, const char *, int, char *);
+// void ls_closelog (void);
+// int ls_setlogmask (int maskpri);
+
+// // void initkeylist (struct keymap *keyList, int, int, struct lsInfo *);
+// // void freekeyval (struct keymap *keyList);
+// // char *parsewindow (char *val, char *fname, size_t *lineNum, char *host);
+
+// unsigned int expandList_ (char ***tolist, unsigned int mask, char **keys);
+// unsigned int expandList1_ (char ***tolist, unsigned int num, unsigned int *bitmMaps, char **keys);
+
+// int osInit_ (void);
+// char *osPathName_ (char *);
+// char *osHomeEnvVar_ (void);
+// int osProcAlive_ (int);
+// void osConvertPath_ (char *);
+
+// void xdr_lsffree (bool_t (*)(), char *, struct LSFHeader *);
+
+// int createUtmpEntry (char *, pid_t, char *);
+// int removeUtmpEntry (pid_t);
+
+// int createSpoolSubDir (const char *);
+
+
+// struct passwd *getpwlsfuser_ (const char *lsfUserName);
+// struct passwd *getpwdirlsfuser_ (const char *lsfUserName);
+
+// int getLSFUser_ (char *lsfUserName, unsigned int lsfUserNameSize);
+// int getLSFUserByName_ (const char *osUserName, char *lsfUserName, unsigned int lsfUserNameSize);
+// int getLSFUserByUid_ (uid_t uid, char *lsfUserName, unsigned int lsfUserNameSize);
+// int getOSUserName_ (const char *lsfUserName, char *osUserName, unsigned int osUserNameSize);
+// int getOSUid_ (const char *lsfUserName, uid_t * uid);
 

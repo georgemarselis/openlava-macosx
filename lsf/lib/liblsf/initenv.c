@@ -26,71 +26,71 @@
 #include "lib/initenv.h"
 
 char *stripDomains_ = NULL;
-char *lsTmpDir_;
+char *lsTmpDir_ - NULL;
 
-static int
+int
 doEnvParams_ (struct config_param *plp)
 {
-    char *sp;
-    char *spp;
+    char *sp = NULL;
+    char *spp = NULL;
 
-    if (!plp)
-        return (0);
+    if (!plp) {
+        return 0;
+    }
 
-    for (; plp->paramName != NULL; plp++)
-        {
-            if ((sp = getenv (plp->paramName)) != NULL)
+    for (; plp->paramName != NULL; plp++) // FIXME FIXME fix initial condition
     {
-        if (NULL == (spp = putstr_ (sp)))
+        if ((sp = getenv (plp->paramName)) != NULL)
+        {
+            if (NULL == (spp = putstr_ (sp)))
             {
                 lserrno = LSE_MALLOC;
-                return (-1);
+                return -1;
             }
-        FREEUP (plp->paramValue);
-        plp->paramValue = spp;
-    }
+            FREEUP (plp->paramValue);
+            plp->paramValue = spp;
         }
-    return (0);
+    }
+    return 0;
 }
 
 char *
 getTempDir_ (void)
 {
-    static char *sp = NULL;
+    char *sp = NULL;
     char *tmpSp = NULL;
     struct stat stb;
 
     if (sp)
-        {
-            return (sp);
-        }
+    {
+        return sp;
+    }
 
     tmpSp = genParams_[LSF_TMPDIR].paramValue;
     if ((tmpSp != NULL) && (stat (tmpSp, &stb) == 0) && (S_ISDIR (stb.st_mode)))
-        {
-            sp = tmpSp;
-        }
+    {
+        sp = tmpSp;
+    }
     else
-        {
-
-            tmpSp = getenv ("TMPDIR");
-            if ((tmpSp != NULL) && (stat (tmpSp, &stb) == 0)
-        && (S_ISDIR (stb.st_mode)))
     {
 
-        sp = putstr_ (tmpSp);
-    }
+            tmpSp = getenv ("TMPDIR"); // FIXME FIXME FIXME FIXME move "TMPDIR" to configure.ac
+            if ((tmpSp != NULL) && (stat (tmpSp, &stb) == 0) && (S_ISDIR (stb.st_mode)))
+            {
+
+                sp = putstr_ (tmpSp);
+            }
 
         }
 
-    if (sp == NULL)
+        if (sp == NULL)
         {
-            sp = "/tmp";
+            sp = "/tmp";  // FIXME FIXME FIXME FIXME move "TMPDIR" to configure.ac
         }
 
-    return sp;
+        return sp;
 
-}
+    }
 
 /* initenv_()
  * Read and initialiaze the openlava environment.
@@ -99,74 +99,81 @@ int
 initenv_ (struct config_param *userEnv, char *pathname)
 {
     int Error = 0;
-    char *envdir;
+    char *envdir = NULL;
     static int lsfenvset = FALSE;
 
     if (osInit_ () < 0)
-        {
-            return (-1);
-        }
+    {
+        return -1;
+    }
 
-    if ((envdir = getenv ("LSF_ENVDIR")) != NULL)
+    if ((envdir = getenv ("LSF_ENVDIR")) != NULL) {  // FIXME FIXME FIXME FIXME move "TMPDIR" to configure.ac
         pathname = envdir;
-    else if (pathname == NULL)
+    }
+    else if (pathname == NULL) {
         pathname = LSETCDIR;
+    }
 
     if (lsfenvset)
+    {
+        if (userEnv == NULL)
         {
-            if (userEnv == NULL)
-    {
-        return (0);
-    }
-            if (readconfenv_ (NULL, userEnv, pathname) < 0)
-    {
-        return (-1);
-    }
-            else if (doEnvParams_ (userEnv) < 0)
-    {
-        return (-1);
-    }
             return 0;
         }
-
-    if (readconfenv_ (genParams_, userEnv, pathname) < 0)
-        return (-1);
-    else
+        if (readconfenv_ (NULL, userEnv, pathname) < 0)
         {
-            if (doEnvParams_ (genParams_) < 0)
-    return (-1);
-            lsfenvset = TRUE;
-            if (doEnvParams_ (userEnv) < 0)
-    Error = 1;
-        }
-
-    if (!genParams_[LSF_CONFDIR].paramValue
-            || !genParams_[LSF_SERVERDIR].paramValue)
-        {
-            lserrno = LSE_BAD_ENV;
             return -1;
         }
+        else if (doEnvParams_ (userEnv) < 0)
+        {
+            return -1;
+        }
+        return 0;
+    }
+
+    if (readconfenv_ (genParams_, userEnv, pathname) < 0) {
+        return -1;
+    }
+    else
+    {
+        if (doEnvParams_ (genParams_) < 0) {
+            return -1;
+        }
+        lsfenvset = TRUE;
+        if (doEnvParams_ (userEnv) < 0) {
+            Error = 1;
+        }
+    }
+
+    if (!genParams_[LSF_CONFDIR].paramValue || !genParams_[LSF_SERVERDIR].paramValue)
+    {
+        lserrno = LSE_BAD_ENV;
+        return -1;
+    }
 
     if (genParams_[LSF_SERVER_HOSTS].paramValue != NULL)
-        {
-            char *sp;
-            for (sp = genParams_[LSF_SERVER_HOSTS].paramValue; *sp != '\0'; sp++)
-    if (*sp == '\"')
-        *sp = ' ';
+    {
+        char *sp = NULL;
+        for (sp = genParams_[LSF_SERVER_HOSTS].paramValue; *sp != '\0'; sp++) {
+            if (*sp == '\"') {
+                *sp = ' ';
+            }
         }
+    }
 
     lsTmpDir_ = getTempDir_ ();
 
-    if (Error)
-        return (-1);
+    if (Error) {
+        return -1;
+    }
 
-    return (0);
+    return 0;
 }
 
 int
 ls_readconfenv (struct config_param *paramList, char *confPath)
 {
-    return (readconfenv_ (NULL, paramList, confPath));
+    return readconfenv_ (NULL, paramList, confPath);
 }
 
 int
@@ -188,7 +195,7 @@ readconfenv_ (struct config_param *pList1, struct config_param *pList2, char *co
         {
 
             lserrno = LSE_BAD_ARGS;
-            return (-1);
+            return -1;
         }
             }
 
@@ -199,7 +206,7 @@ readconfenv_ (struct config_param *pList1, struct config_param *pList2, char *co
         {
 
             lserrno = LSE_BAD_ARGS;
-            return (-1);
+            return -1;
         }
             }
     if (confPath)
@@ -234,7 +241,7 @@ readconfenv_ (struct config_param *pList1, struct config_param *pList2, char *co
         {
 
             lserrno = LSE_LSFCONF;
-            return (-1);
+            return -1;
         }
 
     lineNum = 0;
@@ -256,17 +263,17 @@ readconfenv_ (struct config_param *pList1, struct config_param *pList2, char *co
         || !setConfEnv (key, value, pList2))
     {
         fclose (fp);
-        return (-1);
+        return -1;
     }
         }
     fclose (fp);
     if (errLineNum_ != 0)
         {
             lserrno = saveErrNo;
-            return (-1);
+            return -1;
         }
 
-    return (0);
+    return 0;
 
 }
 
@@ -352,7 +359,7 @@ int
 setConfEnv (char *name, char *value, struct config_param *paramList)
 {
     if (paramList == NULL)
-        return (1);
+        return 1;
 
     if (value == NULL)
         value = "";
@@ -366,9 +373,9 @@ setConfEnv (char *name, char *value, struct config_param *paramList)
         if (paramList->paramValue == NULL)
             {
                 lserrno = LSE_MALLOC;
-                return (0);
+                return 0;
             }
     }
         }
-    return (1);
+    return 1;
 }

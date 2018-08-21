@@ -19,13 +19,11 @@ int    connected_           ( const char *hostname, int sock1, int sock2, int se
 void   hostIndex_           ( const char *hostname, int sock );
 int   *_gethostdata_        ( const char *hostname );
 int    _isconnected_        ( const char *hostname, int *sock );
-int    connected_           ( const char *hostname, int sock1, int sock2, int seqno );
 int    _getcurseqno_        ( const char *hostname );
 void   _setcurseqno_        ( const char *hostname, unsigned int seqno);
 int    ls_isconnected       ( const char *hostname );
 int    getConnectionNum_    ( const char *hostname );
 int    _findmyconnections_  ( struct connectEnt **connPtr );
 char **ls_findmyconnections ( void );
-void   hostIndex_           ( const char *hostname, int sock );
 int    delhostbysock_       ( int sock );
 int    gethostbysock_       ( int sock, const char *hostname );

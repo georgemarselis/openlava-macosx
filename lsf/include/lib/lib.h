@@ -712,14 +712,14 @@ struct hTab conn_table;
 
 char **environ;
 
-void initconntbl_ (void);
+// void initconntbl_ (void);
 // void inithostsock_ (void);
 // int gethostbysock_ (int, char *);
 // int _isconnected_ (char *, int *);
 // int _getcurseqno_ (char *);
-void _setcurseqno_ ( const char *hostname, unsigned int currentSN);
+// void _setcurseqno_ ( const char *hostname, unsigned int currentSN);
 void _lostconnection_ (char *);
-int _findmyconnections_ (struct connectEnt **);
+// int _findmyconnections_ (struct connectEnt **);
 
 int setLockOnOff_ (int, time_t, char *hname);
 
@@ -744,8 +744,7 @@ int lsGetRProcRusage (char *, int, struct jRusage *, int);
 LS_REQUEST_T *lsGetIRProcRusage_ (char *, int, int, struct jRusage *, appCompletionHandler, void *);
 
 // int initenv_ (struct config_param *, char *);
-int readconfenv_ (struct config_param *, struct config_param *, char *);
-// int ls_readconfenv (struct config_param *, char *);
+// int readconfenv_ (struct config_param *, struct config_param *, char *);
 
 int callLim_ (enum limReqCode, void *, bool_t (*)(), void *, bool_t (*)(), char *, int, struct LSFHeader *);
 int initLimSock_ (void);

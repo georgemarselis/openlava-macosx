@@ -29,18 +29,14 @@ enum NODE {
 	NODE_PASED
 };
 
-char *getNextWord1_ (char **);
-char *getNextValueQ_( char **line, char ch1, char ch2 );
-char *getNextWord_( char **line );
-char *getNextLineC_( FILE * p, size_t *LineCount, int confFormat );
-
-struct pStack *blockStack;
-struct pStack *ptrStack;
-
-struct confNode *newNode (void);
-void freeNode (struct confNode *);
-char linkNode (struct confNode *, struct confNode *);
-char *readNextLine (struct lsConf *conf, size_t *lineNum);
-
-char addCond (struct lsConf *, char *);
-char checkCond (struct lsConf *, char *);
+char *getNextLine_(FILE *fp, int confFormat);
+char *getNextWord_(char **line);
+char *getNextWord1_(char **line);
+char *getNextWordSet(char **line, const char *set);
+char *getNextValueQ_(char **line, char ch1, char ch2);
+int stripQStr(char *q, char *str);
+int addQStr(FILE *log_fp, char *str);
+char *getNextLineD_(FILE *fp, size_t *LineCount, int confFormat);
+char *getNextLineC_(FILE *fp, size_t *lineCount, int confFormat);
+void subNewLine_(char *instr);
+char *nextline_(FILE *fp);
