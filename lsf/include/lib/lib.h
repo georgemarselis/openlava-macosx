@@ -774,23 +774,21 @@ char **placement_ (char *resReq, struct decisionReq *placeReqPtr, char *fromhost
 // char *getSigSymbol (int);
 
 // typedef struct svrsock struct svrsock;
+// int setLSFChanSockOpt_ (int newOpt);
 
-
-int setLSFChanSockOpt_ (int newOpt);
-
-int CreateSock_ (int);
-int CreateSockEauth_ (int);
-int Socket_ (int, int, int);
-int get_nonstd_desc_ (int);
+// int CreateSock_ (int);
+// int CreateSockEauth_ (int);
+// int Socket_ (int, int, int);
+// int get_nonstd_desc_ (int);
 // int TcpCreate_ (int, int);
-int opensocks_ (int);
-struct svrsock *svrsockCreate_ (unsigned short, int, struct sockaddr_in *, int);
-int svrsockAccept_ (struct svrsock *, int);
-char *svrsockToString_ (struct svrsock *);
-void svrsockDestroy_ (struct svrsock *);
-int TcpConnect_ (char *, unsigned short, struct timeval *);
+// int opensocks_ (int);
+// struct svrsock *svrsockCreate_ (unsigned short, int, struct sockaddr_in *, int);
+// int svrsockAccept_ (struct svrsock *, int);
+// char *svrsockToString_ (struct svrsock *);
+// void svrsockDestroy_ (struct svrsock *);
+// int TcpConnect_ (char *, unsigned short, struct timeval *);
 
-char *getMsgBuffer_ (int fd, size_t *bufferSize);
+// char *getMsgBuffer_ (int fd, size_t *bufferSize);
 
 // int expSyntax_ (char *);
 

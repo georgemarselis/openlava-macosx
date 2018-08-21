@@ -29,6 +29,7 @@
 #include "daemons/libresd/resd.h"
 #include "lib/channel.h"
 #include "lib/host.h"
+#include "lib/sock.h"
 
 /**************************************************************
  * this file must be compiled together with host.c cuz there is
@@ -565,7 +566,7 @@ chanOpen_ (unsigned int iaddr, unsigned short port, int options)
 
     if ((i = findAFreeChannel ()) < 0)
     {
-        cherrno = CHANE_NOCHAN;
+        chanerr = CHANE_NOCHAN;
         return -1;
     }
 
@@ -589,7 +590,7 @@ chanOpen_ (unsigned int iaddr, unsigned short port, int options)
     setLSFChanSockOpt_ (oldOpt);
     if (returnValue < 0)
     {
-        cherrno = CHANE_SYSCALL;
+        chanerr = CHANE_SYSCALL;
         return -1;
     }
 
@@ -598,7 +599,7 @@ chanOpen_ (unsigned int iaddr, unsigned short port, int options)
         close((int)channels[i].handle);
         channels[i].state = CH_DISC;
         channels[i].handle = INVALID_HANDLE;
-        cherrno = CHANE_SYSCALL;
+        chanerr = CHANE_SYSCALL;
         return -1;
     }
 
@@ -626,7 +627,7 @@ chanOpen_ (unsigned int iaddr, unsigned short port, int options)
             close((int)channels[i].handle);
             channels[i].state = CH_DISC;
             channels[i].handle = INVALID_HANDLE;
-            cherrno = CHANE_SYSCALL;
+            chanerr = CHANE_SYSCALL;
             return -1;
         }
         channels[i].state = CH_PRECONN;
@@ -709,7 +710,7 @@ chanClose_ (int chfd)
 
 /*    if (channels[chfd].handle < 0)
     {
-        cherrno = CHANE_BADCHFD;
+        chanerr = CHANE_BADCHFD;
         return -1;
     }*/
     close ((int)channels[chfd].handle);
@@ -907,14 +908,14 @@ chanEnqueue_ (int chfd, struct Buffer *msg)
 
     if (chfd < 0 || chfd > maxfds)
     {
-        cherrno = CHANE_BADCHAN;
+        chanerr = CHANE_BADCHAN;
         return -1;
     }
 
     if (channels[chfd].handle == INVALID_HANDLE ||
         channels[chfd].state == CH_PRECONN)
     {
-        cherrno = CHANE_NOTCONN;
+        chanerr = CHANE_NOTCONN;
         return -1;
     }
 
@@ -931,19 +932,19 @@ chanDequeue_ (int chfd, struct Buffer **buf)
 
     if (chfd < 0 || chfd > maxfds)
     {
-        cherrno = CHANE_BADCHAN;
+        chanerr = CHANE_BADCHAN;
         return -1;
     }
     if (channels[chfd].handle == INVALID_HANDLE
         || channels[chfd].state == CH_PRECONN)
     {
-        cherrno = CHANE_NOTCONN;
+        chanerr = CHANE_NOTCONN;
         return -1;
     }
 
     if (channels[chfd].recv->forw == channels[chfd].recv)
     {
-        cherrno = CHANE_NOMSG;
+        chanerr = CHANE_NOMSG;
         return -1;
     }
     *buf = channels[chfd].recv->forw;

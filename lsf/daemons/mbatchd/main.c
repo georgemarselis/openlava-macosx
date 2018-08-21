@@ -620,7 +620,7 @@ processClient (struct clientNode *client, int *needFree)
   if (chanDequeue_ (client->chanfd, &buf) < 0)
     {
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL_ENO_D, __func__, "chanDequeue_",
-		 cherrno);
+		 chanerr);
       shutDownClient (client);
       return (-1);
     }

@@ -2,6 +2,13 @@
 
 #pragma once
 
+#include "lib/lib.h"
+
+// extern int totsockets_;
+// extern int currentsocket_;
+
+// static int mLSFChanSockOpt = 0; // defined, but not used
+
 
 int CreateSock_(int protocol);
 int CreateSockEauth_(int protocol);
@@ -11,9 +18,9 @@ int io_nonblock_(int s);
 int io_block_(int s);
 int setLSFChanSockOpt_(int newOpt);
 int Socket_(int domain, int type, int protocol);
-ls_svrsock_t *svrsockCreate_(u_short port, int backlog, struct sockaddr_in *addr, int options);
-int svrsockAccept_(ls_svrsock_t *svrsock, int timeout);
-char *svrsockToString_(ls_svrsock_t *svrsock);
-void svrsockDestroy_(ls_svrsock_t *svrsock);
+struct svrsock *svrsockCreate_(u_short port, int backlog, struct sockaddr_in *addr, int options);
+int svrsockAccept_(struct svrsock *svrsock, int timeout);
+char *svrsockToString_(struct svrsock *svrsock);
+void svrsockDestroy_(struct svrsock *svrsock);
 int TcpConnect_(char *hostname, u_short port, struct timeval *timeout);
 char *getMsgBuffer_(int fd, size_t *bufferSize);

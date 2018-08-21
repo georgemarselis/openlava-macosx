@@ -21,35 +21,32 @@
 
 #include "lib/lib.h"
 #include "lib/lproto.h"
+#include "lib/sock.h"
 
 
-extern int totsockets_;
-extern int currentsocket_;
-
-static int mLSFChanSockOpt = 0;
 
 
 int
 CreateSock_ (int protocol)
 {
-  struct sockaddr_in cliaddr;
-  int s = 0;
-  static unsigned short port = 0;
-  static unsigned short i = 0;
-  static char isroot = FALSE;
+	struct sockaddr_in cliaddr;
+	int s = 0;
+	static unsigned short port = 0;
+	static unsigned short i = 0;
+	static char isroot = FALSE;
 
-  if (geteuid () == 0)
+	if (geteuid () == 0)
 	{
-	  if (!isroot)
-  {
-	port = IPPORT_RESERVED - 1;
-  }
-	  isroot = TRUE;
+		if (!isroot)
+		{
+			port = IPPORT_RESERVED - 1;
+		}
+		isroot = TRUE;
 	}
-  else
+	else
 	{
-	  isroot = FALSE;
-	  port = 0;
+		isroot = FALSE;
+		port = 0;
 	}
 
 	if (isroot && port < IPPORT_RESERVED / 2) {
@@ -60,8 +57,8 @@ CreateSock_ (int protocol)
 		if (logclass & LC_COMM) {
 			ls_syslog (LOG_DEBUG, "%s: Socket_ failed, %s", __func__, strerror (errno));
 		}
-	  lserrno = LSE_SOCK_SYS;
-	  return -1;
+		lserrno = LSE_SOCK_SYS;
+		return -1;
 	}
 
 	memset ((char *) &cliaddr, 0, sizeof (cliaddr));
@@ -97,31 +94,31 @@ CreateSock_ (int protocol)
 		}
 
 
-	  if (isroot && port < IPPORT_RESERVED / 2)
-  port = IPPORT_RESERVED - 1;
+		if (isroot && port < IPPORT_RESERVED / 2)
+			port = IPPORT_RESERVED - 1;
 	}
 
 
-  if (isroot && i == IPPORT_RESERVED / 2)
+	if (isroot && i == IPPORT_RESERVED / 2)
 	{
 		if (logclass & LC_COMM) {
 			ls_syslog (LOG_DEBUG, "%s: went through all , %s", __func__, strerror (errno));
 		}
-	  close (s);
-	  lserrno = LSE_SOCK_SYS;
-	  return -1;
+		close (s);
+		lserrno = LSE_SOCK_SYS;
+		return -1;
 	}
 
 # if defined(FD_CLOEXEC)
-  fcntl (s, F_SETFD, (fcntl (s, F_GETFD) | FD_CLOEXEC));
+	fcntl (s, F_SETFD, (fcntl (s, F_GETFD) | FD_CLOEXEC));
 # else
 #  if defined(FIOCLEX)
   // (void) ioctl (s, FIOCLEX, (char *) NULL);
-		ioctl (s, FIOCLEX, (char *) NULL);
+	ioctl (s, FIOCLEX, (char *) NULL);
 #  endif
 # endif
 
-  return s;
+	return s;
 
 }
 
@@ -135,65 +132,65 @@ CreateSockEauth_ (int protocol)
 	static char isroot = FALSE;
 
 
-  if ((geteuid () == 0) && (genParams_[LSF_AUTH].paramValue == NULL))
+	if ((geteuid () == 0) && (genParams_[LSF_AUTH].paramValue == NULL))
 	{
-	  if (!isroot)
-  {
-	port = IPPORT_RESERVED - 1;
-  }
-	  isroot = TRUE;
+		if (!isroot)
+		{
+			port = IPPORT_RESERVED - 1;
+		}
+		isroot = TRUE;
 	}
-  else
+	else
 	{
-	  isroot = FALSE;
-	  port = 0;
+		isroot = FALSE;
+		port = 0;
 	}
 
 	if (isroot && port < IPPORT_RESERVED / 2) {
 		port = IPPORT_RESERVED - 1;
 	}
 
-  if ((s = Socket_ (AF_INET, protocol, 0)) < 0)
+	if ((s = Socket_ (AF_INET, protocol, 0)) < 0)
 	{
 		if (logclass & LC_COMM) {
 			ls_syslog (LOG_DEBUG, "%s: Socket_ failed, %s", __func__, strerror (errno));
 		}
-	  lserrno = LSE_SOCK_SYS;
-	  return -1;
+		lserrno = LSE_SOCK_SYS;
+		return -1;
 	}
 
-  memset ((char *) &cliaddr, 0, sizeof (cliaddr));
-  cliaddr.sin_family = AF_INET;
-  cliaddr.sin_addr.s_addr = htonl (INADDR_ANY);
-  for (i = 0; i < IPPORT_RESERVED / 2; i++)
+	memset ((char *) &cliaddr, 0, sizeof (cliaddr));
+	cliaddr.sin_family = AF_INET;
+	cliaddr.sin_addr.s_addr = htonl (INADDR_ANY);
+	for (i = 0; i < IPPORT_RESERVED / 2; i++)
 	{
-	  cliaddr.sin_port = htons (port);
+		cliaddr.sin_port = htons (port);
 
-	  if (isroot)
-  {
-	port--;
-  }
+		if (isroot)
+		{
+			port--;
+		}
 		if (bind (s, (struct sockaddr *) &cliaddr, sizeof (cliaddr)) == 0) {
 			break;
 		}
 
 
-	  if (!isroot)
-  {
-	close (s);
-	lserrno = LSE_SOCK_SYS;
-	return -1;
-  }
+		if (!isroot)
+		{
+			close (s);
+			lserrno = LSE_SOCK_SYS;
+			return -1;
+		}
 
-	  if (errno != EADDRINUSE && errno != EADDRNOTAVAIL)
-  {
+		if (errno != EADDRINUSE && errno != EADDRNOTAVAIL)
+		{
 			if (logclass & LC_COMM) {
 				ls_syslog (LOG_DEBUG, "%s: bind failed, %s", __func__, strerror (errno));
 			}
-	close (s);
-	lserrno = LSE_SOCK_SYS;
-	return -1;
-  }
+			close (s);
+			lserrno = LSE_SOCK_SYS;
+			return -1;
+		}
 
 
 		if (isroot && port < IPPORT_RESERVED / 2) {
@@ -207,20 +204,20 @@ CreateSockEauth_ (int protocol)
 		if (logclass & LC_COMM) {
 			ls_syslog (LOG_DEBUG, "%s: went through all , %s", __func__, strerror (errno));
 		}
-	  close (s);
-	  lserrno = LSE_SOCK_SYS;
-	  return -1;
+		close (s);
+		lserrno = LSE_SOCK_SYS;
+		return -1;
 	}
 
 # if defined(FD_CLOEXEC)
-  fcntl (s, F_SETFD, (fcntl (s, F_GETFD) | FD_CLOEXEC));
+	fcntl (s, F_SETFD, (fcntl (s, F_GETFD) | FD_CLOEXEC));
 # else
 #  if defined(FIOCLEX)
-  (void) ioctl (s, FIOCLEX, (char *) NULL);
+	(void) ioctl (s, FIOCLEX, (char *) NULL);
 #  endif
 # endif
 
-  return s;
+	return s;
 
 }
 
@@ -237,16 +234,16 @@ get_nonstd_desc_ (int desc)
 		switch (desc)
 		{
 			case 0:
-				s0 = desc;
+			s0 = desc;
 			break;
 			case 1:
-				s1 = desc;
+			s1 = desc;
 			break;
 			case 2:
-				s2 = desc;
+			s2 = desc;
 			break;
 			default:
-				return -1;
+			return -1;
 			break;
 		}
 		desc = dup (desc);
@@ -268,38 +265,38 @@ get_nonstd_desc_ (int desc)
 int
 TcpCreate_ (int service, int port)
 {
-  register int s;
-  struct sockaddr_in sin;
+	register int s;
+	struct sockaddr_in sin;
 
-  if ((s = Socket_ (AF_INET, SOCK_STREAM, 0)) < 0)
+	if ((s = Socket_ (AF_INET, SOCK_STREAM, 0)) < 0)
 	{
-	  lserrno = LSE_SOCK_SYS;
-	  return -1;
+		lserrno = LSE_SOCK_SYS;
+		return -1;
 	}
 
-  if (service)
+	if (service)
 	{
-	  memset ((char *) &sin, 0, sizeof (sin));
-	  sin.sin_family = AF_INET;
-	  sin.sin_port = htons (port);
-	  sin.sin_addr.s_addr = htonl (INADDR_ANY);
-	  if (bind (s, (struct sockaddr *) &sin, sizeof (sin)) < 0)
-  {
+		memset ((char *) &sin, 0, sizeof (sin));
+		sin.sin_family = AF_INET;
+		sin.sin_port = htons (port);
+		sin.sin_addr.s_addr = htonl (INADDR_ANY);
+		if (bind (s, (struct sockaddr *) &sin, sizeof (sin)) < 0)
+		{
 	// (void) close (s);
-	close (s);
-	lserrno = LSE_SOCK_SYS;
-	return -2;
-  }
-	  if (listen (s, 1024) < 0)
-  {
+			close (s);
+			lserrno = LSE_SOCK_SYS;
+			return -2;
+		}
+		if (listen (s, 1024) < 0)
+		{
 	// (void) close (s);
-	close (s);
-	lserrno = LSE_SOCK_SYS;
-	return -3;
-  }
+			close (s);
+			lserrno = LSE_SOCK_SYS;
+			return -3;
+		}
 	}
 
-  return s;
+	return s;
 
 }
 
@@ -319,10 +316,10 @@ io_block_ (int s)
 int
 setLSFChanSockOpt_ (int newOpt)
 {
-  int oldOpt = mLSFChanSockOpt;
+	int oldOpt = mLSFChanSockOpt;
 
-  mLSFChanSockOpt = newOpt;
-  return oldOpt;
+	mLSFChanSockOpt = newOpt;
+	return oldOpt;
 }
 
 
@@ -352,80 +349,77 @@ Socket_ (int domain, int type, int protocol)
 
 /* svrsockCreate_()
  */
-ls_svrsock_t *
+struct svrsock *
 svrsockCreate_ (u_short port, int backlog, struct sockaddr_in * addr, int options)
 {
-	ls_svrsock_t *svrsock = NULL;
+	struct svrsock *svrsock = NULL;
 	struct sockaddr_in *svrAddr = NULL;
 	int acceptSock = 0;
 	socklen_t length = 0;
 
-  if ((svrsock = malloc (sizeof (ls_svrsock_t))) == NULL)
+	if ((svrsock = malloc (sizeof (struct svrsock))) == NULL)
 	{
-	  lserrno = LSE_MALLOC;
-	  return NULL;
+		lserrno = LSE_MALLOC;
+		return NULL;
 	}
 
-  svrAddr = malloc (sizeof (struct sockaddr_in));
-  if (svrAddr == NULL)
+	svrAddr = malloc (sizeof (struct sockaddr_in));
+	if (svrAddr == NULL)
 	{
-	  lserrno = LSE_MALLOC;
-	  free (svrsock);
-	  return NULL;
+		lserrno = LSE_MALLOC;
+		free (svrsock);
+		return NULL;
 	}
-  svrsock->localAddr = svrAddr;
+	svrsock->localAddr = svrAddr;
 
-  if (addr != NULL)
+	if (addr != NULL)
 	{
-	  port = ntohs (addr->sin_port);
-	  (*svrAddr) = (*addr);
+		port = ntohs (addr->sin_port);
+		(*svrAddr) = (*addr);
 	}
-  else
+	else
 	{
-	  memset ((char *) svrAddr, 0, sizeof (struct sockaddr_in));
-	  svrAddr->sin_family = AF_INET;
-	  svrAddr->sin_port = htons (port);
-	  svrAddr->sin_addr.s_addr = INADDR_ANY;
-	}
-
-  if ((acceptSock = socket (svrAddr->sin_family, SOCK_STREAM, 0)) < 0)
-	{
-	  lserrno = LSE_SOCK_SYS;
-	  free (svrsock->localAddr);
-	  free (svrsock);
-	  return NULL;
+		memset ((char *) svrAddr, 0, sizeof (struct sockaddr_in));
+		svrAddr->sin_family = AF_INET;
+		svrAddr->sin_port = htons (port);
+		svrAddr->sin_addr.s_addr = INADDR_ANY;
 	}
 
-  if (bind (acceptSock,
-	  (struct sockaddr *) svrAddr, sizeof (struct sockaddr_in)) < 0)
-	{
-	  (void) close (acceptSock);
-	  lserrno = LSE_SOCK_SYS;
-	  free (svrsock->localAddr);
-	  free (svrsock);
-	  return NULL;
-	}
-  if (listen (acceptSock, 5) < 0)
-	{
-	  (void) close (acceptSock);
-	  lserrno = LSE_SOCK_SYS;
-	  free (svrsock->localAddr);
-	  free (svrsock);
-	  return NULL;
+	if ((acceptSock = socket (svrAddr->sin_family, SOCK_STREAM, 0)) < 0) {
+		lserrno = LSE_SOCK_SYS;
+		free (svrsock->localAddr);
+		free (svrsock);
+		return NULL;
 	}
 
-  if (port == 0)
+	if (bind (acceptSock, (struct sockaddr *) svrAddr, sizeof (struct sockaddr_in)) < 0) {
+		(void) close (acceptSock);
+		lserrno = LSE_SOCK_SYS;
+		free (svrsock->localAddr);
+		free (svrsock);
+		return NULL;
+	}
+	if (listen (acceptSock, 5) < 0) {
+		(void) close (acceptSock);
+		lserrno = LSE_SOCK_SYS;
+		free (svrsock->localAddr);
+		free (svrsock);
+		return NULL;
+	}
+
+	if (port == 0)
 	{
-	  length = sizeof (struct sockaddr_in);
-	  if (getsockname (acceptSock, (struct sockaddr *) svrAddr, &length) < 0)
-  {
-	lserrno = LSE_SOCK_SYS;
-	(void) close (acceptSock);
-	free (svrsock->localAddr);
-	free (svrsock);
-	return NULL;
-  }
-	  svrsock->port = ntohs (svrAddr->sin_port);
+		length = sizeof (struct sockaddr_in);
+		if (getsockname (acceptSock, (struct sockaddr *) svrAddr, &length) < 0)
+		{
+			lserrno = LSE_SOCK_SYS;
+			// (void) close (acceptSock);
+			close (acceptSock);
+			free (svrsock->localAddr);
+			free (svrsock);
+			return NULL;
+		}
+		svrsock->port = ntohs (svrAddr->sin_port);
 	}
 	else {
 		svrsock->port = port;
@@ -446,7 +440,7 @@ svrsockCreate_ (u_short port, int backlog, struct sockaddr_in * addr, int option
 /* svrsockAccept_()
  */
 int
-svrsockAccept_ (ls_svrsock_t * svrsock, int timeout)
+svrsockAccept_ (struct svrsock * svrsock, int timeout)
 {
 	socklen_t len;
 	int s = 0;
@@ -472,148 +466,143 @@ svrsockAccept_ (ls_svrsock_t * svrsock, int timeout)
 }
 
 char *
-svrsockToString_ (ls_svrsock_t * svrsock)
+svrsockToString_ (struct svrsock * svrsock)
 {
 	char *string = NULL;
 	char *hostname = NULL;
 
-  if (svrsock == NULL)
+	if (svrsock == NULL)
 	{
-	  lserrno = LSE_BAD_ARGS;
-	  return NULL;
+		lserrno = LSE_BAD_ARGS;
+		return NULL;
 	}
 
-  hostname = ls_getmyhostname ();
+	hostname = ls_getmyhostname ();
 
-  if ((string = malloc (strlen (hostname) + 7)) == NULL)
+	if ((string = malloc (strlen (hostname) + 7)) == NULL)
 	{
-	  lserrno = LSE_MALLOC;
-	  return NULL;
+		lserrno = LSE_MALLOC;
+		return NULL;
 	}
 
-  sprintf (string, "%s:%u", hostname, svrsock->port);
+	sprintf (string, "%s:%u", hostname, svrsock->port);
 
-  return string;
+	return string;
 }
 
 void
-svrsockDestroy_ (ls_svrsock_t * svrsock)
+svrsockDestroy_ (struct svrsock * svrsock)
 {
   // (void) close (svrsock->sockfd);
-  close (svrsock->sockfd);
-  free (svrsock->localAddr);
-  free (svrsock);
+	close (svrsock->sockfd);
+	free (svrsock->localAddr);
+	free (svrsock);
 }
 
 int
 TcpConnect_ (char *hostname, u_short port, struct timeval *timeout)
 {
-  int sock = 0;
-  int nwRdy = 0;
-  int i = 0;
-  struct sockaddr_in server;
-  struct hostent *hp = NULL;
-  fd_set wm;
+	int sock = 0;
+	int nwRdy = 0;
+	int i = 0;
+	struct sockaddr_in server;
+	struct hostent *hp = NULL;
+	fd_set wm;
 
-  server.sin_family = AF_INET;
-  if ((hp = Gethostbyname_ (hostname)) == NULL)
+	server.sin_family = AF_INET;
+	if ((hp = Gethostbyname_ (hostname)) == NULL)
 	{
-	  lserrno = LSE_BAD_HOST;
-	  return -1;
+		lserrno = LSE_BAD_HOST;
+		return -1;
 	}
 
-  memcpy ((char *) &server.sin_addr, (char *) hp->h_addr_list[0], hp->h_length);
+	memcpy ((char *) &server.sin_addr, (char *) hp->h_addr_list[0], hp->h_length);
 
-  server.sin_port = htons (port);
+	server.sin_port = htons (port);
 
-  if ((sock = socket (AF_INET, SOCK_STREAM, 0)) < 0)
+	if ((sock = socket (AF_INET, SOCK_STREAM, 0)) < 0)
 	{
-	  lserrno = LSE_SOCK_SYS;
-	  return -1;
+		lserrno = LSE_SOCK_SYS;
+		return -1;
 	}
-  if (io_nonblock_ (sock) < 0)
+	if (io_nonblock_ (sock) < 0)
 	{
-	  lserrno = LSE_MISC_SYS;
-	  close (sock);
-	  return -1;
+		lserrno = LSE_MISC_SYS;
+		close (sock);
+		return -1;
 	}
 
-  if (connect (sock, (struct sockaddr *) &server, sizeof (server)) < 0
-	  && errno != EINPROGRESS)
+	if (connect (sock, (struct sockaddr *) &server, sizeof (server)) < 0
+		&& errno != EINPROGRESS)
 	{
-	  lserrno = LSE_CONN_SYS;
-	  close (sock);
-	  return -1;
+		lserrno = LSE_CONN_SYS;
+		close (sock);
+		return -1;
 	}
 
-  for (i = 0; i < 2; i++)
+	for (i = 0; i < 2; i++)
 	{
-	  FD_ZERO (&wm);
-	  FD_SET (sock, &wm);
-	  nwRdy = select (sock + 1, NULL, &wm, NULL, timeout);
+		FD_ZERO (&wm);
+		FD_SET (sock, &wm);
+		nwRdy = select (sock + 1, NULL, &wm, NULL, timeout);
 
-	  if (nwRdy < 0)
-  {
-	if (errno == EINTR) {
-	  continue;
-	}
-	lserrno = LSE_SELECT_SYS;
-	close (sock);
-	return -1;
-  }
-	  else if (nwRdy == 0)
-  {
-	lserrno = LSE_TIME_OUT;
-	close (sock);
-	return -1;
-  }
-	  break;
+		if (nwRdy < 0)
+		{
+			if (errno == EINTR) {
+				continue;
+			}
+			lserrno = LSE_SELECT_SYS;
+			close (sock);
+			return -1;
+		}
+		else if (nwRdy == 0)
+		{
+			lserrno = LSE_TIME_OUT;
+			close (sock);
+			return -1;
+		}
+		break;
 	}
 
-  return sock;
+	return sock;
 }
 
 
 char *
 getMsgBuffer_ (int fd, size_t *bufferSize)
 {
-  int rc = 0;
-  char hdrbuf[sizeof (struct LSFHeader)]; // FIXME FIXME FIXME memory allocation may not be correct right now
-  struct LSFHeader msgHdr;
-  XDR xdrs;
-  char *msgBuffer;
-  *bufferSize = 0;  // SEEME SEEME SEEME *bufferSize = -1; originally
-					// who calls this function
+	int rc = 0;
+	char hdrbuf[sizeof (struct LSFHeader)]; // FIXME FIXME FIXME memory allocation may not be correct right now
+	struct LSFHeader msgHdr;
+	XDR xdrs;
+	char *msgBuffer;
+	//*bufferSize = 0;  // SEEME SEEME SEEME *bufferSize = -1; originally
+						// who calls this function
 
-  xdrmem_create (&xdrs, hdrbuf, sizeof (struct LSFHeader), XDR_DECODE);
-  rc = readDecodeHdr_ (fd, hdrbuf, b_read_fix, &xdrs, &msgHdr);
-  if (rc < 0)
-	{
-	  lserrno = LSE_MSG_SYS;
-	  xdr_destroy (&xdrs);
-	  return NULL;
+	xdrmem_create (&xdrs, hdrbuf, sizeof (struct LSFHeader), XDR_DECODE);
+	rc = readDecodeHdr_ (fd, hdrbuf, b_read_fix, &xdrs, &msgHdr);
+	if (rc < 0) {
+		lserrno = LSE_MSG_SYS;
+		xdr_destroy (&xdrs);
+		return NULL;
 	}
-  xdr_destroy (&xdrs);
-  *bufferSize = msgHdr.length;
-  if (msgHdr.length)
-	{
-	  if ((msgBuffer = malloc (msgHdr.length)) == NULL)
-  {
-	lserrno = LSE_MALLOC;
-	return NULL;
-  }
+	xdr_destroy (&xdrs);
+	*bufferSize = msgHdr.length;
+	if (msgHdr.length) {
+		if ((msgBuffer = malloc (msgHdr.length)) == NULL) {
+			lserrno = LSE_MALLOC;
+			return NULL;
+		}
 	}
-  else
-	{
-	  lserrno = LSE_NO_ERR;
-	  return NULL;
+	else {
+		lserrno = LSE_NO_ERR;
+		return NULL;
 	}
-  assert( msgHdr.length <= LONG_MAX);
-  if (b_read_fix (fd, msgBuffer, msgHdr.length) != (long) msgHdr.length)
-	{
-	  lserrno = LSE_MSG_SYS;
-	  free (msgBuffer);
-	  return NULL;
+	assert( msgHdr.length <= LONG_MAX);
+	if (b_read_fix (fd, msgBuffer, msgHdr.length) != (long) msgHdr.length) {
+		lserrno = LSE_MSG_SYS;
+		free (msgBuffer);
+		return NULL;
 	}
-  return msgBuffer;
+	return msgBuffer;
 }

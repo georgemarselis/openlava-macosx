@@ -101,8 +101,8 @@ const unsigned short OPENLAVA_VERSION = 20;
 // #define MAXTYPES_31             25
 // #define MAXMODELS_31            30
 
-static int lsferrno = 0;
-static int ENOLOCATION = 0x0FFF;
+// static int lsferrno = 0; // defined, not used? 
+// static int ENOLOCATION = 0x0FFF; // defined, not used
 
 enum LSF_CONSTANTS {
 	LSF_DEFAULT_SOCKS = 15,

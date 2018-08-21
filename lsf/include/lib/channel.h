@@ -25,6 +25,8 @@
 #define CLOSECD(c) { chanClose_((c)); (c) = -1; }
 #define CHAN_INIT_BUF(b)  memset((b), 0, sizeof(struct Buffer));
 
+unsigned int chanerr = 0;
+
 enum chanState {
 	CH_FREE,
 	CH_DISC,
@@ -114,7 +116,7 @@ enum CHAN_MODE {
 // #define  CHANE_NOMSG      10
 // #define  CHANE_CONNRESET  11
 
-enum CHANGE {
+enum CHANE {
 	CHANE_NOERR = 0,
 	CHANE_CONNECTED = 1,
 	CHANE_NOTCONN = 2,
@@ -126,7 +128,8 @@ enum CHANGE {
 	CHANE_BADCHAN = 8,
 	CHANE_BADCHFD = 9,
 	CHANE_NOMSG = 10,
-	CHANE_CONNRESET = 11
+	CHANE_CONNRESET = 11,
+	INVALID_HANDLE = 12  // FIXME FIXME this is definatelly wrong and it will break combatibility with LSF
 };
 
 

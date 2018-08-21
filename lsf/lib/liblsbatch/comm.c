@@ -210,7 +210,7 @@ call_server (char *host, unsigned short serv_port, char *req_buf, size_t req_siz
 		}
 
 		if (chanEnqueue_ (serverSock, sndBuf) < 0) {
-			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_ENO_D, __func__, "chanEnqueue_", cherrno);
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_ENO_D, __func__, "chanEnqueue_", chanerr);
 			chanFreeBuf_ (sndBuf);
 			CLOSECD (serverSock);
 			return -2;

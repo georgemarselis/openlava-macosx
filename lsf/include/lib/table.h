@@ -98,11 +98,11 @@ struct sTab
 
 typedef void (*HTAB_DATA_DESTROY_FUNC_T) (void *);
 
-static unsigned long primes[] = {       // FIXME FIXME why the fuck are these primes here?
-                                        // and why the fuck don't we just generate them?
-    101, 1009, 5009, 10007, 20011, 50021, 100003,
-    200003, 500009, 1030637
-};
+// static unsigned long primes[] = {       // FIXME FIXME why the fuck are these primes here?
+//                                         // and why the fuck don't we just generate them?
+//     101, 1009, 5009, 10007, 20011, 50021, 100003,
+//     200003, 500009, 1030637
+// }; // defined but not used
 
 struct hEnt *h_findEnt (const char *, struct hLinks *);
 unsigned int getAddr (struct hTab *, const char *);
