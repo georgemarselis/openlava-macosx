@@ -406,10 +406,10 @@ struct resItem
 {
 	enum valueType valueType;
 	enum orderType orderType;
-	int flags;
-	int interval;
-	char name[MAXLSFNAMELEN];
-	char des[MAXRESDESLEN];
+	unsigned int flags;
+	unsigned int interval;
+	const char *name;
+	const char *des;
 
 };
 
@@ -426,7 +426,7 @@ struct lsInfo
 	char hostArchs[MAXMODELS][MAXLSFNAMELEN];  // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
 	char paddin1[4];
 	double cpuFactor[MAXMODELS];               // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
-	struct resItem *resTable;
+	struct resItem **resTable;
 };
 
 #define CLUST_STAT_OK             0x01

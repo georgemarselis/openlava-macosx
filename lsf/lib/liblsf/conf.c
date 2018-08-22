@@ -38,7 +38,7 @@
 int
 initResTable_ (void)
 {
-	struct resItem *resTable = NULL;
+	struct resItem **resTable = NULL;
 	unsigned int i           = 0;
 
 	resTable = malloc (1000 * sizeof (struct resItem) + 1 * sizeof( struct resItem ) ); // FIXME FIXME FIXME FIXME '1000' is awfuly partifular
@@ -47,23 +47,21 @@ initResTable_ (void)
 		return -1;
 	}
 
-	i = 0;
 	lsinfo.numIndx = 0;
 	lsinfo.numUsrIndx = 0;
 	while (builtInRes[i].name != NULL) {       // FIXME FIXME FIXME FIXME what the fuck is this builtInRes and where is it?
 		char *number_buffer    = malloc( 10 ); // 10 bytes should be enough to sprintf 4 characters;
 		char *buff             = NULL;
-		int numlength          = sprintf( number_buffer, "%d", builtInRes_ID[i] );
-		
-		assert( numlength >= 0 );
-		buff = malloc( (size_t) numlength + strlen( builtInRes[i].des ) + 4 );
+		size_t numlength       = (size_t) sprintf( number_buffer, "%d", builtInRes_ID[i] ); // FIXME (size_t) is fine here, but verify
+		assert( numlength > 0 );
+		buff = malloc(  (numlength + strlen( builtInRes[i].des ))*sizeof( char ) + 4 );
 		sprintf( buff, "%d", builtInRes_ID[i] );
 
 		sprintf( (buff + numlength ) , "%s", builtInRes[i].des  );
 		*(buff +  numlength + strlen(builtInRes[i].des) + 1 )  = '\0';
-		strcpy (resTable[i].des, buff ); // FIXME FIXME FIXME FIXME FIXXME this will go cablewie
+		resTable[i].des = buff;
 
-		strcpy (resTable[i].name, builtInRes[i].name);
+		resTable[i].name      = builtInRes[i].name;
 		resTable[i].valueType = builtInRes[i].valuetype;
 		resTable[i].orderType = builtInRes[i].ordertype;
 		resTable[i].interval  = builtInRes[i].interval;
@@ -78,7 +76,7 @@ initResTable_ (void)
 		free( buff );
 	}
 	lsinfo.nRes = i;
-	lsinfo.resTable = resTable;
+	lsinfo->resTable = resTable;
 
 	return 0;
 }
@@ -371,7 +369,8 @@ char lsf_setIndex (struct keymap *keyList, const char *filename, size_t lineNum)
 		resIdx = lsinfo.nRes;
 	}
 
-	lsinfo.resTable[resIdx].interval = atoi (keyList[INTERVAL].val); 	// FIXME FIXME FIXME change 0 to appropriate label in enum
+	// lsinfo.resTable[resIdx].interval = atoi (keyList[INTERVAL].val);
+	vfscanf( lsinfo->resTable[resIdx].interval, "%u", keyList[INTERVAL].val ); 	
 	lsinfo.resTable[resIdx].orderType =(strcasecmp (keyList[INCREASING].val, "y") == 0) ? INCR : DECR; // FIXME FIXME FIXME change 1 to appropriate label in enum
 
 	strcpy (lsinfo.resTable[resIdx].des, keyList[DESCRIPTION].val);
