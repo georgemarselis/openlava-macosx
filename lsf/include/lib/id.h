@@ -28,17 +28,11 @@
 #define GET_OS_USER_NAME     "getOSUserName_"
 #define GET_OS_UID           getOSUid_
 
-static int defGetLSFUser (char *lsfUserName, unsigned int lsfUserNameSize);
-static int defGetLSFUserByName (const char *osUserName, char *lsfUserName, unsigned int lsfUserNameSize);
-static int defGetLSFUserByUid (uid_t uid, char *lsfUserName, unsigned int lsfUserNameSize);
-static int defGetOSUserName (const char *lsfUserName, char *osUserName, unsigned int osUserNameSize);
-static int defGetOSUid (const char *lsfUserName, uid_t * uid);
-
-typedef int (*GET_LSF_USER_BY_NAME_FN_T) (const char *osUserName, char *lsfUserName, unsigned int lsfUserNameSize);
-typedef int (*GET_LSF_USER_BY_UID_FN_T) (uid_t uid, char *lsfUserName, unsigned int lsfUserNameSize);
-typedef int (*GET_OS_USER_NAME_FN_T) (const char *lsfUserName, char *osUserName, unsigned int osUserNameSize);
-typedef int (*GET_OS_UID_FN_T) (const char *lsfUserName, uid_t * uid);
-typedef int (*GET_LSF_USER_FN_T) (char *lsfUserName, unsigned int lsfUserNameSize);
+typedef int (*GET_LSF_USER_BY_NAME_FN_T) ( const char *osUserName, char *lsfUserName, unsigned int lsfUserNameSize);
+typedef int (*GET_LSF_USER_BY_UID_FN_T)  (        uid_t uid, char *lsfUserName, unsigned int lsfUserNameSize);
+typedef int (*GET_OS_USER_NAME_FN_T)     ( const char *lsfUserName, char *osUserName, unsigned int osUserNameSize);
+typedef int (*GET_OS_UID_FN_T)           ( const char *lsfUserName, uid_t * uid);
+typedef int (*GET_LSF_USER_FN_T)         ( const char *lsfUserName, unsigned int lsfUserNameSize);
 
 typedef struct
 {
@@ -54,7 +48,7 @@ typedef struct
 } IDLIB_INFO_T;
 
 
-static IDLIB_INFO_T idLib_ = {
+IDLIB_INFO_T idLib_ = {
 	FALSE,
 	FALSE,
 	0,
@@ -65,3 +59,11 @@ static IDLIB_INFO_T idLib_ = {
 	NULL,
 	NULL
 };
+
+int getLSFUser_(char *lsfUserName, unsigned int lsfUserNameSize);
+int getLSFUserByName_(const char *osUserName, char *lsfUserName, unsigned int lsfUserNameSize);
+int getLSFUserByUid_(uid_t uid, char *lsfUserName, unsigned int lsfUserNameSize);
+int getOSUserName_(const char *lsfUserName, char *osUserName, unsigned int osUserNameSize);
+int getOSUid_(const char *lsfUserName, uid_t *uid);
+struct passwd *getpwlsfuser_(const char *lsfUserName);
+struct passwd *getpwdirlsfuser_(const char *lsfUserName);
