@@ -428,7 +428,7 @@ return 0;
 // 			used to live here. Moved over to lib/liblsf/conf/putInLists.c
 
 int
-isInlist (char **adminNames, const char *userName, unsigned int actAds)
+isInlist ( char **adminNames, char *userName, unsigned int actAds)
 {
 
 	if (actAds == 0) {

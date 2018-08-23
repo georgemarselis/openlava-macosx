@@ -53,7 +53,7 @@ struct builtIn
     const char *des;
     enum valueType valuetype;
     enum orderType ordertype;
-    unsigned int flags;
+    int flags;
     unsigned int interval;
 }; 
 
@@ -171,11 +171,11 @@ int addResourceMap        ( const char *resName, const char *location, const cha
 int liblsf_addResourceMap ( const char *resName, const char *location, const char *lsfile, size_t lineNum);
 
 // static 
-unsigned int parseHostList ( const char *hostList, const char *lsfile, size_t lineNum, char ***hosts, int *isDefault);
-int liblsf_parseHostList   ( const char *hostList, const char *lsfile, size_t lineNum, char ***hosts);
+// unsigned int parseHostList          ( const char *hostList, const char *lsfile, const size_t lineNum, char ***hosts, int *isDefault); // was in lim.c had an extra var, not used anywhere else
+unsigned int liblsf_parseHostList   ( const char *hostList, const char *lsfile, const size_t lineNum, char ***hosts);
 //  was : 
 // static struct lsSharedResourceInfo *addResource (char *resName, int nHosts, char **hosts, char *value, char *fileName, size_t lineNum);
-struct lsSharedResourceInfo *liblsf_addResource ( const char *resName, unsigned long nHosts, char **hosts, char *value, const char *fileName, size_t lineNum);
+struct lsSharedResourceInfo *liblsf_addResource ( const char *resName, unsigned int nHosts, char **hosts, char *value, const char *fileName, size_t lineNum);
 // static 
 struct sharedResource *addResource (char *resName, unsigned int nHosts, char **hosts, char *value, const char *fileName, size_t lineNum, int resourceMap);
 int liblsf_addHostInstance(struct lsSharedResourceInfo *sharedResource, unsigned int nHosts, char **hostNames, char *value);
@@ -190,7 +190,7 @@ int resolveBaseNegHosts ( const char *inHosts, char **outHosts, struct HostsArra
 void freeSA_ (char **list, unsigned int num);
 
 int putValue (struct keymap *keyList, const char *key, char *value);
-int isInlist ( const char **adminNames, const char *userName, unsigned int actAds);
+int isInlist ( char **adminNames, char *userName, unsigned int actAds); // FIXME FIXME revisit and see if we can turn the char*s into const
 char *getNextValue (char **line);
 int keyMatch (struct keymap *keyList, const char *line, int exact);
 int isSectionEnd (char *linep, const char *lsfile, size_t *lineNum, const char *sectionName);

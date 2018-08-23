@@ -754,13 +754,13 @@ void err_return_ (enum limReplyCode);
 struct hostLoad *loadinfo_ (char *resReq, struct decisionReq *loadReqPtr, char *fromhost, unsigned long *numHosts, char ***outnlist);
 
 // struct hostent *Gethostbyname_ (char *);
-short getRefNum_ (void);
+// short getRefNum_ (void);
 // unsigned int isint_ (char *);
 // char islongint_ (char *);
 // int isdigitstr_ (char *);
 // LS_LONG_INT atoi64_ (char *);
 // char *chDisplay_ (char *);
-void strToLower_ (char *);
+// void strToLower_ (char *);
 // void initLSFHeader_ (struct LSFHeader *);
 // int isMasterCrossPlatform (void);
 // int isAllowCross (char *);

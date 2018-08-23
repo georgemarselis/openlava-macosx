@@ -54,6 +54,8 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "lsf.h"
+
 #if !defined(__CYGWIN__)
 #include <rpcsvc/ypclnt.h>
 #endif
@@ -101,8 +103,8 @@ const unsigned short OPENLAVA_VERSION = 20;
 // #define MAXTYPES_31             25
 // #define MAXMODELS_31            30
 
-// static int lsferrno = 0; // defined, not used? 
-// static int ENOLOCATION = 0x0FFF; // defined, not used
+int lsferrno = 0; // defined, not used? 
+const int ENOLOCATION = 0x0FFF; // defined, not used
 
 enum LSF_CONSTANTS {
 	LSF_DEFAULT_SOCKS = 15,
@@ -406,7 +408,7 @@ struct resItem
 {
 	enum valueType valueType;
 	enum orderType orderType;
-	unsigned int flags;
+	int flags;
 	unsigned int interval;
 	const char *name;
 	const char *des;
@@ -443,13 +445,13 @@ struct clusterInfo
 	unsigned int numClients;
 	unsigned int nRes;
 	unsigned int nAdmins;
-	const char **resources;
-	const char **hostTypes;
-	const char **hostModels;
-	const char **admins;
-	const char *clusterName;
-	const char *masterName;
-	const char *managerName;
+	char **resources;
+	char **hostTypes;
+	char **hostModels;
+	char **admins;
+	char *clusterName;
+	char *masterName;
+	char *managerName;
 
 };
 
@@ -549,15 +551,27 @@ struct lsfAcctRec
 };
 
 
-#define NIO_STDIN_ON                        0x01
-#define NIO_STDIN_OFF                       0x02
-#define NIO_TAGSTDOUT_ON                    0x03
-#define NIO_TAGSTDOUT_OFF                   0x04
+// #define NIO_STDIN_ON                        0x01
+// #define NIO_STDIN_OFF                       0x02
+// #define NIO_TAGSTDOUT_ON                    0x03
+// #define NIO_TAGSTDOUT_OFF                   0x04
+enum NIO_STREAMS {
+	NIO_STDIN_ON      = 0x01,
+	NIO_STDIN_OFF     = 0x02,
+	NIO_TAGSTDOUT_ON  = 0x03,
+	NIO_TAGSTDOUT_OFF = 0x04
+};
 
-#define NIO_TASK_STDINON                    0x01
-#define NIO_TASK_STDINOFF                   0x02
-#define NIO_TASK_ALL                        0x03
-#define NIO_TASK_CONNECTED                  0x04
+// #define NIO_TASK_STDINON                    0x01
+// #define NIO_TASK_STDINOFF                   0x02
+// #define NIO_TASK_ALL                        0x03
+// #define NIO_TASK_CONNECTED                  0x04
+enum NIO_TASK {
+	NIO_TASK_STDINON   = 0x01,
+	NIO_TASK_STDINOFF  = 0x02,
+	NIO_TASK_ALL       = 0x03,
+	NIO_TASK_CONNECTED = 0x04,
+};
 
 enum nioType
 {

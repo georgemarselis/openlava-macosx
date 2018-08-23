@@ -1382,62 +1382,62 @@ addSharedResourceInstance (unsigned int nHosts, char **hosts, const char *resNam
 // 		used to be here. Moved over to lsf/lib/liblsf/addResourceMap.c
 
 
-unsigned int
-parseHostList ( const char *hostList, const char *lsfile, unsigned int lineNum, char ***hosts, int *hasDefault)
-{
-	char *host       = NULL;
-	char *sp         = NULL;
-	char *hostName   = NULL;
-	char **hostTable = NULL;
-	unsigned int numHosts = 0;
+// unsigned int
+// parseHostList ( const char *hostList, const char *lsfile, unsigned int lineNum, char ***hosts, int *hasDefault)
+// {
+// 	char *host       = NULL;
+// 	char *sp         = NULL;
+// 	char *hostName   = NULL;
+// 	char **hostTable = NULL;
+// 	unsigned int numHosts = 0;
 
-	if (hostList == NULL) {
-		return 0;
-	}
+// 	if (hostList == NULL) {
+// 		return 0;
+// 	}
 
-	sp = hostList;
-	while ((host = getNextWord_ (&sp)) != NULL) {
-		numHosts++;
-	}
-	hostTable = (char **) calloc (numHosts, sizeof (char *));
-	if (NULL == hostTable && ENOMEM == errno ) {
-		ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "malloc");
-		return 0;
-	}
-	sp = hostList;
-	numHosts = 0;
-	while ((host = getNextWord_ (&sp)) != NULL) {
+// 	sp = hostList;
+// 	while ((host = getNextWord_ (&sp)) != NULL) {
+// 		numHosts++;
+// 	}
+// 	hostTable = (char **) calloc (numHosts, sizeof (char *));
+// 	if (NULL == hostTable && ENOMEM == errno ) {
+// 		ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "malloc");
+// 		return 0;
+// 	}
+// 	sp = hostList;
+// 	numHosts = 0;
+// 	while ((host = getNextWord_ (&sp)) != NULL) {
 
-		if ((hostName = validLocationHost (host)) == NULL) {
-			/* catgets 5278 */
-			ls_syslog (LOG_ERR, "5278: %s: %s(%d): Invalid hostname <%s>;ignoring the host", __func__, lsfile, lineNum, host);
-			lim_CheckError = WARNING_ERR;
-			continue;
-		}
+// 		if ((hostName = validLocationHost (host)) == NULL) {
+// 			/* catgets 5278 */
+// 			ls_syslog (LOG_ERR, "5278: %s: %s(%d): Invalid hostname <%s>;ignoring the host", __func__, lsfile, lineNum, host);
+// 			lim_CheckError = WARNING_ERR;
+// 			continue;
+// 		}
 
-		if ((hostTable[numHosts] = putstr_ (hostName)) == NULL) {
-			ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "malloc");
-			for (unsigned int i = 0; i < numHosts; i++) {
-				FREEUP (hostTable[i]);
-			}
-			FREEUP (hostTable);
-			return 0;
-		}
+// 		if ((hostTable[numHosts] = putstr_ (hostName)) == NULL) {
+// 			ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "malloc");
+// 			for (unsigned int i = 0; i < numHosts; i++) {
+// 				FREEUP (hostTable[i]);
+// 			}
+// 			FREEUP (hostTable);
+// 			return 0;
+// 		}
 
-		if (!strcmp (hostName, "default")) {
-			*hasDefault = TRUE;
-		}
-		numHosts++;
-	}
+// 		if (!strcmp (hostName, "default")) {
+// 			*hasDefault = TRUE;
+// 		}
+// 		numHosts++;
+// 	}
 
-	if (numHosts == 0) {
-		FREEUP (hostTable);
-		return 0;
-	}
+// 	if (numHosts == 0) {
+// 		FREEUP (hostTable);
+// 		return 0;
+// 	}
 
-	*hosts = hostTable;
-	return numHosts;
-}
+// 	*hosts = hostTable;
+// 	return numHosts;
+// }
 
 char *
 validLocationHost ( const char *hostName)
@@ -3494,7 +3494,7 @@ addHostInstance (struct sharedResource *sharedResource, unsigned int nHosts, cha
 	}
 	else {
 		if (numHosts == 0 && temp == NULL) {
-			temp = (char **) malloc (numofhosts * sizeof (char *));
+			temp = malloc (numofhosts * sizeof (char *));
 			if(NULL == temp && ENOMEM == errno ) {
 				ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
 				return -1;

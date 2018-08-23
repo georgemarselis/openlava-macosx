@@ -804,11 +804,12 @@ skip_job (struct jobInfoEnt *job)
 static int
 isLSFAdmin (void)
 {
-  static char __func__] = "isLSFAdmin";
-  struct clusterInfo *clusterInfo;
-  char *mycluster;
+  struct clusterInfo *clusterInfo  = NULL;
+  char *mycluster  = NULL;
   char lsfUserName[MAXLINELEN];
-  int i, j, num;
+  int i, j, num = 0;
+
+  memset( lsfUserName, '\0', MAXLINELEN );
 
   if ((mycluster = ls_getclustername ()) == NULL)
     {
