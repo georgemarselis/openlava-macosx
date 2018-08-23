@@ -38,8 +38,8 @@
 int
 initResTable_ (void)
 {
-	struct resItem **resTable = NULL;
-	unsigned int i           = 0;
+	struct resItem  **resTable = NULL;
+	unsigned int i             = 0;
 
 	resTable = malloc (1000 * sizeof (struct resItem) + 1 * sizeof( struct resItem ) ); // FIXME FIXME FIXME FIXME '1000' is awfuly partifular
 	if (!resTable) {
@@ -59,15 +59,15 @@ initResTable_ (void)
 
 		sprintf( (buff + numlength ) , "%s", builtInRes[i].des  );
 		*(buff +  numlength + strlen(builtInRes[i].des) + 1 )  = '\0';
-		resTable[i].des = buff;
+		resTable[i]->des = buff;
 
-		resTable[i].name      = builtInRes[i].name;
-		resTable[i].valueType = builtInRes[i].valuetype;
-		resTable[i].orderType = builtInRes[i].ordertype;
-		resTable[i].interval  = builtInRes[i].interval;
-		resTable[i].flags     = builtInRes[i].flags;
+		resTable[i]->name      = builtInRes[i].name;
+		resTable[i]->valueType = builtInRes[i].valuetype;
+		resTable[i]->orderType = builtInRes[i].ordertype;
+		resTable[i]->interval  = builtInRes[i].interval;
+		resTable[i]->flags     = builtInRes[i].flags;
 
-		if (resTable[i].flags & RESF_DYNAMIC) {
+		if (resTable[i]->flags & RESF_DYNAMIC) {
 			lsinfo.numIndx++;
 		}
 
@@ -76,7 +76,7 @@ initResTable_ (void)
 		free( buff );
 	}
 	lsinfo.nRes = i;
-	lsinfo->resTable = resTable;
+	lsinfo.resTable = resTable;
 
 	return 0;
 }
@@ -323,6 +323,8 @@ char do_Index (FILE * fp, size_t *lineNum, const char *filename)
 char lsf_setIndex (struct keymap *keyList, const char *filename, size_t lineNum)
 {
 	unsigned int resIdx = 0;
+	char **endptr = NULL;
+	int BASE10 = 10;
 
 	const int NEGATIVERESULT = 1;
 
@@ -340,13 +342,13 @@ char lsf_setIndex (struct keymap *keyList, const char *filename, size_t lineNum)
 
 	if (strlen (keyList[NAME].val) >= MAXLSFNAMELEN) {
 		/* catgets 5065 */
-		ls_syslog (LOG_ERR, "catgets 5065: %s: %s(%d): Name %s is too long (maximum is %d chars); ignoring index", __func__, filename, lineNum, keyList[3].val, MAXLSFNAMELEN - 1);
+		ls_syslog (LOG_ERR, "catgets 5065: %s: %s(%d): Name %s is too long (maximum is %d chars); ignoring index", __func__, filename, lineNum, keyList[NAME].val, MAXLSFNAMELEN - 1);
 		return FALSE;
 	}
 
 	if (strpbrk (keyList[NAME].val, ILLEGAL_CHARS) != NULL) {
 		/* catgets 5066 */
-		ls_syslog (LOG_ERR, "catgets 5066 %s: %s(%d): illegal character (one of %s), ignoring index %s", __func__, filename, lineNum, ILLEGAL_CHARS, keyList[3].val);
+		ls_syslog (LOG_ERR, "catgets 5066 %s: %s(%d): illegal character (one of %s), ignoring index %s", __func__, filename, lineNum, ILLEGAL_CHARS, keyList[NAME].val); // keyList[3]
 		return FALSE;
 	}
 
@@ -360,30 +362,28 @@ char lsf_setIndex (struct keymap *keyList, const char *filename, size_t lineNum)
 		return FALSE;
 	} 
 
-	if (!(lsinfo.resTable[resIdx].flags & RESF_DYNAMIC)) {
+	if (!(lsinfo.resTable[resIdx]->flags & RESF_DYNAMIC)) {
 		/* catgets 5067 */
-		ls_syslog (LOG_ERR, "catgets 5067: %s: %s(%d): Name %s is not a dynamic resource; ignored", __func__, filename, lineNum, keyList[3].val);
+		ls_syslog (LOG_ERR, "catgets 5067: %s: %s(%d): Name %s is not a dynamic resource; ignored", __func__, filename, lineNum, keyList[NAME].val); // keyList[NAME]
 		return FALSE;
 	}
 	else {
 		resIdx = lsinfo.nRes;
 	}
 
-	// lsinfo.resTable[resIdx].interval = atoi (keyList[INTERVAL].val);
-	vfscanf( lsinfo->resTable[resIdx].interval, "%u", keyList[INTERVAL].val ); 	
-	lsinfo.resTable[resIdx].orderType =(strcasecmp (keyList[INCREASING].val, "y") == 0) ? INCR : DECR; // FIXME FIXME FIXME change 1 to appropriate label in enum
+	lsinfo.resTable[resIdx]->interval = (unsigned int) strtoul( keyList[INTERVAL].val, endptr, BASE10 );
+	lsinfo.resTable[resIdx]->orderType =(strcasecmp (keyList[INCREASING].val, "y") == 0) ? INCR : DECR; // FIXME FIXME FIXME change 1 to appropriate label in enum
 
-	strcpy (lsinfo.resTable[resIdx].des, keyList[DESCRIPTION].val);
-	strcpy (lsinfo.resTable[resIdx].name, keyList[NAME].val);
-	lsinfo.resTable[resIdx].valueType = LS_NUMERIC;
-	lsinfo.resTable[resIdx].flags = RESF_DYNAMIC | RESF_GLOBAL;
+	lsinfo.resTable[resIdx]->des = keyList[DESCRIPTION].val;
+	lsinfo.resTable[resIdx]->name = keyList[NAME].val;
+	lsinfo.resTable[resIdx]->valueType = LS_NUMERIC;
+	lsinfo.resTable[resIdx]->flags = RESF_DYNAMIC | RESF_GLOBAL;
 
-	if (resIdx == lsinfo.nRes)
-		{
+	if (resIdx == lsinfo.nRes) {
 		lsinfo.numUsrIndx++;
 		lsinfo.numIndx++;
 		lsinfo.nRes++;
-		}
+	}
 
 	FREEUP (keyList[INTERVAL].val);
 	FREEUP (keyList[INCREASING].val);
@@ -750,14 +750,14 @@ char do_Resources (FILE * fp, size_t *lineNum, const char *filename)
 				continue;
 			}
 
-			memset( lsinfo.resTable[lsinfo.nRes].name, 0, strlen( lsinfo.resTable[lsinfo.nRes].name ) );
-			memset( lsinfo.resTable[lsinfo.nRes].des,  0, strlen( lsinfo.resTable[lsinfo.nRes].des  ) );
-			lsinfo.resTable[lsinfo.nRes].flags = RESF_GLOBAL;
-			lsinfo.resTable[lsinfo.nRes].valueType = LS_BOOLEAN;
-			lsinfo.resTable[lsinfo.nRes].orderType = NA;
-			lsinfo.resTable[lsinfo.nRes].interval = 0;
+			// memset( (char ) lsinfo.resTable[lsinfo.nRes]->name, '\0', strlen( lsinfo.resTable[lsinfo.nRes]->name ) );
+			// memset( (char ) lsinfo.resTable[lsinfo.nRes]->des,  '\0', strlen( lsinfo.resTable[lsinfo.nRes]->des  ) );
+			lsinfo.resTable[lsinfo.nRes]->flags = RESF_GLOBAL;
+			lsinfo.resTable[lsinfo.nRes]->valueType = LS_BOOLEAN;
+			lsinfo.resTable[lsinfo.nRes]->orderType = NA;
+			lsinfo.resTable[lsinfo.nRes]->interval = 0;
 
-			strcpy (lsinfo.resTable[lsinfo.nRes].name, keyList[RESOURCENAME].val);
+			strcpy (lsinfo.resTable[lsinfo.nRes]->name, keyList[RESOURCENAME].val);
 
 
 			if (keyList[TYPE].val != NULL && keyList[TYPE].val[RESOURCENAME] != '\0') {

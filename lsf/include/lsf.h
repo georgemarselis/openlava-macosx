@@ -984,6 +984,21 @@ const char LSETCDIR[] = "/fix/me/no/such/place";        // FIXME FIXME FIXME FIX
 // #define NB_SOCK_WRITE_FIX  nb_write_fix
 
 // #define LSF_NSIG NSIG                                   // FIXME FIXME FIXME FIXME FIXME set in configure.ac
+struct extResInfo
+{
+	char *name;
+	char *type;
+	char *interval;
+	char *increasing;
+	char *des;
+};
+
+#ifndef __CYGWIN__
+int optind;
+char *optarg;
+int opterr;
+int optopt;
+#endif
 
 int lserrno;
 int masterLimDown;
@@ -1108,28 +1123,5 @@ int getBEtime (char *, char, time_t *);
  */
 int ls_addhost (struct hostEntry *);
 int ls_rmhost (const char *);
-
-/*
- * openlava LIM log functions
- */
-struct lsEventRec *ls_readeventrec (FILE *);
-int ls_writeeventrec (FILE *, struct lsEventRec *);
-int freeHostEntryLog (struct hostEntryLog **);
-
-struct extResInfo
-{
-	char *name;
-	char *type;
-	char *interval;
-	char *increasing;
-	char *des;
-};
-
-#ifndef __CYGWIN__
-int optind;
-char *optarg;
-int opterr;
-int optopt;
-#endif
 
 // end lsf_h_
