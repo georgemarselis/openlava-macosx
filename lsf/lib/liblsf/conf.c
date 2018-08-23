@@ -30,6 +30,8 @@
 #include "lib/putInLists.h"
 #include "lib/misc.h"
 #include "lib/err.h"
+#include "lib/id.h"
+#include "lib/host.h"
 
 // #define NL_SETN 42
 
@@ -1382,8 +1384,8 @@ ls_setAdmins (struct admins *admins, int mOrA)
 	uid_t tempNAdmins     = 0;
 	uid_t *tempAdminIds   = NULL;
 	uid_t *workAdminIds   = NULL;
-	const char **tempAdminNames = NULL;
-	const char **workAdminNames = NULL;
+	char **tempAdminNames = NULL;
+	char **workAdminNames = NULL;
 	const char mallocString[]   = "malloc";
 
 	tempNAdmins = admins->nAdmins + clinfo.nAdmins; // include/lib/conf.h: struct clusterInfo clinfo;
@@ -1411,7 +1413,7 @@ ls_setAdmins (struct admins *admins, int mOrA)
 	else { // otherwise, use what is in memory
 		workNAdmins = admins->nAdmins;
 		workAdminIds = admins->adminIds;
-		workAdminNames = (const char **)admins->adminNames; // FIXME FIXME FIXME FIXME this needs verification
+		workAdminNames = admins->adminNames; // FIXME FIXME FIXME FIXME this needs verification
 	}
 
 	for ( unsigned int i = 0; i < workNAdmins; i++) {
@@ -1435,7 +1437,7 @@ ls_setAdmins (struct admins *admins, int mOrA)
 	if (mOrA == M_THEN_A) {
 		workNAdmins = admins->nAdmins;
 		workAdminIds = admins->adminIds;
-		workAdminNames = (const char **) admins->adminNames;
+		workAdminNames = admins->adminNames;
 	}
 	else if (mOrA == A_THEN_M) {
 		workNAdmins = clinfo.nAdmins;
@@ -1449,7 +1451,7 @@ ls_setAdmins (struct admins *admins, int mOrA)
 
 	for (unsigned i = 0; i < workNAdmins; i++) {
 
-		if (isInlist (tempAdminNames, workAdminNames[i], tempNAdmins)) {
+		if (isInlist ( tempAdminNames, workAdminNames[i], tempNAdmins)) {
 			continue;
 		}
 
@@ -1564,14 +1566,12 @@ do_Hosts (FILE * fp, const char *filename, size_t *lineNum, struct lsInfo *info)
 
 	if (strchr (linep, '=') == NULL) {
 
-		if (!keyMatch (keyList, linep, FALSE))
-		{
+		if (!keyMatch (keyList, linep, FALSE)) {
 			/* catgets 5136 */
 			ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5136, "%s: %s(%d): keyword line format error for section host, ignoring section")), __func__, filename, *lineNum);
 			doSkipSection (fp, lineNum, filename, hostString);
 			return FALSE;
 		}
-
 
 		for( unsigned int i = 0; keyList[i].key != NULL; i++) {
 			// if (keyList[i].position != -1) {
@@ -1585,111 +1585,111 @@ do_Hosts (FILE * fp, const char *filename, size_t *lineNum, struct lsInfo *info)
 				( strcasecmp ( "type", keyList[i].key ) == 0 ) || ( strcasecmp( "resources", keyList[i].key) == 0 ) ) {
 				/* catgets 5137 */
 				ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5137, "%s: %s(%d): keyword line: key %s is missing in section host, ignoring section")), __func__, filename, *lineNum, keyList[i].key);
-			doSkipSection (fp, lineNum, filename, hostString);
+				doSkipSection (fp, lineNum, filename, hostString);
 
-			for( unsigned int j = 0; keyList[j].key != NULL; j++) {
-					// if (keyList[j].position != -1) {
-				if (keyList[j].position != 255 ) {
-					FREEUP (keyList[j].val);
+				for( unsigned int j = 0; keyList[j].key != NULL; j++) {
+						// if (keyList[j].position != -1) {
+					if (keyList[j].position != 255 ) {
+						FREEUP (keyList[j].val);
+					}
 				}
-			}
 
-			return FALSE;
+				return FALSE;
+			}
 		}
 	}
-}
 
 	// if (keyList[R].position != -1 && keyList[SERVER0].position != -1) {
-if( keyList[R].position != 255 && keyList[SERVER0].position != 255 ) {
+	if( keyList[R].position != 255 && keyList[SERVER0].position != 255 ) {
 		/* catgets 5138 */
-	ls_syslog (LOG_WARNING, (_i18n_msg_get (ls_catd, NL_SETN, 5138, "%s: %s(%d): keyword line: conflicting keyword definition: you cannot define both 'R' and 'SERVER'. 'R' ignored")), __func__, filename, *lineNum);
-	ignoreR = TRUE;
-}
-
-while ((linep = getNextLineC_ (fp, lineNum, TRUE)) != NULL)  {
-
-	freekeyval (keyList);
-	initHostInfo (&host);
-
-	if (isSectionEnd (linep, filename, lineNum, hostString )) {
-		return TRUE;
+		ls_syslog (LOG_WARNING, (_i18n_msg_get (ls_catd, NL_SETN, 5138, "%s: %s(%d): keyword line: conflicting keyword definition: you cannot define both 'R' and 'SERVER'. 'R' ignored")), __func__, filename, *lineNum);
+		ignoreR = TRUE;
 	}
 
-	if (mapValues (keyList, linep) < 0)
-	{
-			/* catgets 5139  */
-		ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5139, "%s: %s(%d): values do not match keys for section host, ignoring line")), __func__, filename, *lineNum);
-		continue;
-	}
+	while ((linep = getNextLineC_ (fp, lineNum, TRUE)) != NULL)  {
 
-	if (strlen (keyList[HOSTNAME].val) > MAXHOSTNAMELEN) {
-			/* catgets 5140 */
-		ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5140, "%s: %s(%d): too long host name, ignored.")), __func__, filename, *lineNum);
-		continue;
-	}
-
-	if (Gethostbyname_ (keyList[HOSTNAME].val) == NULL) {
-			/* catgets 5141 */
-		ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5141, "%s: %s(%d): Invalid hostname %s in section host. Ignoring host")), __func__, filename, *lineNum, keyList[HOSTNAME].val);
-		continue;
-	}
-
-	strcpy (host.hostName, keyList[HOSTNAME].val);
-
-	if ((host.hostModel = putstr_ (keyList[MODEL].val)) == NULL) {
-		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, mallocString);
-		lserrno = LSE_MALLOC;
-		freeHostInfo (&host);
 		freekeyval (keyList);
-		doSkipSection (fp, lineNum, filename, hostString);
-		return FALSE;
-	}
+		initHostInfo (&host);
 
-	if ((host.hostType = putstr_ (keyList[TYPE].val)) == NULL) {
-		ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, mallocString);
-		lserrno = LSE_MALLOC;
-		freeHostInfo (&host);
-		freekeyval (keyList);
-		doSkipSection (fp, lineNum, filename, hostString);
-		return FALSE;
-	}
-
-		// if (keyList[ND].position != -1) {
-	if (keyList[ND].position != 255) {
-		const unsigned short BASEZERO = 0;
-		errno = 0;
-		assert( strtoul( keyList[ND].val, NULL , BASEZERO ) );
-		if( !errno ) {
-			const unsigned short BASEZERO = 0;
-				host.nDisks = (unsigned int) strtoul( keyList[ND].val, NULL , BASEZERO ); // FIXME FIXME FIXME i'm sure nobody will get a couple of billion of disks in a single system any time soon, but please take care of this and change nDisks to size_t or devise a plan to have a proper conversion to int.
-			}
-			else {
-				fprintf( stdout, "%s: errno was: %d; the value of keyList[ND].val was %s; too big for strtoul(); ignoring, no disks set\n", __func__, errno, keyList[ND].val );
-				ls_syslog( LOG_ERR, "%s: errno was: %d; the value of keyList[ND].val was %s; too big for strtoul(); ignoring, no disks set", __func__, errno, keyList[ND].val );
-				errno = 0;
-				continue;
-			}
-
-		}
-		else {
-			host.nDisks = INFINIT_INT;
+		if (isSectionEnd (linep, filename, lineNum, hostString )) {
+			return TRUE;
 		}
 
-		host.busyThreshold = malloc( info->numIndx * sizeof ( host.busyThreshold ) );
-		if ( NULL == host.busyThreshold && ENOMEM == errno ) {
-			/* FIXME
-			 this lserrno and logging to syslog about memory allocation must either
-			 go or get a lot more serious somehow
-			 */
-			assert( info->numIndx );
-			ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, mallocString );
+		if (mapValues (keyList, linep) < 0)
+		{
+				/* catgets 5139  */
+			ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5139, "%s: %s(%d): values do not match keys for section host, ignoring line")), __func__, filename, *lineNum);
+			continue;
+		}
+
+		if (strlen (keyList[HOSTNAME].val) > MAXHOSTNAMELEN) {
+				/* catgets 5140 */
+			ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5140, "%s: %s(%d): too long host name, ignored.")), __func__, filename, *lineNum);
+			continue;
+		}
+
+		if (Gethostbyname_ (keyList[HOSTNAME].val) == NULL) {
+				/* catgets 5141 */
+			ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5141, "%s: %s(%d): Invalid hostname %s in section host. Ignoring host")), __func__, filename, *lineNum, keyList[HOSTNAME].val);
+			continue;
+		}
+
+		strcpy (host.hostName, keyList[HOSTNAME].val);
+
+		if ((host.hostModel = putstr_ (keyList[MODEL].val)) == NULL) {
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, mallocString);
 			lserrno = LSE_MALLOC;
 			freeHostInfo (&host);
 			freekeyval (keyList);
-			doSkipSection (fp, lineNum, filename, hostString );
-
+			doSkipSection (fp, lineNum, filename, hostString);
 			return FALSE;
 		}
+
+		if ((host.hostType = putstr_ (keyList[TYPE].val)) == NULL) {
+			ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, mallocString);
+			lserrno = LSE_MALLOC;
+			freeHostInfo (&host);
+			freekeyval (keyList);
+			doSkipSection (fp, lineNum, filename, hostString);
+			return FALSE;
+		}
+
+		// if (keyList[ND].position != -1) {
+		if (keyList[ND].position != 255) {
+			const unsigned short BASEZERO = 0;
+			errno = 0;
+			assert( strtoul( keyList[ND].val, NULL , BASEZERO ) );
+			if( !errno ) {
+				const unsigned short BASEZERO = 0;
+					host.nDisks = (unsigned int) strtoul( keyList[ND].val, NULL , BASEZERO ); // FIXME FIXME FIXME i'm sure nobody will get a couple of billion of disks in a single system any time soon, but please take care of this and change nDisks to size_t or devise a plan to have a proper conversion to int.
+				}
+				else {
+					fprintf( stdout, "%s: errno was: %d; the value of keyList[ND].val was %s; too big for strtoul(); ignoring, no disks set\n", __func__, errno, keyList[ND].val );
+					ls_syslog( LOG_ERR, "%s: errno was: %d; the value of keyList[ND].val was %s; too big for strtoul(); ignoring, no disks set", __func__, errno, keyList[ND].val );
+					errno = 0;
+					continue;
+				}
+
+			}
+			else {
+				host.nDisks = INFINIT_INT;
+			}
+
+			host.busyThreshold = malloc( info->numIndx * sizeof ( host.busyThreshold ) );
+			if ( NULL == host.busyThreshold && ENOMEM == errno ) {
+				/* FIXME
+				 this lserrno and logging to syslog about memory allocation must either
+				 go or get a lot more serious somehow
+				 */
+				assert( info->numIndx );
+				ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, mallocString );
+				lserrno = LSE_MALLOC;
+				freeHostInfo (&host);
+				freekeyval (keyList);
+				doSkipSection (fp, lineNum, filename, hostString );
+
+				return FALSE;
+			}
 
 		liblsf_putThreshold( R15S, &host, keyList[R15S].position, keyList[R15S].val, INFINIT_LOAD );
 		liblsf_putThreshold( R1M,  &host, keyList[R1M].position,  keyList[R1M].val,  INFINIT_LOAD );
@@ -1709,7 +1709,7 @@ while ((linep = getNextLineC_ (fp, lineNum, TRUE)) != NULL)  {
 		liblsf_putThreshold( MEM, &host, keyList[MEM].position, keyList[MEM].val, -INFINIT_LOAD );
 
 		for (unsigned int i = NBUILTINDEX; i < NBUILTINDEX + info->numUsrIndx; i++) {
-			if (info->resTable[i].orderType == INCR) {
+			if (info->resTable[i]->orderType == INCR) {
 				assert( i <= INT_MAX );
 				liblsf_putThreshold ( i, &host, keyList[i].position, keyList[i].val, INFINIT_LOAD);
 			}
@@ -1869,7 +1869,7 @@ while ((linep = getNextLineC_ (fp, lineNum, TRUE)) != NULL)  {
 		}
 		FREEUP (resList);
 
-		host.rexPriority = DEF_REXPRIORITY;
+		host.rexPriority = (int) DEF_REXPRIORITY; // Cast is fine here: we want DEF_REXPRIORITY to be a constand and rexPriority to be renice-abled
 		if ( keyList[REXPRI0].position != 255 ) { // FIXME FIXME FIXME FIXME 255 must be set to a label and set global
 			host.rexPriority = atoi( keyList[REXPRI0].val );
 		}
@@ -2032,8 +2032,8 @@ void initkeylist (struct keymap keyList[], unsigned int m, unsigned int n, struc
 	{
 		unsigned int index = 0;
 		for (unsigned int i = 0; i < info->nRes; i++) {
-			if ((info->resTable[i].flags & RESF_DYNAMIC) && index < info->numIndx) {
-				keyList[index++].key = info->resTable[i].name;
+			if ((info->resTable[i]->flags & RESF_DYNAMIC) && index < info->numIndx) {
+				keyList[index++].key = info->resTable[i]->name;
 			}
 		}
 	}
@@ -2593,8 +2593,8 @@ int doResourceMap (FILE * fp, const char *lsfile, size_t *lineNum)
 					continue;
 				}
 
-				lsinfo.resTable[resNo].flags &= ~RESF_GLOBAL;
-				lsinfo.resTable[resNo].flags |= RESF_SHARED;
+				lsinfo.resTable[resNo]->flags &= ~RESF_GLOBAL;
+				lsinfo.resTable[resNo]->flags |= RESF_SHARED;
 				resNo = 0;
 			}
 			else
@@ -2617,17 +2617,16 @@ int doResourceMap (FILE * fp, const char *lsfile, size_t *lineNum)
 }
 
 
-int liblsf_addResourceMap ( const char *resName, const char *location, const char *lsfile, size_t lineNum)
+int liblsf_addResourceMap ( const char *resName, const char *location, const char *lsfile, const size_t lineNum)
 {
 	// int j                                = 0;
 	int i                                 = 0;
 	int error                             = 0; // no error
 	int first                             = TRUE;
-	size_t numHosts                       = 0;
+	unsigned int numHosts                 = 0;
 	char *sp                              = NULL;
 	char *cp                              = NULL;
 	char *ssp                             = NULL;
-	char *instance                        = NULL;
 	char *tempHost                        = NULL;
 	char initValue[MAXFILENAMELEN];
 	char externalResourceFlag[]           = "!";
@@ -2635,6 +2634,7 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 	struct lsSharedResourceInfo *resource = NULL;
 
 	// const char liblsf_addResourceMap[] = "liblsf_addResourceMap";
+	memset( initValue, '\0', MAXFILENAMELEN );
 
 	if (resName == NULL || location == NULL) {
 
@@ -2650,7 +2650,7 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 
 	if (!strcmp (location, "!"))
 	{
-		initValue[0] = '\0';
+		memset( initValue, '\0', MAXFILENAMELEN );
 		tempHost = (char *) externalResourceFlag; // FIXME FIXME FIXME is this cast justified?
 		hosts = &tempHost;
 		if ((resource = liblsf_addResource (resName, 1, hosts, initValue, lsfile, lineNum)) == NULL)
@@ -2663,7 +2663,7 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 	}
 
 	resource = NULL;
-	sp = (char *)location; // FIXME FIXME FIXME FIXME this cast oughta be verified
+	sp = strdup( location ); // FIXME FIXME FIXME FIXME this cast oughta be verified
 
 	i = 0;
 	while (*sp != '\0')
@@ -2676,7 +2676,8 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 		}
 		sp++;
 	}
-	sp = (char *)location; // FIXME FIXME FIXME FIXME this cast oughta be verified
+	free( sp );
+	sp = strdup( location ); // FIXME FIXME FIXME FIXME this cast oughta be verified
 	if (i != 0)
 	{
 		/* catgets 5204 */
@@ -2686,14 +2687,12 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 
 	while (sp != NULL && sp[0] != '\0')
 	{
-		for ( unsigned int j = 0; j < numHosts; j++) {
+		for ( unsigned int j = 0; j < (unsigned int) numHosts; j++) { // Cast is ok: by now we have established that numHosts > 0
 			FREEUP (hosts[j]);
 		}
 		FREEUP (hosts);
-		numHosts = 0;
 		error = FALSE;
-		instance = sp;
-		initValue[0] = '\0';
+		memset( initValue, '\0', MAXFILENAMELEN );
 		while (*sp == ' ' && *sp != '\0') {
 			sp++;
 		}
@@ -2738,6 +2737,7 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 		}
 		if (*sp == '[')
 		{
+			int result = 0;
 			sp++;
 			cp = sp;
 			while (*sp != ']' && *sp != '\0') {
@@ -2746,7 +2746,7 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 			if ( *sp == '\0') // FIXME FIXME yeah this probably attempts to check if the first char is replaced by nothing
 			{
 				/* catgets 5206 */
-				ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5206, "%s: %s(%d): Bad format for instance <%s>; ignoring the instance")), __func__, lsfile, lineNum, instance);
+				ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5206, "%s: %s(%d): Bad format for instance <%s>; ignoring the instance")), __func__, lsfile, lineNum, sp);
 				return -1;
 			}
 			if (error == TRUE)
@@ -2755,30 +2755,34 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 				ssp = sp;
 				sp = NULL; // FIXME FIXME FIXME probable segfault
 				/* catgets 5207 */
-				ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5207, "%s: %s(%d): Bad format for instance <%s>; ignoringthe instance")), __func__, lsfile, lineNum, instance);
+				ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5207, "%s: %s(%d): Bad format for instance <%s>; ignoringthe instance")), __func__, lsfile, lineNum, sp);
 				sp = ssp;
 				continue;
 			}
 			*sp = '\0';
 			sp++;
-			if ((numHosts = liblsf_parseHostList (cp, lsfile, lineNum, &hosts)) <= 0)
+			if ((result = liblsf_parseHostList (cp, lsfile, lineNum, &hosts)) <= 0)
 			{
+				const char *parseHostList = "parseHostList";
 				/* catgets 5208 */
-				ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5208, "%s: %s(%d): %s(%s) failed; ignoring the instance <%s%s>")), __func__, lsfile, lineNum, "parseHostList", cp, instance, "]");
+				ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5208, "%s: %s(%d): %s(%s) failed; ignoring the instance <%s%s>")), __func__, lsfile, lineNum, parseHostList, cp, sp, "]");
 				continue;
+			}
+			else {
+				numHosts = (unsigned int) result;
 			}
 
 			if (resource == NULL)
 			{
 				if ((resource = liblsf_addResource (resName, numHosts, hosts, initValue, lsfile, lineNum)) == NULL)
 					/* catgets 5209 */
-					ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5209, "%s: %s(%d): %s() failed; ignoring the instance <%s>")), __func__, lsfile, lineNum, liblsf_addResource, instance);
+					ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5209, "%s: %s(%d): %s() failed; ignoring the instance <%s>")), __func__, lsfile, lineNum, liblsf_addResource, sp);
 			}
 			else
 			{
 				if (liblsf_addHostInstance (resource, numHosts, hosts, initValue) < 0)
 					/* catgets 5210 */
-					ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5210, "%s: %s(%d): %s() failed; ignoring the instance <%s>")), __func__, lsfile, lineNum, __func__, instance);
+					ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5210, "%s: %s(%d): %s() failed; ignoring the instance <%s>")), __func__, lsfile, lineNum, __func__, sp);
 			}
 			continue;
 		}
@@ -2807,12 +2811,12 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 // lsf/lib/liblsf/conf.c:int addResourceMap        ( const char *resName, const char *location, const char *lsfile, size_t lineNum, int *isDefault)
 // 		used to be here. Moved over to lsf/lib/liblsf/addResourceMap.c
 
-int liblsf_parseHostList (const char *hostList, const char *lsfile, size_t lineNum, char ***hosts)
+unsigned int liblsf_parseHostList (const char *hostList, const char *lsfile, const size_t lineNum, char ***hosts)
 {
 	char *host       = NULL;
 	char *sp         = NULL;
 	char **hostTable = NULL;
-	size_t  numHosts = 0;
+	unsigned int  numHosts = 0;
 
 	assert( lsfile );  // FIXME all three assertions got to go
 	assert( lineNum ); // investigate if a file and a line number
@@ -2822,19 +2826,19 @@ int liblsf_parseHostList (const char *hostList, const char *lsfile, size_t lineN
 		return -1;
 	}
 
-	sp = (char *)hostList; // FIXME FIXME FIXME FIXME make sure that the cast is correct, investigate memory
+	sp = strdup( hostList ); // FIXME FIXME FIXME FIXME make sure that the cast is correct, investigate memory
 	while ( NULL != (host = getNextWord_ (&sp)) ) {
 		numHosts++;
 	}
 
-	assert( numHosts >= 0 );
+	assert( numHosts );
 	hostTable = malloc( numHosts * sizeof (char *));
 	if( NULL == hostTable && ENOMEM == errno) {
 		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
 		return -1;
 	}
 
-	sp = (char *)hostList; // FIXME FIXME FIXME FIXME make sure that the cast is correct, investigate memory
+	sp = strdup( hostList ); // FIXME FIXME FIXME FIXME make sure that the cast is correct, investigate memory
 	numHosts = 0;
 	while ((host = getNextWord_ (&sp)) != NULL) {
 
