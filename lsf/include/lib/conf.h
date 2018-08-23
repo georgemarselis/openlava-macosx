@@ -33,7 +33,7 @@ const unsigned int DEF_REXPRIORITY = 0;
 // #define NL_SETN 42
 
 // static 
-struct lsInfo lsinfo;
+struct lsInfo lsinfo; // FIXME FIXME FIXME there is a second decleration in lfh.h . Not sure if dup or not
 // static 
 struct clusterInfo clinfo;
 // static 
@@ -54,7 +54,7 @@ struct builtIn
     enum valueType valuetype;
     enum orderType ordertype;
     unsigned int flags;
-    const unsigned int interval;
+    unsigned int interval;
 }; 
 
 // enum RESF resides in lsf.h

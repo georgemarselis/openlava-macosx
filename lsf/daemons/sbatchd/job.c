@@ -1968,8 +1968,7 @@ addJob (struct jobSpecs *jobSpecs, int mbdVersion)
 	{
 
 
-		if ((pw = getpwlsfuser_ (jobSpecs->execUsername)) == NULL ||
-			pw->pw_name == NULL)
+		if ((pw = getpwlsfuser_ (jobSpecs->execUsername)) == NULL || pw->pw_name == NULL)
 		{
 			ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_S_M, __func__, lsb_jobid2str (jobSpecs->jobId), "getpwlsfuser_", jobSpecs->execUsername);
 			FREEUP (jp);
