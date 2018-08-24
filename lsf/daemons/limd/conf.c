@@ -3452,105 +3452,106 @@ freeSharedRes (struct sharedResource *sharedRes)
 	return;
 }
 
-int
-addHostInstance (struct sharedResource *sharedResource, unsigned int nHosts, char **hostNames, char *value, int resourceMap)
-{
-	unsigned int numList  = 0;
-	unsigned int numHosts = 0;
-	char **temp           = NULL;
-	char **hostList       = NULL ;
-	struct resourceInstance *instance = NULL;
+// addHostInstance: moved over to lib/liblsf/conf.c
+// int
+// addHostInstance (struct sharedResource *sharedResource, unsigned int nHosts, char **hostNames, char *value, int resourceMap)
+// {
+// 	unsigned int numList  = 0;
+// 	unsigned int numHosts = 0;
+// 	char **temp           = NULL;
+// 	char **hostList       = NULL ;
+// 	struct resourceInstance *instance = NULL;
 
-	const char addInstance[] = "addInstance";
-	const char addHostList[] = "addHostList";
+// 	const char addInstance[] = "addInstance";
+// 	const char addHostList[] = "addHostList";
 
-	if (nHosts <= 0 || hostNames == NULL) {
-		return -1;
-	}
+// 	if (nHosts <= 0 || hostNames == NULL) {
+// 		return -1;
+// 	}
 
-	if (resourceMap == FALSE) {
-		if (sharedResource->numInstances > 1) {
-			/* catgets 5405 */
-			ls_syslog (LOG_ERR, "5405: %s: More than one instatnce defined for the resource <%s> on host <%s> in host section; ignoring", __func__, sharedResource->resourceName, hostNames[0]);
-			return -1;
-		}
-		if (sharedResource->numInstances == 0) {
-			if (addInstance (sharedResource, nHosts, hostNames, value) == NULL) {
-				ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, addInstance);
-				return -1;
-			}
-		}
-		else {
-			if (addHostList (sharedResource->instances[0], nHosts, hostNames) < 0) {
-				ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, addHostList);
-				return -1;
-			 a}
-		}
-		instance = sharedResource->instances[0];
+// 	if (resourceMap == FALSE) {
+// 		if (sharedResource->numInstances > 1) {
+// 			/* catgets 5405 */
+// 			ls_syslog (LOG_ERR, "5405: %s: More than one instatnce defined for the resource <%s> on host <%s> in host section; ignoring", __func__, sharedResource->resourceName, hostNames[0]);
+// 			return -1;
+// 		}
+// 		if (sharedResource->numInstances == 0) {
+// 			if (addInstance (sharedResource, nHosts, hostNames, value) == NULL) {
+// 				ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, addInstance);
+// 				return -1;
+// 			}
+// 		}
+// 		else {
+// 			if (addHostList (sharedResource->instances[0], nHosts, hostNames) < 0) {
+// 				ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, addHostList);
+// 				return -1;
+// 			 a}
+// 		}
+// 		instance = sharedResource->instances[0];
 
-		if (addHostNodeIns (instance, nHosts, hostNames) < 0) {
-			return -1;
-		}
-	}
-	else {
-		if (numHosts == 0 && temp == NULL) {
-			temp = malloc (numofhosts * sizeof (char *));
-			if(NULL == temp && ENOMEM == errno ) {
-				ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
-				return -1;
-			}
-		}
-		else {
-			for ( unsigned int i = 0; i < numHosts; i++) {
-				FREEUP (temp[i]);
-			}
-		}
-		numHosts = 0;
-		for (unsigned int i = 0; i < nHosts; i++) {
+// 		if (addHostNodeIns (instance, nHosts, hostNames) < 0) {
+// 			return -1;
+// 		}
+// 	}
+// 	else {
+// 		if (numHosts == 0 && temp == NULL) {
+// 			temp = malloc (numofhosts * sizeof (char *));
+// 			if(NULL == temp && ENOMEM == errno ) {
+// 				ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
+// 				return -1;
+// 			}
+// 		}
+// 		else {
+// 			for ( unsigned int i = 0; i < numHosts; i++) {
+// 				FREEUP (temp[i]);
+// 			}
+// 		}
+// 		numHosts = 0;
+// 		for (unsigned int i = 0; i < nHosts; i++) {
 
-			if ((hostList = getValidHosts (hostNames[i], &numList, sharedResource)) == NULL) {
-				continue;
-			}
-			for ( unsigned int j = 0; j < numList; j++) {
+// 			if ((hostList = getValidHosts (hostNames[i], &numList, sharedResource)) == NULL) {
+// 				continue;
+// 			}
+// 			for ( unsigned int j = 0; j < numList; j++) {
 
-				int duplicated = 0;
-				for ( unsigned int k = 0; k < numHosts; k++)  {
-					if (!strcmp (temp[k], hostList[j])) {
-						duplicated = 1;
-						break;
-					}
-				}
-				if (duplicated) {
-					/* catgets 5478 */
-					ls_syslog (LOG_WARNING, "5478: %s: Host %s is duplicated in resource %s mapping.", __func__, hostList[j], sharedResource->resourceName);
-					continue;
-				}
-				temp[numHosts] = putstr_ (hostList[j]);
-				if (temp[numHosts] == NULL) {
-					ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
-					return -1;
-				}
-				numHosts++;
-			}
-		}
-		if ((instance = addInstance (sharedResource, numHosts, temp, value)) == NULL) {
-			const char addInstance[] = "addInstance";
-			ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, addInstance );
-			return -1;
-			}
+// 				int duplicated = 0;
+// 				for ( unsigned int k = 0; k < numHosts; k++)  {
+// 					if (!strcmp (temp[k], hostList[j])) {
+// 						duplicated = 1;
+// 						break;
+// 					}
+// 				}
+// 				if (duplicated) {
+// 					/* catgets 5478 */
+// 					ls_syslog (LOG_WARNING, "5478: %s: Host %s is duplicated in resource %s mapping.", __func__, hostList[j], sharedResource->resourceName);
+// 					continue;
+// 				}
+// 				temp[numHosts] = putstr_ (hostList[j]);
+// 				if (temp[numHosts] == NULL) {
+// 					ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
+// 					return -1;
+// 				}
+// 				numHosts++;
+// 			}
+// 		}
+// 		if ((instance = addInstance (sharedResource, numHosts, temp, value)) == NULL) {
+// 			const char addInstance[] = "addInstance";
+// 			ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, addInstance );
+// 			return -1;
+// 			}
 
-		if (addHostNodeIns (instance, numHosts, temp) < 0) {
-			return -1;
-		}
+// 		if (addHostNodeIns (instance, numHosts, temp) < 0) {
+// 			return -1;
+// 		}
 
-		if (addSharedResourceInstance( numHosts, temp, sharedResource->resourceName) < 0) {
-			const char addSharedResourceInstance = "addSharedResourceInstance";
-			ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__,  addSharedResourceInstance);
-			return -1;
-		}
-	}
-	return 0;
-}
+// 		if (addSharedResourceInstance( numHosts, temp, sharedResource->resourceName) < 0) {
+// 			const char addSharedResourceInstance = "addSharedResourceInstance";
+// 			ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__,  addSharedResourceInstance);
+// 			return -1;
+// 		}
+// 	}
+// 	return 0;
+// }
 
 char **
 getValidHosts ( const char *hostName, unsigned int *numHost, struct sharedResource *resource)

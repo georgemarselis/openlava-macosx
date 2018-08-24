@@ -642,28 +642,27 @@ struct sharedConf
 	char *servers;
 };
 
-typedef struct lsSharedResourceInstance
+// typedef 
+struct lsSharedResourceInstance
 {
-	unsigned int nHosts;
-	char padding[4];
-	char *value;
 	char **hostList;
+	char *value;
+	unsigned long nHosts;
+};// LS_SHARED_RESOURCE_INST_T;
 
-} LS_SHARED_RESOURCE_INST_T;
-
-typedef struct lsSharedResourceInfo
+// typedef
+struct lsSharedResourceInfo
 {
 	unsigned int nInstances;
 	char padding[4];
 	char *resourceName;
-	LS_SHARED_RESOURCE_INST_T *instances;
-} LS_SHARED_RESOURCE_INFO_T;
+	struct lsSharedResourceInstance *instances;
+}; // LS_SHARED_RESOURCE_INFO_T;
 
-struct clusterConf
-{
-	int numShareRes;
+struct clusterConf {
+	unsigned int numShareRes;
 	unsigned int numHosts;
-	LS_SHARED_RESOURCE_INFO_T *shareRes;
+	struct lsSharedResourceInfo *shareRes;
 	struct hostInfo *hosts;
 	struct clusterInfo *clinfo;
 };

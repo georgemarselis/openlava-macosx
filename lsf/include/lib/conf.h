@@ -19,6 +19,7 @@
 #pragma once
  
 #include "lsf.h"
+#include "lproto.h"
 
 #define ILLEGAL_CHARS     ".!-=+*/[]@:&|{}'`\""
 #define M_THEN_A  1
@@ -167,20 +168,20 @@ void freeKeyList (struct keymap *keyList);
 int validType (char *type);
 int doResourceMap (FILE *fp, const char *lsfile, size_t *lineNum);
 // static 
-int addResourceMap        ( const char *resName, const char *location, const char *lsfile, size_t lineNum, int *isDefault);
-int liblsf_addResourceMap ( const char *resName, const char *location, const char *lsfile, size_t lineNum);
+// int addResourceMap        ( const char *resName, const char *location, const char *lsfile, size_t lineNum, int *isDefault);
+int addResourceMap ( const char *resName, const char *location, const char *lsfile, size_t lineNum);
 
 // static 
 // unsigned int parseHostList          ( const char *hostList, const char *lsfile, const size_t lineNum, char ***hosts, int *isDefault); // was in lim.c had an extra var, not used anywhere else
 unsigned int liblsf_parseHostList   ( const char *hostList, const char *lsfile, const size_t lineNum, char ***hosts);
 //  was : 
 // static struct lsSharedResourceInfo *addResource (char *resName, int nHosts, char **hosts, char *value, char *fileName, size_t lineNum);
-struct lsSharedResourceInfo *liblsf_addResource ( const char *resName, unsigned int nHosts, char **hosts, char *value, const char *fileName, size_t lineNum);
+// struct lsSharedResourceInfo *liblsf_addResource ( const char *resName, unsigned int nHosts, char **hosts, char *value, const char *fileName, size_t lineNum);
 // static 
-struct sharedResource *addResource (char *resName, unsigned int nHosts, char **hosts, char *value, const char *fileName, size_t lineNum, int resourceMap);
-int liblsf_addHostInstance(struct lsSharedResourceInfo *sharedResource, unsigned int nHosts, char **hostNames, char *value);
+struct lsSharedResourceInfo *addResource ( const char *resName, unsigned long nHosts, char **hosts, char *value, const char *filename, size_t lineNum);
+int addHostInstance(struct lsSharedResourceInfo *sharedResource, unsigned long nHosts, char **hostNames, const char *value);
 // static 
-int addHostInstance (struct sharedResource *sharedResource, unsigned int nHosts, char **hostNames, char *value, int resourceMap);
+// int addHostInstance (struct sharedResource *sharedResource, unsigned int nHosts, char **hostNames, char *value, int resourceMap);
 char addHost (struct hostInfo *host, const char *filename, size_t *lineNum);
 
 int convertNegNotation_ (char **, struct HostsArray *);

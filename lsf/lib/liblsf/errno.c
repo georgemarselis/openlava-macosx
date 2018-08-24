@@ -25,7 +25,7 @@
 int
 errnoEncode_ (int eno)
 {
-    int NERRNO_MAP  = sizeof(errno_map) / sizeof(int);
+    int NERRNO_MAP  = ELASTVALUE - 1; // ignore 0th value
 
     if (eno < 0) {
         return eno;
@@ -34,36 +34,36 @@ errnoEncode_ (int eno)
     for ( int i = 0; i < NERRNO_MAP; i++)
     {
         if (errno_map[i] == eno) {
-            return (i);
+            return i;
         }
     }
 
     if (eno >= NERRNO_MAP) {
-        return (eno);
+        return eno;
     }
     else {
-        return (0);
+        return 0;
     }
 }
 
 int
 errnoDecode_ (int eno)
 {
-    int NERRNO_MAP  = sizeof(errno_map) / sizeof(int);
+    int NERRNO_MAP  = ELASTVALUE - 1;
 
     if (eno < 0) {
-        return (eno);
+        return eno;
     }
 
     if (eno >= NERRNO_MAP) {
         if (strerror (eno) != NULL) {
-            return (eno);
+            return eno;
         }
         else {
-            return (0);
+            return 0;
         }
     }
 
-  return (errno_map[eno]);
+  return errno_map[eno];
 
 }

@@ -650,6 +650,63 @@ char ls_addHostModel ( const char *model, const char *arch, double factor) // FI
 	return TRUE;
 }
 
+unsigned int parseHostList (const char *hostList, const char *lsfile, const size_t lineNum, char ***hosts)
+{
+	char *host       = NULL;
+	char *sp         = NULL;
+	char **hostTable = NULL;
+	unsigned int  numHosts = 0;
+
+	assert( lsfile );  // FIXME all three assertions got to go
+	assert( lineNum ); // investigate if a file and a line number
+	                   // are indeed passed over
+
+	if ( NULL == hostList ) {
+		lsferrno = 9000; // FIXME FIXME FIXME return proper labeled error
+		return 0;
+	}
+
+	sp = strdup( hostList ); // FIXME FIXME FIXME FIXME make sure that the cast is correct, investigate memory
+	while ( NULL != (host = getNextWord_ (&sp)) ) {
+		numHosts++;
+	}
+
+	assert( numHosts );
+	hostTable = malloc( numHosts * sizeof (char *));
+	if( NULL == hostTable && ENOMEM == errno) {
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
+		lserrno = 9001; // FIXME FIXME FIXME return proper labeled error
+		return 0;
+	}
+
+	sp = strdup( hostList ); // FIXME FIXME FIXME FIXME make sure that the cast is correct, investigate memory
+	numHosts = 0;
+	while ((host = getNextWord_ (&sp)) != NULL) {
+
+		if ( NULL == (hostTable[numHosts] = putstr_ (host)) ) {
+
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
+			for ( unsigned int i = 0; i < numHosts; i++) {
+				FREEUP (hostTable[i]);
+			}
+
+			FREEUP (hostTable);
+
+			lserrno = 9002; // FIXME FIXME FIXME return proper labeled error
+			return 0;
+		}
+		numHosts++;
+	}
+	if ( 0 == numHosts ) {
+		FREEUP (hostTable);
+		lserrno = 9003; // FIXME FIXME FIXME return proper labeled error
+		return 0; 
+	}
+
+	*hosts = hostTable;
+
+	return numHosts;
+}
 
 // #define RESOURCENAME 0
 // #define TYPE         1
@@ -971,7 +1028,7 @@ char do_Resources (FILE * fp, size_t *lineNum, const char *filename)
 
 			FREEUP (cConf->hosts);
 			cConf->numHosts = 0;
-		for ( int i = 0; i < cConf->numShareRes; i++) // FIXME FIXME FIXME can cConf->numShareRes be unsigned int?
+		for ( unsigned int i = 0; i < cConf->numShareRes; i++) // FIXME FIXME FIXME can cConf->numShareRes be unsigned int?
 		{
 			FREEUP (cConf->shareRes[i].resourceName);
 			for ( unsigned int j = 0; j < cConf->shareRes[i].nInstances; j++)
@@ -2585,14 +2642,14 @@ int doResourceMap (FILE * fp, const char *lsfile, size_t *lineNum)
 					freeSA_ (array.hosts, array.size);
 				}
 
-				if (liblsf_addResourceMap (keyList[RESOURCENAME].val, keyList[LOCATION].val, lsfile, *lineNum) < 0)
+				if ( addResourceMap (keyList[RESOURCENAME].val, keyList[LOCATION].val, lsfile, *lineNum) < 0)
 				{
 					/* catgets 5200 */
-					ls_syslog (LOG_ERR, I18N (5200, "%s: %s(%d): liblsf_addResourceMap() failed for resource <%s>; ignoring line"), __func__, lsfile, *lineNum, keyList[RESOURCENAME].val);
+					ls_syslog (LOG_ERR, I18N (5200, "%s: %s(%d): addResourceMap() failed for resource <%s>; ignoring line"), __func__, lsfile, *lineNum, keyList[RESOURCENAME].val);
 					freeKeyList (keyList);
 					continue;
-				}
-
+				
+}
 				lsinfo.resTable[resNo]->flags &= ~RESF_GLOBAL;
 				lsinfo.resTable[resNo]->flags |= RESF_SHARED;
 				resNo = 0;
@@ -2617,7 +2674,7 @@ int doResourceMap (FILE * fp, const char *lsfile, size_t *lineNum)
 }
 
 
-int liblsf_addResourceMap ( const char *resName, const char *location, const char *lsfile, const size_t lineNum)
+int addResourceMap ( const char *resName, const char *location, const char *lsfile, const size_t lineNum)
 {
 	// int j                                = 0;
 	int i                                 = 0;
@@ -2633,7 +2690,7 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 	char **hosts                          = NULL;
 	struct lsSharedResourceInfo *resource = NULL;
 
-	// const char liblsf_addResourceMap[] = "liblsf_addResourceMap";
+	// const char addResourceMap[] = "addResourceMap";
 	memset( initValue, '\0', MAXFILENAMELEN );
 
 	if (resName == NULL || location == NULL) {
@@ -2653,10 +2710,10 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 		memset( initValue, '\0', MAXFILENAMELEN );
 		tempHost = (char *) externalResourceFlag; // FIXME FIXME FIXME is this cast justified?
 		hosts = &tempHost;
-		if ((resource = liblsf_addResource (resName, 1, hosts, initValue, lsfile, lineNum)) == NULL)
+		if ((resource = addResource (resName, 1, hosts, initValue, lsfile, lineNum)) == NULL)
 		{
 			/* catgets 5209 */
-			ls_syslog (LOG_ERR, I18N (5209, "%s: %s(%d): %s() failed; ignoring the instance <%s>"), __func__, lsfile, lineNum, liblsf_addResource, "!");
+			ls_syslog (LOG_ERR, I18N (5209, "%s: %s(%d): %s() failed; ignoring the instance <%s>"), __func__, lsfile, lineNum, addResource, "!");
 			return -1;
 		}
 		return 0;
@@ -2687,7 +2744,7 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 
 	while (sp != NULL && sp[0] != '\0')
 	{
-		for ( unsigned int j = 0; j < (unsigned int) numHosts; j++) { // Cast is ok: by now we have established that numHosts > 0
+		for ( unsigned int j = 0; j < numHosts; j++) { // Cast is ok: by now we have established that numHosts > 0
 			FREEUP (hosts[j]);
 		}
 		FREEUP (hosts);
@@ -2737,7 +2794,6 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 		}
 		if (*sp == '[')
 		{
-			int result = 0;
 			sp++;
 			cp = sp;
 			while (*sp != ']' && *sp != '\0') {
@@ -2761,26 +2817,21 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 			}
 			*sp = '\0';
 			sp++;
-			if ((result = liblsf_parseHostList (cp, lsfile, lineNum, &hosts)) <= 0)
-			{
+			if (!(numHosts = parseHostList (cp, lsfile, lineNum, &hosts))) {
 				const char *parseHostList = "parseHostList";
 				/* catgets 5208 */
 				ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5208, "%s: %s(%d): %s(%s) failed; ignoring the instance <%s%s>")), __func__, lsfile, lineNum, parseHostList, cp, sp, "]");
 				continue;
 			}
-			else {
-				numHosts = (unsigned int) result;
-			}
 
-			if (resource == NULL)
-			{
-				if ((resource = liblsf_addResource (resName, numHosts, hosts, initValue, lsfile, lineNum)) == NULL)
+			if (resource == NULL) {
+				if ((resource = addResource (resName, numHosts, hosts, initValue, lsfile, lineNum)) == NULL)
 					/* catgets 5209 */
-					ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5209, "%s: %s(%d): %s() failed; ignoring the instance <%s>")), __func__, lsfile, lineNum, liblsf_addResource, sp);
+					ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5209, "%s: %s(%d): %s() failed; ignoring the instance <%s>")), __func__, lsfile, lineNum, addResource, sp);
 			}
-			else
-			{
-				if (liblsf_addHostInstance (resource, numHosts, hosts, initValue) < 0)
+			else {
+				// if (liblsf_addHostInstance (resource, numHosts, hosts, initValue) < 0)
+				if ( addHostInstance (resource, numHosts, hosts, initValue) < 0)
 					/* catgets 5210 */
 					ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5210, "%s: %s(%d): %s() failed; ignoring the instance <%s>")), __func__, lsfile, lineNum, __func__, sp);
 			}
@@ -2802,73 +2853,19 @@ int liblsf_addResourceMap ( const char *resName, const char *location, const cha
 	for ( unsigned int j = 0; j < numHosts; j++) {
 		FREEUP (hosts[j]);
 	}
-	FREEUP (hosts);
-	return 0;
 
+	FREEUP (hosts);
+
+	return 0;
 }
 
 //     limd equiv:       int liblsf_addResourceMap ( const char *resName, const char *location, const char *lsfile, size_t lineNum)
 // lsf/lib/liblsf/conf.c:int addResourceMap        ( const char *resName, const char *location, const char *lsfile, size_t lineNum, int *isDefault)
 // 		used to be here. Moved over to lsf/lib/liblsf/addResourceMap.c
 
-unsigned int liblsf_parseHostList (const char *hostList, const char *lsfile, const size_t lineNum, char ***hosts)
+struct lsSharedResourceInfo *addResource ( const char *resName, unsigned long nHosts, char **hosts, char *value, const char *filename, size_t lineNum)
 {
-	char *host       = NULL;
-	char *sp         = NULL;
-	char **hostTable = NULL;
-	unsigned int  numHosts = 0;
-
-	assert( lsfile );  // FIXME all three assertions got to go
-	assert( lineNum ); // investigate if a file and a line number
-	                   // are indeed passed over
-
-	if ( NULL == hostList ) {
-		return -1;
-	}
-
-	sp = strdup( hostList ); // FIXME FIXME FIXME FIXME make sure that the cast is correct, investigate memory
-	while ( NULL != (host = getNextWord_ (&sp)) ) {
-		numHosts++;
-	}
-
-	assert( numHosts );
-	hostTable = malloc( numHosts * sizeof (char *));
-	if( NULL == hostTable && ENOMEM == errno) {
-		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
-		return -1;
-	}
-
-	sp = strdup( hostList ); // FIXME FIXME FIXME FIXME make sure that the cast is correct, investigate memory
-	numHosts = 0;
-	while ((host = getNextWord_ (&sp)) != NULL) {
-
-		if ( NULL == (hostTable[numHosts] = putstr_ (host)) ) {
-
-			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
-			for ( unsigned int i = 0; i < numHosts; i++) {
-				FREEUP (hostTable[i]);
-			}
-
-			FREEUP (hostTable);
-
-			return -1;
-		}
-		numHosts++;
-	}
-	if ( 0 == numHosts ) {
-		FREEUP (hostTable);
-		return -1;
-	}
-
-	*hosts = hostTable;
-
-	return numHosts;
-}
-
-
-struct lsSharedResourceInfo *liblsf_addResource ( const char *resName, unsigned long nHosts, char **hosts, char *value, const char *filename, size_t lineNum)
-{
-	int nRes = 0;
+	unsigned int nRes = 0;
 	struct lsSharedResourceInfo *resInfo = NULL;
 
 	assert( filename ); // FIXME FIXME FIXME these asserts got to go
@@ -2878,7 +2875,7 @@ struct lsSharedResourceInfo *liblsf_addResource ( const char *resName, unsigned 
 		return NULL;
 	}
 
-	assert( cConf->numShareRes >= 0 ); // FIXME is numShareRes always >= 0 ? // FIXME FIXME FIXME FIXME where is cConf from and what doe sit do?
+	assert( cConf->numShareRes ); // struct clusterConf *cConf global
 	resInfo = myrealloc( cConf->shareRes, sizeof (struct lsSharedResourceInfo) *( cConf->numShareRes + 1 ));
 	if (NULL == resInfo && ENOMEM == errno ) {
 		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "myrealloc");
@@ -2895,7 +2892,7 @@ struct lsSharedResourceInfo *liblsf_addResource ( const char *resName, unsigned 
 
 	resInfo[nRes].nInstances = 0;
 	resInfo[nRes].instances = NULL;
-	if (liblsf_addHostInstance (resInfo + nRes, nHosts, hosts, value) < 0) {
+	if ( addHostInstance (resInfo + nRes, nHosts, hosts, value) < 0) {
 		free (resInfo[nRes].resourceName);
 		return NULL;
 	}
@@ -2906,21 +2903,24 @@ struct lsSharedResourceInfo *liblsf_addResource ( const char *resName, unsigned 
 }
 
 
-int liblsf_addHostInstance (struct lsSharedResourceInfo *sharedResource, unsigned int nHosts, char **hostNames, char *value)
+// int liblsf_addHostInstance (struct lsSharedResourceInfo *sharedResource, unsigned int nHosts, char **hostNames, char *value)
+int addHostInstance( struct lsSharedResourceInfo *sharedResource, unsigned long nHosts, char **hostNames, const char *value)
 {
-	int inst = 0;
+	unsigned int inst = 0;
 	struct lsSharedResourceInstance *instance = NULL;
 	
 	if (nHosts <= 0 || hostNames == NULL) {
-		return -1;
+		lserrno = ENOHOSTADDED; // FIXME change lserrno to lsferrno
+		return 0;
 	}
 	
-	assert( sharedResource->nInstances >= 0 ); // FIXME has to go.
+	assert( sharedResource->nInstances ); // FIXME has to go.
 	instance = myrealloc (sharedResource->instances, sizeof (struct lsSharedResourceInstance) * ( sharedResource->nInstances + 1));
 	
 	if (NULL == instance ) {
 		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "myrealloc" );
-		return -1;
+		lserrno = ENOHOSTADDED; // FIXME change lserrno to lsferrno
+		return 0;
 	}
 	
 	sharedResource->instances = instance;
@@ -2928,11 +2928,12 @@ int liblsf_addHostInstance (struct lsSharedResourceInfo *sharedResource, unsigne
 	
 	if ((instance[inst].value = putstr_ (value)) == NULL) {
 		char putstr_[] = "putstr_";
+		lserrno = ENOHOSTADDED; // FIXME change lserrno to lsferrno
 		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, putstr_);
-		return -1;
+		return 0;
 	}
 	
-	assert( nHosts >= 0 );  // FIXME has to go ^_^
+	assert( nHosts );
 	instance[inst].nHosts = nHosts;
 	instance[inst].hostList = malloc (sizeof (char *) * nHosts);
 	if( NULL == instance[inst].hostList && ENOMEM == errno ) {
@@ -2969,7 +2970,8 @@ int convertNegNotation_ (char **value, struct HostsArray *array)
 	char *ptr      = NULL;
 	char *save     = NULL;
 	char *outHosts = NULL;
-	char *buffer   = strdup (value[0]); // FIXME FIXME FIXME find out what value[0] is, create a union and mark the array subscript appropriatelly
+	unsigned int LOCATION = 0;
+	char *buffer   = strdup (value[ LOCATION ]);
 	char *sp1      = strstr (buffer, "all ");
 	char *sp2      = sp1;
 	
@@ -2983,8 +2985,7 @@ int convertNegNotation_ (char **value, struct HostsArray *array)
 		return result;
 	}
 	
-	for (cnt = 0; (sp2 > buffer) && sp2[0] != '['; cnt++) // FIXME FIXME FIXME find out what sp2[0] is, create a union and mark the array subscript appropriatelly
-	{
+	for (cnt = 0; (sp2 > buffer) && sp2[ LOCATION ] != '['; cnt++) {
 		sp2--;
 	}
 	
@@ -3001,7 +3002,7 @@ int convertNegNotation_ (char **value, struct HostsArray *array)
 	}
 	
 	sp1 = sp2;
-	while (sp2 && sp2[0] != ']') {
+	while (sp2 && sp2[LOCATION] != ']') {
 		sp2++;
 	}
 	
@@ -3013,7 +3014,7 @@ int convertNegNotation_ (char **value, struct HostsArray *array)
 		return result;
 	}
 
-	ls_syslog (LOG_DEBUG, "%s: the original string is \'%s\'", __func__, value[0]);  // FIXME FIXME FIXME FIXME wrap this around debug conditional
+	ls_syslog (LOG_DEBUG, "%s: the original string is \'%s\'", __func__, value[LOCATION]);  // FIXME FIXME FIXME FIXME wrap this around debug conditional
 	
 	ptr = sp1;
 	save = getNextValueQ_ (&sp1, '[', ']');
@@ -3082,7 +3083,7 @@ int resolveBaseNegHosts ( const char *inHosts, char **outHosts, struct HostsArra
 {
 	unsigned int in_num     = 0;
 	unsigned int neg_num    = 0;
-	unsigned int size       = 0;
+	size_t size             = 0;
 	unsigned int counter    = 0;
 	char *buffer            = strdup (inHosts);
 	char *save              = buffer;
