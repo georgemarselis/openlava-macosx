@@ -144,13 +144,13 @@ parseResReq (char *resReq, struct resVal *resVal, struct lsInfo *lsInfo, int opt
 
 	initResVal (resVal);
 
-	req_len = MAX (3 * strlen (resReq) + 1, MAXLINELEN + MAXLSFNAMELEN);
+	req_len = MAX (3 * strlen (resReq) + 1, MAXLINELEN + MAX_LSF_NAME_LEN);
 	if (resVal->selectStr == NULL || resVal->selectStrSize < req_len ) {   
 		FREEUP(resVal->selectStr);                             
 		resVal->selectStr = malloc( req_len * sizeof( char ) + 1 );                   
 		resVal->selectStrSize = req_len;                       
 	}                                               
-	// ALLOC_STRING (resVal->selectStr, resVal->selectStrSize, MAX (3 * strlen (resReq) + 1, MAXLINELEN + MAXLSFNAMELEN));
+	// ALLOC_STRING (resVal->selectStr, resVal->selectStrSize, MAX (3 * strlen (resReq) + 1, MAXLINELEN + MAX_LSF_NAME_LEN));
 	// 	#	fadefine ALLOC_STRING(buffer, buffer_len, req_len) {     
 	// }
 
@@ -370,7 +370,7 @@ parseSelect (char *resReq, struct resVal *resVal, struct lsInfo *lsInfo, bool_t 
 			for ( unsigned int i = 0; i < numXorExprs; i++) {
 				initResVal (&tmpResVal);
 
-				ALLOC_STRING (tmpResVal.selectStr, tmpResVal.selectStrSize, MAX (3 * strlen (expr) + 1, MAXLINELEN + MAXLSFNAMELEN));
+				ALLOC_STRING (tmpResVal.selectStr, tmpResVal.selectStrSize, MAX (3 * strlen (expr) + 1, MAXLINELEN + MAX_LSF_NAME_LEN));
 
 				if (tmpResVal.selectStr == NULL ) {
 					FREEUP (resReq2);
@@ -805,9 +805,9 @@ resToClassNew (char *resReq, struct resVal *resVal, struct lsInfo *lsInfo)
 	size_t t   = 0;
 	size_t s   = 0;
 	size_t len = 0;
-	char res[MAXLSFNAMELEN]; 			// FIXME FIXME FIXME FIXME turn dynamic
-	char val[MAXLSFNAMELEN];			// FIXME FIXME FIXME FIXME turn dynamic
-	char tmpbuf[MAXLSFNAMELEN * 2]; 	// FIXME FIXME FIXME FIXME turn dynamic
+	char res[MAX_LSF_NAME_LEN]; 			// FIXME FIXME FIXME FIXME turn dynamic
+	char val[MAX_LSF_NAME_LEN];			// FIXME FIXME FIXME FIXME turn dynamic
+	char tmpbuf[MAX_LSF_NAME_LEN * 2]; 	// FIXME FIXME FIXME FIXME turn dynamic
 	char *sp = NULL;
 	char *op = NULL;
 
@@ -819,7 +819,7 @@ resToClassNew (char *resReq, struct resVal *resVal, struct lsInfo *lsInfo)
 	t = strlen (sp);
 
 	while (s < len) {
-		if (t >= (resVal->selectStrSize - MAXLSFNAMELEN)) {
+		if (t >= (resVal->selectStrSize - MAX_LSF_NAME_LEN)) {
 			return PARSE_BAD_EXP;
 		}
 
@@ -950,10 +950,10 @@ resToClassNew (char *resReq, struct resVal *resVal, struct lsInfo *lsInfo)
 							val[i++] = resReq[s++];
 					}
 					else {
-						while (resReq[s] && resReq[s] != '\'' && i < MAXLSFNAMELEN) {
+						while (resReq[s] && resReq[s] != '\'' && i < MAX_LSF_NAME_LEN) {
 							val[i++] = resReq[s++];
 						}
-						if (i - 1 == MAXLSFNAMELEN) {
+						if (i - 1 == MAX_LSF_NAME_LEN) {
 							return PARSE_BAD_VAL;
 						}
 						if (resReq[s] == '\'') {
@@ -1033,7 +1033,7 @@ int resToClassOld (char *resReq, struct resVal *resVal, struct lsInfo *lsInfo)
 	{
 		negate = FALSE;
 
-		if (t >= (resVal->selectStrSize - MAXLSFNAMELEN)) {
+		if (t >= (resVal->selectStrSize - MAX_LSF_NAME_LEN)) {
 			return PARSE_BAD_EXP;
 		}
 

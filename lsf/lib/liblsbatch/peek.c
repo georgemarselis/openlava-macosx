@@ -84,7 +84,7 @@ lsb_peekjob (LS_LONG_INT jobid)
   lsberrno = hdr.opCode;
   if (lsberrno == LSBE_NO_ERROR)
     {
-      char fnBuf[MAXPATHLEN];
+      char fnBuf[MAX_PATH_LEN];
       struct passwd *pw;
       LS_STAT_T st;
       assert ( XDR_DECODE_SIZE_ (cc) >= 0 );

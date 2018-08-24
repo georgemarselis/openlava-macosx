@@ -46,7 +46,7 @@ setLockOwnerPid (void)
 #define EVENT_LOCK_FILE  "#lsb.event.lock"
 
 extern int msleeptime;
-static char lockfile[MAXFILENAMELEN]; // FIXME FIXME FIXME FIXME dynamic allocation
+static char lockfile[MAX_FILENAME_LEN]; // FIXME FIXME FIXME FIXME dynamic allocation
 static char gotLock = FALSE;
 
 void

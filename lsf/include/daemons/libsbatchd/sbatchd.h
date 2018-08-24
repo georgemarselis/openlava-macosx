@@ -161,8 +161,8 @@ struct jobSetup
   int execGid;
   int execUid;
   char execUsername[MAX_LSB_NAME_LEN];
-  char execHome[MAXFILENAMELEN];
-  char execCwd[MAXFILENAMELEN];
+  char execHome[MAX_FILENAME_LEN];
+  char execCwd[MAX_FILENAME_LEN];
   int execJobFlag;
 
 #define LSB_PRE_ABORT 99
@@ -254,7 +254,7 @@ int rusageUpdateRate = DEF_RUSAGE_UPDATE_RATE;
 int rusageUpdatePercent = DEF_RUSAGE_UPDATE_PERCENT;
 
 int jobTerminateInterval = DEF_JTERMINATE_INTERVAL;
-char psbdJobSpoolDir[MAXPATHLEN];
+char psbdJobSpoolDir[MAX_PATH_LEN];
 
 time_t now;
 int connTimeout;

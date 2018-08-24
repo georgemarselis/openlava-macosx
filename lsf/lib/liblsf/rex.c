@@ -38,7 +38,7 @@ ls_rexecve (char *host, char **argv, int options, char **envp)
   long max;
   char sock_buf[20];
   char *new_argv[5];
-  char pathbuf[MAXPATHLEN];
+  char pathbuf[MAX_PATH_LEN];
   int s;
   int descriptor[2];
   struct resCmdBill cmdmsg;

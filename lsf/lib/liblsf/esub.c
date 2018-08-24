@@ -41,7 +41,7 @@ static int getEData (struct lenData *, char **, const char *);
 int
 runEsub_ (struct lenData *ed, char *path)
 {
-	char esub[MAXPATHLEN];
+	char esub[MAX_PATH_LEN];
 	char *myargv[6];
 	struct stat sbuf;
 
@@ -87,7 +87,7 @@ runEsub_ (struct lenData *ed, char *path)
 int
 runEClient_ (struct lenData *ed, char **argv)
 {
-  char lsfUserName[MAXLSFNAMELEN];
+  char lsfUserName[MAX_LSF_NAME_LEN];
 
 	if (getLSFUser_ (lsfUserName, sizeof (lsfUserName)) < 0) {
 		return -1;
@@ -257,7 +257,7 @@ runEexec_ (char *option, int job, struct lenData *eexec, char *path)
 	int isRenew         = FALSE;
 	ssize_t cc          = 0;
 	pid_t   pid         = -1;
-	char    eexecPath[MAXFILENAMELEN];
+	char    eexecPath[MAX_FILENAME_LEN];
 	char    *myargv[3];
 	struct  stat sbuf;
 
@@ -393,8 +393,8 @@ char *
 runEGroup_ (char *type, char *gname)
 {
 	struct lenData ed;
-	char lsfUserName[MAXLSFNAMELEN];
-	char egroupPath[MAXFILENAMELEN];
+	char lsfUserName[MAX_LSF_NAME_LEN];
+	char egroupPath[MAX_FILENAME_LEN];
 	char *argv[4] = { NULL, NULL, NULL, NULL };
 	char *managerIdStr = NULL;
 	uid_t uid = -1;

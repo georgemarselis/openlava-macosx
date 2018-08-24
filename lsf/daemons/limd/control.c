@@ -653,8 +653,8 @@ void
 limDebugReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr)
 {
 	char *buf         = malloc( sizeof( char ) * MAXHOSTNAMELEN + 1 );// FIXME FIXME FIXME ; MAXHOSTNAMELEN? why?
-	char *logFileName = malloc( sizeof( char ) * MAXLSFNAMELEN + 1 ); // FIXME FIXME FIXME ; MAXLSFNAMELEN? why?
-	char *lsfLogDir   = malloc( sizeof( char ) * MAXPATHLEN + 1 );    // FIXME FIXME FIXME ; MAXPATHLEN? why? configurable from os limits
+	char *logFileName = malloc( sizeof( char ) * MAX_LSF_NAME_LEN + 1 ); // FIXME FIXME FIXME ; MAX_LSF_NAME_LEN? why?
+	char *lsfLogDir   = malloc( sizeof( char ) * MAX_PATH_LEN + 1 );    // FIXME FIXME FIXME ; MAX_PATH_LEN? why? configurable from os limits
 	char *dir         = NULL;
 	enum limReplyCode limReplyCode;
 	struct debugReq debugReq = { };

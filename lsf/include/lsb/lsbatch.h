@@ -21,245 +21,307 @@
 #include "lsf.h"
 #include "lsb/misc.h"
 
-#define _PATH_NULL      "/dev/null"
+static const char _PATH_NULL[ ] = "/dev/null";
+static const char DEFAULT_MSG_DESC[ ] = "no description";
 
-#define MAX_VERSION_LEN     12
-#define MAX_HPART_USERS     100
-#define MAX_GROUPS          150
-#define MAX_CHARLEN         20
-#define MAX_LSB_NAME_LEN    60
-#define MAX_CMD_DESC_LEN    256
-#define MAX_USER_EQUIVALENT 128
-
-#define DEFAULT_MSG_DESC    "no description"
-
-#define MAX_NRLIMITS      512
-#define MAXQUEUENAMELEN   512
-#define MAXJOBDESPLEN     1024
-#define MAXVERSIONLEN     128 
-
-
-#define HOST_STAT_OK         0x0
-#define HOST_STAT_BUSY       0x01
-#define HOST_STAT_WIND       0x02
-#define HOST_STAT_DISABLED   0x04
-#define HOST_STAT_LOCKED     0x08
-#define HOST_STAT_FULL       0x10
-#define HOST_STAT_UNREACH    0x20
-#define HOST_STAT_UNAVAIL    0x40
-#define HOST_STAT_NO_LIM     0x80
-#define HOST_STAT_EXCLUSIVE  0x100
-#define HOST_STAT_LOCKED_MASTER 0x200
-
-#define LSB_HOST_OK(status)      (status == HOST_STAT_OK)
-
-#define LSB_HOST_BUSY(status)    ((status & HOST_STAT_BUSY) != 0)
-
-#define LSB_HOST_CLOSED(status)  ((status & (HOST_STAT_WIND | HOST_STAT_DISABLED | HOST_STAT_LOCKED | HOST_STAT_LOCKED_MASTER | HOST_STAT_FULL | HOST_STAT_NO_LIM)) != 0)
-
-#define LSB_HOST_FULL(status)    ((status & HOST_STAT_FULL) != 0)
-
-#define LSB_HOST_UNREACH(status) ((status & HOST_STAT_UNREACH) != 0)
-
-#define LSB_HOST_UNAVAIL(status) ((status & HOST_STAT_UNAVAIL) != 0)
-
-#define HOST_BUSY_NOT          0x000
-#define HOST_BUSY_R15S         0x001
-#define HOST_BUSY_R1M          0x002
-#define HOST_BUSY_R15M         0x004
-#define HOST_BUSY_UT           0x008
-#define HOST_BUSY_PG           0x010
-#define HOST_BUSY_IO           0x020
-#define HOST_BUSY_LS           0x040
-#define HOST_BUSY_IT           0x080
-#define HOST_BUSY_TMP          0x100
-#define HOST_BUSY_SWP          0x200
-#define HOST_BUSY_MEM          0x400
-
-#define LSB_ISBUSYON(status, index)  \
-(((status[(index)/INTEGER_BITS]) & (1 << (index)%INTEGER_BITS)) != 0)
-
-#define QUEUE_STAT_OPEN         0x01
-#define QUEUE_STAT_ACTIVE       0x02
-#define QUEUE_STAT_RUN          0x04
-#define QUEUE_STAT_NOPERM       0x08
-#define QUEUE_STAT_DISC         0x10
-#define QUEUE_STAT_RUNWIN_CLOSE 0x20
-
-#define QUEUE_ATTRIB_EXCLUSIVE        0x01
-#define QUEUE_ATTRIB_DEFAULT          0x02
-#define QUEUE_ATTRIB_ROUND_ROBIN      0x04
-#define QUEUE_ATTRIB_BACKFILL         0x80
-#define QUEUE_ATTRIB_HOST_PREFER      0x100
-#define QUEUE_ATTRIB_NO_INTERACTIVE   0x800
-#define QUEUE_ATTRIB_ONLY_INTERACTIVE 0x1000
-#define QUEUE_ATTRIB_NO_HOST_TYPE     0x2000
-#define QUEUE_ATTRIB_IGNORE_DEADLINE  0x4000
-#define QUEUE_ATTRIB_CHKPNT           0x8000
-#define QUEUE_ATTRIB_RERUNNABLE       0x10000
-#define QUEUE_ATTRIB_ENQUE_INTERACTIVE_AHEAD 0x80000
-
-#define MASTER_NULL           200
-#define MASTER_RESIGN         201
-#define MASTER_RECONFIG       202
-#define MASTER_FATAL          203
-#define MASTER_MEM            204
-#define MASTER_CONF           205
-
-#define JOB_STAT_NULL         0x00
-#define JOB_STAT_PEND         0x01
-#define JOB_STAT_PSUSP        0x02
-#define JOB_STAT_RUN          0x04
-#define JOB_STAT_SSUSP        0x08
-#define JOB_STAT_USUSP        0x10
-#define JOB_STAT_EXIT         0x20
-#define JOB_STAT_DONE         0x40
-#define JOB_STAT_PDONE        0x80
-#define JOB_STAT_PERR         0x100
-#define JOB_STAT_WAIT         0x200
-#define JOB_STAT_UNKWN        0x10000
+enum HOST_STAT {
+	HOST_STAT_OK            = 0x0,
+	HOST_STAT_BUSY          = 0x01,
+	HOST_STAT_WIND          = 0x02,
+	HOST_STAT_DISABLED      = 0x04,
+	HOST_STAT_LOCKED        = 0x08,
+	HOST_STAT_FULL          = 0x10,
+	HOST_STAT_UNREACH       = 0x20,
+	HOST_STAT_UNAVAIL       = 0x40,
+	HOST_STAT_NO_LIM        = 0x80,
+	HOST_STAT_EXCLUSIVE     = 0x100,
+	HOST_STAT_LOCKED_MASTER = 0x200
+} HOST_STAT;
 
 
-// EVENT_JOB_*
-#define EVENT_JOB_NEW          1
-#define EVENT_JOB_START        2
-#define EVENT_JOB_STATUS       3
-#define EVENT_JOB_SWITCH       4
-#define EVENT_JOB_MOVE         5
-#define EVENT_JOB_FINISH       10
-#define EVENT_JOB_MODIFY       16
-#define EVENT_JOB_SIGNAL       17
-#define EVENT_JOB_EXECUTE      18
-#define EVENT_JOB_MSG          19
-#define EVENT_JOB_MSG_ACK      20
-#define EVENT_JOB_REQUEUE      21
-#define EVENT_JOB_SIGACT       22
-#define EVENT_JOB_START_ACCEPT 24
-#define EVENT_JOB_CLEAN        25
-#define EVENT_JOB_FORCE        26
-#define EVENT_JOB_MODIFY2      28
-#define EVENT_JOB_ATTR_SET     29
+enum HOST_BUSY {
+	HOST_BUSY_NOT  = 0x000,
+	HOST_BUSY_R15S = 0x001,
+	HOST_BUSY_R1M  = 0x002,
+	HOST_BUSY_R15M = 0x004,
+	HOST_BUSY_UT   = 0x008,
+	HOST_BUSY_PG   = 0x010,
+	HOST_BUSY_IO   = 0x020,
+	HOST_BUSY_LS   = 0x040,
+	HOST_BUSY_IT   = 0x080,
+	HOST_BUSY_TMP  = 0x100,
+	HOST_BUSY_SWP  = 0x200,
+	HOST_BUSY_MEM  = 0x400,
+} HOST_BUSY;
 
-#define EVENT_QUEUE_CTRL       6
+enum QUEUE_STAT {
+	QUEUE_STAT_OPEN         = 0x01,
+	QUEUE_STAT_ACTIVE       = 0x02,
+	QUEUE_STAT_RUN          = 0x04,
+	QUEUE_STAT_NOPERM       = 0x08,
+	QUEUE_STAT_DISC         = 0x10,
+	QUEUE_STAT_RUNWIN_CLOSE = 0x20
+} QUEUE_STAT;
 
-#define EVENT_MBD_START        15
-#define EVENT_MBD_DIE          8
-#define EVENT_MBD_UNFULFILL    9
+enum QUEUE_ATTRIB {
+	QUEUE_ATTRIB_EXCLUSIVE               = 0x01,
+	QUEUE_ATTRIB_DEFAULT                 = 0x02,
+	QUEUE_ATTRIB_ROUND_ROBIN             = 0x04,
+	QUEUE_ATTRIB_BACKFILL                = 0x80,
+	QUEUE_ATTRIB_HOST_PREFER             = 0x100,
+	QUEUE_ATTRIB_NO_INTERACTIVE          = 0x800,
+	QUEUE_ATTRIB_ONLY_INTERACTIVE        = 0x1000,
+	QUEUE_ATTRIB_NO_HOST_TYPE            = 0x2000,
+	QUEUE_ATTRIB_IGNORE_DEADLINE         = 0x4000,
+	QUEUE_ATTRIB_CHKPNT                  = 0x8000,
+	QUEUE_ATTRIB_RERUNNABLE              = 0x10000,
+	QUEUE_ATTRIB_ENQUE_INTERACTIVE_AHEAD = 0x80000,
+} QUEUE_ATTRIB;
 
-#define EVENT_HOST_CTRL        7
-
-#define EVENT_LOAD_INDEX       11
-
-#define EVENT_CHKPNT           12
-
-#define EVENT_MIG              13
-
-#define EVENT_PRE_EXEC_START   14
-
-#define EVENT_SBD_JOB_STATUS   23
-
-#define EVENT_LOG_SWITCH       27
-
-#define EVENT_UNUSED_30        30
-#define EVENT_UNUSED_31        31
-#define EVENT_UNUSED_32        32
-
-
-enum pendingCatgets {
-	PEND_JOB_REASON = 0, 	//
-	PEND_JOB_NEW,   		// from lsbatch.h
-	PEND_JOB_START_TIME,
-	PEND_JOB_DEPEND,
-	PEND_JOB_DEP_INVALID,
-	PEND_JOB_MIG,
-	PEND_JOB_PRE_EXEC,
-	PEND_JOB_NO_FILE,
-	PEND_JOB_ENV,
-	PEND_JOB_PATHS,
-	PEND_JOB_OPEN_FILES,
-	PEND_JOB_EXEC_INIT,
-	PEND_JOB_RESTART_FILE,
-	PEND_JOB_DELAY_SCHED,
-	PEND_JOB_SWITCH,
-	PEND_JOB_DEP_REJECT,
-	PEND_JOB_NO_PASSWD,
-	PEND_JOB_UKNOWN_567,
-	PEND_JOB_MODIFY,
-	PEND_JOB_REQUEUED,
-	PEND_JOB_ARRAY_JLIMIT,
-	PEND_CHKPNT_DIR,
-	PEND_SYS_UNABLE,
-	PEND_QUEUE_INACT,
-	PEND_QUEUE_WINDOW,
-	PEND_QUEUE_JOB_LIMIT,
-	PEND_QUEUE_PJOB_LIMIT,
-	PEND_QUEUE_USR_JLIMIT,
-	PEND_QUEUE_USR_PJLIMIT,
-	PEND_QUEUE_PRE_FAIL,
-	PEND_SYS_NOT_READY,
-	PEND_SBD_JOB_REQUEUE,
-	PEND_JOB_SPREAD_TASK,
-	PEND_QUEUE_SPREAD_TASK,
-	PEND_QUEUE_WINDOW_WILL_CLOSE,
-	PEND_USER_JOB_LIMIT,
-	PEND_UGRP_JOB_LIMIT,
-	PEND_USER_PJOB_LIMIT,
-	PEND_UGRP_PJOB_LIMIT,
-	PEND_USER_RESUME,
-	PEND_USER_STOP,
-	PEND_ADMIN_STOP,
-	PEND_NO_MAPPING,
-	PEND_RMT_PERMISSION,
-	PEND_HOST_RES_REQ,
-	PEND_HOST_NONEXCLUSIVE,
-	PEND_HOST_JOB_SSUSP,
-	PEND_SBD_GETPID,
-	PEND_SBD_LOCK,
-	PEND_SBD_ZOMBIE,
-	PEND_SBD_ROOT,
-	PEND_HOST_WIN_WILL_CLOSE,
-	PEND_HOST_MISS_DEADLINE,
-	PEND_HOST_DISABLED,
-	PEND_HOST_LOCKED,
-	PEND_HOST_LESS_SLOTS,
-	PEND_HOST_WINDOW,
-	PEND_HOST_JOB_LIMIT,
-	PEND_QUEUE_PROC_JLIMIT,
-	PEND_QUEUE_HOST_JLIMIT,
-	PEND_USER_PROC_JLIMIT,
-	PEND_UGRP_PROC_JLIMIT,
-	PEND_HOST_USR_JLIMIT,
-	PEND_HOST_QUEUE_MEMB,
-	PEND_HOST_USR_SPEC,
-	PEND_HOST_NO_USER,
-	PEND_HOST_ACCPT_ONE,
-	PEND_LOAD_UNAVAIL,
-	PEND_HOST_NO_LIM,
-	PEND_HOST_QUEUE_RESREQ,
-	PEND_HOST_SCHED_TYPE,
-	PEND_JOB_NO_SPAN,
-	PEND_QUEUE_NO_SPAN,
-	PEND_HOST_EXCLUSIVE,
-	PEND_HOST_QUEUE_RUSAGE,
-	PEND_HOST_JOB_RUSAGE,
-	PEND_SBD_UNREACH,
-	PEND_SBD_JOB_QUOTA,
-	PEND_JOB_START_FAIL, 
-	PEND_JOB_START_UNKNWN,
-	PEND_SBD_NO_MEM,
-	PEND_SBD_NO_PROCESS,
-	PEND_SBD_SOCKETPAIR,
-	PEND_SBD_JOB_ACCEPT,
-	PEND_HOST_LOAD,
-	PEND_UKNOWN_656,
-	PEND_QUEUE_PROCLIMIT,
-	PEND_HOST_LOCKED_MASTER,
-	PEND_BAD_HOST,
-	PEND_QUEUE_HOST,
-	PEND_FIRST_HOST_INELIGIBLE
+enum MASTER {
+	MASTER_NULL     = 200,
+	MASTER_RESIGN   = 201,
+	MASTER_RECONFIG = 202,
+	MASTER_FATAL    = 203,
+	MASTER_MEM      = 204,
+	MASTER_CONF     = 205,
 };
 
-int pendMsg_ID[] = { 
+enum JOB_STAT {
+	JOB_STAT_NULL  = 0x00,
+	JOB_STAT_PEND  = 0x01,
+	JOB_STAT_PSUSP = 0x02,
+	JOB_STAT_RUN   = 0x04,
+	JOB_STAT_SSUSP = 0x08,
+	JOB_STAT_USUSP = 0x10,
+	JOB_STAT_EXIT  = 0x20,
+	JOB_STAT_DONE  = 0x40,
+	JOB_STAT_PDONE = 0x80,
+	JOB_STAT_PERR  = 0x100,
+	JOB_STAT_WAIT  = 0x200,
+	JOB_STAT_UNKWN = 0x10000,
+};
+
+enum EVENTS {
+	EVENT_JOB_NEW          = 1,
+	EVENT_JOB_START        = 2,
+	EVENT_JOB_STATUS       = 3,
+	EVENT_JOB_SWITCH       = 4,
+	EVENT_JOB_MOVE         = 5,
+	EVENT_JOB_FINISH       = 10,
+	EVENT_JOB_MODIFY       = 16,
+	EVENT_JOB_SIGNAL       = 17,
+	EVENT_JOB_EXECUTE      = 18,
+	EVENT_JOB_MSG          = 19,
+	EVENT_JOB_MSG_ACK      = 20,
+	EVENT_JOB_REQUEUE      = 21,
+	EVENT_JOB_SIGACT       = 22,
+	EVENT_JOB_START_ACCEPT = 24,
+	EVENT_JOB_CLEAN        = 25,
+	EVENT_JOB_FORCE        = 26,
+	EVENT_JOB_MODIFY2      = 28,
+	EVENT_JOB_ATTR_SET     = 29,
+
+	EVENT_QUEUE_CTRL       = 6,
+
+	EVENT_MBD_START        = 15,
+	EVENT_MBD_DIE          = 8,
+	EVENT_MBD_UNFULFILL    = 9,
+
+	EVENT_HOST_CTRL        = 7,
+
+	EVENT_LOAD_INDEX       = 11,
+
+	EVENT_CHKPNT           = 12,
+
+	EVENT_MIG              = 13,
+
+	EVENT_PRE_EXEC_START   = 14,
+
+	EVENT_SBD_JOB_STATUS   = 23,
+
+	EVENT_LOG_SWITCH       = 27,
+
+	EVENT_UNUSED_30        = 30,
+	EVENT_UNUSED_31        = 31,
+	EVENT_UNUSED_32        = 32,
+};
+
+enum PEND {
+	PEND_JOB_NEW                 = 550,
+	PEND_JOB_START_TIME          = 551,
+	PEND_JOB_DEPEND              = 552,
+	PEND_JOB_DEP_INVALID         = 553,
+	PEND_JOB_MIG                 = 554,
+	PEND_JOB_PRE_EXEC            = 555,
+	PEND_JOB_NO_FILE             = 556,
+	PEND_JOB_ENV                 = 557,
+	PEND_JOB_PATHS               = 558,
+	PEND_JOB_OPEN_FILES          = 559,
+
+// 560
+	PEND_JOB_EXEC_INIT           = 560,
+	PEND_JOB_RESTART_FILE        = 561,
+	PEND_JOB_DELAY_SCHED         = 562,
+	PEND_JOB_SWITCH              = 563,
+	PEND_JOB_DEP_REJECT          = 564,
+
+	PEND_JOB_NO_PASSWD           = 566,
+	// FIXME FIXME FIXME FIXME catgets 567 did not originally exist!
+	PEND_JOB_UKNOWN_567          = 567,
+	PEND_JOB_MODIFY              = 568,
+
+// 570
+	PEND_JOB_REQUEUED            = 571,
+
+// 650
+	PEND_JOB_ARRAY_JLIMIT        = 655,
+	PEND_CHKPNT_DIR              = 656,
+
+// 580
+	PEND_SYS_UNABLE              = 583,
+
+	PEND_QUEUE_INACT             = 586,
+	PEND_QUEUE_WINDOW            = 587,
+	PEND_QUEUE_JOB_LIMIT         = 588,
+	PEND_QUEUE_PJOB_LIMIT        = 589,
+
+// 590
+	PEND_QUEUE_USR_JLIMIT        = 590,
+	PEND_QUEUE_USR_PJLIMIT       = 591,
+	PEND_QUEUE_PRE_FAIL          = 592,
+
+	PEND_SYS_NOT_READY           = 596,
+	PEND_SBD_JOB_REQUEUE         = 597,
+	PEND_JOB_SPREAD_TASK         = 598,
+	PEND_QUEUE_SPREAD_TASK       = 599,
+
+// 600
+	PEND_QUEUE_WINDOW_WILL_CLOSE = 600,
+	PEND_USER_JOB_LIMIT          = 601,
+	PEND_UGRP_JOB_LIMIT          = 602,
+	PEND_USER_PJOB_LIMIT         = 603,
+	PEND_UGRP_PJOB_LIMIT         = 604,
+	PEND_USER_RESUME             = 605,
+	PEND_USER_STOP               = 606,
+	PEND_ADMIN_STOP              = 607,
+	PEND_NO_MAPPING              = 608,
+	PEND_RMT_PERMISSION          = 609,
+
+// 610
+	PEND_HOST_RES_REQ            = 610,
+	PEND_HOST_NONEXCLUSIVE       = 611,
+	PEND_HOST_JOB_SSUSP          = 612,
+
+	PEND_SBD_GETPID              = 614,
+	PEND_SBD_LOCK                = 615,
+	PEND_SBD_ZOMBIE              = 616,
+	PEND_SBD_ROOT                = 617,
+	PEND_HOST_WIN_WILL_CLOSE     = 618,
+	PEND_HOST_MISS_DEADLINE      = 619,
+
+// 620
+	PEND_HOST_DISABLED           = 620,
+	PEND_HOST_LOCKED             = 621,
+	PEND_HOST_LESS_SLOTS         = 622,
+	PEND_HOST_WINDOW             = 623,
+	PEND_HOST_JOB_LIMIT          = 624,
+	PEND_QUEUE_PROC_JLIMIT       = 625,
+	PEND_QUEUE_HOST_JLIMIT       = 626,
+	PEND_USER_PROC_JLIMIT        = 627,
+	PEND_UGRP_PROC_JLIMIT        = 628,
+	PEND_HOST_USR_JLIMIT         = 629,
+
+// 630
+	PEND_HOST_QUEUE_MEMB         = 630,
+	PEND_HOST_USR_SPEC           = 631,
+
+	PEND_HOST_NO_USER            = 633,
+	PEND_HOST_ACCPT_ONE          = 634,
+	PEND_LOAD_UNAVAIL            = 635,
+	PEND_HOST_NO_LIM             = 636,
+
+	PEND_HOST_QUEUE_RESREQ       = 638,
+	PEND_HOST_SCHED_TYPE         = 639,
+
+// 640
+	PEND_JOB_NO_SPAN             = 640,
+	PEND_QUEUE_NO_SPAN           = 641,
+	PEND_HOST_EXCLUSIVE          = 642,
+
+	PEND_HOST_QUEUE_RUSAGE       = 644,
+	PEND_HOST_JOB_RUSAGE         = 645,
+	PEND_SBD_UNREACH             = 646,
+	PEND_SBD_JOB_QUOTA           = 647,
+	PEND_JOB_START_FAIL          = 648,
+	PEND_JOB_START_UNKNWN        = 649,
+
+// 650
+	PEND_SBD_NO_MEM              = 650,
+	PEND_SBD_NO_PROCESS          = 651,
+	PEND_SBD_SOCKETPAIR          = 652,
+	PEND_SBD_JOB_ACCEPT          = 653,
+	PEND_HOST_LOAD               = 654,
+
+	// FIXME FIXME FIXME FIXME catgets 656 did not originally exist!
+	PEND_UKNOWN_656              = 656,
+
+// 660
+	PEND_QUEUE_PROCLIMIT         = 662,
+
+	PEND_HOST_LOCKED_MASTER      = 664,
+	PEND_BAD_HOST                = 665,
+	PEND_QUEUE_HOST              = 666,
+	PEND_FIRST_HOST_INELIGIBLE   = 667,
+
+	// PEND_HOST_RES_REQ            = 1001,
+	// PEND_HOST_NONEXCLUSIVE       = 1002,
+	// PEND_HOST_JOB_SSUSP          = 1003,
+	// PEND_HOST_WIN_WILL_CLOSE     = 1009,
+	// PEND_HOST_MISS_DEADLINE      = 1010,
+	// PEND_HOST_DISABLED           = 1301,
+	// PEND_HOST_LOCKED             = 1302,
+	// PEND_HOST_LESS_SLOTS         = 1303,
+	// PEND_HOST_WINDOW             = 1304,
+	// PEND_HOST_JOB_LIMIT          = 1305,
+	// PEND_HOST_USR_JLIMIT         = 1309,
+	// PEND_HOST_QUEUE_MEMB         = 1310,
+	// PEND_HOST_USR_SPEC           = 1311,
+	// PEND_HOST_PART_USER          = 1312,
+	// PEND_HOST_NO_USER            = 1313,
+	// PEND_HOST_ACCPT_ONE          = 1314,
+	// PEND_HOST_NO_LIM             = 1316,
+	// PEND_HOST_QUEUE_RESREQ       = 1318,
+	// PEND_HOST_SCHED_TYPE         = 1319,
+	// PEND_HOST_LOAD               = 2001,
+	// PEND_HOST_QUEUE_RUSAGE       = 2301,
+	// PEND_HOST_JOB_RUSAGE         = 2601,
+	// PEND_HOST_EXCLUSIVE          = 1322,
+	// PEND_HOST_LOCKED_MASTER      = 1327,
+
+	// PEND_SBD_GETPID              = 1005,
+	// PEND_SBD_LOCK                = 1006,
+	// PEND_SBD_ZOMBIE              = 1007,
+	// PEND_SBD_ROOT                = 1008,
+
+	// PEND_SBD_UNREACH             = 1601,
+	// PEND_SBD_JOB_QUOTA           = 1602,
+	// PEND_SBD_NO_MEM              = 1605,
+	// PEND_SBD_NO_PROCESS          = 1606,
+	// PEND_SBD_SOCKETPAIR          = 1607,
+	// PEND_SBD_JOB_ACCEPT          = 1608,
+
+	// PEND_FIRST_HOST_INELIGIBLE   = 1011,
+	// PEND_USER_PROC_JLIMIT        = 1308,
+	// PEND_LOAD_UNAVAIL            = 1315,
+	// PEND_UGRP_PROC_JLIMIT        = 1324,
+
+	// PEND_BAD_HOST                = 1325,
+
+	PEND_MAX_REASONS             = 2900
+};
+
+static const unsigned int pendMsg_ID[ ] = { 
 	550, 551, 552, 553, 554, 555, 556, 557, 558, 559,
 	560, 561, 562, 563, 564,      566, 567, 568,
 	571, 
@@ -281,7 +343,7 @@ struct msgMap
 	const char *message;
 };
 
-struct msgMap pendMsg[] = {
+static struct msgMap pendMsg[] = {
 // sorted by catgets number
 // 		empty lines are meant to draw attention to gaps in numbering
 // 	if discrepancies found during The Dig, they are pointed out.
@@ -422,393 +484,256 @@ struct msgMap pendMsg[] = {
 	{0, "    ", NULL}
 };
 
-
-//
-// PEND_*
-// 
-
-// PEND_JOB_*
-
-// #define PEND_JOB_REASON        0
-// #define PEND_JOB_NEW           1
-// #define PEND_JOB_START_TIME    2
-// #define PEND_JOB_DEPEND        3
-// #define PEND_JOB_DEP_INVALID   4
-// #define PEND_JOB_MIG           5
-// #define PEND_JOB_PRE_EXEC      6
-// #define PEND_JOB_NO_FILE       7
-// #define PEND_JOB_ENV           8
-// #define PEND_JOB_PATHS         9
-// #define PEND_JOB_OPEN_FILES    10
-// #define PEND_JOB_EXEC_INIT     11
-// #define PEND_JOB_RESTART_FILE  12
-// #define PEND_JOB_DELAY_SCHED   13
-// #define PEND_JOB_SWITCH        14
-// #define PEND_JOB_DEP_REJECT    15
-// #define PEND_JOB_NO_PASSWD     17
-// #define PEND_JOB_UKNOWN_567    18 // NOTE: originally undefined
-// #define PEND_JOB_MODIFY        19
-// #define PEND_JOB_REQUEUED      23
-// #define PEND_JOB_ARRAY_JLIMIT  38
-// #define PEND_JOB_SPREAD_TASK   312
-// #define PEND_JOB_NO_SPAN       1320
-// #define PEND_JOB_START_FAIL    1603
-// #define PEND_JOB_START_UNKNWN  1604
-
-
-
-// PEND_CHKPNT_*
-// #define PEND_CHKPNT_DIR        39
-
-
-// PEND_SYS_*
-// #define PEND_SYS_UNABLE        35
-// #define PEND_SYS_NOT_READY     310
-
-
-// PEND_QUEUE
-// #define PEND_QUEUE_INACT             301
-// #define PEND_QUEUE_WINDOW            302
-// #define PEND_QUEUE_JOB_LIMIT         303
-// #define PEND_QUEUE_USR_JLIMIT        304
-// #define PEND_QUEUE_USR_PJLIMIT       305
-// #define PEND_QUEUE_PRE_FAIL          306
-// #define PEND_QUEUE_SPREAD_TASK       313
-// #define PEND_QUEUE_PJOB_LIMIT        314
-// #define PEND_QUEUE_WINDOW_WILL_CLOSE 315
-// #define PEND_QUEUE_PROCLIMIT         316
-// #define PEND_QUEUE_PROC_JLIMIT       1306
-// #define PEND_QUEUE_HOST_JLIMIT       1307
-// #define PEND_QUEUE_NO_SPAN           1321
-// #define PEND_QUEUE_HOST              1326
-
-
-// PEND_WORD_*
-#define PEND_SBD_JOB_REQUEUE       311
-
-
-#define PEND_USER_JOB_LIMIT    601
-#define PEND_USER_PJOB_LIMIT   603
-#define PEND_USER_RESUME       605
-#define PEND_USER_STOP         607
-
-#define PEND_UGRP_JOB_LIMIT    602
-
-#define PEND_UGRP_PJOB_LIMIT   604
-
-
-#define PEND_NO_MAPPING        608
-
-
-#define PEND_RMT_PERMISSION    609
-
-
-#define PEND_ADMIN_STOP        610
-
-
-// PEND_HOST_*
-#define PEND_HOST_RES_REQ        1001
-#define PEND_HOST_NONEXCLUSIVE   1002
-#define PEND_HOST_JOB_SSUSP      1003
-#define PEND_HOST_WIN_WILL_CLOSE 1009
-#define PEND_HOST_MISS_DEADLINE  1010
-#define PEND_HOST_DISABLED       1301
-#define PEND_HOST_LOCKED         1302
-#define PEND_HOST_LESS_SLOTS     1303
-#define PEND_HOST_WINDOW         1304
-#define PEND_HOST_JOB_LIMIT      1305
-#define PEND_HOST_USR_JLIMIT     1309
-#define PEND_HOST_QUEUE_MEMB     1310
-#define PEND_HOST_USR_SPEC       1311
-#define PEND_HOST_PART_USER      1312
-#define PEND_HOST_NO_USER        1313
-#define PEND_HOST_ACCPT_ONE      1314
-#define PEND_HOST_NO_LIM         1316
-#define PEND_HOST_QUEUE_RESREQ   1318
-#define PEND_HOST_SCHED_TYPE     1319
-#define PEND_HOST_LOAD           2001
-#define PEND_HOST_QUEUE_RUSAGE   2301
-#define PEND_HOST_JOB_RUSAGE     2601
-#define PEND_HOST_EXCLUSIVE      1322
-#define PEND_HOST_LOCKED_MASTER  1327
-
-
-#define PEND_SBD_GETPID          1005
-#define PEND_SBD_LOCK            1006
-#define PEND_SBD_ZOMBIE          1007
-#define PEND_SBD_ROOT            1008
-
-#define PEND_SBD_UNREACH         1601
-#define PEND_SBD_JOB_QUOTA       1602
-#define PEND_SBD_NO_MEM          1605
-#define PEND_SBD_NO_PROCESS      1606
-#define PEND_SBD_SOCKETPAIR      1607
-#define PEND_SBD_JOB_ACCEPT      1608
-
-
-#define PEND_FIRST_HOST_INELIGIBLE 1011
-#define PEND_USER_PROC_JLIMIT      1308
-#define PEND_LOAD_UNAVAIL          1315
-#define PEND_UGRP_PROC_JLIMIT      1324
-
-#define PEND_BAD_HOST              1325
-
-
-#define PEND_MAX_REASONS 2900
-
-
 //
 // SUSP_*
 //
+enum SUSP {
+	SUSP_USER_REASON        = 0x00000000,
+	SUSP_USER_RESUME        = 0x00000001,
+	SUSP_USER_STOP          = 0x00000002,
 
-#define SUSP_USER_REASON        0x00000000
-#define SUSP_USER_RESUME        0x00000001
-#define SUSP_USER_STOP          0x00000002
+	SUSP_QUEUE_REASON       = 0x00000004,
+	SUSP_QUEUE_WINDOW       = 0x00000008,
 
-#define SUSP_QUEUE_REASON       0x00000004
-#define SUSP_QUEUE_WINDOW       0x00000008
+	SUSP_HOST_LOCK          = 0x00000020,
+	SUSP_LOAD_REASON        = 0x00000040,
+	SUSP_QUEUE_STOP_COND    = 0x00000200,
+	SUSP_QUEUE_RESUME_COND  = 0x00000400,
+	SUSP_PG_IT              = 0x00000800,
+	SUSP_REASON_RESET       = 0x00001000,
+	SUSP_LOAD_UNAVAIL       = 0x00002000,
+	SUSP_ADMIN_STOP         = 0x00004000,
+	SUSP_RES_RESERVE        = 0x00008000,
+	SUSP_MBD_LOCK           = 0x00010000,
+	SUSP_RES_LIMIT          = 0x00020000,
+	SUB_REASON_RUNLIMIT     = 0x00000001,
+	SUB_REASON_DEADLINE     = 0x00000002,
+	SUB_REASON_PROCESSLIMIT = 0x00000004,
+	SUB_REASON_CPULIMIT     = 0x00000008,
+	SUB_REASON_MEMLIMIT     = 0x00000010,
+	SUSP_SBD_STARTUP        = 0x00040000,
+	SUSP_HOST_LOCK_MASTER   = 0x00080000,
+	EXIT_NORMAL             = 0x00000000,
+	EXIT_RESTART            = 0x00000001,
+	EXIT_ZOMBIE             = 0x00000002,
+	FINISH_PEND             = 0x00000004,
+	EXIT_KILL_ZOMBIE        = 0x00000008,
+	EXIT_ZOMBIE_JOB         = 0x00000010,
+	EXIT_RERUN              = 0x00000020,
+	EXIT_NO_MAPPING         = 0x00000040,
+	EXIT_INIT_ENVIRON       = 0x00000100,
+	EXIT_PRE_EXEC           = 0x00000200,
+	EXIT_REQUEUE            = 0x00000400,
+	EXIT_REMOVE             = 0x00000800,
+	EXIT_VALUE_REQUEUE      = 0x00001000
+};
 
-#define SUSP_HOST_LOCK          0x00000020
-#define SUSP_LOAD_REASON        0x00000040
-#define SUSP_QUEUE_STOP_COND      0x00000200
-#define SUSP_QUEUE_RESUME_COND    0x00000400
-#define SUSP_PG_IT              0x00000800
-#define SUSP_REASON_RESET       0x00001000
-#define SUSP_LOAD_UNAVAIL       0x00002000
-#define SUSP_ADMIN_STOP         0x00004000
-#define SUSP_RES_RESERVE        0x00008000
-#define SUSP_MBD_LOCK           0x00010000
-#define SUSP_RES_LIMIT          0x00020000
-#define SUB_REASON_RUNLIMIT     0x00000001
-#define SUB_REASON_DEADLINE     0x00000002
-#define SUB_REASON_PROCESSLIMIT 0x00000004
-#define SUB_REASON_CPULIMIT     0x00000008
-#define SUB_REASON_MEMLIMIT     0x00000010
-#define SUSP_SBD_STARTUP        0x00040000
-#define SUSP_HOST_LOCK_MASTER   0x00080000
-#define EXIT_NORMAL             0x00000000
-#define EXIT_RESTART            0x00000001
-#define EXIT_ZOMBIE             0x00000002
-#define FINISH_PEND             0x00000004
-#define EXIT_KILL_ZOMBIE        0x00000008
-#define EXIT_ZOMBIE_JOB         0x00000010
-#define EXIT_RERUN              0x00000020
-#define EXIT_NO_MAPPING         0x00000040
-#define EXIT_INIT_ENVIRON       0x00000100
-#define EXIT_PRE_EXEC           0x00000200
-#define EXIT_REQUEUE            0x00000400
-#define EXIT_REMOVE             0x00000800
-#define EXIT_VALUE_REQUEUE      0x00001000
+enum LSBE {
+	LSBE_NO_ERROR            = 00,
+	LSBE_NO_JOB              = 01,
+	LSBE_NOT_STARTED         = 02,
+	LSBE_JOB_STARTED         = 03,
+	LSBE_JOB_FINISH          = 04,
+	LSBE_STOP_JOB            = 05,
+	LSBE_DEPEND_SYNTAX       = 6,
+	LSBE_EXCLUSIVE           = 7,
+	LSBE_ROOT                = 8,
+	LSBE_MIGRATION           = 9,
+	LSBE_J_UNCHKPNTABLE      = 10,
+	LSBE_NO_OUTPUT           = 11,
+	LSBE_NO_JOBID            = 12,
+	LSBE_ONLY_INTERACTIVE    = 13,
+	LSBE_NO_INTERACTIVE      = 14,
 
-#define LSB_MODE_BATCH    0x1
+	LSBE_NO_USER             = 15,
+	LSBE_BAD_USER            = 16,
+	LSBE_PERMISSION          = 17,
+	LSBE_BAD_QUEUE           = 18,
+	LSBE_QUEUE_NAME          = 19,
+	LSBE_QUEUE_CLOSED        = 20,
+	LSBE_QUEUE_WINDOW        = 21,
+	LSBE_QUEUE_USE           = 22,
+	LSBE_BAD_HOST            = 23,
+	LSBE_PROC_NUM            = 24,
+	LSBE_RESERVE1            = 25,
+	LSBE_RESERVE2            = 26,
+	LSBE_NO_GROUP            = 27,
+	LSBE_BAD_GROUP           = 28,
+	LSBE_QUEUE_HOST          = 29,
+	LSBE_UJOB_LIMIT          = 30,
+	LSBE_NO_HOST             = 31,
 
-#define LSBE_NO_ERROR      00
-#define LSBE_NO_JOB        01
-#define LSBE_NOT_STARTED   02
-#define LSBE_JOB_STARTED   03
-#define LSBE_JOB_FINISH    04
-#define LSBE_STOP_JOB      05
-#define LSBE_DEPEND_SYNTAX  6
-#define LSBE_EXCLUSIVE      7
-#define LSBE_ROOT           8
-#define LSBE_MIGRATION      9
-#define LSBE_J_UNCHKPNTABLE 10
-#define LSBE_NO_OUTPUT      11
-#define LSBE_NO_JOBID       12
-#define LSBE_ONLY_INTERACTIVE 13
-#define LSBE_NO_INTERACTIVE   14
+	LSBE_BAD_CHKLOG          = 32,
+	LSBE_PJOB_LIMIT          = 33,
+	LSBE_NOLSF_HOST          = 34,
 
-#define LSBE_NO_USER       15
-#define LSBE_BAD_USER      16
-#define LSBE_PERMISSION    17
-#define LSBE_BAD_QUEUE     18
-#define LSBE_QUEUE_NAME    19
-#define LSBE_QUEUE_CLOSED  20
-#define LSBE_QUEUE_WINDOW  21
-#define LSBE_QUEUE_USE     22
-#define LSBE_BAD_HOST      23
-#define LSBE_PROC_NUM      24
-#define LSBE_RESERVE1      25
-#define LSBE_RESERVE2      26
-#define LSBE_NO_GROUP      27
-#define LSBE_BAD_GROUP     28
-#define LSBE_QUEUE_HOST    29
-#define LSBE_UJOB_LIMIT    30
-#define LSBE_NO_HOST       31
+	LSBE_BAD_ARG             = 35,
+	LSBE_BAD_TIME            = 36,
+	LSBE_START_TIME          = 37,
+	LSBE_BAD_LIMIT           = 38,
+	LSBE_OVER_LIMIT          = 39,
+	LSBE_BAD_CMD             = 40,
+	LSBE_BAD_SIGNAL          = 41,
+	LSBE_BAD_JOB             = 42,
+	LSBE_QJOB_LIMIT          = 43,
 
-#define LSBE_BAD_CHKLOG    32
-#define LSBE_PJOB_LIMIT    33
-#define LSBE_NOLSF_HOST    34
+	LSBE_UNKNOWN_EVENT       = 44,
+	LSBE_EVENT_FORMAT        = 45,
+	LSBE_EOF                 = 46,
 
-#define LSBE_BAD_ARG       35
-#define LSBE_BAD_TIME      36
-#define LSBE_START_TIME    37
-#define LSBE_BAD_LIMIT     38
-#define LSBE_OVER_LIMIT    39
-#define LSBE_BAD_CMD       40
-#define LSBE_BAD_SIGNAL    41
-#define LSBE_BAD_JOB       42
-#define LSBE_QJOB_LIMIT    43
+	LSBE_MBATCHD             = 47,
+	LSBE_SBATCHD             = 48,
+	LSBE_LSBLIB              = 49,
+	LSBE_LSLIB               = 50,
+	LSBE_SYS_CALL            = 51,
+	LSBE_NO_MEM              = 52,
+	LSBE_SERVICE             = 53,
+	LSBE_NO_ENV              = 54,
+	LSBE_CHKPNT_CALL         = 55,
+	LSBE_NO_FORK             = 56,
 
-#define LSBE_UNKNOWN_EVENT 44
-#define LSBE_EVENT_FORMAT  45
-#define LSBE_EOF           46
+	LSBE_PROTOCOL            = 57,
+	LSBE_XDR                 = 58,
+	LSBE_PORT                = 59,
+	LSBE_TIME_OUT            = 60,
+	LSBE_CONN_TIMEOUT        = 61,
+	LSBE_CONN_REFUSED        = 62,
+	LSBE_CONN_EXIST          = 63,
+	LSBE_CONN_NONEXIST       = 64,
+	LSBE_SBD_UNREACH         = 65,
+	LSBE_OP_RETRY            = 66,
+	LSBE_USER_JLIMIT         = 67,
 
-#define LSBE_MBATCHD       47
-#define LSBE_SBATCHD       48
-#define LSBE_LSBLIB        49
-#define LSBE_LSLIB         50
-#define LSBE_SYS_CALL      51
-#define LSBE_NO_MEM        52
-#define LSBE_SERVICE       53
-#define LSBE_NO_ENV        54
-#define LSBE_CHKPNT_CALL   55
-#define LSBE_NO_FORK       56
+	LSBE_JOB_MODIFY          = 68,
+	LSBE_JOB_MODIFY_ONCE     = 69,
 
-#define LSBE_PROTOCOL      57
-#define LSBE_XDR           58
-#define LSBE_PORT          59
-#define LSBE_TIME_OUT      60
-#define LSBE_CONN_TIMEOUT  61
-#define LSBE_CONN_REFUSED  62
-#define LSBE_CONN_EXIST    63
-#define LSBE_CONN_NONEXIST 64
-#define LSBE_SBD_UNREACH   65
-#define LSBE_OP_RETRY      66
-#define LSBE_USER_JLIMIT   67
+	LSBE_J_UNREPETITIVE      = 70,
+	LSBE_BAD_CLUSTER         = 71,
 
-#define LSBE_JOB_MODIFY       68
-#define LSBE_JOB_MODIFY_ONCE  69
+	LSBE_JOB_MODIFY_USED     = 72,
 
-#define LSBE_J_UNREPETITIVE   70
-#define LSBE_BAD_CLUSTER      71
+	LSBE_HJOB_LIMIT          = 73,
 
-#define LSBE_JOB_MODIFY_USED  72
+	LSBE_NO_JOBMSG           = 74,
 
-#define LSBE_HJOB_LIMIT       73
+	LSBE_BAD_RESREQ          = 75,
 
-#define LSBE_NO_JOBMSG        74
+	LSBE_NO_ENOUGH_HOST      = 76,
 
-#define LSBE_BAD_RESREQ       75
+	LSBE_CONF_FATAL          = 77,
+	LSBE_CONF_WARNING        = 78,
 
-#define LSBE_NO_ENOUGH_HOST   76
+	LSBE_NO_RESOURCE         = 79,
+	LSBE_BAD_RESOURCE        = 80,
+	LSBE_INTERACTIVE_RERUN   = 81,
+	LSBE_PTY_INFILE          = 82,
+	LSBE_BAD_SUBMISSION_HOST = 83,
+	LSBE_LOCK_JOB            = 84,
+	LSBE_UGROUP_MEMBER       = 85,
+	LSBE_OVER_RUSAGE         = 86,
+	LSBE_BAD_HOST_SPEC       = 87,
+	LSBE_BAD_UGROUP          = 88,
+	LSBE_ESUB_ABORT          = 89,
+	LSBE_EXCEPT_ACTION       = 90,
+	LSBE_JOB_DEP             = 91,
+	LSBE_JGRP_NULL           = 92,
+	LSBE_JGRP_BAD            = 93,
+	LSBE_JOB_ARRAY           = 94,
+	LSBE_JOB_SUSP            = 95,
+	LSBE_JOB_FORW            = 96,
+	LSBE_BAD_IDX             = 97,
+	LSBE_BIG_IDX             = 98,
+	LSBE_ARRAY_NULL          = 99,
+	LSBE_JOB_EXIST           = 100,
+	LSBE_JOB_ELEMENT         = 101,
+	LSBE_BAD_JOBID           = 102,
+	LSBE_MOD_JOB_NAME        = 103,
 
-#define LSBE_CONF_FATAL       77
-#define LSBE_CONF_WARNING     78
+	LSBE_PREMATURE           = 104,
 
+	LSBE_BAD_PROJECT_GROUP   = 105,
 
-#define LSBE_NO_RESOURCE        79
-#define LSBE_BAD_RESOURCE       80
-#define LSBE_INTERACTIVE_RERUN  81
-#define LSBE_PTY_INFILE         82
-#define LSBE_BAD_SUBMISSION_HOST  83
-#define LSBE_LOCK_JOB           84
-#define LSBE_UGROUP_MEMBER      85
-#define LSBE_OVER_RUSAGE        86
-#define LSBE_BAD_HOST_SPEC      87
-#define LSBE_BAD_UGROUP         88
-#define LSBE_ESUB_ABORT         89
-#define LSBE_EXCEPT_ACTION      90
-#define LSBE_JOB_DEP            91
-#define LSBE_JGRP_NULL           92
-#define LSBE_JGRP_BAD            93
-#define LSBE_JOB_ARRAY           94
-#define LSBE_JOB_SUSP            95
-#define LSBE_JOB_FORW            96
-#define LSBE_BAD_IDX             97
-#define LSBE_BIG_IDX             98
-#define LSBE_ARRAY_NULL          99
-#define LSBE_JOB_EXIST           100
-#define LSBE_JOB_ELEMENT         101
-#define LSBE_BAD_JOBID           102
-#define LSBE_MOD_JOB_NAME        103
+	LSBE_NO_HOST_GROUP       = 106,
+	LSBE_NO_USER_GROUP       = 107,
+	LSBE_INDEX_FORMAT        = 108,
 
-#define LSBE_PREMATURE           104
+	LSBE_SP_SRC_NOT_SEEN     = 109,
+	LSBE_SP_FAILED_HOSTS_LIM = 110,
+	LSBE_SP_COPY_FAILED      = 111,
+	LSBE_SP_FORK_FAILED      = 112,
+	LSBE_SP_CHILD_DIES       = 113,
+	LSBE_SP_CHILD_FAILED     = 114,
+	LSBE_SP_FIND_HOST_FAILED = 115,
+	LSBE_SP_SPOOLDIR_FAILED  = 116,
+	LSBE_SP_DELETE_FAILED    = 117,
 
-#define LSBE_BAD_PROJECT_GROUP   105
+	LSBE_BAD_USER_PRIORITY   = 118,
+	LSBE_NO_JOB_PRIORITY     = 119,
+	LSBE_JOB_REQUEUED        = 120,
 
-#define LSBE_NO_HOST_GROUP       106
-#define LSBE_NO_USER_GROUP       107
-#define LSBE_INDEX_FORMAT        108
+	LSBE_MULTI_FIRST_HOST    = 121,
+	LSBE_HG_FIRST_HOST       = 122,
+	LSBE_HP_FIRST_HOST       = 123,
+	LSBE_OTHERS_FIRST_HOST   = 124,
 
-#define LSBE_SP_SRC_NOT_SEEN     109
-#define LSBE_SP_FAILED_HOSTS_LIM 110
-#define LSBE_SP_COPY_FAILED      111
-#define LSBE_SP_FORK_FAILED      112
-#define LSBE_SP_CHILD_DIES       113
-#define LSBE_SP_CHILD_FAILED     114
-#define LSBE_SP_FIND_HOST_FAILED 115
-#define LSBE_SP_SPOOLDIR_FAILED  116
-#define LSBE_SP_DELETE_FAILED    117
+	LSBE_PROC_LESS           = 125,
+	LSBE_MOD_MIX_OPTS        = 126,
+	LSBE_MOD_CPULIMIT        = 127,
+	LSBE_MOD_MEMLIMIT        = 128,
+	LSBE_MOD_ERRFILE         = 129,
+	LSBE_LOCKED_MASTER       = 130,
+	LSBE_DEP_ARRAY_SIZE      = 131,
+	LSBE_NUM_ERR             = 131
+};
 
-#define LSBE_BAD_USER_PRIORITY   118
-#define LSBE_NO_JOB_PRIORITY     119
-#define LSBE_JOB_REQUEUED        120
+enum SUB{
+	SUB_JOB_NAME      = 0x01,
+	SUB_QUEUE         = 0x02,
+	SUB_HOST          = 0x04,
+	SUB_IN_FILE       = 0x08,
+	SUB_OUT_FILE      = 0x10,
+	SUB_ERR_FILE      = 0x20,
+	SUB_EXCLUSIVE     = 0x40,
+	SUB_NOTIFY_END    = 0x80,
+	SUB_NOTIFY_BEGIN  = 0x100,
+	SUB_USER_GROUP    = 0x200,
+	SUB_CHKPNT_PERIOD = 0x400,
+	SUB_CHKPNT_DIR    = 0x800,
+	SUB_CHKPNTABLE    = SUB_CHKPNT_DIR,
+	SUB_RESTART_FORCE = 0x1000,
+	SUB_RESTART       = 0x2000,
+	SUB_RERUNNABLE    = 0x4000,
+	SUB_WINDOW_SIG    = 0x8000,
+	SUB_HOST_SPEC     = 0x10000,
+	SUB_DEPEND_COND   = 0x20000,
+	SUB_RES_REQ       = 0x40000,
+	SUB_OTHER_FILES   = 0x80000,
+	SUB_PRE_EXEC      = 0x100000,
+	SUB_LOGIN_SHELL   = 0x200000,
+	SUB_MAIL_USER     = 0x400000,
+	SUB_MODIFY        = 0x800000,
+	SUB_MODIFY_ONCE   = 0x1000000,
+	SUB_PROJECT_NAME  = 0x2000000,
+	SUB_INTERACTIVE   = 0x4000000,
+	SUB_PTY           = 0x8000000,
+	SUB_PTY_SHELL     = 0x10000000
+};
 
-#define LSBE_MULTI_FIRST_HOST    121
-#define LSBE_HG_FIRST_HOST       122
-#define LSBE_HP_FIRST_HOST       123
-#define LSBE_OTHERS_FIRST_HOST   124
-
-#define LSBE_PROC_LESS           125
-#define LSBE_MOD_MIX_OPTS        126
-#define LSBE_MOD_CPULIMIT        127
-#define LSBE_MOD_MEMLIMIT        128
-#define LSBE_MOD_ERRFILE         129
-#define LSBE_LOCKED_MASTER       130
-#define LSBE_DEP_ARRAY_SIZE      131
-#define LSBE_NUM_ERR             131
-
-
-// Duplicates from <daemons/daemonout.h>
-// #define PREPARE_FOR_OP          1024
-// #define READY_FOR_OP            1023
-
-
-#define SUB_JOB_NAME       0x01
-#define SUB_QUEUE          0x02
-#define SUB_HOST           0x04
-#define SUB_IN_FILE        0x08
-#define SUB_OUT_FILE       0x10
-#define SUB_ERR_FILE       0x20
-#define SUB_EXCLUSIVE      0x40
-#define SUB_NOTIFY_END     0x80
-#define SUB_NOTIFY_BEGIN   0x100
-#define SUB_USER_GROUP     0x200
-#define SUB_CHKPNT_PERIOD  0x400
-#define SUB_CHKPNT_DIR     0x800
-#define SUB_CHKPNTABLE     SUB_CHKPNT_DIR
-#define SUB_RESTART_FORCE  0x1000
-#define SUB_RESTART        0x2000
-#define SUB_RERUNNABLE     0x4000
-#define SUB_WINDOW_SIG     0x8000
-#define SUB_HOST_SPEC      0x10000
-#define SUB_DEPEND_COND    0x20000
-#define SUB_RES_REQ        0x40000
-#define SUB_OTHER_FILES    0x80000
-#define SUB_PRE_EXEC       0x100000
-#define SUB_LOGIN_SHELL    0x200000
-#define SUB_MAIL_USER      0x400000
-#define SUB_MODIFY         0x800000
-#define SUB_MODIFY_ONCE    0x1000000
-#define SUB_PROJECT_NAME   0x2000000
-#define SUB_INTERACTIVE    0x4000000
-#define SUB_PTY            0x8000000
-#define SUB_PTY_SHELL      0x10000000
-
-#define SUB2_HOLD          0x01
-#define SUB2_MODIFY_CMD    0x02
-#define SUB2_BSUB_BLOCK    0x04
-#define SUB2_HOST_NT       0x08
-#define SUB2_HOST_UX       0x10
-#define SUB2_QUEUE_CHKPNT  0x20
-#define SUB2_QUEUE_RERUNNABLE  0x40
-#define SUB2_IN_FILE_SPOOL 0x80
-#define SUB2_JOB_CMD_SPOOL 0x100
-#define SUB2_JOB_PRIORITY  0x200
-#define SUB2_USE_DEF_PROCLIMIT  0x400
-#define SUB2_MODIFY_RUN_JOB 0x800
-#define SUB2_MODIFY_PEND_JOB 0x1000
+enum SUB2 {
+	SUB2_HOLD              = 0x01,
+	SUB2_MODIFY_CMD        = 0x02,
+	SUB2_BSUB_BLOCK        = 0x04,
+	SUB2_HOST_NT           = 0x08,
+	SUB2_HOST_UX           = 0x10,
+	SUB2_QUEUE_CHKPNT      = 0x20,
+	SUB2_QUEUE_RERUNNABLE  = 0x40,
+	SUB2_IN_FILE_SPOOL     = 0x80,
+	SUB2_JOB_CMD_SPOOL     = 0x100,
+	SUB2_JOB_PRIORITY      = 0x200,
+	SUB2_USE_DEF_PROCLIMIT = 0x400,
+	SUB2_MODIFY_RUN_JOB    = 0x800,
+	SUB2_MODIFY_PEND_JOB   = 0x1000
+};
 
 #define LOST_AND_FOUND  "lost_and_found"
 
@@ -818,53 +743,60 @@ struct msgMap pendMsg[] = {
 
 #define LSB_CHKPERIOD_NOCHNG -1
 
-#define LSB_CHKPNT_KILL  0x1
-#define LSB_CHKPNT_FORCE 0x2
-#define LSB_CHKPNT_COPY  0x3
-#define LSB_CHKPNT_MIG   0x4
-#define LSB_CHKPNT_STOP  0x8
-#define LSB_KILL_REQUEUE 0x10
+enum LSF_CHKPNT {
+	LSB_CHKPNT_KILL  = 0x1,
+	LSB_CHKPNT_FORCE = 0x2,
+	LSB_CHKPNT_COPY  = 0x3,
+	LSB_CHKPNT_MIG   = 0x4,
+	LSB_CHKPNT_STOP  = 0x8,
+	LSB_KILL_REQUEUE = 0x10
+};
 
-#define ALL_USERS       "all"
-#define ALL_JOB         0x0001
-#define DONE_JOB        0x0002
-#define PEND_JOB        0x0004
-#define SUSP_JOB        0x0008
-#define CUR_JOB         0x0010
-#define LAST_JOB        0x0020
-#define RUN_JOB         0x0040
-#define JOBID_ONLY      0x0080
-#define HOST_NAME       0x0100
-#define NO_PEND_REASONS 0x0200
-#define JGRP_ARRAY_INFO 0x1000
-#define JOBID_ONLY_ALL  0x02000
-#define ZOMBIE_JOB      0x04000
+enum ALLJOB {
+	ALL_JOB         = 0x0001,
+	DONE_JOB        = 0x0002,
+	PEND_JOB        = 0x0004,
+	SUSP_JOB        = 0x0008,
+	CUR_JOB         = 0x0010,
+	LAST_JOB        = 0x0020,
+	RUN_JOB         = 0x0040,
+	JOBID_ONLY      = 0x0080,
+	HOST_NAME       = 0x0100,
+	NO_PEND_REASONS = 0x0200,
+	JGRP_ARRAY_INFO = 0x1000,
+	JOBID_ONLY_ALL  = 0x02000,
+	ZOMBIE_JOB      = 0x04000
+};
 
-#define JGRP_NODE_JOB    1
-#define JGRP_NODE_GROUP  2
-#define JGRP_NODE_ARRAY  3
+enum JGRP_NODE {
+	JGRP_NODE_JOB   = 1,
+	JGRP_NODE_GROUP = 2,
+	JGRP_NODE_ARRAY = 3
+};
 
-#define LSB_MAX_ARRAY_JOBID 0x0FFFFFFFF // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
-#define LSB_MAX_ARRAY_IDX   0x0FFFF  // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
+#define LSB_MAX_ARRAY_JOBID 0x0FFFFFFFF
+#define LSB_MAX_ARRAY_IDX   0x0FFFF 
 #define LSB_MAX_SEDJOB_RUNID    (0x0F)
-#define LSB_JOBID(array_jobId, array_idx) (((unsigned long)array_idx << 32UL) | array_jobId) // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
-#define LSB_ARRAY_IDX(jobId) (((jobId) == -1UL) ? (0) : (unsigned long)(((unsigned long)jobId >> 32UL) & LSB_MAX_ARRAY_IDX)) // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
-#define LSB_ARRAY_JOBID(jobId) (((jobId) == -1UL) ? (-1) : (unsigned long)(jobId & LSB_MAX_ARRAY_JOBID)) // FIXME FIXME FIXME FIXME FIXME this needs to be unrolled.
-
+// enum LSB_MAX {
+// 	LSB_MAX_ARRAY_JOBID = 0x0FFFFFFFF // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with,
+// 	LSB_MAX_ARRAY_IDX = 0x0FFFF  // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with,
+// 	LSB_MAX_SEDJOB_RUNID = 0x0F
+// };
 
 #define JGRP_ACTIVE        1
 #define JGRP_UNDEFINED     -1
 
-#define JGRP_COUNT_NJOBS   0
-#define JGRP_COUNT_PEND    1
-#define JGRP_COUNT_NPSUSP  2
-#define JGRP_COUNT_NRUN    3
-#define JGRP_COUNT_NSSUSP  4
-#define JGRP_COUNT_NUSUSP  5
-#define JGRP_COUNT_NEXIT   6
-#define JGRP_COUNT_NDONE   7
-
-#define NUM_JGRP_COUNTERS 8
+enum JGRP_COUNT {
+	JGRP_COUNT_NJOBS  = 0,
+	JGRP_COUNT_PEND   = 1,
+	JGRP_COUNT_NPSUSP = 2,
+	JGRP_COUNT_NRUN   = 3,
+	JGRP_COUNT_NSSUSP = 4,
+	JGRP_COUNT_NUSUSP = 5,
+	JGRP_COUNT_NEXIT  = 6,
+	JGRP_COUNT_NDONE  = 7,
+	NUM_JGRP_COUNTERS = 8,
+};
 
 #define ALL_QUEUE       0x01
 #define DFT_QUEUE       0x02
@@ -872,13 +804,14 @@ struct msgMap pendMsg[] = {
 #define CHECK_USER      0x100
 #define SORT_HOST       0x200
 
-#define LSB_SIG_NUM               23
+#define LSB_SIG_NUM     23
 
-
-#define ACT_NO              0
-#define ACT_START           1
-#define ACT_DONE            3
-#define ACT_FAIL            4
+enum ACT {
+	ACT_NO    = 0,
+	ACT_START = 1,
+	ACT_DONE  = 3,
+	ACT_FAIL  = 4
+};
 
 #define H_ATTR_CHKPNTABLE  0x1
 
@@ -887,81 +820,97 @@ struct msgMap pendMsg[] = {
 #define MAX_JOBID_LOW   999999
 #define MAX_JOBID_HIGH 9999999
 
-#define USER_GRP          0x1
-#define HOST_GRP          0x2
-#define GRP_RECURSIVE     0x8
-#define GRP_ALL           0x10
-#define GRP_SHARES        0x40
+enum GRP {
+	USER_GRP      = 0x1,
+	HOST_GRP      = 0x2,
+	GRP_RECURSIVE = 0x8,
+	GRP_ALL       = 0x10,
+	GRP_SHARES    = 0x40
+};
 
-#define RUNJOB_OPT_NORMAL     0x01
-#define RUNJOB_OPT_NOSTOP     0x02
-#define RUNJOB_OPT_PENDONLY   0x04
-#define RUNJOB_OPT_FROM_BEGIN 0x08
+enum RUNJOB_OPT {
+	RUNJOB_OPT_NORMAL     = 0x01,
+	RUNJOB_OPT_NOSTOP     = 0x02,
+	RUNJOB_OPT_PENDONLY   = 0x04,
+	RUNJOB_OPT_FROM_BEGIN = 0x08
+};
 
-#define REQUEUE_DONE   0x1
-#define REQUEUE_EXIT   0x2
-#define REQUEUE_RUN    0x4
+enum REQUEUE { 
+	REQUEUE_DONE = 0x1,
+	REQUEUE_EXIT = 0x2,
+	REQUEUE_RUN  = 0x4
+};
 
-#define TO_TOP            1
-#define TO_BOTTOM         2
+enum TO_TOP_BOTTOM {
+	TO_TOP    = 1,
+	TO_BOTTOM = 2
+};
 
-#define QUEUE_OPEN        1
-#define QUEUE_CLOSED      2
-#define QUEUE_ACTIVATE    3
-#define QUEUE_INACTIVATE  4
+enum QUEUE {
+	QUEUE_OPEN       = 1,
+	QUEUE_CLOSED     = 2,
+	QUEUE_ACTIVATE   = 3,
+	QUEUE_INACTIVATE = 4
+};
 
-#define HOST_OPEN         1
-#define HOST_CLOSE        2
-#define HOST_REBOOT       3
-#define HOST_SHUTDOWN     4
+enum HOST {
+	HOST_OPEN     = 1,
+	HOST_CLOSE    = 2,
+	HOST_REBOOT   = 3,
+	HOST_SHUTDOWN = 4
+};
 
-#define MBD_RESTART       0
-#define MBD_RECONFIG      1
-#define MBD_CKCONFIG      2
-
-
-#define MAXFILENAMELEN          4096 // FIXME FIXME FIXME re-introduced from lsf.h, cuz gcc was complaining
-
+enum MBD {
+	MBD_RESTART  = 0,
+	MBD_RECONFIG = 1,
+	MBD_CKCONFIG = 2
+};
 
 #define LSF_JOBIDINDEX_FILENAME "lsb.events.index"       // FIXME FIXME FIXME is this approprate ? should it be named like that?
 #define LSF_JOBIDINDEX_FILETAG "#LSF_JOBID_INDEX_FILE" 
 
-
 #define LSB_MAX_SD_LENGTH 128
 
+enum CONF {
+	CONF_NO_CHECK        = 0x00,
+	CONF_CHECK           = 0x01,
+	CONF_EXPAND          = 0X02,
+	CONF_RETURN_HOSTSPEC = 0X04,
+	CONF_NO_EXPAND       = 0X08
+};
 
-#define CONF_NO_CHECK       0x00
-#define CONF_CHECK          0x01
-#define CONF_EXPAND         0X02
-#define CONF_RETURN_HOSTSPEC    0X04
-#define CONF_NO_EXPAND      0X08
+enum PRINT {
+	PRINT_SHORT_NAMELIST = 0x01,
+	PRINT_LONG_NAMELIST  = 0x02,
+	PRINT_MCPU_HOSTS     = 0x04
+};
 
 
+#define LSB_HOST_OK(status)      (status == HOST_STAT_OK)
+#define LSB_HOST_BUSY(status)    ((status & HOST_STAT_BUSY) != 0)
+#define LSB_HOST_CLOSED(status)  ((status & (HOST_STAT_WIND | HOST_STAT_DISABLED | HOST_STAT_LOCKED | HOST_STAT_LOCKED_MASTER | HOST_STAT_FULL | HOST_STAT_NO_LIM)) != 0)
+#define LSB_HOST_FULL(status)    ((status & HOST_STAT_FULL) != 0)
+#define LSB_HOST_UNREACH(status) ((status & HOST_STAT_UNREACH) != 0)
+#define LSB_HOST_UNAVAIL(status) ((status & HOST_STAT_UNAVAIL) != 0)
+
+#define LSB_ISBUSYON(status, index)  \(((status[(index)/INTEGER_BITS]) & (1 << (index)%INTEGER_BITS)) != 0)
+
+#define LSB_JOBID(array_jobId, array_idx) (((unsigned long)array_idx << 32UL) | array_jobId) // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
+#define LSB_ARRAY_IDX(jobId) (((jobId) == -1UL) ? (0) : (unsigned long)(((unsigned long)jobId >> 32UL) & LSB_MAX_ARRAY_IDX)) // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with
+#define LSB_ARRAY_JOBID(jobId) (((jobId) == -1UL) ? (-1) : (unsigned long)(jobId & LSB_MAX_ARRAY_JOBID)) // FIXME FIXME FIXME FIXME FIXME this needs to be unrolled.
 
 #define IS_PEND(s)  (((s) & JOB_STAT_PEND) || ((s) & JOB_STAT_PSUSP))
 
-#define IS_START(s)  (((s) & JOB_STAT_RUN) || ((s) & JOB_STAT_SSUSP) \
-|| ((s) & JOB_STAT_USUSP))
+#define IS_START(s)  (((s) & JOB_STAT_RUN) || ((s) & JOB_STAT_SSUSP) || ((s) & JOB_STAT_USUSP))
 
 #define IS_FINISH(s) (((s) & JOB_STAT_DONE) || ((s) & JOB_STAT_EXIT))
 
-#define IS_SUSP(s) (((s) & JOB_STAT_PSUSP) || ((s) & JOB_STAT_SSUSP) \
-||  ((s) & JOB_STAT_USUSP))
+#define IS_SUSP(s) (((s) & JOB_STAT_PSUSP) || ((s) & JOB_STAT_SSUSP) ||  ((s) & JOB_STAT_USUSP))
 
 #define IS_POST_DONE(s) ( ( (s) & JOB_STAT_PDONE) == JOB_STAT_PDONE )
 #define IS_POST_ERR(s) ( ( (s) & JOB_STAT_PERR) == JOB_STAT_PERR )
 #define IS_POST_FINISH(s) ( IS_POST_DONE(s) || IS_POST_ERR(s) )
 
-#define PRINT_SHORT_NAMELIST  0x01
-#define PRINT_LONG_NAMELIST   0x02
-#define PRINT_MCPU_HOSTS      0x04
-
-
-// #define XF_OP_SUB2EXEC         0x1
-// #define XF_OP_EXEC2SUB         0x2
-// #define XF_OP_SUB2EXEC_APPEND  0x4
-// #define XF_OP_EXEC2SUB_APPEND  0x8
-// #define XF_OP_URL_SOURCE       0x10
 enum XF_OP_OPTIONS {
 	XF_OP_SUB2EXEC = 0x1,
 	XF_OP_EXEC2SUB = 0x2,
@@ -1033,7 +982,7 @@ struct submig
 struct jobAttrInfoEnt
 {
 	unsigned short port;
-	char hostname[MAXHOSTNAMELEN];
+	char hostname[MAX_HOSTNAME_LEN];
 	const char padding[6];
 	unsigned long jobId;
 };
@@ -1543,28 +1492,28 @@ struct newDebugLog
 	int turnOff;
 	uid_t userId;
 	const char padding[4];
-	char *logFileName; //[MAXLSFNAMELEN];
+	char *logFileName; //[MAX_LSF_NAME_LEN];
 };
 
 struct hostCtrlLog
 {
 	int opCode;
-	char host[MAXHOSTNAMELEN];
+	char host[MAX_HOSTNAME_LEN];
 	uid_t userId;
 	char userName[MAX_LSB_NAME_LEN];
 };
 
 struct mbdStartLog
 {
-	char master[MAXHOSTNAMELEN];
-	char cluster[MAXLSFNAMELEN];
+	char master[MAX_HOSTNAME_LEN];
+	char cluster[MAX_LSF_NAME_LEN];
 	int numHosts;
 	int numQueues;
 };
 
 struct mbdDieLog
 {
-	char master[MAXHOSTNAMELEN];
+	char master[MAX_HOSTNAME_LEN];
 	int numRemoveJobs;
 	int exitCode;
 };
@@ -1592,16 +1541,16 @@ struct jobFinishLog
 	uid_t userId;
 	char queue       [MAX_LSB_NAME_LEN];
 	char userName    [MAX_LSB_NAME_LEN];
-	char fromHost    [MAXHOSTNAMELEN];
-	char cwd         [MAXPATHLEN];
-	char inFile      [MAXFILENAMELEN];
-	char outFile     [MAXFILENAMELEN];
-	char errFile     [MAXFILENAMELEN];
-	char inFileSpool [MAXFILENAMELEN];
-	char commandSpool[MAXFILENAMELEN];
-	char jobFile     [MAXFILENAMELEN];
-	char jobName     [MAXLINELEN];
-	char command     [MAXLINELEN];
+	char fromHost    [MAX_HOSTNAME_LEN];
+	char cwd         [MAX_PATH_LEN];
+	char inFile      [MAX_FILENAME_LEN];
+	char outFile     [MAX_FILENAME_LEN];
+	char errFile     [MAX_FILENAME_LEN];
+	char inFileSpool [MAX_FILENAME_LEN];
+	char commandSpool[MAX_FILENAME_LEN];
+	char jobFile     [MAX_FILENAME_LEN];
+	char jobName     [MAX_LINE_LEN];
+	char command     [MAX_LINE_LEN];
 	const char padding[4];
 	char *resReq;
 	char *dependCond;
@@ -1680,7 +1629,7 @@ struct newJobLog
     int mailUserId;
     int umask;
     int numUsHosts;
-    char *queue; // [MAXQUEUENAMELEN];
+    char *queue; // [MAX_QUEUENAME_LEN];
     char *resReq;
     char *fromHost;
     char *cwd;
@@ -1726,7 +1675,7 @@ struct newStatusLog
 struct qControlLog
 {
 	int opCode;
-	char queue[MAXQUEUENAMELEN];
+	char queue[MAX_QUEUENAME_LEN];
 };
 
 struct switchJobLog
@@ -1734,7 +1683,7 @@ struct switchJobLog
 	uid_t userId;
 	const char padding[4];
 	unsigned long jobId;
-	char queue[MAXQUEUENAMELEN];
+	char queue[MAX_QUEUENAME_LEN];
 };
 
 struct moveJobLog
@@ -1760,16 +1709,16 @@ struct finishJobLog
 	int nproc;
 	int status;
 	int numUsHosts;
-	char queue[MAXQUEUENAMELEN];
-	char resReq[MAXLINELEN];
-	char fromHost[MAXHOSTNAMELEN];
-	char cwd[MAXPATHLEN];
-	char inFile[MAXFILENAMELEN];
-	char outFile[MAXFILENAMELEN];
-	char errFile[MAXFILENAMELEN];
-	char jobFile[MAXFILENAMELEN];
-	char jobName[MAXJOBDESPLEN];
-	char command[MAXJOBDESPLEN];
+	char queue[MAX_QUEUENAME_LEN];
+	char resReq[MAX_LINE_LEN];
+	char fromHost[MAX_HOSTNAME_LEN];
+	char cwd[MAX_PATH_LEN];
+	char inFile[MAX_FILENAME_LEN];
+	char outFile[MAX_FILENAME_LEN];
+	char errFile[MAX_FILENAME_LEN];
+	char jobFile[MAX_FILENAME_LEN];
+	char jobName[MAX_JOB_DESP_LEN];
+	char command[MAX_JOB_DESP_LEN];
 	float cpuTime;
 	time_t submitTime;
 	time_t startTime;
@@ -1834,7 +1783,7 @@ struct eventRec
 
 struct eventLogFile
 {
-	char eventDir[MAXFILENAMELEN];
+	char eventDir[MAX_FILENAME_LEN];
 	time_t beginTime;
 	time_t endTime;
 };
@@ -1842,7 +1791,7 @@ struct eventLogFile
 struct eventLogHandle
 {
 	FILE *fp;
-	char openEventFile[MAXFILENAMELEN];
+	char openEventFile[MAX_FILENAME_LEN];
 	int curOpenFile;
 	int lastOpenFile;
 };
@@ -1860,7 +1809,7 @@ struct jobIdIndexS
 	unsigned long maxJobId;
 	FILE *fp;
 	unsigned long *jobIds;
-    char *fileName; //[MAXFILENAMELEN];
+    char *fileName; //[MAX_FILENAME_LEN];
 };
 
 struct sortIntList
@@ -1934,9 +1883,9 @@ struct queueConf
 };
 
 
-int lsberrno;
+static int lsberrno;
 
-int lsb_mbd_version;
+static int lsb_mbd_version;
 
 
 // Ice Age Relic
@@ -1946,6 +1895,11 @@ int lsb_mbd_version;
 // #define P_(s) ()
 // #endif
 
+/**************************************************************************
+ *
+ * FIXME FIXME FIXME FIXME FIXME: each function belongs to a separate file
+ * 
+ */
 
 struct paramConf *lsb_readparam (struct lsConf *);
 struct userConf *lsb_readuser (struct lsConf *, int, struct clusterConf *);
@@ -2019,19 +1973,3 @@ int getMaxSortIntList (struct sortIntList *, int *);
 int getTotalSortIntList (struct sortIntList *);
 
 int updateJobIdIndexFile (char *, char *, int);
-
-/*static int readJobNew (char *, struct jobNewLog *);
-static int readJobMod (char *, struct jobModLog *);
-static int readJobStart (char *, struct jobStartLog *);
-static int readJobStartAccept (char *, struct jobStartAcceptLog *);
-static int readJobExecute (char *, struct jobExecuteLog *);
-static int readJobStatus (char *, struct jobStatusLog *);
-static int readSbdJobStatus (char *, struct sbdJobStatusLog *);
-static int readJobSwitch (char *, struct jobSwitchLog *);
-static int readJobMove (char *, struct jobMoveLog *);
-static int readJobFinish (char *, struct jobFinishLog *, time_t);
-static int readQueueCtrl (char *, struct queueCtrlLog *);
-static int readHostCtrl (char *, struct hostCtrlLog *);*/
-
-// #undef P_
-

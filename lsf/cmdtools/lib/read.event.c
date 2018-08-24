@@ -318,8 +318,8 @@ copyJobModLog (struct jobModLog *des, struct jobModLog *src)
 		}
 	}
 	for (unsigned long i = 1; i < des->nxf; i++) {
-		strncpy (des->xf[i].subFn, src->xf[i].subFn, MAXFILENAMELEN);
-		strncpy (des->xf[i].execFn, src->xf[i].execFn, MAXFILENAMELEN);
+		strncpy (des->xf[i].subFn, src->xf[i].subFn, MAX_FILENAME_LEN);
+		strncpy (des->xf[i].execFn, src->xf[i].execFn, MAX_FILENAME_LEN);
 		des->xf[i].options = src->xf[i].options;
 	}
 
@@ -1087,7 +1087,7 @@ read_loadIndex (struct eventRec *log)
 	loadIndex->name = calloc (loadIndex->nIdx, sizeof (char *));
 
 	for( unsigned integer i = 0; i < loadIndex->nIdx; i++) {
-		loadIndex->name[i] = malloc (MAXLSFNAMELEN);
+		loadIndex->name[i] = malloc (MAX_LSF_NAME_LEN);
 		strcpy (loadIndex->name[i], log->eventLog.loadIndexLog.name[i]);
 	}
 
@@ -1194,11 +1194,11 @@ initJobInfo (void)
 	submitPtr->jobName = malloc (MAX_CMD_DESC_LEN);
 	submitPtr->command = malloc (MAX_CMD_DESC_LEN);
 	submitPtr->resReq = malloc (MAXLINELEN);
-	submitPtr->inFile = malloc (MAXFILENAMELEN);
-	submitPtr->outFile = malloc (MAXFILENAMELEN);
-	submitPtr->errFile = malloc (MAXFILENAMELEN);
-	submitPtr->hostSpec = malloc (MAXFILENAMELEN);
-	submitPtr->chkpntDir = malloc (MAXFILENAMELEN);
+	submitPtr->inFile = malloc (MAX_FILENAME_LEN);
+	submitPtr->outFile = malloc (MAX_FILENAME_LEN);
+	submitPtr->errFile = malloc (MAX_FILENAME_LEN);
+	submitPtr->hostSpec = malloc (MAX_FILENAME_LEN);
+	submitPtr->chkpntDir = malloc (MAX_FILENAME_LEN);
 	submitPtr->dependCond = malloc (6 * MAXLINELEN);
 	submitPtr->preExecCmd = malloc (MAXLINELEN);
 	submitPtr->mailUser = malloc (MAXHOSTNAMELEN);
@@ -1206,9 +1206,9 @@ initJobInfo (void)
 	submitPtr->loginShell = malloc (MAX_LSB_NAME_LEN);
 	job->user = malloc (MAX_LSB_NAME_LEN);
 	job->fromHost = malloc (MAXHOSTNAMELEN);
-	job->cwd = malloc (MAXFILENAMELEN);
-	job->execCwd = malloc (MAXFILENAMELEN);
-	job->execHome = malloc (MAXFILENAMELEN);
+	job->cwd = malloc (MAX_FILENAME_LEN);
+	job->execCwd = malloc (MAX_FILENAME_LEN);
+	job->execHome = malloc (MAX_FILENAME_LEN);
 	job->execUsername = malloc (MAX_LSB_NAME_LEN);
 
 	submitPtr->queue[0] = '\0';
@@ -1510,9 +1510,9 @@ parse_event (struct eventRec *log, struct bhistReq *Req)
 				if (log->type == EVENT_JOB_EXECUTE) {
 					event->numExHosts = 0;
 					event->execUid = jobRecord->job->execUid;
-					event->execHome = malloc (MAXFILENAMELEN);
+					event->execHome = malloc (MAX_FILENAME_LEN);
 					strcpy (event->execHome, jobRecord->job->execHome);
-					event->execCwd = malloc (MAXFILENAMELEN);
+					event->execCwd = malloc (MAX_FILENAME_LEN);
 					strcpy (event->execCwd, jobRecord->job->execCwd);
 					event->execUsername = malloc (MAX_LSB_NAME_LEN);
 					strcpy (event->execUsername, jobRecord->job->execUsername);

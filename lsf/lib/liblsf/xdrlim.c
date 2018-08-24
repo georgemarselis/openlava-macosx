@@ -106,7 +106,7 @@ xdr_decisionReq (XDR * xdrs, struct decisionReq * decisionReqPtr, struct LSFHead
     assert( decisionReqPtr->numPrefs <= INT_MAX );
     if (    !xdr_enum   (xdrs, (enum_t *)&decisionReqPtr->ofWhat)    ||
             !xdr_int    (xdrs, &decisionReqPtr->options)   ||
-            !xdr_string (xdrs, &sp1, MAXLSFNAMELEN)        ||
+            !xdr_string (xdrs, &sp1, MAX_LSF_NAME_LEN)        ||
             !xdr_u_long (xdrs, (unsigned int *)&decisionReqPtr->numHosts)  ||   // FIXME FIXME FIXME FIXME we got to revisit this
             !xdr_string (xdrs, &sp2, MAXLINELEN)           ||
             !xdr_u_long (xdrs, (unsigned int *)&decisionReqPtr->numPrefs))
@@ -200,7 +200,7 @@ xdr_loadReply (XDR * xdrs, struct loadReply *loadReplyPtr, struct LSFHeader *hdr
         vecSize  = loadReplyPtr->nIndex * sizeof (float);
         hlSize   = ALIGNWORD_ (loadReplyPtr->nEntry * sizeof (struct hostLoad)); // FIXME FIXME FIXME what does ALIGNWORD_( ) do?
         matSize  = ALIGNWORD_((loadReplyPtr->nEntry + 1) * vecSize);
-        nameSize = ALIGNWORD_ (loadReplyPtr->nIndex * MAXLSFNAMELEN);
+        nameSize = ALIGNWORD_ (loadReplyPtr->nIndex * MAX_LSF_NAME_LEN);
         staSize  = ALIGNWORD_ ((1 + GET_INTNUM (loadReplyPtr->nIndex)) * sizeof (int));
         loadReplyPtr->loadMatrix = malloc (hlSize + matSize + nameSize + loadReplyPtr->nEntry * staSize);
         
@@ -217,7 +217,7 @@ xdr_loadReply (XDR * xdrs, struct loadReply *loadReplyPtr, struct LSFHeader *hdr
             loadReplyPtr->loadMatrix[i].loadIndex = currp;
         }
         currp = memp + hlSize + matSize;
-        for (u_long i = 0; i < loadReplyPtr->nIndex; i++, currp += MAXLSFNAMELEN) {
+        for (u_long i = 0; i < loadReplyPtr->nIndex; i++, currp += MAX_LSF_NAME_LEN) {
             char *buf = malloc( sizeof( char ) * sizeof( float ) + 1 );
             sprintf( buf, "%f", *currp );
             loadReplyPtr->indicies[i] = buf;
@@ -233,7 +233,7 @@ xdr_loadReply (XDR * xdrs, struct loadReply *loadReplyPtr, struct LSFHeader *hdr
         if (xdrs->x_op == XDR_DECODE) {
             sp = NULL; // FIME FIXME FIXME FIXME not quite sure if this is correct
         }
-        if (!xdr_string (xdrs, &sp, MAXLSFNAMELEN)) {
+        if (!xdr_string (xdrs, &sp, MAX_LSF_NAME_LEN)) {
             return FALSE;
         }
     }
@@ -534,7 +534,7 @@ xdr_shortLsInfo (XDR * xdrs, struct shortLsInfo *shortLInfo, struct LSFHeader *h
             free (memp);
         }
         
-        memp = (char *) malloc ((shortLInfo->nRes + shortLInfo->nTypes + shortLInfo->nModels) * MAXLSFNAMELEN + shortLInfo->nRes * sizeof (char *));
+        memp = (char *) malloc ((shortLInfo->nRes + shortLInfo->nTypes + shortLInfo->nModels) * MAX_LSF_NAME_LEN + shortLInfo->nRes * sizeof (char *));
         if ( NULL == memp && ENOMEM == errno ) {
             return FALSE;
         }
@@ -543,15 +543,15 @@ xdr_shortLsInfo (XDR * xdrs, struct shortLsInfo *shortLInfo, struct LSFHeader *h
         shortLInfo->resName = (char **) currp;  // FIXME FIXME FIXME FIXME FIXME lookup in debugger
         currp += shortLInfo->nRes * sizeof (char *);
         
-        for ( u_long i = 0; i < shortLInfo->nRes; i++, currp += MAXLSFNAMELEN) {
+        for ( u_long i = 0; i < shortLInfo->nRes; i++, currp += MAX_LSF_NAME_LEN) {
             shortLInfo->resName[i] = (char *)currp;     // FIXME FIXME FIXME FIXME FIXME lookup in debugger
         }
         
-        for ( u_long i = 0; i < shortLInfo->nTypes; i++, currp += MAXLSFNAMELEN) {
+        for ( u_long i = 0; i < shortLInfo->nTypes; i++, currp += MAX_LSF_NAME_LEN) {
             shortLInfo->hostTypes[i] = (char *)currp;   // FIXME FIXME FIXME FIXME FIXME lookup in debugger
         }
         
-        for ( u_long i = 0; i < shortLInfo->nModels; i++, currp += MAXLSFNAMELEN) {
+        for ( u_long i = 0; i < shortLInfo->nModels; i++, currp += MAX_LSF_NAME_LEN) {
             shortLInfo->hostModels[i] = (char *)currp;  // FIXME FIXME FIXME FIXME FIXME lookup in debugger
         }
     }
@@ -563,7 +563,7 @@ xdr_shortLsInfo (XDR * xdrs, struct shortLsInfo *shortLInfo, struct LSFHeader *h
             sp[0] = '\0';
         }
     
-        if (!xdr_string (xdrs, &sp, MAXLSFNAMELEN)) {
+        if (!xdr_string (xdrs, &sp, MAX_LSF_NAME_LEN)) {
             return FALSE;
         }
     }
@@ -575,7 +575,7 @@ xdr_shortLsInfo (XDR * xdrs, struct shortLsInfo *shortLInfo, struct LSFHeader *h
             sp[0] = '\0';
         }
         
-        if (!xdr_string (xdrs, &sp, MAXLSFNAMELEN)) {
+        if (!xdr_string (xdrs, &sp, MAX_LSF_NAME_LEN)) {
             return FALSE;
         }
     }
@@ -587,7 +587,7 @@ xdr_shortLsInfo (XDR * xdrs, struct shortLsInfo *shortLInfo, struct LSFHeader *h
             sp[0] = '\0';
         }
         
-        if (!xdr_string (xdrs, &sp, MAXLSFNAMELEN)) {
+        if (!xdr_string (xdrs, &sp, MAX_LSF_NAME_LEN)) {
             return FALSE;
         }
     }
@@ -622,7 +622,7 @@ xdr_limLock (XDR *xdrs, struct limLock *limLockPtr, struct LSFHeader *hdr)
         return FALSE;
     }
     
-    if (!xdr_string (xdrs, &sp, MAXLSFNAMELEN)) {
+    if (!xdr_string (xdrs, &sp, MAX_LSF_NAME_LEN)) {
         return FALSE;
     }
     
@@ -643,7 +643,7 @@ xdr_resItem (XDR * xdrs, struct resItem *resItem, struct LSFHeader *hdr)
         sp[0] = '\0';
         sp1[0] = '\0';
         }
-    if (!xdr_string (xdrs, &sp1, MAXLSFNAMELEN) ||
+    if (!xdr_string (xdrs, &sp1, MAX_LSF_NAME_LEN) ||
         !xdr_string (xdrs, &sp, MAXRESDESLEN) ||
         !xdr_enum (xdrs, (int *) &resItem->valueType) ||
         !xdr_enum (xdrs, (int *) &resItem->orderType) ||
@@ -694,7 +694,7 @@ xdr_lsInfo (XDR * xdrs, struct lsInfo * lsInfoPtr, struct LSFHeader *hdr)
         if (xdrs->x_op == XDR_DECODE) {
             sp[0] = '\0';
         }
-        if (!xdr_string (xdrs, &sp, MAXLSFNAMELEN)) {
+        if (!xdr_string (xdrs, &sp, MAX_LSF_NAME_LEN)) {
             if (xdrs->x_op == XDR_DECODE) {
                 FREEUP (memp);
             }
@@ -714,7 +714,7 @@ xdr_lsInfo (XDR * xdrs, struct lsInfo * lsInfoPtr, struct LSFHeader *hdr)
         if (xdrs->x_op == XDR_DECODE) {
             sp[0] = '\0';
         }
-        if (!xdr_string (xdrs, &sp, MAXLSFNAMELEN)) {
+        if (!xdr_string (xdrs, &sp, MAX_LSF_NAME_LEN)) {
             if (xdrs->x_op == XDR_DECODE) {
                 FREEUP (memp);
             }
@@ -743,7 +743,7 @@ xdr_lsInfo (XDR * xdrs, struct lsInfo * lsInfoPtr, struct LSFHeader *hdr)
         if (xdrs->x_op == XDR_DECODE) {
             sp[0] = '\0';
         }
-        if (!xdr_string (xdrs, &sp, MAXLSFNAMELEN)) {
+        if (!xdr_string (xdrs, &sp, MAX_LSF_NAME_LEN)) {
             if (xdrs->x_op == XDR_DECODE) {
                 FREEUP (memp);
             }
@@ -834,7 +834,7 @@ xdr_clusterInfoReq (XDR *xdrs, struct clusterInfoReq *clusterInfoReq, struct LSF
     }
     
     assert( clusterInfoReq->listsize >= 0);
-    if (!xdr_array_string (xdrs, clusterInfoReq->clusters, MAXLSFNAMELEN, clusterInfoReq->listsize))
+    if (!xdr_array_string (xdrs, clusterInfoReq->clusters, MAX_LSF_NAME_LEN, clusterInfoReq->listsize))
     {
         if (xdrs->x_op == XDR_DECODE) {
             FREEUP (clusterInfoReq->resReq);
@@ -945,9 +945,9 @@ xdr_shortCInfo (XDR * xdrs, struct shortCInfo *clustInfoPtr, struct LSFHeader *h
         clustInfoPtr->admins = NULL;
     }
     
-    if (!(xdr_string ( xdrs, &sp1, MAXLSFNAMELEN)       &&
+    if (!(xdr_string ( xdrs, &sp1, MAX_LSF_NAME_LEN)       &&
           xdr_string ( xdrs, &sp2, MAXHOSTNAMELEN)      &&
-          xdr_string ( xdrs, &sp3, MAXLSFNAMELEN)       &&
+          xdr_string ( xdrs, &sp3, MAX_LSF_NAME_LEN)       &&
           xdr_u_int  ( xdrs, &clustInfoPtr->status)     &&
           xdr_u_int  ( xdrs, &clustInfoPtr->numServers) &&
           xdr_u_int  ( xdrs, &clustInfoPtr->numClients) &&
@@ -1075,9 +1075,9 @@ xdr_cInfo (XDR *xdrs, struct cInfo *cInfo, struct LSFHeader *hdr)
         cInfo->admins = NULL;
     }
     
-    if (!(xdr_string (xdrs, &sp1, MAXLSFNAMELEN) &&
+    if (!(xdr_string (xdrs, &sp1, MAX_LSF_NAME_LEN) &&
           xdr_string (xdrs, &sp2, MAXHOSTNAMELEN)&&
-          xdr_string (xdrs, &sp3, MAXLSFNAMELEN) &&
+          xdr_string (xdrs, &sp3, MAX_LSF_NAME_LEN) &&
           xdr_u_int    (xdrs, &cInfo->status)      &&
           xdr_u_int    (xdrs, &cInfo->numServers)  &&
           xdr_u_int    (xdrs, &cInfo->numClients)  &&
@@ -1154,7 +1154,7 @@ xdr_cInfo (XDR *xdrs, struct cInfo *cInfo, struct LSFHeader *hdr)
     }
     
     if (cInfo->numIndx > 0) {
-        if (!xdr_array_string (xdrs, cInfo->loadIndxNames, MAXLSFNAMELEN, cInfo->numIndx)) {
+        if (!xdr_array_string (xdrs, cInfo->loadIndxNames, MAX_LSF_NAME_LEN, cInfo->numIndx)) {
             FREEUP (cInfo->loadIndxNames);
             return FALSE;
         }
@@ -1387,11 +1387,11 @@ xdr_hostEntry (XDR * xdrs, struct hostEntry *hPtr, struct LSFHeader *hdr)
     }
     
     s = hPtr->hostModel;
-    if (!xdr_string (xdrs, &s, MAXLSFNAMELEN))
+    if (!xdr_string (xdrs, &s, MAX_LSF_NAME_LEN))
         return FALSE;
     
     s = hPtr->hostType;
-    if (!xdr_string (xdrs, &s, MAXLSFNAMELEN)) {
+    if (!xdr_string (xdrs, &s, MAX_LSF_NAME_LEN)) {
         return FALSE;
     }
     

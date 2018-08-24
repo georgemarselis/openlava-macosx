@@ -42,7 +42,7 @@ mychdir_( char *path, struct hostent *hp )
 	static char first = TRUE;
 	char *goodpath = path;
 	char *sp = NULL;
-	char *filename = malloc( sizeof( char ) * MAXPATHLEN + 1);
+	char *filename = malloc( sizeof( char ) * MAX_PATH_LEN + 1);
 
 	if (path == NULL || strlen (path) == 0 || path[0] != '/' || AM_NEVER) {
 		return chdir (usePath (path));
@@ -379,7 +379,7 @@ getMap_ (void)
 int
 netHostChdir (char *path, struct hostent *hp)
 {
-	char *filename = malloc( sizeof( char ) * MAXFILENAMELEN + 1 ); // FIXME FIXME FIXME FIXME FIXME FIXME replace MAXFILENAMELEN to OS equivallent.
+	char *filename = malloc( sizeof( char ) * MAX_FILENAME_LEN + 1 ); // FIXME FIXME FIXME FIXME FIXME FIXME replace MAX_FILENAME_LEN to OS equivallent.
 	char *mp       = NULL;
 
 	if (AM_LAST || AM_NEVER)
@@ -416,10 +416,10 @@ char *
 mountNet_ (struct hostent *hp)
 {
 	static char *filename = NULL;
-	char *hostnamebuf     = malloc( sizeof( char ) * MAXHOSTNAMELEN + 1 ); // FIXME FIXME FIXME FIXME replace MAXFILENAMELEN with appropriate OS constant
-	char *cwd             = malloc( sizeof( char ) * MAXPATHLEN + 1 );     // FIXME FIXME FIXME FIXME replace MAXFILENAMELEN with appropriate OS constant
+	char *hostnamebuf     = malloc( sizeof( char ) * MAXHOSTNAMELEN + 1 ); // FIXME FIXME FIXME FIXME replace MAX_FILENAME_LEN with appropriate OS constant
+	char *cwd             = malloc( sizeof( char ) * MAX_PATH_LEN + 1 );     // FIXME FIXME FIXME FIXME replace MAX_FILENAME_LEN with appropriate OS constant
 	char *sp              = NULL;
-	filename = malloc( sizeof( char ) * MAXFILENAMELEN + 1);  // FIXME FIXME FIXME FIXME replace MAXFILENAMELEN with appropriate OS constant
+	filename = malloc( sizeof( char ) * MAX_FILENAME_LEN + 1);  // FIXME FIXME FIXME FIXME replace MAX_FILENAME_LEN with appropriate OS constant
 
 	if (getcwd (cwd, sizeof (cwd)) == NULL) {
 		return NULL;
@@ -460,7 +460,7 @@ mountNet_ (struct hostent *hp)
 int
 myopen_ (char *filename, int flags, int mode, struct hostent *hp)
 {
-	char *filenamebuf = malloc( sizeof( char ) * MAXFILENAMELEN + 1 );
+	char *filenamebuf = malloc( sizeof( char ) * MAX_FILENAME_LEN + 1 );
 	char *mp = NULL;
 	int i = 0;
 
@@ -501,11 +501,11 @@ myopen_ (char *filename, int flags, int mode, struct hostent *hp)
 FILE *
 myfopen_ (const char *filename, const char *type, struct hostent *hp)
 {
-	char *filenamebuf = malloc( MAXFILENAMELEN*sizeof(char) + 1 ) ;
+	char *filenamebuf = malloc( MAX_FILENAME_LEN*sizeof(char) + 1 ) ;
 	FILE *fp = NULL;
 	char *mp = NULL;
 
-	memset( filenamebuf, ' ', MAXFILENAMELEN*sizeof(char) + 1 );
+	memset( filenamebuf, ' ', MAX_FILENAME_LEN*sizeof(char) + 1 );
 
 	if (!hp || filename[0] != '/' || AM_NEVER) {
 		return fopen (usePath ( filename), type); // FIXME FIXME FIXME fix cast or call to function
@@ -542,7 +542,7 @@ myfopen_ (const char *filename, const char *type, struct hostent *hp)
 int
 mystat_ (char *filename, struct stat *sbuf, struct hostent *hp)
 {
-	char filenamebuf[MAXFILENAMELEN];
+	char filenamebuf[MAX_FILENAME_LEN];
 	char *mp = NULL;
 	int i;
 
@@ -581,7 +581,7 @@ mystat_ (char *filename, struct stat *sbuf, struct hostent *hp)
 int
 mychmod_ (char *filename, mode_t mode, struct hostent *hp)
 {
-	char fnamebuf[MAXFILENAMELEN];
+	char fnamebuf[MAX_FILENAME_LEN];
 	int i  = 0;
 	char *mp = NULL;
 
@@ -620,7 +620,7 @@ mychmod_ (char *filename, mode_t mode, struct hostent *hp)
 void
 myexecv_ (char *filename, char **argv, struct hostent *hp)
 {
-  char fnamebuf[MAXFILENAMELEN];
+  char fnamebuf[MAX_FILENAME_LEN];
   char *mp;
 
   if (!hp || filename[0] != '/' || AM_NEVER)
@@ -664,7 +664,7 @@ myexecv_ (char *filename, char **argv, struct hostent *hp)
 int
 myunlink_ (char *filename, struct hostent *hp, int doMount)
 {
-	char fnamebuf[MAXFILENAMELEN];
+	char fnamebuf[MAX_FILENAME_LEN];
 	char *mp = NULL;
 	int i    = 0;
 
@@ -704,7 +704,7 @@ myunlink_ (char *filename, struct hostent *hp, int doMount)
 int
 mymkdir_ (char *filename, mode_t mode, struct hostent *hp)
 {
-	char fnamebuf[MAXFILENAMELEN];
+	char fnamebuf[MAX_FILENAME_LEN];
 	char *mp = NULL;
 	int i    = 0;
 
@@ -742,8 +742,8 @@ mymkdir_ (char *filename, mode_t mode, struct hostent *hp)
 int
 myrename_ (char *from, char *to, struct hostent *hp)
 {
-	char fnamebuf[MAXFILENAMELEN];
-	char tnamebuf[MAXFILENAMELEN];
+	char fnamebuf[MAX_FILENAME_LEN];
+	char tnamebuf[MAX_FILENAME_LEN];
 	char *mp = NULL;
 	int i    = 0;
 

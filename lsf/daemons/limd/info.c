@@ -225,7 +225,7 @@ clusNameReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr)
   xdrmem_create (&xdrs2, buf, MSGSIZE, XDR_ENCODE);
 
   if (!xdr_LSFHeader (&xdrs2, &replyHdr)
-      || !xdr_string (&xdrs2, &sp, MAXLSFNAMELEN))
+      || !xdr_string (&xdrs2, &sp, MAX_LSF_NAME_LEN))
     {
       ls_syslog (LOG_ERR, "\
 %s: failed decoding message from %s", __func__, sockAdd2Str_ (from));
@@ -566,12 +566,12 @@ cpufReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr)
     char buf[MSGSIZE];
   XDR xdrs2;
   enum limReplyCode limReplyCode;
-  char hostModel[MAXLSFNAMELEN];
+  char hostModel[MAX_LSF_NAME_LEN];
   char *sp = hostModel;
   hEnt *hashEntPtr = NULL;
   struct LSFHeader replyHdr;
 
-  if (!xdr_string (xdrs, &sp, MAXLSFNAMELEN))
+  if (!xdr_string (xdrs, &sp, MAX_LSF_NAME_LEN))
     {
       limReplyCode = LIME_BAD_DATA;
       goto Reply;

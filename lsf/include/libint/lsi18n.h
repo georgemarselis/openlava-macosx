@@ -110,7 +110,7 @@ enum CTIME_ENUM {
 };
 
 // #define I18N_CATFILE        "lsf"
-const char I18N_CATFILE[] = "lsf";
+static const char I18N_CATFILE[] = "lsf";
 
 #ifdef NL_SETN
 #error

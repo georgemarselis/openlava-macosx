@@ -25,7 +25,7 @@
 int
 ls_initdebug (char *appName)
 {
-  char *logMask = malloc( sizeof( char ) * MAXLSFNAMELEN + 1);
+  char *logMask = malloc( sizeof( char ) * MAX_LSF_NAME_LEN + 1);
   struct config_param *pPtr = NULL;
 
 

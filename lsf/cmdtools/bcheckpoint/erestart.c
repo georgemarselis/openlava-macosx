@@ -73,7 +73,7 @@ main (int argc, char **argv)
   char *pOldJobID = NULL;
   char *presAcctFN = NULL;
   char *pChkpntDir = NULL;
-  char erestartProgPath[MAXPATHLEN];
+  char erestartProgPath[MAX_PATH_LEN];
   pid_t iChildPid, myPid, myPGid;
   LS_WAIT_T iStatus;
   int iReValue;
@@ -86,8 +86,8 @@ main (int argc, char **argv)
   long lMaxfds;
 
 
-  char newUserCmd[MAXFILENAMELEN];
-  char newJobFileName[MAXPATHLEN];
+  char newUserCmd[MAX_FILENAME_LEN];
+  char newJobFileName[MAX_PATH_LEN];
   char *pUserCmd = NULL;
 
 
@@ -285,8 +285,8 @@ main (int argc, char **argv)
     }
   else if (iChildPid == 0)
     {
-      char progName[MAXFILENAMELEN];
-      char userCmd[MAXFILENAMELEN];
+      char progName[MAX_FILENAME_LEN];
+      char userCmd[MAX_FILENAME_LEN];
       int ii;
 
 
@@ -351,7 +351,7 @@ main (int argc, char **argv)
 	}
       else
 	{
-	  char aFileName[MAXPATHLEN];
+	  char aFileName[MAX_PATH_LEN];
 
 	  if ((getChkpntDirFile (aFileName, ERESTART_STDOUT_FILE) == -1)
 	      || (redirectFd (aFileName, 1) == -1))
@@ -499,7 +499,7 @@ main (int argc, char **argv)
   else if (iChildPid == 0)
     {
       char *pSubCwd = NULL;
-      char fileName[MAXFILENAMELEN];
+      char fileName[MAX_FILENAME_LEN];
       char *pCurChar = NULL;
       int ii;
 
@@ -748,7 +748,7 @@ getUserCmdFromCmdF (char *pNewUserCmd)
   static char __func__] = "getUserCmdFromCmdF()";
 
   char line[MAXLINELEN];
-  char cmdFileName[MAXPATHLEN];
+  char cmdFileName[MAX_PATH_LEN];
   FILE *pFile = NULL;
   int iReValue = -1;
 

@@ -1077,7 +1077,7 @@ sigActEnd (struct jobCard *jobCard)
   struct stat st;
   bool_t freed = FALSE;
 
-  char exitFile[MAXFILENAMELEN];
+  char exitFile[MAX_FILENAME_LEN];
 
 
   if (jobCard->jobSpecs.actValue < 0)

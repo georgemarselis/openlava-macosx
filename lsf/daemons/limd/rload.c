@@ -72,7 +72,7 @@ time_t
 getutime (char *usert)
 {
     struct stat ttystatus = { };
-    char *buffer = malloc( sizeof( char ) * MAXPATHLEN + 1);
+    char *buffer = malloc( sizeof( char ) * MAX_PATH_LEN + 1);
     time_t lastinputtime = 0;
     time_t t = 0;
 
@@ -993,7 +993,7 @@ getusr (void)
   if (nfds == 1)
     {
       int numIndx, cc;
-      char name[MAXLSFNAMELEN], valueString[MAXEXTRESLEN];
+      char name[MAX_LSF_NAME_LEN], valueString[MAXEXTRESLEN];
       float value;
       sigset_t oldMask;
       sigset_t newMask;
@@ -1078,7 +1078,7 @@ getusr (void)
 	  else
 	    {
 	      cc = fscanf (fp, "%40s", name);
-	      name[MAXLSFNAMELEN - 1] = '\0';
+	      name[MAX_LSF_NAME_LEN - 1] = '\0';
 	    }
 
 	  if (cc == -1)
@@ -1330,10 +1330,10 @@ getElimRes (void)
   int resNo;
   char *resNameString;
 
-  resNameString = malloc ((allInfo.nRes) * MAXLSFNAMELEN);
+  resNameString = malloc ((allInfo.nRes) * MAX_LSF_NAME_LEN);
   if (resNameString == NULL)
     {
-      ls_syslog (LOG_ERR, "%s: failed allocate %d bytes %m", __func__, allInfo.nRes * MAXLSFNAMELEN);
+      ls_syslog (LOG_ERR, "%s: failed allocate %d bytes %m", __func__, allInfo.nRes * MAX_LSF_NAME_LEN);
       lim_Exit ("getElimRes");
     }
 
@@ -1549,8 +1549,8 @@ queueLength (void)
 {
     DIR *dir_proc_fd       = NULL;
     struct dirent *process = NULL;
-    char *filename = malloc( sizeof( char ) * MAXLSFNAMELEN + 1 );
-    char *buffer   = malloc( sizeof( char ) * MAXLSFNAMELEN + 1 );
+    char *filename = malloc( sizeof( char ) * MAX_LSF_NAME_LEN + 1 );
+    char *buffer   = malloc( sizeof( char ) * MAX_LSF_NAME_LEN + 1 );
     char status    = ' ';
     size_t size    = 0;
     float ql       = 0.0;
@@ -1746,8 +1746,8 @@ int
 readMeminfo (void)
 {
     // FILE *f = NULL;
-    // char *lineBuffer = malloc( sizeof( char ) * MAXLSFNAMELEN + 1 );
-    // char *tag        = malloc( sizeof( char ) * MAXLSFNAMELEN + 1 );
+    // char *lineBuffer = malloc( sizeof( char ) * MAX_LSF_NAME_LEN + 1 );
+    // char *tag        = malloc( sizeof( char ) * MAX_LSF_NAME_LEN + 1 );
     // u_long value = 0;
 
     const char hw_memsize_label[] = "hw.memsize";
@@ -1830,8 +1830,8 @@ getPage (double *page_in, double *page_out, bool_t isPaging)
 {
     FILE *f = NULL;
     double value = 0.0;
-    char *lineBuffer = malloc( sizeof( char ) * MAXLSFNAMELEN + 1 );
-    char *tag        = malloc( sizeof( char ) * MAXLSFNAMELEN + 1 );
+    char *lineBuffer = malloc( sizeof( char ) * MAX_LSF_NAME_LEN + 1 );
+    char *tag        = malloc( sizeof( char ) * MAX_LSF_NAME_LEN + 1 );
 
     if ((f = fopen ("/proc/vmstat", "r")) == NULL) // FIXME FIXME FIXME FIXME FIXME set macosx appropriate path
     {

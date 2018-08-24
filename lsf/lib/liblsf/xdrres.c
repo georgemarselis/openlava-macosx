@@ -47,7 +47,7 @@ xdr_resCmdBill (XDR *xdrs, struct resCmdBill *cmd, struct LSFHeader *hdr)
         sp[0] = '\0';
     }
 
-    if (!xdr_string (xdrs, &sp, MAXPATHLEN)) {
+    if (!xdr_string (xdrs, &sp, MAX_PATH_LEN)) {
         return (FALSE);
     }
 
@@ -224,7 +224,7 @@ xdr_resChdir (XDR *xdrs, struct resChdir *ch, struct LSFHeader *hdr)
         sp[0] = '\0';
     }
 
-    if (!xdr_string (xdrs, &sp, MAXFILENAMELEN)) {
+    if (!xdr_string (xdrs, &sp, MAX_FILENAME_LEN)) {
         return (FALSE);
     }
 
@@ -281,7 +281,7 @@ xdr_ropenReq (XDR *xdrs, struct ropenReq *req, struct LSFHeader *hdr)
 
     assert( hdr->length );
     if (xdrs->x_op == XDR_DECODE) {
-        len = MAXFILENAMELEN;
+        len = MAX_FILENAME_LEN;
         sp[0] = '\0';
     }
     else {

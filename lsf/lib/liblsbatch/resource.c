@@ -82,10 +82,10 @@ lsb_sharedresourceinfo (char **resources, unsigned int *numResources, char *host
     }
       for ( unsigned int i = 0; i < *numResources; i++)
     {
-      if (resources[i] && strlen (resources[i]) + 1 < MAXLSFNAMELEN)
+      if (resources[i] && strlen (resources[i]) + 1 < MAX_LSF_NAME_LEN)
         {
           resourceInfoReq.resourceNames[i] = resources[i];
-          cc += MAXLSFNAMELEN;
+          cc += MAX_LSF_NAME_LEN;
         }
       else
         {

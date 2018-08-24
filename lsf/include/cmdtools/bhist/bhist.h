@@ -74,7 +74,7 @@ struct bhistReq
   int options;
   int userId;
   char userName[MAX_LSB_NAME_LEN];
-  char eventFileName[MAXFILENAMELEN];
+  char eventFileName[MAX_FILENAME_LEN];
   char queue[MAX_LSB_NAME_LEN];
   char checkHost[MAXHOSTNAMELEN];
   time_t endTime[2];

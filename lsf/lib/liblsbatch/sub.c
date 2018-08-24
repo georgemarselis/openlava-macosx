@@ -129,7 +129,7 @@ lsb_submit (struct submit *jobSubReq, struct submitReply *submitRep)
 {
 	LS_LONG_INT jobId = -1;
 	struct lsfAuth auth;
-	char cwd[MAXFILENAMELEN]; // FIXME FIXME figure out if MAXFILENAMELEN is a constant offered by the filesystem/OS or by LSF; set to filesystem/OS appropriately
+	char cwd[MAX_FILENAME_LEN]; // FIXME FIXME figure out if MAX_FILENAME_LEN is a constant offered by the filesystem/OS or by LSF; set to filesystem/OS appropriately
 	struct group *grpEntry;
 	char *queue = NULL;
 	struct submitReq submitReq = {
@@ -864,7 +864,7 @@ subRestart (struct submit *jobSubReq, struct submitReq *submitReq, struct submit
 	} err = { 0, 0, 0, 0 } ;
 	struct linger linstr = { 1, 5 };
 
-	chkPath = malloc( sizeof( char ) * MAXFILENAMELEN + 1);
+	chkPath = malloc( sizeof( char ) * MAX_FILENAME_LEN + 1);
 	
 	if (logclass & (LC_TRACE | LC_EXEC)) {
 		ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
@@ -888,7 +888,7 @@ subRestart (struct submit *jobSubReq, struct submitReq *submitReq, struct submit
 		FILE *fp = 0 ;
 		uid_t uid = 0;
 		struct eventRec *logPtr = NULL;
-		char *chklog = malloc( sizeof( char ) * MAXFILENAMELEN + 1 );
+		char *chklog = malloc( sizeof( char ) * MAX_FILENAME_LEN + 1 );
 		int exitVal = -1;
 
 		close (childIoFd[0]);
@@ -1273,7 +1273,7 @@ childExit:
 	}*/
 			submitReq->maxNumProcessors = jobLog->maxNumProcessors;
 
-			if (strlen (jobLog->inFile) >= MAXFILENAMELEN - 1) {
+			if (strlen (jobLog->inFile) >= MAX_FILENAME_LEN - 1) {
 				goto parentErr;
 			}
 			submitReq->inFile = jobLog->inFile;
@@ -1281,7 +1281,7 @@ childExit:
 				submitReq->options |= SUB_IN_FILE;
 			}
 
-			if (strlen (jobLog->outFile) >= MAXFILENAMELEN - 1) {
+			if (strlen (jobLog->outFile) >= MAX_FILENAME_LEN - 1) {
 				goto parentErr;
 			}
 			submitReq->outFile = jobLog->outFile;
@@ -1289,7 +1289,7 @@ childExit:
 				submitReq->options |= SUB_OUT_FILE;
 			}
 
-			if (strlen (jobLog->errFile) >= MAXFILENAMELEN - 1) {
+			if (strlen (jobLog->errFile) >= MAX_FILENAME_LEN - 1) {
 				goto parentErr;
 			}
 			submitReq->errFile = jobLog->errFile;
@@ -1297,7 +1297,7 @@ childExit:
 				submitReq->options |= SUB_ERR_FILE;
 			}
 
-			if (strlen (jobLog->inFileSpool) >= MAXFILENAMELEN) {
+			if (strlen (jobLog->inFileSpool) >= MAX_FILENAME_LEN) {
 				goto parentErr;
 			}
 			submitReq->inFileSpool = jobLog->inFileSpool;
@@ -1305,7 +1305,7 @@ childExit:
 				submitReq->options2 |= SUB2_IN_FILE_SPOOL;
 			}
 
-			if (strlen (jobLog->commandSpool) >= MAXFILENAMELEN) {
+			if (strlen (jobLog->commandSpool) >= MAX_FILENAME_LEN) {
 				goto parentErr;
 			}
 			submitReq->commandSpool = jobLog->commandSpool;
@@ -1328,24 +1328,24 @@ childExit:
 			}
 
 			submitReq->options |= SUB_CHKPNT_DIR;
-			if (strlen (jobLog->chkpntDir) >= MAXFILENAMELEN - 1) {
+			if (strlen (jobLog->chkpntDir) >= MAX_FILENAME_LEN - 1) {
 				goto parentErr;
 			}
 			submitReq->chkpntDir = chkPath;
 
-			if (strlen (jobLog->jobFile) >= MAXFILENAMELEN - 1) {
+			if (strlen (jobLog->jobFile) >= MAX_FILENAME_LEN - 1) {
 				goto parentErr;
 			}
 			submitReq->jobFile = jobLog->jobFile;
 
 			submitReq->umask = jobLog->umask;
 
-			if (strlen (jobLog->cwd) >= MAXFILENAMELEN - 1) {
+			if (strlen (jobLog->cwd) >= MAX_FILENAME_LEN - 1) {
 				goto parentErr;
 			}
 			submitReq->cwd = jobLog->cwd;
 
-			if (strlen (jobLog->subHomeDir) >= MAXFILENAMELEN - 1) {
+			if (strlen (jobLog->subHomeDir) >= MAX_FILENAME_LEN - 1) {
 				goto parentErr;
 			}
 			submitReq->subHomeDir = jobLog->subHomeDir;
@@ -1468,7 +1468,7 @@ getChkDir (char *givenDir, char *chkPath)
 	else {
 		DIR *dirp = NULL;
 		struct dirent *dp = NULL;
-		char jobIdDir[MAXFILENAMELEN];
+		char jobIdDir[MAX_FILENAME_LEN];
 		int i = 0;
 
 		i = 0;
@@ -1505,7 +1505,7 @@ LS_LONG_INT
 subJob (struct submit *jobSubReq, struct submitReq *submitReq, struct submitReply *submitRep, struct lsfAuth *auth)
 {
 
-	char homeDir[MAXFILENAMELEN]; // FIXME FIXME FIXME convert to dynamic string
+	char homeDir[MAX_FILENAME_LEN]; // FIXME FIXME FIXME convert to dynamic string
 	char resReq[MAXLINELEN]; // FIXME FIXME FIXME convert to dynamic string
 	char cmd[MAXLINELEN]; // FIXME FIXME FIXME convert to dynamic string
 	struct lenData jf;
@@ -1774,7 +1774,7 @@ chUserRemoveSpoolFile (const char *hostName, const char *spoolFile)
 	pid_t pid;
 	LS_WAIT_T status;
 	const char *sp;
-	char dirName[MAXFILENAMELEN];
+	char dirName[MAX_FILENAME_LEN];
 
 	sp = getLowestDir_ (spoolFile);
 	if (sp)
@@ -1888,7 +1888,7 @@ getOtherParams (struct submit *jobSubReq, struct submitReq *submitReq, struct su
 			return -1;
 			}
 
-		if (strlen (jobSubReq->inFile) >= MAXFILENAMELEN - 1)
+		if (strlen (jobSubReq->inFile) >= MAX_FILENAME_LEN - 1)
 			{
 			lsberrno = LSBE_SYS_CALL;
 			errno = ENAMETOOLONG;
@@ -1914,7 +1914,7 @@ getOtherParams (struct submit *jobSubReq, struct submitReq *submitReq, struct su
 
 		pSpoolFile = spoolInfo->spoolFile;
 		spoolFileLen = strlen (pSpoolFile);
-		if (spoolFileLen >= MAXFILENAMELEN)
+		if (spoolFileLen >= MAX_FILENAME_LEN)
 			{
 			lsberrno = LSBE_SYS_CALL;
 			errno = ENAMETOOLONG;
@@ -1977,7 +1977,7 @@ getOtherParams (struct submit *jobSubReq, struct submitReq *submitReq, struct su
 			return -1;
 			}
 
-		if (strlen (jobSubReq->outFile) >= MAXFILENAMELEN - 1)
+		if (strlen (jobSubReq->outFile) >= MAX_FILENAME_LEN - 1)
 			{
 			lsberrno = LSBE_SYS_CALL;
 			errno = ENAMETOOLONG;
@@ -1997,7 +1997,7 @@ getOtherParams (struct submit *jobSubReq, struct submitReq *submitReq, struct su
 			return -1;
 			}
 
-		if (strlen (jobSubReq->errFile) >= MAXFILENAMELEN - 1)
+		if (strlen (jobSubReq->errFile) >= MAX_FILENAME_LEN - 1)
 			{
 			lsberrno = LSBE_SYS_CALL;
 			errno = ENAMETOOLONG;
@@ -2034,7 +2034,7 @@ getOtherParams (struct submit *jobSubReq, struct submitReq *submitReq, struct su
 			return -1;
 			}
 
-		if (strlen (jobSubReq->chkpntDir) >= MAXFILENAMELEN - 1)
+		if (strlen (jobSubReq->chkpntDir) >= MAX_FILENAME_LEN - 1)
 			{
 			lsberrno = LSBE_SYS_CALL;
 			errno = ENAMETOOLONG;
@@ -2222,7 +2222,7 @@ getOtherParams (struct submit *jobSubReq, struct submitReq *submitReq, struct su
 
 		pSpoolCmd = spoolInfo->spoolFile;
 		spoolCmdLen = strlen (pSpoolCmd);
-		if (spoolCmdLen >= MAXFILENAMELEN) {
+		if (spoolCmdLen >= MAX_FILENAME_LEN) {
 			lsberrno = LSBE_SYS_CALL;
 			errno = ENAMETOOLONG;
 			return -1;
@@ -2317,7 +2317,7 @@ getOtherParams (struct submit *jobSubReq, struct submitReq *submitReq, struct su
 		return -1;
 	}
 
-	if (strlen (pw->pw_dir) >= MAXFILENAMELEN - 1) {
+	if (strlen (pw->pw_dir) >= MAX_FILENAME_LEN - 1) {
 		lsberrno = LSBE_SYS_CALL;
 		errno = ENAMETOOLONG;
 		return -1;
@@ -2353,7 +2353,7 @@ char *
 acctMapGet (int *fail, char *lsfUserName)
 {
 
-	char hostfn[MAXFILENAMELEN] = "a";
+	char hostfn[MAX_FILENAME_LEN] = "a";
 	char clusorhost[MAX_LSB_NAME_LEN] = "a";
 	char user[MAX_LSB_NAME_LEN] = "a";
 	char dir[40] = "a";
@@ -3401,7 +3401,7 @@ setOption_ (int argc, char **argv, char *template, struct submit *req, int mask,
 						break;
 					}
 
-					if (strlen (optarg) > MAXFILENAMELEN - 1)
+					if (strlen (optarg) > MAX_FILENAME_LEN - 1)
 						{
 						/* catgets 409 */
 						PRINT_ERRMSG1 (errMsg, "catgets 409: %s: File name too long", optarg);
@@ -3428,7 +3428,7 @@ setOption_ (int argc, char **argv, char *template, struct submit *req, int mask,
 						break;
 					}
 
-					if (strlen (optarg) > MAXFILENAMELEN - 1)
+					if (strlen (optarg) > MAX_FILENAME_LEN - 1)
 						{
 						/* catgets 409 */
 						PRINT_ERRMSG1 (errMsg, "catgets 409: %s: File name too long", optarg);
@@ -3446,7 +3446,7 @@ setOption_ (int argc, char **argv, char *template, struct submit *req, int mask,
 					break;
 				}
 
-				if (strlen (optarg) > MAXFILENAMELEN - 1)
+				if (strlen (optarg) > MAX_FILENAME_LEN - 1)
 					{
 					/* catgets 410 */
 					PRINT_ERRMSG1 (errMsg, "catgets 410: %s: File name too long", optarg);
@@ -3491,7 +3491,7 @@ setOption_ (int argc, char **argv, char *template, struct submit *req, int mask,
 					break;
 				}
 
-				if (strlen (optarg) > MAXFILENAMELEN - 1)
+				if (strlen (optarg) > MAX_FILENAME_LEN - 1)
 					{
 					/* catgets 412 */
 					PRINT_ERRMSG1 (errMsg, "catgets 412: %s: File name too long", optarg);
@@ -4395,7 +4395,7 @@ parseXF (struct submit *req, char *arg, char **errMsg)
 	static struct xFile *xp = NULL;
 	struct xFile *tmpXp = NULL;
 	int options = 0;
-	char op[MAXLINELEN], lf[MAXFILENAMELEN], rf[MAXFILENAMELEN];
+	char op[MAXLINELEN], lf[MAX_FILENAME_LEN], rf[MAX_FILENAME_LEN];
 	char *p;
 	char saveArg[MAXLINELEN];
 	const int NUMXF = 10;
@@ -4459,8 +4459,8 @@ parseXF (struct submit *req, char *arg, char **errMsg)
 		return -1;
 		}
 
-	memset (lf, 0, MAXFILENAMELEN);
-	memset (rf, 0, MAXFILENAMELEN);
+	memset (lf, 0, MAX_FILENAME_LEN);
+	memset (rf, 0, MAX_FILENAME_LEN);
 	memcpy (lf, saveArg, p - saveArg);
 	memcpy (rf, p + strlen (op), strlen (saveArg) - strlen (lf) - strlen (op));
 
@@ -4579,8 +4579,8 @@ runBatchEsub (struct lenData *ed_, struct submit *jobSubReq)
 	};
 	int cc = 0;
 	// int i  = 0;
-	char parmFile[MAXFILENAMELEN];
-	char esub[MAXFILENAMELEN];
+	char parmFile[MAX_FILENAME_LEN];
+	char esub[MAX_FILENAME_LEN];
 	FILE *parmfp;
 	struct stat sbuf;
 	const unsigned int LSB_SUB_COMMANDNAME  = 0;
@@ -5124,8 +5124,8 @@ lsb_catch (const char *exceptionName, int (*exceptionHandler) (void *))
 
 void makeCleanToRunEsub ( void )
 {
-	char parmDeltaFile[MAXPATHLEN];
-	char envDeltaFile[MAXPATHLEN];
+	char parmDeltaFile[MAX_PATH_LEN];
+	char envDeltaFile[MAX_PATH_LEN];
 	struct stat stbuf;
 
 	sprintf (parmDeltaFile, "%s/.lsbsubdeltaparm.%d.%d", LSTMPDIR, (int) getpid (), (int) getuid ());
@@ -5148,8 +5148,8 @@ void makeCleanToRunEsub ( void )
 void
 modifyJobInformation (struct submit *jobSubReq)
 {
-	char parmDeltaFile[MAXPATHLEN];
-	char envDeltaFile[MAXPATHLEN];
+	char parmDeltaFile[MAX_PATH_LEN];
+	char envDeltaFile[MAX_PATH_LEN];
 	int validKey = 0;
 	int v = 0;
 	char *sValue = NULL;

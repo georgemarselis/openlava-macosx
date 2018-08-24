@@ -1432,7 +1432,7 @@ adjLsbLoad (struct jData *jpbw, int forResume, bool_t doAdj)
   for (i = 0; i < jpbw->numHostPtr; i++)
     {
       float load;
-      char loadString[MAXLSFNAMELEN];
+      char loadString[MAX_LSF_NAME_LEN];
 
       if (jpbw->hPtr[i]->hStatus & HOST_STAT_UNAVAIL)
 	continue;

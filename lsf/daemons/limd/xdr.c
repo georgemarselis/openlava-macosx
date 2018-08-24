@@ -156,7 +156,7 @@ xdr_masterReg (XDR * xdrs, struct masterReg * masterRegPtr, struct LSFHeader * h
       sp2[0] = '\0';
     }
 
-  if (!xdr_string (xdrs, &sp1, MAXLSFNAMELEN)
+  if (!xdr_string (xdrs, &sp1, MAX_LSF_NAME_LEN)
       || !xdr_string (xdrs, &sp2, MAXHOSTNAMELEN)
       || !xdr_int (xdrs, &masterRegPtr->flags)
       || !xdr_u_int (xdrs, &masterRegPtr->seqNo)
@@ -193,8 +193,8 @@ xdr_statInfo (XDR * xdrs, struct statInfo * sip, struct LSFHeader * hdr)
       sp2[0] = '\0';
     }
 
-  if (!(xdr_string (xdrs, &sp1, MAXLSFNAMELEN) &&
-	xdr_string (xdrs, &sp2, MAXLSFNAMELEN)))
+  if (!(xdr_string (xdrs, &sp1, MAX_LSF_NAME_LEN) &&
+	xdr_string (xdrs, &sp2, MAX_LSF_NAME_LEN)))
     {
       return (FALSE);
     }

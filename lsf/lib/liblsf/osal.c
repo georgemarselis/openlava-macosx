@@ -50,7 +50,7 @@ void
 osConvertPath_ (char *pathname)
 {
   register int i;
-  for (i = 0; pathname[i] != '\0' && i < MAXPATHLEN; i++)
+  for (i = 0; pathname[i] != '\0' && i < MAX_PATH_LEN; i++)
     {
       if (pathname[i] == '\\')
 	pathname[i] = '/';

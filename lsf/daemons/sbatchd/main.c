@@ -501,7 +501,7 @@ processMsg (struct clientNode *client)
 #ifdef INTER_DAEMON_AUTH
       if (daemonParams[LSF_AUTH_DAEMONS].paramValue)
 	{
-	  char *aux_file, aux_file_buf[MAXPATHLEN];
+	  char *aux_file, aux_file_buf[MAX_PATH_LEN];
 
 
 	  putEauthAuxDataEnvVar (NULL);
@@ -727,7 +727,7 @@ start_master (void)
   i = 1;
   if (debug)
     {
-      margv[i] = my_malloc (MAXFILENAMELEN, __func__);
+      margv[i] = my_malloc (MAX_FILENAME_LEN, __func__);
       sprintf (margv[i], "-%d", debug);
       i++;
     }

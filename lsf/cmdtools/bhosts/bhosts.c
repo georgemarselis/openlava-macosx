@@ -686,7 +686,7 @@ formatHeader (char **dispindex, int start, int end)
 #define HEADERLEN  132
   int i, fmtid;
   int maxMem = HEADERLEN;
-  char tmpbuf[MAXLSFNAMELEN];
+  char tmpbuf[MAX_LSF_NAME_LEN];
   char *line = NULL;
   int first = TRUE;
   char fName[] = "formatHeader";
@@ -709,7 +709,7 @@ formatHeader (char **dispindex, int start, int end)
 
       if (fmtid == DEFAULT_FMT)
   {
-    if ((maxMem - strlen (line)) < MAXLSFNAMELEN)
+    if ((maxMem - strlen (line)) < MAX_LSF_NAME_LEN)
       {
         maxMem = 2 * maxMem;
         if ((line = (char *) realloc (line, maxMem)) == NULL)

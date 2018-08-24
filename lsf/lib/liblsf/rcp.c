@@ -64,7 +64,7 @@ parseXferArg (char *arg, char **userName, char **hostName, char **fName)
 
     if (!tmp_ptr || *user_arg == '\0')
         {
-            char lsfUserName[MAXLSFNAMELEN];
+            char lsfUserName[MAX_LSF_NAME_LEN];
             if (getLSFUser_ (lsfUserName, sizeof (lsfUserName)) != 0)
         {
             free (freeup_tmp);
@@ -694,7 +694,7 @@ rmDirAndFilesEx (char *dir, int recur)
 {
     DIR *dirp;
     struct dirent *dp;
-    char path[MAXPATHLEN];
+    char path[MAX_PATH_LEN];
 
     if ((dirp = opendir (dir)) == NULL)
         {
@@ -742,8 +742,8 @@ createSpoolSubDir (const char *spoolFileFullPath)
     char *pEnd2  = NULL;
     char *pBegin = NULL;
     DIR *pDir    = NULL;
-    char subDirectory1[MAXFILENAMELEN];
-    char subDirectory2[MAXFILENAMELEN];
+    char subDirectory1[MAX_FILENAME_LEN];
+    char subDirectory2[MAX_FILENAME_LEN];
     long len = 0;
     int returnValue = 0;
     mode_t previousUmask = 0;

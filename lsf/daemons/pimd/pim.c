@@ -56,7 +56,7 @@ enum
 } pimStatus;
 
 static int pim_debug = 0;
-static char infofile = malloc( sizeof( char ) * (MAXFILENAMELEN + 1 ) );
+static char infofile = malloc( sizeof( char ) * (MAX_FILENAME_LEN + 1 ) );
 static int sleepTime = PIM_SLEEP_TIME;
 static int updInterval = PIM_UPDATE_INTERVAL;
 
@@ -342,7 +342,7 @@ logProcessInfo (void)
 {
   int i;
   FILE *fp;
-  static char wfile[MAXFILENAMELEN];
+  static char wfile[MAX_FILENAME_LEN];
 
   sprintf (wfile, "%s.%d", infofile, getpid ());
 

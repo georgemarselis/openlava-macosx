@@ -139,7 +139,7 @@ typedef enum
 struct hand_shake
 {
   status_t code;
-  char buffer[MAXPATHLEN];
+  char buffer[MAX_PATH_LEN];
 };
 
 int currentRESSN = 0;
@@ -168,9 +168,9 @@ doacceptconn (void)
   socklen_t localLen = sizeof (local);
   struct passwd *pw;
   struct passwd pwSave;
-  char pwDir[MAXFILENAMELEN];
-  char pwShell[MAXFILENAMELEN];
-  char pwName[MAXLSFNAMELEN];
+  char pwDir[MAX_FILENAME_LEN];
+  char pwShell[MAX_FILENAME_LEN];
+  char pwName[MAX_LSF_NAME_LEN];
   struct hostent *hostp;
   socklen_t fromlen;
   int i;
@@ -1107,7 +1107,7 @@ resChdir (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs)
   static char __func__] = "resChdir";
   int i, cc;
   struct stat statbuf;
-  char resdir[MAXPATHLEN];
+  char resdir[MAX_PATH_LEN];
   struct resChdir ch;
 
   if (getcwd (resdir, sizeof (resdir)) == NULL)
@@ -2804,7 +2804,7 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 {
   static char __func__] = "rexecChild";
   sigset_t sigMask;
-  char val[MAXPATHLEN];
+  char val[MAX_PATH_LEN];
   int i, maxfds, lastUnusedFd;
   char *curdir = NULL;
   bool_t fromNT;
@@ -2890,7 +2890,7 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 
   if ((getenv ("WINDIR") != NULL) || (getenv ("windir") != NULL))
 	{
-	  char tmppath[MAXPATHLEN];
+	  char tmppath[MAX_PATH_LEN];
 
 	  fromNT = TRUE;
 	  sprintf (tmppath, "/bin:/usr/bin:/sbin:/usr/sbin");
@@ -2963,7 +2963,7 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 	}
   if (resParams[LSF_LIBDIR].paramValue != NULL)
 	{
-	  char tmppath[MAXFILENAMELEN];
+	  char tmppath[MAX_FILENAME_LEN];
 
 	  putEnv ("LSF_LIBDIR", resParams[LSF_LIBDIR].paramValue);
 
@@ -3145,7 +3145,7 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server,
 	{
 
 
-	  char home[MAXPATHLEN];
+	  char home[MAX_PATH_LEN];
 	  char *homeshare = getenv ("HOMESHARE");
 	  char *homedrive = getenv ("HOMEDRIVE");
 	  char *homepath = getenv ("HOMEPATH");
@@ -3394,7 +3394,7 @@ lsbExecChild (struct resCmdBill *cmdmsg, int *pty, int *sv, int *err, int *info,
 
   if (info)
 	{
-	  char val[MAXPATHLEN];
+	  char val[MAX_PATH_LEN];
 	  sprintf (val, "%d", info[1]);
 	  if (putEnv ("LSF_PM_SOCKFD", val) != 0)
 	{
@@ -5519,9 +5519,9 @@ resDebugReq (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR * xdrs, int c
   struct debugReq debugReq;
   enum resAck ack;
   char *dir = NULL;
-  char logFileName[MAXLSFNAMELEN];
-  char lsfLogDir[MAXPATHLEN];
-  char dynDbgEnv[MAXPATHLEN];
+  char logFileName[MAX_LSF_NAME_LEN];
+  char lsfLogDir[MAX_PATH_LEN];
+  char dynDbgEnv[MAX_PATH_LEN];
 
   memset (logFileName, 0, sizeof (logFileName));
   memset (lsfLogDir, 0, sizeof (lsfLogDir));

@@ -908,14 +908,14 @@ int
 checkSpoolDir ( const char *pSpoolDir)
 {
 	char *pTemp = NULL;
-	char TempPath[MAXPATHLEN];
-	char TempNT[MAXPATHLEN];
-	char TempUnix[MAXPATHLEN];
+	char TempPath[MAX_PATH_LEN];
+	char TempNT[MAX_PATH_LEN];
+	char TempUnix[MAX_PATH_LEN];
 
 	if (logclass & LC_EXEC) {
 		ls_syslog (LOG_DEBUG, "%s: JOB_SPOOL_DIR is set to %s, and  is of length %d \n", __func__, pSpoolDir, strlen (pSpoolDir));
 	}
-	if (strlen (pSpoolDir) >= MAXPATHLEN) {
+	if (strlen (pSpoolDir) >= MAX_PATH_LEN) {
 		return -1;
 		}
 

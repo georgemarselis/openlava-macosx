@@ -267,7 +267,7 @@ getOSUid_ (const char *lsfUserName, uid_t * uid)
 struct passwd *getpwlsfuser_( const char *lsfUserName ) 
 {
 	struct passwd *pw = NULL;
-	char osUserName[MAXLSFNAMELEN];
+	char osUserName[MAX_LSF_NAME_LEN];
 
 	memset ( osUserName, '\0', strlen( osUserName ) );
 
@@ -290,7 +290,7 @@ struct passwd *
 getpwdirlsfuser_ (const char *lsfUserName)
 {
 	struct passwd *pw = NULL;
-	char osUserName[MAXLSFNAMELEN];
+	char osUserName[MAX_LSF_NAME_LEN];
 
 	memset ( osUserName, 0, strlen( osUserName ) );
 

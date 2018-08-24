@@ -353,9 +353,9 @@ char lsf_setIndex (struct keymap *keyList, const char *filename, size_t lineNum)
 		return FALSE;
 	}
 
-	if (strlen (keyList[NAME].val) >= MAXLSFNAMELEN) {
+	if (strlen (keyList[NAME].val) >= MAX_LSF_NAME_LEN) {
 		/* catgets 5065 */
-		ls_syslog (LOG_ERR, "catgets 5065: %s: %s(%d): Name %s is too long (maximum is %d chars); ignoring index", __func__, filename, lineNum, keyList[NAME].val, MAXLSFNAMELEN - 1);
+		ls_syslog (LOG_ERR, "catgets 5065: %s: %s(%d): Name %s is too long (maximum is %d chars); ignoring index", __func__, filename, lineNum, keyList[NAME].val, MAX_LSF_NAME_LEN - 1);
 		return FALSE;
 	}
 
@@ -789,9 +789,9 @@ char do_Resources (FILE * fp, size_t *lineNum, const char *filename)
 				continue;
 			}
 
-			if (strlen (keyList[RESOURCENAME].val) >= MAXLSFNAMELEN - 1) {
+			if (strlen (keyList[RESOURCENAME].val) >= MAX_LSF_NAME_LEN - 1) {
 				/* catgets 5088 */
-				ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5088, "%s: %s(%d): Resource name %s too long in section resource. Should be less than %d characters,  ignoring line")), __func__, filename, *lineNum, keyList[RESOURCENAME].val, MAXLSFNAMELEN - 1);
+				ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5088, "%s: %s(%d): Resource name %s too long in section resource. Should be less than %d characters,  ignoring line")), __func__, filename, *lineNum, keyList[RESOURCENAME].val, MAX_LSF_NAME_LEN - 1);
 				freeKeyList (keyList);
 				continue;
 			}
@@ -2685,13 +2685,13 @@ int addResourceMap ( const char *resName, const char *location, const char *lsfi
 	char *cp                              = NULL;
 	char *ssp                             = NULL;
 	char *tempHost                        = NULL;
-	char initValue[MAXFILENAMELEN];
+	char initValue[MAX_FILENAME_LEN];
 	char externalResourceFlag[]           = "!";
 	char **hosts                          = NULL;
 	struct lsSharedResourceInfo *resource = NULL;
 
 	// const char addResourceMap[] = "addResourceMap";
-	memset( initValue, '\0', MAXFILENAMELEN );
+	memset( initValue, '\0', MAX_FILENAME_LEN );
 
 	if (resName == NULL || location == NULL) {
 
@@ -2707,7 +2707,7 @@ int addResourceMap ( const char *resName, const char *location, const char *lsfi
 
 	if (!strcmp (location, "!"))
 	{
-		memset( initValue, '\0', MAXFILENAMELEN );
+		memset( initValue, '\0', MAX_FILENAME_LEN );
 		tempHost = (char *) externalResourceFlag; // FIXME FIXME FIXME is this cast justified?
 		hosts = &tempHost;
 		if ((resource = addResource (resName, 1, hosts, initValue, lsfile, lineNum)) == NULL)
@@ -2749,7 +2749,7 @@ int addResourceMap ( const char *resName, const char *location, const char *lsfi
 		}
 		FREEUP (hosts);
 		error = FALSE;
-		memset( initValue, '\0', MAXFILENAMELEN );
+		memset( initValue, '\0', MAX_FILENAME_LEN );
 		while (*sp == ' ' && *sp != '\0') {
 			sp++;
 		}

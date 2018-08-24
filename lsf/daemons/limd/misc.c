@@ -241,7 +241,7 @@ shortLsInfoDup (struct shortLsInfo *src)
   shortLInfo->nModels = src->nModels;
 
 
-  memp = malloc ((src->nRes + src->nTypes + src->nModels) * MAXLSFNAMELEN +
+  memp = malloc ((src->nRes + src->nTypes + src->nModels) * MAX_LSF_NAME_LEN +
          src->nRes * sizeof (char *));
 
   if (!memp)
@@ -253,11 +253,11 @@ shortLsInfoDup (struct shortLsInfo *src)
   currp = memp;
   shortLInfo->resName = (char **) currp;
   currp += shortLInfo->nRes * sizeof (char *);
-  for (i = 0; i < src->nRes; i++, currp += MAXLSFNAMELEN)
+  for (i = 0; i < src->nRes; i++, currp += MAX_LSF_NAME_LEN)
     shortLInfo->resName[i] = currp;
-  for (i = 0; i < src->nTypes; i++, currp += MAXLSFNAMELEN)
+  for (i = 0; i < src->nTypes; i++, currp += MAX_LSF_NAME_LEN)
     shortLInfo->hostTypes[i] = currp;
-  for (i = 0; i < src->nModels; i++, currp += MAXLSFNAMELEN)
+  for (i = 0; i < src->nModels; i++, currp += MAX_LSF_NAME_LEN)
     shortLInfo->hostModels[i] = currp;
 
   for (i = 0; i < src->nRes; i++)

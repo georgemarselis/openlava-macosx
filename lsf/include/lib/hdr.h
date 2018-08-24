@@ -37,32 +37,30 @@ struct LSFHeader { // FIXME FIXME FIXME FIXME FIXME ensure compatibility with Pl
 	short opCode;
 	char   padding2[2];
 	pid_t  refCode; 
-
 };
 
 /* always use this macro to size up memory buffers
  * for protocol header.
  */
 // #define LSF_HEADER_LEN (sizeof(struct LSFHeader))
-const unsigned int LSF_HEADER_LEN = sizeof( struct LSFHeader ) ;
+static const unsigned int LSF_HEADER_LEN = sizeof( struct LSFHeader ) ;
 
-struct stringLen
-{
+struct stringLen {
 	char *name;
 	size_t len;
 };
 
-struct lenData
-{
+struct lenData {
 	size_t len;
 	char *data;
 };
 
 // #define AUTH_HOST_NT  0x01
 // #define AUTH_HOST_UX  0x02
-
-const unsigned short int AUTH_HOST_NT = 0x01;
-const unsigned short int AUTH_HOST_UX = 0x02;
+enum AUTH_HOST {
+	AUTH_HOST_NT = 0x01,
+	AUTH_HOST_UX = 0x02 
+} ;
 
 #define EAUTH_SIZE 4096 // FIXME FIXME FIXME FIXME FIXME set value from configure.ac
 // const unsigned int EAUTH_SIZE = 4096;
@@ -70,7 +68,7 @@ struct lsfAuth
 {
 	uid_t uid;
 	uid_t gid;
-	char lsfUserName[MAXLSFNAMELEN]; // FIXME FIXME FIXME change to pointer
+	char lsfUserName[MAX_LSF_NAME_LEN]; // FIXME FIXME FIXME change to pointer
 	enum { CLIENT_SETUID, CLIENT_IDENT, CLIENT_DCE, CLIENT_EAUTH } kind;
 	int options;
 

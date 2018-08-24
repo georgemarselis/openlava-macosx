@@ -43,7 +43,7 @@ char do_Manager (FILE *fp, const char *filename, size_t *lineNum, const char *se
 
 	if (lim_debug > 0 && lim_debug < 3) {
 
-		char lsfUserName[MAXLSFNAMELEN];
+		char lsfUserName[MAX_LSF_NAME_LEN];
 
 		nClusAdmins   = 1;
 		clusAdminIds  = malloc( sizeof (uid_t) );

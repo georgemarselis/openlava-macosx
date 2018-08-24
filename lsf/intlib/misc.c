@@ -943,7 +943,7 @@ openChildLog (const char *defLogFileName,
   static char resChildLogMask[] = "LOG_DEBUG";
 
   char *dbgEnv;
-  char logFileName[MAXFILENAMELEN];
+  char logFileName[MAX_FILENAME_LEN];
   char *logDir;
   char *logMask;
   int isResChild;

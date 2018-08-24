@@ -115,7 +115,7 @@ print_long (struct hostInfo *hostInfo)
 
   if (first)
     {
-      char tmpbuf[MAXLSFNAMELEN];
+      char tmpbuf[MAX_LSF_NAME_LEN];
       int fmtid;
 
 
@@ -287,7 +287,7 @@ print_long (struct hostInfo *hostInfo)
   li = hostInfo->busyThreshold;
   for (i = 0; indxnames[i]; i++)`
     {
-      char tmpfield[MAXLSFNAMELEN];
+      char tmpfield[MAX_LSF_NAME_LEN];
       int id;
 
       if (i > MEM)

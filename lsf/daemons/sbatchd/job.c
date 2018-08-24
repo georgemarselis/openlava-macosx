@@ -200,7 +200,7 @@ getJobTmpDir (char *tmpDirName, struct jobCard *jPtr)
 void
 createJobTmpDir (struct jobCard *jobCardPtr) // FIXME FIXME FIXME clusterfuck of env vars.
 {
-	char tmpDirName[MAXFILENAMELEN];
+	char tmpDirName[MAX_FILENAME_LEN];
 	mode_t previousUmask;
 
 	getJobTmpDir ( tmpDirName, jobCardPtr);
@@ -521,16 +521,16 @@ setJobEnv (struct jobCard *jp)
 	char *eexecT = NULL;
 	char eexecTStr[ EEXECTSTR_LENGTH];
 	char *eauthAuxData = NULL;
-	char eauthAuxDataStr[MAXPATHLEN];
+	char eauthAuxDataStr[MAX_PATH_LEN];
 	char val[MAXLINELEN];
-	char shellFile[MAXFILENAMELEN];
+	char shellFile[MAX_FILENAME_LEN];
 	char userName[MAXLINELEN];
 	struct nameList *hostList = NULL; // was NAMELIST *hostList = NULL;
 
 	memset( tzsave, 0, TZSAVE_LENGTH);
-	memset( eauthAuxDataStr, 0, MAXPATHLEN);
+	memset( eauthAuxDataStr, 0, MAX_PATH_LEN);
 	memset( val, 0, MAXLINELEN);
-	memset( shellFile, 0, MAXFILENAMELEN);
+	memset( shellFile, 0, MAX_FILENAME_LEN);
 	memset( userName, 0, MAXLINELEN);
 
 	if (logclass & LC_TRACE) {
@@ -618,8 +618,8 @@ setJobEnv (struct jobCard *jp)
 		}
 
 		if (strlen (jp->jobSpecs.chkpntDir) > 0) {
-			char chkDir[MAXFILENAMELEN];
-			char cwd[MAXFILENAMELEN];
+			char chkDir[MAX_FILENAME_LEN];
+			char cwd[MAX_FILENAME_LEN];
 			char *strPtr = NULL; // FIXME FIXME FIXME FIXME FIXME 100% mem leak
 			// char *hostList = NULL; // was NAMELIST *hostList = NULL;
 
@@ -630,8 +630,8 @@ setJobEnv (struct jobCard *jp)
  ****************************************************************
  */
 
-			memset( chkDir, 0, MAXFILENAMELEN );
-			memset( cwd,    0, MAXFILENAMELEN ); 
+			memset( chkDir, 0, MAX_FILENAME_LEN );
+			memset( cwd,    0, MAX_FILENAME_LEN ); 
 
 			if (((strPtr = strrchr (jp->jobSpecs.chkpntDir, '/')) != NULL) && (islongint_ (strPtr + 1))) { // FIXME FIXME FIXME FIXME "TMPDIR" should be put into configure.ac
 				if (jp->jobSpecs.chkpntDir[0] == '/') { // FIXME FIXME FIXME FIXME "TMPDIR" should be put into configure.ac
@@ -752,7 +752,7 @@ setJobEnv (struct jobCard *jp)
 
 
 		if ((getenv ("WINDIR") != NULL) || (getenv ("windir") != NULL)) { // FIXME FIXME FIXME FIXME "TMPDIR" should be put into configure.ac
-			char tmppath[MAXPATHLEN];
+			char tmppath[MAX_PATH_LEN];
 
 			sprintf (tmppath, "/bin:/usr/bin:/sbin:/usr/sbin"); // FIXME FIXME FIXME FIXME "TMPDIR" should be put into configure.ac
 			if (daemonParams[LSF_BINDIR].paramValue != NULL) {
@@ -808,9 +808,9 @@ setJobEnv (struct jobCard *jp)
 			putEnv ("LS_SUBCWD", jp->jobSpecs.cwd); // FIXME FIXME FIXME FIXME "TMPDIR" should be put into configure.ac
 		}
 		else {
-			char cwd[MAXFILENAMELEN];
+			char cwd[MAX_FILENAME_LEN];
 
-			memset( cwd, 0, MAXFILENAMELEN );
+			memset( cwd, 0, MAX_FILENAME_LEN );
 			sprintf (cwd, "%s/%s", jp->jobSpecs.subHomeDir, jp->jobSpecs.cwd);
 			putEnv ("LS_SUBCWD", cwd); // FIXME FIXME FIXME FIXME "TMPDIR" should be put into configure.ac
 		}
@@ -827,8 +827,8 @@ setJobEnv (struct jobCard *jp)
 		}
 
 		if (daemonParams[LSF_LIBDIR].paramValue != NULL) { // FIXME FIXME FIXME FIXME "TMPDIR" should be put into configure.ac
-			char path[MAXFILENAMELEN];
-			memset( path, 0, MAXFILENAMELEN );
+			char path[MAX_FILENAME_LEN];
+			memset( path, 0, MAX_FILENAME_LEN );
 
 			putEnv ("LSF_LIBDIR", daemonParams[LSF_LIBDIR].paramValue); // FIXME FIXME FIXME FIXME "TMPDIR" should be put into configure.ac
 
@@ -846,11 +846,11 @@ setJobEnv (struct jobCard *jp)
 
 #ifdef INTER_DAEMON_AUTH
 		if (jp) {
-			char bufUid[MAXFILENAMELEN];
-			char bufGid[MAXFILENAMELEN];
+			char bufUid[MAX_FILENAME_LEN];
+			char bufGid[MAX_FILENAME_LEN];
 
-			memset( bufUid, 0, MAXFILENAMELEN );
-			memset( bufGid, 0, MAXFILENAMELEN );
+			memset( bufUid, 0, MAX_FILENAME_LEN );
+			memset( bufGid, 0, MAX_FILENAME_LEN );
 
 			sprintf (bufUid, "LSB_EEXEC_REAL_UID=%d", jp->jobSpecs.execUid); // FIXME FIXME FIXME FIXME "TMPDIR" should be put into configure.ac
 			sprintf (bufGid, "LSB_EEXEC_REAL_GID=%d", jp->execGid); // FIXME FIXME FIXME FIXME "TMPDIR" should be put into configure.ac
@@ -1045,9 +1045,9 @@ finishJob (struct jobCard *jobCard) // FIXME FIXME FIXME FIXME FIXME there are t
 {
 	int doSendResults = 0;
 	int hasError = 0;
-	char tmpDirName[MAXFILENAMELEN];
+	char tmpDirName[MAX_FILENAME_LEN];
 
-	memset( tmpDirName, 0, MAXFILENAMELEN );
+	memset( tmpDirName, 0, MAX_FILENAME_LEN );
 	doSendResults = (!jobCard->mbdRestarted && !(jobCard->jobSpecs.jStatus & JOB_STAT_PEND));
 	putEnv (LS_EXEC_T, "END"); // FIXME FIXME FIXME FIXME "TMPDIR" should be put into configure.ac
 
@@ -1262,7 +1262,7 @@ shouldCopyFromLsbatch (struct jobCard *jp, int *cpyStdoutFromLsbatch, int *cpySt
 
 	if (lsbStdoutDirect) {
 
-		char filename[MAXFILENAMELEN];
+		char filename[MAX_FILENAME_LEN];
 		if (jp->jobSpecs.options & SUB_OUT_FILE) {
 			sprintf (filename, "%s.out", jp->jobSpecs.jobFile); // FIXME FIXME FIXME FIXME "TMPDIR" should be put into configure.ac
 
@@ -1315,11 +1315,11 @@ send_results (struct jobCard *jp)
 	char rcpMsg[MSGSIZE];
 	char ps[MSGSIZE * 4];
 	char line[MSGSIZE * 2];
-	char fileName[MAXFILENAMELEN];
-	char ofileHost[MAXFILENAMELEN];
-	char outputFileName[MAXFILENAMELEN];
-	char errFileName[MAXFILENAMELEN];
-	char mailSizeStr[MAXFILENAMELEN];
+	char fileName[MAX_FILENAME_LEN];
+	char ofileHost[MAX_FILENAME_LEN];
+	char outputFileName[MAX_FILENAME_LEN];
+	char errFileName[MAX_FILENAME_LEN];
+	char mailSizeStr[MAX_FILENAME_LEN];
 	char jobIdFile[16];
 	char jobIdStr[32];
 	int i = 0;
@@ -2452,7 +2452,7 @@ return 0;
 void
 deallocJobCard (struct jobCard *jobCard)
 {
-char fileBuf[MAXFILENAMELEN];
+char fileBuf[MAX_FILENAME_LEN];
 
 sprintf (fileBuf, "%s/.%s.%s.fail", LSTMPDIR, jobCard->jobSpecs.jobFile, lsb_jobidinstr (jobCard->jobSpecs.jobId));
 
@@ -2669,7 +2669,7 @@ return getpid ();
 char *
 getLoginShell (char *jfData, char *jobFile, struct hostent *hp, int readFile)
 {
-	static char shellPath[MAXFILENAMELEN];
+	static char shellPath[MAX_FILENAME_LEN];
 	int i = 0;
 	char *sp;
 	char line[MAXLINELEN];
@@ -2745,7 +2745,7 @@ createTmpJobFile (struct jobSpecs *jobSpecsPtr, struct hostent *hp, char *stdinF
 {
 
 char errMsg[MAXLINELEN];
-char path[MAXFILENAMELEN];
+char path[MAX_FILENAME_LEN];
 char cmdBuf[MAXLINELEN];
 char *sp = NULL;
 int fd, len, size, i;
@@ -3007,7 +3007,7 @@ int
 acctMapOk (struct jobCard *jobCard)
 {
 	char errMsg[MAXLINELEN];
-	char hostfn[MAXFILENAMELEN];
+	char hostfn[MAX_FILENAME_LEN];
 	char msg[MAXLINELEN * 2];
 	char clusorhost[MAX_LSB_NAME_LEN];
 	char user[MAX_LSB_NAME_LEN];
@@ -3764,7 +3764,7 @@ void
 writePidInfoFile (const struct jobCard *jPtr, const struct jRusage *jRusage)
 {
 
-char buf[MAXFILENAMELEN];
+char buf[MAX_FILENAME_LEN];
 FILE *fp;
 int i;
 
@@ -3800,9 +3800,9 @@ FCLOSEUP (&fp);
 void
 jobFinishRusage (struct jobCard *jp)
 {
-char rufn[MAXFILENAMELEN];
-char rufn30[MAXFILENAMELEN];
-char tmpDirName[MAXFILENAMELEN];
+char rufn[MAX_FILENAME_LEN];
+char rufn30[MAX_FILENAME_LEN];
+char tmpDirName[MAX_FILENAME_LEN];
 struct lsfAcctRec *rec;
 int lineNum = 0;
 FILE *fp;
@@ -4098,7 +4098,7 @@ int
 REShasPTYfix (char *resPath)
 {
 	FILE *fp;
-	char str[256], cmd[MAXFILENAMELEN + 32];
+	char str[256], cmd[MAX_FILENAME_LEN + 32];
 
 	sprintf (cmd, "%s -PTY_FIX", resPath); // FIXME FIXME FIXME FIXME "TMPDIR" should be put into configure.ac
 

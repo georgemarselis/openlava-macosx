@@ -53,12 +53,12 @@ xdr_xFile (XDR *xdrs, struct xFile * xf, struct LSFHeader *hdr)
     }
     sp = xf->subFn;
 
-    if (!xdr_string (xdrs, &sp, MAXFILENAMELEN)) {
+    if (!xdr_string (xdrs, &sp, MAX_FILENAME_LEN)) {
         return FALSE;
     }
 
     sp = xf->execFn;
-    if (!xdr_string (xdrs, &sp, MAXFILENAMELEN)) {
+    if (!xdr_string (xdrs, &sp, MAX_FILENAME_LEN)) {
         return FALSE;
     }
 
@@ -117,10 +117,10 @@ xdr_submitReq (XDR *xdrs, struct submitReq *submitReq, struct LSFHeader *hdr)
         xdr_var_string (xdrs, &submitReq->dependCond) &&
         xdr_var_string (xdrs, &submitReq->jobName) &&
         xdr_var_string (xdrs, &submitReq->command) &&
-        xdr_string     (xdrs, &submitReq->jobFile, MAXFILENAMELEN) &&
-        xdr_string     (xdrs, &submitReq->inFile, MAXFILENAMELEN)  &&
-        xdr_string     (xdrs, &submitReq->outFile, MAXFILENAMELEN) &&
-        xdr_string     (xdrs, &submitReq->errFile, MAXFILENAMELEN) &&
+        xdr_string     (xdrs, &submitReq->jobFile, MAX_FILENAME_LEN) &&
+        xdr_string     (xdrs, &submitReq->inFile, MAX_FILENAME_LEN)  &&
+        xdr_string     (xdrs, &submitReq->outFile, MAX_FILENAME_LEN) &&
+        xdr_string     (xdrs, &submitReq->errFile, MAX_FILENAME_LEN) &&
         xdr_var_string (xdrs, &submitReq->preExecCmd) &&
         xdr_string     (xdrs, &submitReq->hostSpec, MAXHOSTNAMELEN))
     )
@@ -177,9 +177,9 @@ xdr_submitReq (XDR *xdrs, struct submitReq *submitReq, struct LSFHeader *hdr)
             xdr_int    (xdrs, &submitReq->sigValue)     &&
             xdr_int    (xdrs, &submitReq->restartPid)   &&
             xdr_time_t (xdrs, &submitReq->chkpntPeriod) &&
-            xdr_string (xdrs, &submitReq->chkpntDir, MAXFILENAMELEN)  &&
-            xdr_string (xdrs, &submitReq->subHomeDir, MAXFILENAMELEN) &&
-            xdr_string (xdrs, &submitReq->cwd, MAXFILENAMELEN))
+            xdr_string (xdrs, &submitReq->chkpntDir, MAX_FILENAME_LEN)  &&
+            xdr_string (xdrs, &submitReq->subHomeDir, MAX_FILENAME_LEN) &&
+            xdr_string (xdrs, &submitReq->cwd, MAX_FILENAME_LEN))
         )
     {
             goto Error0;   // FIXME FIXME FIXME FIXME remove goto
@@ -245,7 +245,7 @@ xdr_submitReq (XDR *xdrs, struct submitReq *submitReq, struct LSFHeader *hdr)
         goto Error1;  // FIXME FIXME FIXME FIXME remove goto
     }
 
-    if (!(xdr_string (xdrs, &submitReq->inFileSpool, MAXFILENAMELEN) && xdr_string (xdrs, &submitReq->commandSpool, MAXFILENAMELEN))) {
+    if (!(xdr_string (xdrs, &submitReq->inFileSpool, MAX_FILENAME_LEN) && xdr_string (xdrs, &submitReq->commandSpool, MAX_FILENAME_LEN))) {
         return FALSE;
     }
 
@@ -740,7 +740,7 @@ xdr_jgrpInfoReply (XDR *xdrs, struct jobInfoReply * jobInfoReply, struct LSFHead
   xdr_float (xdrs, &(jobInfoReply->cpuTime)) &&
   xdr_u_int (xdrs, &(jobInfoReply->numToHosts)) &&
   xdr_u_int (xdrs, &jobInfoReply->userId) &&
-  xdr_string (xdrs, &sp, MAXLSFNAMELEN)))
+  xdr_string (xdrs, &sp, MAX_LSF_NAME_LEN)))
     {
       return FALSE;
     }
@@ -821,7 +821,7 @@ xdr_jobInfoReply (XDR *xdrs, struct jobInfoReply *jobInfoReply, struct LSFHeader
   xdr_u_int (xdrs, &jobInfoReply->nIdx) &&
   xdr_u_int (xdrs, &jobInfoReply->numReasons) &&
   xdr_u_int (xdrs, &jobInfoReply->userId) &&
-  xdr_string (xdrs, &sp, MAXLSFNAMELEN)))
+  xdr_string (xdrs, &sp, MAX_LSF_NAME_LEN)))
     {
       return FALSE;
     }
@@ -1575,7 +1575,7 @@ xdr_jobPeekReply (XDR *xdrs, struct jobPeekReply * jobPeekReply, struct LSFHeade
 {
 
     assert( hdr->length );
-  static char outFile[MAXFILENAMELEN];
+  static char outFile[MAX_FILENAME_LEN];
 
   if (xdrs->x_op == XDR_DECODE)
     {
@@ -1583,7 +1583,7 @@ xdr_jobPeekReply (XDR *xdrs, struct jobPeekReply * jobPeekReply, struct LSFHeade
       jobPeekReply->outFile = outFile;
     }
 
-    if (!xdr_string (xdrs, &(jobPeekReply->outFile), MAXFILENAMELEN)) {
+    if (!xdr_string (xdrs, &(jobPeekReply->outFile), MAX_FILENAME_LEN)) {
         return FALSE;
     }
 

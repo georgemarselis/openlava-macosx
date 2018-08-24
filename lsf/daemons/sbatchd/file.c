@@ -212,7 +212,7 @@ int
 rmJobBufFiles (struct jobCard *jp)
 {
   char errMsg[MAXLINELEN];
-  char lsbDir[MAXFILENAMELEN];
+  char lsbDir[MAX_FILENAME_LEN];
   struct hostent *hp;
   char *jf;
   int retVal;
@@ -269,7 +269,7 @@ unlinkBufFiles (char *lsbDir, char *jobFile, struct jobCard *jp,
 		struct hostent *hp)
 {
   static char __func__] = "unlinkBufFiles()";
-  char fileBuf[MAXFILENAMELEN], jfPath[MAXFILENAMELEN];
+  char fileBuf[MAX_FILENAME_LEN], jfPath[MAX_FILENAME_LEN];
   char errMsg[MAXLINELEN];
   int error = FALSE;
   int errCode;
@@ -368,9 +368,9 @@ initPaths (struct jobCard *jp, struct hostent *fromHp, struct lenData *jf)
 {
   static char __func__] = "initPaths()";
   char errMsg[MAXLINELEN];
-  char fileBuf[MAXFILENAMELEN];
-  char cwd[MAXFILENAMELEN], lsbDir[MAXFILENAMELEN];
-  char shellFile[MAXFILENAMELEN];
+  char fileBuf[MAX_FILENAME_LEN];
+  char cwd[MAX_FILENAME_LEN], lsbDir[MAX_FILENAME_LEN];
+  char shellFile[MAX_FILENAME_LEN];
   int i;
   char *sp;
   bool_t goodSpoolDir = FALSE;
@@ -527,7 +527,7 @@ initPaths (struct jobCard *jp, struct hostent *fromHp, struct lenData *jf)
 	{
 
 	  char *chkDirEnv = NULL;
-	  char chkDir[MAXFILENAMELEN];
+	  char chkDir[MAX_FILENAME_LEN];
 	  chkDirEnv = getenv ("LSB_CHKPNT_DIR");
 	  if (chkDirEnv != NULL)
 	    {
@@ -608,7 +608,7 @@ initPaths (struct jobCard *jp, struct hostent *fromHp, struct lenData *jf)
     {
 
       char *chkDirEnv = NULL;
-      char chkDir[MAXFILENAMELEN];
+      char chkDir[MAX_FILENAME_LEN];
       chkDirEnv = getenv ("LSB_CHKPNT_DIR");
       if (chkDirEnv != NULL)
 	{
@@ -701,8 +701,8 @@ cwdJob (struct jobCard *jp, char *cwd, struct hostent *fromHp)
 	{
 	  if (chdir (pw->pw_dir) == 0)
 	    {
-	      char homePath[MAXPATHLEN];
-	      char subCwd[MAXPATHLEN];
+	      char homePath[MAX_PATH_LEN];
+	      char subCwd[MAX_PATH_LEN];
 	      int i;
 
 	      if (getcwd (homePath, sizeof (homePath)))
@@ -928,10 +928,10 @@ lsbDirOk (char *lsbDir, struct jobCard *jp, struct hostent *fromHp,
 {
   static char __func__] = "lsbDirOk()";
   struct stat st;
-  char jobFile[MAXFILENAMELEN];
+  char jobFile[MAX_FILENAME_LEN];
   char errMsg[MAXLINELEN];
 
-  char chkpntDir[MAXFILENAMELEN], restartDir[MAXFILENAMELEN];
+  char chkpntDir[MAX_FILENAME_LEN], restartDir[MAX_FILENAME_LEN];
 
   if ((lsbDir != NULL) && (chosenPath != NULL) && (logclass & LC_EXEC))
     {
@@ -1044,7 +1044,7 @@ createChkpntJobFile (char *lsbDir, struct jobCard *jp, struct lenData *jf,
   static char __func__] = "createChkpntJobFile()";
   char errMsg[MAXLINELEN];
 
-  char chkDir[MAXFILENAMELEN], restartDirBak[MAXFILENAMELEN];
+  char chkDir[MAX_FILENAME_LEN], restartDirBak[MAX_FILENAME_LEN];
   char oldJobId[20], newJobId[20];
   char *strPtr, *p;
 
@@ -1069,7 +1069,7 @@ createChkpntJobFile (char *lsbDir, struct jobCard *jp, struct lenData *jf,
 	{
 	  if (*jp->jobSpecs.execCwd == '\0')
 	    {
-	      char cwd[MAXFILENAMELEN];
+	      char cwd[MAX_FILENAME_LEN];
 	      if (cwdJob (jp, cwd, fromHp) == -1)
 		{
 		  ls_syslog (LOG_ERR, "%s: cannot find execCwd for job <%s>",
@@ -1272,8 +1272,8 @@ stdoutDirectSymLink (char *jobFile, char *ext, struct jobSpecs *jobSpecsPtr)
 {
   static char __func__] = "stdoutDirectSymLink";
   char errMsg[MAXLINELEN];
-  char fileLink[MAXFILENAMELEN];
-  char fullpath[MAXFILENAMELEN * 2];
+  char fileLink[MAX_FILENAME_LEN];
+  char fullpath[MAX_FILENAME_LEN * 2];
 
   sprintf (fileLink, "%s.%s", jobFile, ext);
 
@@ -1382,13 +1382,13 @@ openStdFiles (char *lsbDir, char *chkpntDir, struct jobCard *jobCardPtr,
 {
   static char __func__] = "openStdFiles()";
   int i;
-  char filebuf[MAXFILENAMELEN], filebufLink[MAXFILENAMELEN];
-  static char stdinName[MAXFILENAMELEN];
+  char filebuf[MAX_FILENAME_LEN], filebufLink[MAX_FILENAME_LEN];
+  static char stdinName[MAX_FILENAME_LEN];
   char xMsg[3 * MSGSIZE], rcpMsg[MSGSIZE];
   char xfile = FALSE;
   char errMsg[MAXLINELEN];
   struct jobSpecs *jobSpecsPtr = &(jobCardPtr->jobSpecs);
-  char jobFile[MAXFILENAMELEN], jobFileLink[MAXFILENAMELEN];
+  char jobFile[MAX_FILENAME_LEN], jobFileLink[MAX_FILENAME_LEN];
   int outFlag = 0, errFlag = 0;
   char spoolingHost[256];
   char *pStrTmp;
@@ -1468,7 +1468,7 @@ openStdFiles (char *lsbDir, char *chkpntDir, struct jobCard *jobCardPtr,
       int rc;
       struct stat statbuf;
       char *jobStarter;
-      char jobFileExt[MAXFILENAMELEN];
+      char jobFileExt[MAX_FILENAME_LEN];
 
 
       sprintf (jobFileExt, "%s%s", jobFile, JOBFILEEXT);
@@ -2009,7 +2009,7 @@ writePreJobFail (struct jobCard *jp)
 {
   static char __func__] = "writePreJobFail()";
   FILE *fp;
-  char fn[MAXFILENAMELEN];
+  char fn[MAX_FILENAME_LEN];
 
   sprintf (fn, "%s/.%s.%s.fail", LSTMPDIR, jp->jobSpecs.jobFile,
 	   lsb_jobidinstr (jp->jobSpecs.jobId));
@@ -2034,8 +2034,8 @@ createJobFile (char *lsbDir, char *chkpntDir, struct jobCard *jp,
   struct jobSpecs *jobSpecsPtr = &jp->jobSpecs;
   int fd, cc, len;
   char errMsg[MAXLINELEN];
-  char jobFile[MAXFILENAMELEN], jobFileLink[MAXFILENAMELEN];
-  char shellFile[MAXFILENAMELEN], shellFileLink[MAXFILENAMELEN];
+  char jobFile[MAX_FILENAME_LEN], jobFileLink[MAX_FILENAME_LEN];
+  char shellFile[MAX_FILENAME_LEN], shellFileLink[MAX_FILENAME_LEN];
   char *sp;
 
   char *shellLine;
@@ -2260,7 +2260,7 @@ jobFileExitStatus (struct jobCard *jobCard)
 static char *
 lsbTmp (void)
 {
-  static char tmpDir[MAXFILENAMELEN];
+  static char tmpDir[MAX_FILENAME_LEN];
 
   sprintf (tmpDir, "%s/.lsbtmp", lsTmpDir_);
 
@@ -2284,8 +2284,8 @@ localJobRestartFiles (char *lsbDir, char *restartDir, struct jobCard *jp,
   static char __func__] = "localJobRestartFiles";
   struct jobSpecs *jspecs = &jp->jobSpecs;
   char errMsg[MAXLINELEN];
-  char t[MAXFILENAMELEN], s[MAXFILENAMELEN];
-  char jobFile[MAXFILENAMELEN];
+  char t[MAX_FILENAME_LEN], s[MAX_FILENAME_LEN];
+  char jobFile[MAX_FILENAME_LEN];
 
   sprintf (jobFile, "%s", jp->jobSpecs.jobFile);
 

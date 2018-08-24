@@ -336,7 +336,7 @@ char **clusAdminNames = NULL;
 int kernelPerm;
 
 struct limLock limLock;
-char myClusterName[MAXLSFNAMELEN];
+char myClusterName[MAX_LSF_NAME_LEN];
 u_int loadVecSeqNo = 0;
 u_int masterAnnSeqNo = 0;
 int lim_debug = 0;

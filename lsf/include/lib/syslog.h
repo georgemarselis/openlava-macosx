@@ -29,7 +29,7 @@ void ls_closelog_ext (void);
 int logclass = 0;
 int timinglevel = 0;
 
-static char logfile[MAXPATHLEN];
+static char logfile[MAX_PATH_LEN];
 static char logident[10];
 static int logmask;
 static enum { LOGTO_SYS, LOGTO_FILE, LOGTO_STDERR } log_dest;

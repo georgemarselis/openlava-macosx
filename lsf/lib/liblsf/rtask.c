@@ -34,7 +34,7 @@
 
 static void default_tstp_ (int signo);
 static u_short getTaskPort (int s);
-static char rexcwd_[MAXPATHLEN];
+static char rexcwd_[MAX_PATH_LEN];
 static void initSigHandler (int sig);
 
 void setRexWd_ (char *wd);
@@ -55,7 +55,7 @@ ls_rtaske (char *host, char **argv, int options, char **envp)
 	struct sockaddr_in sin;
 	long max = 0;
 	char c_chfd[8];
-	char pathbuf[MAXPATHLEN];
+	char pathbuf[MAX_PATH_LEN];
 	int d = 0;
 	int niosOptions = 0;
 	char *new_argv[5];

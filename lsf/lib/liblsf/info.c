@@ -30,14 +30,14 @@ char *
 ls_getclustername (void)
 {
 
-	char *clName = malloc( sizeof( char ) * MAXLSFNAMELEN + 1 ); // FIXME FIXME FIXME FIXME dynamic memory allocation and management
+	char *clName = malloc( sizeof( char ) * MAX_LSF_NAME_LEN + 1 ); // FIXME FIXME FIXME FIXME dynamic memory allocation and management
 
 	if (logclass & (LC_TRACE)) {
 		ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
 	}
 
 	if( NULL == clName ) {
-		if ( getname_ (LIM_GET_CLUSNAME, clName, MAXLSFNAMELEN) < 0) {
+		if ( getname_ (LIM_GET_CLUSNAME, clName, MAX_LSF_NAME_LEN) < 0) {
 			return NULL;
 		}
 	}
@@ -407,7 +407,7 @@ char *
 ls_gethosttype (char *hostname)
 {
 	struct hostInfo *hostinfo = NULL;
-	static char hostType[MAXLSFNAMELEN];
+	static char hostType[MAX_LSF_NAME_LEN];
 
 	memset( hostType , 0, strlen( hostType) );
 
@@ -430,7 +430,7 @@ char *
 ls_gethostmodel (char *hostname)
 {
 	struct hostInfo *hostinfo = NULL;
-	static char hostModel[MAXLSFNAMELEN];
+	static char hostModel[MAX_LSF_NAME_LEN];
 
 	if (hostname == NULL) {
 		if ((hostname = ls_getmyhostname ()) == NULL) {
@@ -493,7 +493,7 @@ ls_getmodelfactor (char *modelname)
 	}
 
 	str.name = modelname;
-	str.len = MAXLSFNAMELEN;
+	str.len = MAX_LSF_NAME_LEN;
 	if (callLim_ (LIM_GET_CPUF, &str, xdr_stringLen, &cpuf, xdr_float, NULL, 0, NULL) < 0) {
 		return NULL;
 	}
@@ -814,7 +814,7 @@ ls_sharedresourceinfo (char **resources, unsigned int *numResources, char *hostN
 
 		for ( unsigned int i = 0; i < *numResources; i++)
 		{
-			if (resources[i] && strlen (resources[i]) + 1 < MAXLSFNAMELEN) {
+			if (resources[i] && strlen (resources[i]) + 1 < MAX_LSF_NAME_LEN) {
 				resourceInfoReq.resourceNames[i] = resources[i];
 			}
 			else

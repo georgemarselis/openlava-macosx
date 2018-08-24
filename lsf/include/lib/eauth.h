@@ -27,7 +27,7 @@
 
 #pragma once
 
-#define EAUTH_ENV_BUF_LEN       (MAXPATHLEN+32)
+#define EAUTH_ENV_BUF_LEN       (MAX_PATH_LEN+32)
 
 int putEauthClientEnvVar( char *client );
 int putEauthServerEnvVar( char *server );

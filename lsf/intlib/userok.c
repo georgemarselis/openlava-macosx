@@ -226,7 +226,7 @@ userok (int s, struct sockaddr_in *from, char *hostname, struct sockaddr_in *loc
 
 	if (debug)
 	{
-		char lsfUserName[MAXLSFNAMELEN];
+		char lsfUserName[MAX_LSF_NAME_LEN];
 
 		if (getLSFUser_ (lsfUserName, sizeof (lsfUserName)) < 0)
 		{

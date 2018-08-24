@@ -82,7 +82,7 @@ initReadLoad (int checkMode, int *kernelPerm)
 const char *
 getHostModel (void)
 {
-  char model[MAXLSFNAMELEN];
+  char model[MAX_LSF_NAME_LEN];
   char buf[128], b1[128], b2[128]; // FIXME FIXME FIXME FIXME FIXME
   int pos = 0;
   int bmips = 0;
@@ -127,8 +127,8 @@ getHostModel (void)
   if (isdigit (b1[0]))
     model[pos++] = 'x';
 
-  strncpy (&model[pos], b1, MAXLSFNAMELEN - 15);
-  model[MAXLSFNAMELEN - 15] = '\0';
+  strncpy (&model[pos], b1, MAX_LSF_NAME_LEN - 15);
+  model[MAX_LSF_NAME_LEN - 15] = '\0';
   pos = strlen (model);
   if (bmips)
     {
@@ -136,9 +136,9 @@ getHostModel (void)
       if (b2[0])
   {
     model[pos++] = '_';
-    strncpy (&model[pos], b2, MAXLSFNAMELEN - pos - 1);
+    strncpy (&model[pos], b2, MAX_LSF_NAME_LEN - pos - 1);
   }
-      model[MAXLSFNAMELEN - 1] = '\0';
+      model[MAX_LSF_NAME_LEN - 1] = '\0';
     }
 
   return model;

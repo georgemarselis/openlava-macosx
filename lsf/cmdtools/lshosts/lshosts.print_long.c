@@ -61,7 +61,7 @@ struct indexFormat {
 
   if( first ) 
   {
-      char tmpbuf[MAXLSFNAMELEN];
+      char tmpbuf[MAX_LSF_NAME_LEN];
       int fmtid;
 
 
@@ -238,7 +238,7 @@ struct indexFormat {
   li = hostInfo->busyThreshold;
   for (i = 0; indxnames[i]; i++)
     {
-      char tmpfield[MAXLSFNAMELEN];
+      char tmpfield[MAX_LSF_NAME_LEN];
       int id;
 
       if (i > MEM)

@@ -68,7 +68,7 @@ daemonize_ (void)
 }
 
 
-static char daemon_dir[MAXPATHLEN];
+static char daemon_dir[MAX_PATH_LEN];
 void
 saveDaemonDir_ (char *argv0)
 {
@@ -90,7 +90,7 @@ saveDaemonDir_ (char *argv0)
 char *
 getDaemonPath_ (char *name, char *serverdir)
 {
-  static char daemonpath[MAXPATHLEN];
+  static char daemonpath[MAX_PATH_LEN];
 
   strcpy (daemonpath, daemon_dir);
   strcat (daemonpath, name);

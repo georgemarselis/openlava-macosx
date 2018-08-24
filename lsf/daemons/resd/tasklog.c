@@ -35,7 +35,7 @@ static void openResAcctFileInTmp (char *);
 
 int resLogOn = 0;
 int resLogcpuTime = -1;
-char resAcctFN[MAXFILENAMELEN];  // FIXME FIXME FIXME this should be dynamically created
+char resAcctFN[MAX_FILENAME_LEN];  // FIXME FIXME FIXME this should be dynamically created
 
 void
 initResLog (void)
@@ -187,7 +187,7 @@ resAcctWrite (struct child *child)
   FILE *fd;
   int l = 0, j = 0;
   struct lsfAcctRec acctRec;
-  char acctFile[MAXFILENAMELEN];
+  char acctFile[MAX_FILENAME_LEN];
 
 
   if (debug > 1)
@@ -306,7 +306,7 @@ void
 resParentWriteAcct (struct LSFHeader *msgHdr, XDR * xdrs, int sock)
 {
   static char __func__] = "resParentWriteAcct()";
-  char acctFile[MAXFILENAMELEN];
+  char acctFile[MAX_FILENAME_LEN];
   FILE *fp;
   char *buf;
   struct stat sbuf;

@@ -279,17 +279,17 @@ lsb_readjobinfo (int *more)
 	if (first)
 	{
 		if ((submitReq.fromHost = malloc (MAXHOSTNAMELEN)) == NULL
-		|| (submitReq.jobFile = malloc (MAXFILENAMELEN)) == NULL
-		|| (submitReq.inFile = malloc (MAXFILENAMELEN)) == NULL
-		|| (submitReq.outFile = malloc (MAXFILENAMELEN)) == NULL
-		|| (submitReq.errFile = malloc (MAXFILENAMELEN)) == NULL
-		|| (submitReq.inFileSpool = malloc (MAXFILENAMELEN)) == NULL
-		|| (submitReq.commandSpool = malloc (MAXFILENAMELEN)) == NULL
+		|| (submitReq.jobFile = malloc (MAX_FILENAME_LEN)) == NULL
+		|| (submitReq.inFile = malloc (MAX_FILENAME_LEN)) == NULL
+		|| (submitReq.outFile = malloc (MAX_FILENAME_LEN)) == NULL
+		|| (submitReq.errFile = malloc (MAX_FILENAME_LEN)) == NULL
+		|| (submitReq.inFileSpool = malloc (MAX_FILENAME_LEN)) == NULL
+		|| (submitReq.commandSpool = malloc (MAX_FILENAME_LEN)) == NULL
 		|| (submitReq.hostSpec = malloc (MAXHOSTNAMELEN)) == NULL
-		|| (submitReq.chkpntDir = malloc (MAXFILENAMELEN)) == NULL
-		|| (submitReq.subHomeDir = malloc (MAXFILENAMELEN)) == NULL
-		|| (jobInfoReply.userName = malloc (MAXLSFNAMELEN)) == NULL
-		|| (submitReq.cwd = malloc (MAXFILENAMELEN)) == NULL)
+		|| (submitReq.chkpntDir = malloc (MAX_FILENAME_LEN)) == NULL
+		|| (submitReq.subHomeDir = malloc (MAX_FILENAME_LEN)) == NULL
+		|| (jobInfoReply.userName = malloc (MAX_LSF_NAME_LEN)) == NULL
+		|| (submitReq.cwd = malloc (MAX_FILENAME_LEN)) == NULL)
 		{
 			lsberrno = LSBE_NO_MEM;
 			FREEUP (submitReq.fromHost);

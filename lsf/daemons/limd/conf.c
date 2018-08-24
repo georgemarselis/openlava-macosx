@@ -45,7 +45,7 @@ limd_readShared (void)
 	char indxok  = TRUE;
 	char typeok  = FALSE;
 	unsigned int lineNum = 0;
-	char lsfile[MAXFILENAMELEN];
+	char lsfile[MAX_FILENAME_LEN];
 	const char filename = "lsf.shared";
 	const char configCheckSum[] = "configCheckSum";
 	const char readonly[] = "r";
@@ -273,10 +273,10 @@ lim_setIndex (struct keymap *keyList, const char *lsfile, size_t linenum)
 	};
 
 
-	if (strlen (keyList[NAME].val) >= MAXLSFNAMELEN)
+	if (strlen (keyList[NAME].val) >= MAX_LSF_NAME_LEN)
 		{
 			/* catgets 5213 */
-			ls_syslog (LOG_ERR, "5213: %s: %s(%d): Name %s is too long (maximum is %d chars); ignoring index", __func__, lsfile, linenum, keyList[NAME].val, MAXLSFNAMELEN - 1);
+			ls_syslog (LOG_ERR, "5213: %s: %s(%d): Name %s is too long (maximum is %d chars); ignoring index", __func__, lsfile, linenum, keyList[NAME].val, MAX_LSF_NAME_LEN - 1);
 			lim_CheckError = WARNING_ERR;
 			return TRUE;
 		}
@@ -876,9 +876,9 @@ doresources (FILE * fp, unsigned int *lineNum, char *lsfile) // FIXME FIXME FIXM
 				continue;
 			}
 
-			if (strlen (keyList[RKEY_RESOURCENAME].val) >= MAXLSFNAMELEN - 1) {
+			if (strlen (keyList[RKEY_RESOURCENAME].val) >= MAX_LSF_NAME_LEN - 1) {
 				/* catgets 5250 */
-				ls_syslog (LOG_ERR, "5250: %s: %s(%d): Resource name %s too long in section resource. Should be less than %d characters. Ignoring line", __func__, lsfile, *lineNum, keyList[0].val, MAXLSFNAMELEN - 1);
+				ls_syslog (LOG_ERR, "5250: %s: %s(%d): Resource name %s too long in section resource. Should be less than %d characters. Ignoring line", __func__, lsfile, *lineNum, keyList[0].val, MAX_LSF_NAME_LEN - 1);
 				lim_CheckError = WARNING_ERR;
 				freeKeyList (keyList);
 				continue;
@@ -1581,7 +1581,7 @@ readCluster (int checkMode)  // FIXME FIXME move to a cluster.c file
 	checkHostWd ();
 
 	if (nClusAdmins == 0) {
-		size_t len = sizeof( char ) * MAXLSFNAMELEN + 1; // FIXME what is the correct size?
+		size_t len = sizeof( char ) * MAX_LSF_NAME_LEN + 1; // FIXME what is the correct size?
 		char *rootName = malloc( len );
 
 		/* catgets 5396 */
@@ -1609,7 +1609,7 @@ readCluster (int checkMode)  // FIXME FIXME move to a cluster.c file
 int
 readCluster2 (struct clusterNode *clPtr) // FIXME FIXME FIXME FIXME move to cluster.c file
 {
-	char fileName[MAXFILENAMELEN];
+	char fileName[MAX_FILENAME_LEN];
 	char *word = NULL;
 	FILE *clfp = NULL;
 	char *cp   = NULL;
@@ -1827,7 +1827,7 @@ lim_domanager (FILE * fp, const char *lsfile, unsigned int *lineNum, const char 
 
 	if (lim_debug > 0 && lim_debug < 3)
 	{
-		char lsfUserName[MAXLSFNAMELEN];
+		char lsfUserName[MAX_LSF_NAME_LEN];
 
 		nClusAdmins   = 1;
 		clusAdminIds  = malloc (sizeof (uid_t));
@@ -2438,7 +2438,7 @@ setMyClusterName (void)
 	char *hname   = NULL;
 	char *cluster = NULL;
 	unsigned int lineNum = 0;
-	char clusterFile[MAXFILENAMELEN];
+	char clusterFile[MAX_FILENAME_LEN];
 
 	struct keymap *keyList = NULL;
 
@@ -4060,7 +4060,7 @@ findClusterServers ( const char *clName)
 	char *servers        = NULL;
 	unsigned int lineNum = 0;
 
-	char fileName[MAXFILENAMELEN];
+	char fileName[MAX_FILENAME_LEN];
 	const char lsf_cluster[] = "lsf.cluster";
 	const char ENOSERVER[]   = "ENOSERVER";
 	const char readonly[]    = "r";
@@ -4068,7 +4068,7 @@ findClusterServers ( const char *clName)
 	servers = malloc( sizeof( char ) * MAXLINELEN + 1 ); // FIXME FIXME FIXME FIXME memory management
 	memset( servers, 0, sizeof( char ) * MAXLINELEN + 1 );
 	strcpy( servers, ENOSERVER );
-	assert( strlen( limParams[LSF_CONFDIR].paramValue ) + strlen( lsf_cluster ) + strlen( clName ) =< MAXFILENAMELEN );
+	assert( strlen( limParams[LSF_CONFDIR].paramValue ) + strlen( lsf_cluster ) + strlen( clName ) =< MAX_FILENAME_LEN );
 	sprintf (fileName, "%s/%s.%s", limParams[LSF_CONFDIR].paramValue, lsf_cluster ,clName); // FIXME FIXME FIXME FIXME const struct parameter; should be moved to configure.ac
 
 	if ((clfp = confOpen (fileName, "r")) == NULL)

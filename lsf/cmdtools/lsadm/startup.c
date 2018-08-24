@@ -153,7 +153,7 @@ char *
 daemonPath ( const char *daemon)
 {
     char *srvdir = NULL;
-    static char path[MAXFILENAMELEN];
+    static char path[MAX_FILENAME_LEN];
   
     srvdir = myParamList[LSF_SERVERDIR].paramValue;
 

@@ -51,7 +51,7 @@ sysHist (int argc, char **argv, int opCode)
       switch (optName[0])
 	{
 	case 'f':
-	  if (strlen (optarg) > MAXFILENAMELEN - 1)
+	  if (strlen (optarg) > MAX_FILENAME_LEN - 1)
 	    {
 	      fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 1051, "%s: File name too long\n")), optarg);	/* catgets  1051  */
 	      return (-1);
@@ -104,7 +104,7 @@ sysHist (int argc, char **argv, int opCode)
 int
 searchEventFile (struct histReq *req, int *eventFound)
 {
-  char eventFileName[MAXFILENAMELEN];
+  char eventFileName[MAX_FILENAME_LEN];
   int lineNum = 0;
   struct stat statBuf;
   struct eventRec *log;

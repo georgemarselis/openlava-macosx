@@ -509,7 +509,7 @@ initObj (char *obj, int len)
 char *
 parentGroup (char *group_spec)
 {
-  static char parentStr[MAXPATHLEN];
+  static char parentStr[MAX_PATH_LEN];
   int i;
 
   parentStr[0] = '\0';
@@ -519,7 +519,7 @@ parentGroup (char *group_spec)
       return (parentStr);
     }
 
-  if (strlen (group_spec) >= MAXPATHLEN)
+  if (strlen (group_spec) >= MAX_PATH_LEN)
     {
       lsberrno = LSBE_NO_MEM;
       return (parentStr);
@@ -547,7 +547,7 @@ parentGroup (char *group_spec)
 char *
 parentOfJob (char *group_spec)
 {
-  static char parentStr[MAXPATHLEN];
+  static char parentStr[MAX_PATH_LEN];
   int i;
 
   if (!group_spec)
@@ -556,7 +556,7 @@ parentOfJob (char *group_spec)
       return (NULL);
     }
 
-  if (strlen (group_spec) >= MAXPATHLEN)
+  if (strlen (group_spec) >= MAX_PATH_LEN)
     {
       lsberrno = LSBE_NO_MEM;
       return (NULL);
@@ -575,7 +575,7 @@ parentOfJob (char *group_spec)
 char *
 myName (char *group_spec)
 {
-  static char myStr[MAXPATHLEN];
+  static char myStr[MAX_PATH_LEN];
   int i;
 
   myStr[0] = '\0';
@@ -585,7 +585,7 @@ myName (char *group_spec)
       return (myStr);
     }
 
-  if (strlen (group_spec) >= MAXPATHLEN)
+  if (strlen (group_spec) >= MAX_PATH_LEN)
     {
       lsberrno = LSBE_NO_MEM;
       return (myStr);
@@ -613,8 +613,8 @@ myName (char *group_spec)
 char *
 jgrpNodeParentPath (struct jgTreeNode *jgrpNode)
 {
-  static char fullPath[MAXPATHLEN];
-  static char oldPath[MAXPATHLEN];
+  static char fullPath[MAX_PATH_LEN];
+  static char oldPath[MAX_PATH_LEN];
   struct jgTreeNode *jgrpPtr;
   int first = TRUE;
 
@@ -654,7 +654,7 @@ jgrpNodeParentPath (struct jgTreeNode *jgrpNode)
 int
 jgrpNodeParentPath_r (struct jgTreeNode *jgrpNode, char *fullPath)
 {
-  char oldPath[MAXPATHLEN];
+  char oldPath[MAX_PATH_LEN];
   struct jgTreeNode *jgrpPtr;
   int first = TRUE;
 
@@ -1509,7 +1509,7 @@ storeToJgrpList (void *ptr, struct jgrpInfo *jgrp, int type)
 char *
 fullJobName (struct jData *jp)
 {
-  static char jobName[MAXPATHLEN];
+  static char jobName[MAX_PATH_LEN];
 
   if (jp->jgrpNode)
     {

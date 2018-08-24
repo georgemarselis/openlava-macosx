@@ -45,7 +45,7 @@ fileIsExist (const char *pWorkPath)
   static char __func__] = "fileIsExist()";
 
 
-  static char pFileName[MAXPATHLEN];
+  static char pFileName[MAX_PATH_LEN];
   struct stat statbuf;
 
   if (m_pEnvVarFileName == NULL)
@@ -67,13 +67,13 @@ fileIsExist (const char *pWorkPath)
 
   if (pWorkPath != NULL)
     {
-      char pWorkFileName[MAXPATHLEN];
+      char pWorkFileName[MAX_PATH_LEN];
 
       strcpy (pWorkFileName, "");
 
       if (*pWorkPath != '/')
 	{
-	  if (getcwd (pWorkFileName, MAXPATHLEN) == NULL)
+	  if (getcwd (pWorkFileName, MAX_PATH_LEN) == NULL)
 	    {
 	      return (-1);
 	    }
@@ -338,7 +338,7 @@ static int
 updateVarToFile_ ()
 {
 
-  char tmpFileName[MAXPATHLEN];
+  char tmpFileName[MAX_PATH_LEN];
   FILE *pTmpFile = NULL;
   VAR_TABLE_ITEM_T *pTableItem = NULL;
 

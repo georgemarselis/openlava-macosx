@@ -339,7 +339,7 @@ do_options (int argc, char **argv, struct bhistReq *bhistReq)
 	      fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 3164, "Cannot use option %s together with %s.\n")), "'-f'", "'-n'");	/* catgets  3164  */
 	      return (-1);
 	    }
-	  if (optarg && strlen (optarg) < MAXFILENAMELEN - 1)
+	  if (optarg && strlen (optarg) < MAX_FILENAME_LEN - 1)
 	    {
 	      strcpy (bhistReq->eventFileName, optarg);
 	      break;
@@ -1239,7 +1239,7 @@ displayhist (struct bhistReq *bhistReq)
 static char
 logfile_check (struct bhistReq *Req)
 {
-  char workDir[MAXFILENAMELEN], eventFileName[MAXFILENAMELEN];
+  char workDir[MAX_FILENAME_LEN], eventFileName[MAX_FILENAME_LEN];
   int lineNum = 0, pos = 0;
   LS_STAT_T statBuf;
   struct eventRec *log;
@@ -1387,7 +1387,7 @@ logfile_check (struct bhistReq *Req)
     {
 
 
-      char indexFileName[MAXFILENAMELEN];
+      char indexFileName[MAX_FILENAME_LEN];
 
       jobIdIndexSPtr = NULL;
       if (Req->options & OPT_JOBID)
@@ -1488,7 +1488,7 @@ logfile_check (struct bhistReq *Req)
 static void
 readEventFromHead (char *eventDir, struct bhistReq *reqPtr)
 {
-  char eventFile[MAXFILENAMELEN];
+  char eventFile[MAX_FILENAME_LEN];
   LS_STAT_T statBuf;
   struct eventRec *log;
   char ch;

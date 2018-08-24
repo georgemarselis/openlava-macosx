@@ -27,7 +27,7 @@
 #define MINFIELDWIDE  7
 
 
-typedef char loadCharType[MAXLSFNAMELEN];
+typedef char loadCharType[MAX_LSF_NAME_LEN];
 static void fill_load (float *, loadCharType *, int *, int);
 static void fillDefal (char *, char *, int, float);
 static void prtLimit (int, char *, float);

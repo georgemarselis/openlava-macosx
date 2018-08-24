@@ -35,7 +35,7 @@ lsb_openelog (struct eventLogFile *ePtr, size_t *lineNum)
 	int lastOpenFile = 0;
 	int curOpenFile = 0;
 	char ch = '!'; 
-	char eventFile[MAXFILENAMELEN] = "";
+	char eventFile[MAX_FILENAME_LEN] = "";
 	FILE *elog_fp;
 	size_t i = 0;
 	int oldFormat = 0;
@@ -193,7 +193,7 @@ lsb_getelogrec (struct eventLogHandle *ePtr, size_t *lineNum)
 	struct eventRec *logRec = NULL;
 	FILE *newfp = NULL;
 	char *sp = NULL;
-	char eventFile[MAXFILENAMELEN];
+	char eventFile[MAX_FILENAME_LEN];
 
 	if (ePtr->fp != NULL) {
 		logRec = lsb_geteventrec (ePtr->fp, lineNum);
@@ -647,13 +647,13 @@ readJobNew (char *line, struct jobNewLog *jobNewLog)
 	copyQStr (line, MAX_LSB_NAME_LEN, 1, jobNewLog->queue);
 	saveQStr (line, jobNewLog->resReq);
 	copyQStr (line, MAXHOSTNAMELEN, 1, jobNewLog->fromHost);
-	copyQStr (line, MAXFILENAMELEN, 0, jobNewLog->cwd);
-	copyQStr (line, MAXFILENAMELEN, 0, jobNewLog->chkpntDir);
-	copyQStr (line, MAXFILENAMELEN, 0, jobNewLog->inFile);
-	copyQStr (line, MAXFILENAMELEN, 0, jobNewLog->outFile);
-	copyQStr (line, MAXFILENAMELEN, 0, jobNewLog->errFile);
-	copyQStr (line, MAXFILENAMELEN, 0, jobNewLog->subHomeDir);
-	copyQStr (line, MAXFILENAMELEN, 1, jobNewLog->jobFile);
+	copyQStr (line, MAX_FILENAME_LEN, 0, jobNewLog->cwd);
+	copyQStr (line, MAX_FILENAME_LEN, 0, jobNewLog->chkpntDir);
+	copyQStr (line, MAX_FILENAME_LEN, 0, jobNewLog->inFile);
+	copyQStr (line, MAX_FILENAME_LEN, 0, jobNewLog->outFile);
+	copyQStr (line, MAX_FILENAME_LEN, 0, jobNewLog->errFile);
+	copyQStr (line, MAX_FILENAME_LEN, 0, jobNewLog->subHomeDir);
+	copyQStr (line, MAX_FILENAME_LEN, 1, jobNewLog->jobFile);
 
 	cc = sscanf (line, "%d%n", &jobNewLog->numAskedHosts, &ccount);
 	if (cc != 1) {
@@ -715,8 +715,8 @@ readJobNew (char *line, struct jobNewLog *jobNewLog)
 
 	for ( unsigned int i = 0; i < jobNewLog->nxf; i++)
 		{
-			copyQStr (line, MAXFILENAMELEN, 0, jobNewLog->xf[i].subFn);
-			copyQStr (line, MAXFILENAMELEN, 0, jobNewLog->xf[i].execFn);
+			copyQStr (line, MAX_FILENAME_LEN, 0, jobNewLog->xf[i].subFn);
+			copyQStr (line, MAX_FILENAME_LEN, 0, jobNewLog->xf[i].execFn);
 			cc = sscanf (line, "%d%n", &jobNewLog->xf[i].options, &ccount);
 			if (cc != 1) {
 				return LSBE_EVENT_FORMAT;
@@ -768,9 +768,9 @@ readJobNew (char *line, struct jobNewLog *jobNewLog)
 			convertRLimit (jobNewLog->rLimits, 1);
 		}
 
-	copyQStr (line, MAXFILENAMELEN, 0, jobNewLog->inFileSpool);
-	copyQStr (line, MAXFILENAMELEN, 0, jobNewLog->commandSpool);
-	copyQStr (line, MAXPATHLEN, 0, jobNewLog->jobSpoolDir);
+	copyQStr (line, MAX_FILENAME_LEN, 0, jobNewLog->inFileSpool);
+	copyQStr (line, MAX_FILENAME_LEN, 0, jobNewLog->commandSpool);
+	copyQStr (line, MAX_PATH_LEN, 0, jobNewLog->jobSpoolDir);
 
 	cc = sscanf (line, "%d%n", &jobNewLog->userPriority, &ccount);
 	if (cc != 1)
@@ -894,8 +894,8 @@ int readJobMod (char *line, struct jobModLog *jobModLog)
 		}
 			for (i = 0; i < jobModLog->nxf; i++)
 		{
-			copyQStr (line, MAXFILENAMELEN, 0, jobModLog->xf[i].subFn);
-			copyQStr (line, MAXFILENAMELEN, 0, jobModLog->xf[i].execFn);
+			copyQStr (line, MAX_FILENAME_LEN, 0, jobModLog->xf[i].subFn);
+			copyQStr (line, MAX_FILENAME_LEN, 0, jobModLog->xf[i].execFn);
 			cc = sscanf (line, "%d%n", &jobModLog->xf[i].options, &ccount);
 			if (cc != 1) {
 				return LSBE_EVENT_FORMAT;
@@ -1457,11 +1457,11 @@ int readJobFinish (char *line, struct jobFinishLog *jobFinishLog, time_t eventTi
 	saveQStr (line, jobFinishLog->dependCond);
 	saveQStr (line, jobFinishLog->preExecCmd);
 	copyQStr (line, MAXHOSTNAMELEN, 1, jobFinishLog->fromHost);
-	copyQStr (line, MAXFILENAMELEN, 0, jobFinishLog->cwd);
-	copyQStr (line, MAXFILENAMELEN, 0, jobFinishLog->inFile);
-	copyQStr (line, MAXFILENAMELEN, 0, jobFinishLog->outFile);
-	copyQStr (line, MAXFILENAMELEN, 0, jobFinishLog->errFile);
-	copyQStr (line, MAXFILENAMELEN, 1, jobFinishLog->jobFile);
+	copyQStr (line, MAX_FILENAME_LEN, 0, jobFinishLog->cwd);
+	copyQStr (line, MAX_FILENAME_LEN, 0, jobFinishLog->inFile);
+	copyQStr (line, MAX_FILENAME_LEN, 0, jobFinishLog->outFile);
+	copyQStr (line, MAX_FILENAME_LEN, 0, jobFinishLog->errFile);
+	copyQStr (line, MAX_FILENAME_LEN, 1, jobFinishLog->jobFile);
 
 	cc = sscanf (line, "%lu%n", &jobFinishLog->numAskedHosts, &ccount);
 	if (cc != 1)  {
@@ -1571,8 +1571,8 @@ int readJobFinish (char *line, struct jobFinishLog *jobFinishLog, time_t eventTi
 	}
 	line += ccount + 1;
 
-	copyQStr (line, MAXFILENAMELEN, 0, jobFinishLog->inFileSpool);
-	copyQStr (line, MAXFILENAMELEN, 0, jobFinishLog->commandSpool);
+	copyQStr (line, MAX_FILENAME_LEN, 0, jobFinishLog->inFileSpool);
+	copyQStr (line, MAX_FILENAME_LEN, 0, jobFinishLog->commandSpool);
 	free( hName );
 
 	return LSBE_NO_ERROR;
@@ -2576,7 +2576,7 @@ int readMbdStart (char *line, struct mbdStartLog *mbdStartLog)
 	int cc = 0;
 
 	copyQStr (line, MAXHOSTNAMELEN, 0, mbdStartLog->master);
-	copyQStr (line, MAXLSFNAMELEN, 0, mbdStartLog->cluster);
+	copyQStr (line, MAX_LSF_NAME_LEN, 0, mbdStartLog->cluster);
 	cc = sscanf (line, "%d%d", &(mbdStartLog->numHosts),
 					 &(mbdStartLog->numQueues));
 	if (cc != 2) {
@@ -2969,7 +2969,7 @@ lsbGetNextJobEvent (struct eventLogHandle *ePtr,  size_t *lineNum,
 	struct eventRec *logRec = NULL;
 	FILE *newfp = NULL;
 	char *sp = NULL; 
-	char eventFile[MAXFILENAMELEN];
+	char eventFile[MAX_FILENAME_LEN];
 
 	while (TRUE) // FIXME FIXME FIXME this while true has to be replaced by something more sensible
 	{

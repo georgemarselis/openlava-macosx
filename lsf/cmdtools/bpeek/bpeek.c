@@ -201,8 +201,8 @@ static void
 displayOutput (char *jobFile, struct jobInfoEnt *jInfo, char fflag,
 	       char **envp)
 {
-  char fileOut[MAXFILENAMELEN];
-  char fileErr[MAXFILENAMELEN];
+  char fileOut[MAX_FILENAME_LEN];
+  char fileErr[MAX_FILENAME_LEN];
 
   sprintf (fileOut, "%s.out", jobFile);
   sprintf (fileErr, "%s.err", jobFile);
@@ -295,7 +295,7 @@ static void
 remoteOutput (int fidx, char **disOut, char *exHost, char *__func__,
 	      char *execUsername, char **envp)
 {
-  char buf[MAXFILENAMELEN];
+  char buf[MAX_FILENAME_LEN];
   char *args[MAX_PEEK_ARGS + 4];
   char lsfUserName[MAXLINELEN];
 

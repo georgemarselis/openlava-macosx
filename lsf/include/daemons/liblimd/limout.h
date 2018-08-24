@@ -18,8 +18,10 @@
  */
 
 #pragma once
- 
+
+#include "lsf.h"
 #include "lib/hdr.h"
+
 
 enum ofWhat { 
 	OF_ANY,
@@ -31,7 +33,7 @@ typedef enum ofWhat ofWhat_t;
 
 struct decisionReq {
 	int options;
-	char hostType[MAXLSFNAMELEN];
+	char hostType[MAX_LSF_NAME_LEN];
 	char resReq[MAXLINELEN];
 	ofWhat_t ofWhat;
 	unsigned long numPrefs;
@@ -160,9 +162,9 @@ struct shortLsInfo
 	unsigned int nRes;
 	unsigned int nModels;
 	char padding[4];
-	double cpuFactors[MAXMODELS];
-	char *hostModels[MAXMODELS];
-	char *hostTypes[MAXTYPES];
+	double cpuFactors[MAX_MODELS];
+	char *hostModels[MAX_MODELS];
+	char *hostTypes[MAX_TYPES];
 	char **resName;
 	
 };
@@ -185,9 +187,9 @@ struct clusterInfoReq
 
 struct shortCInfo
 {
-	char *clName;      // [MAXLSFNAMELEN];
+	char *clName;      // [MAX_LSF_NAME_LEN];
 	char *masterName;  // [MAXHOSTNAMELEN];
-	char *managerName; // [MAXLSFNAMELEN];
+	char *managerName; // [MAX_LSF_NAME_LEN];
 	uid_t managerId;
 	unsigned int status;
 	unsigned int resClass;
@@ -212,9 +214,9 @@ struct shortCInfo
 
 struct cInfo
 {
-	char clName[MAXLSFNAMELEN];
+	char clName[MAX_LSF_NAME_LEN];
 	char masterName[MAXHOSTNAMELEN];
-	char managerName[MAXLSFNAMELEN];
+	char managerName[MAX_LSF_NAME_LEN];
 	pid_t managerId;
 	unsigned int status;
 	unsigned int resClass;
@@ -283,5 +285,5 @@ struct limLock
 	unsigned int uid;
 	int on;
 	time_t time;
-	char lsfUserName[MAXLSFNAMELEN];
+	char lsfUserName[MAX_LSF_NAME_LEN];
 };

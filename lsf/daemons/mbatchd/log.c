@@ -90,8 +90,8 @@ static int canSwitch (struct eventRec *, struct jData *);
 static char *instrJobStarter1 (char *, int, char *, char *, char *);
 int nextJobId_t = 1;
 time_t dieTime;
-static char elogFname[MAXFILENAMELEN];
-static char jlogFname[MAXFILENAMELEN];
+static char elogFname[MAX_FILENAME_LEN];
+static char jlogFname[MAX_FILENAME_LEN];
 
 static struct eventRec *logPtr;
 
@@ -149,8 +149,8 @@ init_log (void)
   int lineNum = 0;
   int list;
   struct jData *jp;
-  char dirbuf[MAXPATHLEN];
-  char infoDir[MAXPATHLEN];
+  char dirbuf[MAX_PATH_LEN];
+  char infoDir[MAX_PATH_LEN];
   struct stat sbuf;
   struct stat ebuf;
 
@@ -493,7 +493,7 @@ replay_switchjob (char *filename, int lineNum)
 	  if (qtp->qAttrib & QUEUE_ATTRIB_CHKPNT)
 	    {
 
-	      char dir[MAXPATHLEN];
+	      char dir[MAX_PATH_LEN];
 	      sprintf (dir, "%s/%s", qtp->chkpntDir,
 		       lsb_jobid2str (jp->jobId));
 	      jp->shared->jobBill.chkpntDir = safeSave (dir);
@@ -2473,7 +2473,7 @@ int
 switch_log (void)
 {
   static char __func__] = "switch_log";
-  char tmpfn[MAXFILENAMELEN];
+  char tmpfn[MAX_FILENAME_LEN];
   int i, lineNum = 0, errnoSv;
   LS_LONG_INT jobId = 0;
   FILE *efp, *tmpfp;
@@ -2730,7 +2730,7 @@ switch_log (void)
 
       if (fork () == 0)
 	{
-	  char indexFile[MAXFILENAMELEN];
+	  char indexFile[MAX_FILENAME_LEN];
 
 	  sprintf (indexFile, "%s/logdir/%s",
 		   daemonParams[LSB_SHAREDIR].paramValue,
@@ -2767,7 +2767,7 @@ static int
 createAcct0File (void)
 {
   static char __func__] = "createAcct0File";
-  char acct0File[MAXFILENAMELEN];
+  char acct0File[MAX_FILENAME_LEN];
   struct stat st;
   char buf[MSGSIZE];
   FILE *acctPtr, *acct0Ptr;
@@ -2837,7 +2837,7 @@ static int
 createEvent0File (void)
 {
   static char __func__] = "createEvent0File";
-  char event0File[MAXFILENAMELEN];
+  char event0File[MAX_FILENAME_LEN];
   char buf[MSGSIZE];
   char ch;
   struct stat st;
@@ -2926,7 +2926,7 @@ renameElogFiles (void)
   static char __func__] = "renameElogFiles";
   int i;
   int max;
-  char tmpfn[MAXFILENAMELEN], eventfn[MAXFILENAMELEN];
+  char tmpfn[MAX_FILENAME_LEN], eventfn[MAX_FILENAME_LEN];
   struct stat st;
 
   if (logclass & (LC_TRACE))
@@ -2975,7 +2975,7 @@ logJobInfo (struct submitReq *req, struct jData *jp, struct lenData *jf)
 {
   static char __func__] = "logJobInfo";
   int errnoSv;
-  char logFn[MAXFILENAMELEN];
+  char logFn[MAX_FILENAME_LEN];
   FILE *fp;
   mode_t omask = umask (077);
   sigset_t newmask, oldmask;
@@ -3037,7 +3037,7 @@ int
 rmLogJobInfo_ (struct jData *jp, int check)
 {
   static char __func__] = "rmLogJobInfo_()";
-  char logFn[MAXFILENAMELEN];
+  char logFn[MAX_FILENAME_LEN];
   struct stat st;
   struct submitReq *req;
 
@@ -3107,7 +3107,7 @@ readLogJobInfo (struct jobSpecs *jobSpecs, struct jData *jpbw,
 {
 #define ENVEND "$LSB_TRAPSIGS\n"
   static char __func__] = "readLogJobInfo()";
-  char logFn[MAXFILENAMELEN];
+  char logFn[MAX_FILENAME_LEN];
   LS_STAT_T st;
   int fd, i, numEnv, cc;
   char *buf, *sp, *edata, *eventAttrs = NULL;
@@ -3339,7 +3339,7 @@ char *
 readJobInfoFile (struct jData *jp, int *len)
 {
   static char __func__] = "readJobInfoFile";
-  char logFn[MAXFILENAMELEN];
+  char logFn[MAX_FILENAME_LEN];
   LS_STAT_T st;
   int fd;
   char *buf;
@@ -3388,7 +3388,7 @@ writeJobInfoFile (struct jData *jp, char *jf, int len)
 {
 
   static char __func__] = "writeJobInfoFile";
-  char logFn[MAXFILENAMELEN];
+  char logFn[MAX_FILENAME_LEN];
   int fd, errnoSv;
 
   chuser (managerId);
@@ -3432,8 +3432,8 @@ replaceJobInfoFile (char *jobFileName,
 		    char *newCommand, char *jobStarter, int options)
 {
   static char __func__] = "replaceJobInfoFile";
-  char jobFile[MAXFILENAMELEN];
-  char workFile[MAXFILENAMELEN];
+  char jobFile[MAX_FILENAME_LEN];
+  char workFile[MAX_FILENAME_LEN];
   char line[MAXLINELEN];
   char *ptr;
   int nbyte;
@@ -5046,7 +5046,7 @@ renameAcctLogFiles (int fileLimit)
   static char __func__] = "renameAcctLogFiles";
   int i;
   int max;
-  char tmpfn[MAXFILENAMELEN], acctfn[MAXFILENAMELEN];
+  char tmpfn[MAX_FILENAME_LEN], acctfn[MAX_FILENAME_LEN];
   struct stat st;
 
   if (logclass & (LC_TRACE))

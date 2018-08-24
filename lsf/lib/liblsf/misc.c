@@ -571,7 +571,7 @@ getLowestDir_ (const char *filePath)
 {
 	const char *sp1 = NULL;
 	const char *sp2 = NULL;
-	char *dirName = malloc( sizeof( char ) * MAXFILENAMELEN + 1 );
+	char *dirName = malloc( sizeof( char ) * MAX_FILENAME_LEN + 1 );
 	size_t len = 0;
 
 	sp1 = strrchr (filePath, '/');
@@ -931,9 +931,9 @@ readAddHost (char *buf, struct lsEventRec *ev)
   int n;
   int i;
   struct hostEntryLog *hPtr;
-  static char name[MAXLSFNAMELEN + 1];
-  static char model[MAXLSFNAMELEN + 1];
-  static char type[MAXLSFNAMELEN + 1];
+  static char name[MAX_LSF_NAME_LEN + 1];
+  static char model[MAX_LSF_NAME_LEN + 1];
+  static char type[MAX_LSF_NAME_LEN + 1];
   char *p;
   char *window;
 
@@ -1021,7 +1021,7 @@ static int
 readRmHost (char *buf, struct lsEventRec *ev)
 {
   struct hostEntryLog *hPtr;
-  static char name[MAXLSFNAMELEN + 1];
+  static char name[MAX_LSF_NAME_LEN + 1];
 
   hPtr = calloc (1, sizeof (struct hostEntryLog));
 
@@ -1040,7 +1040,7 @@ readRmHost (char *buf, struct lsEventRec *ev)
 static char *
 getstr_ (char *s)
 {
-  static char buf[MAXLSFNAMELEN + 1];
+  static char buf[MAX_LSF_NAME_LEN + 1];
   char *p;
 
   p = buf;

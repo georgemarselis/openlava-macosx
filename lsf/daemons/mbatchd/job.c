@@ -1054,7 +1054,7 @@ selectJobs (struct jobInfoReq *jobInfoReq, struct jData ***jobDataList,
 
 	  if (jobInfoReq->jobName[0] != '\0')
 	    {
-	      char fullName[MAXPATHLEN];
+	      char fullName[MAX_PATH_LEN];
 	      fullJobName_r (jpbw, fullName);
 	      if ((searchJobName == FALSE &&
 		   strcmp (jobInfoReq->jobName, fullName) != 0) ||
@@ -1349,7 +1349,7 @@ peekJob (struct jobPeekReq *jpeekReq, struct jobPeekReply *jpeekReply,
 
   static char __func__] = "peekJob";
   struct jData *job = NULL;
-  char jobFile[MAXFILENAMELEN];
+  char jobFile[MAX_FILENAME_LEN];
 
   if (logclass & LC_EXEC)
     {
@@ -5915,7 +5915,7 @@ modifyJob (struct modifyReq *req, struct submitMbdReply *reply,
   int returnErr, successfulOnce = FALSE;
   int i;
   int uid = auth->uid;
-  char userName[MAXLSFNAMELEN];
+  char userName[MAX_LSF_NAME_LEN];
 
   if ((returnErr = getJobIdList (req->jobIdStr, &numJobIds, &jobIdList))
       != LSBE_NO_ERROR)
@@ -7199,7 +7199,7 @@ copyJobBill (struct submitReq *subReq, struct submitReq *jobBill,
   now = time (NULL);
   if (jobId != FALSE)
     {
-      char fn[MAXFILENAMELEN];
+      char fn[MAX_FILENAME_LEN];
 
       jobBill->submitTime = now;
       if (subReq->jobFile[0] == '\0')
@@ -8910,7 +8910,7 @@ shouldResumeByRes (struct jData *jp)
 
   for (i = 0; i < jp->numHostPtr; i++)
     {
-      char loadString[MAXLSFNAMELEN];
+      char loadString[MAX_LSF_NAME_LEN];
       for (j = 0; j < allLsInfo->numIndx; j++)
 	jp->hPtr[i]->lsbLoad[j] = loads[i][j];
       for (j = 0; j < jp->hPtr[i]->numInstances; j++)
@@ -9256,7 +9256,7 @@ job <%s>", __func__, request->numHosts, lsb_jobid2str (job->jobId));
 static void
 replaceString (char *s1, char *s2, char *s3)
 {
-  char temp[MAXFILENAMELEN];
+  char temp[MAX_FILENAME_LEN];
   char *last;
   char *next;
 

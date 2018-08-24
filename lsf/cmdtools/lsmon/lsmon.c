@@ -44,7 +44,7 @@ int updateRate = 10;
 FILE *lf;
 int Lflag = 0;
 int redirect = 0;
-char logFilename[MAXFILENAMELEN];
+char logFilename[MAX_FILENAME_LEN];
 extern int num_loadindex;
 
 

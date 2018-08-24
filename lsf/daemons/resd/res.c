@@ -86,7 +86,7 @@ int sbdFlags = 0;
 
 int lastChildExitStatus = 0;
 
-char res_logfile[MAXPATHLEN];
+char res_logfile[MAX_PATH_LEN];
 int res_logop;
 
 int restart_argc    = 0;

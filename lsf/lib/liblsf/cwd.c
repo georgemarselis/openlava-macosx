@@ -24,14 +24,14 @@ mygetwd_ (char *path)
 {
   char *pwd;
   struct stat pwdstat, dotstat;
-  static char temp_buff[MAXPATHLEN];
+  static char temp_buff[MAX_PATH_LEN];
 
   pwd = getenv ("PWD");
   if (pwd == NULL && (pwd = getenv ("CWD")) == NULL)
     {
       if (getcwd (temp_buff, sizeof (temp_buff)))
 	{
-	  strncpy (path, temp_buff, MAXFILENAMELEN);
+	  strncpy (path, temp_buff, MAX_FILENAME_LEN);
 	  return (path);
 	}
       else
@@ -49,7 +49,7 @@ mygetwd_ (char *path)
     }
   if (getcwd (temp_buff, sizeof (temp_buff)))
     {
-      strncpy (path, temp_buff, MAXFILENAMELEN);
+      strncpy (path, temp_buff, MAX_FILENAME_LEN);
       return (path);
     }
   else

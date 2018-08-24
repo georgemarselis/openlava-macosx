@@ -73,8 +73,7 @@ bool_t xdr_xFile         ( XDR *xdrs, struct xFile * xf, struct LSFHeader *hdr);
 
 int getXdrStrlen         ( char * );
 
-// static 
-int lsbSharedResConfigured_ = FALSE;
+static int lsbSharedResConfigured_ = FALSE;
 
 
 void encodeHdr ( pid_t *word1, size_t *word2, unsigned int *word3, unsigned int *word4, struct LSFHeader *header);

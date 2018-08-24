@@ -471,8 +471,8 @@ updSharedResourceByRUNJob (const struct jData *jp)
 	for ( unsigned int i = 0; i < jp->numHostPtr; i++)
 	{
 		float load = 0;;
-		char loadString[MAXLSFNAMELEN];
-		memset( loadString, 0, MAXLSFNAMELEN );
+		char loadString[MAX_LSF_NAME_LEN];
+		memset( loadString, 0, MAX_LSF_NAME_LEN );
 
 		if (jp->hPtr[i]->hStatus & HOST_STAT_UNAVAIL)
 			continue;

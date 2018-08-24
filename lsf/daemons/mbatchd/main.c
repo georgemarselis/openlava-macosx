@@ -1115,7 +1115,7 @@ authRequest (struct lsfAuth *auth,
 	     struct sockaddr_in *local, char *hostName, int s)
 {
   mbdReqType reqType = reqHdr->opCode;
-  char buf[MAXLSFNAMELEN];
+  char buf[MAX_LSF_NAME_LEN];
 
   if (!(reqType == BATCH_JOB_SUB
 	|| reqType == BATCH_JOB_PEEK

@@ -149,7 +149,7 @@ ropen (int sock, struct LSFHeader *hdr)
 	XDR xdrs = { };
 	struct ropenReq req = { };
 	char *buf = malloc( sizeof( char ) * LSRCP_MSGSIZE + 1 ); // FIXME FIXME FIXME get rid of label
-	char *fn  = malloc( sizeof( char ) * MAXFILENAMELEN + 1 ); // FIXME FIXME FIXME get rid of label
+	char *fn  = malloc( sizeof( char ) * MAX_FILENAME_LEN + 1 ); // FIXME FIXME FIXME get rid of label
 
 	req.fn = fn;
 
@@ -495,11 +495,11 @@ rstat (int sock, struct LSFHeader *hdr)
   static char __func__] = "rstat()";
   struct stat st;
   char buf[LSRCP_MSGSIZE];
-  char fn[MAXFILENAMELEN];
+  char fn[MAX_FILENAME_LEN];
   XDR xdrs;
   struct stringLen fnStr;
 
-  fnStr.len = MAXFILENAMELEN;
+  fnStr.len = MAX_FILENAME_LEN;
   fnStr.name = fn;
 
   xdrmem_create (&xdrs, buf, LSRCP_MSGSIZE, XDR_DECODE);
@@ -589,12 +589,12 @@ rgetmnthost (int sock, struct LSFHeader *hdr)
 {
   static char __func__] = "rgetmnthost()";
   char buf[LSRCP_MSGSIZE];
-  char fn[MAXFILENAMELEN], *host;
+  char fn[MAX_FILENAME_LEN], *host;
   XDR xdrs;
   struct stringLen fnStr;
   struct stringLen hostStr;
 
-  fnStr.len = MAXFILENAMELEN;
+  fnStr.len = MAX_FILENAME_LEN;
   fnStr.name = fn;
 
   xdrmem_create (&xdrs, buf, LSRCP_MSGSIZE, XDR_DECODE);
@@ -650,9 +650,9 @@ runlink (int sock, struct LSFHeader *hdr) // FIXME FIXME is int the right choice
   struct stat st         = { };
   struct stringLen fnStr = { };
   char *buf              = malloc( sizeof( char ) * LSRCP_MSGSIZE + 1 );
-  char *fn               = malloc( sizeof( char ) * MAXFILENAMELEN + 1 );
+  char *fn               = malloc( sizeof( char ) * MAX_FILENAME_LEN + 1 );
 
-  fnStr.len = MAXFILENAMELEN; // FIXME FIXME FIXME replace this by OS filename defined assigned into a constant.
+  fnStr.len = MAX_FILENAME_LEN; // FIXME FIXME FIXME replace this by OS filename defined assigned into a constant.
   fnStr.name = fn;
 
   xdrmem_create (&xdrs, buf, LSRCP_MSGSIZE, XDR_DECODE);
@@ -673,7 +673,7 @@ runlink (int sock, struct LSFHeader *hdr) // FIXME FIXME is int the right choice
 
 	  DIR *dirp = NULL;
 	  struct dirent *dp = NULL;
-	  char *path = malloc( sizeof(char) * MAXPATHLEN + 1 ); // FIXME FIXME FIXME replace with OS define assigned into a const
+	  char *path = malloc( sizeof(char) * MAX_PATH_LEN + 1 ); // FIXME FIXME FIXME replace with OS define assigned into a const
 
 	  if ((dirp = opendir (fn)) == NULL)
 	{

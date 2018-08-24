@@ -1034,10 +1034,10 @@ ctrlSbdDebug (struct debugReq *pdebug)
   int level;
   int newClass;
   int options;
-  char logFileName[MAXLSFNAMELEN];
-  char lsfLogDir[MAXPATHLEN];
+  char logFileName[MAX_LSF_NAME_LEN];
+  char lsfLogDir[MAX_PATH_LEN];
   char *dir;
-  char dynDbgEnv[MAXPATHLEN];
+  char dynDbgEnv[MAX_PATH_LEN];
 
   memset (logFileName, 0, sizeof (logFileName));
   memset (lsfLogDir, 0, sizeof (lsfLogDir));

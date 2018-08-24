@@ -330,7 +330,7 @@ xdr_lsfAuth (XDR *xdrs, struct lsfAuth *auth, struct LSFHeader *hdr)
     }
 
     assert( auth->uid <= INT_MAX );
-    if (!(xdr_int (xdrs, (int *)&auth->uid) && xdr_int (xdrs, (int *)&auth->gid) && xdr_string (xdrs, &sp, MAXLSFNAMELEN))) {
+    if (!(xdr_int (xdrs, (int *)&auth->uid) && xdr_int (xdrs, (int *)&auth->gid) && xdr_string (xdrs, &sp, MAX_LSF_NAME_LEN))) {
         return FALSE;
     }
 

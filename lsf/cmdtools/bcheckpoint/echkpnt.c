@@ -55,9 +55,9 @@ main (int argc, char **argv)
   char *pJobID = NULL;
 
   char *presAcctFN = NULL;
-  char resAcctFN[MAXFILENAMELEN];
+  char resAcctFN[MAX_FILENAME_LEN];
 
-  char echkpntProgPath[MAXPATHLEN];
+  char echkpntProgPath[MAX_PATH_LEN];
   char *pChkpntDir = NULL;
   pid_t iChildPid;
   LS_WAIT_T iStatus;
@@ -239,7 +239,7 @@ main (int argc, char **argv)
     {
       long lMaxfds;
       int ii;
-      char progName[MAXFILENAMELEN];
+      char progName[MAX_FILENAME_LEN];
 
 
       sprintf (logMesgBuf, "erestart.%s", pMethodName);
@@ -268,7 +268,7 @@ main (int argc, char **argv)
 	}
       else
 	{
-	  char aFileName[MAXPATHLEN];
+	  char aFileName[MAX_PATH_LEN];
 
 
 

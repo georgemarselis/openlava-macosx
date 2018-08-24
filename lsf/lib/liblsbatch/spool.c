@@ -82,13 +82,13 @@ copySpoolFile (const char *srcFilePath, spoolOptions_t option)
 	char spoolHost[MAXHOSTNAMELEN];
 	char localHost[MAXHOSTNAMELEN];
 	LSB_SPOOL_INFO_T spoolFileInfoStruct;
-	char srcFileFullPath[MAXFILENAMELEN];
-	char srcFileName[MAXFILENAMELEN];
+	char srcFileFullPath[MAX_FILENAME_LEN];
+	char srcFileName[MAX_FILENAME_LEN];
 	char *startFileName = NULL;
-	char destinationDir[MAXFILENAMELEN], destinationFile[MAXFILENAMELEN];
-	char spoolDir[MAXFILENAMELEN];
+	char destinationDir[MAX_FILENAME_LEN], destinationFile[MAX_FILENAME_LEN];
+	char spoolDir[MAX_FILENAME_LEN];
 	const char *spoolDirPtr = NULL;
-	char spoolFileFullPath[MAXFILENAMELEN];
+	char spoolFileFullPath[MAX_FILENAME_LEN];
 	spoolCopyStatus_t spoolCopyStatus = SPOOL_COPY_FAILURE;
 	pid_t pid = 0;
 	char pidString[16];
@@ -140,7 +140,7 @@ copySpoolFile (const char *srcFilePath, spoolOptions_t option)
 	}
 	else
 	{
-		size_t size = MAXFILENAMELEN;
+		size_t size = MAX_FILENAME_LEN;
 
 
 
@@ -351,7 +351,7 @@ char *
 findSpoolDir (const char *spoolHost)
 {
 	char *returnStringPtr = NULL;
-	char spoolDir[MAXFILENAMELEN];
+	char spoolDir[MAX_FILENAME_LEN];
 	char *delimiterPtr = NULL;
 	struct parameterInfo *parameterInfoPtr = NULL;
 
@@ -670,7 +670,7 @@ cpRemoteFiles (const char *localSrcFileFullPath, const char *hostName, const cha
 	lsRcpXfer lsXfer;
 	spoolCopyStatus_t spoolCopyStatus = SPOOL_COPY_FAILURE;
 	char remoteHost[MAXHOSTNAMELEN];
-	char remoteFileSpec[1 + MAXHOSTNAMELEN + 1 + MAXFILENAMELEN];
+	char remoteFileSpec[1 + MAXHOSTNAMELEN + 1 + MAX_FILENAME_LEN];
 	char *buf = NULL;
 	int iCount = 0;
 	int output = -1;
@@ -824,7 +824,7 @@ copyFileToHost (const char *localSrcFileFullPath, const char *hostName, const ch
 	spoolCopyStatus_t spoolCopyStatus = SPOOL_COPY_FAILURE;
 	char localHost[MAXHOSTNAMELEN];
 	char hostNameTwin[MAXHOSTNAMELEN];
-	char outputFileName[MAXFILENAMELEN];
+	char outputFileName[MAX_FILENAME_LEN];
 	struct hostent *hp;
 
 	if (logclass & (LC_TRACE | LC_EXEC))
@@ -893,7 +893,7 @@ removeSpoolFile (const char *hostName, const char *destinFileFullPath)
 {
 	pid_t pid;
 	DIR *dirPtr = NULL;
-	char szRshDest[MAXFILENAMELEN];
+	char szRshDest[MAX_FILENAME_LEN];
 	char localHost[MAXHOSTNAMELEN];
 	char hostNameTwin[MAXHOSTNAMELEN];
 	struct hostent *hp;

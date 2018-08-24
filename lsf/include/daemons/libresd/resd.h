@@ -65,10 +65,17 @@ int lastChildExitStatus;
 
 int sbdMode;
 int sbdFlags;
-#define SBD_FLAG_STDIN  0x1
-#define SBD_FLAG_STDOUT 0x2
-#define SBD_FLAG_STDERR 0x4
-#define SBD_FLAG_TERM   0x8
+
+// #define SBD_FLAG_STDIN  0x1
+// #define SBD_FLAG_STDOUT 0x2
+// #define SBD_FLAG_STDERR 0x4
+// #define SBD_FLAG_TERM   0x8
+enum SBD_FLAG {
+	SBD_FLAG_STDIN  = 0x1,
+	SBD_FLAG_STDOUT = 0x2,
+	SBD_FLAG_STDERR = 0x4,
+	SBD_FLAG_TERM   = 0x8
+} SBD_FLAG;
 
 int accept_sock;
 char child_res;
@@ -149,7 +156,7 @@ char *env_dir;
 // 	LSF_MLS_LOG,
 // } status;
 
-struct config_param resParams[] = {
+static struct config_param resParams[]= {
     { "LSF_RES_DEBUG",          NULL },
     { "LSF_SERVERDIR",          NULL },
     { "LSF_AUTH",               NULL },
@@ -265,8 +272,8 @@ struct niosChannel
 
 // struct nioschannel niosChannel;  // FIXME FIXME FIXME remove typedef from struct
 
-
-typedef struct ttystruct
+//typedef 
+struct ttystruct
 {
 	struct termios attr;
 	struct winsize ws;
@@ -295,7 +302,7 @@ struct client
 
 struct child
 {
-	char username[MAXLSFNAMELEN];
+	char username[MAX_LSF_NAME_LEN];
 	char fromhost[MAXHOSTNAMELEN];
 	char slavepty[sizeof (PTY_TEMPLATE)];
 	char padding1[5];
@@ -421,7 +428,7 @@ struct resCmdBill
 	int filemask;
 	int priority;
 	int options;
-	char cwd[MAXPATHLEN]; // FIXME FIXME FIXME FIXME turn into dynamic allocation
+	char cwd[MAX_PATH_LEN]; // FIXME FIXME FIXME FIXME turn into dynamic allocation
 	// char *cwd;
 	char padding2[4];
 	char **argv;
@@ -460,7 +467,7 @@ struct resRusage
 
 struct resChdir
 {
-  char dir[MAXFILENAMELEN];
+  char dir[MAX_FILENAME_LEN];
 };
 
 struct resControl
@@ -582,7 +589,7 @@ int check_valid_tty (char *);
 
 void resAcctWrite (struct child *);
 void initResLog (void);
-char resAcctFN[MAXFILENAMELEN];
+char resAcctFN[MAX_FILENAME_LEN];
 int resLogOn;
 int resLogcpuTime;
 void initRU (struct rusage *);

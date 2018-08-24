@@ -26,8 +26,8 @@ typedef enum spoolOptions
 
 typedef struct lsbSpoolInfo
 {
-  char srcFile[MAXFILENAMELEN];
-  char spoolFile[MAXFILENAMELEN];
+  char srcFile[MAX_FILENAME_LEN];
+  char spoolFile[MAX_FILENAME_LEN];
 
 } LSB_SPOOL_INFO_T;
 

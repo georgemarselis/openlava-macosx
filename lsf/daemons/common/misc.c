@@ -376,7 +376,7 @@ relife (void)
         i = 1;
         if (debug)
             {
-            margv[i] = my_malloc (MAXFILENAMELEN, "relife");
+            margv[i] = my_malloc (MAX_FILENAME_LEN, "relife");
             sprintf (margv[i], "-%d", debug);
             i++;
             }

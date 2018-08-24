@@ -27,7 +27,7 @@
 
 // extern int optionFlag;
 // extern char *loginShell;
-// extern char *optionFileName; // [MAXLSFNAMELEN];
+// extern char *optionFileName; // [MAX_LSF_NAME_LEN];
 // extern int sig_decode (int);
 // extern int isatty (int);
 

@@ -24,7 +24,7 @@
 char **environ;
 char *loginShell;
 int optionFlag;
-char optionFileName[MAXLSFNAMELEN];
+char optionFileName[MAX_LSF_NAME_LEN];
 int sig_decode (int);
 int isatty (int);
 

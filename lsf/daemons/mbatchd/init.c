@@ -2557,8 +2557,8 @@ createCondNodes (unsigned int numConds, char **conds, char *fileName, int flags)
 	}
 
 	auth.uid = batchId;
-	strncpy (auth.lsfUserName, batchName, MAXLSFNAMELEN);
-	auth.lsfUserName[MAXLSFNAMELEN - 1] = '\0';
+	strncpy (auth.lsfUserName, batchName, MAX_LSF_NAME_LEN);
+	auth.lsfUserName[MAX_LSF_NAME_LEN - 1] = '\0';
 
 	for (unsigned int i = 0; i < numConds; i++) {
 		if (conds[i] == NULL || conds[i][0] == '\0') {

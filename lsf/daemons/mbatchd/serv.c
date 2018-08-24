@@ -335,9 +335,9 @@ packJgrpInfo (struct jgTreeNode *jgNode, int remain, char **replyBuf, int schedu
 
   jobInfoReply.nIdx = 0;
   len = 4 * MAX_LSB_NAME_LEN + 3 * MAXLINELEN + 2 * MAXHOSTNAMELEN
-    + 7 * MAXFILENAMELEN + sizeof (struct submitReq)
+    + 7 * MAX_FILENAME_LEN + sizeof (struct submitReq)
     + sizeof (struct jobInfoReply)
-    + MAX_LSB_NAME_LEN + 2 * MAXFILENAMELEN
+    + MAX_LSB_NAME_LEN + 2 * MAX_FILENAME_LEN
     + sizeof (time_t)
     + strlen (jobInfoReply.jobBill->dependCond)
     + 100
@@ -379,7 +379,7 @@ jobInfoReplyXdrBufLen (struct jobInfoReply *jobInfoReplyPtr)
   len += jobInfoReply.numReasons * sizeof (int);
   len += jobInfoReply.numToHosts * ALIGNWORD_ (MAXHOSTNAMELEN);
   len += 2 * jobInfoReply.nIdx * sizeof (float);
-  len += ALIGNWORD_ (MAXLSFNAMELEN);
+  len += ALIGNWORD_ (MAX_LSF_NAME_LEN);
   len += ALIGNWORD_ (strlen (jobInfoReply.execUsername) + 1);
   len += ALIGNWORD_ (strlen (jobInfoReply.execHome) + 1);
   len += ALIGNWORD_ (strlen (jobInfoReply.execCwd) + 1);
@@ -402,16 +402,16 @@ jobInfoReplyXdrBufLen (struct jobInfoReply *jobInfoReplyPtr)
   len += ALIGNWORD_ (strlen (jobInfoReply.jobBill->resReq) + 1);
   len += ALIGNWORD_ (MAXHOSTNAMELEN);
   len += ALIGNWORD_ (strlen (jobInfoReply.jobBill->dependCond) + 1);
-  len += ALIGNWORD_ (MAXFILENAMELEN);
-  len += ALIGNWORD_ (MAXFILENAMELEN);
-  len += ALIGNWORD_ (MAXFILENAMELEN);
-  len += ALIGNWORD_ (MAXFILENAMELEN);
+  len += ALIGNWORD_ (MAX_FILENAME_LEN);
+  len += ALIGNWORD_ (MAX_FILENAME_LEN);
+  len += ALIGNWORD_ (MAX_FILENAME_LEN);
+  len += ALIGNWORD_ (MAX_FILENAME_LEN);
   len += ALIGNWORD_ (strlen (jobInfoReply.jobBill->command) + 1);
-  len += ALIGNWORD_ (MAXFILENAMELEN);
+  len += ALIGNWORD_ (MAX_FILENAME_LEN);
   len += jobInfoReply.jobBill->nxf * sizeof (struct xFile);
-  len += ALIGNWORD_ (MAXFILENAMELEN);
+  len += ALIGNWORD_ (MAX_FILENAME_LEN);
   len += ALIGNWORD_ (MAXHOSTNAMELEN);
-  len += ALIGNWORD_ (MAXFILENAMELEN);
+  len += ALIGNWORD_ (MAX_FILENAME_LEN);
   len += ALIGNWORD_ (strlen (jobInfoReply.jobBill->preExecCmd) + 1);
   len += ALIGNWORD_ (strlen (jobInfoReply.jobBill->mailUser) + 1);
   len += ALIGNWORD_ (strlen (jobInfoReply.jobBill->projectName) + 1);
@@ -447,7 +447,7 @@ packJobInfo (struct jData *jobData,
   float *cpuFactor;
   float one = 1.0;
   float cpuF;
-  char fullName[MAXPATHLEN];
+  char fullName[MAX_PATH_LEN];
   struct jgTreeNode *jgNode;
   int job_numReasons;
   int *job_reasonTb;
@@ -2049,15 +2049,15 @@ initSubmit (int *first, struct submitReq *subReq,
     {
 
       subReq->fromHost = (char *) my_malloc (MAXHOSTNAMELEN, __func__);
-      subReq->jobFile = (char *) my_malloc (MAXFILENAMELEN, __func__);
-      subReq->inFile = (char *) my_malloc (MAXFILENAMELEN, __func__);
-      subReq->outFile = (char *) my_malloc (MAXFILENAMELEN, __func__);
-      subReq->errFile = (char *) my_malloc (MAXFILENAMELEN, __func__);
-      subReq->inFileSpool = (char *) my_malloc (MAXFILENAMELEN, __func__);
-      subReq->commandSpool = (char *) my_malloc (MAXFILENAMELEN, __func__);
-      subReq->cwd = (char *) my_malloc (MAXFILENAMELEN, __func__);
-      subReq->subHomeDir = (char *) my_malloc (MAXFILENAMELEN, __func__);
-      subReq->chkpntDir = (char *) my_malloc (MAXFILENAMELEN, __func__);
+      subReq->jobFile = (char *) my_malloc (MAX_FILENAME_LEN, __func__);
+      subReq->inFile = (char *) my_malloc (MAX_FILENAME_LEN, __func__);
+      subReq->outFile = (char *) my_malloc (MAX_FILENAME_LEN, __func__);
+      subReq->errFile = (char *) my_malloc (MAX_FILENAME_LEN, __func__);
+      subReq->inFileSpool = (char *) my_malloc (MAX_FILENAME_LEN, __func__);
+      subReq->commandSpool = (char *) my_malloc (MAX_FILENAME_LEN, __func__);
+      subReq->cwd = (char *) my_malloc (MAX_FILENAME_LEN, __func__);
+      subReq->subHomeDir = (char *) my_malloc (MAX_FILENAME_LEN, __func__);
+      subReq->chkpntDir = (char *) my_malloc (MAX_FILENAME_LEN, __func__);
       subReq->hostSpec = (char *) my_malloc (MAXHOSTNAMELEN, __func__);
       submitReply->badJobName = (char *) my_malloc (MAX_CMD_DESC_LEN, __func__);
       *first = FALSE;
@@ -2066,7 +2066,7 @@ initSubmit (int *first, struct submitReq *subReq,
     {
       FREEUP (subReq->chkpntDir);
       FREEUP (submitReply->badJobName);
-      subReq->chkpntDir = (char *) my_malloc (MAXFILENAMELEN, __func__);
+      subReq->chkpntDir = (char *) my_malloc (MAX_FILENAME_LEN, __func__);
       submitReply->badJobName = (char *) my_malloc (MAX_CMD_DESC_LEN, __func__);
     }
 
@@ -2556,8 +2556,8 @@ ctrlMbdDebug (struct debugReq *pdebug, struct lsfAuth *auth)
 {
   char __func__] = "ctrlMbdDebug";
   int opCode, level, newClass, options;
-  char logFileName[MAXLSFNAMELEN];
-  char lsfLogDir[MAXPATHLEN];
+  char logFileName[MAX_LSF_NAME_LEN];
+  char lsfLogDir[MAX_PATH_LEN];
   char *dir = NULL;
 
   memset (logFileName, 0, sizeof (logFileName));
@@ -2825,14 +2825,14 @@ do_resourceInfoReq (XDR * xdrs, int chfd, struct sockaddr_in *from,
 
 	  len = ALIGNWORD_ (resInfoReply.numResources
 			    * (sizeof (struct lsbSharedResourceInfo) +
-			       MAXLSFNAMELEN)) + 100;
+			       MAX_LSF_NAME_LEN)) + 100;
 
 	  for (i = 0; i < resInfoReply.numResources; i++)
 	    {
 	      for (j = 0; j < resInfoReply.resources[i].nInstances; j++)
 		{
 		  len += ALIGNWORD_ (sizeof (struct lsbSharedResourceInstance)
-				     + MAXLSFNAMELEN
+				     + MAX_LSF_NAME_LEN
 				     +
 				     (resInfoReply.resources[i].instances[j].
 				      nHosts * MAXHOSTNAMELEN)) + 4;

@@ -20,7 +20,7 @@
 
 static struct hTab hashTab;
 
-char chosenPath[MAXPATHLEN];
+char chosenPath[MAX_PATH_LEN];
 
 // struct config_param genParams_[]; // FIXME FIXME FIXME commended line out, cuz compiler was complaining. no obvious side-effects. revisit
 

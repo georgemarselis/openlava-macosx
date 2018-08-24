@@ -307,7 +307,7 @@ rmDir (char *dir)
 {
   DIR *dirp;
   struct dirent *dp;
-  char path[MAXPATHLEN];
+  char path[MAX_PATH_LEN];
 
   if ((dirp = opendir (dir)) == NULL)
     return -1;

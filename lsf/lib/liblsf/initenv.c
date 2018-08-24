@@ -183,7 +183,7 @@ readconfenv_ (struct config_param *pList1, struct config_param *pList2, char *co
     char *value;
     char *line;
     FILE *fp;
-    char filename[MAXFILENAMELEN];
+    char filename[MAX_FILENAME_LEN];
     struct config_param *plp;
     size_t lineNum = 0;
     int saveErrNo = 0;
@@ -221,7 +221,7 @@ readconfenv_ (struct config_param *pList1, struct config_param *pList2, char *co
     else
         {
             char *ep = getenv ("LSF_ENVDIR");
-            char buf[MAXFILENAMELEN];
+            char buf[MAX_FILENAME_LEN];
 
             if (ep == NULL)
     {

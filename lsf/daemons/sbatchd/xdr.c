@@ -65,8 +65,8 @@ xdr_jobSetup (XDR * xdrs, struct jobSetup *jsetup, struct LSFHeader *hdr)
     }
 
   if (!(xdr_string (xdrs, &sp1, MAX_LSB_NAME_LEN) &&
-	xdr_string (xdrs, &sp2, MAXFILENAMELEN) &&
-	xdr_string (xdrs, &sp3, MAXFILENAMELEN)))
+	xdr_string (xdrs, &sp2, MAX_FILENAME_LEN) &&
+	xdr_string (xdrs, &sp3, MAX_FILENAME_LEN)))
     {
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_string");
       return (FALSE);

@@ -54,8 +54,6 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "lsf.h"
-
 #if !defined(__CYGWIN__)
 #include <rpcsvc/ypclnt.h>
 #endif
@@ -74,52 +72,64 @@
 
 // #define LS_LONG_FORMAT ("%ld") 
 // #define _OPENLAVA_PROJECT_ "openlava project 2.0" // FIXME FIXME FIXME FIXME FIXME move to configure.ac
-const char _OPENLAVA_PROJECT_[] = "openlava project 2.0";
+static const char _OPENLAVA_PROJECT_[] = "openlava project 2.0";
 
 
 /*
  * This is our identifier printed out by all daemons and commands.
  */
 #ifdef REL_DATE  // FIXME FIXME FIXME FIXME FIXME move to configure.ac
-#define _LS_VERSION_ (_OPENLAVA_PROJECT_", " REL_DATE"\n")
+#define LS_VERSION_ (_OPENLAVA_PROJECT_", " REL_DATE"\n")
 #else
-#define _LS_VERSION_ (_OPENLAVA_PROJECT_", " __DATE__"\n")
+#define LS_VERSION_ (_OPENLAVA_PROJECT_", " __DATE__"\n")
 #endif
 
 /*
  * This is our current version.
  */
 // #define OPENLAVA_VERSION   20  // FIXME FIXME FIXME FIXME FIXME move to configure.ac
-const unsigned short OPENLAVA_VERSION = 20;
+static const unsigned short OPENLAVA_VERSION = 20;
 
 // #define LSF_DEFAULT_SOCKS       15
 // #define MAXLINELEN              512
-// #define MAXLSFNAMELEN           128
+// #define MAX_LSF_NAME_LEN           128
 // #define MAXSRES                 32
 // #define MAXRESDESLEN            256
 // #define NBUILTINDEX             11
-// #define MAXTYPES                128
-// #define MAXMODELS               128
-// #define MAXTYPES_31             25
-// #define MAXMODELS_31            30
+// #define MAX_TYPES                128
+// #define MAX_MODELS               128
+// #define MAX_TYPES_31             25
+// #define MAX_MODELS_31            30
 
-int lsferrno = 0; // defined, not used? 
-const int ENOLOCATION = 0x0FFF; // defined, not used
+static int lsferrno = 0; // defined, not used? 
+static const int ENOLOCATION = 0x0FFF; // defined, not used
 
 enum LSF_CONSTANTS {
-	LSF_DEFAULT_SOCKS = 15,
-	MAXLINELEN    = 512,
-	MAXLSFNAMELEN = 128,
-	MAXSRES       = 32,
-	MAXRESDESLEN  = 256,
-	NBUILTINDEX   = 11,
-	MAXTYPES      = 128,
-	MAXMODELS     = 128,
-	MAXTYPES_31   = 25,
-	MAXMODELS_31  = 30
+	LSF_DEFAULT_SOCKS   = 15,
+	MAX_CHARLEN         = 20,
+	MAX_CMD_DESC_LEN    = 256,
+	MAX_FILENAME_LEN    = 4096,
+	MAX_GROUPS          = 150,
+	MAX_HPART_USERS     = 100,
+	MAX_HOSTNAME_LEN    = 2048,
+	MAX_JOB_DESP_LEN    = 1024,
+	MAX_LINE_LEN        = 512,
+	MAX_LSB_NAME_LEN    = 60,
+	MAX_LSF_NAME_LEN    = 128,
+	MAX_MODELS          = 128,
+	MAX_MODELS_31       = 30,
+	MAX_NRLIMITS        = 512,
+	MAX_QUEUENAME_LEN   = 512,
+	MAX_RESDES_LEN      = 256,
+	MAX_SRES            = 32,
+	MAX_TYPES           = 128,
+	MAX_TYPES_31        = 25,
+	MAX_USER_EQUIVALENT = 128,
+	MAX_VERSION_LEN     = 12,
+	MAX_VERSIONLEN      = 128,
+	NBUILTINDEX         = 11,
+	MAX_PATH_LEN        = PATH_MAX // <limits.h>
 };
-//#define MAXFILENAMELEN          4096
-const unsigned int MAXFILENAMELEN = 4096;   // FIXME FIXME FIXME FIXME value of MAXFILENAMELEN must be set by configure script
 
 // #define FIRST_RES_SOCK  20
 // static const unsigned int FIRST_RES_SOCK = 20;
@@ -163,7 +173,7 @@ typedef enum {
 #define INFINIT_SHORT  0x7fff // FIXME FIXME FIXME FIXME  turn into constant
 
 // #define DEFAULT_RLIMIT     -1
-const short DEFAULT_RLIMIT = -1;
+static const short DEFAULT_RLIMIT = -1;
 
 // #define LSF_RLIMIT_CPU      0
 // #define LSF_RLIMIT_FSIZE    1
@@ -419,15 +429,15 @@ struct lsInfo
 {
 	unsigned int nTypes;
 	unsigned int nModels;
-	unsigned int modelRefs[MAXMODELS];         // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
+	unsigned int modelRefs[MAX_MODELS];         // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
 	unsigned int nRes;
 	unsigned int numIndx;
 	unsigned int numUsrIndx;
-	char hostTypes[MAXTYPES][MAXLSFNAMELEN];   // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
-	char hostModels[MAXMODELS][MAXLSFNAMELEN]; // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
-	char hostArchs[MAXMODELS][MAXLSFNAMELEN];  // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
+	char hostTypes[MAX_TYPES][MAX_LSF_NAME_LEN];   // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
+	char hostModels[MAX_MODELS][MAX_LSF_NAME_LEN]; // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
+	char hostArchs[MAX_MODELS][MAX_LSF_NAME_LEN];  // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
 	char paddin1[4];
-	double cpuFactor[MAXMODELS];               // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
+	double cpuFactor[MAX_MODELS];               // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
 	struct resItem **resTable;
 };
 
@@ -493,8 +503,8 @@ struct hostEntry
 	unsigned int nRes;
 	char padding1[4];
 	const char *hostName; // [MAXHOSTNAMELEN];
-	const char *hostModel; // [MAXLSFNAMELEN];
-	const char *hostType;  // [MAXLSFNAMELEN];
+	const char *hostModel; // [MAX_LSF_NAME_LEN];
+	const char *hostType;  // [MAX_LSF_NAME_LEN];
 	const char *window;
 	char **resList;
 	float cpuFactor;
@@ -671,7 +681,9 @@ struct clusterConf {
  * Maximum number of processes reported by PIM and read by the PIM library.
  */
 // #define MAX_PROC_ENT (2 * 1024)           // FIXME FIXME FIXME FIXME FIXME set by configuration
-const unsigned int MAX_PROC_ENT = 2 * 1024;  // FIXME FIXME FIXME FIXME FIXME set by configuration
+enum MAX_PROC_ENT {
+	MAX_PROC_ENT = 2 * 1024
+};  // FIXME FIXME FIXME FIXME FIXME set by configuration
 
 struct pidInfo
 {
@@ -729,8 +741,8 @@ struct hostEntryLog
 	int   rexPriority;
 	char padding1[4];
 	char  *hostName;  // [MAXHOSTNAMELEN];
-	char  *hostModel; // [MAXLSFNAMELEN];
-	char  *hostType;  // [MAXLSFNAMELEN];
+	char  *hostModel; // [MAX_LSF_NAME_LEN];
+	char  *hostType;  // [MAX_LSF_NAME_LEN];
 	float cpuFactor;
 	char padding2[4];
 	float *busyThreshold;
@@ -955,14 +967,18 @@ enum LOGDEBUG {
 };
 
 // #define LSF_NIOS_REQUEUE        127
-const unsigned short LSF_NIOS_REQUEUE = 127;
+enum LSF_NIOS_REQUEUE {
+	LSF_NIOS_REQUEUE = 127
+};
 
 typedef void (*SIGFUNCTYPE) (int);
 
 // #ifndef MSGSIZE
 // #define MSGSIZE   8192
 // #endif
-const unsigned int MSGSIZE = 8192;
+enum MSGSIZE {
+	MSGSIZE = 8192
+};
 
 #ifdef __CYGWIN__
 #define NICE_LEAST -19
@@ -984,9 +1000,9 @@ const unsigned int MSGSIZE = 8192;
 typedef struct stat LS_STAT_T;
 #define LSTMPDIR        lsTmpDir_                       // FIXME FIXME FIXME FIXME FIXME set in configure.ac
 // #define LSDEVNULL       "/dev/null"
-const char LSDEVNULL[] = "/dev/null";                   // FIXME FIXME FIXME FIXME FIXME set in configure.ac
+static const char LSDEVNULL[] = "/dev/null";                   // FIXME FIXME FIXME FIXME FIXME set in configure.ac
 // #define LSETCDIR        "/fix/me/no/such/place"
-const char LSETCDIR[] = "/fix/me/no/such/place";        // FIXME FIXME FIXME FIXME FIXME set in configure.ac
+static const char LSETCDIR[] = "/fix/me/no/such/place";        // FIXME FIXME FIXME FIXME FIXME set in configure.ac
 
 // #define LSETCDIR           SYSCONFDIR
 #define SOCK_CALL_FAIL(c)  ((c) < 0 )

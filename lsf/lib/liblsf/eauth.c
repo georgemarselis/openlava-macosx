@@ -82,7 +82,7 @@ static int
 getEAuth (struct eauth *eauth, char *host)
 {
 	char *argv[4];
-	char path[MAXPATHLEN];
+	char path[MAX_PATH_LEN];
 	struct lenData ld;
 
 	memset (path, 0, sizeof (path));
@@ -151,7 +151,7 @@ int
 verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
 {
 
-	char path[MAXPATHLEN] = "";
+	char path[MAX_PATH_LEN] = "";
 	char uData[256] = "";
 	char ok ;
 	char *eauth_client      = NULL;
@@ -385,7 +385,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
 static char *
 getLSFAdmin (void)
 {
-	static char admin[MAXLSFNAMELEN];
+	static char admin[MAX_LSF_NAME_LEN];
 	struct clusterInfo *clusterInfo = NULL;
 	struct passwd *pw = NULL;
 	const char *lsfUserName = NULL;

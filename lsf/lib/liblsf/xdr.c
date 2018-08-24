@@ -425,7 +425,7 @@ xdr_debugReq (XDR * xdrs, struct debugReq * debugReq, struct LSFHeader *hdr)
   && xdr_int (xdrs, &debugReq->logClass)
   && xdr_int (xdrs, &debugReq->options)
   && xdr_string (xdrs, &phostname, MAXHOSTNAMELEN)
-  && xdr_string (xdrs, &sp, MAXPATHLEN)))
+  && xdr_string (xdrs, &sp, MAX_PATH_LEN)))
 	return FALSE;
 
   return TRUE;

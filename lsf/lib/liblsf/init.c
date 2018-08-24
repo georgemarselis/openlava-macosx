@@ -259,7 +259,7 @@ lsfSetXUid (int flag, uid_t ruid, uid_t euid, uid_t suid, int (*func) ())
 void
 lsfExecLog (const char *cmd)
 {
-    char *lsfUserName   = malloc( sizeof( char ) * MAXLSFNAMELEN + 1 );
+    char *lsfUserName   = malloc( sizeof( char ) * MAX_LSF_NAME_LEN + 1 );
 
     if (genParams_[LSF_MLS_LOG].paramValue &&
             ((genParams_[LSF_MLS_LOG].paramValue[0] == 'y') ||

@@ -1601,7 +1601,7 @@ Reply1:
   if (limReplyCode == LIME_NO_ERR)
     {
       replyStruct = (char *) &reply;
-      bufSize = ALIGNWORD_ (MAXLSFNAMELEN * allInfo.numIndx
+      bufSize = ALIGNWORD_ (MAX_LSF_NAME_LEN * allInfo.numIndx
           + hlSize + reply.nEntry * (lvecSize + staSize));
     }
   else

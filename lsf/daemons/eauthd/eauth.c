@@ -155,7 +155,7 @@ assert( *inst );
 int
 printUserName (void)
 {
-  char lsfUserName[MAXLSFNAMELEN];
+  char lsfUserName[MAX_LSF_NAME_LEN];
   char *encUsername;
   char dataBuff[1024];
 

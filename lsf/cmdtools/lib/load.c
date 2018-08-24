@@ -105,7 +105,7 @@ char *
 formatHeader (char **dispindex, char longformat)
 {
   int i, fmtid, maxMem;
-  char tmpbuf[MAXLSFNAMELEN];
+  char tmpbuf[MAX_LSF_NAME_LEN];
   static char *line = NULL;
   static int first = TRUE;
 #define HEADERLEN  132
@@ -160,7 +160,7 @@ char *
 wideformatHeader (char **dispindex, char longformat)
 {
   int i, fmtid, maxMem;
-  char tmpbuf[MAXLSFNAMELEN];
+  char tmpbuf[MAX_LSF_NAME_LEN];
   static char *line = NULL;
   static int first = TRUE;
 #define HEADERLEN  132
@@ -250,7 +250,7 @@ stripSpaces (char *field)
 char **
 filterToNames (char *filter)
 {
-  char tmpname[MAXLSFNAMELEN];
+  char tmpname[MAX_LSF_NAME_LEN];
   static char **names;
   static int namelen;
   int i, j, k, len;

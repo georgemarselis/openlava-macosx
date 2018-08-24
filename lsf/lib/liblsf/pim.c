@@ -36,7 +36,7 @@
 struct jRusage *
 getJInfo_ (int npgid, int *pgid, unsigned short options, gid_t cpgid)
 {
-    static char pfile[MAXFILENAMELEN];
+    static char pfile[MAX_FILENAME_LEN];
     static struct sockaddr_in pimAddr;
     static time_t lastTime = 0, lastUpdateNow = 0;
     static time_t pimSleepTime = PIM_SLEEP_TIME;

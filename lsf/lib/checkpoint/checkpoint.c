@@ -39,7 +39,7 @@ const unsigned int LSF_SERVERDIR = 0
 char *getEchkpntMethodDir (char *pChkpnt_Cmd, const char *pMethodDir, const char *pProgramName, const char *pMethodName)
 {
 
-    char tmp_chkpnt_cmd[MAXPATHLEN];
+    char tmp_chkpnt_cmd[MAX_PATH_LEN];
     char *pConfigPath = NULL;
     char *pChkpntBuf = NULL;
 
@@ -163,7 +163,7 @@ getChkpntDirFile (char *pPathBuf, const char *pFileName)
 
     if (pFileName != NULL) {
 
-        char tmpFileName[MAXFILENAMELEN];
+        char tmpFileName[MAX_FILENAME_LEN];
         char *pFileNameChar = tmpFileName;
 
         strcpy (tmpFileName, pFileName);
@@ -215,7 +215,7 @@ redirectFd (const char *pFileName, int iFileNo)
 int
 initLog (char *pMesgHeader)
 {
-    char logFileName[MAXPATHLEN];
+    char logFileName[MAX_PATH_LEN];
 
     if (m_pLogFile == NULL) {
         if (getChkpntDirFile (logFileName, ECHKPNT_LOG_FILENAME) != 0) {

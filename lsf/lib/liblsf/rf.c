@@ -204,7 +204,7 @@ ls_ropen (char *host, char *fn, int flags, int mode)
 	req.flags = flags;
 	req.mode = mode;
 
-	if (lsSendMsg_ (rh->sock, RF_OPEN, 0, (char *) &req, buf, sizeof (struct LSFHeader) + MAXFILENAMELEN + sizeof (req), xdr_ropenReq, b_write_fix, NULL) < 0)
+	if (lsSendMsg_ (rh->sock, RF_OPEN, 0, (char *) &req, buf, sizeof (struct LSFHeader) + MAX_FILENAME_LEN + sizeof (req), xdr_ropenReq, b_write_fix, NULL) < 0)
 	{
 	  return -1;
 	}
@@ -542,10 +542,10 @@ ls_rstat (char *host, char *fn, struct stat *st)
   if ((rh = rhConnect (host)) == NULL)
 	return -1;
 
-  fnStr.len = MAXFILENAMELEN;
+  fnStr.len = MAX_FILENAME_LEN;
   fnStr.name = fn;
   if (lsSendMsg_ (rh->sock, RF_STAT, 0, (char *) &fnStr, buf,
-		  sizeof (struct LSFHeader) + MAXFILENAMELEN,
+		  sizeof (struct LSFHeader) + MAX_FILENAME_LEN,
 		  xdr_stringLen, b_write_fix, NULL) < 0)
 	{
 	  return -1;
@@ -583,11 +583,11 @@ ls_rgetmnthost (char *host, char *fn)
 
   hostStr.len = MAXHOSTNAMELEN;
   hostStr.name = hostname;
-  fnStr.len = MAXFILENAMELEN;
+  fnStr.len = MAX_FILENAME_LEN;
   fnStr.name = fn;
 
   if (lsSendMsg_ (rh->sock, RF_GETMNTHOST, 0, (char *) &fnStr, buf,
-		  sizeof (struct LSFHeader) + MAXFILENAMELEN,
+		  sizeof (struct LSFHeader) + MAX_FILENAME_LEN,
 		  xdr_stringLen, b_write_fix, NULL) < 0)
 	{
 	  return NULL;
@@ -672,11 +672,11 @@ ls_runlink (char *host, char *fn)
 
   hostStr.len = MAXHOSTNAMELEN;
   hostStr.name = hostname;
-  fnStr.len = MAXFILENAMELEN;
+  fnStr.len = MAX_FILENAME_LEN;
   fnStr.name = fn;
 
   if (lsSendMsg_ (rh->sock, RF_UNLINK, 0, (char *) &fnStr, buf,
-		  sizeof (struct LSFHeader) + MAXFILENAMELEN,
+		  sizeof (struct LSFHeader) + MAX_FILENAME_LEN,
 		  xdr_stringLen, b_write_fix, NULL) < 0)
 	{
 	  return -1;

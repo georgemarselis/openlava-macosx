@@ -101,14 +101,14 @@ ls_eligible ( const char *task, char *resreqstr, const char mode)
 long
 inittasklists_ (void)
 {
-	char filename[MAXFILENAMELEN];
+	char filename[MAX_FILENAME_LEN];
 	char *homep = NULL;
 	char *clName = NULL;
 
 	h_initTab_ (&rtask_table, 11);
 	h_initTab_ (&ltask_table, 11);
 
-	memset( filename, 0, MAXFILENAMELEN);
+	memset( filename, 0, MAX_FILENAME_LEN);
 
 	if (initenv_ (NULL, NULL) < 0) {
 		return -1;

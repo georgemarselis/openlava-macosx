@@ -35,14 +35,14 @@ enum lsPStatType
 
 struct lsPidInfo
 {
-int pid;
-	int ppid;
-	int pgid;
-	int jobid;
-	int utime;
-	int stime;
-	int cutime;
-	int cstime;
+	pid_t pid;
+	pid_t ppid;
+	pid_t pgid;
+	pid_t jobid;
+	time_t utime;
+	time_t stime;
+	time_t cutime;
+	time_t cstime;
 	int proc_size;
 	int resident_size;
 	int stack_size;
@@ -50,18 +50,18 @@ int pid;
 	char command[PATH_MAX]; // PATH_MAX is declared in limits.h
 };
 
-const unsigned int NL_SETN = 32;     // FIXME FIXME remove at earliest convience
+// const unsigned int NL_SETN = 32;     // FIXME FIXME remove at earliest convience
 
-int npidList                = 0;
-struct pidInfo *pidList     = NULL;
-struct lsPidInfo *pinfoList = NULL;
-int npinfoList              = 0;
-int npgidList               = 0;
-int *pgidList               = NULL;
-unsigned int hitPGid        = 0;
-char *pimInfoBuf            = NULL;
-unsigned long pimInfoLen    = 0;
-int argOptions              = 0;
+static pid_t npidList              = 0;
+static struct pidInfo *pidList     = NULL;
+static struct lsPidInfo *pinfoList = NULL;
+static unsigned int npinfoList     = 0;
+static pid_t npgidList             = 0;
+static pid_t *pgidList             = NULL;
+static unsigned int hitPGid        = 0;
+static char *pimInfoBuf            = NULL;
+static unsigned long pimInfoLen    = 0;
+static int argOptions              = 0;
 
 char *getNextString (char *, char *);
 char *readPIMBuf (char *);

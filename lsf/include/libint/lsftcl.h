@@ -54,7 +54,7 @@ typedef struct {
 // #define   CPU_       (nRes + numIndx + 7)
 // #define   SERVER     (nRes + numIndx + 8)
 
-enum {
+enum HOST_CHARACTERISTICS {
 	CPUFACTOR, // = nRes + numIndx, // FIXME FIXME FIXME FIXME just how many "CPUFACTOR/CPU/SERVER/NDISK" declerations are there?
 	NDISK,
 	REXPRI,
@@ -73,7 +73,7 @@ enum {
 // #define   LAST_STRING (HOSTNAME + 1)
 // #define   DEFINEDFUNCTION 5
 
-enum HOST {
+enum HOSTTYPE {
 	HOSTTYPE, 		// FIXME FIXME FIXME FIXME just how many "HOSTTYPE/HOSTNAME" declerations are there?
 	HOSTMODEL,
 	HOSTSTATUS,

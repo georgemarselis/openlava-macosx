@@ -1234,7 +1234,7 @@ jobact (struct jobCard *jp, int actValue, char *actCmd, int actFlags,
 {
   static char __func__] = "jobact";
   pid_t pid;
-  char exitFile[MAXFILENAMELEN], msg[MAXLINELEN * 2];
+  char exitFile[MAX_FILENAME_LEN], msg[MAXLINELEN * 2];
 
 
   jp->jobSpecs.actValue = actValue;
@@ -1363,7 +1363,7 @@ exeActCmd (struct jobCard *jp, char *actCmd, char *exitFile)
   char jobIdStr[16];
   char suspendReasons[128];
   char suspSubReasons[128];
-  char buf[MAXFILENAMELEN];
+  char buf[MAX_FILENAME_LEN];
 
 
   /* _i18n_msg_get(ls_catd , NL_SETN, 5913, */
@@ -1600,9 +1600,9 @@ execRestart (struct jobCard *jobCardPtr, struct hostent *hp)
   char errMsg[MAXLINELEN];
   char pidStr[20], pgidStr[20];
 
-  char chkDir[MAXFILENAMELEN],
-    chkpntDir[MAXFILENAMELEN],
-    restartDir[MAXFILENAMELEN], oldChkpntDir[MAXFILENAMELEN];
+  char chkDir[MAX_FILENAME_LEN],
+    chkpntDir[MAX_FILENAME_LEN],
+    restartDir[MAX_FILENAME_LEN], oldChkpntDir[MAX_FILENAME_LEN];
   char oldJobId[20], newJobId[20];
   char *strPtr;
 
@@ -1841,11 +1841,11 @@ void
 exeChkpnt (struct jobCard *jp, int chkFlags, char *exitFile)
 {
   static char __func__] = "exeChkpnt";
-  char s[MAXFILENAMELEN], t[MAXFILENAMELEN];
+  char s[MAX_FILENAME_LEN], t[MAX_FILENAME_LEN];
 
 
-  char chkDir[MAXFILENAMELEN],
-    chkpntDir[MAXFILENAMELEN], chkpntDirTmp[MAXFILENAMELEN];
+  char chkDir[MAX_FILENAME_LEN],
+    chkpntDir[MAX_FILENAME_LEN], chkpntDirTmp[MAX_FILENAME_LEN];
   char oldJobId[20], newJobId[20];
   char *strPtr, *p;
 
@@ -2221,7 +2221,7 @@ suspendUntilSignal (int signo)
 char *
 getEchkpntDir (char *name)
 {
-  static char echpnt_path[MAXPATHLEN];
+  static char echpnt_path[MAX_PATH_LEN];
   char *echkpnt_dir;
 
   if ((echkpnt_dir = getenv ("LSF_ECHKPNTDIR")) == NULL)
@@ -2396,7 +2396,7 @@ int
 sbdlog_newstatus (struct jobCard *jp)
 {
   static char __func__] = "sbdlog_newstatus()";
-  char logFile[MAXFILENAMELEN];
+  char logFile[MAX_FILENAME_LEN];
   struct eventRec logPtr;
   int eno;
   struct sbdJobStatusLog *jobStatusLog;
@@ -2454,7 +2454,7 @@ sbdlog_newstatus (struct jobCard *jp)
 int
 sbdread_jobstatus (struct jobCard *jp)
 {
-  char logFile[MAXFILENAMELEN];
+  char logFile[MAX_FILENAME_LEN];
   struct eventRec *logPtr;
 
   int line = INFINIT_INT;
