@@ -34,7 +34,8 @@ typedef int (*GET_OS_USER_NAME_FN_T)     ( const char *lsfUserName, char *osUser
 typedef int (*GET_OS_UID_FN_T)           ( const char *lsfUserName, uid_t * uid);
 typedef int (*GET_LSF_USER_FN_T)         ( const char *lsfUserName, unsigned int lsfUserNameSize);
 
-typedef struct
+// typedef
+struct IDLIB_INFO_T
 {
 	bool_t initialized;
 	bool_t initFailed;
@@ -45,10 +46,9 @@ typedef struct
 	GET_LSF_USER_BY_UID_FN_T getLSFUserByUid_;
 	GET_OS_USER_NAME_FN_T getOSUserName_;
 	GET_OS_UID_FN_T getOSUid_;
-} IDLIB_INFO_T;
+};
 
-
-IDLIB_INFO_T idLib_ = {
+static struct IDLIB_INFO_T idLib_ = {
 	FALSE,
 	FALSE,
 	0,

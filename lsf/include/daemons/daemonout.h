@@ -45,13 +45,13 @@ static const unsigned short READY_FOR_OP   = 1023;
 
 // #define RSCHED_LISTSEARCH_BY_EXECJID       0
 // #define RSCHED_LISTSEARCH_BY_EXECLUSNAME   1
-enum RSCHED_LISTSEARCH {
+static enum RSCHED_LISTSEARCH {
 	RSCHED_LISTSEARCH_BY_EXECJID = 0,
 	RSCHED_LISTSEARCH_BY_EXECLUSNAME = 1	
 } RSCHED_LISTSEARCH;
 
 // FIXME FIXME sort labels, remove numbers, make sure everything is compared using the labels and not the numbers
-enum mbdReqType {
+static enum mbdReqType {
 	BATCH_JOB_SUB        = 1,
 	BATCH_JOB_INFO       = 2,
 	BATCH_JOB_PEEK       = 3,
@@ -137,7 +137,7 @@ static const unsigned short LOAD_REPLY_SHARED_RESOURCE = 0x1;
 // #define CALL_SERVER_USE_SOCKET    0x2
 // #define CALL_SERVER_NO_HANDSHAKE  0x4
 // #define CALL_SERVER_ENQUEUE_ONLY  0x8
-enum CALL_SERVER {
+static enum CALL_SERVER {
 	CALL_SERVER_NO_WAIT_REPLY = 0x1,
 	CALL_SERVER_USE_SOCKET    = 0x2,
 	CALL_SERVER_NO_HANDSHAKE  = 0x4,
@@ -147,10 +147,7 @@ enum CALL_SERVER {
 
 typedef enum
 {
-
 	MBD_NEW_JOB_KEEP_CHAN = 0,
-
-
 	MBD_NEW_JOB = 1,
 	MBD_SIG_JOB = 2,
 	MBD_SWIT_JOB = 3,

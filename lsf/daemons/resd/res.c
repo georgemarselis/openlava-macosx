@@ -39,65 +39,6 @@
 
 #define NL_SETN     29
 
-// extern void child_channel_clear (struct child *, struct outputchannel *);
-// extern char **environ;
-
-int rexecPriority = 0;
-
-struct client *clients[MAXCLIENTS_HIGHWATER_MARK + 1] = { };
-
-struct child **children; // FIXME FIXME FIXME remove from global; accessor, mutator;
-
-int child_cnt    = 0;
-int client_cnt   = 0;
-char *Myhost     = NULL;
-char *myHostType = NULL;
-
-// taggedConn_t 
-struct taggedConn conn2NIOS = { };
-LIST_T *resNotifyList = NULL;
-
-bool_t vclPlugin = FALSE;
-
-char child_res = ' ';
-char child_go =  ' ';
-char res_interrupted = ' ';
-char *gobuf = NULL;
-
-int accept_sock = INVALID_FD;
-char allow_accept = 1;
-
-int ctrlSock = INVALID_FD;
-struct sockaddr_in ctrlAddr =  { };
-
-int child_res_port = INVALID_FD;
-int parent_res_port = INVALID_FD;
-fd_set readmask = { }, writemask = { }, exceptmask = { };
-
-int on = 1;
-int off = 0;
-int debug = 0;
-int res_status = 0;
-
-char *lsbJobStarter = NULL;
-
-int sbdMode = FALSE;
-int sbdFlags = 0;
-
-int lastChildExitStatus = 0;
-
-char res_logfile[MAX_PATH_LEN];
-int res_logop;
-
-int restart_argc    = 0;
-char **restart_argv = NULL;
-
-char *env_dir = NULL;
-
-struct config_param resConfParams[] = {
-	{"LSB_UTMP", NULL},
-	{NULL,       NULL}
-};
 
 #if __STDC__
 #define P_(s) s

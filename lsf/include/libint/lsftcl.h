@@ -22,20 +22,20 @@
 #include <tcl/tcl.h>
 #include <sys/types.h>
 
-struct tclHostData *hPtr;
-struct Tcl_Interp *globinterp;
-char overRideFromType;
-char runTimeDataQueried;
-unsigned int numIndx;
-unsigned int nRes;
-struct tclLsInfo *myTclLsInfo;
+static struct tclHostData *hPtr;
+static struct Tcl_Interp *globinterp;
+static char overRideFromType;
+static char runTimeDataQueried;
+static unsigned int numIndx;
+static unsigned int nRes;
+static struct tclLsInfo *myTclLsInfo;
 
 /* Arrays holding symbols used in resource requirement
  * expressions.
  */
-int *ar;
-int *ar2;
-int *ar4;
+static int *ar;
+static int *ar2;
+static int *ar4;
 
 typedef struct {
 	char *name;

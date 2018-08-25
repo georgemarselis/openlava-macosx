@@ -28,23 +28,13 @@
 
 
 // #define DEF_REXPRIORITY 0
-const unsigned int DEF_REXPRIORITY = 0;
-
-
-// #define NL_SETN 42
-
-// static 
-struct lsInfo lsinfo; // FIXME FIXME FIXME there is a second decleration in lfh.h . Not sure if dup or not
-// static 
-struct clusterInfo clinfo;
-// static 
-struct sharedConf sConf_;
-// static 
-struct clusterConf cConf_;
-// static 
-struct sharedConf *sConf = NULL;
-// static 
-struct clusterConf *cConf = NULL;
+static const unsigned int DEF_REXPRIORITY = 0;
+static struct lsInfo lsinfo; // FIXME FIXME FIXME there is a second decleration in lfh.h . Not sure if dup or not
+static struct clusterInfo clinfo;
+static struct sharedConf sConf_;
+static struct clusterConf cConf_;
+static struct sharedConf *sConf = NULL;
+static struct clusterConf *cConf = NULL;
 
 struct builtIn
 {
@@ -70,7 +60,7 @@ struct builtIn
 // unsigned int TYPE3 = RESF_BUILTIN | RESF_GLOBAL | RESF_LIC;
 
 // static 
-struct builtIn builtInRes[] = { // FIXME FIXME FIXME find out where this LS_NUMERIC comes from
+static struct builtIn builtInRes[] = { // FIXME FIXME FIXME find out where this LS_NUMERIC comes from
     {  0, "      ",  "r15s",   "15-second CPU run queue length",              LS_NUMERIC, INCR, TYPE0, 15  },
     {  1, "      ",  "r1m",    "1-minute CPU run queue length (alias: cpu)",  LS_NUMERIC, INCR, TYPE0, 15  },
     {  2, "      ",  "r15m",   "15-minute CPU run queue length",              LS_NUMERIC, INCR, TYPE0, 15  },
@@ -94,7 +84,7 @@ struct builtIn builtInRes[] = { // FIXME FIXME FIXME find out where this LS_NUME
     { 21, "      ",  "rexpri", "Remote execution priority",                   LS_NUMERIC, NA,   TYPE2, 0   },
     { 22, "      ",  "server", "LSF server host",                             LS_BOOLEAN, NA,   TYPE2, 0   },
     { 23, "      ",  "hname",  "Host name",                                   LS_STRING,  NA,   TYPE2, 0   },
-    { -1, "      ",  NULL,      NULL,                                         LS_NUMERIC, INCR, TYPE1, 0   }
+    { -1, "      ",  NULL,      NULL,                                         LS_NUMERIC, INCR, 0,     0   }
 };
 
 struct HostsArray
@@ -111,7 +101,7 @@ struct keymap {
     char *val;
 };
 
-const int builtInRes_ID[] = { // FIXME FIXME FIXME FIXME careful when compiling with the -Wkitchen-sink
+static const int builtInRes_ID[] = { // FIXME FIXME FIXME FIXME careful when compiling with the -Wkitchen-sink
     1300, 1301, 1302, 1303, 1304, 1305, 1306, 1307, 1308, 1309,
     1310, 1311, 1312, 1313, 1314, 1315, 1316, 1317, 1318, 1319,
     1320, 1321
@@ -206,4 +196,12 @@ struct clusterConf *ls_readcluster_ex ( const char *filename, struct lsInfo *inf
 int ls_setAdmins (struct admins *admins, int mOrA);
 void freekeyval (struct keymap keylist[]);
 char *parsewindow (char *linep, const char *filename, size_t *lineNum, const char *section);
-
+char lsf_setIndex (struct keymap *keyList, const char *filename, size_t lineNum);
+struct sharedConf *ls_readshared ( const char *filename);
+int initResTable_ (void);
+void initkeylist (struct keymap keyList[], unsigned int m, unsigned int n, struct lsInfo *info);
+int ls_getClusAdmins (char *line, const char *filename, size_t *lineNum, const char *secName, int lookupAdmins);
+struct clusterConf *ls_readcluster ( const char *filename, struct lsInfo *info);
+unsigned int parseHostList (const char *hostList, const char *lsfile, const size_t lineNum, char ***hosts);
+char ls_addHostModel ( const char *model, const char *arch, double factor);
+char ls_addHostType (char *type);

@@ -60,7 +60,7 @@ struct listEntry
 };
 
 
-char chosenPath[MAX_PATH_LEN];
+static char chosenPath[MAX_PATH_LEN];
 
 void daemonize_ (void);
 void saveDaemonDir_ (char *);

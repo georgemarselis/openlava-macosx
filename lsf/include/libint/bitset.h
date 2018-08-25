@@ -32,7 +32,7 @@ struct LS_BITSET_T {
 	unsigned int setWidth;
 	unsigned int setNumElements;
 	bool_t allowObservers;
-	LIST_T *observers;
+	struct _list *observers;
 	int (*getIndexByObject) (void *);
 	void *(*getObjectByIndex) (int);
 };
@@ -89,7 +89,7 @@ enum bitState {
 #define SET_DEFAULT_SIZE WORDLENGTH
 
 //#define SET_WORD_DEFAULT_EXTENT 2
-const unsigned short SET_WORD_DEFAULT_EXTENT = 2;
+static const unsigned short SET_WORD_DEFAULT_EXTENT = 2;
 
 // #define LS_SET_UNION      0
 // #define LS_SET_INTERSECT  1

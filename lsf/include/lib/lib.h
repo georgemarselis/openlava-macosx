@@ -133,7 +133,7 @@
 // // #define LSF_LOGDIR          3
 // #define LSF_PIM_SLEEPTIME_UPDATE 4
 
-struct config_param pimParams[] = {
+static struct config_param pimParams[] = {
     { "LSF_PIM_INFODIR",          NULL },
     { "LSF_PIM_SLEEPTIME",        NULL },
     { "LSF_LIM_DEBUG",            NULL },
@@ -268,7 +268,7 @@ enum {
 // #define MBD_DONT_FORK                 54      // FIXME the pattern does not match, but what the heck.
 // #define LIM_NO_MIGRANT_HOSTS          55
 
-struct config_param genParams_[ ] = {
+static struct config_param genParams_[ ] = {
     { "LSF_CONFDIR",            NULL },
     { "LSF_SERVERDIR",          NULL },
     { "LSF_LIM_DEBUG",          NULL },
@@ -298,7 +298,7 @@ struct config_param genParams_[ ] = {
     { NULL,                     NULL }
 };
 
-struct config_param lsfParams[] = {
+static struct config_param lsfParams[] = {
     { "LSF_SERVERDIR", NULL },
     { "LSF_CONFDIR",   NULL },
     { "LSF_SHAREDIR",  NULL },
@@ -369,7 +369,7 @@ enum {
     LSF_CONF_RETRY_MAX
 } daemonStatus;
 
-struct config_param daemonParams[] = {
+static struct config_param daemonParams[] = {
     { "LSB_DEBUG",                    NULL },
     { "LSB_CONFDIR",                  NULL },
     { "LSF_SERVERDIR",                NULL },
@@ -474,7 +474,7 @@ enum
     LSB_API_QUOTE_CMD
 } lsbStatus;
 
-struct config_param lsbParams[] = {
+static struct config_param lsbParams[] = {
 //  { "LSB_DEBUG",              NULL },
     { "LSB_SHAREDIR",           NULL },
     { "LSB_SBD_PORT",           NULL },
@@ -517,7 +517,7 @@ typedef enum {
 } resdParams_t;
 
 
-struct config_param limParams[] = {
+static struct config_param limParams[] = {
     { "LIM_DEBUG",            NULL },
     { "LIM_PORT",             NULL },
     { "LIM_TIME",             NULL },
@@ -532,7 +532,7 @@ struct config_param limParams[] = {
     { NULL,                   NULL },
 };
 
-struct config_param debParams[] = {
+static struct config_param debParams[] = {
     { "LSF_DEBUG_CMD",      NULL },
     { "LSF_TIME_CMD",       NULL },
     { "LSF_CMD_LOGDIR",     NULL },
@@ -582,34 +582,52 @@ enum {
 
 #define LOOP_ADDR       0x7F000001
 
-#define _NON_BLOCK_         0x01
-#define _LOCAL_             0x02
-#define _USE_TCP_           0x04
-#define _KEEP_CONNECT_      0x08
-#define _USE_PRIMARY_       0x10
-#define _USE_PPORT_         0x20
+// #define _NON_BLOCK_         0x01
+// #define _LOCAL_             0x02
+// #define _USE_TCP_           0x04
+// #define _KEEP_CONNECT_      0x08
+// #define _USE_PRIMARY_       0x10
+// #define _USE_PPORT_         0x20
+enum PORTS {
+    _NON_BLOCK_ = 0x01,
+    _LOCAL_ = 0x02,
+    _USE_TCP_ = 0x04,
+    _KEEP_CONNECT_ = 0x08,
+    _USE_PRIMARY_ = 0x10,
+    _USE_PPORT_ = 0x20,
+};
 /* openlava call LSF_SERVER_HOSTS regardless of local lim.
  */
-#define _SERVER_HOSTS_ONLY_       0x40
+enum _SERVER_HOSTS_ONLY_ {
+    _SERVER_HOSTS_ONLY_ = 0x40
+};
 
-#define PRIMARY    0
-#define MASTER     1
-#define UNBOUND    2
-#define TCP        3
+enum PMUT {
+    PRIMARY = 0,
+    MASTER  = 1,
+    UNBOUND = 2,
+    TCP     = 3
+};
 
-#define RES_TIMEOUT 120
-#define NIOS_TIMEOUT 120
+enum RESNIOS_TIMEOUT {
+    RES_TIMEOUT  = 120,
+    NIOS_TIMEOUT = 120
+};
 
-#define NOCODE 10000
+enum NOCODE {
+    NOCODE = 10000
+};
 
-#define RSIG_ID_ISTID   0x01
+enum RSIG {
+    RSIG_ID_ISTID = 0x01,
+    RSIG_ID_ISPID = 0x02,
+    RSIG_KEEP_CONN = 0x04
+};
 
-#define RSIG_ID_ISPID   0x02
-
-#define RSIG_KEEP_CONN  0x04
-
-#define RID_ISTID       0x01
-#define RID_ISPID       0x02
+enum RID {
+    RID_ISTID = 0x01,
+    RID_ISPID = 0x02
+};
 
 #define NO_SIGS (~(sigmask(SIGTRAP) | sigmask(SIGEMT)))
 #define SET_LSLIB_NIOS_HDR(hdr,opcode,l) { (hdr).opCode = (opcode); (hdr).len = (l); }

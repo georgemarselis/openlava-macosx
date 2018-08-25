@@ -46,7 +46,7 @@
 #define RECORD_LEN      128
 
 // typedef struct lsLimitT_
-struct lsLimitT_
+static struct lsLimitT_
 {
   int notAvail;
 } LS_LIMIT_T; 
@@ -175,7 +175,7 @@ struct lsProcessT_
 
 /// untypedef'ed
 //typedef 
-struct lsfRusage LS_RUSAGE_T;
+static struct lsfRusage LS_RUSAGE_T;
 
 typedef void (*LS_THREAD_FUNC_T) (void *);
 

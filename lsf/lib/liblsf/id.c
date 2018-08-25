@@ -19,7 +19,7 @@
 #include "lib/id.h"
 
 static void
-initIdLibDefaults (IDLIB_INFO_T * idLib)
+initIdLibDefaults (struct IDLIB_INFO_T *idLib)
 {
 	idLib->getLSFUser_        = defGetLSFUser;
 	idLib->getLSFUserByName_  = defGetLSFUserByName;
@@ -29,7 +29,7 @@ initIdLibDefaults (IDLIB_INFO_T * idLib)
 }
 
 static int
-initIdLib (IDLIB_INFO_T * idLib)
+initIdLib ( struct IDLIB_INFO_T *idLib)
 {
 
 	int retcode = -1;
@@ -141,7 +141,7 @@ return retcode;
 }
 
 static bool_t
-checkInit (IDLIB_INFO_T * idLib)
+checkInit ( struct IDLIB_INFO_T *idLib)
 {
 	if (!idLib->initialized)
 	{

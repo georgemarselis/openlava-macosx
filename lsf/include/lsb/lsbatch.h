@@ -24,7 +24,7 @@
 static const char _PATH_NULL[ ] = "/dev/null";
 static const char DEFAULT_MSG_DESC[ ] = "no description";
 
-enum HOST_STAT {
+static enum HOST_STAT {
 	HOST_STAT_OK            = 0x0,
 	HOST_STAT_BUSY          = 0x01,
 	HOST_STAT_WIND          = 0x02,
@@ -39,7 +39,7 @@ enum HOST_STAT {
 } HOST_STAT;
 
 
-enum HOST_BUSY {
+static enum HOST_BUSY {
 	HOST_BUSY_NOT  = 0x000,
 	HOST_BUSY_R15S = 0x001,
 	HOST_BUSY_R1M  = 0x002,
@@ -54,7 +54,7 @@ enum HOST_BUSY {
 	HOST_BUSY_MEM  = 0x400,
 } HOST_BUSY;
 
-enum QUEUE_STAT {
+static enum QUEUE_STAT {
 	QUEUE_STAT_OPEN         = 0x01,
 	QUEUE_STAT_ACTIVE       = 0x02,
 	QUEUE_STAT_RUN          = 0x04,
@@ -63,7 +63,7 @@ enum QUEUE_STAT {
 	QUEUE_STAT_RUNWIN_CLOSE = 0x20
 } QUEUE_STAT;
 
-enum QUEUE_ATTRIB {
+static enum QUEUE_ATTRIB {
 	QUEUE_ATTRIB_EXCLUSIVE               = 0x01,
 	QUEUE_ATTRIB_DEFAULT                 = 0x02,
 	QUEUE_ATTRIB_ROUND_ROBIN             = 0x04,

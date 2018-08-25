@@ -36,8 +36,8 @@
 // #define NL_SETN 42
 
 // const int NEGATIVERESULT = 1;
-const char N[] = "N";
-const char Y[] = "Y";
+static const char N[] = "N";
+static const char Y[] = "Y";
 
 int
 initResTable_ (void)
@@ -84,7 +84,6 @@ initResTable_ (void)
 
 	return 0;
 }
-
 
 struct sharedConf *
 ls_readshared ( const char *filename)
@@ -245,9 +244,6 @@ ls_readshared ( const char *filename)
 			doSkipSection (fp, &lineNum, filename, word);
 		}
 	}
-
-	fprintf( stderr, "%s: you are not supposed to be here\n", __func__ );
-	ls_syslog( LOG_ERR, "%s: you are not supposed to be here", __func__ );
 
 	return NULL;
 }
@@ -493,10 +489,10 @@ ls_addHostType (char *type) // duplicate function name from limd: lim_addHostTyp
 		return FALSE;
 	}
 
-	if (lsinfo.nTypes == MAXTYPES)
+	if (lsinfo.nTypes == MAX_TYPES)
 	{
 		/* catgets 5075 */
-		ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5075, "%s: Too many host types defined in section HostType. You can only define up to %d host types; host type %s ignored")), __func__, MAXTYPES, type);
+		ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5075, "%s: Too many host types defined in section HostType. You can only define up to %d host types; host type %s ignored")), __func__, MAX_TYPES, type);
 		return FALSE;
 	}
 
@@ -624,9 +620,9 @@ char ls_addHostModel ( const char *model, const char *arch, double factor) // FI
 		return FALSE;
 	}
 
-	if (lsinfo.nModels == MAXMODELS) {
+	if (lsinfo.nModels == MAX_MODELS) {
 		/* catgets 5084 */
-		ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5084, "%s: Too many host models defined in section HostModel. You can only define up to %d host models; host model %s ignored")), __func__, MAXMODELS, model);
+		ls_syslog (LOG_ERR, (_i18n_msg_get (ls_catd, NL_SETN, 5084, "%s: Too many host models defined in section HostModel. You can only define up to %d host models; host model %s ignored")), __func__, MAX_MODELS, model);
 		return FALSE;
 	}
 
@@ -1199,8 +1195,6 @@ char do_Resources (FILE * fp, size_t *lineNum, const char *filename)
 		}
 	}
 
-	fprintf( stderr, "%s: you are not supposed to be here\n", __func__ );
-	ls_syslog( LOG_ERR, "%s: you are not supposed to be here", __func__);
 	return NULL;
 }
 
@@ -1717,7 +1711,6 @@ do_Hosts (FILE * fp, const char *filename, size_t *lineNum, struct lsInfo *info)
 			errno = 0;
 			assert( strtoul( keyList[ND].val, NULL , BASEZERO ) );
 			if( !errno ) {
-				const unsigned short BASEZERO = 0;
 					host.nDisks = (unsigned int) strtoul( keyList[ND].val, NULL , BASEZERO ); // FIXME FIXME FIXME i'm sure nobody will get a couple of billion of disks in a single system any time soon, but please take care of this and change nDisks to size_t or devise a plan to have a proper conversion to int.
 				}
 				else {
@@ -2059,7 +2052,8 @@ char addHost (struct hostInfo *host, const char *filename, size_t *lineNum)
 	return TRUE;
 }
 
-void initkeylist (struct keymap keyList[], unsigned int m, unsigned int n, struct lsInfo *info)
+void 
+initkeylist (struct keymap keyList[], unsigned int m, unsigned int n, struct lsInfo *info)
 {
 
 	assert( m ); // check if these two amigos are 0
@@ -2865,7 +2859,6 @@ int addResourceMap ( const char *resName, const char *location, const char *lsfi
 
 struct lsSharedResourceInfo *addResource ( const char *resName, unsigned long nHosts, char **hosts, char *value, const char *filename, size_t lineNum)
 {
-	unsigned int nRes = 0;
 	struct lsSharedResourceInfo *resInfo = NULL;
 
 	assert( filename ); // FIXME FIXME FIXME these asserts got to go

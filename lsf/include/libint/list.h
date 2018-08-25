@@ -19,11 +19,7 @@
 
 #include <stdlib.h>
 
-typedef struct _listEntry LIST_ENTRY_T;
-typedef struct _list LIST_T;
-typedef struct _listEvent LIST_EVENT_T;
-typedef struct _listObserver LIST_OBSERVER_T;
-typedef struct _listIterator LIST_ITERATOR_T;
+
 
 struct _listEntry
 {
@@ -33,116 +29,75 @@ struct _listEntry
 
 struct _list
 {
-	LIST_ENTRY_T *forw;
-	LIST_ENTRY_T *back;
+	struct _listEntry *forw;
+	struct _listEntry *back;
 	char *name;
 	int numEnts;
 	int allowObservers;
-	LIST_T *observers;
+	struct _list *observers;
 };
 
 
-#define LIST_IS_EMPTY(List) ((List)->forw == (LIST_ENTRY_T *)List)
-
+#define LIST_IS_EMPTY(List) ((List)->forw == (struct _listEntry *)List)
 #define LIST_NUM_ENTRIES(List) ((List)->numEnts)
 
-typedef void (*LIST_ENTRY_DESTROY_FUNC_T) (LIST_ENTRY_T *);
+typedef void (*LIST_ENTRY_DESTROY_FUNC_T) (struct _listEntry *);
 typedef int (*LIST_ENTRY_EQUALITY_OP_T) (void *entry, void *subject, int hint);
-typedef void (*LIST_ENTRY_DISPLAY_FUNC_T) (LIST_ENTRY_T *, void *);
-typedef char *(*LIST_ENTRY_CAT_FUNC_T) (LIST_ENTRY_T *, void *);
+typedef void (*LIST_ENTRY_DISPLAY_FUNC_T) (struct _listEntry *, void *);
+typedef char *(*LIST_ENTRY_CAT_FUNC_T) (struct _listEntry *, void *);
 
-LIST_T *listCreate (char *name);
-void listDestroy (LIST_T * list, void (*destroy) (LIST_ENTRY_T *));
-int listAllowObservers (LIST_T * list);
-LIST_ENTRY_T *listGetFrontEntry (LIST_T * list);
-LIST_ENTRY_T *listGetBackEntry (LIST_T * list);
-int listInsertEntryBefore (LIST_T * list, LIST_ENTRY_T * succ, LIST_ENTRY_T * entry);
-int listInsertEntryAfter (LIST_T * list, LIST_ENTRY_T * pred, LIST_ENTRY_T * entry);
-int listInsertEntryAtFront (LIST_T * list, LIST_ENTRY_T * entry);
-int listInsertEntryAtBack (LIST_T * list, LIST_ENTRY_T * entry);
-LIST_ENTRY_T *listSearchEntry (LIST_T * list, void *subject, int (*equal) (void *, void *, int), int hint);
-void listRemoveEntry (LIST_T * list, LIST_ENTRY_T * entry);
-int listNotifyObservers (LIST_T * list, LIST_EVENT_T * event);
-#define LIST_TRAVERSE_FORWARD              0x1
-#define LIST_TRAVERSE_BACKWARD             0x2
 
-void list2Vector (LIST_T * list, int direction, void *vector, void (*putVecEnt) (void *vector, int index, LIST_ENTRY_T * entry));
+// #define struct _listRAVERSE_FORWARD              0x1
+// #define struct _listRAVERSE_BACKWARD             0x2
+enum LIST_TRAVERSE {
+	TRAVERSE_FORWARD   = 0x1,
+	TRAVERSE_BACKWARD  = 0x2
+};
 
-void listDisplay (LIST_T * list, int direction, void (*displayEntry) (LIST_ENTRY_T *, void *), void *hint);
 
-void listCat (LIST_T * list, int direction, char *buffer, size_t bufferSize, char *(*catEntry) (LIST_ENTRY_T *, void *), void *hint);
 
-LIST_T *listDup (LIST_T *, int);
-void listDump (LIST_T *);
-
-typedef enum _listEventType
+//typedef 
+static enum _listEventType
 {
 	LIST_EVENT_ENTER,
 	LIST_EVENT_LEAVE,
 	LIST_EVENT_NULL
-} LIST_EVENT_TYPE_T;
+} _listEventType;
 
-struct _listEvent
-{
+struct _listEvent {
 	char padding[4];
-	LIST_EVENT_TYPE_T type;
-	LIST_ENTRY_T *entry;
+	enum _listEventType type;
+	struct _listEntry *entry;
 };
 
-typedef int (*LIST_ENTRY_SELECT_OP_T) (void *extra, LIST_EVENT_T *);
+typedef int (*LIST_ENTRY_SELECT_OP_T) (void *extra, struct _listEvent *);
+typedef int (*LIST_EVENT_CALLBACK_FUNC_T) (struct _list * list, void *extra, struct _listEvent * event);
 
-typedef int (*LIST_EVENT_CALLBACK_FUNC_T) (LIST_T * list, void *extra, LIST_EVENT_T * event);
-
-struct _listObserver
-{
+struct _listObserver {
 	struct _listObserver *forw;
 	struct _listObserver *back;
 	char *name;
-	LIST_T *list;
+	struct _list *list;
 	void *extra;
 	LIST_ENTRY_SELECT_OP_T select;
 	LIST_EVENT_CALLBACK_FUNC_T enter;
 	LIST_EVENT_CALLBACK_FUNC_T leave_;
 };
 
-
-LIST_OBSERVER_T *listObserverCreate (char *name, void *extra, LIST_ENTRY_SELECT_OP_T select, ...);
-void listObserverDestroy (LIST_OBSERVER_T * observer);
-int listObserverAttach (LIST_OBSERVER_T * observer, LIST_T * list);
-void listObserverDetach (LIST_OBSERVER_T * observer, LIST_T * list);
-
-
-struct _listIterator
-{
+struct _listIterator {
 	char *name;
-	LIST_T *list;
-	LIST_ENTRY_T *curEnt;
+	struct _list *list;
+	struct _listEntry *curEnt;
 };
 
 #define LIST_ITERATOR_ZERO_OUT(Iter)                            \
 	{                                                           \
-		memset((void *)(Iter), 0, sizeof(LIST_ITERATOR_T));     \
+		memset((void *)(Iter), 0, sizeof(struct _listIterator));     \
 		(Iter)->name = "";                                      \
 	}
 
-
-LIST_ITERATOR_T *listIteratorCreate (char *name);
-void listIteratorDestroy (LIST_ITERATOR_T * iter);
-int listIteratorAttach (LIST_ITERATOR_T * iter, LIST_T * list);
-void listIteratorDetach (LIST_ITERATOR_T * iter);
-LIST_T *listIteratorGetList (LIST_ITERATOR_T * iter);
-LIST_ENTRY_T *listIteratorGetCurEntry (LIST_ITERATOR_T * iter);
-int listIteratorSetCurEntry (LIST_ITERATOR_T * iter, LIST_ENTRY_T * ent, int validateEnt);
-void listIteratorNext (LIST_ITERATOR_T * iter, LIST_ENTRY_T ** next);
-void listIteratorPrev (LIST_ITERATOR_T * iter, LIST_ENTRY_T ** prev);
-int listIteratorIsEndOfList (LIST_ITERATOR_T * iter);
-
-
-int listerrno;
-
 #undef LIST_ERROR_CODE_ENTRY
 #define LIST_ERROR_CODE_ENTRY(Id, Desc)
-
 
 enum _listErrno
 {
@@ -155,9 +110,39 @@ enum _listErrno
     LIST_ERROR_LAST
 };
 
-enum _listErrnoTypes{ LIST_ERR_NOERR = 0, LIST_ERR_BADARG, LIST_ERR_NOMEM, LIST_ERR_NOOBSVR  }; // FIXME FIXME FIXME FIXME this enum should not exist, but err codes should work with above . wtf is the above enum doing?
 
-enum _listErrno listErrnoType;
+static enum _listErrnoTypes{ LIST_ERR_NOERR = 0, LIST_ERR_BADARG, LIST_ERR_NOMEM, LIST_ERR_NOOBSVR  } listErrnoType; // FIXME FIXME FIXME FIXME this enum should not exist, but err codes should work with above . wtf is the above enum doing?
 
 char *listStrError (int listerrno);
 void listPError (char *usrmsg);
+struct _listIterator *listIteratorCreate (char *name);
+void listIteratorDestroy (struct _listIterator * iter);
+int listIteratorAttach (struct _listIterator * iter, struct _list * list);
+void listIteratorDetach (struct _listIterator * iter);
+struct _list *listIteratorGetList (struct _listIterator * iter);
+struct _listEntry *listIteratorGetCurEntry (struct _listIterator * iter);
+int listIteratorSetCurEntry (struct _listIterator * iter, struct _listEntry * ent, int validateEnt);
+void listIteratorNext (struct _listIterator * iter, struct _listEntry ** next);
+void listIteratorPrev (struct _listIterator * iter, struct _listEntry ** prev);
+int listIteratorIsEndOfList (struct _listIterator * iter);
+struct _listObserver *listObserverCreate (char *name, void *extra, LIST_ENTRY_SELECT_OP_T select, ...);
+void listObserverDestroy (struct _listObserver * observer);
+int listObserverAttach (struct _listObserver * observer, struct _list * list);
+void listObserverDetach (struct _listObserver * observer, struct _list * list);
+struct _list *listCreate (char *name);
+void listDestroy (struct _list * list, void (*destroy) (struct _listEntry *));
+int listAllowObservers (struct _list * list);
+struct _listEntry *listGetFrontEntry (struct _list * list);
+struct _listEntry *listGetBackEntry (struct _list * list);
+int listInsertEntryBefore (struct _list * list, struct _listEntry * succ, struct _listEntry * entry);
+int listInsertEntryAfter (struct _list * list, struct _listEntry * pred, struct _listEntry * entry);
+int listInsertEntryAtFront (struct _list * list, struct _listEntry * entry);
+int listInsertEntryAtBack (struct _list * list, struct _listEntry * entry);
+struct _listEntry *listSearchEntry (struct _list * list, void *subject, int (*equal) (void *, void *, int), int hint);
+void listRemoveEntry (struct _list * list, struct _listEntry * entry);
+int listNotifyObservers (struct _list * list, struct _listEvent * event);
+void list2Vector (struct _list * list, int direction, void *vector, void (*putVecEnt) (void *vector, int index, struct _listEntry * entry));
+void listDisplay (struct _list * list, int direction, void (*displayEntry) (struct _listEntry *, void *), void *hint);
+void listCat (struct _list * list, int direction, char *buffer, size_t bufferSize, char *(*catEntry) (struct _listEntry *, void *), void *hint);
+struct _list *listDup (struct _list *, int);
+void listDump (struct _list *);

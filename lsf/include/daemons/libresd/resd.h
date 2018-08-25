@@ -23,13 +23,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "daemons/libresd/resout.h"
-#include "libint/intlibout.h"
-#include "libint/list.h"
-#include "lib/osal.h"
-#include "lib/xdr.h"
 #include "lsf.h"
 #include "config.h"
+#include "lib/xdr.h"
+#include "lib/osal.h"
+#include "lib/lproto.h"
+#include "libint/list.h"
+#include "libint/intlibout.h"
+#include "daemons/libresd/resout.h"
+#include "daemons/libresd/resd.h"
 
 // #ifndef _BSD
 // #define _BSD
@@ -53,57 +55,6 @@
 #endif 
 */
 
-int rexecPriority;
-// extern struct client *clients[]; // FIXME FIXME FIXME FIXME FIXME attach specific header!
-int client_cnt;
-struct child **children;
-int child_cnt;
-char *Myhost;
-char *myHostType;
-
-int lastChildExitStatus;
-
-int sbdMode;
-int sbdFlags;
-
-// #define SBD_FLAG_STDIN  0x1
-// #define SBD_FLAG_STDOUT 0x2
-// #define SBD_FLAG_STDERR 0x4
-// #define SBD_FLAG_TERM   0x8
-enum SBD_FLAG {
-	SBD_FLAG_STDIN  = 0x1,
-	SBD_FLAG_STDOUT = 0x2,
-	SBD_FLAG_STDERR = 0x4,
-	SBD_FLAG_TERM   = 0x8
-} SBD_FLAG;
-
-int accept_sock;
-char child_res;
-char child_go;
-char res_interrupted;
-char *gobuf;
-char allow_accept;
-// extern char magic_str[]; // FIXME FIXME FIXME FIXME FIXME attach specific header!
-int child_res_port;
-int parent_res_port;
-fd_set readmask, writemask, exceptmask;
-
-int ctrlSock;
-struct sockaddr_in ctrlAddr;
-
-int on;
-int off;
-int debug;
-int res_status;
-
-char *lsbJobStarter;
-
-extern char res_logfile[]; // FIXME FIXME FIXME FIXME FIXME attach specific header!
-int res_logop;
-int restart_argc;
-char **restart_argv;
-char *env_dir;
-
 #define UTMP_CHECK_CODE "sbdRes"
 
 
@@ -111,51 +62,47 @@ char *env_dir;
 #define MAXCLIENTS_LOWWATER_MARK  1
 
 
-#define DOREAD  0
-#define DOWRITE 1
+#define DOREAD      0
+#define DOWRITE     1
 #define DOEXCEPTION 2
-#define DOSTDERR 3
+#define DOSTDERR    3
 
-#define PTY_TEMPLATE    "/dev/ptyXX"
+#define PTY_TEMPLATE     "/dev/ptyXX"
 
-#define PTY_SLAVE_INDEX   (sizeof(PTY_TEMPLATE) - 6)
-#define PTY_ALPHA_INDEX   (sizeof(PTY_TEMPLATE) - 3)
-#define PTY_DIGIT_INDEX   (sizeof(PTY_TEMPLATE) - 2)
+#define PTY_SLAVE_INDEX  (sizeof(PTY_TEMPLATE) - 6)
+#define PTY_ALPHA_INDEX  (sizeof(PTY_TEMPLATE) - 3)
+#define PTY_DIGIT_INDEX  (sizeof(PTY_TEMPLATE) - 2)
 
-#define PTY_FIRST_ALPHA   'p'
-# define PTY_LAST_ALPHA   'v'
+#define PTY_FIRST_ALPHA  'p'
+#define PTY_LAST_ALPHA   'v'
 
-#define   BUFSTART(x)    ((char *) ((x)->buf) + sizeof(struct LSFHeader))
+#define BUFSTART(x)      ((char *) ((x)->buf) + sizeof(struct LSFHeader))
 
 #define CLOSE_IT(fd)     if (fd>=0) {close(fd); fd = INVALID_FD;}
 
-// moved to $(include_dir)/lib.h
-// enum {
-// 	LSF_RES_DEBUG,
-// 	LSF_SERVERDIR,
-// 	LSF_AUTH,
-// 	LSF_LOGDIR,
-// 	LSF_ROOT_REX,
-// 	LSF_LIM_PORT,
-// 	LSF_RES_PORT,
-// 	LSF_ID_PORT,
-// 	LSF_USE_HOSTEQUIV,
-// 	LSF_RES_ACCTDIR,
-// 	LSF_RES_ACCT,
-// 	LSF_DEBUG_RES, // FIXME FIXME FIXME LSF_RES_DEBUG and LSF_DEBUG_RES , replace with single tag
-// 	LSF_TIME_RES,
-// 	LSF_LOG_MASK,
-// 	LSF_RES_RLIMIT_UNLIM,
-// 	LSF_CMD_SHELL,
-// 	LSF_ENABLE_PTY,
-// 	LSF_TMPDIR,
-// 	LSF_BINDIR,
-// 	LSF_LIBDIR,
-// 	LSF_RES_TIMEOUT,
-// 	LSF_RES_NO_LINEBUF,
-// 	LSF_MLS_LOG,
-// } status;
 
+
+// #define SBD_FLAG_STDIN  0x1
+// #define SBD_FLAG_STDOUT 0x2
+// #define SBD_FLAG_STDERR 0x4
+// #define SBD_FLAG_TERM   0x8
+static enum SBD_FLAG {
+	SBD_FLAG_STDIN  = 0x1,
+	SBD_FLAG_STDOUT = 0x2,
+	SBD_FLAG_STDERR = 0x4,
+	SBD_FLAG_TERM   = 0x8
+} SBD_FLAG;
+
+enum RES_RPID_KEEPPID {
+	RES_RPID_KEEPPID = 0x01
+};
+
+static enum RES_RID {
+	RES_RID_ISTID = 0x01,
+	RES_RID_ISPID = 0x02
+} RES_RID;
+
+// enum for this is in lib/lib.h
 static struct config_param resParams[]= {
     { "LSF_RES_DEBUG",          NULL },
     { "LSF_SERVERDIR",          NULL },
@@ -207,13 +154,6 @@ static struct config_param resParams[]= {
     { "LSB_SHAREDIR",           NULL },
     { NULL,                     NULL }  
 };
-
-#ifdef LINE_BUFSIZ
-#error
-#else
-#define LINE_BUFSIZ 4096  // FIXME FIXME FIXME FIXME 
-#endif
-// const unsigned short LINE_BUFSIZ = 4096;
 
 struct relaylinebuf// FIXME FIXME FIXME FIXME struct relaylinebuf and struct relaybuf are identical; should be consolidated
 {
@@ -293,9 +233,9 @@ struct client
 	char *clntdir;
 	char *homedir;
 	char **env;
-	ttyStruct tty;
+	struct tty_struct *tty;
 	GETGROUPS_T groups[NGROUPS_MAX];
-	char padding1[4];
+	char padding1[8];
 	struct hostent hostent;
 	struct lenData eexec;
 };
@@ -406,14 +346,6 @@ typedef struct resNotice
 	struct sigStatusUsage *sigStatRu;
 } resNotice_t;
 
-
-
-/*********************************************/
-/* these structures where moved over here from
- * resout.h because of scoping issues.
- * investigate what's up
- */
-
 struct resSignal
 {
 	pid_t pid;
@@ -440,9 +372,6 @@ struct resSetenv
 	char **env;
 };
 
-#define RES_RID_ISTID          0x01
-#define RES_RID_ISPID          0x02
-
 struct resRKill
 {
   pid_t rid;
@@ -455,8 +384,6 @@ struct resPid
   pid_t rpid;
   pid_t pid;
 };
-
-#define RES_RPID_KEEPPID 0x01
 
 struct resRusage
 {
@@ -483,16 +410,6 @@ struct resStty
   struct winsize ws;
 };
 
-// typedef struct nioschannel
-// {
-//   int fd;
-//   struct RelayBuf *rbuf;
-//   int rcount;
-//   struct RelayLineBuf *wbuf;
-//   int wcount;
-//   int opCode;
-// } niosChannel;
-
 struct niosConnect
 {
   pid_t rpid;
@@ -502,7 +419,6 @@ struct niosConnect
 
 struct niosStatus
 {
-
 	enum resAck ack;
 	char padding[4];
 
@@ -516,94 +432,182 @@ struct niosStatus
 
 /*********************************************/
 
-// extern
-struct taggedConn conn2NIOS;
-// extern
-LIST_T *resNotifyList;
+static int rexecPriority;
+static int client_cnt;
+static struct child **children;
+static int child_cnt;
+static char *Myhost;
+static char *myHostType;
 
-// extern
-int currentRESSN; // FIXME FIXME FIXME FIXME accessor and mutators for this global
+static int lastChildExitStatus;
 
-// static 
-unsigned int globCurrentSN;
+static int sbdMode;
+static int sbdFlags;
 
-// #define LSB_UTMP           0
 
-// #define SIG_NT_CTRLC        2000
-// #define SIG_NT_CTRLBREAK    2001
+static int accept_sock;
+static char child_res;
+static char child_go;
+static char res_interrupted;
+static char *gobuf;
+static char allow_accept;
 
-const unsigned short SIG_NT_CTRLC     = 2000;
-const unsigned short SIG_NT_CTRLBREAK = 2001;
+static int child_res_port;
+static int parent_res_port;
+static fd_set readmask;
+static int writemask;
+static int exceptmask;
 
-// struct config_param resParams[];
-// extern struct config_param resConfParams[]; // FIXME FIXME FIXME FIXME FIXME attach specific header!
-// #define RES_REPLYBUF_LEN   4096
-// #define RESS_LOGBIT         0x00000001
+static int ctrlSock;
+static struct sockaddr_in ctrlAddr;
 
-const unsigned short RES_REPLYBUF_LEN = 4096;
-int RESS_LOGBIT = 0x00000001;
+static int on;
+static int off;
+static int debug;
+static int res_status;
 
-void init_res (void);
-void resExit_ (int exitCode);
-// long nb_write_fix (int s, char *buf, size_t len);
-int ptymaster (char *);
-int ptyslave (char *);
-void doacceptconn (void);
-void dochild_stdio (struct child *, int);
-void dochild_remsock (struct child *, int);
-void dochild_buffer (struct child *, int);
-void dochild_info (struct child *, int);
-void doclient (struct client *);
-void ptyreset (void);
-void stdout_flush (struct child *chld);
-void doResParentCtrl (void);
-enum resAck sendResParent (struct LSFHeader * msgHdr, char *msgBuf, bool_t (*xdrFunc) ());
-int sendReturnCode (int, int);
+static char *lsbJobStarter;
 
-void donios_sock (struct child **, int);
-int deliver_notifications (LIST_T *);
+static char res_logfile[];
+static int res_logop;
+static int restart_argc;
+static char **restart_argv;
+static char *env_dir;
+static int  rexecPriority = 0;
 
-void term_handler (int);
-void sigHandler (int);
-void child_handler_res (void);
-void child_handler_ext (void);
-void getMaskReady (fd_set * rm, fd_set * wm, fd_set * em);
-void display_masks (fd_set *, fd_set *, fd_set *);
+static struct  client *clients[MAXCLIENTS_HIGHWATER_MARK + 1];
 
-// long b_write_fix  (int s, char *buf, size_t len);
+static struct  child **children; // FIXME FIXME FIXME remove from global; accessor, mutator;
 
-int lsbJobStart (char **, unsigned short, char *, int);
+static int  child_cnt    = 0;
+static int  client_cnt   = 0;
+static char  *Myhost     = NULL;
+static char  *myHostType = NULL;
 
-void childAcceptConn (int, struct passwd *, struct lsfAuth *, struct resConnect *, struct hostent *);
+// taggedConn_t 
+static struct  taggedConn conn2NIOS;
+static struct _list *resNotifyList = NULL;
 
-void resChild (char *, char *);
-int resParent (int, struct passwd *, struct lsfAuth *, struct resConnect *, struct hostent *);
-bool_t isLSFAdmin_resd (const char *);
+static bool_t  vclPlugin = FALSE;
 
-bool_t xdr_resChildInfo (XDR *, struct resChildInfo *, struct LSFHeader *);
+static char  child_res = ' ';
+static char  child_go =  ' ';
+static char  res_interrupted = ' ';
+static char  *gobuf = NULL;
 
-void rfServ_ (int);
+static int  accept_sock = INVALID_FD;
+static char  allow_accept = 1;
 
-char *pty_translate (char *);
-int check_valid_tty (char *);
+static int  ctrlSock = INVALID_FD;
+static struct  sockaddr_in ctrlAddr =  { };
 
-void resAcctWrite (struct child *);
-void initResLog (void);
-char resAcctFN[MAX_FILENAME_LEN];
-int resLogOn;
-int resLogcpuTime;
-void initRU (struct rusage *);
-void resParentWriteAcct (struct LSFHeader *, XDR *, int);
+static int  child_res_port = INVALID_FD;
+static int  parent_res_port = INVALID_FD;
 
-int findRmiDest (int *, int *);
 
-void delete_child (struct child *);
-void destroy_child (struct child *);
-int resSignal (struct child *chld, struct resSignal sig);
+static int  on = 1;
+static int  off = 0;
+static int  debug = 0;
+static int  res_status = 0;
 
-void dumpClient (struct client *, char *);
-void dumpChild (struct child *, int, char *);
+static char  *lsbJobStarter = NULL;
 
-unsigned int  getCurrentSN( void );
-unsigned int  setCurrentSN( unsigned int currentSN );
+static int  sbdMode = FALSE;
+static int  sbdFlags = 0;
+
+static int  lastChildExitStatus = 0;
+
+static char  res_logfile[MAX_PATH_LEN];
+static int  res_logop;
+
+static int  restart_argc    = 0;
+static char  **restart_argv = NULL;
+
+static char  *env_dir = NULL;
+
+static unsigned int globCurrentSN;
+
+static const unsigned short SIG_NT_CTRLC     = 2000;
+static const unsigned short SIG_NT_CTRLBREAK = 2001;
+
+static const unsigned short RES_REPLYBUF_LEN = 4096;
+static const int RESS_LOGBIT = 0x00000001;
+
+static struct  config_param resConfParams[] = {
+	{"LSB_UTMP", NULL},
+	{NULL,       NULL}
+};
+
+/* daemons/resd/getproc.c */
+int getPPSGids_(int pid, int *ppid, int *sid, int *pgid);
+
+/* daemons/resd/handler.c */
+void doacceptconn(void);
+void childAcceptConn(int s, struct passwd *pw, struct lsfAuth *auth, struct resConnect *connReq, struct hostent *hostp);
+void doclient(struct client *cli_ptr);
+void dochild_info(struct child *chld, int op);
+void doResParentCtrl(void);
+enum resAck sendResParent(struct LSFHeader *msgHdr, char *msgBuf, bool_t (*xdrFunc )());
+void delete_child(struct child *cp);
+void dochild_stdio(struct child *chld, int op);
+int resSignal(struct child *chld, struct resSignal sig);
+void child_handler(void);
+void child_handler_ext(void);
+void term_handler(int signum);
+void sigHandler(int signum);
+int matchExitVal(int val, char *requeueEval);
+int sendReturnCode(int s, int code);
+void child_channel_clear(struct child *chld, struct outputchannel *channel);
+int lsbJobStart(char **jargv, u_short retPort, char *host, int usePty);
+void dumpClient(struct client *client, char *why);
+void dumpChild(struct child *child, int operation, char *why);
+void dochild_buffer(struct child *chld, int op);
+void donios_sock(struct child **children, int op);
+int deliver_notifications( struct _list *list);
+
+/* daemons/resd/init.c */
+void init_res(void);
+int resParent(int s, struct passwd *pw, struct lsfAuth *auth, struct resConnect *connReq, struct hostent *hostp);
+void resChild(char *arg, char *envdir);
+
+/* daemons/resd/misc.c */
+bool_t xdr_resChildInfo(XDR *xdrs, struct resChildInfo *childInfo, struct LSFHeader *hdr);
+
+/* daemons/resd/pty.c */
+void ptyreset(void);
+int ptymaster(char *line);
+int ptyslave(char *tty_name);
+char *pty_translate(char *pty_name);
+int check_valid_tty(char *tty_name);
+
+/* daemons/resd/res.c */
+void usage(char *cmd);
+int main(int argc, char **argv);
+void initSignals(void);
+void getMaskReady(fd_set *rm, fd_set *wm, fd_set *em);
+void display_masks(fd_set *rm, fd_set *wm, fd_set *em);
+void put_mask(char *name, fd_set *mask);
+void periodic(int signum);
+void houseKeeping(void);
+void unblockSignals(void);
+void blockSignals(void);
+void resExit_(int exitCode);
+
+/* daemons/resd/rf.c */
+void rfServ_(int acceptSock);
+int ropen(int sock, struct LSFHeader *hdr);
+int rclose(int sock, struct LSFHeader *hdr);
+int rwrite(int sock, struct LSFHeader *hdr);
+int rread(int sock, struct LSFHeader *hdr);
+int rlseek(int sock, struct LSFHeader *hdr);
+int clearSock(int sock, int len);
+int rstat(int sock, struct LSFHeader *hdr);
+int rfstat(int sock, struct LSFHeader *hdr);
+int rgetmnthost(int sock, struct LSFHeader *hdr);
+int runlink(int sock, struct LSFHeader *hdr);
+
+/* daemons/resd/tasklog.c */
+void initResLog(void);
+void resAcctWrite(struct child *child);
+void resParentWriteAcct(struct LSFHeader *msgHdr, XDR *xdrs, int sock);
 
