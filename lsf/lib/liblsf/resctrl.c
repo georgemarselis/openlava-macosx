@@ -39,13 +39,13 @@ ls_rescontrol (char *host, int opCode, int data)
   struct timeval timeout;
 
 
-  if (genParams_[LSF_RES_TIMEOUT].paramValue)
+  if (genParams_[RES_TIMEOUT].paramValue)
     {
-      timeout.tv_sec = atoi (genParams_[LSF_RES_TIMEOUT].paramValue);
+      timeout.tv_sec = atoi (genParams_[RES_TIMEOUT].paramValue);
     }
   else
     {
-      timeout.tv_sec = LSF_RES_TIMEOUT;
+      timeout.tv_sec = RES_TIMEOUT;
     }
 
   timeout.tv_usec = 0;

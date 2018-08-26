@@ -20,23 +20,20 @@
 
 typedef enum
 {
-  MLS_FATAL,
-  MLS_INVALID,
-  MLS_CLEARANCE,
-  MLS_RHOST,
-  MLS_DOMINATE
+	MLS_FATAL,
+	MLS_INVALID,
+	MLS_CLEARANCE,
+	MLS_RHOST,
+	MLS_DOMINATE
 } mlsErrCode;
 
-int mlsSbdMode;
+// static int mlsSbdMode;
 
-/*#define lsfSetUid(uid)              lsfSetXUid(0, uid, uid, -1, setuid)
-
+/*#define lsfSetUid(uid)            lsfSetXUid(0, uid, uid, -1, setuid)
 #define lsfSetEUid(uid)             lsfSetXUid(0, -1, uid, -1, seteuid)
-
-#define lsfSetREUid(ruid, euid)	    lsfSetXUid(0, ruid, euid, -1, setreuid)
-
-#define lsfExecv(path, argv)	    lsfExecX(path, argv, execv)
-#define lsfExecvp(file, argv)	    lsfExecX(file, argv, execvp)*/
+#define lsfSetREUid(ruid, euid)     lsfSetXUid(0, ruid, euid, -1, setreuid)
+#define lsfExecv(path, argv)        lsfExecX(path, argv, execv)
+#define lsfExecvp(file, argv)       lsfExecX(file, argv, execvp)*/
 
 // FIXME investigate if the third argument to lsfSetXUid can be set to the appropriate
 // [s]uid_t type. if yes, try to see if there is an alternative to passing -1.

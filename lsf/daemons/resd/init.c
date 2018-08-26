@@ -29,31 +29,17 @@
 #include <sys/types.h>
 
 
-#include "daemons/libresd/resd.h"
-#include "lib/lproto.h"
 #include "lib/mls.h"
 #include "lib/lib.h"
+#include "lib/lproto.h"
+#include "daemons/libresd/init.c"
+#include "daemons/libresd/resd.h"
 
-#define RES_TIMEOUT_DEFAULT     60
+enum RES_TIMEOUT_DEFAULT RES_TIMEOUT_DEFAULT;
 
-#define NL_SETN     29
-
-
-
-static void init_AcceptSock (void);
-static void initConn2NIOS (void);
-static void initChildRes (char *envdir);
-int initResVcl (void);
-void init_res (void);
-
-ttyStruct defaultTty = { };
-
-
-
-static void
+void
 initConn2NIOS (void)
 {
-	static  char __func__] = "initConn2NIOS"; // FIXME FIXME change type of all __func__s-named-variable to const
 	conn2NIOS.task_duped = calloc (sysconf (_SC_OPEN_MAX), sizeof (int));
 
 	if ( NULL == conn2NIOS.task_duped )
@@ -92,13 +78,12 @@ initConn2NIOS (void)
 void
 init_res( void )
 {
-	static char __func__] = "init_res";
 	int i = 0;
 	int maxfds = 0;
 
- 	if (logclass & (LC_TRACE | LC_HANG)) {
+	if (logclass & (LC_TRACE | LC_HANG)) {
 		ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
- 	}
+	}
 
 	if (!sbdMode)  // FIXME FIXME FIXME FIXME this control code can be made more brief
 	{
@@ -191,10 +176,10 @@ init_res( void )
  */
 
 // FIXME FIXME FIXME FIXME FIXME memory management needs work
-static void
+void
 init_AcceptSock (void)
 {
-	static char __func__] = "init_AcceptSock()";
+
 	struct sockaddr_in svaddr = { };
 	struct servent *sv = NULL ;
 	struct hostent *hp = NULL;
@@ -226,7 +211,7 @@ init_AcceptSock (void)
 	}
 	else if (debug)
 	{
-	  svaddr.sin_port = htons (RES_PORT);
+		svaddr.sin_port = htons (RES_PORT);
 	}
 	else
 	{
@@ -273,42 +258,37 @@ init_AcceptSock (void)
 	return;
 }
 
-#define LOOP_ADDR       0x7F000001 // FIXME FIXME FIXME FIXME why is this here?
-
-static void
+void
 initChildRes (char *envdir)
 {
-  static char __func__] = "initChildRes";
-  int i, maxfds;
+	int i, maxfds;
 
-  getLogClass_ (resParams[LSF_DEBUG_RES].paramValue,
-		resParams[LSF_TIME_RES].paramValue);
+	getLogClass_ (resParams[LSF_DEBUG_RES].paramValue,resParams[LSF_TIME_RES].paramValue);
 
-  openChildLog ("res", resParams[LSF_LOGDIR].paramValue,
-		(debug > 1), &(resParams[LSF_LOG_MASK].paramValue));
+	openChildLog ("res", resParams[LSF_LOGDIR].paramValue, (debug > 1), &(resParams[LSF_LOG_MASK].paramValue));
 
-  if ((Myhost = ls_getmyhostname ()) == NULL)
+	if ((Myhost = ls_getmyhostname ()) == NULL)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "ls_getmyhostname");
-	  resExit_ (-1);
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "ls_getmyhostname");
+		resExit_ (-1);
 	}
-  client_cnt = child_cnt = 0;
+	client_cnt = child_cnt = 0;
 
-  for (i = 0; i < MAXCLIENTS_HIGHWATER_MARK + 1; i++)
+	for (i = 0; i < MAXCLIENTS_HIGHWATER_MARK + 1; i++)
 	{
-	  clients[i] = NULL;
+		clients[i] = NULL;
 	}
-  children = calloc (sysconf (_SC_OPEN_MAX), sizeof (struct children *));
-  if (!children)
+	children = calloc (sysconf (_SC_OPEN_MAX), sizeof (struct children *));
+	if (!children)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "calloc");
-	  resExit_ (-1);
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "calloc");
+		resExit_ (-1);
 	}
-  maxfds = sysconf (_SC_OPEN_MAX);
+	maxfds = sysconf (_SC_OPEN_MAX);
 
-  for (i = 0; i < maxfds; i++)
+	for (i = 0; i < maxfds; i++)
 	{
-	  children[i] = NULL;
+		children[i] = NULL;
 	}
 
 	initConn2NIOS ();
@@ -325,7 +305,6 @@ initChildRes (char *envdir)
 int
 resParent (int s, struct passwd *pw, struct lsfAuth *auth, struct resConnect *connReq, struct hostent *hostp)
 {
-	static char __func__]           = "resParent";
 	struct resChildInfo childInfo = { };
 	struct LSFHeader hdr          = { };
 	XDR xdrs      = { };
@@ -337,276 +316,267 @@ resParent (int s, struct passwd *pw, struct lsfAuth *auth, struct resConnect *co
 	int *hpipe    = malloc( sizeof( int ) * 2 );
 	int *wrapPipe = malloc( sizeof( int ) * 2 );
 	int cc        = 0;
-  
-	if (resParams[LSF_SERVERDIR].paramValue != NULL)
-	{
+
+	if (resParams[LSF_SERVERDIR].paramValue != NULL) {
 		argv[0] = getDaemonPath_ ("/res", resParams[LSF_SERVERDIR].paramValue); // FIXME FIXME FIXME FIXME FIXME replace fixed string with autotools value
 	}
-	else
-	{
+	else {
 		argv[0] = "res";  // FIXME FIXME FIXME FIXME FIXME replace fixed string with autotools value
 	}
 
-  childInfo.resConnect = connReq;
-  childInfo.lsfAuth = auth;
-  childInfo.pw = pw;
-  childInfo.host = hostp;
-  childInfo.parentPort = ctrlAddr.sin_port;
-  childInfo.currentRESSN = currentRESSN;
+	childInfo.resConnect = connReq;
+	childInfo.lsfAuth = auth;
+	childInfo.pw = pw;
+	childInfo.host = hostp;
+	childInfo.parentPort = ctrlAddr.sin_port;
+	childInfo.currentRESSN = currentRESSN;
 
 
-  if (resLogOn == 1)
-	{
-	  char *strLogCpuTime = malloc( sizeof( char )* 32 + 1 ); // FIXME FIXME FIXME FIXME FIXME replace fixed number with constant. why 32? autoconf const?
+	if (resLogOn == 1) {
+		char *strLogCpuTime = malloc( sizeof( char )* 32 + 1 ); // FIXME FIXME FIXME FIXME FIXME replace fixed number with constant. why 32? autoconf const?
 
-	  sprintf (strLogCpuTime, "%d", resLogcpuTime);
-	  putEnv ("LSF_RES_LOGON", "1");
-	  putEnv ("LSF_RES_CPUTIME", strLogCpuTime);
-	  putEnv ("LSF_RES_ACCTPATH", resAcctFN);
+		sprintf (strLogCpuTime, "%d", resLogcpuTime);
+		putEnv ("LSF_RES_LOGON", "1"); 				// FIXME FIXME FIXME get appropriate gParams variable in.
+		putEnv ("LSF_RES_CPUTIME", strLogCpuTime);    // FIXME FIXME FIXME get appropriate gParams variable in.
+		putEnv ("LSF_RES_ACCTPATH", resAcctFN);       // FIXME FIXME FIXME get appropriate gParams variable in.
 	}
-  else if (resLogOn == 0)
+	else if (resLogOn == 0)
 	{
-	  putEnv ("LSF_RES_LOGON", "0");
+		putEnv ("LSF_RES_LOGON", "0");                // FIXME FIXME FIXME get appropriate gParams variable in.
 	}
-  else if (resLogOn == -1)
+	else if (resLogOn == -1)
 	{
-	  putEnv ("LSF_RES_LOGON", "-1");
-	}
+		putEnv ("LSF_RES_LOGON", "-1");               // FIXME FIXME FIXME get appropriate gParams variable in.
 
-  xdrmem_create (&xdrs, buf, 2 * MSGSIZE, XDR_ENCODE);
-  memset ( &hdr, 0, sizeof (struct LSFHeader));
-  hdr.version = OPENLAVA_VERSION; // FIXME FIXME FIXME FIXME FIXME set in configure.ac
-  if (!xdr_resChildInfo (&xdrs, &childInfo, &hdr))
-	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_resChildInfo");
-	  return (-1);
-	}
-  len = XDR_GETPOS (&xdrs);
-
-  if (socketpair (AF_UNIX, SOCK_STREAM, 0, hpipe) < 0)
-	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "socketpair");
-	  return (-1);
-	}
-  if (socketpair (AF_UNIX, SOCK_STREAM, 0, wrapPipe) < 0)
-	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "socketpair");
-	  return (-1);
-	}
-  sprintf (hndlbuf, "%d:%d", hpipe[1], s);
-
-  	// FIXME FIXME FIXME FIXME replace with getopts() ;
- 	// FIXME FIXME FIXME FIXME explain what the otpions do.
-  cc = 1;
-  argv[cc++] = "-d";
-  argv[cc++] = env_dir;
-  if (debug)
-	{
-	  if (debug == 1)
-	argv[cc++] = "-1";
-	  else
-	argv[cc++] = "-2";
-	  argv[cc++] = "-s";
-	  argv[cc++] = hndlbuf;
-	  argv[cc++] = NULL;
-	}
-  else
-	{
-	  argv[cc++] = "-s";
-	  argv[cc++] = hndlbuf;
-	  argv[cc++] = NULL;
-	}
-
-
-  if (getenv ("LSF_SETDCEPAG") == NULL)
-	putEnv ("LSF_SETDCEPAG", "Y");
-
-  pid = fork ();
-  if (pid < 0)
-	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "fork");
-	  close (hpipe[0]);
-	  close (hpipe[1]);
-	  close (wrapPipe[0]);
-	  close (wrapPipe[1]);
-	  return (-1);
-	}
-
-  if (pid == 0)
-	{
-	  if (logclass & LC_TRACE)
-	{
-	  if (debug)
+		xdrmem_create (&xdrs, buf, 2 * MSGSIZE, XDR_ENCODE);
+		memset ( &hdr, 0, sizeof (struct LSFHeader));
+		hdr.version = OPENLAVA_VERSION; // FIXME FIXME FIXME FIXME FIXME set in configure.ac
+		if (!xdr_resChildInfo (&xdrs, &childInfo, &hdr))
 		{
-		  ls_syslog (LOG_DEBUG2, "%s: executing %s %s %s %s %s %s ",
-			 __func__, argv[0], argv[1], argv[2], argv[3], argv[4],
-			 argv[5]);
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_resChildInfo");
+			return -1;
 		}
-	  else
+		len = XDR_GETPOS (&xdrs);
+
+		if (socketpair (AF_UNIX, SOCK_STREAM, 0, hpipe) < 0)
 		{
-		  ls_syslog (LOG_DEBUG2, "%s: executing %s %s %s %s %s ",
-			 __func__, argv[0], argv[1], argv[2], argv[3], argv[4]);
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "socketpair");
+			return -1;
+		}
+		if (socketpair (AF_UNIX, SOCK_STREAM, 0, wrapPipe) < 0)
+		{
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "socketpair");
+			return -1;
+		}
+		sprintf (hndlbuf, "%d:%d", hpipe[1], s);
+
+		// FIXME FIXME FIXME FIXME replace with getopts() ;
+		// FIXME FIXME FIXME FIXME explain what the otpions do.
+		cc = 1;
+		argv[cc++] = "-d";
+		argv[cc++] = env_dir;
+		if (debug)
+		{
+			if (debug == 1) {
+				argv[cc++] = "-1";
+			}
+			else {
+				argv[cc++] = "-2";
+			}
+			argv[cc++] = "-s";
+			argv[cc++] = hndlbuf;
+			argv[cc++] = NULL;
+		}
+		else
+		{
+			argv[cc++] = "-s";
+			argv[cc++] = hndlbuf;
+			argv[cc++] = NULL;
+		}
+
+
+if (getenv ("LSF_SETDCEPAG") == NULL) { // FIXME FIXME FIXME get appropriate gParams variable in.
+	putEnv ("LSF_SETDCEPAG", "Y");      // FIXME FIXME FIXME get appropriate gParams variable in.
+}
+
+	pid = fork ();
+	if (pid < 0)
+	{
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "fork");
+		close (hpipe[0]);
+		close (hpipe[1]);
+		close (wrapPipe[0]);
+		close (wrapPipe[1]);
+		return -1;
+	}
+
+	if (pid == 0)
+	{
+		if (logclass & LC_TRACE)
+		{
+			if (debug)
+			{
+				ls_syslog (LOG_DEBUG2, "%s: executing %s %s %s %s %s %s ",
+					__func__, argv[0], argv[1], argv[2], argv[3], argv[4],
+					argv[5]);
+			}
+			else
+			{
+				ls_syslog (LOG_DEBUG2, "%s: executing %s %s %s %s %s ",
+					__func__, argv[0], argv[1], argv[2], argv[3], argv[4]);
+			}
+		}
+		close (hpipe[0]);
+		close (wrapPipe[0]);
+
+
+		if (dup2 (wrapPipe[1], 0) == -1)
+		{
+			ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "dup2");
+			exit (-1);
+		}
+		close (wrapPipe[1]);
+		lsfExecX(argv[0], argv, execvp); // FIXME FIXME FIXME FIXME FIXME sanitize argv[0]
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "execv");
+		exit (-1);
+	}
+
+	close (hpipe[1]);
+	close (wrapPipe[1]);
+
+	if (connReq->eexec.len > 0)
+	{
+		int cc1;
+		if ((cc1 = b_write_fix (wrapPipe[0], connReq->eexec.data,
+			connReq->eexec.len)) != connReq->eexec.len)
+		{
+			/* catgets 5333 */
+			ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5333, "%s: Falied in sending data to wrap for user <%s>, length = %d, cc=1%d: %m"), __func__, pw->pw_name, connReq->eexec.len, cc1);
+			close (wrapPipe[0]);
+			close (hpipe[0]);
+			return -1;
 		}
 	}
-	  close (hpipe[0]);
-	  close (wrapPipe[0]);
+	close (wrapPipe[0]);
 
-
-	  if (dup2 (wrapPipe[1], 0) == -1)
+	if (write (hpipe[0], (char *) &len, sizeof (len)) != sizeof (len))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "dup2");
-	  exit (-1);
-	}
-	  close (wrapPipe[1]);
-	  lsfExecX(argv[0], argv, execvp); // FIXME FIXME FIXME FIXME FIXME sanitize argv[0]
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "execv");
-	  exit (-1);
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "write");
+		xdr_destroy (&xdrs);
+		close (hpipe[0]);
+		return -1;
 	}
 
-  close (hpipe[1]);
-  close (wrapPipe[1]);
-
-  if (connReq->eexec.len > 0)
+	if (write (hpipe[0], buf, len) != len)
 	{
-	  int cc1;
-	  if ((cc1 = b_write_fix (wrapPipe[0], connReq->eexec.data,
-				  connReq->eexec.len)) != connReq->eexec.len)
-	{
-	  ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5333, "%s: Falied in sending data to wrap for user <%s>, length = %d, cc=1%d: %m"), __func__, pw->pw_name, connReq->eexec.len, cc1) /* catgets 5333 */
-		;
-	  close (wrapPipe[0]);
-	  close (hpipe[0]);
-	  return (-1);
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "write");
+		xdr_destroy (&xdrs);
+		close (hpipe[0]);
+		return -1;
 	}
-	}
-  close (wrapPipe[0]);
+	xdr_destroy (&xdrs);
+	close (hpipe[0]);
 
-  if (write (hpipe[0], (char *) &len, sizeof (len)) != sizeof (len))
-	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "write");
-	  xdr_destroy (&xdrs);
-	  close (hpipe[0]);
-	  return (-1);
-	}
-
-  if (write (hpipe[0], buf, len) != len)
-	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "write");
-	  xdr_destroy (&xdrs);
-	  close (hpipe[0]);
-	  return (-1);
-	}
-  xdr_destroy (&xdrs);
-  close (hpipe[0]);
-
-  //loop over *argv size )
-  	free( *argv  );
+	//loop over *argv size )
+	free( *argv  );
 	free( hndlbuf );
 	free( buf );
 	free( hpipe );
 	free (wrapPipe );
 
-	return (0);
+	return 0;
 }
 
 
 void
 resChild (char *arg, char *envdir)
 {
-  static char __func__] = "resChild";
-  struct passwd pw;
-  struct hostent hp;
-  struct resConnect connReq;
-  struct lsfAuth auth;
-  struct resChildInfo childInfo;
-  XDR xdrs;
-  int clientHandle, resHandle;
-  char *sp, *buf;
-  struct LSFHeader hdr;
-  int len;
-  char *nullist[1];
+	struct passwd pw;
+	struct hostent hp;
+	struct resConnect connReq;
+	struct lsfAuth auth;
+	struct resChildInfo childInfo;
+	XDR xdrs;
+	int clientHandle, resHandle;
+	char *sp, *buf;
+	struct LSFHeader hdr;
+	int len;
+	char *nullist[1];
 
-  initChildRes (envdir);
+	initChildRes (envdir);
 
+	sp = strchr (arg, ':');
+	sp[0] = '\0';
+	sp++;
+	resHandle = atoi (arg);
+	clientHandle = atoi (sp);
 
-  sp = strchr (arg, ':');
-  sp[0] = '\0';
-  sp++;
-  resHandle = atoi (arg);
-  clientHandle = atoi (sp);
-
-
-
-
-  if (b_read_fix (resHandle, (char *) &len, sizeof (len)) != sizeof (len))
+	if (b_read_fix (resHandle, (char *) &len, sizeof (len)) != sizeof (len))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "b_read_fix");
-	  resExit_ (-1);
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "b_read_fix");
+		resExit_ (-1);
 	}
-  buf = malloc (len);
-  if (!buf)
+	buf = malloc (len);
+	if (!buf)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
-	  resExit_ (-1);
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
+		resExit_ (-1);
 	}
-  if (b_read_fix (resHandle, buf, len) != len)
+	if (b_read_fix (resHandle, buf, len) != len)
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "b_read_fix");
-	  resExit_ (-1);
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "b_read_fix");
+		resExit_ (-1);
 	}
 
-  CLOSE_IT (resHandle);
+	CLOSE_IT (resHandle);
 
-  childInfo.pw = &pw;
-  childInfo.host = &hp;
-  childInfo.resConnect = &connReq;
-  childInfo.lsfAuth = &auth;
+	childInfo.pw = &pw;
+	childInfo.host = &hp;
+	childInfo.resConnect = &connReq;
+	childInfo.lsfAuth = &auth;
 
-  xdrmem_create (&xdrs, buf, len, XDR_DECODE);
-  hdr.version = OPENLAVA_VERSION;
-  if (!xdr_resChildInfo (&xdrs, &childInfo, &hdr))
+	xdrmem_create (&xdrs, buf, len, XDR_DECODE);
+	hdr.version = OPENLAVA_VERSION;
+	if (!xdr_resChildInfo (&xdrs, &childInfo, &hdr))
 	{
-	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "xdr_resChildInfo");
-	  resExit_ (-1);
+		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "xdr_resChildInfo");
+		resExit_ (-1);
 	}
 
-  ctrlAddr.sin_addr.s_addr = htonl (LOOP_ADDR);
-  ctrlAddr.sin_family = AF_INET;
-  ctrlAddr.sin_port = childInfo.parentPort;
-  currentRESSN = childInfo.currentRESSN;
+	ctrlAddr.sin_addr.s_addr = htonl (LOOP_ADDR);
+	ctrlAddr.sin_family = AF_INET;
+	ctrlAddr.sin_port = childInfo.parentPort;
+	currentRESSN = childInfo.currentRESSN;
 
-
-
-  if (getenv ("LSF_RES_LOGON"))
+	if (getenv ("LSF_RES_LOGON")) // FIXME FIXME FIXME FIXME FIXME sanitize argv[0]
 	{
-	  if (strcmp (getenv ("LSF_RES_LOGON"), "1") == 0)
-	{
-	  resLogOn = 1;
-	  if (getenv ("LSF_RES_CPUTIME"))
+		if (strcmp (getenv ("LSF_RES_LOGON"), "1") == 0) // FIXME FIXME FIXME FIXME FIXME sanitize argv[0]
 		{
-		  resLogcpuTime = atoi (getenv ("LSF_RES_CPUTIME"));
+			resLogOn = 1;
+			if (getenv ("LSF_RES_CPUTIME")) // FIXME FIXME FIXME FIXME FIXME sanitize argv[0]
+			{
+				resLogcpuTime = atoi (getenv ("LSF_RES_CPUTIME")); // FIXME FIXME FIXME FIXME FIXME sanitize argv[0]
+			}
+			if (getenv ("LSF_RES_ACCTPATH")) // FIXME FIXME FIXME FIXME FIXME sanitize argv[0]
+			{
+				strcpy (resAcctFN, getenv ("LSF_RES_ACCTPATH")); // FIXME FIXME FIXME FIXME FIXME sanitize argv[0]
+			}
 		}
-	  if (getenv ("LSF_RES_ACCTPATH"))
+		else if (strcmp (getenv ("LSF_RES_LOGON"), "0") == 0) // FIXME FIXME FIXME FIXME FIXME sanitize argv[0] 
 		{
-		  strcpy (resAcctFN, getenv ("LSF_RES_ACCTPATH"));
+			resLogOn = 0;
+		}
+		else if (strcmp (getenv ("LSF_RES_LOGON"), "-1") == 0) // FIXME FIXME FIXME FIXME FIXME sanitize argv[0]
+		{
+			resLogOn = -1;
 		}
 	}
-	  else if (strcmp (getenv ("LSF_RES_LOGON"), "0") == 0)
-	{
-	  resLogOn = 0;
-	}
-	  else if (strcmp (getenv ("LSF_RES_LOGON"), "-1") == 0)
-	{
-	  resLogOn = -1;
-	}
-	}
 
-  nullist[0] = NULL;
-  hp.h_aliases = nullist;
+	nullist[0] = NULL;
+	hp.h_aliases = nullist;
 
-  childAcceptConn (clientHandle, &pw, &auth, &connReq, &hp);
+	childAcceptConn (clientHandle, &pw, &auth, &connReq, &hp);
 
-
-  free (buf);
-  return;
+	free (buf);
+	return;
 }

@@ -42,7 +42,6 @@
 #define LOG_PRI(p)      ((p) & LOG_PRIMASK)
 #endif
 
-
 #define MIN_REF_NUM          1000
 #define MAX_REF_NUM          32760
 
@@ -50,9 +49,6 @@
 #define packshort_(buf, x)       memcpy(buf, (char *)&(x), sizeof(short))
 #define packint_(buf, x)         memcpy(buf, (char *)&(x), sizeof(int))
 #define pack_lsf_rlim_t_(buf, x) memcpy(buf, (char *)&(x), sizeof(lsf_rlim_t))
-
-
-
 
 ///////////////////////////////////////////////////////
 //
@@ -68,516 +64,432 @@
 //      pemdParams
 //      niosdParams
 
-
-
-// enum
-// {
-// // start inclusion from resd.h
-//     LSF_RES_DEBUG,
-//     LSF_SERVERDIR,
-//     LSF_AUTH,
-//     LSF_LOGDIR,
-//     LSF_ROOT_REX,
-//     LSF_LIM_PORT,
-//     LSF_RES_PORT,
-//     LSF_ID_PORT,
-//     LSF_USE_HOSTEQUIV,
-//     LSF_RES_ACCTDIR,
-//     LSF_RES_ACCT,
-//     LSF_DEBUG_RES, // FIXME FIXME FIXME LSF_RES_DEBUG and LSF_DEBUG_RES , replace with single tag
-//     LSF_TIME_RES,
-//     LSF_LOG_MASK,
-//     LSF_RES_RLIMIT_UNLIM,
-//     LSF_CMD_SHELL,
-//     LSF_ENABLE_PTY,
-//     LSF_TMPDIR,
-//     LSF_BINDIR,
-//     LSF_LIBDIR,
-//     LSF_RES_TIMEOUT,
-//     LSF_RES_NO_LINEBUF,
-//     LSF_MLS_LOG,
-// //////////////////////// end inclusion from resd.h
-//     LSF_CONFDIR,
-//     // LSF_SERVERDIR,
-//     LSF_LIM_DEBUG,
-//     // LSF_RES_DEBUG,
-//     LSF_STRIP_DOMAIN,
-//     // LSF_LIM_PORT,
-//     // LSF_RES_PORT,
-//     // LSF_LOG_MASK,
-//     LSF_SERVER_HOSTS,
-//     // LSF_AUTH,
-//     // LSF_USE_HOSTEQUIV,
-//     // LSF_ID_PORT,
-//     // LSF_RES_TIMEOUT,
-//     LSF_API_CONNTIMEOUT,
-//     LSF_API_RECVTIMEOUT,
-//     LSF_AM_OPTIONS,
-//     // LSF_TMPDIR,
-//     // LSF_LOGDIR,
-//     LSF_SYMBOLIC_LINK,
-//     LSF_MASTER_LIST,
-//     // LSF_MLS_LOG,
-//     LSF_INTERACTIVE_STDERR,
-//     NO_HOSTS_FILE
-// } status;
-
-// from include/daemons/libpimd/pimd.h
-
 #define PIM_SLEEP_TIME 3
 #define PIM_UPDATE_INTERVAL 30
 
-// #define LSF_PIM_INFODIR     0
-// #define LSF_PIM_SLEEPTIME   1
-// #define LSF_LIM_DEBUG       2
-// // #define LSF_LOGDIR          3
-// #define LSF_PIM_SLEEPTIME_UPDATE 4
+// static struct config_param pimParams[] = {
+// 	{ "LSF_PIM_INFODIR",          NULL },
+// 	{ "LSF_PIM_SLEEPTIME",        NULL },
+// 	{ NULL,                       NULL },
+// 	{ NULL,                       NULL },
+// 	{ "LSF_PIM_SLEEPTIME_UPDATE", NULL },
+// 	{ NULL,                       NULL }
+// };
 
-static struct config_param pimParams[] = {
-    { "LSF_PIM_INFODIR",          NULL },
-    { "LSF_PIM_SLEEPTIME",        NULL },
-    { "LSF_LIM_DEBUG",            NULL },
-    { NULL,                       NULL },
-    { "LSF_PIM_SLEEPTIME_UPDATE", NULL },
-    { NULL,                       NULL }
-};
-
-enum LSF_PIM {
-    LSF_PIM_INFODIR          = 0,
-    LSF_PIM_SLEEPTIME        = 1,
-    LSF_PIM_SLEEPTIME_UPDATE = 4
-} LSF_PIM;
+// static enum LSF_PIM {
+// 	LSF_PIM_INFODIR          = 0,
+// 	LSF_PIM_SLEEPTIME        = 1,
+// 	LSF_PIM_SLEEPTIME_UPDATE = 4
+// } LSF_PIM;
 
 
-// #define PIM_API_TREAT_JID_AS_PGID 0x1
-// #define PIM_API_UPDATE_NOW        0x2
-enum PIM_API {
-    PIM_API_TREAT_JID_AS_PGID = 0x1,
-    PIM_API_UPDATE_NOW        = 0x2
-} PIM_API;
-
-
-enum LSF_LIM {
-    LSF_LIM_DEBUG = 2
-} LSF_LIM;
+// static enum PIM_API {
+// 	PIM_API_TREAT_JID_AS_PGID = 0x1,
+// 	PIM_API_UPDATE_NOW        = 0x2
+// } PIM_API;
 
 #define PGID_LIST_SIZE  16
 #define PID_LIST_SIZE   64
 #define MAX_NUM_PID     300
 
+// static enum {
+// 	MBD_DEBUG = 1,
+// 	MBD_TIMING,
+// 	SBD_DEBUG,
+// 	SBD_TIMING,
+// // #define LIM_DEBUG 5
+// 	LIM_TIMING  = 6,
+// 	RES_DEBUG,
+// 	RES_TIMING 
+// } debug_t;
 
-// from lib/lproto.h
-// #define MBD_DEBUG                     1
-// #define MBD_TIMING                    2
-// #define SBD_DEBUG                     3
-// #define SBD_TIMING                    4
-// #define LIM_DEBUG                     5
-// #define LIM_TIMING                    6
-// #define RES_DEBUG                     7
-// #define RES_TIMING                    8
-// end lib/lproto.h
-enum {
-    MBD_DEBUG = 1,
-    MBD_TIMING,
-    SBD_DEBUG,
-    SBD_TIMING,
-// #define LIM_DEBUG 5
-    LIM_TIMING  = 6,
-    RES_DEBUG,
-    RES_TIMING 
-} debug_t;
-
-// FIXME FIXME FIXME FIXME FIXME "this shit has to be fixed and all the defines gone"
-
-#define LSF_RES_DEBUG                 0
-// #define LSF_SERVERDIR                 1
-#define LSF_ENVDIR                    2 // FIXME FIXME newly inserted variable
-// #define LSF_LOGDIR                    3
-#define LSF_LIM_PORT                  5
-#define LSF_RES_PORT                  6
-// #define LSF_ID_PORT                   9
-#define LSF_RES_ACCTDIR               9
-#define LSF_RES_ACCT                  10
-// #define LSF_AUTH                      10
-#define LSF_DEBUG_RES                 11
-#define LSF_TIME_RES                  12
-// #define LSF_USE_HOSTEQUIV             12
-// #define LSF_ROOT_REX                  13
-#define LSF_RES_RLIMIT_UNLIM          14
-#define LSF_CMD_SHELL                 15
-#define LSF_ENABLE_PTY                16
-#define LSF_TMPDIR                    17
-// #define LSF_LOG_MASK                  19
-// #define LSF_BINDIR                    18
-#define LSF_RES_TIMEOUT               20  // FIXME FIXME move to resd.h
-// #define LSF_BINDIR                    20
-#define LSF_RES_NO_LINEBUF            21
-// #define LSF_CONFDIR                   23
-// #define LSF_GETPWNAM_RETRY            28
-// #define LSF_AUTH_DAEMONS              33
-// #define LSF_LIBDIR                    40
-// #define LSF_MLS_LOG                   46
-
-
-// #define LSB_DEBUG                     0
-// #define LSB_CONFDIR                   1
-// #define LSB_SHAREDIR                  4
-// #define LSB_MAILTO                    5
-// #define LSB_MAILPROG                  6
-// #define LSB_MBD_PORT                  8
-// #define LSB_SBD_PORT                  7
-
-// #define LSB_CRDIR                     11
-// #define LSB_DEBUG_MBD                 14
-// #define LSB_DEBUG_SBD                 15
-// #define LSB_TIME_MBD                  16
-// #define LSB_TIME_SBD                  17
-// #define LSB_SIGSTOP                   18
-
-// #define LSB_MBD_CONNTIMEOUT           21
-// #define LSB_SBD_CONNTIMEOUT           22
-// #define LSB_MBD_MAILREPLAY            24
-// #define LSB_MBD_MIGTOPEND             25
-// #define LSB_SBD_READTIMEOUT           26
-// #define LSB_MBD_BLOCK_SEND            27
-// #define LSB_MEMLIMIT_ENFORCE          29
-
-// #define LSB_BSUBI_OLD                 30
-// #define LSB_STOP_IGNORE_IT            31
-// #define LSB_HJOB_PER_SESSION          32
-// #define LSB_REQUEUE_HOLD              34
-// #define LSB_SMTP_SERVER               35
-// #define LSB_MAILSERVER                36
-// #define LSB_MAILSIZE_LIMIT            37
-// #define LSB_REQUEUE_TO_BOTTOM         38
-// #define LSB_ARRAY_SCHED_ORDER         39
-
-// #define LSB_QPOST_EXEC_ENFORCE        41
-// #define LSB_MIG2PEND                  42
-// #define LSB_UTMP                      43
-// #define LSB_JOB_CPULIMIT              44
-// #define LSB_RENICE_NEVER_AT_RESTART   45
-// #define LSB_JOB_MEMLIMIT              47
-// #define LSB_MOD_ALL_JOBS              48
-// #define LSB_SET_TMPDIR                49
-
-// #define LSB_PTILE_PACK                50
-// #define LSB_SBD_FINISH_SLEEP          51
-// #define LSB_VIRTUAL_SLOT              52
-// #define LSB_STDOUT_DIRECT             53
-// #define MBD_DONT_FORK                 54      // FIXME the pattern does not match, but what the heck.
-// #define LIM_NO_MIGRANT_HOSTS          55
-
-static struct config_param genParams_[ ] = {
-    { "LSF_CONFDIR",            NULL },
-    { "LSF_SERVERDIR",          NULL },
-    { "LSF_LIM_DEBUG",          NULL },
-    { "LSF_RES_DEBUG",          NULL },
-    { "LSF_STRIP_DOMAIN",       NULL },
-    { "LSF_LIM_PORT",           NULL },
-    { "LSF_RES_PORT",           NULL },
-    { "LSF_LOG_MASK",           NULL },
-    { "LSF_SERVER_HOSTS",       NULL },
-    { "LSF_AUTH",               NULL },
-    { "LSF_USE_HOSTEQUIV",      NULL },
-    { "LSF_ID_PORT",            NULL },
-    { "LSF_RES_TIMEOUT",        NULL },
-    { "LSF_API_CONNTIMEOUT",    NULL },
-    { "LSF_API_RECVTIMEOUT",    NULL },
-    { "LSF_AM_OPTIONS",         NULL },
-    { "LSF_TMPDIR",             NULL },
-    { "LSF_LOGDIR",             NULL },
-    { "LSF_SYMBOLIC_LINK",      NULL },
-    { "LSF_MASTER_LIST",        NULL },
-    { "LSF_MLS_LOG",            NULL },
-    { "LSF_INTERACTIVE_STDERR", NULL },
-    { "HOSTS_FILE",             NULL },
-    { "LSB_SHAREDIR",           NULL },
-    { "NO_HOSTS_FILE",          NULL },
-    { "LSF_SERVER_HOSTS",       NULL },
-    { NULL,                     NULL }
-};
-
-static struct config_param lsfParams[] = {
-    { "LSF_SERVERDIR", NULL },
-    { "LSF_CONFDIR",   NULL },
-    { "LSF_SHAREDIR",  NULL },
-    { NULL,            NULL }
-};
-
-enum {
-    LSB_DEBUG,
-    LSB_CONFDIR,
-    LSF_SERVERDIR,
-    LSF_LOGDIR,
-    LSB_SHAREDIR,
-    LSB_MAILTO,
-    LSB_MAILPROG,
-    LSB_SBD_PORT,
-    LSB_MBD_PORT,
-    LSF_ID_PORT,
-    LSF_AUTH,
-    LSB_CRDIR,
-    LSF_USE_HOSTEQUIV,
-    LSF_ROOT_REX,
-    LSB_DEBUG_MBD,
-    LSB_DEBUG_SBD,
-    LSB_TIME_MBD,
-    LSB_TIME_SBD,
-    LSB_SIGSTOP,
-    LSF_LOG_MASK,
-    LSF_BINDIR,
-    LSB_MBD_CONNTIMEOUT,
-    LSB_SBD_CONNTIMEOUT,
-    LSF_CONFDIR,
-    LSB_MBD_MAILREPLAY,
-    LSB_MBD_MIGTOPEND,
-    LSB_SBD_READTIMEOUT,
-    LSB_MBD_BLOCK_SEND,
-    LSF_GETPWNAM_RETRY,
-    LSB_MEMLIMIT_ENFORCE,
-    LSB_BSUBI_OLD,
-    LSB_STOP_IGNORE_IT,
-    LSB_HJOB_PER_SESSION,
-    LSF_AUTH_DAEMONS,
-    LSB_REQUEUE_HOLD,
-    LSB_SMTP_SERVER,
-    LSB_MAILSERVER,
-    LSB_MAILSIZE_LIMIT,
-    LSB_REQUEUE_TO_BOTTOM,
-    LSB_ARRAY_SCHED_ORDER,
-    LSF_LIBDIR,
-    LSB_QPOST_EXEC_ENFORCE,
-    LSB_MIG2PEND,
-    LSB_UTMP,
-    LSB_JOB_CPULIMIT,
-    LSB_RENICE_NEVER_AT_RESTART,
-    LSF_MLS_LOG,
-    LSB_JOB_MEMLIMIT,
-    LSB_MOD_ALL_JOBS,
-    LSB_SET_TMPDIR,
-    LSB_PTILE_PACK,
-    LSB_SBD_FINISH_SLEEP,
-    LSB_VIRTUAL_SLOT,
-    LSB_STDOUT_DIRECT,
-    MBD_DONT_FORK,
-    LSF_AM_OPTIONS,
-    NO_HOSTS_FILE,
-    LSF_SERVER_HOSTS,
-    LSF_INTERACTIVE_STDERR,
-    LSF_CONF_RETRY_INT,
-    LSF_CONF_RETRY_MAX
-} daemonStatus;
-
-static struct config_param daemonParams[] = {
-    { "LSB_DEBUG",                    NULL },
-    { "LSB_CONFDIR",                  NULL },
-    { "LSF_SERVERDIR",                NULL },
-    { "LSF_LOGDIR",                   NULL },
-    { "LSB_SHAREDIR",                 NULL },
-    { "LSB_MAILTO",                   NULL },
-    { "LSB_MAILPROG",                 NULL },
-    { "LSB_SBD_PORT",                 NULL },
-    { "LSB_MBD_PORT",                 NULL },
-    { "LSF_ID_PORT",                  NULL },
-    { "LSF_AUTH",                     NULL },
-    { "LSB_CRDIR",                    NULL },
-    { "LSF_USE_HOSTEQUIV",            NULL },
-    { "LSF_ROOT_REX",                 NULL },
-    { "LSB_DEBUG_MBD",                NULL },
-    { "LSB_DEBUG_SBD",                NULL },
-    { "LSB_TIME_MBD",                 NULL },
-    { "LSB_TIME_SBD",                 NULL },
-    { "LSB_SIGSTOP",                  NULL },
-    { "LSF_LOG_MASK",                 NULL },
-    { "LSF_BINDIR",                   NULL },
-    { "LSB_MBD_CONNTIMEOUT",          NULL },
-    { "LSB_SBD_CONNTIMEOUT",          NULL },
-    { "LSF_CONFDIR",                  NULL },
-    { "LSB_MBD_MAILREPLAY",           NULL },
-    { "LSB_MBD_MIGTOPEND",            NULL },
-    { "LSB_SBD_READTIMEOUT",          NULL },
-    { "LSB_MBD_BLOCK_SEND",           NULL },
-    { "LSF_GETPWNAM_RETRY",           NULL },
-    { "LSB_MEMLIMIT_ENFORCE",         NULL },
-    { "LSB_BSUBI_OLD",                NULL },
-    { "LSB_STOP_IGNORE_IT",           NULL },
-    { "LSB_HJOB_PER_SESSION",         NULL },
-    { "LSF_AUTH_DAEMONS",             NULL },
-    { "LSB_REQUEUE_HOLD",             NULL },
-    { "LSB_SMTP_SERVER",              NULL },
-    { "LSB_MAILSERVER",               NULL },
-    { "LSB_MAILSIZE_LIMIT",           NULL },
-    { "LSB_REQUEUE_TO_BOTTOM",        NULL },
-    { "LSB_ARRAY_SCHED_ORDER",        NULL },
-    { "LSF_LIBDIR",                   NULL },
-    { "LSB_QPOST_EXEC_ENFORCE",       NULL },
-    { "LSB_MIG2PEND",                 NULL },
-    { "LSB_UTMP",                     NULL },
-    { "LSB_JOB_CPULIMIT",             NULL },
-    { "LSB_RENICE_NEVER_AT_RESTART",  NULL },
-    { "LSF_MLS_LOG",                  NULL },
-    { "LSB_JOB_MEMLIMIT",             NULL },
-    { "LSB_MOD_ALL_JOBS",             NULL },
-    { "LSB_SET_TMPDIR",               NULL },
-    { "LSB_PTILE_PACK",               NULL },
-    { "LSB_SBD_FINISH_SLEEP",         NULL },
-    { "LSB_VIRTUAL_SLOT",             NULL },
-    { "LSB_STDOUT_DIRECT",            NULL },
-    { "MBD_DONT_FORK",                NULL },
-    { "LIM_NO_MIGRANT_HOSTS",         NULL },
-    { "LSF_AM_OPTIONS",               NULL },
-    { "LSF_CONF_RETRY_INT",           NULL },
-    { "LSF_CONF_RETRY_MAX",           NULL },
-    { NULL,                           NULL }
+static enum RES_PARAMS {
+		RES_TIMEOUT             = 20
 };
 
 
-// preserved for historical reasons, will be slowly pushed out
-// #define LSB_DEBUG              0
-// #define LSB_SHAREDIR           1
-// #define LSB_SBD_PORT           2
-// #define LSB_MBD_PORT           3
-// #define LSB_DEBUG_CMD          4
-// #define LSB_TIME_CMD           5
-// #define LSB_CMD_LOGDIR         6
-// #define LSB_CMD_LOG_MASK       7
-// #define LSF_LOG_MASK           8
-// #define LSB_API_CONNTIMEOUT    9
-// #define LSB_API_RECVTIMEOUT    10
-// #define LSB_SERVERDIR          11
-// #define LSB_MODE               12
-// #define LSB_SHORT_HOSTLIST     13
-// #define LSB_INTERACTIVE_STDERR 14
-// #define LSB_32_PAREN_ESC       15
-// #define LSB_API_QUOTE_CMD      14
-// #define LSB_API_QUOTE_CMD      16
+static enum LSF_PARAMS {
+	LSF_RES_DEBUG               = 0,
+	LSF_SERVERDIR               = 1,
+	LSF_ENVDIR                  = 2, // FIXME FIXME newly inserted variable
+	LSF_LOGDIR                  = 3,
+	LSF_LIM_PORT                = 5,
+	LSF_RES_PORT                = 6,
+	LSF_ID_PORT                 = 9,
+	LSF_AUTH                    = 10,
+	LSF_DEBUG_RES               = 11,
+	LSF_TIME_RES                = 12,
+	LSF_ROOT_REX                = 13,
+	LSF_RES_RLIMIT_UNLIM        = 14,
+	LSF_CMD_SHELL               = 15,
+	LSF_ENABLE_PTY              = 16,
+	LSF_TMPDIR                  = 17,
+	LSF_BINDIR                  = 18,
+	LSF_LOG_MASK                = 19,
+	LSF_BINDIR                  = 20,
+	LSF_RES_NO_LINEBUF          = 21,
+	LSF_CONFDIR                 = 23,
+	LSF_GETPWNAM_RETRY          = 28,
+	LSF_AUTH_DAEMONS            = 33,
+	LSF_LIBDIR                  = 40,
+	LSF_MLS_LOG                 = 46,
+	LSF_LIM_DEBUG               = 2
+	LSF_RES_ACCTDIR             = 9,
+	LSF_RES_ACCT                = 10,
+	LSF_USE_HOSTEQUIV           = 12,
+} LSF_STATUS;
 
-enum 
-{
-    // LSB_DEBUG = 0,
-    // LSB_SHAREDIR,
-    // LSB_SBD_PORT,
-    // LSB_MBD_PORT,
-    LSB_DEBUG_CMD = 4,
-    LSB_TIME_CMD,
-    LSB_CMD_LOGDIR,
-    LSB_CMD_LOG_MASK,
-    LSB_LOG_MASK,
-    LSB_API_CONNTIMEOUT,
-    LSB_API_RECVTIMEOUT,
-    LSB_SERVERDIR,
-    LSB_MODE,
-    LSB_SHORT_HOSTLIST,
-    LSB_INTERACTIVE_STDERR,
-    LSB_32_PAREN_ESC,
-    LSB_API_QUOTE_CMD
-} lsbStatus;
-
-static struct config_param lsbParams[] = {
-//  { "LSB_DEBUG",              NULL },
-    { "LSB_SHAREDIR",           NULL },
-    { "LSB_SBD_PORT",           NULL },
-    { "LSB_MBD_PORT",           NULL },
-    { "LSB_DEBUG_CMD",          NULL },
-    { "LSB_TIME_CMD",           NULL },
-    { "LSB_CMD_LOGDIR",         NULL },
-    { "LSB_CMD_LOG_MASK",       NULL },
-    { "LSB_LOG_MASK",           NULL },
-    { "LSB_API_CONNTIMEOUT",    NULL },
-    { "LSB_API_RECVTIMEOUT",    NULL },
-    { "LSB_SERVERDIR",          NULL },
-    { "LSB_MODE",               NULL },
-    { "LSB_SHORT_HOSTLIST",     NULL },
-    { "LSF_INTERACTIVE_STDERR", NULL },
-    { "LSB_32_PAREN_ESC",       NULL },
-    { "LSB_API_QUOTE_CMD",      NULL },
-    { NULL,                     NULL }
+static struct config_param lsfParams_[ ] = { // FIXME FIXME FIXME FIXME genParams order has to match with above enum LSF_LSB
+	{ "LSF_CONFDIR",            NULL }, // 23
+	{ "LSF_RES_DEBUG",          NULL }, // 0
+	{ "LSF_SERVERDIR",          NULL }, // 1
+	{ "LSF_LIM_DEBUG",          NULL }, // 2
+	{ "LSF_STRIP_DOMAIN",       NULL }, // N+1
+	{ "LSF_LIM_PORT",           NULL }, // 5
+	{ "LSF_RES_PORT",           NULL }, // 6
+	{ "LSF_LOG_MASK",           NULL }, // 19
+	{ "LSF_SERVER_HOSTS",       NULL }, // N+2
+	{ "LSF_AUTH",               NULL }, // 10
+	{ "LSF_USE_HOSTEQUIV",      NULL }, // 12
+	{ "LSF_ID_PORT",            NULL }, // 9
+	{ "LSF_API_CONNTIMEOUT",    NULL }, // N+3
+	{ "LSF_API_RECVTIMEOUT",    NULL }, // N+4
+	{ "LSF_AM_OPTIONS",         NULL },
+	{ "LSF_TMPDIR",             NULL },
+	{ "LSF_LOGDIR",             NULL },
+	{ "LSF_SYMBOLIC_LINK",      NULL },
+	{ "LSF_MASTER_LIST",        NULL },
+	{ "LSF_MLS_LOG",            NULL },
+	{ "LSF_INTERACTIVE_STDERR", NULL },
+	{ "HOSTS_FILE",             NULL },
+	{ "LSB_SHAREDIR",           NULL },
+	{ "NO_HOSTS_FILE",          NULL },
+	{ NULL,                     NULL }
 };
 
-typedef enum
-{
-    LIM_DEBUG,
-// #define LIM_PORT        36000 // FIXME FIXME FIXME FIXME FIXME set appropriate configuration variable in configure.ac
-// #define RES_PORT        36002 // FIXME FIXME FIXME FIXME FIXME set appropriate configuration variable in configure.ac 
-    LIM_PORT, // FIXME FIXME FIXME FIXME FIXME set appropriate configuration variable in configure.ac; 3600 by default
-    LIM_TIME,
-    LIM_IGNORE_CHECKSUM,
-    LIM_JACKUP_BUSY,
-    LIM_COMPUTE_ONLY,
-    LIM_NO_MIGRANT_HOSTS,
-    LIM_NO_FORK,
-    LSF_DEBUG_LIM,
-    LSF_TIME_LIM,
-    LIM_RSYNC_CONFIG
-} limParams_t;
+enum LSB_PARAMS {
+	LSB_DEBUG                   = 0,
+	LSB_CONFDIR                 = 1,
+	LSB_SHAREDIR                = 4,
+	LSB_MAILTO                  = 5,
+	LSB_MAILPROG                = 6,
+	LSB_MBD_PORT                = 8,
+	LSB_SBD_PORT                = 7,
+
+	LSB_CRDIR                   = 11,
+	LSB_DEBUG_MBD               = 14,
+	LSB_DEBUG_SBD               = 15,
+	LSB_TIME_MBD                = 16,
+	LSB_TIME_SBD                = 17,
+	LSB_SIGSTOP                 = 18,
+
+	LSB_MBD_CONNTIMEOUT         = 21,
+	LSB_SBD_CONNTIMEOUT         = 22,
+	LSB_MBD_MAILREPLAY          = 24,
+	LSB_MBD_MIGTOPEND           = 25,
+	LSB_SBD_READTIMEOUT         = 26,
+	LSB_MBD_BLOCK_SEND          = 27,
+	LSB_MEMLIMIT_ENFORCE        = 29,
+
+	LSB_BSUBI_OLD               = 30,
+	LSB_STOP_IGNORE_IT          = 31,
+	LSB_HJOB_PER_SESSION        = 32,
+	LSB_REQUEUE_HOLD            = 34,
+	LSB_SMTP_SERVER             = 35,
+	LSB_MAILSERVER              = 36,
+	LSB_MAILSIZE_LIMIT          = 37,
+	LSB_REQUEUE_TO_BOTTOM       = 38,
+	LSB_ARRAY_SCHED_ORDER       = 39,
+
+	LSB_QPOST_EXEC_ENFORCE      = 41,
+	LSB_MIG2PEND                = 42,
+	LSB_UTMP                    = 43,
+	LSB_JOB_CPULIMIT            = 44,
+	LSB_RENICE_NEVER_AT_RESTART = 45,
+	LSB_JOB_MEMLIMIT            = 47,
+	LSB_MOD_ALL_JOBS            = 48,
+	LSB_SET_TMPDIR              = 49,
+
+	LSB_PTILE_PACK              = 50,
+	LSB_SBD_FINISH_SLEEP        = 51,
+	LSB_VIRTUAL_SLOT            = 52,
+	LSB_STDOUT_DIRECT           = 53,
+	MBD_DONT_FORK               = 54, // FIXME the var name pattern does not match, but i stuffed it here anyway
+	LIM_NO_MIGRANT_HOSTS        = 55  // FIXME the var name pattern does not match, but i stuffed it here anyway
+} LSB status;
+
+static struct config_param lsbParams[ ] = {
+	 { "LSB_DEBUG",                   NULL }, // 0
+	 { "LSB_CONFDIR",                 NULL }, // 1
+	 { "LSB_SHAREDIR",                NULL }, // 4
+	 { "LSB_MAILTO",                  NULL }, // 5
+	 { "LSB_MAILPROG",                NULL }, // 6
+	 { "LSB_MBD_PORT",                NULL }, // 8
+	 { "LSB_SBD_PORT",                NULL }, // 7
+
+	 { "LSB_CRDIR",                   NULL }, // 11
+	 { "LSB_DEBUG_MBD",               NULL }, // 14
+	 { "LSB_DEBUG_SBD",               NULL }, // 15
+	 { "LSB_TIME_MBD",                NULL }, // 16
+	 { "LSB_TIME_SBD",                NULL }, // 17
+	 { "LSB_SIGSTOP",                 NULL }, // 18
+
+	 { "LSB_MBD_CONNTIMEOUT",         NULL }, // 21
+	 { "LSB_SBD_CONNTIMEOUT",         NULL }, // 22
+	 { "LSB_MBD_MAILREPLAY",          NULL }, // 24
+	 { "LSB_MBD_MIGTOPEND",           NULL }, // 25
+	 { "LSB_SBD_READTIMEOUT",         NULL }, // 26
+	 { "LSB_MBD_BLOCK_SEND",          NULL }, // 27
+	 { "LSB_MEMLIMIT_ENFORCE",        NULL }, // 29
+
+	 { "LSB_BSUBI_OLD",               NULL }, // 30
+	 { "LSB_STOP_IGNORE_IT",          NULL }, // 31
+	 { "LSB_HJOB_PER_SESSION",        NULL }, // 32
+	 { "LSB_REQUEUE_HOLD",            NULL }, // 34
+	 { "LSB_SMTP_SERVER",             NULL }, // 35
+	 { "LSB_MAILSERVER",              NULL }, // 36
+	 { "LSB_MAILSIZE_LIMIT",          NULL }, // 37
+	 { "LSB_REQUEUE_TO_BOTTOM",       NULL }, // 38
+	 { "LSB_ARRAY_SCHED_ORDER",       NULL }, // 39
+
+	 { "LSB_QPOST_EXEC_ENFORCE",      NULL }, // 41
+	 { "LSB_MIG2PEND",                NULL }, // 42
+	 { "LSB_UTMP",                    NULL }, // 43
+	 { "LSB_JOB_CPULIMIT",            NULL }, // 44
+	 { "LSB_RENICE_NEVER_AT_RESTART", NULL }, // 45
+	 { "LSB_JOB_MEMLIMIT",            NULL }, // 47
+	 { "LSB_MOD_ALL_JOBS",            NULL }, // 48
+	 { "LSB_SET_TMPDIR",              NULL }, // 49
+
+	 { "LSB_PTILE_PACK",              NULL }, // 50
+	 { "LSB_SBD_FINISH_SLEEP",        NULL }, // 51
+	 { "LSB_VIRTUAL_SLOT",            NULL }, // 52
+	 { "LSB_STDOUT_DIRECT",           NULL }, // 53
+	 { "MBD_DONT_FORK",               NULL }, // 54
+	 { "LIM_NO_MIGRANT_HOSTS",        NULL }, // 55
+	 { NULL,                          NULL }
+};
+
+// static struct config_param lsfParams[] = {
+// 	{ "LSF_SHAREDIR",  NULL },
+// 	{ NULL,            NULL }
+// };
+
+
+enum LIM_PARAMS {
+	LIM_DEBUG = 0
+};
+
+static struct config_param limDaemonParams[ ] = {
+	{ "LIM_NO_MIGRANT_HOSTS",         NULL },
+	{ NULL,                           NULL }
+};
+
+enum LSB_PARAMS {
+	LSB_DEBUG = 0
+};
+
+static struct config_param lsbDaemonParams[ ] = {
+	{ "LSB_ARRAY_SCHED_ORDER",        NULL },
+	{ "LSB_BSUBI_OLD",                NULL },
+	{ "LSB_CONFDIR",                  NULL },
+	{ "LSB_CRDIR",                    NULL },
+	{ "LSB_DEBUG",                    NULL },
+	{ "LSB_DEBUG_MBD",                NULL },
+	{ "LSB_DEBUG_SBD",                NULL },
+	{ "LSB_HJOB_PER_SESSION",         NULL },
+	{ "LSB_JOB_CPULIMIT",             NULL },
+	{ "LSB_JOB_MEMLIMIT",             NULL },
+	{ "LSB_MAILPROG",                 NULL },
+	{ "LSB_MAILSERVER",               NULL },
+	{ "LSB_MAILSIZE_LIMIT",           NULL },
+	{ "LSB_MAILTO",                   NULL },
+	{ "LSB_MBD_BLOCK_SEND",           NULL },
+	{ "LSB_MBD_CONNTIMEOUT",          NULL },
+	{ "LSB_MBD_MAILREPLAY",           NULL },
+	{ "LSB_MBD_MIGTOPEND",            NULL },
+	{ "LSB_MBD_PORT",                 NULL },
+	{ "LSB_MEMLIMIT_ENFORCE",         NULL },
+	{ "LSB_MIG2PEND",                 NULL },
+	{ "LSB_MOD_ALL_JOBS",             NULL },
+	{ "LSB_PTILE_PACK",               NULL },
+	{ "LSB_QPOST_EXEC_ENFORCE",       NULL },
+	{ "LSB_RENICE_NEVER_AT_RESTART",  NULL },
+	{ "LSB_REQUEUE_HOLD",             NULL },
+	{ "LSB_REQUEUE_TO_BOTTOM",        NULL },
+	{ "LSB_SBD_CONNTIMEOUT",          NULL },
+	{ "LSB_SBD_FINISH_SLEEP",         NULL },
+	{ "LSB_SBD_PORT",                 NULL },
+	{ "LSB_SBD_READTIMEOUT",          NULL },
+	{ "LSB_SET_TMPDIR",               NULL },
+	{ "LSB_SHAREDIR",                 NULL },
+	{ "LSB_SIGSTOP",                  NULL },
+	{ "LSB_SMTP_SERVER",              NULL },
+	{ "LSB_STDOUT_DIRECT",            NULL },
+	{ "LSB_STOP_IGNORE_IT",           NULL },
+	{ "LSB_TIME_MBD",                 NULL },
+	{ "LSB_TIME_SBD",                 NULL },
+	{ "LSB_UTMP",                     NULL },
+	{ "LSB_VIRTUAL_SLOT",             NULL },
+	{ NULL,                           NULL }
+}
+
+static struct config_param lsfDaemonParams[ ] = {
+	{ "LSF_AUTH_DAEMONS",             NULL },
+	{ "LSF_BINDIR",                   NULL },
+	{ "LSF_CONF_RETRY_INT",           NULL },
+	{ "LSF_CONF_RETRY_MAX",           NULL },
+	{ "LSF_GETPWNAM_RETRY",           NULL },
+	{ "LSF_LIBDIR",                   NULL },
+	{ "LSF_LOGDIR",                   NULL },
+	{ "LSF_MLS_LOG",                  NULL },
+	{ "LSF_ROOT_REX",                 NULL },
+	{ "LSF_SHAREDIR",                 NULL },
+	{ NULL,                           NULL }
+}
+
+enum MDB_PARAMS {
+	MBD_DEBUG = 0
+};
+
+static struct config_param mbdDaemonParams[ ] = {
+	{ "MBD_DONT_FORK",                NULL },
+	{ NULL,                           NULL }
+};
+
+enum RES_PARAMS {
+	RES_DEBUG = 0
+};
+
+static struct config_param resDaemonParams[ ] = {
+	{ "RES_TIMEOUT",            NULL },
+	{ NULL,                     NULL }
+};
+
+// static enum {
+// 	// LSB_DEBUG              = 0,
+// 	// LSB_SHAREDIR           = 1,
+// 	// LSB_SBD_PORT           = 2,
+// 	// LSB_MBD_PORT           = 3,
+// 	LSB_DEBUG_CMD          = 4,
+// 	LSB_TIME_CMD           = 5,
+// 	LSB_CMD_LOGDIR         = 6,
+// 	LSB_CMD_LOG_MASK       = 7,
+// 	// LSF_LOG_MASK           = 8, // dupe
+// 	LSB_API_CONNTIMEOUT    = 9,
+// 	LSB_API_RECVTIMEOUT    = 10,
+// 	LSB_SERVERDIR          = 11,
+// 	LSB_MODE               = 12,
+// 	LSB_SHORT_HOSTLIST     = 13,
+// 	LSB_INTERACTIVE_STDERR = 14,
+// 	LSB_32_PAREN_ESC       = 15,
+// 	LSB_API_QUOTE_CMD      = 14,
+// 	// LSB_API_QUOTE_CMD      = 16
+// } lsbStatus;
+
+// static struct config_param lsbParams[] = {
+// //  { "LSB_DEBUG",              NULL },
+// 	{ "LSB_SHAREDIR",           NULL },
+// 	{ "LSB_SBD_PORT",           NULL },
+// 	{ "LSB_MBD_PORT",           NULL },
+// 	{ "LSB_DEBUG_CMD",          NULL },
+// 	{ "LSB_TIME_CMD",           NULL },
+// 	{ "LSB_CMD_LOGDIR",         NULL },
+// 	{ "LSB_CMD_LOG_MASK",       NULL },
+// 	{ "LSB_LOG_MASK",           NULL },
+// 	{ "LSB_API_CONNTIMEOUT",    NULL },
+// 	{ "LSB_API_RECVTIMEOUT",    NULL },
+// 	{ "LSB_SERVERDIR",          NULL },
+// 	{ "LSB_MODE",               NULL },
+// 	{ "LSB_SHORT_HOSTLIST",     NULL },
+// 	{ "LSF_INTERACTIVE_STDERR", NULL },
+// 	{ "LSB_32_PAREN_ESC",       NULL },
+// 	{ "LSB_API_QUOTE_CMD",      NULL },
+// 	{ NULL,                     NULL }
+// };
+
+// static enum limParams_t {
+// 	LIM_DEBUG,
+// // #define LIM_PORT        36000 // FIXME FIXME FIXME FIXME FIXME set appropriate configuration variable in configure.ac
+// // #define RES_PORT        36002 // FIXME FIXME FIXME FIXME FIXME set appropriate configuration variable in configure.ac 
+// 	LIM_PORT, // FIXME FIXME FIXME FIXME FIXME set appropriate configuration variable in configure.ac; 3600 by default
+// 	LIM_TIME,
+// 	LIM_IGNORE_CHECKSUM,
+// 	LIM_JACKUP_BUSY,
+// 	LIM_COMPUTE_ONLY,
+// 	// LIM_NO_MIGRANT_HOSTS,
+// 	LIM_NO_FORK,
+// 	LSF_DEBUG_LIM,
+// 	LSF_TIME_LIM,
+// 	LIM_RSYNC_CONFIG
+// } limParams_t;
 
 typedef enum {
-    RES_PORT = 36002 // FIXME FIXME FIXME FIXME FIXME make it configurable in configure.ac; 36002 by default
+	RES_PORT = 36002 // FIXME FIXME FIXME FIXME FIXME make it configurable in configure.ac; 36002 by default
 } resdParams_t;
 
 
-static struct config_param limParams[] = {
-    { "LIM_DEBUG",            NULL },
-    { "LIM_PORT",             NULL },
-    { "LIM_TIME",             NULL },
-    { "LIM_IGNORE_CHECKSUM",  NULL },
-    { "LIM_JACKUP_BUSY",      NULL },
-    { "LIM_COMPUTE_ONLY",     NULL },
-    { "LIM_NO_MIGRANT_HOSTS", NULL },
-    { "LIM_NO_FORK",          NULL },
-    { "LSF_DEBUG_LIM",        NULL },
-    { "LSF_TIME_LIM",         NULL },
-    { "LIM_RSYNC_CONFIG",     NULL },
-    { NULL,                   NULL },
-};
+// static struct config_param limParams[] = {
+// 	{ "LIM_DEBUG",            NULL },
+// 	{ "LIM_PORT",             NULL },
+// 	{ "LIM_TIME",             NULL },
+// 	{ "LIM_IGNORE_CHECKSUM",  NULL },
+// 	{ "LIM_JACKUP_BUSY",      NULL },
+// 	{ "LIM_COMPUTE_ONLY",     NULL },
+// 	{ "LIM_NO_MIGRANT_HOSTS", NULL },
+// 	{ "LIM_NO_FORK",          NULL },
+// 	{ "LSF_DEBUG_LIM",        NULL },
+// 	{ "LSF_TIME_LIM",         NULL },
+// 	{ "LIM_RSYNC_CONFIG",     NULL },
+// 	{ NULL,                   NULL },
+// };
 
-static struct config_param debParams[] = {
-    { "LSF_DEBUG_CMD",      NULL },
-    { "LSF_TIME_CMD",       NULL },
-    { "LSF_CMD_LOGDIR",     NULL },
-    { "LSF_CMD_LOG_MASK",   NULL },
-    { "LSF_LOG_MASK_DEBUG", NULL },
-    { NULL,                 NULL }
-};
+// static struct config_param debParams[] = {
+// 	{ "LSF_DEBUG_CMD",      NULL },
+// 	{ "LSF_TIME_CMD",       NULL },
+// 	{ "LSF_CMD_LOGDIR",     NULL },
+// 	{ "LSF_CMD_LOG_MASK",   NULL },
+// 	{ "LSF_LOG_MASK_DEBUG", NULL },
+// 	{ NULL,                 NULL }
+// };
 
-enum {
-    LSF_DEBUG_CMD,
-    LSF_TIME_CMD,
-    LSF_CMD_LOGDIR,
-    LSF_CMD_LOG_MASK,
-    LSF_LOG_MASK_DEBUG
-} debugParams_t;
+// static enum debugParams_t {
+// 	LSF_DEBUG_CMD,
+// 	LSF_TIME_CMD,
+// 	LSF_CMD_LOGDIR,
+// 	LSF_CMD_LOG_MASK,
+// 	LSF_LOG_MASK_DEBUG
+// } debugParams_t;
 
 
-enum { 
-    NIOS2RES_EOF,
-    NIOS2RES_HEARTBEAT,
-    NIOS2RES_SETTTY,
-    NIOS2RES_SIGNAL,
-    NIOS2RES_STDIN,
-    NIOS2RES_TIMEOUT
-} niosResCmd;
+// static enum niosResCmd { 
+// 	NIOS2RES_EOF,
+// 	NIOS2RES_HEARTBEAT,
+// 	NIOS2RES_SETTTY,
+// 	NIOS2RES_SIGNAL,
+// 	NIOS2RES_STDIN,
+// 	NIOS2RES_TIMEOUT
+// } niosResCmd;
 
-enum {
-    RES2NIOS_CONNECT,
-    RES2NIOS_EOF,
-    RES2NIOS_NEWTASK,
-    RES2NIOS_REQUEUE,
-    RES2NIOS_STATUS,
-    RES2NIOS_STDERR,
-    RES2NIOS_STDOUT
-} resNiosCmd;
+// static enum resNiosCmd {
+// 	RES2NIOS_CONNECT,
+// 	RES2NIOS_EOF,
+// 	RES2NIOS_NEWTASK,
+// 	RES2NIOS_REQUEUE,
+// 	RES2NIOS_STATUS,
+// 	RES2NIOS_STDERR,
+// 	RES2NIOS_STDOUT
+// } resNiosCmd;
 
 // typedef enum status genparams_t;
 
 #define AM_LAST  (!(genParams_[LSF_AM_OPTIONS].paramValue && \
-                                    strstr(genParams_[LSF_AM_OPTIONS].paramValue, \
-                                                            AUTOMOUNT_LAST_STR)))
+									strstr(genParams_[LSF_AM_OPTIONS].paramValue, \
+															AUTOMOUNT_LAST_STR)))
 
 #define AM_NEVER (genParams_[LSF_AM_OPTIONS].paramValue && \
-                                    strstr(genParams_[LSF_AM_OPTIONS].paramValue, \
-                                                            AUTOMOUNT_NEVER_STR))
+									strstr(genParams_[LSF_AM_OPTIONS].paramValue, \
+															AUTOMOUNT_NEVER_STR))
 
 
 #define LOOP_ADDR       0x7F000001
@@ -589,44 +501,44 @@ enum {
 // #define _USE_PRIMARY_       0x10
 // #define _USE_PPORT_         0x20
 enum PORTS {
-    _NON_BLOCK_ = 0x01,
-    _LOCAL_ = 0x02,
-    _USE_TCP_ = 0x04,
-    _KEEP_CONNECT_ = 0x08,
-    _USE_PRIMARY_ = 0x10,
-    _USE_PPORT_ = 0x20,
+	_NON_BLOCK_ = 0x01,
+	_LOCAL_ = 0x02,
+	_USE_TCP_ = 0x04,
+	_KEEP_CONNECT_ = 0x08,
+	_USE_PRIMARY_ = 0x10,
+	_USE_PPORT_ = 0x20,
 };
 /* openlava call LSF_SERVER_HOSTS regardless of local lim.
  */
 enum _SERVER_HOSTS_ONLY_ {
-    _SERVER_HOSTS_ONLY_ = 0x40
+	_SERVER_HOSTS_ONLY_ = 0x40
 };
 
 enum PMUT {
-    PRIMARY = 0,
-    MASTER  = 1,
-    UNBOUND = 2,
-    TCP     = 3
+	PRIMARY = 0,
+	MASTER  = 1,
+	UNBOUND = 2,
+	TCP     = 3
 };
 
 enum RESNIOS_TIMEOUT {
-    RES_TIMEOUT  = 120,
-    NIOS_TIMEOUT = 120
+	// RES_TIMEOUT  = 120,
+	NIOS_TIMEOUT = 120
 };
 
 enum NOCODE {
-    NOCODE = 10000
+	NOCODE = 10000
 };
 
 enum RSIG {
-    RSIG_ID_ISTID = 0x01,
-    RSIG_ID_ISPID = 0x02,
-    RSIG_KEEP_CONN = 0x04
+	RSIG_ID_ISTID = 0x01,
+	RSIG_ID_ISPID = 0x02,
+	RSIG_KEEP_CONN = 0x04
 };
 
 enum RID {
-    RID_ISTID = 0x01,
-    RID_ISPID = 0x02
+	RID_ISTID = 0x01,
+	RID_ISPID = 0x02
 };
 
 #define NO_SIGS (~(sigmask(SIGTRAP) | sigmask(SIGEMT)))
@@ -643,92 +555,93 @@ typedef int (*appCompletionHandler) (struct lsRequest *requestType, void *);
 
 struct lsRequest
 {
-    int tid;
-    pid_t seqno;
-    int connfd;
-    int rc;
-    int completed;
-    char padding[4];
-    unsigned long replyBufLen;
-    requestCompletionHandler replyHandler;
-    appCompletionHandler appHandler;
-    void *extra;
-    void *replyBuf;
-    void *appExtra;
+	int tid;
+	pid_t seqno;
+	int connfd;
+	int rc;
+	int completed;
+	char padding[4];
+	unsigned long replyBufLen;
+	requestCompletionHandler replyHandler;
+	appCompletionHandler appHandler;
+	void *extra;
+	void *replyBuf;
+	void *appExtra;
 };
 
 
 struct taskMsg
 {
-    char *inBuf;
-    char *outBuf;
-    size_t len;
+	char *inBuf;
+	char *outBuf;
+	size_t len;
 };
-
-struct lsQueue *requestQ;
-unsigned int requestSN;
 
 enum lsTMsgType
 {
-    LSTMSG_DATA,
-    LSTMSG_IOERR,
-    LSTMSG_EOF
+	LSTMSG_DATA,
+	LSTMSG_IOERR,
+	LSTMSG_EOF
 };
 
 struct lsTMsgHdr
 {
-    enum lsTMsgType type;
-    char padding[4];
-    char *msgPtr;
-    size_t len;
+	enum lsTMsgType type;
+	char padding[4];
+	char *msgPtr;
+	size_t len;
 };
 
 struct tid
 {
-    bool_t isEOF;
-    unsigned short taskPort;
-    char padding[2];
-    int rtid;
-    int sock;
-    int refCount;
-    int pid;
-    char *host;
-    struct lsQueue *tMsgQ;
-    struct tid *link;
+	bool_t isEOF;
+	unsigned short taskPort;
+	char padding[2];
+	int rtid;
+	int sock;
+	int refCount;
+	int pid;
+	char *host;
+	struct lsQueue *tMsgQ;
+	struct tid *link;
 };
 
 struct svrsock
 {
-    int sockfd;
-    int port;
-    struct sockaddr_in *localAddr;
-    int backlog;
-    int options;
+	int sockfd;
+	int port;
+	struct sockaddr_in *localAddr;
+	int backlog;
+	int options;
 };
 
 // #define LS_CSO_ASYNC_NT       (0x0001)
 // #define LS_CSO_PRIVILEGE_PORT (0x0002)
-enum LS_CSO {
-    LS_CSO_ASYNC_NT       = 0x0001,
-    LS_CSO_PRIVILEGE_PORT = 0x0002
+static enum LS_CSO {
+	LS_CSO_ASYNC_NT       = 0x0001,
+	LS_CSO_PRIVILEGE_PORT = 0x0002
 } LS_CSO;
 
-struct sockaddr_in limSockId_;
-struct sockaddr_in limTcpSockId_;
-char rootuid_;
-struct sockaddr_in res_addr_;
-fd_set connection_ok_;
-int currentsocket_;
-int totsockets_;
-// extern int cli_nios_fd[]; // FIXME FIXME FIXME FIXME FIXME put in specific header
-short nios_ok_;
-struct masterInfo masterInfo_;
-int masterknown_;
-char *indexfilter_;
-char *stripDomains_;
-struct hTab conn_table;
+extern int isPamBlockWait;
+// static struct lsQueue *requestQ;
+// static unsigned int requestSN;
 
-char **environ;
+// static struct sockaddr_in limSockId_;
+// static struct sockaddr_in limTcpSockId_;
+extern char rootuid_;
+// static struct sockaddr_in res_addr_;
+// static fd_set connection_ok_;
+// static int currentsocket_;
+// static int totsockets_;
+// extern int cli_nios_fd[]; // FIXME FIXME FIXME FIXME FIXME put in specific header
+// static short nios_ok_;
+// static struct masterInfo masterInfo_;
+// static int masterknown_;
+// static char *indexfilter_;
+// static char *stripDomains_;
+// static struct hTab conn_table;
+
+// static char **environ;
 
 // void initconntbl_ (void);
 // void inithostsock_ (void);
@@ -821,10 +734,8 @@ int callRes_ (int s, enum resCmd cmd, char *data, char *reqBuf, size_t reqLen, b
 int sendCmdBill_ (int, enum resCmd, struct resCmdBill *, int *, struct timeval *);
 void ls_errlog (FILE * fd, const char *fmt, ...)
 #if defined(__GNUC__) && defined(CHECK_PRINTF)
-    __attribute__ ((format (printf, 2, 3)))
+	__attribute__ ((format (printf, 2, 3)))
 #endif
 ;
 
 // void ls_verrlog (FILE * fd, const char *fmt, va_list ap);
-int isPamBlockWait;
-

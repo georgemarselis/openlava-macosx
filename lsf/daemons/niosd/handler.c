@@ -591,8 +591,8 @@ check_timeout_task ()
   if (count_unconn <= 0)
     return 0;
 
-  if (genParams_[LSF_RES_TIMEOUT].paramValue)
-    resTimeout = atoi (genParams_[LSF_RES_TIMEOUT].paramValue);
+  if (genParams_[RES_TIMEOUT].paramValue)
+    resTimeout = atoi (genParams_[RES_TIMEOUT].paramValue);
   else
     resTimeout = RES_TIMEOUT;
 

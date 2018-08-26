@@ -22,28 +22,26 @@
 #include <tcl/tcl.h>
 #include <sys/types.h>
 
-static struct tclHostData *hPtr;
-static struct Tcl_Interp *globinterp;
-static char overRideFromType;
-static char runTimeDataQueried;
-static unsigned int numIndx;
-static unsigned int nRes;
-static struct tclLsInfo *myTclLsInfo;
+// static struct tclHostData *hPtr;
+// static struct Tcl_Interp *globinterp;
+// static char overRideFromType;
+// static char runTimeDataQueried;
+extern unsigned int numIndx;
+extern unsigned int nRes;
+// static struct tclLsInfo *myTclLsInfo;
 
 /* Arrays holding symbols used in resource requirement
  * expressions.
  */
-static int *ar;
-static int *ar2;
-static int *ar4;
+// static int *ar;
+// static int *ar2;
+// static int *ar4;
 
 typedef struct {
 	char *name;
 	int clientData;
 	char padding[4];
 } attribFunc;
-
-
 // #define   CPUFACTOR_ (nRes + numIndx)
 // #define   NDISK      (nRes + numIndx + 1)
 // #define   REXPRI     (nRes + numIndx + 2)
@@ -53,8 +51,7 @@ typedef struct {
 // #define   MAXTMP     (nRes + numIndx + 6)
 // #define   CPU_       (nRes + numIndx + 7)
 // #define   SERVER     (nRes + numIndx + 8)
-
-enum HOST_CHARACTERISTICS {
+enum HOST_CHARACTERISTICS { // FIXME FIXME FIXME FIXME FIXME initialization function
 	CPUFACTOR, // = nRes + numIndx, // FIXME FIXME FIXME FIXME just how many "CPUFACTOR/CPU/SERVER/NDISK" declerations are there?
 	NDISK,
 	REXPRI,
@@ -66,13 +63,27 @@ enum HOST_CHARACTERISTICS {
 	SERVER
 };
 
+typedef enum kot {
+  kotkot
+} *kot;
+// static enum HOST_CHARACTERISTICS {
+// 	CPUFACTOR_ = (nRes + numIndx),
+// 	NDISK      = (nRes + numIndx + 1),
+// 	REXPRI     = (nRes + numIndx + 2),
+// 	MAXCPUS_   = (nRes + numIndx + 3),
+// 	MAXMEM     = (nRes + numIndx + 4),
+// 	MAXSWAP    = (nRes + numIndx + 5),
+// 	MAXTMP     = (nRes + numIndx + 6),
+// 	CPU_       = (nRes + numIndx + 7),
+// 	SERVER     = (nRes + numIndx + 8)
+// } HOST_CHARACTERISTICS;
+
 // #define   HOSTTYPE   1
 // #define   HOSTMODEL  2
 // #define   HOSTSTATUS 3
 // #define   HOSTNAME   4
 // #define   LAST_STRING (HOSTNAME + 1)
 // #define   DEFINEDFUNCTION 5
-
 enum HOSTTYPE {
 	HOSTTYPE, 		// FIXME FIXME FIXME FIXME just how many "HOSTTYPE/HOSTNAME" declerations are there?
 	HOSTMODEL,

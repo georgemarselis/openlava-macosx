@@ -136,7 +136,7 @@ enum LSF_CONSTANTS {
 };
 
 // #define FIRST_RES_SOCK  20
-// static const unsigned int FIRST_RES_SOCK = 20;
+static const unsigned int FIRST_RES_SOCK = 20;
 
 // FIXME FIXME FIXME FIXME HAVE_UNION_WAIT must be moved to configure.ac
 #ifdef HAVE_UNION_WAIT
@@ -276,27 +276,31 @@ enum STATUS_REX {
 								|| ((s) == STATUS_REX_MLS_RHOST)        \
 								|| ((s) == STATUS_REX_MLS_DOMIN))
 
-#define   REXF_USEPTY   0x00000001
-#define   REXF_CLNTDIR  0x00000002
-#define   REXF_TASKPORT 0x00000004
-#define   REXF_SHMODE   0x00000008
-#define   REXF_TASKINFO 0x00000010
-#define   REXF_REQVCL   0x00000020
-#define   REXF_SYNCNIOS 0x00000040
-#define   REXF_TTYASYNC 0x00000080
-#define   REXF_STDERR   0x00000100
+static enum  REXF {
+	REXF_USEPTY   = 0x00000001,
+	REXF_CLNTDIR  = 0x00000002,
+	REXF_TASKPORT = 0x00000004,
+	REXF_SHMODE   = 0x00000008,
+	REXF_TASKINFO = 0x00000010,
+	REXF_REQVCL   = 0x00000020,
+	REXF_SYNCNIOS = 0x00000040,
+	REXF_TTYASYNC = 0x00000080,
+	REXF_STDERR   = 0x00000100
+} REXF;
 
-#define EXACT                0x01
-#define OK_ONLY              0x02
-#define NORMALIZE            0x04
-#define LOCALITY             0x08
-#define IGNORE_RES           0x10
-#define LOCAL_ONLY           0x20
-#define DFT_FROMTYPE         0x40
-#define ALL_CLUSTERS         0x80
-#define EFFECTIVE            0x100
-#define RECV_FROM_CLUSTERS   0x200
-#define NEED_MY_CLUSTER_NAME 0x400
+static enum STATUSES {
+	EXACT = 0x01,
+	OK_ONLY = 0x02,
+	NORMALIZE = 0x04,
+	LOCALITY = 0x08,
+	IGNORE_RES = 0x10,
+	LOCAL_ONLY = 0x20,
+	DFT_FROMTYPE = 0x40,
+	ALL_CLUSTERS = 0x80,
+	EFFECTIVE = 0x100,
+	RECV_FROM_CLUSTERS = 0x200,
+	NEED_MY_CLUSTER_NAME = 0x400
+} STATUSES;
 
 #define SEND_TO_CLUSTERS   0x400
 
@@ -304,13 +308,17 @@ enum STATUS_REX {
 
 #define KEEPUID       0x01
 
-#define RES_CMD_REBOOT          1
-#define RES_CMD_SHUTDOWN        2
-#define RES_CMD_LOGON           3
-#define RES_CMD_LOGOFF          4
+static enum RES_CMD {
+	RES_CMD_REBOOT   = 1,
+	RES_CMD_SHUTDOWN = 2,
+	RES_CMD_LOGON    = 3,
+	RES_CMD_LOGOFF   = 4
+} RES_CMD;
 
-#define LIM_CMD_REBOOT          1
-#define LIM_CMD_SHUTDOWN        2
+static enum LIM_CMD {
+	LIM_CMD_REBOOT   = 1,
+	LIM_CMD_SHUTDOWN = 2
+} LIM_CMD;
 
 #ifndef MAX
 #define MAX(x,y)  ((x) > (y) ? (x) : (y))
@@ -749,9 +757,9 @@ struct lsEventRec
 struct hostEntryLog
 {
 	int   rcv;
-	unsigned int   nDisks;
-	unsigned int   numIndx;
-	unsigned int   nRes;
+	unsigned int nDisks;
+	unsigned int numIndx;
+	unsigned int nRes;
 	int   rexPriority;
 	char padding1[4];
 	char  *hostName;  // [MAXHOSTNAMELEN];
@@ -767,7 +775,7 @@ struct hostEntryLog
 /*
  * openlava error numbers
  */
-enum OPENLAVA_ERROR_NUMBERS {
+enum OPENLAVA_ERROR_NUMBERS { // FIXME FIXME FIXME FIXME this needs to be compatible with LSF
 	LSE_NO_ERR         = 0,
 	LSE_BAD_XDR,
 	LSE_MSG_SYS,

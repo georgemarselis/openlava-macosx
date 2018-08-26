@@ -41,19 +41,19 @@ struct config_param pimParams[] = {
 	{NULL,                      NULL}
 };
 
-enum
-{
-  LSF_LIM_DEBUG,
-  LSF_LOGDIR,
-  LSF_DEBUG_PIM,
-  LSF_LOG_MASK,
-  LSF_TIME_PIM,
-  LSF_PIM_SLEEPTIME,
-  LSF_PIM_INFODIR,
-  LSF_PIM_NPROC,
-  LSF_PIM_TRACE,
-  LSF_PIM_UPDATE_INTERVAL
-} pimStatus;
+// enum
+// {
+//   LSF_LIM_DEBUG,
+//   LSF_LOGDIR,
+//   LSF_DEBUG_PIM,
+//   LSF_LOG_MASK,
+//   LSF_TIME_PIM,
+//   LSF_PIM_SLEEPTIME,
+//   LSF_PIM_INFODIR,
+//   LSF_PIM_NPROC,
+//   LSF_PIM_TRACE,
+//   LSF_PIM_UPDATE_INTERVAL
+// } pimStatus;
 
 static int pim_debug = 0;
 static char infofile = malloc( sizeof( char ) * (MAX_FILENAME_LEN + 1 ) );

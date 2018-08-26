@@ -34,7 +34,7 @@ typedef enum ofWhat ofWhat_t;
 struct decisionReq {
 	int options;
 	char hostType[MAX_LSF_NAME_LEN];
-	char resReq[MAXLINELEN];
+	char resReq[MAX_LINE_LEN];
 	ofWhat_t ofWhat;
 	unsigned long numPrefs;
 	unsigned long numHosts;
@@ -49,7 +49,7 @@ struct placeReply
 
 struct jobXfer
 {
-	char resReq[MAXLINELEN];
+	char resReq[MAX_LINE_LEN];
 	size_t numHosts;
 	struct placeInfo *placeInfo;
 };

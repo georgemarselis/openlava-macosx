@@ -80,12 +80,6 @@
 
 #define CLOSE_IT(fd)     if (fd>=0) {close(fd); fd = INVALID_FD;}
 
-
-
-// #define SBD_FLAG_STDIN  0x1
-// #define SBD_FLAG_STDOUT 0x2
-// #define SBD_FLAG_STDERR 0x4
-// #define SBD_FLAG_TERM   0x8
 static enum SBD_FLAG {
 	SBD_FLAG_STDIN  = 0x1,
 	SBD_FLAG_STDOUT = 0x2,
@@ -101,59 +95,6 @@ static enum RES_RID {
 	RES_RID_ISTID = 0x01,
 	RES_RID_ISPID = 0x02
 } RES_RID;
-
-// enum for this is in lib/lib.h
-static struct config_param resParams[]= {
-    { "LSF_RES_DEBUG",          NULL },
-    { "LSF_SERVERDIR",          NULL },
-    { "LSF_AUTH",               NULL },
-    { "LSF_LOGDIR",             NULL },
-    { "LSF_ROOT_REX",           NULL },
-    { "LSF_LIM_PORT",           NULL },
-    { "LSF_RES_PORT",           NULL },
-    { "LSF_ID_PORT",            NULL },
-    { "LSF_USE_HOSTEQUIV",      NULL },
-    { "LSF_RES_ACCTDIR",        NULL },
-    { "LSF_RES_ACCT",           NULL },
-    { "LSF_DEBUG_RES",          NULL }, // FIXME FIXME FIXME LSF_RES_DEBUG and LSF_DEBUG_RES , replace with single tag
-    { "LSF_TIME_RES",           NULL },
-    { "LSF_LOG_MASK",           NULL },
-    { "LSF_RES_RLIMIT_UNLIM",   NULL },
-    { "LSF_CMD_SHELL",          NULL },
-    { "LSF_ENABLE_PTY",         NULL },
-    { "LSF_TMPDIR",             NULL },
-    { "LSF_BINDIR",             NULL },
-    { "LSF_LIBDIR",             NULL },
-    { "LSF_RES_TIMEOUT",        NULL },
-    { "LSF_RES_NO_LINEBUF",     NULL },
-    { "LSF_MLS_LOG",            NULL },
-    //////////////////////// end inclusion from resd.h
-    { "LSF_CONFDIR",            NULL },
-    // { "LSF_SERVERDIR" ,      NULL },
-    { "LSF_LIM_DEBUG",          NULL },
-    // { "LSF_RES_DEBUG",       NULL },
-    { "LSF_STRIP_DOMAIN",       NULL },
-    // { "LSF_LIM_PORT",        NULL },
-    // { "LSF_RES_PORT",        NULL },
-    // { "LSF_LOG_MASK",        NULL },
-    { "LSF_SERVER_HOSTS",       NULL },
-    // { "LSF_AUTH",            NULL },
-    // { "LSF_USE_HOSTEQUIV",   NULL },
-    // { "LSF_ID_PORT",         NULL },
-    // { "LSF_RES_TIMEOUT",     NULL },
-    { "LSF_API_CONNTIMEOUT",    NULL },
-    { "LSF_API_RECVTIMEOUT",    NULL },
-    { "LSF_AM_OPTIONS",         NULL },
-    // { "LSF_TMPDIR",          NULL },
-    // { "LSF_LOGDIR",          NULL },
-    { "LSF_SYMBOLIC_LINK",      NULL },
-    { "LSF_MASTER_LIST",        NULL },
-    // { "LSF_MLS_LOG",         NULL },
-    { "LSF_INTERACTIVE_STDERR", NULL },
-    { "NO_HOSTS_FILE",          NULL },
-    { "LSB_SHAREDIR",           NULL },
-    { NULL,                     NULL }  
-};
 
 struct relaylinebuf// FIXME FIXME FIXME FIXME struct relaylinebuf and struct relaybuf are identical; should be consolidated
 {
@@ -213,15 +154,14 @@ struct niosChannel
 // struct nioschannel niosChannel;  // FIXME FIXME FIXME remove typedef from struct
 
 //typedef 
-struct ttystruct
+struct ttyStruct
 {
 	struct termios attr;
 	struct winsize ws;
 #    if defined(hpux) || defined(__hpux)
 	struct ltchars hp_ltchars;
 #    endif
-} ttyStruct;    // FIXME FIXME FIXME remove typedef from struct
-
+}; // ttyStruct;
 
 struct client
 {
@@ -434,8 +374,8 @@ struct niosStatus
 
 static int rexecPriority;
 static int client_cnt;
-static struct child **children;
-static int child_cnt;
+// static struct child **children;
+// static int child_cnt;
 static char *Myhost;
 static char *myHostType;
 
@@ -452,91 +392,89 @@ static char res_interrupted;
 static char *gobuf;
 static char allow_accept;
 
-static int child_res_port;
+// static int child_res_port;
 static int parent_res_port;
-static fd_set readmask;
-static int writemask;
-static int exceptmask;
+// static fd_set readmask;
+// static int writemask;
+// static int exceptmask;
 
-static int ctrlSock;
-static struct sockaddr_in ctrlAddr;
+// static int ctrlSock;
+// static struct sockaddr_in ctrlAddr;
 
-static int on;
-static int off;
-static int debug;
-static int res_status;
+// static int res_status;
 
-static char *lsbJobStarter;
+// static char *lsbJobStarter;
 
-static char res_logfile[];
-static int res_logop;
-static int restart_argc;
-static char **restart_argv;
-static char *env_dir;
-static int  rexecPriority = 0;
+// static char res_logfile[ MAX_FILENAME_LEN ];
+// static int res_logop;
+// static int restart_argc;
+// static char **restart_argv;
+// static char *env_dir;
+// static int  rexecPriority = 0;
 
-static struct  client *clients[MAXCLIENTS_HIGHWATER_MARK + 1];
+// static struct  client *clients[MAXCLIENTS_HIGHWATER_MARK + 1];
 
-static struct  child **children; // FIXME FIXME FIXME remove from global; accessor, mutator;
-
-static int  child_cnt    = 0;
-static int  client_cnt   = 0;
-static char  *Myhost     = NULL;
-static char  *myHostType = NULL;
+// static int  child_cnt    = 0;
+// static int  client_cnt   = 0;
+// static char  *Myhost     = NULL;
+// static char  *myHostType = NULL;
 
 // taggedConn_t 
-static struct  taggedConn conn2NIOS;
-static struct _list *resNotifyList = NULL;
+// static struct  taggedConn conn2NIOS;
+// static struct _list *resNotifyList = NULL;
 
-static bool_t  vclPlugin = FALSE;
+// static bool_t  vclPlugin = FALSE;
 
-static char  child_res = ' ';
-static char  child_go =  ' ';
-static char  res_interrupted = ' ';
-static char  *gobuf = NULL;
-
-static int  accept_sock = INVALID_FD;
-static char  allow_accept = 1;
-
-static int  ctrlSock = INVALID_FD;
-static struct  sockaddr_in ctrlAddr =  { };
-
-static int  child_res_port = INVALID_FD;
-static int  parent_res_port = INVALID_FD;
-
-
-static int  on = 1;
-static int  off = 0;
-static int  debug = 0;
-static int  res_status = 0;
-
-static char  *lsbJobStarter = NULL;
-
-static int  sbdMode = FALSE;
-static int  sbdFlags = 0;
-
-static int  lastChildExitStatus = 0;
-
-static char  res_logfile[MAX_PATH_LEN];
-static int  res_logop;
-
-static int  restart_argc    = 0;
-static char  **restart_argv = NULL;
-
-static char  *env_dir = NULL;
-
-static unsigned int globCurrentSN;
-
-static const unsigned short SIG_NT_CTRLC     = 2000;
-static const unsigned short SIG_NT_CTRLBREAK = 2001;
-
-static const unsigned short RES_REPLYBUF_LEN = 4096;
-static const int RESS_LOGBIT = 0x00000001;
-
-static struct  config_param resConfParams[] = {
-	{"LSB_UTMP", NULL},
-	{NULL,       NULL}
+// static char  child_res = ' ';
+static char  child_go =  '\0';
+// static char  res_interrupted = ' ';
+// static char  *gobuf = NULL;
+enum INVALIDFD {
+	INVALID_FD = -1
 };
+
+// static int  accept_sock = INVALID_FD;
+// static char  allow_accept = 1;
+
+// static int  ctrlSock = INVALID_FD;
+// static struct  sockaddr_in ctrlAddr;
+
+// static int  child_res_port = INVALID_FD;
+// static int  parent_res_port = INVALID_FD;
+
+
+// static int  on = 1;
+// static int  off = 0;
+// static int  debug = 0;
+// static int  res_status = 0;
+
+// static char  *lsbJobStarter = NULL;
+
+// static int  sbdMode = FALSE;
+// static int  sbdFlags = 0;
+
+// static int  lastChildExitStatus = 0;
+
+// static char  res_logfile[MAX_PATH_LEN];
+// static int  res_logop;
+
+// static int  restart_argc    = 0;
+// static char  **restart_argv = NULL;
+
+// static char  *env_dir = NULL;
+
+// static unsigned int globCurrentSN;
+
+// static const unsigned short SIG_NT_CTRLC     = 2000;
+// static const unsigned short SIG_NT_CTRLBREAK = 2001;
+
+// static const unsigned short RES_REPLYBUF_LEN = 4096;
+// static const int RESS_LOGBIT = 0x00000001;
+
+// static struct  config_param resConfParams[] = {
+// 	{"LSB_UTMP", NULL},
+// 	{NULL,       NULL}
+// };
 
 /* daemons/resd/getproc.c */
 int getPPSGids_(int pid, int *ppid, int *sid, int *pgid);

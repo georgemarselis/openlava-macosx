@@ -29,37 +29,22 @@
 #include "lib/xdrnio.h"
 #include "lib/xdrrf.h"
 #include "lib/tid.h"
-#include "lib/res.h" // FIXME FIXME FIXME delete, move functions to appropriate header file
+#include "lib/res.h" 
+#include "lib/conn.h"
+#include "lib/host.h"
 
-/* #define SIGEMT SIGBUS */
-
-extern char **environ;
-extern int gethostbysock_ (int, char *);
-
+// globals 
 int lsf_res_version               = -1;
 int totsockets_                   =  0;
 int currentsocket_                =  0;
 unsigned int requestSN            =  0;
+unsigned int requestHighWaterMark =  0;
+unsigned int globCurrentSN        =  0;
+char rootuid_ = '\0';
 // static unsigned int requestHighWaterMark =  0;
 fd_set connection_ok_;
 struct sockaddr_in res_addr_;
 struct lsQueue *requestQ;
-static int getLimits (struct lsfLimit *);
-static int mygetLimits (struct lsfLimit *);
-
-#define REQUESTSN ((requestSN < USHRT_MAX) ? requestSN++ : (requestSN=11 , 10))
-
-int callRes_ (int s, enum resCmd cmd, char *data, char *reqBuf, size_t reqLen, bool_t (*xdrFunc) (), int *rd, struct timeval *timeout, struct lsfAuth *auth);
-int   do_rstty1_ (char *host, int async);
-int   do_rstty2_ (int s, int io_fd, int redirect, int async);
-FILE *ls_popen   (int s, char *command, char *type);
-int   ls_pclose  (FILE * stream);
-int   rsetenv_   (char *host, char **envp, int option);
-int   enqueueTaskMsg_ (int s, pid_t taskID, struct LSFHeader *msgHdr);
-int   sendSig_   (char *host, pid_t rid, int sig, int options);
-int   rgetRusageCompletionHandler_ (struct lsRequest *request);
-int   ls_rstty (char *host);
-
 
 unsigned int  getCurrentSN( void ) {
     return globCurrentSN;
@@ -74,7 +59,6 @@ unsigned int  setCurrentSN( unsigned int currentSN ) {
     return rvalue;
 }
 
-
 int
 ls_connect (char *host)
 {
@@ -88,8 +72,8 @@ ls_connect (char *host)
     struct hostent *hp = NULL;
     char official[MAXHOSTNAMELEN] = "";
  
-    if (genParams_[LSF_RES_TIMEOUT].paramValue) {
-        resTimeout = atoi (genParams_[LSF_RES_TIMEOUT].paramValue);
+    if (genParams_[RES_TIMEOUT].paramValue) {
+        resTimeout = atoi (genParams_[RES_TIMEOUT].paramValue);
     }
     else {
         resTimeout = RES_TIMEOUT;
@@ -105,7 +89,7 @@ ls_connect (char *host)
     }
 
     strcpy (official, hp->h_name);
-    memcpy ((char *) &res_addr_.sin_addr, (char *) hp->h_addr_list[0], hp->h_length);
+    memcpy ((char *) &res_addr_.sin_addr, (char *) hp->h_addr_list[0], (size_t) hp->h_length); // all casts are OK here.
     if ((rootuid_) && (genParams_[LSF_AUTH].paramValue == NULL))
     {
         if (currentsocket_ > (int)(FIRST_RES_SOCK + (unsigned int)totsockets_ - 1))
@@ -749,14 +733,8 @@ ackReturnCode_ (int s)
 
 }
 
-static int
+int
 getLimits (struct lsfLimit *limits)
-{
-    return mygetLimits (limits);
-}
-
-static int
-mygetLimits (struct lsfLimit *limits)
 {
   int i;
   struct rlimit rlimit;

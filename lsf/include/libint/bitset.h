@@ -23,7 +23,16 @@
 #include "lib/lproto.h"
 #include "daemons/libresd/resd.h"
 
-// typedef struct _bitsetEvent LS_BITSET_EVENT_T;
+#define WORDLENGTH (sizeof(unsigned int)*8)
+#define SET_DEFAULT_SIZE WORDLENGTH
+#define BYTES_IN_MASK(x) (x)*(sizeof(unsigned int))
+#define SET_GET_WORD(position) (position/WORDLENGTH)
+#define SET_GET_BIT_IN_WORD(position) (position % WORDLENGTH);
+#define SET_IS_VALID(set) (set != NULL)
+#define SET_IS_EMPTY(set) (set->setNumElements == 0)
+// #undef LS_BITSET_ERROR_CODE_ENTRY
+#define LS_BITSET_ERROR_CODE_ENTRY(Id, Desc) Id,
+
 
 struct LS_BITSET_T {
 	char *setDescription;
@@ -83,12 +92,6 @@ enum bitState {
 	SET_BIT_ON
 };
 
-
-#define WORDLENGTH (sizeof(unsigned int)*8)
-
-#define SET_DEFAULT_SIZE WORDLENGTH
-
-//#define SET_WORD_DEFAULT_EXTENT 2
 static const unsigned short SET_WORD_DEFAULT_EXTENT = 2;
 
 // #define LS_SET_UNION      0
@@ -102,21 +105,7 @@ enum LS_SET {
 	LS_SET_ASSIGN     = 5
 };
 
-
-#define BYTES_IN_MASK(x) (x)*(sizeof(unsigned int))
-
-#define SET_GET_WORD(position) (position/WORDLENGTH)
-
-#define SET_GET_BIT_IN_WORD(position) (position % WORDLENGTH);
-
-#define SET_IS_VALID(set) (set != NULL)
-
-#define SET_IS_EMPTY(set) (set->setNumElements == 0)
-
-// #undef LS_BITSET_ERROR_CODE_ENTRY
-#define LS_BITSET_ERROR_CODE_ENTRY(Id, Desc) Id,
-
-int bitseterrno;
+static int bitseterrno;
 
 enum _lsBitSetErrno_ {
 /*#    include "lsbitseterr.def" */

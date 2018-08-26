@@ -2,11 +2,12 @@
 
 #pragma once
 
-#define MAX_HOSTALIAS 64
+// #define MAX_HOSTALIAS 64
+enum MAX_HOSTALIAS  {
+	MAX_HOSTALIAS = 64
+};
 /* #define MAX_HOSTIPS   32 */
-
-struct hTab *nameTab;
-struct hTab *addrTab;
+	
 
 char *ls_getmyhostname(void);
 struct hostent *Gethostbyname_(char *hname);

@@ -54,8 +54,8 @@ niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus,
         return -1;
     }
 
-    if (genParams_[LSF_RES_TIMEOUT].paramValue) {
-        resTimeout = atoi (genParams_[LSF_RES_TIMEOUT].paramValue);
+    if (genParams_[RES_TIMEOUT].paramValue) {
+        resTimeout = atoi (genParams_[RES_TIMEOUT].paramValue);
     }
     else {
         resTimeout = RES_TIMEOUT;

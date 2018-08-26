@@ -621,9 +621,9 @@ ls_conntaskport (int rpid)
 	struct sockaddr_in sin;
 	socklen_t sinLen;
 
-	if (*genParams_[LSF_RES_TIMEOUT].paramValue) {
-		assert( *genParams_[LSF_RES_TIMEOUT].paramValue >= 0 ); // paranoia
-		resTimeout = atoi (genParams_[LSF_RES_TIMEOUT].paramValue);
+	if (*genParams_[RES_TIMEOUT].paramValue) {
+		assert( *genParams_[RES_TIMEOUT].paramValue >= 0 ); // paranoia
+		resTimeout = atoi (genParams_[RES_TIMEOUT].paramValue);
 	}
 	else {
 		resTimeout = RES_TIMEOUT;

@@ -38,6 +38,8 @@
  *
  */
 
+static struct hTab *nameTab;
+static struct hTab *addrTab;
 
 /* ls_getmyhostname()
  */

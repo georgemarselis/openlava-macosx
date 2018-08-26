@@ -81,10 +81,6 @@
 
 #define END_FOR_EACH_WORD_IN_SPACE_DELIMITED_STRING }}
 
-static enum INVALIDFD {
-	INVALID_FD = -1
-} INVALID_FD;
-
 static enum {
 	LSF_O_RDONLY    = 00000,
 	LSF_O_WRONLY    = 00001,

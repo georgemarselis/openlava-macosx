@@ -26,4 +26,4 @@ int    getConnectionNum_    ( const char *hostname );
 int    _findmyconnections_  ( struct connectEnt **connPtr );
 char **ls_findmyconnections ( void );
 int    delhostbysock_       ( int sock );
-int    gethostbysock_       ( int sock, const char *hostname );
+int    gethostbysock_       ( int sock, const char *hostname ); // from include/lib/res.h

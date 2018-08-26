@@ -44,8 +44,8 @@ ls_rexecve (char *host, char **argv, int options, char **envp)
   struct resCmdBill cmdmsg;
   int resTimeout;
 
-  if (genParams_[LSF_RES_TIMEOUT].paramValue) {
-    resTimeout = atoi (genParams_[LSF_RES_TIMEOUT].paramValue);
+  if (genParams_[RES_TIMEOUT].paramValue) {
+    resTimeout = atoi (genParams_[RES_TIMEOUT].paramValue);
   }
   else {
     resTimeout = RES_TIMEOUT;
@@ -199,8 +199,8 @@ ls_startserver (char *host, char **server, int options)
   int resTimeout;
   socklen_t len;
 
-  if (genParams_[LSF_RES_TIMEOUT].paramValue)
-    resTimeout = atoi (genParams_[LSF_RES_TIMEOUT].paramValue);
+  if (genParams_[RES_TIMEOUT].paramValue)
+    resTimeout = atoi (genParams_[RES_TIMEOUT].paramValue);
   else
     resTimeout = RES_TIMEOUT;
 

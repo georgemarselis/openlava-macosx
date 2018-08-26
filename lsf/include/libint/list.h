@@ -54,15 +54,12 @@ enum LIST_TRAVERSE {
 	TRAVERSE_BACKWARD  = 0x2
 };
 
-
-
-//typedef 
-static enum _listEventType
+enum _listEventType
 {
 	LIST_EVENT_ENTER,
 	LIST_EVENT_LEAVE,
 	LIST_EVENT_NULL
-} _listEventType;
+};
 
 struct _listEvent {
 	char padding[4];
@@ -111,7 +108,7 @@ enum _listErrno
 };
 
 
-static enum _listErrnoTypes{ LIST_ERR_NOERR = 0, LIST_ERR_BADARG, LIST_ERR_NOMEM, LIST_ERR_NOOBSVR  } listErrnoType; // FIXME FIXME FIXME FIXME this enum should not exist, but err codes should work with above . wtf is the above enum doing?
+// static enum _listErrnoTypes{ LIST_ERR_NOERR = 0, LIST_ERR_BADARG, LIST_ERR_NOMEM, LIST_ERR_NOOBSVR  } listErrnoType; // FIXME FIXME FIXME FIXME this enum should not exist, but err codes should work with above . wtf is the above enum doing?
 
 char *listStrError (int listerrno);
 void listPError (char *usrmsg);
