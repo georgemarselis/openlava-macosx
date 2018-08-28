@@ -372,7 +372,7 @@ lsRGetpidAsync_ (int taskid, int *pid)
 	struct LSFHeader hdrBuf;
 	struct resPid pidBuf;
   } buf;
-  LS_REQUEST_T *request;
+  struct lsRequest *request;
 
   struct resPid pidReq;
   int s;
@@ -433,7 +433,7 @@ lsRGetpid_ (int taskid, int options)
 	struct LSFHeader hdrBuf;
 	struct resPid pidBuf;
   } buf;
-  LS_REQUEST_T *request;
+  struct lsRequest *request;
   pid_t pid = 0;
 
   struct resPid pidReq;
@@ -503,7 +503,7 @@ lsRGetpgrp_ (int sock, int taskid, pid_t pid)
 	struct LSFHeader hdrBuf;
 	struct resPid pidBuf;
   } buf;
-  LS_REQUEST_T *request;
+  struct lsRequest *request;
   char host[MAXHOSTNAMELEN];
 
   struct resPid pidReq;

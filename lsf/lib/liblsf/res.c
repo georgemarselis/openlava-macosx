@@ -1045,7 +1045,7 @@ rgetRusageCompletionHandler_ (struct lsRequest *request)
 
 }
 
-LS_REQUEST_T *
+struct lsRequest *
 lsIRGetRusage_ (pid_t rpid, struct jRusage * ru, appCompletionHandler appHandler, void *appExtra, int options)
 {
     int s;
@@ -1182,7 +1182,7 @@ lsGetRProcRusage (char *host, int pid, struct jRusage *ru, int options)
 
 }
 
-LS_REQUEST_T *
+struct lsRequest *
 lsGetIRProcRusage_ (char *host, int tid, pid_t pid, struct jRusage * ru, appCompletionHandler appHandler, void *appExtra)
 {
     struct requestbuf {
@@ -1244,7 +1244,7 @@ lsGetIRProcRusage_ (char *host, int tid, pid_t pid, struct jRusage * ru, appComp
 int
 lsRGetRusage (int rpid, struct jRusage *ru, int options)
 {
-    LS_REQUEST_T *request = NULL;
+    struct lsRequest *request = NULL;
 
     request = lsIRGetRusage_ (rpid, ru, NULL, NULL, options);
 
@@ -1938,7 +1938,7 @@ lsReqCmp_ (char *val, char *reqEnt, int hint)
 }
 
 int
-lsReqTest_ (LS_REQUEST_T * request)
+lsReqTest_ (struct lsRequest * request)
 {
     if (!request) {
         return FALSE;
@@ -1953,7 +1953,7 @@ lsReqTest_ (LS_REQUEST_T * request)
 }
 
 int
-lsReqWait_ (LS_REQUEST_T * request, int options)
+lsReqWait_ (struct lsRequest * request, int options)
 {
     int rc = 0;
     struct LSFHeader header;
@@ -1980,7 +1980,7 @@ lsReqWait_ (LS_REQUEST_T * request, int options)
 
 
 void
-lsReqFree_ (LS_REQUEST_T * request)
+lsReqFree_ (struct lsRequest * request)
 {
   if (request)
     free ((void *) request);
