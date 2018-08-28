@@ -72,11 +72,11 @@ ls_connect (char *host)
     struct hostent *hp = NULL;
     char official[MAXHOSTNAMELEN] = "";
  
-    if (genParams_[RES_TIMEOUT].paramValue) {
-        resTimeout = atoi (genParams_[RES_TIMEOUT].paramValue);
+    if (resDaemonParams[RES_TIMEOUT].paramValue) {
+        resTimeout = atoi (resDaemonParams[ RES_TIMEOUT ].paramValue);
     }
     else {
-        resTimeout = RES_TIMEOUT;
+        resTimeout = RES_TIMEOUT_DEFAULT;
     }
 
     if (_isconnected_ (host, descriptor)) {

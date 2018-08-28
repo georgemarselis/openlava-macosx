@@ -23,7 +23,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "lib/lib.h"
+#include "lib/res.c"
 #include "lib/lproto.h"
 #include "lib/mls.h"
 #include "lib/queue.h"
