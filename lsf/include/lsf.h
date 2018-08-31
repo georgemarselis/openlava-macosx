@@ -534,12 +534,6 @@ struct hostEntry
 	float *busyThreshold;   
 };
 
-struct config_param
-{
-	const char *paramName;
-	char *paramValue;
-};
-
 // FIXME FIXME FIXME FIXME this struct needs to be profiled for issues
 //      with time
 struct lsfRusage

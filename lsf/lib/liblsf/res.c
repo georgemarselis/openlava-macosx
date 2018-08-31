@@ -32,6 +32,7 @@
 #include "lib/res.h" 
 #include "lib/conn.h"
 #include "lib/host.h"
+#include "struct-config_param.h"
 
 // globals 
 int lsf_res_version               = -1;
