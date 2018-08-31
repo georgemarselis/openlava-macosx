@@ -19,6 +19,11 @@
 
 #pragma once
 
+// #define NL_SETN 23
+
+int mlsSbdMode = FALSE;
+char rootuid_;
+
 // FIXME investigate if the third argument to lsfSetXUid can be set to the appropriate
 // [s]uid_t type. if yes, try to see if there is an alternative to passing -1
 int lsfSetXUid (int flag, uid_t ruid, uid_t euid, uid_t suid, int (*func) ());

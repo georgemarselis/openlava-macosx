@@ -211,15 +211,7 @@ struct svrsock
 	int options;
 };
 
-// #define LS_CSO_ASYNC_NT       (0x0001)
-// #define LS_CSO_PRIVILEGE_PORT (0x0002)
-static enum LS_CSO {
-	LS_CSO_ASYNC_NT       = 0x0001,
-	LS_CSO_PRIVILEGE_PORT = 0x0002
-} LS_CSO;
 
-extern int isPamBlockWait;
-extern char rootuid_;
 void _lostconnection_ (char *);
 
 int setLockOnOff_ (int, time_t, char *hname);

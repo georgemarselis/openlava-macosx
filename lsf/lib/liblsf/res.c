@@ -23,6 +23,7 @@
 #include <termios.h>
 #include <unistd.h>
 
+#include "lib/init.h"
 #include "lib/lib.h"
 #include "lib/lproto.h"
 #include "lib/queue.h"
@@ -41,7 +42,7 @@ int currentsocket_                =  0;
 unsigned int requestSN            =  0;
 unsigned int requestHighWaterMark =  0;
 unsigned int globCurrentSN        =  0;
-char rootuid_ = '\0';
+
 // static unsigned int requestHighWaterMark =  0;
 fd_set connection_ok_;
 struct sockaddr_in res_addr_;

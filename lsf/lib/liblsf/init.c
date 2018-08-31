@@ -31,10 +31,8 @@
 #include "daemons/libniosd/niosd.h"
 
 
-// #define NL_SETN 23
 
-int mlsSbdMode = FALSE;
-char rootuid_ = FALSE;
+rootuid_ = FALSE;
 
 int
 ls_initrex (int num, int options)

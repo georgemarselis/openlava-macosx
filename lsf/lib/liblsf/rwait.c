@@ -21,19 +21,12 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include "lib/rwait.h"
 #include "lib/lib.h"
 #include "lib/lproto.h"
 #include "daemons/libniosd/niosd.h"
 #include "daemons/libresd/resout.h"
 
-/* #define SIGEMT SIGBUS */
-
-
-static int rwait_ (int tid, LS_WAIT_T * status, int block, struct rusage *ru);
-static int readWaitReply (LS_WAIT_T * status, struct rusage *ru);
-static void restartRWait (sigset_t);
-static void usr1Handler (int);
-int isPamBlockWait = 0;
 
 int
 ls_rwait (LS_WAIT_T * status, int options, struct rusage *ru)
@@ -48,7 +41,7 @@ ls_rwaittid (int tid, LS_WAIT_T * status, int options, struct rusage *ru)
   return (rwait_ (tid, status, options, ru));
 }
 
-static int
+int
 rwait_ (int tid, LS_WAIT_T * status, int options, struct rusage *ru)
 {
   int rpid;
@@ -150,7 +143,7 @@ Start:
 
 }
 
-static int
+int
 readWaitReply (LS_WAIT_T * status, struct rusage *ru)
 {
   struct lslibNiosWaitReply reply;
@@ -171,7 +164,7 @@ readWaitReply (LS_WAIT_T * status, struct rusage *ru)
 }
 
 
-static void
+void
 restartRWait (sigset_t oldMask)
 {
   int usr1handler = FALSE;
@@ -214,7 +207,7 @@ restartRWait (sigset_t oldMask)
 
 }
 
-static void
+void
 usr1Handler (int sig)
 {
   assert( sig );

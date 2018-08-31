@@ -22,13 +22,14 @@
 #include <sys/time.h> /* struct timeval */
 #include <sys/socket.h> 
 
-#include "lib/osal.h"
-#include "lib/lib.h"
-#include "lib/lproto.h"
-#include "lib/rdwr.h"
 #include "daemons/libresd/resd.h"
 #include "lib/channel.h"
 #include "lib/host.h"
+#include "lib/lib.h"
+#include "lib/lproto.h"
+#include "lib/osal.h"
+#include "lib/rdwr.h"
+#include "lib/rwait.h"
 #include "lib/sock.h"
 
 /**************************************************************
