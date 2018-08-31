@@ -12,7 +12,7 @@ static enum LS_CSO {
 	LS_CSO_PRIVILEGE_PORT = 0x0002
 } LS_CSO;
 
-static int isPamBlockWait = 0;
+int isPamBlockWait; // defined in lib/liblsf/rwait.c
 
 /* rwait.c */
 int  ls_rwait     ( LS_WAIT_T *status, int options, struct rusage *ru );
