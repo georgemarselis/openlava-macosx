@@ -1,1 +1,12 @@
+TODO
+
+1. Deal with function loading up the configure paramets and genParams_
+2. compile res.c
+
+
+
+
+
+DEEP END
+
 * integrate openlava with unison ( https://github.com/bcpierce00/unison ) or a unison-like tool for pre-staging files
