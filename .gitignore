@@ -38,8 +38,12 @@ autoscan.log
 configure.scan
 compile
 build/lsf
-build-aux
+build-aux/*
 m4
 .Tpo
 .Po
 po/*
+*.in.in
+ABOUT-NLS
+build-aux/config.rpath
+po/Makefile.in.in
