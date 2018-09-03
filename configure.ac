@@ -13,6 +13,7 @@ AC_CONFIG_AUX_DIR([build-aux])
 
 # make autoconfiguration look for an external libintl
 AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.19.7])
 
 # Init m4 macro dir
 AC_CONFIG_MACRO_DIR([m4])
@@ -55,6 +56,8 @@ AC_CHECK_HEADERS([tcl.h], [HAVE_TCL_TCL_H=yes], [HAVE_TCL_H=y]) # FIXME FIXME FI
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lm':
 AC_CHECK_LIB([m], [main])
+# FIXME: Replace `main' with a function in `-lm':
+AC_CHECK_LIB([m], [pow])
 # FIXME: Replace `main' with a function in `-lncurses':
 AC_CHECK_LIB([ncurses], [main])
 # FIXME: Replace `main' with a function in `-lnsl':
@@ -75,6 +78,14 @@ AC_CHECK_MEMBERS([struct stat.st_rdev])
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 AC_TYPE_UINT8_T
+AC_CHECK_FUNCS([strtoul])
+AC_CHECK_HEADERS([libintl.h])
+AC_CHECK_HEADERS([stddef.h])
+AC_CHECK_HEADERS([utmpx.h])
+AC_CHECK_HEADER_STDBOOL
+AC_FUNC_ALLOCA
+AC_TYPE_INT16_T
+AC_TYPE_INT8_T
 
 # Checks for library functions.
 AC_FUNC_CHOWN
@@ -87,7 +98,7 @@ AC_FUNC_MKTIME
 AC_FUNC_REALLOC
 AC_FUNC_STRTOD
 AC_FUNC_WAIT3
-AC_CHECK_FUNCS([alarm atexit dup2 endgrent getcwd gethostbyaddr gethostbyname gethostname getpagesize gettimeofday inet_ntoa isascii memmove memset mkdir pow putenv rmdir select socket stime strcasecmp strchr strdup strerror strncasecmp strpbrk strrchr strstr strtol utime])
+AC_CHECK_FUNCS([alarm atexit dup2 endgrent getcwd gethostbyaddr gethostbyname gethostname getpagesize gettimeofday inet_ntoa isascii memmove memset mkdir putenv rmdir select socket stime strcasecmp strchr strdup strerror strncasecmp strpbrk strrchr strstr strtol utime])
 
 #ac_cv_pow
 
