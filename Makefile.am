@@ -1,14 +1,8 @@
+# George Marselis <george@marsel.is>
 #
-# Copyright (C) 2011-2012 David Bigagli
-#
-
-#include $(top_srcdir)/common.mk
-
-#
-# Copyright (C) 2012 Claudio Luck
-#
-# contencts of common.mk
 AM_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\"
+
+# bin_PROGRAMS = pimd limd eauthd resd mbatchd sbatchd niosd badmin bbottom bcheckpoint beligible bhc bhist bhosts bjobs bkill bmgroup bmig bmigrate bmigrategroup bmod bmodify bmove bparams bpeek bqc bqueues brequeue brestart bresume brun bstop bsub bswitch btop bugroup busers lsacct lsaddhost lsadm lseligible lshosts lsid lsinfo lsload lsloadadj lsmon lsplace lsrcp lsrmhost lsrun 
 
 
 SUBDIRS = po lsf docs scripts
