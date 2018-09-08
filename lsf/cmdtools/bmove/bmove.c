@@ -39,61 +39,61 @@ bmove (int argc, char **argv, int opCode)
 	int achar    = 0;
 
 	if (lsb_init (argv[0]) < 0)
-		{
-			lsb_perror ("lsb_init");
-			exit (-1);
-		}
+	{
+		lsb_perror ("lsb_init");
+		exit (-1);
+	}
 
 	opterr = 0;
 	while ((achar = getopt (argc, argv, "hV")) != EOF) {
-			switch (achar)
-	{
-	case 'V':
-		fputs (_LS_VERSION_, stderr);
-		exit (0);
-	break;
-	case 'h':
-	default:
-		usage (argv[0]);
-	break;
+		switch (achar)
+		{
+			case 'V':
+			fputs (_LS_VERSION_, stderr);
+			exit (0);
+			break;
+			case 'h':
+			default:
+			usage (argv[0]);
+			break;
+		}
 	}
-		}
 	if (argc == optind)
-		{
-			/* catgets  852  */
-			fprintf (stderr, "%s.\n", (_i18n_msg_get (ls_catd, NL_SETN, 852, "Job ID must be specified")));
-			usage (argv[0]);
-		}
+	{
+		/* catgets  852  */
+		fprintf (stderr, "%s.\n", (_i18n_msg_get (ls_catd, NL_SETN, 852, "Job ID must be specified")));
+		usage (argv[0]);
+	}
 	if (optind < argc - 2)
-		{
-			/* catgets  853  */
-			fprintf (stderr, "%s.\n", (_i18n_msg_get (ls_catd, NL_SETN, 853, "Command syntax error: too many arguments")));
-			usage (argv[0]);
-		}
+	{
+		/* catgets  853  */
+		fprintf (stderr, "%s.\n", (_i18n_msg_get (ls_catd, NL_SETN, 853, "Command syntax error: too many arguments")));
+		usage (argv[0]);
+	}
 
 	if (getOneJobId (argv[optind], &jobId, 0))
-		{
-			usage (argv[0]);
-		}
+	{
+		usage (argv[0]);
+	}
 
 	position = 1;
 	if (optind == argc - 2)
-		{
-			if (!isint_ (argv[++optind]) || atoi (argv[optind]) <= 0)
 	{
+		if (!isint_ (argv[++optind]) || atoi (argv[optind]) <= 0)
+		{
 		/* catgets854 */
-		fprintf (stderr, "%s: %s.\n", argv[optind], I18N (854, "Position value must be a positive integer"));
-		usage (argv[0]);
-	}
-			position = atoi (argv[optind]);
+			fprintf (stderr, "%s: %s.\n", argv[optind], I18N (854, "Position value must be a positive integer"));
+			usage (argv[0]);
 		}
+		position = atoi (argv[optind]);
+	}
 
 	reqPos = position;
 	if (lsb_movejob (jobId, &position, opCode) < 0)
-		{
-			lsb_perror (lsb_jobid2str (jobId));
-			exit (-1);
-		}
+	{
+		lsb_perror (lsb_jobid2str (jobId));
+		exit (-1);
+	}
 
 	if (position != reqPos) {
 		/* catgets  855  */

@@ -126,6 +126,7 @@ AC_CONFIG_FILES([Makefile po/Makefile.in
                 lsf/cmdtools/bmigrategroup/Makefile
                 lsf/cmdtools/bmod/Makefile
                 lsf/cmdtools/bmodify/Makefile
+                lsf/cmdtools/bmove/Makefile
                 lsf/cmdtools/bparams/Makefile
                 lsf/cmdtools/bpeek/Makefile
                 lsf/cmdtools/bqc/Makefile
