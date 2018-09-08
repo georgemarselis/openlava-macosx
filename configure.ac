@@ -104,6 +104,7 @@ AC_CHECK_FUNCS([alarm atexit dup2 endgrent getcwd gethostbyaddr gethostbyname ge
 
 AC_CONFIG_FILES([Makefile po/Makefile.in
                 config/Makefile
+                docs/Makefile
                 docs/examples/Makefile
                 docs/man/Makefile
                 docs/man/man1/Makefile
