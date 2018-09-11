@@ -135,30 +135,30 @@ enum CHANE {
 
 static size_t chanMaxSize = 0;
 
-#define chanSend_  chanEnqueue_
-#define chanRecv_  chanDequeue_
+// #define chanSend_  chanEnqueue_
+// #define chanRecv_  chanDequeue_
 
-int chanInit_(void);
-int chanServSocket_(int type, unsigned short port, int backlog, int options);
-int chanClientSocket_(int domain, int type, int options);
-int chanAccept_(int chfd, struct sockaddr_in *from);
-void chanInactivate_(unsigned int chfd);
-void chanActivate_(unsigned int chfd);
-int chanConnect_(int chfd, struct sockaddr_in *peer, int timeout);
-int chanSendDgram_(int chfd, char *buf, int len, struct sockaddr_in *peer);
-int chanRcvDgram_(int chfd, char *buf, int len, struct sockaddr_in *peer, int timeout);
-int chanOpen_(unsigned int iaddr, unsigned short port, int options);
-int chanOpenSock_(int s, int options);
-int chanClose_(int chfd);
-void chanCloseAll_(void);
-void chanCloseAllBut_(int chfd);
-int chanSelect_(struct Masks *sockmask, struct Masks *chanmask, struct timeval *timeout);
-int chanEnqueue_(int chfd, struct Buffer *msg);
-int chanDequeue_(int chfd, struct Buffer **buf);
-long chanReadNonBlock_(int chfd, char *buf, size_t len, int timeout);
-long chanRead_(int chfd, char *buf, size_t len);
-long chanWrite_(int chfd, char *buf, size_t len);
-int chanRpc_(int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *outhdr, int timeout);
+int            chanInit_        ( void );
+int            chanServSocket_  ( int type, unsigned short port, int backlog, int options);
+int            chanClientSocket_( int domain, int type, int options);
+int            chanAccept_      ( int chfd, struct sockaddr_in *from);
+void           chanInactivate_  ( unsigned int chfd);
+void           chanActivate_    ( unsigned int chfd);
+int            chanConnect_     ( int chfd, struct sockaddr_in *peer, int timeout);
+int            chanSendDgram_   ( int chfd, char *buf, int len, struct sockaddr_in *peer);
+int            chanRcvDgram_    ( int chfd, char *buf, int len, struct sockaddr_in *peer, int timeout);
+int            chanOpen_        ( unsigned int iaddr, unsigned short port, int options);
+int            chanOpenSock_    ( int s, int options);
+int            chanClose_       ( int chfd);
+void           chanCloseAll_    ( void);
+void           chanCloseAllBut_ ( int chfd);
+int            chanSelect_      ( struct Masks *sockmask, struct Masks *chanmask, struct timeval *timeout);
+int            chanEnqueue_     ( int chfd, struct Buffer *msg);
+int            chanDequeue_     ( int chfd, struct Buffer **buf);
+long           chanReadNonBlock_( int chfd, char *buf, size_t len, int timeout);
+long           chanRead_        ( int chfd, char *buf, size_t len);
+long           chanWrite_       ( int chfd, char *buf, size_t len);
+int            chanRpc_         ( int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *outhdr, int timeout);
 
 unsigned long  chanSock_          ( unsigned int chfd );
 int            chanSetMode_       ( unsigned int chfd, int mode );

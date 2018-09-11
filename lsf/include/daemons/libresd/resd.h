@@ -393,7 +393,7 @@ static char *gobuf;
 static char allow_accept;
 
 // static int child_res_port;
-static int parent_res_port;
+static int parent_res_port = INVALID_FD;
 // static fd_set readmask;
 // static int writemask;
 // static int exceptmask;

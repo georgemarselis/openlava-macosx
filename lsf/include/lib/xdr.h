@@ -24,10 +24,10 @@
 #endif
 #include <stdio.h>
 
-#include "daemons/daemonout.h"
+// #include "daemons/daemonout.h"
 #include "lib/common_structs.h"
-#include "lib/hdr.h"
-#include "lsb/lsbatch.h"
+// #include "lib/hdr.h"
+// #include "lsb/lsbatch.h"
 
 bool_t xdr_address       ( XDR *,     unsigned int * );
 bool_t xdr_array_string  ( XDR *xdrs, char **astring, unsigned int maxlen, unsigned int arraysize );

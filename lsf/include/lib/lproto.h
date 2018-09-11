@@ -18,21 +18,23 @@
 
 #pragma once
 
-#include "lsf.h"
+// #include "lsf.h"
 // #include "lib/conf.h"
-#include "lib/hdr.h"
-#include "lib/table.h"
-#include "lib/xdrrf.h"
-#include "libint/lsi18n.h"
-#include "daemons/libpimd/pimd.h"
-#include "daemons/libresd/resd.h"
-#include "daemons/libresd/resout.h"
+// #include "lib/hdr.h"
+// #include "lib/table.h"
+// #include "lib/xdrrf.h"
+// #include "libint/lsi18n.h"
+// #include "daemons/libpimd/pimd.h"
+// #include "daemons/libresd/resd.h"
+// #include "daemons/libresd/resout.h"
 
 #define VALID_IO_ERR(x) ((x) == EWOULDBLOCK || (x) == EINTR || (x) == EAGAIN)
 #define BAD_IO_ERR(x)   ( ! VALID_IO_ERR(x))
 
 
 // #define INVALID_FD      (-1)
+const int INVALID_FD = -1; 
+
 #define FD_IS_VALID(x)  ((x) >= 0 && (x) < sysconf(_SC_OPEN_MAX) )
 #define FD_NOT_VALID(x) ( ! FD_IS_VALID(x))
 
@@ -55,9 +57,9 @@
 #define TRIM_RIGHT(sp)     while (isspace(*(sp+strlen(sp)-1))) *(sp+strlen(sp)-1)='\0';
 
 #define ALIGNWORD_(s)    (((s)&0xfffffffc) + 4)
-#define NET_INTADDR_(a) ((char *) (a))
+// #define NET_INTADDR_(a) ((char *) (a))
 
-#define NET_INTSIZE_ 4
+// #define NET_INTSIZE_ 4
 
 #define XDR_DECODE_SIZE_(a) (a)
 

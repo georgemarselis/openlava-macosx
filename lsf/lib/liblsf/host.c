@@ -46,23 +46,23 @@ static struct hTab *addrTab;
 char *
 ls_getmyhostname (void)
 {
-	char hname[MAXHOSTNAMELEN];
+	char hostname[MAXHOSTNAMELEN];
 	struct hostent *hp = NULL;
 
-	memset( hname, '\0', MAXHOSTNAMELEN );
+	memset( hostname, '\0', MAXHOSTNAMELEN );
 
 // YOUR CACHING MECHANISM IS BAD AND YOU SHOULD FEEL BAD
-	// if (hname[0] != 0){
-	//     return hname;
+	// if (hostname[0] != 0){
+	//     return hostname;
 	// }
 
-	gethostname (hname, MAXHOSTNAMELEN);
-	hp = Gethostbyname_ (hname);
+	gethostname (hostname, MAXHOSTNAMELEN);
+	hp = Gethostbyname_ (hostname);
 	if (hp == NULL)  {
 			return NULL;
 	}
 
-	// strcpy (hname, hp->h_name);
+	// strcpy (hostname, hp->h_name);
 
 	return hp->h_name;
 }
@@ -70,7 +70,7 @@ ls_getmyhostname (void)
 /* Gethostbyname_()
  */
 struct hostent *
-Gethostbyname_ (char *hname)
+Gethostbyname_ (char *hostname)
 {
 	// int cc;
 	struct hEnt *e = NULL;
@@ -79,12 +79,12 @@ Gethostbyname_ (char *hname)
 
 	memset( lsfHname, '\0', MAXHOSTNAMELEN );
 
-	if (strlen (hname) >= MAXHOSTNAMELEN) {
+	if (strlen (hostname) >= MAXHOSTNAMELEN) {
 		lserrno = LSE_BAD_HOST;
 		return NULL;
 	}
 
-	strcpy (lsfHname, hname);
+	strcpy (lsfHname, hostname);
 		/* openlava strips all hostnames
 		 * of their domain names.
 		 */
@@ -312,7 +312,7 @@ mkHostTab (void)
 /* addHost2Tab()
  */
 void
-addHost2Tab (const char *hname, in_addr_t ** addrs, char **aliases)
+addHost2Tab (const char *hostname, in_addr_t ** addrs, char **aliases)
 {
 	struct hostent *hp = NULL;
 	char ipbuf[32] = NULL;
@@ -325,11 +325,11 @@ addHost2Tab (const char *hname, in_addr_t ** addrs, char **aliases)
 	 * if it exists already we must be processing
 	 * another ipaddr for it.
 	 */
-	e = h_addEnt_ (nameTab, hname, &new);
+	e = h_addEnt_ (nameTab, hostname, &new);
 	if (new)
 		{
 			hp = calloc (1, sizeof (struct hostent));
-			hp->h_name = strdup (hname);
+			hp->h_name = strdup (hostname);
 			hp->h_addrtype = AF_INET;
 			hp->h_length = 4;
 			e->hData = hp;
@@ -396,7 +396,7 @@ getAskedHosts_ (char *optarg_, char ***askedHosts, unsigned int *numAskedHosts, 
 {
 	unsigned long  num = 64;
 	char *word;
-	char *hname;
+	char *hostname;
 	char **tmp;
 	int foundBadHost = FALSE;
 	static char **hlist = NULL;
@@ -428,7 +428,7 @@ getAskedHosts_ (char *optarg_, char ***askedHosts, unsigned int *numAskedHosts, 
 		{
 			if (checkHost == FALSE)
 				{
-					hname = host;
+					hostname = host;
 				}
 			else
 				{
@@ -439,18 +439,18 @@ getAskedHosts_ (char *optarg_, char ***askedHosts, unsigned int *numAskedHosts, 
 							foundBadHost = TRUE;
 							*badIdx = nhlist;
 						}
-					hname = host;
+					hostname = host;
 				}
 					else
 				{
-					hname = host;
+					hostname = host;
 				}
 				}
 		}
 			else
-		hname = host;
+		hostname = host;
 
-			if ((hlist[nhlist] = putstr_ (hname)) == NULL)
+			if ((hlist[nhlist] = putstr_ (hostname)) == NULL)
 		{
 			lserrno = LSE_MALLOC;
 			goto Error;

@@ -500,7 +500,7 @@ svrsockDestroy_ (struct svrsock * svrsock)
 }
 
 int
-TcpConnect_ (char *hostname, u_short port, struct timeval *timeout)
+TcpConnect_ ( const char *hostname, u_short port, struct timeval *timeout)
 {
 	int sock = 0;
 	int nwRdy = 0;

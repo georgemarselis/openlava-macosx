@@ -1325,7 +1325,7 @@ xdr_hostDataReply (XDR *xdrs, struct hostDataReply *hostDataReply, struct LSFHea
 				return FALSE;
 			}
 
-			sp = malloc (hostCount * (MAXHOSTNAMELEN + MAXLINELEN));
+			sp = malloc (hostCount * (MAXHOSTNAMELEN + MAXLINELEN)); // FIXME FIXME FIXME this is a bit overkill.
 			if ( NULL == sp && ENOMEM == errno ) {
 				FREEUP (hInfoTmp);
 				lsberrno = LSBE_NO_MEM;
@@ -1382,11 +1382,11 @@ xdr_hostDataReply (XDR *xdrs, struct hostDataReply *hostDataReply, struct LSFHea
 	{
 		if (xdrs->x_op == XDR_DECODE) {
 			hostDataReply->hosts[i].loadSched = loadSched + (i * hostDataReply->nIdx);
-			hostDataReply->hosts[i].loadStop  = loadStop + (i * hostDataReply->nIdx);
-			hostDataReply->hosts[i].realLoad  = realLoad + (i * hostDataReply->nIdx);
-			hostDataReply->hosts[i].load      = load + (i * hostDataReply->nIdx);
+			hostDataReply->hosts[i].loadStop  = loadStop  + (i * hostDataReply->nIdx);
+			hostDataReply->hosts[i].realLoad  = realLoad  + (i * hostDataReply->nIdx);
+			hostDataReply->hosts[i].load      = load      + (i * hostDataReply->nIdx);
 			hostDataReply->hosts[i].busySched = busySched + (i * GET_INTNUM (hostDataReply->nIdx));
-			hostDataReply->hosts[i].busyStop  = busyStop + (i * GET_INTNUM (hostDataReply->nIdx));
+			hostDataReply->hosts[i].busyStop  = busyStop  + (i * GET_INTNUM (hostDataReply->nIdx));
 		}
 
 		if (!xdr_arrayElement (xdrs, (char *) &(hostDataReply->hosts[i]), hdr, xdr_hostInfoEnt, (char *) &hostDataReply->nIdx)) { // FIXME FIXME FIXME FIXME FIXME passing a struct as char *? debugger
