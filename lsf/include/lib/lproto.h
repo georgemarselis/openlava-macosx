@@ -32,13 +32,6 @@
 #define BAD_IO_ERR(x)   ( ! VALID_IO_ERR(x))
 
 
-// #define INVALID_FD      (-1)
-const int INVALID_FD = -1; 
-
-#define FD_IS_VALID(x)  ((x) >= 0 && (x) < sysconf(_SC_OPEN_MAX) )
-#define FD_NOT_VALID(x) ( ! FD_IS_VALID(x))
-
-
 #define FREEUP(pointer)   if (pointer != NULL) {  \
 							  free(pointer);      \
 							  pointer = NULL;     \
@@ -83,7 +76,7 @@ const int INVALID_FD = -1;
 
 #define END_FOR_EACH_WORD_IN_SPACE_DELIMITED_STRING }}
 
-static enum {
+enum {
 	LSF_O_RDONLY    = 00000,
 	LSF_O_WRONLY    = 00001,
 	LSF_O_RDWR      = 00002,
@@ -141,35 +134,35 @@ struct resourceInfoReply
 // #define HOST_ATTR_CLIENT        (0x00000002)
 // #define HOST_ATTR_NOT_LOCAL     (0x00000004)
 // #define HOST_ATTR_NOT_READY     (0xffffffff)
-static const unsigned long HOST_ATTR_SERVER    = 0x00000001;
-static const unsigned long HOST_ATTR_CLIENT    = 0x00000002;
-static const unsigned long HOST_ATTR_NOT_LOCAL = 0x00000004;
-static const unsigned long HOST_ATTR_NOT_READY = 0xffffffff;
+const unsigned long HOST_ATTR_SERVER    = 0x00000001;
+const unsigned long HOST_ATTR_CLIENT    = 0x00000002;
+const unsigned long HOST_ATTR_NOT_LOCAL = 0x00000004;
+const unsigned long HOST_ATTR_NOT_READY = 0xffffffff;
 
 // #define AUTH_IDENT          "ident"
 // #define AUTH_PARAM_DCE      "dce"
 // #define AUTH_PARAM_EAUTH    "eauth"
 // #define AUTOMOUNT_LAST_STR  "AMFIRST"
 // #define AUTOMOUNT_NEVER_STR "AMNEVER"
-static const char AUTH_IDENT[]          = "ident";
-static const char AUTH_PARAM_DCE[]      = "dce";
-static const char AUTH_PARAM_EAUTH[]    = "eauth";
-static const char AUTOMOUNT_LAST_STR[]  = "AMFIRST";
-static const char AUTOMOUNT_NEVER_STR[] = "AMNEVER";
+const char AUTH_IDENT[]          = "ident";
+const char AUTH_PARAM_DCE[]      = "dce";
+const char AUTH_PARAM_EAUTH[]    = "eauth";
+const char AUTOMOUNT_LAST_STR[]  = "AMFIRST";
+const char AUTOMOUNT_NEVER_STR[] = "AMNEVER";
 
 
-static const char LSF_LIM_ERESOURCE_OBJECT[]   =  "liblimvcl.so";
-static const char LSF_LIM_ERESOURCE_VERSION[]  = "lim_vcl_get_eres_version";
-static const char LSF_LIM_ERESOURCE_DEFINE[]   = "lim_vcl_get_eres_def";
-static const char LSF_LIM_ERESOURCE_LOCATION[] = "lim_vcl_get_eres_loc";
-static const char LSF_LIM_ERESOURCE_VALUE[]    = "lim_vcl_get_eres_val";
-static const char LSF_LIM_ERES_TYPE[]          = "!";
+const char LSF_LIM_ERESOURCE_OBJECT[]   =  "liblimvcl.so";
+const char LSF_LIM_ERESOURCE_VERSION[]  = "lim_vcl_get_eres_version";
+const char LSF_LIM_ERESOURCE_DEFINE[]   = "lim_vcl_get_eres_def";
+const char LSF_LIM_ERESOURCE_LOCATION[] = "lim_vcl_get_eres_loc";
+const char LSF_LIM_ERESOURCE_VALUE[]    = "lim_vcl_get_eres_val";
+const char LSF_LIM_ERES_TYPE[]          = "!";
 
 
 
-static const char LS_EXEC_T[] = "LS_EXEC_T";
+const char LS_EXEC_T[] = "LS_EXEC_T";
 
-static char *lsTmpDir_ = NULL;
+char *lsTmpDir_ = NULL;
 
-static const unsigned short BIND_RETRY_TIMES = 100;
-static int sharedResConfigured_;
+const unsigned short BIND_RETRY_TIMES = 100;
+int sharedResConfigured_;

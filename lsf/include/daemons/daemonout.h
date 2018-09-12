@@ -29,29 +29,31 @@
 // #define BATCH_MASTER_PORT   40000
 // #define ALL_HOSTS      "all"
 
-static const unsigned int BATCH_MASTER_PORT = 40000;
-static const char ALL_HOSTS[] = "all";
-
 #define  PUT_LOW(word, s)  (word = (s | (word & ~0x0000ffff)))
 #define  PUT_HIGH(word, s) (word = ((s << 16) | (word & 0x0000ffff)))
 #define  GET_LOW(s, word)  (s = word & 0x0000ffff)
 #define  GET_HIGH(s, word) (s = (word >> 16) & 0x0000ffff)
 
+const unsigned int BATCH_MASTER_PORT = 40000;
+const char ALL_HOSTS[] = "all";
+
+
+
 
 // #define PREPARE_FOR_OP          1024
 // #define READY_FOR_OP            1023
-static const unsigned short PREPARE_FOR_OP = 1024;
-static const unsigned short READY_FOR_OP   = 1023;
+const unsigned short PREPARE_FOR_OP = 1024;
+const unsigned short READY_FOR_OP   = 1023;
 
 // #define RSCHED_LISTSEARCH_BY_EXECJID       0
 // #define RSCHED_LISTSEARCH_BY_EXECLUSNAME   1
-static enum RSCHED_LISTSEARCH {
+enum RSCHED_LISTSEARCH {
 	RSCHED_LISTSEARCH_BY_EXECJID = 0,
 	RSCHED_LISTSEARCH_BY_EXECLUSNAME = 1	
 } RSCHED_LISTSEARCH;
 
 // FIXME FIXME sort labels, remove numbers, make sure everything is compared using the labels and not the numbers
-static enum mbdReqType {
+enum mbdReqType {
 	BATCH_JOB_SUB        = 1,
 	BATCH_JOB_INFO       = 2,
 	BATCH_JOB_PEEK       = 3,
@@ -95,7 +97,7 @@ static enum mbdReqType {
 } mbdReqType;
 
 // #define SUB_RLIMIT_UNIT_IS_KB 0x80000000
-static const unsigned long SUB_RLIMIT_UNIT_IS_KB = 0x80000000;
+const unsigned long SUB_RLIMIT_UNIT_IS_KB = 0x80000000;
 
 
 // #define SHELLLINE "#! /bin/sh\n\n"
@@ -115,21 +117,21 @@ static const unsigned long SUB_RLIMIT_UNIT_IS_KB = 0x80000000;
 // #define LOAD_REPLY_SHARED_RESOURCE 0x1
 
 // NOTE The output script that executes the job starts here
-static const char SHELLLINE[]           = "#! /bin/sh\n\n"; // FIXME FIXME FIXME: !# evn sh, instead
-static const char CMDSTART[]            = "# LSBATCH: User input\n";
-static const char CMDEND[]              = "# LSBATCH: End user input\n";
-static const char ENVSSTART[]           = "# LSBATCH: Environments\n";
-static const char LSBNUMENV[]           = "#LSB_NUM_ENV=";
-static const char EDATASTART[]          = "# LSBATCH: edata\n";
-static const char AUXAUTHSTART[]        = "# LSBATCH: aux_auth_data\n";
-static const char EXITCMD[]             = "exit `expr $? \"|\" $ExitStat`\n";
-static const char WAITCLEANCMD[]        = "\nExitStat=$?\nwait\n# LSBATCH: End user input\ntrue\n";
-static const char TAILCMD[]             = "'; export ";
-static const char TRAPSIGCMD[]          = "$LSB_TRAPSIGS\n$LSB_RCP1\n$LSB_RCP2\n$LSB_RCP3\n";
-static const char JOB_STARTER_KEYWORD[] = "%USRCMD";
-static const char SCRIPT_WORD[]         = "_USER_\\SCRIPT_";
-static const char SCRIPT_WORD_END[]     = "_USER_SCRIPT_";
-static const unsigned short LOAD_REPLY_SHARED_RESOURCE = 0x1;
+const char SHELLLINE[]           = "#! /bin/sh\n\n"; // FIXME FIXME FIXME: !# evn sh, instead
+const char CMDSTART[]            = "# LSBATCH: User input\n";
+const char CMDEND[]              = "# LSBATCH: End user input\n";
+const char ENVSSTART[]           = "# LSBATCH: Environments\n";
+const char LSBNUMENV[]           = "#LSB_NUM_ENV=";
+const char EDATASTART[]          = "# LSBATCH: edata\n";
+const char AUXAUTHSTART[]        = "# LSBATCH: aux_auth_data\n";
+const char EXITCMD[]             = "exit `expr $? \"|\" $ExitStat`\n";
+const char WAITCLEANCMD[]        = "\nExitStat=$?\nwait\n# LSBATCH: End user input\ntrue\n";
+const char TAILCMD[]             = "'; export ";
+const char TRAPSIGCMD[]          = "$LSB_TRAPSIGS\n$LSB_RCP1\n$LSB_RCP2\n$LSB_RCP3\n";
+const char JOB_STARTER_KEYWORD[] = "%USRCMD";
+const char SCRIPT_WORD[]         = "_USER_\\SCRIPT_";
+const char SCRIPT_WORD_END[]     = "_USER_SCRIPT_";
+const unsigned short LOAD_REPLY_SHARED_RESOURCE = 0x1;
 
 
 // duplicate: 4 define
@@ -137,7 +139,7 @@ static const unsigned short LOAD_REPLY_SHARED_RESOURCE = 0x1;
 // #define CALL_SERVER_USE_SOCKET    0x2
 // #define CALL_SERVER_NO_HANDSHAKE  0x4
 // #define CALL_SERVER_ENQUEUE_ONLY  0x8
-static enum CALL_SERVER {
+enum CALL_SERVER {
 	CALL_SERVER_NO_WAIT_REPLY = 0x1,
 	CALL_SERVER_USE_SOCKET    = 0x2,
 	CALL_SERVER_NO_HANDSHAKE  = 0x4,
@@ -177,29 +179,4 @@ struct lenDataList
 	char padding1[4];
 	struct lenData *jf;
 };
-
-
-void initTab (struct hTab *tabPtr);
-struct hEnt *addMemb (struct hTab *tabPtr, long member);
-char remvMemb (struct hTab *tabPtr, long member);
-struct hEnt *chekMemb (struct hTab *tabPtr, long member);
-struct hEnt *addMembStr (struct hTab *tabPtr, char *member);
-char remvMembStr (struct hTab *tabPtr, char *member);
-struct hEnt *chekMembStr (struct hTab *tabPtr, char *member);
-void convertRLimit (int *pRLimits, int toKb);
-int limitIsOk_ (int *rLimits);
-
-int handShake_ (int, char, int);
-
-
-int call_server (char *host, unsigned short serv_port, char *req_buf, size_t req_size,  char **rep_buf, struct LSFHeader *replyHdr, int conn_timeout, int recv_timeout, int *connectedSock, int (*postSndFunc) (), int *postSndFuncArg, int flags);
-
-int sndJobFile_ (int, struct lenData *);
-
-void freeUnixGrp (struct group *);
-struct group *copyUnixGrp (struct group *);
-
-void freeGroupInfoReply (struct groupInfoReply *reply);
-
-void appendEData (struct lenData *jf, struct lenData *ed);
 

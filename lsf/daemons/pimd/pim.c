@@ -21,24 +21,24 @@
 #include "lib/lproto.h"
 #include "intlib/intlibout.h"
 
-static struct lsPidInfo pbase[MAX_PROC_ENT]; // FIXME FIXME FIXME FIXME MAX_PROC_ENT, what is it depended on? Can this declaration be turned into a pointe?
-static int numprocs = 0;
+struct lsPidInfo pbase[MAX_PROC_ENT]; // FIXME FIXME FIXME FIXME MAX_PROC_ENT, what is it depended on? Can this declaration be turned into a pointe?
+int numprocs = 0;
 
-static u_short pimPort = 0;
-static int gothup;
+u_short pimPort = 0;
+int gothup;
 
 struct config_param pimParams[] = {
-	{"LSF_LIM_DEBUG",           NULL},
-	{"LSF_LOGDIR",              NULL},
-	{"LSF_DEBUG_PIM",           NULL},
-	{"LSF_LOG_MASK",            NULL},
-	{"LSF_TIME_PIM",            NULL},
-	{"LSF_PIM_SLEEPTIME",       NULL},
-	{"LSF_PIM_INFODIR",         NULL},
-	{"LSF_PIM_NPROC",           NULL},
-	{"LSF_PIM_TRACE",           NULL},
-	{"LSF_PIM_UPDATE_INTERVAL", NULL},
-	{NULL,                      NULL}
+	{ "LSF_LIM_DEBUG",           NULL },
+	{ "LSF_LOGDIR",              NULL },
+	{ "LSF_DEBUG_PIM",           NULL },
+	{ "LSF_LOG_MASK",            NULL },
+	{ "LSF_TIME_PIM",            NULL },
+	{ "LSF_PIM_SLEEPTIME",       NULL },
+	{ "LSF_PIM_INFODIR",         NULL },
+	{ "LSF_PIM_NPROC",           NULL },
+	{ "LSF_PIM_TRACE",           NULL },
+	{ "LSF_PIM_UPDATE_INTERVAL", NULL },
+	{  NULL,                     NULL }
 };
 
 // enum
@@ -55,20 +55,20 @@ struct config_param pimParams[] = {
 //   LSF_PIM_UPDATE_INTERVAL
 // } pimStatus;
 
-static int pim_debug = 0;
-static char infofile = malloc( sizeof( char ) * (MAX_FILENAME_LEN + 1 ) );
-static int sleepTime = PIM_SLEEP_TIME;
-static int updInterval = PIM_UPDATE_INTERVAL;
+int pim_debug = 0;
+char infofile = malloc( sizeof( char ) * (MAX_FILENAME_LEN + 1 ) );
+int sleepTime = PIM_SLEEP_TIME;
+int updInterval = PIM_UPDATE_INTERVAL;
 
-static void logProcessInfo (void);
-static int doServ (void);
-static void hup (int);
-static int scan_procs (void);
-static void updateProcs (const time_t);
-static int parse_stat (char *, struct lsPidInfo *);
-static int ls_pidinfo (int, struct lsPidInfo *);
+void logProcessInfo (void);
+int doServ (void);
+void hup (int);
+int scan_procs (void);
+void updateProcs (const time_t);
+int parse_stat (char *, struct lsPidInfo *);
+int ls_pidinfo (int, struct lsPidInfo *);
 
-static void  // FIXME FIXME FIXME this needs more descriptive love
+void  // FIXME FIXME FIXME this needs more descriptive love
 usage (const char *cmd)
 {
   fprintf (stderr, "%s: [-V] [-h] [-debug_level] [-d env_dir]\n", cmd);
@@ -211,10 +211,10 @@ pim: Howdy this is Process Information Manager daemon on host %s.", myHost);
 /* doServ()
  * Da main loop.
  */
-static int
+int
 doServ (void)
 {
-  int ppid;
+  pid_t ppid;
   socklen_t len;
   struct sockaddr_in sin;
   int asock;
@@ -325,7 +325,7 @@ doServ (void)
 
 /* updateProcs()
  */
-static void
+void
 updateProcs (const time_t lastUpdate)
 {
   ls_syslog (LOG_DEBUG, "\
@@ -337,12 +337,12 @@ updateProcs (const time_t lastUpdate)
 
 /* logProcessInfo()
  */
-static void
+void
 logProcessInfo (void)
 {
   int i;
   FILE *fp;
-  static char wfile[MAX_FILENAME_LEN];
+  char wfile[MAX_FILENAME_LEN];
 
   sprintf (wfile, "%s.%d", infofile, getpid ());
 
@@ -380,13 +380,13 @@ logProcessInfo (void)
 
 }
 
-static void
+void
 hup (int sig)
 {
   gothup = 1;
 }
 
-static int
+int
 scan_procs (void)
 {
   DIR *dir;
@@ -447,12 +447,12 @@ scan_procs (void)
 
 /* ls_pidinfo()
  */
-static int
+int
 ls_pidinfo (int pid, struct lsPidInfo *rec)
 {
   int fd;
-  static char filename[PATH_MAX];
-  static char buffer[BUFSIZ];
+  char filename[PATH_MAX];
+  char buffer[BUFSIZ];
 
   sprintf (filename, "/proc/%d/stat", pid);
 
@@ -485,7 +485,7 @@ ls_pidinfo (int pid, struct lsPidInfo *rec)
 
 /* parse_stat()
  */
-static int
+int
 parse_stat (char *buf, struct lsPidInfo *pinfo)
 {
   unsigned int rss_rlim;

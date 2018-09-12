@@ -21,10 +21,10 @@
 #include "lsf.h"
 #include "lsb/misc.h"
 
-static const char _PATH_NULL[ ] = "/dev/null";
-static const char DEFAULT_MSG_DESC[ ] = "no description";
+const char _PATH_NULL[ ] = "/dev/null";
+const char DEFAULT_MSG_DESC[ ] = "no description";
 
-static enum HOST_STAT {
+enum HOST_STAT {
 	HOST_STAT_OK            = 0x0,
 	HOST_STAT_BUSY          = 0x01,
 	HOST_STAT_WIND          = 0x02,
@@ -39,7 +39,7 @@ static enum HOST_STAT {
 } HOST_STAT;
 
 
-static enum HOST_BUSY {
+enum HOST_BUSY {
 	HOST_BUSY_NOT  = 0x000,
 	HOST_BUSY_R15S = 0x001,
 	HOST_BUSY_R1M  = 0x002,
@@ -54,7 +54,7 @@ static enum HOST_BUSY {
 	HOST_BUSY_MEM  = 0x400,
 } HOST_BUSY;
 
-static enum QUEUE_STAT {
+enum QUEUE_STAT {
 	QUEUE_STAT_OPEN         = 0x01,
 	QUEUE_STAT_ACTIVE       = 0x02,
 	QUEUE_STAT_RUN          = 0x04,
@@ -63,7 +63,7 @@ static enum QUEUE_STAT {
 	QUEUE_STAT_RUNWIN_CLOSE = 0x20
 } QUEUE_STAT;
 
-static enum QUEUE_ATTRIB {
+enum QUEUE_ATTRIB {
 	QUEUE_ATTRIB_EXCLUSIVE               = 0x01,
 	QUEUE_ATTRIB_DEFAULT                 = 0x02,
 	QUEUE_ATTRIB_ROUND_ROBIN             = 0x04,
@@ -321,7 +321,7 @@ enum PEND {
 	PEND_MAX_REASONS             = 2900
 };
 
-static const unsigned int pendMsg_ID[ ] = { 
+const unsigned int pendMsg_ID[ ] = { 
 	550, 551, 552, 553, 554, 555, 556, 557, 558, 559,
 	560, 561, 562, 563, 564,      566, 567, 568,
 	571, 
@@ -343,7 +343,7 @@ struct msgMap
 	const char *message;
 };
 
-static struct msgMap pendMsg[] = {
+struct msgMap pendMsg[] = {
 // sorted by catgets number
 // 		empty lines are meant to draw attention to gaps in numbering
 // 	if discrepancies found during The Dig, they are pointed out.
@@ -1883,9 +1883,9 @@ struct queueConf
 };
 
 
-static int lsberrno;
+int lsberrno;
 
-static int lsb_mbd_version;
+int lsb_mbd_version;
 
 
 // Ice Age Relic

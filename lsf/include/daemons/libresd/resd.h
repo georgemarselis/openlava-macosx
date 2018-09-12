@@ -62,10 +62,17 @@
 #define MAXCLIENTS_LOWWATER_MARK  1
 
 
-#define DOREAD      0
-#define DOWRITE     1
-#define DOEXCEPTION 2
-#define DOSTDERR    3
+// #define DOREAD      0
+// #define DOWRITE     1
+// #define DOEXCEPTION 2
+// #define DOSTDERR    3
+
+enum DO {
+	DOREAD      = 0,
+	DOWRITE     = 1,
+	DOEXCEPTION = 2,
+	DOSTDERR    = 3
+} DO;
 
 #define PTY_TEMPLATE     "/dev/ptyXX"
 
@@ -78,9 +85,17 @@
 
 #define BUFSTART(x)      ((char *) ((x)->buf) + sizeof(struct LSFHeader))
 
+// #define INVALID_FD      (-1)
+enum FD {
+	INVALID_FD = -1
+} FD;
+
+#define FD_IS_VALID(x)  ((x) >= 0 && (x) < sysconf(_SC_OPEN_MAX) )
+#define FD_NOT_VALID(x) ( ! FD_IS_VALID(x))
+
 #define CLOSE_IT(fd)     if (fd>=0) {close(fd); fd = INVALID_FD;}
 
-static enum SBD_FLAG {
+enum SBD_FLAG {
 	SBD_FLAG_STDIN  = 0x1,
 	SBD_FLAG_STDOUT = 0x2,
 	SBD_FLAG_STDERR = 0x4,
@@ -91,7 +106,7 @@ enum RES_RPID_KEEPPID {
 	RES_RPID_KEEPPID = 0x01
 };
 
-static enum RES_RID {
+enum RES_RID {
 	RES_RID_ISTID = 0x01,
 	RES_RID_ISPID = 0x02
 } RES_RID;
@@ -372,106 +387,99 @@ struct niosStatus
 
 /*********************************************/
 
-static int rexecPriority;
-static int client_cnt;
-// static struct child **children;
-// static int child_cnt;
-static char *Myhost;
-static char *myHostType;
+int rexecPriority;
+int client_cnt;
+struct child **children;
+int child_cnt;
+char *Myhost;
+char *myHostType;
 
-static int lastChildExitStatus;
+int lastChildExitStatus;
 
-static int sbdMode;
-static int sbdFlags;
+int sbdMode;
+int sbdFlags;
 
 
-static int accept_sock;
-static char child_res;
-static char child_go;
-static char res_interrupted;
-static char *gobuf;
-static char allow_accept;
+int accept_sock;
+char child_res;
+char child_go;
+char res_interrupted;
+char *gobuf;
+char allow_accept;
 
-// static int child_res_port;
-static int parent_res_port = INVALID_FD;
-// static fd_set readmask;
-// static int writemask;
-// static int exceptmask;
+int child_res_port;
+fd_set readmask;
+int writemask;
+int exceptmask;
 
-// static int ctrlSock;
-// static struct sockaddr_in ctrlAddr;
+int ctrlSock;
 
-// static int res_status;
+int res_status;
 
-// static char *lsbJobStarter;
+char *lsbJobStarter;
 
-// static char res_logfile[ MAX_FILENAME_LEN ];
-// static int res_logop;
-// static int restart_argc;
-// static char **restart_argv;
-// static char *env_dir;
-// static int  rexecPriority = 0;
+int restart_argc;
+char **restart_argv;
+char *env_dir;
+int  rexecPriority = 0;
 
-// static struct  client *clients[MAXCLIENTS_HIGHWATER_MARK + 1];
+struct  client *clients[MAXCLIENTS_HIGHWATER_MARK + 1];
 
-// static int  child_cnt    = 0;
-// static int  client_cnt   = 0;
-// static char  *Myhost     = NULL;
-// static char  *myHostType = NULL;
+int  child_cnt    = 0;
+int  client_cnt   = 0;
+char  *Myhost     = NULL;
+char  *myHostType = NULL;
 
 // taggedConn_t 
-// static struct  taggedConn conn2NIOS;
-// static struct _list *resNotifyList = NULL;
+struct  taggedConn conn2NIOS;
+struct _list *resNotifyList = NULL;
 
-// static bool_t  vclPlugin = FALSE;
+bool_t  vclPlugin = FALSE;
 
-// static char  child_res = ' ';
-static char  child_go =  '\0';
-// static char  res_interrupted = ' ';
-// static char  *gobuf = NULL;
-enum INVALIDFD {
-	INVALID_FD = -1
-};
+char  child_res = ' ';
+char  child_go =  '\0';
+char  res_interrupted = ' ';
+char  *gobuf = NULL;
 
-// static int  accept_sock = INVALID_FD;
-// static char  allow_accept = 1;
+int  accept_sock = INVALID_FD;
+char  allow_accept = 1;
 
-// static int  ctrlSock = INVALID_FD;
-// static struct  sockaddr_in ctrlAddr;
+int  ctrlSock = INVALID_FD;
+struct  sockaddr_in ctrlAddr;
 
-// static int  child_res_port = INVALID_FD;
-// static int  parent_res_port = INVALID_FD;
+int  child_res_port = INVALID_FD;
+int  parent_res_port = INVALID_FD;
 
 
-// static int  on = 1;
-// static int  off = 0;
-// static int  debug = 0;
-// static int  res_status = 0;
+int  on = 1;
+int  off = 0;
+int  debug = 0;
+int  res_status = 0;
 
-// static char  *lsbJobStarter = NULL;
+char  *lsbJobStarter = NULL;
 
-// static int  sbdMode = FALSE;
-// static int  sbdFlags = 0;
+int  sbdMode = FALSE;
+int  sbdFlags = 0;
 
-// static int  lastChildExitStatus = 0;
+int  lastChildExitStatus = 0;
 
-// static char  res_logfile[MAX_PATH_LEN];
-// static int  res_logop;
+char  res_logfile[MAX_PATH_LEN];
+int  res_logop;
 
-// static int  restart_argc    = 0;
-// static char  **restart_argv = NULL;
+int  restart_argc    = 0;
+char  **restart_argv = NULL;
 
-// static char  *env_dir = NULL;
+char  *env_dir = NULL;
 
-// static unsigned int globCurrentSN;
+unsigned int globCurrentSN;
 
-// static const unsigned short SIG_NT_CTRLC     = 2000;
-// static const unsigned short SIG_NT_CTRLBREAK = 2001;
+const unsigned short SIG_NT_CTRLC     = 2000;
+const unsigned short SIG_NT_CTRLBREAK = 2001;
 
-// static const unsigned short RES_REPLYBUF_LEN = 4096;
-// static const int RESS_LOGBIT = 0x00000001;
+const unsigned short RES_REPLYBUF_LEN = 4096;
+const int RESS_LOGBIT = 0x00000001;
 
-// static struct  config_param resConfParams[] = {
+// struct  config_param resConfParams[] = {
 // 	{"LSB_UTMP", NULL},
 // 	{NULL,       NULL}
 // };

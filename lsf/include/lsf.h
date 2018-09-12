@@ -72,7 +72,7 @@
 
 // #define LS_LONG_FORMAT ("%ld") 
 // #define _OPENLAVA_PROJECT_ "openlava project 2.0" // FIXME FIXME FIXME FIXME FIXME move to configure.ac
-static const char _OPENLAVA_PROJECT_[] = "openlava project 2.0";
+const char _OPENLAVA_PROJECT_[] = "openlava project 2.0";
 
 
 /*
@@ -88,7 +88,7 @@ static const char _OPENLAVA_PROJECT_[] = "openlava project 2.0";
  * This is our current version.
  */
 // #define OPENLAVA_VERSION   20  // FIXME FIXME FIXME FIXME FIXME move to configure.ac
-static const unsigned short OPENLAVA_VERSION = 20;
+const unsigned short OPENLAVA_VERSION = 20;
 
 // #define LSF_DEFAULT_SOCKS       15
 // #define MAXLINELEN              512
@@ -101,8 +101,8 @@ static const unsigned short OPENLAVA_VERSION = 20;
 // #define MAX_TYPES_31             25
 // #define MAX_MODELS_31            30
 
-static int lsferrno = 0; // defined, not used? 
-static const int ENOLOCATION = 0x0FFF; // defined, not used
+int lsferrno = 0; // defined, not used? 
+const int ENOLOCATION = 0x0FFF; // defined, not used
 
 enum LINE_BUFSIZ {
 	LINE_BUFSIZ = 4096
@@ -136,7 +136,7 @@ enum LSF_CONSTANTS {
 };
 
 // #define FIRST_RES_SOCK  20
-static const unsigned int FIRST_RES_SOCK = 20;
+const unsigned int FIRST_RES_SOCK = 20;
 
 // FIXME FIXME FIXME FIXME HAVE_UNION_WAIT must be moved to configure.ac
 #ifdef HAVE_UNION_WAIT
@@ -177,7 +177,7 @@ typedef enum {
 #define INFINIT_SHORT  0x7fff // FIXME FIXME FIXME FIXME  turn into constant
 
 // #define DEFAULT_RLIMIT     -1
-static const short DEFAULT_RLIMIT = -1;
+const short DEFAULT_RLIMIT = -1;
 
 // #define LSF_RLIMIT_CPU      0
 // #define LSF_RLIMIT_FSIZE    1
@@ -276,7 +276,7 @@ enum STATUS_REX {
 								|| ((s) == STATUS_REX_MLS_RHOST)        \
 								|| ((s) == STATUS_REX_MLS_DOMIN))
 
-static enum  REXF {
+enum  REXF {
 	REXF_USEPTY   = 0x00000001,
 	REXF_CLNTDIR  = 0x00000002,
 	REXF_TASKPORT = 0x00000004,
@@ -288,7 +288,7 @@ static enum  REXF {
 	REXF_STDERR   = 0x00000100
 } REXF;
 
-static enum STATUSES {
+enum STATUSES {
 	EXACT = 0x01,
 	OK_ONLY = 0x02,
 	NORMALIZE = 0x04,
@@ -308,14 +308,14 @@ static enum STATUSES {
 
 #define KEEPUID       0x01
 
-static enum RES_CMD {
+enum RES_CMD {
 	RES_CMD_REBOOT   = 1,
 	RES_CMD_SHUTDOWN = 2,
 	RES_CMD_LOGON    = 3,
 	RES_CMD_LOGOFF   = 4
 } RES_CMD;
 
-static enum LIM_CMD {
+enum LIM_CMD {
 	LIM_CMD_REBOOT   = 1,
 	LIM_CMD_SHUTDOWN = 2
 } LIM_CMD;
@@ -328,7 +328,7 @@ static enum LIM_CMD {
 #define MIN(x,y)  ((x) < (y) ? (x) : (y))
 #endif
 
-static enum LSFERRORS { // FIXME FIXME FIXME FIXME FIXME global enum with all the lserrno values in it
+enum LSFERRORS { // FIXME FIXME FIXME FIXME FIXME global enum with all the lserrno values in it
 	ENOERROR,
 	ENEGATIVERESULT,
 	KEYNULL
@@ -345,7 +345,7 @@ static enum LSFERRORS { // FIXME FIXME FIXME FIXME FIXME global enum with all th
 // #define LIM_LOCKEDM  0x00200000
 // #define LIM_OK_MASK  0x00bf0000
 // #define LIM_SBDDOWN  0x00400000
-static enum LIM_ENUM {
+enum LIM_ENUM {
 	LIM_UNAVAIL = 0x00010000,
 	LIM_LOCKEDU = 0x00020000,
 	LIM_LOCKEDW = 0x00040000,
@@ -1016,9 +1016,9 @@ enum MSGSIZE {
 // typedef struct stat LS_STAT_T;
 #define LSTMPDIR        lsTmpDir_                       // FIXME FIXME FIXME FIXME FIXME set in configure.ac
 // #define LSDEVNULL       "/dev/null"
-static const char LSDEVNULL[] = "/dev/null";                   // FIXME FIXME FIXME FIXME FIXME set in configure.ac
+const char LSDEVNULL[] = "/dev/null";                   // FIXME FIXME FIXME FIXME FIXME set in configure.ac
 // #define LSETCDIR        "/fix/me/no/such/place"
-static const char LSETCDIR[] = "/fix/me/no/such/place";        // FIXME FIXME FIXME FIXME FIXME set in configure.ac
+const char LSETCDIR[] = "/fix/me/no/such/place";        // FIXME FIXME FIXME FIXME FIXME set in configure.ac
 
 // #define LSETCDIR           SYSCONFDIR
 #define SOCK_CALL_FAIL(c)  ((c) < 0 )
@@ -1039,23 +1039,23 @@ struct extResInfo
 };
 
 #ifdef __CYGWIN__
-static int optind;
-static char *optarg;
-static int opterr;
-static int optopt;
+int optind;
+char *optarg;
+int opterr;
+int optopt;
 #endif
 
 static  int lserrno;
-static int masterLimDown;
-static int ls_nerr;           // FIXME FIXME FIXME FIXME FIXME too many different types of lserrno
+int masterLimDown;
+int ls_nerr;           // FIXME FIXME FIXME FIXME FIXME too many different types of lserrno
 // char *ls_errmsg[];  // FIXME FIXME FIXME FIXME FIXME put in specific header
-static int logclass;
-static int timinglevel;
+int logclass;
+int timinglevel;
 
 // int lsf_lim_version; // FIXME FIXME FIXME FIXME FIXME set in configure.ac
 // int lsf_res_version; // FIXME FIXME FIXME FIXME FIXME set in configure.ac
-static unsigned int LSF_LIM_VERSION; // FIXME FIXME FIXME FIXME FIXME set in configure.ac
-static unsigned int LSF_RES_VERSION; // FIXME FIXME FIXME FIXME FIXME set in configure.ac
+unsigned int LSF_LIM_VERSION; // FIXME FIXME FIXME FIXME FIXME set in configure.ac
+unsigned int LSF_RES_VERSION; // FIXME FIXME FIXME FIXME FIXME set in configure.ac
 
 int ls_initrex (int, int);
 int ls_connect (char *);

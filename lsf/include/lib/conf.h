@@ -18,8 +18,8 @@
 
 #pragma once
  
-#include "lsf.h"
-#include "lproto.h"
+// #include "lsf.h"
+// #include "lproto.h"
 
 #define ILLEGAL_CHARS     ".!-=+*/[]@:&|{}'`\""
 #define M_THEN_A  1
@@ -28,13 +28,13 @@
 
 
 // #define DEF_REXPRIORITY 0
-static const unsigned int DEF_REXPRIORITY = 0;
-static struct lsInfo lsinfo; // FIXME FIXME FIXME there is a second decleration in lfh.h . Not sure if dup or not
-static struct clusterInfo clinfo;
-static struct sharedConf sConf_;
-static struct clusterConf cConf_;
-static struct sharedConf *sConf = NULL;
-static struct clusterConf *cConf = NULL;
+const unsigned int DEF_REXPRIORITY = 0;
+struct lsInfo lsinfo; // FIXME FIXME FIXME there is a second decleration in lfh.h . Not sure if dup or not
+struct clusterInfo clinfo;
+struct sharedConf sConf_;
+struct clusterConf cConf_;
+struct sharedConf  *sConf = NULL;
+struct clusterConf *cConf = NULL;
 
 struct builtIn
 {
@@ -59,8 +59,8 @@ struct builtIn
 // unsigned int TYPE2 = RESF_BUILTIN | RESF_GLOBAL;
 // unsigned int TYPE3 = RESF_BUILTIN | RESF_GLOBAL | RESF_LIC;
 
-// static 
-static struct builtIn builtInRes[] = { // FIXME FIXME FIXME find out where this LS_NUMERIC comes from
+// 
+struct builtIn builtInRes[] = { // FIXME FIXME FIXME find out where this LS_NUMERIC comes from
     {  0, "      ",  "r15s",   "15-second CPU run queue length",              LS_NUMERIC, INCR, TYPE0, 15  },
     {  1, "      ",  "r1m",    "1-minute CPU run queue length (alias: cpu)",  LS_NUMERIC, INCR, TYPE0, 15  },
     {  2, "      ",  "r15m",   "15-minute CPU run queue length",              LS_NUMERIC, INCR, TYPE0, 15  },
@@ -101,7 +101,7 @@ struct keymap {
     char *val;
 };
 
-static const int builtInRes_ID[] = { // FIXME FIXME FIXME FIXME careful when compiling with the -Wkitchen-sink
+const int builtInRes_ID[] = { // FIXME FIXME FIXME FIXME careful when compiling with the -Wkitchen-sink
     1300, 1301, 1302, 1303, 1304, 1305, 1306, 1307, 1308, 1309,
     1310, 1311, 1312, 1313, 1314, 1315, 1316, 1317, 1318, 1319,
     1320, 1321
@@ -120,11 +120,11 @@ char do_Manager     (FILE *fp, const char *fname, size_t *lineNum, char const *c
 char do_Hosts       (FILE *fp, const char *fname, size_t *lineNum, struct lsInfo *myInfo);
 char do_Clparams    (FILE *fp, const char *fname, size_t *lineNum);
 
-// static 
+// 
 char addHostType (char *);
-// static 
+// 
 char addHostModel (char *model, char *arch, double factor);
-// static 
+// 
 char setIndex    (struct keymap *keyList, const char *fname, size_t lineNum);
 
 unsigned int resNameDefined (char *);
@@ -133,44 +133,44 @@ void initClusterInfo (struct clusterInfo *);
 void freeClusterInfo (struct clusterInfo *);
 void initHostInfo (struct hostInfo *);
 void freeHostInfo (struct hostInfo *);
-// static 
+// 
 void initResTable (void);
-// static 
+// 
 void putThreshold (int indx, struct hostEntry *hostEntryPtr, int position, char *val, float def);
 void liblsf_putThreshold ( unsigned int indx, struct hostInfo *host, long position, const char *val, float def);
 
 
-// static 
+// 
 int wgetClusAdmins (char *line, const char *lsfile,   size_t *lineNum, char *secName);
 int getClusAdmins  (char *line, const char *filename, size_t *lineNum, char *secName, int lookupAdmins);
-// static 
+// 
 struct admins *getAdmins_       (char *line, const char *fname, size_t *lineNum, const char *secName, int lookupAdmins);
 struct admins *liblsf_getAdmins (char *line, const char *fname, size_t *lineNum, const char *secName, int lookupAdmins);
 
-// static 
+// 
 int validWindow ( const char *wordpair, const char *context);
 
-// static 
+// 
 int setAdmins (struct admins *, int);
-// static 
+// 
 void freeKeyList (struct keymap *keyList);
-// static 
+// 
 int validType (char *type);
 int doResourceMap (FILE *fp, const char *lsfile, size_t *lineNum);
-// static 
+// 
 // int addResourceMap        ( const char *resName, const char *location, const char *lsfile, size_t lineNum, int *isDefault);
 int addResourceMap ( const char *resName, const char *location, const char *lsfile, size_t lineNum);
 
-// static 
+// 
 // unsigned int parseHostList          ( const char *hostList, const char *lsfile, const size_t lineNum, char ***hosts, int *isDefault); // was in lim.c had an extra var, not used anywhere else
 unsigned int liblsf_parseHostList   ( const char *hostList, const char *lsfile, const size_t lineNum, char ***hosts);
 //  was : 
-// static struct lsSharedResourceInfo *addResource (char *resName, int nHosts, char **hosts, char *value, char *fileName, size_t lineNum);
+// struct lsSharedResourceInfo *addResource (char *resName, int nHosts, char **hosts, char *value, char *fileName, size_t lineNum);
 // struct lsSharedResourceInfo *liblsf_addResource ( const char *resName, unsigned int nHosts, char **hosts, char *value, const char *fileName, size_t lineNum);
-// static 
+// 
 struct lsSharedResourceInfo *addResource ( const char *resName, unsigned long nHosts, char **hosts, char *value, const char *filename, size_t lineNum);
 int addHostInstance(struct lsSharedResourceInfo *sharedResource, unsigned long nHosts, char **hostNames, const char *value);
-// static 
+// 
 // int addHostInstance (struct sharedResource *sharedResource, unsigned int nHosts, char **hostNames, char *value, int resourceMap);
 char addHost (struct hostInfo *host, const char *filename, size_t *lineNum);
 
@@ -201,7 +201,7 @@ struct sharedConf *ls_readshared ( const char *filename);
 int initResTable_ (void);
 void initkeylist (struct keymap keyList[], unsigned int m, unsigned int n, struct lsInfo *info);
 int ls_getClusAdmins (char *line, const char *filename, size_t *lineNum, const char *secName, int lookupAdmins);
-struct clusterConf *ls_readcluster ( const char *filename, struct lsInfo *info);
+struct clusterConf *ls_readcluster ( const char *filename, struct lsInfo *info, bool_t ALWAYS_TRUE );
 unsigned int parseHostList (const char *hostList, const char *lsfile, const size_t lineNum, char ***hosts);
 char ls_addHostModel ( const char *model, const char *arch, double factor);
 char ls_addHostType (char *type);

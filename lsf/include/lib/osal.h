@@ -45,13 +45,6 @@
 #endif
 #define RECORD_LEN      128
 
-// typedef struct lsLimitT_
-static struct lsLimitT_
-{
-  int notAvail;
-} LS_LIMIT_T; 
-
-
 
 // FIXME FIXME FIXME these should go as variables
 #define CHLD_KEEP_STDIN_LS  (0x00000001)
@@ -138,6 +131,14 @@ static struct lsLimitT_
 #define PC_LSF_FMAPNAME	"!1j8Gp6o$(*7&$@"
 #define PC_LSF_FMAPSIZE	(4096)
 
+
+// typedef struct lsLimitT_
+struct lsLimitT_
+{
+  int notAvail;
+} LS_LIMIT_T; 
+
+
 ///typedef 
 struct lsProcStartT_
 {
@@ -175,7 +176,7 @@ struct lsProcessT_
 
 /// untypedef'ed
 //typedef 
-static struct lsfRusage LS_RUSAGE_T;
+struct lsfRusage LS_RUSAGE_T;
 
 typedef void (*LS_THREAD_FUNC_T) (void *);
 
@@ -195,19 +196,27 @@ struct lsThreadT_
 };
 // LS_THREAD_T;
 
-int procStart_ (char **, char **, int, struct lsProcStartT_ *, struct lsProcessT_ *);
-int procLsInit_ (int);
-int procWaitChld_ (int, LS_WAIT_T *, struct lsfRusage *, int); // LS_WAIT_T is defined in lsf.h
-int procSendSignal_ (int, int, int, int);
-int procManage_ (int);
-int procEnablePriv_ (int);
-int procGetRusage_ (int, struct jRusage *, int);
+
+/* osal.c */
+int   osInit_       ( void           );
+char *osPathName_   ( char *pathname );
+char *osHomeEnvVar_ ( void           );
+void  osConvertPath_( char *pathname );
+int   osProcAlive_  ( int pid        );
+
+// int procStart_ (char **, char **, int, struct lsProcStartT_ *, struct lsProcessT_ *);
+// int procLsInit_ (int);
+// int procWaitChld_ (int, LS_WAIT_T *, struct lsfRusage *, int); // LS_WAIT_T is defined in lsf.h
+// int procSendSignal_ (int, int, int, int);
+// int procManage_ (int);
+// int procEnablePriv_ (int);
+// int procGetRusage_ (int, struct jRusage *, int);
 
 
-int thrdStart_ (LS_THREAD_FUNC_T, void *, int, struct lsThrdStartT_ *, struct lsThreadT_ *); // LS_THREAD_FUNC_T is a typedef above
-int thrdWait_ (int, LS_WAIT_T *, int); // LS_WAIT_T is defined in lsf.h
+// int thrdStart_ (LS_THREAD_FUNC_T, void *, int, struct lsThrdStartT_ *, struct lsThreadT_ *); // LS_THREAD_FUNC_T is a typedef above
+// int thrdWait_ (int, LS_WAIT_T *, int); // LS_WAIT_T is defined in lsf.h
 
-int getProcPrioById_ (int, int *);
-int putProcPrioById_ (int, int *);
-int hdInherit_ (int * h);
-int hdNotInherit_ (int * h);
+// int getProcPrioById_ (int, int *);
+// int putProcPrioById_ (int, int *);
+// int hdInherit_ (int * h);
+// int hdNotInherit_ (int * h);

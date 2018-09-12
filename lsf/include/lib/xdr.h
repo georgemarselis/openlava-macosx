@@ -26,61 +26,61 @@
 
 // #include "daemons/daemonout.h"
 #include "lib/common_structs.h"
-// #include "lib/hdr.h"
+#include "lib/hdr.h"
 // #include "lsb/lsbatch.h"
 
-bool_t xdr_address       ( XDR *,     unsigned int * );
-bool_t xdr_array_string  ( XDR *xdrs, char **astring, unsigned int maxlen, unsigned int arraysize );
-bool_t xdr_controlReq    ( XDR *,     struct controlReq *,     struct LSFHeader *);
-bool_t xdr_debugReq      ( XDR *,     struct debugReq *,       struct LSFHeader *);
-bool_t xdr_groupInfoEnt  ( XDR *,     struct groupInfoEnt *,   struct LSFHeader *);
-bool_t xdr_groupInfoReply( XDR *,     struct groupInfoReply *, struct LSFHeader *);
-bool_t xdr_hostDataReply ( XDR *,     struct hostDataReply *,  struct LSFHeader *);
-bool_t xdr_hostInfoEnt   ( XDR *,     struct hostInfoEnt *,    struct LSFHeader *, unsigned int *);
-bool_t xdr_infoReq       ( XDR *,     struct infoReq *,        struct LSFHeader *);
-bool_t xdr_jgrpInfoReply ( XDR *xdrs, struct jobInfoReply * jobInfoReply, struct LSFHeader *hdr);
-bool_t xdr_jobAttrReq    ( XDR *,     struct jobAttrInfoEnt *, struct LSFHeader *);
-bool_t xdr_jobInfoEnt    ( XDR *, struct jobInfoEnt *,         struct LSFHeader *);
-bool_t xdr_jobInfoHead   ( XDR *, struct jobInfoHead *,   struct LSFHeader *);
-bool_t xdr_jobInfoReply  ( XDR *, struct jobInfoReply *,  struct LSFHeader *);
-bool_t xdr_jobInfoReq    ( XDR *, struct jobInfoReq *,    struct LSFHeader *);
-bool_t xdr_jobMoveReq    ( XDR *, struct jobMoveReq *,    struct LSFHeader *);
-bool_t xdr_jobPeekReply  ( XDR *, struct jobPeekReply *,  struct LSFHeader *);
-bool_t xdr_jobPeekReq    ( XDR *, struct jobPeekReq *,    struct LSFHeader *);
-bool_t xdr_jobSwitchReq  ( XDR *, struct jobSwitchReq *,  struct LSFHeader *);
-bool_t xdr_lenData       ( XDR *, struct lenData * );
-bool_t xdr_lsbMsg        ( XDR *, struct lsbMsg *,        struct LSFHeader *);
-bool_t xdr_lsbShareResourceInfoReply (XDR *, struct lsbShareResourceInfoReply *, struct LSFHeader *hdr);
-bool_t xdr_lsfLimit      ( XDR *, struct lsfLimit *, struct LSFHeader * );
-bool_t xdr_lsfRusage     ( XDR *, struct lsfRusage * );
-bool_t xdr_lvector       ( XDR *, float *, int );
-bool_t xdr_migReq        ( XDR *, struct migReq *,        struct LSFHeader *);
-bool_t xdr_modifyReq     ( XDR *, struct modifyReq *,     struct LSFHeader *);
-bool_t xdr_parameterInfo ( XDR *, struct parameterInfo *, struct LSFHeader *);
-bool_t xdr_portno        ( XDR *, unsigned short * );
-bool_t xdr_queueInfoEnt  ( XDR *xdrs, struct queueInfoEnt * qInfo, struct LSFHeader *hdr, unsigned int *nIdx);
-bool_t xdr_queueInfoReply( XDR *,     struct queueInfoReply *,     struct LSFHeader *);
-bool_t xdr_runJobReq     ( XDR *,     struct runJobRequest *,      struct LSFHeader *);
-bool_t xdr_signalReq     ( XDR *, struct signalReq *, struct LSFHeader *);
-// bool_t xdr_stringLen     ( XDR *, struct stringLen *, struct LSFHeader * );
-bool_t xdr_submitMbdReply( XDR *, struct submitMbdReply *,struct LSFHeader *);
-bool_t xdr_submitReq     ( XDR *xdrs, struct submitReq *submitReq, struct LSFHeader *hdr);
-bool_t xdr_time_t        ( XDR *, time_t *);
-bool_t xdr_userInfoEnt   ( XDR *, struct userInfoEnt *,   struct LSFHeader *);
-bool_t xdr_userInfoReply ( XDR *, struct userInfoReply *, struct LSFHeader *);
-bool_t xdr_var_string    ( XDR *, char ** );
-bool_t xdr_xFile         ( XDR *xdrs, struct xFile * xf, struct LSFHeader *hdr);
+bool_t xdr_array_string              ( XDR *xdrs, char   **astring,                                 unsigned int maxlen,      unsigned int arraysize );
+bool_t xdr_controlReq                ( XDR *xdrs, struct   controlReq                *,             struct LSFHeader *hdr     );
+bool_t xdr_debugReq                  ( XDR *xdrs, struct   debugReq                  *,             struct LSFHeader *hdr     );
+bool_t xdr_groupInfoEnt              ( XDR *xdrs, struct   groupInfoEnt              *,             struct LSFHeader *hdr     );
+bool_t xdr_groupInfoReply            ( XDR *xdrs, struct   groupInfoReply            *,             struct LSFHeader *hdr     );
+bool_t xdr_hostDataReply             ( XDR *xdrs, struct   hostDataReply             *,             struct LSFHeader *hdr     );
+bool_t xdr_hostInfoEnt               ( XDR *xdrs, struct   hostInfoEnt               *,             struct LSFHeader *,       unsigned int * );
+bool_t xdr_infoReq                   ( XDR *xdrs, struct   infoReq                   *,             struct LSFHeader *hdr     );
+bool_t xdr_jgrpInfoReply             ( XDR *xdrs, struct   jobInfoReply              *jobInfoReply, struct LSFHeader *hdr);
+bool_t xdr_jobAttrReq                ( XDR *xdrs, struct   jobAttrInfoEnt            *,             struct LSFHeader *hdr     );
+bool_t xdr_jobInfoEnt                ( XDR *xdrs, struct   jobInfoEnt                *,             struct LSFHeader *hdr     );
+bool_t xdr_jobInfoHead               ( XDR *xdrs, struct   jobInfoHead               *,             struct LSFHeader *hdr     );
+bool_t xdr_jobInfoReply              ( XDR *xdrs, struct   jobInfoReply              *,             struct LSFHeader *hdr     );
+bool_t xdr_jobInfoReq                ( XDR *xdrs, struct   jobInfoReq                *,             struct LSFHeader *hdr     );
+bool_t xdr_jobMoveReq                ( XDR *xdrs, struct   jobMoveReq                *,             struct LSFHeader *hdr     );
+bool_t xdr_jobPeekReply              ( XDR *xdrs, struct   jobPeekReply              *,             struct LSFHeader *hdr     );
+bool_t xdr_jobPeekReq                ( XDR *xdrs, struct   jobPeekReq                *,             struct LSFHeader *hdr     );
+bool_t xdr_jobSwitchReq              ( XDR *xdrs, struct   jobSwitchReq              *,             struct LSFHeader *hdr     );
+bool_t xdr_lsbMsg                    ( XDR *xdrs, struct   lsbMsg                    *,             struct LSFHeader *hdr     );
+bool_t xdr_lsbShareResourceInfoReply ( XDR *xdrs, struct   lsbShareResourceInfoReply *,             struct LSFHeader *hdr     );
+bool_t xdr_lsfLimit                  ( XDR *xdrs, struct   lsfLimit                  *,             struct LSFHeader *hdr     );
+bool_t xdr_migReq                    ( XDR *xdrs, struct   migReq                    *,             struct LSFHeader *hdr     );
+bool_t xdr_modifyReq                 ( XDR *xdrs, struct   modifyReq                 *,             struct LSFHeader *hdr     );
+bool_t xdr_parameterInfo             ( XDR *xdrs, struct   parameterInfo             *,             struct LSFHeader *hdr     );
+bool_t xdr_queueInfoEnt              ( XDR *xdrs, struct   queueInfoEnt              *qInfo,        struct LSFHeader *hdr,    unsigned int *nIdx );
+bool_t xdr_queueInfoReply            ( XDR *xdrs, struct   queueInfoReply            *,             struct LSFHeader *hdr     );
+bool_t xdr_runJobReq                 ( XDR *xdrs, struct   runJobRequest             *,             struct LSFHeader *hdr     );
+bool_t xdr_signalReq                 ( XDR *xdrs, struct   signalReq                 *,             struct LSFHeader *hdr     );
+bool_t xdr_submitMbdReply            ( XDR *xdrs, struct   submitMbdReply            *,             struct LSFHeader *hdr     );
+bool_t xdr_submitReq                 ( XDR *xdrs, struct   submitReq                 *submitReq,    struct LSFHeader *hdr     );
+bool_t xdr_userInfoEnt               ( XDR *xdrs, struct   userInfoEnt               *,             struct LSFHeader *hdr     );
+bool_t xdr_userInfoReply             ( XDR *xdrs, struct   userInfoReply             *,             struct LSFHeader *hdr     );
+bool_t xdr_xFile                     ( XDR *xdrs, struct   xFile                     *xf,           struct LSFHeader *hdr     );
+bool_t xdr_lenData                   ( XDR *xdrs, struct   lenData                   *              );
+bool_t xdr_lsfRusage                 ( XDR *xdrs, struct   lsfRusage                 *              );
+bool_t xdr_lvector                   ( XDR *xdrs, float   *, int                                      );
+bool_t xdr_portno                    ( XDR *xdrs, unsigned short  *                                   );
+bool_t xdr_time_t                    ( XDR *xdrs, time_t          *                                   );
+bool_t xdr_var_string                ( XDR *xdrs, char           **                                   );
+bool_t xdr_address                   ( XDR *xdrs, unsigned int    *                                   );
+
+// bool_t xdr_stringLen     ( XDR *xdrs, struct stringLen *, struct LSFHeader *hdr ));
+
+int lsbSharedResConfigured_ = FALSE;
 
 int getXdrStrlen         ( char * );
 
-static int lsbSharedResConfigured_ = FALSE;
-
-
 void encodeHdr ( pid_t *word1, size_t *word2, unsigned int *word3, unsigned int *word4, struct LSFHeader *header);
 // bool_t xdr_LSFHeader (XDR * xdrs, struct LSFHeader *header);
-// bool_t xdr_packLSFHeader (char *buf, struct LSFHeader * header);
+// bool_t xdr_packLSFHeader (char *buf, struct LSFHeader *hdr )header);
 // bool_t xdr_encodeMsg (XDR * xdrs, char *data, struct LSFHeader *hdr, bool_t (*xdr_func) (), int options, struct lsfAuth *auth);
-// bool_t xdr_arrayElement (XDR * xdrs, char *data, struct LSFHeader * hdr, bool_t (*xdr_func) (), ...);
+// bool_t xdr_arrayElement (XDR * xdrs, char *data, struct LSFHeader *hdr )hdr, bool_t (*xdr_func) (), ...);
 int readDecodeHdr_ (int s, char *buf, long (*readFunc) (), XDR * xdrs, struct LSFHeader *hdr);
 int readDecodeMsg_ (int s, char *buf, struct LSFHeader *hdr, long (*readFunc) (),  XDR * xdrs,  char *data, bool_t (*xdrFunc) (), struct lsfAuth *auth);
 int writeEncodeMsg_ (int s, char *buf, unsigned int len, struct LSFHeader *hdr, char *data, long (*writeFunc) (), bool_t (*xdrFunc) (), int options);

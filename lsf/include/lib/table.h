@@ -51,9 +51,9 @@ struct sTab __searchPtr__; \
 // #define RESETFACTOR     2
 // #define RESETLIMIT      1.5
 // #define DEFAULT_SLOTS   11
-static const unsigned int DEFAULT_SLOTS = 11;
-static const unsigned int RESETFACTOR   = 2;
-static const float        RESETLIMIT    = 1.500f;
+const unsigned int DEFAULT_SLOTS = 11;
+const unsigned int RESETFACTOR   = 2;
+const float        RESETLIMIT    = 1.500f;
 
 /* Double linked list addressed by each
  * hash table slot.
@@ -98,7 +98,7 @@ struct sTab
 
 typedef void (*HTAB_DATA_DESTROY_FUNC_T) (void *);
 
-// static unsigned long primes[] = {       // FIXME FIXME why the fuck are these primes here?
+// unsigned long primes[] = {       // FIXME FIXME why the fuck are these primes here?
 //                                         // and why the fuck don't we just generate them?
 //     101, 1009, 5009, 10007, 20011, 50021, 100003,
 //     200003, 500009, 1030637

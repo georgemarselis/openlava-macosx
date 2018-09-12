@@ -37,7 +37,7 @@
 	}*/
 
 
-static struct LSFAdmins
+struct LSFAdmins
 {
 	unsigned int numAdmins;
 	const char padding[4];
@@ -45,29 +45,29 @@ static struct LSFAdmins
 
 } LSFAdmins;
 
-char isanumber_(char *word);
-char islongint_(char *word);
-int isdigitstr_(char *string);
-long atoi64_(char *word);
-unsigned int isint_(const char *word);
-char *putstr_(const char *s);
-short getRefNum_(void);
-char *chDisplay_(char *disp);
-void strToLower_(char *name);
-char *getNextToken(char **sp);
-int getValPair(char **resReq, int *val1, int *val2);
-char *my_getopt(int nargc, char **nargv, char *ostr, char **errMsg);
-int putEnv(char *env, char *val);
-void initLSFHeader_(struct LSFHeader *hdr);
-void *myrealloc(void *ptr, size_t size);
-int Bind_(int sockfd, struct sockaddr *myaddr, socklen_t addrlen);
-char *getCmdPathName_(const char *cmdStr, size_t *cmdLen);
-int replace1stCmd_(const char *oldCmdArgs, const char *newCmdArgs, char *outCmdArgs, size_t outLen);
-char *getLowestDir_(const char *filePath);
-void getLSFAdmins_(void);
-bool_t isLSFAdmin_(const char *name);
-int ls_strcat(char *trustedBuffer, int bufferLength, const char *strToAdd);
-struct lsEventRec *ls_readeventrec(FILE *fp);
-int ls_writeeventrec(FILE *fp, struct lsEventRec *ev);
-int freeHostEntryLog(struct hostEntryLog **hPtr);
+char               isanumber_       (        char  *word   ); // FIXME FIXME FIXME FIXME FIXME replace with GNU library call
+char               islongint_       (        char  *word   ); // FIXME FIXME FIXME FIXME FIXME replace with GNU library call
+int                isdigitstr_      (        char  *string ); // FIXME FIXME FIXME FIXME FIXME replace with GNU library call
+long               atoi64_          (        char  *word   ); // FIXME FIXME FIXME FIXME FIXME replace with GNU library call
+unsigned int      isint_            ( const  char  *word   ); // FIXME FIXME FIXME FIXME FIXME replace with GNU library call
+char              *putstr_          ( const  char  *s      );
+short              getRefNum_       (        void             );
+char              *chDisplay_       (        char       *disp );
+void               strToLower_      (        char       *name );
+char              *getNextToken     (        char      **sp   );
+int                getValPair       (        char      **resReq,           int                *val1,              int  *val2 );
+char              *my_getopt        (        int         nargc,            char              **nargv,             char *ostr, char **errMsg);
+int                putEnv           (        char       *env,              char               *val);
+void               initLSFHeader_   (        struct LSFHeader  *hdr );
+void              *myrealloc        (        void       *ptr,              size_t              size );
+int                Bind_            (        int         sockfd,           struct   sockaddr  *myaddr,     socklen_t  addrlen);
+char              *getCmdPathName_  ( const  char       *cmdStr,           size_t             *cmdLen );
+int                replace1stCmd_   ( const  char       *oldCmdArgs, const char               *newCmdArgs,        char *outCmdArgs, size_t outLen );
+char              *getLowestDir_    ( const  char       *filePath);
+void               getLSFAdmins_    (        void );
+bool_t             isLSFAdmin_      ( const  char          *name);
+int                ls_strcat        (        char          *trustedBuffer, int                bufferLength, const char *strToAdd);
+struct lsEventRec *ls_readeventrec  (        FILE          *fp );
+int                ls_writeeventrec (        FILE          *fp,            struct lsEventRec *ev);
+int                freeHostEntryLog ( struct hostEntryLog **hPtr );
 

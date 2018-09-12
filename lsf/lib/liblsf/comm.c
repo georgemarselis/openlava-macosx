@@ -26,6 +26,7 @@
 #include "lib/lib.h"
 #include "lib/comm.h"
 #include "lib/rdwr.h"
+#include "lib/tid.h"
 
 
 static char amSlave_ = FALSE;

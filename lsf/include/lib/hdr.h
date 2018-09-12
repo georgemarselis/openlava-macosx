@@ -43,7 +43,7 @@ struct LSFHeader { // FIXME FIXME FIXME FIXME FIXME ensure compatibility with Pl
  * for protocol header.
  */
 // #define LSF_HEADER_LEN (sizeof(struct LSFHeader))
-static const unsigned int LSF_HEADER_LEN = sizeof( struct LSFHeader ) ;
+const unsigned int LSF_HEADER_LEN = sizeof( struct LSFHeader ) ;
 
 struct stringLen {
 	char *name;

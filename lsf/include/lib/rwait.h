@@ -7,7 +7,7 @@
 /* #define SIGEMT SIGBUS */
 // #define LS_CSO_ASYNC_NT       (0x0001)
 // #define LS_CSO_PRIVILEGE_PORT (0x0002)
-static enum LS_CSO {
+enum LS_CSO {
 	LS_CSO_ASYNC_NT       = 0x0001,
 	LS_CSO_PRIVILEGE_PORT = 0x0002
 } LS_CSO;

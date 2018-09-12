@@ -52,16 +52,16 @@ struct lsPidInfo
 
 // const unsigned int NL_SETN = 32;     // FIXME FIXME remove at earliest convience
 
-static pid_t npidList              = 0;
-static struct pidInfo *pidList     = NULL;
-static struct lsPidInfo *pinfoList = NULL;
-static unsigned int npinfoList     = 0;
-static pid_t npgidList             = 0;
-static pid_t *pgidList             = NULL;
-static unsigned int hitPGid        = 0;
-static char *pimInfoBuf            = NULL;
-static unsigned long pimInfoLen    = 0;
-static int argOptions              = 0;
+pid_t npidList              = 0;
+struct pidInfo *pidList     = NULL;
+struct lsPidInfo *pinfoList = NULL;
+unsigned int npinfoList     = 0;
+pid_t npgidList             = 0;
+pid_t *pgidList             = NULL;
+unsigned int hitPGid        = 0;
+char *pimInfoBuf            = NULL;
+unsigned long pimInfoLen    = 0;
+int argOptions              = 0;
 
 char *getNextString (char *, char *);
 char *readPIMBuf (char *);

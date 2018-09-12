@@ -92,7 +92,7 @@ enum bitState {
 	SET_BIT_ON
 };
 
-static const unsigned short SET_WORD_DEFAULT_EXTENT = 2;
+const unsigned short SET_WORD_DEFAULT_EXTENT = 2;
 
 // #define LS_SET_UNION      0
 // #define LS_SET_INTERSECT  1
@@ -105,7 +105,7 @@ enum LS_SET {
 	LS_SET_ASSIGN     = 5
 };
 
-static int bitseterrno;
+int bitseterrno;
 
 enum _lsBitSetErrno_ {
 /*#    include "lsbitseterr.def" */

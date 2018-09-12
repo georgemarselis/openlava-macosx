@@ -205,7 +205,7 @@ findMyCluster ( const char *CName, struct sharedConf *mySharedConf)
     ls_strcat (lsfClusterFile, sizeof (lsfClusterFile), "/lsf.cluster.");  // FIXME FIXME FIXME FIXME FIXME
     ls_strcat (lsfClusterFile, sizeof (lsfClusterFile), CName);
 
-    cl = ls_readcluster (lsfClusterFile, mySharedConf->lsinfo);
+    cl = ls_readcluster (lsfClusterFile, mySharedConf->lsinfo, TRUE );
     if (cl == NULL) {
         if (logclass & LC_TRACE) {
             ls_syslog (LOG_DEBUG, "ls_readcluster <%s> failed: %M", lsfClusterFile);
