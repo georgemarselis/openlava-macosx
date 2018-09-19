@@ -1438,6 +1438,19 @@ struct admins *liblsf_getAdmins (char *line, const char *filename, size_t *lineN
 	return &admins;
 }
 
+
+/***************************************************************************************
+ * int ls_setAdmins (struct admins *admins, int mOrA)
+ *
+ * INPUT ; struct admins, int mOrA
+ * OUTPUT:
+ *
+ * WHAT DOES THIS FUNCTION DO:
+ * 		grab the already existing admins from memory.
+ *		If new admins are registerd in the configuration files, reconstruct the admins from scratch
+ * 		n order to add/delete entries instead of proper insertion/deletion from a hash.
+ * 
+ */
 int
 ls_setAdmins (struct admins *admins, int mOrA)
 {
@@ -1447,17 +1460,14 @@ ls_setAdmins (struct admins *admins, int mOrA)
 	uid_t *workAdminIds   = NULL;
 	char **tempAdminNames = NULL;
 	char **workAdminNames = NULL;
+
+	const char **tempNames = NULL;
+
 	const char mallocString[]   = "malloc";
 
 	tempNAdmins = admins->nAdmins + clinfo.nAdmins; // include/lib/conf.h: struct clusterInfo clinfo;
-	if( tempNAdmins ) {
-		tempAdminIds   =  malloc ( tempNAdmins * sizeof ( tempAdminIds ) );
-		tempAdminNames =  malloc ( tempNAdmins * sizeof ( *tempAdminNames ) + 1 ); // FIXME FIXME FIXME FIXME FIXME certain malloc failure
-	}
-	else {
-		tempAdminIds = NULL;
-		tempAdminNames = NULL;
-	}
+	tempAdminIds   =  malloc ( tempNAdmins * sizeof ( tempAdminIds ) );
+	tempAdminNames =  malloc ( tempNAdmins * sizeof ( *tempAdminNames ) + 1 ); // FIXME FIXME FIXME FIXME FIXME check if this malloc allocation is correct
 
 	if (!tempAdminIds || !tempAdminNames) {
 		ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, mallocString);
@@ -1467,13 +1477,13 @@ ls_setAdmins (struct admins *admins, int mOrA)
 	}
 
 	if (mOrA == M_THEN_A) { // if true, use the command-line provided info
-		workNAdmins = clinfo.nAdmins;
-		workAdminIds = clinfo.adminIds;
+		workNAdmins    = clinfo.nAdmins;
+		workAdminIds   = clinfo.adminIds;
 		workAdminNames = clinfo.admins;
 	}
 	else { // otherwise, use what is in memory
-		workNAdmins = admins->nAdmins;
-		workAdminIds = admins->adminIds;
+		workNAdmins    = admins->nAdmins;
+		workAdminIds   = admins->adminIds;
 		workAdminNames = admins->adminNames; // FIXME FIXME FIXME FIXME this needs verification
 	}
 
@@ -1496,19 +1506,36 @@ ls_setAdmins (struct admins *admins, int mOrA)
 
 	tempNAdmins = workNAdmins;
 	if (mOrA == M_THEN_A) {
-		workNAdmins = admins->nAdmins;
-		workAdminIds = admins->adminIds;
+		workNAdmins    = admins->nAdmins;
+		workAdminIds   = admins->adminIds;
 		workAdminNames = admins->adminNames;
 	}
 	else if (mOrA == A_THEN_M) {
-		workNAdmins = clinfo.nAdmins;
-		workAdminIds = clinfo.adminIds;
+		workNAdmins    = clinfo.nAdmins;
+		workAdminIds   = clinfo.adminIds;
 		workAdminNames = clinfo.admins;
 	}
 	else {
 		workNAdmins = 0;
 	}
 
+
+	// uid_t workNAdmins     = 0;
+	// uid_t tempNAdmins     = 0;
+	// uid_t *tempAdminIds   = NULL;
+	// uid_t *workAdminIds   = NULL;
+	// char **tempAdminNames = NULL;
+	// char **workAdminNames = NULL;
+
+	// const char **tempNames = NULL;
+	// create the const array require to pass to isInlist()
+		// one at a time, linear, not everything at once.
+		// copy tempAdminNames to new **array
+		// copy workAdminNames to new **array
+		// copy tempNAdmins    to new int
+	for (unsigned i = 0; i < workNAdmins; i++) {
+
+	}
 
 	for (unsigned i = 0; i < workNAdmins; i++) {
 
@@ -1538,6 +1565,9 @@ ls_setAdmins (struct admins *admins, int mOrA)
 
 		FREEUP (clinfo.adminIds);
 		FREEUP (clinfo.admins);
+	}
+	else {
+		ls_syslog (LOG_ERR, "%s: clinfo.nAdmins: value is not greater than zero! (%d)\n", __func__, cliinfo.nAdmins);
 	}
 
 	clinfo.nAdmins = tempNAdmins;

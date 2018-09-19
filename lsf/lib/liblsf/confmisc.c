@@ -398,6 +398,13 @@ mapValues (struct keymap *keyList, char *line) // FIXME FIXME should char *line 
 // int putInLists (char *word, struct admins *admins, unsigned int *numAds, const char *forWhat)
 // 			used to live here. moved to lsf/lib/liblsf/putInLists.c
 
+/********************************************************************************************
+ *
+ * int isInlist ( const char **adminNames, const char *userName, unsigned int actAds)
+ *
+ * INPUT : list of admin names, username strings, max size of admin names array
+ * OUTPUT: TRUE/FALSE, depending if userName is in adminNames 
+ */
 int
 isInlist ( const char **adminNames, const char *userName, unsigned int actAds)
 {
