@@ -5959,7 +5959,16 @@ putIntoList (char **list, unsigned int *len, const char *string, const char *lis
 	return *list;
 }
 
-
+/***************************************************************************************
+ *int isInList ( const char *list, const char *string)
+ *
+ * INPUT ; const char *list, const char *string
+ * OUTPUT: TRUE/FALSE
+ *
+ * WHAT DOES THIS FUNCTION DO:
+ * 	Compares the two input strings for equality
+ * 
+ */
 int
 isInList ( const char *list, const char *string)
 {

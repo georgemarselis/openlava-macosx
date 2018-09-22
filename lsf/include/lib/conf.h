@@ -95,8 +95,8 @@ struct HostsArray
 };
 
 struct keymap {
-    unsigned int position;
-    char padding1[4];
+    size_t position;
+    char padding[8];
     const char *key;
     char *val;
 };
@@ -181,13 +181,13 @@ int resolveBaseNegHosts ( const char *inHosts, char **outHosts, struct HostsArra
 void freeSA_ (char **list, unsigned int num);
 
 int putValue (struct keymap *keyList, const char *key, char *value);
-int isInlist ( char **adminNames, char *userName, unsigned int actAds); // FIXME FIXME revisit and see if we can turn the char*s into const
-char *getNextValue (char **line);
-int keyMatch (struct keymap *keyList, const char *line, int exact);
-int isSectionEnd (char *linep, const char *lsfile, size_t *lineNum, const char *sectionName);
-char *getBeginLine (FILE *fp, size_t *lineNum);
-int readHvalues (struct keymap *keyList, char *linep, FILE *fp, const char *lsfile, size_t *lineNum, int exact, const char *section);
-int mapValues (struct keymap *keyList, char *line);
+// int isInlist ( char **adminNames, char *userName, unsigned int actAds); // FIXME FIXME revisit and see if we can turn the char*s into const
+// char *getNextValue (char **line);
+// int keyMatch (struct keymap *keyList, const char *line, int exact);
+// int isSectionEnd (char *linep, const char *lsfile, size_t *lineNum, const char *sectionName);
+// char *getBeginLine (FILE *fp, size_t *lineNum);
+// int readHvalues (struct keymap *keyList, char *linep, FILE *fp, const char *lsfile, size_t *lineNum, int exact, const char *section);
+// int mapValues (struct keymap *keyList, char *line);
 // FIXME also found in lproto.h, should be in lib/conf.h
 // int putInLists (char *word, struct admins *admins, unsigned integer *numAds, char *forWhat);
 int parse_time ( const char *word, float *hour, unsigned int *day);
