@@ -4,6 +4,6 @@
 
 struct config_param
 {
-	const char *paramName;
+	char *paramName;
 	char *paramValue;
 };

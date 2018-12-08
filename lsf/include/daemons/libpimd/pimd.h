@@ -21,6 +21,8 @@
 #include <limits.h>
 #include <time.h>
 
+#include "struct-config_param.h"
+
 enum lsPStatType
 {
 	LS_PSTAT_RUNNING,
@@ -52,24 +54,64 @@ struct lsPidInfo
 
 // const unsigned int NL_SETN = 32;     // FIXME FIXME remove at earliest convience
 
-pid_t npidList              = 0;
-struct pidInfo *pidList     = NULL;
-struct lsPidInfo *pinfoList = NULL;
-unsigned int npinfoList     = 0;
-pid_t npgidList             = 0;
-pid_t *pgidList             = NULL;
-unsigned int hitPGid        = 0;
-char *pimInfoBuf            = NULL;
-unsigned long pimInfoLen    = 0;
-int argOptions              = 0;
+const struct config_param pimParams[ ] = {
+	{ "LSF_DEBUG_PIM",           NULL },
+	{ "LSF_LIM_DEBUG",           NULL },
+	{ "LSF_LOGDIR",              NULL },
+	{ "LSF_LOG_MASK",            NULL },
+	{ "LSF_PIM_INFODIR",         NULL },
+	{ "LSF_PIM_NPROC",           NULL },
+	{ "LSF_PIM_SLEEPTIME",       NULL },
+	{ "LSF_PIM_TRACE",           NULL },
+	{ "LSF_PIM_UPDATE_INTERVAL", NULL },
+	{ "LSF_TIME_PIM",            NULL },
+	{  NULL,                     NULL }
+};
 
-char *getNextString (char *, char *);
-char *readPIMBuf (char *);
-FILE *openPIMFile (char *pfile);
-int inAddPList (struct lsPidInfo *pinfo);
-int intoPidList (struct lsPidInfo *pinfo);
-int pimPort (struct sockaddr_in *, char *);
-int readPIMFile (char *);
-struct jRusage *getJInfo_ (int npgid, int *pgid, unsigned short options, gid_t cpgid);
-struct jRusage *readPIMInfo (int, int *);
+enum
+{
+	LSF_LIM_DEBUG,
+	LSF_LOGDIR,
+	LSF_DEBUG_PIM,
+	LSF_LOG_MASK,
+	LSF_TIME_PIM,
+	LSF_PIM_SLEEPTIME,
+	LSF_PIM_INFODIR,
+	LSF_PIM_NPROC,
+	LSF_PIM_TRACE,
+	LSF_PIM_UPDATE_INTERVAL,
+	LSF_PIM_NULL
+} pimStatus;
 
+
+int      gothup;
+char     *pimInfoBuf =                    NULL;
+int       argOptions =                    0;
+int       numprocs   =                    0;
+pid_t    *pgidList   =                    NULL;
+pid_t     npgidList  =                    0;
+pid_t     npidList   =                    0;
+unsigned int         hitPGid             = 0;
+unsigned int         npinfoList          = 0;
+unsigned long        pimInfoLen          = 0;
+unsigned short      *pimPortNo           = NULL;
+struct   lsPidInfo  *pinfoList           = NULL;
+struct   pidInfo    *pidList             = NULL;
+struct   lsPidInfo   pbase[MAX_PROC_ENT];  // FIXME FIXME FIXME FIXME MAX_PROC_ENT, 
+                                           // what is it depended on? 
+                                           // Can this declaration be turned into a pointer?
+
+int pim_debug = 0;
+int sleepTime = PIM_SLEEP_TIME;
+int updInterval = PIM_UPDATE_INTERVAL;
+
+
+/*   pim.c  */
+int  doServ         ( void   );
+void logProcessInfo ( void   );
+int  scan_procs     ( void   );
+void hup            ( int    sig    );
+void usage          ( const  char   *cmd         );
+void updateProcs    ( const  time_t  lastUpdate );
+int  ls_pidinfo     ( int     pid,   struct lsPidInfo *rec   );
+int  parse_stat     ( char   *buf,   struct lsPidInfo *pinfo );
