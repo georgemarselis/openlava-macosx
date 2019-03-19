@@ -1,0 +1,4 @@
+utoreconf: running: /usr/bin/autoconf --force --warnings=all
+configure.ac:100: warning: AC_FUNC_WAIT3: `wait3' has been removed from POSIX.
+configure.ac:100: Remove this `AC_FUNC_WAIT3' and adjust your code to use `waitpid' instead.
+../../lib/autoconf/functions.m4:1975: AC_FUNC_WAIT3 is expanded from...
