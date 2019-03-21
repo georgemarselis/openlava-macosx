@@ -184,7 +184,7 @@ sendNotification (struct jobCard *jobCardPtr) // FIXME FIXME FIXME replace sendi
 void
 getJobTmpDir (char *tmpDirName, struct jobCard *jPtr)
 {
-	char jobId[16];
+	char jobId[16]; // FIXME FIXME FIXME FIXME  FIXME
 
 	memset( jobId, '\0', 16 );
 

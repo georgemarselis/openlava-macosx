@@ -54,7 +54,7 @@ struct lsPidInfo
 
 // const unsigned int NL_SETN = 32;     // FIXME FIXME remove at earliest convience
 
-const struct config_param pimParams[ ] = {
+struct config_param pimParams[ ] = {
 	{ "LSF_DEBUG_PIM",           NULL },
 	{ "LSF_LIM_DEBUG",           NULL },
 	{ "LSF_LOGDIR",              NULL },

@@ -388,11 +388,13 @@ struct niosStatus
 /*********************************************/
 
 int rexecPriority;
-int client_cnt;
 struct child **children;
-int child_cnt;
-char *Myhost;
-char *myHostType;
+// int  child_cnt    = 0;
+// int  client_cnt   = 0;
+unsigned int  child_cnt    = 0;
+unsigned int  client_cnt   = 0;
+char  *Myhost     = NULL;
+char  *myHostType = NULL;
 
 int lastChildExitStatus;
 
@@ -425,10 +427,6 @@ int  rexecPriority = 0;
 
 struct  client *clients[MAXCLIENTS_HIGHWATER_MARK + 1];
 
-int  child_cnt    = 0;
-int  client_cnt   = 0;
-char  *Myhost     = NULL;
-char  *myHostType = NULL;
 
 // taggedConn_t 
 struct  taggedConn conn2NIOS;
