@@ -144,19 +144,19 @@ void cleanUpKeptPids(void);
 
 
 
-#define SET_RLIMIT(rlim, limit,loglevel)                                \
-    if (setrlimit(rlim, &limit) < 0 && getuid() == 0) {                 \
-        if (loglevel == LOG_INFO && errno == EINVAL) {                  \
-            ls_syslog(loglevel,_i18n_msg_get(ls_catd , NL_SETN, 5299,   \
-                                             "setrlimit(Resource Limit %d) failed: %m: soft %f hard %f , may be larger than the kernel allowed limit\n"), \
-                      rlim, (double)limit.rlim_cur, (double)limit.rlim_max); \
-        }else{                                                          \
-            ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 5100,   \
-                                             "setrlimit(Resouce Limit %d) failed: %m: soft %f hard %f infi=%f\n"), \
-                      rlim, (double) limit.rlim_cur,                    \
-                      (double) limit.rlim_max, (double) RLIM_INFINITY); \
-        }                                                               \
-    }               /* catgets 5100 */
+// #define SET_RLIMIT(rlim, limit,loglevel)                                \
+//     if (setrlimit(rlim, &limit) < 0 && getuid() == 0) {                 \
+//         if (loglevel == LOG_INFO && errno == EINVAL) {                  \
+//             ls_syslog(loglevel,_i18n_msg_get(ls_catd , NL_SETN, 5299,   \
+//                                              "setrlimit(Resource Limit %d) failed: %m: soft %f hard %f , may be larger than the kernel allowed limit\n"), \
+//                       rlim, (double)limit.rlim_cur, (double)limit.rlim_max); \
+//         }else{                                                          \
+//             ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 5100,   \
+//                                              "setrlimit(Resouce Limit %d) failed: %m: soft %f hard %f infi=%f\n"), \
+//                       rlim, (double) limit.rlim_cur,                    \
+//                       (double) limit.rlim_max, (double) RLIM_INFINITY); \
+//         }                                                               \
+//     }               /* catgets 5100 */
 
 
 // #define PAIRSOCKET_TIMEOUT      30

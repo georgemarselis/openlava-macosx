@@ -29,6 +29,7 @@
 #include <sys/signal.h>
 #include <sys/stat.h>
 #include <sys/time.h>
+#include <sys/resource.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -3795,7 +3796,7 @@ child_handler_ext (void)
     LS_WAIT_T status;
     struct rusage ru;
 
-    memset ((char *) &ru, 0, sizeof (ru));
+    memset ((char *) &ru, '\0', sizeof (ru));
 
     if (debug > 1) {
         fputs ("SIGCHLD: child_handler_ext\n", stdout);
@@ -3817,7 +3818,19 @@ child_handler_ext (void)
  *  with appropriate brackets 
  */
 
-    while ((pid = wait3 (&status, wait_flags, &ru)) > 0) {
+    while( ( pid = waitpid( -1, &status, wait_flags ) ) > 0) { // WAS: while ((pid = wait3 (&status, wait_flags, &ru)) > 0) {
+
+        if( -1 == getrusage( RUSAGE_CHILDREN , &ru ) ) {
+            if( EFAULT == errno ) {
+                ls_syslog( LOG_ERR, "Cannot get resource usage for children of pid %d: usage points outside the accessible address space.", pid );
+                fprintf( STDERR, "Cannot get resource usage for children of pid %d: usage points outside the accessible address space.", pid );
+            } else {
+                ls_syslog( LOG_ERR, "Cannot get resource usage for children of pid %d: 'who' for getrusage() is invalid.", pid );
+                fprintf( STDERR, "Cannot get resource usage for children of pid %d: ide the accessible address space.", pid );
+            }
+            exit( 127 );
+        }
+
         if (logclass & LC_TRACE) {
             ls_syslog (LOG_DEBUG, "%s: pid=<%d> status=<%x> exitcode=<%d> stopped=<%d> signaled=<%d> coredumped=<%d> exited=<%d>", __func__, pid, LS_STATUS (status), WEXITSTATUS (status), WIFSTOPPED (status), WIFSIGNALED (status), WCOREDUMP (status), WIFEXITED (status));
         }
@@ -3841,7 +3854,6 @@ child_handler_ext (void)
             else
                 printf ("child exit(%d)\n", WEXITSTATUS (status));
         }
-
         
         for (i = 0; i < child_cnt && children[i]->pid != pid;) {
             i++;
@@ -3850,7 +3862,6 @@ child_handler_ext (void)
         if (i == child_cnt) {
             continue;
         }
-                    
 
         children[i]->wait = status;
         if (WIFSTOPPED (status)) {
@@ -4547,7 +4558,19 @@ mysetlimits (struct lsfLimit *lsfLimits)
             rlimit.rlim_max = RLIM_INFINITY;
         }
     }
-    SET_RLIMIT (RLIMIT_CPU, rlimit, LOG_ERR);
+    // SET_RLIMIT (RLIMIT_CPU, rlimit, LOG_ERR);
+    // #define SET_RLIMIT(RLIMIT_CPU, rlimit, loglevel)
+    if( setrlimit( RLIMIT_CPU, &rlimit ) < 0 && getuid() == 0 ) {
+        if (LOG_ERR == LOG_INFO && errno == EINVAL) {
+            /* catgets 5299 */
+            ls_syslog( LOG_ERR ,_i18n_msg_get(ls_catd , NL_SETN, 5299, "setrlimit(Resource Limit %d) failed: %m: soft %f hard %f , may be larger than the kernel allowed limit\n"), RLIMIT_CPU, (double)rlimit.rlim_cur, (double)rlimit.rlim_max);
+        }
+        else {
+            /* catgets 5100 */
+            ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 5100, "setrlimit(Resouce Limit %d) failed: %m: soft %f hard %f infi=%f\n"), RLIMIT_CPU, (double) rlimit.rlim_cur, (double) rlimit.rlim_max, (double) RLIM_INFINITY);
+        }                                                               \
+    }
+
     ls_syslog (LOG_DEBUG, "CPU limit, max=%d, min=%d", rlimit.rlim_max, rlimit.rlim_cur);
 #endif
 
@@ -4558,7 +4581,18 @@ mysetlimits (struct lsfLimit *lsfLimits)
             rlimit.rlim_max = RLIM_INFINITY;
         }
     }
-    SET_RLIMIT (RLIMIT_FSIZE, rlimit, LOG_ERR);
+    // SET_RLIMIT (RLIMIT_FSIZE, rlimit, LOG_ERR);
+    if( setrlimit( RLIMIT_FSIZE, &rlimit ) < 0 && getuid() == 0 ) {
+        if (LOG_ERR == LOG_INFO && errno == EINVAL) {
+            /* catgets 5299 */
+            ls_syslog( LOG_ERR ,_i18n_msg_get(ls_catd , NL_SETN, 5299, "setrlimit(Resource Limit %d) failed: %m: soft %f hard %f , may be larger than the kernel allowed limit\n"), RLIMIT_FSIZE, (double)rlimit.rlim_cur, (double)rlimit.rlim_max);
+        }
+        else {
+            /* catgets 5100 */
+            ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 5100, "setrlimit(Resouce Limit %d) failed: %m: soft %f hard %f infi=%f\n"), RLIMIT_FSIZE, (double) rlimit.rlim_cur, (double) rlimit.rlim_max, (double) RLIM_INFINITY);
+        }                                                               \
+    }
+
 #endif
 
 #ifdef  RLIMIT_DATA // FIXME FIXME FIXME FIXME FIXME add -DRLIMIT_DATA in compile/config
@@ -4568,8 +4602,17 @@ mysetlimits (struct lsfLimit *lsfLimits)
             rlimit.rlim_max = RLIM_INFINITY;
         }
     }
-
-    SET_RLIMIT (RLIMIT_DATA, rlimit, LOG_ERR);
+    // SET_RLIMIT (RLIMIT_DATA, rlimit, LOG_ERR);
+    if( setrlimit( RLIMIT_DATA, &rlimit ) < 0 && getuid() == 0 ) {
+        if (LOG_ERR == LOG_INFO && errno == EINVAL) {
+            /* catgets 5299 */
+            ls_syslog( LOG_ERR ,_i18n_msg_get(ls_catd , NL_SETN, 5299, "setrlimit(Resource Limit %d) failed: %m: soft %f hard %f , may be larger than the kernel allowed limit\n"), RLIMIT_DATA, (double)rlimit.rlim_cur, (double)rlimit.rlim_max);
+        }
+        else {
+            /* catgets 5100 */
+            ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 5100, "setrlimit(Resouce Limit %d) failed: %m: soft %f hard %f infi=%f\n"), RLIMIT_DATA, (double) rlimit.rlim_cur, (double) rlimit.rlim_max, (double) RLIM_INFINITY);
+        }                                                               \
+    }    
 #endif
 
 #ifdef  RLIMIT_STACK // FIXME FIXME FIXME FIXME FIXME add -DRLIMIT_STACK in compile/config
@@ -4579,8 +4622,17 @@ mysetlimits (struct lsfLimit *lsfLimits)
             rlimit.rlim_max = RLIM_INFINITY;
         }
     }
-
-    SET_RLIMIT (RLIMIT_STACK, rlimit, LOG_ERR);
+    // SET_RLIMIT (RLIMIT_STACK, rlimit, LOG_ERR);
+    if( setrlimit( RLIMIT_STACK, &rlimit ) < 0 && getuid() == 0 ) {
+        if (LOG_ERR == LOG_INFO && errno == EINVAL) {
+            /* catgets 5299 */
+            ls_syslog( LOG_ERR ,_i18n_msg_get(ls_catd , NL_SETN, 5299, "setrlimit(Resource Limit %d) failed: %m: soft %f hard %f , may be larger than the kernel allowed limit\n"), RLIMIT_STACK, (double)rlimit.rlim_cur, (double)rlimit.rlim_max);
+        }
+        else {
+            /* catgets 5100 */
+            ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 5100, "setrlimit(Resouce Limit %d) failed: %m: soft %f hard %f infi=%f\n"), RLIMIT_STACK, (double) rlimit.rlim_cur, (double) rlimit.rlim_max, (double) RLIM_INFINITY);
+        }                                                               \
+    }    
 #endif
 
 #ifdef  RLIMIT_CORE // FIXME FIXME FIXME FIXME FIXME add -DRLIMIT_CORE in compile/config
@@ -4591,21 +4643,61 @@ mysetlimits (struct lsfLimit *lsfLimits)
         }
     }
     SET_RLIMIT (RLIMIT_CORE, rlimit, LOG_ERR);
+    if( setrlimit( RLIMIT_STACK, &rlimit ) < 0 && getuid() == 0 ) {
+        if (LOG_ERR == LOG_INFO && errno == EINVAL) {
+            /* catgets 5299 */
+            ls_syslog( LOG_ERR ,_i18n_msg_get(ls_catd , NL_SETN, 5299, "setrlimit(Resource Limit %d) failed: %m: soft %f hard %f , may be larger than the kernel allowed limit\n"), RLIMIT_STACK, (double)rlimit.rlim_cur, (double)rlimit.rlim_max);
+        }
+        else {
+            /* catgets 5100 */
+            ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 5100, "setrlimit(Resouce Limit %d) failed: %m: soft %f hard %f infi=%f\n"), RLIMIT_STACK, (double) rlimit.rlim_cur, (double) rlimit.rlim_max, (double) RLIM_INFINITY);
+        }                                                               \
+    }  
 #endif
 
 #ifdef  RLIMIT_RSS // FIXME FIXME FIXME FIXME FIXME add -DRLIMIT_RSS in compile/config
     rlimitDecode_ (&lsfLimits[LSF_RLIMIT_RSS], &rlimit, LSF_RLIMIT_RSS);
-    SET_RLIMIT (RLIMIT_RSS, rlimit, LOG_ERR);
+    // SET_RLIMIT (RLIMIT_RSS, rlimit, LOG_ERR);
+    if( setrlimit( RLIMIT_RSS, &rlimit ) < 0 && getuid() == 0 ) {
+        if (LOG_ERR == LOG_INFO && errno == EINVAL) {
+            /* catgets 5299 */
+            ls_syslog( LOG_ERR ,_i18n_msg_get(ls_catd , NL_SETN, 5299, "setrlimit(Resource Limit %d) failed: %m: soft %f hard %f , may be larger than the kernel allowed limit\n"), RLIMIT_RSS, (double)rlimit.rlim_cur, (double)rlimit.rlim_max);
+        }
+        else {
+            /* catgets 5100 */
+            ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 5100, "setrlimit(Resouce Limit %d) failed: %m: soft %f hard %f infi=%f\n"), RLIMIT_RSS, (double) rlimit.rlim_cur, (double) rlimit.rlim_max, (double) RLIM_INFINITY);
+        }                                                               \
+    }  
 #endif
 
 #ifdef  RLIMIT_NOFILE // FIXME FIXME FIXME FIXME FIXME add -DRLIMIT_NOFILE in compile/config
     rlimitDecode_ (&lsfLimits[LSF_RLIMIT_NOFILE], &rlimit, LSF_RLIMIT_NOFILE);
-    SET_RLIMIT (RLIMIT_NOFILE, rlimit, LOG_ERR);
+    // SET_RLIMIT (RLIMIT_NOFILE, rlimit, LOG_ERR);
+    if( setrlimit( RLIMIT_NOFILE, &rlimit ) < 0 && getuid() == 0 ) {
+        if (LOG_ERR == LOG_INFO && errno == EINVAL) {
+            /* catgets 5299 */
+            ls_syslog( LOG_ERR ,_i18n_msg_get(ls_catd , NL_SETN, 5299, "setrlimit(Resource Limit %d) failed: %m: soft %f hard %f , may be larger than the kernel allowed limit\n"), RLIMIT_NOFILE, (double)rlimit.rlim_cur, (double)rlimit.rlim_max);
+        }
+        else {
+            /* catgets 5100 */
+            ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 5100, "setrlimit(Resouce Limit %d) failed: %m: soft %f hard %f infi=%f\n"), RLIMIT_NOFILE, (double) rlimit.rlim_cur, (double) rlimit.rlim_max, (double) RLIM_INFINITY);
+        }                                                               \
+    }  
 #endif
 
 #ifdef RLIMIT_OPEN_MAX // FIXME FIXME FIXME FIXME FIXME add -DRLIMIT_OPEN_MAX in compile/config
     rlimitDecode_ (&lsfLimits[LSF_RLIMIT_OPEN_MAX], &rlimit, LSF_RLIMIT_OPEN_MAX);
-    SET_RLIMIT (RLIMIT_OPEN_MAX, rlimit, LOG_ERR);
+    // SET_RLIMIT (RLIMIT_OPEN_MAX, rlimit, LOG_ERR);
+    if( setrlimit( RLIMIT_OPEN_MAX, &rlimit ) < 0 && getuid() == 0 ) {
+        if (LOG_ERR == LOG_INFO && errno == EINVAL) {
+            /* catgets 5299 */
+            ls_syslog( LOG_ERR ,_i18n_msg_get(ls_catd , NL_SETN, 5299, "setrlimit(Resource Limit %d) failed: %m: soft %f hard %f , may be larger than the kernel allowed limit\n"), RLIMIT_OPEN_MAX, (double)rlimit.rlim_cur, (double)rlimit.rlim_max);
+        }
+        else {
+            /* catgets 5100 */
+            ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 5100, "setrlimit(Resouce Limit %d) failed: %m: soft %f hard %f infi=%f\n"), RLIMIT_OPEN_MAX, (double) rlimit.rlim_cur, (double) rlimit.rlim_max, (double) RLIM_INFINITY);
+        }                                                               \
+    }  
 #endif
 
 #ifdef RLIMIT_VMEM // FIXME FIXME FIXME FIXME FIXME add -DRLIMIT_VMEM in compile/config
@@ -4615,7 +4707,17 @@ mysetlimits (struct lsfLimit *lsfLimits)
             rlimit.rlim_max = RLIM_INFINITY;
         }
     }
-    SET_RLIMIT (RLIMIT_VMEM, rlimit, LOG_ERR);
+    // SET_RLIMIT (RLIMIT_VMEM, rlimit, LOG_ERR);
+    if( setrlimit( RLIMIT_VMEM, &rlimit ) < 0 && getuid() == 0 ) {
+        if (LOG_ERR == LOG_INFO && errno == EINVAL) {
+            /* catgets 5299 */
+            ls_syslog( LOG_ERR ,_i18n_msg_get(ls_catd , NL_SETN, 5299, "setrlimit(Resource Limit %d) failed: %m: soft %f hard %f , may be larger than the kernel allowed limit\n"), RLIMIT_VMEM, (double)rlimit.rlim_cur, (double)rlimit.rlim_max);
+        }
+        else {
+            /* catgets 5100 */
+            ls_syslog(LOG_ERR, _i18n_msg_get(ls_catd , NL_SETN, 5100, "setrlimit(Resouce Limit %d) failed: %m: soft %f hard %f infi=%f\n"), RLIMIT_VMEM, (double) rlimit.rlim_cur, (double) rlimit.rlim_max, (double) RLIM_INFINITY);
+        }                                                               \
+    }
 #endif
 
     return;

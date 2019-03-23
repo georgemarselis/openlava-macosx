@@ -17,6 +17,7 @@
  */
 
 #include <stdlib.h>
+#include <sys/resource.h>
 
 #include "sbd.h"
 #include "lib/lsi18n.h"
@@ -65,11 +66,11 @@ milliSleep (int msec)
 char
 window_ok (struct jobCard *jobPtr)
 {
-    windows_t *wp;
-    struct dayhour dayhour;
     char active;
     time_t ckTime;
     time_t now;
+    windows_t *wp = NULL;
+    struct dayhour dayhour;
 
     now = time (0);
     active = jobPtr->active;
@@ -86,8 +87,7 @@ window_ok (struct jobCard *jobPtr)
     }
 
     getDayHour (&dayhour, ckTime);
-    if (jobPtr->week[dayhour.day] == NULL)
-    {
+    if (jobPtr->week[dayhour.day] == NULL) {
         jobPtr->active = TRUE;
         jobPtr->windEdge = now + (24.0 - dayhour.hour) * 3600.0;
         return (jobPtr->active);
@@ -99,8 +99,7 @@ window_ok (struct jobCard *jobPtr)
         checkWindow (&dayhour, &jobPtr->active, &jobPtr->windEdge, wp, now);
     }
 
-    if (active && !jobPtr->active && now - jobPtr->windWarnTime >= WARN_TIME && (jobPtr->jobSpecs.options & SUB_WINDOW_SIG))
-    {
+    if (active && !jobPtr->active && now - jobPtr->windWarnTime >= WARN_TIME && (jobPtr->jobSpecs.options & SUB_WINDOW_SIG)) {
 
         if (!(jobPtr->jobSpecs.jStatus & JOB_STAT_RUN)) {
             job_resume (jobPtr);
@@ -110,7 +109,6 @@ window_ok (struct jobCard *jobPtr)
     }
 
     return (jobPtr->active);
-
 }
 
 void
@@ -118,6 +116,7 @@ shout_err (struct jobCard *jobPtr, char *msg)
 {
     char buf[MSGSIZE];
 
+    memset( buf, '\0', MSGSIZE );
     sprintf (buf, "We are unable to run your job %s:<%s>. The error is:\n%s.", lsb_jobid2str (jobPtr->jobSpecs.jobId), jobPtr->jobSpecs.command, msg);
 
     if (jobPtr->jobSpecs.options & SUB_MAIL_USER) {
@@ -126,12 +125,14 @@ shout_err (struct jobCard *jobPtr, char *msg)
     else {
         merr_user (jobPtr->jobSpecs.userName, jobPtr->jobSpecs.fromHost, buf, I18N_error);
     }
+
+    return;
 }
 
 void
 child_handler (int sig)
 {
-    pid_t pid;
+    pid_t pid = -1;
     LS_WAIT_T status;
     register float cpuTime;
     static short lastMbdExitVal = MASTER_NULL;
@@ -142,17 +143,28 @@ child_handler (int sig)
 
     cleanRusage (&rusage);
     now = time (0);
-    while ((pid = wait3 (&status, WNOHANG, &rusage)) > 0)
-    {
-        if (pid == mbdPid)
-        {
+
+    while( ( pid = waitpid( -1, &status, WNOHANG ) ) > 0)  { // while ((pid = wait3 (&status, WNOHANG, &rusage)) > 0)  {
+
+        if( -1 == getrusage( RUSAGE_CHILDREN , &rusage ) ) {
+            if( EFAULT == errno ) {
+                ls_syslog( LOG_ERR, "Cannot get resource usage for children of pid %d: usage points outside the accessible address space.", pid );
+                fprintf( STDERR, "Cannot get resource usage for children of pid %d: usage points outside the accessible address space.", pid );
+            } else {
+                ls_syslog( LOG_ERR, "Cannot get resource usage for children of pid %d: 'who' for getrusage() is invalid.", pid );
+                fprintf( STDERR, "Cannot get resource usage for children of pid %d: ide the accessible address space.", pid );
+            }
+            exit( 127 );
+        }
+
+        if (pid == mbdPid) {
+
             int sig = WTERMSIG (status);
             if (mbdExitCnt > 150) {
                 mbdExitCnt = 150;
             }
             mbdExitVal = WIFSIGNALED (status);
-            if (mbdExitVal)
-            {
+            if (mbdExitVal) {
                 /* catgets 5600 */
                 ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5600, "mbatchd died with signal <%d> termination"), sig);
                 if (WCOREDUMP (status)) {
@@ -170,8 +182,7 @@ child_handler (int sig)
                 }
                 continue;
             }
-            else
-            {
+            else {
                 mbdExitVal = WEXITSTATUS (status);
 
                 if (mbdExitVal == lastMbdExitVal) {
@@ -187,7 +198,8 @@ child_handler (int sig)
                     start_master ();
                 }
                 else {
-                    ls_syslog (LOG_NOTICE, _i18n_msg_get (ls_catd, NL_SETN, 5603, "mbatchd exited with value <%d>"), mbdExitVal); /* catgets 5603 */
+                    /* catgets 5603 */
+                    ls_syslog (LOG_NOTICE, _i18n_msg_get (ls_catd, NL_SETN, 5603, "mbatchd exited with value <%d>"), mbdExitVal);
                 }
                 continue;
             }
