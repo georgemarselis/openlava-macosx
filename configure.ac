@@ -97,7 +97,7 @@ AC_FUNC_MALLOC
 AC_FUNC_MKTIME
 AC_FUNC_REALLOC
 AC_FUNC_STRTOD
-AC_FUNC_WAIT3
+# AC_FUNC_WAIT3 # removed from POSIX
 AC_CHECK_FUNCS([alarm atexit dup2 endgrent getcwd gethostbyaddr gethostbyname gethostname getpagesize gettimeofday inet_ntoa isascii memmove memset mkdir putenv rmdir select socket stime strcasecmp strchr strdup strerror strncasecmp strpbrk strrchr strstr strtol utime])
 
 #ac_cv_pow
