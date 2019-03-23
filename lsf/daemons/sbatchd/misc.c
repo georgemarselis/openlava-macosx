@@ -21,6 +21,7 @@
 
 #include "sbd.h"
 #include "lib/lsi18n.h"
+#include "daemons/libsbatchd/misc.h"
 
 
 #ifdef __sun__
@@ -33,16 +34,6 @@
 extern short mbdExitVal;
 extern int mbdExitCnt;
 
-
-
-
-// #ifndef BSIZE
-// #define BSIZE 1024 // FIXME FIXME FIXME FIXME FIXME 
-// #endif
-
-static const unsigned int BSIZE = 1024;
-
-// #define NL_SETN         11
 
 void
 milliSleep (int msec)
