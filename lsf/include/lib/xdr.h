@@ -18,9 +18,10 @@
 
 #pragma once
 
-#include <rpc/types.h>
+//
+#include <tirpc/rpc/types.h>
 #ifndef __XDR_HEADER__
-#include <rpc/xdr.h>
+#include <tirpc/rpc/xdr.h>
 #endif
 #include <stdio.h>
 

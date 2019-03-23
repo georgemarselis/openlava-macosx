@@ -18,9 +18,10 @@
 
 #pragma once
 
-#include <rpc/types.h>
+// FIXME FIXME FIXME FIXME FIXME prc headers have been removed from glibc ever since version 2.14. using tinyrpc now, but this should differenciate between different versionf of glibc library
+#include <tirpc/rpc/types.h>
 #ifndef __XDR_HEADER__
-#include <rpc/xdr.h>
+#include <tirpc/rpc/xdr.h>
 #endif
 
 #include <sys/stat.h>

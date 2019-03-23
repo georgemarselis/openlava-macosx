@@ -31,8 +31,8 @@
 #include <netdb.h>
 #include <netinet/in.h>
 #include <pwd.h>
-#include <rpc/types.h>
-#include <rpc/xdr.h>
+#include <tirpc/rpc/types.h>
+#include <tirpc/rpc/xdr.h>
 #include <signal.h>
 #include <stdarg.h>
 #include <stdint.h>
