@@ -37,6 +37,7 @@
 #include "daemons/daemons.h"
 #include "daemons/sbatchd/job.h"
 #include "daemons/libsbatchd/sbatchd.h"
+#include "daemons/libsbatchd/job.h"
 #include "libint/lsi18n.h"
 
 /*************************************************************
