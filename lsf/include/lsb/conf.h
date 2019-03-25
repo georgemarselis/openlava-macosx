@@ -74,20 +74,20 @@ char *maxHName    = NULL;
 bool_t initUnknownUsers = FALSE;
 
 
-char do_Param  (struct lsConf *conf, char *fname, size_t *lineNumber);
-char do_Users  (struct lsConf *conf, char *fname, size_t *lineNumber, int option);
-char do_Hosts_ (struct lsConf *conf, char *fname, size_t *lineNumber, struct lsInfo *info, int options);
-char do_Queues (struct lsConf *conf, char *fname, size_t *lineNumber, struct lsInfo *info, int options);
-char do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, char *fname, size_t *lineNumber, unsigned int *ngroups, int options);
-int  isHostName (char *grpName);
-int  addHostEnt (struct hostInfoEnt *hp, struct hostInfo *hostInfo, size_t *override);
-char addQueue  (struct queueInfoEnt *qp, char *fname, unsigned int lineNum);
-char addUser   (char *, int, float, char *, int);
-char addMember (struct groupInfoEnt *gp, char *word, int grouptype, char *fname, unsigned int lineNumber, char *section, int options, int checkAll);
+char do_Param   ( struct lsConf *conf,          char *fname, size_t *lineNumber );
+char do_Users   ( struct lsConf *conf,          char *fname, size_t *lineNumber, int option );
+char do_Hosts_  ( struct lsConf *conf,          char *fname, size_t *lineNumber, struct lsInfo *info, int options );
+char do_Queues  ( struct lsConf *conf,          char *fname, size_t *lineNumber, struct lsInfo *info, int options );
+char do_Groups  ( struct groupInfoEnt **groups, struct lsConf *conf, char *fname, size_t *lineNumber, unsigned int *ngroups, int options );
+int  isHostName ( char *grpName );
+int  addHostEnt ( struct hostInfoEnt *hp, struct hostInfo *hostInfo, size_t *override );
+char addQueue   ( struct queueInfoEnt *qp, char *fname, unsigned int lineNum );
+char addUser    ( char *, int, float, char *, int );
+char addMember  ( struct groupInfoEnt *gp, char *word, int grouptype, char *fname, unsigned int lineNumber, char *section, int options, int checkAll );
 
-char isInGrp (char *, struct groupInfoEnt *, int, int);
-char **expandGrp (char *, unsigned int *, int);
-struct groupInfoEnt *addGroup (struct groupInfoEnt **, char *, unsigned int *, int);
+char                  isInGrp   ( char *, struct groupInfoEnt *, int, int);
+char                **expandGrp ( char *, unsigned int *, int);
+struct groupInfoEnt  *addGroup  ( struct groupInfoEnt **, char *, unsigned int *, int);
 
 struct groupInfoEnt *addUnixGrp (struct group *, char *, char *, unsigned int, char *, int);
 char *parseGroups (char *linep, char *fname, size_t *lineNumber, char *section, int groupType, int options);
@@ -130,7 +130,6 @@ double *getModelFactor (char *, struct lsInfo *);
 double *getHostFactor (char *);
 char *parseAdmins (char *admins, int options, char *fname, size_t *lineNum);
 char *putIntoList (char **list, unsigned int *len, char *string, char *listName);
-int isInList (char *, char *);
 int setDefaultHost (struct lsInfo *);
 int handleUserMem (void);
 int setDefaultUser (void);

@@ -30,6 +30,10 @@ char *getBeginLine      (        FILE            *fp        ,       size_t   *li
 int  readHvalues        (        struct keymap   *keyList   ,       char     *linep   ,         FILE       *fp,      const char *lsfile, size_t *lineNum, int exact, const char *section );
 void doSkipSection      (        FILE            *fp        ,       size_t   *lineNum,    const char       *lsfile,  const char *sectionName );
 int  mapValues          (        struct keymap   *keyList   ,       char     *line     );
-int  isInlist           ( const  char           **adminNames, const char     *userName,         unsigned  int actAds );
 char *getBeginLine_conf ( const  struct lsConf   *conf      ,       size_t   *lineNum  );
 void doSkipSection_conf ( const  struct lsConf   *conf      ,       size_t   *lineNum,    const char    *lsfile,     const char *sectionName );
+
+int  isInlist1          ( char           **adminNames, char     *userName );
+int  isInlist2          ( char           **adminNames, char     *userName,         unsigned  int actAds );
+// int  isInlist3          ( const  char           **adminNames, const char     *userName,         unsigned  int actAds ); // FIXME FIXME FIXME FIXME FIXME useless delete
+

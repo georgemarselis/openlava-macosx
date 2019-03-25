@@ -426,21 +426,3 @@ return 0;
 
 // int putInLists (char *word, struct admins *admins, unsigned int *numAds, const char *forWhat)
 // 			used to live here. Moved over to lib/liblsf/conf/putInLists.c
-
-int
-isInlist ( char **adminNames, char *userName, unsigned int actAds)
-{
-
-	if (actAds == 0) {
-		return FALSE;
-	}
-
-	for( unsigned int i = 0; i < actAds; i++)
-	{
-		if (strcmp (adminNames[i], userName) == 0) {
-			return TRUE;
-		}
-	}
-
-	return FALSE;
-}

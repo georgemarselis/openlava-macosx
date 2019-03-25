@@ -181,7 +181,6 @@ int resolveBaseNegHosts ( const char *inHosts, char **outHosts, struct HostsArra
 void freeSA_ (char **list, unsigned int num);
 
 int putValue (struct keymap *keyList, const char *key, char *value);
-// int isInlist ( char **adminNames, char *userName, unsigned int actAds); // FIXME FIXME revisit and see if we can turn the char*s into const
 // char *getNextValue (char **line);
 // int keyMatch (struct keymap *keyList, const char *line, int exact);
 // int isSectionEnd (char *linep, const char *lsfile, size_t *lineNum, const char *sectionName);

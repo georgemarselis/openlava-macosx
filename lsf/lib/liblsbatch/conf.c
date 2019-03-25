@@ -1466,6 +1466,9 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filena
 	struct passwd *pw       = NULL;
 	struct groupInfoEnt *gp = NULL;
 
+	const char ALL[] = "all";
+	const cahr OTHERS[] = "others";
+
 	if (groups == NULL || conf == NULL || ngroups == NULL) {
 		return FALSE;
 	}
@@ -1518,9 +1521,9 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filena
 				continue;
 			}
 
-			if (    strcmp (keyList[GROUP_NAME].val, "all")        == 0 || 
+			if (    strcmp (keyList[GROUP_NAME].val, ALL)          == 0 ||  // ALL is defined at top
 					strcmp (keyList[GROUP_NAME].val, defaultLabel) == 0 || 
-					strcmp (keyList[GROUP_NAME].val, "others")     == 0
+					strcmp (keyList[GROUP_NAME].val, OTHERS)       == 0     // OTHERS is defined on top
 				)
 				{
 				/* catgets 5103 */
@@ -5959,35 +5962,6 @@ putIntoList (char **list, unsigned int *len, const char *string, const char *lis
 	return *list;
 }
 
-/***************************************************************************************
- *int isInList ( const char *list, const char *string)
- *
- * INPUT ; const char *list, const char *string
- * OUTPUT: TRUE/FALSE
- *
- * WHAT DOES THIS FUNCTION DO:
- * 	Compares the two input strings for equality
- * 
- */
-int
-isInList ( const char *list, const char *string)
-{
-	char *sp   = NULL; 
-	char *word = NULL;
-	
-	if (list == NULL || string == NULL || list[0] == '\0' || string[0] == '\0') {
-		return FALSE;
-	}
-	
-	sp = list;
-	while ((word = getNextWord_ (&sp)) != NULL) {
-		if (strcmp (word, string ) == 0) {
-			return TRUE;
-		}
-	}
-	return FALSE;
-	
-}
 
 int
 setDefaultHost (struct lsInfo *info)

@@ -19,7 +19,7 @@
 #pragma once
  
 #include "daemons/liblimd/limout.h"
-#include "daemons/libpimd/pimd.h"
+// #include "daemons/libpimd/pimd.h"
 #include "daemons/libresd/resd.h"
 #include "lib/conn.h"
 #include "lib/hdr.h"
