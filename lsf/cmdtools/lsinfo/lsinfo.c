@@ -26,7 +26,7 @@
 #include "lsf.h"
 
 
-static void usage (char *);
+static void lsinfo_usage (char *);
 static void print_long (struct resItem *);
 static char nameInList (char **, int, char *);
 static char *flagToStr (int);
@@ -171,11 +171,9 @@ main (int argc, char **argv)
 }
 
 static void
-usage (char *cmd)
+lsinfo_usage (char *cmd)
 {
-  fprintf (stderr,
-	   "%s: %s [-h] [-V] [-l] [-r] [-m] [-M] [-t] [resource_name ...]\n",
-	   I18N_Usage, cmd);
+  fprintf (stderr, "%s: %s [-h] [-V] [-l] [-r] [-m] [-M] [-t] [resource_name ...]\n", I18N_Usage, cmd);
   exit (-1);
 }
 

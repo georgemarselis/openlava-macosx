@@ -4,7 +4,7 @@
 
 struct config_param
 {
-	char *paramName;
+	const char *paramName;
 	char *paramValue;
 };
 

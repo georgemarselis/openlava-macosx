@@ -25,11 +25,11 @@
 #include "lib/table.h"
 #include "lsf.h"
 
-static void usage (char *);
+void lsid_usage (char *);
 extern int errLineNum_;
 
-static void
-usage (char *cmd)
+void
+lsid_usage (char *cmd)
 {
   fprintf (stderr, "%s: %s [-h] [-V]\n", I18N_Usage, cmd);
 }

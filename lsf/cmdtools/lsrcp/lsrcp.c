@@ -35,7 +35,7 @@
 #include "lib/rcp.h"
 #include "lsf.h"
 
-extern void usage (char *cmd);
+extern void lsrcp_usage (char *cmd);
 
 extern int mystat_ (char *, struct stat *, struct hostent *);
 extern int myopen_ (char *, int, int, struct hostent *);

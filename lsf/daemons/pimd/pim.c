@@ -30,7 +30,7 @@ char infofile = malloc( sizeof( char ) * (MAX_FILENAME_LEN + 1 ) );
 
 
 void  // FIXME FIXME FIXME this needs more descriptive love
-usage (const char *cmd)
+pimd_usage (const char *cmd)
 {
 	fprintf (stderr, "%s: [-V] [-h] [-debug_level] [-d env_dir]\n", cmd);
 }
@@ -122,12 +122,12 @@ else
 	ls_openlog ("pim", pimParams[LSF_LOGDIR].paramValue, FALSE,
 		pimParams[LSF_LOG_MASK].paramValue);
 
-if ((sp = pimParams[LSF_PIM_SLEEPTIME].paramValue))
+if ((sp = pimParams[PIM_SLEEP_TIME].paramValue))
 {
 	if ((sleepTime = atoi (sp) < 0))
 	{
 		ls_syslog (LOG_ERR, "\
-			%s: LSF_PIM_SLEEPTIME value %s must be a positive integer, set to %d", __func__, sp, PIM_SLEEP_TIME);
+			%s: PIM_SLEEP_TIME value %s must be a positive integer, set to %d", __func__, sp, PIM_SLEEP_TIME);
 		sleepTime = PIM_SLEEP_TIME;
 	}
 }
@@ -137,7 +137,7 @@ if ((sp = pimParams[LSF_PIM_UPDATE_INTERVAL].paramValue))
 	if ((updInterval = atoi (sp)) < 0)
 	{
 		ls_syslog (LOG_ERR, "\
-			%s: LSF_PIM_UPDATE_INTERVAL value %s must be a positive integer, set to %d", __func__, sp, PIM_UPDATE_INTERVAL);
+			%s: PIM_SLEEP_TIME value %s must be a positive integer, set to %d", __func__, sp, PIM_UPDATE_INTERVAL);
 		updInterval = PIM_UPDATE_INTERVAL;
 	}
 }

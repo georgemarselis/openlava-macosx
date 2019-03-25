@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <rpc/types.h>
-#include <rpc/xdr.h>
+#include <tirpc/rpc/types.h>
+#include <tirpc/rpc/xdr.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -525,8 +525,7 @@ char *pty_translate(char *pty_name);
 int check_valid_tty(char *tty_name);
 
 /* daemons/resd/res.c */
-void usage(char *cmd);
-int main(int argc, char **argv);
+void resd_usage(char *cmd);
 void initSignals(void);
 void getMaskReady(fd_set *rm, fd_set *wm, fd_set *em);
 void display_masks(fd_set *rm, fd_set *wm, fd_set *em);

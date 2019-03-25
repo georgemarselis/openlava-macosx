@@ -28,9 +28,9 @@
 
 
 void
-usage (void)
+limd_usage (void)
 {
-  fprintf (stderr, "lim: [-C] [-V] [-h] [-t] [-debug_level] [-d env_dir]\n");
+    fprintf (stderr, "lim: [-C] [-V] [-h] [-t] [-debug_level] [-d env_dir]\n");
 }
 
 /* LIM main()
@@ -38,61 +38,61 @@ usage (void)
 int
 main (int argc, char **argv)
 {
-  fd_set allMask        = { };
-  struct Masks sockmask = { };
-  struct Masks chanmask = { };
-  struct timeval timer  = { };
-  struct timeval t0     = { };
-  struct timeval t1     = { };
-  int maxfd = 0;
-  char *sp = NULL;
-  int showTypeModel = 0;
-  int cc = 0;
+    fd_set allMask        = { };
+    struct Masks sockmask = { };
+    struct Masks chanmask = { };
+    struct timeval timer  = { };
+    struct timeval t0     = { };
+    struct timeval t1     = { };
+    int maxfd = 0;
+    char *sp = NULL;
+    int showTypeModel = 0;
+    int cc = 0;
 
-  kernelPerm = 0;
-  saveDaemonDir_ (argv[0]);
-  showTypeModel = 0;
+    kernelPerm = 0;
+    saveDaemonDir_ (argv[0]);
+    showTypeModel = 0;
 
   while ((cc = getopt (argc, argv, "12CVthd:")) != EOF)
     {
 
       switch (cc)
-	{
-	case 'd':
-	  env_dir = optarg;
-	  break;
-	case '1':
-	  lim_debug = 1;
-	  break;
-	case '2':
-	  lim_debug = 2;
-	  break;
-	case 'C':
-	  putEnv ("RECONFIG_CHECK", "YES");
-	  fputs (_LS_VERSION_, stderr);
-	  lim_CheckMode = 1;
-	  lim_debug = 2;
-	  break;
-	case 'V':
-	  fputs (_LS_VERSION_, stderr);
-	  return 0;
-	case 't':
-	  showTypeModel = 1;
-	  break;
-	case 'h':
-	case '?':
-	default:
-	  usage ();
-	  return -1;
-	}
+    {
+    case 'd':
+      env_dir = optarg;
+      break;
+    case '1':
+      lim_debug = 1;
+      break;
+    case '2':
+      lim_debug = 2;
+      break;
+    case 'C':
+      putEnv ("RECONFIG_CHECK", "YES");
+      fputs (_LS_VERSION_, stderr);
+      lim_CheckMode = 1;
+      lim_debug = 2;
+      break;
+    case 'V':
+      fputs (_LS_VERSION_, stderr);
+      return 0;
+    case 't':
+      showTypeModel = 1;
+      break;
+    case 'h':
+    case '?':
+    default:
+      usage ();
+      return -1;
+    }
     }
 
   if (env_dir == NULL)
     {
       if ((env_dir = getenv ("LSF_ENVDIR")) == NULL)
-	{
-	  env_dir = LSETCDIR;
-	}
+    {
+      env_dir = LSETCDIR;
+    }
     }
 
   if (lim_debug > 1)
@@ -104,10 +104,10 @@ Reading configuration from %s/lsf.conf\n", env_dir);
 
       sp = getenv ("LSF_LOGDIR");
       if (sp != NULL)
-	limParams[LSF_LOGDIR].paramValue = sp;
+    limParams[LSF_LOGDIR].paramValue = sp;
       ls_openlog ("lim",
-		  limParams[LSF_LOGDIR].paramValue,
-		  (lim_debug == 2), limParams[LSF_LOG_MASK].paramValue);
+          limParams[LSF_LOGDIR].paramValue,
+          (lim_debug == 2), limParams[LSF_LOG_MASK].paramValue);
       ls_syslog (LOG_ERR, "\
 %s: initenv() failed reading lsf.conf from %s", __func__, env_dir);
       lim_Exit ("main");
@@ -120,10 +120,10 @@ Reading configuration from %s/lsf.conf\n", env_dir);
        */
       cc = initAndConfig (lim_CheckMode, &kernelPerm);
       if (cc < 0)
-	{
-	  ls_syslog (LOG_ERR, "%s: failed to configure, exiting...", __func__);
-	  return -1;
-	}
+    {
+      ls_syslog (LOG_ERR, "%s: failed to configure, exiting...", __func__);
+      return -1;
+    }
       printTypeModel ();
       return 0;
     }
@@ -154,7 +154,7 @@ Reading configuration from %s/lsf.conf\n", env_dir);
     {
 
       for (cc = maxfd; cc >= 0; cc--)
-	close (cc);
+    close (cc);
 
       daemonize_ ();
       nice (NICE_LEAST);
@@ -164,7 +164,7 @@ Reading configuration from %s/lsf.conf\n", env_dir);
     chdir ("/tmp");
 
   getLogClass_ (limParams[LSF_DEBUG_LIM].paramValue,
-		limParams[LSF_TIME_LIM].paramValue);
+        limParams[LSF_TIME_LIM].paramValue);
 
   if (lim_debug > 1)
     {
@@ -173,8 +173,8 @@ Reading configuration from %s/lsf.conf\n", env_dir);
   else
     {
       ls_openlog ("lim",
-		  limParams[LSF_LOGDIR].paramValue,
-		  FALSE, limParams[LSF_LOG_MASK].paramValue);
+          limParams[LSF_LOGDIR].paramValue,
+          FALSE, limParams[LSF_LOG_MASK].paramValue);
     }
 
   ls_syslog (LOG_NOTICE, argvmsg_ (argc, argv));
@@ -200,11 +200,11 @@ Reading configuration from %s/lsf.conf\n", env_dir);
     {
 
       if (lim_CheckError == EXIT_WARNING_ERROR)
-	{
-	  ls_syslog (LOG_WARNING, "\
+    {
+      ls_syslog (LOG_WARNING, "\
 %s: Checking Done. Warning(s)/error(s) found.", __func__);
-	  exit (EXIT_WARNING_ERROR);
-	}
+      exit (EXIT_WARNING_ERROR);
+    }
 
       ls_syslog (LOG_INFO, "%s: Checking Done.", __func__);
       return 0;
@@ -247,19 +247,19 @@ Reading configuration from %s/lsf.conf\n", env_dir);
 
       sockmask.rmask = allMask;
       if (pimPid == -1)
-	startPIM (argc, argv);
+    startPIM (argc, argv);
 
       ls_syslog (LOG_DEBUG2, "\
 %s: Before select: timer %dsec", __func__, timer.tv_sec);
 
       nReady = chanSelect_ (&sockmask, &chanmask, &timer);
       if (nReady < 0)
-	{
-	  if (errno != EINTR)
-	    ls_syslog (LOG_ERR, "\
+    {
+      if (errno != EINTR)
+        ls_syslog (LOG_ERR, "\
 %s: chanSelect() failed %M", __func__);
-	  continue;
-	}
+      continue;
+    }
 
       /* Check if timer expired, if not
        * reload it with the time till
@@ -267,23 +267,23 @@ Reading configuration from %s/lsf.conf\n", env_dir);
        */
       gettimeofday (&t1, NULL);
       if (t1.tv_sec - t0.tv_sec >= 5)
-	{
-	  /* set the new timer
-	   */
-	  timer.tv_sec = 5;
-	  timer.tv_usec = 0;
-	  /* reset the start time
-	   */
-	  t0.tv_sec = t1.tv_sec;
-	  t0.tv_usec = t1.tv_sec;
-	  alarmed = 1;
-	}
+    {
+      /* set the new timer
+       */
+      timer.tv_sec = 5;
+      timer.tv_usec = 0;
+      /* reset the start time
+       */
+      t0.tv_sec = t1.tv_sec;
+      t0.tv_usec = t1.tv_sec;
+      alarmed = 1;
+    }
       else
-	{
-	  timer.tv_sec = 5 - (t1.tv_sec - t0.tv_sec);
-	  timer.tv_usec = 0;
-	  alarmed = 0;
-	}
+    {
+      timer.tv_sec = 5 - (t1.tv_sec - t0.tv_sec);
+      timer.tv_usec = 0;
+      alarmed = 0;
+    }
 
       ls_syslog (LOG_DEBUG2, "\
 %s: After select: cc %d alarmed %d timer %dsec", __func__, cc, alarmed, timer.tv_sec);
@@ -291,34 +291,34 @@ Reading configuration from %s/lsf.conf\n", env_dir);
       blockSigs_ (0, &newMask, &oldMask);
 
       if (alarmed)
-	{
-	  periodic (kernelPerm);
-	  sigprocmask (SIG_SETMASK, &oldMask, NULL);
-	}
+    {
+      periodic (kernelPerm);
+      sigprocmask (SIG_SETMASK, &oldMask, NULL);
+    }
 
       if (nReady <= 0)
-	{
-	  sigprocmask (SIG_SETMASK, &oldMask, NULL);
-	  continue;
-	}
+    {
+      sigprocmask (SIG_SETMASK, &oldMask, NULL);
+      continue;
+    }
 
       if (FD_ISSET (limSock, &chanmask.rmask))
-	{
-	  processUDPMsg ();
-	}
+    {
+      processUDPMsg ();
+    }
 
       if (FD_ISSET (limTcpSock, &chanmask.rmask))
-	{
-	  doAcceptConn ();
-	}
+    {
+      doAcceptConn ();
+    }
 
       clientIO (&chanmask);
 
       sigprocmask (SIG_SETMASK, &oldMask, NULL);
 
-    }				/* for (;;) */
+    }               /* for (;;) */
 
-}				/* main() */
+}               /* main() */
 
 /* processUDPMsg()
  */
@@ -366,31 +366,31 @@ processUDPMsg (void)
        * at runtime.
        */
       if (limParams[LIM_NO_MIGRANT_HOSTS].paramValue)
-	{
+    {
 
-	  ls_syslog (LOG_WARNING, "\
+      ls_syslog (LOG_WARNING, "\
 %s: Received request %d from non-LSF host %s", __func__, limReqCode, sockAdd2Str_ (&from));
-	  /* tell the remote that we don't know him.
-	   */
-	  errorBack (&from, &reqHdr, LIME_NAUTH_HOST, -1);
-	  xdr_destroy (&xdrs);
-	  return -1;
-	}
+      /* tell the remote that we don't know him.
+       */
+      errorBack (&from, &reqHdr, LIME_NAUTH_HOST, -1);
+      xdr_destroy (&xdrs);
+      return -1;
+    }
 
       /* If we can accept a host at runtime
        * we must however be able to resolve
        * its address.
        */
       hp = Gethostbyaddr_ (&from.sin_addr.s_addr,
-			   sizeof (in_addr_t), AF_INET);
+               sizeof (in_addr_t), AF_INET);
       if (hp == NULL)
-	{
-	  ls_syslog (LOG_WARNING, "\
+    {
+      ls_syslog (LOG_WARNING, "\
 %s: Received request %d from unresolvable address %s", __func__, limReqCode, sockAdd2Str_ (&from));
-	  errorBack (&from, &reqHdr, LIME_NAUTH_HOST, -1);
-	  xdr_destroy (&xdrs);
-	  return -1;
-	}
+      errorBack (&from, &reqHdr, LIME_NAUTH_HOST, -1);
+      xdr_destroy (&xdrs);
+      return -1;
+    }
     }
 
   ls_syslog (LOG_DEBUG, "\
@@ -462,16 +462,16 @@ processUDPMsg (void)
       break;
     default:
       if (reqHdr.version <= OPENLAVA_VERSION)
-	{
-	  static int lastcode;
+    {
+      static int lastcode;
 
-	  errorBack (&from, &reqHdr, LIME_BAD_REQ_CODE, -1);
-	  if (limReqCode != lastcode) {
-	    ls_syslog (LOG_ERR, "%s: Unknown request code %d vers %d from %s", __func__, limReqCode, reqHdr.version, sockAdd2Str_ (&from));
+      errorBack (&from, &reqHdr, LIME_BAD_REQ_CODE, -1);
+      if (limReqCode != lastcode) {
+        ls_syslog (LOG_ERR, "%s: Unknown request code %d vers %d from %s", __func__, limReqCode, reqHdr.version, sockAdd2Str_ (&from));
     }
-	  lastcode = limReqCode;
-	  break;
-	}
+      lastcode = limReqCode;
+      break;
+    }
     }
 
   xdr_destroy (&xdrs);
@@ -585,10 +585,10 @@ initAndConfig (int checkMode, int *kernelPerm)
     {
       cc = getClusterConfig ();
       if (cc < 0)
-	{
-	  ls_syslog (LOG_ERR, "%s: failed getting cluster configuration files %M, exiting...", __func__);
-	  return -1;
-	}
+    {
+      ls_syslog (LOG_ERR, "%s: failed getting cluster configuration files %M, exiting...", __func__);
+      return -1;
+    }
     }
 
   initLiStruct ();
@@ -641,32 +641,32 @@ initAndConfig (int checkMode, int *kernelPerm)
     if ((lsfLimLock = getenv ("LSF_LIM_LOCK")) != NULL && lsfLimLock[0] != 0)
       {
 
-	if (logclass & LC_TRACE)
-	  {
-	    ls_syslog (LOG_DEBUG2, "%s: LSF_LIM_LOCK %s", __func__, lsfLimLock);
-	  }
-	sscanf (lsfLimLock, "%d %ld", &flag, &lockTime);
-	if (flag > 0)
-	  {
+    if (logclass & LC_TRACE)
+      {
+        ls_syslog (LOG_DEBUG2, "%s: LSF_LIM_LOCK %s", __func__, lsfLimLock);
+      }
+    sscanf (lsfLimLock, "%d %ld", &flag, &lockTime);
+    if (flag > 0)
+      {
 
-	    limLock.on = flag;
-	    limLock.time = lockTime;
-	    if (LOCK_BY_USER (limLock.on))
-	      {
-		myHostPtr->status[0] |= LIM_LOCKEDU;
-	      }
-	    if (LOCK_BY_MASTER (limLock.on))
-	      {
-		myHostPtr->status[0] |= LIM_LOCKEDM;
-	      }
-	  }
+        limLock.on = flag;
+        limLock.time = lockTime;
+        if (LOCK_BY_USER (limLock.on))
+          {
+        myHostPtr->status[0] |= LIM_LOCKEDU;
+          }
+        if (LOCK_BY_MASTER (limLock.on))
+          {
+        myHostPtr->status[0] |= LIM_LOCKEDM;
+          }
+      }
       }
     else
       {
-	limLock.on = FALSE;
-	limLock.time = 0;
+    limLock.on = FALSE;
+    limLock.time = 0;
 
-	myHostPtr->status[0] &= ~LIM_LOCKEDU;
+    myHostPtr->status[0] &= ~LIM_LOCKEDU;
       }
   }
 
@@ -728,7 +728,7 @@ lim_term_handler (int signum)
 
   exit (0);
 
-}				/* lim_term_handler() */
+}               /* lim_term_handler() */
 
 /* lim_child_handler()
  */
@@ -744,20 +744,20 @@ lim_child_handler (int sig)
   while ((pid = waitpid (-1, &status, WNOHANG)) > 0)
     {
       if (pid == elim_pid)
-	{
-	  ls_syslog (LOG_ERR, "%s: elim (pid=%d) died (exit_code=%d,exit_sig=%d)", __func__, elim_pid, WEXITSTATUS (status), WIFSIGNALED (status) ? WTERMSIG (status) : 0);
-	  elim_pid = -1;
-	}
-      if (pid == pimPid)
-	{
-	  if (logclass & LC_PIM) {
-	    ls_syslog (LOG_DEBUG, "%s: pim (pid=%d) died", __func__, pid);
+    {
+      ls_syslog (LOG_ERR, "%s: elim (pid=%d) died (exit_code=%d,exit_sig=%d)", __func__, elim_pid, WEXITSTATUS (status), WIFSIGNALED (status) ? WTERMSIG (status) : 0);
+      elim_pid = -1;
     }
-	  pimPid = -1;
-	}
+      if (pid == pimPid)
+    {
+      if (logclass & LC_PIM) {
+        ls_syslog (LOG_DEBUG, "%s: pim (pid=%d) died", __func__, pid);
+    }
+      pimPid = -1;
+    }
     }
 
-}				/* lim_child_handler() */
+}               /* lim_child_handler() */
 
 int
 initSock (int checkMode)
@@ -796,7 +796,7 @@ initSock (int checkMode)
 
   size = sizeof (limTcpSockId);
   if (getsockname (chanSock_ (limTcpSock),
-		   (struct sockaddr *) &limTcpSockId, &size) < 0)
+           (struct sockaddr *) &limTcpSockId, &size) < 0)
     {
 
       ls_syslog (LOG_ERR, "\
@@ -836,7 +836,7 @@ errorBack (struct sockaddr_in *from, struct LSFHeader *reqHdr, enum limReplyCode
 
   if (cc < 0)
     ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__,
-	       "chanSendDgram_/chanWrite_", limSock);
+           "chanSendDgram_/chanWrite_", limSock);
 
   xdr_destroy (&xdrs2);
   return;
@@ -855,7 +855,7 @@ getTclLsInfo (void)
     }
 
   if ((tclLsInfo->indexNames = calloc (allInfo.numIndx,
-				       sizeof (char *))) == NULL)
+                       sizeof (char *))) == NULL)
     {
       ls_syslog (LOG_ERR, "%s: %s", __func__);
       return NULL;
@@ -889,7 +889,7 @@ startPIM (int argc, char **argv)
   if ((pimPid = fork ()))
     {
       if (pimPid < 0)
-	ls_syslog (LOG_ERR, "%s: %m", __func__);
+    ls_syslog (LOG_ERR, "%s: %m", __func__);
       return;
     }
 
@@ -899,13 +899,13 @@ startPIM (int argc, char **argv)
     {
 
       for (i = 3; i < sysconf (_SC_OPEN_MAX); i++)
-	close (i);
+    close (i);
 
     }
   else
     {
       for (i = 0; i < sysconf (_SC_OPEN_MAX); i++)
-	close (i);
+    close (i);
     }
 
   for (i = 1; i < NSIG; i++)
@@ -1050,32 +1050,32 @@ printTypeModel (void)
   printf ("Host Type             : %s\n", getHostType ());
   printf ("Host Architecture     : %s\n", getHostModel ());
   printf ("Matched Type          : %s\n",
-	  allInfo.hostTypes[myHostPtr->hTypeNo]);
+      allInfo.hostTypes[myHostPtr->hTypeNo]);
   printf ("Matched Architecture  : %s\n",
-	  allInfo.hostArchs[myHostPtr->hModelNo]);
+      allInfo.hostArchs[myHostPtr->hModelNo]);
   printf ("Matched Model         : %s\n",
-	  allInfo.hostModels[myHostPtr->hModelNo]);
+      allInfo.hostModels[myHostPtr->hModelNo]);
   printf ("CPU Factor            : %.1f\n",
-	  allInfo.cpuFactor[myHostPtr->hModelNo]);
+      allInfo.cpuFactor[myHostPtr->hModelNo]);
 
   if (myHostPtr->hTypeNo == 1 || myHostPtr->hModelNo == 1)
     {
       printf
-	("When automatic detection of host type or model fails, the type or\n");
+    ("When automatic detection of host type or model fails, the type or\n");
       printf
-	("model is set to DEFAULT. LSF will still work on the host. A DEFAULT\n");
+    ("model is set to DEFAULT. LSF will still work on the host. A DEFAULT\n");
       printf
-	("model may be inefficient because of incorrect CPU factor. A DEFAULT\n");
+    ("model may be inefficient because of incorrect CPU factor. A DEFAULT\n");
       printf
-	("type may cause binary incompatibility - a job from a DEFAULT host \n");
+    ("type may cause binary incompatibility - a job from a DEFAULT host \n");
       printf
-	("type can be dispatched or migrated to another DEFAULT host type.\n\n");
+    ("type can be dispatched or migrated to another DEFAULT host type.\n\n");
       printf
-	("User can use lim -t to detect the real model or type for a host. \n");
+    ("User can use lim -t to detect the real model or type for a host. \n");
       printf
-	("Change a DEFAULT host model by adding a new model in HostModel in\n");
+    ("Change a DEFAULT host model by adding a new model in HostModel in\n");
       printf
-	("lsf.shared.  Change a DEFAULT host type by adding a new type in \n");
+    ("lsf.shared.  Change a DEFAULT host type by adding a new type in \n");
       printf ("HostType in lsf.shared.\n\n");
     }
 }
@@ -1102,7 +1102,7 @@ initMiscLiStruct (void)
       li[i].sigdiff = 0.0001;
     }
 
-}				/* initMiscLiStruct() */
+}               /* initMiscLiStruct() */
 
 /* getClusterConfig()
  */
@@ -1154,4 +1154,4 @@ getClusterConfig (void)
 
   return 0;
 
-}				/* getClusterConfig() */
+}               /* getClusterConfig() */

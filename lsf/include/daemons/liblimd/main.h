@@ -16,6 +16,6 @@ int initAndConfig (int checkMode, int *kernelPerm);
 void initSignals (void);
 void doAcceptConn (void);
 int processUDPMsg (void);
-void usage (void);
+void limd_usage (void);
 
 struct clientNode **clientMap = NULL; // FIXME FIXME FIXME FIXME FIXME this needs memory management and/or debug

@@ -18,8 +18,8 @@
 
 #pragma once
 
-// FIXME FIXME FIXME FIXME tcl/tcl.h must be moved to a variable in configure.ac
-#include <tcl/tcl.h>
+
+#include <tcl.h> // FIXME FIXME FIXME FIXME tcl/tcl.h must be moved to a variable in configure.ac
 #include <sys/types.h>
 
 // static struct tclHostData *hPtr;

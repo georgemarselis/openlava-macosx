@@ -27,37 +27,36 @@
 #include "cmdtools/cmdtools.h"
 
 #define NL_SETN 8
+#define MAX_PEEK_ARGS  5
 
 extern int errno;
-static void displayOutput (char *, struct jobInfoEnt *, char, char **);
-static void oneOf (char *);
-static void output (char *, char *, int, char *, char **);
-static void usage (char *cmd);
-static void remoteOutput (int fidx, char **disOut, char *exHost, char *__func__,
-			  char *execUsername, char **);
-static int useTmp (char *exHost, char *__func__);
-static void stripClusterName (char *);
+void displayOutput (char *, struct jobInfoEnt *, char, char **);
+void oneOf (char *);
+void output (char *, char *, int, char *, char **);
+void bpeek_usage (char *cmd);
+void remoteOutput (int fidx, char **disOut, char *exHost, char *__func__, char *execUsername, char **);
+int useTmp (char *exHost, char *__func__);
+void stripClusterName (char *);
 
-static void
-usage (char *cmd)
+void
+bpeek_usage (char *cmd)
 {
-  fprintf (stderr,
-	   "%s: %s [-h] [-V] [-f] [-m host_name | -q queue_name |\n        -J job_name | jobId",
-	   I18N_Usage, cmd);
-  if (lsbMode_ & LSB_MODE_BATCH)
-    fprintf (stderr, " | \"jobId[index]\"");
-  fprintf (stderr, "]\n");
-  exit (-1);
+    fprintf (stderr,"%s: %s [-h] [-V] [-f] [-m host_name | -q queue_name |\n        -J job_name | jobId", I18N_Usage, cmd);
+    if (lsbMode_ & LSB_MODE_BATCH) {
+        fprintf (stderr, " | \"jobId[index]\"");
+    }
+    fprintf (stderr, "]\n");
+    exit (-1);
 }
 
-static void
+void
 oneOf (char *cmd)
 {
-  fprintf (stderr, "%s.\n", _i18n_msg_get (ls_catd, NL_SETN, 2453, "Command syntax error: more than one of -m , -q, -J or jobId are specified"));	/* catgets  2453  */
-  usage (cmd);
+     /* catgets  2453  */
+    fprintf (stderr, "%s.\n", _i18n_msg_get (ls_catd, NL_SETN, 2453, "Command syntax error: more than one of -m , -q, -J or jobId are specified"));
+    usage (cmd);
 }
 
-#define MAX_PEEK_ARGS  5
 
 int
 main (int argc, char **argv, char **environ)
@@ -82,32 +81,32 @@ main (int argc, char **argv, char **environ)
   while ((cc = getopt (argc, argv, "Vhfq:m:J:")) != EOF)
     {
       switch (cc)
-	{
-	case 'q':
-	  if (queue || host || jobName)
-	    oneOf (argv[0]);
-	  queue = optarg;
-	  break;
-	case 'm':
-	  if (queue || host || jobName)
-	    oneOf (argv[0]);
-	  host = optarg;
-	  break;
-	case 'J':
-	  if (queue || host || jobName)
-	    oneOf (argv[0]);
-	  jobName = optarg;
-	  break;
-	case 'V':
-	  fputs (_LS_VERSION_, stderr);
-	  exit (0);
-	case 'f':
-	  fflag = TRUE;
-	  break;
-	case 'h':
-	default:
-	  usage (argv[0]);
-	}
+    {
+    case 'q':
+      if (queue || host || jobName)
+        oneOf (argv[0]);
+      queue = optarg;
+      break;
+    case 'm':
+      if (queue || host || jobName)
+        oneOf (argv[0]);
+      host = optarg;
+      break;
+    case 'J':
+      if (queue || host || jobName)
+        oneOf (argv[0]);
+      jobName = optarg;
+      break;
+    case 'V':
+      fputs (_LS_VERSION_, stderr);
+      exit (0);
+    case 'f':
+      fflag = TRUE;
+      break;
+    case 'h':
+    default:
+      usage (argv[0]);
+    }
     }
 
   jobId = 0;
@@ -115,16 +114,16 @@ main (int argc, char **argv, char **environ)
   if (argc >= optind + 1)
     {
       if (queue || host || jobName)
-	{
-	  oneOf (argv[0]);
-	}
+    {
+      oneOf (argv[0]);
+    }
       else if ((argc > 2 && !fflag) || (argc > 3 && fflag))
-	usage (argv[0]);
+    usage (argv[0]);
 
       if (getOneJobId (argv[optind], &jobId, 0))
-	{
-	  usage (argv[0]);
-	}
+    {
+      usage (argv[0]);
+    }
 
       options = 0;
     }
@@ -136,20 +135,20 @@ main (int argc, char **argv, char **environ)
     {
 
       if (jobId != 0 || jobName != NULL)
-	{
-	  user = ALL_USERS;
-	  if (lsb_openjobinfo (jobId, jobName, user, queue, host, options) < 0
-	      || (jInfo = lsb_readjobinfo (NULL)) == NULL)
-	    {
-	      jobInfoErr (jobId, jobName, NULL, queue, host, options);
-	      exit (-1);
-	    }
-	}
+    {
+      user = ALL_USERS;
+      if (lsb_openjobinfo (jobId, jobName, user, queue, host, options) < 0
+          || (jInfo = lsb_readjobinfo (NULL)) == NULL)
+        {
+          jobInfoErr (jobId, jobName, NULL, queue, host, options);
+          exit (-1);
+        }
+    }
       else
-	{
-	  jobInfoErr (jobId, jobName, NULL, queue, host, options);
-	  exit (-1);
-	}
+    {
+      jobInfoErr (jobId, jobName, NULL, queue, host, options);
+      exit (-1);
+    }
     }
   lsb_closejobinfo ();
 
@@ -165,22 +164,22 @@ main (int argc, char **argv, char **environ)
   if ((jInfo->submit.options & SUB_INTERACTIVE) &&
       !(jInfo->submit.options & (SUB_OUT_FILE | SUB_ERR_FILE)))
     {
-      fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 2456, "Job <%s> : Cannot bpeek an interactive job.\n"),	/* catgets  2456 */
-	       lsb_jobid2str (jInfo->jobId));
+      fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 2456, "Job <%s> : Cannot bpeek an interactive job.\n"), /* catgets  2456 */
+           lsb_jobid2str (jInfo->jobId));
       exit (-1);
     }
 
   if (IS_PEND (jInfo->status) || jInfo->execUsername[0] == '\0')
     {
-      fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 2454, "Job <%s> : Not yet started.\n"),	/* catgets  2454 */
-	       lsb_jobid2str (jInfo->jobId));
+      fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 2454, "Job <%s> : Not yet started.\n"), /* catgets  2454 */
+           lsb_jobid2str (jInfo->jobId));
 
       exit (-1);
     }
   if (IS_FINISH (jInfo->status))
     {
-      fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 2455, "Job <%s> : Already finished.\n"),	/* catgets  2455  */
-	       lsb_jobid2str (jInfo->jobId));
+      fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 2455, "Job <%s> : Already finished.\n"),    /* catgets  2455  */
+           lsb_jobid2str (jInfo->jobId));
       exit (-1);
     }
 
@@ -197,9 +196,9 @@ main (int argc, char **argv, char **environ)
 
 }
 
-static void
+void
 displayOutput (char *jobFile, struct jobInfoEnt *jInfo, char fflag,
-	       char **envp)
+           char **envp)
 {
   char fileOut[MAX_FILENAME_LEN];
   char fileErr[MAX_FILENAME_LEN];
@@ -212,9 +211,9 @@ displayOutput (char *jobFile, struct jobInfoEnt *jInfo, char fflag,
 
 
   if (!((jInfo->submit.options & SUB_OUT_FILE)
-	&& strcmp (jInfo->submit.outFile, LSDEVNULL) == 0))
+    && strcmp (jInfo->submit.outFile, LSDEVNULL) == 0))
     {
-      printf ("<< %s >>\n", (_i18n_msg_get (ls_catd, NL_SETN, 2457, "output from stdout")));	/* catgets  2457  */
+      printf ("<< %s >>\n", (_i18n_msg_get (ls_catd, NL_SETN, 2457, "output from stdout")));    /* catgets  2457  */
       output (fileOut, jInfo->exHosts[0], fflag, jInfo->execUsername, envp);
     }
 
@@ -222,7 +221,7 @@ displayOutput (char *jobFile, struct jobInfoEnt *jInfo, char fflag,
   if ((jInfo->submit.options & SUB_ERR_FILE)
       && strcmp (jInfo->submit.errFile, LSDEVNULL) != 0)
     {
-      printf ("\n<< %s >>\n", (_i18n_msg_get (ls_catd, NL_SETN, 2458, "output from stderr")));	/* catgets  2458  */
+      printf ("\n<< %s >>\n", (_i18n_msg_get (ls_catd, NL_SETN, 2458, "output from stderr")));  /* catgets  2458  */
       output (fileErr, jInfo->exHosts[0], fflag, jInfo->execUsername, envp);
     }
 
@@ -231,10 +230,10 @@ displayOutput (char *jobFile, struct jobInfoEnt *jInfo, char fflag,
 }
 
 
-static void
+void
 output (char *__func__, char *exHost, int fflag, char *execUsername, char **envp)
 {
-  char *disOut[MAX_PEEK_ARGS];
+  char *disOut[MAX_PEEK_ARGS]; // MAX__PEEK_ARGS is defined in bpeek.h
   int fidx;
   int pid = 0;
   struct stat buf;
@@ -244,10 +243,10 @@ output (char *__func__, char *exHost, int fflag, char *execUsername, char **envp
 
       pid = fork ();
       if (pid < 0)
-	{
-	  perror ("fork");
-	  exit (-1);
-	}
+    {
+      perror ("fork");
+      exit (-1);
+    }
     }
 
   if (pid > 0)
@@ -283,7 +282,7 @@ output (char *__func__, char *exHost, int fflag, char *execUsername, char **envp
       disOut[fidx] = __func__;
       lsfExecvp (disOut[0], disOut);
       fprintf (stderr, I18N_FUNC_S_S_FAIL_S, "execvp", disOut[0],
-	       strerror (errno));
+           strerror (errno));
     }
   exit (-1);
 
@@ -291,9 +290,9 @@ output (char *__func__, char *exHost, int fflag, char *execUsername, char **envp
 
 
 
-static void
+void
 remoteOutput (int fidx, char **disOut, char *exHost, char *__func__,
-	      char *execUsername, char **envp)
+          char *execUsername, char **envp)
 {
   char buf[MAX_FILENAME_LEN];
   char *args[MAX_PEEK_ARGS + 4];
@@ -307,37 +306,37 @@ remoteOutput (int fidx, char **disOut, char *exHost, char *__func__,
 
 
       if (useTmp (exHost, __func__))
-	{
-	  sprintf (buf, "/tmp/.lsbtmp%d/%s", (int) getuid (), __func__);
-	  disOut[fidx] = buf;
-	}
+    {
+      sprintf (buf, "/tmp/.lsbtmp%d/%s", (int) getuid (), __func__);
+      disOut[fidx] = buf;
+    }
       else
-	{
-	  disOut[fidx] = __func__;
-	}
+    {
+      disOut[fidx] = __func__;
+    }
 
       args[0] = RSHCMD;
       args[1] = exHost;
       args[2] = "-l";
       args[3] = execUsername;
       if (fidx == 2)
-	{
-	  args[4] = disOut[0];
-	  args[5] = disOut[1];
-	  args[6] = disOut[2];
-	  args[7] = NULL;
-	}
+    {
+      args[4] = disOut[0];
+      args[5] = disOut[1];
+      args[6] = disOut[2];
+      args[7] = NULL;
+    }
       else
-	{
-	  args[4] = disOut[0];
-	  args[5] = disOut[1];
-	  args[6] = NULL;
-	}
+    {
+      args[4] = disOut[0];
+      args[5] = disOut[1];
+      args[6] = NULL;
+    }
 
 
       lsfExecvp (RSHCMD, args);
       fprintf (stderr, I18N_FUNC_S_S_FAIL_S, "execvp", args[0],
-	       strerror (errno));
+           strerror (errno));
       return;
     }
 
@@ -359,11 +358,11 @@ remoteOutput (int fidx, char **disOut, char *exHost, char *__func__,
   ls_rexecve (exHost, disOut, REXF_CLNTDIR, envp);
 
   fprintf (stderr, I18N_FUNC_S_S_FAIL_S, "ls_rexecv", disOut[0],
-	   ls_sysmsg ());
+       ls_sysmsg ());
 
 }
 
-static int
+int
 useTmp (char *exHost, char *__func__)
 {
   int pid;
@@ -375,22 +374,22 @@ useTmp (char *exHost, char *__func__)
   if ((pid = fork ()) == 0)
     {
       if (ls_initrex (1, 0) < 0)
-	{
-	  ls_perror ("ls_initrex");
-	  exit (FALSE);
-	}
+    {
+      ls_perror ("ls_initrex");
+      exit (FALSE);
+    }
 
       ls_rfcontrol (RF_CMD_RXFLAGS, REXF_CLNTDIR);
 
       if (ls_rstat (exHost, __func__, &st) < 0)
-	{
-	  if (lserrno == LSE_FILE_SYS && (errno == ENOENT || errno == EACCES))
-	    {
-	      exit (TRUE);
-	    }
+    {
+      if (lserrno == LSE_FILE_SYS && (errno == ENOENT || errno == EACCES))
+        {
+          exit (TRUE);
+        }
 
-	  ls_perror ("ls_rstat");
-	}
+      ls_perror ("ls_rstat");
+    }
 
       exit (FALSE);
     }
@@ -411,7 +410,7 @@ useTmp (char *exHost, char *__func__)
 }
 
 
-static void
+void
 stripClusterName (char *str)
 {
   char *p;

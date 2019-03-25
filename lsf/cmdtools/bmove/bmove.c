@@ -23,7 +23,7 @@
 // #define NL_SETN 8
 
 
-void usage (char *cmd)
+void bmove_usage (char *cmd)
 {
 	fprintf (stderr, "%s\n", _i18n_msg_get(ls_catd, 33, 5000, "Usage") );
 	fprintf (stderr, ": %s [-h] [-V] jobId | \"jobId[index]\" [position]\n", cmd);

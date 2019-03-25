@@ -29,16 +29,15 @@
 
 #define LSTMPDIR        lsTmpDir_
 
-static void usage (const char *);
+void echkpnt_usage (const char *);
 
 static char logMesgBuf[MAXLINELEN];
 extern char *lsTmpDir_;
+
 static void
-usage (const char *pCmd)
+echkpnt_usage (const char *pCmd)
 {
-  fprintf (stderr,
-	   "Usage: %s [-c] [-f] [-k | -s] [-x] [-d chkdir] [-h] [-V] pid\n",
-	   pCmd);
+  fprintf (stderr, "Usage: %s [-c] [-f] [-k | -s] [-x] [-d chkdir] [-h] [-V] pid\n", Cmd);
 }
 
 

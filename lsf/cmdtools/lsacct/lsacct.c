@@ -42,12 +42,14 @@ static const char *dashed_line =
   "------------------------------------------------------------------------------"
   "--";
 
+#define NL_SETN 27
 
 #define MAX_LOGIN 31
 #define MAX_PATH 1000
 #define MAX_USERS 1000
 #define MAX_HOSTS 1000
 #define MAX_PIDS 1000
+
 static int details;
 static char logfile[MAX_PATH + 1];
 static char mylogin[MAX_LOGIN + 1];
@@ -70,10 +72,8 @@ static int tottasks;
 static struct interval actual_start;
 static struct interval actual_complete;
 
-enum resource
-{ cpu, pf, swaps, bin, bout, msgs, msgr, vcsw, ivcsw, turn };
-enum useage
-{ min, max, tot };
+enum resource { cpu, pf, swaps, bin, bout, msgs, msgr, vcsw, ivcsw, turn };
+enum useage { min, max, tot };
 #define NUM_RESOURCES 10
 #define NUM_USAGE 3
 static double statistics[NUM_RESOURCES][NUM_USAGE];
@@ -83,33 +83,32 @@ static int resRecNum[NUM_RESOURCES];
 
 extern const char *getHostOfficialByName_ (const char *);
 
-static void setdefaults (void);
-static void getoptions (int argc, char *argv[]);
-static void getpids (int argc, char *argv[]);
-static void printheader (void);
-static void initstats (void);
-static void processlogfile (void);
-static void printsummary (void);
-static void usage (const char *cmd);
-static void getarglist (char *argstr, char *arglist[], int n);
-static void expandhostnames (void);
-static void processacctrec (const struct lsfAcctRec *acctrec);
-static void printacctrec (const struct lsfAcctRec *acctrec);
-static void processresuse (enum resource res, double use);
-static void processtime (time_t time, struct interval *inter);
-static void printresuse (enum resource res, const char *label);
-static int isinteresting (const struct lsfAcctRec *acctrec);
-static int innamelist (const char *name, char *namelist[]);
-static int innumlist (int num, const int numlist[]);
-static int ininterval (time_t time, struct interval inter);
-static struct interval mkinterval (time_t begin, time_t end);
-static struct interval getinterval (char *timeform);
+void setdefaults (void);
+void getoptions (int argc, char *argv[]);
+void getpids (int argc, char *argv[]);
+void printheader (void);
+void initstats (void);
+void processlogfile (void);
+void printsummary (void);
+void lsacct_usage (const char *cmd);
+void getarglist (char *argstr, char *arglist[], int n);
+void expandhostnames (void);
+void processacctrec (const struct lsfAcctRec *acctrec);
+void printacctrec (const struct lsfAcctRec *acctrec);
+void processresuse (enum resource res, double use);
+void processtime (time_t time, struct interval *inter);
+void printresuse (enum resource res, const char *label);
+int isinteresting (const struct lsfAcctRec *acctrec);
+int innamelist (const char *name, char *namelist[]);
+int innumlist (int num, const int numlist[]);
+int ininterval (time_t time, struct interval inter);
+struct interval mkinterval (time_t begin, time_t end);
+struct interval getinterval (char *timeform);
 
 
-#define NL_SETN 27
 
 
-static void
+void
 setdefaults (void)
 {
   int n;
@@ -158,7 +157,7 @@ setdefaults (void)
 }
 
 
-static void
+void
 getoptions (int argc, char *argv[])
 {
 
@@ -167,42 +166,42 @@ getoptions (int argc, char *argv[])
   while ((cc = getopt (argc, argv, "hVlf:u:m:C:S:")) != EOF)
     {
       switch (cc)
-	{
-	case 'C':
-	  complete = getinterval (optarg);
-	  break;
-	case 'S':
-	  start = getinterval (optarg);
-	  break;
-	case 'V':
-	  fputs (_LS_VERSION_, stderr);
-	  exit (-1);
-	case 'f':
-	  strcpy (logfile, optarg);
-	  break;
-	case 'h':
-	  usage (argv[0]);
-	case 'l':
-	  details = 1;
-	  break;
-	case 'm':
-	  getarglist (optarg, hosts, MAX_HOSTS + 1);
-	  expandhostnames ();
-	  break;
-	case 'u':
-	  getarglist (optarg, users, MAX_USERS + 1);
-	  if (strcmp (users[0], "all") == 0)
-	    users[0] = NULL;
-	  break;
-	case '?':
-	default:
-	  usage (argv[0]);
-	}
+  {
+  case 'C':
+    complete = getinterval (optarg);
+    break;
+  case 'S':
+    start = getinterval (optarg);
+    break;
+  case 'V':
+    fputs (_LS_VERSION_, stderr);
+    exit (-1);
+  case 'f':
+    strcpy (logfile, optarg);
+    break;
+  case 'h':
+    usage (argv[0]);
+  case 'l':
+    details = 1;
+    break;
+  case 'm':
+    getarglist (optarg, hosts, MAX_HOSTS + 1);
+    expandhostnames ();
+    break;
+  case 'u':
+    getarglist (optarg, users, MAX_USERS + 1);
+    if (strcmp (users[0], "all") == 0)
+      users[0] = NULL;
+    break;
+  case '?':
+  default:
+    usage (argv[0]);
+  }
     }
 }
 
 
-static void
+void
 getpids (int argc, char *argv[])
 {
   int i, pid;
@@ -211,32 +210,32 @@ getpids (int argc, char *argv[])
     {
       pid = atoi (argv[optind]);
       if (pid != 0)
-	{
-	  if (i < MAX_PIDS)
-	    pids[i++] = pid;
-	  else
-	    {
-	      fprintf (stderr, "lsacct: %s pids\n", I18N (1201, "too many"));	/* catgets 1201 */
-	      exit (-1);
-	    }
-	}
+  {
+    if (i < MAX_PIDS)
+      pids[i++] = pid;
+    else
+      {
+        fprintf (stderr, "lsacct: %s pids\n", I18N (1201, "too many")); /* catgets 1201 */
+        exit (-1);
+      }
+  }
     }
 
   pids[i] = 0;
 }
 
 
-static void
+void
 printheader (void)
 {
   int i;
   char localTimeStrStart[50];
   char localTimeStrEnd[50];
 
-  printf (_i18n_msg_get (ls_catd, NL_SETN, 1202, "Accounting information in %s about commands\n"),	/* catgets  1202  */
-	  logfile);
+  printf (_i18n_msg_get (ls_catd, NL_SETN, 1202, "Accounting information in %s about commands\n"),  /* catgets  1202  */
+    logfile);
 
-  printf (" - %s", I18N (1203, "executed by user(s)"));	/* catgets  1203  */
+  printf (" - %s", I18N (1203, "executed by user(s)")); /* catgets  1203  */
   if (users[0] == NULL)
     printf (" %s", I18N (1212, "all"));
   else
@@ -244,7 +243,7 @@ printheader (void)
       printf (" %s", users[i]);
   printf ("\n");
 
-  printf (" - %s", I18N (1204, "executed on host(s)"));	/* catgets  1204  */
+  printf (" - %s", I18N (1204, "executed on host(s)")); /* catgets  1204  */
   if (hosts[0] == NULL)
     printf (" %s", I18N (1212, "all"));
   else
@@ -253,34 +252,34 @@ printheader (void)
   printf ("\n");
 
   if (start.begin == eternity.begin && start.end == eternity.end)
-    printf ("  - %s", I18N (1205, "started any time"));	/* catgets  1205  */
+    printf ("  - %s", I18N (1205, "started any time")); /* catgets  1205  */
   else
     {
       strcpy (localTimeStrStart, _i18n_ctime (ls_catd, 1, &start.begin));
       strcpy (localTimeStrEnd, _i18n_ctime (ls_catd, 1, &start.end));
-      sprintf (printline, I18N (1206, "  - started between %s and %s"),	/* catgets  1206 */
-	       localTimeStrStart, localTimeStrEnd);
+      sprintf (printline, I18N (1206, "  - started between %s and %s"), /* catgets  1206 */
+         localTimeStrStart, localTimeStrEnd);
 
       printf ("%s", printline);
     }
   printf ("\n");
 
   if (complete.begin == eternity.begin && complete.end == eternity.end)
-    printf ("  - %s", I18N (1208, "completed any time"));	/* catgets 1208 */
+    printf ("  - %s", I18N (1208, "completed any time")); /* catgets 1208 */
   else
     {
       strcpy (localTimeStrStart, _i18n_ctime (ls_catd, 1, &complete.begin));
       strcpy (localTimeStrEnd, _i18n_ctime (ls_catd, 1, &complete.end));
-      sprintf (printline, I18N (1209, "  - completed between %s and %s"),	/* catgets 1209 */
-	       localTimeStrStart, localTimeStrEnd);
+      sprintf (printline, I18N (1209, "  - completed between %s and %s"), /* catgets 1209 */
+         localTimeStrStart, localTimeStrEnd);
 
       printf ("%s", printline);
     }
   printf ("\n");
 
-  printf (_i18n_msg_get (ls_catd, NL_SETN, 1211, "  - with pid(s)"));	/* catgets  1211  */
+  printf (_i18n_msg_get (ls_catd, NL_SETN, 1211, "  - with pid(s)")); /* catgets  1211  */
   if (pids[0] == 0)
-    printf (" %s", I18N (1212, "all"));	/* catgets  1212  */
+    printf (" %s", I18N (1212, "all")); /* catgets  1212  */
   else
     for (i = 0; pids[i]; i++)
       printf (" %d", pids[i]);
@@ -290,7 +289,7 @@ printheader (void)
 }
 
 
-static void
+void
 initstats (void)
 {
   int i;
@@ -310,7 +309,7 @@ initstats (void)
 }
 
 
-static void
+void
 processlogfile (void)
 {
   struct stat statBuf;
@@ -326,14 +325,14 @@ processlogfile (void)
 
   if ((statBuf.st_mode & S_IFMT) != S_IFREG)
     {
-      fprintf (stderr, "%s: %s\n", logfile, _i18n_msg_get (ls_catd, NL_SETN, 1213, "Not a regular file"));	/* catgets  1213  */
+      fprintf (stderr, "%s: %s\n", logfile, _i18n_msg_get (ls_catd, NL_SETN, 1213, "Not a regular file"));  /* catgets  1213  */
       exit (-1);
     }
 
   if ((lfp = fopen (logfile, "r")) == NULL)
     {
       sprintf (printline, I18N_FUNC_S_FAIL, "processlogfile", "fopen",
-	       logfile);
+         logfile);
       perror (printline);
       exit (-1);
     }
@@ -343,26 +342,26 @@ processlogfile (void)
   for (;;)
     {
       if ((acctrec = ls_getacctrec (lfp, &linenum)) == NULL)
-	{
-	  if (lserrno == LSE_EOF)
-	    break;
-	  fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 1215, "Warning : %s at line <%d>: %s. Ignored.\n\n")),	/* catgets  1215  */
-		   logfile, linenum, ls_sysmsg ());
-	  continue;
-	}
+  {
+    if (lserrno == LSE_EOF)
+      break;
+    fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 1215, "Warning : %s at line <%d>: %s. Ignored.\n\n")), /* catgets  1215  */
+       logfile, linenum, ls_sysmsg ());
+    continue;
+  }
 
       if (isinteresting (acctrec))
-	{
-	  processacctrec (acctrec);
+  {
+    processacctrec (acctrec);
 
-	  if (details)
-	    printacctrec (acctrec);
-	}
+    if (details)
+      printacctrec (acctrec);
+  }
     }
 }
 
 
-static void
+void
 processacctrec (const struct lsfAcctRec *acctrec)
 {
   tottasks++;
@@ -388,39 +387,39 @@ processacctrec (const struct lsfAcctRec *acctrec)
 }
 
 
-static void
+void
 printacctrec (const struct lsfAcctRec *acctrec)
 {
   char *buf1, *buf2, *buf3, *buf4, *buf5;
 
   sprintf (printline, "%s", _i18n_ctime (ls_catd, 1, &acctrec->dispTime));
 
-  sprintf (printline + strlen (printline), _i18n_msg_get (ls_catd, NL_SETN, 1216, ": %s@%s executed pid %d on %s."),	/* catgets  1216  */
-	   acctrec->username, acctrec->fromHost, acctrec->pid,
-	   acctrec->execHost);
+  sprintf (printline + strlen (printline), _i18n_msg_get (ls_catd, NL_SETN, 1216, ": %s@%s executed pid %d on %s."),  /* catgets  1216  */
+     acctrec->username, acctrec->fromHost, acctrec->pid,
+     acctrec->execHost);
   printf ("%s\n", printline);
 
-  printf ("  %s: %s\n", _i18n_msg_get (ls_catd, NL_SETN, 1217, "Command"),	/* catgets 1217 */
-	  acctrec->cmdln);
+  printf ("  %s: %s\n", _i18n_msg_get (ls_catd, NL_SETN, 1217, "Command"),  /* catgets 1217 */
+    acctrec->cmdln);
 
-  printf ("  %s: %s\n", _i18n_msg_get (ls_catd, NL_SETN, 1218, "CWD"),	/* catgets 1218 */
-	  acctrec->cwd);
+  printf ("  %s: %s\n", _i18n_msg_get (ls_catd, NL_SETN, 1218, "CWD"),  /* catgets 1218 */
+    acctrec->cwd);
 
   sprintf (printline, "%s", _i18n_ctime (ls_catd, 1, &acctrec->termTime));
-  sprintf (printline + strlen (printline), _i18n_msg_get (ls_catd, NL_SETN, 1219, ": Completed, exit status = %d."),	/* catgets  1219  */
-	   acctrec->exitStatus);
+  sprintf (printline + strlen (printline), _i18n_msg_get (ls_catd, NL_SETN, 1219, ": Completed, exit status = %d."),  /* catgets  1219  */
+     acctrec->exitStatus);
   printf ("%s\n\n", printline);
 
-  printf ("%s:\n\n", _i18n_msg_get (ls_catd, NL_SETN, 1220, "Accounting information"));	/* catgets  1220  */
+  printf ("%s:\n\n", _i18n_msg_get (ls_catd, NL_SETN, 1220, "Accounting information")); /* catgets  1220  */
 
-  buf1 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1221, "CPU time"));	/* catgets  1221  */
-  buf2 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1222, "Page faults"));	/* catgets  1222  */
-  buf3 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1223, "Swaps"));	/* catgets  1223  */
-  buf4 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1224, "Blocks in"));	/* catgets  1224  */
-  buf5 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1225, "Blocks out"));	/* catgets  1225  */
+  buf1 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1221, "CPU time"));  /* catgets  1221  */
+  buf2 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1222, "Page faults")); /* catgets  1222  */
+  buf3 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1223, "Swaps")); /* catgets  1223  */
+  buf4 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1224, "Blocks in")); /* catgets  1224  */
+  buf5 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1225, "Blocks out"));  /* catgets  1225  */
 
   printf ("%16.16s%16.16s%16.16s%16.16s%16.16s\n", buf1, buf2, buf3, buf4,
-	  buf5);
+    buf5);
 
   FREEUP (buf1);
   FREEUP (buf2);
@@ -453,15 +452,15 @@ printacctrec (const struct lsfAcctRec *acctrec)
   else
     printf ("%16s\n\n", "-");
 
-  buf1 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1226, "Messages sent"));	/* catgets  1226  */
-  buf2 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1227, "Messages rcvd"));	/* catgets  1227  */
-  buf3 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1228, "Vol cont sw"));	/* catgets  1228  */
-  buf4 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1229, "Invol cont sw"));	/* catgets  1229  */
-  buf5 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1230, "Turnaround"));	/* catgets  1230  */
+  buf1 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1226, "Messages sent")); /* catgets  1226  */
+  buf2 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1227, "Messages rcvd")); /* catgets  1227  */
+  buf3 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1228, "Vol cont sw")); /* catgets  1228  */
+  buf4 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1229, "Invol cont sw")); /* catgets  1229  */
+  buf5 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1230, "Turnaround"));  /* catgets  1230  */
 
 
   printf ("%16.16s%16.16s%16.16s%16.16s%16.16s\n", buf1, buf2, buf3, buf4,
-	  buf5);
+    buf5);
 
   FREEUP (buf1);
   FREEUP (buf2);
@@ -490,13 +489,13 @@ printacctrec (const struct lsfAcctRec *acctrec)
     printf ("%16s", "-");
 
   printf ("%16.1f\n",
-	  (double) difftime (acctrec->termTime, acctrec->dispTime));
+    (double) difftime (acctrec->termTime, acctrec->dispTime));
 
   printf ("%s\n\n", dashed_line);
 }
 
 
-static void
+void
 printsummary (void)
 {
   char localTimeStrBegin[60];
@@ -509,30 +508,30 @@ printsummary (void)
   strcpy (localTimeStrBegin, _i18n_ctime (ls_catd, 1, &actual_start.begin));
   strcpy (localTimeStrEnd, _i18n_ctime (ls_catd, 1, &actual_start.end));
 
-  printf (_i18n_msg_get (ls_catd, NL_SETN, 1231, "Summary of %d task(s).  (Exit status zero: %d; exit status non-zero: %d).\n"),	/* catgets  1231  */
-	  tottasks, totstatz, totstatnz);
+  printf (_i18n_msg_get (ls_catd, NL_SETN, 1231, "Summary of %d task(s).  (Exit status zero: %d; exit status non-zero: %d).\n"),  /* catgets  1231  */
+    tottasks, totstatz, totstatnz);
 
-  sprintf (printline, _i18n_msg_get (ls_catd, NL_SETN, 1232, "Started between %s and %s"),	/* catgets  1232  */
-	   localTimeStrBegin, localTimeStrEnd);
+  sprintf (printline, _i18n_msg_get (ls_catd, NL_SETN, 1232, "Started between %s and %s"),  /* catgets  1232  */
+     localTimeStrBegin, localTimeStrEnd);
 
   printf ("%s", printline);
 
 
   strcpy (localTimeStrBegin,
-	  _i18n_ctime (ls_catd, 1, &actual_complete.begin));
+    _i18n_ctime (ls_catd, 1, &actual_complete.begin));
   strcpy (localTimeStrEnd, _i18n_ctime (ls_catd, 1, &actual_complete.end));
 
-  sprintf (printline, _i18n_msg_get (ls_catd, NL_SETN, 1234, "Completed between %s and %s"),	/* catgets 1234 */
-	   localTimeStrBegin, localTimeStrEnd);
+  sprintf (printline, _i18n_msg_get (ls_catd, NL_SETN, 1234, "Completed between %s and %s"),  /* catgets 1234 */
+     localTimeStrBegin, localTimeStrEnd);
 
 
   printf ("%s\n", printline);
 
-  buf1 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1236, "Resource"));	/* catgets  1236  */
-  buf2 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1237, "Total"));	/* catgets  1237  */
-  buf3 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1238, "Average"));	/* catgets  1238  */
-  buf4 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1239, "Maximum"));	/* catgets  1239  */
-  buf5 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1240, "Minimum"));	/* catgets  1240  */
+  buf1 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1236, "Resource"));  /* catgets  1236  */
+  buf2 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1237, "Total")); /* catgets  1237  */
+  buf3 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1238, "Average")); /* catgets  1238  */
+  buf4 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1239, "Maximum")); /* catgets  1239  */
+  buf5 = putstr_ (_i18n_msg_get (ls_catd, NL_SETN, 1240, "Minimum")); /* catgets  1240  */
 
   printf ("  %-30s%12s%12s%12s%12s\n", buf1, buf2, buf3, buf4, buf5);
 
@@ -542,20 +541,20 @@ printsummary (void)
   FREEUP (buf4);
   FREEUP (buf5);
 
-  printresuse (cpu, _i18n_msg_get (ls_catd, NL_SETN, 1241, "CPU time (seconds):"));	/* catgets  1241  */
-  printresuse (pf, _i18n_msg_get (ls_catd, NL_SETN, 1242, "Page faults:"));	/* catgets  1242  */
-  printresuse (swaps, _i18n_msg_get (ls_catd, NL_SETN, 1243, "Swaps:"));	/* catgets  1243  */
-  printresuse (bin, _i18n_msg_get (ls_catd, NL_SETN, 1244, "Block input:"));	/* catgets  1244  */
-  printresuse (bout, _i18n_msg_get (ls_catd, NL_SETN, 1245, "Block output:"));	/* catgets  1245  */
-  printresuse (msgs, _i18n_msg_get (ls_catd, NL_SETN, 1246, "Messages sent:"));	/* catgets  1246  */
-  printresuse (msgr, _i18n_msg_get (ls_catd, NL_SETN, 1247, "Messages received:"));	/* catgets  1247  */
-  printresuse (vcsw, _i18n_msg_get (ls_catd, NL_SETN, 1248, "Voluntary context switches:"));	/* catgets  1248  */
-  printresuse (ivcsw, _i18n_msg_get (ls_catd, NL_SETN, 1249, "Involuntary context switches:"));	/* catgets  1249  */
-  printresuse (turn, _i18n_msg_get (ls_catd, NL_SETN, 1250, "Turnaround time (seconds):"));	/* catgets  1250  */
+  printresuse (cpu, _i18n_msg_get (ls_catd, NL_SETN, 1241, "CPU time (seconds):")); /* catgets  1241  */
+  printresuse (pf, _i18n_msg_get (ls_catd, NL_SETN, 1242, "Page faults:")); /* catgets  1242  */
+  printresuse (swaps, _i18n_msg_get (ls_catd, NL_SETN, 1243, "Swaps:"));  /* catgets  1243  */
+  printresuse (bin, _i18n_msg_get (ls_catd, NL_SETN, 1244, "Block input:"));  /* catgets  1244  */
+  printresuse (bout, _i18n_msg_get (ls_catd, NL_SETN, 1245, "Block output:"));  /* catgets  1245  */
+  printresuse (msgs, _i18n_msg_get (ls_catd, NL_SETN, 1246, "Messages sent:")); /* catgets  1246  */
+  printresuse (msgr, _i18n_msg_get (ls_catd, NL_SETN, 1247, "Messages received:")); /* catgets  1247  */
+  printresuse (vcsw, _i18n_msg_get (ls_catd, NL_SETN, 1248, "Voluntary context switches:"));  /* catgets  1248  */
+  printresuse (ivcsw, _i18n_msg_get (ls_catd, NL_SETN, 1249, "Involuntary context switches:")); /* catgets  1249  */
+  printresuse (turn, _i18n_msg_get (ls_catd, NL_SETN, 1250, "Turnaround time (seconds):")); /* catgets  1250  */
 }
 
 
-static void
+void
 printresuse (enum resource res, const char *label)
 {
   printf ("  %-30s", label);
@@ -563,7 +562,7 @@ printresuse (enum resource res, const char *label)
     {
       printf ("%12.*f", res == cpu || res == turn, statistics[res][tot]);
       printf ("%12.*f", res == cpu
-	      || res == turn, statistics[res][tot] / resRecNum[res]);
+        || res == turn, statistics[res][tot] / resRecNum[res]);
       printf ("%12.*f", res == cpu || res == turn, statistics[res][max]);
       printf ("%12.*f", res == cpu || res == turn, statistics[res][min]);
     }
@@ -576,18 +575,16 @@ printresuse (enum resource res, const char *label)
 }
 
 
-static void
-usage (const char *cmd)
+void
+lsacct_usage (const char *cmd)
 {
-  fprintf (stderr,
-	   "%s:  %s  [-h] [-V] [-l] [-f logfile] [-u userlist | -u all] [-m machinelist] ",
-	   I18N_Usage, cmd);
-  fprintf (stderr, "[-C 'time0,time1'] [-S 'time0,time1'] [pid ...]\n");
-  exit (-1);
+    fprintf (stderr, "%s:  %s  [-h] [-V] [-l] [-f logfile] [-u userlist | -u all] [-m machinelist] ", I18N_Usage, cmd);
+    fprintf (stderr, "[-C 'time0,time1'] [-S 'time0,time1'] [pid ...]\n");
+    exit (-1);
 }
 
 
-static struct interval
+struct interval
 mkinterval (time_t begin, time_t end)
 {
   struct interval i;
@@ -599,7 +596,7 @@ mkinterval (time_t begin, time_t end)
 }
 
 
-static struct interval
+struct interval
 getinterval (char *timeform)
 {
   time_t twotimes[2];
@@ -618,7 +615,7 @@ getinterval (char *timeform)
 }
 
 
-static void
+void
 getarglist (char *argstr, char *arglist[], int n)
 {
   int i;
@@ -629,19 +626,19 @@ getarglist (char *argstr, char *arglist[], int n)
     {
       arglist[i] = strtok (NULL, " ");
       if (arglist[i] == NULL)
-	break;
+  break;
     }
 
   if (i == n)
     {
       fprintf (stderr, "getarglist: %s\n",
-	       I18N (1254, "too many arguments") /* catgets 1254 */ );
+         I18N (1254, "too many arguments") /* catgets 1254 */ );
       exit (-1);
     }
 }
 
 
-static void
+void
 expandhostnames (void)
 {
   int i;
@@ -650,19 +647,19 @@ expandhostnames (void)
   for (i = 0; hosts[i]; i++)
     {
       if ((hp = Gethostbyname_ (hosts[i])) == NULL)
-	continue;
+  continue;
 
       hosts[i] = strdup (hp->h_name);
       if (hosts[i] == NULL)
-	{
-	  perror ("strdup()");
-	  exit (-1);
-	}
+  {
+    perror ("strdup()");
+    exit (-1);
+  }
     }
 }
 
 
-static void
+void
 processresuse (enum resource res, double use)
 {
   if (use >= 0)
@@ -671,15 +668,15 @@ processresuse (enum resource res, double use)
       statistics[res][tot] += use;
 
       if (statistics[res][max] < use)
-	statistics[res][max] = use;
+  statistics[res][max] = use;
 
       if (statistics[res][min] > use)
-	statistics[res][min] = use;
+  statistics[res][min] = use;
     }
 }
 
 
-static void
+void
 processtime (time_t time, struct interval *inter)
 {
   if (inter->begin > time)
