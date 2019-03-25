@@ -23,7 +23,7 @@ static enum PIM_PARAMS {
 static struct config_param pimDaemonParams[ ] = {
 	{ "PIM_DEBUG",                NULL }, // -1
 	{ "PIM_INFODIR",              NULL }, //  0
-	{ "PIM_SLEEPTIME",            NULL }, //  1
+	{ "PIM_SLEEP_TIME",           NULL }, //  1
 	{ NULL,                       NULL },
 	{ "PIM_PORT",                 NULL }, //  3 // made up value
 	{ "PIM_SLEEPTIME_UPDATE",     NULL }, //  4

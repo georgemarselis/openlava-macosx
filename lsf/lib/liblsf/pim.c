@@ -104,17 +104,17 @@ getJInfo_ (int npgid, int *pgid, unsigned short options, gid_t cpgid)
             }
         }
 
-        if (pimParams[LSF_PIM_SLEEPTIME].paramValue) {
-            if ((pimSleepTime = atoi (pimParams[LSF_PIM_SLEEPTIME].paramValue)) < 0) {
+        if (pimParams[PIM_SLEEP_TIME].paramValue) {
+            if ((pimSleepTime = atoi (pimParams[PIM_SLEEP_TIME].paramValue)) < 0) {
                 if (logclass & LC_PIM) {
-                    ls_syslog (LOG_DEBUG, "LSF_PIM_SLEEPTIME value <%s> must be a positive integer, defaulting to %d", pimParams[LSF_PIM_SLEEPTIME].paramValue, PIM_SLEEP_TIME);
+                    ls_syslog (LOG_DEBUG, "PIM_SLEEP_TIME value <%s> must be a positive integer, defaulting to %d", pimParams[PIM_SLEEP_TIME].paramValue, PIM_SLEEP_TIME);
                 }
           
                 pimSleepTime = PIM_SLEEP_TIME;
             }
         }
 
-        if (pimParams[LSF_PIM_SLEEPTIME_UPDATE].paramValue != NULL && strcasecmp (pimParams[LSF_PIM_SLEEPTIME_UPDATE].paramValue, "y") == 0) {
+        if (pimParams[PIM_SLEEP_TIME_UPDATE].paramValue != NULL && strcasecmp (pimParams[PIM_SLEEP_TIME_UPDATE].paramValue, "y") == 0) {
             
             periodicUpdateOnly = TRUE;
             
