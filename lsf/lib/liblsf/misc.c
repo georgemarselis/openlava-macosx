@@ -206,7 +206,7 @@ strToLower_ (char *name)
 char *
 getNextToken (char **sp)
 {
-	static char word[MAXLINELEN];
+	static char word[MAX_LINE_LEN];
 	char *cp;
 
 	if (!*sp) {

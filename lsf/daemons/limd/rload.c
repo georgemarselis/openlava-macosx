@@ -103,7 +103,7 @@ getutime (char *usert)
 void
 putLastActiveTime ()
 {
-  char lsfLastActiveTime[MAXLINELEN];
+  char lsfLastActiveTime[MAX_LINE_LEN];
 
   sprintf (lsfLastActiveTime, "%ld", lastActiveTime);
   if (putEnv (ENV_LAST_ACTIVE_TIME, lsfLastActiveTime) != 0)
@@ -999,7 +999,7 @@ getusr (void)
       sigset_t newMask;
 
       char *fromELIM = NULL;
-      int sizeOfFromELIM = MAXLINELEN;
+      int sizeOfFromELIM = MAX_LINE_LEN;
       char *elimPos;
       int spaceLeft, spaceRequired;
 

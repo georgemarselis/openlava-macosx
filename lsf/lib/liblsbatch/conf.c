@@ -2937,11 +2937,11 @@ parseGroups (char *linep, const char *filename, size_t *lineNum, const char *sec
 
     initGroupInfo (mygp);
     if (groupType == HOST_GRP) {
-        hostGroup = malloc (MAXLINELEN);
+        hostGroup = malloc (MAX_LINE_LEN);
         if (NULL == hostGroup && ENOMEM == errno ) {
-            // failReturn (mygp, MAXLINELEN);
+            // failReturn (mygp, MAX_LINE_LEN);
             const char malloc[] = "malloc";
-            ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, "malloc", MAXLINELEN );
+            ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, "malloc", MAX_LINE_LEN );
             freeGroupInfo (mygp);
             FREEUP (mygp);
             FREEUP (hostGroup);
@@ -2949,7 +2949,7 @@ parseGroups (char *linep, const char *filename, size_t *lineNum, const char *sec
 
             return NULL;
         }
-        len = MAXLINELEN;
+        len = MAX_LINE_LEN;
         checkAll = FALSE;
         hostGroup[0] = '\0';
     }
@@ -4178,7 +4178,7 @@ do_Queues (struct lsConf *conf, char *filename, size_t *lineNum, struct lsInfo *
 
         if (keyList[QKEY_CHKPNT].val != NULL && strcmp (keyList[QKEY_CHKPNT].val, ""))
             {
-            if (strlen (keyList[QKEY_CHKPNT].val) >= MAXLINELEN)
+            if (strlen (keyList[QKEY_CHKPNT].val) >= MAX_LINE_LEN)
                 {
                 /* catgets 5439 */
                 ls_syslog (LOG_ERR, _i18n_msg_get (ls_catd, NL_SETN, 5439, "%s: File %s in section Queue ending at line %d: CHKPNT of the queue <%s> is too long <%s>; ignoring"), __func__, filename, *lineNum, queue.queue, keyList[QKEY_CHKPNT].val);
@@ -4305,11 +4305,11 @@ do_Queues (struct lsConf *conf, char *filename, size_t *lineNum, struct lsInfo *
 
         if (keyList[QKEY_DESCRIPTION].val != NULL)
             {
-            if (strlen (keyList[QKEY_DESCRIPTION].val) > 10 * MAXLINELEN)
+            if (strlen (keyList[QKEY_DESCRIPTION].val) > 10 * MAX_LINE_LEN)
                 {
                 ls_syslog (LOG_ERR, I18N (5338, "%s: File %s in section Queue ending at line %d: Too many characters in DESCRIPTION of the queue; truncated"), __func__, filename, *lineNum); /* catgets 5338 */
                 lsberrno = LSBE_CONF_WARNING;
-                keyList[QKEY_DESCRIPTION].val[10 * MAXLINELEN - 1] = '\0';
+                keyList[QKEY_DESCRIPTION].val[10 * MAX_LINE_LEN - 1] = '\0';
                 }
             queue.description = putstr_ (keyList[QKEY_DESCRIPTION].val);
             if (queue.description == NULL)
@@ -4357,7 +4357,7 @@ do_Queues (struct lsConf *conf, char *filename, size_t *lineNum, struct lsInfo *
         if (keyList[QKEY_PRE_EXEC].val != NULL
             && strcmp (keyList[QKEY_PRE_EXEC].val, ""))
             {
-            if (strlen (keyList[QKEY_PRE_EXEC].val) >= MAXLINELEN)
+            if (strlen (keyList[QKEY_PRE_EXEC].val) >= MAX_LINE_LEN)
                 {
                 ls_syslog (LOG_ERR, I18N (5344, "%s: File %s in section Queue ending at line %d: PRE_EXEC of the queue <%s> is too long <%s>; ignoring"), __func__, filename, *lineNum, queue.queue, keyList[QKEY_PRE_EXEC].val); /* catgets 5344 */
                 lsberrno = LSBE_CONF_WARNING;
@@ -4375,7 +4375,7 @@ do_Queues (struct lsConf *conf, char *filename, size_t *lineNum, struct lsInfo *
         }
 
         if (keyList[QKEY_PRE_POST_EXEC_USER].val != NULL && strcmp (keyList[QKEY_PRE_POST_EXEC_USER].val, "")) {
-            if (strlen (keyList[QKEY_PRE_POST_EXEC_USER].val) >= MAXLINELEN) {
+            if (strlen (keyList[QKEY_PRE_POST_EXEC_USER].val) >= MAX_LINE_LEN) {
                 ls_syslog (LOG_ERR, I18N (5352, "%s: User name %s in section Queue ending at line %d: PRE_POST_EXEC_USER of the queue <%s> is too long <%s>; ignoring"), __func__, filename, *lineNum, queue.queue, keyList[QKEY_PRE_POST_EXEC_USER].val);    /* catgets 5352 */
                 lsberrno = LSBE_CONF_WARNING;
             }
@@ -4392,7 +4392,7 @@ do_Queues (struct lsConf *conf, char *filename, size_t *lineNum, struct lsInfo *
         }
 
         if (keyList[QKEY_POST_EXEC].val != NULL && strcmp (keyList[QKEY_POST_EXEC].val, "")) {
-            if (strlen (keyList[QKEY_POST_EXEC].val) >= MAXLINELEN) {
+            if (strlen (keyList[QKEY_POST_EXEC].val) >= MAX_LINE_LEN) {
                 ls_syslog (LOG_ERR, I18N (5347, "%s: File %s in section Queue ending at line %d: POST_EXEC of the queue <%s> is too long <%s>; ignoring"), __func__, filename, *lineNum, queue.queue, keyList[QKEY_POST_EXEC].val);   /* catgets 5347 */
                 lsberrno = LSBE_CONF_WARNING;
             }
@@ -4409,7 +4409,7 @@ do_Queues (struct lsConf *conf, char *filename, size_t *lineNum, struct lsInfo *
         }
 
         if (keyList[QKEY_REQUEUE_EXIT_VALUES].val != NULL && strcmp (keyList[QKEY_REQUEUE_EXIT_VALUES].val, "")) {
-            if (strlen (keyList[QKEY_REQUEUE_EXIT_VALUES].val) >= MAXLINELEN) {
+            if (strlen (keyList[QKEY_REQUEUE_EXIT_VALUES].val) >= MAX_LINE_LEN) {
                 ls_syslog (LOG_ERR, I18N (5350, "%s: File %s in section Queue ending at line %d: REQUEUE_EXIT_VALUES  of the queue <%s> is too long <%s>; ignoring"), __func__, filename, *lineNum, queue.queue, keyList[QKEY_REQUEUE_EXIT_VALUES].val);  /* catgets 5350 */
                 lsberrno = LSBE_CONF_WARNING;
             }
@@ -4638,10 +4638,10 @@ checkRequeEValues (struct queueInfoEnt *qp, char *word, const char *filename, si
     char *sp       = NULL;
     char *cp       = NULL;
     int exitInts[400];
-    char exitValues[MAXLINELEN];
+    char exitValues[MAX_LINE_LEN];
 
     memset( exitInts, 0, 400 );
-    memset( exitValues, 0, MAXLINELEN );
+    memset( exitValues, 0, MAX_LINE_LEN );
 
     cp = word;
 
@@ -5368,15 +5368,15 @@ parseAdmins (char *admins, int options, char *filename, size_t *lineNum)
         return NULL;
     }
 
-    expandAds = malloc( MAXLINELEN );
+    expandAds = malloc( MAX_LINE_LEN );
     if ( NULL == expandAds && ENOMEM == errno ) {
-        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, filename, "malloc", MAXLINELEN);
+        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, filename, "malloc", MAX_LINE_LEN);
         lsberrno = LSBE_NO_MEM;
         return NULL;
     }
 
     expandAds = "";
-    len = MAXLINELEN;
+    len = MAX_LINE_LEN;
     sp = admins;
     while ((word = getNextWord_ (&sp)) != NULL) {
         if (strcmp (word, "all") == 0) {

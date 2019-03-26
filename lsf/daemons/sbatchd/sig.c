@@ -1234,7 +1234,7 @@ jobact (struct jobCard *jp, int actValue, char *actCmd, int actFlags,
 {
   static char __func__] = "jobact";
   pid_t pid;
-  char exitFile[MAX_FILENAME_LEN], msg[MAXLINELEN * 2];
+  char exitFile[MAX_FILENAME_LEN], msg[MAX_LINE_LEN * 2];
 
 
   jp->jobSpecs.actValue = actValue;
@@ -1356,8 +1356,8 @@ exeActCmd (struct jobCard *jp, char *actCmd, char *exitFile)
   static char __func__] = "exeActCmd";
   pid_t pid1, actCmdExecPid;
   LS_WAIT_T status;
-  char msg[MAXLINELEN * 2];
-  char errMsg[MAXLINELEN];
+  char msg[MAX_LINE_LEN * 2];
+  char errMsg[MAX_LINE_LEN];
   int i, maxfds;
   FILE *fp;
   char jobIdStr[16];
@@ -1597,7 +1597,7 @@ execRestart (struct jobCard *jobCardPtr, struct hostent *hp)
   pid_t pid, erestartPid, erestartPGid;
   int i;
   int fds[2];
-  char errMsg[MAXLINELEN];
+  char errMsg[MAX_LINE_LEN];
   char pidStr[20], pgidStr[20];
 
   char chkDir[MAX_FILENAME_LEN],
@@ -1854,7 +1854,7 @@ exeChkpnt (struct jobCard *jp, int chkFlags, char *exitFile)
 
 
   pid_t pid1, echkpntPid;
-  char errMsg[MAXLINELEN], msg[MAXLINELEN * 2];
+  char errMsg[MAX_LINE_LEN], msg[MAX_LINE_LEN * 2];
   LS_WAIT_T status;
   struct hostent *hp;
   FILE *fp;

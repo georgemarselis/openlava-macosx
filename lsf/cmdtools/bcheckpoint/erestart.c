@@ -38,7 +38,7 @@ int isUserCmdLineMark (const char *);
 int buildNewJobFile (char *, const char *, const char *);
 void erestart_usage (const char *);
 
-char logMesgBuf[MAXLINELEN];
+char logMesgBuf[MAX_LINE_LEN];
 
 void
 erestart_usage (const char *pCmd)
@@ -51,7 +51,7 @@ erestart_usage (const char *pCmd)
 void
 sendPidPGid (pid_t pid, pid_t pgid)
 {
-    char message[MAXLINELEN];
+    char message[MAX_LINE_LEN];
     sprintf (message, "%s%d %s%d", PID_MSG_HEADER, pid, PGID_MSG_HEADER, pgid);
     fprintf (stderr, "%s", message);
     fflush (stderr);
@@ -244,7 +244,7 @@ main (int argc, char **argv)
 
 #ifdef _TEST
   {
-    char strfd[MAXLINELEN];
+    char strfd[MAX_LINE_LEN];
     int fd;
     fd =
       open ("/export/home/cchen/null.out", O_CREAT | O_WRONLY,
@@ -618,7 +618,7 @@ getUserCmdFromJF (char *pUserCmd, const char *pJobFileName)
 {
   static char __func__] = "getUserCmdFromJF()";
 
-  char line[MAXLINELEN];
+  char line[MAX_LINE_LEN];
   FILE *pFile = NULL;
   int iCmdFlag = 0;
 
@@ -633,7 +633,7 @@ getUserCmdFromJF (char *pUserCmd, const char *pJobFileName)
     }
 
 
-  while (fgets (line, MAXLINELEN, pFile) != NULL)
+  while (fgets (line, MAX_LINE_LEN, pFile) != NULL)
     {
       char *pCurChar = line;
 
@@ -685,7 +685,7 @@ int
 isUserCmdLineMark (const char *pLine)
 {
 
-  char aOperLine[MAXLINELEN];
+  char aOperLine[MAX_LINE_LEN];
   static char *apWord[3] = {
     "LSBATCH:",
     "User",
@@ -746,7 +746,7 @@ getUserCmdFromCmdF (char *pNewUserCmd)
 {
   static char __func__] = "getUserCmdFromCmdF()";
 
-  char line[MAXLINELEN];
+  char line[MAX_LINE_LEN];
   char cmdFileName[MAX_PATH_LEN];
   FILE *pFile = NULL;
   int iReValue = -1;
@@ -785,7 +785,7 @@ getUserCmdFromCmdF (char *pNewUserCmd)
     }
 
 
-  while (fgets (line, MAXLINELEN, pFile) != NULL)
+  while (fgets (line, MAX_LINE_LEN, pFile) != NULL)
     {
       char *pCurChar = line;
       char *pCurWord = NULL;
@@ -835,7 +835,7 @@ buildNewJobFile (char *pNewJobFileName, const char *pUserCmd,
 {
   static char __func__] = "buildNewJobFile()";
 
-  char line[MAXLINELEN];
+  char line[MAX_LINE_LEN];
   FILE *pSource, *pDest;
   int iCmdFlag = 0;
 
@@ -866,7 +866,7 @@ buildNewJobFile (char *pNewJobFileName, const char *pUserCmd,
     }
 
 
-  while (fgets (line, MAXLINELEN, pSource) != NULL)
+  while (fgets (line, MAX_LINE_LEN, pSource) != NULL)
     {
       char *pCurChar = line;
 

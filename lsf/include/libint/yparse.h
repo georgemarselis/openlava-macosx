@@ -57,7 +57,7 @@ struct mallocList
 };
 
 char *token;
-char yyerr[MAXLINELEN];
+char yyerr[MAX_LINE_LEN];
 // char *yyerr;
 #if !defined(__CYGWIN__) && !defined(__sun__)
 FILE *yyout;

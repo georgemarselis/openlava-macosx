@@ -31,8 +31,8 @@ void
 jobInfoErr (LS_LONG_INT jobId, char *jobName, char *user, char *queue,
 	    char *host, int options)
 {
-  char errMsg[MAXLINELEN / 2];
-  char hostOrQueue[MAXLINELEN / 2];
+  char errMsg[MAX_LINE_LEN / 2];
+  char hostOrQueue[MAX_LINE_LEN / 2];
 
   if (user && lsberrno == LSBE_BAD_USER)
     {

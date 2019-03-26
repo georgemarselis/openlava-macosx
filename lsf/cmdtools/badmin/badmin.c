@@ -49,7 +49,7 @@ main (int argc, char **argv)
 	int cc = 0; 
 	int myIndex = 0;
 	const char prompt[] = "badmin> ";
-	static char line[MAXLINELEN];
+	static char line[MAX_LINE_LEN];
 	// int rc = 0;
 
 	// rc = 
@@ -101,7 +101,7 @@ main (int argc, char **argv)
 		printf ("%s", prompt);
 		fflush (stdout);
 
-		if (fgets (line, MAXLINELEN, stdin) == NULL) {
+		if (fgets (line, MAX_LINE_LEN, stdin) == NULL) {
 			printf ("\n");
 			// _i18n_end (ls_catd);
 			_i18n_end( );

@@ -1711,14 +1711,14 @@ chkResReq (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *reqHdr)
   struct LSFHeader replyBuf      = { };
   struct resVal resVal           = { };
   XDR xdrs2 = { };
-  char *resReq = malloc( sizeof( char ) * MAXLINELEN + 1 ); // FIXME FIXME FIXME FIXME free at end
+  char *resReq = malloc( sizeof( char ) * MAX_LINE_LEN + 1 ); // FIXME FIXME FIXME FIXME free at end
   char *sp = NULL;
 
   initResVal (&resVal);
 
   sp = resReq;
   
-  if (!xdr_string (xdrs, &sp, MAXLINELEN))
+  if (!xdr_string (xdrs, &sp, MAX_LINE_LEN))
     {
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_string");
       limReplyCode = LIME_BAD_DATA;

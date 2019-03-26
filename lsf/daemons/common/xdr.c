@@ -185,9 +185,9 @@ xdr_jobSpecs (XDR *xdrs, struct jobSpecs *jobSpecs, struct LSFHeader *hdr)
           xdr_string (xdrs, &sp[4], MAX_FILENAME_LEN) &&
           xdr_string (xdrs, &sp[5], MAX_FILENAME_LEN) &&
           xdr_string (xdrs, &sp[6], MAX_FILENAME_LEN) &&
-          xdr_string (xdrs, &sp[7], MAXLINELEN) &&
-          xdr_string (xdrs, &sp[8], MAXLINELEN) &&
-          xdr_string (xdrs, &sp[9], MAXLINELEN) &&
+          xdr_string (xdrs, &sp[7], MAX_LINE_LEN) &&
+          xdr_string (xdrs, &sp[8], MAX_LINE_LEN) &&
+          xdr_string (xdrs, &sp[9], MAX_LINE_LEN) &&
           xdr_string (xdrs, &sp[10], MAXHOSTNAMELEN)))
         {
         ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_S, __func__, lsb_jobid2str (tmpJobId), "xdr_int", "jobFile");
@@ -196,7 +196,7 @@ xdr_jobSpecs (XDR *xdrs, struct jobSpecs *jobSpecs, struct LSFHeader *hdr)
     if (xdrs->x_op == XDR_DECODE) {
         sp[11][0] = '\0';
     }
-    if (!xdr_string (xdrs, &sp[11], MAXLINELEN)) {
+    if (!xdr_string (xdrs, &sp[11], MAX_LINE_LEN)) {
         ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_S, __func__, lsb_jobid2str (tmpJobId), "xdr_int", "jobFile");
         return FALSE;
     }
@@ -211,7 +211,7 @@ xdr_jobSpecs (XDR *xdrs, struct jobSpecs *jobSpecs, struct LSFHeader *hdr)
         }
     }
 
-    if (!(xdr_string (xdrs, &sp[12], MAX_FILENAME_LEN) &&  xdr_string (xdrs, &sp[13], MAXLINELEN) && xdr_string (xdrs, &sp[14], MAX_LSB_NAME_LEN)))
+    if (!(xdr_string (xdrs, &sp[12], MAX_FILENAME_LEN) &&  xdr_string (xdrs, &sp[13], MAX_LINE_LEN) && xdr_string (xdrs, &sp[14], MAX_LSB_NAME_LEN)))
         {
         ls_syslog (LOG_ERR, I18N_JOB_FAIL_S_S, __func__, lsb_jobid2str (tmpJobId), "xdr_int", "jobFile");
         return FALSE;
@@ -277,14 +277,14 @@ xdr_jobSpecs (XDR *xdrs, struct jobSpecs *jobSpecs, struct LSFHeader *hdr)
         }
     }
 
-    if (!(xdr_string (xdrs, &sp[0], MAXLINELEN)          &&
+    if (!(xdr_string (xdrs, &sp[0], MAX_LINE_LEN)          &&
           xdr_string (xdrs, &sp[1], MAX_LSB_NAME_LEN)    &&
           xdr_string (xdrs, &sp[2], MAX_LSB_NAME_LEN)    &&
-          xdr_string (xdrs, &sp[3], MAXLINELEN)          &&
-          xdr_string (xdrs, &sp[4], MAXLINELEN)          &&
+          xdr_string (xdrs, &sp[3], MAX_LINE_LEN)          &&
+          xdr_string (xdrs, &sp[4], MAX_LINE_LEN)          &&
           xdr_string (xdrs, &sp[5], MAX_FILENAME_LEN)      &&
           xdr_string (xdrs, &sp[6], MAX_FILENAME_LEN)      &&
-          xdr_string (xdrs, &sp[7], MAXLINELEN)          &&
+          xdr_string (xdrs, &sp[7], MAX_LINE_LEN)          &&
           xdr_int    (xdrs, &jobSpecs->execUid)          &&
           xdr_u_int  (xdrs, &jobSpecs->maxNumProcessors) &&
           xdr_u_int  (xdrs, &jobSpecs->numEnv))
@@ -322,8 +322,8 @@ xdr_jobSpecs (XDR *xdrs, struct jobSpecs *jobSpecs, struct LSFHeader *hdr)
         sp[0][0] = '\0';
         sp[1][0] = '\0';
         }
-    if (!(xdr_string (xdrs, &sp[0], MAXLINELEN)) ||
-        !(xdr_string (xdrs, &sp[1], MAXLINELEN)))
+    if (!(xdr_string (xdrs, &sp[0], MAX_LINE_LEN)) ||
+        !(xdr_string (xdrs, &sp[1], MAX_LINE_LEN)))
         return FALSE;
 
 
@@ -335,7 +335,7 @@ xdr_jobSpecs (XDR *xdrs, struct jobSpecs *jobSpecs, struct LSFHeader *hdr)
     }
 
     for ( uint i = 2; i < 5; i++) {
-        if (!(xdr_string (xdrs, &sp[i], MAXLINELEN)))
+        if (!(xdr_string (xdrs, &sp[i], MAX_LINE_LEN)))
             return FALSE;
     }
 

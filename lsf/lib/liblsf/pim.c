@@ -309,7 +309,7 @@ int readPIMFile (char *pfile)
     char *tmpbuf          = NULL;
     char *pimString       = NULL;
 
-    pimString = malloc( MAXLINELEN * sizeof( *pimString ) );
+    pimString = malloc( MAX_LINE_LEN * sizeof( *pimString ) );
 
     if ((buffer = readPIMBuf (pfile)) == NULL) {
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "readPIMBuf");

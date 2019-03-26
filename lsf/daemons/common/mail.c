@@ -41,7 +41,7 @@ lsb_mperr (char *msg)
 {
     static char __func__] = "lsb_mperr()";
     char *p;
-    char err[MAXLINELEN];
+    char err[MAX_LINE_LEN];
 
     if (lsb_CheckMode)
         return;
@@ -190,9 +190,9 @@ smail (char *to, char *tohost)
         return stderr;
     }
 
-    if (getOSUserName_ (to, osUserName, MAXLINELEN) != 0) {
-        strncpy (osUserName, to, MAXLINELEN);
-        assert( osUserName[MAXLINELEN - 1] ==  '\0' );
+    if (getOSUserName_ (to, osUserName, MAX_LINE_LEN) != 0) {
+        strncpy (osUserName, to, MAX_LINE_LEN);
+        assert( osUserName[MAX_LINE_LEN - 1] ==  '\0' );
     }
 
 

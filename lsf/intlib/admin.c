@@ -279,14 +279,14 @@ char *myGetOpt (int nargc, char **nargv, char *ostr)
 
 int getConfirm (char *msg)
 {
-	char answer[MAXLINELEN]; // convert to dynamic allocation
+	char answer[MAX_LINE_LEN]; // convert to dynamic allocation
 	int i = 0;
 
 	while (1)
 	{
 		fputs (msg, stdout);
 		fflush (stdout);
-		if (fgets (answer, MAXLINELEN, stdin) == NULL)
+		if (fgets (answer, MAX_LINE_LEN, stdin) == NULL)
 		{
 			return FALSE;
 		}

@@ -163,7 +163,7 @@ ctrlHost (char *host, int hStatus, int opCode)
 int
 doConfirm (int opCode, char *host)
 {
-  char msg[MAXLINELEN];
+  char msg[MAX_LINE_LEN];
 
   if (host == NULL)
     host = (_i18n_msg_get (ls_catd, NL_SETN, 916, "all the hosts"));	/* catgets  916  */

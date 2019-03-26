@@ -296,11 +296,11 @@ remoteOutput (int fidx, char **disOut, char *exHost, char *__func__,
 {
   char buf[MAX_FILENAME_LEN];
   char *args[MAX_PEEK_ARGS + 4];
-  char lsfUserName[MAXLINELEN];
+  char lsfUserName[MAX_LINE_LEN];
 
 #   define RSHCMD "rsh"
 
-  if ((getLSFUser_ (lsfUserName, MAXLINELEN) == 0)
+  if ((getLSFUser_ (lsfUserName, MAX_LINE_LEN) == 0)
       && strcmp (lsfUserName, execUsername))
     {
 

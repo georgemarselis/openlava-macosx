@@ -131,8 +131,8 @@ childRemoveSpoolFile (const char *spoolFile, int options, const struct passwd *p
     char __func__]    = "childRemoveSpoolFile";
     char apiName[]  = "ls_initrex";
     char *hostName  = malloc( sizeof( char ) * MAXHOSTNAMELEN + 1 ); // FIXME FIXME FIXME FIXME free memory after use
-    char *errMsg    = malloc( sizeof( char ) * MAXLINELEN + 1 ); // FIXME FIXME FIXME FIXME free memory after use
-    char *dirName   = malloc( sizeof( char ) * MAXLINELEN + 1 ); // FIXME FIXME FIXME FIXME free memory after use
+    char *errMsg    = malloc( sizeof( char ) * MAX_LINE_LEN + 1 ); // FIXME FIXME FIXME FIXME free memory after use
+    char *dirName   = malloc( sizeof( char ) * MAX_LINE_LEN + 1 ); // FIXME FIXME FIXME FIXME free memory after use
     char *fromHost  = NULL;
     static char *sp = NULL ;
     pid_t pid = 0;

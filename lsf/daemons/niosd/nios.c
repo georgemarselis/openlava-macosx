@@ -1215,7 +1215,7 @@ setStdout (struct lslibNiosHdr *hdr)
     {
       if (first)
 	{
-	  req.format = (char *) calloc (MAXLINELEN, sizeof (char));
+	  req.format = (char *) calloc (MAX_LINE_LEN, sizeof (char));
 	  if (req.format == NULL)
 	    {
 	      perror ("calloc failed");

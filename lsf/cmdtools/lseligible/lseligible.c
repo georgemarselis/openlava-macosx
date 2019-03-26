@@ -37,7 +37,7 @@ int
 main (int argc, char **argv)
 {
   static char __func__] = "lseligible/main";
-  char resreq[MAXLINELEN];
+  char resreq[MAX_LINE_LEN];
   char mode = LSF_LOCAL_MODE;
   int quiet = 0;
   int cc;

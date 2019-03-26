@@ -239,7 +239,7 @@ fillTable_ ()
 {
 
   FILE *pFile = NULL;
-  char line[MAXLINELEN];
+  char line[MAX_LINE_LEN];
   char *pCurChar = NULL;
   char *pWord = NULL;
 
@@ -259,7 +259,7 @@ fillTable_ ()
     }
 
 
-  while (fgets (line, MAXLINELEN, pFile) != NULL)
+  while (fgets (line, MAX_LINE_LEN, pFile) != NULL)
     {
       pWord = pCurChar = line;
 

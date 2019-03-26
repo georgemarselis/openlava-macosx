@@ -394,7 +394,7 @@ copyJobInfoEnt (struct jobInfoEnt *jobInfo)
 	strcpy (submitPtr->mailUser, jobInfo->submit.mailUser);
 	strcpy (submitPtr->projectName, jobInfo->submit.projectName);
 
-	STRNCPY (submitPtr->dependCond, jobInfo->submit.dependCond, 6 * MAXLINELEN);
+	STRNCPY (submitPtr->dependCond, jobInfo->submit.dependCond, 6 * MAX_LINE_LEN);
 
 	strcpy (submitPtr->jobName, jobInfo->submit.jobName);
 
@@ -1193,14 +1193,14 @@ initJobInfo (void)
 	submitPtr->queue = malloc (MAX_LSB_NAME_LEN);
 	submitPtr->jobName = malloc (MAX_CMD_DESC_LEN);
 	submitPtr->command = malloc (MAX_CMD_DESC_LEN);
-	submitPtr->resReq = malloc (MAXLINELEN);
+	submitPtr->resReq = malloc (MAX_LINE_LEN);
 	submitPtr->inFile = malloc (MAX_FILENAME_LEN);
 	submitPtr->outFile = malloc (MAX_FILENAME_LEN);
 	submitPtr->errFile = malloc (MAX_FILENAME_LEN);
 	submitPtr->hostSpec = malloc (MAX_FILENAME_LEN);
 	submitPtr->chkpntDir = malloc (MAX_FILENAME_LEN);
-	submitPtr->dependCond = malloc (6 * MAXLINELEN);
-	submitPtr->preExecCmd = malloc (MAXLINELEN);
+	submitPtr->dependCond = malloc (6 * MAX_LINE_LEN);
+	submitPtr->preExecCmd = malloc (MAX_LINE_LEN);
 	submitPtr->mailUser = malloc (MAXHOSTNAMELEN);
 	submitPtr->projectName = malloc (MAX_LSB_NAME_LEN);
 	submitPtr->loginShell = malloc (MAX_LSB_NAME_LEN);

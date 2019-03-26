@@ -108,7 +108,7 @@ xdr_decisionReq (XDR * xdrs, struct decisionReq * decisionReqPtr, struct LSFHead
             !xdr_int    (xdrs, &decisionReqPtr->options)   ||
             !xdr_string (xdrs, &sp1, MAX_LSF_NAME_LEN)        ||
             !xdr_u_long (xdrs, (unsigned int *)&decisionReqPtr->numHosts)  ||   // FIXME FIXME FIXME FIXME we got to revisit this
-            !xdr_string (xdrs, &sp2, MAXLINELEN)           ||
+            !xdr_string (xdrs, &sp2, MAX_LINE_LEN)           ||
             !xdr_u_long (xdrs, (unsigned int *)&decisionReqPtr->numPrefs))
         {
         return FALSE;
@@ -270,7 +270,7 @@ xdr_jobXfer (XDR * xdrs, struct jobXfer * jobXferPtr, struct LSFHeader * hdr)
     }
     
     assert( jobXferPtr->numHosts <= INT_MAX );
-    if (!(xdr_int (xdrs, (int *) &jobXferPtr->numHosts) && xdr_string (xdrs, &sp, MAXLINELEN))) {
+    if (!(xdr_int (xdrs, (int *) &jobXferPtr->numHosts) && xdr_string (xdrs, &sp, MAX_LINE_LEN))) {
         return FALSE;
     }
     
@@ -334,7 +334,7 @@ xdr_hostInfoReply (XDR *xdrs, struct hostInfoReply *hostInfoReply, struct LSFHea
         assert( hostInfoReply->nIndex >= 0 );
         vecSize = ALIGNWORD_ ( (u_long)hostInfoReply->nIndex * sizeof (float));
         resSize = (u_long)(GET_INTNUM (hostInfoReply->shortLsInfo->nRes) + GET_INTNUM (hostInfoReply->nIndex)) * sizeof (int);
-        matSize = ALIGNWORD_ (hostInfoReply->nHost * (vecSize + resSize + MAXLINELEN + 100));
+        matSize = ALIGNWORD_ (hostInfoReply->nHost * (vecSize + resSize + MAX_LINE_LEN + 100));
         
         hostInfoReply->hostMatrix = (struct shortHInfo *) malloc (shISize + matSize);
         if ( NULL == hostInfoReply->hostMatrix && ENOMEM == errno ) {
@@ -350,7 +350,7 @@ xdr_hostInfoReply (XDR *xdrs, struct hostInfoReply *hostInfoReply, struct LSFHea
             hostInfoReply->hostMatrix[i].resBitMaps    = (unsigned int *) currp; // FIXME FIXME FIXME FIXME   why is the same value assinged to three different members of the structure?
             currp += resSize;
             hostInfoReply->hostMatrix[i].windows       = (char *)currp; // FIXME FIXME FIXME FIXME   why is the same value assinged to three different members of the structure?
-            currp += MAXLINELEN;
+            currp += MAX_LINE_LEN;
         }
     }
     
@@ -380,7 +380,7 @@ xdr_hostInfoReply (XDR *xdrs, struct hostInfoReply *hostInfoReply, struct LSFHea
 bool_t
 xdr_shortHInfo (XDR *xdrs, struct shortHInfo *shortHInfo, struct LSFHeader *hdr, char *nIndex)
 {
-    char window[MAXLINELEN];
+    char window[MAX_LINE_LEN];
     char *sp;
     char *sp1 = window;
     unsigned int tIndx = 0;
@@ -447,7 +447,7 @@ xdr_shortHInfo (XDR *xdrs, struct shortHInfo *shortHInfo, struct LSFHeader *hdr,
         if ((xdrs->x_op == XDR_ENCODE) && (shortHInfo->windows[0] != '-'))
         {
             sp1 = shortHInfo->windows;
-            if (!xdr_string (xdrs, &sp1, MAXLINELEN)) {
+            if (!xdr_string (xdrs, &sp1, MAX_LINE_LEN)) {
                 return FALSE;
         }
     }
@@ -456,7 +456,7 @@ xdr_shortHInfo (XDR *xdrs, struct shortHInfo *shortHInfo, struct LSFHeader *hdr,
 
         if ((a >> 16) & 0x8000) {
         
-            if (!xdr_string (xdrs, &sp1, MAXLINELEN)) {
+            if (!xdr_string (xdrs, &sp1, MAX_LINE_LEN)) {
                 return FALSE;
             }
         }
@@ -794,13 +794,13 @@ xdr_masterInfo (XDR * xdrs, struct masterInfo * mInfoPtr, struct LSFHeader * hdr
 bool_t
 xdr_clusterInfoReq (XDR *xdrs, struct clusterInfoReq *clusterInfoReq, struct LSFHeader *hdr)
 {
-    char line[MAXLINELEN];
+    char line[MAX_LINE_LEN];
     char *sp = line;
     
     assert( hdr->length);
     
     if (xdrs->x_op == XDR_DECODE) {
-        if (!xdr_string (xdrs, &sp, MAXLINELEN)) {
+        if (!xdr_string (xdrs, &sp, MAX_LINE_LEN)) {
             return FALSE;
         }
         clusterInfoReq->resReq = putstr_ (line);
@@ -810,7 +810,7 @@ xdr_clusterInfoReq (XDR *xdrs, struct clusterInfoReq *clusterInfoReq, struct LSF
     }
     else
     {
-        if (!xdr_string (xdrs, &clusterInfoReq->resReq, MAXLINELEN)) {
+        if (!xdr_string (xdrs, &clusterInfoReq->resReq, MAX_LINE_LEN)) {
             return FALSE;
         }
     }

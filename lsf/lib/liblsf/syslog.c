@@ -418,7 +418,7 @@ ls_setlogmask (int maskpri)
 int
 getLogMask (char **msg, char *logMask)
 {
-  static char msgbuf[MAXLINELEN];
+  static char msgbuf[MAX_LINE_LEN];
 
   *msg = NULL;
 

@@ -31,7 +31,7 @@
 
 static FILE *m_pLogFile = NULL;
 static char *m_pMessageHeader = NULL;
-static char logMesgBuf[MAXLINELEN];
+static char logMesgBuf[MAX_LINE_LEN];
 
 // #define LSF_SERVERDIR    0
 const unsigned int LSF_SERVERDIR = 0

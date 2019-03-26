@@ -89,7 +89,7 @@ unsigned char *yysptr, yysbuf[];
 #endif
 #include <syslog.h>
 
-#ifndef  MAXLINELEN
+#ifndef  MAX_LINE_LEN
 #include "lsf.h"
 #endif
 #include "libint/tokdefs.h"
@@ -111,7 +111,7 @@ static Stream _in, *in = &_in;
 char *source = 0;
 char *token = NULL;
 char *yybuff;
-char yyerr[MAXLINELEN];
+char yyerr[MAX_LINE_LEN];
 extern int calerrno;
 
 static int screen (void);

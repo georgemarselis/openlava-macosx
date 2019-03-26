@@ -40,7 +40,7 @@ void resControl (char *host, int opCode, int data, int ask);
 
 int exitrc;
 int fFlag;
-char opStr[MAXLINELEN];
+char opStr[MAX_LINE_LEN];
 
 
 int

@@ -91,7 +91,7 @@ const char _OPENLAVA_PROJECT_[] = "openlava project 2.0";
 const unsigned short OPENLAVA_VERSION = 20;
 
 // #define LSF_DEFAULT_SOCKS       15
-// #define MAXLINELEN              512
+// #define MAX_LINE_LEN              512
 // #define MAX_LSF_NAME_LEN           128
 // #define MAXSRES                 32
 // #define MAXRESDESLEN            256

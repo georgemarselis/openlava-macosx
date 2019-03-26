@@ -10,7 +10,7 @@ doSkipSection_ (FILE *fp, size_t *lineNum, const char *lsfFileName, const char *
 		if (strcasecmp (word, end ) == 0) {
 			word = getNextWord_ (&cp);
 			if (!word) {
-				char buffer[MAXLINELEN];
+				char buffer[MAX_LINE_LEN];
 				memset( buffer, 0, strlen( buffer) );
 				/* catgets 5400 */
 				sprintf( buffer, "5400: %s at line %d: Section ended without section name, ignored", lsfFileName, *lineNum);
@@ -18,7 +18,7 @@ doSkipSection_ (FILE *fp, size_t *lineNum, const char *lsfFileName, const char *
 			}
 			else {
 				if (strcasecmp (word, sectionName) != 0) {
-					char buffer[MAXLINELEN];
+					char buffer[MAX_LINE_LEN];
 					memset( buffer, 0, strlen( buffer) );
 					/* catgets 5401 */
 					sprintf( buffer,  "5401: %s at line %d: Section %s ended with wrong section name %s, ignored", lsfFileName, *lineNum, sectionName, word);
@@ -54,7 +54,7 @@ doSkipSection_conf (const struct lsConf *conf, size_t *lineNum, const char *lsfF
 		if (strcasecmp (word, end) == 0) {
 			word = getNextWord_ (&cp);
 			if (!word) {
-				char buffer[MAXLINELEN];
+				char buffer[MAX_LINE_LEN];
 				memset( buffer, 0, strlen( buffer) );
 				/* catgets 5419 */
 				sprintf (buffer, "5419: %s at line %d: Section ended without section name, ignored", lsfFileName, *lineNum);
@@ -62,7 +62,7 @@ doSkipSection_conf (const struct lsConf *conf, size_t *lineNum, const char *lsfF
 			}
 			else {
 				if (strcasecmp (word, sectionName) != 0) {
-					char buffer[MAXLINELEN];
+					char buffer[MAX_LINE_LEN];
 					memset( buffer, 0, strlen( buffer) );
 					/* catgets 5420 */
 					ls_syslog (LOG_ERR, "5420: %s at line %d: Section %s ended with wrong section name: %s, ignored", lsfFileName, *lineNum, sectionName, word);
@@ -89,7 +89,7 @@ doSkipSection (FILE * fp, size_t *lineNum, const char *lsfFileName, const char *
 		if (strcasecmp (word, end) == 0) {
 			word = getNextWord_ (&cp);
 			if (!word) {
-				char buffer[MAXLINELEN];
+				char buffer[MAX_LINE_LEN];
 				memset( buffer, 0, strlen( buffer) );
 				/* catgets 5407 */
 				sprintf( buffer, "5407: %s at line %d: Section ended without section name, ignored", lsfFileName, *lineNum);
@@ -97,7 +97,7 @@ doSkipSection (FILE * fp, size_t *lineNum, const char *lsfFileName, const char *
 			}
 			else {
 				if (strcasecmp (word, sectionName) != 0) {
-					char buffer[MAXLINELEN];
+					char buffer[MAX_LINE_LEN];
 					memset( buffer, 0, strlen( buffer) );
 					/* catgets 5408 */
 					sprintf( buffer, "5408: %s at line %d: Section %s ended with wrong section name: %s, ignored", lsfFileName, *lineNum, sectionName, word);

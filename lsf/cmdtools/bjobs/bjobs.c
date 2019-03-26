@@ -103,9 +103,9 @@ main (int argc, char **argv)
   LS_LONG_INT jobId;
   int jobDisplayed = 0;
   float cpuFactor = -1;
-  char prline[MAXLINELEN];
+  char prline[MAX_LINE_LEN];
   char defaultJobName[8] = "/";
-  static char lsfUserName[MAXLINELEN];
+  static char lsfUserName[MAX_LINE_LEN];
   int rc, cc;
 
   rc = _i18n_init (I18N_CAT_MIN);
@@ -153,7 +153,7 @@ main (int argc, char **argv)
       exit (-1);
     }
 
-  TIMEIT (0, (cc = getLSFUser_ (lsfUserName, MAXLINELEN)), "getLSFUser_");
+  TIMEIT (0, (cc = getLSFUser_ (lsfUserName, MAX_LINE_LEN)), "getLSFUser_");
   if (cc != 0)
     {
       exit (-1);
@@ -443,14 +443,14 @@ displayJobs (struct jobInfoEnt *job, struct jobInfoHead *jInfoH,
   char *exec_host = "";
   char *jobName, *pos;
   char *hostList = NULL // was NAMELIST;
-  char tmpBuf[MAXLINELEN];
-  char osUserName[MAXLINELEN];
+  char tmpBuf[MAX_LINE_LEN];
+  char osUserName[MAX_LINE_LEN];
   int i = 0;
 
-  if (getOSUserName_ (job->user, osUserName, MAXLINELEN) != 0)
+  if (getOSUserName_ (job->user, osUserName, MAX_LINE_LEN) != 0)
     {
-      strncpy (osUserName, job->user, MAXLINELEN);
-      osUserName[MAXLINELEN - 1] = '\0';
+      strncpy (osUserName, job->user, MAX_LINE_LEN);
+      osUserName[MAX_LINE_LEN - 1] = '\0';
     }
 
   if (lsbParams[LSB_SHORT_HOSTLIST].paramValue && job->numExHosts > 1
@@ -582,7 +582,7 @@ displayJobs (struct jobInfoEnt *job, struct jobInfoHead *jInfoH,
 
 	  /* Assume one page is 4K.
 	   */
-	  L = 8 * MAXLINELEN;
+	  L = 8 * MAX_LINE_LEN;
 	  if (execHostList == NULL)
 	    {
 	      if ((execHostList = calloc (1, L)) == NULL)
@@ -806,10 +806,10 @@ isLSFAdmin (void)
 {
   struct clusterInfo *clusterInfo  = NULL;
   char *mycluster  = NULL;
-  char lsfUserName[MAXLINELEN];
+  char lsfUserName[MAX_LINE_LEN];
   int i, j, num = 0;
 
-  memset( lsfUserName, '\0', MAXLINELEN );
+  memset( lsfUserName, '\0', MAX_LINE_LEN );
 
   if ((mycluster = ls_getclustername ()) == NULL)
     {
@@ -827,7 +827,7 @@ isLSFAdmin (void)
     }
 
 
-  if (getLSFUser_ (lsfUserName, MAXLINELEN) != 0)
+  if (getLSFUser_ (lsfUserName, MAX_LINE_LEN) != 0)
     {
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "getLSFUser_");
       return (FALSE);

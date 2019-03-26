@@ -35,7 +35,7 @@ lsb_modify (struct submit *jobSubReq, struct submitReply *submitRep, LS_LONG_INT
   int i;
   struct lsfAuth auth;
   char homeDir[MAX_FILENAME_LEN], cwd[MAX_FILENAME_LEN];  // ifXME FIXME FIXME dynamically assigned.
-  char resReq[MAXLINELEN], cmd[MAXLINELEN];
+  char resReq[MAX_LINE_LEN], cmd[MAX_LINE_LEN];
   struct jobInfoEnt *jInfo = NULL;
   LSB_SUB_SPOOL_FILE_T subSpoolFiles;
   LS_LONG_INT jobId = -1;

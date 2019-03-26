@@ -33,7 +33,7 @@ void prtJobRusage (struct jobInfoEnt *);
 void
 prtHeader (struct jobInfoEnt *job, int prt_q, int tFormat)
 {
-  char prline[MAXLINELEN];
+  char prline[MAX_LINE_LEN];
 
   if (!tFormat)
     {
@@ -126,7 +126,7 @@ prtHeader (struct jobInfoEnt *job, int prt_q, int tFormat)
 void
 prtJobSubmit (struct jobInfoEnt *job, int prt_q, int tFormat)
 {
-  char prline[MAXLINELEN];
+  char prline[MAX_LINE_LEN];
   char *timestr;
 
   timestr =
@@ -165,7 +165,7 @@ prtJobSubmit (struct jobInfoEnt *job, int prt_q, int tFormat)
 void
 prtBTTime (struct jobInfoEnt *job)
 {
-  char prline[MAXLINELEN];
+  char prline[MAX_LINE_LEN];
 
 
   if (job->submit.beginTime > 0)
@@ -191,7 +191,7 @@ prtBTTime (struct jobInfoEnt *job)
 void
 prtFileNames (struct jobInfoEnt *job, int prtCwd)
 {
-  char prline[MAXLINELEN];
+  char prline[MAX_LINE_LEN];
   int i;
 
 
@@ -429,7 +429,7 @@ prtSubDetails (struct jobInfoEnt *job, char *hostPtr, float hostFactor)
 void
 prtJobStart (struct jobInfoEnt *job, int prtFlag, int jobPid, int tFormat)
 {
-  char prline[MAXLINELEN], tBuff[20];
+  char prline[MAX_LINE_LEN], tBuff[20];
   time_t startTime;
 
 
@@ -556,7 +556,7 @@ prtJobStart (struct jobInfoEnt *job, int prtFlag, int jobPid, int tFormat)
 void
 prtJobReserv (struct jobInfoEnt *job)
 {
-  char prline[MAXLINELEN];
+  char prline[MAX_LINE_LEN];
 
 
   int i = 0;
@@ -611,7 +611,7 @@ prtJobReserv (struct jobInfoEnt *job)
 void
 prtAcctFinish (struct jobInfoEnt *job)
 {
-  char prline[MAXLINELEN];
+  char prline[MAX_LINE_LEN];
 
   if (job->status == JOB_STAT_DONE)
     sprintf (prline, "%s: %s.\n", _i18n_ctime (ls_catd, CTIME_FORMAT_a_b_d_T, &job->endTime), I18N (620, "Completed <done>"));	/* catgets  620  */
@@ -839,7 +839,7 @@ initLoadIndex (void)
 void
 prtJobRusage (struct jobInfoEnt *job)
 {
-  char prline[MAXLINELEN];
+  char prline[MAX_LINE_LEN];
 
   int i, j;
   int linepos;
@@ -967,7 +967,7 @@ displayLong (struct jobInfoEnt *job, struct jobInfoHead *jInfoH,
   float hostFactor, *getFactor;
   static int first = TRUE;
   static struct lsInfo *lsInfo;
-  char prline[MAXLINELEN];
+  char prline[MAX_LINE_LEN];
 
   if (first)
     {

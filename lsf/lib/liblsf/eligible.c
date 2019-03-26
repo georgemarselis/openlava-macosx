@@ -38,7 +38,7 @@ char listok;
 char *
 ls_resreq ( const char *task)
 {
-	static char resreq[MAXLINELEN];
+	static char resreq[MAX_LINE_LEN];
 
 	if (!ls_eligible (task, resreq, LSF_LOCAL_MODE)) {
 		return NULL;
@@ -534,12 +534,12 @@ listtask_ (char ***taskList, struct hTab *tasktb, int sortflag)
 	static char **tlist;
 	struct hEnt *hEntPtr = NULL;
 	struct hLinks *hashLinks = NULL;
-	char buff[MAXLINELEN];
+	char buff[MAX_LINE_LEN];
 	char *p = NULL;
 	unsigned long index = 0;
 	long nEntry;
 
-	memset( buff, 0, MAXLINELEN );
+	memset( buff, 0, MAX_LINE_LEN );
 
 
 	nEntry = tasktb->numEnts;

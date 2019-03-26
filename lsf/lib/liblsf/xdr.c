@@ -191,7 +191,7 @@ bool_t
 xdr_array_string (XDR * xdrs, char **astring, unsigned int maxlen, unsigned int arraysize)
 {
 
-  char line[MAXLINELEN] = "";
+  char line[MAX_LINE_LEN] = "";
   char *sp = line;
 
   for (unsigned int i = 0; i < arraysize; i++) {

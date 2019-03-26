@@ -144,13 +144,13 @@ parseResReq (char *resReq, struct resVal *resVal, struct lsInfo *lsInfo, int opt
 
 	initResVal (resVal);
 
-	req_len = MAX (3 * strlen (resReq) + 1, MAXLINELEN + MAX_LSF_NAME_LEN);
+	req_len = MAX (3 * strlen (resReq) + 1, MAX_LINE_LEN + MAX_LSF_NAME_LEN);
 	if (resVal->selectStr == NULL || resVal->selectStrSize < req_len ) {   
 		FREEUP(resVal->selectStr);                             
 		resVal->selectStr = malloc( req_len * sizeof( char ) + 1 );                   
 		resVal->selectStrSize = req_len;                       
 	}                                               
-	// ALLOC_STRING (resVal->selectStr, resVal->selectStrSize, MAX (3 * strlen (resReq) + 1, MAXLINELEN + MAX_LSF_NAME_LEN));
+	// ALLOC_STRING (resVal->selectStr, resVal->selectStrSize, MAX (3 * strlen (resReq) + 1, MAX_LINE_LEN + MAX_LSF_NAME_LEN));
 	// 	#	fadefine ALLOC_STRING(buffer, buffer_len, req_len) {     
 	// }
 
@@ -370,7 +370,7 @@ parseSelect (char *resReq, struct resVal *resVal, struct lsInfo *lsInfo, bool_t 
 			for ( unsigned int i = 0; i < numXorExprs; i++) {
 				initResVal (&tmpResVal);
 
-				ALLOC_STRING (tmpResVal.selectStr, tmpResVal.selectStrSize, MAX (3 * strlen (expr) + 1, MAXLINELEN + MAX_LSF_NAME_LEN));
+				ALLOC_STRING (tmpResVal.selectStr, tmpResVal.selectStrSize, MAX (3 * strlen (expr) + 1, MAX_LINE_LEN + MAX_LSF_NAME_LEN));
 
 				if (tmpResVal.selectStr == NULL ) {
 					FREEUP (resReq2);
@@ -1003,7 +1003,7 @@ int resToClassOld (char *resReq, struct resVal *resVal, struct lsInfo *lsInfo)
 	int entry = 0;
 	size_t t = 0;
 	char *token = NULL;
-	char tmpbuf[MAXLINELEN];
+	char tmpbuf[MAX_LINE_LEN];
 	float value = 0.0f;
 	char negate;
 	char valueSpecified;

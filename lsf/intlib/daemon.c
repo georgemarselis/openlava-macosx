@@ -24,7 +24,7 @@ daemonize_ (void)
 {
   int i;
   struct rlimit rlp;
-  char errMsg[MAXLINELEN];
+  char errMsg[MAX_LINE_LEN];
 
   ls_closelog ();
   switch (fork ())

@@ -178,8 +178,8 @@ void doAllHosts (int opCode)
 
 void operateHost (char *host, int opCode, int confirm)
 {
-	char msg1[MAXLINELEN];
-	char msg[MAXLINELEN];
+	char msg1[MAX_LINE_LEN];
+	char msg[MAX_LINE_LEN];
 
 	memset( msg1, 0, strlen( msg1 ) );
 	memset( msg, 0 , strlen( msg  ) );

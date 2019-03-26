@@ -5,10 +5,10 @@
 #include "daemons/libsbatchd/sbatchd.h"
 #include "lib/channel.h"
 
-// #define MAX_PREEXEC_ENVS  ((MAXLINELEN + 1)/3 + 2)
+// #define MAX_PREEXEC_ENVS  ((MAX_LINE_LEN + 1)/3 + 2)
 // #define MAX_LSB_HOSTS_LEN 4096
 
-const unsigned int MAX_PREEXEC_ENVS  = ((MAXLINELEN + 1)/3 + 2);
+const unsigned int MAX_PREEXEC_ENVS  = ((MAX_LINE_LEN + 1)/3 + 2);
 const unsigned int MAX_LSB_HOSTS_LEN = 4096;
 
 struct passwd *my_getpwnam(const char *name, char *caller);

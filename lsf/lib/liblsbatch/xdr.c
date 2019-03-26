@@ -1325,7 +1325,7 @@ xdr_hostDataReply (XDR *xdrs, struct hostDataReply *hostDataReply, struct LSFHea
 				return FALSE;
 			}
 
-			sp = malloc (hostCount * (MAXHOSTNAMELEN + MAXLINELEN)); // FIXME FIXME FIXME this is a bit overkill.
+			sp = malloc (hostCount * (MAXHOSTNAMELEN + MAX_LINE_LEN)); // FIXME FIXME FIXME this is a bit overkill.
 			if ( NULL == sp && ENOMEM == errno ) {
 				FREEUP (hInfoTmp);
 				lsberrno = LSBE_NO_MEM;
@@ -1343,7 +1343,7 @@ xdr_hostDataReply (XDR *xdrs, struct hostDataReply *hostDataReply, struct LSFHea
 				hInfo[i].host = sp;
 				sp += MAXHOSTNAMELEN;
 				hInfo[i].windows = sp;
-				sp += MAXLINELEN;
+				sp += MAX_LINE_LEN;
 			}
 		}
 
@@ -1422,7 +1422,7 @@ xdr_hostInfoEnt (XDR *xdrs, struct hostInfoEnt *hostInfoEnt, struct LSFHeader *h
 
 	if ( ! (xdr_string (xdrs, &sp, MAXHOSTNAMELEN)        &&
 			xdr_double (xdrs, &hostInfoEnt->cpuFactor)    &&
-			xdr_string (xdrs, &wp, MAXLINELEN)            &&
+			xdr_string (xdrs, &wp, MAX_LINE_LEN)            &&
 			xdr_u_long (xdrs, (unsigned int *)&hostInfoEnt->userJobLimit) && // FIXME FIXME FIXME FIXME we have to revisit this.
 			xdr_u_long (xdrs, (unsigned int *)&hostInfoEnt->maxJobs)      && // FIXME FIXME FIXME FIXME we have to revisit this.
 			xdr_u_long (xdrs, (unsigned int *)&hostInfoEnt->numJobs)      && // FIXME FIXME FIXME FIXME we have to revisit this.

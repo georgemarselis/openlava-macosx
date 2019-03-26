@@ -31,7 +31,7 @@
 
 void echkpnt_usage (const char *);
 
-static char logMesgBuf[MAXLINELEN];
+static char logMesgBuf[MAX_LINE_LEN];
 extern char *lsTmpDir_;
 
 static void

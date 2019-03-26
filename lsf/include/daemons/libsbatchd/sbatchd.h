@@ -171,7 +171,7 @@ struct jobSetup
 struct jobSyslog
 {
   int logLevel;
-  char msg[MAXLINELEN];
+  char msg[MAX_LINE_LEN];
 };
 
 #define UID_MAPPED(jp) (strcmp((jp)->jobSpecs.userName, (jp)->execUsername))
@@ -230,7 +230,7 @@ int statusChan;
 
 time_t bootTime = 0;
 
-char errbuf[MAXLINELEN];
+char errbuf[MAX_LINE_LEN];
 
 char *lsbManager = NULL;
 int debug = 0;

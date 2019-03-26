@@ -492,7 +492,7 @@ sbdSyslog (int level, char *msg)
   if ((sbdLogMask & LOG_MASK (level)) != 0)
     {
       slog.logLevel = level;
-      STRNCPY (slog.msg, msg, MAXLINELEN);
+      STRNCPY (slog.msg, msg, MAX_LINE_LEN);
       msgSbd (-1, (char *) &slog, SBD_SYSLOG, xdr_jobSyslog);
 
     }

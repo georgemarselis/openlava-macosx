@@ -1178,7 +1178,7 @@ displayhist (struct bhistReq *bhistReq)
       else
         {
           char *jobName, *pos;
-          char osUserName[MAXLINELEN];
+          char osUserName[MAX_LINE_LEN];
           jobName = job->submit.jobName;
           if ((pos = strchr (jobName, '[')) && LSB_ARRAY_IDX (job->jobId))
         {
@@ -1190,10 +1190,10 @@ displayhist (struct bhistReq *bhistReq)
 
 
           if (getOSUserName_ (jobRecord->job->user, osUserName,
-                  MAXLINELEN) != 0)
+                  MAX_LINE_LEN) != 0)
         {
-          strncpy (osUserName, job->user, MAXLINELEN);
-          osUserName[MAXLINELEN - 1] = '\0';
+          strncpy (osUserName, job->user, MAX_LINE_LEN);
+          osUserName[MAX_LINE_LEN - 1] = '\0';
         }
 
           printf
@@ -2177,9 +2177,9 @@ prtParameters (struct jobInfoEnt *params, struct bhistReq *bhistReq,
 static char *
 getUserName (int userId)
 {
-  static char lsfUserName[MAXLINELEN];
+  static char lsfUserName[MAX_LINE_LEN];
 
-  if (getLSFUserByUid_ (userId, lsfUserName, MAXLINELEN) == 0)
+  if (getLSFUserByUid_ (userId, lsfUserName, MAX_LINE_LEN) == 0)
     return (lsfUserName);
   else
     return ((_i18n_msg_get (ls_catd, NL_SETN, 3220, "unknown")));   /* catgets  3220  */
@@ -2717,7 +2717,7 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
   struct jobInfoEnt *job;
   struct submit *submitPtr;
   struct eventRecord *event;
-  char prline[MAXLINELEN], tBuff[20];
+  char prline[MAX_LINE_LEN], tBuff[20];
   int i;
   char *hostPtr;
   LS_LONG_INT jobId;

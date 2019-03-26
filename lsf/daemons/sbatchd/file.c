@@ -64,9 +64,9 @@ int
 rcpFile (struct jobSpecs *jp, struct xFile *xf, char *host, int op,
 	 char *errMsg)
 {
-  char rcpCmd[MAXLINELEN];
-  char rcpArg[MAXLINELEN];
-  char rcpsh[MAXLINELEN];
+  char rcpCmd[MAX_LINE_LEN];
+  char rcpArg[MAX_LINE_LEN];
+  char rcpsh[MAX_LINE_LEN];
   int cc, pid, i;
   LS_WAIT_T status;
 
@@ -90,7 +90,7 @@ rcpFile (struct jobSpecs *jp, struct xFile *xf, char *host, int op,
 
   if (pid == 0)
     {
-      char debugMsg[MAXLINELEN];
+      char debugMsg[MAX_LINE_LEN];
       sigset_t newmask;
       int maxfds = sysconf (_SC_OPEN_MAX);
 
@@ -211,7 +211,7 @@ rcpFile (struct jobSpecs *jp, struct xFile *xf, char *host, int op,
 int
 rmJobBufFiles (struct jobCard *jp)
 {
-  char errMsg[MAXLINELEN];
+  char errMsg[MAX_LINE_LEN];
   char lsbDir[MAX_FILENAME_LEN];
   struct hostent *hp;
   char *jf;
@@ -270,7 +270,7 @@ unlinkBufFiles (char *lsbDir, char *jobFile, struct jobCard *jp,
 {
   static char __func__] = "unlinkBufFiles()";
   char fileBuf[MAX_FILENAME_LEN], jfPath[MAX_FILENAME_LEN];
-  char errMsg[MAXLINELEN];
+  char errMsg[MAX_LINE_LEN];
   int error = FALSE;
   int errCode;
   int doMount = TRUE;
@@ -367,7 +367,7 @@ int
 initPaths (struct jobCard *jp, struct hostent *fromHp, struct lenData *jf)
 {
   static char __func__] = "initPaths()";
-  char errMsg[MAXLINELEN];
+  char errMsg[MAX_LINE_LEN];
   char fileBuf[MAX_FILENAME_LEN];
   char cwd[MAX_FILENAME_LEN], lsbDir[MAX_FILENAME_LEN];
   char shellFile[MAX_FILENAME_LEN];
@@ -667,7 +667,7 @@ static int
 cwdJob (struct jobCard *jp, char *cwd, struct hostent *fromHp)
 {
   struct passwd *pw;
-  char errMsg[MAXLINELEN];
+  char errMsg[MAX_LINE_LEN];
 
   if (logclass & LC_EXEC)
     {
@@ -800,7 +800,7 @@ lsbatchDir (char *lsbDir, struct jobCard *jp, struct hostent *fromHp,
 	    struct lenData *jf)
 {
   static char __func__] = "lsbatchDir()";
-  char errMsg[MAXLINELEN];
+  char errMsg[MAX_LINE_LEN];
   struct passwd *pw;
   bool_t goodSpoolDir = FALSE;
 
@@ -929,7 +929,7 @@ lsbDirOk (char *lsbDir, struct jobCard *jp, struct hostent *fromHp,
   static char __func__] = "lsbDirOk()";
   struct stat st;
   char jobFile[MAX_FILENAME_LEN];
-  char errMsg[MAXLINELEN];
+  char errMsg[MAX_LINE_LEN];
 
   char chkpntDir[MAX_FILENAME_LEN], restartDir[MAX_FILENAME_LEN];
 
@@ -1042,7 +1042,7 @@ createChkpntJobFile (char *lsbDir, struct jobCard *jp, struct lenData *jf,
 		     char *restartDir)
 {
   static char __func__] = "createChkpntJobFile()";
-  char errMsg[MAXLINELEN];
+  char errMsg[MAX_LINE_LEN];
 
   char chkDir[MAX_FILENAME_LEN], restartDirBak[MAX_FILENAME_LEN];
   char oldJobId[20], newJobId[20];
@@ -1253,7 +1253,7 @@ createChkpntJobFile (char *lsbDir, struct jobCard *jp, struct lenData *jf,
 int
 myRename (char *fromDir, char *toDir)
 {
-  char errMsg[MAXLINELEN];
+  char errMsg[MAX_LINE_LEN];
 
   if (rename (fromDir, toDir) == -1)
     {
@@ -1271,7 +1271,7 @@ static int
 stdoutDirectSymLink (char *jobFile, char *ext, struct jobSpecs *jobSpecsPtr)
 {
   static char __func__] = "stdoutDirectSymLink";
-  char errMsg[MAXLINELEN];
+  char errMsg[MAX_LINE_LEN];
   char fileLink[MAX_FILENAME_LEN];
   char fullpath[MAX_FILENAME_LEN * 2];
 
@@ -1386,7 +1386,7 @@ openStdFiles (char *lsbDir, char *chkpntDir, struct jobCard *jobCardPtr,
   static char stdinName[MAX_FILENAME_LEN];
   char xMsg[3 * MSGSIZE], rcpMsg[MSGSIZE];
   char xfile = FALSE;
-  char errMsg[MAXLINELEN];
+  char errMsg[MAX_LINE_LEN];
   struct jobSpecs *jobSpecsPtr = &(jobCardPtr->jobSpecs);
   char jobFile[MAX_FILENAME_LEN], jobFileLink[MAX_FILENAME_LEN];
   int outFlag = 0, errFlag = 0;
@@ -2033,7 +2033,7 @@ createJobFile (char *lsbDir, char *chkpntDir, struct jobCard *jp,
   static char __func__] = "createJobFile";
   struct jobSpecs *jobSpecsPtr = &jp->jobSpecs;
   int fd, cc, len;
-  char errMsg[MAXLINELEN];
+  char errMsg[MAX_LINE_LEN];
   char jobFile[MAX_FILENAME_LEN], jobFileLink[MAX_FILENAME_LEN];
   char shellFile[MAX_FILENAME_LEN], shellFileLink[MAX_FILENAME_LEN];
   char *sp;
@@ -2169,7 +2169,7 @@ jobFileExitStatus (struct jobCard *jobCard)
 {
   static char __func__] = "jobFileExitStatus()";
   FILE *jobFile_fp;
-  char line[MAXLINELEN];
+  char line[MAX_LINE_LEN];
   struct hostent *hp;
   int pid;
 
@@ -2213,25 +2213,25 @@ jobFileExitStatus (struct jobCard *jobCard)
 
   if ((jobFile_fp = myfopen_ (jobCard->jobSpecs.jobFile, "r", hp)) != NULL)
     {
-      while (fgets (line, MAXLINELEN, jobFile_fp) != NULL)
+      while (fgets (line, MAX_LINE_LEN, jobFile_fp) != NULL)
 	{
 	  if (strncmp (line, "# JOB_PID:", 10) == 0)
 	    {
-	      if (fgets (line, MAXLINELEN, jobFile_fp) != NULL)
+	      if (fgets (line, MAX_LINE_LEN, jobFile_fp) != NULL)
 		sscanf (line, "%d", &jobCard->jobSpecs.jobPid);
 	      else
 		break;
 
-	      if ((fgets (line, MAXLINELEN, jobFile_fp) != NULL)
+	      if ((fgets (line, MAX_LINE_LEN, jobFile_fp) != NULL)
 		  && (strncmp (line, "# JOB_PGID:", 11) == 0)
-		  && (fgets (line, MAXLINELEN, jobFile_fp) != NULL))
+		  && (fgets (line, MAX_LINE_LEN, jobFile_fp) != NULL))
 		sscanf (line, "%d", &jobCard->jobSpecs.jobPGid);
 	      else
 		break;
 
-	      if ((fgets (line, MAXLINELEN, jobFile_fp) != NULL)
+	      if ((fgets (line, MAX_LINE_LEN, jobFile_fp) != NULL)
 		  && (strncmp (line, "# PRE_EXEC STATUS:", 18) == 0)
-		  && (fgets (line, MAXLINELEN, jobFile_fp) != NULL))
+		  && (fgets (line, MAX_LINE_LEN, jobFile_fp) != NULL))
 		sscanf (line, "%d", &jobCard->w_status);
 	      else
 		break;
@@ -2239,7 +2239,7 @@ jobFileExitStatus (struct jobCard *jobCard)
 	  else if (strncmp (line, "# EXIT STATUS:", 14) == 0)
 	    {
 
-	      if (fgets (line, MAXLINELEN, jobFile_fp) != NULL)
+	      if (fgets (line, MAX_LINE_LEN, jobFile_fp) != NULL)
 		sscanf (line, "%d", &jobCard->w_status);
 	      break;
 	    }
@@ -2283,7 +2283,7 @@ localJobRestartFiles (char *lsbDir, char *restartDir, struct jobCard *jp,
 {
   static char __func__] = "localJobRestartFiles";
   struct jobSpecs *jspecs = &jp->jobSpecs;
-  char errMsg[MAXLINELEN];
+  char errMsg[MAX_LINE_LEN];
   char t[MAX_FILENAME_LEN], s[MAX_FILENAME_LEN];
   char jobFile[MAX_FILENAME_LEN];
 

@@ -673,7 +673,7 @@ readJobNew (char *line, struct jobNewLog *jobNewLog)
 
 			for ( unsigned int i = 0; i < jobNewLog->numAskedHosts; i++)
 		{
-			char hName[MAXLINELEN];
+			char hName[MAX_LINE_LEN];
 			if ((ccount = stripQStr (line, hName)) < 0)
 				{
 
@@ -989,7 +989,7 @@ int readJobStart (char *line, struct jobStartLog *jobStartLog)
 
 	for (i = 0; i < jobStartLog->numExHosts; i++)
 		{
-			char hName[MAXLINELEN];
+			char hName[MAX_LINE_LEN];
 			if ((ccount = stripQStr (line, hName)) < 0)
 		{
 			jobStartLog->numExHosts = i;
@@ -1193,7 +1193,7 @@ int readJobSigAct (char *line, struct sigactLog *sigactLog)
 {
 	int cc, ccount;
 	int tmpPeriod;
-	char sigSymbol[MAXLINELEN];
+	char sigSymbol[MAX_LINE_LEN];
 
 	cc = sscanf (line, "%d%d%d%d%d%d%d%n",
 					 &(sigactLog->jobId),
@@ -1433,7 +1433,7 @@ int readJobFinish (char *line, struct jobFinishLog *jobFinishLog, time_t eventTi
 	int tmpBegin = 0;
 	int tmpTerm = 0;
 	int tmpStart = 0;
-	char *hName = malloc( sizeof(char) * MAXLINELEN + 1 );
+	char *hName = malloc( sizeof(char) * MAX_LINE_LEN + 1 );
 
 	cc = sscanf (line, "%d%d%d%lu%d%d%d%d%n",
 					 &(jobFinishLog->jobId),
@@ -2684,7 +2684,7 @@ int readJobSignal (char *line, struct signalLog *signalLog)
 {
 	int cc = 0;
 	int ccount = 0;
-	char *sigSymbol = malloc( sizeof(char) * MAXLINELEN + 1 );
+	char *sigSymbol = malloc( sizeof(char) * MAX_LINE_LEN + 1 );
 
 	cc = sscanf (line, "%d%d%d%n",
 					 &(signalLog->jobId),
@@ -2723,7 +2723,7 @@ int readJobMsg (char *line, struct jobMsgLog *jobMsgLog)
 {
 	int cc = 0;
 	int ccount = 0;
-	char strBuf[MAXLINELEN];
+	char strBuf[MAX_LINE_LEN];
 
 	cc = sscanf (line, "%d%d%d%d%n",
 					 &(jobMsgLog->usrId),
@@ -2778,7 +2778,7 @@ int readJobMsgAck (char *line, struct jobMsgAckLog *jobMsgAckLog)
 {
 	int cc = 0;
 	int ccount = 0;
-	char strBuf[MAXLINELEN];
+	char strBuf[MAX_LINE_LEN];
 
 	cc = sscanf (line, "%d%d%d%d%n",
 					 &(jobMsgAckLog->usrId),
@@ -2890,7 +2890,7 @@ int readJobForce (char *line, struct jobForceRequestLog *jobForceRequestLog)
 
 	for (i = 0; i < jobForceRequestLog->numExecHosts; i++)
 		{
-			char hName[MAXLINELEN];
+			char hName[MAX_LINE_LEN];
 
 
 			if ((cc = stripQStr (line, hName)) < 0)
@@ -3070,7 +3070,7 @@ lsbGetNextJobRecFromFile( FILE *logFp, size_t *lineNum, size_t numJobIds, LS_LON
 	int cc = 0;
 	int ccount = 0;
 	char *line = NULL;
-	char nameBuf[MAXLINELEN];
+	char nameBuf[MAX_LINE_LEN];
 	static struct eventRec *logRec = NULL;
 	int eventKind = 0;
 	int tempTimeStamp = 0;
@@ -3405,7 +3405,7 @@ int
 lsb_readeventrecord (char *line, struct eventRec *logRec)
 {
 	char etype[MAX_LSB_NAME_LEN]; 	// FIXME FIXME convert to dynamic-length
-	char namebuf[MAXLINELEN]; 		// FIXME FIXME convert to dynamic-length
+	char namebuf[MAX_LINE_LEN]; 		// FIXME FIXME convert to dynamic-length
 	int cc = 0;
 	int ccount = 0;
 	int eventKind = 0;
@@ -3579,7 +3579,7 @@ getJobIdIndexFromEventFile (char *eventFile, struct sortIntList *header, time_t 
 	long jobId = 0;
 	int ccount  = 0;
 	char *line = NULL;
-	char nameBuf[MAXLINELEN]; // FIXME FIXME convert to dynamic-length
+	char nameBuf[MAX_LINE_LEN]; // FIXME FIXME convert to dynamic-length
 	int eventKind = 0;
 	int eventType = 0;
 	time_t eventTime = 0;
@@ -3814,7 +3814,7 @@ updateJobIdIndexFile (char *indexFile, char *eventFile, int totalEventFile)
 {
 	struct stat st;
 	FILE *indexFp = NULL;
-	char nameBuf[MAXLINELEN];
+	char nameBuf[MAX_LINE_LEN];
 	char indexVersion[16];
 	int rows = 0;
 	int lastUpdate;

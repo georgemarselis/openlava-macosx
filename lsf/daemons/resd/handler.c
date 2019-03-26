@@ -659,7 +659,7 @@ setClUid (struct client *cli_ptr) // clusterfuck
 {
     // static char __func__] = "setClUid";
     char **saveEnv = environ;
-    char val[MAXLINELEN]; // FIXME FIXME FIXME FIXME FIXME replace with proper 
+    char val[MAX_LINE_LEN]; // FIXME FIXME FIXME FIXME FIXME replace with proper 
 
     if (setCliEnv (cli_ptr, "LSF_FROM_HOST", cli_ptr->hostent.h_name) < 0) {
         ls_syslog (LOG_ERR, I18N_FUNC_S_S_FAIL_M, __func__, "setenv", "LSF_FROM_HOST", cli_ptr->hostent.h_name);
@@ -1091,8 +1091,8 @@ resSetenv (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR *xdrs)
 {
     // static char __func__] = "resSetenv";
     struct resSetenv envReq;
-    char bufHome[MAXLINELEN];
-    char bufWinDir[MAXLINELEN];
+    char bufHome[MAX_LINE_LEN];
+    char bufWinDir[MAX_LINE_LEN];
     // int cnt;
 
     if (logclass & LC_TRACE) {
@@ -1895,7 +1895,7 @@ resRexec (struct client *cli_ptr, struct LSFHeader *msgHdr, XDR *xdrs)
         io_nonblock_ (conn2NIOS.sock->fd);
 
         if (setsockopt(conn2NIOS.sock->fd, SOL_SOCKET, SO_LINGER, &linstr, sizeof (linstr)) < 0) {
-            char *errSockId = malloc( sizeof(MAXLINELEN) + 1 );
+            char *errSockId = malloc( sizeof(MAX_LINE_LEN) + 1 );
             sprintf (errSockId, "setsockopt failed on %d", conn2NIOS.sock->fd);
             ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, *errSockId);
             free( errSockId);
@@ -4730,7 +4730,7 @@ setCliEnv (struct client *cl, char *envName, char *value)
 {
     char *cp = NULL;
     char *sp = NULL;
-    char buf[MAXLINELEN];
+    char buf[MAX_LINE_LEN];
 
     for (unsigned int cnt = 0; cl->env[cnt]; cnt++)
     {
@@ -4765,7 +4765,7 @@ addCliEnv (struct client *cl, char *envName, char *value)
 {
     unsigned int cnt = 0;
     char **env = NULL;
-    char *buf = malloc( sizeof( char ) * MAXLINELEN + 1 );
+    char *buf = malloc( sizeof( char ) * MAX_LINE_LEN + 1 );
 
     for (cnt = 0; cl->env[cnt]; cnt++) {
         1;

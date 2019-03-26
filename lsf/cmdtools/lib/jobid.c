@@ -308,7 +308,7 @@ getJobIdIndexList (char *string, int *outJobId, struct idxList **idxListP,
   char *startP;
   static char jobIdStr[16];
   int jobIdLen;
-  char inJobIdStr[MAXLINELEN];
+  char inJobIdStr[MAX_LINE_LEN];
 
   *idxListP = NULL;
 

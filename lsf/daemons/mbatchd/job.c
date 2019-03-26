@@ -247,7 +247,7 @@ newJob (struct submitReq *subReq, struct submitMbdReply *Reply, int chan,
       if ((subReq->options & SUB_CHKPNT_DIR)
 	  && (!(subReq->options & SUB_RESTART)))
 	{
-	  char dir[MAXLINELEN];
+	  char dir[MAX_LINE_LEN];
 	  sprintf (jobIdStr, "/%s", lsb_jobidinstr (nextId));
 	  strcpy (dir, subReq->chkpntDir);
 	  strcat (dir, jobIdStr);
@@ -2514,14 +2514,14 @@ packJobSpecs (struct jData *jDataPtr, struct jobSpecs *jobSpecs)
     strcpy (jobSpecs->requeueEValues, "");
   if (qp->resumeCond)
     {
-      STRNCPY (jobSpecs->resumeCond, qp->resumeCond, MAXLINELEN);
+      STRNCPY (jobSpecs->resumeCond, qp->resumeCond, MAX_LINE_LEN);
     }
   else
     strcpy (jobSpecs->resumeCond, "");
 
   if (qp->stopCond)
     {
-      STRNCPY (jobSpecs->stopCond, qp->stopCond, MAXLINELEN);
+      STRNCPY (jobSpecs->stopCond, qp->stopCond, MAX_LINE_LEN);
     }
   else
     strcpy (jobSpecs->stopCond, "");
@@ -4172,7 +4172,7 @@ freeExecParams (struct jData *jData)
   if (jData->execCwd != NULL && jData->hPtr != NULL)
     {
       int len = 0;
-      static char execCwd[MAXLINELEN + 1];
+      static char execCwd[MAX_LINE_LEN + 1];
 
       if (jData->execCwd)
 	{
@@ -4628,7 +4628,7 @@ switchAJob (struct jobSwitchReq *switchReq,
 	      if (qtp->qAttrib & QUEUE_ATTRIB_CHKPNT)
 		{
 
-		  char dir[MAXLINELEN];
+		  char dir[MAX_LINE_LEN];
 		  sprintf (dir, "%s/%s", qtp->chkpntDir,
 			   lsb_jobid2str (job->jobId));
 
@@ -4654,7 +4654,7 @@ switchAJob (struct jobSwitchReq *switchReq,
 	      if (qtp->qAttrib & QUEUE_ATTRIB_CHKPNT)
 		{
 
-		  char dir[MAXLINELEN];
+		  char dir[MAX_LINE_LEN];
 		  sprintf (dir, "%s/%s", qtp->chkpntDir,
 			   lsb_jobid2str (job->jobId));
 		  job->newSub->chkpntDir = safeSave (dir);
@@ -6382,7 +6382,7 @@ getMergeSubReq (struct jData *jpbw, struct modifyReq *req, int *errorCode)
 {
   struct submitReq *tempSub, *oldReq;
   int returnCode;
-  char newCmdArgs[2 * MAXLINELEN];
+  char newCmdArgs[2 * MAX_LINE_LEN];
   struct passwd pwUser;
 
   memset (&pwUser, 0, sizeof (pwUser));
@@ -6687,7 +6687,7 @@ handleJParameters (struct jData *jpbw, struct jData *job,
 
 		      if (qp->qAttrib & QUEUE_ATTRIB_CHKPNT)
 			{
-			  char dir[MAXLINELEN];
+			  char dir[MAX_LINE_LEN];
 			  char jobIdStr[20];
 
 			  jpbw->shared->jobBill.options |= SUB_CHKPNT_DIR;
@@ -9549,7 +9549,7 @@ setNewSub (struct jData *jpbw, struct jData *job,
 
 	  if (qp->qAttrib & QUEUE_ATTRIB_CHKPNT)
 	    {
-	      char dir[MAXLINELEN];
+	      char dir[MAX_LINE_LEN];
 	      char jobIdStr[20];
 
 	      newSub->options |= SUB_CHKPNT_DIR;

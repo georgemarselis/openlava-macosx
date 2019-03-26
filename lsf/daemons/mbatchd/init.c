@@ -984,7 +984,7 @@ parseAUids (struct qData *qp, char *line)
 	struct group *unixGrp = NULL;
 	struct gData *uGrp = NULL;
 	struct admins admins;
-	char forWhat[MAXLINELEN];
+	char forWhat[MAX_LINE_LEN];
 
 	sprintf (forWhat, "for queue <%s> administrator", qp->queue);
 

@@ -116,7 +116,7 @@ main (int argc, char **argv)
 {
   int cc, myIndex;
   char prompt[] = "lsadmin> ";
-  char line[MAXLINELEN];
+  char line[MAX_LINE_LEN];
 
   if (ls_initdebug (argv[0]) < 0)
     {
@@ -162,7 +162,7 @@ main (int argc, char **argv)
     {
       printf ("%s", prompt);
       fflush (stdout);
-      if (fgets (line, MAXLINELEN, stdin) == NULL)
+      if (fgets (line, MAX_LINE_LEN, stdin) == NULL)
 	{
 	  printf ("\n");
 	  exit (-1);

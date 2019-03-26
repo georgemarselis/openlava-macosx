@@ -187,7 +187,7 @@ reconfig (void)
 
 			if (limLock.on)
 			{
-				char *lsfLimLock = malloc( sizeof( char ) * MAXLINELEN + 1 );
+				char *lsfLimLock = malloc( sizeof( char ) * MAX_LINE_LEN + 1 );
 
 				if (time (0) > limLock.time)
 				{
@@ -214,7 +214,7 @@ reconfig (void)
 			}
 			else
 			{
-				char *lsfLimLock = malloc( sizeof( char ) * MAXLINELEN + 1 );
+				char *lsfLimLock = malloc( sizeof( char ) * MAX_LINE_LEN + 1 );
 				sprintf (lsfLimLock, "LSF_LIM_LOCK=");
 				putenv (lsfLimLock);
 				free( lsfLimLock );

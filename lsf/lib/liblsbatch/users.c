@@ -38,7 +38,7 @@ lsb_userinfo (char **users, unsigned int *numUsers)
   unsigned int i = 0;
   unsigned long cc = 0;
   unsigned long numReq = 0;
-  char lsfUserName[MAXLINELEN];
+  char lsfUserName[MAX_LINE_LEN];
   int returnValue = 0;
 
   if (numUsers)
@@ -68,7 +68,7 @@ lsb_userinfo (char **users, unsigned int *numUsers)
     }
   else if (numReq == 1 && users == NULL)
     {
-      if (getLSFUser_ (lsfUserName, MAXLINELEN) != 0)
+      if (getLSFUser_ (lsfUserName, MAX_LINE_LEN) != 0)
   {
     return (NULL);
   }

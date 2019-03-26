@@ -115,7 +115,7 @@ doXferRcp (lsRcpXfer * lsXfer, int option)
         pid_t pid;
         int rcpp[2], sourceFh;
         char errMsg[1024];
-        char szRshDest[MAXLINELEN];
+        char szRshDest[MAX_LINE_LEN];
         int local_errno = 0;
         // int n = 0 ;
         int status = 0;

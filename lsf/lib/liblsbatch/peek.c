@@ -40,7 +40,7 @@ lsb_peekjob (LS_LONG_INT jobid)
 	struct lsfAuth auth;
 	struct jobInfoEnt *jInfo = NULL;
 	char *pSpoolDirUnix = NULL;
-	char lsfUserName[MAXLINELEN];
+	char lsfUserName[MAX_LINE_LEN];
 
 
   if (jobid <= 0)
@@ -106,7 +106,7 @@ lsb_peekjob (LS_LONG_INT jobid)
 	  free (reply_buf);
 	}
 
-      if (getLSFUser_ (lsfUserName, MAXLINELEN) != 0)
+      if (getLSFUser_ (lsfUserName, MAX_LINE_LEN) != 0)
 	{
 	  return (NULL);
 	}

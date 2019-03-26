@@ -160,7 +160,7 @@ readHvalues (struct keymap *keyList, char *linep, FILE *fp, const char *lsfile, 
 	char *value = NULL;
 	char *sp    = NULL;
 	char *sp1   = NULL;
-	char buffer[MAXLINELEN];     // FIXME FIXME FIXME 2048 seems awfuly specific
+	char buffer[MAX_LINE_LEN];     // FIXME FIXME FIXME 2048 seems awfuly specific
 	char error = FALSE;
 	unsigned int i = 0;
 
@@ -203,7 +203,7 @@ readHvalues (struct keymap *keyList, char *linep, FILE *fp, const char *lsfile, 
 
 	if( putValue( keyList, key, value ) < 0)
 	{
-		char buff[MAXLINELEN];
+		char buff[MAX_LINE_LEN];
 		memset ( buff, 0, strlen( buff ) );
 		/* catgets 5404  */
 		sprintf( "5404, %s: %s(%d): bad keyword %s in section %s, ignoring the section", __func__, lsfile, *lineNum, key, section );
@@ -225,7 +225,7 @@ readHvalues (struct keymap *keyList, char *linep, FILE *fp, const char *lsfile, 
 			{
 				if (keyList[i].val == NULL)
 				{
-					char buff[MAXLINELEN];
+					char buff[MAX_LINE_LEN];
 					memset ( buff, 0, strlen( buff ) );
 					/* catgets 5405  */
 					sprintf( buffer, "5405: %s: %s(%zu): required keyword %s is missing in section %s, ignoring the section", __func__, lsfile, *lineNum, keyList[i].key, section);
@@ -296,7 +296,7 @@ doSkipSection (FILE *fp, size_t *lineNum, const char *lsfile, const char *sectio
 	char *word = NULL;
 	char *cp   = NULL;
 	char end[] = "end";
-	char buffer[MAXLINELEN];
+	char buffer[MAX_LINE_LEN];
 	memset( buffer, 0, strlen( buffer) );
 
 	while( ( cp = getNextLineC_( fp, lineNum, TRUE ) ) != NULL )
@@ -307,14 +307,14 @@ doSkipSection (FILE *fp, size_t *lineNum, const char *lsfile, const char *sectio
 			word = getNextWord_ (&cp);
 			if (!word)
 			{
-				char buffer[MAXLINELEN];
+				char buffer[MAX_LINE_LEN];
 				memset( buffer, 0, strlen( buffer) );
 				sprintf( buffer,  "5400: %s(%zu): Section ended without section name, ignored", lsfile, *lineNum);
 				ls_syslog (LOG_ERR, buffer) ;
 			}
 			else {
 				if (strcasecmp (word, sectionName) != 0) {
-					char buffer[MAXLINELEN] = "";
+					char buffer[MAX_LINE_LEN] = "";
 					memset( buffer, 0, strlen( buffer) );
 					sprintf( buffer,  "5401: %s(%zu): Section %s ended with wrong section name %s, ignored", lsfile, *lineNum, sectionName, word);
 					ls_syslog (LOG_ERR, buffer );

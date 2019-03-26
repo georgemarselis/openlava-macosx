@@ -282,13 +282,13 @@ int
 parseLine (char *line, char **keyPtr, char **valuePtr)
 {
     char *sp = line;
-#define L_MAXLINELEN_4ENV (8*MAXLINELEN) // FIXME FIXME FIXME FIXME this seems awfuly specific
-    static char key[L_MAXLINELEN_4ENV];
-    static char value[L_MAXLINELEN_4ENV];
+#define L_MAX_LINE_LEN_4ENV (8*MAX_LINE_LEN) // FIXME FIXME FIXME FIXME this seems awfuly specific
+    static char key[L_MAX_LINE_LEN_4ENV];
+    static char value[L_MAX_LINE_LEN_4ENV];
     char *word;
     char *cp;
 
-    if (strlen (sp) >= L_MAXLINELEN_4ENV - 1)
+    if (strlen (sp) >= L_MAX_LINE_LEN_4ENV - 1)
         {
             lserrno = LSE_BAD_ENV;
             return -1;

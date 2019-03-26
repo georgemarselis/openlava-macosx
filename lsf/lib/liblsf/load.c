@@ -45,7 +45,7 @@ namestofilter_ (char **indxs )
                 len += strlen (indxs[i]);
         }
 
-        if (!len || len > MAXLINELEN) {
+        if (!len || len > MAX_LINE_LEN) {
                 lserrno = LSE_BAD_ARGS;
                 return (NULL);
         }
@@ -73,7 +73,7 @@ ls_loadinfo (char *resreq, size_t *numhosts, int options, char *fromhost, char *
     char *indexfilter   = NULL;
     unsigned long *num  = 0;
     unsigned long *initialValueofNum    = 0;
-    char tempresreq[MAXLINELEN]         = { '\0' };
+    char tempresreq[MAX_LINE_LEN]         = { '\0' };
     struct decisionReq loadReq;
     
     *initialValueofNum = 1;
@@ -211,9 +211,9 @@ ls_loadinfo (char *resreq, size_t *numhosts, int options, char *fromhost, char *
 
         if (resreq && indexfilter)
         {
-            if ((strlen (resreq) + strlen (indexfilter)) < MAXLINELEN - 8)
+            if ((strlen (resreq) + strlen (indexfilter)) < MAX_LINE_LEN - 8)
             {
-                char tmp[MAXLINELEN / 2];
+                char tmp[MAX_LINE_LEN / 2];
                 sprintf (tmp, "filter[%s]", indexfilter);
                 strcpy (tempresreq, resreq);
                 strcat (tempresreq, tmp);
@@ -302,13 +302,13 @@ loadinfo_ (char *resReq, struct decisionReq *loadReqPtr, char *fromhost, unsigne
     }
 
     if (resReq) {
-        strncpy (loadReqPtr->resReq, resReq, MAXLINELEN);
+        strncpy (loadReqPtr->resReq, resReq, MAX_LINE_LEN);
     }
     else {
         strcpy (loadReqPtr->resReq, " ");
     }
 
-    loadReqPtr->resReq[MAXLINELEN - 1] = '\0';
+    loadReqPtr->resReq[MAX_LINE_LEN - 1] = '\0';
     if (loadReqPtr->ofWhat == OF_HOSTS && loadReqPtr->numPrefs == 2 && loadReqPtr->numHosts == 1 && equalHost_ (loadReqPtr->preferredHosts[1], loadReqPtr->preferredHosts[0])) {
         options |= _LOCAL_;
     }

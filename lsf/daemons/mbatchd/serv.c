@@ -334,7 +334,7 @@ packJgrpInfo (struct jgTreeNode *jgNode, int remain, char **replyBuf, int schedu
   jobInfoReply.jobBill->jobName = jgNode->name;
 
   jobInfoReply.nIdx = 0;
-  len = 4 * MAX_LSB_NAME_LEN + 3 * MAXLINELEN + 2 * MAXHOSTNAMELEN
+  len = 4 * MAX_LSB_NAME_LEN + 3 * MAX_LINE_LEN + 2 * MAXHOSTNAMELEN
     + 7 * MAX_FILENAME_LEN + sizeof (struct submitReq)
     + sizeof (struct jobInfoReply)
     + MAX_LSB_NAME_LEN + 2 * MAX_FILENAME_LEN
@@ -1362,7 +1362,7 @@ do_hostInfoReq (XDR * xdrs,
   reply = checkHosts (&hostsReq, &hostsReply);
 
   count = hostsReply.numHosts * (sizeof (struct hostInfoEnt)
-				 + MAXLINELEN + MAXHOSTNAMELEN
+				 + MAX_LINE_LEN + MAXHOSTNAMELEN
 				 + hostsReply.nIdx * 4 * sizeof (float)) +
     100;
 

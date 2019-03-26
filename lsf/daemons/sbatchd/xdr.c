@@ -104,7 +104,7 @@ xdr_jobSyslog (XDR * xdrs, struct jobSyslog * slog, struct LSFHeader * hdr)
       sp1[0] = '\0';
     }
 
-  if (!xdr_string (xdrs, &sp1, MAXLINELEN))
+  if (!xdr_string (xdrs, &sp1, MAX_LINE_LEN))
     {
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "xdr_string");
       return (FALSE);

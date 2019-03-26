@@ -40,16 +40,22 @@
 
 
 // FIXME FIXME FIXME this should be defined in configure.ac
-#if !defined(MAXLINELEN)
-#define MAXLINELEN      512
-#endif
-#define RECORD_LEN      128
+// #if !defined(MAX_LINE_LEN)
+// #define MAX_LINE_LEN      512
+// #endif
+// #define RECORD_LEN      128
+
+const unsigned int RECORD_LEN = 128;
 
 
 // FIXME FIXME FIXME these should go as variables
-#define CHLD_KEEP_STDIN_LS  (0x00000001)
-#define CHLD_KEEP_STDOUT_LS (0x00000002)
-#define CHLD_KEEP_STDERR_LS (0x00000004)
+// #define CHLD_KEEP_STDIN_LS  (0x00000001)
+// #define CHLD_KEEP_STDOUT_LS (0x00000002)
+// #define CHLD_KEEP_STDERR_LS (0x00000004)
+
+const long CHLD_KEEP_STDIN_LS  = 0x00000001;
+const long CHLD_KEEP_STDOUT_LS = 0x00000002;
+const long CHLD_KEEP_STDERR_LS = 0x00000004;
 
 #define CHLD_KEEP_MSK_LS  (CHLD_KEEP_STDIN_LS | CHLD_KEEP_STDOUT_LS | CHLD_KEEP_STDERR_LS)
 
@@ -96,18 +102,20 @@
 #define THRD_ID_THRDI_LS(thrdInfo)    ((thrdInfo)->idThrd)
 
 // FIXME FIXME FIXME these should go as variables
-#define JCNTL_TKNSEND_LS	(1024)
-#define JCNTL_TKNACKW_LS	(1025)
-#define JCNTL_TKNUSAG_LS	(1026)
-#define JCNTL_TKNRDNT_LS	(1027)
-#define JCNTL_TKNDENY_LS	(1028)
-#define JCNTL_TKNFAIL_LS	(1029)
-#define JCNTL_TKNUNKW_LS	(1030)
-#define JCNTL_TKNOKEY_LS	(1031)
-#define JCNTL_TKNFNSD_LS	(1032)
+#define JCNTL_TKNSEND_LS    (1024)
+#define JCNTL_TKNACKW_LS    (1025)
+#define JCNTL_TKNUSAG_LS    (1026)
+#define JCNTL_TKNRDNT_LS    (1027)
+#define JCNTL_TKNDENY_LS    (1028)
+#define JCNTL_TKNFAIL_LS    (1029)
+#define JCNTL_TKNUNKW_LS    (1030)
+#define JCNTL_TKNOKEY_LS    (1031)
+#define JCNTL_TKNFNSD_LS    (1032)
 
 // FIXME FIXME FIXME these should go as variables
-#define PASSWD_FILE_LS          "passwd.lsfuser"
+// #define PASSWD_FILE_LS          "passwd.lsfuser"
+
+const char PASSWD_FILE_LS[ ] = "passwd.lsfuser";
 
 
 // FIXME FIXME FIXME these should be undefined
@@ -125,52 +133,52 @@
 #define ERR_SYSERR      (ERR_BASE_NUM + 2)
 
 // FIXME FIXME FIXME these should go as variables
-#define PC_LSF_ANYSTR	"Unknown"
+#define PC_LSF_ANYSTR   "Unknown"
 #define PC_LSF_CUGID    (-11)
 #define PC_LSF_ANYUGID  (-12)
-#define PC_LSF_FMAPNAME	"!1j8Gp6o$(*7&$@"
-#define PC_LSF_FMAPSIZE	(4096)
+#define PC_LSF_FMAPNAME "!1j8Gp6o$(*7&$@"
+#define PC_LSF_FMAPSIZE (4096)
 
 
 // typedef struct lsLimitT_
 struct lsLimitT_
 {
-  int notAvail;
+    int notAvail;
 } LS_LIMIT_T; 
 
 
 ///typedef 
 struct lsProcStartT_
 {
-  int numHds;
-  char padding1[4];
-  int *flgHds;
-  int *handles;
-  int priority;
-  char padding2[4];
-  const char *lsfName;
-  const char *userName;
-  const char *projName;
-  const char *wrkDir;
-  const char *fromHost;
-  const char *deskTop;
-  struct lsLimitT_ *limits;
+    int numHds;
+    char padding1[4];
+    int *flgHds;
+    int *handles;
+    int priority;
+    char padding2[4];
+    const char *lsfName;
+    const char *userName;
+    const char *projName;
+    const char *wrkDir;
+    const char *fromHost;
+    const char *deskTop;
+    struct lsLimitT_ *limits;
 };
 // LS_PROC_START_T;
 
 // typedef 
 struct lsProcessT_
 {
-  int idThrd; // FIXME this might need to be an unsigned int/unsigned long
-  int hdThrd;
-  int idProc;
-  int hdProc; // FIXME this might need to be an unsigned int/unsigned long
-  int idProcGrp;
-  int hdProcGrp; // FIXME this might need to be an unsigned int/unsigned long
-  int misc;
-  char padding[4];
-  char *userName;
-  char *wrkDir;
+    int idThrd; // FIXME this might need to be an unsigned int/unsigned long
+    int hdThrd;
+    int idProc;
+    int hdProc; // FIXME this might need to be an unsigned int/unsigned long
+    int idProcGrp;
+    int hdProcGrp; // FIXME this might need to be an unsigned int/unsigned long
+    int misc;
+    char padding[4];
+    char *userName;
+    char *wrkDir;
 };
 // LS_PROCESS_T;
 
@@ -183,16 +191,16 @@ typedef void (*LS_THREAD_FUNC_T) (void *);
 //typedef 
 struct lsThrdStartT_
 {
-  int priority;
-  int stackSize;
+    int priority;
+    int stackSize;
 };
 // LS_THRD_START_T;
 
 //typedef 
 struct lsThreadT_
 {
-  int hdThrd; // FIXME this might need to be an unsigned int/unsigned long
-  int idThrd;
+    int hdThrd; // FIXME this might need to be an unsigned int/unsigned long
+    int idThrd;
 };
 // LS_THREAD_T;
 

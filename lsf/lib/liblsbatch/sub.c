@@ -288,7 +288,7 @@ getCommonParams (struct submit *jobSubReq, struct submitReq *submitReq, struct s
 		if (!jobSubReq->preExecCmd) {
 			return -1;
 		}
-		if (strlen (jobSubReq->preExecCmd) >= MAXLINELEN - 1) {
+		if (strlen (jobSubReq->preExecCmd) >= MAX_LINE_LEN - 1) {
 			return -1;
 		}
 		else {
@@ -964,7 +964,7 @@ subRestart (struct submit *jobSubReq, struct submitReq *submitReq, struct submit
 		}
 
 		assert( strlen(jobLog->resReq) + 1 <= UINT_MAX );
-		if ((length = strlen (jobLog->resReq) + 1) >= MAXLINELEN) {
+		if ((length = strlen (jobLog->resReq) + 1) >= MAX_LINE_LEN) {
 			goto childExit;
 		}
 
@@ -1255,7 +1255,7 @@ childExit:
 				submitReq->options |= SUB_QUEUE;
 			}
 
-			if (strlen (jobLog->resReq) >= MAXLINELEN - 1) {
+			if (strlen (jobLog->resReq) >= MAX_LINE_LEN - 1) {
 				goto parentErr;
 			}
 			submitReq->resReq = jobLog->resReq;
@@ -1506,8 +1506,8 @@ subJob (struct submit *jobSubReq, struct submitReq *submitReq, struct submitRepl
 {
 
 	char homeDir[MAX_FILENAME_LEN]; // FIXME FIXME FIXME convert to dynamic string
-	char resReq[MAXLINELEN]; // FIXME FIXME FIXME convert to dynamic string
-	char cmd[MAXLINELEN]; // FIXME FIXME FIXME convert to dynamic string
+	char resReq[MAX_LINE_LEN]; // FIXME FIXME FIXME convert to dynamic string
+	char cmd[MAX_LINE_LEN]; // FIXME FIXME FIXME convert to dynamic string
 	struct lenData jf;
 	int niosSock = 0;
 	LSB_SUB_SPOOL_FILE_T subSpoolFiles;
@@ -1845,7 +1845,7 @@ int
 getOtherParams (struct submit *jobSubReq, struct submitReq *submitReq, struct submitReply *submitRep, struct lsfAuth *auth, LSB_SUB_SPOOL_FILE_T * subSpoolFiles)
 {
 	char jobdespBuf[MAX_CMD_DESC_LEN];
-	char lineStrBuf[MAXLINELEN];
+	char lineStrBuf[MAX_LINE_LEN];
 	char *sp = NULL;
 	char *jobdesp = NULL;
 	char *myHostName = NULL;
@@ -2283,7 +2283,7 @@ getOtherParams (struct submit *jobSubReq, struct submitReq *submitReq, struct su
 	}
 
 	lineStrBuf[0] = '\0';
-	strncat (lineStrBuf, jobSubReq->command, MIN (counter, MAXLINELEN));
+	strncat (lineStrBuf, jobSubReq->command, MIN (counter, MAX_LINE_LEN));
 
 	if ((myHostName = ls_getmyhostname ()) == NULL) {
 		lsberrno = LSBE_LSLIB;
@@ -2291,7 +2291,7 @@ getOtherParams (struct submit *jobSubReq, struct submitReq *submitReq, struct su
 	}
 	if (jobSubReq->resReq != NULL && jobSubReq->options & SUB_RES_REQ) {
 
-		if (strlen (jobSubReq->resReq) > MAXLINELEN - 1) {
+		if (strlen (jobSubReq->resReq) > MAX_LINE_LEN - 1) {
 			lsberrno = LSBE_BAD_RESREQ;
 			return -1;
 		}
@@ -2428,7 +2428,7 @@ acctMapGet (int *fail, char *lsfUserName)
 int
 getUserInfo (struct submitReq *submitReq, struct submit *jobSubReq)
 {
-	char lsfUserName[MAXLINELEN];		// FIXME FIXME malloc
+	char lsfUserName[MAX_LINE_LEN];		// FIXME FIXME malloc
 	int childIoFd[2];
 	uid_t uid  = 0;
 	pid_t pid  = 0;
@@ -2444,7 +2444,7 @@ getUserInfo (struct submitReq *submitReq, struct submit *jobSubReq)
 		int lsberrno;
 	} err;
 
-	if (getLSFUser_ (lsfUserName, MAXLINELEN) != 0) {
+	if (getLSFUser_ (lsfUserName, MAX_LINE_LEN) != 0) {
 		return -1;
 	}
 
@@ -3067,7 +3067,7 @@ setOption_ (int argc, char **argv, char *template, struct submit *req, int mask,
 	char *optName;
 	char *pExclStr;
 	char *(*getoptfunc) ();
-	char savearg[MAXLINELEN];
+	char savearg[MAX_LINE_LEN];
 
 	struct args {
 		int argc;
@@ -3965,7 +3965,7 @@ setOption_ (int argc, char **argv, char *template, struct submit *req, int mask,
 
 					if (req->options & SUB_MODIFY)
 						{
-						if (strlen (optarg) >= MAXLINELEN)
+						if (strlen (optarg) >= MAX_LINE_LEN)
 							{
 							/* catgets 409 */
 							PRINT_ERRMSG1 (errMsg, "catgets 409: %s: File name too long", optarg);
@@ -3989,7 +3989,7 @@ setOption_ (int argc, char **argv, char *template, struct submit *req, int mask,
 						return -1;
 						}
 
-					if (strlen (optarg) >= MAXLINELEN)
+					if (strlen (optarg) >= MAX_LINE_LEN)
 						{
 						/* catgets 409 */
 						PRINT_ERRMSG1 (errMsg, "catgets 409: %s: File name too long", optarg);
@@ -4182,7 +4182,7 @@ parseOptFile_ (char *filename, struct submit *req, char **errMsg)
 	else if (pid == 0)
 		{
 
-		char childLine[MAXLINELEN * 4];
+		char childLine[MAX_LINE_LEN * 4];
 		int exitVal = -1;
 
 		close (childIoFd[0]);
@@ -4395,9 +4395,9 @@ parseXF (struct submit *req, char *arg, char **errMsg)
 	static struct xFile *xp = NULL;
 	struct xFile *tmpXp = NULL;
 	int options = 0;
-	char op[MAXLINELEN], lf[MAX_FILENAME_LEN], rf[MAX_FILENAME_LEN];
+	char op[MAX_LINE_LEN], lf[MAX_FILENAME_LEN], rf[MAX_FILENAME_LEN];
 	char *p;
-	char saveArg[MAXLINELEN];
+	char saveArg[MAX_LINE_LEN];
 	const int NUMXF = 10;
 
 	if (maxNxf == 0) {
@@ -4847,7 +4847,7 @@ fprintf(parmfp, "%s=%d\n", name, (int) field); \
 
 	if (jobSubReq->options & SUB_HOST)
 		{
-		char askedHosts[MAXLINELEN];
+		char askedHosts[MAX_LINE_LEN];
 
 		askedHosts[0] = '\0';
 		for (unsigned int i = 0; i < jobSubReq->numAskedHosts; i++)
@@ -4884,7 +4884,7 @@ fprintf(parmfp, "%s=%d\n", name, (int) field); \
 		}
 	else if (jobSubReq->options & SUB_OTHER_FILES)
 		{
-		char str[MAXLINELEN];
+		char str[MAX_LINE_LEN];
 
 		fprintf (parmfp, "LSB_SUB_OTHER_FILES=%d\n", jobSubReq->nxf);
 
@@ -5630,7 +5630,7 @@ wrapCommandLine (char *command)
 	"saveExit=$?\n"
 	"/bin/rm -f $LSB_JOBFILENAME.shell\n" "(exit $saveExit)\n";
 
-	static char cmdString[MAXLINELEN * 4];
+	static char cmdString[MAX_LINE_LEN * 4];
 
 	if (strchr (command, (int) '\n') == NULL)
 		{
@@ -5727,7 +5727,7 @@ char *
 extractStringValue (char *line)
 {
 	char *p;
-	static char sValue[MAXLINELEN];
+	static char sValue[MAX_LINE_LEN];
 	int i;
 
 	p = line;

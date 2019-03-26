@@ -910,7 +910,7 @@ resetDepCond (struct dptNode *dptNode)
 static char *
 getToken (char **sp, dptType * type)
 {
-  static char token[4 * MAXLINELEN];
+  static char token[4 * MAX_LINE_LEN];
   int i, j = 0;
 
   if (!*sp)
@@ -943,7 +943,7 @@ getToken (char **sp, dptType * type)
       char quote = **sp;
       (*sp)++;
       token[j++] = quote;
-      while ((j < 4 * MAXLINELEN - 1) && (**sp != '\0'))
+      while ((j < 4 * MAX_LINE_LEN - 1) && (**sp != '\0'))
 	{
 	  token[j++] = **sp;
 	  if (token[j - 1] == quote)
@@ -957,7 +957,7 @@ getToken (char **sp, dptType * type)
   else
     {
       while (IS_VALIDCHAR (**sp) && !IS_DELIM (**sp)
-	     && (j < 4 * MAXLINELEN - 1))
+	     && (j < 4 * MAX_LINE_LEN - 1))
 	{
 	  token[j] = **sp;
 	  (*sp)++;

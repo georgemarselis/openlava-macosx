@@ -437,7 +437,7 @@ limitIsOk_ (int *rLimits)
 char *
 lsb_splitName (char *str, unsigned int *number)
 {
-	static char name[4 * sizeof(char) * MAXLINELEN ];
+	static char name[4 * sizeof(char) * MAX_LINE_LEN ];
 	static unsigned int nameNum = 0;
 	int twoPartFlag = 0;
 	unsigned int counter = 0;
@@ -586,7 +586,7 @@ lsb_printNameList (struct nameList * nameList, int format)
 				FREEUP (namestr);
 		}
 
-		allocLen = MAXLINELEN;
+		allocLen = MAX_LINE_LEN;
 		namestr = calloc (allocLen, sizeof (char));
 		if (!namestr) {
 				ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "calloc");
@@ -598,7 +598,7 @@ lsb_printNameList (struct nameList * nameList, int format)
 
 				if (format == PRINT_SHORT_NAMELIST)
 				{
-						buf = calloc (MAXLINELEN, sizeof (char));
+						buf = calloc (MAX_LINE_LEN, sizeof (char));
 						if ( NULL == buf && ENOMEM == errno )
 						{
 							 ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "calloc");
@@ -610,7 +610,7 @@ lsb_printNameList (struct nameList * nameList, int format)
 				}
 				else if (format == PRINT_MCPU_HOSTS)
 				{
-								buf = (char *) calloc (MAXLINELEN, sizeof (char));
+								buf = (char *) calloc (MAX_LINE_LEN, sizeof (char));
 								if ( NULL == buf && ENOMEM == errno )
 								{
 									 ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "calloc");
@@ -637,7 +637,7 @@ lsb_printNameList (struct nameList * nameList, int format)
 
 				if (buflen + strlen (namestr) >= allocLen)
 				{
-						allocLen += buflen + MAXLINELEN;
+						allocLen += buflen + MAX_LINE_LEN;
 						namestr = (char *) realloc (namestr, allocLen * sizeof (char));
 						if ( NULL == namestr && ENOMEM == errno )
 						{
@@ -758,7 +758,7 @@ lsb_parseShortStr (char *string, int format)
 	static struct nameList nameList;
 	unsigned long numStr = strlen (string) / 2 + 1;
 	unsigned int numSameStr;
-	char namestr[4 * MAXLINELEN];
+	char namestr[4 * MAX_LINE_LEN];
 	char *name;
 	char *curStr;
 

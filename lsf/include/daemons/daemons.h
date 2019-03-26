@@ -91,7 +91,7 @@
 #define JOB_URGENT        0x40000000
 #define JOB_URGENT_NOSTOP 0x80000000
 
-char errbuf[MAXLINELEN]; // FIXME FIXME FIXME FIXME convert to dynamic allocation
+char errbuf[MAX_LINE_LEN]; // FIXME FIXME FIXME FIXME convert to dynamic allocation
 
 #define lsb_merr1(fmt,a1)        sprintf(errbuf,fmt,a1),lsb_merr(errbuf)
 #define lsb_merr2(fmt,a1,a2)     sprintf(errbuf,fmt,a1,a2),lsb_merr(errbuf)
@@ -166,20 +166,20 @@ struct jobSpecs
     unsigned int nxf;
     unsigned int maxNumProcessors;
     int sigMap     [LSB_SIG_NUM];
-    char jobName   [MAXLINELEN];
+    char jobName   [MAX_LINE_LEN];
     char userName  [MAX_LSB_NAME_LEN];
     char queue     [MAX_LSB_NAME_LEN];
     char fromHost  [MAXHOSTNAMELEN];
-    char resReq    [MAXLINELEN];
-    char windows   [MAXLINELEN];
+    char resReq    [MAX_LINE_LEN];
+    char windows   [MAX_LINE_LEN];
     char subHomeDir[MAX_FILENAME_LEN];
-    char command   [MAXLINELEN];
+    char command   [MAX_LINE_LEN];
     char jobFile   [MAX_FILENAME_LEN];
     char inFile    [MAX_FILENAME_LEN];
     char outFile   [MAX_FILENAME_LEN];
     char errFile   [MAX_FILENAME_LEN];
     char cwd       [MAX_FILENAME_LEN];
-    char preExecCmd[MAXLINELEN];
+    char preExecCmd[MAX_LINE_LEN];
     time_t runTime;
     time_t startTime;
     time_t termTime;
@@ -191,20 +191,20 @@ struct jobSpecs
     char *schedHostType;
     char *execHosts;
     char chkpntDir      [MAX_FILENAME_LEN];
-    char mailUser       [MAXLINELEN];
+    char mailUser       [MAX_LINE_LEN];
     char clusterName    [MAX_LSB_NAME_LEN];
     char projectName    [MAX_LSB_NAME_LEN];
-    char preCmd         [MAXLINELEN];
-    char postCmd        [MAXLINELEN];
+    char preCmd         [MAX_LINE_LEN];
+    char postCmd        [MAX_LINE_LEN];
     char prepostUsername[MAX_LSB_NAME_LEN];
     char execCwd        [MAX_FILENAME_LEN];
     char execHome       [MAX_FILENAME_LEN];
-    char requeueEValues [MAXLINELEN];
-    char resumeCond     [MAXLINELEN];
-    char stopCond       [MAXLINELEN];
-    char suspendActCmd  [MAXLINELEN];
-    char resumeActCmd   [MAXLINELEN];
-    char terminateActCmd[MAXLINELEN];
+    char requeueEValues [MAX_LINE_LEN];
+    char resumeCond     [MAX_LINE_LEN];
+    char stopCond       [MAX_LINE_LEN];
+    char suspendActCmd  [MAX_LINE_LEN];
+    char resumeActCmd   [MAX_LINE_LEN];
+    char terminateActCmd[MAX_LINE_LEN];
     char jobSpoolDir    [MAX_PATH_LEN];
     char inFileSpool    [MAX_FILENAME_LEN];
     char commandSpool   [MAX_FILENAME_LEN];

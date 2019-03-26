@@ -25,7 +25,7 @@
 // #define   NL_SETN     13
 
 static char msgbuf[MSGSIZE];
-static char msgline[MAXLINELEN];
+static char msgline[MAX_LINE_LEN];
 
 char *getMsg (struct msgMap *msgMap, int *msg_ID, int number)
 {

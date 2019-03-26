@@ -368,7 +368,7 @@ if (initPaths (jobCardPtr, fromHp, &jf) < 0) {
     if (!(jobSpecsPtr->options & SUB_RESTART)) {
         char *jobArgv[4];
         char **execArgv = NULL;
-        char tmpJobFile[MAXLINELEN];
+        char tmpJobFile[MAX_LINE_LEN];
 
         if (!(jobSpecsPtr->options & SUB_LOGIN_SHELL) && !UID_MAPPED (jobCardPtr)) {
 
@@ -523,16 +523,16 @@ setJobEnv (struct jobCard *jp)
     char eexecTStr[ EEXECTSTR_LENGTH];
     char *eauthAuxData = NULL;
     char eauthAuxDataStr[MAX_PATH_LEN];
-    char val[MAXLINELEN];
+    char val[MAX_LINE_LEN];
     char shellFile[MAX_FILENAME_LEN];
-    char userName[MAXLINELEN];
+    char userName[MAX_LINE_LEN];
     struct nameList *hostList = NULL; // was NAMELIST *hostList = NULL;
 
     memset( tzsave, 0, TZSAVE_LENGTH);
     memset( eauthAuxDataStr, 0, MAX_PATH_LEN);
-    memset( val, 0, MAXLINELEN);
+    memset( val, 0, MAX_LINE_LEN);
     memset( shellFile, 0, MAX_FILENAME_LEN);
-    memset( userName, 0, MAXLINELEN);
+    memset( userName, 0, MAX_LINE_LEN);
 
     if (logclass & LC_TRACE) {
         ls_syslog (LOG_DEBUG, "setJobEnv: Job <%s> numEnv %d ...", lsb_jobid2str (jp->jobSpecs.jobId), jp->jobSpecs.numEnv);
@@ -728,7 +728,7 @@ setJobEnv (struct jobCard *jp)
 
         putEnv ("LSFUSER", jp->execUsername); // FIXME FIXME FIXME FIXME "TMPDIR" should be put into configure.ac
 
-        if (getOSUserName_ (jp->execUsername, userName, MAXLINELEN) == 0) {
+        if (getOSUserName_ (jp->execUsername, userName, MAX_LINE_LEN) == 0) {
             putEnv ("USER", userName); // FIXME FIXME FIXME FIXME "TMPDIR" should be put into configure.ac
         }
         else {
@@ -1285,8 +1285,8 @@ shouldCopyFromLsbatch (struct jobCard *jp, int *cpyStdoutFromLsbatch, int *cpySt
     }
 
     if (logclass & LC_TRACE) {
-        char errMsg[MAXLINELEN];
-        memset( errMsg, 0, MAXLINELEN );
+        char errMsg[MAX_LINE_LEN];
+        memset( errMsg, 0, MAX_LINE_LEN );
 
         sprintf (errMsg, "%s: leaving... cpyStdoutFromLsbatch = %d cpyStderrFromLsbatch = %d", __func__, cpyStdoutFromLsbatch, cpyStderrFromLsbatch);
         sbdSyslog (LOG_DEBUG, errMsg);
@@ -1571,9 +1571,9 @@ send_results (struct jobCard *jp)
     else
     {
         char *hostList; // was NAMELIST *hostList;
-        char str[MAXLINELEN];
+        char str[MAX_LINE_LEN];
 
-        memset( str, 0, MAXLINELEN );
+        memset( str, 0, MAX_LINE_LEN );
         hostList = lsb_compressStrList (jp->jobSpecs.toHosts, jp->jobSpecs.numToHosts);
 
         sprintf (str, "%d*%s", hostList->counter[0], hostList->names[0]);
@@ -1622,7 +1622,7 @@ send_results (struct jobCard *jp)
             fprintf (notif, _i18n_msg_get (ls_catd, NL_SETN, 427, "Cannot open your job file: %s\n"), fileName);
         }
         else {
-            while (fgets (line, MAXLINELEN, fp) != NULL) {
+            while (fgets (line, MAX_LINE_LEN, fp) != NULL) {
                 if (!strcmp (line, CMDSTART)) {
                     break;
                 }
@@ -1642,7 +1642,7 @@ send_results (struct jobCard *jp)
                 fprintf (notif, "# LSBATCH: %s\n", I18N (430, "User input")); // FIXME FIXME FIXME FIXME "TMPDIR" should be put into configure.ac
 
                 k = 0;
-                while (fgets (line, MAXLINELEN, fp) != NULL) {
+                while (fgets (line, MAX_LINE_LEN, fp) != NULL) {
 
                     if (strstr (line, "# LOGIN_SHELL") != NULL) { // FIXME FIXME FIXME FIXME "TMPDIR" should be put into configure.ac
                         continue;
@@ -1778,7 +1778,7 @@ send_results (struct jobCard *jp)
                         /* catgets 447 */
                         fprintf (output, "\n%s\n\n", _i18n_msg_get (ls_catd, NL_SETN, 447, "The output (if any) follows:"));
                     }
-                    while ((nItems = fread (line, sizeof (char), MAXLINELEN, fp))) {
+                    while ((nItems = fread (line, sizeof (char), MAX_LINE_LEN, fp))) {
                         if (fwrite (line, sizeof (char), nItems, output) == 0) {
 
                             sprintf (line, "\nWARNING: writing output file %s failed for job %s\nError message: %s", lsb_jobid2str (jp->jobSpecs.jobId), jp->jobSpecs.outFile, strerror (errno));
@@ -1805,7 +1805,7 @@ send_results (struct jobCard *jp)
 
             sprintf (fileName, "%s.err", jp->jobSpecs.jobFile); // FIXME FIXME FIXME FIXME "TMPDIR" should be put into configure.ac
             if ((fp = myfopen_ (fileName, "r", hp)) != NULL) {
-                while ((nItems = fread (line, sizeof (char), MAXLINELEN, fp))) {
+                while ((nItems = fread (line, sizeof (char), MAX_LINE_LEN, fp))) {
                     fwrite (line, sizeof (char), nItems, errout);
                 }
                 FCLOSEUP (&fp);
@@ -1831,7 +1831,7 @@ send_results (struct jobCard *jp)
                     strcat (ps, line);
                     withps = TRUE;
                 }
-                while (copyStderrFromLsbatch && (nItems = fread (line, sizeof (char), MAXLINELEN, fp))) {
+                while (copyStderrFromLsbatch && (nItems = fread (line, sizeof (char), MAX_LINE_LEN, fp))) {
                     fwrite (line, sizeof (char), nItems, errout);
                 }
                 FCLOSEUP (&fp);
@@ -2618,7 +2618,7 @@ getLoginShell (char *jfData, char *jobFile, struct hostent *hp, int readFile)
     int i = 0;
     char *sp = NULL;
     FILE *fp = NULL;
-    char line[MAXLINELEN];
+    char line[MAX_LINE_LEN];
     static int first_time = 1;
     static char shellPath[MAX_FILENAME_LEN];
 
@@ -2651,7 +2651,7 @@ getLoginShell (char *jfData, char *jobFile, struct hostent *hp, int readFile)
         exit (-1);
     }
 
-    while (fgets (line, MAXLINELEN, fp) != NULL) {
+    while (fgets (line, MAX_LINE_LEN, fp) != NULL) {
         if (!strcmp (line, CMDSTART)) {
             break;
         }
@@ -2662,7 +2662,7 @@ getLoginShell (char *jfData, char *jobFile, struct hostent *hp, int readFile)
         exit (-1);
     }
 
-    if (fgets (line, MAXLINELEN, fp) != NULL) {
+    if (fgets (line, MAX_LINE_LEN, fp) != NULL) {
 
         if ((sp = strstr (line, "# LOGIN_SHELL ")) == NULL) {// FIXME FIXME FIXME FIXME "TMPDIR" should be put into configure.ac
             FCLOSEUP (&fp);
@@ -2695,13 +2695,13 @@ createTmpJobFile (struct jobSpecs *jobSpecsPtr, struct hostent *hp, char *stdinF
     char *sp = NULL;
     char *argv[2];
     char **execArgv = NULL;
-    char errMsg[MAXLINELEN];
+    char errMsg[MAX_LINE_LEN];
     char path[MAX_FILENAME_LEN];
-    char cmdBuf[MAXLINELEN];
+    char cmdBuf[MAX_LINE_LEN];
 
-    memset( errMsg, '\0', MAXLINELEN );
+    memset( errMsg, '\0', MAX_LINE_LEN );
     memset( path,   '\0,' MAX_FILENAME_LEN );
-    memset( cmdBuf, '\0', MAXLINELEN );
+    memset( cmdBuf, '\0', MAX_LINE_LEN );
 
     if (logclass & LC_EXEC) {
         sprintf (errMsg, "%s: entering, jobFile=<%s>", __func__, jobSpecsPtr->jobFile);
@@ -2856,13 +2856,13 @@ acctMapTo (struct jobCard *jobCard)
     char mycluster = '\0';
     char *sp = NULL;
     char *hostname = NULL;
-    char line[MAXLINELEN];
+    char line[MAX_LINE_LEN];
     char user[MAX_LSB_NAME_LEN];
     char clusorhost[MAX_LSB_NAME_LEN];
     struct passwd *pw = NULL;
     struct hostent *hp = NULL;
 
-    memset( line,       '\0', MAXLINELEN );
+    memset( line,       '\0', MAX_LINE_LEN );
     memset( user,       '\0', MAX_LSB_NAME_LEN );
     memset( clusorhost, '\0', MAX_LSB_NAME_LEN );
 
@@ -2938,7 +2938,7 @@ acctMapTo (struct jobCard *jobCard)
 
     sp += 13;
     i = 0;
-    while (*sp != '\n' && *sp != '\0' && i < MAXLINELEN) { // FIXME FIXME FIXME FIXME turn this into a for loop
+    while (*sp != '\n' && *sp != '\0' && i < MAX_LINE_LEN) { // FIXME FIXME FIXME FIXME turn this into a for loop
         line[i++] = *sp++;
     }
     line[i] = '\0';
@@ -3033,9 +3033,9 @@ acctMapOk (struct jobCard *jobCard)
     int num;
     char *line;
     char dir[30]; // FIXME FIXM FIXME why is dir only 30 chars long?
-    char errMsg[MAXLINELEN];
+    char errMsg[MAX_LINE_LEN];
     char hostfn[MAX_FILENAME_LEN];
-    char msg[MAXLINELEN * 2];
+    char msg[MAX_LINE_LEN * 2];
     char user[MAX_LSB_NAME_LEN];
     char clusorhost[MAX_LSB_NAME_LEN];
     FILE *fp = NULL;
@@ -3043,9 +3043,9 @@ acctMapOk (struct jobCard *jobCard)
     struct stat statbuf;
 
     memset( dir,        '\0', 30 );
-    memset( errMsg,     '\0', MAXLINELEN );
+    memset( errMsg,     '\0', MAX_LINE_LEN );
     memset( hostfn,     '\0', MAX_FILENAME_LEN );
-    memset( msg,        '\0', MAXLINELEN );
+    memset( msg,        '\0', MAX_LINE_LEN );
     memset( user,       '\0', MAX_LSB_NAME_LEN );
     memset( clusorhost, '\0', MAX_LSB_NAME_LEN );
 
@@ -3139,9 +3139,9 @@ runQPre (struct jobCard *jp)
 {
     int i = 0;
     pid_t pid = -1;
-    char errMsg[MAXLINELEN];
+    char errMsg[MAX_LINE_LEN];
 
-    memset( errMsg, '\0', MAXLINELEN );
+    memset( errMsg, '\0', MAX_LINE_LEN );
 
     if( !jp->jobSpecs.preCmd || jp->jobSpecs.preCmd[0] == '\0' ) {
         return;
@@ -3208,7 +3208,7 @@ runQPost (struct jobCard *jp)
     int i = 0;
     int maxfds = 0;
     pid_t pid = -1;
-    char val[MAXLINELEN];
+    char val[MAX_LINE_LEN];
     char *myargv[6];
     sigset_t newmask;
 
@@ -3338,9 +3338,9 @@ int
 postJobSetup (struct jobCard *jp)
 {
     struct hostent *hp = NULL;
-    char userName[MAXLINELEN];
+    char userName[MAX_LINE_LEN];
 
-    memset( userName, '\0', MAXLINELEN );
+    memset( userName, '\0', MAX_LINE_LEN );
 
     closeBatchSocket ();
     sbdChildCloseChan (-1);
@@ -3371,7 +3371,7 @@ postJobSetup (struct jobCard *jp)
         putEnv ("LSFUSER", jp->execUsername); // FIXME FIXME FIXME FIXME "TMPDIR" should be put into configure.ac
 
 
-        if (getOSUserName_ (jp->execUsername, userName, MAXLINELEN) == 0)  {
+        if (getOSUserName_ (jp->execUsername, userName, MAX_LINE_LEN) == 0)  {
             putEnv ("USER", userName); // FIXME FIXME FIXME FIXME "TMPDIR" should be put into configure.ac
 
         }
@@ -3427,7 +3427,7 @@ runUPre (struct jobCard *jp)
 {
     int i = 0;
     pid_t pid = -1;
-    char errMsg[MAXLINELEN];
+    char errMsg[MAX_LINE_LEN];
 
     if ((pid = fork ()) < 0) {
         sprintf (errMsg, I18N_JOB_FAIL_S_M, __func__, lsb_jobid2str (jp->jobSpecs.jobId), "fork");
@@ -3472,11 +3472,11 @@ collectPreStatus (struct jobCard *jp, pid_t pid, char *context)
 {
     pid_t id = -1;
     LS_WAIT_T status;
-    char errMsg[MAXLINELEN];
+    char errMsg[MAX_LINE_LEN];
     struct rusage rusage;
     struct lsfRusage lsfRusage;
 
-    memset( errMsg, '\0', MAXLINELEN );
+    memset( errMsg, '\0', MAX_LINE_LEN );
 
     while ((id = waitpid( -1, &status, 0, &rusage)) != pid) { // while ((id = wait3 (&status, 0, &rusage)) != pid) {
         if( -1 == getrusage( RUSAGE_CHILDREN , &ru ) ) {
@@ -4135,9 +4135,9 @@ setJobArrayEnv ( const char *jobName, int jobIndex)
     char *index   = NULL;
     struct idxList *idx     = NULL;
     struct idxList *idxList = NULL;
-    char val[MAXLINELEN];
+    char val[MAX_LINE_LEN];
 
-    memset( val, '\0', MAXLINELEN );
+    memset( val, '\0', MAX_LINE_LEN );
 
     index = strchr (jobName, '['); // FIXME FIXME FIXME FIXME "TMPDIR" should be put into configure.ac
     if (!index) {

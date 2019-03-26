@@ -399,7 +399,7 @@ main (int argc, char **argv)
       switch (achar)
         {
         case 'R':
-          if (strlen (optarg) > MAXLINELEN)
+          if (strlen (optarg) > MAX_LINE_LEN)
         {
           printf (" %s", I18N (1645, "The resource requirement string exceeds the maximum length of 512 characters. Specify a shorter resource requirement.\n"));   /* catgets  1645  */
           exit (-1);

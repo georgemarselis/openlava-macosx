@@ -321,12 +321,12 @@ parseScript2 (FILE * from, int *embedArgc, char ***embedArgv, int option)
 
   register int ttyin  = 0;
   // char *prompt  = NULL;
-  char firstLine[MAXLINELEN * 10];
-  char line[MAXLINELEN * 10];
+  char firstLine[MAX_LINE_LEN * 10];
+  char line[MAX_LINE_LEN * 10];
   int notBourne         = FALSE;
   unsigned int length           = 0;
   unsigned long lineLen = 0;
-  unsigned long size    = 10 * MAXLINELEN;
+  unsigned long size    = 10 * MAX_LINE_LEN;
   char *buf             = NULL;
   char *sp              = NULL;
   # define szTmpShellCommands "%s\n) > $LSB_CHKFILENAME.shell\nchmod u+x $LSB_CHKFILENAME.shell\n$LSB_JOBFILENAME.shell\nsaveExit=$?\n/bin/rm -f $LSB_JOBFILENAME.shell\n(exit $saveExit)\n" // FIXME FIXME FIXME this shit has to go
@@ -362,7 +362,7 @@ parseScript2 (FILE * from, int *embedArgc, char ***embedArgv, int option)
 
   sp = line;
   lineLen = 0;
-  while (fgets (sp, 10 * MAXLINELEN - (int)lineLen - 1, from) != NULL)
+  while (fgets (sp, 10 * MAX_LINE_LEN - (int)lineLen - 1, from) != NULL)
     {
       lineLen = strlen (line);
 

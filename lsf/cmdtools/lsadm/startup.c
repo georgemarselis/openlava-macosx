@@ -70,7 +70,7 @@ getLSFenv (void)
 {
     char *envDir                    = NULL;
     struct sharedConf *mySharedConf = NULL;
-    char lsfSharedFile[MAXLINELEN];
+    char lsfSharedFile[MAX_LINE_LEN];
 
     for ( unsigned int i = 0; i < LSF_CONF_LAST; i++) { // FIXME FIXME FIXME FIXME LSF_CONF_LAST 
         FREEUP (myParamList[i].paramValue);
@@ -192,7 +192,7 @@ findMyCluster ( const char *CName, struct sharedConf *mySharedConf)
 {
     char *lhost = NULL;
     struct clusterConf *cl = NULL;
-    char lsfClusterFile[MAXLINELEN];
+    char lsfClusterFile[MAX_LINE_LEN];
 
     if ((lhost = ls_getmyhostname ()) == NULL) {
         ls_perror ("ls_getmyhostname"); // FIXME FIXME FIXME FIXME FIXME
@@ -248,7 +248,7 @@ findMyCluster ( const char *CName, struct sharedConf *mySharedConf)
 void
 startupAllHosts (int opCode, int confirm)
 {
-    char msg[MAXLINELEN];
+    char msg[MAX_LINE_LEN];
 
 
     if (confirm) {
@@ -295,7 +295,7 @@ startupLocalHost (int opCode)
     int  *myargc     = 10;
     char *host       = NULL;
     char *myargv[10] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL }; // FIXME FIXME FIXME FIXME FIXME 10 seems awfully particular
-    char operation[MAXLINELEN / 2];
+    char operation[MAX_LINE_LEN / 2];
 
     if ((host = ls_getmyhostname ()) == NULL) {
         host = "localhost";
@@ -358,7 +358,7 @@ startupRemoteHost ( const char *host, int opCode, int ask)
     int symbolic     = FALSE;
     char *envDir     = NULL;
     char *myargv[10] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL }; // FIXME FIXME FIXME FIXME FIXME 10 seems awfully particular
-    char msg[2 * MAXLINELEN];
+    char msg[2 * MAX_LINE_LEN];
 
     if (opCode == LSADM_LIMSTARTUP) {  // FIXME FIXME FIXME FIXME FIXME where does the label come from?
         /* catgets 411 */
@@ -399,8 +399,8 @@ startupRemoteHost ( const char *host, int opCode, int ask)
         myargv[cc++] = "/bin/sh ";             // FIXME FIXME FIXME FIXME FIXME no malloc
         myargv[cc++] = "-c ";                  // FIXME FIXME FIXME FIXME FIXME no malloc
 
-        if (strlen (envDir) > MAXLINELEN) {
-            fprintf (stderr, "LSF_ENVDIR is longer than <%d> chars <%s> \n", MAXLINELEN, envDir);
+        if (strlen (envDir) > MAX_LINE_LEN) {
+            fprintf (stderr, "LSF_ENVDIR is longer than <%d> chars <%s> \n", MAX_LINE_LEN, envDir);
             exit (-1);
         }
 

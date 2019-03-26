@@ -136,7 +136,7 @@ lsb_hostinfo_ex (char **hosts, unsigned int *numHosts, char *resReq, int options
   hostInfoReq.options = options;
   if (resReq != NULL)
     {
-      if (strlen (resReq) > MAXLINELEN - 1)
+      if (strlen (resReq) > MAX_LINE_LEN - 1)
 	{
 	  lsberrno = LSBE_BAD_RESREQ;
 	  return (NULL);

@@ -393,11 +393,11 @@ int
 parseScript (FILE * from, int *embedArgc, char ***embedArgv, int option)
 {
   static char __func__] = "parseScript";
-  char *buf, line[MAXLINELEN * 10], *prompt;
+  char *buf, line[MAX_LINE_LEN * 10], *prompt;
   register int ttyin = 0;
-  int length = 0, size = 10 * MAXLINELEN;
+  int length = 0, size = 10 * MAX_LINE_LEN;
   int i, j, lineLen;
-  char firstLine[MAXLINELEN * 10];
+  char firstLine[MAX_LINE_LEN * 10];
   char *sp;
   int notBourne = FALSE;
   int isBSUB = FALSE;
@@ -438,7 +438,7 @@ parseScript (FILE * from, int *embedArgc, char ***embedArgv, int option)
 
   sp = line;
   lineLen = 0;
-  while (fgets (sp, 10 * MAXLINELEN - lineLen - 1, from) != NULL)
+  while (fgets (sp, 10 * MAX_LINE_LEN - lineLen - 1, from) != NULL)
     {
       lineLen = strlen (line);
       if (line[0] == '#')
@@ -474,7 +474,7 @@ parseScript (FILE * from, int *embedArgc, char ***embedArgv, int option)
 	  lineLen = strlen (line);
 
 
-	  if (length + lineLen + MAXLINELEN + 20 >= size)
+	  if (length + lineLen + MAX_LINE_LEN + 20 >= size)
 	    {
 	      size = size * 2;
 	      if ((buf = (char *) realloc (buf, size)) == NULL)

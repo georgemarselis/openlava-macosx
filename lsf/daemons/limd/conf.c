@@ -1537,9 +1537,9 @@ readCluster (int checkMode)  // FIXME FIXME move to a cluster.c file
     }
 
     if ((hname = ls_getmyhostname ()) == NULL) {
-        char exitmsg[MAXLINELEN/4];
+        char exitmsg[MAX_LINE_LEN/4];
         const char ls_getmyhostname[] = "ls_getmyhostname";
-        memset( exitmsg, 0, MAXLINELEN/4 );
+        memset( exitmsg, 0, MAX_LINE_LEN/4 );
         sprintf( exitmsg, "%s: failed at %s", __func__, ls_getmyhostname );
         lim_Exit ( exitmsg ); // FIXME FIXME FIXME FIXME lim_Exit all the things!
     }
@@ -4070,8 +4070,8 @@ findClusterServers ( const char *clName)
     const char ENOSERVER[]   = "ENOSERVER";
     const char readonly[]    = "r";
     
-    servers = malloc( sizeof( char ) * MAXLINELEN + 1 ); // FIXME FIXME FIXME FIXME memory management
-    memset( servers, 0, sizeof( char ) * MAXLINELEN + 1 );
+    servers = malloc( sizeof( char ) * MAX_LINE_LEN + 1 ); // FIXME FIXME FIXME FIXME memory management
+    memset( servers, 0, sizeof( char ) * MAX_LINE_LEN + 1 );
     strcpy( servers, ENOSERVER );
     assert( strlen( limParams[LSF_CONFDIR].paramValue ) + strlen( lsf_cluster ) + strlen( clName ) =< MAX_FILENAME_LEN );
     sprintf (fileName, "%s/%s.%s", limParams[LSF_CONFDIR].paramValue, lsf_cluster ,clName); // FIXME FIXME FIXME FIXME const struct parameter; should be moved to configure.ac

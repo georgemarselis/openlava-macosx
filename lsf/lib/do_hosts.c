@@ -1,16 +1,16 @@
 // added by George Marselis <george@marsel.is> Tuesday March 26
 
 #include <stdio.h>
+#include <stdlib.h>
 
-#include "lsf.h"
-#include "lib/conf.h"
+#include "lib/do_hosts.h"
 
 /*************************************************************************************************************************
  * FIXME FIXME FIXME FIXME FIXME explain the difference between the two
 */
 
 /*************************************************************************************************************************
- * Function: do_Hosts_lsf (FILE * fp, const char *filename, size_t *lineNum, struct lsInfo *info)
+ * Function: do_Hosts_lsf (FILE *fp, const char *filename, size_t *lineNum, struct lsInfo *info)
  * 
  *  purpose: 
  *

@@ -557,7 +557,7 @@ cpLocalFiles (const char *localSrcFileFullPath, const char *outputFileName)
 {
 	spoolCopyStatus_t spoolCopyStatus = SPOOL_COPY_FAILURE;
 	int input, output;
-	char line[MAXLINELEN + 1];
+	char line[MAX_LINE_LEN + 1];
 	ssize_t nItems;
 
 	if (logclass & (LC_TRACE | LC_EXEC))
@@ -624,7 +624,7 @@ cpLocalFiles (const char *localSrcFileFullPath, const char *outputFileName)
 
 spoolCopyStatus = SPOOL_COPY_SUCCESS;
 
-while ((nItems = read (input, line, MAXLINELEN)))
+while ((nItems = read (input, line, MAX_LINE_LEN)))
 {
 
 	assert( nItems >= 0 );
@@ -676,7 +676,7 @@ cpRemoteFiles (const char *localSrcFileFullPath, const char *hostName, const cha
 	int output = -1;
 	struct stat remoteFileStatusBuf;
 	SIGFUNCTYPE oldsigTTIN, oldsigTTOU, oldsigINT, oldsigUSR1;
-	char lsfUserName[MAXLINELEN];
+	char lsfUserName[MAX_LINE_LEN];
 	struct hostent *hp;
 
 	if (logclass & (LC_TRACE | LC_EXEC))
@@ -740,7 +740,7 @@ cpRemoteFiles (const char *localSrcFileFullPath, const char *hostName, const cha
 	lsXfer.szSourceArg = putstr_ (localSrcFileFullPath);
 
 
-	if (getLSFUser_ (lsfUserName, MAXLINELEN) != 0)
+	if (getLSFUser_ (lsfUserName, MAX_LINE_LEN) != 0)
 	{
 
 		ls_donerex ();

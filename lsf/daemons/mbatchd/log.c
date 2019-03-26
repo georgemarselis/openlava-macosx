@@ -3434,7 +3434,7 @@ replaceJobInfoFile (char *jobFileName,
   static char __func__] = "replaceJobInfoFile";
   char jobFile[MAX_FILENAME_LEN];
   char workFile[MAX_FILENAME_LEN];
-  char line[MAXLINELEN];
+  char line[MAX_LINE_LEN];
   char *ptr;
   int nbyte;
   FILE *fdi, *fdo;
@@ -3461,7 +3461,7 @@ replaceJobInfoFile (char *jobFileName,
       return (-1);
     }
 
-  while ((ptr = fgets (line, MAXLINELEN, fdi)) != NULL)
+  while ((ptr = fgets (line, MAX_LINE_LEN, fdi)) != NULL)
     {
       if (strcmp (line, CMDSTART) != 0)
 	{
@@ -3469,7 +3469,7 @@ replaceJobInfoFile (char *jobFileName,
 	}
       else
 	{
-	  char outCmdArgs[2 * MAXLINELEN];
+	  char outCmdArgs[2 * MAX_LINE_LEN];
 	  char *pFileCmdArgs;
 
 	  fputs (line, fdo);
@@ -3479,7 +3479,7 @@ replaceJobInfoFile (char *jobFileName,
 	      char *oldCmdArgs;
 
 
-	      if ((ptr = fgets (line, MAXLINELEN, fdi)) == NULL)
+	      if ((ptr = fgets (line, MAX_LINE_LEN, fdi)) == NULL)
 		{
 		  FCLOSEUP (&fdo);
 		  FCLOSEUP (&fdi);
@@ -3550,11 +3550,11 @@ replaceJobInfoFile (char *jobFileName,
     }
 
 
-  while ((ptr = fgets (line, MAXLINELEN, fdi)) != NULL)
+  while ((ptr = fgets (line, MAX_LINE_LEN, fdi)) != NULL)
     {
       if (strcmp (line, CMDEND) == 0)
 	{
-	  ptr = fgets (line, MAXLINELEN, fdi);
+	  ptr = fgets (line, MAX_LINE_LEN, fdi);
 	  break;
 	}
       else
@@ -3579,7 +3579,7 @@ replaceJobInfoFile (char *jobFileName,
 
   fputs (WAITCLEANCMD, fdo);
 
-  while ((nbyte = fread (line, 1, MAXLINELEN, fdi)) > 0)
+  while ((nbyte = fread (line, 1, MAX_LINE_LEN, fdi)) > 0)
     if (fwrite (line, 1, nbyte, fdo) != nbyte)
       {
 	FCLOSEUP (&fdo);

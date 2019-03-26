@@ -62,7 +62,7 @@ lsb_openjobinfo_a (LS_LONG_INT jobId, char *jobName, char *userName, char *queue
 	int cc = 0;
 	int aa = 0;
 	struct LSFHeader hdr; 					// FIXME FIXME full init
-	char *lsfUserName = malloc( sizeof( char ) * MAXLINELEN + 1);
+	char *lsfUserName = malloc( sizeof( char ) * MAX_LINE_LEN + 1);
 
 	if (first)
 	{
@@ -159,7 +159,7 @@ lsb_openjobinfo_a (LS_LONG_INT jobId, char *jobName, char *userName, char *queue
   if (userName == NULL)
 	{
 	  // TIMEIT (0, (
-	  cc = getLSFUser_ (lsfUserName, MAXLINELEN);
+	  cc = getLSFUser_ (lsfUserName, MAX_LINE_LEN);
 	  // ), "getLSFUser_");
 	  if (cc != 0)
 	{

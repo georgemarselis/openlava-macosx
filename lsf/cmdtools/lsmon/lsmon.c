@@ -36,8 +36,8 @@ void printHeader (char **);
 #define CONTROL_L  12
 #define MAXLISTSIZE 256
 
-char resreq[MAXLINELEN] = "";
-char indexfilter[MAXLINELEN] = "";
+char resreq[MAX_LINE_LEN] = "";
+char indexfilter[MAX_LINE_LEN] = "";
 char *hostnames[MAXLISTSIZE];
 int numneeded, num = 0, options = 0;
 int updateRate = 10;
@@ -368,7 +368,7 @@ void
 chResReq (void)
 {
 
-  char newresreq[MAXLINELEN];
+  char newresreq[MAX_LINE_LEN];
 
 
   move (1, 0);
