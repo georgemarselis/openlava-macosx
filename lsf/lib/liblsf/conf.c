@@ -2138,7 +2138,7 @@ int doResourceMap (FILE * fp, const char *lsfile, size_t *lineNum)
     if (isSectionEnd (linep, lsfile, lineNum, resourceMapString)) {
         /* catgets 5109 */
         char buffer[MAXHOSTNAMELEN];
-        sprintf( buffer, "catgets 5109: %s: %s(%lu): Empty resourceMap, no keywords or resources defined.", __func__, lsfile, *lineNum);
+        // sprintf( buffer, "catgets 5109: %s: %s(%lu): Empty resourceMap, no keywords or resources defined.", __func__, lsfile, *lineNum);
         ls_syslog (LOG_WARNING, buffer );
         return -1;
     }
@@ -2171,7 +2171,7 @@ int doResourceMap (FILE * fp, const char *lsfile, size_t *lineNum)
             {
                 char buffer[MAXHOSTNAMELEN];
                 memset( buffer, '\0', MAXHOSTNAMELEN );
-                sprintf( buffer, "catgets 5199: %s: %s(%lu): Resource name <%s> is not defined; ignoring line", __func__, lsfile, *lineNum, keyList[RESOURCENAME].val );
+                // sprintf( buffer, "catgets 5199: %s: %s(%lu): Resource name <%s> is not defined; ignoring line", __func__, lsfile, *lineNum, keyList[RESOURCENAME].val );
                 ls_syslog (LOG_ERR, buffer);
                 freeKeyList (keyList);
                 continue;
