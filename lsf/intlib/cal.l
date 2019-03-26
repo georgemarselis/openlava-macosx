@@ -20,13 +20,13 @@ unsigned char *yysptr, yysbuf[];
 #include <syslog.h>
 #include <malloc.h>
 
-#ifndef  MAX_LINE_LEN
-#include "../lsf.h"
-#endif
+; #ifndef  MAX_LINE_LEN
+#include "lsf.h"
+; #endif
 #include "calendar.h"
 #include "tokdefs.h"
 #include "yparse.h"
-#include "../lib/lsi18n.h" 
+#include "lib/lsi18n.h" 
 
 #define MAXTOKENLEN 302
 #define NL_SETN      22     /* MOD_LSFINTLIB 22   msgId  350-399 */  
