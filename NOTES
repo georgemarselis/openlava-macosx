@@ -1,0 +1,1 @@
+lib/liblsbatch/conf.c and lib/liblsf/conf.c have to be compiled together with lib/do_hosts.c
