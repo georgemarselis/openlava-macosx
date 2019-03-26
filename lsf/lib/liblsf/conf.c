@@ -1550,13 +1550,21 @@ ls_setAdmins (struct admins *admins, int mOrA)
         ls_syslog (LOG_ERR, "%s: clinfo.nAdmins: value is not greater than zero! (%d)\n", __func__, clinfo.nAdmins);
     }
 
-    clinfo.nAdmins = tempNAdmins;
+    clinfo.nAdmins  = tempNAdmins;
     clinfo.adminIds = tempAdminIds;
-    clinfo.admins = tempAdminNames;
+    clinfo.admins   = tempAdminNames;
 
     return 0;
 }
 
+/*************************************************************************************************************************
+ * Function: do_Hosts (FILE * fp, const char *filename, size_t *lineNum, struct lsInfo *info)
+ * 
+ *  purpose: 
+ *
+ * Input:
+ * Output: 
+*/
 char
 do_Hosts (FILE * fp, const char *filename, size_t *lineNum, struct lsInfo *info)
 {
@@ -1652,8 +1660,7 @@ do_Hosts (FILE * fp, const char *filename, size_t *lineNum, struct lsInfo *info)
                 break;
             }
 
-            if( ( strcasecmp ( "hostname", keyList[i].key ) == 0 ) || ( strcasecmp( "model", keyList[i].key) == 0 ) ||
-                ( strcasecmp ( "type", keyList[i].key ) == 0 ) || ( strcasecmp( "resources", keyList[i].key) == 0 ) ) {
+            if( ( strcasecmp ( "hostname", keyList[i].key ) == 0 ) || ( strcasecmp( "model", keyList[i].key) == 0 ) || ( strcasecmp ( "type", keyList[i].key ) == 0 ) || ( strcasecmp( "resources", keyList[i].key) == 0 ) ) {
                 /* catgets 5137 */
                 ls_syslog (LOG_ERR, "catgets 5137: %s: %s(%d): keyword line: key %s is missing in section host, ignoring section", __func__, filename, *lineNum, keyList[i].key);
                 doSkipSection (fp, lineNum, filename, hostString);
@@ -1688,19 +1695,19 @@ do_Hosts (FILE * fp, const char *filename, size_t *lineNum, struct lsInfo *info)
 
         if (mapValues (keyList, linep) < 0)
         {
-                /* catgets 5139  */
+            /* catgets 5139  */
             ls_syslog (LOG_ERR, "catgets 5139: %s: %s(%d): values do not match keys for section host, ignoring line", __func__, filename, *lineNum);
             continue;
         }
 
         if (strlen (keyList[HOSTNAME].val) > MAXHOSTNAMELEN) {
-                /* catgets 5140 */
+            /* catgets 5140 */
             ls_syslog (LOG_ERR, "catgets 5140: %s: %s(%d): too long host name, ignored.", __func__, filename, *lineNum);
             continue;
         }
 
         if (Gethostbyname_ (keyList[HOSTNAME].val) == NULL) {
-                /* catgets 5141 */
+            /* catgets 5141 */
             ls_syslog (LOG_ERR, "catgets 5141: %s: %s(%d): Invalid hostname %s in section host. Ignoring host", __func__, filename, *lineNum, keyList[HOSTNAME].val);
             continue;
         }
@@ -1732,34 +1739,34 @@ do_Hosts (FILE * fp, const char *filename, size_t *lineNum, struct lsInfo *info)
             assert( strtoul( keyList[ND].val, NULL , BASEZERO ) );
             if( !errno ) {
                     host.nDisks = (unsigned int) strtoul( keyList[ND].val, NULL , BASEZERO ); // FIXME FIXME FIXME i'm sure nobody will get a couple of billion of disks in a single system any time soon, but please take care of this and change nDisks to size_t or devise a plan to have a proper conversion to int.
-                }
-                else {
-                    fprintf( stdout, "%s: errno was: %d; the value of keyList[ND].val was %s; too big for strtoul(); ignoring, no disks set\n", __func__, errno, keyList[ND].val );
-                    ls_syslog( LOG_ERR, "%s: errno was: %d; the value of keyList[ND].val was %s; too big for strtoul(); ignoring, no disks set", __func__, errno, keyList[ND].val );
-                    errno = 0;
-                    continue;
-                }
-
             }
             else {
-                host.nDisks = INFINIT_INT;
+                fprintf( stdout, "%s: errno was: %d; the value of keyList[ND].val was %s; too big for strtoul(); ignoring, no disks set\n", __func__, errno, keyList[ND].val );
+                ls_syslog( LOG_ERR, "%s: errno was: %d; the value of keyList[ND].val was %s; too big for strtoul(); ignoring, no disks set", __func__, errno, keyList[ND].val );
+                errno = 0;
+                continue;
             }
 
-            host.busyThreshold = malloc( info->numIndx * sizeof ( host.busyThreshold ) );
-            if ( NULL == host.busyThreshold && ENOMEM == errno ) {
-                /* FIXME
-                 this lserrno and logging to syslog about memory allocation must either
-                 go or get a lot more serious somehow
-                 */
-                assert( info->numIndx );
-                ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, mallocString );
-                lserrno = LSE_MALLOC;
-                freeHostInfo (&host);
-                freekeyval (keyList);
-                doSkipSection (fp, lineNum, filename, hostString );
+        }
+        else {
+            host.nDisks = INFINIT_INT;
+        }
 
-                return FALSE;
-            }
+        host.busyThreshold = malloc( info->numIndx * sizeof ( host.busyThreshold ) );
+        if ( NULL == host.busyThreshold && ENOMEM == errno ) {
+            /* FIXME
+             this lserrno and logging to syslog about memory allocation must either
+             go or get a lot more serious somehow
+             */
+            assert( info->numIndx );
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, mallocString );
+            lserrno = LSE_MALLOC;
+            freeHostInfo (&host);
+            freekeyval (keyList);
+            doSkipSection (fp, lineNum, filename, hostString );
+
+            return FALSE;
+        }
 
         liblsf_putThreshold( R15S, &host, keyList[R15S].position, keyList[R15S].val, INFINIT_LOAD );
         liblsf_putThreshold( R1M,  &host, keyList[R1M].position,  keyList[R1M].val,  INFINIT_LOAD );
