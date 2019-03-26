@@ -1865,6 +1865,7 @@ int parse_time (const char *word, float *hour, unsigned int *day) // FIXME FIXME
     return 0;
 }
 
+
 char do_Cluster (FILE * fp, size_t *lineNum, const char *filename)
 {
     char *linep                = NULL;
@@ -2136,17 +2137,15 @@ int doResourceMap (FILE * fp, const char *lsfile, size_t *lineNum)
     }
 
     if (isSectionEnd (linep, lsfile, lineNum, resourceMapString)) {
+        char buffer[MAX_FILENAME_LEN];
         /* catgets 5109 */
-        char buffer[MAXHOSTNAMELEN];
-        // sprintf( buffer, "catgets 5109: %s: %s(%lu): Empty resourceMap, no keywords or resources defined.", __func__, lsfile, *lineNum);
+        sprintf( buffer, "catgets 5109: %s: %s(%lu): Empty resourceMap, no keywords or resources defined.", __func__, lsfile, *lineNum);
         ls_syslog (LOG_WARNING, buffer );
         return -1;
     }
 
-    if (strchr (linep, '=') == NULL)
-    {
-        if (!keyMatch (keyList, linep, TRUE))
-        {
+    if (strchr (linep, '=') == NULL) {
+        if (!keyMatch (keyList, linep, TRUE)) {
             /* catgets 5197 */
             ls_syslog (LOG_ERR, "catgets 5197: %s: %s(%d): keyword line format error for section resource, ignoring section", __func__, lsfile, *lineNum);
             doSkipSection (fp, lineNum, lsfile, resourceMapString);
@@ -2159,19 +2158,17 @@ int doResourceMap (FILE * fp, const char *lsfile, size_t *lineNum)
             if (isSectionEnd (linep, lsfile, lineNum, resourceMapString)) {
                 return 0;
             }
-            if (mapValues (keyList, linep) < 0)
-            {
+            if (mapValues (keyList, linep) < 0) {
                 /* catgets 5198 */
                 ls_syslog (LOG_ERR, "catgets 5198: %s: %s(%d): values do not match keys for resourceMap section, ignoring line", __func__, lsfile, *lineNum);
                 continue;
             }
 
             resNo = resNameDefined (keyList[RESOURCENAME].val);
-            if ( !resNo ) 
-            {
-                char buffer[MAXHOSTNAMELEN];
-                memset( buffer, '\0', MAXHOSTNAMELEN );
-                // sprintf( buffer, "catgets 5199: %s: %s(%lu): Resource name <%s> is not defined; ignoring line", __func__, lsfile, *lineNum, keyList[RESOURCENAME].val );
+            if ( !resNo ) {
+                char buffer[MAX_FILENAME_LEN];
+                memset( buffer, '\0', MAX_FILENAME_LEN );
+                sprintf( buffer, "catgets 5199: %s: %s(%lu): Resource name <%s> is not defined; ignoring line", __func__, lsfile, *lineNum, keyList[RESOURCENAME].val );
                 ls_syslog (LOG_ERR, buffer);
                 freeKeyList (keyList);
                 continue;
