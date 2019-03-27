@@ -243,7 +243,7 @@ readHvalues_conf (struct keymap *keyList, char *linep, struct lsConf *conf, cons
         return readHvalues_conf (keyList, linep, conf, lsfile, lineNumber, exact, section);
     }
 
-    ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, lsfile, *lineNumber, section);
+    ls_syslog (LOG_ERR, "catgets 33: %s: %s(%d): Premature EOF in section %s", __func__, lsfile, *lineNumber, section); /*catgets33 */
     return -1;
 }
 
@@ -4710,36 +4710,6 @@ checkRequeEValues (struct queueInfoEnt *qp, char *word, const char *filename, si
         }
 
     return TRUE;
-}
-
-char *
-a_getNextWord_ (char **line)
-{
-    char *wordp = NULL;
-    char *word  = NULL;
-
-    word = getNextWord_ (line);
-    if (word && (wordp = strchr (word, '('))) {
-        *(wordp + 1) = '\0';
-        while (**line != '(') {
-            (*line)--;
-        }
-        (*line)++;
-        }
-    else if (word && (wordp = strchr (word, ')')))
-        {
-        if (wordp != word)
-            {
-            wordp--;
-            while (isspace (*wordp)) {
-                wordp--;
-            }
-            *(wordp + 1) = '\0';
-            while (**line != ')')
-                (*line)--;
-            }
-        }
-    return word;
 }
 
 char

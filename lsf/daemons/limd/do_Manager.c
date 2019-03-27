@@ -1,4 +1,4 @@
-
+// added by George Marselis <george@marsel.is> Wed March 27 2019
 
 #include "daemons/liblimd/do_Manager.h"
 
@@ -68,7 +68,7 @@ char do_Manager (FILE *fp, const char *filename, size_t *lineNum, const char *se
 
 	linep = getNextLineC_ (fp, lineNum, TRUE);
 	if (!linep) {
-		ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, filename, *lineNum, secName);
+		ls_syslog (LOG_ERR, "catgets 33: %s: %s(%d): Premature EOF in section %s", __func__, filename, *lineNum, secName); /*catgets33 */
 		return FALSE;
 	}
 

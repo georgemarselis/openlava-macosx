@@ -44,8 +44,8 @@ static const char Y[] = "Y";
 int
 initResTable_ (void)
 {
-    struct resItem  **resTable = NULL;
     unsigned int i             = 0;
+    struct resItem  **resTable = NULL;
 
     resTable = malloc (1000 * sizeof (struct resItem) + 1 * sizeof( struct resItem ) ); // FIXME FIXME FIXME FIXME '1000' is awfuly partifular
     if (!resTable) {
@@ -168,6 +168,7 @@ ls_readshared ( const char *filename)
     }
 
     for (;;) {  // FIXME FIXME FIXME FIXME replace infinite loop with a ccertain-to-terminate condition
+        const char *copyPtr = NULL;
         if ((cp = getBeginLine (fp, &lineNum)) == NULL) {
             fclose (fp);
             if (!modelok)
@@ -193,10 +194,9 @@ ls_readshared ( const char *filename)
             return sConf;
         }
 
-
-        word = getNextWord_ (&cp);
+        copyPtr = cp;
+        word = getNextWord_ ( &copyPtr );
         if (!word) {
-
             /* catgets 5057 */
             ls_syslog (LOG_ERR, "catgets 5057: %s: %s(%d): Section name expected after Begin; ignoring section", __func__, filename, lineNum);
             doSkipSection (fp, &lineNum, filename, unknown_section);
@@ -291,7 +291,7 @@ char do_Index (FILE * fp, size_t *lineNum, const char *filename)
     linep = getNextLineC_ (fp, lineNum, TRUE);
     if (!linep)
     {
-        ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, filename, *lineNum, newindex);
+        ls_syslog (LOG_ERR, "catgets 33: %s: %s(%d): Premature EOF in section %s", __func__, filename, *lineNum, newindex); /*catgets33 */
         return FALSE;
     }
 
@@ -335,7 +335,7 @@ char do_Index (FILE * fp, size_t *lineNum, const char *filename)
         return TRUE;
     }
 
-    ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, filename, *lineNum, newindex);
+    ls_syslog (LOG_ERR, "catgets 33: %s: %s(%d): Premature EOF in section %s", __func__, filename, *lineNum, newindex); /*catgets33 */
     return TRUE;
 }
 
@@ -437,7 +437,7 @@ char do_HostTypes (FILE * fp, size_t *lineNum, const char *filename)
     linep = getNextLineC_ (fp, lineNum, TRUE);
     if (!linep)
     {
-        ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, filename, *lineNum, hosttype);
+        ls_syslog (LOG_ERR, "catgets 33: %s: %s(%d): Premature EOF in section %s", __func__, filename, *lineNum, hosttype); /*catgets33 */
         return FALSE;
     }
 
@@ -486,7 +486,7 @@ char do_HostTypes (FILE * fp, size_t *lineNum, const char *filename)
         return FALSE;
     }
 
-    ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, filename, *lineNum, hosttype);
+    ls_syslog (LOG_ERR, "catgets 33: %s: %s(%d): Premature EOF in section %s", __func__, filename, *lineNum, hosttype); /*catgets33 */
 
     return TRUE;
 }
@@ -553,7 +553,7 @@ char do_HostModels (FILE * fp, size_t *lineNum, const char *filename)
 
     linep = getNextLineC_ (fp, lineNum, TRUE);
     if (!linep) {
-        ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, filename, *lineNum, hostModel);
+        ls_syslog (LOG_ERR, "catgets 33: %s: %s(%d): Premature EOF in section %s", __func__, filename, *lineNum, hostModel); /*catgets33 */
         return FALSE;
     }
 
@@ -619,7 +619,7 @@ char do_HostModels (FILE * fp, size_t *lineNum, const char *filename)
         return FALSE;
     }
 
-    ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, filename, *lineNum, hostModel);
+    ls_syslog (LOG_ERR, "catgets 33: %s: %s(%d): Premature EOF in section %s", __func__, filename, *lineNum, hostModel); /*catgets33 */
     return TRUE;
 }
 
@@ -767,7 +767,7 @@ char do_Resources (FILE * fp, size_t *lineNum, const char *filename)
 
     linep = getNextLineC_ (fp, lineNum, TRUE);
     if (!linep) {
-        ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, filename, *lineNum, resource);
+        ls_syslog (LOG_ERR, "catgets 33: %s: %s(%d): Premature EOF in section %s", __func__, filename, *lineNum, resource); /*catgets33 */
         return FALSE;
     }
 
@@ -977,7 +977,7 @@ char do_Resources (FILE * fp, size_t *lineNum, const char *filename)
             return FALSE;
         }
 
-        ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, filename, *lineNum, "resource");
+        ls_syslog (LOG_ERR, "catgets 33: %s: %s(%d): Premature EOF in section %s", __func__, filename, *lineNum, "resource"); /*catgets33 */
         return TRUE;
     }
 
@@ -1896,7 +1896,7 @@ char do_Cluster (FILE * fp, size_t *lineNum, const char *filename)
     linep = getNextLineC_ (fp, lineNum, TRUE);
     if (!linep)
     {
-        ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, filename, *lineNum, cluster);
+        ls_syslog (LOG_ERR, "catgets 33: %s: %s(%d): Premature EOF in section %s", __func__, filename, *lineNum, cluster); /*catgets33 */
         return FALSE;
     }
 
@@ -1976,7 +1976,7 @@ char do_Cluster (FILE * fp, size_t *lineNum, const char *filename)
         return FALSE;
     }
 
-    ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, filename, *lineNum, cluster);
+    ls_syslog (LOG_ERR, "catgets 33: %s: %s(%d): Premature EOF in section %s", __func__, filename, *lineNum, cluster); /*catgets33 */
     return FALSE;
 }
 
@@ -2047,7 +2047,7 @@ char do_Clparams (FILE * clfp, const char *lsfile, size_t *lineNum)
 
     linep = getNextLineC_ (clfp, lineNum, TRUE);
     if (!linep) {
-        ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, lsfile, *lineNum, parameters);
+        ls_syslog (LOG_ERR, "catgets 33: %s: %s(%d): Premature EOF in section %s", __func__, lsfile, *lineNum, parameters); /*catgets33 */
         return FALSE;
     }
 
@@ -2132,7 +2132,7 @@ int doResourceMap (FILE * fp, const char *lsfile, size_t *lineNum)
 
     linep = getNextLineC_ (fp, lineNum, TRUE);
     if (!linep) {
-        ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, lsfile, *lineNum, resourceMapString);
+        ls_syslog (LOG_ERR, "catgets 33: %s: %s(%d): Premature EOF in section %s", __func__, lsfile, *lineNum, resourceMapString); /*catgets33 */
         return -1;
     }
 

@@ -38,13 +38,13 @@ getNextValue (char **line)
 int
 keyMatch (struct keymap *keyList, const char *line, int exact)
 {
-    char *word     = NULL;
-    int pos        = 0;
     int found      = FALSE;
+    size_t pos     = 0;
     unsigned int i = 0;
     char *sp       = NULL;
+    char *word     = NULL;
 
-    sp = malloc( strlen(line)*sizeof( char ) + 1 );
+    sp = malloc( strlen( line ) * sizeof( char ) + 1 );
     strcpy( sp, line );
 
     while (keyList[i].key != NULL)
@@ -249,7 +249,7 @@ readHvalues (struct keymap *keyList, char *linep, FILE * fp, const char *lsfile,
         return readHvalues (keyList, linep, fp, lsfile, lineNum, exact, section);
     }
 
-    ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, lsfile, *lineNum, section);
+    ls_syslog (LOG_ERR, "catgets 33: %s: %s(%d): Premature EOF in section %s", __func__, lsfile, *lineNum, section); /*catgets33 */
     return -1;
 }
 
@@ -299,17 +299,17 @@ doSkipSection (FILE * fp, size_t *lineNum, const char *lsfile, const char *secti
         }
     }
 
-    ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, lsfile, *lineNum, sectionName);
+    ls_syslog (LOG_ERR, "catgets 33: %s: %s(%d): Premature EOF in section %s", __func__, lsfile, *lineNum, sectionName); /*catgets33 */
     return;
 }
 
 int
 mapValues (struct keymap *keyList, char *line) // FIXME FIXME should char *line be const char * ?
 {
-    long pos       = 0;
     char *value    = NULL;
     int found      = 0; // FALSE
-    int numv       = 0;
+    size_t pos     = 0;
+    size_t numv    = 0;
     unsigned int i = 0;
 
     while (keyList[i].key != NULL) {
@@ -462,7 +462,7 @@ doSkipSection_conf (const struct lsConf *conf, size_t *lineNum, const char *lsfi
         }
     }
 
-    ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, lsfile, *lineNum, sectionName);
+    ls_syslog (LOG_ERR, "catgets 33: %s: %s(%d): Premature EOF in section %s", __func__, lsfile, *lineNum, sectionName); /*catgets33 */
 
     return;
 }
@@ -486,16 +486,14 @@ doSkipSection_conf (const struct lsConf *conf, size_t *lineNum, const char *lsfi
 int
 isInList1 ( const char *list, const char *string)
 {
-    char *sp   = NULL; 
     char *word = NULL;
     
     if (list == NULL || string == NULL || list[0] == '\0' || string[0] == '\0') {
         return FALSE;
     }
     
-    sp = list;
-    while ((word = getNextWord_ (&sp)) != NULL) {
-        if (strcmp (word, string ) == 0) {
+    while( ( word = getNextWord_( &list ) ) != NULL) {
+        if (strcmp( word, string ) == 0) {
             return TRUE;
         }
     }

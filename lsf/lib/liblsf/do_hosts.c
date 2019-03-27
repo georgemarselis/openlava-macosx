@@ -85,7 +85,7 @@ do_Hosts_lsf (FILE *fp, const char *filename, size_t *lineNum, struct lsInfo *in
 
     linep = getNextLineC_ (fp, lineNum, TRUE);
     if (!linep) {
-        ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, filename, *lineNum, hostString);
+        ls_syslog (LOG_ERR, "catgets 33: %s: %s(%d): Premature EOF in section %s", __func__, filename, *lineNum, hostString); /*catgets33 */
         return FALSE;
     }
 
@@ -451,7 +451,7 @@ do_Hosts_lsf (FILE *fp, const char *filename, size_t *lineNum, struct lsInfo *in
      return FALSE;
      }*/
 
-    ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, filename, *lineNum, hostString);
+    ls_syslog (LOG_ERR, "catgets 33: %s: %s(%d): Premature EOF in section %s", __func__, filename, *lineNum, hostString); /*catgets33 */
     return TRUE;
 }
 

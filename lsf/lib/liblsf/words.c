@@ -22,9 +22,9 @@
 #include  "lib/getnextline.h"
 
 char *
-getNextWord_ (char **line)
+getNextWord_ ( const char **line)
 {
-    static char word[4 * MAX_LINE_LEN];
+    char word[4 * MAX_LINE_LEN];
     char *wordp = word;
 
     while (isspace (**line)) {
@@ -44,9 +44,9 @@ getNextWord_ (char **line)
 }
 
 char *
-getNextWord1_ (char **line)
+getNextWord1_( char **line)
 {
-    static char word[4 * MAX_LINE_LEN];
+     char word[4 * MAX_LINE_LEN];
     char *wordp = word;
 
     while (isspace (**line)) {
@@ -66,16 +66,34 @@ getNextWord1_ (char **line)
     return word;
 }
 
-static int
-charInSet (char c, const char *set)
+char *
+a_getNextWord_ (char **line)
 {
-    while (*set != '\0') {
-       if (c == *set) {
-            return TRUE;
+    char *wordp = NULL;
+    char *word  = NULL;
+
+    word = getNextWord_ (line);
+    if (word && (wordp = strchr (word, '('))) {
+        *(wordp + 1) = '\0';
+        while (**line != '(') {
+            (*line)--;
         }
-        set++;
-    }
-    return FALSE;
+        (*line)++;
+        }
+    else if (word && (wordp = strchr (word, ')')))
+        {
+        if (wordp != word)
+            {
+            wordp--;
+            while (isspace (*wordp)) {
+                wordp--;
+            }
+            *(wordp + 1) = '\0';
+            while (**line != ')')
+                (*line)--;
+            }
+        }
+    return word;
 }
 
 char *
@@ -101,6 +119,20 @@ getNextWordSet (char **line, const char *set)
 
     return word;
 }
+
+
+int
+charInSet (char c, const char *set)
+{
+    while (*set != '\0') {
+       if (c == *set) {
+            return TRUE;
+        }
+        set++;
+    }
+    return FALSE;
+}
+
 
 char *
 getNextValueQ_ (char **line, char ch1, char ch2)

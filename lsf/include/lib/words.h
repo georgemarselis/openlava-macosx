@@ -29,14 +29,14 @@ enum NODE {
 	NODE_PASED
 };
 
-char *getNextLine_(FILE *fp, int confFormat);
-char *getNextWord_(char **line);
-char *getNextWord1_(char **line);
-char *getNextWordSet(char **line, const char *set);
-char *getNextValueQ_(char **line, char ch1, char ch2);
-int stripQStr(char *q, char *str);
-int addQStr(FILE *log_fp, char *str);
-char *getNextLineD_(FILE *fp, size_t *LineCount, int confFormat);
-char *getNextLineC_(FILE *fp, size_t *lineCount, int confFormat);
-void subNewLine_(char *instr);
-char *nextline_(FILE *fp);
+/* lib/liblsf/words.c */
+char *getNextWord_  ( const char **line);
+char *getNextWord1_ ( const char **line );
+char *a_getNextWord_( const char **line );
+char *getNextWordSet( char **line, const char *set );
+int   charInSet     ( char c, const char *set );
+char *getNextValueQ_( char **line, char ch1, char ch2 );
+int   stripQStr     ( char *q, char *str );
+int   addQStr       ( FILE *log_fp, char *str );
+void  subNewLine_   ( char *instr );
+char *nextline_     ( FILE *fp );

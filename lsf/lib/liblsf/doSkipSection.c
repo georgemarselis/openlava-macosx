@@ -72,7 +72,7 @@ doSkipSection_conf (const struct lsConf *conf, size_t *lineNum, const char *lsfF
 		}
 	}
 
-	ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, lsfFileName, *lineNum, sectionName);
+	ls_syslog (LOG_ERR, "catgets 33: %s: %s(%d): Premature EOF in section %s", __func__, lsfFileName, *lineNum, sectionName); /*catgets33 */
 
 	return;
 }
@@ -108,6 +108,6 @@ doSkipSection (FILE * fp, size_t *lineNum, const char *lsfFileName, const char *
 		}
 	}
 
-	ls_syslog (LOG_ERR, I18N_PREMATURE_EOF, __func__, lsfFileName, *lineNum, sectionName);
+	ls_syslog (LOG_ERR, "catgets 33: %s: %s(%d): Premature EOF in section %s", __func__, lsfFileName, *lineNum, sectionName); /*catgets33 */
 	return;
 }
