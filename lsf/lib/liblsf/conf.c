@@ -34,6 +34,7 @@
 #include "lib/host.h"
 #include "lib/do_hosts.h"
 #include "libint/lsi18n.h"
+#include "lib/getnextline.h"
 
 // #define NL_SETN 42
 
@@ -99,7 +100,7 @@ struct sharedConf *
 ls_readshared ( const char *filename)
 {
     FILE *fp       = NULL;
-    char *cp       = NULL;
+    // char *cp       = NULL;
     char *word     = NULL;
     char modelok   = 'a';
     char resok     = 'a';
@@ -169,7 +170,7 @@ ls_readshared ( const char *filename)
 
     for (;;) {  // FIXME FIXME FIXME FIXME replace infinite loop with a ccertain-to-terminate condition
         const char *copyPtr = NULL;
-        if ((cp = getBeginLine (fp, &lineNum)) == NULL) {
+        if ((copyPtr = getBeginLine (fp, &lineNum)) == NULL) {
             fclose (fp);
             if (!modelok)
             {
@@ -194,7 +195,6 @@ ls_readshared ( const char *filename)
             return sConf;
         }
 
-        copyPtr = cp;
         word = getNextWord_ ( &copyPtr );
         if (!word) {
             /* catgets 5057 */
@@ -601,7 +601,8 @@ char do_HostModels (FILE * fp, size_t *lineNum, const char *filename)
 
             sp = keyList[ARCHITECTURE].val;
             if (sp && sp[0]) {
-                while ((word = getNextWord_ (&sp)) != NULL) {
+                const char *pointer = sp;
+                while ((word = getNextWord_ (&pointer)) != NULL) {
                     addHostModel (keyList[MODELNAME].val, word, atof (keyList[CPUFACTOR].val)); // FIXME FIXME FIXME replace 1 with uname label
                 }
             }
@@ -659,7 +660,6 @@ char ls_addHostModel ( const char *model, const char *arch, double factor) // FI
 unsigned int parseHostList (const char *hostList, const char *lsfile, const size_t lineNum, char ***hosts)
 {
     char *host       = NULL;
-    char *sp         = NULL;
     char **hostTable = NULL;
     unsigned int  numHosts = 0;
 
@@ -672,8 +672,7 @@ unsigned int parseHostList (const char *hostList, const char *lsfile, const size
         return 0;
     }
 
-    sp = strdup( hostList ); // FIXME FIXME FIXME FIXME make sure that the cast is correct, investigate memory
-    while ( NULL != (host = getNextWord_ (&sp)) ) {
+    while ( NULL != (host = getNextWord_ (&hostList)) ) {
         numHosts++;
     }
 
@@ -685,9 +684,8 @@ unsigned int parseHostList (const char *hostList, const char *lsfile, const size
         return 0;
     }
 
-    sp = strdup( hostList ); // FIXME FIXME FIXME FIXME make sure that the cast is correct, investigate memory
     numHosts = 0;
-    while ((host = getNextWord_ (&sp)) != NULL) {
+    while ((host = getNextWord_ (&hostList)) != NULL) {
 
         if ( NULL == (hostTable[numHosts] = putstr_ (host)) ) {
 
@@ -984,7 +982,6 @@ char do_Resources (FILE * fp, size_t *lineNum, const char *filename)
 struct clusterConf *ls_readcluster ( const char *filename, struct lsInfo *info, int lookupAdmins)
 {
     FILE *fp    = NULL;
-    char *cp    = NULL;
     char *word  = NULL;
     int Error   = FALSE;
     int aorm    = FALSE;
@@ -1104,7 +1101,8 @@ struct clusterConf *ls_readcluster ( const char *filename, struct lsInfo *info, 
         const char host[]           = "host";
         const char resourceMap[]    = "resourceMap";
 
-        cp = getBeginLine (fp, &lineNum);
+        const char *cp = getBeginLine (fp, &lineNum);
+
         if (!cp) {
 
             fclose (fp);
@@ -1345,13 +1343,12 @@ int ls_getClusAdmins (char *line, const char *filename, size_t *lineNum, const c
     return 0;
 }
 
-struct admins *liblsf_getAdmins (char *line, const char *filename, size_t *lineNum, const char *secName, int lookupAdmins)
+struct admins *liblsf_getAdmins ( const char *line, const char *filename, size_t *lineNum, const char *secName, int lookupAdmins)
 {
 
     static int first = TRUE;
     static struct admins admins;
 
-    char *sp              = NULL;
     char *word            = NULL;
     unsigned int numAds   = 0;
     struct passwd *pw     = NULL;
@@ -1379,8 +1376,7 @@ struct admins *liblsf_getAdmins (char *line, const char *filename, size_t *lineN
 
     first = FALSE;
     admins.nAdmins = 0;
-    sp = line;
-    while ((word = getNextWord_ (&sp)) != NULL) {
+    while ((word = getNextWord_ (&line)) != NULL) {
         numAds++;
     }
 
@@ -1405,8 +1401,7 @@ struct admins *liblsf_getAdmins (char *line, const char *filename, size_t *lineN
         return &admins;
     }
 
-    sp = line;
-    while ((word = getNextWord_ (&sp)) != NULL) {
+    while ((word = getNextWord_ (&line)) != NULL) {
         const char *forWhat = "for LSF administrator";
 
         if (lookupAdmins) {
@@ -1682,9 +1677,8 @@ void freekeyval (struct keymap keylist[])
     }
 }
 
-char *parsewindow (char *linep, const char *filename, size_t *lineNum, const char *section)
+char *parsewindow ( const char *linep, const char *filename, const size_t *lineNum, const char *section)
 {
-//  char *sp      = NULL;
     char *word    = NULL;
     char *save    = NULL;
     char *windows = NULL;
@@ -2669,8 +2663,6 @@ int resolveBaseNegHosts ( const char *inHosts, char **outHosts, struct HostsArra
     unsigned int neg_num    = 0;
     size_t size             = 0;
     unsigned int counter    = 0;
-    char *buffer            = strdup (inHosts);
-    char *save              = buffer;
     char *word              = NULL;
     char **inTable          = NULL;
     char **outTable         = NULL;
@@ -2679,22 +2671,18 @@ int resolveBaseNegHosts ( const char *inHosts, char **outHosts, struct HostsArra
     in_num = array->size;
     
     outTable = malloc( array->size * sizeof( outTable ) + 1 ); // FIXME FIXME FIXME certain buffer overflow
-    if (!buffer || !inTable || !outTable) {
+    if( !inTable || !outTable) {
         lserrno = LSE_MALLOC;
         freeSA_ (outTable, neg_num);
-        FREEUP (buffer);
         FREEUP (outHosts[0]);
-        FREEUP (save);
         return -1;
     }
     
-    if ((word = getNextWord_ (&buffer)) != NULL)
+    if ((word = getNextWord_ (&inHosts)) != NULL)
     {
         if (strcmp (word, "all")) {
             freeSA_ (outTable, neg_num);
-            FREEUP (buffer);
             FREEUP (outHosts[0]);
-            FREEUP (save);
             return -1;            
         }
         for ( unsigned int j = 0; j < in_num; j++) {
@@ -2703,20 +2691,16 @@ int resolveBaseNegHosts ( const char *inHosts, char **outHosts, struct HostsArra
     }
     else {
         freeSA_ (outTable, neg_num);
-        FREEUP (buffer);
         FREEUP (outHosts[0]);
-        FREEUP (save);
         return -1;
     }
     
-    while ((word = getNextWord_ (&buffer)) != NULL) {
+    while ((word = getNextWord_ (&inHosts)) != NULL) {
         if (word[0] == '~') {
             word++;
             if (!isalnum (word[0])) {
                 freeSA_ (outTable, neg_num);
-                FREEUP (buffer);
                 FREEUP (outHosts[0]);
-                FREEUP (save);
                 return -1;
             }
         }
@@ -2728,9 +2712,7 @@ int resolveBaseNegHosts ( const char *inHosts, char **outHosts, struct HostsArra
         if (!outTable[neg_num]) {
             lserrno = LSE_MALLOC;
             freeSA_ (outTable, neg_num);
-            FREEUP (buffer);
             FREEUP (outHosts[0]);
-            FREEUP (save);
             return -1;
         }
         neg_num++;
@@ -2741,9 +2723,7 @@ int resolveBaseNegHosts ( const char *inHosts, char **outHosts, struct HostsArra
             {
                 lserrno = LSE_MALLOC;
                 freeSA_ (outTable, neg_num);
-                FREEUP (buffer);
                 FREEUP (outHosts[0]);
-                FREEUP (save);
                 return -1;
             }
         }
@@ -2767,9 +2747,7 @@ int resolveBaseNegHosts ( const char *inHosts, char **outHosts, struct HostsArra
     if (!outHosts[0]) {                    // FIXME FIXME FIXME find out what outHosts[0] is, create a union and mark the array subscript appropriatelly
         lserrno = LSE_MALLOC;
         freeSA_ (outTable, neg_num);
-        FREEUP (buffer);
         FREEUP (outHosts[0]);
-        FREEUP (save);
         return -1;
     }
     
@@ -2789,7 +2767,6 @@ int resolveBaseNegHosts ( const char *inHosts, char **outHosts, struct HostsArra
     }
     
     FREEUP (outTable);
-    FREEUP (save);
     
     assert( counter <= INT_MAX);
     return (int) counter; // FIXME FIXME FIXME FIXME remove the cast

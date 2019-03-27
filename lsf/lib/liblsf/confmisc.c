@@ -27,6 +27,7 @@
 #include "lib/conf.h"
 #include "lib/misc.h"
 #include "lib/wconf.h"
+#include "lib/getnextline.h"
 
 
 char *
@@ -41,11 +42,7 @@ keyMatch (struct keymap *keyList, const char *line, int exact)
     int found      = FALSE;
     size_t pos     = 0;
     unsigned int i = 0;
-    char *sp       = NULL;
     char *word     = NULL;
-
-    sp = malloc( strlen( line ) * sizeof( char ) + 1 );
-    strcpy( sp, line );
 
     while (keyList[i].key != NULL)
     {
@@ -53,7 +50,7 @@ keyMatch (struct keymap *keyList, const char *line, int exact)
         i++;
     }
 
-    while ((word = getNextWord_ (&sp)) != NULL)
+    while ((word = getNextWord_ (&line)) != NULL)
     {
         i = 0;
         found = FALSE;
@@ -90,13 +87,11 @@ keyMatch (struct keymap *keyList, const char *line, int exact)
         i++;
     }
 
-    sp = NULL; free( sp );
-
     return TRUE;
 }
 
 int
-isSectionEnd (char *linep, const char *lsfile, size_t *lineNum, const char *sectionName) // FIX
+isSectionEnd ( const char *linep, const char *lsfile, size_t *lineNum, const char *sectionName) // FIX
 {
     char *word  = getNextWord_ (&linep);
 
@@ -141,10 +136,10 @@ isSectionEnd (char *linep, const char *lsfile, size_t *lineNum, const char *sect
 //  }
 
 // }
-char *
+const char *
 getBeginLine (FILE *fp, size_t *lineNum)
 {
-    char *sp           = NULL;
+    const char *sp     = NULL;
     char *wp           = NULL;
     const char begin[] = "begin";
 
@@ -175,13 +170,13 @@ getBeginLine (FILE *fp, size_t *lineNum)
 
 
 int
-readHvalues (struct keymap *keyList, char *linep, FILE * fp, const char *lsfile, size_t *lineNum, int exact, const char *section)
+readHvalues (struct keymap *keyList, const char *linep, FILE * fp, const char *lsfile, size_t *lineNum, int exact, const char *section)
 {
     char *key      = NULL;
     char *value    = NULL;
-    char *sp       = NULL;
     char *sp1      = NULL;
     char error     = FALSE;
+    const char *sp = NULL;
     unsigned int i = 0;
 
     sp = linep;
@@ -280,8 +275,8 @@ readHvalues (struct keymap *keyList, char *linep, FILE * fp, const char *lsfile,
 void
 doSkipSection (FILE * fp, size_t *lineNum, const char *lsfile, const char *sectionName)
 {
-    char *word = NULL;
-    char *cp   = NULL;
+    char *word     = NULL;
+    const char *cp = NULL;
 
     while ((cp = getNextLineC_ (fp, lineNum, TRUE)) != NULL) {
         word = getNextWord_ (&cp);
@@ -292,14 +287,17 @@ doSkipSection (FILE * fp, size_t *lineNum, const char *lsfile, const char *secti
                 ls_syslog (LOG_ERR, "5407: %s(%d): Section ended without section name, ignored", lsfile, *lineNum);
             }
             else {
-                if (strcasecmp (word, sectionName) != 0)
-                ls_syslog (LOG_ERR, "5408: %s(%d): Section %s ended with wrong section name: %s, ignored", lsfile, *lineNum, sectionName, word);  /* catgets 5408 */
+                if (strcasecmp (word, sectionName) != 0) {
+                    /* catgets 5408 */
+                    ls_syslog (LOG_ERR, "5408: %s(%d): Section %s ended with wrong section name: %s, ignored", lsfile, *lineNum, sectionName, word);
+                }
             }
             return;
         }
     }
 
-    ls_syslog (LOG_ERR, "catgets 33: %s: %s(%d): Premature EOF in section %s", __func__, lsfile, *lineNum, sectionName); /*catgets33 */
+    /*catgets33 */
+    ls_syslog (LOG_ERR, "catgets 33: %s: %s(%d): Premature EOF in section %s", __func__, lsfile, *lineNum, sectionName);
     return;
 }
 
@@ -394,11 +392,11 @@ mapValues (struct keymap *keyList, char *line) // FIXME FIXME should char *line 
 
 }
 
-char *
+const char *
 getBeginLine_conf (const struct lsConf *conf, size_t *lineNum)
 {
-    char *sp = NULL;
-    char *wp = NULL;
+    char *wp       = NULL;
+    const char *sp = NULL;
 
     if (conf == NULL) {
         return NULL;
@@ -420,7 +418,9 @@ getBeginLine_conf (const struct lsConf *conf, size_t *lineNum)
     {
         const char begin[] = "begin";
         sp = getNextLineC_conf (conf, lineNum, TRUE);
-        if( !sp ) { break; }
+        if( !sp ) { 
+            break; 
+        }
         wp = getNextWord_ (&sp);
         if (wp && (strcasecmp (wp, begin) == 0)) {
             return sp;
@@ -434,7 +434,7 @@ void
 doSkipSection_conf (const struct lsConf *conf, size_t *lineNum, const char *lsfile, const char *sectionName)
 {
     char *word = NULL;
-    char *cp   = NULL;
+    const char *cp   = NULL;
 
     if (conf == NULL) {
         return;
@@ -446,15 +446,13 @@ doSkipSection_conf (const struct lsConf *conf, size_t *lineNum, const char *lsfi
         if (strcasecmp (word, "end") == 0)
         {
             word = getNextWord_ (&cp);
-            if (!word)
-            {
-           /* catgets 5419 */
+            if (!word) {
+                /* catgets 5419 */
                 ls_syslog (LOG_ERR, "5419: %s(%d): Section ended without section name, ignored", lsfile, *lineNum);
             }
-            else
-            {
+            else {
                 if (strcasecmp (word, sectionName) != 0) {
-            /* catgets 5420 */
+                    /* catgets 5420 */
                     ls_syslog (LOG_ERR, "5420: %s(%d): Section %s ended with wrong section name: %s, ignored", lsfile, *lineNum, sectionName, word);
                 }
             }

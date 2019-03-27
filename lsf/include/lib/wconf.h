@@ -20,15 +20,15 @@
 
 // #define NL_SETN   23
 
-char *readNextLine (struct lsConf *conf, size_t *lineNum);
-char *getNextLineC_conf (const struct lsConf *conf, size_t *LineCount, int confFormat);
-void ls_freeconf (struct lsConf *conf);
-char linkNode (struct confNode *prev, struct confNode *node);
-char checkCond (struct lsConf *conf, char *cond);
-char addCond( struct lsConf *conf, char *cond );
-void freeStack (struct pStack *stack);
-struct confNode *popStack( struct pStack *stack );
-int pushStack (struct pStack *stack, struct confNode *node);
-struct pStack *initStack (void);
-struct confNode *newNode( void );
-struct lsConf *ls_getconf (char *fname);
+// char *readNextLine (struct lsConf *conf, size_t *lineNum);
+// char *getNextLineC_conf (const struct lsConf *conf, size_t *LineCount, int confFormat);
+// void ls_freeconf (struct lsConf *conf);
+// char linkNode (struct confNode *prev, struct confNode *node);
+// char checkCond (struct lsConf *conf, char *cond);
+// char addCond( struct lsConf *conf, char *cond );
+// void freeStack (struct pStack *stack);
+// struct confNode *popStack( struct pStack *stack );
+// int pushStack (struct pStack *stack, struct confNode *node);
+// struct pStack *initStack (void);
+// struct confNode *newNode( void );
+// struct lsConf *ls_getconf (char *fname);

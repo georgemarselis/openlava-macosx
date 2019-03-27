@@ -144,8 +144,8 @@ void liblsf_putThreshold ( unsigned int indx, struct hostInfo *host, long positi
 int wgetClusAdmins (char *line, const char *lsfile,   size_t *lineNum, char *secName);
 int getClusAdmins  (char *line, const char *filename, size_t *lineNum, char *secName, int lookupAdmins);
 // 
-struct admins *getAdmins_       (char *line, const char *fname, size_t *lineNum, const char *secName, int lookupAdmins);
-struct admins *liblsf_getAdmins (char *line, const char *fname, size_t *lineNum, const char *secName, int lookupAdmins);
+struct admins *getAdmins_       ( const char *line, const char *fname, size_t *lineNum, const char *secName, int lookupAdmins);
+struct admins *liblsf_getAdmins ( const char *line, const char *fname, size_t *lineNum, const char *secName, int lookupAdmins);
 
 // 
 int validWindow ( const char *wordpair, const char *context);
@@ -194,7 +194,7 @@ struct clusterConf *ls_readcluster_ex ( const char *filename, struct lsInfo *inf
 
 int ls_setAdmins (struct admins *admins, int mOrA);
 void freekeyval (struct keymap keylist[]);
-char *parsewindow (char *linep, const char *filename, size_t *lineNum, const char *section);
+char *parsewindow ( const char *linep, const char *filename, const size_t *lineNum, const char *section);
 char lsf_setIndex (struct keymap *keyList, const char *filename, size_t lineNum);
 struct sharedConf *ls_readshared ( const char *filename);
 int initResTable_ (void);
