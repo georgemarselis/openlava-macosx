@@ -78,7 +78,7 @@ char *getNTSpoolDir (char *);
 char *getMasterName (void);
 unsigned short get_mbd_port (void);
 unsigned short get_sbd_port (void);
-int getAuth (struct lsfAuth *);
+// int getAuth (struct lsfAuth *);
 
 int chUserRemoveSpoolFile (const char *hostName, const char *spoolFile);
 void prtBETime_ (struct submit *);

@@ -113,7 +113,7 @@ ls_openlog (const char *ident, const char *path, int use_stderr, char *logMask)
 		}
 	  else
 		{
-		  sprintf (logfile, "%s/%s.log.%s", lsTmpDir_, ident, myname);
+		  sprintf (logfile, "%s/%s.log.%s", LSTMPDIR, ident, myname);
 		  if (lstat (logfile, &st) < 0)
 		{
 		  if (errno == ENOENT)
@@ -186,7 +186,7 @@ openLogFile (const char *ident, char *myname)
   if ((lfp = fopen (logfile, "a")) == NULL)
 	{
 
-	  sprintf (logfile, "%s/%s.log.%s", lsTmpDir_, ident, myname);
+	  sprintf (logfile, "%s/%s.log.%s", LSTMPDIR, ident, myname);
 	  if (lstat (logfile, &st) < 0)
 	{
 	  if (errno == ENOENT)

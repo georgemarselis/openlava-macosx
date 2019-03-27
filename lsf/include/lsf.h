@@ -1014,7 +1014,7 @@ enum MSGSIZE {
 #define BSD_NICE                                        // FIXME FIXME FIXME FIXME FIXME set in configure.ac
 
 // typedef struct stat LS_STAT_T;
-#define LSTMPDIR        lsTmpDir_                       // FIXME FIXME FIXME FIXME FIXME set in configure.ac
+#define LSTMPDIR        LSTMPDIR                       // FIXME FIXME FIXME FIXME FIXME set in configure.ac
 // #define LSDEVNULL       "/dev/null"
 const char LSDEVNULL[] = "/dev/null";                   // FIXME FIXME FIXME FIXME FIXME set in configure.ac
 // #define LSETCDIR        "/fix/me/no/such/place"
@@ -1095,9 +1095,9 @@ char *ls_gethosttype (char *hostname);
 float *ls_getmodelfactor (char *modelname);
 float *ls_gethostfactor (char *hostname);
 char *ls_gethostmodel (char *hostname);
-int ls_lockhost (time_t duration);
-int ls_unlockhost (void);
-int ls_limcontrol (char *hostname, int opCode);
+// int ls_lockhost (time_t duration);
+// int ls_unlockhost (void);
+// int ls_limcontrol (char *hostname, int opCode);
 void ls_remtty (int ind, int enableIntSus);
 void ls_loctty (int ind);
 char *ls_sysmsg (void);
@@ -1124,7 +1124,7 @@ int ls_niossync (long numTasks);
 int ls_setstdin (int on, int *rpidlist, size_t len);
 int ls_chdir (char *, char *);
 char *ls_getmnthost (char *fn);
-int ls_servavail (int, int);
+// int ls_servavail (int, int);
 int ls_setpriority (int newPriority);
 
 int ls_ropen (char *host, char *fn, int flags, int mode);

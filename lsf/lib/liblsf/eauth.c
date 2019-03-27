@@ -43,11 +43,11 @@
 
 // #define _DARWIN_C_SOURCE
 
-const static char EAUTHNAME[] = "eauth";
+const static char EAUTHNAME[] = "eauth"; // FIXME FIXME FIXME FIXME put in configure.ac
 
 
 int
-getAuth_ (struct lsfAuth *auth, char *host)
+getAuth_lsf( struct lsfAuth *auth, char *host )
 {
   auth->uid = getuid ();
 

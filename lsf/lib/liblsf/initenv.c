@@ -26,7 +26,7 @@
 #include "lib/initenv.h"
 
 char *stripDomains_ = NULL;
-char *lsTmpDir_ - NULL;
+char *LSTMPDIR = NULL;
 
 int
 doEnvParams_ (struct config_param *plp)
@@ -161,7 +161,7 @@ initenv_ (struct config_param *userEnv, char *pathname)
         }
     }
 
-    lsTmpDir_ = getTempDir_ ();
+    LSTMPDIR = getTempDir_ ();
 
     if (Error) {
         return -1;

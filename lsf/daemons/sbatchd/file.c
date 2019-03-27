@@ -453,10 +453,10 @@ initPaths (struct jobCard *jp, struct hostent *fromHp, struct lenData *jf)
 	  sprintf (errMsg, _i18n_msg_get (ls_catd, NL_SETN, 314, "%s: Job <%s> chdir(%s) failed, errno=<%s>. Use <%s> as execCwd"),	/* catgets 314 */
 		   __func__,
 		   lsb_jobidinstr (jp->jobSpecs.jobId),
-		   jp->jobSpecs.execCwd, strerror (errno), lsTmpDir_);
+		   jp->jobSpecs.execCwd, strerror (errno), LSTMPDIR);
 	  sbdSyslog (LOG_INFO, errMsg);
-	  chdir (lsTmpDir_);
-	  strcpy (jp->jobSpecs.execCwd, lsTmpDir_);
+	  chdir (LSTMPDIR);
+	  strcpy (jp->jobSpecs.execCwd, LSTMPDIR);
 	}
       putEnv ("PWD", jp->jobSpecs.execCwd);
     }
@@ -2262,7 +2262,7 @@ lsbTmp (void)
 {
   static char tmpDir[MAX_FILENAME_LEN];
 
-  sprintf (tmpDir, "%s/.lsbtmp", lsTmpDir_);
+  sprintf (tmpDir, "%s/.lsbtmp", LSTMPDIR);
 
   return (tmpDir);
 }

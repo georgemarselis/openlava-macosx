@@ -162,7 +162,7 @@ const char LSF_LIM_ERES_TYPE[]          = "!";
 
 const char LS_EXEC_T[] = "LS_EXEC_T";
 
-char *lsTmpDir_ = NULL;
+char *LSTMPDIR = NULL;
 
 const unsigned short BIND_RETRY_TIMES = 100;
 int sharedResConfigured_;

@@ -189,7 +189,7 @@ getJobTmpDir (char *tmpDirName, struct jobCard *jPtr)
 
     memset( jobId, '\0', 16 );
 
-    strcpy (tmpDirName, lsTmpDir_);
+    strcpy (tmpDirName, LSTMPDIR);
     strcat (tmpDirName, "/"); // FIXME FIXME replace with define
     sprintf (jobId, "%s", lsb_jobidinstr (jPtr->jobSpecs.jobId));
     strcat (tmpDirName, jobId);

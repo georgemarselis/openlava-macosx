@@ -381,7 +381,7 @@ findSpoolDir (const char *spoolHost)
 
 		if (defaultSpoolDir == NULL)
 		{
-			strcpy (spoolDir, lsTmpDir_);
+			strcpy (spoolDir, LSTMPDIR);
 		}
 		else
 		{

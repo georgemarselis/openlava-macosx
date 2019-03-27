@@ -24,60 +24,48 @@
 #include "lib/lib.h"
 #include "lib/lproto.h"
 #include "lsf.h"
+#include "daemons/libeauth/eauth.h"
 
-
-#if defined(DEBUG)
-FILE *logfp;
-char logfile[100]; // FIXME FIXME FIXME oddly specific
-#endif
-
-int getAuth (char *);
-int printUserName (void);
-int vauth (char *, char *, int);
 
 int main (int argc, char **argv)
 {
 
-  if (initenv_ (NULL, NULL) < 0)
-    exit (-1);
+    if( initenv_ (NULL, NULL) < 0 ) {
+        exit (-1);
+    }
 
 #if defined(DEBUG)
-  sprintf (logfile, "%s/eauth.log", LSTMPDIR);
+    sprintf( logfile, "%s/eauth.log", LSTMPDIR ); // FIXME FIXME FIXME FIXME put in configure.ac // LSTMPDIR defined in cmdtools/bcheckpoint/echkpnt.c 
 
-  if ((logfp = fopen (logfile, "a+")) == NULL)
-    {
-      perror ("fopen failed!");
-      exit (-1);
+    if ((logfp = fopen (logfile, "a+")) == NULL) {
+        perror ("fopen failed!");
+        exit (-1); // FIXME FIMXME FIXME FIXME replace negative exit number with positive indicating fopen failure
     }
-#endif
+    #endif
 
-  if (argc < 2)
-    {
+  if (argc < 2) {
 #if defined(DEBUG)
       fprintf (logfp, "Missing argument.\n");
       fclose (logfp);
 #endif
-      exit (-1);
+      exit (-1); // FIXME FIMXME FIXME FIXME replace negative exit number with positive indicating missing arguments
     }
 
-  if (!strcmp (argv[1], "-c"))
-    {
+    if (!strcmp (argv[1], "-c")) {
 
-      if (setuid (getuid ()) < 0)
-	{
+        if (setuid (getuid ()) < 0) {
 #if defined(DEBUG)
-	  fclose (logfp);
+          fclose (logfp);
 #endif
-	  exit (-1);
-	}
+          exit (-1);
+    }
 
-      if (getAuth (argv[2]))
-	{
+    if (getAuth( argv[2] ) ) {
 #if defined(DEBUG)
-	  fclose (logfp);
+      fclose (logfp);
 #endif
-	  exit (-1);
-	}
+      exit (-1);
+    }
     }
   else if (!strcmp (argv[1], "-s"))
     {
@@ -93,42 +81,42 @@ int main (int argc, char **argv)
       unsigned long cc = 0;
 
       for (;;)
-	{
-	  fflush (stderr);
+    {
+      fflush (stderr);
 
-	  memset (datBuf, 0, sizeof (datBuf));
-	  memset (lsfUserName, 0, sizeof (lsfUserName));
-	  memset (client_addr, 0, sizeof (client_addr));
-	  memset (lsfUserNameTmp, 0, sizeof (lsfUserNameTmp));
-	  memset (client_addrTmp, 0, sizeof (client_addrTmp));
-	  fgets (datBuf, sizeof (datBuf), stdin);
-	  sscanf (datBuf, "%d %d %s %s %hd %ld", &uid, &gid, lsfUserNameTmp, client_addrTmp, &client_port, &datLen);
+      memset (datBuf, 0, sizeof (datBuf));
+      memset (lsfUserName, 0, sizeof (lsfUserName));
+      memset (client_addr, 0, sizeof (client_addr));
+      memset (lsfUserNameTmp, 0, sizeof (lsfUserNameTmp));
+      memset (client_addrTmp, 0, sizeof (client_addrTmp));
+      fgets (datBuf, sizeof (datBuf), stdin);
+      sscanf (datBuf, "%d %d %s %s %hd %ld", &uid, &gid, lsfUserNameTmp, client_addrTmp, &client_port, &datLen);
 
-	  ls_strcat (lsfUserName, sizeof (lsfUserName), lsfUserNameTmp);
-	  ls_strcat (client_addr, sizeof (client_addr), client_addrTmp);
+      ls_strcat (lsfUserName, sizeof (lsfUserName), lsfUserNameTmp);
+      ls_strcat (client_addr, sizeof (client_addr), client_addrTmp);
 
-	  memset (datBuf, 0, sizeof (datBuf));
-	  if ((cc = fread (datBuf, 1, datLen, stdin)) != datLen)
-	    {
+      memset (datBuf, 0, sizeof (datBuf));
+      if ((cc = fread (datBuf, 1, datLen, stdin)) != datLen)
+        {
 #if defined(DEBUG)
-	      fprintf (logfp, "fread (%d) failed\n", datLen);
-	      fprintf (logfp, "uid=%d, gid=%d, username=%s, client_addr=%s, client_port=%d, datLen=%d, cc=%d, dataBuf=%s\n", uid, gid, lsfUserName, client_addr, client_port, datLen, cc, datBuf);
-	      fclose (logfp);
+          fprintf (logfp, "fread (%d) failed\n", datLen);
+          fprintf (logfp, "uid=%d, gid=%d, username=%s, client_addr=%s, client_port=%d, datLen=%d, cc=%d, dataBuf=%s\n", uid, gid, lsfUserName, client_addr, client_port, datLen, cc, datBuf);
+          fclose (logfp);
 #endif
-	      exit (-1);
-	    }
+          exit (-1);
+        }
 
       assert( datLen <= INT_MAX );
-	  if (vauth (lsfUserName, datBuf, (int)datLen) == -1)
-	    {
-	      putchar ('0');
-	    }
-	  else
-	    {
-	      putchar ('1');
-	    }
-	  fflush (stdout);
-	}
+      if (vauth (lsfUserName, datBuf, (int)datLen) == -1)
+        {
+          putchar ('0');
+        }
+      else
+        {
+          putchar ('1');
+        }
+      fflush (stdout);
+    }
     }
 #if defined(DEBUG)
   fclose (logfp);
@@ -182,7 +170,7 @@ printUserName (void)
 
 #if defined(DEBUG)
   fprintf (logfp, "username is %s, encrypted username is %s, len=%d\n",
-	   lsfUserName, dataBuff, strlen (dataBuff));
+       lsfUserName, dataBuff, strlen (dataBuff));
 #endif
 
   fwrite (dataBuff, strlen (dataBuff), 1, stdout);
@@ -220,14 +208,14 @@ vauth (char *lsfUserName, char *datBuf, int datLen)
     {
 #if defined(DEBUG)
       fprintf (logfp, "decrypt username %s doesn't equal username %s\n",
-	       deUserName, lsfUserName);
+           deUserName, lsfUserName);
       fflush (logfp);
 #endif
       return -1;
     }
 #if defined(DEBUG)
   fprintf (logfp, "decrypt username success, dataBuf is %s, username is %s\n",
-	   datBuf, lsfUserName);
+       datBuf, lsfUserName);
   fflush (logfp);
 #endif
   return 0;
