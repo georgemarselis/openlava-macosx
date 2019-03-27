@@ -37,7 +37,7 @@ typedef enum
 
 // FIXME investigate if the third argument to lsfSetXUid can be set to the appropriate
 // [s]uid_t type. if yes, try to see if there is an alternative to passing -1.
-int lsfSetXUid (int, uid_t uid, gid_t gid, uid_t suid, int (*)());
+// int lsfSetXUid (int, uid_t uid, gid_t gid, uid_t suid, int (*)());
 void lsfExecLog (const char *);
-int lsfExecX (char *path, char **argv, int (*func) ());
+// int lsfExecX (char *path, char **argv, int (*func) ());
 

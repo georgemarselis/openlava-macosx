@@ -70,16 +70,16 @@ ls_getmyhostname (void)
 /* Gethostbyname_()
  */
 struct hostent *
-Gethostbyname_ (char *hostname)
+Gethostbyname_( const char *hostname )
 {
 	// int cc;
 	struct hEnt *e = NULL;
 	struct hostent *hp = NULL;
-	char lsfHname[MAXHOSTNAMELEN];
+	char lsfHname[ MAXHOSTNAMELEN ];
 
 	memset( lsfHname, '\0', MAXHOSTNAMELEN );
 
-	if (strlen (hostname) >= MAXHOSTNAMELEN) {
+	if (strlen (hostname) >= MAXHOSTNAMELEN) { // FIXME FIXME FIXME FIXME FIXME what is the maximum hostname length allowed by DNS?
 		lserrno = LSE_BAD_HOST;
 		return NULL;
 	}

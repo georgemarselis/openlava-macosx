@@ -21,7 +21,7 @@
 
 // #define NL_SETN 23
 
-int mlsSbdMode = FALSE;
+int mlsSbdMode = 0;
 char rootuid_;
 
 // FIXME investigate if the third argument to lsfSetXUid can be set to the appropriate

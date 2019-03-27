@@ -13,6 +13,8 @@ struct connectEnt
 	int csock[2];
 };
 
+char *connnamelist[MAXCONNECT + 1]; // FIXME FIXME FIXME FIXME FIXME this is stupid
+
 void   inithostsock_        ( void );
 void   initconntbl_         ( void );
 int    connected_           ( const char *hostname, int sock1, int sock2, int seqno );

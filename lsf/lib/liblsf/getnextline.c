@@ -207,7 +207,6 @@ getNextLineC_conf ( const struct lsConf *conf, size_t *LineCount, int confFormat
                 else if (*sp == '\\') {
 
                     if (sp == &(line[len - 2])) {
-
                         sp++;
                         toBeContinue = 1;
                     }
@@ -222,7 +221,7 @@ getNextLineC_conf ( const struct lsConf *conf, size_t *LineCount, int confFormat
                             cp++;
                         }
                         else {
-                            sp++;
+                            sp++; // FIXME FIXME FIXME FIXME FIXME this first invocation might actually be cp++ ;
                             sp++;
                         }
                     }
