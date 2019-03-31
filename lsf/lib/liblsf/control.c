@@ -19,13 +19,19 @@
  *
  */
 
+#include <time.h>
 #include <unistd.h>
 
+#include "lib/control.h"
 #include "lib/lib.h"
 #include "lib/lproto.h"
+#include "lib/initenv.h"
 #include "lib/xdr.h"
-#include "lib/control.h"
 #include "lib/eauth.h"
+#include "daemons/liblimd/lim.h"
+#include "lib/common_structs.h"
+#include "lib/id.h"
+#include "lib/host.h"
 
 int
 ls_limcontrol (const char *hname, int opCode)
@@ -134,27 +140,25 @@ setLockOnOff_ (int on_, time_t duration, const char *hname)
 }
 
 int
-oneLimDebug (struct debugReq *pdebug, char *hostname)
+oneLimDebug (struct debugReq *pdebug, const char *hostname)
 {
     struct debugReq debugData;
-    char *host = hostname;
-    char space[] = " ";
     enum limReqCode limReqCode;
 
-    limReqCode = LIM_DEBUGREQ;
-    debugData.opCode = pdebug->opCode;
-    debugData.logClass = pdebug->logClass;
-    debugData.level = pdebug->level;
-    debugData.hostName = space;
-    debugData.options = pdebug->options;
+    limReqCode            = LIM_DEBUGREQ;
+    debugData.opCode      = pdebug->opCode;
+    debugData.logClass    = pdebug->logClass;
+    debugData.level       = pdebug->level;
+    debugData.hostName    = NULL;
+    debugData.options     = pdebug->options;
+    debugData.logFileName = NULL;
     strcpy (debugData.logFileName, pdebug->logFileName);
 
-    if (callLim_ (limReqCode, &debugData, xdr_debugReq, NULL, NULL, host, 0, NULL) < 0) {
+    if (callLim_ (limReqCode, &debugData, xdr_debugReq, NULL, NULL, hostname, 0, NULL) < 0) {
         return -1;
     }
 
     return 0;
-
 }
 
 /* ls_servavail()

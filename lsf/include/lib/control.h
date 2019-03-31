@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "lib/common_structs.h"
+
 /* control.c */
 int ls_limcontrol(const char *hname, int opCode);
 int ls_lockhost(time_t duration);

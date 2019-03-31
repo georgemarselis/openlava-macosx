@@ -31,9 +31,11 @@
 
 const size_t EAUTH_ENV_BUF_LEN = MAX_PATH_LEN + 32;
 
+/* eauth.c */
+int   getAuth_lsf(struct lsfAuth *auth, const char *host);
+int   getEAuth(struct eauth *eauth, const char *host);
+int   verifyEAuth_(struct lsfAuth *auth, struct sockaddr_in *from);
+char *getLSFAdmin( void );
+int   putEnvVar(char *buf, const char *envVar, const char *envValue);
 int   putEauthClientEnvVar( const char *client );
 int   putEauthServerEnvVar( const char *server );
-int   verifyEAuth_        ( struct lsfAuth *auth, struct sockaddr_in *from );
-int   getEAuth     ( struct eauth *, char * );
-int   putEnvVar    ( char *buf, const char *envVar, const char *envValue );
-char *getLSFAdmin( void );

@@ -343,8 +343,7 @@ badminDebug (int nargc, char *nargv[], int opCode)
 	int retCode = 0;
 	int all = FALSE;
 	unsigned int numHosts = 0;
-	struct debugReq debug = {
-		opCode, 0, 0, 0, NULL, 0 };
+	struct debugReq debug = { opCode, 0, 0, 0, NULL, 0 };
 
 	// debug.opCode = opCode;
 	// debug.logClass = 0;

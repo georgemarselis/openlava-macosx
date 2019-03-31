@@ -41,6 +41,7 @@
 // const int NEGATIVERESULT = 1;
 static const char N[] = "N";
 static const char Y[] = "Y";
+static int lserrno;
 
 int
 initResTable_ (void)

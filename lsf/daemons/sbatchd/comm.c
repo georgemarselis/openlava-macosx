@@ -278,44 +278,40 @@ status_job (mbdReqType reqType, struct jobCard *jp, int newStatus, sbdReplyType 
 void
 getJobsState (struct sbdPackage *sbdPackage)
 {
-  mbdReqType mbdReqtype;
-  char request_buf[MSGSIZE / 8]; // FIXME FIXME FIXME why /8 ?
-  char *reply_buf;
-  char *myhostnm;
-  XDR xdrs;
-  struct LSFHeader hdr;
-  int reply;
-  int i;
-  int cc;
-  int numJobs;
-  struct jobSpecs jobSpecs;
-  struct jobCard *job = NULL;
+    mbdReqType mbdReqtype;
+    char request_buf[MSGSIZE / 8]; // FIXME FIXME FIXME why /8 ?
+    char *reply_buf;
+    char *myhostnm;
+    XDR xdrs;
+    struct LSFHeader hdr;
+    int reply;
+    int i;
+    int cc;
+    int numJobs;
+    struct jobSpecs jobSpecs;
+    struct jobCard *job = NULL;
 
-  if ((myhostnm = ls_getmyhostname ()) == NULL)
-    {
-      ls_syslog (LOG_ERR, "%s: Ohmygosh failed to get my hostname... %M", __func__);
-      die (SLAVE_FATAL);
+    if ((myhostnm = ls_getmyhostname ()) == NULL) {
+        ls_syslog (LOG_ERR, "%s: Ohmygosh failed to get my hostname... %M", __func__);
+        die (SLAVE_FATAL);
     }
 
 znovu:
-  mbdReqtype = BATCH_SLAVE_RESTART;
-  xdrmem_create (&xdrs, request_buf, MSGSIZE / 8, XDR_ENCODE);
-  initLSFHeader_ (&hdr);
-  hdr.opCode = mbdReqtype;
+      mbdReqtype = BATCH_SLAVE_RESTART;
+      xdrmem_create(&xdrs, request_buf, MSGSIZE / 8, XDR_ENCODE);
+      initLSFHeader_( &hdr );
+      hdr.opCode = mbdReqtype;
 
-  if (!xdr_encodeMsg (&xdrs, NULL, &hdr, NULL, 0, NULL))
-    {
-      ls_syslog (LOG_ERR, "\
-%s: Ohmygosh failed to encode BATCH_SLAVE_RESTART", __func__);
-      xdr_destroy (&xdrs);
-      lsb_merr ("Failed in xdr for BATCH_SLAVE_RESTART\n");
-      die (SLAVE_FATAL);
+    if( !xdr_encodeMsg( &xdrs, NULL, &hdr, NULL, 0, NULL ) ) {
+        ls_syslog( LOG_ERR, "%s: Ohmygosh failed to encode BATCH_SLAVE_RESTART", __func__ );
+        xdr_destroy (&xdrs);
+        lsb_merr( "Failed in xdr for BATCH_SLAVE_RESTART\n" );
+        die (SLAVE_FATAL);
     }
 
   for (;;)
     {
-      cc = call_server (masterHost,
-      mbd_port,
+      cc = call_server (masterHost,  mbd_port,
       request_buf,
       XDR_GETPOS (&xdrs),
       &reply_buf,
@@ -340,8 +336,7 @@ znovu:
       }
   }
 
-      ls_syslog (LOG_ERR, "\
-%s: mbatchd on host %s not responding: %s, EAGAIN...", __func__, masterHost, lsb_sysmsg ());
+      ls_syslog (LOG_ERR, "%s: mbatchd on host %s not responding: %s, EAGAIN...", __func__, masterHost, lsb_sysmsg ());
 
       millisleep_ (sbdSleepTime * 1000);
       masterHost = ls_getmastername ();
@@ -353,8 +348,7 @@ znovu:
     int cnt = 0;
     if (cnt == 0)
       {
-        ls_syslog (LOG_ERR, "\
-%s: waiting to get my master name %M", __func__);
+        ls_syslog (LOG_ERR, "%s: waiting to get my master name %M", __func__);
         cnt = 10;
       }
     --cnt;
@@ -376,8 +370,7 @@ znovu:
       xdrmem_create (&xdrs, reply_buf, cc, XDR_DECODE);
       if (!xdr_sbdPackage (&xdrs, sbdPackage, &hdr))
   {
-    ls_syslog (LOG_ERR, "\
-%s: Ohmygosh failed to decode sbdPackage from %s", __func__, masterHost);
+    ls_syslog (LOG_ERR, "%s: Ohmygosh failed to decode sbdPackage from %s", __func__, masterHost);
     xdr_destroy (&xdrs);
     if (cc)
       free (reply_buf);
@@ -391,8 +384,7 @@ znovu:
     if (!xdr_arrayElement (&xdrs,
          (char *) &jobSpecs, &hdr, xdr_jobSpecs))
       {
-        sprintf (ebuf, "\
-%s: Ohmygosh failed to decode jobSpecs from %s", __func__, masterHost);
+        sprintf (ebuf, "%s: Ohmygosh failed to decode jobSpecs from %s", __func__, masterHost);
         ls_syslog (LOG_ERR, "%s", ebuf);
         lsb_merr (ebuf);
         xdr_destroy (&xdrs);
@@ -406,8 +398,7 @@ znovu:
 
       if (!xdr_sbdPackage1 (&xdrs, sbdPackage, &hdr))
   {
-    sprintf (ebuf, "\
-%s: Ohmygosh failed to decode sbdPackage from %s", __func__, masterHost);
+    sprintf (ebuf, "%s: Ohmygosh failed to decode sbdPackage from %s", __func__, masterHost);
     ls_syslog (LOG_ERR, "%s", ebuf);
     lsb_merr (ebuf);
   }
@@ -415,25 +406,21 @@ znovu:
       if (cc)
   free (reply_buf);
 
-      ls_syslog (LOG_DEBUG, "\
-%s: got configuration from master %s all right", __func__, masterHost);
+      ls_syslog (LOG_DEBUG, "%s: got configuration from master %s all right", __func__, masterHost);
 
       return;
 
     case LSBE_BAD_HOST:
-      ls_syslog (LOG_ERR, "\
-%s: This host is not yet used by the batch system... EAGAIN", __func__);
+      ls_syslog (LOG_ERR, "%s: This host is not yet used by the batch system... EAGAIN", __func__);
       free (reply_buf);
       millisleep_ (sbdSleepTime * 1000);
       goto znovu;
     case LSBE_PORT:
-      ls_syslog (LOG_ERR, "\
-%s: mbatchd reports that it is using a bad port", __func__);
+      ls_syslog (LOG_ERR, "%s: mbatchd reports that it is using a bad port", __func__);
       free (reply_buf);
       die (SLAVE_FATAL);
     default:
-      ls_syslog (LOG_ERR, "\
-%s: Invalid return code %d from mbatchd on %s", __func__, reply, masterHost);
+      ls_syslog (LOG_ERR, "%s: Invalid return code %d from mbatchd on %s", __func__, reply, masterHost);
       xdr_destroy (&xdrs);
       die (SLAVE_FATAL);
     }
@@ -442,38 +429,37 @@ znovu:
 void
 jobSetupStatus (int jStatus, int pendReason, struct jobCard *jp)
 {
-  static char __func__] = "jobSetupStatus()";
-  struct jobSetup jsetup;
+  // static char __func__] = "jobSetupStatus()";
+    struct jobSetup jsetup;
 
-  jsetup.jobId = jp->jobSpecs.jobId;
-  jsetup.jStatus = jStatus;
-  jsetup.reason = pendReason;
-  jsetup.jobPid = jp->jobSpecs.jobPid;
-  jsetup.jobPGid = jp->jobSpecs.jobPGid;
-  jsetup.execGid = jp->execGid;
-  jsetup.execUid = jp->jobSpecs.execUid;
-  jsetup.execJobFlag = jp->execJobFlag;
+    jsetup.jobId = jp->jobSpecs.jobId;
+    jsetup.jStatus = jStatus;
+    jsetup.reason = pendReason;
+    jsetup.jobPid = jp->jobSpecs.jobPid;
+    jsetup.jobPGid = jp->jobSpecs.jobPGid;
+    jsetup.execGid = jp->execGid;
+    jsetup.execUid = jp->jobSpecs.execUid;
+    jsetup.execJobFlag = jp->execJobFlag;
 
-  strcpy (jsetup.execUsername, jp->execUsername);
-  strcpy (jsetup.execCwd, jp->jobSpecs.execCwd);
-  strcpy (jsetup.execHome, jp->jobSpecs.execHome);
-  jsetup.lsfRusage = jp->lsfRusage;
-  jsetup.cpuTime = jp->cpuTime;
-  jsetup.w_status = jp->w_status;
+    strcpy (jsetup.execUsername, jp->execUsername);
+    strcpy (jsetup.execCwd, jp->jobSpecs.execCwd);
+    strcpy (jsetup.execHome, jp->jobSpecs.execHome);
+    jsetup.lsfRusage = jp->lsfRusage;
+    jsetup.cpuTime = jp->cpuTime;
+    jsetup.w_status = jp->w_status;
 
-  while (msgSbd (jp->jobSpecs.jobId, (char *) &jsetup, SBD_JOB_SETUP,
-     xdr_jobSetup) == -1)
-    {
-      ls_syslog (LOG_DEBUG, "%s: Job %s msgSbd() failed", __func__,
-     lsb_jobid2str (jp->jobSpecs.jobId));
+    while (msgSbd (jp->jobSpecs.jobId, (char *) &jsetup, SBD_JOB_SETUP, xdr_jobSetup) == -1) {
+      ls_syslog (LOG_DEBUG, "%s: Job %s msgSbd() failed", __func__, lsb_jobid2str (jp->jobSpecs.jobId));
       millisleep_ (10000);
     }
 
-  if (jStatus & JOB_STAT_RUN)
+    if (jStatus & JOB_STAT_RUN) {
+        return;
+    }
+
+    exit (jp->w_status);
+
     return;
-
-  exit (jp->w_status);
-
 }
 
 void

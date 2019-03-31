@@ -19,7 +19,17 @@
 
 #pragma once
 
-static size_t errLineNum_ = 0;
+#include "struct-config_param.h"
+
+// #define L_MAX_LINE_LEN_4ENV (8*MAX_LINE_LEN) // FIXME FIXME FIXME FIXME this seems awfuly specific
+
+const unsigned int L_MAX_LINE_LEN_4ENV = 8 * MAX_LINE_LEN;
+
+// static size_t errLineNum_ = 0; // FIXME FIXME FIXME turn into accessor and mutator
+
+char *stripDomains_ = NULL;
+// char *LSTMPDIR = NULL;
+
 
 char *getTempDir_(void);
 int initenv_(struct config_param *userEnv, char *pathname);

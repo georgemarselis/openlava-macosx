@@ -59,6 +59,7 @@ channels[i].handle = INVALID_HANDLE; }
 
 
 static unsigned int NET_INTSIZE_  = 4;
+static int lserrno;
 
 int
 chanInit_ (void)

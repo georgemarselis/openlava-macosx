@@ -25,8 +25,6 @@
 #include "lib/osal.h"
 #include "lib/initenv.h"
 
-char *stripDomains_ = NULL;
-char *LSTMPDIR = NULL;
 
 int
 doEnvParams_ (struct config_param *plp)
@@ -61,50 +59,42 @@ getTempDir_ (void)
     char *tmpSp = NULL;
     struct stat stb;
 
-    if (sp)
-    {
+    if (sp) {
         return sp;
     }
 
     tmpSp = genParams_[LSF_TMPDIR].paramValue;
-    if ((tmpSp != NULL) && (stat (tmpSp, &stb) == 0) && (S_ISDIR (stb.st_mode)))
-    {
+    if ((tmpSp != NULL) && (stat (tmpSp, &stb) == 0) && (S_ISDIR (stb.st_mode))) {
         sp = tmpSp;
     }
-    else
-    {
-
-            tmpSp = getenv ("TMPDIR"); // FIXME FIXME FIXME FIXME move "TMPDIR" to configure.ac
-            if ((tmpSp != NULL) && (stat (tmpSp, &stb) == 0) && (S_ISDIR (stb.st_mode)))
-            {
-
-                sp = putstr_ (tmpSp);
-            }
-
+    else {
+        tmpSp = getenv ("TMPDIR"); // FIXME FIXME FIXME FIXME move "TMPDIR" to configure.ac
+        if ((tmpSp != NULL) && (stat (tmpSp, &stb) == 0) && (S_ISDIR (stb.st_mode))) {
+            sp = putstr_ (tmpSp);
         }
-
-        if (sp == NULL)
-        {
-            sp = "/tmp";  // FIXME FIXME FIXME FIXME move "TMPDIR" to configure.ac
-        }
-
-        return sp;
 
     }
+
+    if (sp == NULL)
+    {
+        sp = "/tmp";  // FIXME FIXME FIXME FIXME move "TMPDIR" to configure.ac
+    }
+
+    return sp;
+}
 
 /* initenv_()
  * Read and initialiaze the openlava environment.
  */
 int
-initenv_ (struct config_param *userEnv, char *pathname)
+initenv_ (struct config_param *userEnv, const char *pathname)
 {
     int Error = 0;
     char *envdir = NULL;
     static int lsfenvset = FALSE;
 
-    if (osInit_ () < 0)
-    {
-        return -1;
+    if (osInit_ () < 0) {
+        return -1; // FIXME FIXME FIXME FIXME replace return value by appropriate *positive* return value
     }
 
     if ((envdir = getenv ("LSF_ENVDIR")) != NULL) {  // FIXME FIXME FIXME FIXME move "TMPDIR" to configure.ac
@@ -114,30 +104,25 @@ initenv_ (struct config_param *userEnv, char *pathname)
         pathname = LSETCDIR;
     }
 
-    if (lsfenvset)
-    {
-        if (userEnv == NULL)
-        {
+    if (lsfenvset) {
+        if (userEnv == NULL) {
             return 0;
         }
-        if (readconfenv_ (NULL, userEnv, pathname) < 0)
-        {
-            return -1;
+        if (readconfenv_ (NULL, userEnv, pathname) < 0) {
+            return -1; // FIXME FIXME FIXME FIXME replace return value by appropriate *positive* return value
         }
-        else if (doEnvParams_ (userEnv) < 0)
-        {
-            return -1;
+        else if (doEnvParams_ (userEnv) < 0) {
+            return -1; // FIXME FIXME FIXME FIXME replace return value by appropriate *positive* return value
         }
         return 0;
     }
 
     if (readconfenv_ (genParams_, userEnv, pathname) < 0) {
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace return value by appropriate *positive* return value
     }
-    else
-    {
+    else {
         if (doEnvParams_ (genParams_) < 0) {
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace return value by appropriate *positive* return value
         }
         lsfenvset = TRUE;
         if (doEnvParams_ (userEnv) < 0) {
@@ -145,14 +130,12 @@ initenv_ (struct config_param *userEnv, char *pathname)
         }
     }
 
-    if (!genParams_[LSF_CONFDIR].paramValue || !genParams_[LSF_SERVERDIR].paramValue)
-    {
+    if (!genParams_[LSF_CONFDIR].paramValue || !genParams_[LSF_SERVERDIR].paramValue) {
         lserrno = LSE_BAD_ENV;
         return -1;
     }
 
-    if (genParams_[LSF_SERVER_HOSTS].paramValue != NULL)
-    {
+    if (genParams_[LSF_SERVER_HOSTS].paramValue != NULL) {
         char *sp = NULL;
         for (sp = genParams_[LSF_SERVER_HOSTS].paramValue; *sp != '\0'; sp++) {
             if (*sp == '\"') {
@@ -188,93 +171,77 @@ readconfenv_ (struct config_param *pList1, struct config_param *pList2, char *co
     size_t lineNum = 0;
     int saveErrNo = 0;
 
-    if (pList1)
-        for (plp = pList1; plp->paramName != NULL; plp++)
-            {
-    if (plp->paramValue != NULL)
-        {
-
-            lserrno = LSE_BAD_ARGS;
-            return -1;
-        }
-            }
-
-    if (pList2)
-        for (plp = pList2; plp->paramName != NULL; plp++)
-            {
-    if (plp->paramValue != NULL)
-        {
-
-            lserrno = LSE_BAD_ARGS;
-            return -1;
-        }
-            }
-    if (confPath)
-        {
-            {
-    memset (filename, 0, sizeof (filename));
-    ls_strcat (filename, sizeof (filename), confPath);
-    ls_strcat (filename, sizeof (filename), "/lsf.conf");
-    fp = fopen (filename, "r");
+    if (pList1) {
+        for (plp = pList1; plp->paramName != NULL; plp++) {
+            if (plp->paramValue != NULL) {
+                lserrno = LSE_BAD_ARGS;
+                return -1; // FIXME FIXME FIXME FIXME replace return value by appropriate *positive* return value
             }
         }
-    else
-        {
-            char *ep = getenv ("LSF_ENVDIR");
-            char buf[MAX_FILENAME_LEN];
-
-            if (ep == NULL)
-    {
-        sprintf (buf, "%s/lsf.conf", LSETCDIR);
-        fp = fopen (buf, "r");
     }
-            else
-    {
-        memset (buf, 0, sizeof (buf));
-        ls_strcat (buf, sizeof (buf), ep);
-        ls_strcat (buf, sizeof (buf), "/lsf.conf");
-        fp = fopen (buf, "r");
+
+    if (pList2) {
+        for (plp = pList2; plp->paramName != NULL; plp++) {
+            if (plp->paramValue != NULL) {
+                lserrno = LSE_BAD_ARGS;
+                return -1; // FIXME FIXME FIXME FIXME replace return value by appropriate *positive* return value
+            }
+        }
     }
-        }
+    if (confPath) {
+        memset (filename, 0, sizeof (filename));
+        ls_strcat (filename, sizeof (filename), confPath);
+        ls_strcat (filename, sizeof (filename), "/lsf.conf");  // FIXME FIXME FIXME FIXME put in configure.ac
+        fp = fopen (filename, "r");
+    }
+    else {
+        char *ep = getenv ("LSF_ENVDIR"); // FIXME FIXME FIXME FIXME put in configure.ac
+        char buf[MAX_FILENAME_LEN];
 
-    if (!fp)
-        {
-
-            lserrno = LSE_LSFCONF;
-            return -1;
+        if (ep == NULL) {
+            sprintf (buf, "%s/lsf.conf", LSETCDIR); // FIXME FIXME FIXME FIXME put in configure.ac
+            fp = fopen (buf, "r");
         }
+        else {
+            memset (buf, 0, sizeof (buf));
+            ls_strcat (buf, sizeof (buf), ep);
+            ls_strcat (buf, sizeof (buf), "/lsf.conf"); // FIXME FIXME FIXME FIXME put in configure.ac
+            fp = fopen (buf, "r");
+        }
+    }
+
+    if (!fp) {
+        lserrno = LSE_LSFCONF;
+        return -1;
+    }
 
     lineNum = 0;
     errLineNum_ = 0;
-    while ((line = getNextLineC_ (fp, &lineNum, TRUE)) != NULL)
-        {
-            int cc;
-            cc = parseLine (line, &key, &value);
-            if (cc < 0 && errLineNum_ == 0)
-    {
-        errLineNum_ = lineNum;
-        saveErrNo = lserrno;
-        continue;
-    }
-            if (!matchEnv (key, pList1) && !matchEnv (key, pList2))
-    continue;
-
-            if (!setConfEnv (key, value, pList1)
-        || !setConfEnv (key, value, pList2))
-    {
-        fclose (fp);
-        return -1;
-    }
+    while ((line = getNextLineC_ (fp, &lineNum, TRUE)) != NULL) {
+        int cc;
+        cc = parseLine (line, &key, &value);
+        if (cc < 0 && errLineNum_ == 0) {
+            errLineNum_ = lineNum;
+            saveErrNo = lserrno;
+            continue;
         }
-    fclose (fp);
-    if (errLineNum_ != 0)
-        {
-            lserrno = saveErrNo;
+        if (!matchEnv (key, pList1) && !matchEnv (key, pList2)) {
+            continue;
+        }
+
+
+        if (!setConfEnv (key, value, pList1) || !setConfEnv (key, value, pList2)) {
+            fclose (fp);
             return -1;
         }
+    }
+    fclose (fp);
+    if (errLineNum_ != 0) {
+        lserrno = saveErrNo;
+        return -1;
+    }
 
     return 0;
-
 }
 
 
@@ -282,17 +249,17 @@ int
 parseLine (char *line, char **keyPtr, char **valuePtr)
 {
     char *sp = line;
-#define L_MAX_LINE_LEN_4ENV (8*MAX_LINE_LEN) // FIXME FIXME FIXME FIXME this seems awfuly specific
+
+    char *word = NULL;
+    char *cp   = NULL;
+
     static char key[L_MAX_LINE_LEN_4ENV];
     static char value[L_MAX_LINE_LEN_4ENV];
-    char *word;
-    char *cp;
 
-    if (strlen (sp) >= L_MAX_LINE_LEN_4ENV - 1)
-        {
-            lserrno = LSE_BAD_ENV;
-            return -1;
-        }
+    if (strlen (sp) >= L_MAX_LINE_LEN_4ENV - 1) {
+        lserrno = LSE_BAD_ENV;
+        return -1;
+    }
 
     *keyPtr = key;
     *valuePtr = value;
