@@ -17,19 +17,19 @@
 #pragma once
 
 char *argvmsg_( int argc, char **argv);
-void ls_openlog( const char *ident, const char *path, int use_stderr, char *logMask);
-int openLogFile( const char *ident, char *myname );
-void ls_syslog( int level, const char *fmt, ... );
-void ls_closelog( void);
-int ls_setlogmask( int maskpri );
-int getLogMask (char **msg, char *logMask);
-int getLogClass_ (char *lsp, char *tsp);
-void ls_closelog_ext (void);
+void  ls_openlog( const char *ident, const char *path, int use_stderr, char *logMask);
+int   openLogFile( const char *ident, char *myname );
+void  ls_syslog( int level, const char *fmt, ... );
+void  ls_closelog( void);
+int   ls_setlogmask( int maskpri );
+int   getLogMask (char **msg, char *logMask);
+int   getLogClass_ (char *lsp, char *tsp);
+void  ls_closelog_ext (void);
 
 int logclass = 0;
 int timinglevel = 0;
 
-static char logfile[MAX_PATH_LEN];
-static char logident[10];
-static int logmask;
-static enum { LOGTO_SYS, LOGTO_FILE, LOGTO_STDERR } log_dest;
+// static char logfile[MAX_PATH_LEN];
+// static char logident[10];
+// static int logmask;
+// static enum { LOGTO_SYS, LOGTO_FILE, LOGTO_STDERR } log_dest;

@@ -32,6 +32,7 @@
 #include "lib/rwait.h"
 #include "lib/sock.h"
 #include "lib/xdr.h"
+#include "lib/syslog.h"
 
 /**************************************************************
  * this file must be compiled together with host.c cuz there is

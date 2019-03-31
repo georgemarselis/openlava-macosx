@@ -35,6 +35,7 @@
 #include "lib/do_hosts.h"
 #include "libint/lsi18n.h"
 #include "lib/getnextline.h"
+#include "lib/syslog.h"
 
 // #define NL_SETN 42
 

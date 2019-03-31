@@ -21,44 +21,66 @@
 
 #include "lib/lib.h"
 #include "lib/lproto.h"
+#include "lib/initenv.h"
+#include "struct-config_param.h"
+#include "lib/syslog.h"
+
+
 
 int
 ls_initdebug (char *appName)
 {
-  char *logMask = malloc( sizeof( char ) * MAX_LSF_NAME_LEN + 1);
-  struct config_param *pPtr = NULL;
+    char *logMask = malloc( sizeof( char ) * MAX_LSF_NAME_LEN + 1);
+    struct config_param *pPtr = NULL;
+
+    enum debparams {
+        LSF_CMD_LOG_MASK,
+        LSF_LOG_MASK,
+        LSF_CMD_LOGDIR,
+        LSF_DEBUG_CMD,
+        LSF_TIME_CMD,
+        DEBPARAMS_NULL
+    };
+
+    struct config_param debParams[ ] = {
+        { "LSF_CMD_LOG_MASK",  NULL },
+        { "LSF_LOG_MASK",      NULL },
+        { "LSF_CMD_LOGDIR",    NULL },
+        { "LSF_DEBUG_CMD",     NULL },
+        { "LSF_TIME_CMD",      NULL },
+        { NULL,    NULL }
+    };
 
 
-  if (initenv_ (debParams, NULL) < 0) {
-    return -1;
-  }
 
-  if (debParams[LSF_CMD_LOG_MASK].paramValue != NULL) {
-    logMask = debParams[LSF_CMD_LOG_MASK].paramValue;
-  }
-  else {
-    logMask = debParams[LSF_LOG_MASK].paramValue;
-  }
-
-  if (appName == NULL) {
-    ls_openlog ("lscmd", debParams[LSF_CMD_LOGDIR].paramValue,(debParams[LSF_CMD_LOGDIR].paramValue == NULL), logMask);
-  }
-  else
-    {
-      if (strrchr (appName, '/') != 0) {
-	         appName = strrchr (appName, '/') + 1;
-      }
-      ls_openlog (appName, debParams[LSF_CMD_LOGDIR].paramValue,
-		  (debParams[LSF_CMD_LOGDIR].paramValue == NULL), logMask);
+    if (initenv_ (debParams, NULL) < 0) {
+        return -1; // FIXME FIXME FIXME FIXME return meaningful *positive* return value
     }
 
-  getLogClass_ (debParams[LSF_DEBUG_CMD].paramValue, debParams[LSF_TIME_CMD].paramValue);
+    if (debParams[LSF_CMD_LOG_MASK].paramValue != NULL) {
+        logMask = debParams[LSF_CMD_LOG_MASK].paramValue;
+    }
+    else {
+        logMask = debParams[LSF_LOG_MASK].paramValue;
+    }
 
-  for (pPtr = debParams; pPtr->paramName != NULL; pPtr++) {
-    FREEUP (pPtr->paramValue);
-  }
+    if (appName == NULL) {
+        ls_openlog ("lscmd", debParams[LSF_CMD_LOGDIR].paramValue,(debParams[LSF_CMD_LOGDIR].paramValue == NULL), logMask); // FIXME FIXME FIXME static string fix
+    }
+    else {
+        if (strrchr (appName, '/') != 0) { // FIXME FIXME FIXME static string fix
+            appName = strrchr (appName, '/') + 1; // FIXME FIXME FIXME static string fix
+        }
+        ls_openlog (appName, debParams[LSF_CMD_LOGDIR].paramValue, (debParams[LSF_CMD_LOGDIR].paramValue == NULL), logMask);
+    }
 
-  free( logMask );
-  return 0;
+    getLogClass_ (debParams[LSF_DEBUG_CMD].paramValue, debParams[LSF_TIME_CMD].paramValue);
+
+    for (pPtr = debParams; pPtr->paramName != NULL; pPtr++) {
+        FREEUP (pPtr->paramValue);
+    }
+
+    free( logMask );
+    return 0;
 
 }

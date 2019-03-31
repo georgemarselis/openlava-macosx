@@ -1110,7 +1110,7 @@ void ls_perror (char *usrMsg);
 // struct clusterConf *ls_readcluster_ex (char *, struct lsInfo *, int);
 
 int ls_initdebug (char *appName);
-void ls_syslog (int level, const char *fmt, ...);
+// void ls_syslog (int level, const char *fmt, ...);
 void ls_verrlog (FILE * fp, const char *fmt, va_list ap);
 
 int ls_rescontrol (char *host, int opcode, int options);
