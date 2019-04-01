@@ -245,7 +245,7 @@ mkHostTab (void)
 		return -1;
 	}
 
-	if (genParams_[NO_HOSTS_FILE].paramValue) {
+	if (genParams_[LSF_NO_HOSTS_FILE].paramValue) {
 		return -1;
 	}
 

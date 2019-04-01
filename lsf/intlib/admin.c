@@ -30,10 +30,6 @@
 
 const char BADCH = ":";
 
-
-
-
-
 void parseAndDo (char *cmdBuf, int (*func)() ) // FIXME FIXME FIXME replace with parser
 {
 
@@ -316,10 +312,10 @@ int checkConf (int verbose, int who)
 	int cc       = 0;
 	int fd       = 0;
 
-	if (lsfParams[LSF_ENVDIR].paramValue == NULL)
+	if (genParams_[LSF_ENVDIR].paramValue == NULL)
 	{
 		lsfEnvDir = getenv ("LSF_ENVDIR"); // FIXME FIXME FIXME FIXME remove environmental variable
-		cc = initenv_ (lsfParams, lsfEnvDir);
+		cc = initenv_ (genParams_, lsfEnvDir);
 	}
 
 	if (cc < 0)
@@ -335,7 +331,7 @@ int checkConf (int verbose, int who)
 			ls_perror ("initenv_");
 		}
 	}
-	plp = lsfParams;
+	plp = genParams_;
 	for (; plp->paramName != NULL; plp++) 
 	{
 		if (plp->paramValue == NULL)
@@ -353,13 +349,13 @@ int checkConf (int verbose, int who)
 		return EXIT_WARNING_ERROR;
 	}
 
-	if ((daemon = calloc (strlen (lsfParams[LSF_ENVDIR].paramValue) + 15, sizeof (char))) == NULL)
+	if ((daemon = calloc (strlen (genParams_[LSF_ENVDIR].paramValue) + 15, sizeof (char))) == NULL)
 	{
 		perror ("calloc");
 		return EXIT_FATAL_ERROR;
 	}
 
-	strcpy (daemon, lsfParams[LSF_ENVDIR].paramValue);
+	strcpy (daemon, genParams_[LSF_ENVDIR].paramValue);
 	strcat (daemon, ((who == 1) ? "/lim" : "/mbatchd")); // FIXME FIXME FIXME FIXME replace fixed strings
 
 	if (access (daemon, X_OK) < 0)

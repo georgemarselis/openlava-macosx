@@ -147,8 +147,8 @@ const unsigned long HOST_ATTR_NOT_READY = 0xffffffff;
 const char AUTH_IDENT[]          = "ident";
 const char AUTH_PARAM_DCE[]      = "dce";
 const char AUTH_PARAM_EAUTH[]    = "eauth";
-const char AUTOMOUNT_LAST_STR[]  = "AMFIRST";
-const char AUTOMOUNT_NEVER_STR[] = "AMNEVER";
+// const char AUTOMOUNT_LAST_STR[]  = "AMFIRST";
+// const char AUTOMOUNT_NEVER_STR[] = "AMNEVER";
 
 
 const char LSF_LIM_ERESOURCE_OBJECT[]   =  "liblimvcl.so";

@@ -36,7 +36,7 @@
 // #define NL_SETN      22
 
 
-extern struct config_param genParams_[]; // FIXME FIXME FIXME FIXME localize this shit
+// extern struct config_param genParams_[]; // FIXME FIXME FIXME FIXME localize this shit
 
 
 char *auth_user (u_long in, u_short local, u_short remote)
