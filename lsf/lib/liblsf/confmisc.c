@@ -28,7 +28,7 @@
 #include "lib/misc.h"
 #include "lib/wconf.h"
 #include "lib/getnextline.h"
-
+#include "lib/syslog.h"
 
 char *
 getNextValue (char **line)

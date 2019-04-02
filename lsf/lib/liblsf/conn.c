@@ -25,6 +25,7 @@
 #include "lib/table.h"
 #include "lib/conn.h"
 #include "lib/host.h"
+#include "lib/syslog.h"
 
 struct hTab conn_table;
 
