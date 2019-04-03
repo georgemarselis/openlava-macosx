@@ -607,5 +607,5 @@ int
 tcomp_ (const void *tlist1, const void *tlist2)
 {
     // return strcmp (*(char **) tlist1, *(char **) tlist2);
-    return strcmp (  tlist1, tlist2 );
+    return strcmp (*(char * const *) tlist1, *(char * const *) tlist2); 
 }
