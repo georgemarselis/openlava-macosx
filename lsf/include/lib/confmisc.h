@@ -23,13 +23,13 @@
 
 // #define NL_SETN   23
 /* confmisc.c */
-      char *getNextValue       (       char           **line );
+      char *getNextValue       ( const char           **line );
       int   keyMatch           (       struct keymap   *keyList   , const char     *line,             int         exact);
       int   isSectionEnd       ( const char            *linep     , const char     *lsfile,           size_t     *lineNum, const char *sectionName );
 const char *getBeginLine       (       FILE            *fp        ,       size_t   *lineNum );
       int   readHvalues        (       struct keymap   *keyList   , const char     *linep   ,         FILE       *fp,      const char *lsfile, size_t *lineNum, int exact, const char *section );
       void  doSkipSection      (       FILE            *fp        ,       size_t   *lineNum,    const char       *lsfile,  const char *sectionName );
-      int   mapValues          (       struct keymap   *keyList   ,       char     *line     );
+      int   mapValues          (       struct keymap   *keyList   , const char     *line     );
 const char *getBeginLine_conf  ( const struct lsConf   *conf      ,       size_t   *lineNum  );
       void  doSkipSection_conf ( const struct lsConf   *conf      ,       size_t   *lineNum,    const char    *lsfile,     const char *sectionName );
 

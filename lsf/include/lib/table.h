@@ -81,7 +81,8 @@ struct hEnt
 struct hTab
 {
   struct hLinks *slotPtr;
-  long numEnts;
+  // long numEnts;
+  size_t numEnts;
   size_t size;
 }; // hTab;
 

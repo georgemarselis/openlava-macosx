@@ -32,7 +32,7 @@
 
 
 char *
-getNextValue (char **line)
+getNextValue (const char **line)
 {
     return getNextValueQ_ (line, '(', ')');
 }
@@ -305,7 +305,7 @@ doSkipSection (FILE * fp, size_t *lineNum, const char *lsfile, const char *secti
 }
 
 int
-mapValues (struct keymap *keyList, char *line) // FIXME FIXME should char *line be const char * ?
+mapValues (struct keymap *keyList, const char *line) // FIXME FIXME should char *line be const char * ?
 {
     char *value    = NULL;
     int found      = 0; // FALSE

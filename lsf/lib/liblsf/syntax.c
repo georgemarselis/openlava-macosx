@@ -18,28 +18,30 @@
 
 #include <string.h>
 
-#include "lib/lib.h"
+// #include "lib/lib.h"
 #include "lib/xdr.h"
 #include "lib/lproto.h"
+#include "lib/syntax.h"
 
 int
 expSyntax_ (char *resReq)
 {
-  struct stringLen str;
+    struct stringLen str;
 
-  if (initenv_ (NULL, NULL) < 0)
-    return (-1);
+    if (initenv_ (NULL, NULL) < 0) {
+        return -1; // FIXME FIXME FIXME FIXME replace with sensible, meaningful *positive* return value
+    }
 
-  if (!resReq)
-    resReq = " ";
+    if (!resReq) {
+        resReq = " ";
+    }
 
-  str.name = resReq;
-  str.len = MAX_LINE_LEN;
+    str.name = resReq;
+    str.len = MAX_LINE_LEN;
 
-  if (callLim_ (LIM_CHK_RESREQ, &str, xdr_stringLen,
-		NULL, NULL, NULL, 0, NULL) < 0)
-    return (-1);
+    if (callLim_ (LIM_CHK_RESREQ, &str, xdr_stringLen, NULL, NULL, NULL, 0, NULL) < 0) {
+        return -1; // FIXME FIXME FIXME FIXME replace with sensible, meaningful *positive* return value
+    }
 
-  return 0;
-
+    return 0;
 }

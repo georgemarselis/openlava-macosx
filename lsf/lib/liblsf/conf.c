@@ -2547,13 +2547,13 @@ int convertNegNotation_ (char **value, struct HostsArray *array)
 {
     int cnt        = 0;
     int result     = -1;
-    char *ptr      = NULL;
+    // const char *ptr      = NULL;
     char *save     = NULL;
     char *outHosts = NULL;
     unsigned int LOCATION = 0;
-    char *buffer   = strdup (value[ LOCATION ]);
-    char *sp1      = strstr (buffer, "all ");
-    char *sp2      = sp1;
+    char *buffer    = strdup( value[ LOCATION ] );
+    const char *sp1 = strstr( buffer, "all " );
+    char *sp2       = strdup( sp1 );
     
     if (!buffer) {
         lserrno = LSE_MALLOC;
@@ -2596,7 +2596,7 @@ int convertNegNotation_ (char **value, struct HostsArray *array)
 
     ls_syslog (LOG_DEBUG, "%s: the original string is \'%s\'", __func__, value[LOCATION]);  // FIXME FIXME FIXME FIXME wrap this around debug conditional
     
-    ptr = sp1;
+    // ptr = sp1;
     save = getNextValueQ_ (&sp1, '[', ']');
     if (!save) {
         // goto clean_up;
@@ -2610,7 +2610,7 @@ int convertNegNotation_ (char **value, struct HostsArray *array)
     if (result >= 0) {
         char *new_value = NULL;
         
-        *ptr = 0;
+        // *ptr = 0;
         new_value = malloc (strlen (buffer) + strlen (outHosts) + strlen (sp2) + 2);
         if (!new_value) {
             lserrno = LSE_MALLOC;

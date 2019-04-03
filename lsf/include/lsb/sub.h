@@ -15,7 +15,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  */
- 
+
 
 #pragma once
 
@@ -38,8 +38,8 @@ typedef struct lsbSpoolInfo
 
 typedef enum spoolOptions
 {
-  SPOOL_INPUT_FILE,
-  SPOOL_COMMAND
+    SPOOL_INPUT_FILE,
+    SPOOL_COMMAND
 } spoolOptions_t;
 
 LSB_SPOOL_INFO_T *copySpoolFile (const char *srcFilePath, spoolOptions_t option);
@@ -54,14 +54,14 @@ struct hTab *bExceptionTab;
 int mySubUsage_ (void *);
 int bExceptionTabInit (void);
 void subUsage_ (int, char **);
- char *niosArgv[5];
+char *niosArgv[5];
 char *niosPath; // [MAX_FILENAME_LEN]; // FIXME FIXME FIXME change to dynamic allocation
 
 const char *defaultSpoolDir;
 void sub_perror (char *usrMsg);
-char *my_getopt (int, char **, char *, char **);
+// char *my_getopt (int, char **, char *, char **);
 char *getNextLine_ (FILE * fp, int confFormat);
-uid_t getuid (void);
+// uid_t getuid (void);
 char *lsb_sysmsg (void);
 
 
@@ -69,8 +69,8 @@ typedef int (*bException_handler_t) (void *);
 
 typedef struct bException
 {
-  char *name;
-  bException_handler_t handler;
+    char *name;
+    bException_handler_t handler;
 } bException_t;
 
 char **environ;
@@ -136,10 +136,10 @@ int createNiosSock (struct submitReq *);
 void startNios (struct submitReq *, int, long) __attribute__ ((noreturn));
 
 
-int parseLine (char *line, int *embedArgc, char ***embedArgv, int option);
+// int parseLine (char *line, int *embedArgc, char ***embedArgv, int option);
 int parseScript (FILE * from, int *embedArgc, char ***embedArgv, int option);
 int addLabel2RsrcReq (struct submit *subreq);
 int CopyCommand (char **, int);
-void sub_perror (char *);
+// void sub_perror (char *);
 
 

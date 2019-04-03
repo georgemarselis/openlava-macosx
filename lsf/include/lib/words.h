@@ -35,7 +35,7 @@ char *getNextWord1_ ( const char **line );
 char *a_getNextWord_( const char **line );
 char *getNextWordSet( char **line, const char *set );
 int   charInSet     ( char c, const char *set );
-char *getNextValueQ_( char **line, char ch1, char ch2 );
+char *getNextValueQ_( const char **line, char ch1, char ch2 );
 int   stripQStr     ( char *q, char *str );
 int   addQStr       ( FILE *log_fp, char *str );
 void  subNewLine_   ( char *instr );

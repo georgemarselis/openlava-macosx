@@ -1901,75 +1901,75 @@ int lsb_mbd_version;
  * 
  */
 
-struct paramConf *lsb_readparam (struct lsConf *);
-struct userConf *lsb_readuser (struct lsConf *, int, struct clusterConf *);
-struct userConf *lsb_readuser_ex (struct lsConf *, int, struct clusterConf *, struct sharedConf *);
-struct hostConf *lsb_readhost (struct lsConf *, struct lsInfo *, int, struct clusterConf *);
-struct queueConf *lsb_readqueue (struct lsConf *, struct lsInfo *, int, struct sharedConf *);
-void updateClusterConf (struct clusterConf *);
+// struct paramConf *lsb_readparam (struct lsConf *);
+// struct userConf *lsb_readuser (struct lsConf *, int, struct clusterConf *);
+// struct userConf *lsb_readuser_ex (struct lsConf *, int, struct clusterConf *, struct sharedConf *);
+// struct hostConf *lsb_readhost (struct lsConf *, struct lsInfo *, int, struct clusterConf *);
+// struct queueConf *lsb_readqueue (struct lsConf *, struct lsInfo *, int, struct sharedConf *);
+// void updateClusterConf (struct clusterConf *);
 
 
-int lsb_init (char *appName);
-int lsb_openjobinfo (unsigned long jobId, char *, char *, char *, char *, int);
-struct jobInfoHead *lsb_openjobinfo_a (unsigned long, char *, char *, char *, char *, int);
-struct jobInfoEnt *lsb_readjobinfo (int *);
-unsigned long lsb_submit (struct submit *, struct submitReply *);
+// int lsb_init (char *appName);
+// int lsb_openjobinfo (unsigned long jobId, char *, char *, char *, char *, int);
+// struct jobInfoHead *lsb_openjobinfo_a (unsigned long, char *, char *, char *, char *, int);
+// struct jobInfoEnt *lsb_readjobinfo (int *);
+// unsigned long lsb_submit (struct submit *, struct submitReply *);
 
 
-void lsb_closejobinfo (void);
+// void lsb_closejobinfo (void);
 
-int lsb_hostcontrol (char *, int);
-struct queueInfoEnt *lsb_queueinfo (char **queues, unsigned int *numQueues, char *host, char *userName, int options);
-int lsb_reconfig (int);
-int lsb_signaljob (unsigned long jobId, int signal);
-int lsb_msgjob (unsigned long jobId, char *message);
-int lsb_chkpntjob (unsigned long jobId, time_t, int);
-int lsb_deletejob (unsigned long jobId, int, int);
-int lsb_forcekilljob (unsigned long jobId);
-int lsb_requeuejob (struct jobrequeue *newQueue);
-char *lsb_sysmsg (void);
-void lsb_perror (char *);
-char *lsb_sperror (char *);
-char *lsb_peekjob (unsigned long jobId);
+// int lsb_hostcontrol (char *, int);
+// struct queueInfoEnt *lsb_queueinfo (char **queues, unsigned int *numQueues, char *host, char *userName, int options);
+// int lsb_reconfig (int);
+// int lsb_signaljob (unsigned long jobId, int signal);
+// int lsb_msgjob (unsigned long jobId, char *message);
+// int lsb_chkpntjob (unsigned long jobId, time_t, int);
+// int lsb_deletejob (unsigned long jobId, int, int);
+// int lsb_forcekilljob (unsigned long jobId);
+// int lsb_requeuejob (struct jobrequeue *newQueue);
+// char *lsb_sysmsg (void);
+// void lsb_perror (char *);
+// char *lsb_sperror (char *);
+// char *lsb_peekjob (unsigned long jobId);
 
-int lsb_mig (struct submig *, int *badHostIdx);
+// int lsb_mig (struct submig *, int *badHostIdx);
 
-struct hostInfoEnt *lsb_hostinfo (char **, unsigned int *);
-struct hostInfoEnt *lsb_hostinfo_ex (char **, unsigned int *, char *, int);
-int lsb_movejob (unsigned long jobId, int *, int);
-int lsb_switchjob (unsigned long jobId, char *queue);
-int lsb_queuecontrol (char *, int);
-struct userInfoEnt *lsb_userinfo (char **, unsigned int *);
-struct groupInfoEnt *lsb_hostgrpinfo (char **groups, unsigned int *numGroups, int options);
-struct groupInfoEnt *lsb_usergrpinfo (char **groups, unsigned int *numGroups, int options);
-struct parameterInfo *lsb_parameterinfo (char **, unsigned int *, int);
-unsigned long lsb_modify (struct submit *, struct submitReply *, unsigned long);
-float *getCpuFactor (char *, int);
-// char *lsb_suspreason (int, int, struct loadIndexLog *);
-// char *lsb_pendreason (int, int *, struct jobInfoHead *, struct loadIndexLog *);
+// struct hostInfoEnt *lsb_hostinfo (char **, unsigned int *);
+// struct hostInfoEnt *lsb_hostinfo_ex (char **, unsigned int *, char *, int);
+// int lsb_movejob (unsigned long jobId, int *, int);
+// int lsb_switchjob (unsigned long jobId, char *queue);
+// int lsb_queuecontrol (char *, int);
+// struct userInfoEnt *lsb_userinfo (char **, unsigned int *);
+// struct groupInfoEnt *lsb_hostgrpinfo (char **groups, unsigned int *numGroups, int options);
+// struct groupInfoEnt *lsb_usergrpinfo (char **groups, unsigned int *numGroups, int options);
+// struct parameterInfo *lsb_parameterinfo (char **, unsigned int *, int);
+// unsigned long lsb_modify (struct submit *, struct submitReply *, unsigned long);
+// float *getCpuFactor (char *, int);
+// // char *lsb_suspreason (int, int, struct loadIndexLog *);
+// // char *lsb_pendreason (int, int *, struct jobInfoHead *, struct loadIndexLog *);
 
-int lsb_puteventrec (FILE *, struct eventRec *);
-// struct eventRec *lsb_geteventrec (FILE *log_fp, size_t *lineNum);
-struct lsbSharedResourceInfo *lsb_sharedresourceinfo (char **, unsigned int *, char *, int);
+// int lsb_puteventrec (FILE *, struct eventRec *);
+// // struct eventRec *lsb_geteventrec (FILE *log_fp, size_t *lineNum);
+// struct lsbSharedResourceInfo *lsb_sharedresourceinfo (char **, unsigned int *, char *, int);
 
-int lsb_runjob (struct runJobRequest *);
+// int lsb_runjob (struct runJobRequest *);
 
-char *lsb_jobid2str  ( unsigned long ) ;
-char *lsb_jobidinstr  ( unsigned long ) ;
-void jobId32To64 (unsigned long *, unsigned long jobId, unsigned int jobArrElemId ) ; // FIXME FIXME FIXME FIXME unsigned int to unsigned long or u_int64_t
-void jobId64To32 (unsigned long, unsigned int *jobId, unsigned int *jobArrElemId ) ; // FIXME FIXME FIXME FIXME unsigned int to unsigned long or u_int64_t
-int lsb_setjobattr (int, struct jobAttrInfoEnt *);
+// char *lsb_jobid2str  ( unsigned long ) ;
+// char *lsb_jobidinstr  ( unsigned long ) ;
+// void jobId32To64 (unsigned long *, unsigned long jobId, unsigned int jobArrElemId ) ; // FIXME FIXME FIXME FIXME unsigned int to unsigned long or u_int64_t
+// void jobId64To32 (unsigned long, unsigned int *jobId, unsigned int *jobArrElemId ) ; // FIXME FIXME FIXME FIXME unsigned int to unsigned long or u_int64_t
+// int lsb_setjobattr (int, struct jobAttrInfoEnt *);
 
-unsigned long lsb_rexecv (int, char **, char **, int *, int);
-int lsb_catch (const char *, int (*)(void *));
-void lsb_throw (const char *, void *);
+// unsigned long lsb_rexecv (int, char **, char **, int *, int);
+// int lsb_catch (const char *, int (*)(void *));
+// void lsb_throw (const char *, void *);
 
-struct sortIntList *initSortIntList (int);
-int insertSortIntList (struct sortIntList *, int);
-struct sortIntList *getNextSortIntList (struct sortIntList *, struct sortIntList *, int *);
-void freeSortIntList (struct sortIntList *);
-int getMinSortIntList (struct sortIntList *, int *);
-int getMaxSortIntList (struct sortIntList *, int *);
-int getTotalSortIntList (struct sortIntList *);
+// struct sortIntList *initSortIntList (int);
+// int insertSortIntList (struct sortIntList *, int);
+// struct sortIntList *getNextSortIntList (struct sortIntList *, struct sortIntList *, int *);
+// void freeSortIntList (struct sortIntList *);
+// int getMinSortIntList (struct sortIntList *, int *);
+// int getMaxSortIntList (struct sortIntList *, int *);
+// int getTotalSortIntList (struct sortIntList *);
 
-int updateJobIdIndexFile (char *, char *, int);
+// int updateJobIdIndexFile (char *, char *, int);

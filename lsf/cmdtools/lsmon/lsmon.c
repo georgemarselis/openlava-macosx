@@ -24,6 +24,7 @@
 
 #include "lib/lproto.h"
 #include "lib/lsi18n.h"
+#include "lib/syntax.h"
 #include "lsf.h"
 
 // extern void( *Signal_ (int, void (*)(int))) (int);
