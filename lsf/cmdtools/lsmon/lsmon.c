@@ -26,10 +26,10 @@
 #include "lib/lsi18n.h"
 #include "lsf.h"
 
-extern void( *Signal_ (int, void (*)(int))) (int);
-extern int makeFields (struct hostLoad *, char *loadval[], char **);
-extern void *formatHeader (char **, char);
-extern char **filterToNames (char *);
+// extern void( *Signal_ (int, void (*)(int))) (int);
+// extern int makeFields (struct hostLoad *, char *loadval[], char **);
+// extern void *formatHeader (char **, char);
+// extern char **filterToNames (char *);
 
 void printHeader (char **);
 
@@ -45,20 +45,17 @@ FILE *lf;
 int Lflag = 0;
 int redirect = 0;
 char logFilename[MAX_FILENAME_LEN];
-extern int num_loadindex;
+// extern int num_loadindex;
 
 
-#define NL_SETN  27
+// #define NL_SETN  27
 
 
 void
 usage (char *cmd)
 {
-
-  fprintf (stderr,
-	   "%s: %s [-h] [-V] [-N|-E] [-n num_hosts] [-R res_req] [-I index_list] [-i interval] [-L logfile] [host_name ... ]\n",
-	   I18N_Usage, cmd);
-  exit (0);
+    fprintf (stderr, "%s: %s [-h] [-V] [-N|-E] [-n num_hosts] [-R res_req] [-I index_list] [-i interval] [-L logfile] [host_name ... ]\n", I18N_Usage, cmd);
+    exit (0);
 }
 
 
@@ -95,39 +92,42 @@ quit ()
 void
 getLoadInfo (void)
 {
-  int i, j, nf;
-  static int numStatus;
-  struct hostLoad *hosts;
-  int numwanted;
-  static char **loadval = NULL;
-  static char first = TRUE;
-  static char *defaultindex[] = { "r15s", "r1m", "r15m", "ut", "pg", "ls",
-    "it", "tmp", "swp", "mem", NULL
-  };
-  char **nlp;
-  char linebuf[132];
+    int i = 0;
+    int j = 0; 
+    int nf = 0;
+    static int numStatus;
+    struct hostLoad *hosts NULL;
+    int numwanted;
+    static char **loadval = NULL;
+    static char first = TRUE;
+    static char *defaultindex[] = { "r15s", "r1m", "r15m", "ut", "pg", "ls", "it", "tmp", "swp", "mem", NULL };
+    char **nlp = NULL;
+    char linebuf[132];
 
-  numwanted = numneeded;
-  if (num > 0)
-    options = options | EXACT;
+    numwanted = numneeded;
+    if (num > 0) {
+       options = options | EXACT;
+    }
 
-  if (indexfilter[0] != '\0')
-    nlp = filterToNames (indexfilter);
-  else
-    nlp = defaultindex;
+    if (indexfilter[0] != '\0') {
+        nlp = filterToNames (indexfilter);
+    }
+    else {
+        nlp = defaultindex;
+    }
 
-  hosts = ls_loadinfo (resreq, &numwanted, options, 0, hostnames, num, &nlp);
+    hosts = ls_loadinfo (resreq, &numwanted, options, 0, hostnames, num, &nlp);
 
   if (!hosts)
     {
       numwanted = 0;
       if (!redirect)
-	{
-	  mvprintw (3, 0, ls_sysmsg ());
-	  clrtobot ();
-	  move (1, 0);
-	  refresh ();
-	}
+    {
+      mvprintw (3, 0, ls_sysmsg ());
+      clrtobot ();
+      move (1, 0);
+      refresh ();
+    }
       return;
     }
 
@@ -139,9 +139,9 @@ getLoadInfo (void)
   if (loadval == NULL)
     if (!(loadval = (char **) malloc (num_loadindex * sizeof (char *))))
       {
-	lserrno = LSE_MALLOC;
-	ls_perror ("lsmon");
-	exit (-1);
+    lserrno = LSE_MALLOC;
+    ls_perror ("lsmon");
+    exit (-1);
       }
 
   if (!redirect)
@@ -149,118 +149,118 @@ getLoadInfo (void)
       {
 
 
-	mvprintw (i + 3, 0, "%-15.15s ", hosts[i].hostName);
+    mvprintw (i + 3, 0, "%-15.15s ", hosts[i].hostName);
 
 
-	if (LS_ISUNAVAIL (hosts[i].status))
-	  addstr (I18N_unavail);
-	else if (!LS_ISUNAVAIL (hosts[i].status)
-		 && LS_ISRESDOWN (hosts[i].status))
-	  {
-	    char str[7];
+    if (LS_ISUNAVAIL (hosts[i].status))
+      addstr (I18N_unavail);
+    else if (!LS_ISUNAVAIL (hosts[i].status)
+         && LS_ISRESDOWN (hosts[i].status))
+      {
+        char str[7];
 
-	    sprintf (str, "-%2s    ", I18N_ok);
-	    addstr (str);
-	  }
-	else if (LS_ISOKNRES (hosts[i].status))
-	  {
-	    char str[7];
+        sprintf (str, "-%2s    ", I18N_ok);
+        addstr (str);
+      }
+    else if (LS_ISOKNRES (hosts[i].status))
+      {
+        char str[7];
 
-	    sprintf (str, " %2s    ", I18N_ok);
-	    addstr (str);
-	  }
-	else if (LS_ISLOCKED (hosts[i].status))
-	  {
-	    addstr ((_i18n_msg_get (ls_catd, NL_SETN, 2107, "lock")));	/* catgets  2107  */
-	    if (LS_ISLOCKEDU (hosts[i].status))
-	      addch ('U');
-	    if (LS_ISLOCKEDW (hosts[i].status))
-	      addch ('W');
-	    if (LS_ISLOCKEDM (hosts[i].status))
-	      addch ('M');
-	    addstr ("   ");
-	  }
-	else if (LS_ISBUSY (hosts[i].status))
-	  addstr ((_i18n_msg_get (ls_catd, NL_SETN, 2108, "busy   ")));	/* catgets  2108  */
+        sprintf (str, " %2s    ", I18N_ok);
+        addstr (str);
+      }
+    else if (LS_ISLOCKED (hosts[i].status))
+      {
+        addstr ((_i18n_msg_get (ls_catd, NL_SETN, 2107, "lock")));  /* catgets  2107  */
+        if (LS_ISLOCKEDU (hosts[i].status))
+          addch ('U');
+        if (LS_ISLOCKEDW (hosts[i].status))
+          addch ('W');
+        if (LS_ISLOCKEDM (hosts[i].status))
+          addch ('M');
+        addstr ("   ");
+      }
+    else if (LS_ISBUSY (hosts[i].status))
+      addstr ((_i18n_msg_get (ls_catd, NL_SETN, 2108, "busy   "))); /* catgets  2108  */
 
-	if (!LS_ISUNAVAIL (hosts[i].status))
-	  {
-	    nf = makeFields (&hosts[i], loadval, nlp);
-	    strcpy (linebuf, loadval[0]);
-	    for (j = 1; j < nf; j++)
-	      strcat (linebuf, loadval[j]);
+    if (!LS_ISUNAVAIL (hosts[i].status))
+      {
+        nf = makeFields (&hosts[i], loadval, nlp);
+        strcpy (linebuf, loadval[0]);
+        for (j = 1; j < nf; j++)
+          strcat (linebuf, loadval[j]);
 
-	    mvprintw (i + 3, 22, "%s", linebuf);
-	  }
+        mvprintw (i + 3, 22, "%s", linebuf);
+      }
 
-	if (Lflag)
-	  {
-	    if (first)
-	      {
-		numStatus = 0;
-		for (j = 0; nlp[j]; j++)
-		  {
-		    fprintf (lf, "%s ", nlp[j]);
-		    numStatus++;
-		  }
-		fprintf (lf, "\n");
-		first = FALSE;
-	      }
+    if (Lflag)
+      {
+        if (first)
+          {
+        numStatus = 0;
+        for (j = 0; nlp[j]; j++)
+          {
+            fprintf (lf, "%s ", nlp[j]);
+            numStatus++;
+          }
+        fprintf (lf, "\n");
+        first = FALSE;
+          }
 
-	    fprintf (lf, "%ld %s", time (NULL), hosts[i].hostName);
+        fprintf (lf, "%ld %s", time (NULL), hosts[i].hostName);
 
-	    for (j = 0; j < 1 + GET_INTNUM (numStatus); j++)
-	      {
-		if (j == GET_INTNUM (numStatus))
-		  fprintf (lf, " %d ", hosts[i].status[j]);
-		else
-		  fprintf (lf, " %d", hosts[i].status[j]);
-	      }
-	    for (j = 0; nlp[j]; j++)
-	      fprintf (lf, "%f ", hosts[i].li[j]);
-	    fprintf (lf, "\n");
-	  }
-	clrtoeol ();
+        for (j = 0; j < 1 + GET_INTNUM (numStatus); j++)
+          {
+        if (j == GET_INTNUM (numStatus))
+          fprintf (lf, " %d ", hosts[i].status[j]);
+        else
+          fprintf (lf, " %d", hosts[i].status[j]);
+          }
+        for (j = 0; nlp[j]; j++)
+          fprintf (lf, "%f ", hosts[i].li[j]);
+        fprintf (lf, "\n");
+      }
+    clrtoeol ();
       }
   else
     {
       for (i = 0; i < numwanted; i++)
-	{
-	  if (Lflag)
-	    {
-	      if (first)
-		{
-		  numStatus = 0;
-		  for (j = 0; nlp[j]; j++)
-		    {
-		      fprintf (lf, "%s ", nlp[j]);
-		      numStatus++;
-		    }
-		  fprintf (lf, "\n");
-		  first = FALSE;
-		}
-	      fprintf (lf, "%ld %s", time (NULL), hosts[i].hostName);
-	      for (j = 0; j < 1 + GET_INTNUM (numStatus); j++)
-		{
-		  if (j == GET_INTNUM (numStatus))
-		    fprintf (lf, " %d ", hosts[i].status[j]);
-		  else
-		    fprintf (lf, " %d", hosts[i].status[j]);
-		}
-	      for (j = 0; nlp[j]; j++)
-		fprintf (lf, "%f ", hosts[i].li[j]);
-	      fprintf (lf, "\n");
-	    }
-	}
+    {
+      if (Lflag)
+        {
+          if (first)
+        {
+          numStatus = 0;
+          for (j = 0; nlp[j]; j++)
+            {
+              fprintf (lf, "%s ", nlp[j]);
+              numStatus++;
+            }
+          fprintf (lf, "\n");
+          first = FALSE;
+        }
+          fprintf (lf, "%ld %s", time (NULL), hosts[i].hostName);
+          for (j = 0; j < 1 + GET_INTNUM (numStatus); j++)
+        {
+          if (j == GET_INTNUM (numStatus))
+            fprintf (lf, " %d ", hosts[i].status[j]);
+          else
+            fprintf (lf, " %d", hosts[i].status[j]);
+        }
+          for (j = 0; nlp[j]; j++)
+        fprintf (lf, "%f ", hosts[i].li[j]);
+          fprintf (lf, "\n");
+        }
+    }
     }
 
   if (!redirect)
     {
       if (i < (LINES - 4))
-	{
-	  move (i + 3, 0);
-	  clrtobot ();
-	}
+    {
+      move (i + 3, 0);
+      clrtobot ();
+    }
       move (1, 0);
       refresh ();
     }
@@ -274,7 +274,7 @@ printHeader (char **nlp)
   char *headLine;
 
   if (!redirect)
-    mvaddstr (0, 0, _i18n_msg_get (ls_catd, NL_SETN, 2109, "Hostname: "));	/* catgets  2109  */
+    mvaddstr (0, 0, _i18n_msg_get (ls_catd, NL_SETN, 2109, "Hostname: "));  /* catgets  2109  */
   if ((hname = ls_getmyhostname ()) == NULL)
     {
       endPgm ("ls_getmyhostname", -1);
@@ -286,8 +286,8 @@ printHeader (char **nlp)
   if (!redirect)
     {
       addstr (hname);
-      mvprintw (0, COLS - 25, _i18n_msg_get (ls_catd, NL_SETN, 2110, "Refresh rate: %3d secs"),	/* catgets  2110  */
-		updateRate);
+      mvprintw (0, COLS - 25, _i18n_msg_get (ls_catd, NL_SETN, 2110, "Refresh rate: %3d secs"), /* catgets  2110  */
+        updateRate);
       mvaddstr (2, 0, headLine);
     }
 
@@ -304,7 +304,7 @@ chInterval (void)
 
 
 
-  mvaddstr (1, 0, _i18n_msg_get (ls_catd, NL_SETN, 2111, "Enter a new refresh rate (secs):  "));	/* catgets  2111  */
+  mvaddstr (1, 0, _i18n_msg_get (ls_catd, NL_SETN, 2111, "Enter a new refresh rate (secs):  "));    /* catgets  2111  */
   clrtoeol ();
   refresh ();
 
@@ -316,7 +316,7 @@ chInterval (void)
 
   if (interval <= 0)
     {
-      mvaddstr (1, 0, _i18n_msg_get (ls_catd, NL_SETN, 2112, "Refresh rate must be greater than zero.  Interval unchanged."));	/* catgets  2112  */
+      mvaddstr (1, 0, _i18n_msg_get (ls_catd, NL_SETN, 2112, "Refresh rate must be greater than zero.  Interval unchanged."));  /* catgets  2112  */
     }
   else
     {
@@ -338,7 +338,7 @@ chNumNeeded (void)
 
   move (1, 0);
   clrtoeol ();
-  mvaddstr (1, 0, _i18n_msg_get (ls_catd, NL_SETN, 2113, "Enter number of hosts to be displayed:  "));	/* catgets  2113  */
+  mvaddstr (1, 0, _i18n_msg_get (ls_catd, NL_SETN, 2113, "Enter number of hosts to be displayed:  "));  /* catgets  2113  */
   refresh ();
   echo ();
   getstr (str);
@@ -349,7 +349,7 @@ chNumNeeded (void)
     {
       move (1, 0);
       clrtoeol ();
-      mvaddstr (1, 0, _i18n_msg_get (ls_catd, NL_SETN, 2114, "Number of hosts must be greater than zero. Number unchanged."));	/* catgets  2114  */
+      mvaddstr (1, 0, _i18n_msg_get (ls_catd, NL_SETN, 2114, "Number of hosts must be greater than zero. Number unchanged."));  /* catgets  2114  */
       numhosts = numneeded;
     }
   else
@@ -373,7 +373,7 @@ chResReq (void)
 
   move (1, 0);
   clrtoeol ();
-  mvaddstr (1, 0, _i18n_msg_get (ls_catd, NL_SETN, 2115, "Enter resource requirements string:  "));	/* catgets  2115  */
+  mvaddstr (1, 0, _i18n_msg_get (ls_catd, NL_SETN, 2115, "Enter resource requirements string:  ")); /* catgets  2115  */
   refresh ();
 
   echo ();
@@ -384,7 +384,7 @@ chResReq (void)
   if (expSyntax_ (newresreq) < 0)
     {
 
-      mvaddstr (1, 0, _i18n_msg_get (ls_catd, NL_SETN, 2116, "Invalid resource requirements.  Resource requirements unchanged."));	/* catgets  2116  */
+      mvaddstr (1, 0, _i18n_msg_get (ls_catd, NL_SETN, 2116, "Invalid resource requirements.  Resource requirements unchanged."));  /* catgets  2116  */
       clrtoeol ();
     }
   else
@@ -420,98 +420,98 @@ main (int argc, char **argv)
   while ((optc = getopt (argc, argv, "hVNEn:R:I:i:L:")) != EOF)
     {
       switch (optc)
-	{
-	case 'R':
-	  if (Rflag)
-	    usage (cmd);
-	  else
-	    {
-	      Rflag = 1;
-	      strcpy (resreq, optarg);
-	      break;
-	    }
-	case 'I':
-	  if (Iflag)
-	    usage (cmd);
-	  else
-	    {
-	      Iflag = 1;
-	      strcpy (indexfilter, optarg);
-	      break;
-	    }
+    {
+    case 'R':
+      if (Rflag)
+        usage (cmd);
+      else
+        {
+          Rflag = 1;
+          strcpy (resreq, optarg);
+          break;
+        }
+    case 'I':
+      if (Iflag)
+        usage (cmd);
+      else
+        {
+          Iflag = 1;
+          strcpy (indexfilter, optarg);
+          break;
+        }
 
-	case 'n':
-	  if (nflag)
-	    usage (cmd);
-	  else
-	    {
-	      nflag = 1;
-	      numneeded = atoi (optarg);
-	      if (numneeded <= 0)
-		{
-		  usage (cmd);
-		}
-	      break;
-	    }
+    case 'n':
+      if (nflag)
+        usage (cmd);
+      else
+        {
+          nflag = 1;
+          numneeded = atoi (optarg);
+          if (numneeded <= 0)
+        {
+          usage (cmd);
+        }
+          break;
+        }
 
-	case 'i':
-	  if (iflag)
-	    usage (cmd);
-	  else
-	    {
-	      iflag = 1;
-	      updateRate = atoi (optarg);
-	      if (updateRate <= 0)
-		{
-		  usage (cmd);
-		}
-	      break;
-	    }
+    case 'i':
+      if (iflag)
+        usage (cmd);
+      else
+        {
+          iflag = 1;
+          updateRate = atoi (optarg);
+          if (updateRate <= 0)
+        {
+          usage (cmd);
+        }
+          break;
+        }
 
-	case 'L':
-	  if (Lflag)
-	    usage (cmd);
-	  else
-	    {
-	      Lflag = 1;
-	      strcpy (logFilename, optarg);
-	      break;
-	    }
+    case 'L':
+      if (Lflag)
+        usage (cmd);
+      else
+        {
+          Lflag = 1;
+          strcpy (logFilename, optarg);
+          break;
+        }
 
-	case 'N':
-	  if (Nflag || Eflag)
-	    usage (cmd);
-	  else
-	    {
-	      Nflag = 1;
-	      options = NORMALIZE;
-	      break;
-	    }
+    case 'N':
+      if (Nflag || Eflag)
+        usage (cmd);
+      else
+        {
+          Nflag = 1;
+          options = NORMALIZE;
+          break;
+        }
 
-	case 'E':
-	  if (Nflag || Eflag)
-	    usage (cmd);
-	  else
-	    {
-	      Eflag = 1;
-	      options = EFFECTIVE;
-	      break;
-	    }
+    case 'E':
+      if (Nflag || Eflag)
+        usage (cmd);
+      else
+        {
+          Eflag = 1;
+          options = EFFECTIVE;
+          break;
+        }
 
-	case 'V':
-	  if (Vflag)
-	    usage (cmd);
-	  else
-	    {
-	      Vflag = 1;
-	      fputs (_LS_VERSION_, stderr);
-	      exit (0);
-	    }
+    case 'V':
+      if (Vflag)
+        usage (cmd);
+      else
+        {
+          Vflag = 1;
+          fputs (_LS_VERSION_, stderr);
+          exit (0);
+        }
 
-	case 'h':
-	default:
-	  usage (cmd);
-	}
+    case 'h':
+    default:
+      usage (cmd);
+    }
 
     }
 
@@ -520,30 +520,30 @@ main (int argc, char **argv)
 
       hostnames[num] = argv[optind++];
       if (ls_isclustername (hostnames[num]) <= 0
-	  && !Gethostbyname_ (hostnames[num]))
-	{
-	  fprintf (stderr, "\
+      && !Gethostbyname_ (hostnames[num]))
+    {
+      fprintf (stderr, "\
 %s: unknown host %s\n", __func__, hostnames[num]);;
-	  usage (cmd);
-	}
+      usage (cmd);
+    }
       num++;
       if (num >= MAXLISTSIZE)
-	{
-	  fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 2142, "too many hosts specified\n"));	/* catgets  2142  */
-	  exit (-1);
-	}
+    {
+      fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 2142, "too many hosts specified\n"));   /* catgets  2142  */
+      exit (-1);
+    }
     }
 
   if (Lflag)
     {
       lf = fopen (logFilename, "a");
       if (lf == NULL)
-	{
-	  fprintf (stderr, I18N_FUNC_FAIL_S, logFilename, "fopen",
-		   strerror (errno));
-	  fprintf (stderr, "\n");
-	  exit (-1);
-	}
+    {
+      fprintf (stderr, I18N_FUNC_FAIL_S, logFilename, "fopen",
+           strerror (errno));
+      fprintf (stderr, "\n");
+      exit (-1);
+    }
     }
 
   if (fstat (0, &statBuf) == 0)
@@ -558,30 +558,30 @@ main (int argc, char **argv)
 
 
       if ((COLS < 80))
-	{
-	  endwin ();
-	  fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 2144, "Sorry, screen must be at least %d COLUMNS wide (currently COLS = %d).\n"),	/* catgets  2144  */
-		   80, COLS);
-	  exit (1);
-	}
+    {
+      endwin ();
+      fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 2144, "Sorry, screen must be at least %d COLUMNS wide (currently COLS = %d).\n"),   /* catgets  2144  */
+           80, COLS);
+      exit (1);
+    }
 
       if (LINES < 5)
-	{
-	  endwin ();
-	  fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 2145, "Sorry, screen must have at least %d LINES (currently LINES = %d).\n"),	/* catgets  2145  */
-		   5, LINES);
-	  exit (1);
-	}
+    {
+      endwin ();
+      fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 2145, "Sorry, screen must have at least %d LINES (currently LINES = %d).\n"),   /* catgets  2145  */
+           5, LINES);
+      exit (1);
+    }
       else if ((LINES < num + 4))
-	{
+    {
 
-	  endwin ();
-	  fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 2146, "Sorry, screen must have at least %d LINES to display all of the requested hosts.\n"),	/* catgets  2146  */
-		   num + 4);
-	  fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 2147, "The current window has %d lines.\n"),	/* catgets  2147  */
-		   LINES);
-	  exit (1);
-	}
+      endwin ();
+      fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 2146, "Sorry, screen must have at least %d LINES to display all of the requested hosts.\n"),    /* catgets  2146  */
+           num + 4);
+      fprintf (stderr, _i18n_msg_get (ls_catd, NL_SETN, 2147, "The current window has %d lines.\n"),    /* catgets  2147  */
+           LINES);
+      exit (1);
+    }
 
       FD_ZERO (&allMask);
       FD_SET (StdIn, &allMask);
@@ -596,108 +596,108 @@ main (int argc, char **argv)
       getLoadInfo ();
 
       if (!redirect)
-	{
+    {
 
-	  timeout.tv_usec = 0;
-	  timeout.tv_sec = updateRate;
+      timeout.tv_usec = 0;
+      timeout.tv_sec = updateRate;
 
-	  mask = allMask;
-	  nReady = select (StdIn + 1, &mask, 0, 0, &timeout);
+      mask = allMask;
+      nReady = select (StdIn + 1, &mask, 0, 0, &timeout);
 
 
-	  move (1, 0);
-	  clrtoeol ();
+      move (1, 0);
+      clrtoeol ();
 
-	  if ((nReady < 0) && (errno != EINTR))
-	    {
-	      char i18nBuf[100];
-	      sprintf (i18nBuf, I18N_ERROR, "lsmon", "select");
-	      endPgm (i18nBuf, 1);
-	    }
-	  else if (nReady > 0)
-	    {
-	      if (FD_ISSET (StdIn, &mask))
-		{
+      if ((nReady < 0) && (errno != EINTR))
+        {
+          char i18nBuf[100];
+          sprintf (i18nBuf, I18N_ERROR, "lsmon", "select");
+          endPgm (i18nBuf, 1);
+        }
+      else if (nReady > 0)
+        {
+          if (FD_ISSET (StdIn, &mask))
+        {
 
-		  switch (getch ())
-		    {
-		    case CONTROL_L:
+          switch (getch ())
+            {
+            case CONTROL_L:
 
-		      erase ();
-		      refresh ();
-		      break;
+              erase ();
+              refresh ();
+              break;
 
-		    case 'q':
+            case 'q':
 
-		      endPgm (NULL, 0);
-		      break;
+              endPgm (NULL, 0);
+              break;
 
-		    case 'i':
+            case 'i':
 
-		      chInterval ();
-		      break;
+              chInterval ();
+              break;
 
-		    case 'n':
+            case 'n':
 
-		      numneeded = chNumNeeded ();
-		      break;
+              numneeded = chNumNeeded ();
+              break;
 
-		    case 'N':
+            case 'N':
 
-		      move (1, 0);
-		      clrtoeol ();
-		      if (options == NORMALIZE)
-			{
-			  options = 0;
-			  mvaddstr (1, 0, _i18n_msg_get (ls_catd, NL_SETN, 2149, "Output raw CPU run queue load indices"));	/* catgets  2149  */
-			}
-		      else
-			{
-			  options = NORMALIZE;
-			  mvaddstr (1, 0, _i18n_msg_get (ls_catd, NL_SETN, 2150, "Output normalized CPU run queue load indices"));	/* catgets  2150  */
-			}
-		      move (1, 0);
-		      refresh ();
-		      break;
+              move (1, 0);
+              clrtoeol ();
+              if (options == NORMALIZE)
+            {
+              options = 0;
+              mvaddstr (1, 0, _i18n_msg_get (ls_catd, NL_SETN, 2149, "Output raw CPU run queue load indices")); /* catgets  2149  */
+            }
+              else
+            {
+              options = NORMALIZE;
+              mvaddstr (1, 0, _i18n_msg_get (ls_catd, NL_SETN, 2150, "Output normalized CPU run queue load indices"));  /* catgets  2150  */
+            }
+              move (1, 0);
+              refresh ();
+              break;
 
-		    case 'E':
+            case 'E':
 
-		      move (1, 0);
-		      clrtoeol ();
-		      if (options == EFFECTIVE)
-			{
-			  options = 0;
-			  mvaddstr (1, 0, _i18n_msg_get (ls_catd, NL_SETN, 2151, "Output raw CPU run queue load indices"));	/* catgets  2151  */
-			}
-		      else
-			{
-			  options = EFFECTIVE;
-			  mvaddstr (1, 0, _i18n_msg_get (ls_catd, NL_SETN, 2152, "Output effective CPU run queue load indices"));	/* catgets  2152  */
-			}
-		      move (1, 0);
-		      refresh ();
-		      break;
+              move (1, 0);
+              clrtoeol ();
+              if (options == EFFECTIVE)
+            {
+              options = 0;
+              mvaddstr (1, 0, _i18n_msg_get (ls_catd, NL_SETN, 2151, "Output raw CPU run queue load indices")); /* catgets  2151  */
+            }
+              else
+            {
+              options = EFFECTIVE;
+              mvaddstr (1, 0, _i18n_msg_get (ls_catd, NL_SETN, 2152, "Output effective CPU run queue load indices"));   /* catgets  2152  */
+            }
+              move (1, 0);
+              refresh ();
+              break;
 
-		    case 'R':
+            case 'R':
 
-		      chResReq ();
-		      break;
+              chResReq ();
+              break;
 
-		    default:
+            default:
 
-		      move (1, 0);
-		      clrtoeol ();
-		      mvaddstr (1, 0, _i18n_msg_get (ls_catd, NL_SETN, 2153, "Options:(i)nterval,(n)umber,(N)ormalize,(E)ffective,(R)esources,(q)uit,(^L)refresh"));	/* catgets  2153  */
-		      move (1, 0);
-		      refresh ();
-		      break;
-		    }
-		}
-	    }
+              move (1, 0);
+              clrtoeol ();
+              mvaddstr (1, 0, _i18n_msg_get (ls_catd, NL_SETN, 2153, "Options:(i)nterval,(n)umber,(N)ormalize,(E)ffective,(R)esources,(q)uit,(^L)refresh"));    /* catgets  2153  */
+              move (1, 0);
+              refresh ();
+              break;
+            }
+        }
+        }
 
-	}
+    }
       else
-	sleep (updateRate);
+    sleep (updateRate);
     }
 
   return (0);

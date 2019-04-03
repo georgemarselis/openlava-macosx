@@ -17,85 +17,9 @@
  */
  
 #include "lib/lib.h"
-#include "lsb/sig.h"
+#include "lib/sig.h"
+// #include "lsb/sig.h" // deprecated
 
-// #define SIGEMT  SIGBUS
-// #define SIGLOST SIGIO
-// #define SIGIOT  SIGABRT
-
-#if !defined(SIGWINCH) && defined(SIGWINDOW)
-#    define SIGWINCH SIGWINDOW
-#endif
-
-static int sig_map[] = { 0,
-  SIGHUP,
-  SIGINT,
-  SIGQUIT,
-  SIGILL,
-  SIGTRAP,
-  SIGIOT,
-  SIGEMT,
-  SIGFPE,
-  SIGKILL,
-  SIGBUS,
-  SIGSEGV,
-  SIGSYS,
-  SIGPIPE,
-  SIGALRM,
-  SIGTERM,
-  SIGSTOP,
-  SIGTSTP,
-  SIGCONT,
-  SIGCHLD,
-  SIGTTIN,
-  SIGTTOU,
-  SIGIO,
-  SIGXCPU,
-  SIGXFSZ,
-  SIGVTALRM,
-  SIGPROF,
-  SIGWINCH,
-#ifdef __sparc__
-  SIGLOST,
-#endif
-  SIGUSR1,
-  SIGUSR2
-};
-
-static char *sigSymbol[] = { "",
-  "HUP",
-  "INT",
-  "QUIT",
-  "ILL",
-  "TRAP",
-  "IOT",
-  "EMT",
-  "FPE",
-  "KILL",
-  "BUS",
-  "SEGV",
-  "SYS",
-  "PIPE",
-  "ALRM",
-  "TERM",
-  "STOP",
-  "TSTP",
-  "CONT",
-  "CHLD",
-  "TTIN",
-  "TTOU",
-  "IO",
-  "XCPU",
-  "XFSZ",
-  "VTALRM",
-  "PROF",
-  "WINCH",
-  "LOST",
-  "USR1",
-  "USR2"
-};
-
-static unsigned int NSIG_MAP = (sizeof (sig_map) / sizeof ( unsigned int)); // FIXME FIXME FIXME move this out to appropriate header
 
 int
 sig_encode (int sig)
@@ -129,8 +53,9 @@ sig_encode (int sig)
 int
 sig_decode (int sig)
 {
-	if (sig < 0)
+	if (sig < 0) {
 		return sig;
+	}
 
 	if (sig >= (int) NSIG_MAP)  // FIXME FIXME FIXME the cast has to go; does sig below need to be negative at any point? if no, remove cast, change function param
 	{

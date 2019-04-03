@@ -41,7 +41,9 @@
 #include "daemons/libniosd/niosd.h"
 #include "daemons/libresd/resout.h"
 #include "libint/lsi18n.h"
-
+#include "lib/structs/genParams.h"
+#include "lib/esub.h"
+#include "lib/sig.h"
 
 // #define NL_SETN 23
 
@@ -85,16 +87,18 @@ getEAuth (struct eauth *eauth, const char *host)
     char *argv[4];
     char path[MAX_PATH_LEN];
     struct lenData ld;
-    const static char EAUTHNAME[] = "eauth"; // FIXME FIXME FIXME FIXME put in configure.ac
+    static const  char EAUTHNAME[] = "eauth"; // FIXME FIXME FIXME FIXME put in configure.ac
+
+    assert( host );
 
     memset (path, 0, sizeof (path));
     ls_strcat (path, sizeof (path), genParams_[LSF_SERVERDIR].paramValue);
     ls_strcat (path, sizeof (path), "/");
     ls_strcat (path, sizeof (path), EAUTHNAME); 
-    argv[0] = path; // FIXME FIXME FIXME FIXME FIXME   wut
-    argv[1] = "-c"; // FIXME FIXME FIXME FIXME FIXME   the
-    argv[2] = host; // FIXME FIXME FIXME FIXME FIXME  frack
-    argv[3] = NULL; // FIXME FIXME FIXME FIXME FIXME    ?
+    // argv[0] = path; // FIXME FIXME FIXME FIXME FIXME   wut
+    // argv[1] = "-c"; // FIXME FIXME FIXME FIXME FIXME   the
+    // argv[2] = host; // FIXME FIXME FIXME FIXME FIXME  frack
+    // argv[3] = NULL; // FIXME FIXME FIXME FIXME FIXME    ?
 
     if (logclass & LC_TRACE) {
         ls_syslog (LOG_DEBUG, "runEAuth(): path=<%s>", path);
@@ -161,8 +165,10 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
     char *eauth_aux_data    = NULL;
     char *eauth_aux_status  = NULL;
     size_t cc = 0;
+    int returnvalue = 0;
     size_t uData_length = 0;
-    const static char EAUTHNAME[] = "eauth"; // FIXME FIXME FIXME FIXME put in configure.ac
+    long b_write_fix_returnvalue = 0;
+    static const char EAUTHNAME[] = "eauth"; // FIXME FIXME FIXME FIXME put in configure.ac
 
     static int connected = FALSE;
     static int in[2], out[2];
@@ -184,7 +190,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
     eauth_aux_status = getenv ("LSF_EAUTH_AUX_STATUS");  // FIXME FIXME FIXME FIXME FIXME LSF_EAUTH_AUX_STATUS must go to configure.ac
 
     assert( auth->k.eauth.len <= INT_MAX ); // FIXME FIXME why does it need to be less than INT_MAX?S
-    sprintf (uData, "%d %d %s %s %u %ld %s %s %s %s\n", auth->uid, auth->gid,
+    sprintf (uData, "%ud %ud %s %s %u %lu %s %s %s %s\n", auth->uid, auth->gid,
         auth->lsfUserName, inet_ntoa (from->sin_addr),
             ntohs (from->sin_port), auth->k.eauth.len,
             (eauth_client ? eauth_client : "NULL"),
@@ -211,7 +217,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
         tv.tv_sec = 0;
         tv.tv_usec = 0;
 
-        if ((cc = select (out[0] + 1, &mask, NULL, NULL, &tv)) > 0) {
+        if ((returnvalue = select (out[0] + 1, &mask, NULL, NULL, &tv)) > 0) {
             if (logclass & (LC_AUTH | LC_TRACE)) {
                ls_syslog (LOG_DEBUG, "%s: <%s> got exception", __func__, uData);
             }
@@ -221,13 +227,13 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
             close (out[0]);
         }
         else {
-           if (cc < 0.0 ) { // FIXME FIXME 
+           if (returnvalue < 0 ) { // FIXME FIXME 
                ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "select", uData);
            }
        }
     
         if (logclass & (LC_AUTH | LC_TRACE)) {
-           ls_syslog (LOG_DEBUG, "%s: <%s> select returned cc=%d", __func__, uData, cc);
+           ls_syslog (LOG_DEBUG, "%s: <%s> select returned cc=%d", __func__, uData, returnvalue);
        }
 
     }
@@ -264,8 +270,8 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
 
             // FIXME investigate if the third argument to lsfSetXUid can be set to the appropriate
             // [s]uid_t type. if yes, try to see if there is an alternative to passing -1.
-            if (lsfSetXUid(0, pw->pw_uid, pw->pw_uid, (int) -1, setuid)  < 0) {
-              ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "setuid", (int) pw->pw_uid);
+            if (lsfSetXUid(0, pw->pw_uid, pw->pw_uid, 4294967295, setuid)  < 0) {
+              ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "setuid", pw->pw_uid);
               exit (-1);
             }
 
@@ -289,9 +295,9 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
                 close (i);
             }
 
-            myargv[0] = path;
-            myargv[1] = "-s";
-            myargv[2] = NULL;
+            // myargv[0] = path;
+            // myargv[1] = "-s"; // FIXME FIXME FIXME FIXME the fuck is this? default arguments?
+            // myargv[2] = NULL;
 
             lsfExecX( myargv[0], myargv, execvp);
             ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "execvp", myargv[0]);
@@ -320,12 +326,13 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
     //
     //  that depends on the use of cc, of course. Investigate
     // looks like it is done
-    cc = b_write_fix (in[1], uData, uData_length);
+    b_write_fix_returnvalue = b_write_fix (in[1], uData, uData_length);
     // like above: investigate, remove cast
-    if (cc != uData_length)
+    assert( b_write_fix_returnvalue >  0);
+    if (uData_length != (size_t) b_write_fix_returnvalue)
     {
         /* catgets 5513 */
-        ls_syslog (LOG_ERR, "5513: %s: b_write_fix <%s> failed, cc=%d, i=%d: %ld", __func__, uData, cc, uData_length);
+        ls_syslog (LOG_ERR, "5513: %s: b_write_fix <%s> failed, cc=%ld, i=%d: %ld", __func__, uData, b_write_fix_returnvalue, uData_length);
         close (in[1]);
         close (out[0]);
         connected = FALSE;
@@ -333,17 +340,14 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
     }
     
     if (logclass & (LC_AUTH | LC_TRACE)) {
-        ls_syslog (LOG_DEBUG, "5514: %s: b_write_fix <%s> ok, cc=%d, i=%d", __func__, uData, cc, uData_length);
+        ls_syslog (LOG_DEBUG, "5514: %s: b_write_fix <%s> ok, cc=%ld, i=%d", __func__, uData, b_write_fix_returnvalue, uData_length);
     }
 
-    // FIXME investigate the type of auth->k.eauth.len and figure out if len
-    //    should be a size_t type.
-    //    remove cast after you are done
-    cc = (long) b_write_fix (in[1], auth->k.eauth.data, (size_t) auth->k.eauth.len);  
+    b_write_fix_returnvalue = b_write_fix (in[1], auth->k.eauth.data, (size_t) auth->k.eauth.len); // FIXME FIXME FIXME FIXME investigate the type of auth->k.eauth.len and figure out if len should be a size_t type. remove cast after you are done
     if ( cc != auth->k.eauth.len)
     {
          /* catgets 5515 */
-        ls_syslog (LOG_ERR, "5515: %s: b_write_fix <%s> failed, eauth.len=%d, cc=%d", __func__, uData, auth->k.eauth.len, cc);
+        ls_syslog (LOG_ERR, "5515: %s: b_write_fix <%s> failed, eauth.len=%d, cc=%ld", __func__, uData, auth->k.eauth.len, b_write_fix_returnvalue);
         close (in[1]);
         close (out[0]);
         connected = FALSE;
@@ -351,13 +355,13 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
     }
 
     if (logclass & (LC_AUTH | LC_TRACE)) {
-        ls_syslog (LOG_DEBUG, "5516: %s: b_write_fix <%s> ok, eauth.len=%d, eauth.data=%.*s cc=%d:", __func__, uData, auth->k.eauth.len, auth->k.eauth.len, auth->k.eauth.data, cc);
+        ls_syslog (LOG_DEBUG, "5516: %s: b_write_fix <%s> ok, eauth.len=%d, eauth.data=%.*s cc=%ld:", __func__, uData, auth->k.eauth.len, auth->k.eauth.len, auth->k.eauth.data, b_write_fix_returnvalue);
     }
 
-    cc = (long) b_read_fix (out[0], &ok, 1);
-    if ( cc != 1) {
+    b_write_fix_returnvalue = b_read_fix (out[0], &ok, 1);
+    if ( b_write_fix_returnvalue != 1) {
         /* catgets 5517 */
-        ls_syslog (LOG_ERR, "5517: %s: b_read_fix <%s> failed, cc=%d: %ld", __func__, uData, cc);
+        ls_syslog (LOG_ERR, "5517: %s: b_read_fix <%s> failed, cc=%ld: %ld", __func__, uData, b_write_fix_returnvalue);
         close (in[1]);
         close (out[0]);
         connected = FALSE;
@@ -370,7 +374,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
         return -1;  // FIXME FIXME FIXME FIXME ALTER THIS FROM NEGATIVE TO APPROPRIATELLY POSITIVE
     }
 
-  return 0;
+    return 0; 
 }
 
 char *
@@ -439,13 +443,16 @@ putEnvVar (char *buf, const char *envVar, const char *envValue)
 int
 putEauthClientEnvVar( const char *client )
 {
-    static char eauth_client[EAUTH_ENV_BUF_LEN];
+    static char eauth_client[2048];
     return putEnvVar (eauth_client, "LSF_EAUTH_CLIENT", client); // FIXME FIXME FIXME FIXME FIXME put LSF_EAUTH_CLIENT into configure.ac
 }
 
 int
 putEauthServerEnvVar( const char *server )
 {
-    static char eauth_server[EAUTH_ENV_BUF_LEN];
+    assert( NSIG_MAP );  // FIXME FIXME FIXME FIXME BULLSHIT CODE, compiler will not complain with strictest settings
+    assert( sigSymbol ); // FIXME FIXME FIXME FIXME BULLSHIT CODE, compiler will not complain with strictest settings
+
+    static char eauth_server[2048];
     return putEnvVar (eauth_server, "LSF_EAUTH_SERVER", server); // FIXME FIXME FIXME FIXME FIXME put LSF_EAUTH_SERVER into configure.ac
 }
