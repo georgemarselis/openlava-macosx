@@ -34,7 +34,7 @@
 #include "lib/host.h"
 
 
-static int lserrno = 0;
+// static int lserrno = 0;
 
 int
 ls_limcontrol (const char *hname, int opCode)

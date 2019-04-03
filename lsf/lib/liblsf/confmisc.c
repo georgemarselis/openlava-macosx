@@ -30,6 +30,7 @@
 #include "lib/getnextline.h"
 #include "lib/syslog.h"
 
+
 char *
 getNextValue (char **line)
 {
@@ -110,6 +111,8 @@ isSectionEnd ( const char *linep, const char *lsfile, size_t *lineNum, const cha
         /* catgets 5401 */
         ls_syslog (LOG_ERR, "5401: %s(%d): section %s ended with wrong section name %s,ignored", lsfile, *lineNum, sectionName, word);    
     }
+
+    lserrno = LSE_NO_ERR; // global, lsf.h
 
     return TRUE;
 }

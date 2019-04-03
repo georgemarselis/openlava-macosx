@@ -46,6 +46,7 @@ void
 inithostsock_ (void)
 {
     hostSock = NULL;
+    lserrno = LSE_NO_ERR;
     return;
 }
 

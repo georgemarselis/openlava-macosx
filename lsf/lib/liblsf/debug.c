@@ -81,6 +81,7 @@ ls_initdebug (char *appName)
     }
 
     free( logMask );
+    lserrno = LSE_NO_ERR;
     return 0;
 
 }

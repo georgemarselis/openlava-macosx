@@ -238,7 +238,7 @@ checkInit ( struct IDLIB_INFO_T *idLib)
 }
 
 int
-getLSFUser_ (char *lsfUserName, unsigned int lsfUserNameSize)
+getLSFUser_ (const char *lsfUserName, unsigned int lsfUserNameSize)
 {
     int rc = 0;
 

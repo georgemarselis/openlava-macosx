@@ -23,7 +23,7 @@
 #include "lib/lproto.h"
 #include "lib/err.h"
 
-int lserrno = LSE_NO_ERR;
+lserrno = LSE_NO_ERR;
 int masterLimDown = FALSE;
 int ls_nerr = LSE_NERR;
 

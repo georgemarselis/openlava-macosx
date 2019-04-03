@@ -60,10 +60,10 @@ struct IDLIB_INFO_T idLib_ = {
 	NULL
 };
 
-int            getLSFUser_       ( char       *lsfUserName,                     unsigned int lsfUserNameSize );
-int            getLSFUserByName_ ( const char *osUserName,  char  *lsfUserName, unsigned int lsfUserNameSize );
-int            getLSFUserByUid_  ( uid_t uid,               char  *lsfUserName, unsigned int lsfUserNameSize );
-int            getOSUserName_    ( const char *lsfUserName, char  *osUserName,  unsigned int osUserNameSize  );
+int            getLSFUser_       ( const char *lsfUserName,                           unsigned int lsfUserNameSize );
+int            getLSFUserByName_ ( const char *osUserName,  const char  *lsfUserName, unsigned int lsfUserNameSize );
+int            getLSFUserByUid_  ( uid_t uid,               const char  *lsfUserName, unsigned int lsfUserNameSize );
+int            getOSUserName_    ( const char *lsfUserName, const char  *osUserName,  unsigned int osUserNameSize  );
 int            getOSUid_         ( const char *lsfUserName, uid_t *uid );
 struct passwd *getpwlsfuser_     ( const char *lsfUserName );
 struct passwd *getpwdirlsfuser_  ( const char *lsfUserName );

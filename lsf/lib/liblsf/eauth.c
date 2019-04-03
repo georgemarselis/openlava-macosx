@@ -30,14 +30,18 @@
 #include <termios.h>
 
 #include "lib/lib.h"
+#include "lib/id.h"
 #include "lib/lproto.h"
 #include "lib/init.h"
 #include "lib/eauth.h"
 #include "lib/rdwr.h"
 #include "lib/misc.h"
+#include "lib/syslog.h"
 #include "lsb/sig.h"    // NSIG 
 #include "daemons/libniosd/niosd.h"
 #include "daemons/libresd/resout.h"
+#include "libint/lsi18n.h"
+
 
 // #define NL_SETN 23
 
@@ -46,9 +50,9 @@
 int
 getAuth_lsf( struct lsfAuth *auth, const char *host )
 {
-  auth->uid = getuid ();
+    auth->uid = getuid ();
 
-  if (getLSFUser_ (auth->lsfUserName, sizeof (auth->lsfUserName)) < 0)
+    if (getLSFUser_ (auth->lsfUserName, sizeof (auth->lsfUserName)) < 0)
     {
       ls_syslog (LOG_DEBUG, I18N_FUNC_FAIL_MM, __func__, "getLSFUser_");
       lserrno = LSE_BADUSER;

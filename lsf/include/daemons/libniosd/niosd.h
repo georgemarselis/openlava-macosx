@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "struct-config_param.h"
 
 // #define NL_SETN         29
 
@@ -126,13 +127,13 @@ int standaloneTaskDone = 0;
 int forwardTSTP = 0;
 
 int cli_nios_fd[2] = {-1, -1 };
-int standalone;
-int niosSbdMode;
-int heartbeatInterval;
-int jobStatusInterval;
-int pendJobTimeout;
-int msgInterval;
-unsigned long jobId;
+// int standalone;
+// int niosSbdMode;
+// int heartbeatInterval;
+// int jobStatusInterval;
+// int pendJobTimeout;
+// int msgInterval;
+// unsigned long jobId;
 
 
 typedef enum

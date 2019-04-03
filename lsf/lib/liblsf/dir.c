@@ -224,6 +224,8 @@ tryPwd ( const char *path, const char *pwdpath)
     char *filename = malloc( strlen( pwdpath ) + 1 ); // FIXME FIXME FIXME FIXME replace  with OS dependent settings @ configure.ac
     char *goodpath = strdup( path );
 
+    lserrno = LSE_NO_ERR; // global, ignore
+
     if (pwdpath == NULL) {
         return -1; // FIXME FIXME FIXME FIXME return an appropriate *positive* value
     }
