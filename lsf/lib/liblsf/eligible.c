@@ -17,6 +17,7 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 #include <strings.h>
 #include <unistd.h>
 
@@ -605,6 +606,6 @@ listtask_ (char ***taskList, struct hTab *tasktb, int sortflag)
 int
 tcomp_ (const void *tlist1, const void *tlist2)
 {
-    return strcmp (*(char **) tlist1, *(char **) tlist2);
-    // return strcmp (  tlist1, tlist2 );
+    // return strcmp (*(char **) tlist1, *(char **) tlist2);
+    return strcmp (  tlist1, tlist2 );
 }
