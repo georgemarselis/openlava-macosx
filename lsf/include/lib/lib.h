@@ -17,7 +17,7 @@
  */
 
 #pragma once
- 
+
 #include "daemons/liblimd/limout.h"
 // #include "daemons/libpimd/pimd.h"
 #include "daemons/libresd/resd.h"
@@ -78,20 +78,6 @@ enum LIST_SIZES {
 //      pemdParams
 //      niosdParams
 
-// typedef enum status genparams_t;
-// #define AUTOMOUNT_LAST_STR  "AMFIRST"      // copied over from lib/lproto.h
-const char AUTOMOUNT_LAST_STR[]  = "AMFIRST"; // copied over from lib/lproto.h
-// #define AUTOMOUNT_NEVER_STR "AMNEVER"      // copied over from lib/lproto.h
-const char AUTOMOUNT_NEVER_STR[] = "AMNEVER"; // copied over from lib/lproto.h
-
-#define AM_LAST  (!(genParams_[LSF_AM_OPTIONS].paramValue && strstr(genParams_[LSF_AM_OPTIONS].paramValue, AUTOMOUNT_LAST_STR)))
-#define AM_NEVER (genParams_[LSF_AM_OPTIONS].paramValue && strstr(genParams_[LSF_AM_OPTIONS].paramValue, AUTOMOUNT_NEVER_STR))
-
-// int AM_LAST  = !( genParams_[ LSF_AM_OPTIONS ].paramValue && strstr( genParams_[ LSF_AM_OPTIONS ].paramValue, "AMFIRST" ) ); // FIXME FIXME FIXME FIXME init early in the init process
-// int AM_NEVER =    genParams_[ LSF_AM_OPTIONS ].paramValue && strstr( genParams_[ LSF_AM_OPTIONS ].paramValue, "AMNEVER" );   // FIXME FIXME FIXME FIXME init early in the init process
-
-// #define LOOP_ADDR       0x7F000001
-unsigned long LOOP_ADDR = 0x7F000001;
 
 
 // #define _NON_BLOCK_         0x01

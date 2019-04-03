@@ -8,7 +8,7 @@
 //*****************************************************************
 // LSF
 
-static enum LSF_PARAMS {
+enum LSF_PARAMS {
     LSF_DEBUG                   = 0,
     LSF_SERVERDIR               = 1,
     LSF_ENVDIR                  = 2, // FIXME FIXME newly inserted variable
