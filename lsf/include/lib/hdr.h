@@ -30,14 +30,14 @@
 
 // openlava 2.0 header breaks compatibility with 1.0 but offers more flexibility and room for growth
 struct LSFHeader { // FIXME FIXME FIXME FIXME FIXME ensure compatibility with Platform LSF
-	unsigned short version;
-	unsigned short reserved0;
-	unsigned short reserved;
-	char paddin1[2];
-	size_t length;
-	short opCode;
-	char   padding2[2];
-	pid_t  refCode; 
+    unsigned short version;
+    unsigned short reserved0;
+    unsigned short reserved;
+    char paddin1[2];
+    size_t length;
+    short opCode;
+    char   padding2[2];
+    pid_t  refCode; 
 };
 
 /* always use this macro to size up memory buffers
@@ -47,63 +47,50 @@ struct LSFHeader { // FIXME FIXME FIXME FIXME FIXME ensure compatibility with Pl
 const unsigned int LSF_HEADER_LEN = sizeof( struct LSFHeader ) ;
 
 struct stringLen {
-	const char *name;
-	size_t len;
+    const char *name;
+    size_t len;
 };
 
 struct lenData {
-	size_t len;
-	char *data;
+    size_t len;
+    char *data;
 };
 
 // #define AUTH_HOST_NT  0x01
 // #define AUTH_HOST_UX  0x02
 enum AUTH_HOST {
-	AUTH_HOST_NT = 0x01,
-	AUTH_HOST_UX = 0x02 
+    AUTH_HOST_NT = 0x01,
+    AUTH_HOST_UX = 0x02 
 } ;
 
 #define EAUTH_SIZE 4096 // FIXME FIXME FIXME FIXME FIXME set value from configure.ac
 // const unsigned int EAUTH_SIZE = 4096;
 struct lsfAuth
 {
-	uid_t uid;
-	uid_t gid;
-	char lsfUserName[MAX_LSF_NAME_LEN]; // FIXME FIXME FIXME change to pointer
-	enum { CLIENT_SETUID, CLIENT_IDENT, CLIENT_DCE, CLIENT_EAUTH } kind;
-	int options;
+    uid_t uid;
+    uid_t gid;
+    char lsfUserName[MAX_LSF_NAME_LEN]; // FIXME FIXME FIXME change to pointer
+    enum { CLIENT_SETUID, CLIENT_IDENT, CLIENT_DCE, CLIENT_EAUTH } kind;
+    int options;
 
-	union authBody {
-		struct eauth {
-			size_t len;
-			char data[EAUTH_SIZE];
-		} eauth;
-		int filler;
-	
-		struct lenData authToken;
-	} k;
+    union authBody {
+        struct eauth {
+            size_t len;
+            char data[EAUTH_SIZE];
+        } eauth;
+        int filler;
+    
+        struct lenData authToken;
+    } k;
 };
 
 
 struct lsfLimit
 {
-  rlim_t rlim_maxh;
-  rlim_t rlim_curl;
-  rlim_t rlim_curh;
-  rlim_t rlim_maxl;
+    rlim_t rlim_maxh;
+    rlim_t rlim_curl;
+    rlim_t rlim_curh;
+    rlim_t rlim_maxl;
 };
 
-
-bool_t xdr_LSFHeader (XDR *, struct LSFHeader *);
-bool_t xdr_packLSFHeader (char *, struct LSFHeader *);
-
-bool_t xdr_encodeMsg (XDR *, char *, struct LSFHeader *, bool_t (*)(), int, struct lsfAuth *);
-
-bool_t xdr_arrayElement (XDR *, char *, struct LSFHeader *, bool_t (*)(), ...);
-bool_t xdr_LSFlong (XDR *, long *);
-bool_t xdr_stringLen (XDR *, struct stringLen *, struct LSFHeader *);
-bool_t xdr_stat (XDR *, struct stat *, struct LSFHeader *);
-bool_t xdr_lsfAuth (XDR *, struct lsfAuth *, struct LSFHeader *);
-int xdr_lsfAuthSize (struct lsfAuth *);
-bool_t xdr_jRusage (XDR *, struct jRusage *, struct LSFHeader *);
 

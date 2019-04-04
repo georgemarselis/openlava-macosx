@@ -32,6 +32,7 @@
 #include "lib/common_structs.h"
 #include "lib/id.h"
 #include "lib/host.h"
+#include "lib/xdrmisc.h"
 
 
 // static int lserrno = 0;

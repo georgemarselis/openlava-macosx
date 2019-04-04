@@ -480,13 +480,13 @@ ls_gethostmodel( const char *hostname )
 //  out: NULL if
 //          hostname is not found
 //          hostinfo for the specified host is not found
-//       float host factor if
+//       double host factor if
 //          hostname and hostinfo are found
-float *
+double *
 ls_gethostfactor( const char *hostname )
 {
     struct hostInfo *hostinfo = NULL;
-    static float cpufactor    = 0.0F;
+    double *cpufactor         = 0;
     char default_param[ ]     = "-";
 
 
@@ -501,14 +501,14 @@ ls_gethostfactor( const char *hostname )
         return NULL;
     }
 
-    cpufactor = hostinfo->cpuFactor;
-    return &cpufactor;
+    *cpufactor = hostinfo->cpuFactor;
+    return cpufactor;
 }
 
-float *
+double *
 ls_getmodelfactor( const char *modelname )
 {
-    static float cpuf = 0.0F;
+    double *cpuf = 0;
     struct stringLen str;
 
     if (!modelname) {
@@ -521,18 +521,18 @@ ls_getmodelfactor( const char *modelname )
 
     str.name = strdup( modelname );
     str.len = MAX_LSF_NAME_LEN;
-    if (callLim_ (LIM_GET_CPUF, &str, xdr_stringLen, &cpuf, xdr_float, NULL, 0, NULL) < 0) {
+    if (callLim_ (LIM_GET_CPUF, &str, xdr_stringLen, cpuf, xdr_float, NULL, 0, NULL) < 0) {
         return NULL;
     }
     
-    return &cpuf;
+    return cpuf;
 }
 
 struct hostInfo *
 expandSHinfo (struct hostInfoReply *hostInfoReply)
 {
-    static unsigned long nHost  = 0;
-    static struct hostInfo *hostInfoPtr = NULL;
+    unsigned long nHost  = 0;
+    struct hostInfo *hostInfoPtr = NULL;
     unsigned long final_counter = 0;
     struct shortLsInfo *lsInfoPtr = NULL;
 
@@ -558,6 +558,7 @@ expandSHinfo (struct hostInfoReply *hostInfoReply)
     for (unsigned long i = 0; i < hostInfoReply->nHost; i++)
     {
         unsigned int indx = 0;
+        const char unknown[ ] = "unknown";
         strcpy (hostInfoPtr[i].hostName, hostInfoReply->hostMatrix[i].hostName);
         hostInfoPtr[i].windows     = hostInfoReply->hostMatrix[i].windows;
         hostInfoPtr[i].maxCpus     = hostInfoReply->hostMatrix[i].maxCpus;
@@ -572,17 +573,31 @@ expandSHinfo (struct hostInfoReply *hostInfoReply)
         hostInfoPtr[i].busyThreshold = hostInfoReply->hostMatrix[i].busyThreshold;
 
         indx = hostInfoReply->hostMatrix[i].hTypeIndx;
-        hostInfoPtr[i].hostType  = (indx == MAX_TYPES) ? "unknown" : lsInfoPtr->hostTypes[indx];
-
-        indx = hostInfoReply->hostMatrix[i].hModelIndx; hostInfoPtr[i].hostModel = (indx == MAX_MODELS) ? "unknown" : lsInfoPtr->hostModels[indx];
-        hostInfoPtr[i].cpuFactor = (indx == MAX_MODELS) ? 1.0 : lsInfoPtr->cpuFactors[indx];
-
-        if (hostInfoReply->hostMatrix[i].nRInt == 0) {
-            hostInfoPtr[i].nRes = expandList_ (&hostInfoPtr[i].resources, hostInfoReply->hostMatrix[i].resClass, lsInfoPtr->resName);
+        if( indx == MAX_TYPES ) {
+        	strcpy( hostInfoPtr[i].hostType,  unknown );
+        	strcpy( hostInfoPtr[i].hostModel, unknown );
+        	hostInfoPtr[i].cpuFactor = 1.0F;
         }
         else {
-            assert( lsInfoPtr->nRes <= INT_MAX);
-            hostInfoPtr[i].nRes = expandList1_ (&hostInfoPtr[i].resources, lsInfoPtr->nRes, hostInfoReply->hostMatrix[i].resBitMaps, lsInfoPtr->resName);
+        	strcpy( hostInfoPtr[i].hostType, lsInfoPtr->hostTypes[indx]);
+        	strcpy( hostInfoPtr[i].hostModel, lsInfoPtr->hostModels[indx] );
+        	hostInfoPtr[i].cpuFactor = lsInfoPtr->cpuFactors[indx];
+        }
+        // hostInfoPtr[i].hostType  = (indx == MAX_TYPES) ? "unknown" : lsInfoPtr->hostTypes[indx];
+        // hostInfoPtr[i].hostModel = (indx == MAX_MODELS) ? "unknown" : lsInfoPtr->hostModels[indx];
+        // hostInfoPtr[i].cpuFactor = (indx == MAX_MODELS) ? 1.0 : lsInfoPtr->cpuFactors[indx];
+
+        if (hostInfoReply->hostMatrix[i].nRInt == 0) {
+            unsigned int resClass = hostInfoReply->hostMatrix[i].resClass;
+            assert( resClass < INT_MAX );
+            hostInfoPtr[i].nRes = expandList_ (&hostInfoPtr[i].resources, (int) resClass, lsInfoPtr->resName);
+        }
+        else {
+            unsigned int nRes = lsInfoPtr->nRes;
+            unsigned int *resBitMaps = hostInfoReply->hostMatrix[i].resBitMaps;
+            assert( nRes <= INT_MAX);
+            assert( *resBitMaps <= INT_MAX );
+            hostInfoPtr[i].nRes = expandList1_ (&hostInfoPtr[i].resources, (int) nRes, (int *) resBitMaps, lsInfoPtr->resName);
         }
 
         final_counter = i;
@@ -604,7 +619,7 @@ expandSHinfo (struct hostInfoReply *hostInfoReply)
 }
 
 struct hostInfo *
-ls_gethostinfo (char *resReq, size_t *numhosts, char **hostlist, size_t listsize, int options)
+ls_gethostinfo (char *resReq, size_t *numhosts, const char **hostlist, size_t listsize, int options)
 {
     char *hname = NULL;
     int cc = 0;
@@ -746,7 +761,7 @@ ls_indexnames (struct lsInfo *lsInfo)
     FREEUP (indicies);
 
     for ( unsigned int i = 0, j = 0; i < lsInfo->nRes; i++) {
-        if ((lsInfo->resTable[i].flags & RESF_DYNAMIC) && (lsInfo->resTable[i].flags & RESF_GLOBAL)) {
+        if ((lsInfo->resTable[i]->flags & RESF_DYNAMIC) && (lsInfo->resTable[i]->flags & RESF_GLOBAL)) {
             j++;
             lastElement = j;
         }
@@ -759,8 +774,8 @@ ls_indexnames (struct lsInfo *lsInfo)
     }
 
     for ( unsigned int i = 0, j = 0; i < lsInfo->nRes; i++) {
-        if ((lsInfo->resTable[i].flags & RESF_DYNAMIC) && (lsInfo->resTable[i].flags & RESF_GLOBAL)) {
-            indicies[j] = lsInfo->resTable[i].name;
+        if ((lsInfo->resTable[i]->flags & RESF_DYNAMIC) && (lsInfo->resTable[i]->flags & RESF_GLOBAL)) {
+            indicies[j] = strdup( lsInfo->resTable[i]->name );
             j++;
             lastElement = j;
         }
@@ -773,7 +788,9 @@ ls_indexnames (struct lsInfo *lsInfo)
 int
 ls_isclustername ( const char *name)
 {
-  char *clname = NULL;
+    char *clname = NULL;
+
+    assert( chanMaxSize ); // NOTE BULLSHIT OP for the compiler to stop complaining 
 
     clname = ls_getclustername ();
     if (clname && strcmp (clname, name) == 0) {
@@ -804,7 +821,7 @@ ls_sharedresourceinfo (char **resources, unsigned int *numResources, const char 
         resourceInfoReply.numResources = 0;
         resourceInfoReq.resourceNames = NULL;
         resourceInfoReq.numResourceNames = 0;
-        resourceInfoReq.hostName = NULL;
+        resourceInfoReq.hostname = NULL;
         first = FALSE;
     }
 
@@ -813,7 +830,7 @@ ls_sharedresourceinfo (char **resources, unsigned int *numResources, const char 
     }
 
     FREEUP (resourceInfoReq.resourceNames);
-    FREEUP (resourceInfoReq.hostName);
+    resourceInfoReq.hostname = NULL;
 
     if (numResources == NULL || (resources == NULL && *numResources > 0))
     {
@@ -828,7 +845,7 @@ ls_sharedresourceinfo (char **resources, unsigned int *numResources, const char 
             lserrno = LSE_MALLOC;
             return NULL;
         }
-        resourceInfoReq.resourceNames[0] = "";
+        strcpy( resourceInfoReq.resourceNames[0], "" );
         resourceInfoReq.numResourceNames = 1;
     }
     else
@@ -863,14 +880,14 @@ ls_sharedresourceinfo (char **resources, unsigned int *numResources, const char 
             return NULL;
         }
 
-        resourceInfoReq.hostName = putstr_ (hostName);
+        resourceInfoReq.hostname = putstr_ (hostName);
     }
     else {
-        resourceInfoReq.hostName = putstr_ (" ");
+        resourceInfoReq.hostname = putstr_ (" ");
     }
 
 
-    if (resourceInfoReq.hostName == NULL)
+    if (resourceInfoReq.hostname == NULL)
     {
         lserrno = LSE_MALLOC;
         return NULL;

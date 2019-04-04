@@ -25,12 +25,8 @@
 #include <time.h>
 
 #include "lib/lib.h"
-#include "lib/lproto.h"
 #include "lib/xdr.h"
-
-bool_t my_xdr_float( XDR *xdrs, float *fp );
-bool_t xdr_pidInfo (XDR *xdrs, struct pidInfo *pidInfo, struct LSFHeader *hdr);
-
+#include "lib/xdrmisc.h"
 
 bool_t
 xdr_LSFlong (XDR * xdrs, long *l)
