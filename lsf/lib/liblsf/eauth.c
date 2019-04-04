@@ -40,6 +40,7 @@
 #include "lib/structs/genParams.h"
 #include "lib/esub.h"
 #include "lib/sig.h"
+#include "lib/info.h"
 
 // #define NL_SETN 23
 

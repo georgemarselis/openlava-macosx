@@ -47,7 +47,7 @@ struct LSFHeader { // FIXME FIXME FIXME FIXME FIXME ensure compatibility with Pl
 const unsigned int LSF_HEADER_LEN = sizeof( struct LSFHeader ) ;
 
 struct stringLen {
-	char *name;
+	const char *name;
 	size_t len;
 };
 

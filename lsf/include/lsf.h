@@ -1079,22 +1079,22 @@ int ls_loadadj  (char *resreq, struct placeInfo *hostlist, size_t listsize);
 
 // char **ls_findmyconnections (void);
 int ls_lostconnection (void);
-char *ls_getclustername (void);
-struct clusterInfo *ls_clusterinfo (char *resReq, unsigned int *numclusters, char **clusterList, int listsize, int options);
-struct lsSharedResourceInfo *ls_sharedresourceinfo (char **resources, unsigned int *numResources, char *hostName, int options);
-char *ls_getmastername (void);
-char *ls_getmastername2 (void);
-struct hostInfo *ls_gethostinfo (char *resReq, size_t *numhosts, char **hostlist, size_t listsize, int options);
+// char *ls_getclustername (void);
+// struct clusterInfo *ls_clusterinfo (char *resReq, unsigned int *numclusters, char **clusterList, int listsize, int options);
+// struct lsSharedResourceInfo *ls_sharedresourceinfo (char **resources, unsigned int *numResources, char *hostName, int options);
+// char *ls_getmastername (void);
+// char *ls_getmastername2 (void);
+// struct hostInfo *ls_gethostinfo (char *resReq, size_t *numhosts, char **hostlist, size_t listsize, int options);
 char *ls_getISVmode (void);
 
-struct lsInfo *ls_info (void);
+// struct lsInfo *ls_info (void);
 
-char **ls_indexnames (struct lsInfo *);
-int ls_isclustername (char *);
-char *ls_gethosttype (char *hostname);
-float *ls_getmodelfactor (char *modelname);
-float *ls_gethostfactor (char *hostname);
-char *ls_gethostmodel (char *hostname);
+// char **ls_indexnames (struct lsInfo *);
+// int ls_isclustername (char *);
+// char *ls_gethosttype (char *hostname);
+// float *ls_getmodelfactor (char *modelname);
+// float *ls_gethostfactor (char *hostname);
+// char *ls_gethostmodel (char *hostname);
 // int ls_lockhost (time_t duration);
 // int ls_unlockhost (void);
 // int ls_limcontrol (char *hostname, int opCode);

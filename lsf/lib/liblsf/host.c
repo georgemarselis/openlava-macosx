@@ -31,6 +31,7 @@
 #include "lib/initenv.h"
 #include "lib/words.h"
 #include "lib/misc.h"
+#include "lib/info.h"
 #include "lib/structs/genParams.h"
 
 

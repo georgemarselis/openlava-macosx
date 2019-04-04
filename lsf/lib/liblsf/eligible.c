@@ -29,6 +29,7 @@
 #include "lib/eligible.h"
 #include "lib/initenv.h"
 #include "lib/syntax.h"
+#include "lib/info.h"
 #include "lib/structs/genParams.h"
 
 
