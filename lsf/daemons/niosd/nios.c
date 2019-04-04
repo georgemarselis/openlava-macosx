@@ -42,7 +42,7 @@
 int
 main (int argc, char **argv)
 {
-  char __func__] = "nios/main()";
+  // char __func__] = "nios/main()";
   ushort port;
   int asock;
   socklen_t len;
@@ -1867,7 +1867,7 @@ JobExitInfo (void)
     }
 
 
-  for (i = 1; i < NSIG; i++)
+  for (i = 1; i < SIGRTMAX; i++)
     {
       Signal_ (i, SIG_DFL);
     }

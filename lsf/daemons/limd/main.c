@@ -878,7 +878,7 @@ void
 startPIM (int argc, char **argv)
 {
   char *pargv[16];
-  int i;
+  // int i;
   static time_t lastTime = 0;
 
   if (time (NULL) - lastTime < 60 * 2)
@@ -898,7 +898,7 @@ startPIM (int argc, char **argv)
   if (lim_debug > 1)
     {
 
-      for (i = 3; i < sysconf (_SC_OPEN_MAX); i++)
+      for ( unsigned int i = 3; i < sysconf (_SC_OPEN_MAX); i++)
     close (i);
 
     }
@@ -908,10 +908,10 @@ startPIM (int argc, char **argv)
     close (i);
     }
 
-  for (i = 1; i < NSIG; i++)
+  for ( unsigned int i = 1; i < SIGRTMAX; i++)
     Signal_ (i, SIG_DFL);
 
-  for (i = 1; i < argc; i++)
+  for ( unsigned int i = 1; i < argc; i++)
     pargv[i] = argv[i];
 
   pargv[i] = NULL;

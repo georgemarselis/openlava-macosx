@@ -11,8 +11,8 @@
 // #define NL_SETN   23 
 
 /* esub.c */
-int   runEsub_   (struct lenData *ed, char *path);
-int   runEClient_(struct lenData *ed, char **argv);
-int   getEData   (struct lenData *ed, char **argv, const char *lsfUserName);
-int   runEexec_  (char *option, int job, struct lenData *eexec, const char *path);
-char *runEGroup_ (char *type, char *gname);
+int   runEsub_   ( struct lenData *ed, const char *path );
+int   runEClient_( struct lenData *ed, char **argv );
+int   getEData   ( struct lenData *ed, char **argv, const char *lsfUserName );
+int   runEexec_  ( char *option, unsigned int job, struct lenData *eexec, const char *path );
+char *runEGroup_ ( char *type, char *gname );

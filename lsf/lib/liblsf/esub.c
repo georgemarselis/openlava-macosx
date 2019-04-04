@@ -19,12 +19,21 @@
 #include <termios.h>
 #include <limits.h>
 #include <stdlib.h>
+#include <signal.h>
 #include <sys/wait.h>
 #include <pwd.h>
 
 #include "lib/lib.h"
 #include "lib/lproto.h"
 #include "lib/mls.h"
+#include "lib/syslog.h"
+#include "lib/esub.h"
+#include "lib/id.h"
+#include "lib/init.h"
+#include "lib/sig.h"
+#include "lib/rdwr.h"
+#include "libint/lsi18n.h"
+#include "lib/structs/genParams.h"
 #include "daemons/libniosd/niosd.h"
 #include "daemons/libresd/resout.h"
 
@@ -36,23 +45,27 @@ runEsub_ (struct lenData *ed, const char *path)
     char esub[MAX_PATH_LEN];
     char *myargv[6];
     struct stat sbuf;
+    char ESUB[] = "esub";
+
+    assert( NSIG_MAP );  // bullshit OP, make the compiler stop complaining
+    assert( sigSymbol ); // bullshit OP, make the compiler stop complaining
 
     ed->len = 0;
     ed->data = NULL;
 
     myargv[0] = esub;
     if (path == NULL) {
-        sprintf (esub, "%s/%s", genParams_[LSF_SERVERDIR].paramValue, ESUBNAME);
+        sprintf (esub, "%s/%s", genParams_[LSF_SERVERDIR].paramValue, ESUB);
         myargv[1] = NULL;
     }
     else {
         if (*path == '\0') {
-            strcpy (esub, ESUBNAME);
+            strcpy (esub, ESUB);
         }
         else {
-            sprintf (esub, "%s/%s", path, ESUBNAME);
+            sprintf (esub, "%s/%s", path, ESUB);
         }
-        myargv[1] = "-r";
+        strcpy( myargv[1], "-r"); // FIXME FIXME FIXME FIXME FIXME someone sure loves his default arguments
         myargv[2] = NULL;
     }
 
@@ -88,7 +101,7 @@ runEClient_ (struct lenData *ed, char **argv)
     return getEData (ed, argv, lsfUserName);
 }
 
-static int
+int
 getEData (struct lenData *ed, char **argv, const char *lsfUserName)
 {
     int ePorts[2]  = { 0, 0 };
@@ -121,7 +134,8 @@ getEData (struct lenData *ed, char **argv, const char *lsfUserName)
         close (ePorts[0]);
         dup2 (ePorts[1], 1);
 
-        lsfSetXUid(0, uid, uid, -1, setuid);
+        // lsfSetXUid(0, uid, uid, -1, setuid);
+        lsfSetXUid(0, uid, uid, INT_MAX, setuid); // the 4th argument, INT_MAX here is totally ignored in the body of the function
 
         lsfExecX( NULL, &argv[0], execvp);
         ls_syslog (LOG_DEBUG, "%s: execvp(%s) failed: %m", __func__, argv[0]);
@@ -178,7 +192,7 @@ getEData (struct lenData *ed, char **argv, const char *lsfUserName)
             }
 
             /* catgets 5552 */
-            ls_syslog (LOG_ERR, I18N (5552, "%s: <%s> read(%d): %m"), __func__, argv[0], size);
+            ls_syslog( LOG_ERR, "catgets 5552: %s: <%s> read(%d): %m", __func__, argv[0], size );
             break;
         }
     }
@@ -270,6 +284,7 @@ runEexec_ (char *option, unsigned int job, struct lenData *eexec, const char *pa
     char    eexecPath[MAX_FILENAME_LEN];
     char    *myargv[3];
     struct  stat sbuf;
+    const char EEXECNAME[] = "eexec";
 
 
 
@@ -287,7 +302,7 @@ runEexec_ (char *option, unsigned int job, struct lenData *eexec, const char *pa
         }
     }
     else {
-      sprintf (eexecPath, "%s/%s", genParams_[LSF_SERVERDIR].paramValue, EEXECNAME);
+        sprintf (eexecPath, "%s/%s", genParams_[LSF_SERVERDIR].paramValue, EEXECNAME);
     }
 
     if (logclass & LC_TRACE) {
@@ -306,7 +321,8 @@ runEexec_ (char *option, unsigned int job, struct lenData *eexec, const char *pa
     //i = 0;
     myargv[0] = eexecPath;
     if (strcmp (option, "-r") == 0) {
-        myargv[1] = "-r";
+        myargv[1] = malloc( sizeof(char)*strlen("-r") + 1 );
+        strcpy( myargv[1], "-r");
     }
     myargv[2] = NULL;
 
@@ -342,7 +358,7 @@ runEexec_ (char *option, unsigned int job, struct lenData *eexec, const char *pa
           
         }
 
-        if ( lsfSetXUid(0, uid, uid, -1, setuid) < 0) {
+        if ( lsfSetXUid(0, uid, uid, INT_MAX, setuid) < 0) { // FIXME FIXME the 4th arguement is ignored in the body of the function, so, passing INT_MAX as a sentinel flag is fine.
             ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "setuid", uid);  // FIXME FIXME FIXME FIXME add to configure.ac
             exit (-1);
         }
@@ -352,7 +368,7 @@ runEexec_ (char *option, unsigned int job, struct lenData *eexec, const char *pa
             exit (-1);
         }
 
-        for ( int i = 1; i < NSIG; i++) { // NSIG is in <signal.h>
+        for ( int i = 1; i < SIGRTMAX; i++) { // NSIG is in <signal.h>
             Signal_ (i, SIG_DFL); 
         }
 
@@ -407,8 +423,9 @@ runEGroup_ (char *type, char *gname)
     char egroupPath[MAX_FILENAME_LEN];
     char *argv[4] = { NULL, NULL, NULL, NULL };
     char *managerIdStr = NULL;
-    uid_t uid = -1;
+    uid_t uid = INT_MAX;
     struct stat sbuf;
+    char EGROUPNAME[ ] = "egroup";
 
     sprintf (egroupPath, "%s/%s", genParams_[LSF_SERVERDIR].paramValue, EGROUPNAME);
 

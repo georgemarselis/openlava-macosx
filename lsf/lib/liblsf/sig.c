@@ -59,7 +59,7 @@ sig_decode (int sig)
 
 	if (sig >= (int) NSIG_MAP)  // FIXME FIXME FIXME the cast has to go; does sig below need to be negative at any point? if no, remove cast, change function param
 	{
-		if (sig < NSIG) {  // NSIG is in <signal.h>
+		if (sig < SIGRTMAX) {  // NSIG is in <signal.h>
 			return sig;
 		}
 		else
@@ -86,7 +86,7 @@ getSigVal (char *sigString)
 
 	if (isint_ (sigString) == TRUE)
 	{
-		if ((sigVal = atoi (sigString)) > NSIG) {
+		if ((sigVal = atoi (sigString)) > SIGRTMAX) {
 			return -1;
 		}
 		else {

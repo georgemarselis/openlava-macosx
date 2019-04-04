@@ -196,18 +196,13 @@ printLong (struct parameterInfo *reply)
 
   if (reply->jobDepLastSub == 1)
     {
-      printf ("%s:\n", I18N (2464, "Used with job dependency scheduling"))	/*
-										   catgets 2464 */ ;
+      printf ("%s:\n", I18N (2464, "Used with job dependency scheduling"));	/*catgets 2464 */
       printf ("    JOB_DEP_LAST_SUB = %d \n\n", reply->jobDepLastSub);
     }
 
 
-  printf ("%s:\n",
-	  I18N (2422,
-		"The Maximum JobId defined in the system" /* catgets 2422 */
-		));
-  printf (I18N (2426, "    MAX_JOBID = %d\n\n"), /* catgets 2426 */
-	  reply->maxJobId);
+  printf ("%s:\n", I18N (2422,	"The Maximum JobId defined in the system" )); /* catgets 2422 */
+  printf (I18N (2426, "    MAX_JOBID = %d\n\n"),  reply->maxJobId); /* catgets 2426 */
 
 
   if (reply->maxAcctArchiveNum > 0)

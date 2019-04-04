@@ -120,7 +120,7 @@ fileNumbers (char *inputstr, struct bhistReq *Req)
       if (!isint_ (inputstr) || (Req->numLogFile = atoi (inputstr)) < 0)
     {
       fprintf (stderr, "bhist: ");
-      fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 3176, "The number of event log files must be a positive integer.\n")));    /* catgets  3176  */
+      fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 3176, "The number of event log files must be a positive integer.\n")));    /* catgets 3176  */
       exit (-1);
     }
     }
@@ -141,7 +141,7 @@ fileNumbers (char *inputstr, struct bhistReq *Req)
       || (Req->numLogFile = atoi (second)) < 0)
     {
       fprintf (stderr, "bhist: ");
-      fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 3267, "The numbers of both event log files must be positive integers.\n")));   /* catgets  3267  */
+      fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 3267, "The numbers of both event log files must be positive integers.\n")));   /* catgets 3267  */
       exit (-1);
     }
 
@@ -150,7 +150,7 @@ fileNumbers (char *inputstr, struct bhistReq *Req)
       if (Req->numMinLogFile > Req->numLogFile)
     {
       fprintf (stderr, "bhist: ");
-      fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 3297, "The value of min_logfile should not exceed the value of max_logfile\n")));  /* catgets  3297  */
+      fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 3297, "The value of min_logfile should not exceed the value of max_logfile\n")));  /* catgets 3297  */
       exit (-1);
     }
 
@@ -196,7 +196,7 @@ main (int argc, char **argv)
 
       if (!foundJob)
     {
-      printf ((_i18n_msg_get (ls_catd, NL_SETN, 3160, "No matching job/event found\n")));   /* catgets  3160  */
+      printf ((_i18n_msg_get (ls_catd, NL_SETN, 3160, "No matching job/event found\n")));   /* catgets 3160  */
       exit (-1);
     }
       else
@@ -209,9 +209,9 @@ main (int argc, char **argv)
   if (!foundJob)
     {
       if (Req.options & OPT_ARRAY_INFO)
-    printf ((_i18n_msg_get (ls_catd, NL_SETN, 3161, "No matching job array found\n"))); /* catgets  3161  */
+    printf ((_i18n_msg_get (ls_catd, NL_SETN, 3161, "No matching job array found\n"))); /* catgets 3161  */
       else
-    printf ((_i18n_msg_get (ls_catd, NL_SETN, 3162, "No matching job found\n")));   /* catgets  3162  */
+    printf ((_i18n_msg_get (ls_catd, NL_SETN, 3162, "No matching job found\n")));   /* catgets 3162  */
 
       exit (-1);
     }
@@ -329,8 +329,8 @@ do_options (int argc, char **argv, struct bhistReq *bhistReq)
       bhistReq->options |= OPT_ELOGFILE;
       if (bhistReq->options & OPT_NUMLOGFILE)
         {
-          fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 3164, "Cannot use option %s together with %s.\n")), "'-f'", "'-n'");   /* catgets  3164  */
-          return (-1);
+          fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 3164, "Cannot use option %s together with %s.\n")), "'-f'", "'-n'");   /* catgets 3164  */
+          return -1;
         }
       if (optarg && strlen (optarg) < MAX_FILENAME_LEN - 1)
         {
@@ -339,8 +339,8 @@ do_options (int argc, char **argv, struct bhistReq *bhistReq)
         }
       else
         {
-          fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 3166, "%s : Bad event file name.\n")), optarg);    /* catgets  3166  */
-          return (-1);
+          fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 3166, "%s : Bad event file name.\n")), optarg);    /* catgets 3166  */
+          return -1;
         }
     case 'u':
       if (strcmp (optarg, "all") == 0)
@@ -379,8 +379,8 @@ do_options (int argc, char **argv, struct bhistReq *bhistReq)
       else
         {
           fprintf (stderr, "%s, : ", optarg);
-          fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 3167, "project name too long.\n")));   /* catgets  3167  */
-          return (-1);
+          fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 3167, "project name too long.\n")));   /* catgets 3167  */
+          return -1;
         }
       break;
 
@@ -390,14 +390,14 @@ do_options (int argc, char **argv, struct bhistReq *bhistReq)
       bhistReq->options |= OPT_HOST;
       if ((hp = Gethostbyname_ (optarg)) == NULL)
         {
-          fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 3168, "Warning: <%s> is not a valid hostname\n")), /* catgets  3168  */
+          fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 3168, "Warning: <%s> is not a valid hostname\n")), /* catgets 3168  */
                optarg);
           if (strlen (optarg) < MAXHOSTNAMELEN - 1)
         strcpy (bhistReq->checkHost, optarg);
           else
         {
-          fprintf (stderr, "%s : %s.\n", optarg, (_i18n_msg_get (ls_catd, NL_SETN, 3169, "Bad host name")));    /* catgets  3169  */
-          return (-1);
+          fprintf (stderr, "%s : %s.\n", optarg, (_i18n_msg_get (ls_catd, NL_SETN, 3169, "Bad host name")));    /* catgets 3169  */
+          return -1;
         }
         }
       else
@@ -416,7 +416,7 @@ do_options (int argc, char **argv, struct bhistReq *bhistReq)
       else
         {
           fprintf (stderr, "%s : %s.\n", optarg, _i18n_msg_get (ls_catd, NL_SETN, 3170, "Bad queue name")); /* catgets 3170 */
-          return (-1);
+          return -1;
         }
     case 'C':
       bhistReq->options |= OPT_COMPLETE;
@@ -431,7 +431,7 @@ do_options (int argc, char **argv, struct bhistReq *bhistReq)
       if (getBEtime (optarg, 't', bhistReq->endTime) == -1)
         {
           ls_perror (optarg);
-          return (-1);
+          return -1;
         }
 
       break;
@@ -440,7 +440,7 @@ do_options (int argc, char **argv, struct bhistReq *bhistReq)
       if (getBEtime (optarg, 't', bhistReq->submitTime) == -1)
         {
           ls_perror (optarg);
-          return (-1);
+          return -1;
         }
       break;
     case 'D':
@@ -448,7 +448,7 @@ do_options (int argc, char **argv, struct bhistReq *bhistReq)
       if (getBEtime (optarg, 't', bhistReq->startTime) == -1)
         {
           ls_perror (optarg);
-          return (-1);
+          return -1;
         }
       break;
 
@@ -459,8 +459,8 @@ do_options (int argc, char **argv, struct bhistReq *bhistReq)
           if ((!isanumber_ (optarg)) ||
           ((bhistReq->cpuFactor = atof (optarg)) <= 0))
         {
-          fprintf (stderr, "<%s> %s.\n", optarg, (_i18n_msg_get (ls_catd, NL_SETN, 3171, "neither a host model, nor a host name, nor a CPU factor")));  /* catgets  3171  */
-          return (-1);
+          fprintf (stderr, "<%s> %s.\n", optarg, (_i18n_msg_get (ls_catd, NL_SETN, 3171, "neither a host model, nor a host name, nor a CPU factor")));  /* catgets 3171  */
+          return -1;
         }
       if (tempPtr)
         bhistReq->cpuFactor = *tempPtr;
@@ -475,7 +475,7 @@ do_options (int argc, char **argv, struct bhistReq *bhistReq)
       if (getBEtime (optarg, 't', bhistReq->searchTime) == -1)
         {
           ls_perror (optarg);
-          return (-1);
+          return -1;
         }
       break;
 
@@ -488,14 +488,14 @@ do_options (int argc, char **argv, struct bhistReq *bhistReq)
 
       if ((numJobs = getSpecIdxs (bhistReq->jobName, &idxList)) == 0
           && idxerrno != 0)
-        return (-1);
+        return -1;
       break;
     case 'n':
       bhistReq->options |= OPT_NUMLOGFILE;
       if (bhistReq->options & OPT_ELOGFILE)
         {
-          fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 3164, "Cannot use option %s together with %s.\n")), "'-n'", "'-f'");   /* catgets  3164  */
-          return (-1);
+          fprintf (stderr, (_i18n_msg_get (ls_catd, NL_SETN, 3164, "Cannot use option %s together with %s.\n")), "'-n'", "'-f'");   /* catgets 3164  */
+          return -1;
         }
       fileNumbers (optarg, bhistReq);
       if (bhistReq->numLogFile == 0)
@@ -527,7 +527,7 @@ do_options (int argc, char **argv, struct bhistReq *bhistReq)
       bhistReq->searchTime[1] = defaultTime[1];
     }
 
-      return (0);
+      return 0
     }
 
 
@@ -597,7 +597,7 @@ do_options (int argc, char **argv, struct bhistReq *bhistReq)
         || ((bhistReq->options & OPT_EXIT) != OPT_EXIT))
       bhistReq->options |= OPT_ALL;
       }
-  return (0);
+  return 0
 
 }
 
@@ -612,10 +612,10 @@ getEventStatus (struct eventRecord *event)
   switch (event->jStatus & (JOB_STAT_PDONE | JOB_STAT_PERR))
     {
     case JOB_STAT_PDONE:
-      strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3174, "Post job process done successfully")));  /* catgets  3174  */
+      strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3174, "Post job process done successfully")));  /* catgets 3174  */
       break;
     case JOB_STAT_PERR:
-      strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3175, "Post job process failed" /* catgets  3175  */
+      strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3175, "Post job process failed" /* catgets 3175  */
                )));
       break;
     }
@@ -631,7 +631,7 @@ getEventStatus (struct eventRecord *event)
       break;
     case JOB_STAT_PEND:
       LS_STATUS (wStatus) = event->exitStatus;
-      sprintf (status, (_i18n_msg_get (ls_catd, NL_SETN, 3178, "Pending:%s")), lsb_pendreason (1, &event->reasons,  /* catgets  3178  */
+      sprintf (status, (_i18n_msg_get (ls_catd, NL_SETN, 3178, "Pending:%s")), lsb_pendreason (1, &event->reasons,  /* catgets 3178  */
                                                    NULL,
                                                    event->
                                                    ld));
@@ -643,66 +643,66 @@ getEventStatus (struct eventRecord *event)
       sp = status;
       while (*sp != '\n')
         sp++;
-      sprintf (sp, (_i18n_msg_get (ls_catd, NL_SETN, 3179, "(exit code %d)\n")), WEXITSTATUS (wStatus));    /* catgets  3179  */
+      sprintf (sp, (_i18n_msg_get (ls_catd, NL_SETN, 3179, "(exit code %d)\n")), WEXITSTATUS (wStatus));    /* catgets 3179  */
     }
       break;
     case JOB_STAT_RUN:
-      strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3180, "Running"))); /* catgets  3180  */
+      strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3180, "Running"))); /* catgets 3180  */
       break;
     case JOB_STAT_RUN | JOB_STAT_WAIT:
-      strcpy (status, I18N (3427, "Waiting"));  /* catgets  3427  */
+      strcpy (status, I18N (3427, "Waiting"));  /* catgets 3427  */
       break;
     case JOB_STAT_SSUSP:
 
       if (event->reasons & SUSP_RES_LIMIT)
     {
-      sprintf (status, "%s: %s", _i18n_msg_get (ls_catd, NL_SETN, 3196, "Terminated"),  /* catgets  3196  */
+      sprintf (status, "%s: %s", _i18n_msg_get (ls_catd, NL_SETN, 3196, "Terminated"),  /* catgets 3196  */
            lsb_suspreason ((event->reasons & ~SUSP_MBD_LOCK),
                    event->subreasons, event->ld));
     }
       else
     {
-      sprintf (status, "%s: %s", _i18n_msg_get (ls_catd, NL_SETN, 3181, "Suspended"),   /* catgets  3181  */
+      sprintf (status, "%s: %s", _i18n_msg_get (ls_catd, NL_SETN, 3181, "Suspended"),   /* catgets 3181  */
            lsb_suspreason ((event->reasons & ~SUSP_MBD_LOCK),
                    event->subreasons, event->ld));
     }
       break;
     case JOB_STAT_USUSP:
-      strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3182, "Suspended by the user or administrator")));  /* catgets  3182  */
+      strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3182, "Suspended by the user or administrator")));  /* catgets 3182  */
       break;
     case JOB_STAT_PSUSP:
-      strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3183, "Suspended by the user or administrator while pending")));    /* catgets  3183  */
+      strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3183, "Suspended by the user or administrator while pending")));    /* catgets 3183  */
       break;
     case JOB_STAT_UNKWN:
-      strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3184, "Unknown; unable to reach the execution host"))); /* catgets  3184  */
+      strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3184, "Unknown; unable to reach the execution host"))); /* catgets 3184  */
       break;
     case JOB_STAT_EXIT:
       if (event->reasons & EXIT_ZOMBIE)
     {
-      strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3185, "Execution host unavailable; job is killed")));   /* catgets  3185  */
+      strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3185, "Execution host unavailable; job is killed")));   /* catgets 3185  */
     }
       else if (event->reasons & EXIT_KILL_ZOMBIE)
-    strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3186, "Termination request issued; but unable to reach the execution host")));    /* catgets  3186  */
+    strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3186, "Termination request issued; but unable to reach the execution host")));    /* catgets 3186  */
       else if (event->reasons & EXIT_ZOMBIE_JOB)
-    strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3187, "sbatchd startup; kill ZOMBIE job")));  /* catgets  3187  */
+    strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3187, "sbatchd startup; kill ZOMBIE job")));  /* catgets 3187  */
       else if (event->reasons & EXIT_RERUN)
-    strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3188, "Exited; job will be requeued and rerun")));    /* catgets  3188  */
+    strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3188, "Exited; job will be requeued and rerun")));    /* catgets 3188  */
       else if (event->reasons & EXIT_NO_MAPPING)
-    strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3189, "Exited; remote job has no user mapping for the local cluster")));  /* catgets  3189  */
+    strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3189, "Exited; remote job has no user mapping for the local cluster")));  /* catgets 3189  */
       else if (event->reasons & EXIT_INIT_ENVIRON)
-    strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3191, "Exited; remote job cannot run locally because of environment problem")));  /* catgets  3191  */
+    strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3191, "Exited; remote job cannot run locally because of environment problem")));  /* catgets 3191  */
       else if (event->reasons & EXIT_PRE_EXEC)
-    strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3192, "Exited; remote job's pre-exec command failed")));  /* catgets  3192  */
+    strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3192, "Exited; remote job's pre-exec command failed")));  /* catgets 3192  */
       else if (event->reasons & EXIT_REMOVE)
     strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3428, "Exited; job has been forced to exit")));   /* catgets 3428  */
       else
-    strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3193, "Exited")));    /* catgets  3193  */
+    strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3193, "Exited")));    /* catgets 3193  */
       break;
     case JOB_STAT_DONE:
-      strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3194, "Done successfully")));   /* catgets  3194  */
+      strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3194, "Done successfully")));   /* catgets 3194  */
       break;
     default:
-      strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3195, "Unknown"))); /* catgets  3195  */
+      strcpy (status, (_i18n_msg_get (ls_catd, NL_SETN, 3195, "Unknown"))); /* catgets 3195  */
       break;
     }
 
@@ -720,21 +720,21 @@ skip_jobRecord (struct jobRecord *jobRecord, struct bhistReq *Req)
   options = Req->options;
 
   if (!matchJobId (Req, jobRecord->job->jobId))
-    return (TRUE);
+    return TRUE;
   if (((options & OPT_ALLUSERS) != OPT_ALLUSERS) &&
       (strcmp (jobRecord->job->user, Req->userName)))
-    return (TRUE);
+    return TRUE;
 
   if (((options & OPT_ALLPROJ) != OPT_ALLPROJ) &&
       (strcmp (jobRecord->job->submit.projectName, Req->projectName)))
-    return (TRUE);
+    return TRUE;
 
   if (options & OPT_ARRAY_INFO)
     {
       if (strchr (jobRecord->job->submit.jobName, '[') == NULL)
-    return (TRUE);
+    return TRUE;
       else
-    return (FALSE);
+    return FALSE;
     }
   if ((options & OPT_ALL) != OPT_ALL && !(options & OPT_CHRONICLE))
     {
@@ -753,22 +753,22 @@ skip_jobRecord (struct jobRecord *jobRecord, struct bhistReq *Req)
             currentStatus & (JOB_STAT_SSUSP | JOB_STAT_USUSP)))
         || ((options & OPT_RUN)
             && (jobRecord->currentStatus & JOB_STAT_RUN))))
-        return (TRUE);
+        return TRUE;
     }
       else
     {
       if (jobRecord->currentStatus & (JOB_STAT_DONE | JOB_STAT_EXIT))
-        return (TRUE);
+        return TRUE;
     }
     }
 
   if ((options & OPT_QUEUE) &&
       (strcmp (jobRecord->job->submit.queue, Req->queue) != 0))
-    return (TRUE);
+    return TRUE;
   if (options & OPT_HOST)
     {
       if (jobRecord->job->startTime == 0)
-    return (TRUE);
+    return TRUE;
       for (i = 0; i < jobRecord->job->numExHosts; i++)
     {
       if (strcmp (jobRecord->job->exHosts[i], Req->checkHost) == 0)
@@ -778,37 +778,37 @@ skip_jobRecord (struct jobRecord *jobRecord, struct bhistReq *Req)
         }
     }
       if (found == FALSE)
-    return (TRUE);
+    return TRUE;
     }
 
   if (options & OPT_COMPLETE)
     {
       if (jobRecord->job->endTime == 0)
-    return (TRUE);
+    return TRUE;
       if ((jobRecord->job->endTime < Req->endTime[0]) ||
       (jobRecord->job->endTime > Req->endTime[1]))
-    return (TRUE);
+    return TRUE;
     }
 
   if (options & OPT_SUBMIT)
     {
       if (jobRecord->job->submitTime == 0)
-    return (TRUE);
+    return TRUE;
       if ((jobRecord->job->submitTime < Req->submitTime[0]) ||
       (jobRecord->job->submitTime > Req->submitTime[1]))
-    return (TRUE);
+    return TRUE;
     }
 
   if (options & OPT_DISPATCH)
     {
       if (jobRecord->job->startTime == 0)
-    return (TRUE);
+    return TRUE;
       if ((jobRecord->job->startTime < Req->startTime[0]) ||
       (jobRecord->job->startTime > Req->startTime[1]))
-    return (TRUE);
+    return TRUE;
     }
 
-  return (FALSE);
+  return FALSE;
 }
 
 static void
@@ -1148,10 +1148,10 @@ displayhist (struct bhistReq *bhistReq)
     {
       if (first == TRUE)
         {
-          printf ((_i18n_msg_get (ls_catd, NL_SETN, 3197, "Summary of time in seconds spent in various states:\n")));   /* catgets  3197  */
-          printf ((_i18n_msg_get (ls_catd, NL_SETN, 3198, "JOBID   USER    JOB_NAME  PEND    PSUSP   RUN     USUSP ")));    /* catgets  3198  */
+          printf ((_i18n_msg_get (ls_catd, NL_SETN, 3197, "Summary of time in seconds spent in various states:\n")));   /* catgets 3197  */
+          printf ((_i18n_msg_get (ls_catd, NL_SETN, 3198, "JOBID   USER    JOB_NAME  PEND    PSUSP   RUN     USUSP ")));    /* catgets 3198  */
           printf ("  ");
-          printf ((_i18n_msg_get (ls_catd, NL_SETN, 3199, "SSUSP   UNKWN   TOTAL\n"))); /* catgets  3199  */
+          printf ((_i18n_msg_get (ls_catd, NL_SETN, 3199, "SSUSP   UNKWN   TOTAL\n"))); /* catgets 3199  */
           first = FALSE;
         }
       if (bhistReq->options & OPT_WIDEFORMAT)
@@ -1209,11 +1209,11 @@ displayhist (struct bhistReq *bhistReq)
     }
       else
     {
-      printf ("\n%s  ", (_i18n_msg_get (ls_catd, NL_SETN, 3200, "Summary of time in seconds spent in various states by"))); /* catgets  3200  */
+      printf ("\n%s  ", (_i18n_msg_get (ls_catd, NL_SETN, 3200, "Summary of time in seconds spent in various states by"))); /* catgets 3200  */
       printf ("%-12.24s\n", currentOrDoneTime);
       FREEUP (currentOrDoneTime);
-      printf ("  %s    ", (_i18n_msg_get (ls_catd, NL_SETN, 3201, "PEND     PSUSP    RUN      USUSP    SSUSP")));   /* catgets  3201  */
-      printf ((_i18n_msg_get (ls_catd, NL_SETN, 3202, "UNKWN    TOTAL\n")));    /* catgets  3202  */
+      printf ("  %s    ", (_i18n_msg_get (ls_catd, NL_SETN, 3201, "PEND     PSUSP    RUN      USUSP    SSUSP")));   /* catgets 3201  */
+      printf ((_i18n_msg_get (ls_catd, NL_SETN, 3202, "UNKWN    TOTAL\n")));    /* catgets 3202  */
       printf ("  %-9.0f%-9.0f%-9.0f%-9.0f%-9.0f%-9.0f%-12.0f\n",
           NegtoZero (pendTime), NegtoZero (pendSuspTime),
           NegtoZero (runTime), NegtoZero (usrSuspTime),
@@ -1499,7 +1499,7 @@ readEventFromHead (char *eventDir, struct bhistReq *reqPtr)
 
   if ((statBuf.st_mode & S_IFREG) != S_IFREG)
     {
-      fprintf (stderr, "%s: %s\n", eventFile, (_i18n_msg_get (ls_catd, NL_SETN, 3204, "Not a regular file\n")));    /* catgets  3204  */
+      fprintf (stderr, "%s: %s\n", eventFile, (_i18n_msg_get (ls_catd, NL_SETN, 3204, "Not a regular file\n")));    /* catgets 3204  */
       exit (-1);
     }
 
@@ -1574,19 +1574,13 @@ prtModifiedJob (struct jobModLog *jobModLog, struct bhistReq *bhistReq,
         prtLine(i18nstr);                       \
     }
 
-  sprintf (prline,
-       I18N (3357,
-         "%-12.19s: Parameters of Job are changed:")
-       /* catgets 3357 */ ,
-       timestamp);
+  sprintf (prline, I18N (3357, "%-12.19s: Parameters of Job are changed:"), timestamp );  /* catgets 3357 */
   prtLine (prline);
 
 
   if (jobModLog->options & SUB_QUEUE)
     {
-      sprintf (prline,
-           I18N (3358, "Job queue changes to : %s") /* catgets 3358 */ ,
-           jobModLog->queue);
+      sprintf (prline, I18N (3358, "Job queue changes to : %s"), jobModLog->queue); /* catgets 3358 */ 
       PRT_FMTSTR (prline);
     }
 
@@ -2110,56 +2104,54 @@ prtModifiedJob (struct jobModLog *jobModLog, struct bhistReq *bhistReq,
 
 
 
-static void
-prtParameters (struct jobInfoEnt *params, struct bhistReq *bhistReq,
-           char *timestamp)
+void
+prtParameters (struct jobInfoEnt *params, struct bhistReq *bhistReq, char *timestamp)
 {
-  char prline[MSGSIZE], tBuff[80];
+    char prline[MSGSIZE], tBuff[80];
 
-  if (params->submit.options & SUB_MODIFY_ONCE)
-    sprintf (tBuff, "%s: ", (_i18n_msg_get (ls_catd, NL_SETN, 3210, "Parameters are modified (only used once) to")));   /* catgets  3210  */
-  else
-    sprintf (tBuff, "%s:  ", (_i18n_msg_get (ls_catd, NL_SETN, 3211, "Parameters are modified to")));   /* catgets  3211  */
+    if (params->submit.options & SUB_MODIFY_ONCE) {
+        sprintf (tBuff, "%s: ", (_i18n_msg_get (ls_catd, NL_SETN, 3210, "Parameters are modified (only used once) to")));   /* catgets 3210  */
+    }
+    else {
+        sprintf (tBuff, "%s:  ", (_i18n_msg_get (ls_catd, NL_SETN, 3211, "Parameters are modified to")));   /* catgets 3211  */
+    }
 
-  if (bhistReq->options & OPT_CHRONICLE)
-    sprintf (prline, "%-12.19s: %s <%s> %s",
-         timestamp,
-         I18N_Job, lsb_jobidinstr (params->jobId), lowFirstChar (tBuff));
-  else
-    sprintf (prline, "%-12.19s: %s", timestamp, tBuff);
+    if (bhistReq->options & OPT_CHRONICLE) {
+        sprintf (prline, "%-12.19s: %s <%s> %s", timestamp, I18N_Job, lsb_jobidinstr (params->jobId), lowFirstChar (tBuff));
+    }
+    else {
+        sprintf (prline, "%-12.19s: %s", timestamp, tBuff);
+    }
 
-  prtLine (prline);
-  sprintf (prline, " %s <%s>, ", (_i18n_msg_get (ls_catd, NL_SETN, 3213, "Project")), params->submit.projectName);  /* catgets  3213  */
+    prtLine (prline);
+    sprintf (prline, " %s <%s>, ", (_i18n_msg_get (ls_catd, NL_SETN, 3213, "Project")), params->submit.projectName);  /* catgets 3213  */
 
-  prtLine (prline);
+    prtLine (prline);
 
 
-  if ((params->submit.options2 & SUB2_JOB_CMD_SPOOL) &&
-      (params->submit.command))
-    {
-      sprintf (prline, " %s <%s>, ", (_i18n_msg_get (ls_catd, NL_SETN, 3152, "Command (Spooled)")), /* catgets 3152 */
-           params->submit.command);
-      prtLine (prline);
+    if ((params->submit.options2 & SUB2_JOB_CMD_SPOOL) && (params->submit.command)) {
+        sprintf (prline, " %s <%s>, ", (_i18n_msg_get (ls_catd, NL_SETN, 3152, "Command (Spooled)")), params->submit.command); /* catgets 3152 */
+        prtLine (prline);
     }
 
   if ((params->submit.options2 & SUB2_MODIFY_CMD) && (params->submit.command))
     {
-      sprintf (prline, " %s <%s>, ", (_i18n_msg_get (ls_catd, NL_SETN, 3214, "Command")), params->submit.command);  /* catgets  3214  */
+      sprintf (prline, " %s <%s>, ", (_i18n_msg_get (ls_catd, NL_SETN, 3214, "Command")), params->submit.command);  /* catgets 3214  */
       prtLine (prline);
     }
 
 
   if (params->submit.options & SUB_MAIL_USER)
     {
-      sprintf (prline, " %s <%s>, ", (_i18n_msg_get (ls_catd, NL_SETN, 3217, "Mail")), params->submit.mailUser);    /* catgets  3217  */
+      sprintf (prline, " %s <%s>, ", (_i18n_msg_get (ls_catd, NL_SETN, 3217, "Mail")), params->submit.mailUser);    /* catgets 3217  */
       prtLine (prline);
     }
-  sprintf (prline, "%s <%s>", (_i18n_msg_get (ls_catd, NL_SETN, 3218, "Queue")),    /* catgets  3218  */
+  sprintf (prline, "%s <%s>", (_i18n_msg_get (ls_catd, NL_SETN, 3218, "Queue")),    /* catgets 3218  */
        params->submit.queue);
   prtLine (prline);
   if (params->submit.options & SUB_JOB_NAME)
     {
-      sprintf (prline, ", %s <%s>", (_i18n_msg_get (ls_catd, NL_SETN, 3219, "Job Name")),   /* catgets  3219  */
+      sprintf (prline, ", %s <%s>", (_i18n_msg_get (ls_catd, NL_SETN, 3219, "Job Name")),   /* catgets 3219  */
            params->submit.jobName);
       prtLine (prline);
     }
@@ -2174,46 +2166,47 @@ prtParameters (struct jobInfoEnt *params, struct bhistReq *bhistReq,
 }
 
 
-static char *
+char *
 getUserName (int userId)
 {
-  static char lsfUserName[MAX_LINE_LEN];
+    static char lsfUserName[MAX_LINE_LEN];
 
-  if (getLSFUserByUid_ (userId, lsfUserName, MAX_LINE_LEN) == 0)
-    return (lsfUserName);
-  else
-    return ((_i18n_msg_get (ls_catd, NL_SETN, 3220, "unknown")));   /* catgets  3220  */
+    if (getLSFUserByUid_ (userId, lsfUserName, MAX_LINE_LEN) == 0) {
+        return lsfUserName;
+    }
+    else {
+        return (_i18n_msg_get (ls_catd, NL_SETN, 3220, "unknown"));   /* catgets 3220  */
+    }
 
+    return NULL;
 }
 
 
-static int
+int
 dispChkpnt (struct eventRecord *event, struct jobRecord *jobRecord)
 {
+    struct eventRecord *eventP   = NULL;
+    struct jobInfoEnt *newParams = NULL;
 
-  struct eventRecord *eventP;
-  struct jobInfoEnt *newParams = NULL;
-
-
-  for (eventP = jobRecord->eventhead; eventP != event; eventP = eventP->next)
-    {
-      if (eventP->kind == EVENT_JOB_MODIFY)
-    newParams = eventP->newParams;
+    for (eventP = jobRecord->eventhead; eventP != event; eventP = eventP->next) {
+        if (eventP->kind == EVENT_JOB_MODIFY) {
+            newParams = eventP->newParams;
+        }
     }
-  if (newParams != NULL)
-    {
-      if ((newParams->submit.options & SUB_RERUNNABLE) &&
-      !(newParams->submit.options & SUB_CHKPNTABLE))
-    return (FALSE);
+
+    if (newParams != NULL) {
+        if ((newParams->submit.options & SUB_RERUNNABLE) && !(newParams->submit.options & SUB_CHKPNTABLE)) {
+            return FALSE;
+        }
     }
-  else
-    {
-      if ((jobRecord->job->submit.options & SUB_RERUNNABLE) &&
-      !(jobRecord->job->submit.options & SUB_CHKPNTABLE))
-    return (FALSE);
+    else {
+        if ((jobRecord->job->submit.options & SUB_RERUNNABLE) && !(jobRecord->job->submit.options & SUB_CHKPNTABLE)) {
+            return FALSE;
+        }
 
     }
-  return (TRUE);
+
+    return TRUE;
 }
 
 
@@ -2222,92 +2215,110 @@ dispChkpnt (struct eventRecord *event, struct jobRecord *jobRecord)
 char *
 actionName (char *sigName)
 {
-  static char *actionString = NULL;
-  char *action;
+    static char *actionString = NULL;
+    char *action = NULL;
 
-  if (actionString != NULL)
-    {
-      free (actionString);
+    if (actionString != NULL) {
+        free (actionString);
     }
 
-  if ((strcmp (sigName, "CHKPNT") == 0)
-      || (strcmp (sigName, "CHKPNT_COPY") == 0))
-    {
-      action = _i18n_msg_get (ls_catd, NL_SETN, 3221, "checkpoint action"); /* catgets 3221 */
+    if ((strcmp (sigName, "CHKPNT") == 0) || (strcmp (sigName, "CHKPNT_COPY") == 0)) {
+        action = _i18n_msg_get (ls_catd, NL_SETN, 3221, "checkpoint action");       /* catgets 3221 */
     }
-  else if (strcmp (sigName, "SIG_SUSP_USER") == 0)
-    action = _i18n_msg_get (ls_catd, NL_SETN, 3222, "User suspending action");  /* catgets  3222  */
-  else if (strcmp (sigName, "SIG_SUSP_LOAD") == 0)
-    action = _i18n_msg_get (ls_catd, NL_SETN, 3223, "Load suspending action");  /* catgets  3223  */
-  else if (strcmp (sigName, "SIG_SUSP_WINDOW") == 0)
-    action = _i18n_msg_get (ls_catd, NL_SETN, 3225, "Window suspending action");    /* catgets  3225  */
-  else if (strcmp (sigName, "SIG_SUSP_OTHER") == 0)
-    action = _i18n_msg_get (ls_catd, NL_SETN, 3226, "Other suspending action"); /* catgets  3226  */
-  else if (strcmp (sigName, "SIG_RESUME_USER") == 0)
-    action = _i18n_msg_get (ls_catd, NL_SETN, 3227, "User resumption action");  /* catgets  3227  */
-  else if (strcmp (sigName, "SIG_RESUME_LOAD") == 0)
-    action = _i18n_msg_get (ls_catd, NL_SETN, 3228, "Load resumption action");  /* catgets  3228  */
-  else if (strcmp (sigName, "SIG_RESUME_WINDOW") == 0)
-    action = _i18n_msg_get (ls_catd, NL_SETN, 3230, "Window resumption action");    /* catgets  3230  */
-  else if (strcmp (sigName, "SIG_RESUME_OTHER") == 0)
-    action = _i18n_msg_get (ls_catd, NL_SETN, 3231, "Other resumption action"); /* catgets  3231  */
-  else if (strcmp (sigName, "SIG_TERM_USER") == 0)
-    action = _i18n_msg_get (ls_catd, NL_SETN, 3232, "User termination action"); /* catgets  3232  */
-  else if (strcmp (sigName, "SIG_TERM_LOAD") == 0)
-    action = _i18n_msg_get (ls_catd, NL_SETN, 3233, "Load termination action"); /* catgets  3233  */
-  else if (strcmp (sigName, "SIG_TERM_WINDOW") == 0)
-    action = _i18n_msg_get (ls_catd, NL_SETN, 3235, "Window termination action");   /* catgets  3235  */
-  else if (strcmp (sigName, "SIG_TERM_OTHER") == 0)
-    action = _i18n_msg_get (ls_catd, NL_SETN, 3236, "Other termination action");    /* catgets  3236  */
-  else if (strcmp (sigName, "SIG_TERM_RUNLIMIT") == 0)
-    action = _i18n_msg_get (ls_catd, NL_SETN, 3237, "RUNLIMIT termination action"); /* catgets  3237  */
-  else if (strcmp (sigName, "SIG_TERM_DEADLINE") == 0)
-    action = _i18n_msg_get (ls_catd, NL_SETN, 3238, "DEADLINE termination action"); /* catgets  3238  */
-  else if (strcmp (sigName, "SIG_TERM_PROCESSLIMIT") == 0)
-    action = _i18n_msg_get (ls_catd, NL_SETN, 3239, "PROCESSLIMIT termination action"); /* catgets  3239  */
-  else if (strcmp (sigName, "SIG_TERM_CPULIMIT") == 0)
-    action = I18N (3430, "CPULIMIT termination action");    /* catgets 3430 */
-  else if (strcmp (sigName, "SIG_TERM_FORCE") == 0)
-    action = I18N (3431, "Kill & Remove action");   /* catgets 3431 */
-  else if (strcmp (sigName, "SIG_KILL_REQUEUE") == 0)
-    action = I18N (3432, "Kill & Requeue action");  /* catgets 3432 */
-  else if (strcmp (sigName, "SIG_TERM_MEMLIMIT") == 0)
-    action = I18N (3433, "MEMLIMIT termination action");    /* catgets 3433 */
-  else
-    action = _i18n_msg_get (ls_catd, NL_SETN, 3240, "Unknow action");   /* catgets  3240  */
-
-  actionString = putstr_ (action);
-  if (actionString == NULL)
-    {
-      perror ("malloc");
-      exit (-1);
+    else if (strcmp (sigName, "SIG_SUSP_USER") == 0) {
+        action = _i18n_msg_get (ls_catd, NL_SETN, 3222, "User suspending action");  /* catgets 3222  */
     }
-  else
-    return (actionString);
+    else if (strcmp (sigName, "SIG_SUSP_LOAD") == 0) {
+        action = _i18n_msg_get (ls_catd, NL_SETN, 3223, "Load suspending action");  /* catgets 3223  */
+    }
+    else if (strcmp (sigName, "SIG_SUSP_WINDOW") == 0) {
+        action = _i18n_msg_get (ls_catd, NL_SETN, 3225, "Window suspending action"); /* catgets 3225  */
+    }
+    else if (strcmp (sigName, "SIG_SUSP_OTHER") == 0) {
+        action = _i18n_msg_get (ls_catd, NL_SETN, 3226, "Other suspending action"); /* catgets 3226  */
+    }
+    else if (strcmp (sigName, "SIG_RESUME_USER") == 0) {
+        action = _i18n_msg_get (ls_catd, NL_SETN, 3227, "User resumption action");  /* catgets 3227  */
+    }
+    else if (strcmp (sigName, "SIG_RESUME_LOAD") == 0) {
+        action = _i18n_msg_get (ls_catd, NL_SETN, 3228, "Load resumption action");  /* catgets 3228  */
+    }
+    else if (strcmp (sigName, "SIG_RESUME_WINDOW") == 0) {
+        action = _i18n_msg_get (ls_catd, NL_SETN, 3230, "Window resumption action"); /* catgets 3230  */
+    }
+    else if (strcmp (sigName, "SIG_RESUME_OTHER") == 0) {
+        action = _i18n_msg_get (ls_catd, NL_SETN, 3231, "Other resumption action"); /* catgets 3231  */
+    }
+    else if (strcmp (sigName, "SIG_TERM_USER") == 0) {
+        action = _i18n_msg_get (ls_catd, NL_SETN, 3232, "User termination action"); /* catgets 3232  */
+    }
+    else if (strcmp (sigName, "SIG_TERM_LOAD") == 0) {
+        action = _i18n_msg_get (ls_catd, NL_SETN, 3233, "Load termination action"); /* catgets 3233  */
+    }
+    else if (strcmp (sigName, "SIG_TERM_WINDOW") == 0) {
+        action = _i18n_msg_get (ls_catd, NL_SETN, 3235, "Window termination action");/* catgets 3235  */
+    }
+    else if (strcmp (sigName, "SIG_TERM_OTHER") == 0) {
+        action = _i18n_msg_get (ls_catd, NL_SETN, 3236, "Other termination action"); /* catgets 3236  */
+    }
+    else if (strcmp (sigName, "SIG_TERM_RUNLIMIT") == 0) {
+        action = _i18n_msg_get (ls_catd, NL_SETN, 3237, "RUNLIMIT termination action"); /* catgets 3237  */
+    }
+    else if (strcmp (sigName, "SIG_TERM_DEADLINE") == 0) {
+        action = _i18n_msg_get (ls_catd, NL_SETN, 3238, "DEADLINE termination action"); /* catgets 3238  */
+    }
+    else if (strcmp (sigName, "SIG_TERM_PROCESSLIMIT") == 0) {
+        action = _i18n_msg_get (ls_catd, NL_SETN, 3239, "PROCESSLIMIT termination action"); /* catgets 3239  */
+    }
+    else if (strcmp (sigName, "SIG_TERM_CPULIMIT") == 0) {
+        action = I18N (3430, "CPULIMIT termination action");                               /* catgets 3430 */
+    }
+    else if (strcmp (sigName, "SIG_TERM_FORCE") == 0) {
+        action = I18N (3431, "Kill & Remove action");                                      /* catgets 3431 */
+    }
+    else if (strcmp (sigName, "SIG_KILL_REQUEUE") == 0) {
+        action = I18N (3432, "Kill & Requeue action");                                     /* catgets 3432 */
+    }
+    else if (strcmp (sigName, "SIG_TERM_MEMLIMIT") == 0) {
+        action = I18N (3433, "MEMLIMIT termination action");                              /* catgets 3433 */
+    }
+    else {
+        action = _i18n_msg_get (ls_catd, NL_SETN, 3240, "Unknow action");                 /* catgets 3240  */
+    }
 
+    actionString = putstr_ (action);
+    if (actionString == NULL) {
+        perror ("malloc");
+        exit (-1);
+    }
+    else {
+        return actionString;
+    }
+
+    return NULL;
 }
 
-static void
-printEvent (struct bhistReq *bhistReq, struct jobRecord *jobRecord,
-        struct jobInfoEnt *job, struct eventRecord *event,
-        time_t timeStamp, char *timeStampStr, int option)
+void
+printEvent (struct bhistReq *bhistReq, struct jobRecord *jobRecord, struct jobInfoEnt *job, struct eventRecord *event, time_t timeStamp, char *timeStampStr, int option)
 {
-  static char __func__] = "printEvent()";
-  int i;
-  char tBuff[20];
-  char *disptime = NULL;
-  char prline[MSGSIZE];
-  char *hostPtr;
-  char *cp;
-  char *cp1;
-  int display;
-  int lastChkPeriod;
+    // static char __func__] = "printEvent()";
+    // int i;
+    char tBuff[20]; // FIXME FIXME FIXME turn to pointer
+    char *disptime = NULL;
+    char prline[MSGSIZE];  // FIXME FIXME FIXME turn to pointer
+    char *hostPtr = NULL;
+    char *cp      = NULL;
+    char *cp1     = NULL;
+    int display   = 0;
+    unsigned int lastChkPeriod = 0;
 
-  if ((bhistReq->options & OPT_DFTFORMAT) == OPT_DFTFORMAT)
-    return;
+    if ((bhistReq->options & OPT_DFTFORMAT) == OPT_DFTFORMAT) {
+        return;
+    }
 
-  if (logclass & LC_TRACE)
-    ls_syslog (LOG_DEBUG2, "%s: (2)event.kind=%x", __func__, event->kind);
+    if (logclass & LC_TRACE) {
+        ls_syslog (LOG_DEBUG2, "%s: (2)event.kind=%x", __func__, event->kind);
+    }
 
   if ((bhistReq->options & OPT_CHRONICLE))
     {
@@ -2394,33 +2405,33 @@ printEvent (struct bhistReq *bhistReq, struct jobRecord *jobRecord,
 
     case EVENT_JOB_SWITCH:
       if (tBuff[0] == '\0')
-    sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3248, "%-12.19s: Switched to Queue <%s> by user or administrator <%s>")),    /* catgets  3248  */
+    sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3248, "%-12.19s: Switched to Queue <%s> by user or administrator <%s>")),    /* catgets 3248  */
          timeStampStr, event->queue, event->userName);
       else
-    sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3249, "%-12.19s:%s switched to Queue <%s> by user or administrator <%s>")),  /* catgets  3249  */
+    sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3249, "%-12.19s:%s switched to Queue <%s> by user or administrator <%s>")),  /* catgets 3249  */
          timeStampStr, tBuff, event->queue, event->userName);
       prtLine (prline);
       break;
 
     case EVENT_JOB_MSG:
-      sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3250, "%-12.19s:%s Message <%s>  Message ID<%d> requested by user or administrator <%s>")),    /* catgets  3250  */
+      sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3250, "%-12.19s:%s Message <%s>  Message ID<%d> requested by user or administrator <%s>")),    /* catgets 3250  */
            timeStampStr, tBuff,
            event->jmMsg, event->jmMsgId, getUserName (event->usrId));
       prtLine (prline);
       break;
 
     case EVENT_JOB_MSG_ACK:
-      sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3251, "%-12.19s:%s Message <%s> Message ID<%d>has been dispatchd")),   /* catgets  3251  */
+      sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3251, "%-12.19s:%s Message <%s> Message ID<%d>has been dispatchd")),   /* catgets 3251  */
            timeStampStr, tBuff, event->jmMsg, event->jmMsgId);
       prtLine (prline);
       break;
 
     case EVENT_JOB_START_ACCEPT:
       if (tBuff[0] == '\0')
-    sprintf (prline, "%-12.19s: %s (Pid %d)", timeStampStr, (_i18n_msg_get (ls_catd, NL_SETN, 3252, "Starting")),   /* catgets  3252  */
+    sprintf (prline, "%-12.19s: %s (Pid %d)", timeStampStr, (_i18n_msg_get (ls_catd, NL_SETN, 3252, "Starting")),   /* catgets 3252  */
          event->jobPid);
       else
-    sprintf (prline, "%-12.19s:%s %s (Pid %d)", timeStampStr, tBuff, (_i18n_msg_get (ls_catd, NL_SETN, 3253, "starting")),  /* catgets  3253  */
+    sprintf (prline, "%-12.19s:%s %s (Pid %d)", timeStampStr, tBuff, (_i18n_msg_get (ls_catd, NL_SETN, 3253, "starting")),  /* catgets 3253  */
          event->jobPid);
       prtLine (prline);
       break;
@@ -2429,21 +2440,21 @@ printEvent (struct bhistReq *bhistReq, struct jobRecord *jobRecord,
       if (strcmp (event->sigSymbol, "DELETEJOB") == 0)
     {
       if (tBuff[0] == '\0')
-        sprintf (prline, "%-12.19s: %s <%s>", timeStampStr, (_i18n_msg_get (ls_catd, NL_SETN, 3254, "Delete requested by user or administrator")),  /* catgets  3254 */
+        sprintf (prline, "%-12.19s: %s <%s>", timeStampStr, (_i18n_msg_get (ls_catd, NL_SETN, 3254, "Delete requested by user or administrator")),  /* catgets 3254 */
              event->userName);
       else
-        sprintf (prline, "%-12.19s:%s %s<%s>", timeStampStr, tBuff, (_i18n_msg_get (ls_catd, NL_SETN, 3255, "delete requested by user or administrator")),  /* catgets  3255  */
+        sprintf (prline, "%-12.19s:%s %s<%s>", timeStampStr, tBuff, (_i18n_msg_get (ls_catd, NL_SETN, 3255, "delete requested by user or administrator")),  /* catgets 3255  */
              event->userName);
       if (event->runCount > 0)
         {
           char i18nBuf[150];
           sprintf (i18nBuf, "%s", prline);
-          sprintf (prline, "%s; %s %d", i18nBuf, (_i18n_msg_get (ls_catd, NL_SETN, 3256, "Running times is")),  /* catgets  3256  */
+          sprintf (prline, "%s; %s %d", i18nBuf, (_i18n_msg_get (ls_catd, NL_SETN, 3256, "Running times is")),  /* catgets 3256  */
                event->runCount);
         }
     }
       else
-    sprintf (prline, _i18n_msg_get (ls_catd, NL_SETN, 3257, "%-12.19s:%s Signal <%s> requested by user or administrator <%s>"), /* catgets  3257  */
+    sprintf (prline, _i18n_msg_get (ls_catd, NL_SETN, 3257, "%-12.19s:%s Signal <%s> requested by user or administrator <%s>"), /* catgets 3257  */
          timeStampStr, tBuff, event->sigSymbol, event->userName);
 
       prtLine (prline);
@@ -2451,14 +2462,14 @@ printEvent (struct bhistReq *bhistReq, struct jobRecord *jobRecord,
 
     case EVENT_MIG:
       if (event->userName && event->userName[0])
-    sprintf (prline, "%-12.19s:%s %s <%s>", timeStampStr, tBuff, _i18n_msg_get (ls_catd, NL_SETN, 3258, "Migration requested by user or administrator"),    /* catgets  3258  */
+    sprintf (prline, "%-12.19s:%s %s <%s>", timeStampStr, tBuff, _i18n_msg_get (ls_catd, NL_SETN, 3258, "Migration requested by user or administrator"),    /* catgets 3258  */
          event->userName);
       else
-    sprintf (prline, "%-12.19s:%s %s", timeStampStr, tBuff, _i18n_msg_get (ls_catd, NL_SETN, 3259, "Migration requested by unknown user")); /* catgets  3259  */
+    sprintf (prline, "%-12.19s:%s %s", timeStampStr, tBuff, _i18n_msg_get (ls_catd, NL_SETN, 3259, "Migration requested by unknown user")); /* catgets 3259  */
 
       if (event->migNumAskedHosts)
     {
-      sprintf (prline, "%s; %s", prline, (_i18n_msg_get (ls_catd, NL_SETN, 3260, "Specified Hosts")));  /* catgets  3260  */
+      sprintf (prline, "%s; %s", prline, (_i18n_msg_get (ls_catd, NL_SETN, 3260, "Specified Hosts")));  /* catgets 3260  */
       for (i = 0; i < event->migNumAskedHosts; i++)
         {
           sprintf (prline, "%s <%s>", prline, event->migAskedHosts[i]);
@@ -2486,7 +2497,7 @@ printEvent (struct bhistReq *bhistReq, struct jobRecord *jobRecord,
 
         if (event->chkPeriod)
           {
-            sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3261, "%-12.19s:%s Checkpoint period is set to %d min.")),   /* catgets  3261  */
+            sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3261, "%-12.19s:%s Checkpoint period is set to %d min.")),   /* catgets 3261  */
                  timeStampStr,
                  tBuff, (int) (event->chkPeriod / 60));
             prtLine (prline);
@@ -2500,15 +2511,15 @@ printEvent (struct bhistReq *bhistReq, struct jobRecord *jobRecord,
         if (display == TRUE)
           {
             char *i18nBuf;
-            i18nBuf = putstr_ ((_i18n_msg_get (ls_catd, NL_SETN, 3262, "initiated")));  /* catgets  3262  */
-            sprintf (prline, "%-12.19s:%s %s %s (actpid %d)", timeStampStr, tBuff, (event->actFlags & LSB_CHKPNT_MIG) ? (_i18n_msg_get (ls_catd, NL_SETN, 3263, "Migration checkpoint")) :  /* catgets  3263  */
-                 (_i18n_msg_get (ls_catd, NL_SETN, 3264, "Checkpoint")),    /* catgets  3264  */
+            i18nBuf = putstr_ ((_i18n_msg_get (ls_catd, NL_SETN, 3262, "initiated")));  /* catgets 3262  */
+            sprintf (prline, "%-12.19s:%s %s %s (actpid %d)", timeStampStr, tBuff, (event->actFlags & LSB_CHKPNT_MIG) ? (_i18n_msg_get (ls_catd, NL_SETN, 3263, "Migration checkpoint")) :  /* catgets 3263  */
+                 (_i18n_msg_get (ls_catd, NL_SETN, 3264, "Checkpoint")),    /* catgets 3264  */
                  i18nBuf, event->actPid);
             if (event->chkPeriod != lastChkPeriod)
               {
             lastChkPeriod = event->chkPeriod;
             if (event->chkPeriod)
-              sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3265, "%s; checkpoint period is %d min.")),    /* catgets  3265  */
+              sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3265, "%s; checkpoint period is %d min.")),    /* catgets 3265  */
                    prline, (int) (event->chkPeriod / 60));
               }
             free (i18nBuf);
@@ -2519,7 +2530,7 @@ printEvent (struct bhistReq *bhistReq, struct jobRecord *jobRecord,
                tBuff,
                _i18n_msg_get (ls_catd, NL_SETN, 3266,
                       "Job is being requeued")
-               /* catgets  3266  */ );
+               /* catgets 3266  */ );
           }
         else if (event->actStatus == ACT_DONE ||
              event->actStatus == ACT_FAIL)
@@ -2527,11 +2538,11 @@ printEvent (struct bhistReq *bhistReq, struct jobRecord *jobRecord,
         if (display == TRUE)
           {
             char *statusPtr;
-            statusPtr = putstr_ ((event->actStatus == ACT_DONE) ? (_i18n_msg_get (ls_catd, NL_SETN, 3270, "succeeded")) :   /* catgets  3270  */
-                     (_i18n_msg_get (ls_catd, NL_SETN, 3271, "failed")));   /* catgets  3271  */
+            statusPtr = putstr_ ((event->actStatus == ACT_DONE) ? (_i18n_msg_get (ls_catd, NL_SETN, 3270, "succeeded")) :   /* catgets 3270  */
+                     (_i18n_msg_get (ls_catd, NL_SETN, 3271, "failed")));   /* catgets 3271  */
 
-            sprintf (prline, "%-12.19s:%s %s %s (actpid %d)", timeStampStr, tBuff, (event->actFlags & LSB_CHKPNT_MIG) ? (_i18n_msg_get (ls_catd, NL_SETN, 3268, "Migration checkpoint")) :  /* catgets  3268  */
-                 (_i18n_msg_get (ls_catd, NL_SETN, 3269, "Checkpoint")),    /* catgets  3269  */
+            sprintf (prline, "%-12.19s:%s %s %s (actpid %d)", timeStampStr, tBuff, (event->actFlags & LSB_CHKPNT_MIG) ? (_i18n_msg_get (ls_catd, NL_SETN, 3268, "Migration checkpoint")) :  /* catgets 3268  */
+                 (_i18n_msg_get (ls_catd, NL_SETN, 3269, "Checkpoint")),    /* catgets 3269  */
                  statusPtr, event->actPid);
             free (statusPtr);
           }
@@ -2541,7 +2552,7 @@ printEvent (struct bhistReq *bhistReq, struct jobRecord *jobRecord,
                tBuff,
                _i18n_msg_get (ls_catd, NL_SETN, 3272,
                       "Job has been requeued")
-               /* catgets  3272  */ );
+               /* catgets 3272  */ );
           }
         prtLine (prline);
       }
@@ -2561,8 +2572,8 @@ printEvent (struct bhistReq *bhistReq, struct jobRecord *jobRecord,
         break;
           case ACT_DONE:
           case ACT_FAIL:
-        sprintf (prline, "%-12.19s:%s %s %s (actpid %d)", timeStampStr, tBuff, actionName (event->sigSymbol), (event->actStatus == ACT_DONE) ? (_i18n_msg_get (ls_catd, NL_SETN, 3275, "completed")) :  /* catgets  3275  */
-             (_i18n_msg_get (ls_catd, NL_SETN, 3276, "exited with non-zero value")),    /* catgets  3276  */
+        sprintf (prline, "%-12.19s:%s %s %s (actpid %d)", timeStampStr, tBuff, actionName (event->sigSymbol), (event->actStatus == ACT_DONE) ? (_i18n_msg_get (ls_catd, NL_SETN, 3275, "completed")) :  /* catgets 3275  */
+             (_i18n_msg_get (ls_catd, NL_SETN, 3276, "exited with non-zero value")),    /* catgets 3276  */
              event->actPid);
         break;
           }
@@ -2621,10 +2632,10 @@ printEvent (struct bhistReq *bhistReq, struct jobRecord *jobRecord,
           event->exitStatus && event->cpuTime >= MIN_CPU_TIME)
         {
           if (WIFEXITED (wStatus))
-        sprintf (prline, " %s %d", (_i18n_msg_get (ls_catd, NL_SETN, 3282, "with exit code")),  /* catgets  3282  */
+        sprintf (prline, " %s %d", (_i18n_msg_get (ls_catd, NL_SETN, 3282, "with exit code")),  /* catgets 3282  */
              WEXITSTATUS (wStatus));
           else
-        sprintf (prline, " %s %d", (_i18n_msg_get (ls_catd, NL_SETN, 3283, "by signal")),   /* catgets  3283  */
+        sprintf (prline, " %s %d", (_i18n_msg_get (ls_catd, NL_SETN, 3283, "by signal")),   /* catgets 3283  */
              WTERMSIG (wStatus));
           prtLine (prline);
         }
@@ -2632,13 +2643,13 @@ printEvent (struct bhistReq *bhistReq, struct jobRecord *jobRecord,
       if ((job->numExHosts > 0) && (!IS_POST_FINISH (event->jStatus)))
         {
           if (event->cpuTime < MIN_CPU_TIME)
-        sprintf (prline, _i18n_msg_get (ls_catd, NL_SETN, 3284, "The CPU time used is unknown"));   /* catgets  3284  */
+        sprintf (prline, _i18n_msg_get (ls_catd, NL_SETN, 3284, "The CPU time used is unknown"));   /* catgets 3284  */
           else
         {
           if (bhistReq->options & OPT_NORMALIZECPU)
             event->cpuTime = event->cpuTime *
               job->cpuFactor / bhistReq->cpuFactor;
-          sprintf (prline, _i18n_msg_get (ls_catd, NL_SETN, 3285, "The CPU time used is %1.1f seconds"),    /* catgets  3285  */
+          sprintf (prline, _i18n_msg_get (ls_catd, NL_SETN, 3285, "The CPU time used is %1.1f seconds"),    /* catgets 3285  */
                event->cpuTime);
         }
           prtLine (". ");
@@ -2661,18 +2672,18 @@ printEvent (struct bhistReq *bhistReq, struct jobRecord *jobRecord,
 
     case EVENT_JOB_EXECUTE:
       if (tBuff[0] == '\0')
-    sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3286, "%-12.19s: Running with execution home <%s>, Execution CWD <%s>, Execution Pid <%d>")),    /* catgets  3286  */
+    sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3286, "%-12.19s: Running with execution home <%s>, Execution CWD <%s>, Execution Pid <%d>")),    /* catgets 3286  */
          timeStampStr,
          event->execHome, event->execCwd, event->jobPid);
       else
-    sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3287, "%-12.19s:%s running with execution home <%s>, Execution CWD <%s>, Execution Pid <%d>")),  /* catgets  3287  */
+    sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3287, "%-12.19s:%s running with execution home <%s>, Execution CWD <%s>, Execution Pid <%d>")),  /* catgets 3287  */
          timeStampStr,
          tBuff, event->execHome, event->execCwd, event->jobPid);
       prtLine (prline);
       if (event->execUsername && strcmp (event->execUsername, "")
       && strcmp (job->user, event->execUsername))
     {
-      sprintf (prline, ", %s <%s>", (_i18n_msg_get (ls_catd, NL_SETN, 3288, "Execution user name")),    /* catgets  3288  */
+      sprintf (prline, ", %s <%s>", (_i18n_msg_get (ls_catd, NL_SETN, 3288, "Execution user name")),    /* catgets 3288  */
            event->execUsername);
       prtLine (prline);
     }
@@ -2685,7 +2696,7 @@ printEvent (struct bhistReq *bhistReq, struct jobRecord *jobRecord,
          timeStampStr,
          I18N (3289,
                "Job is forced to run by user or administrator")
-         /* catgets  3289  */ ,
+         /* catgets 3289  */ ,
          event->userName);
       else
     sprintf (prline, "%-12.19s: %s %s <%s>", timeStampStr, tBuff, I18N (3290, "is forced to run by user or administrator"), /* catgets 3290 */
@@ -2695,25 +2706,25 @@ printEvent (struct bhistReq *bhistReq, struct jobRecord *jobRecord,
 
     case EVENT_JOB_REQUEUE:
       if (tBuff[0] == '\0')
-    sprintf (prline, "%-12.19s: %s", timeStampStr, (_i18n_msg_get (ls_catd, NL_SETN, 3291, "Pending: Job has been requeued"))); /* catgets  3291  */
+    sprintf (prline, "%-12.19s: %s", timeStampStr, (_i18n_msg_get (ls_catd, NL_SETN, 3291, "Pending: Job has been requeued"))); /* catgets 3291  */
 
       else
-    sprintf (prline, "%-12.19s:%s %s", timeStampStr, tBuff, (_i18n_msg_get (ls_catd, NL_SETN, 3292, "pending: Job has been requeued")));    /* catgets  3292  */
+    sprintf (prline, "%-12.19s:%s %s", timeStampStr, tBuff, (_i18n_msg_get (ls_catd, NL_SETN, 3292, "pending: Job has been requeued")));    /* catgets 3292  */
       prtLine (prline);
       break;
     case EVENT_JOB_CLEAN:
-      sprintf (prline, "%-12.19s: %s", timeStampStr, (_i18n_msg_get (ls_catd, NL_SETN, 3293, "Cleaned: Job has been removed")));    /* catgets  3293  */
+      sprintf (prline, "%-12.19s: %s", timeStampStr, (_i18n_msg_get (ls_catd, NL_SETN, 3293, "Cleaned: Job has been removed")));    /* catgets 3293  */
       prtLine (prline);
       break;
     }
-  return;
 
+    return;
 }
 
-static void
+void
 printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
 {
-  static char __func__] = "printChronicleEventLog";
+  // static char __func__] = "printChronicleEventLog";
   struct jobInfoEnt *job;
   struct submit *submitPtr;
   struct eventRecord *event;
@@ -2752,7 +2763,7 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
       prtFileNames (job, TRUE);
       if (job->submit.options & SUB_JOB_NAME)
     {
-      sprintf (prline, ", %s <%s>", I18N (3296, "Job Name"),    /* catgets  3296  */
+      sprintf (prline, ", %s <%s>", I18N (3296, "Job Name"),    /* catgets 3296  */
            job->submit.jobName);
       prtLine (prline);
     }
@@ -2776,14 +2787,14 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
       sprintf (tBuff, "%s <%s>", I18N_Job, lsb_jobid2str (jobId));
 
       if (log->type == EVENT_PRE_EXEC_START)
-    sprintf (prline, "%-12.19s:%s, %s", timeStampStr, tBuff, (_i18n_msg_get (ls_catd, NL_SETN, 3298, "the pre-exec command is started on")));   /* catgets  3298  */
+    sprintf (prline, "%-12.19s:%s, %s", timeStampStr, tBuff, (_i18n_msg_get (ls_catd, NL_SETN, 3298, "the pre-exec command is started on")));   /* catgets 3298  */
       else
-    sprintf (prline, "%-12.19s:%s, %s", timeStampStr, tBuff, (_i18n_msg_get (ls_catd, NL_SETN, 3299, "the batch job command is started on")));  /* catgets  3299  */
+    sprintf (prline, "%-12.19s:%s, %s", timeStampStr, tBuff, (_i18n_msg_get (ls_catd, NL_SETN, 3299, "the batch job command is started on")));  /* catgets 3299  */
 
       prtLine (prline);
       if (log->eventLog.jobStartLog.numExHosts > 1)
     {
-      sprintf (prline, " %d %s", log->eventLog.jobStartLog.numExHosts, (_i18n_msg_get (ls_catd, NL_SETN, 3300, "Hosts/Processors")));   /* catgets  3300  */
+      sprintf (prline, " %d %s", log->eventLog.jobStartLog.numExHosts, (_i18n_msg_get (ls_catd, NL_SETN, 3300, "Hosts/Processors")));   /* catgets 3300  */
       prtLine (prline);
     }
       for (i = 0; i < log->eventLog.jobStartLog.numExHosts; i++)
@@ -2798,7 +2809,7 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
       jobId = LSB_JOBID (log->eventLog.jobExecuteLog.jobId,
              log->eventLog.jobExecuteLog.idx);
       sprintf (tBuff, " %s <%s>", I18N_Job, lsb_jobid2str (jobId));
-      sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3302, "%-12.19s:%s running with execution home <%s>, Execution CWD <%s>, Execution Pid <%d>")),    /* catgets  3302  */
+      sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3302, "%-12.19s:%s running with execution home <%s>, Execution CWD <%s>, Execution Pid <%d>")),    /* catgets 3302  */
            timeStampStr,
            tBuff,
            log->eventLog.jobExecuteLog.execHome,
@@ -2808,7 +2819,7 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
       if (log->eventLog.jobExecuteLog.execUsername &&
       strcmp (log->eventLog.jobExecuteLog.execUsername, ""))
     {
-      sprintf (prline, ", %s <%s>", (_i18n_msg_get (ls_catd, NL_SETN, 3303, "Execution user name")),    /* catgets  3303  */
+      sprintf (prline, ", %s <%s>", (_i18n_msg_get (ls_catd, NL_SETN, 3303, "Execution user name")),    /* catgets 3303  */
            log->eventLog.jobExecuteLog.execUsername);
       prtLine (prline);
     }
@@ -2872,10 +2883,10 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
         event->exitStatus && event->cpuTime >= MIN_CPU_TIME)
           {
         if (WIFEXITED (wStatus))
-          sprintf (prline, " %s %d", (_i18n_msg_get (ls_catd, NL_SETN, 3305, "with exit code")),    /* catgets  3305  */
+          sprintf (prline, " %s %d", (_i18n_msg_get (ls_catd, NL_SETN, 3305, "with exit code")),    /* catgets 3305  */
                WEXITSTATUS (wStatus));
         else
-          sprintf (prline, " %s %d", (_i18n_msg_get (ls_catd, NL_SETN, 3283, "by signal")), /* catgets  3283  */
+          sprintf (prline, " %s %d", (_i18n_msg_get (ls_catd, NL_SETN, 3283, "by signal")), /* catgets 3283  */
                WTERMSIG (wStatus));
         prtLine (prline);
         prtLine ("\n");
@@ -2883,13 +2894,13 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
         if (event->numExHosts > 0)
           {
         if (event->cpuTime < MIN_CPU_TIME)
-          sprintf (prline, ". %s", (_i18n_msg_get (ls_catd, NL_SETN, 3307, "The CPU time used is unknown")));   /* catgets  3307  */
+          sprintf (prline, ". %s", (_i18n_msg_get (ls_catd, NL_SETN, 3307, "The CPU time used is unknown")));   /* catgets 3307  */
         else
           {
             if (req->options & OPT_NORMALIZECPU)
               event->cpuTime = event->cpuTime *
             job->cpuFactor / req->cpuFactor;
-            sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3308, ". The CPU time used is %1.1f seconds")),  /* catgets  3308  */
+            sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3308, ". The CPU time used is %1.1f seconds")),  /* catgets 3308  */
                  event->cpuTime);
           }
         prtLine (prline);
@@ -2902,7 +2913,7 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
       jobId = LSB_JOBID (log->eventLog.jobSwitchLog.jobId,
              log->eventLog.jobSwitchLog.idx);
       sprintf (tBuff, " %s <%s>", I18N_Job, lsb_jobid2str (jobId));
-      sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3310, "%-12.19s:%s switched to Queue <%s> by user or administrator <%s>")),    /* catgets  3310  */
+      sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3310, "%-12.19s:%s switched to Queue <%s> by user or administrator <%s>")),    /* catgets 3310  */
            timeStampStr,
            tBuff,
            log->eventLog.jobSwitchLog.queue,
@@ -2915,7 +2926,7 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
       jobId = LSB_JOBID (log->eventLog.jobMoveLog.jobId,
              log->eventLog.jobMoveLog.idx);
       sprintf (tBuff, " %s <%s>", I18N_Job, lsb_jobid2str (jobId));
-      sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3312, "%-12.19s:%s moved to position %d relative to <%s> by user or administrator <%s>")), /* catgets  3312  */
+      sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3312, "%-12.19s:%s moved to position %d relative to <%s> by user or administrator <%s>")), /* catgets 3312  */
            timeStampStr,
            tBuff,
            log->eventLog.jobMoveLog.position,
@@ -2934,7 +2945,7 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
       jobId = LSB_JOBID (log->eventLog.chkpntLog.jobId,
              log->eventLog.chkpntLog.idx);
       sprintf (tBuff, " %s <%s>", I18N_Job, lsb_jobid2str (jobId));
-      sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3314, "%-12.19s:%s checkpoint info with period<%ld> pid<%d> ok<%d> flags<%d>")),   /* catgets  3314  */
+      sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3314, "%-12.19s:%s checkpoint info with period<%ld> pid<%d> ok<%d> flags<%d>")),   /* catgets 3314  */
            timeStampStr,
            tBuff,
            log->eventLog.chkpntLog.period,
@@ -2948,15 +2959,15 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
              log->eventLog.migLog.idx);
       sprintf (tBuff, " %s <%s>", I18N_Job, lsb_jobid2str (jobId));
       if (log->eventLog.migLog.userName && log->eventLog.migLog.userName[0])
-    sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3316, "%-12.19s:%s migration requested by user or administrator <%s>")), /* catgets  3316  */
+    sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3316, "%-12.19s:%s migration requested by user or administrator <%s>")), /* catgets 3316  */
          timeStampStr, tBuff, log->eventLog.migLog.userName);
       else
-    sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3317, "%-12.19s:%s migration requested by unknown user")),   /* catgets  3317  */
+    sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3317, "%-12.19s:%s migration requested by unknown user")),   /* catgets 3317  */
          timeStampStr, tBuff);
 
       if (log->eventLog.migLog.numAskedHosts)
     {
-      sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3318, "%s; Specified Hosts")), prline);    /* catgets  3318  */
+      sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3318, "%s; Specified Hosts")), prline);    /* catgets 3318  */
       for (i = 0; i < log->eventLog.migLog.numAskedHosts; i++)
         {
           sprintf (prline, "%s <%s>", prline,
@@ -2989,11 +3000,11 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
       sprintf (prline, "%-12.19s:%s, %s <%s>", timeStampStr, tBuff, I18N (3321, "delete requested by user or administrator"),   /* catgets 3321 */
            log->eventLog.signalLog.userName);
       if (log->eventLog.signalLog.runCount > 0)
-        sprintf (prline, "%s; %s %d", prline, (_i18n_msg_get (ls_catd, NL_SETN, 3322, "running times is")), /* catgets  3322  */
+        sprintf (prline, "%s; %s %d", prline, (_i18n_msg_get (ls_catd, NL_SETN, 3322, "running times is")), /* catgets 3322  */
              log->eventLog.signalLog.runCount);
     }
       else
-    sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3323, "%-12.19s:%s, signal <%s> requested by user or administrator <%s>")),  /* catgets  3323  */
+    sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3323, "%-12.19s:%s, signal <%s> requested by user or administrator <%s>")),  /* catgets 3323  */
          timeStampStr,
          tBuff,
          log->eventLog.signalLog.signalSymbol,
@@ -3006,7 +3017,7 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
       jobId = LSB_JOBID (log->eventLog.jobMsgLog.jobId,
              log->eventLog.jobMsgLog.idx);
       sprintf (tBuff, " %s <%s>", I18N_Job, lsb_jobid2str (jobId));
-      sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3329, "%-12.19s:%s, message <%s>  message ID<%d> requested by user or administrator <%s>")),   /* catgets  3329  */
+      sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3329, "%-12.19s:%s, message <%s>  message ID<%d> requested by user or administrator <%s>")),   /* catgets 3329  */
            timeStampStr, tBuff,
            log->eventLog.jobMsgLog.msg,
            log->eventLog.jobMsgLog.msgId,
@@ -3019,7 +3030,7 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
       jobId = LSB_JOBID (log->eventLog.jobMsgAckLog.jobId,
              log->eventLog.jobMsgAckLog.idx);
       sprintf (tBuff, " %s <%s>", I18N_Job, lsb_jobid2str (jobId));
-      sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3331, "%-12.19s:%s, message <%s> message ID<%d>has been dispatchd")),  /* catgets  3331  */
+      sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3331, "%-12.19s:%s, message <%s> message ID<%d>has been dispatchd")),  /* catgets 3331  */
            timeStampStr,
            tBuff,
            log->eventLog.jobMsgAckLog.msg,
@@ -3036,7 +3047,7 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
            timeStampStr,
            tBuff,
            I18N (3333,
-             "pending: Job has been requeued") /* catgets  3333  */ );
+             "pending: Job has been requeued") /* catgets 3333  */ );
       prtLine (prline);
       prtLine (";\n");
       break;
@@ -3059,7 +3070,7 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
           {
 
         if (sigactLog->period)
-          sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3335, "%-12.19s:%s, checkpoint period is set to %d min.")),    /* catgets  3335  */
+          sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3335, "%-12.19s:%s, checkpoint period is set to %d min.")),    /* catgets 3335  */
                timeStampStr,
                tBuff, (int) (sigactLog->period / 60));
         prtLine (prline);
@@ -3073,8 +3084,8 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
         tmpPtr =
           putstr_ ((_i18n_msg_get
                 (ls_catd, NL_SETN, 3262, "initiated")));
-        sprintf (prline, "%-12.19s:%s %s %s (actpid %d)", timeStampStr, tBuff, (sigactLog->flags & LSB_CHKPNT_MIG) ? (_i18n_msg_get (ls_catd, NL_SETN, 3337, "Migration checkpoint")) : /* catgets  3337  */
-             (_i18n_msg_get (ls_catd, NL_SETN, 3338, "Checkpoint")),    /* catgets  3338  */
+        sprintf (prline, "%-12.19s:%s %s %s (actpid %d)", timeStampStr, tBuff, (sigactLog->flags & LSB_CHKPNT_MIG) ? (_i18n_msg_get (ls_catd, NL_SETN, 3337, "Migration checkpoint")) : /* catgets 3337  */
+             (_i18n_msg_get (ls_catd, NL_SETN, 3338, "Checkpoint")),    /* catgets 3338  */
              tmpPtr, sigactLog->pid);
         free (tmpPtr);
           }
@@ -3082,10 +3093,10 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
              sigactLog->actStatus == ACT_FAIL)
           {
         char *tmpPtr;
-        tmpPtr = putstr_ ((sigactLog->actStatus == ACT_DONE) ? (_i18n_msg_get (ls_catd, NL_SETN, 3341, "succeeded")) :  /* catgets  3341  */
-                  (_i18n_msg_get (ls_catd, NL_SETN, 3342, "failed")));  /* catgets  3342  */
-        sprintf (prline, "%-12.19s:%s %s %s (actpid %d)", timeStampStr, tBuff, (sigactLog->flags & LSB_CHKPNT_MIG) ? (_i18n_msg_get (ls_catd, NL_SETN, 3337, "Migration checkpoint")) : /* catgets  3337  */
-             (_i18n_msg_get (ls_catd, NL_SETN, 3338, "Checkpoint")),    /* catgets  3338  */
+        tmpPtr = putstr_ ((sigactLog->actStatus == ACT_DONE) ? (_i18n_msg_get (ls_catd, NL_SETN, 3341, "succeeded")) :  /* catgets 3341  */
+                  (_i18n_msg_get (ls_catd, NL_SETN, 3342, "failed")));  /* catgets 3342  */
+        sprintf (prline, "%-12.19s:%s %s %s (actpid %d)", timeStampStr, tBuff, (sigactLog->flags & LSB_CHKPNT_MIG) ? (_i18n_msg_get (ls_catd, NL_SETN, 3337, "Migration checkpoint")) : /* catgets 3337  */
+             (_i18n_msg_get (ls_catd, NL_SETN, 3338, "Checkpoint")),    /* catgets 3338  */
              tmpPtr, sigactLog->pid);
         free (tmpPtr);
           }
@@ -3105,8 +3116,8 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
         break;
           case ACT_DONE:
           case ACT_FAIL:
-        sprintf (prline, "%-12.19s:%s %s %s (actpid %d)", timeStampStr, tBuff, actionName (sigactLog->signalSymbol), (sigactLog->actStatus == ACT_DONE) ? (_i18n_msg_get (ls_catd, NL_SETN, 3343, "completed")) :   /* catgets  3343  */
-             (_i18n_msg_get (ls_catd, NL_SETN, 3344, "exited with non-zero value")),    /* catgets  3344  */
+        sprintf (prline, "%-12.19s:%s %s %s (actpid %d)", timeStampStr, tBuff, actionName (sigactLog->signalSymbol), (sigactLog->actStatus == ACT_DONE) ? (_i18n_msg_get (ls_catd, NL_SETN, 3343, "completed")) :   /* catgets 3343  */
+             (_i18n_msg_get (ls_catd, NL_SETN, 3344, "exited with non-zero value")),    /* catgets 3344  */
              sigactLog->pid);
         break;
           }
@@ -3123,7 +3134,7 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
       jobId = LSB_JOBID (log->eventLog.jobStartAcceptLog.jobId,
              log->eventLog.jobStartAcceptLog.idx);
       sprintf (tBuff, "%s <%s>", I18N_Job, lsb_jobid2str (jobId));
-      sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3347, "%-12.19s:%s, starting (Pid %d)")),  /* catgets  3347  */
+      sprintf (prline, (_i18n_msg_get (ls_catd, NL_SETN, 3347, "%-12.19s:%s, starting (Pid %d)")),  /* catgets 3347  */
            timeStampStr, tBuff, log->eventLog.jobStartAcceptLog.jobPid);
       prtLine (prline);
       prtLine (";\n");
@@ -3179,46 +3190,43 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
     }
 }
 
-static char *
+char *
 lowFirstChar (char *statement)
 {
-  if (isalpha (*statement))
-    *statement = tolower (*statement);
-  return (statement);
+    if (isalpha (*statement)) {
+       *statement = tolower (*statement);
+    }
 
+    return statement;
 }
 
-static int
+int
 initJobIdIndexS (struct jobIdIndexS *indexS, char *fileName)
 {
-  int cc;
-  char tag[80];
-  char version[80];
+    int cc;
+    char tag[80];
+    char version[80];
 
-  if ((indexS->fp = fopen (fileName, "r")) == NULL)
-    {
-      if (errno != ENOENT)
-    {
-      fprintf (stderr, "failed to open the jobId index file.\n");
-      perror (fileName);
-    }
-      return (-1);
+    if ((indexS->fp = fopen (fileName, "r")) == NULL) {
+        if (errno != ENOENT) {
+            fprintf (stderr, "failed to open the jobId index file.\n");
+            perror (fileName);
+        }
+        return -1;
     }
 
-  cc = fscanf (indexS->fp, "\
-%s %s %d %ld", tag, version, &(indexS->totalRows), &(indexS->lastUpdate));
-  if (cc != 4 || strcmp (tag, LSF_JOBIDINDEX_FILETAG))
-    {
-      fprintf (stderr, "wrong jobId index file format.\n");
-      fclose (indexS->fp);
-      return (-1);
+    cc = fscanf (indexS->fp, "%s %s %d %ld", tag, version, &(indexS->totalRows), &(indexS->lastUpdate));
+    if (cc != 4 || strcmp (tag, LSF_JOBIDINDEX_FILETAG)) {
+        fprintf (stderr, "wrong jobId index file format.\n");
+        fclose (indexS->fp);
+        return -1;
     }
 
-  fseek (indexS->fp, 80, SEEK_SET);
+    fseek (indexS->fp, 80, SEEK_SET);
 
-  strcpy (indexS->fileName, fileName);
-  indexS->version = atof (version);
-  indexS->curRow = 0;
+    strcpy (indexS->fileName, fileName);
+    indexS->version = atof (version);
+    indexS->curRow = 0;
 
-  return (0);
+    return 0;
 }

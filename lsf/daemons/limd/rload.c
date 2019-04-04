@@ -78,7 +78,7 @@ getutime (char *usert)
 
 
     if (strchr (usert, ':') != NULL) {
-        return (MAXIDLETIME);
+        return MAXIDLETIME;
     }
   
     strcpy (buffer, "/dev/"); // FIXME FIXME FIXME FIXME remove fixed strings
@@ -93,10 +93,10 @@ getutime (char *usert)
 
     time (&t);
     if (t < lastinputtime) {
-        return (time_t) 0;
+        return time_t 0;
     }
     else {
-        return (t - lastinputtime);
+        return t - lastinputtime;
     }
 }
 
@@ -185,7 +185,7 @@ idletime (int *logins)
   if (idcount != 1)
     {
       *logins = last_logins;
-      return (idleSeconds / 60.0);
+      return idleSeconds / 60.0;
     }
 
     // FIXME FIXME FIXME future compatibility point
@@ -193,7 +193,7 @@ idletime (int *logins)
     {
         ls_syslog (LOG_WARNING, I18N_FUNC_S_FAIL_M, __func__, "open", UTMPX_FILE);
         *logins = last_logins;
-        return (MAXIDLETIME / 60.0);
+        return MAXIDLETIME / 60.0;
     }
 
   numusers = 0;
@@ -321,7 +321,7 @@ idletime (int *logins)
     {
       idleSeconds = currentTime - lastActiveTime;
     }
-  return (idleSeconds / 60.0);
+  return idleSeconds / 60.0;
 }
 
 time_t
@@ -357,7 +357,7 @@ getXIdle ()
   if (t < lastTime)
     return 0;
   else
-    return (t - lastTime);
+    return t - lastTime;
 }
 
 void
@@ -587,10 +587,10 @@ lim_popen (char **argv, char *mode)
     int p[2], pid, i;
 
   if (mode[0] != 'r')
-    return (NULL);
+    return NULL;
 
     if (pipe (p) < 0) {
-        return (NULL);
+        return NULL;
     }
 
     if ((pid = fork ()) == 0)
@@ -612,7 +612,7 @@ lim_popen (char **argv, char *mode)
         for (i = 2; i < sysconf (_SC_OPEN_MAX); i++) {
             close (i);
         }
-        for (i = 1; i < NSIG; i++) {
+        for (i = 1; i < SIGRTMAX; i++) {
             Signal_ (i, SIG_DFL);
         }
         lsfExecX(argv[0], argv, execvp); // FIXME FIXME FIXME FIXME sanitize argv[0]; name argv[0]
@@ -648,7 +648,7 @@ lim_pclose (FILE * ptr)
     fclose (ptr);
 
   if (child == -1)
-    return (-1);
+    return -1;
 
   kill (child, SIGTERM);
 
@@ -660,7 +660,7 @@ lim_pclose (FILE * ptr)
 
   sigprocmask (SIG_SETMASK, &omask, NULL);
 
-  return (0);
+  return 0;
 }
 
 int
@@ -701,7 +701,7 @@ saveIndx (char *name, float value)
 
     if (allInfo.resTable[indx].valueType != LS_NUMERIC  || indx >= allInfo.numIndx)
     {
-      return (0);
+      return 0;
     }
 
     if (indx < NBUILTINDEX)
@@ -1230,7 +1230,7 @@ saveSBValue (char *name, char *value)
   time_t currentTime = 0;
 
   if ((indx = getResEntry (name)) < 0)
-    return (-1);
+    return -1;
 
   if (!(allInfo.resTable[indx].flags & RESF_DYNAMIC))
     return -1;
@@ -1244,7 +1244,7 @@ saveSBValue (char *name, char *value)
     }
 
   if (myHostPtr->numInstances <= 0)
-    return (-1);
+    return -1;
 
   for (i = 0; i < myHostPtr->numInstances; i++)
     {
@@ -1272,14 +1272,14 @@ saveSBValue (char *name, char *value)
 	      && (myHostNo < 0
 		  || ((updHostNo < myHostNo)
 		      && strcmp (myHostPtr->instances[i]->value, "-"))))
-	    return (0);
+	    return 0;
 	}
 
       if ((temp = (char *) malloc (strlen (value) + 1)) == NULL)
 	{
 	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
 	  FREEUP (temp);
-	  return (0);
+	  return 0;
 	}
       strcpy (temp, value);
       FREEUP (myHostPtr->instances[i]->value);
@@ -1291,9 +1291,9 @@ saveSBValue (char *name, char *value)
 		   i, myHostPtr->instances[i]->resName,
 		   myHostPtr->instances[i]->value, temp,
 		   myHostPtr->instances[i]->updHost->hostName);
-      return (0);
+      return 0;
     }
-  return (-1);
+  return -1;
 
 }
 
@@ -1498,11 +1498,11 @@ isResourceSharedInAllHosts (char *resName)
         }
         if (tmpSharedRes->nHosts == myClusterPtr->numHosts)
         {
-            return (1);
+            return 1;
         }
     }
 
-  return (0);
+  return 0;
 }
 
 int
@@ -1561,7 +1561,7 @@ queueLength (void)
     if (dir_proc_fd == (DIR *) 0)
     {
         ls_syslog (LOG_ERR, "%s: opendir() /proc failed: %m", __func__);
-        return (0.0);
+        return 0.0;
     }
 
     while ((process = readdir (dir_proc_fd)))
@@ -1660,7 +1660,7 @@ getpaging (float etime)
 
   if (getPage (&page_in, &page_out, TRUE) == -1)
     {
-      return (0.0);
+      return 0.0;
     }
 
   page = page_in + page_out;
@@ -1694,7 +1694,7 @@ getIoRate (float etime)
 
   if (getPage (&page_in, &page_out, FALSE) == -1)
     {
-      return (0.0);
+      return 0.0;
     }
 
   if (first)
@@ -1893,7 +1893,7 @@ tmpspace (void)
     if (statvfs ("/tmp", &fs) < 0)  // FIXME FIXME FIXME FIXME /tmp should be set in configure.ac
     {
         ls_syslog (LOG_ERR, "%s: statfs() /tmp failed: %m", __func__);
-        return (tmps);
+        return tmps;
     }
 
     if (fs.f_bavail > 0) {
@@ -1913,7 +1913,7 @@ realMem (float extrafactor)
     u_long realmem = 0;
 
     if (readMeminfo () == -1) {
-        return (0);
+        return 0;
     }
     realmem = (free_mem + buf_mem + cashed_mem) / 1024;
     realmem -= 2;
@@ -1936,7 +1936,7 @@ numCpus (void)
         ls_syslog (LOG_ERR, "%s: fopen() failed on proc/cpuinfo: %m", __func__);
         ls_syslog (LOG_ERR, "%s: assuming one CPU only", __func__);
         // cpu_number = 1;
-        // return (1);
+        // return 1;
         fclose( fp );
         exit( 127 );
     }

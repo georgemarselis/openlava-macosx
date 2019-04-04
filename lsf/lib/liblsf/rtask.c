@@ -234,7 +234,7 @@ ls_rtaske (char *host, char **argv, int options, char **envp)
             }
         }
 
-      for (d = 1; d < NSIG; d++) { // NSIG is in <signal.h>
+      for (d = 1; d < SIGRTMAX; d++) { // SIGRTMAX is in <signal.h>
         Signal_ (d, SIG_DFL);
     }
 

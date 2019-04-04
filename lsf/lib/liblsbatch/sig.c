@@ -25,148 +25,141 @@
 #include "lsb/lsb.h"
 #include "lib/xdr.h"
 
-static int signalJob_ (int, LS_LONG_INT, time_t, int);
+// static int signalJob_ (int, LS_LONG_INT, time_t, int);
 
 int
 lsb_signaljob (LS_LONG_INT jobId, int sigValue)
 {
-  if (sigValue < 0 || sigValue >= NSIG)
-    {
-      lsberrno = LSBE_BAD_SIGNAL;
-      return (-1);
+    if (sigValue < 0 || sigValue >= SIGRTMAX ) {
+        lsberrno = LSBE_BAD_SIGNAL;
+        return -1;
     }
-  return (signalJob_ (sigValue, jobId, 0, 0));
+
+    return signalJob_ (sigValue, jobId, 0, 0);
 }
 
 int
 lsb_chkpntjob (LS_LONG_INT jobId, time_t period, int options)
 {
-  int lsbOptions = 0;
+    int lsbOptions = 0;
 
-  if (period < LSB_CHKPERIOD_NOCHNG)
-    {
-      lsberrno = LSBE_BAD_ARG;
-      return (-1);
+    if (period < LSB_CHKPERIOD_NOCHNG) {
+        lsberrno = LSBE_BAD_ARG;
+        return -1;
     }
 
+    if (options & LSB_CHKPNT_KILL) {
+        lsbOptions |= LSB_CHKPNT_KILL;
+    }
+    if (options & LSB_CHKPNT_FORCE) {
+        lsbOptions |= LSB_CHKPNT_FORCE;
+    }
+    if (options & LSB_CHKPNT_STOP) {
+        lsbOptions |= LSB_CHKPNT_STOP;
+    }
 
-
-  if (options & LSB_CHKPNT_KILL)
-    lsbOptions |= LSB_CHKPNT_KILL;
-  if (options & LSB_CHKPNT_FORCE)
-    lsbOptions |= LSB_CHKPNT_FORCE;
-  if (options & LSB_CHKPNT_STOP)
-    lsbOptions |= LSB_CHKPNT_STOP;
-
-  return (signalJob_ (SIG_CHKPNT, jobId, period, lsbOptions));
+    return signalJob_ (SIG_CHKPNT, jobId, period, lsbOptions);
 }
 
 int
 lsb_deletejob (LS_LONG_INT jobId, int times, int options)
 {
-  if (times < 0)
-    {
-      lsberrno = LSBE_BAD_ARG;
-      return (-1);
+    if (times < 0) {
+        lsberrno = LSBE_BAD_ARG;
+        return -1;
     }
-  if (options & LSB_KILL_REQUEUE)
-    {
-      return (signalJob_ (SIG_KILL_REQUEUE, jobId, 0, 0));
+    if (options & LSB_KILL_REQUEUE) {
+            return signalJob_ (SIG_KILL_REQUEUE, jobId, 0, 0);
     }
-  return (signalJob_ (SIG_DELETE_JOB, jobId, times, options));
 
+    return signalJob_ (SIG_DELETE_JOB, jobId, times, options);
 }
 
 
 int
 lsb_forcekilljob (LS_LONG_INT jobId)
 {
-  return (signalJob_ (SIG_TERM_FORCE, jobId, 0, 0));
+    return signalJob_ (SIG_TERM_FORCE, jobId, 0, 0);
 }
 
 
-static int
+int
 signalJob_ (int sigValue, LS_LONG_INT jobId, time_t period, int options)
 {
-  struct signalReq signalReq;
-  char request_buf[MSGSIZE];
-  char *reply_buf;
-  XDR xdrs;
-  mbdReqType mbdReqtype;
-  int cc;
-  struct LSFHeader hdr;
-  struct lsfAuth auth;
+    struct signalReq signalReq;
+    char request_buf[MSGSIZE];
+    char *reply_buf = NULL;
+    XDR xdrs;
+    mbdReqType mbdReqtype;
+    int cc = 0;
+    struct LSFHeader hdr;
+    struct lsfAuth auth;
 
-  signalReq.jobId = jobId;
+    signalReq.jobId = jobId;
 
-  if (authTicketTokens_ (&auth, NULL) == -1)
-    return (-1);
+    if (authTicketTokens_ (&auth, NULL) == -1) {
+        return -1;
+    }
 
-  signalReq.sigValue = sigValue;
-  signalReq.chkPeriod = period;
-  signalReq.actFlags = options;
+    signalReq.sigValue = sigValue;
+    signalReq.chkPeriod = period;
+    signalReq.actFlags = options;
 
-  signalReq.sigValue = sig_encode (signalReq.sigValue);
+    signalReq.sigValue = sig_encode (signalReq.sigValue);
 
-  mbdReqtype = BATCH_JOB_SIG;
-  xdrmem_create (&xdrs, request_buf, MSGSIZE, XDR_ENCODE);
+    mbdReqtype = BATCH_JOB_SIG;
+    xdrmem_create (&xdrs, request_buf, MSGSIZE, XDR_ENCODE);
 
-  initLSFHeader_ (&hdr);
-  hdr.opCode = mbdReqtype;
-  if (!xdr_encodeMsg (&xdrs,
-		      (char *) &signalReq, &hdr, xdr_signalReq, 0, &auth))
-    {
-      lsberrno = LSBE_XDR;
-      xdr_destroy (&xdrs);
-      return -1;
+    initLSFHeader_ (&hdr);
+    hdr.opCode = mbdReqtype;
+    if (!xdr_encodeMsg (&xdrs, (char *) &signalReq, &hdr, xdr_signalReq, 0, &auth)) {
+        lsberrno = LSBE_XDR;
+        xdr_destroy (&xdrs);
+        return -1;
     }
 
     assert( XDR_GETPOS (&xdrs) <= INT_MAX );
-  if ((cc = callmbd (NULL, request_buf, (int)XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL)) < 0)
-    {
-      xdr_destroy (&xdrs);
-      return -1;
+    if ((cc = callmbd (NULL, request_buf, (int)XDR_GETPOS (&xdrs), &reply_buf, &hdr, NULL, NULL, NULL)) < 0) {
+        xdr_destroy (&xdrs);
+        return -1;
     }
 
-  xdr_destroy (&xdrs);
+    xdr_destroy (&xdrs);
 
-  if (cc)
-    free (reply_buf);
+    if (cc) {
+        free (reply_buf);
+    }
 
-  lsberrno = hdr.opCode;
-  if (lsberrno == LSBE_NO_ERROR || lsberrno == LSBE_JOB_DEP)
-    return 0;
+    lsberrno = hdr.opCode;
+    if (lsberrno == LSBE_NO_ERROR || lsberrno == LSBE_JOB_DEP) {
+        return 0;
+    }
 
-  return -1;
+    return -1;
 }
 
 int
 lsb_requeuejob (struct jobrequeue *reqPtr)
 {
-  int cc;
+    int cc = 0;
 
-  if (reqPtr == NULL || (*reqPtr).jobId <= 0)
-    {
-      lsberrno = LSBE_BAD_ARG;
-      return (-1);
+    if (reqPtr == NULL || (*reqPtr).jobId <= 0) {
+        lsberrno = LSBE_BAD_ARG;
+        return -1;
     }
 
-  if ((*reqPtr).status != JOB_STAT_PEND && (*reqPtr).status != JOB_STAT_PSUSP)
-    {
-      (*reqPtr).status = JOB_STAT_PEND;
+    if ((*reqPtr).status != JOB_STAT_PEND && (*reqPtr).status != JOB_STAT_PSUSP) {
+        (*reqPtr).status = JOB_STAT_PEND;
     }
 
-  if ((*reqPtr).options != REQUEUE_DONE
-      && (*reqPtr).options != REQUEUE_EXIT
-      && (*reqPtr).options != REQUEUE_RUN)
-    {
-      (*reqPtr).options |= (REQUEUE_DONE | REQUEUE_EXIT | REQUEUE_RUN);
+    if ((*reqPtr).options != REQUEUE_DONE && (*reqPtr).options != REQUEUE_EXIT && (*reqPtr).options != REQUEUE_RUN) {
+        (*reqPtr).options |= (REQUEUE_DONE | REQUEUE_EXIT | REQUEUE_RUN);
     }
 
-  cc = signalJob_ (SIG_ARRAY_REQUEUE,
-		   (*reqPtr).jobId, (*reqPtr).status, (*reqPtr).options);
-  if (cc == LSBE_NO_ERROR)
-    return 0;
+    cc = signalJob_ (SIG_ARRAY_REQUEUE, (*reqPtr).jobId, (*reqPtr).status, (*reqPtr).options);
+    if (cc == LSBE_NO_ERROR) {
+        return 0;
+    }
 
-  return -1;
+    return -1;
 }

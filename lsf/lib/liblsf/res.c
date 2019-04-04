@@ -1293,7 +1293,7 @@ sendSig_ (char *host, pid_t rid, int sig, int options)
         }
     }
     
-    if (sig >= NSIG || sig < 0) {  // NSIG is in <signal.h>
+    if (sig >= SIGRTMAX || sig < 0) {  // NSIG is in <signal.h>
         lserrno = LSE_BAD_ARGS;
         return -1;
     }

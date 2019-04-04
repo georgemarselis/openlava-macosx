@@ -21,10 +21,6 @@
 #include <limits.h>
 #include <pwd.h>
 #include <signal.h>
-// FIXME FIXME FIXME
-// above is related to signal.h and specifically to NSIG (the maximum available signal for the platform) 
-// see if the define is necessary and get rid of it
-
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <termios.h>
@@ -37,7 +33,7 @@
 #include "lib/rdwr.h"
 #include "lib/misc.h"
 #include "lib/syslog.h"
-#include "lsb/sig.h"    // NSIG 
+// #include "lsb/sig.h"    // SIGRTMAX 
 #include "daemons/libniosd/niosd.h"
 #include "daemons/libresd/resout.h"
 #include "libint/lsi18n.h"
@@ -275,7 +271,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
               exit (-1);
             }
 
-            for ( int i = 1; i < SIGRTMAX; i++) {  // NSIG is in a linux thing. SIGRTMAX is POSIX compliant // FIXME FIXME FIXME FIXME see if this works in other opearting systems
+            for ( int i = 1; i < SIGRTMAX; i++) {  // SIGRTMAX is in a linux thing. SIGRTMAX is POSIX compliant // FIXME FIXME FIXME FIXME see if this works in other opearting systems
                 Signal_ (i, SIG_DFL);               // IF you get stuck here and try to throw the kitchen sink on it in order to compile, disregard -D__SIGNAL_H if you see it in <signal.h>
             }
 

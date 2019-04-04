@@ -1725,7 +1725,7 @@ sendResParent( struct LSFHeader *msgHdr, char *msgBuf, bool_t (*xdrFunc) () )
     }
 
     free( buf );
-    //  return (resAck) msgHdr->opCode;
+    //  return resAck msgHdr->opCode;
     return msgHdr->opCode;
 }
 
@@ -2591,7 +2591,7 @@ stripHomeNT (const char *curdir, const char *home)
         curdir = NULL;
     }
 
-    return (char *) curdir;
+    return char * curdir;
 }
 
 // static 
@@ -2943,7 +2943,7 @@ rexecChild (struct client *cli_ptr, struct resCmdBill *cmdmsg, int server, int t
             }
         }
 
-    for( unsigned int counter = 1; counter < NSIG; counter++) {
+    for( unsigned int counter = 1; counter < SIGRTMAX; counter++) {
         Signal_ (counter, SIG_DFL);
     }
 
@@ -3046,7 +3046,7 @@ lsbExecChild (struct resCmdBill *cmdmsg, int *pty, int *sv, int *err, int *info,
         }
     }
 
-    for ( i = 1; i < NSIG; i++) {
+    for ( i = 1; i < SIGRTMAX; i++) {
         Signal_ (i, SIG_DFL);
     }
 
