@@ -17,6 +17,8 @@
  */
 
 #include <signal.h>
+#include <errno.h>
+#include <limits.h>
 
 #include "lib/lib.h"
 #include "lib/err.h"
@@ -31,12 +33,15 @@ errnoEncode_ (int eno)
         return eno;
     }
 
-    for ( int i = 0; i < NERRNO_MAP; i++)
-    {
-        if (errno_map[i] == eno) {
-            return i;
-        }
-    }
+    // for ( int i = 0; i < NERRNO_MAP; i++) // FIXME FIXME FIXME FIXME this has to be revisted
+    /* they are trying to encode the error into a number?
+     * 
+    */
+    // {
+    //     if ( ls_errmsg[i] == eno) { // ls_errmsg is from lib/err.h
+    //         return i;
+    //     }
+    // }
 
     if (eno >= NERRNO_MAP) {
         return eno;
@@ -44,12 +49,16 @@ errnoEncode_ (int eno)
     else {
         return 0;
     }
+
+    return INT_MAX;
 }
 
 int
 errnoDecode_ (int eno)
 {
     int NERRNO_MAP  = ELASTVALUE - 1;
+
+    assert( lserrno ); // BULLSHIT CODE so the compiler will not generate a warning.
 
     if (eno < 0) {
         return eno;
@@ -64,6 +73,6 @@ errnoDecode_ (int eno)
         }
     }
 
-  return errno_map[eno];
-
+    // return ls_errmsg[eno];  // ls_errmsg is from lib/err.h
+    return INT_MAX;
 }
