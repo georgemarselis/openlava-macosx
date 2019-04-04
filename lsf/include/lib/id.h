@@ -60,10 +60,20 @@ struct IDLIB_INFO_T idLib_ = {
 	NULL
 };
 
-int            getLSFUser_       ( const char *lsfUserName,                           unsigned int lsfUserNameSize );
-int            getLSFUserByName_ ( const char *osUserName,  const char  *lsfUserName, unsigned int lsfUserNameSize );
-int            getLSFUserByUid_  ( uid_t uid,               const char  *lsfUserName, unsigned int lsfUserNameSize );
-int            getOSUserName_    ( const char *lsfUserName, const char  *osUserName,  unsigned int osUserNameSize  );
-int            getOSUid_         ( const char *lsfUserName, uid_t *uid );
-struct passwd *getpwlsfuser_     ( const char *lsfUserName );
-struct passwd *getpwdirlsfuser_  ( const char *lsfUserName );
+/* id.c */
+void initIdLibDefaults         ( struct IDLIB_INFO_T *idLib );
+int initIdLib                  ( struct IDLIB_INFO_T *idLib );
+bool_t checkInit               ( struct IDLIB_INFO_T *idLib );
+int getLSFUser_                ( const char *lsfUserName, unsigned int lsfUserNameSize );
+int getLSFUserByName_          ( const char *osUserName, const char *lsfUserName, unsigned int lsfUserNameSize );
+int getLSFUserByUid_           ( const uid_t uid, const char *lsfUserName, unsigned int lsfUserNameSize);
+int getOSUserName_             ( const char *lsfUserName, const char *osUserName, unsigned int osUserNameSize );
+int getOSUid_                  ( const char *lsfUserName, const uid_t *uid);
+struct passwd *getpwlsfuser_   ( const char *lsfUserName );
+struct passwd *getpwdirlsfuser_( const char *lsfUserName );
+int defGetLSFUser              ( const char *lsfUserName, unsigned int lsfUserNameSize );
+int defGetLSFUserByName        ( const char *osUserName, const char *lsfUserName, unsigned int lsfUserNameSize );
+int defGetLSFUserByUid         ( const uid_t uid, const char *lsfUserName, unsigned int lsfUserNameSize);
+int defGetOSUserName           ( const char *lsfUserName, const char *osUserName, unsigned int osUserNameSize);
+int defGetOSUid                ( const char *lsfUserName, const uid_t *uid);
+

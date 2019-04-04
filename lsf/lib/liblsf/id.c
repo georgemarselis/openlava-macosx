@@ -224,7 +224,7 @@ cleanup:  // FIXME FIXME FIXME FIXME FIXME remove cleanup: label
     return retcode;
 }
 
-static bool_t
+bool_t
 checkInit ( struct IDLIB_INFO_T *idLib)
 {
     if (!idLib->initialized) {

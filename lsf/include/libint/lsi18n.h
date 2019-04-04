@@ -129,14 +129,14 @@ enum CTIME_ENUM {
 // #endif
 
 
-int    _i18n_end         ( void );
-char  *_i18n_ctime       ( int, int, const time_t * );
+// int    _i18n_end         ( void );
+// char  *_i18n_ctime       ( int, int, const time_t * );
 char  *_i18n_msg_get     ( int, int typeofError, int catgetsNumber, char *errorMessage );
 char **_i18n_msgArray_get( int, int, int *, char ** );
-void   _i18n_ctime_init  ( int );
+// void   _i18n_ctime_init  ( int );
 
-int   _i18n_init   ( int );
-char *_i18n_printf (const char *, ...);
+// int   _i18n_init   ( int );
+// char *_i18n_printf (const char *, ...);
 
 
 
