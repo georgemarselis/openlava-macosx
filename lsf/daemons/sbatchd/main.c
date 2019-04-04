@@ -259,7 +259,7 @@ main (int argc, char **argv)
     }
 
 
-  for (i = allLsInfo->nModels; i < MAXMODELS; i++)
+  for (i = allLsInfo->nModels; i < MAX_MODELS; i++)
     allLsInfo->cpuFactor[i] = 1.0;
 
   if (logclass & (LC_TRACE | LC_COMM))

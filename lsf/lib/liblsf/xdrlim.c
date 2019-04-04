@@ -404,10 +404,10 @@ xdr_shortHInfo (XDR *xdrs, struct shortHInfo *shortHInfo, struct LSFHeader *hdr,
     if (xdrs->x_op == XDR_ENCODE) {
 
 //        if (shortHInfo->hTypeIndx >= 0) {
-            tIndx = MIN (MAXTYPES, shortHInfo->hTypeIndx);
+            tIndx = MIN (MAX_TYPES, shortHInfo->hTypeIndx);
 //        }
 //        else {
-//            tIndx = MAXTYPES;
+//            tIndx = MAX_TYPES; // FIXME FIXME throw in debugger?
 //        }
         
         tIndx &= 0x7FFF;
@@ -417,10 +417,10 @@ xdr_shortHInfo (XDR *xdrs, struct shortHInfo *shortHInfo, struct LSFHeader *hdr,
         }
         
 //        if (shortHInfo->hModelIndx >= 0) {
-            mIndx = MIN (MAXMODELS, shortHInfo->hModelIndx);
+            mIndx = MIN (MAX_MODELS, shortHInfo->hModelIndx);
 //        }
 //        else {
-//            mIndx = MAXMODELS;
+//            mIndx = MAX_MODELS;
 //        }
         
         a = tIndx << 16;

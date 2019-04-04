@@ -8,8 +8,8 @@ int masterknown_ = 0; // FALSE
 
 /* info.c */
 char *ls_getclustername(void);
-unsigned int expandList1_(char ***tolist, unsigned int num, unsigned int *bitmMaps, char **keys);
-unsigned int expandList_(char ***tolist, unsigned int mask, char **keys);
+unsigned int expandList1_(char ***tolist, int num, int *bitmMaps, char **keys);
+unsigned int expandList_(char ***tolist, int mask, char **keys);
 int copyAdmins_(struct clusterInfo *clusPtr, struct shortCInfo *clusShort);
 struct clusterInfo *expandSCinfo(struct clusterInfoReply *clusterInfoReply);
 struct clusterInfo *ls_clusterinfo(char *resReq, unsigned int *numclusters, char **clusterList, int listsize, int options);

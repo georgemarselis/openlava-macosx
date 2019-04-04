@@ -52,20 +52,21 @@ ls_getclustername (void)
 }
 
 unsigned int
-expandList1_ (char ***tolist, unsigned int num, unsigned int *bitmMaps, char **keys)
+expandList1_ (char ***tolist, int num, int *bitmMaps, char **keys) // NOTE the ints are correct, we are talking bitmaps
 {
 
-    unsigned int ii = 0;
+    int ii = 0;
     unsigned int jj = 0;
     int isSet = 0;
     char **temp = NULL;
+    size_t omgbecky = 0;
 
     if (num <= 0) {
         return 0;
     }
 
-    // FIXME num is checked above. cast ok
-    temp = calloc ( num, sizeof (char *) + 1);
+    omgbecky = (size_t) num; // FIXME num is checked above. cast ok
+    temp = calloc ( omgbecky, sizeof (char *) + 1);
     if (  NULL == temp && ENOMEM == errno ) {
         lserrno = LSE_MALLOC;
         return 0;
@@ -91,7 +92,7 @@ expandList1_ (char ***tolist, unsigned int num, unsigned int *bitmMaps, char **k
 }
 
 unsigned int
-expandList_ (char ***tolist, unsigned int mask, char **keys)
+expandList_ (char ***tolist, int mask, char **keys) // NOTE yeah we mean the int
 {
     unsigned int lastElementCounter = 0;
     char *temp[32];                         // FIXME FIXME FIXME 32 element array looks awfuly particular. why?
@@ -136,7 +137,11 @@ copyAdmins_ (struct clusterInfo *clusPtr, struct shortCInfo *clusShort)
     clusPtr->admins   = calloc(  clusShort->nAdmins, sizeof (char *));
 
     if (!clusPtr->admins || !clusPtr->adminIds) {
-        goto errReturn;
+        // goto errReturn;
+        FREEUP (clusPtr->admins);
+        FREEUP (clusPtr->adminIds);
+        lserrno = LSE_MALLOC;
+        return -1;
     }
 
     for( unsigned int i = 0; i < clusShort->nAdmins; i++) {
@@ -151,18 +156,21 @@ copyAdmins_ (struct clusterInfo *clusPtr, struct shortCInfo *clusShort)
                 FREEUP (clusPtr->admins[j]);
             }
 
-            goto errReturn;
+            // goto errReturn;
+            FREEUP (clusPtr->admins);
+            FREEUP (clusPtr->adminIds);
+            lserrno = LSE_MALLOC;
+            return -1;
         }
     }
     
     return 0;
 
-errReturn:  // FIXME FIXME FIXME 
-    FREEUP (clusPtr->admins);
-    FREEUP (clusPtr->adminIds);
-    lserrno = LSE_MALLOC;
-    return -1;
-
+// errReturn:  // FIXME FIXME FIXME 
+//     FREEUP (clusPtr->admins);
+//     FREEUP (clusPtr->adminIds);
+//     lserrno = LSE_MALLOC;
+//     return -1;
 }
 
 struct clusterInfo *
@@ -224,24 +232,32 @@ expandSCinfo (struct clusterInfoReply *clusterInfoReply)
         clusterInfoPtr[i].hostModels = NULL;
 
         if (clusterInfoReply->clusterMatrix[i].nRes == 0) {
-            clusterInfoPtr[i].nRes = expandList_ (&clusterInfoPtr[i].resources, clusterInfoReply->clusterMatrix[i].resClass, lsInfoPtr->resName);
+            unsigned int resClass = clusterInfoReply->clusterMatrix[i].resClass;
+            assert( resClass <= INT_MAX );
+            clusterInfoPtr[i].nRes = expandList_ (&clusterInfoPtr[i].resources, (int) resClass, lsInfoPtr->resName);
         }
         else {
-            clusterInfoPtr[i].nRes = expandList1_ (&clusterInfoPtr[i].resources, clusterInfoReply->clusterMatrix[i].nRes, clusterInfoReply->clusterMatrix[i].resBitMaps, lsInfoPtr->resName);
+            unsigned int *resBitMaps = clusterInfoReply->clusterMatrix[i].resBitMaps;
+            unsigned int nRes = clusterInfoReply->clusterMatrix[i].nRes;
+            assert( *resBitMaps <= INT_MAX );
+            assert( nRes <= INT_MAX );
+            clusterInfoPtr[i].nRes = expandList1_ (&clusterInfoPtr[i].resources, (int) nRes, (int *) resBitMaps, lsInfoPtr->resName);
         }
 
         if (clusterInfoReply->clusterMatrix[i].nTypes == 0) {
-            clusterInfoPtr[i].nTypes = expandList_ (&clusterInfoPtr[i].hostTypes, clusterInfoReply->clusterMatrix[i].typeClass, lsInfoPtr->hostTypes);
+            clusterInfoPtr[i].nTypes = expandList_ (&clusterInfoPtr[i].hostTypes, (int) clusterInfoReply->clusterMatrix[i].typeClass, lsInfoPtr->hostTypes);
         }
         else {
-            clusterInfoPtr[i].nTypes = expandList1_ (&clusterInfoPtr[i].hostTypes, clusterInfoReply->clusterMatrix[i].nTypes, clusterInfoReply->clusterMatrix[i].hostTypeBitMaps, lsInfoPtr->hostTypes);
+            unsigned int *hostTypeBitMaps = clusterInfoReply->clusterMatrix[i].hostTypeBitMaps;
+            clusterInfoPtr[i].nTypes = expandList1_ (&clusterInfoPtr[i].hostTypes, (int) clusterInfoReply->clusterMatrix[i].nTypes, (int *)hostTypeBitMaps, lsInfoPtr->hostTypes);
         }
 
         if (clusterInfoReply->clusterMatrix[i].nModels == 0) {
-            clusterInfoPtr[i].nModels = expandList_ (&clusterInfoPtr[i].hostModels, clusterInfoReply->clusterMatrix[i].modelClass, lsInfoPtr->hostModels);
+            clusterInfoPtr[i].nModels = expandList_ (&clusterInfoPtr[i].hostModels, (int) clusterInfoReply->clusterMatrix[i].modelClass, lsInfoPtr->hostModels);
         }
         else {
-            clusterInfoPtr[i].nModels = expandList1_ (&clusterInfoPtr[i].hostModels, clusterInfoReply->clusterMatrix[i].nModels, clusterInfoReply->clusterMatrix[i].hostModelBitMaps, lsInfoPtr->hostModels);
+            unsigned int *hostModelBitMaps = clusterInfoReply->clusterMatrix[i].hostModelBitMaps;
+            clusterInfoPtr[i].nModels = expandList1_ (&clusterInfoPtr[i].hostModels, (int) clusterInfoReply->clusterMatrix[i].nModels, (int *) hostModelBitMaps, lsInfoPtr->hostModels);
         }
   
         if (i != clusterInfoReply->nClusters) {
@@ -556,10 +572,10 @@ expandSHinfo (struct hostInfoReply *hostInfoReply)
         hostInfoPtr[i].busyThreshold = hostInfoReply->hostMatrix[i].busyThreshold;
 
         indx = hostInfoReply->hostMatrix[i].hTypeIndx;
-        hostInfoPtr[i].hostType  = (indx == MAXTYPES) ? "unknown" : lsInfoPtr->hostTypes[indx];
+        hostInfoPtr[i].hostType  = (indx == MAX_TYPES) ? "unknown" : lsInfoPtr->hostTypes[indx];
 
-        indx = hostInfoReply->hostMatrix[i].hModelIndx; hostInfoPtr[i].hostModel = (indx == MAXMODELS) ? "unknown" : lsInfoPtr->hostModels[indx];
-        hostInfoPtr[i].cpuFactor = (indx == MAXMODELS) ? 1.0 : lsInfoPtr->cpuFactors[indx];
+        indx = hostInfoReply->hostMatrix[i].hModelIndx; hostInfoPtr[i].hostModel = (indx == MAX_MODELS) ? "unknown" : lsInfoPtr->hostModels[indx];
+        hostInfoPtr[i].cpuFactor = (indx == MAX_MODELS) ? 1.0 : lsInfoPtr->cpuFactors[indx];
 
         if (hostInfoReply->hostMatrix[i].nRInt == 0) {
             hostInfoPtr[i].nRes = expandList_ (&hostInfoPtr[i].resources, hostInfoReply->hostMatrix[i].resClass, lsInfoPtr->resName);

@@ -622,7 +622,7 @@ dohostmodel (FILE * fp, unsigned int *lineNum, const char *lsfile)
     const char HostModel[] = "HostModel";
 
     if (first) {
-        for ( int i = 0; i < MAXMODELS; ++i) {
+        for ( int i = 0; i < MAX_MODELS; ++i) {
             allInfo.cpuFactor[i] = 1.0;
             allInfo.modelRefs[i] = 0;
         }
@@ -643,7 +643,7 @@ dohostmodel (FILE * fp, unsigned int *lineNum, const char *lsfile)
 
     if (allInfo.nModels <= 0)
         {
-        memset (allInfo.modelRefs, 0, sizeof (int) * MAXMODELS);
+        memset (allInfo.modelRefs, 0, sizeof (int) * MAX_MODELS);
         allInfo.nModels = 2;
         }
     if (shortInfo.nModels <= 0)
@@ -3916,10 +3916,10 @@ lim_addHostType ( const char *type) // duplicate function name from liblsf: ls_a
 {
     int cntofdefault = 0;
 
-    if (allInfo.nTypes == MAXTYPES)
+    if (allInfo.nTypes == MAX_TYPES)
         {
         /* catgets 5353 */
-        ls_syslog (LOG_ERR, "5353: %s: Too many host types defined in section HostType. You can only define up to %d host types; host type %s ignored", __func__, MAXTYPES, type);
+        ls_syslog (LOG_ERR, "5353: %s: Too many host types defined in section HostType. You can only define up to %d host types; host type %s ignored", __func__, MAX_TYPES, type);
         return FALSE;
         }
 
@@ -3948,9 +3948,9 @@ char
 lim_addHostModel ( const char *model, const char *arch, double factor) // duplicate function name from liblsf: ls_addHostModel
 {
 
-    if (allInfo.nModels == MAXMODELS) {
+    if (allInfo.nModels == MAX_MODELS) { // FIXME FIXME FIXME remove this limitation
         /* catgets 5355 */
-        ls_syslog (LOG_ERR, "5355: %s: Too many host models defined in section HostModel. You can only define up to %d host models; host model %s ignored", __func__, MAXMODELS, model);
+        ls_syslog (LOG_ERR, "5355: %s: Too many host models defined in section HostModel. You can only define up to %d host models; host model %s ignored", __func__, MAX_MODELS, model);
         return FALSE;
         }
 

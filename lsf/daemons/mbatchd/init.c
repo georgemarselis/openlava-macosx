@@ -125,7 +125,7 @@ minit (int mbdInitFlags)
 	  mbdDie (MASTER_FATAL);
 	}
 
-  for ( unsigned long i = allLsInfo->nModels; i < MAXMODELS; i++) {
+  for ( unsigned long i = allLsInfo->nModels; i < MAX_MODELS; i++) {
 	allLsInfo->cpuFactor[i] = 1.0;
   }
 
@@ -151,8 +151,7 @@ minit (int mbdInitFlags)
 
   uGrpAllSet = setCreate (MAX_GROUPS, getIndexByuData, getuDataByIndex, "");
 
-  uGrpAllAncestorSet = setCreate (MAX_GROUPS, getIndexByuData,
-		  getuDataByIndex, "");
+  uGrpAllAncestorSet = setCreate (MAX_GROUPS, getIndexByuData, getuDataByIndex, "");
 
   TIMEIT (0, readParamConf (mbdInitFlags), "minit_readParamConf");
   TIMEIT (0, readHostConf (mbdInitFlags), "minit_readHostConf");

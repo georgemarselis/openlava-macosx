@@ -641,8 +641,7 @@ validHosts (char **hostList, int num, char *clName, int options)
 
       if (findHostbyList (clPtr->hostList, hostList[cc]) == NULL)
   {
-    ls_syslog (LOG_WARNING, "\
-%s: Unknown host %s in request", __func__, hostList[cc]);
+    ls_syslog (LOG_WARNING, "%s: Unknown host %s in request", __func__, hostList[cc]);
     return FALSE;
   }
     }
@@ -662,9 +661,9 @@ getCShortInfo (struct LSFHeader *reqHdr)
 
   oldShortInfo.nRes = shortInfo.nRes;
   oldShortInfo.resName = shortInfo.resName;
-  if (shortInfo.nTypes > MAXTYPES_31)
+  if (shortInfo.nTypes > MAX_TYPES_31)
     {
-      oldShortInfo.nTypes = MAXTYPES_31;
+      oldShortInfo.nTypes = MAX_TYPES_31;
     }
   else
     {
@@ -674,9 +673,9 @@ getCShortInfo (struct LSFHeader *reqHdr)
     {
       oldShortInfo.hostTypes[i] = shortInfo.hostTypes[i];
     }
-  if (shortInfo.nModels > MAXMODELS_31)
+  if (shortInfo.nModels > MAX_MODELS_31)
     {
-      oldShortInfo.nModels = MAXMODELS_31;
+      oldShortInfo.nModels = MAX_MODELS_31;
     }
   else
     {

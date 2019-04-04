@@ -57,12 +57,9 @@
 #define XDR_DECODE_SIZE_(a) (a)
 
 #define GET_INTNUM(i) ((i)/INTEGER_BITS + 1)
-#define SET_BIT(bitNo, integers)           \
-	integers[(bitNo)/INTEGER_BITS] |= (1<< (bitNo)%INTEGER_BITS);
-#define CLEAR_BIT(bitNo, integers)           \
-	integers[(bitNo)/INTEGER_BITS] &= ~(1<< (bitNo)%INTEGER_BITS);
-#define TEST_BIT(bitNo, integers, isSet)  \
-   {  \
+#define SET_BIT(bitNo, integers)   integers[(bitNo)/INTEGER_BITS] |= (1<< (bitNo)%INTEGER_BITS);
+#define CLEAR_BIT(bitNo, integers) integers[(bitNo)/INTEGER_BITS] &= ~(1<< (bitNo)%INTEGER_BITS);
+#define TEST_BIT(bitNo, integers, isSet)  {  \
 	  if (integers[(bitNo)/INTEGER_BITS] & (1<<(bitNo)%INTEGER_BITS))  \
 		  isSet = 1;         \
 	  else                   \
