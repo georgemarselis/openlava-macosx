@@ -209,9 +209,8 @@ void _lostconnection_ (char *);
 struct lsRequest *lsReqHandCreate_ (int, int, int, void *, requestCompletionHandler, appCompletionHandler, void *);
 void lsReqHandDestroy_ (struct lsRequest *);
 
-void ls_errlog (FILE * fd, const char *fmt, ...)
+// void ls_errlog (FILE * fd, const char *fmt, ...)
 #if defined(__GNUC__) && defined(CHECK_PRINTF)
 	__attribute__ ((format (printf, 2, 3)))
 #endif
-;
 

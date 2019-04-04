@@ -1047,7 +1047,7 @@ int optopt;
 
 static int lserrno;
 int masterLimDown;
-int ls_nerr;           // FIXME FIXME FIXME FIXME FIXME too many different types of lserrno
+// int ls_nerr;           // FIXME FIXME FIXME FIXME FIXME too many different types of lserrno
 // char *ls_errmsg[];  // FIXME FIXME FIXME FIXME FIXME put in specific header
 int logclass;
 int timinglevel;
@@ -1100,8 +1100,8 @@ char *ls_gethostmodel (char *hostname);
 // int ls_limcontrol (char *hostname, int opCode);
 void ls_remtty (int ind, int enableIntSus);
 void ls_loctty (int ind);
-char *ls_sysmsg (void);
-void ls_perror (char *usrMsg);
+// char *ls_sysmsg (void);
+// void ls_perror (char *usrMsg);
 
 
 // struct lsConf *ls_getconf (char *);
