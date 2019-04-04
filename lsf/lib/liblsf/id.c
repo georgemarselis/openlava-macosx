@@ -16,7 +16,12 @@
  *
  */
 
+
 #include "lib/id.h"
+#include "lib/syslog.h"
+#include "lib/structs/genParams.h"
+#include "libint/lsi18n.h"
+
 
 void
 initIdLibDefaults (struct IDLIB_INFO_T *idLib)
@@ -108,8 +113,11 @@ initIdLib ( struct IDLIB_INFO_T *idLib)
         return retcode;
     }
 
-    idLib->getLSFUser_ = (GET_LSF_USER_FN_T)
-    soSym_ (idLib->handle, "getLSFUser_");
+    int (*koko) ( const char *lsfUserName,  unsigned int lsfUserNameSize ); // FIXME This must be thrown in the debugger
+    *(int **)(&koko) = soSym_ (idLib->handle, "getLSFUser_");
+    // idLib->getLSFUser_ = (GET_LSF_USER_FN_T) soSym_ (idLib->handle, "getLSFUser_"); // https://stackoverflow.com/questions/14134245/iso-c-void-and-function-pointers
+    idLib->getLSFUser_ = koko;
+
     if (idLib->getLSFUser_ == NULL) {
         /* catgets 6351 */
         ls_syslog (LOG_ERR, "6351: %s: Error loading symbol %s from library %s: %k", __func__, "getLSFUser_", libPath);
@@ -127,8 +135,10 @@ initIdLib ( struct IDLIB_INFO_T *idLib)
 
         return retcode;
     }
-    idLib->getLSFUserByName_ = (GET_LSF_USER_BY_NAME_FN_T)
-    soSym_ (idLib->handle, "getLSFUserByName_");
+    int (*lala) ( const char *osUserName,  const char  *lsfUserName, unsigned int lsfUserNameSize ); // FIXME This must be thrown in the debugger
+    *( int **)(& lala ) = soSym_ (idLib->handle, "getLSFUserByName_");
+    // idLib->getLSFUserByName_ = (GET_LSF_USER_BY_NAME_FN_T) soSym_ (idLib->handle, "getLSFUserByName_"); // https://stackoverflow.com/questions/14134245/iso-c-void-and-function-pointers?
+    idLib->getLSFUserByName_ = lala;
     if (idLib->getLSFUserByName_ == NULL) {
         /* catgets 6351 */
         ls_syslog (LOG_ERR, "6351: %s: Error loading symbol %s from library %s: %k", __func__, "getLSFUserByName_", libPath);
@@ -146,8 +156,10 @@ initIdLib ( struct IDLIB_INFO_T *idLib)
 
         return retcode;
     }
-    idLib->getLSFUserByUid_ = (GET_LSF_USER_BY_UID_FN_T)
-    soSym_ (idLib->handle, "getLSFUserByUid_");
+    int (*foo) ( const uid_t uid, const char  *lsfUserName, unsigned int lsfUserNameSize ); // FIXME This must be thrown in the debugger
+    *( int **)( & foo ) = soSym_ (idLib->handle, "getLSFUserByUid_");
+    // idLib->getLSFUserByUid_ = (GET_LSF_USER_BY_UID_FN_T) soSym_ (idLib->handle, "getLSFUserByUid_"); // https://stackoverflow.com/questions/14134245/iso-c-void-and-function-pointers?
+    idLib->getLSFUserByUid_  = foo;
     if (idLib->getLSFUserByUid_ == NULL) {
         /* catgets 6351 */
         ls_syslog (LOG_ERR, "6351: %s: Error loading symbol %s from library %s: %k", __func__, "getLSFUserByUid_", libPath);
@@ -165,8 +177,10 @@ initIdLib ( struct IDLIB_INFO_T *idLib)
 
         return retcode;
     }
-    idLib->getOSUserName_ = (GET_OS_USER_NAME_FN_T)
-    soSym_ (idLib->handle, "getOSUserName_");
+    int (*bar) ( const char *lsfUserName, const char  *osUserName,  unsigned int osUserNameSize  ); // FIXME This must be thrown in the debugger
+    *( int ** )( &bar ) = soSym_ (idLib->handle, "getOSUserName_");
+    // idLib->getOSUserName_ = (GET_OS_USER_NAME_FN_T) soSym_ (idLib->handle, "getOSUserName_"); // https://stackoverflow.com/questions/14134245/iso-c-void-and-function-pointers?
+    idLib->getOSUserName_ = bar;
     if (idLib->getOSUserName_ == NULL) {
         /* catgets 6351 */
         ls_syslog (LOG_ERR, "6351: %s: Error loading symbol %s from library %s: %k", __func__, "getOSUserName_", libPath);
@@ -187,7 +201,10 @@ initIdLib ( struct IDLIB_INFO_T *idLib)
     
     // FIXME FIXME FIXME FIXME
     // check with the debugger
-    idLib->getOSUid_ = (GET_OS_UID_FN_T) soSym_ (idLib->handle, "getOSUid_");
+    int (* foobar ) ( const char *lsfUserName, const uid_t *uid);
+    *( int ** )( & foobar ) = soSym_ (idLib->handle, "getOSUid_");
+    // idLib->getOSUid_ = (GET_OS_UID_FN_T) soSym_ (idLib->handle, "getOSUid_"); // https://stackoverflow.com/questions/14134245/iso-c-void-and-function-pointers
+    idLib->getOSUid_ = foobar;
     if ( NULL == idLib->getOSUid_ ) {
         /* catgets 6351 */
         ls_syslog (LOG_ERR, "6351: %s: Error loading symbol %s from library %s: %k", __func__, getOSUid_, libPath);
@@ -208,7 +225,7 @@ initIdLib ( struct IDLIB_INFO_T *idLib)
 
     retcode = 0;
 
-cleanup:  // FIXME FIXME FIXME FIXME FIXME remove cleanup: label
+// cleanup:  // FIXME FIXME FIXME FIXME FIXME remove cleanup: label
 
     FREEUP (libPath);
 
@@ -257,7 +274,7 @@ getLSFUser_ (const char *lsfUserName, unsigned int lsfUserNameSize)
 }
 
 int
-getLSFUserByName_ (const char *osUserName, char *lsfUserName, unsigned int lsfUserNameSize)
+getLSFUserByName_ (const char *osUserName, const char *lsfUserName, unsigned int lsfUserNameSize)
 {
     int rc = 0;
 
@@ -276,7 +293,7 @@ getLSFUserByName_ (const char *osUserName, char *lsfUserName, unsigned int lsfUs
 }
 
 int
-getLSFUserByUid_ (uid_t uid, char *lsfUserName, unsigned int lsfUserNameSize)
+getLSFUserByUid_( const uid_t uid, const char *lsfUserName, unsigned int lsfUserNameSize)
 {
     int rc = 0;
 
@@ -295,7 +312,7 @@ getLSFUserByUid_ (uid_t uid, char *lsfUserName, unsigned int lsfUserNameSize)
 }
 
 int
-getOSUserName_ (const char *lsfUserName, char *osUserName, unsigned int osUserNameSize)
+getOSUserName_ (const char *lsfUserName, const char *osUserName, unsigned int osUserNameSize)
 {
     int rc;
 
@@ -315,7 +332,7 @@ getOSUserName_ (const char *lsfUserName, char *osUserName, unsigned int osUserNa
 
 
 int
-getOSUid_ (const char *lsfUserName, uid_t * uid)
+getOSUid_ (const char *lsfUserName, const uid_t *uid)
 {
     int rc = 0;
 
@@ -374,11 +391,11 @@ getpwdirlsfuser_ (const char *lsfUserName)
 }
 
 int
-defGetLSFUser (char *lsfUserName, unsigned int lsfUserNameSize)
+defGetLSFUser( const char *lsfUserName, unsigned int lsfUserNameSize)
 {
     struct passwd *pw = NULL;
 
-    lsfUserName[0] = '\0';
+    // lsfUserName[0] = '\0';
 
     if ((pw = getpwuid (getuid ())) == NULL) {
         return LSE_BADUSER;
@@ -387,30 +404,33 @@ defGetLSFUser (char *lsfUserName, unsigned int lsfUserNameSize)
     if (strlen (pw->pw_name) + 1 > lsfUserNameSize)  {
         return LSE_BAD_ARGS;
     }
-    strcpy (lsfUserName, pw->pw_name);
+    // strcpy( lsfUserName, pw->pw_name );
+    lsfUserName = strdup( pw->pw_name );
+    assert( lsfUserName );
 
     return LSE_NO_ERR;
 }
 
 int
-defGetLSFUserByName (const char *osUserName, char *lsfUserName, unsigned int lsfUserNameSize)
+defGetLSFUserByName (const char *osUserName, const char *lsfUserName, unsigned int lsfUserNameSize)
 {
-    lsfUserName[0] = '\0';
+    // lsfUserName[0] = '\0';
 
     if (strlen (osUserName) + 1 > lsfUserNameSize) {
         return LSE_BAD_ARGS;
     }
-    strcpy (lsfUserName, osUserName);
+    lsfUserName = strdup( osUserName );
+    assert( lsfUserName );
 
     return LSE_NO_ERR;
 }
 
 int
-defGetLSFUserByUid (uid_t uid, char *lsfUserName, unsigned int lsfUserNameSize)
+defGetLSFUserByUid( const uid_t uid, const char *lsfUserName, unsigned int lsfUserNameSize)
 {
     struct passwd *pw = NULL;
 
-    lsfUserName[0] = '\0';
+    // lsfUserName[0] = '\0';
 
     if ((pw = getpwuid (uid)) == NULL) {
         return LSE_BADUSER;
@@ -419,36 +439,39 @@ defGetLSFUserByUid (uid_t uid, char *lsfUserName, unsigned int lsfUserNameSize)
     if (strlen (pw->pw_name) + 1 > lsfUserNameSize) {
         return LSE_BAD_ARGS;
     }
-    strcpy (lsfUserName, pw->pw_name);
+    // strcpy (lsfUserName, pw->pw_name);
+    lsfUserName = strdup( pw->pw_name );
+    assert( lsfUserName );
 
     return LSE_NO_ERR;
 }
 
 int
-defGetOSUserName (const char *lsfUserName, char *osUserName, unsigned int osUserNameSize)
+defGetOSUserName (const char *lsfUserName, const char *osUserName, unsigned int osUserNameSize)
 {
-    osUserName[0] = '\0';
+    // osUserName[0] = '\0';
 
-    if (strlen (lsfUserName) + 1 > osUserNameSize)
-    {
+    if (strlen (lsfUserName) + 1 > osUserNameSize) {
         return LSE_BAD_ARGS;
     }
-    strcpy (osUserName, lsfUserName);
+    // strcpy (osUserName, lsfUserName);
+    osUserName = strdup( lsfUserName );
+    assert( osUserName );
 
     return LSE_NO_ERR;
 }
 
 int
-defGetOSUid (const char *lsfUserName, uid_t * uid)
+defGetOSUid (const char *lsfUserName, const uid_t *uid)
 {
     struct passwd *pw = NULL;
 
-    if ((pw = getpwnam (lsfUserName)) == NULL)
-    {
+    if ((pw = getpwnam (lsfUserName)) == NULL) {
         return LSE_BADUSER;
     }
 
-    *uid = pw->pw_uid;
+    uid = &pw->pw_uid ; // FIXME FIXME FIXME FIXME fuck me if i know what this points to.
+    assert( *uid );
 
     return LSE_NO_ERR;
 }

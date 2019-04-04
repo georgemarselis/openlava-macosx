@@ -18,10 +18,10 @@
 
 #pragma once
 
-typedef int SO_HANDLE_T;  // FIXME FIXME FIXME un-typedef
+// typedef int SO_HANDLE_T;  // FIXME FIXME FIXME un-typedef
 
 
-SO_HANDLE_T soOpen_ (const char *libFileName);
-void soClose_ (SO_HANDLE_T handle);
-void *soSym_ (SO_HANDLE_T handle, const char *entryName);
+int soOpen_   ( const char *libFileName );
+void soClose_ ( int handle );
+void *soSym_  ( int handle, const char *entryName );
 

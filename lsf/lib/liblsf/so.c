@@ -23,8 +23,8 @@
 
 #include "lib/so.h"
 
-SO_HANDLE_T
-soOpen_ (const char *libFileName)
+int
+soOpen_ ( const char *libFileName )
 {
 	int strcmp_rvalue = 0;
     strcmp_rvalue = strcmp( libFileName, "");
@@ -34,7 +34,7 @@ soOpen_ (const char *libFileName)
 
 
 void
-soClose_ (SO_HANDLE_T handle)
+soClose_( int handle )
 {
     // SO_HANDLE_T is int, typedef'ed
     assert( handle );
@@ -42,7 +42,7 @@ soClose_ (SO_HANDLE_T handle)
 
 
 void *
-soSym_ (SO_HANDLE_T handle, const char *entryName)
+soSym_( SO_HANDLE_T handle, const char *entryName )
 {
 	int strcmp_rvalue = 0;
     // SO_HANDLE_T is int, typedef'ed

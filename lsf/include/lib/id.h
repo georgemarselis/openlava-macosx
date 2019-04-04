@@ -28,10 +28,13 @@
 #define GET_OS_USER_NAME     "getOSUserName_"
 #define GET_OS_UID           getOSUid_
 
-typedef int (*GET_LSF_USER_BY_NAME_FN_T) ( const char *osUserName,  char  *lsfUserName, unsigned int lsfUserNameSize );
-typedef int (*GET_LSF_USER_BY_UID_FN_T)  (       uid_t uid,         char  *lsfUserName, unsigned int lsfUserNameSize );
-typedef int (*GET_OS_USER_NAME_FN_T)     ( const char *lsfUserName, char  *osUserName,  unsigned int osUserNameSize  );
-typedef int (*GET_OS_UID_FN_T)           ( const char *lsfUserName, uid_t * uid);
+
+// https://stackoverflow.com/questions/14134245/iso-c-void-and-function-pointers
+
+typedef int (*GET_LSF_USER_BY_NAME_FN_T) ( const char *osUserName,  const char  *lsfUserName, unsigned int lsfUserNameSize );
+typedef int (*GET_LSF_USER_BY_UID_FN_T)  ( const uid_t uid,         const char  *lsfUserName, unsigned int lsfUserNameSize );
+typedef int (*GET_OS_USER_NAME_FN_T)     ( const char *lsfUserName, const char  *osUserName,  unsigned int osUserNameSize  );
+typedef int (*GET_OS_UID_FN_T)           ( const char *lsfUserName, const uid_t *uid);
 typedef int (*GET_LSF_USER_FN_T)         ( const char *lsfUserName,                     unsigned int lsfUserNameSize );
 
 // typedef
@@ -39,7 +42,7 @@ struct IDLIB_INFO_T
 {
 	bool_t initialized;
 	bool_t initFailed;
-	SO_HANDLE_T handle;
+	int handle;
 	char padding[4];
 	GET_LSF_USER_FN_T getLSFUser_;
 	GET_LSF_USER_BY_NAME_FN_T getLSFUserByName_;
