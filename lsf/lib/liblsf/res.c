@@ -35,19 +35,6 @@
 #include "lib/host.h"
 #include "struct-config_param.h"
 
-// globals 
-int lsf_res_version               = -1;
-int totsockets_                   =  0;
-int currentsocket_                =  0;
-unsigned int requestSN            =  0;
-unsigned int requestHighWaterMark =  0;
-unsigned int globCurrentSN        =  0;
-
-// static unsigned int requestHighWaterMark =  0;
-fd_set connection_ok_;
-struct sockaddr_in res_addr_;
-struct lsQueue *requestQ;
-
 unsigned int  getCurrentSN( void ) {
     return globCurrentSN;
 }

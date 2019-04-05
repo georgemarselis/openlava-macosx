@@ -202,11 +202,11 @@ struct svrsock
 };
 
 
-void _lostconnection_ (char *);
+// void _lostconnection_ (char *);
 
 // int setLockOnOff_ (int, time_t, char *hname);
 
-struct lsRequest *lsReqHandCreate_ (int, int, int, void *, requestCompletionHandler, appCompletionHandler, void *);
+// struct lsRequest *lsReqHandCreate_ (int, int, int, void *, requestCompletionHandler, appCompletionHandler, void *);
 void lsReqHandDestroy_ (struct lsRequest *);
 
 // void ls_errlog (FILE * fd, const char *fmt, ...)

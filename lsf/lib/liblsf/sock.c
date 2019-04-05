@@ -18,6 +18,7 @@
 
 #include <unistd.h>
 #include <fcntl.h>
+#include <limits.h>
 
 #include "lib/lib.h"
 #include "lib/lproto.h"
@@ -26,11 +27,11 @@
 
 
 
-int
+unsigned int
 CreateSock_ (int protocol)
 {
 	struct sockaddr_in cliaddr;
-	int s = 0;
+	// int s = 0;
 	static unsigned short port = 0;
 	static unsigned short i = 0;
 	static char isroot = FALSE;
@@ -58,13 +59,13 @@ CreateSock_ (int protocol)
 			ls_syslog (LOG_DEBUG, "%s: Socket_ failed, %s", __func__, strerror (errno));
 		}
 		lserrno = LSE_SOCK_SYS;
-		return -1;
+		return UINT_MAX;
 	}
 
 	memset ((char *) &cliaddr, 0, sizeof (cliaddr));
 	cliaddr.sin_family = AF_INET;
 	cliaddr.sin_addr.s_addr = htonl (INADDR_ANY);
-	for (i = 0; i < IPPORT_RESERVED / 2; i++)
+	for ( unsigned i = 0; i < IPPORT_RESERVED / 2; i++)
 	{
 		cliaddr.sin_port = htons (port);
 
@@ -150,7 +151,8 @@ CreateSockEauth_ (int protocol)
 		port = IPPORT_RESERVED - 1;
 	}
 
-	if ((s = Socket_ (AF_INET, protocol, 0)) < 0)
+	s = Socket_ (AF_INET, protocol, 0);
+	if ( UINT_MAX == s )
 	{
 		if (logclass & LC_COMM) {
 			ls_syslog (LOG_DEBUG, "%s: Socket_ failed, %s", __func__, strerror (errno));

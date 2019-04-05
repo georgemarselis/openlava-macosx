@@ -31,7 +31,8 @@
 char *
 usePath( const char *path)
 {
-    strcpy( chosenPath, path ); 
+    assert( rootuid_ ); // NOTE bullshit op to hush up the compiler
+    strcpy( chosenPath, path );
     return chosenPath;
 }
 

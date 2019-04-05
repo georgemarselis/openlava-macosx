@@ -13,6 +13,7 @@ enum LSF_PARAMS {
     LSF_SERVERDIR               = 1,
     LSF_ENVDIR                  = 2, // FIXME FIXME newly inserted variable
     LSF_LOGDIR                  = 3,
+    LSF_RES_PORT                = 6,
     LSF_LOG_MASK                = 8, // or 19
     LSF_ID_PORT                 = 9,
     LSF_AUTH                    = 10,
@@ -37,6 +38,7 @@ enum LSF_PARAMS {
     LSF_RES_ACCT                = 10,
     LSF_USE_HOSTEQUIV           = 122,
     LSF_AM_OPTIONS              = 123,
+    LSF_RES_DEBUG               = 124,
     LSF_NULL
 } LSF_STATUS;
 

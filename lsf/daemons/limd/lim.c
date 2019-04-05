@@ -19,6 +19,7 @@
  *
  */
 
+#include <limits.h>
 #include <unistd.h>
 
 #include "lib/lproto.h"
@@ -31,7 +32,7 @@ callLim_ (enum limReqCode reqCode, void *dsend, bool_t (*xdr_sfunc) (), void *dr
     XDR xdrs;
     char sbuf[8 * MSGSIZE];
     char rbuf[MAXMSGLEN];
-    char *repBuf;
+    char *repBuf = NULL;
     enum limReplyCode limReplyCode;
     size_t reqLen = 0;
     static char first = TRUE;
@@ -518,23 +519,23 @@ initLimSock_ (void)
     sockIds_[TCP].sin_family = AF_INET;
     sockIds_[TCP].sin_addr.s_addr = 0;
     sockIds_[TCP].sin_port = 0;
-    limchans_[TCP] = -1;
+    limchans_[TCP] = INT_MAX;
 
     localAddr = htonl (LOOP_ADDR);
     sockIds_[PRIMARY].sin_family = AF_INET;
     sockIds_[PRIMARY].sin_addr.s_addr = localAddr;
     sockIds_[PRIMARY].sin_port = (u_short) service_port;
-    limchans_[PRIMARY] = -1;
+    limchans_[PRIMARY] = INT_MAX;
 
     sockIds_[MASTER].sin_family = AF_INET;
     sockIds_[MASTER].sin_addr.s_addr = localAddr;
     sockIds_[MASTER].sin_port = (u_short) service_port;
-    limchans_[MASTER] = -1;
+    limchans_[MASTER] = INT_MAX;
 
     sockIds_[UNBOUND].sin_family = AF_INET;
     sockIds_[UNBOUND].sin_addr.s_addr = localAddr;
     sockIds_[UNBOUND].sin_port = (u_short) service_port;
-    limchans_[UNBOUND] = -1;
+    limchans_[UNBOUND] = INT_MAX;
 
     return 0;
 }

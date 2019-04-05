@@ -95,17 +95,18 @@ chanInit_ (void)
     return 0;
 }
 
-int
+unsigned int
 chanServSocket_ (int type, unsigned short port, int backlog, int options)
 {
-    int ch = 0;
+    unsigned int ch = 0;
     int s  = 0;
     struct sockaddr_in sin;
 
-    if ((ch = findAFreeChannel ()) < 0)
+    ch = findAFreeChannel( );
+    if ( UINT_MAX == ch )
     {
         lserrno = LSE_NO_CHAN;
-        return -1;
+        return UINT_MAX;
     }
 
     s = socket (AF_INET, type, 0);
@@ -113,7 +114,7 @@ chanServSocket_ (int type, unsigned short port, int backlog, int options)
     if (SOCK_INVALID (s))
     {
         lserrno = LSE_SOCK_SYS;
-        return -1;
+        return UINT_MAX;
     }
 
     memset ((char *) &sin, 0, sizeof (sin));
@@ -130,9 +131,9 @@ chanServSocket_ (int type, unsigned short port, int backlog, int options)
 
     if (bind (s, (struct sockaddr *) &sin, sizeof (sin)) < 0)
     {
-        (void) close (s);
+        close (s);
         lserrno = LSE_SOCK_SYS;
-        return -2;
+        return UINT_MAX-2;
     }
 
     if (backlog > 0)
@@ -141,7 +142,7 @@ chanServSocket_ (int type, unsigned short port, int backlog, int options)
         {
             (void) close (s);
             lserrno = LSE_SOCK_SYS;
-            return -3;
+            return UINT_MAX-3;
         }
     }
 
@@ -158,10 +159,10 @@ chanServSocket_ (int type, unsigned short port, int backlog, int options)
     return ch;
 }
 
-int
-chanClientSocket_ (int domain, int type, int options)
+unsigned int
+chanClientSocket_( int domain, int type, int options )
 {
-    int ch = 0;
+    unsigned int ch = 0;
     int s0 = 0;
     int s1 = 0;
     unsigned int counter = 0;
@@ -172,26 +173,29 @@ chanClientSocket_ (int domain, int type, int options)
     if (domain != AF_INET)
     {
         lserrno = LSE_INTERNAL;
-        return -1;
+        return UINT_MAX;
     }
 
-    if ((ch = findAFreeChannel ()) < 0)
+    ch = findAFreeChannel( );
+    if ( UINT_MAX == ch )
     {
         lserrno = LSE_NO_CHAN;
-        return -1;
+        return UINT_MAX;
     }
 
-    if (type == SOCK_STREAM)
+    if (type == SOCK_STREAM) {
         channels[ch].type = CH_TYPE_TCP;
-    else
+    }
+    else {
         channels[ch].type = CH_TYPE_UDP;
+    }
 
     s0 = socket (domain, type, 0);
 
     if (SOCK_INVALID (s0))
     {
         lserrno = LSE_SOCK_SYS;
-        return -1;
+        return UINT_MAX;
     }
 
     channels[ch].state = CH_DISC;
@@ -234,12 +238,13 @@ chanClientSocket_ (int domain, int type, int options)
             cliaddr.sin_port = htons (port);
             port--;
         }
-        else
+        else {
             cliaddr.sin_port = htons (0);
+        }
 
-        if (bind (s0, (struct sockaddr *) &cliaddr, sizeof (cliaddr)) == 0)
+        if (bind (s0, (struct sockaddr *) &cliaddr, sizeof (cliaddr)) == 0) {
             break;
-
+        }
 
         if (!(options & CHAN_OP_PPORT))
         {
@@ -249,22 +254,19 @@ chanClientSocket_ (int domain, int type, int options)
                 port = (unsigned short) (time (0) | getpid ());
                 port = (unsigned short) ( port < 1024 ? (port + 1024) : port );
                 cliaddr.sin_port = htons (port);
-                if (bind (s0, (struct sockaddr *) &cliaddr, sizeof (cliaddr)) ==
-                    0)
+                if (bind (s0, (struct sockaddr *) &cliaddr, sizeof (cliaddr)) == 0 ) {
                     break;
+                }
             }
 
-            assert( ch >= 0 );
             chanClose_ (ch);
             lserrno = LSE_SOCK_SYS;
-            return -1;
+            return UINT_MAX;
         }
-        if (errno != EADDRINUSE && errno != EADDRNOTAVAIL)
-        {
-            assert( ch >= 0 );
+        if (errno != EADDRINUSE && errno != EADDRNOTAVAIL) {
             chanClose_ (ch);
             lserrno = LSE_SOCK_SYS;
-            return -1;
+            return UINT_MAX;
         }
 
 
@@ -280,7 +282,7 @@ chanClientSocket_ (int domain, int type, int options)
         assert( ch <= INT_MAX );
         chanClose_ (ch);
         lserrno = LSE_SOCK_SYS;
-        return -1;
+        return UINT_MAX;
     }
 
 # if defined(FD_CLOEXEC)
@@ -563,14 +565,15 @@ chanRcvDgram_ (int chfd, char *buf, int len, struct sockaddr_in *peer, int timeo
 int
 chanOpen_ (unsigned int iaddr, unsigned short port, int options)
 {
-    int i      = 0;
     int cc     = 0;
     int oldOpt = 0;
     int newOpt = 0;
-    int returnValue = 0;
+    unsigned int i           = 0;
+    unsigned int returnValue = 0;
     struct sockaddr_in addr;
 
-    if ((i = findAFreeChannel ()) < 0)
+    i = findAFreeChannel( );
+    if ( UINT_MAX == i )
     {
         chanerr = CHANE_NOCHAN;
         return -1;
@@ -591,10 +594,9 @@ chanOpen_ (unsigned int iaddr, unsigned short port, int options)
 
     oldOpt = setLSFChanSockOpt_ (newOpt | LS_CSO_ASYNC_NT);
     returnValue = CreateSock_ (SOCK_STREAM);
-    assert( returnValue >= 0 );
-    channels[i].handle = (unsigned int) returnValue;
+    channels[i].handle = returnValue;
     setLSFChanSockOpt_ (oldOpt);
-    if (returnValue < 0)
+    if (returnValue == UINT_MAX )
     {
         chanerr = CHANE_SYSCALL;
         return -1;
@@ -637,7 +639,7 @@ chanOpen_ (unsigned int iaddr, unsigned short port, int options)
             return -1;
         }
         channels[i].state = CH_PRECONN;
-        return i;
+        return (int) i;
     }
 
     channels[i].state = CH_CONN;
@@ -661,7 +663,7 @@ chanOpen_ (unsigned int iaddr, unsigned short port, int options)
         return -1;
     }
 
-    return i;
+    return (int) i;
 
 }   /* chanOpen_() */
 
@@ -669,9 +671,9 @@ chanOpen_ (unsigned int iaddr, unsigned short port, int options)
 int
 chanOpenSock_ (int s, int options)
 {
-    int i;
+    unsigned int i = findAFreeChannel( );
 
-    if ((i = findAFreeChannel ()) < 0)
+    if( UINT_MAX == i )
     {
         lserrno = LSE_NO_CHAN;
         return -1;
@@ -687,7 +689,7 @@ chanOpenSock_ (int s, int options)
     channels[i].state = CH_CONN;
 
     if (options & CHAN_OP_RAW) {
-        return i;
+        return (int) i;
     }
 
     channels[i].send = newBuf ();
@@ -708,11 +710,11 @@ chanOpenSock_ (int s, int options)
         lserrno = LSE_MALLOC;
         return -1;
     }
-    return i;
+    return (int)i;
 }
 
 int
-chanClose_ (int chfd)
+chanClose_ ( unsigned int chfd )
 {
     struct Buffer *buf     = NULL;
     struct Buffer *nextbuf = NULL;
@@ -723,7 +725,7 @@ chanClose_ (int chfd)
     if (chfd > maxfds)
     {
         lserrno = LSE_INTERNAL;
-        return -1;
+        return INT_MAX;
     }
 
 /*    if (channels[chfd].handle < 0)
@@ -785,12 +787,13 @@ chanClose_ (int chfd)
 void
 chanCloseAll_ (void)
 {
-    for ( unsigned long i = 0; i < chanIndex; i++) {
+    for ( unsigned int i = 0; i < chanIndex; i++) {
         if (channels[i].state != CH_FREE) {
-            chanClose_ ((int)i); // FIXME FIXME FIXME FIXME FIXME FIXME does chanClose expect negative, and if yes, why?
+            chanClose_ (i); // FIXME FIXME FIXME FIXME FIXME FIXME does chanClose expect negative, and if yes, why?
         }
     }
 
+    return;
 }
 
 void
@@ -798,9 +801,11 @@ chanCloseAllBut_ (int chfd)
 {
     for (unsigned int i = 0; i < chanIndex; i++) {
         if ((channels[i].state != CH_FREE) && (i != (unsigned int)chfd)) {
-            chanClose_ ((int)i); // FIXME FIXME FIXME FIXME FIXME FIXME does chanClose expect negative, and if yes, why?
+            chanClose_ ( i); // FIXME FIXME FIXME FIXME FIXME FIXME does chanClose expect negative, and if yes, why?
         }
     }
+
+    return;
 }
 
 int
@@ -1436,14 +1441,12 @@ enqueueTail_ (struct Buffer *entry, struct Buffer *pred)
     pred->back = entry;
 }
 
-int
+unsigned int
 findAFreeChannel (void)
 {
     unsigned int i = 0;
-    int  returnValue = 0;
 
-    if (chanIndex != 0)
-    {
+    if (chanIndex != 0)  {
         for (i = 0; i < chanIndex; i++) {
             if (channels[i].handle == INVALID_HANDLE) {
                 break;
@@ -1451,24 +1454,21 @@ findAFreeChannel (void)
         }
     }
 
-        if (i == chanIndex) {
-            chanIndex++;
-        }
-
-        if (i == chanMaxSize)
-        {
-            assert( chanMaxSize <= UINT_MAX );
-            chanIndex = (unsigned int)chanMaxSize;
-            return -1;
-        }
-
-        channels[i].handle = INVALID_HANDLE;
-        channels[i].state = CH_FREE;
-        channels[i].send = NULL;
-        channels[i].recv = NULL;
-        channels[i].chanerr = CHANE_NOERR;
-
-        assert( i <= INT_MAX );
-        returnValue = (int)i;
-        return returnValue;
+    if (i == chanIndex) {
+        chanIndex++;
     }
+
+    if (i == chanMaxSize)  {
+        assert( chanMaxSize <= UINT_MAX );
+        chanIndex = (unsigned int)chanMaxSize;
+        return UINT_MAX;
+    }
+
+    channels[i].handle = INVALID_HANDLE;
+    channels[i].state = CH_FREE;
+    channels[i].send = NULL;
+    channels[i].recv = NULL;
+    channels[i].chanerr = CHANE_NOERR;
+
+    return i;
+}

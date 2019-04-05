@@ -1057,8 +1057,8 @@ int timinglevel;
 unsigned int LSF_LIM_VERSION; // FIXME FIXME FIXME FIXME FIXME set in configure.ac
 unsigned int LSF_RES_VERSION; // FIXME FIXME FIXME FIXME FIXME set in configure.ac
 
-int ls_initrex (int, int);
-int ls_connect (char *);
+// int ls_initrex (int, int);
+// int ls_connect (char *);
 int ls_rexecv (char *, char **, int);
 int ls_rexecve (char *, char **, int, char **);
 int ls_rtask (char *, char **, int);
@@ -1117,12 +1117,12 @@ int ls_rescontrol (char *host, int opcode, int options);
 int ls_stdinmode (int onoff);
 int ls_stoprex (void);
 int ls_donerex (void);
-int ls_rsetenv (char *host, char **env);
-int ls_rsetenv_async (char *host, char **env);
+// int ls_rsetenv (char *host, char **env);
+// int ls_rsetenv_async (char *host, char **env);
 int ls_setstdout (int on, char *format);
 int ls_niossync (long numTasks);
 int ls_setstdin (int on, int *rpidlist, size_t len);
-int ls_chdir (char *, char *);
+// int ls_chdir (char *, char *);
 char *ls_getmnthost (char *fn);
 // int ls_servavail (int, int);
 int ls_setpriority (int newPriority);

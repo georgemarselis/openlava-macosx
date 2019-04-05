@@ -139,8 +139,8 @@ static size_t chanMaxSize = 0;
 // #define chanRecv_  chanDequeue_
 
 int            chanInit_        ( void );
-int            chanServSocket_  ( int type, unsigned short port, int backlog, int options);
-int            chanClientSocket_( int domain, int type, int options);
+unsigned int   chanServSocket_  ( int type, unsigned short port, int backlog, int options);
+unsigned int   chanClientSocket_( int domain, int type, int options);
 int            chanAccept_      ( int chfd, struct sockaddr_in *from);
 void           chanInactivate_  ( unsigned int chfd);
 void           chanActivate_    ( unsigned int chfd);
@@ -149,9 +149,9 @@ int            chanSendDgram_   ( int chfd, char *buf, int len, struct sockaddr_
 int            chanRcvDgram_    ( int chfd, char *buf, int len, struct sockaddr_in *peer, int timeout);
 int            chanOpen_        ( unsigned int iaddr, unsigned short port, int options);
 int            chanOpenSock_    ( int s, int options);
-int            chanClose_       ( int chfd);
-void           chanCloseAll_    ( void);
-void           chanCloseAllBut_ ( int chfd);
+int            chanClose_       ( unsigned int chfd );
+void           chanCloseAll_    ( void );
+void           chanCloseAllBut_ ( int chfd );
 int            chanSelect_      ( struct Masks *sockmask, struct Masks *chanmask, struct timeval *timeout);
 int            chanEnqueue_     ( int chfd, struct Buffer *msg);
 int            chanDequeue_     ( int chfd, struct Buffer **buf);
@@ -170,4 +170,4 @@ int            chanFreeBuf_       ( struct Buffer  *buf   );
 int            chanFreeStashedBuf_( struct Buffer  *buf   );
 void           dequeue_           ( struct Buffer  *entry );
 void           enqueueTail_       ( struct Buffer  *entry, struct Buffer *pred );
-int            findAFreeChannel   ( void );
+unsigned int   findAFreeChannel   ( void );

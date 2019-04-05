@@ -11,7 +11,7 @@
 
 
 /* sock.c */
-int             CreateSock_(int protocol);
+unsigned int    CreateSock_(int protocol);
 int             CreateSockEauth_(int protocol);
 int             get_nonstd_desc_(int desc);
 int             TcpCreate_(int service, int port);

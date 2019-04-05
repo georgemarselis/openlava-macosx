@@ -38,8 +38,8 @@ struct lsQueue
 
 #define LS_QUEUE_EMPTY(Head) ((Head)->start->forw == (Head)->start)
 
-void tMsgDestroy_ (void *);
-int lsReqCmp_ (char *, char *, int);
+// void tMsgDestroy_ (void *);
+// int lsReqCmp_ (char *, char *, int);
 int lsQueueInit_ (struct lsQueue **head, int (*compare) (char *, char *, int), lsQueueDestroyFuncType destroy);
 
 int lsQueueEntryAddFront_ (struct lsQueueEntry *entry, struct lsQueue *head);

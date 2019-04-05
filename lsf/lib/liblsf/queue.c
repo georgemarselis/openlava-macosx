@@ -21,9 +21,7 @@
 #include "lib/queue.h"
 
 int
-lsQueueInit_ (struct lsQueue **head,
-                int (*compareFunc) (char *data1, char *data2, int hint),
-                void (*destroyFunc) (void *data))
+lsQueueInit_ (struct lsQueue **head, int (*compareFunc) (char *data1, char *data2, int hint), void (*destroyFunc) (void *data))
 {
     struct lsQueueEntry *qPtr;
 

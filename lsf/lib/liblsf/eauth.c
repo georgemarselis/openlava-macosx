@@ -49,6 +49,7 @@
 int
 getAuth_lsf( struct lsfAuth *auth, const char *host )
 {
+    assert( rootuid_ ); // NOTE bullshit op to hush up the compiler
     auth->uid = getuid ();
 
     if (getLSFUser_ (auth->lsfUserName, sizeof (auth->lsfUserName)) < 0)

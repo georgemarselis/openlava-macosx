@@ -21,12 +21,17 @@
 
 // #define NL_SETN 23
 
-int mlsSbdMode = 0;
-char rootuid_;
+unsigned int totsockets_     = 0;
+unsigned int currentsocket_  =  0;
+int mlsSbdMode               = 0;
+static char rootuid_         = '\0';
 
 // FIXME investigate if the third argument to lsfSetXUid can be set to the appropriate
 // [s]uid_t type. if yes, try to see if there is an alternative to passing -1
-int lsfSetXUid (int flag, uid_t ruid, uid_t euid, uid_t suid, int (*func) ());
-int lsfExecX (char *path, char **argv, int (*func) ());
+int lsfSetXUid ( int flag, uid_t ruid, uid_t euid, uid_t suid, int (*func) () );
+int lsfExecX   ( const char *path, char **argv, int (*func) () );
 
-int ls_fdbusy (int fd);
+int ls_fdbusy   ( int fd );
+unsigned int opensocks_  ( unsigned int num );
+unsigned int ls_initrex  ( unsigned int num, int options );
+void lsfExecLog ( const char *cmd );

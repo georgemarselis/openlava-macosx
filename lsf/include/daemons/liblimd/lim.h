@@ -18,7 +18,8 @@ const unsigned int RECV_TIMEOUT    = 3;
 int lsf_lim_version = -1;
 
 struct sockaddr_in sockIds_[4]; // FIXME FIXME FIXME FIXME 4 is very particular
-int limchans_[4];               // FIXME FIXME FIXME FIXME 4 is very particular
+unsigned int limchans_[4];      // FIXME FIXME FIXME FIXME 4 is very particular: 
+								// limchans_[TCP], limchans_[PRIMARY], limchans_[MASTER], limchans_[UNBOUND]
 
 /* daemons/limd/lim.c */
 int callLim_      ( enum limReqCode reqCode, void *dsend, bool_t (*xdr_sfunc )(), void *drecv, bool_t (*xdr_rfunc )(), const char *host, int options, struct LSFHeader *hdr );

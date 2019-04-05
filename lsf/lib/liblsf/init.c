@@ -16,28 +16,42 @@
  *
  */
 
+#include <stdio.h>
 #include <ctype.h>
 #include <fcntl.h>
 #include <pwd.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <limits.h>
+#include <sys/select.h>
 
+#include "lib/res.h"
 #include "lib/lib.h"
-#include "lib/lim.h"
 #include "lib/mls.h"
 #include "lib/init.h"
-#include "lib/lproto.h"
+#include "lib/initenv.h"
+// #include "lib/lproto.h"
+#include "lib/structs/genParams.h"
 #include "lib/queue.h"
+#include "lib/syslog.h"
 #include "daemons/libniosd/niosd.h"
+#include "daemons/liblimd/lim.h"
+#include "lib/sock.h"
+#include "lib/channel.h"
+#include "lib/conn.h"
+#include "lib/id.h"
 
 
-
-rootuid_ = FALSE;
-
-int
-ls_initrex (int num, int options)
+void bullshit( void )
 {
-    struct servent *sv;
+    assert(chanMaxSize );
+    return;
+}
+
+unsigned int
+ls_initrex ( unsigned int num, int options)
+{
+    struct servent *sv = NULL;
 
     if (geteuid () == 0){
         rootuid_ = TRUE;
@@ -45,17 +59,17 @@ ls_initrex (int num, int options)
 
     if (initenv_ (NULL, NULL) < 0) {
         if (rootuid_ && !(options & KEEPUID)) {
-            lsfSetXUid(0, getuid(), getuid(), -1, setuid);
+            lsfSetXUid(0, getuid(), getuid(), INT_MAX, setuid);
         }
 
-        return -1;
+        return UINT_MAX; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     inithostsock_ ();
     lsQueueInit_ (&requestQ, lsReqCmp_, NULL);
     if (requestQ == NULL) {
             lserrno = LSE_MALLOC;
-            return -1;
+            return UINT_MAX; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     res_addr_.sin_family = AF_INET;
@@ -63,8 +77,8 @@ ls_initrex (int num, int options)
     if (genParams_[LSF_RES_PORT].paramValue) {
 
         // FIXME cast. res_addr_ is of type sockaddres_in, which is a system struct.
-        int envport = atoi( genParams_[LSF_RES_PORT].paramValue );
-        assert( envport > 0 && envport <= USHRT_MAX );
+        in_port_t envport = (in_port_t) atoi( genParams_[LSF_RES_PORT].paramValue );
+        assert( envport > 0 );
         res_addr_.sin_port = envport;
         if ( res_addr_.sin_port ) {
              res_addr_.sin_port = htons (res_addr_.sin_port);
@@ -74,15 +88,17 @@ ls_initrex (int num, int options)
         }
     }
     else if (genParams_[LSF_RES_DEBUG].paramValue) {
-        res_addr_.sin_port = htons (RES_PORT);
+        res_addr_.sin_port = htons (LSF_RES_PORT);
     }
     else {
 
 #ifdef _COMPANY_X_
-        if ((res_addr_.sin_port = get_port_number (RES_SERVICE, (char *) NULL)) == -1) {
+        if ((res_addr_.sin_port = get_port_number (RES_SERVICE, (char *) NULL)) == -1) { // FIXME replace -1 with label
 #else
-        if ((sv = getservbyname ("res", "tcp")) != NULL) {
-            res_addr_.sin_port = sv->s_port;
+        if ((sv = getservbyname ("res", "tcp")) != NULL) { // FIXME FIXME FIXME what is this "res" and "tcp"
+            int kot = sv->s_port;
+            assert(  kot <= USHRT_MAX  && kot > 0 );
+            res_addr_.sin_port = ( in_port_t ) kot;
         }
         else {
 #endif
@@ -90,10 +106,10 @@ ls_initrex (int num, int options)
             lserrno = LSE_RES_NREG;
             
             if (rootuid_ && !(options & KEEPUID)) {
-                lsfSetXUid(0, getuid(), getuid(), -1, setuid);
+                lsfSetXUid(0, getuid(), getuid(), INT_MAX, setuid);
             }
 
-            return -1;
+            return UINT_MAX; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
     }
 
@@ -101,10 +117,9 @@ ls_initrex (int num, int options)
     FD_ZERO (&connection_ok_);
 
     if ((rootuid_) && (genParams_[LSF_AUTH].paramValue == NULL)) {
-        int i;
-        i = opensocks_ (num);
+        unsigned int i = opensocks_ (num);
             if (!(options & KEEPUID)) {
-                lsfSetXUid(0, getuid(), getuid(), -1, setuid);
+                lsfSetXUid(0, getuid(), getuid(), INT_MAX, setuid);
             }
             return i;
     }
@@ -113,66 +128,68 @@ ls_initrex (int num, int options)
     }
 }
 
-int
-opensocks_ (int num)
+unsigned int
+opensocks_ (unsigned int num)
 {
-    int s;
-    int nextdescr;
-    int i;
+    unsigned int nextdescr = 0;
+    // int i;
 
-    totsockets_ = (num <= 0 || num > MAXCONNECT) ? LSF_DEFAULT_SOCKS : num;
+    totsockets_ = (num <= 0 || num > MAXCONNECT) ? LSF_DEFAULT_SOCKS : num; // totsockets_ is in lib/init.h
 
-    if (logclass & LC_COMM)
+    if (logclass & LC_COMM) {
         ls_syslog (LOG_DEBUG, "%s: try to allocate num <%d> of socks", __func__, num);
+    }
 
-    nextdescr = FIRST_RES_SOCK;
-    for (i = 0; i < totsockets_; i++)
-        {
-            if ((s = CreateSock_ (SOCK_STREAM)) < 0)
-    {
-        if (logclass & LC_COMM) {
-            ls_syslog (LOG_DEBUG, "%s: CreateSock_ failed, iter:<%d> %s",  __func__, i, strerror (errno));
-        }
-        totsockets_ = i;
-        if (i > 0)
+    nextdescr = FIRST_RES_SOCK; // NOFIX : cast is perfectly fine here, FIRST_RES_SOCK has a const value of 20, from lsf.h
+    for( unsigned int i = 0; i < totsockets_; i++) {
+        unsigned int s = CreateSock_ (SOCK_STREAM);        
+        if( UINT_MAX == s ) {
+            if (logclass & LC_COMM) {
+                ls_syslog (LOG_DEBUG, "%s: CreateSock_ failed, iter:<%d> %s",  __func__, i, strerror (errno));
+            }
+            totsockets_ = i;
+            if (i > 0)
             {
                 break;
             }
-        else
+            else
             {
-                return -1;
+                return UINT_MAX; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
-    }
+        }
 
-            if (s != nextdescr)
-    {
-        if (dup2 (s, nextdescr) < 0)
-            {
+        assert( s <= INT_MAX );
+        assert( nextdescr <= INT_MAX );
+        if (s != nextdescr)
+        {
+            if( dup2 ( (int) s, (int) nextdescr ) < 0 )   {
                 if (logclass & LC_COMM) {
                     ls_syslog (LOG_DEBUG, "%s: dup2() failed, old:<%d>, new<%d>, iter:<%d>  %s", __func__, s, nextdescr, i, strerror (errno));
                 }
-                close (s);
+                close ( (int) s);
                 lserrno = LSE_SOCK_SYS;
                 totsockets_ = i;
-                if (i > 0)
-        break;
-                else
-        return -1;
+                if (i > 0) {
+                    break;
+                }
+                else {
+                    return UINT_MAX; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+                }
             }
 
 #if defined(FD_CLOEXEC)
-        fcntl (nextdescr, F_SETFD, (fcntl (nextdescr, F_GETFD) | FD_CLOEXEC));
+            fcntl ( (int)nextdescr, F_SETFD, (fcntl ( (int) nextdescr, F_GETFD) | FD_CLOEXEC));
 #else
 #if defined(FIOCLEX)
-        // (void) ioctl (nextdescr, FIOCLEX, (char *) NULL);
-        ioctl (nextdescr, FIOCLEX, (char *) NULL);
+            // (void) ioctl (nextdescr, FIOCLEX, (char *) NULL);
+            ioctl (nextdescr, FIOCLEX, (char *) NULL);
 #endif
 #endif
 
-        close (s);
-    }
-            nextdescr++;
+            close ((int)s);
         }
+        nextdescr++;
+    }
 
     currentsocket_ = FIRST_RES_SOCK;
 
@@ -181,7 +198,6 @@ opensocks_ (int num)
     }
 
     return totsockets_;
-
 }
 
 /* ls_fdbusy()
@@ -191,13 +207,15 @@ ls_fdbusy (int fd)
 {
     struct sTab hashSearchPtr;
     struct hEnt *hEntPtr      = 0;
+    unsigned long foo  = 0;
 
-    assert (limchans_[PRIMARY] >= 0 );
-    assert (limchans_[MASTER] >= 0 );
-    assert (limchans_[UNBOUND] >= 0 );
-    if (    fd == chanSock_ (limchans_[PRIMARY]) ||
-            fd == chanSock_ (limchans_[MASTER])  ||
-            fd == chanSock_ (limchans_[UNBOUND])
+    assert (fd > 0 );
+
+    foo = ( unsigned long )fd;
+
+    if (    foo == chanSock_ (limchans_[PRIMARY]) ||
+            foo == chanSock_ (limchans_[MASTER])  ||
+            foo == chanSock_ (limchans_[UNBOUND])
         )
     {
         return TRUE;
@@ -221,8 +239,8 @@ ls_fdbusy (int fd)
         hEntPtr = h_nextEnt_ (&hashSearchPtr);
     }
 
-    assert( currentsocket_ >= 0 );
-    if (rootuid_ && fd >= currentsocket_ && fd < (int) FIRST_RES_SOCK +  totsockets_) { // NOFIX : cast is perfectly fine here, FIRST_RES_SOCK has a const value of 20, from lsf.h
+    assert( fd >= 0 );
+    if (rootuid_ && (unsigned int)fd >= currentsocket_ && (unsigned int)fd < FIRST_RES_SOCK +  totsockets_) {
         return TRUE;
     }
 
@@ -274,7 +292,7 @@ lsfExecLog (const char *cmd)
 }
 
 int
-lsfExecX (char *path, char **argv, int (*func) ())
+lsfExecX ( const char *path, char **argv, int (*func) ())
 {
     return func (path, argv);
 }

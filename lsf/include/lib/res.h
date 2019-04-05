@@ -18,19 +18,26 @@
 
 #pragma once 
 
+#include "lib/hdr.h"
+#include "lib/lib.h"
+#include "daemons/libresd/resout.h"
 /****************************************************************
  * All externs below are defined/initialized in lib/liblsf/res.c
  *
  */
-extern int lsf_res_version;
-extern int totsockets_;
-extern int currentsocket_;
-extern fd_set connection_ok_;
-extern struct sockaddr_in res_addr_;
-extern struct lsQueue *requestQ;
-extern unsigned int requestSN;
-extern unsigned int requestHighWaterMark;
-extern unsigned int globCurrentSN;
+
+// globals 
+int lsf_res_version               = -1;
+// int currentsocket_                =  0;
+unsigned int requestSN            =  0;
+unsigned int requestHighWaterMark =  0;
+unsigned int globCurrentSN        =  0;
+
+// static unsigned int requestHighWaterMark =  0;
+fd_set connection_ok_;
+struct sockaddr_in res_addr_;
+struct lsQueue *requestQ;
+
 
 #define REQUESTSN ((requestSN < USHRT_MAX) ? requestSN++ : (requestSN=11 , 10))
 

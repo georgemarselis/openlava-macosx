@@ -410,9 +410,9 @@ getname_ (enum limReqCode limReqCode, char *name, size_t namesize)
 
     if (memcmp (&sockIds_[MASTER].sin_addr, &masterInfo_.addr, sizeof (in_addr_t))) {
         chanClose_(limchans_[MASTER]);
-        limchans_[MASTER] = -1;
+        limchans_[MASTER] = INT_MAX;
         chanClose_(limchans_[TCP]);
-        limchans_[TCP] = -1;
+        limchans_[TCP] = INT_MAX;
     }
 
     memcpy (&sockIds_[MASTER].sin_addr, &masterInfo_.addr, sizeof (in_addr_t));

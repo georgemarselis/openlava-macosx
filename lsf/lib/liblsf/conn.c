@@ -27,24 +27,12 @@
 #include "lib/host.h"
 #include "lib/syslog.h"
 
-struct hTab conn_table;
-
-// typedef
-struct _hostSock {
-    int   socket;
-    const char  padding[4];
-    const char *hostname;
-    struct _hostSock *next;
-};
-
-
-// int cli_nios_fd[2] = { -1, -1 };
-struct _hostSock *hostSock;
-struct connectEnt connlist[MAXCONNECT];
 
 void
 inithostsock_ (void)
 {
+    assert ( rootuid_ ); // NOTE BULLSHIT OP to shut up the compiler 
+
     hostSock = NULL;
     lserrno = LSE_NO_ERR;
     return;

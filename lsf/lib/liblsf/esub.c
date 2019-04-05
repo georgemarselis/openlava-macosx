@@ -47,6 +47,7 @@ runEsub_ (struct lenData *ed, const char *path)
     struct stat sbuf;
     char ESUB[] = "esub";
 
+    assert( rootuid_ ); // NOTE bullshit op to hush up the compiler
     assert( NSIG_MAP );  // bullshit OP, make the compiler stop complaining
     assert( sigSymbol ); // bullshit OP, make the compiler stop complaining
 
