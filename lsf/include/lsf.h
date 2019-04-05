@@ -1059,33 +1059,33 @@ unsigned int LSF_RES_VERSION; // FIXME FIXME FIXME FIXME FIXME set in configure.
 
 // int ls_initrex (int, int);
 // int ls_connect (char *);
-int ls_rexecv (char *, char **, int);
-int ls_rexecve (char *, char **, int, char **);
-int ls_rtask (char *, char **, int);
-int ls_rtaske (char *, char **, int, char **);
+// int ls_rexecv (char *, char **, int);
+// int ls_rexecve (char *, char **, int, char **);
+// int ls_rtask (char *, char **, int);
+// int ls_rtaske (char *, char **, int, char **);
 // int ls_rwait (LS_WAIT_T *, int, struct rusage *);
 // int ls_rwaittid (int, LS_WAIT_T *, int, struct rusage *);
-int lls_rkill (unsigned int rtid, int sig);
-int ls_startserver (char *, char **, int);
-int ls_conntaskport (int);
-char **ls_placereq              (char *resreq, size_t *numhosts, int options, char *fromhost);
-char **ls_placeofhosts          (char *resreq, size_t *numhosts, int options, char *fromhost, char **hostlist, size_t listsize);
-char **ls_placeoftype           (char *resreq, size_t *numhosts, int options, char *fromhost, char *hosttype);
-struct hostLoad *ls_load        (char *resreq, size_t *numhosts, int options, char *fromhost);
-struct hostLoad *ls_loadofhosts (char *resreq, size_t *numhosts, int options, char *fromhost, char **hostlist, size_t listsize);
-struct hostLoad *ls_loadoftype  (char *resreq, size_t *numhosts, int options, char *fromhost, char *hosttype);
-struct hostLoad *ls_loadinfo    (char *resreq, size_t *numhosts, int options, char *fromhost, char **hostlist, size_t listsize, char ***indxnamelist);
-int ls_loadadj  (char *resreq, struct placeInfo *hostlist, size_t listsize);
+// int lls_rkill (unsigned int rtid, int sig);
+// int ls_startserver (char *, char **, int);
+// int ls_conntaskport (int);
+// char **ls_placereq              (char *resreq, size_t *numhosts, int options, char *fromhost);
+// char **ls_placeofhosts          (char *resreq, size_t *numhosts, int options, char *fromhost, char **hostlist, size_t listsize);
+// char **ls_placeoftype           (char *resreq, size_t *numhosts, int options, char *fromhost, char *hosttype);
+// struct hostLoad *ls_load        (char *resreq, size_t *numhosts, int options, char *fromhost);
+// struct hostLoad *ls_loadofhosts (char *resreq, size_t *numhosts, int options, char *fromhost, char **hostlist, size_t listsize);
+// struct hostLoad *ls_loadoftype  (char *resreq, size_t *numhosts, int options, char *fromhost, char *hosttype);
+// struct hostLoad *ls_loadinfo    (char *resreq, size_t *numhosts, int options, char *fromhost, char **hostlist, size_t listsize, char ***indxnamelist);
+// int ls_loadadj  (char *resreq, struct placeInfo *hostlist, size_t listsize);
 
 // char **ls_findmyconnections (void);
-int ls_lostconnection (void);
+// int ls_lostconnection (void);
 // char *ls_getclustername (void);
 // struct clusterInfo *ls_clusterinfo (char *resReq, unsigned int *numclusters, char **clusterList, int listsize, int options);
 // struct lsSharedResourceInfo *ls_sharedresourceinfo (char **resources, unsigned int *numResources, char *hostName, int options);
 // char *ls_getmastername (void);
 // char *ls_getmastername2 (void);
 // struct hostInfo *ls_gethostinfo (char *resReq, size_t *numhosts, char **hostlist, size_t listsize, int options);
-char *ls_getISVmode (void);
+// char *ls_getISVmode (void);
 
 // struct lsInfo *ls_info (void);
 
@@ -1098,8 +1098,8 @@ char *ls_getISVmode (void);
 // int ls_lockhost (time_t duration);
 // int ls_unlockhost (void);
 // int ls_limcontrol (char *hostname, int opCode);
-void ls_remtty (int ind, int enableIntSus);
-void ls_loctty (int ind);
+// void ls_remtty (int ind, int enableIntSus);
+// void ls_loctty (int ind);
 // char *ls_sysmsg (void);
 // void ls_perror (char *usrMsg);
 
@@ -1109,64 +1109,64 @@ void ls_loctty (int ind);
 // struct clusterConf *ls_readcluster (char *, struct lsInfo *);
 // struct clusterConf *ls_readcluster_ex (char *, struct lsInfo *, int);
 
-int ls_initdebug (char *appName);
+// int ls_initdebug (char *appName);
 // void ls_syslog (int level, const char *fmt, ...);
-void ls_verrlog (FILE * fp, const char *fmt, va_list ap);
+// void ls_verrlog (FILE * fp, const char *fmt, va_list ap);
 
-int ls_rescontrol (char *host, int opcode, int options);
-int ls_stdinmode (int onoff);
-int ls_stoprex (void);
-int ls_donerex (void);
+// int ls_rescontrol (char *host, int opcode, int options);
+// int ls_stdinmode (int onoff);
+// int ls_stoprex (void);
+// int ls_donerex (void);
 // int ls_rsetenv (char *host, char **env);
 // int ls_rsetenv_async (char *host, char **env);
-int ls_setstdout (int on, char *format);
-int ls_niossync (long numTasks);
-int ls_setstdin (int on, int *rpidlist, size_t len);
-// int ls_chdir (char *, char *);
-char *ls_getmnthost (char *fn);
-// int ls_servavail (int, int);
-int ls_setpriority (int newPriority);
+// int ls_setstdout (int on, char *format);
+// int ls_niossync (long numTasks);
+// int ls_setstdin (int on, int *rpidlist, size_t len);
+// // int ls_chdir (char *, char *);
+// char *ls_getmnthost (char *fn);
+// // int ls_servavail (int, int);
+// int ls_setpriority (int newPriority);
 
-int ls_ropen (char *host, char *fn, int flags, int mode);
-int ls_rclose (int rfd);
-int ls_rwrite (int rfd, char *buf, size_t len);
-int ls_rread (int rfd, char *buf, size_t len);
-off_t ls_rlseek (int rfd, off_t offset, int whence);
-int ls_runlink (char *host, char *fn);
-int ls_rfstat (int rfd, struct stat *buf);
-int ls_rstat (char *host, char *fn, struct stat *buf);
-char *ls_rgetmnthost (char *host, char *fn);
-int ls_rfcontrol (int command, int arg);
-int ls_rfterminate (char *host);
+// int ls_ropen (char *host, char *fn, int flags, int mode);
+// int ls_rclose (int rfd);
+// int ls_rwrite (int rfd, char *buf, size_t len);
+// int ls_rread (int rfd, char *buf, size_t len);
+// off_t ls_rlseek (int rfd, off_t offset, int whence);
+// int ls_runlink (char *host, char *fn);
+// int ls_rfstat (int rfd, struct stat *buf);
+// int ls_rstat (char *host, char *fn, struct stat *buf);
+// char *ls_rgetmnthost (char *host, char *fn);
+// int ls_rfcontrol (int command, int arg);
+// int ls_rfterminate (char *host);
 
-void ls_ruunix2lsf (struct rusage *rusage, struct lsfRusage *lsfRusage);
-void ls_rulsf2unix (struct lsfRusage *lsfRusage, struct rusage *rusage);
-void cleanLsfRusage (struct lsfRusage *);
-void cleanRusage (struct rusage *);
+// void ls_ruunix2lsf (struct rusage *rusage, struct lsfRusage *lsfRusage);
+// void ls_rulsf2unix (struct lsfRusage *lsfRusage, struct rusage *rusage);
+// void cleanLsfRusage (struct lsfRusage *);
+// void cleanRusage (struct rusage *);
 
-struct resLogRecord *ls_readrexlog (FILE *);
-int ls_nioinit (int sock);
-int ls_nioselect (int, fd_set *, fd_set *, fd_set *, struct nioInfo **, struct timeval *);
-int ls_nioctl (int, int);
-int ls_nionewtask (int, int);
-int ls_nioremovetask (int);
-int ls_niowrite (char *, int);
-int ls_nioclose (void);
-int ls_nioread (int, char *, int);
-int ls_niotasks (int, int *, int);
-int ls_niostatus (int, int *, struct rusage *);
-int ls_niokill (int);
-// int ls_niosetdebug (int);
-int ls_niodump (int, int, int, char *);
-struct lsfAcctRec *ls_getacctrec (FILE *, int *);
-int ls_putacctrec (FILE *, struct lsfAcctRec *);
-int getBEtime (char *, char, time_t *);
+// struct resLogRecord *ls_readrexlog (FILE *);
+// int ls_nioinit (int sock);
+// int ls_nioselect (int, fd_set *, fd_set *, fd_set *, struct nioInfo **, struct timeval *);
+// int ls_nioctl (int, int);
+// int ls_nionewtask (int, int);
+// int ls_nioremovetask (int);
+// int ls_niowrite (char *, int);
+// int ls_nioclose (void);
+// int ls_nioread (int, char *, int);
+// int ls_niotasks (int, int *, int);
+// int ls_niostatus (int, int *, struct rusage *);
+// int ls_niokill (int);
+// // int ls_niosetdebug (int);
+// int ls_niodump (int, int, int, char *);
+// struct lsfAcctRec *ls_getacctrec (FILE *, int *);
+// int ls_putacctrec (FILE *, struct lsfAcctRec *);
+// int getBEtime (char *, char, time_t *);
 
 
 /*
  * openlava add host
  */
-int ls_addhost (struct hostEntry *);
-int ls_rmhost (const char *);
+// int ls_addhost (struct hostEntry *);
+// int ls_rmhost (const char *);
 
 // end lsf_h_
