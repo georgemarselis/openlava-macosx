@@ -21,10 +21,13 @@
 #include <unistd.h>
 
 #include "lib/lib.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/osal.h"
 #include "lib/initenv.h"
-
+#include "lib/misc.h"
+#include "lib/structs/genParams.h"
+#include "lib/getnextline.h"
+#include "lib/words.h"
 
 int
 doEnvParams_ (struct config_param *plp)
@@ -59,9 +62,9 @@ getTempDir_ (void)
     char *tmpSp = NULL;
     struct stat stb;
 
-    if (sp) {
-        return sp;
-    }
+    // if (sp) {
+    //     return sp;
+    // }
 
     tmpSp = genParams_[LSF_TMPDIR].paramValue;
     if ((tmpSp != NULL) && (stat (tmpSp, &stb) == 0) && (S_ISDIR (stb.st_mode))) {
@@ -75,9 +78,10 @@ getTempDir_ (void)
 
     }
 
-    if (sp == NULL)
-    {
-        sp = "/tmp";  // FIXME FIXME FIXME FIXME move "TMPDIR" to configure.ac
+    if( NULL == sp ) {
+        char tmpdir[ ] = "/tmp"; // FIXME FIXME FIXME FIXME move "TMPDIR" to configure.ac
+        sp = malloc( sizeof(char) * strlen( tmpdir ) + 1 );
+        strcpy( sp, tmpdir ); // FIXME FIXME FIXME FIXME memleak.
     }
 
     return sp;
@@ -153,23 +157,26 @@ initenv_ (struct config_param *userEnv, const char *pathname)
     return 0;
 }
 
-int
-ls_readconfenv (struct config_param *paramList, char *confPath)
-{
-    return readconfenv_ (NULL, paramList, confPath);
-}
+// int
+// ls_readconfenv (struct config_param *paramList, const char *confPath)
+// {
+//     return readconfenv_ (NULL, paramList, confPath);
+// }
 
 int
-readconfenv_ (struct config_param *pList1, struct config_param *pList2, char *confPath)
+readconfenv_ (struct config_param *pList1, struct config_param *pList2, const char *confPath)
 {
-    char *key;
-    char *value;
-    char *line;
-    FILE *fp;
+    char *key       = NULL;
+    char *value     = NULL;
+    char *line      = NULL;
+    FILE *fp        = NULL;
+    size_t lineNum  = 0;
+    size_t errLineNum_ = 0;
+    unsigned int saveErrNo = 0;
     char filename[MAX_FILENAME_LEN];
-    struct config_param *plp;
-    size_t lineNum = 0;
-    int saveErrNo = 0;
+    struct config_param *plp = NULL;
+
+    memset( filename, '\0', strlen( filename ) );
 
     if (pList1) {
         for (plp = pList1; plp->paramName != NULL; plp++) {
@@ -215,14 +222,13 @@ readconfenv_ (struct config_param *pList1, struct config_param *pList2, char *co
         return -1;
     }
 
-    lineNum = 0;
-    errLineNum_ = 0;
     while ((line = getNextLineC_ (fp, &lineNum, TRUE)) != NULL) {
         int cc;
         cc = parseLine (line, &key, &value);
         if (cc < 0 && errLineNum_ == 0) {
             errLineNum_ = lineNum;
-            saveErrNo = lserrno;
+            assert( lserrno > 0 );
+            saveErrNo = (u_int) lserrno;
             continue;
         }
         if (!matchEnv (key, pList1) && !matchEnv (key, pList2)) {
@@ -237,7 +243,8 @@ readconfenv_ (struct config_param *pList1, struct config_param *pList2, char *co
     }
     fclose (fp);
     if (errLineNum_ != 0) {
-        lserrno = saveErrNo;
+        assert( saveErrNo <= INT_MAX );
+        lserrno = (int) saveErrNo;
         return -1;
     }
 
@@ -248,11 +255,11 @@ readconfenv_ (struct config_param *pList1, struct config_param *pList2, char *co
 int
 parseLine (char *line, char **keyPtr, char **valuePtr)
 {
-    char *sp = line;
 
-    char *word = NULL;
-    char *cp   = NULL;
-
+    char       *cp   = NULL;
+    const char *sp   = line;
+    const char *word = NULL;
+   
     static char key[L_MAX_LINE_LEN_4ENV];
     static char value[L_MAX_LINE_LEN_4ENV];
 
@@ -310,26 +317,31 @@ parseLine (char *line, char **keyPtr, char **valuePtr)
 }
 
 int
-matchEnv (char *name, struct config_param *paramList)
+matchEnv ( const char *name, struct config_param *paramList)
 {
-    if (paramList == NULL)
+    if (paramList == NULL) {
         return FALSE;
+    }
 
-    for (; paramList->paramName; paramList++)
-        if (strcmp (paramList->paramName, name) == 0)
+    for (; paramList->paramName; paramList++) {
+        if (strcmp (paramList->paramName, name) == 0) {
             return TRUE;
+        }
+    }
 
     return FALSE;
 }
 
 int
-setConfEnv (char *name, char *value, struct config_param *paramList)
+setConfEnv ( const char *name, char *value, struct config_param *paramList)
 {
-    if (paramList == NULL)
+    if (paramList == NULL) {
         return 1;
+    }
 
-    if (value == NULL)
-        value = "";
+    if (value == NULL) {
+        *value = '\0';
+    }
 
     for (; paramList->paramName; paramList++)
         {

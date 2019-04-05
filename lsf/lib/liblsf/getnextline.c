@@ -299,3 +299,152 @@ getNextLine_ (FILE * fp, int confFormat)
     return getNextLineC_ (fp, zeroLineCount, confFormat);
 }
 
+
+
+char *
+getNextLineC_conf( const struct lsConf *conf, size_t *LineCount, int confFormat)
+{
+    char *sp               = NULL;
+    char *cp               = NULL;
+    char *line             = NULL;
+    int toBeContinue       = 0;
+    int isUNCPath          = 0;
+    unsigned long len      = 0;
+    unsigned long linesize = 0;
+
+    static char *longLine = NULL;
+    static char *myLine = NULL;
+
+    if (conf == NULL) { 
+        return NULL;
+    }
+
+    FREEUP (longLine);
+
+    if (confFormat) {
+        do {
+            line = readNextLine (conf, LineCount);
+            if (line == NULL) {
+                return NULL;
+            }
+
+            toBeContinue = 0;
+            FREEUP (myLine);
+            len = strlen (line) + 1;
+            myLine = malloc (len * sizeof (char));
+            if (myLine == NULL) {
+                return NULL;
+            }
+
+            sp = line;
+            cp = myLine;
+            while (sp != &(line[len - 1]))
+            {
+                if (*sp == '#')
+                {
+                    break;
+                }
+                else if (*sp == '\\')
+                {
+
+                    if (sp == &(line[len - 2]))
+                    {
+
+                        sp++;
+                        toBeContinue = 1;
+                    }
+                    else
+                    {
+
+                        if (!isUNCPath && *(sp + 1) == '\\' && !isspace (*(sp + 2))) {
+                            isUNCPath = 1;
+                        }
+                        if (!isspace (*(sp + 1)))
+                        {
+                            *cp = *sp;
+                            sp++;
+                            cp++;
+                        }
+                        else
+                        {
+                            sp++;
+                            sp++;
+                        }
+                    }
+                }
+                else if (isspace (*sp))
+                {
+                    *cp = ' ';
+                    sp++;
+                    cp++;
+                }
+                else
+                {
+                    *cp = *sp;
+                    sp++;
+                    cp++;
+                }
+            }
+            *cp = '\0';
+
+            if (!toBeContinue)
+            {
+                while (cp != myLine && *(--cp) == ' ');
+
+                if (cp == myLine && (*cp == ' ' || *cp == '\0'))
+                {
+                    *cp = '\0';
+                }
+                else
+                    *(++cp) = '\0';
+            }
+
+            if (!(myLine[0] == '\0' && !longLine))  // FIXME FIXME FIXME what line[0] represents?
+            {
+
+                if (longLine)
+                {
+                    linesize += strlen (myLine);
+                    sp = malloc (linesize * sizeof (char));
+                    if (sp == NULL) {
+                        return longLine;
+                    }
+
+                    strcpy (sp, longLine);
+                    strcat (sp, myLine);
+                    FREEUP (longLine);
+                    longLine = sp;
+                }
+                else
+                {
+                    linesize = strlen (myLine) + 1;
+                    longLine = malloc (linesize * sizeof (char));
+                    strcpy (longLine, myLine);
+                }
+            }
+
+        }
+        while ((myLine[0] == '\0' && !longLine) || toBeContinue);  // FIXME FIXME FIXME what line[0] represents?
+
+
+        return longLine;
+    }
+    else
+    {
+        do
+        {
+            line = readNextLine (conf, LineCount);
+            if (line == NULL) {
+                return NULL;
+            }
+        }
+        while (line[0] == '\0'); { // FIXME FIXME FIXME what line[0] represents?
+            return line;
+        }
+    }
+
+    fprintf( stderr, "%s: you are not suppposed to be here!", __func__ );
+    ls_syslog( LSE_ERR, "%s: you are not suppposed to be here!", __func__ );
+    return NULL;
+}
+
