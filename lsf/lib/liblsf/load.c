@@ -19,18 +19,16 @@
 #include "lib/lib.h"
 #include "lib/lproto.h"
 #include "lib/xdr.h"
-
+#include "lib/load.h"
+#include "lib/syslog.h"
+#include "lib/info.h"
+#include "lib/host.h"
+#include "lib/misc.h"
+#include "daemons/liblimd/lim.h"
 // #define LOAD_INFO_THRESHOLD 75
 
 
-extern int sharedResConfigured_;
-
-static char *namestofilter_ (char **);
-
-struct hostLoad *loadinfo_ (char *resReq, struct decisionReq *loadReqPtr, char *fromhost, unsigned long *numHosts, char ***outnlist);
-
-
-static char *
+char *
 namestofilter_ (char **indxs )
 {
         size_t i = 0;
@@ -47,14 +45,14 @@ namestofilter_ (char **indxs )
 
         if (!len || len > MAX_LINE_LEN) {
                 lserrno = LSE_BAD_ARGS;
-                return (NULL);
+                return NULL;
         }
 
         len += i ;
         filter = malloc( len + 1 );
         if( NULL == filter && ENOMEM == errno ) {
                 lserrno = LSE_MALLOC;
-                return (NULL);
+                return NULL;
         }
 
         filter[0] = '\0';
@@ -63,11 +61,11 @@ namestofilter_ (char **indxs )
                 strcat (filter, ":");
         }
         
-        return (filter);
+        return filter;
 }
 
 struct hostLoad *
-ls_loadinfo (char *resreq, size_t *numhosts, int options, char *fromhost, char **hostlist, size_t listsize, char ***indxnamelist)
+ls_loadinfo (char *resreq, size_t *numhosts, int options, const char *fromhost, char **hostlist, size_t listsize, char ***indxnamelist)
 {
     int isClus          = 0;
     char *indexfilter   = NULL;
@@ -84,7 +82,7 @@ ls_loadinfo (char *resreq, size_t *numhosts, int options, char *fromhost, char *
 
     if (!indxnamelist) {
         lserrno = LSE_BAD_ARGS;
-        return (NULL);
+        return NULL;
     }
 
     if (hostlist && listsize) {
@@ -128,7 +126,7 @@ ls_loadinfo (char *resreq, size_t *numhosts, int options, char *fromhost, char *
         if (loadReq.preferredHosts == NULL)
         {
             lserrno = LSE_MALLOC;
-            return (NULL);
+            return NULL;
         }
 
         for (i = 1; i < loadReq.numPrefs; i++)
@@ -168,7 +166,7 @@ ls_loadinfo (char *resreq, size_t *numhosts, int options, char *fromhost, char *
                 free (loadReq.preferredHosts[j]);
             }
             free (loadReq.preferredHosts);
-            return (NULL);
+            return NULL;
         }
 
         if (*num > listsize && (loadReq.options & EXACT) && !clusterinlist)
@@ -178,7 +176,7 @@ ls_loadinfo (char *resreq, size_t *numhosts, int options, char *fromhost, char *
                 free (loadReq.preferredHosts[j]);
             }
             free (loadReq.preferredHosts);
-            return (NULL);
+            return NULL;
         }
 
 
@@ -196,7 +194,7 @@ ls_loadinfo (char *resreq, size_t *numhosts, int options, char *fromhost, char *
         if (loadReq.preferredHosts == NULL)
         {
             lserrno = LSE_MALLOC;
-            return (NULL);
+            return NULL;
             }
     }
 
@@ -222,7 +220,7 @@ ls_loadinfo (char *resreq, size_t *numhosts, int options, char *fromhost, char *
             else
             {
                 lserrno = LSE_BAD_ARGS;
-                return (NULL);
+                return NULL;
             }
         }
         else if (indexfilter)
@@ -235,30 +233,30 @@ ls_loadinfo (char *resreq, size_t *numhosts, int options, char *fromhost, char *
             ls_syslog (LOG_DEBUG, "%s: loadReq.ofWhat=%d loadReq.numHosts=%1.0ld loadReq..numPrefs=%1.0ld", __func__, loadReq.ofWhat, loadReq.numHosts, loadReq.numPrefs);
         }
 
-    return (loadinfo_ (resreq, &loadReq, fromhost, num, indxnamelist));
+    return loadinfo_ (resreq, &loadReq, fromhost, num, indxnamelist);
 
 }
 
 struct hostLoad *
-ls_load (char *resreq, size_t *numhosts, int options, char *fromhost)
+ls_load (char *resreq, size_t *numhosts, int options, const char *fromhost)
 {
     char **dummynl = NULL;
 
-    return (ls_loadinfo (resreq, numhosts, options, fromhost, NULL, 0, &dummynl));
+    return ls_loadinfo (resreq, numhosts, options, fromhost, NULL, 0, &dummynl);
 
 }
 
 struct hostLoad *
-ls_loadofhosts (char *resreq, size_t *numhosts, int options, char *fromhost, char **hostlist, size_t listsize)
+ls_loadofhosts (char *resreq, size_t *numhosts, int options, const char *fromhost, char **hostlist, size_t listsize)
 {
     char **dummynl = NULL;
 
-    return (ls_loadinfo(resreq, numhosts, options, fromhost, hostlist, listsize, &dummynl));
+    return ls_loadinfo(resreq, numhosts, options, fromhost, hostlist, listsize, &dummynl);
 
 }
 
 struct hostLoad *
-loadinfo_ (char *resReq, struct decisionReq *loadReqPtr, char *fromhost, unsigned long *numHosts, char ***outnlist)
+loadinfo_ (char *resReq, struct decisionReq *loadReqPtr, const char *fromhost, unsigned long *numHosts, char ***outnlist)
 {
     static struct loadReply loadReply;
     char *hname;
@@ -275,7 +273,7 @@ loadinfo_ (char *resReq, struct decisionReq *loadReqPtr, char *fromhost, unsigne
         }
 
         FREEUP (loadReqPtr->preferredHosts);
-        return (NULL);
+        return NULL;
     }
 
     if (!fromhost)  {
@@ -284,7 +282,7 @@ loadinfo_ (char *resReq, struct decisionReq *loadReqPtr, char *fromhost, unsigne
                 FREEUP (loadReqPtr->preferredHosts[i]);
             }
             FREEUP (loadReqPtr->preferredHosts);
-            return (NULL);
+            return NULL;
         }
         loadReqPtr->preferredHosts[0] = putstr_ (hname);
     }
@@ -298,7 +296,7 @@ loadinfo_ (char *resReq, struct decisionReq *loadReqPtr, char *fromhost, unsigne
             FREEUP (loadReqPtr->preferredHosts[i]);
         }
         FREEUP (loadReqPtr->preferredHosts);
-        return (NULL);
+        return NULL;
     }
 
     if (resReq) {
@@ -321,7 +319,7 @@ loadinfo_ (char *resReq, struct decisionReq *loadReqPtr, char *fromhost, unsigne
             FREEUP (loadReqPtr->preferredHosts[i]);
         }
         FREEUP (loadReqPtr->preferredHosts);
-        return (NULL);
+        return NULL;
     }
     if (loadReply.flags & LOAD_REPLY_SHARED_RESOURCE)
         {
@@ -333,14 +331,14 @@ loadinfo_ (char *resReq, struct decisionReq *loadReqPtr, char *fromhost, unsigne
     FREEUP (loadReqPtr->preferredHosts);
     *numHosts = loadReply.nEntry;
     *outnlist = loadReply.indicies;
-    return (loadReply.loadMatrix);
+    return loadReply.loadMatrix;
 
 // error: was here
 /*    for (unsigned long i = 0; i < loadReqPtr->numPrefs; i++) {
         FREEUP (loadReqPtr->preferredHosts[i]);
     }
     FREEUP (loadReqPtr->preferredHosts);
-    return (NULL);
+    return NULL;
 */
 }
 
@@ -363,7 +361,7 @@ ls_loadadj (char *resreq, struct placeInfo *placeinfo, size_t listsize)
             return -1;
         }
         
-        strcpy (placeinfo[i].hostName, placeinfo[i].hostName);
+        // strcpy (placeinfo[i].hostName, placeinfo[i].hostName); // f
 
         if (placeinfo[i].numtask < 0) {
             placeinfo[i].numtask = 0;
@@ -379,9 +377,8 @@ ls_loadadj (char *resreq, struct placeInfo *placeinfo, size_t listsize)
 
     callLimResult = callLim_ (LIM_LOAD_ADJ, &loadadjReq, xdr_jobXfer, NULL, NULL, NULL, _USE_TCP_, NULL);
     if ( callLimResult < 0 ) {
-        return (-1);
+        return -1;
     }
 
-    return (0);
-
+    return 0;
 }
