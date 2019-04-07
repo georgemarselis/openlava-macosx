@@ -187,7 +187,7 @@ keyMatch (struct keymap *keyList, const char *line, int exact)
 
 // FIXME FIXME FIXME FIXME pulled from intlib/conf.c, decided to keep this version
 int
-isSectionEnd (char *linep, const char *lsfile, const size_t *lineNum, const char *sectionName)
+isSectionEnd ( const char *linep, const char *lsfile, const size_t *lineNum, const char *sectionName)
 {
     char *word = NULL;
     char *buff = malloc( sizeof(char) * 1024 + 1 ); // FIXME FIXME FIXME 1024 is awfuly particular
@@ -212,7 +212,7 @@ isSectionEnd (char *linep, const char *lsfile, const size_t *lineNum, const char
         ls_syslog (LOG_ERR, buff );
     }
 
-//     lserrno = LSE_NO_ERR; // global, lsf.h
+    assert( lserrno ); // FIXME move lserrno the frackety frack out of lsf.h into some lsferr.h or something
 
     return TRUE;
 }
