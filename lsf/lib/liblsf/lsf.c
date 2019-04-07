@@ -169,8 +169,8 @@ str2lsfRu (char *line, struct lsfRusage *lsfRu, int *ccount)
 "%ld %ld  %ld %ld %lf %ld %ld %ld %ld %ld %ld %ld %lf %ld %ld %ld %ld %ld %lf %d", 
                 &(lsfRu->ru_utime.tv_sec),    &(lsfRu->ru_stime.tv_sec), &(lsfRu->ru_maxrss),
                 &(lsfRu->ru_ixrss),           &(lsfRu->ru_ismrss),       &(lsfRu->ru_idrss),   &(lsfRu->ru_isrss),   &(lsfRu->ru_minflt), &(lsfRu->ru_majflt),
-                &(lsfRu->ru_nswap),           &(lsfRu->ru_inblock), &(lsfRu->ru_oublock), &(lsfRu->ru_ioch),    &(lsfRu->ru_msgsnd), &(lsfRu->ru_msgrcv),
-                &(lsfRu->ru_nsignals),        &(lsfRu->ru_nvcsw),   &(lsfRu->ru_nivcsw),  &(lsfRu->ru_exutime), ccount);
+                &(lsfRu->ru_nswap),           &(lsfRu->ru_inblock),      &(lsfRu->ru_oublock), &(lsfRu->ru_ioch),    &(lsfRu->ru_msgsnd), &(lsfRu->ru_msgrcv),
+                &(lsfRu->ru_nsignals),        &(lsfRu->ru_nvcsw),        &(lsfRu->ru_nivcsw),  &(lsfRu->ru_exutime), ccount);
   return cc;
 }
 
@@ -196,7 +196,7 @@ lsfRusageAdd_ (struct lsfRusage *lsfRusage1, struct lsfRusage *lsfRusage2)
     LSFRU_FIELD_ADD ( lsfRusage1->ru_nsignals,        lsfRusage2->ru_nsignals     );
     LSFRU_FIELD_ADD ( lsfRusage1->ru_nvcsw,           lsfRusage2->ru_nvcsw        );
     LSFRU_FIELD_ADD ( lsfRusage1->ru_nivcsw,          lsfRusage2->ru_nivcsw       );
-    LSFRU_FIELD_ADD ( lsfRusage1->ru_exutime,  lsfRusage2->ru_exutime  );
+    LSFRU_FIELD_ADD ( lsfRusage1->ru_exutime,         lsfRusage2->ru_exutime      );
 
     return;
 }
