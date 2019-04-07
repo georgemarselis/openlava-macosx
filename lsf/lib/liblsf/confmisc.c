@@ -40,7 +40,7 @@ getNextValue (const char **line)
 }
 
 // FIXME FIXME FIXME FIXME pulled from intlib/conf.c:
-char *
+// char *
 // getNextValue (char **line)
 // {
 //     return getNextValueQ_ (line, '(', ')');
