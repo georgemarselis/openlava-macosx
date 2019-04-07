@@ -4,6 +4,11 @@
 
 #include "lsf.h"
 #include "lib/conf.h"
+#include "lib/getnextline.h"
+#include "lib/syslog.h"
+#include "lsb/lsbatch.h"
+#include "lib/words.h"
+#include "lib/misc.h"
 
 /*************************************************************************************************************************
  * FIXME FIXME FIXME FIXME FIXME explain the difference between the two
