@@ -439,7 +439,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
         { MAX_ACCT_ARCHIVE_FILE,         "    ", keylist[MAX_ACCT_ARCHIVE_FILE],         NULL },
         { ACCT_ARCHIVE_SIZE,             "    ", keylist[ACCT_ARCHIVE_SIZE],             NULL },
         { ACCT_ARCHIVE_AGE,              "    ", keylist[ACCT_ARCHIVE_AGE],              NULL },
-        { -1,                            "    ", NULL, NULL }
+        { UINT_MAX,                            "    ", NULL, NULL }
     };
 
     const char *parameters[] = "parameters"

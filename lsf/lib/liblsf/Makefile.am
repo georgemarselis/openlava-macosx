@@ -78,4 +78,5 @@ xdrlim.c \
 xdrmisc.c \
 xdrnio.c \
 xdrres.c \
-xdrrf.c
+xdrrf.c \
+conf_lsb.c

@@ -59,7 +59,7 @@ struct builtIn
 // unsigned int TYPE2 = RESF_BUILTIN | RESF_GLOBAL;
 // unsigned int TYPE3 = RESF_BUILTIN | RESF_GLOBAL | RESF_LIC;
 
-// 
+// FIXME FIXME FIXME this should go into a resources.h file
 struct builtIn builtInRes[] = { // FIXME FIXME FIXME find out where this LS_NUMERIC comes from
     {  0, "      ",  "r15s",   "15-second CPU run queue length",              LS_NUMERIC, INCR, TYPE0, 15  },
     {  1, "      ",  "r1m",    "1-minute CPU run queue length (alias: cpu)",  LS_NUMERIC, INCR, TYPE0, 15  },
@@ -137,7 +137,7 @@ void freeHostInfo (struct hostInfo *);
 void initResTable (void);
 // 
 void putThreshold (int indx, struct hostEntry *hostEntryPtr, int position, char *val, float def);
-void liblsf_putThreshold ( unsigned int indx, struct hostInfo *host, long position, const char *val, float def);
+void liblsf_putThreshold ( unsigned int indx, const struct hostInfo *host, size_t position, const char *val, float def);
 
 
 // 

@@ -1557,13 +1557,13 @@ ls_setAdmins (struct admins *admins, int mOrA)
 
 
 void
-liblsf_putThreshold (unsigned int indx, struct hostInfo *host, long position, const char *val, float def)
+liblsf_putThreshold (unsigned int indx, const struct hostInfo *host, const size_t position, const char *val, float def)
 {
     if ( NULL == host ) {
         return;
     }
 
-    if (position != -1) {
+    if (position != UINT_MAX) {
         if (strcmp (val, "") == 0) {
             host->busyThreshold[indx] = def;
         }
