@@ -818,11 +818,11 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
     return TRUE;
 }
 
-int
+unsigned int
 my_atoi (char *arg, int upBound, int botBound)
 {
-    int num = 0;
-    if (!isint_ (arg)) {
+    unsigned int num = 0;
+    if( !isint_ (arg) ) {
         return INFINIT_INT;
     }
     num = atoi (arg);

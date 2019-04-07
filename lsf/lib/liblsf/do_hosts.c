@@ -491,7 +491,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
     struct hTab     *tmpHosts            = NULL;
     struct hostInfo *hostInfo            = NULL;
     struct hostInfo *hostList            = NULL;
-    struct htab     *nonOverridableHosts = NULL;
+    struct hTab     *nonOverridableHosts = NULL;
 
     enum state { 
         HKEY_HNAME, 
@@ -558,7 +558,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
         return FALSE;
     }
 
-    if (isSectionEnd (linep, filename, lineNum, host)) {
+    if (isSectionEnd (linep, filename, lineNum, host_string)) {
         // ls_syslog (LOG_WARNING, I18N_EMPTY_SECTION, __func__, filename, *lineNum, host_string);
         ls_syslog (LOG_WARNING, LSB_EMPTY_SECTION_STR, __func__, filename, *lineNum, host_string); /*catgets 5052 */
         lsberrno = LSBE_CONF_WARNING;
@@ -568,7 +568,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
     if (strchr (linep, '=') != NULL) {
         ls_syslog (LOG_ERR, I18N_HORI_NOT_IMPLE, __func__, filename, *lineNum, host_string);
         lsberrno = LSBE_CONF_WARNING;
-        doSkipSection_conf (conf, lineNum, filename, host);
+        doSkipSection_conf (conf, lineNum, filename, host_string);
         return FALSE;
     }
 
@@ -576,7 +576,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
         /* catgets 5174 */
         ls_syslog (LOG_ERR, "catgets 5174: %s: File %s at line %d: Keyword line format error for Host section; ignoring section", __func__, filename, *lineNum);
         lsberrno = LSBE_CONF_WARNING;
-        doSkipSection_conf (conf, lineNum, filename, host);
+        doSkipSection_conf (conf, lineNum, filename, host_string);
         return FALSE;
     }
 
@@ -584,7 +584,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
         /* catgets 5175 */
         ls_syslog (LOG_ERR, "catgets 5175: %s: File %s at line %d: Hostname required for Host section; ignoring section", __func__, filename, *lineNum);
         lsberrno = LSBE_CONF_WARNING;
-        doSkipSection_conf (conf, lineNum, filename, host);
+        doSkipSection_conf (conf, lineNum, filename, host_string);
         return FALSE;
     }
 
@@ -614,9 +614,9 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
         isTypeOrModel    = FALSE;
         numSelectedHosts = 0;
 
-        if (isSectionEnd (linep, filename, lineNum, host)) {
+        if (isSectionEnd (linep, filename, lineNum, host_string)) {
             FREEUP (hostList);
-            h_delTab_ ((hTab *)nonOverridableHosts);
+            h_delTab_ (( struct hTab *)nonOverridableHosts);
             FREEUP (nonOverridableHosts);
             h_delTab_ (tmpHosts);
             FREEUP (tmpHosts);
@@ -712,7 +712,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
         else if( keyList[HKEY_MXJ].val != NULL   && 
                  strcmp (keyList[HKEY_MXJ].val, "") ) 
         {
-            assert( my_atoi (keyList[HKEY_MXJ].val, INFINIT_INT, -1) >= 0);
+            // assert( my_atoi (keyList[HKEY_MXJ].val, INFINIT_INT, -1) >= 0);
             host.maxJobs = my_atoi (keyList[HKEY_MXJ].val, INFINIT_INT, -1);
             // if ( fabs( INFINIT_INT - host.maxJobs) < 0.00001 ) {
             if ( ( INFINIT_INT - host.maxJobs) < 0.00001F ) {
@@ -725,7 +725,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
         // if( keyList[HKEY_UJOB_LIMIT].position >= 0 && keyList[HKEY_UJOB_LIMIT].val != NULL && strcmp (keyList[HKEY_UJOB_LIMIT].val, "")) {
         if( keyList[HKEY_UJOB_LIMIT].val != NULL && strcmp (keyList[HKEY_UJOB_LIMIT].val, "" ) ) {
 
-            assert( my_atoi( keyList[HKEY_UJOB_LIMIT].val, INFINIT_INT, -1 ) >=0 );
+            // assert( my_atoi( keyList[HKEY_UJOB_LIMIT].val, INFINIT_INT, -1 ) >=0 );
             host.userJobLimit = my_atoi( keyList[HKEY_UJOB_LIMIT].val, INFINIT_INT, -1 );
             // if ( fabs( INFINIT_INT - host.userJobLimit ) < 0.00001 ) {
             if ( ( INFINIT_INT - host.userJobLimit ) < 0.00001F ) {
@@ -763,7 +763,8 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
         // if (keyList[HKEY_MIG].position >= 0 keyList[HKEY_MIG].val != NULL && strcmp (keyList[HKEY_MIG].val, "")) {
         if( keyList[HKEY_MIG].val != NULL && strcmp (keyList[HKEY_MIG].val, "" ) ) {
 
-            host.mig = my_atoi (keyList[HKEY_MIG].val, INFINIT_INT / 60, -1);
+            assert( my_atoi (keyList[HKEY_MIG].val, INFINIT_INT / 60, -1) < INT_MAX );
+            host.mig = (int) my_atoi (keyList[HKEY_MIG].val, INFINIT_INT / 60, -1);
             // if ( fabs( INFINIT_INT - host.mig ) < 0.00001 ) {
             if ( ( INFINIT_INT - host.mig ) < 0.00001F ) {
                 /* catgets 5186 */
@@ -778,7 +779,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
             lsberrno = LSBE_NO_MEM;
             freekeyval (keyList);
             FREEUP (hostList);
-            h_delTab_ ( (hTab *)nonOverridableHosts);
+            h_delTab_ ( ( struct hTab *)nonOverridableHosts);
             FREEUP (nonOverridableHosts);
             h_delTab_ (tmpHosts);
             FREEUP (tmpHosts);
@@ -795,7 +796,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
             lsberrno = LSBE_NO_MEM;
             freekeyval (keyList);
             FREEUP (hostList);
-            h_delTab_ ( (hTab *)nonOverridableHosts);
+            h_delTab_ ( ( struct hTab *)nonOverridableHosts);
             FREEUP (nonOverridableHosts);
             h_delTab_ (tmpHosts);
             FREEUP (tmpHosts);
@@ -813,7 +814,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
             num = 1;
             *override = (size_t)TRUE;
             copyCPUFactor = FALSE;
-            h_addEnt_ ( (hTab *)nonOverridableHosts, hostname, &new);
+            h_addEnt_( ( struct hTab * )nonOverridableHosts, hostname, &new );
         }
         else if (strcmp (hostname, default_ ) == 0) {
             num = 0;
@@ -865,7 +866,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
         }
         for( int i = 0; i < num; i++) {
 
-            if (isTypeOrModel && h_getEnt_ ((hTab *)nonOverridableHosts, hostList[i].hostName)) {
+            if (isTypeOrModel && h_getEnt_ (( struct hTab *)nonOverridableHosts, hostList[i].hostName)) {
                 continue;
             }
 
@@ -883,7 +884,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
             if (addHostEnt (&host, &hostList[i], override) == FALSE) {
                     freekeyval (keyList);
                     FREEUP (hostList);
-                    h_delTab_ ((hTab *)nonOverridableHosts);
+                    h_delTab_ ( (struct hTab *) nonOverridableHosts );
                     FREEUP (nonOverridableHosts);
                     h_delTab_ (tmpHosts);
                     FREEUP (tmpHosts);

@@ -157,7 +157,7 @@ unsigned int expandWordAll(unsigned int *size, unsigned int *num, struct inNames
 int readHvalues_conf(struct keymap *keyList, char *linep, struct lsConf *conf, const char *lsfile, size_t *lineNumber, int exact, const char *section);
 struct paramConf *lsb_readparam(struct lsConf *conf);
 char do_Param(struct lsConf *conf, const char *filename, size_t *lineNum);
-int my_atoi(char *arg, int upBound, int botBound);
+unsigned int my_atoi(char *arg, int upBound, int botBound);
 float my_atof(char *arg, float upBound, float botBound);
 void initParameterInfo(struct parameterInfo *param);
 void freeParameterInfo(struct parameterInfo *param);
