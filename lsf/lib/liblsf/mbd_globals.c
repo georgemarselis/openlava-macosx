@@ -1,6 +1,11 @@
 // added by George Marselis <george@marsel.is>
 
-/ MDB
+// / MDB
+
+#include <stdio.h>
+
+#include "struct-config_param.h"
+
 
 enum MDB_PARAMS {
 	MBD_DEBUG                         = 0,
@@ -10,7 +15,7 @@ enum MDB_PARAMS {
 	MBD_NULL
 };
 
-static struct config_param mbdDaemonParams[ ] = {
+struct config_param mbdDaemonParams[ ] = {
 	{ "MBD_DEBUG",                    NULL }, // 0	
 	{ "MBD_PORT",                     NULL }, // 3   // default port: 
 	{ "MBD_DONT_FORK",                NULL }, // 54

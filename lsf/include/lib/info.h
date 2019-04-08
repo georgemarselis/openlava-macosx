@@ -3,6 +3,10 @@
 
 #include "daemons/liblimd/limout.h" // FIXME FIXME FIXME FIXME de-couple fhe structs used for limd from limd functionality
 
+
+struct sharedResource **hostResources = NULL;
+
+
 struct masterInfo masterInfo_;
 int masterknown_ = 0; // FALSE
 

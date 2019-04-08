@@ -24,7 +24,6 @@ globals.c \
 host.c \
 i18n.c \
 id.c \
-inHostResources.c \
 info.c \
 init.c \
 initenv.c \
@@ -33,7 +32,6 @@ limits.c \
 load.c \
 lsb_globals.c \
 lsf.c \
-lsf_globals.c \
 mbd_globals.c \
 misc.c \
 nioback.c \

@@ -1,5 +1,10 @@
 // added by George Marselis <george@marsel.is>
 
+#include <stdio.h>
+
+#include "struct-config_param.h"
+
+
 // LIMD
 
 enum LIM_PARAMS {
@@ -10,7 +15,7 @@ enum LIM_PARAMS {
 	LIM_NULL
 };
 
-static struct config_param limDaemonParams[ ] = {
+struct config_param limDaemonParams[ ] = {
 	{ "LIM_DEBUG",                    NULL }, // 0
 	{ "LIM_PORT",                     NULL }, // 5   // default port: 
 	{ "LIM_TIMING",                   NULL }, // 6 

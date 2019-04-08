@@ -1,6 +1,10 @@
 // Added by George Marselis <george@marsel.is>
 
-static enum LSB_PARAMS {
+#include <stdio.h>
+
+#include "struct-config_param.h"
+
+enum LSB_PARAMS {
 	LSB_DEBUG                   = 0,
 	LSB_CONFDIR                 = 1,
 	LSB_SHAREDIR                = 4,
@@ -65,7 +69,7 @@ static enum LSB_PARAMS {
 } LSB_PARAMS;
 
 
-static struct config_param lsbParams[ ] = {
+struct config_param lsbParams[ ] = {
 	{ "LSB_DEBUG",                   NULL }, // 0
 	{ "LSB_CONFDIR",                 NULL }, // 1
 	{ "LSB_SHAREDIR",                NULL }, // 4

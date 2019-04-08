@@ -345,8 +345,6 @@ int lim_CheckError = 0;
 char *env_dir = NULL;
 static int alarmed;
 char ignDedicatedResource = FALSE;
-unsigned int numHostResources;
-struct sharedResource **hostResources = NULL;
 u_short lsfSharedCkSum = 0;
 
 pid_t pimPid = -1;
@@ -421,8 +419,6 @@ pid_t pimPid;
 
 char ignDedicatedResource;
 struct limLock limLock;
-unsigned int numHostResources;
-struct sharedResource **hostResources;
 
 u_short lsfSharedCkSum;
 
@@ -430,6 +426,8 @@ int numMasterCandidates;
 int isMasterCandidate;
 int limConfReady;
 int kernelPerm;
+
+unsigned int numHostResources = 0;
 
 
 
