@@ -25,7 +25,7 @@
 #include "lib/xdr.h"
 
 int
-lsb_switchjob (LS_LONG_INT jobId, char *queue)
+lsb_switchjob (size_t jobId, char *queue)
 {
   struct jobSwitchReq jobSwitchReq;
   char request_buf[MSGSIZE];

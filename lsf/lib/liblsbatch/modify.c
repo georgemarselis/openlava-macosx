@@ -28,8 +28,8 @@
 
 // #define  NL_SETN   13
 
-LS_LONG_INT
-lsb_modify (struct submit *jobSubReq, struct submitReply *submitRep, LS_LONG_INT job)
+size_t
+lsb_modify (struct submit *jobSubReq, struct submitReply *submitRep, size_t job)
 {
   struct modifyReq modifyReq;
   int i;
@@ -38,7 +38,7 @@ lsb_modify (struct submit *jobSubReq, struct submitReply *submitRep, LS_LONG_INT
   char resReq[MAX_LINE_LEN], cmd[MAX_LINE_LEN];
   struct jobInfoEnt *jInfo = NULL;
   LSB_SUB_SPOOL_FILE_T subSpoolFiles;
-  LS_LONG_INT jobId = -1;
+  size_t jobId = -1;
 
   subSpoolFiles.inFileSpool[0] = 0;
   subSpoolFiles.commandSpool[0] = 0;
@@ -171,7 +171,7 @@ cleanup:
 
 }
 
-static LS_LONG_INT
+static size_t
 sendModifyReq (struct modifyReq *modifyReq, struct submitReply *submitReply,
          struct lsfAuth *auth)
 {
@@ -182,7 +182,7 @@ sendModifyReq (struct modifyReq *modifyReq, struct submitReply *submitReply,
   int cc;
   struct LSFHeader hdr;
   struct submitMbdReply *reply;
-  LS_LONG_INT jobId;
+  size_t jobId;
 
 
   mbdReqtype = BATCH_JOB_MODIFY;

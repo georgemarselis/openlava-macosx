@@ -34,7 +34,7 @@ extern int _lsb_recvtimeout;
 static int mbdSock = -1;
 
 int
-lsb_openjobinfo (LS_LONG_INT jobId, char *jobName, char *userName, char *queueName, char *hostName, int options)
+lsb_openjobinfo (size_t jobId, char *jobName, char *userName, char *queueName, char *hostName, int options)
 {
   struct jobInfoHead *jobInfoHead = NULL;
 
@@ -48,7 +48,7 @@ lsb_openjobinfo (LS_LONG_INT jobId, char *jobName, char *userName, char *queueNa
 }
 
 struct jobInfoHead *
-lsb_openjobinfo_a (LS_LONG_INT jobId, char *jobName, char *userName, char *queueName, char *hostName, int options)
+lsb_openjobinfo_a (size_t jobId, char *jobName, char *userName, char *queueName, char *hostName, int options)
 {
 	static int first = TRUE;
 	static struct jobInfoReq jobInfoReq; 	// FIXME FIXME full init

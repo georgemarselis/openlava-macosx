@@ -43,9 +43,9 @@ initTab (struct hTab *tabPtr)
 }
 
 struct hEnt *
-addMemb (struct hTab *tabPtr, LS_LONG_INT member)  // FIXME FIXME FIXME replae LS_LONG_INT with 64-bit integer
+addMemb (struct hTab *tabPtr, size_t member)  // FIXME FIXME FIXME replae size_t with 64-bit integer
 {
-	char *memberStr = malloc( sizeof (char ) * sizeof( LS_LONG_INT ) * 8 + 1 );
+	char *memberStr = malloc( sizeof (char ) * sizeof( size_t ) * 8 + 1 );
 	hEnt *ent = NULL;
 	int newNumber = 0;
 
@@ -68,9 +68,9 @@ addMemb (struct hTab *tabPtr, LS_LONG_INT member)  // FIXME FIXME FIXME replae L
 }
 
 char
-remvMemb (struct hTab *tabPtr, LS_LONG_INT member)
+remvMemb (struct hTab *tabPtr, size_t member)
 {
-	char *memberStr = malloc( sizeof (char ) * sizeof( LS_LONG_INT ) * 8 + 1 );;
+	char *memberStr = malloc( sizeof (char ) * sizeof( size_t ) * 8 + 1 );;
 	hEnt *ent = NULL;
 
 	if (tabPtr)
@@ -93,13 +93,13 @@ remvMemb (struct hTab *tabPtr, LS_LONG_INT member)
 }
 
 struct hEnt *
-chekMemb (struct hTab * tabPtr, LS_LONG_INT member)
+chekMemb (struct hTab * tabPtr, size_t member)
 {
 		hEnt *ent = NULL;
 
 		if (tabPtr)
 		{
-			char *memberStr = malloc( sizeof (char ) * sizeof( LS_LONG_INT ) * 8 + 1 );
+			char *memberStr = malloc( sizeof (char ) * sizeof( size_t ) * 8 + 1 );
 			sprintf (memberStr, LONG_INT_FORMAT, member);
 			ent = h_getEnt_ (tabPtr, memberStr);
 			free( memberStr );
@@ -931,7 +931,7 @@ int lsb_arrayj_jobid( int jobId )
 }
 
 void
-jobId64To32 (LS_LONG_INT interJobId, unsigned int *jobId, unsigned int *jobArrElemId) // FIXME FIXME FIXME 32 bit support has to go.
+jobId64To32 (size_t interJobId, unsigned int *jobId, unsigned int *jobArrElemId) // FIXME FIXME FIXME 32 bit support has to go.
 {
 	*jobArrElemId = lsb_array_idx (interJobId);
 	*jobId = lsb_arrayj_jobid (interJobId);
@@ -939,7 +939,7 @@ jobId64To32 (LS_LONG_INT interJobId, unsigned int *jobId, unsigned int *jobArrEl
 
 
 void
-jobId32To64 (LS_LONG_INT *interJobId, unsigned int jobId, unsigned int jobArrElemId) // FIXME FIXME FIXME 32 bit support has to go.
+jobId32To64 (size_t *interJobId, unsigned int jobId, unsigned int jobArrElemId) // FIXME FIXME FIXME 32 bit support has to go.
 {
 		assert( jobId >= 0);
 		unsigned long temp = LSB_JOBID (jobId, jobArrElemId);

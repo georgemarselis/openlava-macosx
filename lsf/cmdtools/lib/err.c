@@ -28,7 +28,7 @@
 
 
 void
-jobInfoErr (LS_LONG_INT jobId, char *jobName, char *user, char *queue, char *host, int options)
+jobInfoErr (size_t jobId, char *jobName, char *user, char *queue, char *host, int options)
 {
     char errMsg[ MAX_LINE_LEN ];
     char hostOrQueue[ MAX_LINE_LEN ];

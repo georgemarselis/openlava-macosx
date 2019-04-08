@@ -108,16 +108,16 @@ int supportJobNamePattern (char *);
 
 
 int repeatedName (char *, char **, int);
-void jobInfoErr (LS_LONG_INT, char *, char *, char *, char *, int);
+void jobInfoErr (size_t, char *, char *, char *, char *, int);
 int printThresholds (float *, float *, int *, int *, int,
 			    struct lsInfo *);
 void prtResourceLimit (int *, char *, float, int *);
 int getNames (int, char **, int, char ***, int *, char *);
 int getJobIds (int, char **, char *, char *, char *, char *,
-		      LS_LONG_INT **, int);
-int getSpecJobIds (int, char **, LS_LONG_INT **, int *);
+		      size_t **, int);
+int getSpecJobIds (int, char **, size_t **, int *);
 int getSpecIdxs (char *, int **);
-int getOneJobId (char *, LS_LONG_INT *, int);
+int getOneJobId (char *, size_t *, int);
 int gettimefor (char *toptarg, time_t * tTime);
 int skipJob (int, int *, int);
 

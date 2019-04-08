@@ -40,7 +40,7 @@ static void do_options (int, char **, int *, char **, char **,
 static int skip_job (struct jobInfoEnt *);
 static void displayJobs (struct jobInfoEnt *, struct jobInfoHead *, int, int);
 
-static LS_LONG_INT *usrJids;
+static size_t *usrJids;
 static int *numJobs;
 
 static int numJids;
@@ -100,7 +100,7 @@ main (int argc, char **argv)
   struct jobInfoHead *jInfoH;
   struct jobInfoEnt *job;
   int i;
-  LS_LONG_INT jobId;
+  size_t jobId;
   int jobDisplayed = 0;
   float cpuFactor = -1;
   char prline[MAX_LINE_LEN];

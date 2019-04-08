@@ -134,7 +134,7 @@ void updJgrpCountByOp (struct jgTreeNode *, int);
 char *myName (char *);
 void freeJarray (struct jarray *);
 void checkJgrpDep (void);
-int inIdxList (LS_LONG_INT, struct idxList *);
+int inIdxList (size_t, struct idxList *);
 int matchName (char *, char *);
 struct jgTreeNode *treeNextSib (struct jgTreeNode *);
 char *jgrpNodeParentPath (struct jgTreeNode *);

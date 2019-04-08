@@ -6,8 +6,8 @@
 #define GET_JOBID(jobId, idx) ((Req.options & OPT_ARRAY_INFO)) ? (jobId): LSB_JOBID((jobId), (idx))
 
 // extern void initTab (struct hTab *tabPtr);
-// extern hEnt *addMemb (struct hTab *tabPtr, LS_LONG_INT member);
-// extern char remvMemb (struct hTab *tabPtr, LS_LONG_INT member);
+// extern hEnt *addMemb (struct hTab *tabPtr, size_t member);
+// extern char remvMemb (struct hTab *tabPtr, size_t member);
 // extern int matchName (char *, char *);
 
 struct eventRecord *lastEvent = NULL;

@@ -24,7 +24,7 @@
 #include "lib/xdr.h"
 
 int
-lsb_movejob (LS_LONG_INT jobId, int *position, int opCode)
+lsb_movejob (size_t jobId, int *position, int opCode)
 {
   struct jobMoveReq jobMoveReq;
   char request_buf[MSGSIZE];

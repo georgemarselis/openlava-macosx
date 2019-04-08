@@ -2963,7 +2963,7 @@ countLineNum (FILE * fp, long pos, size_t *lineNum)
 
 struct eventRec *
 lsbGetNextJobEvent (struct eventLogHandle *ePtr,  size_t *lineNum,
-						 size_t numJobIds, LS_LONG_INT *jobIds, // FIXME FIXME FIXME FIXME why LS_LONG_INT
+						 size_t numJobIds, size_t *jobIds, // FIXME FIXME FIXME FIXME why size_t
 						struct jobIdIndexS *indexS)
 {
 	struct eventRec *logRec = NULL;
@@ -3065,7 +3065,7 @@ lsbGetNextJobEvent (struct eventLogHandle *ePtr,  size_t *lineNum,
 }
 
 struct eventRec *
-lsbGetNextJobRecFromFile( FILE *logFp, size_t *lineNum, size_t numJobIds, LS_LONG_INT *jobIds )
+lsbGetNextJobRecFromFile( FILE *logFp, size_t *lineNum, size_t numJobIds, size_t *jobIds )
 {
 	int cc = 0;
 	int ccount = 0;
@@ -3179,7 +3179,7 @@ lsbGetNextJobRecFromFile( FILE *logFp, size_t *lineNum, size_t numJobIds, LS_LON
 }
 
 int
-checkJobEventAndJobId (char *line, int eventType, size_t numJobIds, LS_LONG_INT * jobIds)
+checkJobEventAndJobId (char *line, int eventType, size_t numJobIds, size_t * jobIds)
 {
 
 	int cc = 0;
@@ -3944,7 +3944,7 @@ updateJobIdIndexFile (char *indexFile, char *eventFile, int totalEventFile)
 }
 
 int
-getNextFileNumFromIndexS (struct jobIdIndexS *indexS, int numJobIds, LS_LONG_INT * jobIds)
+getNextFileNumFromIndexS (struct jobIdIndexS *indexS, int numJobIds, size_t * jobIds)
 {
 	int position;
 	int i = 0; 

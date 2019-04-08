@@ -2955,7 +2955,7 @@ checkPendingJobStatus (int s)
 }
 
 JOB_STATUS
-getJobStatus (LS_LONG_INT jid, struct jobInfoEnt ** job,
+getJobStatus (size_t jid, struct jobInfoEnt ** job,
 	      struct jobInfoHead ** jobHead)
 {
   char __func__] = "getJobStatus()";

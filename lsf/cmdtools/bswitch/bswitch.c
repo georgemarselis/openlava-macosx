@@ -21,7 +21,7 @@
 #define NL_SETN 8
 
 
-static int printErrMsg (LS_LONG_INT jobId, char *queue);
+static int printErrMsg (size_t jobId, char *queue);
 
 void
 usage (char *cmd)
@@ -39,7 +39,7 @@ main (int argc, char **argv)
   char *queue = NULL, *user = NULL, *host = NULL, *jobName = NULL;
   char *destQueue = NULL;
   int numJobs;
-  LS_LONG_INT *jobIds;
+  size_t *jobIds;
   int i, cc, exitrc = 0;
   int rc;
 
@@ -113,7 +113,7 @@ main (int argc, char **argv)
 }
 
 static int
-printErrMsg (LS_LONG_INT jobId, char *queue)
+printErrMsg (size_t jobId, char *queue)
 {
   char Job[80];
   sprintf (Job, "%s <%s>", I18N_Job, lsb_jobid2str (jobId));

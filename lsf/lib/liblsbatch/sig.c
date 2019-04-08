@@ -25,10 +25,10 @@
 #include "lsb/lsb.h"
 #include "lib/xdr.h"
 
-// static int signalJob_ (int, LS_LONG_INT, time_t, int);
+// static int signalJob_ (int, size_t, time_t, int);
 
 int
-lsb_signaljob (LS_LONG_INT jobId, int sigValue)
+lsb_signaljob (size_t jobId, int sigValue)
 {
     if (sigValue < 0 || sigValue >= SIGRTMAX ) {
         lsberrno = LSBE_BAD_SIGNAL;
@@ -39,7 +39,7 @@ lsb_signaljob (LS_LONG_INT jobId, int sigValue)
 }
 
 int
-lsb_chkpntjob (LS_LONG_INT jobId, time_t period, int options)
+lsb_chkpntjob (size_t jobId, time_t period, int options)
 {
     int lsbOptions = 0;
 
@@ -62,7 +62,7 @@ lsb_chkpntjob (LS_LONG_INT jobId, time_t period, int options)
 }
 
 int
-lsb_deletejob (LS_LONG_INT jobId, int times, int options)
+lsb_deletejob (size_t jobId, int times, int options)
 {
     if (times < 0) {
         lsberrno = LSBE_BAD_ARG;
@@ -77,14 +77,14 @@ lsb_deletejob (LS_LONG_INT jobId, int times, int options)
 
 
 int
-lsb_forcekilljob (LS_LONG_INT jobId)
+lsb_forcekilljob (size_t jobId)
 {
     return signalJob_ (SIG_TERM_FORCE, jobId, 0, 0);
 }
 
 
 int
-signalJob_ (int sigValue, LS_LONG_INT jobId, time_t period, int options)
+signalJob_ (int sigValue, size_t jobId, time_t period, int options)
 {
     struct signalReq signalReq;
     char request_buf[MSGSIZE];

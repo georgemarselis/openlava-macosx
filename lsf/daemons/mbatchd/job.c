@@ -98,7 +98,7 @@ static bool_t clusterAdminFlag;
 static void setClusterAdmin (bool_t admin);
 static bool_t requestByClusterAdmin (void);
 
-void expandFileNameWithJobId (char *, char *, LS_LONG_INT);
+void expandFileNameWithJobId (char *, char *, size_t);
 char *getJobAttaDataLocation (struct jData *, int);
 static void jobRequeueTimeUpdate (struct jData *, time_t);
 
@@ -154,7 +154,7 @@ newJob (struct submitReq *subReq, struct submitMbdReply *Reply, int chan,
   static char __func__] = "newJob";
   static struct jData *newjob;
   int returnErr;
-  LS_LONG_INT nextId;
+  size_t nextId;
   char jobIdStr[20];
   struct lenData jf;
   struct hData *hData;
@@ -1313,7 +1313,7 @@ matchJobStatus (int options, struct jData *jobPtr)
 int
 findLastJob (int options, struct jData *jobPtr, struct jData **recentJob)
 {
-  LS_LONG_INT jobIdDiff;
+  size_t jobIdDiff;
 
   if (!(options & LAST_JOB))
     return (TRUE);
@@ -5027,7 +5027,7 @@ initJobIdHT (void)
 }
 
 void
-removeJob (LS_LONG_INT jobId)
+removeJob (size_t jobId)
 {
   struct jData *zp, *jp;
   struct jgTreeNode *node;
@@ -5311,7 +5311,7 @@ jobInQueueEnd (struct jData *job, struct qData *qp)
 }
 
 struct jData *
-getJobData (LS_LONG_INT jobId)
+getJobData (size_t jobId)
 {
   hEnt *ent;
 
@@ -5911,7 +5911,7 @@ modifyJob (struct modifyReq *req, struct submitMbdReply *reply,
 {
   struct jData *jpbw, *jArray;
   int numJobIds = 0;
-  LS_LONG_INT *jobIdList = NULL;
+  size_t *jobIdList = NULL;
   int returnErr, successfulOnce = FALSE;
   int i;
   int uid = auth->uid;
@@ -7191,7 +7191,7 @@ error:
 
 void
 copyJobBill (struct submitReq *subReq, struct submitReq *jobBill,
-	     LS_LONG_INT jobId)
+	     size_t jobId)
 {
   int i;
 
@@ -7965,7 +7965,7 @@ isInZomJobList (struct hData *hData, struct statusReq *statusReq)
 }
 
 struct jData *
-getZombieJob (LS_LONG_INT jobId)
+getZombieJob (size_t jobId)
 {
   struct jData *jData;
 
@@ -9275,7 +9275,7 @@ replaceString (char *s1, char *s2, char *s3)
 }
 
 void
-expandFileNameWithJobId (char *out, char *in, LS_LONG_INT jobId)
+expandFileNameWithJobId (char *out, char *in, size_t jobId)
 {
 
   char jobIdStr[16];

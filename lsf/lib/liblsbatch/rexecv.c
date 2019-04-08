@@ -569,13 +569,13 @@ fillReq2 (int argc, char **argv, int operate, struct submit *req)
   return 0;
 }
 
-LS_LONG_INT
+size_t
 lsb_rexecv (int argc, char **argv, char **env, int *fds, int options)
 {
     struct submit req;
     struct submitReply reply;
     pid_t pid;
-    LS_LONG_INT jobId;
+    size_t jobId;
     int jobIdFd[2];
 
     assert( **env );

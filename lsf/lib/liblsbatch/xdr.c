@@ -609,7 +609,7 @@ xdr_jobInfoHead (XDR *xdrs, struct jobInfoHead *jobInfoHead, struct LSFHeader *h
 	static char **hostNames      = NULL;
 	static unsigned long numJobs = 0;
 	static unsigned int numHosts = 0;
-	static LS_LONG_INT *jobIds   = NULL;
+	static size_t *jobIds   = NULL;
 	char *sp                     = NULL;
 	unsigned int *jobArrIds      = NULL; 
 	unsigned int *jobArrElemIds  = NULL;
@@ -642,7 +642,7 @@ xdr_jobInfoHead (XDR *xdrs, struct jobInfoHead *jobInfoHead, struct LSFHeader *h
 		{
 			FREEUP (jobIds);
 			numJobs = 0;
-			jobIds = calloc (jobInfoHead->numJobs, sizeof (LS_LONG_INT));
+			jobIds = calloc (jobInfoHead->numJobs, sizeof (size_t));
 			if (NULL == jobIds && ENOMEM == errno )
 			{
 				lsberrno = LSBE_NO_MEM;

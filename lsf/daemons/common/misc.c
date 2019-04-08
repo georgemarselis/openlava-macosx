@@ -655,7 +655,7 @@ getResMaps (uint nRes, char **resource)
 
 
 int
-checkResumeByLoad (LS_LONG_INT jobId, int num, struct thresholds thresholds, struct hostLoad *loads, uint *reason, uint *subreasons, int jAttrib, struct resVal *resumeCondVal, struct tclHostData *tclHostData)
+checkResumeByLoad (size_t jobId, int num, struct thresholds thresholds, struct hostLoad *loads, uint *reason, uint *subreasons, int jAttrib, struct resVal *resumeCondVal, struct tclHostData *tclHostData)
 {
     static char __func__] = "checkResumeByLoad";
     int resume = TRUE;

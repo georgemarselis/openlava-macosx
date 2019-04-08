@@ -1456,7 +1456,7 @@ do_lsbMsg (XDR * xdrs, int s, struct LSFHeader *reqHdr)
   int found = FALSE;
   struct jobCard *jp = NULL;
   int ret, cnt;
-  LS_LONG_INT jobId;
+  size_t jobId;
   int freeMsg = FALSE;
 
   if (logclass & LC_TRACE)
@@ -1562,7 +1562,7 @@ replyHdrWithRC (int rc, int chfd, int jobId)
   XDR xdrs2;
   char reply_buf[MSGSIZE];
   struct LSFHeader replyHdr;
-  LS_LONG_INT tmpJobId;
+  size_t tmpJobId;
 
   initLSFHeader_ (&replyHdr);
   xdrmem_create (&xdrs2, reply_buf, MSGSIZE, XDR_ENCODE);

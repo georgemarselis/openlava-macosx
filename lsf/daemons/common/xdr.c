@@ -32,8 +32,8 @@
 
 extern int xdr_time_t (XDR *xdrs, time_t * t);
 extern int xdr_lsfRusage (XDR *xdrs, struct lsfRusage *);
-extern void jobId64To32 (LS_LONG_INT, uint *, uint *);
-extern void jobId32To64 (LS_LONG_INT *, uint, uint);
+extern void jobId64To32 (size_t, uint *, uint *);
+extern void jobId32To64 (size_t *, uint, uint);
 static int xdr_thresholds (XDR *xdrs, struct jobSpecs *jp);
 
 bool_t
@@ -45,7 +45,7 @@ xdr_jobSpecs (XDR *xdrs, struct jobSpecs *jobSpecs, struct LSFHeader *hdr)
     uint nLimits         = 0;
     uint jobArrId        = 0;
     uint jobArrElemId    = 0;
-    LS_LONG_INT tmpJobId = 0;
+    size_t tmpJobId = 0;
 
     if (xdrs->x_op == XDR_DECODE) {
         jobSpecs->numToHosts    = 0;

@@ -78,7 +78,7 @@ const unsigned short BLANKLEN = 22;
 // #define WIDTH      80
 const unsigned short WIDTH = 80;
 
-// extern LS_LONG_INT atoi64_ (char *ptr);
+// extern size_t atoi64_ (char *ptr);
 // extern int requeued;
 
 pid_t niosPid;

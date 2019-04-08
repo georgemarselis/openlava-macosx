@@ -132,7 +132,7 @@ static struct dptNode *popStackDep (struct Stack *);
 static void freeStackDep (struct Stack *, int);
 
 static struct jData **matchJobs (char *, char *, int *, int *,
-				 struct jobIdx **, LS_LONG_INT *, int *);
+				 struct jobIdx **, size_t *, int *);
 static int createMoreNodes (dptType, int, struct jData **, struct jobIdx *,
 			    struct dptNode **);
 static int getCounterOfDep (int, int *);
@@ -152,7 +152,7 @@ parseDepCond (char *dependCond, struct lsfAuth *auth, int *replyCode,
   struct jobIdx *jobIdx;
   struct dptNode **nodeList = NULL;
   int numJob = 0;
-  LS_LONG_INT notExistArrayJob = 0;
+  size_t notExistArrayJob = 0;
   int opFlag = 0;
 
 
@@ -663,7 +663,7 @@ evalDepCond (struct dptNode *node, struct jData *jobRec)
 	      }
 	    else if ((*node).dptUnion.job.opFlag == ARRAY_DEP_ONE_TO_ONE)
 	      {
-		LS_LONG_INT arrayIdx;
+		size_t arrayIdx;
 
 
 		arrayIdx = LSB_ARRAY_IDX ((*jobRec).jobId);
@@ -1146,7 +1146,7 @@ freeStackDep (struct Stack *stack, int freeNodes)
 
 static struct jData **
 matchJobs (char *jobp, char *lsfUserName, int *numFoundJob, int *replyCode,
-	   struct jobIdx **jobIdx, LS_LONG_INT * element, int *flag)
+	   struct jobIdx **jobIdx, size_t * element, int *flag)
 {
   struct jData *jpbw, **foundJobRec, **tempJobRec;
   int jobId, numJob, numRec = 20;
@@ -1399,7 +1399,7 @@ checkIdx:
       else
 	{
 	  int i;
-	  LS_LONG_INT jobid;
+	  size_t jobid;
 
 
 	  jobid = foundJobRec[0]->jobId;

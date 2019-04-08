@@ -67,7 +67,7 @@
 #define FALSE 0
 #endif
 
-// typedef long LS_LONG_INT; // FIXME FIXME FIXME FIXME FIXME  untypedef, leave to compiler to deal with
+// typedef long size_t; // FIXME FIXME FIXME FIXME FIXME  untypedef, leave to compiler to deal with
 // typedef unsigned long LS_UNS_LONG_INT; // FIXME FIXME FIXME FIXME FIXME untypedef, leave to compiler to deal with
 
 // #define LS_LONG_FORMAT ("%ld") 

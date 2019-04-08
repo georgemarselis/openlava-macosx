@@ -55,7 +55,7 @@ do_sub (int argc, char **argv, int option)
     // static char __func__] = "do_sub";
     struct submit req;
     struct submitReply reply;
-    LS_LONG_INT jobId = -1;
+    size_t jobId = -1;
 
     if (lsb_init (argv[0]) < 0)
     {
@@ -297,7 +297,7 @@ if (fstat (0, &statBuf) == 0)
     else if (argc == optind + 2)
     {
 
-      LS_LONG_INT arrayJobId;
+      size_t arrayJobId;
       if (getOneJobId (argv[optind + 1], &arrayJobId, 0))
         return -1;
 

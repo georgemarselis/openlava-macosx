@@ -124,10 +124,10 @@ void PRINT_ERRMSG3( char **errMsg, char *fmt, char *msg1, char *msg2, char *msg3
 }
 
 
-LS_LONG_INT
+size_t
 lsb_submit (struct submit *jobSubReq, struct submitReply *submitRep)
 {
-	LS_LONG_INT jobId = -1;
+	size_t jobId = -1;
 	struct lsfAuth auth;
 	char cwd[MAX_FILENAME_LEN]; // FIXME FIXME figure out if MAX_FILENAME_LEN is a constant offered by the filesystem/OS or by LSF; set to filesystem/OS appropriately
 	struct group *grpEntry;
@@ -709,7 +709,7 @@ appendEData (struct lenData *jf, struct lenData *ed_)
 }
 
 
-LS_LONG_INT
+size_t
 send_batch (struct submitReq *submitReqPtr, struct lenData *jf, struct submitReply *submitReply, struct lsfAuth *auth)
 {
 	mbdReqType mbdReqtype;
@@ -720,7 +720,7 @@ send_batch (struct submitReq *submitReqPtr, struct lenData *jf, struct submitRep
 	char *reply_buf   = NULL;
 	struct LSFHeader hdr;
 	struct submitMbdReply *reply = NULL;
-	LS_LONG_INT jobId;
+	size_t jobId;
 
 	if (logclass & (LC_TRACE | LC_EXEC)) {
 		ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
@@ -833,7 +833,7 @@ dependCondSyntax (char *dependCond)
 	return 0;
 }
 
-LS_LONG_INT
+size_t
 subRestart (struct submit *jobSubReq, struct submitReq *submitReq, struct submitReply *submitRep, struct lsfAuth *auth)
 {	
 	char *resReq        = NULL;
@@ -848,7 +848,7 @@ subRestart (struct submit *jobSubReq, struct submitReq *submitReq, struct submit
   
 	struct jobNewLog *jobLog = NULL;
 	struct xFile *xFiles     = NULL;
-	LS_LONG_INT jobId        = -1;
+	size_t jobId        = -1;
 	LS_WAIT_T status         = 0;
 	char *ptr                = NULL ;
 	unsigned int length      = 0;
@@ -1501,7 +1501,7 @@ getChkDir (char *givenDir, char *chkPath)
 }
 
 
-LS_LONG_INT
+size_t
 subJob (struct submit *jobSubReq, struct submitReq *submitReq, struct submitReply *submitRep, struct lsfAuth *auth)
 {
 
@@ -1511,7 +1511,7 @@ subJob (struct submit *jobSubReq, struct submitReq *submitReq, struct submitRepl
 	struct lenData jf;
 	int niosSock = 0;
 	LSB_SUB_SPOOL_FILE_T subSpoolFiles;
-	LS_LONG_INT jobId = -1;
+	size_t jobId = -1;
 
 	subSpoolFiles.inFileSpool[0] = 0;
 	subSpoolFiles.commandSpool[0] = 0;
@@ -2788,7 +2788,7 @@ createNiosSock (struct submitReq *submitReq)
 
 
 void
-startNios (struct submitReq *submitReq, int asock, LS_LONG_INT jobId)
+startNios (struct submitReq *submitReq, int asock, size_t jobId)
 {
 	char sockStr[10];
 	char envStr[64];
@@ -2845,7 +2845,7 @@ startNios (struct submitReq *submitReq, int asock, LS_LONG_INT jobId)
 
 
 void
-postSubMsg (struct submit *req, LS_LONG_INT jobId, struct submitReply *reply)
+postSubMsg (struct submit *req, size_t jobId, struct submitReply *reply)
 {
 
 

@@ -303,7 +303,7 @@ handleNewJobArray (struct jData *jarray, struct idxList *idxList,
     {
       for (i = idxPtr->start; i <= idxPtr->end; i += idxPtr->step)
 	{
-	  if (getJobData (LSB_JOBID ((LS_LONG_INT) jarray->jobId, i)))
+	  if (getJobData (LSB_JOBID ((size_t) jarray->jobId, i)))
 	    continue;
 	  jPtr->nextJob = copyJData (jarray);
 	  numJobs++;
@@ -311,7 +311,7 @@ handleNewJobArray (struct jData *jarray, struct idxList *idxList,
 
 	  jPtr->nodeType = JGRP_NODE_JOB;
 	  jPtr->nextJob = NULL;
-	  jPtr->jobId = LSB_JOBID ((LS_LONG_INT) jarray->jobId, i);
+	  jPtr->jobId = LSB_JOBID ((size_t) jarray->jobId, i);
 	  addJobIdHT (jPtr);
 	  inPendJobList (jPtr, PJL, 0);
 	  if (userPending)
@@ -397,7 +397,7 @@ offArray (struct jData *jp)
 }
 
 int
-inIdxList (LS_LONG_INT jobId, struct idxList *idxList)
+inIdxList (size_t jobId, struct idxList *idxList)
 {
   struct idxList *idx;
 
@@ -461,11 +461,11 @@ getJobIdIndexList (char *jobIdStr, int *outJobId, struct idxList **idxListP)
 
 #define MAX_JOB_IDS 50
 int
-getJobIdList (char *jobIdStr, int *numJobIds, LS_LONG_INT ** jobIdList)
+getJobIdList (char *jobIdStr, int *numJobIds, size_t ** jobIdList)
 {
   int jobId;
-  LS_LONG_INT lsbJobId;
-  LS_LONG_INT *temp, *jobIds;
+  size_t lsbJobId;
+  size_t *temp, *jobIds;
   struct idxList *idxListP = NULL, *idx;
   int sizeOfJobIdArray = MAX_JOB_IDS;
   int i, j, errCode;
@@ -481,7 +481,7 @@ getJobIdList (char *jobIdStr, int *numJobIds, LS_LONG_INT ** jobIdList)
     return (LSBE_BAD_JOBID);
 
   if ((jobIds =
-       (LS_LONG_INT *) calloc (MAX_JOB_IDS, sizeof (LS_LONG_INT))) == NULL)
+       (size_t *) calloc (MAX_JOB_IDS, sizeof (size_t))) == NULL)
     {
       mbdDie (MASTER_MEM);
     }
@@ -502,9 +502,9 @@ getJobIdList (char *jobIdStr, int *numJobIds, LS_LONG_INT ** jobIdList)
 	  if (*numJobIds >= sizeOfJobIdArray)
 	    {
 	      sizeOfJobIdArray += MAX_JOB_IDS;
-	      if ((temp = (LS_LONG_INT *) realloc (jobIds,
+	      if ((temp = (size_t *) realloc (jobIds,
 						   sizeOfJobIdArray *
-						   sizeof (LS_LONG_INT))) ==
+						   sizeof (size_t))) ==
 		  NULL)
 		{
 		  mbdDie (MASTER_MEM);

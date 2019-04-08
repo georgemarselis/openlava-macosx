@@ -30,7 +30,7 @@
 
 /*struct chkpntLog
 {
-  LS_LONG_INT jobId;
+  size_t jobId;
   int chkperiod;
 };
 */
@@ -102,9 +102,9 @@ int readJobAttrSet (char *, struct jobAttrSetLog *);
 
 void freeLogRec (struct eventRec *);
 
-struct eventRec *lsbGetNextJobEvent (struct eventLogHandle *ePtr, size_t *lineNum, size_t numJobIds, LS_LONG_INT *jobIds, struct jobIdIndexS *indexS);
-struct eventRec *lsbGetNextJobRecFromFile( FILE *logFp, size_t *lineNum, size_t numJobIds, LS_LONG_INT *jobIds );
-int checkJobEventAndJobId (char *line, int eventType, size_t numJobIds, LS_LONG_INT * jobIds);
+struct eventRec *lsbGetNextJobEvent (struct eventLogHandle *ePtr, size_t *lineNum, size_t numJobIds, size_t *jobIds, struct jobIdIndexS *indexS);
+struct eventRec *lsbGetNextJobRecFromFile( FILE *logFp, size_t *lineNum, size_t numJobIds, size_t *jobIds );
+int checkJobEventAndJobId (char *line, int eventType, size_t numJobIds, size_t * jobIds);
 int getEventTypeAndKind (char *, int *);
 void readEventRecord (char *, struct eventRec *);
 int lsb_readeventrecord (char *, struct eventRec *);
@@ -112,7 +112,7 @@ int getJobIdIndexFromEventFile (char *, struct sortIntList *, time_t *);
 int getJobIdFromEvent (char *, int);
 int writeJobIdIndexToIndexFile (FILE *, struct sortIntList *, time_t);
 int updateJobIdIndexFile (char *, char *, int);
-int getNextFileNumFromIndexS (struct jobIdIndexS *, int, LS_LONG_INT *);
+int getNextFileNumFromIndexS (struct jobIdIndexS *, int, size_t *);
 
 
 struct eventLogHandle *lsb_openelog (struct eventLogFile *, size_t *lineNum);

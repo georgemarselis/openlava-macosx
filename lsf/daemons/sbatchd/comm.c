@@ -26,7 +26,7 @@
 // extern int connTimeout;
 // extern int readTimeout;
 // extern int sbdLogMask;
-// static int msgSbd (LS_LONG_INT, char *, sbdReqType, int (*)());
+// static int msgSbd (size_t, char *, sbdReqType, int (*)());
 // extern int jRusageUpdatePeriod;
 
 // #define NL_SETN     11
@@ -479,7 +479,7 @@ sbdSyslog (int level, char *msg)
 }
 
 static int
-msgSbd (LS_LONG_INT jobId, char *req, sbdReqType reqType, int (*xdrFunc) ())
+msgSbd (size_t jobId, char *req, sbdReqType reqType, int (*xdrFunc) ())
 {
   static char __func__] = "msgSbd";
   XDR xdrs;

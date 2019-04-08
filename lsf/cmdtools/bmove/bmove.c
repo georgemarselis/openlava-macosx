@@ -35,7 +35,7 @@ bmove (int argc, char **argv, int opCode)
 {
 	int position = 0;
 	int reqPos   = 0;
-	LS_LONG_INT jobId = 0;
+	size_t jobId = 0;
 	int achar    = 0;
 
 	if (lsb_init (argv[0]) < 0)

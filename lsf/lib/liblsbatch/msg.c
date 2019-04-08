@@ -24,7 +24,7 @@
 #include "lib/xdr.h"
 
 int
-lsb_msgjob (LS_LONG_INT jobId, char *msg)
+lsb_msgjob (size_t jobId, char *msg)
 {
     int cc;
     char *reply_buf;

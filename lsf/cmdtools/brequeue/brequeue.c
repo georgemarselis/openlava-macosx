@@ -39,7 +39,7 @@ main (int argc, char **argv)
   char *jobName = NULL;
   char Job[80];
   int numJobs;
-  LS_LONG_INT *jobIds;
+  size_t *jobIds;
   struct jobrequeue reqJob;
   int i;
   int cc;

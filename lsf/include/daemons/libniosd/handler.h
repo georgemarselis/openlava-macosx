@@ -96,8 +96,8 @@ int sendUpdatetty ();
 void checkHeartbeat (int nready);
 int sendHeartbeat (void);
 void checkJobStatus (int numTries);
-JOB_STATUS getJobStatus (LS_LONG_INT jid, struct jobInfoEnt **job, struct jobInfoHead **jobHead);
-int JobStateInfo (LS_LONG_INT jid);
+JOB_STATUS getJobStatus (size_t jid, struct jobInfoEnt **job, struct jobInfoHead **jobHead);
+int JobStateInfo (size_t jid);
 bool_t compareTaskId (rtaskInfo_t *, int *, int);
 rtaskInfo_t *getTask (LIST_T *, int);
 rtaskInfo_t *addTask (LIST_T *);
@@ -145,4 +145,4 @@ time_t lastCheckTime = 0;
 // extern char *getTimeStamp ();
 // extern void kill_self (int, int);
 
-// extern int JobStateInfo (LS_LONG_INT jid);
+// extern int JobStateInfo (size_t jid);

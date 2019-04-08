@@ -26,7 +26,7 @@
 #include "lib/xdr.h"
 
 char *
-lsb_peekjob (LS_LONG_INT jobid)
+lsb_peekjob (size_t jobid)
 {
 
 	struct jobPeekReq jobPeekReq;

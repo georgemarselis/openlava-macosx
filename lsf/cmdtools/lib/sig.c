@@ -29,16 +29,16 @@
 extern int getSigVal (char *);
 extern char *getSigSymbolList (void);
 
-int signalJobs (LS_LONG_INT *, int);
-void prtSignaled (int, LS_LONG_INT);
+int signalJobs (size_t *, int);
+void prtSignaled (int, size_t);
 int sigValue;
-LS_LONG_INT sigJobId;
+size_t sigJobId;
 char *sigUser, *sigQueue, *sigHost, *sigJobName;
 time_t chkPeriod = LSB_CHKPERIOD_NOCHNG;
 int chkOptions;
 int runCount = 0;
 
-int do_options (int argc, char **argv, LS_LONG_INT ** jobIds, int signalValue);
+int do_options (int argc, char **argv, size_t ** jobIds, int signalValue);
 void sig_usage (char *cmd, int sig);
 
 void sig_usage (char *cmd, int sig)
@@ -74,7 +74,7 @@ void sig_usage (char *cmd, int sig)
 }
 
 int
-do_options (int argc, char **argv, LS_LONG_INT ** jobIds, int signalValue)
+do_options (int argc, char **argv, size_t ** jobIds, int signalValue)
 {
   int cc;
   int kflg = 0;
@@ -293,7 +293,7 @@ int
 bsignal (int argc, char **argv)
 {
   int numJobs;
-  LS_LONG_INT *jobIds;
+  size_t *jobIds;
   int signalValue;
 
   if (lsb_init (argv[0]) < 0)
@@ -331,7 +331,7 @@ bsignal (int argc, char **argv)
 }
 
 int
-signalJobs (LS_LONG_INT * jobIds, int numJobs)
+signalJobs (size_t * jobIds, int numJobs)
 {
   int failsignal = FALSE, signaled = FALSE;
   int i, cc;
@@ -381,7 +381,7 @@ signalJobs (LS_LONG_INT * jobIds, int numJobs)
 }
 
 void
-prtSignaled (int signalValue, LS_LONG_INT jobId)
+prtSignaled (int signalValue, size_t jobId)
 {
   char *op;
 

@@ -35,7 +35,7 @@ static int getJobIdIndexList (char *, int *, struct idxList **, int);
 
 int
 getJobIds (int argc, char **argv, char *jobName, char *user, char *queue,
-	   char *host, LS_LONG_INT ** jobIds0, int extOption)
+	   char *host, size_t ** jobIds0, int extOption)
 {
   int numJobIds = 0;
   int options = LAST_JOB;
@@ -80,7 +80,7 @@ getJobIds (int argc, char **argv, char *jobName, char *user, char *queue,
 
   TIMEIT (0,
 	  (jobInfoHead =
-	   lsb_openjobinfo_a ((LS_LONG_INT) 0, jobName, user, queue, host,
+	   lsb_openjobinfo_a ((size_t) 0, jobName, user, queue, host,
 			      options)), "lsb_openjobinfo");
   if (jobInfoHead == NULL)
     {
@@ -96,15 +96,15 @@ getJobIds (int argc, char **argv, char *jobName, char *user, char *queue,
 }
 
 int
-getSpecJobIds (int argc, char **argv, LS_LONG_INT ** jobIds0, int *options)
+getSpecJobIds (int argc, char **argv, size_t ** jobIds0, int *options)
 {
   int numJobIds = 0;
-  static LS_LONG_INT *jobIds = NULL;
+  static size_t *jobIds = NULL;
   int i;
   int j;
-  LS_LONG_INT *temp;
+  size_t *temp;
   int jobId;
-  LS_LONG_INT lsbJobId;
+  size_t lsbJobId;
   int sizeOfJobIdArray = MAX_JOB_IDS;
   struct idxList *idxListP = NULL, *idx;
   static char fName[] = "getSpecJobIds";
@@ -119,7 +119,7 @@ getSpecJobIds (int argc, char **argv, LS_LONG_INT ** jobIds0, int *options)
     }
 
   if ((jobIds =
-       (LS_LONG_INT *) calloc (MAX_JOB_IDS, sizeof (LS_LONG_INT))) == NULL)
+       (size_t *) calloc (MAX_JOB_IDS, sizeof (size_t))) == NULL)
     {
       perror ("calloc");
       exit (-1);
@@ -143,7 +143,7 @@ getSpecJobIds (int argc, char **argv, LS_LONG_INT ** jobIds0, int *options)
 	      sizeOfJobIdArray += MAX_JOB_IDS;
 	      if ((jobIds =
 		   realloc (jobIds,
-			    sizeOfJobIdArray * sizeof (LS_LONG_INT))) == NULL)
+			    sizeOfJobIdArray * sizeof (size_t))) == NULL)
 		{
 		  fprintf (stderr, I18N_FUNC_FAIL, fName, "malloc");
 		  exit (-1);
@@ -178,9 +178,9 @@ getSpecJobIds (int argc, char **argv, LS_LONG_INT ** jobIds0, int *options)
 	      if (numJobIds >= sizeOfJobIdArray)
 		{
 		  sizeOfJobIdArray += MAX_JOB_IDS;
-		  if ((temp = (LS_LONG_INT *) realloc (jobIds,
+		  if ((temp = (size_t *) realloc (jobIds,
 						       sizeOfJobIdArray *
-						       sizeof (LS_LONG_INT)))
+						       sizeof (size_t)))
 		      == NULL)
 		    {
 		      fprintf (stderr, I18N_FUNC_FAIL, fName, "malloc");
@@ -258,7 +258,7 @@ getSpecIdxs (char *jobName, int **idxs0)
 }
 
 int
-getOneJobId (char *string, LS_LONG_INT * outJobId, int options)
+getOneJobId (char *string, size_t * outJobId, int options)
 {
   int jobId = 0;
   struct idxList *idxListP = NULL;
@@ -320,7 +320,7 @@ getJobIdIndexList (char *string, int *outJobId, struct idxList **idxListP,
 	{
 	  if (isdigitstr_ (string) && islongint_ (string))
 	    {
-	      LS_LONG_INT interJobId = 0;
+	      size_t interJobId = 0;
 	      if ((interJobId = atoi64_ (string)) > 0)
 		{
 		  strcpy (inJobIdStr, lsb_jobid2str (interJobId));
@@ -462,12 +462,12 @@ parseJobArrayIndex (char *jobName)
 
 
 int
-getJobIdList (char *jobIdStr, LS_LONG_INT ** jobIdList)
+getJobIdList (char *jobIdStr, size_t ** jobIdList)
 {
   int numJobIds = 0;
   int jobId;
-  LS_LONG_INT lsbJobId;
-  LS_LONG_INT *temp, *jobIds;
+  size_t lsbJobId;
+  size_t *temp, *jobIds;
   struct idxList *idxListP = NULL, *idx;
   int sizeOfJobIdArray = MAX_JOB_IDS;
   int i, j;
@@ -481,7 +481,7 @@ getJobIdList (char *jobIdStr, LS_LONG_INT ** jobIdList)
     return (-1);
 
   if ((jobIds =
-       (LS_LONG_INT *) calloc (MAX_JOB_IDS, sizeof (LS_LONG_INT))) == NULL)
+       (size_t *) calloc (MAX_JOB_IDS, sizeof (size_t))) == NULL)
     {
       return (-1);
     }
@@ -502,9 +502,9 @@ getJobIdList (char *jobIdStr, LS_LONG_INT ** jobIdList)
 	  if (numJobIds >= sizeOfJobIdArray)
 	    {
 	      sizeOfJobIdArray += MAX_JOB_IDS;
-	      if ((temp = (LS_LONG_INT *) realloc (jobIds,
+	      if ((temp = (size_t *) realloc (jobIds,
 						   sizeOfJobIdArray *
-						   sizeof (LS_LONG_INT))) ==
+						   sizeof (size_t))) ==
 		  NULL)
 		{
 		  return (-1);

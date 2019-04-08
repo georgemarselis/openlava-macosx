@@ -199,7 +199,7 @@ do_jobInfoReq (XDR * xdrs,
   jobInfoHead.numJobs = listSize;
 
   if (jobInfoHead.numJobs > 0)
-    jobInfoHead.jobIds = my_calloc (listSize, sizeof (LS_LONG_INT), __func__);
+    jobInfoHead.jobIds = my_calloc (listSize, sizeof (size_t), __func__);
   for (i = 0; i < listSize; i++)
     {
       if (!jgrplist[i].isJData)
@@ -224,7 +224,7 @@ do_jobInfoReq (XDR * xdrs,
     }
 
   len = sizeof (struct jobInfoHead)
-    + jobInfoHead.numJobs * sizeof (LS_LONG_INT)
+    + jobInfoHead.numJobs * sizeof (size_t)
     + jobInfoHead.numHosts * (sizeof (char *) + MAXHOSTNAMELEN) + 100;
 
   reply_buf = (char *) my_malloc (len, __func__);

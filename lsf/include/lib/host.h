@@ -2,14 +2,14 @@
 
 #pragma once
 
-#define ISBOUNDARY(h1, h2, len)  ( (h1[len]=='.' || h1[len]=='\0') && (h2[len]=='.' || h2[len]=='\0') )
+// #define ISBOUNDARY(h1, h2, len)  ( (h1[len]=='.' || h1[len]=='\0') && (h2[len]=='.' || h2[len]=='\0') )
 
 // #define MAX_HOSTALIAS 64
-enum MAX_HOSTALIAS  {
-	MAX_HOSTALIAS = 64
-};
+// const enum MAX_HOSTALIAS  {
+static unsigned int MAX_HOSTALIAS = 64;
+// };
 /* #define MAX_HOSTIPS   32 */
-	
+    
 /* host.c */
 char           *ls_getmyhostname( void ) ;
 struct hostent *Gethostbyname_  ( const char *hname);

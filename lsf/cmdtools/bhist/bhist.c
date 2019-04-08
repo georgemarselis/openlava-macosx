@@ -60,7 +60,7 @@ extern void displayEvent (struct eventRec *, struct histReq *);
 extern struct eventLogHandle *lsb_openelog (struct eventLogFile *, int *);
 extern struct eventRec *lsb_getelogrec (struct eventLogHandle *, int *);
 extern void countLineNum (FILE * fp, long, int *);
-extern struct eventRec *lsbGetNextJobEvent (struct eventLogHandle *, int *, int, LS_LONG_INT *, struct jobIdIndexS *);
+extern struct eventRec *lsbGetNextJobEvent (struct eventLogHandle *, int *, int, size_t *, struct jobIdIndexS *);
 
 
 struct hTab jobIdHT;
@@ -2731,7 +2731,7 @@ printChronicleEventLog (struct eventRec *log, struct bhistReq *req)
   char prline[MAX_LINE_LEN], tBuff[20];
   int i;
   char *hostPtr;
-  LS_LONG_INT jobId;
+  size_t jobId;
   char timeStampStr[64];
   struct eventRecord eventT;
   char *cp, *cp1;

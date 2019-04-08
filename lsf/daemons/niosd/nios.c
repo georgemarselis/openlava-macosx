@@ -1711,7 +1711,7 @@ getTimeStamp (void)
 
 
 int
-JobStateInfo (LS_LONG_INT jid)
+JobStateInfo (size_t jid)
 {
   struct jobInfoHead *jobInfoHead = NULL;
   struct jobInfoEnt *jobInfo = NULL;
@@ -2125,7 +2125,7 @@ prtLine (char *line)
 }
 
 int
-printJobSuspend (LS_LONG_INT jid)
+printJobSuspend (size_t jid)
 {
   struct jobInfoHead *jobInfoHead = NULL;
   struct jobInfoEnt *jobInfo = NULL;

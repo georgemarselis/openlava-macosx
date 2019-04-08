@@ -25,7 +25,7 @@ int getCommonParams (struct submit *, struct submitReq *, struct submitReply *);
 int getOtherParams (struct submit *, struct submitReq *,  struct submitReply *, struct lsfAuth *, LSB_SUB_SPOOL_FILE_T *);
 char *getSpoolHostBySpoolFile (const char *spoolFile);
 
-static LS_LONG_INT sendModifyReq (struct modifyReq *, struct submitReply *, struct lsfAuth *);
+static size_t sendModifyReq (struct modifyReq *, struct submitReply *, struct lsfAuth *);
 static int esubValModify (struct submit *);
 void makeCleanToRunEsub ();
 void modifyJobInformation (struct submit *);

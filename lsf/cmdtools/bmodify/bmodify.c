@@ -25,7 +25,7 @@
 #define NL_SETN 8
 
 extern void sub_perror (char *usrMsg);
-extern int getJobIdList (char *, LS_LONG_INT **);
+extern int getJobIdList (char *, size_t **);
 
 int
 main (int argc, char **argv)
@@ -33,7 +33,7 @@ main (int argc, char **argv)
   struct submit req;
   struct submitReply reply;
   char *job;
-  LS_LONG_INT jobId = -1, *jobIdList = NULL;
+  size_t jobId = -1, *jobIdList = NULL;
   int numJobIds;
   time_t beginTime, terminTime;
   int rc;

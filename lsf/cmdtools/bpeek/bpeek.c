@@ -62,7 +62,7 @@ int
 main (int argc, char **argv, char **environ)
 {
   char *queue = NULL, *host = NULL, *jobName = NULL, *user = NULL;
-  LS_LONG_INT jobId;
+  size_t jobId;
   int options;
   struct jobInfoEnt *jInfo;
   char *outFile;
