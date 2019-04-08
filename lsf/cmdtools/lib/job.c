@@ -960,7 +960,7 @@ prtJobRusage (struct jobInfoEnt *job)
 
 void
 displayLong (struct jobInfoEnt *job, struct jobInfoHead *jInfoH,
-	     float cpuFactor)
+	     double cpuFactor)
 {
   char *hostPtr, *sp;
   char hostName[MAXHOSTNAMELEN];

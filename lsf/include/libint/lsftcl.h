@@ -123,8 +123,8 @@ struct tclHostData
 	char *hostModel;
 	char *fromHostType;
 	char *fromHostModel;
-	float cpuFactor;
-	char padding2[4];
+	double cpuFactor;
+	// char padding2[4];
 	float *loadIndex;
 	struct resPair *resPairs;
 };

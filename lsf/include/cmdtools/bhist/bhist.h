@@ -81,7 +81,7 @@ struct bhistReq
   time_t submitTime[2];
   time_t startTime[2];
   time_t searchTime[2];
-  float cpuFactor;
+  double cpuFactor;
   int numJobs;
   size_t *jobIds;
   char *jobName;
@@ -153,7 +153,7 @@ struct jobRecord
   int currentStatus;
   time_t delayTime;
   float hostFactor;
-  float cpuFactor;
+  double cpuFactor;
   char *hostPtr;
   int preExecPid;
   int preExecPGid;

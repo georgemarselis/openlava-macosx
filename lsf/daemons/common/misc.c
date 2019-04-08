@@ -532,7 +532,7 @@ errorBack (uint chan, ushort replyCode, struct sockaddr_in *from)
 }
 
 void
-scaleByFactor (uint *h32, uint *l32, float cpuFactor)
+scaleByFactor (uint *h32, uint *l32, double cpuFactor)
 {
     double limit = 0;
     double tmp   = 0;

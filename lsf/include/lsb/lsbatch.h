@@ -1009,7 +1009,7 @@ struct jobInfoHead
 struct jobInfoEnt
 {
 	unsigned short port;
-	const char padding[2];
+	char padding1[2];
 	int status;
 	int reasons;
 	int subreasons;
@@ -1036,7 +1036,7 @@ struct jobInfoEnt
 	float *loadStop;
 	unsigned long jobPid;
 	float cpuTime;
-	float cpuFactor;
+	char padding2[4];
 	time_t submitTime;
 	time_t reserveTime;
 	time_t startTime;
@@ -1047,6 +1047,7 @@ struct jobInfoEnt
 	struct submit submit;
 	struct jRusage runRusage;
 	unsigned long jobId;
+	double cpuFactor;
 };
 
 struct userInfoEnt

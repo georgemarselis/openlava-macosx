@@ -616,7 +616,7 @@ struct hData
   char *hostType;
   char *hostModel;
   struct hostent hostEnt;
-  float cpuFactor;
+  double cpuFactor;
   int numCPUs;
   float *loadSched;
   float *loadStop;

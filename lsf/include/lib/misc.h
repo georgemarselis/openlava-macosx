@@ -89,7 +89,9 @@ int                ls_writeeventrec (        FILE          *fp,            struc
 int                freeHostEntryLog ( struct hostEntryLog **hPtr );
 
 int readAddHost ( const char *buf, struct lsEventRec *ev);
+int writeAddHost (FILE * fp, struct lsEventRec *ev);
 int readRmHost (char *buf, struct lsEventRec *ev);
 int writeRmHost (FILE * fp, struct lsEventRec *ev);
 int readEventHeader (char *buf, struct lsEventRec *ev);
-int writeEventHeader (FILE * fp, struct lsEventRec *ev)
+int writeEventHeader (FILE * fp, struct lsEventRec *ev);
+

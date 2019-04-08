@@ -523,16 +523,16 @@ struct hostEntry
     unsigned int numIndx;
     unsigned int nDisks;
     unsigned int nRes;
-    char padding1[4];
+    char   padding1[4];
+    double cpuFactor;
+    float *busyThreshold;   
     const char *hostName; // [MAXHOSTNAMELEN];
     const char *hostModel; // [MAX_LSF_NAME_LEN];
     const char *hostType;  // [MAX_LSF_NAME_LEN];
     const char *window;
     char **resList;
-    float cpuFactor;
-    char padding2[4];
-    float *busyThreshold;   
 };
+
 
 // FIXME FIXME FIXME FIXME this struct needs to be profiled for issues
 //      with time
@@ -750,20 +750,19 @@ struct lsEventRec
  */
 struct hostEntryLog
 {
-    int   rcv;
     unsigned int nDisks;
     unsigned int numIndx;
     unsigned int nRes;
+    int   rcv;
     int   rexPriority;
-    char padding1[4];
+    char   padding[4];
     char  *hostName;  // [MAXHOSTNAMELEN];
     char  *hostModel; // [MAX_LSF_NAME_LEN];
     char  *hostType;  // [MAX_LSF_NAME_LEN];
-    float cpuFactor;
-    char padding2[4];
+    char  *window;
+    double cpuFactor;
     float *busyThreshold;
     char  **resList;
-    char  *window;
 };
 
 /*
@@ -1035,7 +1034,7 @@ struct extResInfo
     char *type;
     char *interval;
     char *increasing;
-    char *des;
+    char *des; 
 };
 
 #ifdef __CYGWIN__

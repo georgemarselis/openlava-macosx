@@ -102,7 +102,7 @@ main (int argc, char **argv)
   int i;
   size_t jobId;
   int jobDisplayed = 0;
-  float cpuFactor = -1;
+  double cpuFactor = -1;
   char prline[MAX_LINE_LEN];
   char defaultJobName[8] = "/";
   static char lsfUserName[MAX_LINE_LEN];

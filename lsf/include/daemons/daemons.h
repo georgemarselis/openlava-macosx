@@ -503,10 +503,10 @@ int xdr_jobReply (XDR * xdrs, struct jobReply *jobReply, struct LSFHeader *);
 int xdr_jobSig (XDR * xdrs, struct jobSig *jobSig, struct LSFHeader *);
 int xdr_chunkStatusReq (XDR *, struct chunkStatusReq *, struct LSFHeader *);
 
-float normalizeRq_ (float rawql, float cpuFactor, int nprocs);
+float normalizeRq_ (float rawql, double cpuFactor, int nprocs);
 
 void daemon_doinit (void);
 
-void scaleByFactor (unsigned int *h32, unsigned int *l32, float cpuFactor);
+void scaleByFactor (unsigned int *h32, unsigned int *l32, double cpuFactor);
 int execNqsi (u_long, int, int, int *, char *, int, char *);
 void doDaemonHang (char *);

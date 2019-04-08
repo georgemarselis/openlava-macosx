@@ -29,5 +29,5 @@ void rcvLoad (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *hdr);
 void rcvLoadVector (XDR * xdrs, struct sockaddr_in *from, struct LSFHeader *hdr);
 void copyResValues (struct loadVectorStruct loadVector, struct hostNode *hPtr);
 void copyIndices (float *lindx, int numIndx, int numUsrIndx, struct hostNode *hPtr);
-float normalizeRq (float rawql, float cpuFactor, int nprocs);
+float normalizeRq (float rawql, double cpuFactor, int nprocs);
 

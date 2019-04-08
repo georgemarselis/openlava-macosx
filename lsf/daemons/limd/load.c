@@ -579,7 +579,7 @@ copyIndices (float *lindx, int numIndx, int numUsrIndx, struct hostNode *hPtr)
 }
 
 float
-normalizeRq (float rawql, float cpuFactor, int nprocs)
+normalizeRq (float rawql, double cpuFactor, int nprocs)
 {
   float nrq;
   float f, k1, k2;

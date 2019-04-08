@@ -487,7 +487,7 @@ void checkAfterHourWindow ();
 void sendLoad (void);
 void rcvLoad (XDR *, struct sockaddr_in *, struct LSFHeader *);
 void copyIndices (float *, int, int, struct hostNode *);
-float normalizeRq (float rawql, float cpuFactor, int nprocs);
+float normalizeRq (float rawql, double cpuFactor, int nprocs);
 struct resPair *getResPairs (struct hostNode *);
 void satIndex (void);
 void loadIndex (void);

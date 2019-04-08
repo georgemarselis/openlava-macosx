@@ -401,7 +401,7 @@ float *
 getHostFactor (char *host)
 {
   struct hData *hD;
-  static float cpuFactor;
+  static double cpuFactor;
   struct hostInfo *hInfo;
   struct hostent *hp;
 
@@ -437,7 +437,7 @@ getHostFactor (char *host)
 float *
 getModelFactor (char *hostModel)
 {
-  static float cpuFactor;
+  static double cpuFactor;
   int i;
 
   if (hostModel == NULL || strlen (hostModel) == 0)

@@ -818,7 +818,7 @@ writeEventHeader (FILE * fp, struct lsEventRec *ev)
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    fprintf (fp, "%s %hu %lu ", emap[ev->event], ev->version, ev->etime);
+    fprintf (fp, "%s %hu %ld", emap[ev->event], ev->version, ev->etime);
 
     fflush (fp);
 
