@@ -860,7 +860,7 @@ freeNode (struct confNode *node)
 // }
 
 char *
-readNextLine (struct lsConf *conf, size_t *lineNum)
+readNextLine ( const struct lsConf *conf, size_t *lineNum)
 {
     struct confNode *node = NULL;
     struct confNode *prev = NULL;
@@ -948,6 +948,6 @@ readNextLine (struct lsConf *conf, size_t *lineNum)
     }
 
     fprintf( stderr, "%s: you are not suppposed to be here!", __func__ );
-    ls_syslog( LSE_ERR, "%s: you are not suppposed to be here!", __func__ );
+    ls_syslog( LOG_ERR, "%s: you are not suppposed to be here!", __func__ );
     return NULL;
 }

@@ -429,27 +429,29 @@ putEnv (char *env, char *val)
 void
 initLSFHeader_ (struct LSFHeader *hdr)
 {
-  memset (hdr, 0, sizeof (struct LSFHeader));
-  hdr->version = OPENLAVA_VERSION;
+	memset (hdr, 0, sizeof (struct LSFHeader));
+	hdr->version = OPENLAVA_VERSION;
+
+	return;
 }
 
 void *
 myrealloc (void *ptr, size_t size)
 {
-  if (ptr == NULL)
-	{
+	if (ptr == NULL) {
 	  return malloc (size);
 	}
-  else
-	{
+	else {
 	  return realloc (ptr, size);
 	}
+
+	return;
 }
 
 int
 Bind_ (int sockfd, struct sockaddr *myaddr, socklen_t addrlen)
 {
-  struct sockaddr_in *cliaddr;
+  struct sockaddr_in *cliaddr = NULL;
   unsigned short port = 0;
   int i;
 
