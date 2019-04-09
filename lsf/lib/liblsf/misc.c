@@ -23,6 +23,14 @@
 #include "lib/info.h"
 #include "libint/lsi18n.h"
 
+void misc_c_bullshit( ) 
+{
+    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
+
+    return;
+}
+
+
 char
 isanumber_ ( char *word )
 {
@@ -945,7 +953,7 @@ readAddHost ( const char *buf, struct lsEventRec *ev)
 
     hPtr->busyThreshold = calloc ( (unsigned long) hPtr->numIndx, sizeof (float));
     for( unsigned int i = 0; i < hPtr->numIndx; i++) {
-        cc = sscanf (p, "%f%n", &hPtr->busyThreshold[i], &n);
+        cc = sscanf (p, "%lf%n", &hPtr->busyThreshold[i], &n);
         if (cc != 1) {
             // goto out
             FREEUP (hPtr->busyThreshold);
