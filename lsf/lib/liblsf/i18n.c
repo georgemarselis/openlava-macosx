@@ -48,6 +48,7 @@ _i18n_ctime_init (int catID)
     assert( catID ); // not used
 
     assert( lserrno ); // BULLSHIT OP, so the compiler will not complain
+    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
 
     for ( int i = 0; i <= MAX_CTIME_FORMATID; i++) {
         i18nCTFormatStr[i] = i18n_ct_format[i];

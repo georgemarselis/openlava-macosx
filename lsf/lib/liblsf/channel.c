@@ -68,6 +68,8 @@ chanInit_ (void)
     static char first = TRUE;
     long result = 0;
 
+    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
+
     if (!first) {
         return 0;
     }
@@ -79,7 +81,7 @@ chanInit_ (void)
     }
     else if ( -1 == result && errno == EINVAL ) {
         syslog( LOG_ERR, "%s: sysconf value passed was invalid", __func__ );
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
     else {
         fprintf( stderr, "%s: you are not supposed to be here\n", __func__ );
@@ -87,7 +89,7 @@ chanInit_ (void)
 
     channels = calloc ( chanMaxSize, sizeof (struct chanData)); // channels is global, located in <channel.h>
     if (channels == NULL) {
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     chanIndex = 0; // chanIndex is global, located in <channel.h>
@@ -305,7 +307,7 @@ chanAccept_ (int chfd, struct sockaddr_in *from)
     if (channels[chfd].type != CH_TYPE_PASSIVE)
     {
         lserrno = LSE_INTERNAL;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     len = sizeof (struct sockaddr);
@@ -314,7 +316,7 @@ chanAccept_ (int chfd, struct sockaddr_in *from)
     if (SOCK_INVALID (s))
     {
         lserrno = LSE_SOCK_SYS;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     return chanOpenSock_ (s, CHAN_OP_NONBLOCK);
@@ -356,7 +358,7 @@ chanConnect_ (int chfd, struct sockaddr_in *peer, int timeout)
     if (channels[chfd].state != CH_DISC)
     {
         lserrno = LSE_INTERNAL;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (logclass & (LC_COMM | LC_TRACE)) {
@@ -370,7 +372,7 @@ chanConnect_ (int chfd, struct sockaddr_in *peer, int timeout)
         if (SOCK_CALL_FAIL (cc))
         {
             lserrno = LSE_CONN_SYS;
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
         channels[chfd].state = CH_CONN;
         return 0;
@@ -387,7 +389,7 @@ chanConnect_ (int chfd, struct sockaddr_in *peer, int timeout)
             else {
                 lserrno = LSE_CONN_SYS;
             }
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
         channels[chfd].state = CH_CONN;
         return 0;
@@ -414,12 +416,12 @@ chanSendDgram_ (int chfd, char *buf, int len, struct sockaddr_in *peer)
     if (channels[chfd].type != CH_TYPE_UDP)
     {
         lserrno = LSE_INTERNAL;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if( len < 0 ) {
         lserrno = LSE_INTERNAL;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (channels[chfd].state == CH_CONN)
@@ -437,7 +439,7 @@ chanSendDgram_ (int chfd, char *buf, int len, struct sockaddr_in *peer)
     if (SOCK_CALL_FAIL (cc))
     {
         lserrno = LSE_MSG_SYS;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     return 0;
@@ -462,7 +464,7 @@ chanRcvDgram_ (int chfd, char *buf, int len, struct sockaddr_in *peer, int timeo
     if (channels[chfd].type != CH_TYPE_UDP)
     {
         lserrno = LSE_INTERNAL;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (logclass & (LC_COMM | LC_TRACE)){
@@ -475,7 +477,7 @@ chanRcvDgram_ (int chfd, char *buf, int len, struct sockaddr_in *peer, int timeo
         {
             if( len < 0 ) {
                 lserrno = LSE_INTERNAL;
-                return -1;
+                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
 
             cc = recv (sock, buf, (size_t) len, 0);
@@ -484,7 +486,7 @@ chanRcvDgram_ (int chfd, char *buf, int len, struct sockaddr_in *peer, int timeo
         else {
             if( len < 0 ) {
                 lserrno = LSE_INTERNAL;
-                return -1;
+                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
 
             cc = recvfrom (sock, buf, (size_t) len, 0, (struct sockaddr *) peer, &peersize);
@@ -492,7 +494,7 @@ chanRcvDgram_ (int chfd, char *buf, int len, struct sockaddr_in *peer, int timeo
         if (SOCK_CALL_FAIL (cc))
         {
             lserrno = LSE_MSG_SYS;
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
         return 0;
     }
@@ -520,25 +522,25 @@ chanRcvDgram_ (int chfd, char *buf, int len, struct sockaddr_in *peer, int timeo
         if (nReady < 0)
         {
             lserrno = LSE_SELECT_SYS;
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
         if (nReady == 0)
         {
             lserrno = LSE_TIME_OUT;
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
         if (channels[chfd].state == CH_CONN) {
 
             if( len < 0 ) { /* FIXME FIXME all these checks should be turned into n assert */
                 lserrno = LSE_INTERNAL;
-                return -1;
+                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
             cc = recv (sock, buf, (size_t) len, 0);
         }
         else {
             if( len < 0 ) {
                 lserrno = LSE_INTERNAL;
-                return -1;
+                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
             cc = recvfrom (sock, buf, (size_t) len, 0, (struct sockaddr *) peer, &peersize);
         }
@@ -552,7 +554,7 @@ chanRcvDgram_ (int chfd, char *buf, int len, struct sockaddr_in *peer, int timeo
                 lserrno = LSE_MSG_SYS;
             }
 
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
 
         return 0;
@@ -576,7 +578,7 @@ chanOpen_ (unsigned int iaddr, unsigned short port, int options)
     if ( UINT_MAX == i )
     {
         chanerr = CHANE_NOCHAN;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     channels[i].type = CH_TYPE_TCP;
@@ -599,7 +601,7 @@ chanOpen_ (unsigned int iaddr, unsigned short port, int options)
     if (returnValue == UINT_MAX )
     {
         chanerr = CHANE_SYSCALL;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (io_nonblock_ ((int)channels[i].handle) < 0)
@@ -608,7 +610,7 @@ chanOpen_ (unsigned int iaddr, unsigned short port, int options)
         channels[i].state = CH_DISC;
         channels[i].handle = INVALID_HANDLE;
         chanerr = CHANE_SYSCALL;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     // channels[i].handle is unsigned int
@@ -636,7 +638,7 @@ chanOpen_ (unsigned int iaddr, unsigned short port, int options)
             channels[i].state = CH_DISC;
             channels[i].handle = INVALID_HANDLE;
             chanerr = CHANE_SYSCALL;
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
         channels[i].state = CH_PRECONN;
         return (int) i;
@@ -660,7 +662,7 @@ chanOpen_ (unsigned int iaddr, unsigned short port, int options)
             channels[i].recv = NULL;
         }
         lserrno = LSE_MALLOC;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     return (int) i;
@@ -676,13 +678,13 @@ chanOpenSock_ (int s, int options)
     if( UINT_MAX == i )
     {
         lserrno = LSE_NO_CHAN;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if ((options & CHAN_OP_NONBLOCK) && (io_nonblock_ (s) < 0))
     {
         lserrno = LSE_SOCK_SYS;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
     channels[i].type = CH_TYPE_TCP;
     channels[i].handle = (unsigned int)s;
@@ -708,7 +710,7 @@ chanOpenSock_ (int s, int options)
             channels[i].recv = NULL;
         }
         lserrno = LSE_MALLOC;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
     return (int)i;
 }
@@ -731,7 +733,7 @@ chanClose_ ( unsigned int chfd )
 /*    if (channels[chfd].handle < 0)
     {
         chanerr = CHANE_BADCHFD;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }*/
     close ((int)channels[chfd].handle);
 
@@ -950,13 +952,13 @@ chanEnqueue_ (int chfd, struct Buffer *msg)
     if (chfd < 0 || chfd > maxfds)
     {
         chanerr = CHANE_BADCHAN;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (channels[chfd].handle == INVALID_HANDLE || channels[chfd].state == CH_PRECONN)
     {
         chanerr = CHANE_NOTCONN;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     enqueueTail_ (msg, channels[chfd].send);
@@ -973,18 +975,18 @@ chanDequeue_ (int chfd, struct Buffer **buf)
     if (chfd < 0 || chfd > maxfds)
     {
         chanerr = CHANE_BADCHAN;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
     if (channels[chfd].handle == INVALID_HANDLE || channels[chfd].state == CH_PRECONN)
     {
         chanerr = CHANE_NOTCONN;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (channels[chfd].recv->forw == channels[chfd].recv)
     {
         chanerr = CHANE_NOMSG;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
     *buf = channels[chfd].recv->forw;
     dequeue_ (channels[chfd].recv->forw);
@@ -998,7 +1000,7 @@ chanReadNonBlock_ (int chfd, char *buf, size_t len, int timeout)
     {
         lserrno = LSE_FILE_SYS;
         ls_syslog (LOG_ERR, "%s: %s failed, %m", __func__, "io_nonblock_", 2); // FIXME the 2 is from a leftover from the macro expansion
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     return nb_read_timeout( (int)channels[chfd].handle, buf, len, timeout);
@@ -1041,7 +1043,7 @@ chanRpc_ (int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *out
 
         // FIXME fix chanWrite to return size_t, take out cast
         if (chanWrite_ (chfd, in->data, in->len) != (long) in->len) {
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
 
         if (in->forw != NULL)
@@ -1055,12 +1057,12 @@ chanRpc_ (int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *out
                         // #define NET_INTADDR_(a) ((char *) (a))
             // if (chanWrite_ (chfd, NET_INTADDR_(&nlen), NET_INTSIZE_) != NET_INTSIZE_) {
             if    (chanWrite_ (chfd, ((char *) (&nlen)), NET_INTSIZE_) != NET_INTSIZE_) {
-                return -1;
+                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
 
             // FIXME fix chanWrite to return size_t, take out cast
             if (chanWrite_ (chfd, buf->data, buf->len) != (long) buf->len) {
-                return -1;
+                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
         }
     }
@@ -1096,7 +1098,7 @@ chanRpc_ (int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *out
         else {
             lserrno = LSE_SELECT_SYS;
         }
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (logclass & LC_COMM) {
@@ -1109,7 +1111,7 @@ chanRpc_ (int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *out
     if (cc < 0)
     {
         xdr_destroy (&xdrs);
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
     xdr_destroy (&xdrs);
 
@@ -1117,7 +1119,7 @@ chanRpc_ (int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *out
     if (outhdr->length > MAXMSGLEN)
     {
         lserrno = LSE_PROTOCOL;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (logclass & LC_COMM) {
@@ -1133,7 +1135,7 @@ chanRpc_ (int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *out
         if ((out->data = malloc( (size_t) out->len)) == NULL)
         {
             lserrno = LSE_MALLOC;
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
 
         chanReadout = chanRead_(chfd, out->data, out->len );
@@ -1145,7 +1147,7 @@ chanRpc_ (int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *out
             }
 
             lserrno = LSE_MSG_SYS;
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
     }
     else {
@@ -1176,14 +1178,14 @@ chanSetMode_ (unsigned int chfd, int mode)
     if ( chfd > chanMaxSize)
     {
         lserrno = LSE_BAD_CHAN;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (channels[chfd].state == CH_FREE
         || channels[chfd].handle == INVALID_HANDLE)
     {
         lserrno = LSE_BAD_CHAN;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (mode == CHAN_MODE_NONBLOCK)
@@ -1192,7 +1194,7 @@ chanSetMode_ (unsigned int chfd, int mode)
         if (io_nonblock_ ((int)channels[chfd].handle) < 0)
         {
             lserrno = LSE_SOCK_SYS;
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
         if (!channels[chfd].send) {
             channels[chfd].send = newBuf ();
@@ -1203,7 +1205,7 @@ chanSetMode_ (unsigned int chfd, int mode)
         if (!channels[chfd].send || !channels[chfd].recv)
         {
             lserrno = LSE_MALLOC;
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
 
         return 0;
@@ -1212,7 +1214,7 @@ chanSetMode_ (unsigned int chfd, int mode)
     if (io_block_ ((int)channels[chfd].handle) < 0)
     {
         lserrno = LSE_SOCK_SYS;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     return 0;
@@ -1383,14 +1385,14 @@ chanAllocBuf_ (struct Buffer **buf, int size)
 {
     *buf = newBuf ();
     if (!*buf) {
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     (*buf)->data = calloc( (size_t) size, (size_t) sizeof (char));
     if ((*buf)->data == NULL)
     {
         free (*buf);
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     return 0;
@@ -1422,7 +1424,7 @@ chanFreeStashedBuf_ (struct Buffer *buf)
         buf->stashed = FALSE;
         return chanFreeBuf_ (buf);
     }
-    return -1;
+    return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
 }
 
 void

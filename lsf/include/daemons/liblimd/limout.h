@@ -150,7 +150,7 @@ struct shortHInfo
     char padding[4];
     char *windows;
     unsigned int *resBitMaps;
-    float *busyThreshold;
+    double *busyThreshold;
 
 };
 

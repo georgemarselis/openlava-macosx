@@ -94,4 +94,5 @@ int readRmHost (char *buf, struct lsEventRec *ev);
 int writeRmHost (FILE * fp, struct lsEventRec *ev);
 int readEventHeader (char *buf, struct lsEventRec *ev);
 int writeEventHeader (FILE * fp, struct lsEventRec *ev);
+char *getstr_  ( const char *s );
 

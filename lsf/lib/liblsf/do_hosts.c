@@ -235,9 +235,9 @@ do_Hosts_lsf (FILE *fp, const char *filename, size_t *lineNum, struct lsInfo *in
         liblsf_putThreshold( R15M, &host, keyList[R15M].position, keyList[R15M].val, INFINIT_LOAD );
         liblsf_putThreshold( UT,   &host, keyList[UT].position,   keyList[UT].val,   INFINIT_LOAD );
 
-        if (host.busyThreshold[UT] > 1.0f && host.busyThreshold[UT] < INFINIT_LOAD) {
+        if (host.busyThreshold[UT] > 1.0l  && host.busyThreshold[UT] < INFINIT_LOAD) {
             ls_syslog (LOG_INFO, "catgets 5145: %s: %s(%d): value for threshold ut <%2.2e> is greater than 1, assumming <%5.1e%%>", __func__, filename, *lineNum, (double) host.busyThreshold[UT], (double) host.busyThreshold[UT]); // FIXME FIXME the (double) cast s probably correct
-            host.busyThreshold[UT] /= 100.0f;
+            host.busyThreshold[UT] /= 100;
         }
         liblsf_putThreshold( PG,   &host, keyList[PG].position,  keyList[PG].val,   INFINIT_LOAD );
         liblsf_putThreshold( IO,   &host, keyList[IO].position,  keyList[IO].val,   INFINIT_LOAD );

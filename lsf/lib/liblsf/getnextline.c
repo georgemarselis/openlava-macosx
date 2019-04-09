@@ -10,6 +10,8 @@ char *
 getNextLine_conf ( const struct lsConf *conf, int confFormat) // FIXME FIXME FIXME FIXME this wrapper function has to go
 {
     size_t *dummy = 0;
+
+    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain    
     return getNextLineC_conf (conf, dummy, confFormat);
 }
 

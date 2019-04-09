@@ -47,6 +47,8 @@ ls_limcontrol (const char *hname, int opCode)
 
     memset (&auth, 0, sizeof (struct lsfAuth));
 
+    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
+
     switch (opCode) {
         case LIM_CMD_SHUTDOWN: {
             limReqCode = LIM_SHUTDOWN;

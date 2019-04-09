@@ -120,7 +120,7 @@ struct hostNode
     char *hostName;
     char *windows;
     windows_t *week[8];
-    float *busyThreshold;
+    double *busyThreshold;
     float *loadIndex;
     float *uloadIndex;
     time_t wind_edge;

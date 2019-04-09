@@ -43,89 +43,91 @@ static int lserrno   =  0;
 void
 ls_minit ( void )
 {
-	char *c;
+    char *c = NULL;
 
-	if ((c = getenv ("LSF_RPID")) == NULL)
-	{
-		fprintf (stderr, "ls_minit: Internal error- don't know my rpid\n");
-		exit (-1);
-	}
-	else
-	{
+    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
 
-		const char env_name[] = "LSF_RPID";
-		myrpid_ = atoi (c);
-		unsetenv( env_name );
-	}
+    if ((c = getenv ("LSF_RPID")) == NULL)
+    {
+        fprintf (stderr, "ls_minit: Internal error- don't know my rpid\n");
+        exit (-1);
+    }
+    else
+    {
 
-	if ((c = getenv ("LSF_CALLBACK_SOCK")) == NULL)
-	{
-		fprintf (stderr, "ls_minit: Internal error-no connection to master\n");
-		exit (-1);
-	}
-	else
-	{
-		msock_ = atoi (c);
-		amSlave_ = TRUE;
-		unsetenv ("LSF_CALLBACK_SOCK");
-	}
+        const char env_name[] = "LSF_RPID";
+        myrpid_ = atoi (c);
+        unsetenv( env_name );
+    }
+
+    if ((c = getenv ("LSF_CALLBACK_SOCK")) == NULL)
+    {
+        fprintf (stderr, "ls_minit: Internal error-no connection to master\n");
+        exit (-1);
+    }
+    else
+    {
+        msock_ = atoi (c);
+        amSlave_ = TRUE;
+        unsetenv ("LSF_CALLBACK_SOCK");
+    }
 }
 
 int
 ls_getrpid (void)
 {
-	if (amSlave_ == TRUE) {
-		return (myrpid_);
-	}
+    if (amSlave_ == TRUE) {
+        return (myrpid_);
+    }
 
-	return (0);
+    return (0);
 
 }
 
 long
 ls_sndmsg (int tid, char *buf, size_t count)
 {
-	int sock;
-	struct tid *tid_;
+    int sock;
+    struct tid *tid_;
 
-	if (amSlave_ == TRUE)
-	{
-		sock = msock_;
-	}
-	else
-	{
-		if ((tid_ = tid_find (tid)) == NULL)
-		{
-			return (-1);
-		}
-		sock = tid_->sock;
-	}
+    if (amSlave_ == TRUE)
+    {
+        sock = msock_;
+    }
+    else
+    {
+        if ((tid_ = tid_find (tid)) == NULL)
+        {
+            return (-1);
+        }
+        sock = tid_->sock;
+    }
 
-	//FIXME fix this function to not return -1?
-	return (long) b_write_fix (sock, buf, count);
+    //FIXME fix this function to not return -1?
+    return (long) b_write_fix (sock, buf, count);
 }
 
 
 long
 ls_rcvmsg (int tid, char *buf, size_t count)
 {
-	int sock;
+    int sock;
 
-	if (amSlave_ == TRUE)
-	{
-		sock = msock_;
-	}
-	else
-	{
-		struct tid *tid_ = tid_find( tid );
-		sock = tid_->sock;
-		if( sock < 0)
-		{
-			lserrno = LSE_RES_INVCHILD;
-			return (-1);
-		}
-	}
+    if (amSlave_ == TRUE)
+    {
+        sock = msock_;
+    }
+    else
+    {
+        struct tid *tid_ = tid_find( tid );
+        sock = tid_->sock;
+        if( sock < 0)
+        {
+            lserrno = LSE_RES_INVCHILD;
+            return (-1);
+        }
+    }
 
-	// FIXME fix this function to not return -1?
-	return (long) b_read_fix (sock, buf, count);
+    // FIXME fix this function to not return -1?
+    return (long) b_read_fix (sock, buf, count);
 }

@@ -50,6 +50,8 @@ initResTable_ (void)
     unsigned int i             = 0;
     struct resItem  **resTable = NULL;
 
+    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
+
     resTable = malloc (1000 * sizeof (struct resItem) + 1 * sizeof( struct resItem ) ); // FIXME FIXME FIXME FIXME '1000' is awfuly partifular
     if (!resTable) {
         ls_syslog (LOG_ERR, "%s: %s() failed", __func__, "malloc");
@@ -1557,7 +1559,7 @@ ls_setAdmins (struct admins *admins, int mOrA)
 
 
 void
-liblsf_putThreshold (unsigned int indx, const struct hostInfo *host, const size_t position, const char *val, float def)
+liblsf_putThreshold (unsigned int indx, const struct hostInfo *host, const size_t position, const char *val, double def)
 {
     if ( NULL == host ) {
         return;

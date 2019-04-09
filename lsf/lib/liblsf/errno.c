@@ -32,7 +32,7 @@ errnoEncode_ (int eno)
     if (eno < 0) {
         return eno;
     }
-
+    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
     // for ( int i = 0; i < NERRNO_MAP; i++) // FIXME FIXME FIXME FIXME this has to be revisted
     /* they are trying to encode the error into a number?
      * 

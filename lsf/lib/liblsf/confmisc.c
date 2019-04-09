@@ -54,6 +54,8 @@ keyMatch (struct keymap *keyList, const char *line, int exact)
     unsigned int i = 0;
     char *word     = NULL;
 
+    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
+
     while (keyList[i].key != NULL)
     {
         keyList[i].position = strlen( keyList[i].key ) + 10; // strlen( keyList[i].key ) is already an upper bound.

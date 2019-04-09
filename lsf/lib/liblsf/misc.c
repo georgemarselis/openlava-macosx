@@ -834,13 +834,13 @@ writeAddHost (FILE * fp, struct lsEventRec *ev)
 
     hPtr = ev->record;
 
-    fprintf (fp, "\"%s\" \"%s\" \"%s\" %d %d %4.2f %d ", hPtr->hostName, hPtr->hostModel, hPtr->hostType, hPtr->rcv, hPtr->nDisks, hPtr->cpuFactor, hPtr->numIndx);
+    fprintf (fp, "\"%s\" \"%s\" \"%s\" %d %u %4.2f %u ", hPtr->hostName, hPtr->hostModel, hPtr->hostType, hPtr->rcv, hPtr->nDisks, hPtr->cpuFactor, hPtr->numIndx);
 
     for( size_t cc = 0; cc < hPtr->numIndx; cc++) {
-        fprintf (fp, "%4.2f ", hPtr->busyThreshold[cc]);
+        fprintf (fp, "%4.2lf",  hPtr->busyThreshold[cc] );
     }
 
-    fprintf (fp, "%d ", hPtr->nRes);
+    fprintf (fp, "%u ", hPtr->nRes);
 
     for( size_t cc = 0; cc < hPtr->nRes; cc++) {
         fprintf (fp, "\"%s\" ", hPtr->resList[cc]);
@@ -885,7 +885,7 @@ readEventHeader (char *buf, struct lsEventRec *ev)
 
     memset( event, '\0', strlen( event ) );
 
-    cc = sscanf (buf, "%s %hd %lu %n", event, &ev->version, &ev->etime, &n);
+    cc = sscanf (buf, "%s %hu %ld %n", event, &ev->version, &ev->etime, &n);
     if (cc != 3) {
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
@@ -917,7 +917,7 @@ readAddHost ( const char *buf, struct lsEventRec *ev)
     int cc = 0;
     int n = 0;
     // int i;
-    struct hostEntryLog *hPtr;
+    struct hostEntryLog *hPtr = NULL;
     static char name[MAX_LSF_NAME_LEN + 1];
     static char model[MAX_LSF_NAME_LEN + 1];
     static char type[MAX_LSF_NAME_LEN + 1];
@@ -925,11 +925,11 @@ readAddHost ( const char *buf, struct lsEventRec *ev)
     char *window = NULL;
 
     hPtr = calloc (1, sizeof (struct hostEntryLog));
-    p = buf;
+    p = strdup( buf );
     /* name, model, type, number of disks
      * and cpu factor.
      */
-    cc = sscanf (p, "%s%s%s%d%d%f%d%n", name, model, type, &hPtr->rcv, &hPtr->nDisks, &hPtr->cpuFactor, &hPtr->numIndx, &n);
+    cc = sscanf (p, "%s%s%s%d%u%lf%u%n", name, model, type, &hPtr->rcv, &hPtr->nDisks, &hPtr->cpuFactor, &hPtr->numIndx, &n);
     if (cc != 7) {
         free (hPtr);
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
@@ -957,7 +957,7 @@ readAddHost ( const char *buf, struct lsEventRec *ev)
 
     /* resources
     */
-    cc = sscanf (p, "%d%n", &hPtr->nRes, &n);
+    cc = sscanf (p, "%u%n", &hPtr->nRes, &n);
     if (cc != 1) {
         // goto out
         FREEUP (hPtr->busyThreshold);
@@ -1039,14 +1039,17 @@ readRmHost (char *buf, struct lsEventRec *ev)
  * Strip the quotes around the string
  */
 char *
-getstr_ (char *s)
+getstr_ (const char *s)
 {
     char *p = NULL;
     static char buf[MAX_LSF_NAME_LEN + 1];
+    const char *kot = "";
+    char *buffer = malloc( strlen( kot ) );
+    strcpy( buffer, kot );
 
-    p = buf;
-    if (s[0] == '"' && s[1] == '"') {
-        return "";
+    p = strdup( buf );
+    if (s[0] == '"' && s[1] == '"') { // FIXME FIXME FIXME identify what is s[0] and s[1] and use labels instead of numbers
+        return buffer;
     }
 
     ++s;

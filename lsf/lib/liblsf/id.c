@@ -41,6 +41,7 @@ initIdLib ( struct IDLIB_INFO_T *idLib)
     char *serverDir = NULL;
     char *libPath = NULL;
 // #define LIB_FORMAT_STR "%s/%s"
+    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
 
     idLib->initialized = TRUE;
 

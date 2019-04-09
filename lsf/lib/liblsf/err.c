@@ -205,6 +205,8 @@ ls_perror( char *usrMsg )
         fputs (": ", stderr);
     }
 
+    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
+
     fputs (ls_sysmsg (), stderr);
     putc ('\n', stderr);
 

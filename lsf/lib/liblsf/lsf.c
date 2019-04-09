@@ -25,25 +25,34 @@
 #include <time.h>
 
 #include "lib/lib.h"
+#include "lsf.h"
 
-#ifndef MIN
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
-#endif
+// #ifndef MIN
+// #define MIN(a,b) ((a) < (b) ? (a) : (b))
+// #endif
 
-#ifndef MAX
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
-#endif
+// #ifndef MAX
+// #define MAX(a,b) ((a) > (b) ? (a) : (b))
+// #endif
 
-#ifndef LSFRU_FIELD_ADD
-#define LSFRU_FIELD_ADD(a,b) \
-{ \
-    if ((a) < 0 || (b) < 0) { \
-        (a) = MAX((a), (b)); \
-    } else { \
-        (a) += (b); \
-    } \
+// #ifndef LSFRU_FIELD_ADD
+// #define LSFRU_FIELD_ADD(a,b) 
+// { 
+//     if ((a) < 0 || (b) < 0) { 
+//         (a) = MAX((a), (b)); 
+//     } else { 
+//         (a) += (b); 
+//     } 
+// }
+// #endif
+
+
+void lsf_c_bullshit( ) 
+{
+    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
+
+    return;
 }
-#endif
 
 long int 
 tosec( long int tv_usec )

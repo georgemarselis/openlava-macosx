@@ -31,8 +31,9 @@ static int SHIFT_32 = 32;
 
 void limits_c_bullshit( ) 
 {
-
     assert( lserrno );
+    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
+
     return;
 }
 

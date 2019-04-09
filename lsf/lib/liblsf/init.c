@@ -45,6 +45,8 @@
 void bullshit( void )
 {
     assert(chanMaxSize );
+    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain    
+
     return;
 }
 

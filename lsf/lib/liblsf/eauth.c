@@ -52,11 +52,11 @@ getAuth_lsf( struct lsfAuth *auth, const char *host )
     assert( rootuid_ ); // NOTE bullshit op to hush up the compiler
     auth->uid = getuid ();
 
-    if (getLSFUser_ (auth->lsfUserName, sizeof (auth->lsfUserName)) < 0)
-    {
-      ls_syslog (LOG_DEBUG, I18N_FUNC_FAIL_MM, __func__, "getLSFUser_");
-      lserrno = LSE_BADUSER;
-      return -1; // FIXME FIXME FIXME FIXME ALTER THIS FROM NEGATIVE TO APPROPRIATELLY POSITIVE
+    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
+    if (getLSFUser_ (auth->lsfUserName, sizeof (auth->lsfUserName)) < 0) {
+        ls_syslog (LOG_DEBUG, I18N_FUNC_FAIL_MM, __func__, "getLSFUser_");
+        lserrno = LSE_BADUSER;
+        return -1; // FIXME FIXME FIXME FIXME ALTER THIS FROM NEGATIVE TO APPROPRIATELLY POSITIVE
     }
 
     auth->gid = getgid ();

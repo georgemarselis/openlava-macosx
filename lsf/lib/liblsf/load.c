@@ -27,6 +27,12 @@
 #include "daemons/liblimd/lim.h"
 // #define LOAD_INFO_THRESHOLD 75
 
+void load_c_bullshit( ) 
+{
+    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
+
+    return;
+}
 
 char *
 namestofilter_ (char **indxs )

@@ -32,8 +32,10 @@
 int
 doEnvParams_ (struct config_param *plp)
 {
-    char *sp = NULL;
+    char *sp  = NULL;
     char *spp = NULL;
+
+    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
 
     if (!plp) {
         return 0;

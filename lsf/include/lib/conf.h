@@ -137,7 +137,7 @@ void freeHostInfo (struct hostInfo *);
 void initResTable (void);
 // 
 void putThreshold (int indx, struct hostEntry *hostEntryPtr, int position, char *val, float def);
-void liblsf_putThreshold ( unsigned int indx, const struct hostInfo *host, size_t position, const char *val, float def);
+void liblsf_putThreshold ( unsigned int indx, const struct hostInfo *host, size_t position, const char *val, double def);
 
 
 // 

@@ -59,6 +59,8 @@ expandList1_ (char ***tolist, int num, int *bitmMaps, char **keys) // NOTE the i
     char **temp = NULL;
     size_t omgbecky = 0;
 
+    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
+
     if (num <= 0) {
         return 0;
     }

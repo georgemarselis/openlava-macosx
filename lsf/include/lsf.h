@@ -168,7 +168,9 @@ typedef enum {
     #define MAXFLOAT        3.40282347e+38F // FIXME FIXME FIXME FIXME turn into constant
 #endif
 
-#define INFINIT_LOAD    (float) (0x7fffffff) // FIXME FIXME FIXME FIXME turn into constant
+// #define INFINIT_LOAD    (float) (0x7fffffff) // FIXME FIXME FIXME FIXME turn into constant
+
+static const double INFINIT_LOAD = 0x7fffffff;
 #define INFINIT_FLOAT   (float) (0x7fffffff) // FIXME FIXME FIXME FIXME turn into constant
 
 #define INFINIT_INT         0x7fffffff // FIXME FIXME FIXME FIXME turn into constant
@@ -326,6 +328,17 @@ enum LIM_CMD {
 
 #ifndef MIN
 #define MIN(x,y)  ((x) < (y) ? (x) : (y))
+#endif
+
+#ifndef LSFRU_FIELD_ADD
+#define LSFRU_FIELD_ADD(a,b) \
+{ \
+    if ((a) < 0 || (b) < 0) { \
+        (a) = MAX((a), (b)); \
+    } else { \
+        (a) += (b); \
+    } \
+}
 #endif
 
 enum LSFERRORS { // FIXME FIXME FIXME FIXME FIXME global enum with all the lserrno values in it
@@ -502,8 +515,7 @@ struct hostInfo
     char *windows;
     char *hostType;
     double cpuFactor;
-
-    float *busyThreshold;
+    double *busyThreshold;
     unsigned long numIndx;
     char **resources;
     // char hostName[MAXHOSTNAMELEN];
@@ -525,7 +537,7 @@ struct hostEntry
     unsigned int nRes;
     char   padding1[4];
     double cpuFactor;
-    float *busyThreshold;   
+    double *busyThreshold;   
     const char *hostName; // [MAXHOSTNAMELEN];
     const char *hostModel; // [MAX_LSF_NAME_LEN];
     const char *hostType;  // [MAX_LSF_NAME_LEN];
@@ -761,7 +773,7 @@ struct hostEntryLog
     char  *hostType;  // [MAX_LSF_NAME_LEN];
     char  *window;
     double cpuFactor;
-    float *busyThreshold;
+    double *busyThreshold;
     char  **resList;
 };
 

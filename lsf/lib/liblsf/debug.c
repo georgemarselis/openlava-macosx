@@ -33,6 +33,8 @@ ls_initdebug (char *appName)
     char *logMask = malloc( sizeof( char ) * MAX_LSF_NAME_LEN + 1);
     struct config_param *pPtr = NULL;
 
+    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
+
     enum debparams {
         LSF_CMD_LOG_MASK,
         LSF_LOG_MASK,

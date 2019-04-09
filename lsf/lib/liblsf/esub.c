@@ -50,14 +50,15 @@ runEsub_ (struct lenData *ed, const char *path)
     assert( rootuid_ ); // NOTE bullshit op to hush up the compiler
     assert( NSIG_MAP );  // bullshit OP, make the compiler stop complaining
     assert( sigSymbol ); // bullshit OP, make the compiler stop complaining
+    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
 
     ed->len = 0;
     ed->data = NULL;
 
-    myargv[0] = esub;
+    myargv[0] = esub; // FIXME FIXME FIXME figure out what myargv[0] is and replace the 0 with a label
     if (path == NULL) {
         sprintf (esub, "%s/%s", genParams_[LSF_SERVERDIR].paramValue, ESUB);
-        myargv[1] = NULL;
+        myargv[1] = NULL;  // FIXME FIXME FIXME figure out what myargv[1] is and replace the 1 with a label
     }
     else {
         if (*path == '\0') {

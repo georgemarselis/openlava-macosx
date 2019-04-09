@@ -38,7 +38,7 @@
 /**************************************************************
  * this file must be compiled together with channel.c cuz there is
  * sockAdd2Str_() to resolve
- *
+ *any
  */
 
 static struct hTab *nameTab;
@@ -52,6 +52,8 @@ ls_getmyhostname (void)
     char hostname[MAXHOSTNAMELEN];
     struct hostent *hp = NULL;
 
+    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
+    
     memset( hostname, '\0', MAXHOSTNAMELEN );
 
 // YOUR CACHING MECHANISM IS BAD AND YOU SHOULD FEEL BAD

@@ -27,8 +27,10 @@ mygetwd_ ( char *path)
     struct stat dotstat;
     static char temp_buff[MAX_PATH_LEN];
 
-    pwd = getenv ("PWD");
-    if (pwd == NULL && (pwd = getenv ("CWD")) == NULL)
+    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
+
+    pwd = getenv ("PWD"); // FIXME FIXME FIXME put in configure.ac
+    if (pwd == NULL && (pwd = getenv ("CWD")) == NULL) // FIXME FIXME FIXME put in configure.ac
     {
         if (getcwd (temp_buff, sizeof (temp_buff)))
         {
