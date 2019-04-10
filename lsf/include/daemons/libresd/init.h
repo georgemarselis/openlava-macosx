@@ -5,11 +5,11 @@
 // #define RES_TIMEOUT_DEFAULT     60
 // #define LOOP_ADDR       0x7F000001 // FIXME FIXME FIXME FIXME why is this here?
 
-ttyStruct defaultTty = { };
+struct ttyStruct defaultTty;
 
 
-enum RES_TIMEOUT_DEFAULT {
-	RES_TIMEOUT_DEFAULT = 60
+enum RES_TIMEOUT {
+	RES_TIMEOUT = 60
 };
 
 enum LOOP_ADDR {

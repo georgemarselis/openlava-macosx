@@ -40,7 +40,7 @@ void delete_child(struct child *cp);
 void kill_child(struct child *cp);
 int unlink_child(struct child *cp);
 int notify_client(int s, int rpid, enum resAck ack, struct sigStatusUsage *sigStatRu);
-void setptymode(ttyStruct *tts, int slave);
+void setptymode(struct ttyStruct *tts, int slave);
 void dochild_stdio(struct child *chld, int op);
 int resSignal(struct child *chld, struct resSignal sig);
 void simu_eof(struct child *chld, int which);
@@ -63,7 +63,7 @@ void mysetlimits(struct lsfLimit *lsfLimits);
 int setCliEnv(struct client *cl, char *envName, char *value);
 int addCliEnv(struct client *cl, char *envName, char *value);
 int lsbJobStart(char **jargv, u_short retPort, char *host, int usePty);
-int ttyCallback(int s, ttyStruct *tty);
+int ttyCallback(int s, struct ttyStruct *tty);
 void resDebugReq(struct client *cli_ptr, struct LSFHeader *msgHdr, XDR *xdrs, int childSock);
 void doReopen(void);
 uid_t setEUid(uid_t uid);
@@ -180,9 +180,9 @@ struct hand_shake
 
 int currentRESSN = 0;
 
-extern char **environ;
-extern ttyStruct defaultTty;
-extern int initLimSock_ (void);
+// extern char **environ;
+// extern ttyStruct defaultTty;
+// extern int initLimSock_ (void);
 
 short is_resumed = FALSE;
 

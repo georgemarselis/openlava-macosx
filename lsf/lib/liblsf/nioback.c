@@ -21,18 +21,35 @@
 #include <unistd.h>
 
 #include "lib/lib.h"
-#include "lib/lproto.h"
+#include "lib/rdwr.h"
+#include "lib/nioback.h"
+#include "lib/sock.h"
 #include "lib/xdrnio.h"
+#include "lib/syslog.h"
+#include "lib/host.h"
+#include "lib/misc.h"
+#include "libint/lsi18n.h"
+#include "struct-config_param.h"
+#include "lib/structs/genParams.h"
+#include "daemons/libresd/init.h"
 #include "daemons/libresd/rescom.h"
-#include "daemons/libresd/resd.h"
+
+
+void nioback_c_bullshit( ) 
+{
+    assert ( lserrno );      // NOFIX bullshit call so the compiler will not complain
+    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
+
+    return;
+}
 
 /* FIXME macro is not in use */
-#define NL_SETN 23
+// #define NL_SETN 23
 
 int
 niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus, int terWhiPendStatus)
 {
-    int s;
+    int s = 0;
     struct niosConnect conn;
     struct {
         struct niosConnect conn;
@@ -40,7 +57,8 @@ niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus,
         struct LSFHeader hdr;
     } reqBuf;
     struct LSFHeader reqHdr;
-    int resTimeout;
+    int resTimeout = 0;
+    // struct gen
 
     struct linger linstr = { 1, 1 };
 
@@ -51,7 +69,7 @@ niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus,
             ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "tcpCreate");
         }
         
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (genParams_[RES_TIMEOUT].paramValue) {
@@ -69,7 +87,7 @@ niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus,
         }
         close (s);
         
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     fcntl (s, F_SETFD, fcntl (s, F_GETFD) | FD_CLOEXEC);
@@ -100,12 +118,12 @@ niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus,
     if (writeEncodeMsg_ (s, (char *) &reqBuf, sizeof (reqBuf), &reqHdr, (char *) &conn, nb_write_fix, xdr_niosConnect, 0) < 0) {
         if (logclass & LC_EXEC) {
             /* catgets 6201 */
-            ls_syslog (LOG_ERR, I18N (6201, "%s: writeEncodeMsg_(%d,%d) RES2NIOS_connect failed: %M"), __func__, s, rpid);
+            ls_syslog( LOG_ERR, "catgets 6201: %s: writeEncodeMsg_(%d,%d) RES2NIOS_connect failed: %M", __func__, s, rpid );
         }
       
         close (s);
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-  return s;
+    return s;
 }

@@ -55,11 +55,15 @@
 #endif 
 */
 
-#define UTMP_CHECK_CODE "sbdRes"
+// #define UTMP_CHECK_CODE "sbdRes"
+
+const char UTMP_CHECK_CODE[ ] = "sbdRes";
 
 
 #define MAXCLIENTS_HIGHWATER_MARK 100
 #define MAXCLIENTS_LOWWATER_MARK  1
+// const unsigned int MAXCLIENTS_HIGHWATER_MARK = 100;
+// const unsigned int MAXCLIENTS_LOWWATER_MARK  = 1;
 
 
 // #define DOREAD      0
@@ -74,14 +78,22 @@ enum DO {
 	DOSTDERR    = 3
 } DO;
 
-#define PTY_TEMPLATE     "/dev/ptyXX"
+// #define PTY_TEMPLATE     "/dev/ptyXX"
 
-#define PTY_SLAVE_INDEX  (sizeof(PTY_TEMPLATE) - 6)
-#define PTY_ALPHA_INDEX  (sizeof(PTY_TEMPLATE) - 3)
-#define PTY_DIGIT_INDEX  (sizeof(PTY_TEMPLATE) - 2)
+const char PTY_TEMPLATE[ ] = "/dev/ptyXX";
 
-#define PTY_FIRST_ALPHA  'p'
-#define PTY_LAST_ALPHA   'v'
+// #define PTY_SLAVE_INDEX  (sizeof(PTY_TEMPLATE) - 6)
+// #define PTY_ALPHA_INDEX  (sizeof(PTY_TEMPLATE) - 3)
+// #define PTY_DIGIT_INDEX  (sizeof(PTY_TEMPLATE) - 2)
+
+const unsigned int PTY_SLAVE_INDEX = sizeof(PTY_TEMPLATE) - 6; // FIXME FIXME FIXEME - WAT
+const unsigned int PTY_ALPHA_INDEX = sizeof(PTY_TEMPLATE) - 3; // FIXME FIXME FIXEME - THE
+const unsigned int PTY_DIGIT_INDEX = sizeof(PTY_TEMPLATE) - 2; // FIXME FIXME FIXEME - FUCK
+
+// #define PTY_FIRST_ALPHA  'p'
+// #define PTY_LAST_ALPHA   'v'
+const char PTY_FIRST_ALPHA = 'p';
+const char PTY_LAST_ALPHA  = 'v';
 
 #define BUFSTART(x)      ((char *) ((x)->buf) + sizeof(struct LSFHeader))
 
@@ -483,46 +495,46 @@ const int RESS_LOGBIT = 0x00000001;
 // };
 
 /* daemons/resd/getproc.c */
-int getPPSGids_(int pid, int *ppid, int *sid, int *pgid);
+// int getPPSGids_(int pid, int *ppid, int *sid, int *pgid);
 
 /* daemons/resd/handler.c */
-void doacceptconn(void);
-void childAcceptConn(int s, struct passwd *pw, struct lsfAuth *auth, struct resConnect *connReq, struct hostent *hostp);
-void doclient(struct client *cli_ptr);
-void dochild_info(struct child *chld, int op);
-void doResParentCtrl(void);
-enum resAck sendResParent(struct LSFHeader *msgHdr, char *msgBuf, bool_t (*xdrFunc )());
-void delete_child(struct child *cp);
-void dochild_stdio(struct child *chld, int op);
-int resSignal(struct child *chld, struct resSignal sig);
-void child_handler(void);
-void child_handler_ext(void);
-void term_handler(int signum);
-void sigHandler(int signum);
-int matchExitVal(int val, char *requeueEval);
-int sendReturnCode(int s, int code);
-void child_channel_clear(struct child *chld, struct outputchannel *channel);
-int lsbJobStart(char **jargv, u_short retPort, char *host, int usePty);
-void dumpClient(struct client *client, char *why);
-void dumpChild(struct child *child, int operation, char *why);
-void dochild_buffer(struct child *chld, int op);
-void donios_sock(struct child **children, int op);
-int deliver_notifications( struct _list *list);
+// void doacceptconn(void);
+// void childAcceptConn(int s, struct passwd *pw, struct lsfAuth *auth, struct resConnect *connReq, struct hostent *hostp);
+// void doclient(struct client *cli_ptr);
+// void dochild_info(struct child *chld, int op);
+// void doResParentCtrl(void);
+// enum resAck sendResParent(struct LSFHeader *msgHdr, char *msgBuf, bool_t (*xdrFunc )());
+// void delete_child(struct child *cp);
+// void dochild_stdio(struct child *chld, int op);
+// int resSignal(struct child *chld, struct resSignal sig);
+// void child_handler(void);
+// void child_handler_ext(void);
+// void term_handler(int signum);
+// void sigHandler(int signum);
+// int matchExitVal(int val, char *requeueEval);
+// int sendReturnCode(int s, int code);
+// void child_channel_clear(struct child *chld, struct outputchannel *channel);
+// int lsbJobStart(char **jargv, u_short retPort, char *host, int usePty);
+// void dumpClient(struct client *client, char *why);
+// void dumpChild(struct child *child, int operation, char *why);
+// void dochild_buffer(struct child *chld, int op);
+// void donios_sock(struct child **children, int op);
+// int deliver_notifications( struct _list *list);
 
 /* daemons/resd/init.c */
-void init_res(void);
-int resParent(int s, struct passwd *pw, struct lsfAuth *auth, struct resConnect *connReq, struct hostent *hostp);
-void resChild(char *arg, char *envdir);
+// void init_res(void);
+// int resParent(int s, struct passwd *pw, struct lsfAuth *auth, struct resConnect *connReq, struct hostent *hostp);
+// void resChild(char *arg, char *envdir);
 
 /* daemons/resd/misc.c */
-bool_t xdr_resChildInfo(XDR *xdrs, struct resChildInfo *childInfo, struct LSFHeader *hdr);
+// bool_t xdr_resChildInfo(XDR *xdrs, struct resChildInfo *childInfo, struct LSFHeader *hdr);
 
 /* daemons/resd/pty.c */
-void ptyreset(void);
-int ptymaster(char *line);
-int ptyslave(char *tty_name);
-char *pty_translate(char *pty_name);
-int check_valid_tty(char *tty_name);
+// void ptyreset(void);
+// int ptymaster(char *line);
+// int ptyslave(char *tty_name);
+// char *pty_translate(char *pty_name);
+// int check_valid_tty(char *tty_name);
 
 /* daemons/resd/res.c */
 void resd_usage(char *cmd);
@@ -537,20 +549,20 @@ void blockSignals(void);
 void resExit_(int exitCode);
 
 /* daemons/resd/rf.c */
-void rfServ_(int acceptSock);
-int ropen(int sock, struct LSFHeader *hdr);
-int rclose(int sock, struct LSFHeader *hdr);
-int rwrite(int sock, struct LSFHeader *hdr);
-int rread(int sock, struct LSFHeader *hdr);
-int rlseek(int sock, struct LSFHeader *hdr);
-int clearSock(int sock, int len);
-int rstat(int sock, struct LSFHeader *hdr);
-int rfstat(int sock, struct LSFHeader *hdr);
-int rgetmnthost(int sock, struct LSFHeader *hdr);
-int runlink(int sock, struct LSFHeader *hdr);
+// void rfServ_(int acceptSock);
+// int ropen(int sock, struct LSFHeader *hdr);
+// int rclose(int sock, struct LSFHeader *hdr);
+// int rwrite(int sock, struct LSFHeader *hdr);
+// int rread(int sock, struct LSFHeader *hdr);
+// int rlseek(int sock, struct LSFHeader *hdr);
+// int clearSock(int sock, int len);
+// int rstat(int sock, struct LSFHeader *hdr);
+// int rfstat(int sock, struct LSFHeader *hdr);
+// int rgetmnthost(int sock, struct LSFHeader *hdr);
+// int runlink(int sock, struct LSFHeader *hdr);
 
 /* daemons/resd/tasklog.c */
-void initResLog(void);
-void resAcctWrite(struct child *child);
-void resParentWriteAcct(struct LSFHeader *msgHdr, XDR *xdrs, int sock);
+// void initResLog(void);
+// void resAcctWrite(struct child *child);
+// void resParentWriteAcct(struct LSFHeader *msgHdr, XDR *xdrs, int sock);
 

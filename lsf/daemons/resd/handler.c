@@ -3486,7 +3486,7 @@ notify_client (int s, int rpid, enum resAck ack, struct sigStatusUsage *sigStatR
 
 // static 
 void
-setptymode (ttyStruct *tts, int slave)
+setptymode ( struct ttyStruct *tts, int slave)
 {
     // static char __func__] = "setptymode()";
     struct termios termattr = { };
@@ -5020,7 +5020,7 @@ lsbJobStart (char **jargv, u_short retPort, char *host, int usePty)
 
 // static 
 int
-ttyCallback (int s, ttyStruct *tty)
+ttyCallback (int s, struct ttyStruct *tty)
 {
     // static char __func__] = "ttyCallback()";
     int cc = 0;
@@ -6025,7 +6025,7 @@ resUpdatetty (struct LSFHeader msgHdr)
     int cc = 0;
     char *tempBuf = NULL;
     XDR xdrs;
-    ttyStruct ttyInfo;
+    struct ttyStruct ttyInfo;
     struct resStty restty;
 
     if (logclass & LC_TRACE) {
