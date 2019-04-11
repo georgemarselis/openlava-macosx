@@ -19,6 +19,8 @@
 #pragma once
 
 #include "struct-config_param.h"
+#include "lsf.h"
+#include "lsb/lsbatch.h" // FIXME FIXME FIXME FIXME move this to lib/
 
 // #define NL_SETN         29
 

@@ -6,7 +6,7 @@ enum RESNIOS_TIMEOUT {
 	NIOS_TIMEOUT = 120
 };
 
-static enum niosResCmd { 
+enum niosResCmd { 
 	NIOS2RES_EOF,
 	NIOS2RES_HEARTBEAT,
 	NIOS2RES_SETTTY,
@@ -15,7 +15,7 @@ static enum niosResCmd {
 	NIOS2RES_TIMEOUT
 } niosResCmd;
 
-static enum resNiosCmd {
+enum resNiosCmd {
 	RES2NIOS_CONNECT,
 	RES2NIOS_EOF,
 	RES2NIOS_NEWTASK,
