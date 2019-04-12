@@ -715,10 +715,11 @@ enum MAX_PROC_ENT {
 
 struct pidInfo
 {
+    size_t jobid;
     pid_t pid;
     pid_t ppid;
-    pid_t pgid;
-    unsigned int jobid;
+    gid_t pgid;
+    char padding[4];
 };
 
 struct jRusage

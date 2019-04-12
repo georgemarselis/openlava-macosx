@@ -21,6 +21,8 @@
 #include <limits.h>
 #include <time.h>
 
+#include "lsf.h"
+#include "lib/syslog.h"
 #include "struct-config_param.h"
 
 // Added by George Marselis <george@marsel.is
@@ -71,19 +73,20 @@ enum lsPStatType
 
 struct lsPidInfo
 {
+    // char padding[4];
+    enum lsPStatType status;
+    char command[PATH_MAX]; // PATH_MAX is declared in limits.h
     pid_t pid;
     pid_t ppid;
     pid_t pgid;
-    pid_t jobid;
+    size_t proc_size;
+    size_t resident_size;
+    size_t stack_size;
+    size_t jobid;
     time_t utime;
     time_t stime;
     time_t cutime;
     time_t cstime;
-    int proc_size;
-    int resident_size;
-    int stack_size;
-    enum lsPStatType status;
-    char command[PATH_MAX]; // PATH_MAX is declared in limits.h
 };
 
 // const unsigned int NL_SETN = 32;     // FIXME FIXME remove at earliest convience

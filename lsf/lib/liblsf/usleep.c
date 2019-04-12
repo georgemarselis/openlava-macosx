@@ -19,9 +19,6 @@
 #include <sys/types.h>
 #include <sys/time.h>
 
-void millisleep_ (int msec);
-
-
 // minnum input for this function is 0
 // what is the max? why doesn't it return the select statement result?
 //      max is the max time to wait to connect to a server process

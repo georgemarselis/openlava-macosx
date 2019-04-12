@@ -29,14 +29,24 @@
 #include "lsf.h"
 
 // openlava 2.0 header breaks compatibility with 1.0 but offers more flexibility and room for growth
+// struct LSFHeader { // FIXME FIXME FIXME FIXME FIXME ensure compatibility with Platform LSF
+//     unsigned short version;
+//     unsigned short reserved0;
+//     unsigned short reserved;
+//     char paddin1[2];
+//     size_t length;
+//     ushort opCode;
+//     char   padding2[2];
+//     pid_t  refCode; 
+// };
 struct LSFHeader { // FIXME FIXME FIXME FIXME FIXME ensure compatibility with Platform LSF
     unsigned short version;
     unsigned short reserved0;
-    unsigned short reserved;
-    char paddin1[2];
+    gid_t reserved;
+    // char paddin1[4];
     size_t length;
-    short opCode;
-    char   padding2[2];
+    gid_t  opCode;
+    // char   padding2[2];
     pid_t  refCode; 
 };
 
