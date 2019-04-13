@@ -60,7 +60,7 @@ getJInfo_ (pid_t npgid, pid_t *pgid, unsigned short options, gid_t cpgid)
     struct LSFHeader sendHdr;
     struct LSFHeader recvHdr;
     struct LSFHeader hdrBuf;
-    struct timeval  timeOut;
+    struct timeval   timeOut;
     char *myHost = NULL;
     time_t now;
     int s = 0;
@@ -84,7 +84,7 @@ getJInfo_ (pid_t npgid, pid_t *pgid, unsigned short options, gid_t cpgid)
             }
         }
 
-        if (initenv_ (pimParams, NULL) < 0) {
+        if (initenv_ (pimParams, NULL) < 0) { // init the pimd environment
             if (logclass & LC_PIM) {
                 ls_syslog (LOG_DEBUG, "%s: initenv_() failed: %M", __func__);
             }
@@ -134,7 +134,7 @@ getJInfo_ (pid_t npgid, pid_t *pgid, unsigned short options, gid_t cpgid)
             periodicUpdateOnly = TRUE;
             
             if (logclass & LC_PIM) {
-                ls_syslog (LOG_DEBUG, "%s: Only to call pim each PIM_SLEEP_TIME interval", __func__);
+                ls_syslog (LOG_DEBUG, "%s: Only to call pim each PIM_SLEEP_TIME %d interval", __func__, PIM_SLEEP_TIME );
             }
         }
 
@@ -243,12 +243,12 @@ getJInfo_ (pid_t npgid, pid_t *pgid, unsigned short options, gid_t cpgid)
     lastTime = now;
     if ((jru = readPIMInfo (npgid, pgid)) == NULL && !(options & PIM_API_UPDATE_NOW) && (periodicUpdateOnly == FALSE || (periodicUpdateOnly == TRUE && now - lastUpdateNow >= pimSleepTime))) {
         if (hitPGid > 0) {
-            jru = getJInfo_ (npgid, pgid, options | PIM_API_UPDATE_NOW, hitPGid);
+            jru = getJInfo_ (npgid, pgid, options | PIM_API_UPDATE_NOW, hitPGid); // wait, function calls itself?
             hitPGid = 0;
             return jru;
         }
         else {
-            return getJInfo_(npgid, pgid, options | PIM_API_UPDATE_NOW, cpgid);
+            return getJInfo_(npgid, pgid, options | PIM_API_UPDATE_NOW, cpgid); // wait, function calls itself?
         }
     }
 
