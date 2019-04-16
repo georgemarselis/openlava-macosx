@@ -17,8 +17,21 @@
  */
 
 #include "lib/lib.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
+#include "lib/initenv.h"
+#include "lib/host.h"
+#include "lib/info.h"
 #include "lib/xdr.h"
+#include "lib/place.h"
+#include "daemons/liblimd/lim.h"
+
+
+void place_c_bullshit( )
+{
+    assert( INFINIT_LOAD );
+    return;
+}
+
 
 char **
 ls_placereq (char *resreq, size_t *numhosts, int options, char *fromhost)
@@ -267,26 +280,26 @@ placement_ (char *resReq, struct decisionReq *placeReqPtr, char *fromhost, size_
 int
 ls_addhost (struct hostEntry *hPtr)
 {
-  char *master;
+    char *master;
 
-  if (hPtr == NULL)
-    {
-      lserrno = LSE_BAD_ARGS;
-      return -1;
+    if (hPtr == NULL) {
+        lserrno = LSE_BAD_ARGS;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
   /* Make sure the library calls the server
    * hosts as they have for sure the most
    * upto date master LIM information.
    */
-  if ((master = ls_getmastername2 ()) == NULL)
-    return -1;
+    if ((master = ls_getmastername2 ()) == NULL) {
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+    }
 
-  if (callLim_ (LIM_ADD_HOST,
-    hPtr, xdr_hostEntry, NULL, NULL, NULL, _USE_TCP_, NULL) < 0)
-    return -1;
+    if (callLim_ (LIM_ADD_HOST, hPtr, xdr_hostEntry, NULL, NULL, NULL, _USE_TCP_, NULL) < 0) {
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+    }
 
-  return 0;
+    return 0;
 }
 
 /* ls_rmhost()
@@ -294,25 +307,25 @@ ls_addhost (struct hostEntry *hPtr)
 int
 ls_rmhost (const char *host)
 {
-  char *master;
+    char *master = NULL;
 
-  if (host == NULL)
-    {
-      lserrno = LSE_BAD_ARGS;
-      return -1;
+    if (host == NULL) {
+        lserrno = LSE_BAD_ARGS;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
   /* Dirty trick to force the library
    * to call all hosts in LSF_SERVER_HOSTS
    * and not the local LIM first...
    */
-  if ((master = ls_getmastername2 ()) == NULL)
-    return -1;
+    if ((master = ls_getmastername2 ()) == NULL) {
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+    }
 
-  if (callLim_ (LIM_RM_HOST,
-    (char *) host,
-    xdr_hostName, NULL, NULL, NULL, _USE_TCP_, NULL) < 0)
-    return -1;
+    // if (callLim_ (LIM_RM_HOST, host, xdr_hostName, NULL, NULL, NULL, _USE_TCP_, NULL) < 0) {
+    if (callLim_ (LIM_RM_HOST, NULL, xdr_hostName, NULL, NULL, host, _USE_TCP_, NULL) < 0) {
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+    }
 
-  return 0;
+    return 0;
 }
