@@ -42,7 +42,7 @@ callLim_ (enum limReqCode reqCode, void *dsend, bool_t (*xdr_sfunc) (), void *dr
     masterLimDown = FALSE;
     if (first) {
         if (initLimSock_ () < 0) {
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
         first = FALSE;
 
@@ -71,14 +71,14 @@ callLim_ (enum limReqCode reqCode, void *dsend, bool_t (*xdr_sfunc) (), void *dr
     if( !xdr_encodeMsg (&xdrs, dsend, &reqHdr, xdr_sfunc, 0, NULL ) ) {
         xdr_destroy (&xdrs);
         lserrno = LSE_BAD_XDR;
-        return -1; // FIXME FIXME FIXME FIXME FIXME return appropriate *positive* number.
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value // FIXME FIXME FIXME FIXME FIXME return appropriate *positive* number.
     }
 
     reqLen = XDR_GETPOS (&xdrs);
     xdr_destroy (&xdrs);
     if (options & _USE_TCP_) {
         if (callLimTcp_ (sbuf, &repBuf, reqLen, &replyHdr, options) < 0) {
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
         if (replyHdr.length != 0) {
             xdrmem_create (&xdrs, repBuf, XDR_DECODE_SIZE_ (replyHdr.length), XDR_DECODE);
@@ -89,7 +89,7 @@ callLim_ (enum limReqCode reqCode, void *dsend, bool_t (*xdr_sfunc) (), void *dr
     }
     else {
         if (callLimUdp_ (sbuf, rbuf, reqLen, &reqHdr, host, options) < 0) {
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
         if (options & _NON_BLOCK_) {
             return 0;
@@ -102,7 +102,7 @@ callLim_ (enum limReqCode reqCode, void *dsend, bool_t (*xdr_sfunc) (), void *dr
         if (!xdr_LSFHeader (&xdrs, &replyHdr)) {
             xdr_destroy (&xdrs);
             lserrno = LSE_BAD_XDR;
-            return -1; // FIXME FIXME FIXME FIXME FIXME return appropriate *positive* number.
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value // FIXME FIXME FIXME FIXME FIXME return appropriate *positive* number.
         }
     }
 
@@ -118,7 +118,7 @@ callLim_ (enum limReqCode reqCode, void *dsend, bool_t (*xdr_sfunc) (), void *dr
                         FREEUP (repBuf);
                     }
                     lserrno = LSE_BAD_XDR;
-                    return -1;  // FIXME FIXME FIXME FIXME FIXME return appropriate *positive* number.
+                    return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value  // FIXME FIXME FIXME FIXME FIXME return appropriate *positive* number.
                 }
             }
             xdr_destroy (&xdrs);
@@ -137,7 +137,7 @@ callLim_ (enum limReqCode reqCode, void *dsend, bool_t (*xdr_sfunc) (), void *dr
                 FREEUP (repBuf);
             }
             err_return_ (limReplyCode);
-            return -1; // FIXME FIXME FIXME FIXME FIXME return appropriate *positive* number.
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value // FIXME FIXME FIXME FIXME FIXME return appropriate *positive* number.
         }
         break;
     }
@@ -161,7 +161,7 @@ callLimTcp_ (char *reqbuf, char **rep_buf, int req_size, struct LSFHeader *reply
     *rep_buf = NULL;
     if (!sockIds_[TCP].sin_addr.s_addr) {
         if (ls_getmastername () == NULL) {
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
     }
 
@@ -170,7 +170,7 @@ contact:
 
         limchans_[TCP] = chanClientSocket_ (AF_INET, SOCK_STREAM, 0);
         if (limchans_[TCP] < 0) {
-            return -1; // FIXME FIXME FIXME FIXME FIXME return appropriate *positive* number.
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value // FIXME FIXME FIXME FIXME FIXME return appropriate *positive* number.
         }
 
         cc = chanConnect_ (limchans_[TCP], &sockIds_[TCP], conntimeout_ * 1000);
@@ -191,7 +191,7 @@ contact:
             sockIds_[TCP].sin_addr.s_addr = 0;
             sockIds_[TCP].sin_port = 0;
             CLOSECD (limchans_[TCP]);
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
     }
 
@@ -203,7 +203,7 @@ contact:
     cc = chanRpc_ (limchans_[TCP], &sndbuf, &rcvbuf, replyHdr, recvtimeout_ * 1000);
     if (cc < 0 ) {
         CLOSECD (limchans_[TCP]);
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
     *rep_buf = rcvbuf.data;
 
@@ -212,7 +212,7 @@ contact:
             lserrno = LSE_MASTR_UNKNW;
             FREEUP (*rep_buf);
             CLOSECD (limchans_[TCP]);
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
         break;
         case LIME_WRONG_MASTER: {
@@ -222,7 +222,7 @@ contact:
                 xdr_destroy (&xdrs);
                 FREEUP (*rep_buf);
                 CLOSECD (limchans_[TCP]);
-                return -1;
+                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
        
             xdr_destroy (&xdrs);
@@ -236,7 +236,7 @@ contact:
                 }
               FREEUP (*rep_buf);
               CLOSECD (limchans_[TCP]);
-              return -1;
+              return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
 
             masterknown_ = TRUE;
@@ -253,7 +253,7 @@ contact:
             }
             else {
                 lserrno = LSE_LIM_DOWN;
-                return -1;
+                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
         }
         break;
@@ -294,7 +294,7 @@ callLimUdp_ (char *reqbuf, char *repbuf, int len, struct LSFHeader *reqHdr, cons
     else if (host != NULL) {
 
         if ((hp = Gethostbyname_ (host)) == NULL) {
-            return -1; // FIXME FIMXME FIXME FIXME FIXME return a proper non-negative number
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value // FIXME FIMXME FIXME FIXME FIXME return a proper non-negative number
         }
 
         id = UNBOUND;
@@ -316,7 +316,7 @@ callLimUdp_ (char *reqbuf, char *repbuf, int len, struct LSFHeader *reqHdr, cons
              * local LIM does not know which is the master LIM, of course.
              */
                 if (callLimUdp_ (reqbuf, repbuf, len, reqHdr, ls_getmyhostname (), options | _NON_BLOCK_) < 0) {
-                    return -1; // FIXME FIMXME FIXME FIXME FIXME return a proper non-negative number
+                    return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value // FIXME FIMXME FIXME FIXME FIXME return a proper non-negative number
                 }
             }
             multicasting = TRUE;
@@ -350,14 +350,14 @@ contact:
         case MASTER:
             if (limchans_[id] < 0) {
                 if ((limchans_[id] = createLimSock_ (NULL)) < 0) {
-                    return -1;  // FIXME FIXME FIXME FIXME FIXME return a proper non-negative number
+                    return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value  // FIXME FIXME FIXME FIXME FIXME return a proper non-negative number
                 }
             }
         break;
         case UNBOUND:
             if (limchans_[id] < 0) {
                 if ((limchans_[id] = createLimSock_ (NULL)) < 0) {
-                    return -1;  // FIXME FIXME FIXME FIXME FIXME return a proper non-negative number
+                    return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value  // FIXME FIXME FIXME FIXME FIXME return a proper non-negative number
                 }
             }
         break;
@@ -369,7 +369,7 @@ contact:
 
     cc = chanSendDgram_ (limchans_[id], reqbuf, len, &sockIds_[id]);
     if (cc < 0)  {
-        return -1; // FIXME FIXME FIXME FIXME FIXME return a proper non-negative number
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value // FIXME FIXME FIXME FIXME FIXME return a proper non-negative number
     }
 
     /* Return right away after sending the
@@ -384,15 +384,15 @@ check:
     if (rcvreply_ (limchans_[id], repbuf) < 0) {
 
         if (lserrno != LSE_TIME_OUT)
-            return -1; // FIXME FIXME FIXME FIXME FIXME return a proper non-negative number
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value // FIXME FIXME FIXME FIXME FIXME return a proper non-negative number
 
         if (host != NULL)
-            return -1; // FIXME FIXME FIXME FIXME FIXME return a proper non-negative number
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value // FIXME FIXME FIXME FIXME FIXME return a proper non-negative number
 
         if (id == PRIMARY) {
             if (retried) {
                 lserrno = LSE_LIM_DOWN;
-                return -1; // FIXME FIXME FIXME FIXME FIXME return a proper non-negative number
+                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value // FIXME FIXME FIXME FIXME FIXME return a proper non-negative number
             }
             else {
                 retried = 1; // FIXME FIXME FIXME FIXME FIXME return a proper non-negative number
@@ -407,7 +407,7 @@ check:
     if (!xdr_LSFHeader (&xdrs, &replyHdr)) {
         lserrno = LSE_BAD_XDR;
         xdr_destroy (&xdrs);
-        return -1; // FIXME FIXME FIXME FIXME FIXME return a proper non-negative number
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value // FIXME FIXME FIXME FIXME FIXME return a proper non-negative number
     }
 
     if (reqHdr->refCode != replyHdr.refCode) {
@@ -423,14 +423,14 @@ check:
         case LIME_MASTER_UNKNW: {
             lserrno = LSE_MASTR_UNKNW;
             xdr_destroy (&xdrs);
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
         break;
         case LIME_WRONG_MASTER: {
             if (!xdr_masterInfo (&xdrs, &masterInfo_, &replyHdr)) {
                 lserrno = LSE_BAD_XDR;
                 xdr_destroy (&xdrs);
-                return -1;
+                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
             masterLimAddr = masterInfo_.addr;
 
@@ -442,7 +442,7 @@ check:
                     lserrno = LSE_MASTR_UNKNW;
                 }
                 xdr_destroy (&xdrs);
-                return -1;
+                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
             previousMasterLimAddr = masterLimAddr;
 
@@ -481,7 +481,7 @@ createLimSock_ (struct sockaddr_in *connaddr)
     }
 
     if (connaddr && chanConnect_ (chfd, connaddr, -1) < 0) {
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     return chfd;
@@ -494,7 +494,7 @@ initLimSock_ (void)
     ushort service_port;
 
     if (initenv_ (NULL, NULL) < 0) {
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (genParams_[LSF_LIM_PORT].paramValue) {
@@ -502,7 +502,7 @@ initLimSock_ (void)
             service_port = htons (service_port);
         else {
             lserrno = LSE_LIM_NREG;
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
     }
     else if (genParams_[LSF_LIM_DEBUG].paramValue) {
@@ -511,7 +511,7 @@ initLimSock_ (void)
     else {
         if ((sv = getservbyname ("lim", "udp")) == NULL) {  // FIXME FIXME FIXME FIXME FIXME set these in configure.ac
             lserrno = LSE_LIM_NREG;
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
         service_port = sv->s_port;
     }
