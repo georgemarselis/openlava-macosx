@@ -1057,7 +1057,7 @@ int opterr;
 int optopt;
 #endif
 
-static int lserrno;
+int lserrno;
 int masterLimDown;
 // int ls_nerr;           // FIXME FIXME FIXME FIXME FIXME too many different types of lserrno
 // char *ls_errmsg[];  // FIXME FIXME FIXME FIXME FIXME put in specific header

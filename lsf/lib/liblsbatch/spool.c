@@ -667,7 +667,7 @@ return spoolCopyStatus;
 spoolCopyStatus_t
 cpRemoteFiles (const char *localSrcFileFullPath, const char *hostName, const char *outputDirectory, const char *outputFileName)
 {
-	lsRcpXfer lsXfer;
+	struct rcpXfer lsXfer;
 	spoolCopyStatus_t spoolCopyStatus = SPOOL_COPY_FAILURE;
 	char remoteHost[MAXHOSTNAMELEN];
 	char remoteFileSpec[1 + MAXHOSTNAMELEN + 1 + MAX_FILENAME_LEN];

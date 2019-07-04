@@ -18,7 +18,7 @@
 
 #pragma once
  
-// #include "lsf.h"
+#include "lsf.h"
 // #include "lproto.h"
 
 #define ILLEGAL_CHARS     ".!-=+*/[]@:&|{}'`\""

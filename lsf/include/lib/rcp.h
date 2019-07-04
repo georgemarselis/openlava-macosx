@@ -23,30 +23,35 @@
 
 #include <sys/stat.h>
 
-typedef struct rcpXfer
+struct rcpXfer
 {
-    int iOptions;
-    int iNumFiles;
     char *szSourceArg;
     char *szDestArg;
     char *szHostUser;
     char *szDestUser;
     char *szHost;
     char *szDest;
-    char *ppszHostFnames[1];
-    char *ppszDestFnames[1];
+    char *ppszHostFnames[1]; // FIXME FIXME change the 1 to an easily understood label
+    char *ppszDestFnames[1]; // FIXME FIXME change the 1 to an easily understood label
     struct hostent *pheHost;
     struct hostent *pheDest;
-} lsRcpXfer;
-
-#define RSHCMD "rsh" // FIXME FIXME FIXME FIXME rsh must go
-
-#define SPOOL_DIR_SEPARATOR "/"
-#define SPOOL_DIR_SEPARATOR_CHAR '/'
-
-#define SPOOL_BY_LSRCP      0x1
+    int iOptions;
+    char padding[4];
+    size_t iNumFiles;
+};
 
 
+// #define RSHCMD "rsh" // FIXME FIXME FIXME FIXME rsh must go
+
+// #define SPOOL_DIR_SEPARATOR "/"
+// #define SPOOL_DIR_SEPARATOR_CHAR '/'
+
+// #define SPOOL_BY_LSRCP      0x1
+
+char RSHCMD[] = "rsh";
+char SPOOL_DIR_SEPARATOR = '/';
+char SPOOL_DIR_SEPARATOR_CHAR = '/';
+int SPOOL_BY_LSRCP = 0x1;
 
 #define FILE_ERRNO(errno) \
     (errno == ENOENT || errno == EPERM || errno == EACCES || \
@@ -56,27 +61,28 @@ typedef struct rcpXfer
          errno == EISDIR || errno == ENOSPC || errno == ENXIO || \
          errno == EROFS || errno == ETXTBSY)
 
-#define LSRCP_MSGSIZE   1048576
+// #define LSRCP_MSGSIZE   1048576
+size_t LSRCP_MSGSIZE = 1048576;
 
 // extern int mystat_ (char *, struct stat *, struct hostent *);
 // extern int myopen_ (char *, int, int, struct hostent *);
 // extern char *usePath (char *path);
 // extern int parseXferArg (char *arg, char **userName, char **hostName, char **fName);
-// extern int createXfer (lsRcpXfer * lsXfer);
-// extern int destroyXfer (lsRcpXfer * lsXfer);
-// extern int copyFile (lsRcpXfer * lsXfer, char *buf, int option);
-// extern int equivalentXferFile (lsRcpXfer * lsXfer, char *szLocalFile, char *szRemoteFile, struct stat *psLstat, struct stat *psRstat, char *szRhost);
-// extern int doXferRcp (lsRcpXfer * lsXfer, int option);
+// extern int createXfer (struct rcpXfer * lsXfer);
+// extern int destroyXfer (struct rcpXfer * lsXfer);
+// extern int copyFile (struct rcpXfer * lsXfer, char *buf, int option);
+// extern int equivalentXferFile (struct rcpXfer * lsXfer, char *szLocalFile, char *szRemoteFile, struct stat *psLstat, struct stat *psRstat, char *szRhost);
+// extern int doXferRcp (struct rcpXfer * lsXfer, int option);
 // extern int rmDirAndFiles (char *dir);
 // extern int rmDirAndFilesEx (char *, int);
 // extern int createSpoolSubDir (const char *spoolFileFullPath);
 
 int parseXferArg(char *arg, char **userName, char **hostName, char **fName);
-int doXferRcp(lsRcpXfer *lsXfer, int option);
-int createXfer(lsRcpXfer *lsXfer);
-int destroyXfer(lsRcpXfer *lsXfer);
-int equivalentXferFile(lsRcpXfer *lsXfer, char *szLocalFile, char *szRemoteFile, struct stat *psLstat, struct stat *psRstat, char *szRhost);
-int copyFile(lsRcpXfer *lsXfer, char *buf, int option);
-int rmDirAndFiles(char *dir);
-int rmDirAndFilesEx(char *dir, int recur);
+int doXferRcp (struct rcpXfer *lsXfer, int option);
+int createXfer(struct rcpXfer *lsXfer);
+int destroyXfer(struct rcpXfer *lsXfer);
+int equivalentXferFile(struct rcpXfer * lsXfer, const char *szLocalFile, const char *szRemoteFile, struct stat *psLstat, struct stat *psRstat, const char *szRhost);
+int copyFile(struct rcpXfer *lsXfer, const char *buf, int option);
+int rmDirAndFiles( const char *dir);
+int rmDirAndFilesEx( const char *dir, int recur);
 int createSpoolSubDir(const char *spoolFileFullPath);

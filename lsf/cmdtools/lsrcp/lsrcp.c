@@ -35,28 +35,28 @@
 #include "lib/rcp.h"
 #include "lsf.h"
 
-extern void lsrcp_usage (char *cmd);
+// extern void lsrcp_usage (char *cmd);
 
-extern int mystat_ (char *, struct stat *, struct hostent *);
-extern int myopen_ (char *, int, int, struct hostent *);
+// extern int mystat_ (char *, struct stat *, struct hostent *);
+// extern int myopen_ (char *, int, int, struct hostent *);
 
 extern char **environ;
 
-#define NL_SETN 27
+// #define NL_SETN 27
 
 #define LSRCP_MSGSIZE   1048576
 
-void displayXfer (lsRcpXfer * lsXfer);
-void doXferUsage (void);
-int createXfer (lsRcpXfer * lsXfer);
-int destroyXfer (lsRcpXfer * lsXfer);
-int doXferOptions (lsRcpXfer * lsXfer, int argc, char *argv[]);
+// void displayXfer (struct rcpXfer * lsXfer);
+// void doXferUsage (void);
+// int createXfer (struct rcpXfer * lsXfer);
+// int destroyXfer (struct rcpXfer * lsXfer);
+// int doXferOptions (struct rcpXfer * lsXfer, int argc, char *argv[]);
 
 int
 main (int argc, char *argv[])
 {
 
-  lsRcpXfer lsXfer;
+  struct rcpXfer lsXfer;
   int iCount;
   char *buf;
   int rc;
@@ -155,7 +155,7 @@ doXferUsage ()
 }
 
 void
-displayXfer (lsRcpXfer * lsXfer)
+displayXfer (struct rcpXfer * lsXfer)
 {
 
   if (lsXfer->szSourceArg)
@@ -208,7 +208,7 @@ displayXfer (lsRcpXfer * lsXfer)
 }
 
 int
-doXferOptions (lsRcpXfer * lsXfer, int argc, char *argv[])
+doXferOptions (struct rcpXfer * lsXfer, int argc, char *argv[])
 {
   int c;
 
