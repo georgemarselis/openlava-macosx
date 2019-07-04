@@ -465,7 +465,7 @@ mountNet_ (struct hostent *hp)
 }
 
 int
-myopen_ ( const char *filename, int flags, int mode, struct hostent *hp)
+myopen_ ( const char *filename, int flags, mode_t mode, struct hostent *hp)
 {
     char *filenamebuf = malloc( sizeof( char ) * MAX_FILENAME_LEN + 1 );
     char *mp = NULL;
@@ -501,8 +501,7 @@ myopen_ ( const char *filename, int flags, int mode, struct hostent *hp)
         return i;
     }
 
-  return open (usePath (filename), flags, mode);
-
+    return open (usePath (filename), flags, mode);
 }
 
 FILE *

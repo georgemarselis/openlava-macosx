@@ -75,18 +75,36 @@ struct rlseekReq
 };
 
 
+#define RF_MAXHOSTS 5
+// #define RF_CMD_MAXHOSTS 0
+// #define RF_CMD_RXFLAGS 2
+
+// unsigned int RF_MAXHOSTS     = 5;
+unsigned int RF_CMD_MAXHOSTS = 0;
+unsigned int RF_CMD_RXFLAGS  = 2;
+
+
 int nrh = 0;
 int rxFlags = 0;
-int maxnrh = RF_MAXHOSTS;
+unsigned int maxnrh = RF_MAXHOSTS;
 // #define RF_SERVERD "_rf_Server_"
 const char RF_SERVERD[] = "_rf_Server_";
 
-struct rHosts *rhConnect (char *host);
-struct rHosts *allocRH   (void);
-struct rHosts *rhFind    (char *host);
-int            ls_ropen  (char *host, char *fn, int flags, int mode);
-int            ls_rclose (int fd);
-int            ls_rwrite (int fd, char *buf, size_t len);
-int            ls_rread  (int fd, char *buf, size_t len);
-int          rhTerminate (char *host);
+/* lib/liblsf/rf.c */
+struct rHosts *rhConnect(const char *host);
+struct rHosts *allocRH(void);
+struct rHosts *rhFind(const char *host);
+int ls_ropen(const char *host, const char *fn, int flags, mode_t mode);
+int ls_rclose(int fd);
+int ls_rwrite(int fd, char *buf, size_t len);
+int ls_rread(int fd, const char *buf, size_t len);
+off_t ls_rlseek(int fd, off_t offset, int whence);
+int ls_rfstat(int fd, struct stat *st);
+int ls_rfcontrol(int command, int arg);
+int ls_rfterminate(const char *host);
+int rhTerminate(char *host);
+int ls_rstat(const char *host, const char *fn, struct stat *st);
+char *ls_rgetmnthost(const char *host, const char *fn);
+int ls_conntaskport(pid_t rpid);
+int ls_runlink(const char *host, const char *fn);
 

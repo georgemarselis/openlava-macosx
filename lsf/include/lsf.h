@@ -211,15 +211,13 @@ enum LSF_RLIMIT {
     LSF_RLIM_NLIMITS
 };
 
-#define LSF_NULL_MODE    0
-#define LSF_LOCAL_MODE   1
-#define LSF_REMOTE_MODE  2
+// #define LSF_NULL_MODE    0
+// #define LSF_LOCAL_MODE   1
+// #define LSF_REMOTE_MODE  2
 
-#define RF_MAXHOSTS 5
-
-#define RF_CMD_MAXHOSTS 0
-#define RF_CMD_RXFLAGS 2
-
+unsigned int LSF_NULL_MODE   = 0;
+unsigned int LSF_LOCAL_MODE  = 1;
+unsigned int LSF_REMOTE_MODE = 2;
 
 // #define STATUS_TIMEOUT        125
 // #define STATUS_IOERR          124

@@ -43,7 +43,7 @@ enum LSF_PARAMS {
     LSF_NULL
 } LSF_STATUS;
 
-static struct config_param genParams_[ ] = { // FIXME FIXME FIXME FIXME genParams order has to match with above enum LSF_LSB
+struct config_param genParams_[ ] = { // FIXME FIXME FIXME FIXME genParams order has to match with above enum LSF_LSB
     { "LSF_DEBUG",              NULL }, // 0
     { "LSF_SERVERDIR",          NULL }, // 1
     { "LSF_ENVDIR",             NULL }, // 2

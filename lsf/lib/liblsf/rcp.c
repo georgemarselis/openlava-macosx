@@ -31,6 +31,9 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "lib/dir.h"
+#include "lib/rf.h"
+#include "lib/whathost.h"
 #include "lib/confmisc.h"
 #include "lib/info.h"
 #include "lib/host.h"
@@ -337,7 +340,7 @@ equivalentXferFile (struct rcpXfer * lsXfer, const char *szLocalFile, const char
     }
 
     // hostlist[0] = szRhost; // FIXME FIXME replace 0 with appropriate label
-    hostinfo = ls_gethostinfo ( NULL, NULL, szRhost, 1, 0);
+    hostinfo = ls_gethostinfo ( NULL, NULL, &szRhost, 1, 0);
     if (hostinfo == NULL) {
             return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
@@ -385,7 +388,7 @@ equivalentXferFile (struct rcpXfer * lsXfer, const char *szLocalFile, const char
 }
 
 int
-copyFile (struct rcpXfer * lsXfer, char *buf, int option)
+copyFile (struct rcpXfer *lsXfer, const char *buf, int option)
 {
     int s             = 0;
     int lfd           = 0;
@@ -427,7 +430,7 @@ copyFile (struct rcpXfer * lsXfer, char *buf, int option)
 
     if (strcmp (lsXfer->szHostUser, lsXfer->szDestUser) != 0) {
         /* catgets 6050 */
-        ls_syslog (LOG_ERR, I18N (6050, "%s: %s does not support account mapping using rcp"), __func__, "RES");
+        ls_syslog (LOG_ERR, "catgets 6050: %s: %s does not support account mapping using rcp", __func__, "RES");
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
@@ -491,16 +494,19 @@ copyFile (struct rcpXfer * lsXfer, char *buf, int option)
             ls_syslog (LOG_DEBUG, "%s, begin copy from '%s' to '%s'", __func__, lsXfer->szHost, lsXfer->szDest);
         }
 
-        for ( size_t len = LSRCP_MSGSIZE; len > 0;) {                      // FIXME FIXME FIXME FIXME re-write using while loop
+        for ( size_t len = LSRCP_MSGSIZE; len > 0;) { // FIXME FIXME FIXME FIXME re-write using while loop
 
-            if ((len = read (lfd, buf, LSRCP_MSGSIZE)) > 0) {
-                if ((ret = write (rfd, buf, len)) != len) {
+            ssize_t read_return_value = (ssize_t) len; // NOFIX len will always be positive at the start
+            if ((read_return_value = read (lfd, strdup(buf), LSRCP_MSGSIZE)) > 0) {
+                if ((ret = write (rfd, buf, len)) != read_return_value) {
                     ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "write", ret);
                     close (lfd);
                     close (rfd);
                     return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
                 }
             }
+
+            len = (size_t) read_return_value; // NOFIX the only reason the assignment is here, is to create a terminating condition (len == 0)
         }
 
         if (logclass & (LC_FILE)) {
@@ -585,17 +591,19 @@ copyFile (struct rcpXfer * lsXfer, char *buf, int option)
         ls_syslog (LOG_DEBUG, "%s, begin copy from '%s' to '%s'", __func__, lsXfer->szHost, lsXfer->szDest);
     }
 
-    for ( ssize_t len = LSRCP_MSGSIZE; len > 0;) {              // FIXME FIXME FIXME FIXME FIXME re-write with whiole loop and breaking condition
-        if ((len = read (lfd, buf, LSRCP_MSGSIZE)) > 0) {
+    for ( size_t len = LSRCP_MSGSIZE; len > 0;) { // FIXME FIXME FIXME FIXME FIXME re-write with whiole loop and breaking condition
+        ssize_t read_return_value = (ssize_t) len; // NOFIX len will always be positive at the start
+        if ((read_return_value = read (lfd, strdup(buf), LSRCP_MSGSIZE)) > 0) { // FIXME IFXME why is the read length here LSRCP_MSGSIZE and not len?
 
-            assert( len >= 0);
-            ret = ls_rwrite (rfd, buf, len); 
-            if ( ret != len)  {
+            ret = ls_rwrite (rfd, strdup(buf), len); 
+            if ( ret != read_return_value)  {
                 close (lfd);
                 ls_rclose (rfd);
                 ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_MM, __func__, "ls_rwrite", ret);
                 return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
+
+            len  = (size_t) read_return_value; // NOFIX the only reason the assignment is here, is to create a terminating condition (len == 0)
         }
     }
 
@@ -668,15 +676,19 @@ copyFile (struct rcpXfer * lsXfer, char *buf, int option)
         }
 
         for ( size_t len = LSRCP_MSGSIZE; len > 0;) {
-            if ((len = ls_rread (lfd, buf, LSRCP_MSGSIZE)) > 0) {
+
+            ssize_t read_return_value = (ssize_t) len; // NOFIX len will always be positive at the start
+            if ((read_return_value = ls_rread (lfd, buf, LSRCP_MSGSIZE)) > 0) { // FIXME IFXME why is the read length here LSRCP_MSGSIZE and not len?
                 ret = write (rfd, buf, len);
-                if ( ret !=  len) {
+                if ( ret !=  read_return_value) {
                     ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "write", ret);
                     ls_rclose (lfd);
                     close (rfd);
                     return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
                 }
             }
+
+            len  = (size_t) read_return_value; // NOFIX the only reason the assignment is here, is to create a terminating condition (len == 0)
         }
 
         if (logclass & (LC_FILE)) {
@@ -791,7 +803,8 @@ createSpoolSubDir (const char *spoolFileFullPath)
         subDirectory1[len] = '\0';
 
         if ((pDir = opendir (subDirectory1)) == NULL) {
-            pBegin = &subDirectory1;
+            // pBegin = &subDirectory1; 
+            pBegin = subDirectory1; 
 
             if ((pEnd1 = strrchr (pBegin, '/')) == NULL) {
                 pEnd1 = pBegin;

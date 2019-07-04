@@ -40,20 +40,19 @@
 #endif
 #endif
 
-#include "lsf.h"
+// #include "lsf.h"
+// extern const char *getHostOfficialByName_ (const char *);
 
-extern const char *getHostOfficialByName_ (const char *);
+#include "lib/whathost.h"
 
 char *
-ls_getmnthost (char *file)
+ls_getmnthost ( const char *file)
 {
-  struct stat statb;
+	struct stat statb;
 
-  if (stat (file, &statb) < 0)
-    {
-      return (NULL);
-    }
+	if (stat (file, &statb) < 0) {
+    	return NULL;
+	}
 
-  return (NULL);
-
+	return NULL;
 }

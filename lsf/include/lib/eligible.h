@@ -19,7 +19,7 @@
 #pragma once
 
 char   *ls_resreq      ( const char *task);
-int     ls_eligible    ( const char *task, char *resreqstr, const char mode);
+int     ls_eligible    ( const char *task, char *resreqstr, const unsigned int mode);
 long    inittasklists_ ( void );
 int     readtaskfile_  ( const char *filename, struct hTab *minusListl, struct hTab *minusListr, struct hTab *localList, struct hTab *remoteList, const char useMinus);
 int     writetaskfile_ ( const char *filename, struct hTab *minusListl, struct hTab *minusListr, struct hTab *localList, struct hTab *remoteList);

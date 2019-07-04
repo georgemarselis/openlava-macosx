@@ -16,9 +16,10 @@
  *
  */
 
- #pragma once
+#pragma once
 
 #include "lib/structs/genParams.h"
+#include "lsf.h"
 
 // typedef enum status genparams_t;
 // #define AUTOMOUNT_LAST_STR  "AMFIRST"      // copied over from lib/lproto.h
@@ -34,7 +35,8 @@ const char AUTOMOUNT_NEVER_STR[] = "AMNEVER"; // copied over from lib/lproto.h
 
 // #define LOOP_ADDR       0x7F000001
 // unsigned long LOOP_ADDR = 0x7F000001; enum LOOP_ADDR in include/daemons/libresd/init.h
-static struct hTab hashTab;
+// static 
+struct hTab hashTab;
 
 char chosenPath[MAX_PATH_LEN];
 
@@ -46,7 +48,7 @@ int   putin_  ( int instatus, char *inkey, int inkeylen, char *inval, int invall
 int   getMap_ ( void );
 int   netHostChdir( const char *path, struct hostent *hp );
 char *mountNet_( struct hostent *hp );
-int   myopen_  ( const char *filename, int flags, int mode, struct hostent *hp );
+int   myopen_  ( const char *filename, int flags, mode_t mode, struct hostent *hp );
 FILE *myfopen_ ( const char *filename, const char *type, struct hostent *hp );
 int   mystat_  ( const char *filename, struct stat *sbuf, struct hostent *hp );
 int   mychmod_ ( const char *filename, mode_t mode, struct hostent *hp );

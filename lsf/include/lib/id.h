@@ -35,7 +35,6 @@
 // const char GET_LSF_USER_BY_UID[ ]  = "getLSFUserByUid_";
 // const char GET_OS_USER_NAME[ ]     = "getOSUserName_";
 // const char GET_OS_UID[ ]           = "getOSUid_";
-
 // const char IDLIB_SO_NAME[] = "liblsfid.so";
 
 // https://stackoverflow.com/questions/14134245/iso-c-void-and-function-pointers

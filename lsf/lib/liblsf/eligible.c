@@ -57,7 +57,7 @@ ls_resreq ( const char *task)
 
 
 int
-ls_eligible ( const char *task, char *resreqstr, const char mode)
+ls_eligible ( const char *task, char *resreqstr, const unsigned int mode)
 {
     struct hEnt *mykey = NULL;
     char *p = NULL;

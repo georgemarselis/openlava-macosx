@@ -152,7 +152,7 @@ rhFind ( const char *host)
 
 
 int
-ls_ropen (const char *host, const char *fn, int flags, int mode)
+ls_ropen (const char *host, const char *fn, int flags, mode_t mode)
 {
     char buf[MSGSIZE]; // FIXME FIXME FIXME FIXME dynamic message allocation
     struct ropenReq req;
@@ -547,7 +547,7 @@ ls_rstat (const char *host, const char *fn, struct stat *st)
 }
 
 char *
-ls_rgetmnthost ( const char *host, char *fn)
+ls_rgetmnthost ( const char *host, const char *fn)
 {
     char buf[MSGSIZE];
     char hostname[MAXHOSTNAMELEN];
@@ -566,7 +566,7 @@ ls_rgetmnthost ( const char *host, char *fn)
     hostStr.len  = MAXHOSTNAMELEN;
     hostStr.name = hostname;
     fnStr.len    = MAX_FILENAME_LEN;
-    fnStr.name   = fn;
+    fnStr.name   = strdup( fn );
 
     if (lsSendMsg_ (rh->sock, RF_GETMNTHOST, 0, (char *) &fnStr, buf, sizeof (struct LSFHeader) + MAX_FILENAME_LEN, xdr_stringLen, b_write_fix, NULL) < 0) { // FIXME FIXME suspicious cast
         return NULL;
@@ -588,7 +588,7 @@ ls_rgetmnthost ( const char *host, char *fn)
 /* ls_conntaskport()
  */
 int
-ls_conntaskport (int rpid)
+ls_conntaskport (pid_t rpid)
 { 
     int sock        = 0;
     int cc          = 0;
@@ -633,7 +633,7 @@ ls_conntaskport (int rpid)
 
 
 int
-ls_runlink (char *host, char *fn)
+ls_runlink (const char *host, const char *fn)
 {
     char buf[MSGSIZE];
     char hostname[MAXHOSTNAMELEN];
@@ -652,7 +652,7 @@ ls_runlink (char *host, char *fn)
     hostStr.len  = MAXHOSTNAMELEN;
     hostStr.name = hostname;
     fnStr.len    = MAX_FILENAME_LEN;
-    fnStr.name   = fn;
+    fnStr.name   = strdup( fn );
 
     if (lsSendMsg_ (rh->sock, RF_UNLINK, 0, (char *) &fnStr, buf, sizeof (struct LSFHeader) + MAX_FILENAME_LEN, xdr_stringLen, b_write_fix, NULL) < 0) { // FIXME FIXME suspicious cast
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
