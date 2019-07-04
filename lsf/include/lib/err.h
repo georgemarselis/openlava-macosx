@@ -19,7 +19,7 @@
 
 #pragma once
 
-static int lserrno = LSE_NO_ERR;
+// static int lserrno = LSE_NO_ERR;
 int masterLimDown = FALSE;
 // static int ls_nerr = LSE_NERR;
 

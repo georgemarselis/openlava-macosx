@@ -32,7 +32,7 @@
 static char amSlave_ = FALSE;
 static int msock_    = -1;
 static int myrpid_   = -1;
-static int lserrno   =  0;
+// static int lserrno   =  0;
 
 /*
 * FIXME FIXME the following function conflicts with the standard library
