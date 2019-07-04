@@ -23,6 +23,7 @@
 #include "lib/info.h"
 #include "lib/xdr.h"
 #include "lib/place.h"
+#include "lib/misc.h"
 #include "daemons/liblimd/lim.h"
 
 
