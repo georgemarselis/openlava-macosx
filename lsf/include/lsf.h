@@ -170,7 +170,7 @@ typedef enum {
 
 // #define INFINIT_LOAD    (float) (0x7fffffff) // FIXME FIXME FIXME FIXME turn into constant
 
-static const double INFINIT_LOAD = 0x7fffffff;
+const double INFINIT_LOAD = 0x7fffffff;
 #define INFINIT_FLOAT   (float) (0x7fffffff) // FIXME FIXME FIXME FIXME turn into constant
 
 #define INFINIT_INT         0x7fffffff // FIXME FIXME FIXME FIXME turn into constant

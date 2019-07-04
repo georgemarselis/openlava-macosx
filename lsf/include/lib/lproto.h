@@ -28,6 +28,9 @@
 // #include "daemons/libresd/resd.h"
 // #include "daemons/libresd/resout.h"
 
+#include <sys/types.h>
+#include <stddef.h>
+
 #define VALID_IO_ERR(x) ((x) == EWOULDBLOCK || (x) == EINTR || (x) == EAGAIN)
 #define BAD_IO_ERR(x)   ( ! VALID_IO_ERR(x))
 

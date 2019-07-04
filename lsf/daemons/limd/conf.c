@@ -4391,7 +4391,7 @@ configCheckSum ( const char *file, int *checkSum)
 }
 
 struct admins *
-lim_getAdmins (char *line, const char *lsfile, unsigned int *lineNum, const char *secName)
+lim_getAdmins (const char *line, const char *lsfile, const unsigned int *lineNum, const char *secName)
 {
     char *sp              = NULL;
     char *word            = NULL;
@@ -4417,7 +4417,7 @@ s
     }
     first = FALSE;
     admins->nAdmins = 0;
-    sp = line;
+    sp = strdup( line );
 
     while ((word = getNextWord_ (&sp)) != NULL) {
         numAds++;
@@ -4441,7 +4441,7 @@ s
         return admins;
     }
 
-    sp = line;
+    sp = strdup( line );
     while ((word = getNextWord_ (&sp)) != NULL) {
 
         if ((pw = getpwlsfuser_ (word)) != NULL)
@@ -4469,7 +4469,7 @@ s
 
 
 int
-doubleResTable ( const char *lsfile, unsigned int lineNum) // FIXME FIXME FIXME function might need reconstruvtion: 
+doubleResTable ( const char *lsfile, const unsigned int lineNum) // FIXME FIXME FIXME function might need reconstruvtion: 
 {
     struct resItem *tempTable = NULL;
     const char realloc[] = "realloc";

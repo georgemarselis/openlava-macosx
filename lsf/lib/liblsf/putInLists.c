@@ -1,5 +1,14 @@
+// Added by George Marselis <george@marsel.is> 
 
+#include <sys/types.h>
+#include <pwd.h>
+
+#include "lsf.h"
 #include "lib/putInLists.h"
+#include "lib/syslog.h"
+#include "lib/confmisc.h"
+#include "lib/misc.h"
+#include "libint/lsi18n.h"
 
 int
 putInLists (char *word, struct admins *admins, unsigned int *numAds, const char *forWhat)
@@ -18,7 +27,7 @@ putInLists (char *word, struct admins *admins, unsigned int *numAds, const char 
 		return 0;
 	}
 
-	if( isInlist( admins->adminNames, pw->pw_name, admins->nAdmins ) ) {
+	if( isInlist2( admins->adminNames, pw->pw_name, admins->nAdmins ) ) {
 		/* catgets 5411  */
 		ls_syslog (LOG_WARNING, "5411: %s: Duplicate user name <%s> %s; ignored", __func__, word, forWhat);
 		return 0;

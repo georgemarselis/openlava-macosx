@@ -26,7 +26,7 @@ int   getLogMask (char **msg, char *logMask);
 int   getLogClass_ (char *lsp, char *tsp);
 void  ls_closelog_ext (void);
 
-int logclass = 0;
+// int logclass = 0; // also defined in lsf.h
 int timinglevel = 0;
 
 // static char logfile[MAX_PATH_LEN];

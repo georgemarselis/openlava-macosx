@@ -142,7 +142,7 @@ int sleepTime = PIM_SLEEP_TIME;
 int updInterval = PIM_UPDATE_INTERVAL;
 
 
-/*   pdaemons/pimd/pim.c  */
+/*   daemons/pimd/pim.c  */
 int  doServ         ( void   );
 void logProcessInfo ( void   );
 int  scan_procs     ( void   );
