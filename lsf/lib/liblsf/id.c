@@ -16,12 +16,15 @@
  *
  */
 
+#include <assert.h>
 
 #include "lib/id.h"
 #include "lib/syslog.h"
 #include "lib/structs/genParams.h"
 #include "libint/lsi18n.h"
-
+#include "lsf.h"
+#include "lib/lproto.h"
+#include "lib/so.h"
 
 void
 initIdLibDefaults (struct IDLIB_INFO_T *idLib)
@@ -242,7 +245,7 @@ initIdLib ( struct IDLIB_INFO_T *idLib)
     return retcode;
 }
 
-bool_t
+unsigned short
 checkInit ( struct IDLIB_INFO_T *idLib)
 {
     if (!idLib->initialized) {
