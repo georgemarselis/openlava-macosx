@@ -1,8 +1,11 @@
-// Added by George Marselis <george@marsel.is
+// Added by George Marselis <george@marsel.is> 
 
 // PIMD
+#include <stddef.h>
+#include <struct-config_param.h>
 
-static enum PIM_API {
+
+enum PIM_API {
 	PIM_API_TREAT_JID_AS_PGID = 0x1,
 	PIM_API_UPDATE_NOW        = 0x2,
 	PIM_API_NULL
@@ -10,7 +13,7 @@ static enum PIM_API {
 
 // #define PIM_SLEEP_TIME 3
 // #define PIM_UPDATE_INTERVAL 30
-static enum PIM_PARAMS {
+enum PIM_PARAMS {
 	PIM_DEBUG             = -1,
 	PIM_INFODIR           =  0,
 	PIM_SLEEP_TIME        =  1, // or 3
@@ -20,7 +23,7 @@ static enum PIM_PARAMS {
 	PIM_NULL
 } PIM_PARAMS;
 
-static struct config_param pimDaemonParams[ ] = {
+struct config_param pimDaemonParams[ ] = {
 	{ "PIM_DEBUG",                NULL }, // -1
 	{ "PIM_INFODIR",              NULL }, //  0
 	{ "PIM_SLEEP_TIME",           NULL }, //  1
