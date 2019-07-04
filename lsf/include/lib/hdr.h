@@ -42,7 +42,7 @@
 struct LSFHeader { // FIXME FIXME FIXME FIXME FIXME ensure compatibility with Platform LSF
     unsigned short version;
     unsigned short reserved0;
-    gid_t reserved;
+    pid_t reserved; // was gid_t 2019-07-03
     // char paddin1[4];
     size_t length;
     gid_t  opCode;

@@ -1,0 +1,24 @@
+[DEFAULT]
+
+#ignore attempts from the UiO ranges
+ignoreip = 127.0.0.1/8 129.240/16 129.240.235.130/32
+
+# Override /etc/fail2ban/jail.d/00-firewalld.conf:
+banaction = iptables-multiport
+
+[sshd]
+enabled = TRUE
+
+port    = ssh
+logpath = %(sshd_log)s
+
+[recidive]
+
+enabled  = True
+filter   = recidive
+logpath  = /var/log/fail2ban.log
+action   = iptables-allports[name=recidive]
+           sendmail-whois-lines[name=recidive, logpath=/var/log/fail2ban.log]
+bantime  = -1 ; for ever
+findtime = 86400   ; 1 day
+maxretry = 3

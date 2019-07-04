@@ -48,7 +48,7 @@ void pim_c_bullshit( void )
 
 
 struct jRusage *
-getJInfo_ (pid_t npgid, pid_t *pgid, unsigned short options, gid_t cpgid)
+getJInfo_ (pid_t npgid, pid_t *pgid, unsigned short options, pid_t cpgid)
 {
     static char pfile[MAX_FILENAME_LEN];
     static struct sockaddr_in pimAddr;
@@ -142,9 +142,9 @@ getJInfo_ (pid_t npgid, pid_t *pgid, unsigned short options, gid_t cpgid)
             return NULL;
         }
 
-        memset ((char *) &pimAddr, 0, sizeof (pimAddr));
+        memset (&pimAddr, 0, sizeof (pimAddr));
         assert( hp->h_length > 0 );
-        memcpy ((char *) &pimAddr.sin_addr, (char *) hp->h_addr_list[0], (size_t) hp->h_length); // FIXME FIXME FIXME FIXME hp->h_addr_list[0] put a label and an explaination to the label next to it
+        memcpy ( &pimAddr.sin_addr, hp->h_addr_list[0], (size_t) hp->h_length); // FIXME FIXME FIXME FIXME hp->h_addr_list[0] put a label and an explaination to the label next to it
         pimAddr.sin_family = AF_INET;
     }
 
@@ -224,7 +224,7 @@ getJInfo_ (pid_t npgid, pid_t *pgid, unsigned short options, gid_t cpgid)
 
         if (recvHdr.refCode != sendHdr.refCode) {
             if (logclass & LC_PIM) {
-                ls_syslog (LOG_DEBUG, "%s: recv refCode=%u not equal to send refCode=%u, server is not PIM", __func__,recvHdr.refCode, sendHdr.refCode);
+                ls_syslog (LOG_DEBUG, "%s: recv refCode=%u not equal to send refCode=%u, server is not PIM", __func__, recvHdr.refCode, sendHdr.refCode);
             }
 
             return NULL;
@@ -242,9 +242,9 @@ getJInfo_ (pid_t npgid, pid_t *pgid, unsigned short options, gid_t cpgid)
 
     lastTime = now;
     if ((jru = readPIMInfo (npgid, pgid)) == NULL && !(options & PIM_API_UPDATE_NOW) && (periodicUpdateOnly == FALSE || (periodicUpdateOnly == TRUE && now - lastUpdateNow >= pimSleepTime))) {
-        if (hitPGid > 0) {
-            jru = getJInfo_ (npgid, pgid, options | PIM_API_UPDATE_NOW, hitPGid); // wait, function calls itself?
-            hitPGid = 0;
+        if (hitPGid > 0) { // global in include/lib/pim.h
+            jru = getJInfo_ (npgid, pgid, options | PIM_API_UPDATE_NOW, hitPGid); // wait, function calls itself? // hitPGid is global in include/lib/pim.h
+            hitPGid = 0; // hitPGid is global in include/lib/pim.h
             return jru;
         }
         else {
@@ -360,7 +360,7 @@ int readPIMFile ( const char *pfile)
         }
 
         sscanf (pimString, "%d %d %d %lu %ld %ld %ld %ld %lu %lu %lu %u",
-            &pinfoList[npinfoList].pid,
+            &pinfoList[npinfoList].pid,  // pinfoList is a global in include/daemons/libpimd/pimd.h
             &pinfoList[npinfoList].ppid,
             &pinfoList[npinfoList].pgid,
             &pinfoList[npinfoList].jobid,
@@ -398,33 +398,36 @@ readPIMInfo ( pid_t inNPGids, pid_t *inPGid)
     //int cc = 0;
     //int pinfoNum = 0;
     int found = FALSE;
-    int *activeInPGid = NULL;
-    struct jRusage *jru = malloc( sizeof( struct jRusage ) );
+    pid_t *activeInPGid = NULL;
+    struct jRusage *jru = malloc( sizeof( struct jRusage ) ); // struct jRusage is defined in include/lsf.h
+    size_t u_inNPGids = 0;
     
     // FREEUP (pgidList); // SEEME SEEME SEEME why on earth are we using a global object
     // FREEUP (pidList);
     // FREEUP (activeInPGid);
 
     memset ( jru, '\0', sizeof( struct jRusage ) );
-    activeInPGid = malloc( inNPGids * sizeof (int) );
+    assert( inNPGids > 0 );
+    u_inNPGids = (size_t) inNPGids; // duplicate the value of inNPGids to an unsigned long in order to get rid of the warnings
+    activeInPGid = malloc( u_inNPGids * sizeof ( pid_t ) );
     if (activeInPGid == NULL) {
-        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", (unsigned long)inNPGids * sizeof (int));
+        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", u_inNPGids * sizeof( pid_t ) );
         return NULL;
     }
 
-    memset ( activeInPGid, '\0', inNPGids * sizeof (int));
+    memset ( activeInPGid, '\0', u_inNPGids * sizeof (int));
+    pgidList = malloc( ( inNPGids < PGID_LIST_SIZE ? PGID_LIST_SIZE : ( u_inNPGids + PGID_LIST_SIZE) ) * sizeof( pid_t ) );
 
-    pgidList = malloc( ( inNPGids < PGID_LIST_SIZE ? PGID_LIST_SIZE : (inNPGids + PGID_LIST_SIZE)) * sizeof (int));
     if (pgidList == NULL) {
-        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", (inNPGids < PGID_LIST_SIZE ? PGID_LIST_SIZE : (unsigned long)(inNPGids + PGID_LIST_SIZE)) * sizeof (int));
+        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", (inNPGids < PGID_LIST_SIZE ? PGID_LIST_SIZE : (u_inNPGids + PGID_LIST_SIZE)) * sizeof( pid_t ));
         return NULL;
     }
 
     npgidList = inNPGids;
     assert( npgidList >= 0 );
-    memcpy ( pgidList, inPGid, (unsigned long)npgidList * sizeof (int));
+    memcpy ( pgidList, inPGid, u_inNPGids * sizeof( pid_t ) );
 
-    pidList = (struct pidInfo *) malloc (PID_LIST_SIZE * sizeof (struct pidInfo));
+    pidList = malloc (PID_LIST_SIZE * sizeof (struct pidInfo));
 
     if (pidList == NULL) {
         ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", PID_LIST_SIZE * sizeof (struct pidInfo));
@@ -432,15 +435,19 @@ readPIMInfo ( pid_t inNPGids, pid_t *inPGid)
     }
     npidList = 0;
 
-    for ( unsigned int pinfoNum = 0; pinfoNum < npinfoList; pinfoNum++)
+    for ( size_t pinfoNum = 0; pinfoNum < npinfoList; pinfoNum++)
     {
         int cc = 0;
 
-        if (argOptions & PIM_API_TREAT_JID_AS_PGID) { // SEEME SEEME SEEME search for "PIM_API_TREAT_JID_AS_PGID"
-            pinfoList[pinfoNum].pgid = pinfoList[pinfoNum].jobid;
-        }
+        //
+        // FIXME FIXME FIXME FIXME apparently, there is a reason to treat the job id as the process group id, when set by the PIM API
+        //      I will leave this here and investigate later.
+        // 
+        // if (argOptions & PIM_API_TREAT_JID_AS_PGID) { // PIM_API_TREAT_JID_AS_PGID = 0x01; set in include/daemons/libpimd/pimd.h
+        //     pinfoList[pinfoNum].pgid = pinfoList[pinfoNum].jobid;
+        // }
 
-        for ( int i = 0; i < inNPGids; i++) {
+        for ( size_t i = 0; i < u_inNPGids; i++) {
             
             if (pinfoList[pinfoNum].pgid == inPGid[i]) {
                 activeInPGid[i] = TRUE;
@@ -454,13 +461,13 @@ readPIMInfo ( pid_t inNPGids, pid_t *inPGid)
 
                 if (pinfoList[pinfoNum].stack_size == UINT_MAX ) {
                     assert( pinfoList[pinfoNum].pgid >= 0 );
-                    hitPGid = (unsigned int) pinfoList[pinfoNum].pgid;
+                    hitPGid = pinfoList[pinfoNum].pgid; // hitPGid is global in include/lib/pim.h
                     found = FALSE;
                     break;
                 }
 
-                jru->mem += pinfoList[pinfoNum].resident_size;
-                jru->swap += pinfoList[pinfoNum].proc_size;
+                jru->mem   += pinfoList[pinfoNum].resident_size;
+                jru->swap  += pinfoList[pinfoNum].proc_size;
                 jru->utime += pinfoList[pinfoNum].utime;
                 jru->stime += pinfoList[pinfoNum].stime;
 
@@ -496,27 +503,27 @@ readPIMInfo ( pid_t inNPGids, pid_t *inPGid)
 
     if (found) {
         
-        unsigned int n = inNPGids; // FIXME FIXME FIXME this should be pid_t
-        for ( unsigned int i = 0; i < n; i++) {
+        pid_t n = inNPGids; // FIXME FIXME FIXME this should be pid_t
+        for ( pid_t i = 0; i < n; i++) {
 
             if (!activeInPGid[i]) {
                 npgidList--;
 
-                for ( unsigned int j = i; j < npgidList; j++) {
+                for ( pid_t j = i; j < npgidList; j++) {
                     pgidList[j] = pgidList[j + 1];
                 }
 
                 n--;
-                for ( unsigned int j = i; j < n; j++) {
+                for ( pid_t j = i; j < n; j++) {
                     activeInPGid[j] = activeInPGid[j + 1];
                 }
         }
     }
 
-        jru->npids = npidList;
+        jru->npids   = npidList;
         jru->pidInfo = pidList;
-        jru->npgids = npgidList;
-        jru->pgid = pgidList;
+        jru->npgids  = npgidList;
+        jru->pgid    = pgidList;
 
         return jru;
     }
@@ -527,7 +534,12 @@ readPIMInfo ( pid_t inNPGids, pid_t *inPGid)
 int inAddPList (struct lsPidInfo *pinfo)
 {
 
-    for ( int i = 0; i < npgidList; i++) {
+    size_t u_npidList = 0;
+
+    assert( npidList > 0 );
+    u_npidList = (size_t) npidList;
+
+    for ( size_t i = 0; i < u_npidList; i++) {
 
         if (pinfo->pgid == pgidList[i]) {
             if (pinfo->pid > -1) {
@@ -544,21 +556,24 @@ int inAddPList (struct lsPidInfo *pinfo)
         return 0;
     }
 
-    for ( unsigned int i = 0; i < npidList; i++)
+    for ( size_t i = 0; i < u_npidList; i++)
     {
         if (pinfo->ppid == pidList[i].pid)
         {
-            pgidList[npgidList] = pinfo->pgid;
+            pgidList[u_npidList] = pinfo->pgid;
             npgidList++;
 
-            if (npgidList % PGID_LIST_SIZE == 0)
+            assert( npidList > 0 );
+            u_npidList = (size_t) npidList;
+
+            if (u_npidList % PGID_LIST_SIZE == 0)
             {
                 int *tmpPtr = 0;
                 // assert( npgidList + PGID_LIST_SIZE >= 0 );
-                tmpPtr = realloc ( pgidList, (npgidList + PGID_LIST_SIZE) * sizeof (int));
+                tmpPtr = realloc ( pgidList, (u_npidList + PGID_LIST_SIZE) * sizeof( pid_t ) );
                 
                 if ( NULL == tmpPtr && ENOMEM == errno ) { 
-                    ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "inAddPList", "realloc", (npgidList + PGID_LIST_SIZE) * sizeof (int));
+                    ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "realloc", (u_npidList + PGID_LIST_SIZE) * sizeof (int));
                     return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
                 }
             
@@ -579,19 +594,23 @@ int inAddPList (struct lsPidInfo *pinfo)
 
 int intoPidList (struct lsPidInfo *pinfo)
 {
-    pidList[npidList].pid = pinfo->pid;
-    pidList[npidList].ppid = pinfo->ppid;
-    pidList[npidList].pgid = pinfo->pgid;
-    pidList[npidList].jobid = pinfo->jobid;
+    assert( npidList > 0 );
+    size_t u_npidList = (size_t) npidList;
+
+    pidList[u_npidList].pid   = pinfo->pid;
+    pidList[u_npidList].ppid  = pinfo->ppid;
+    pidList[u_npidList].pgid  = pinfo->pgid;
+    pidList[u_npidList].jobid = pinfo->jobid;
 
     npidList++;
-
-    if (npidList % PID_LIST_SIZE == 0) {
+    u_npidList = (size_t) npidList;
+    
+    if (u_npidList % PID_LIST_SIZE == 0) {
         struct pidInfo *tmpPtr = NULL;
 
-        tmpPtr = realloc ( pidList, (npidList + PID_LIST_SIZE) * sizeof( struct pidInfo ) );
+        tmpPtr = realloc ( pidList, (u_npidList + PID_LIST_SIZE) * sizeof( struct pidInfo ) );
         if ( NULL == tmpPtr && ENOMEM == errno ) {
-            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, "intoPidList", "realloc", (unsigned long)(npidList + PID_LIST_SIZE) * sizeof (struct pidInfo));
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "realloc", (u_npidList + PID_LIST_SIZE) * sizeof (struct pidInfo));
             return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
 

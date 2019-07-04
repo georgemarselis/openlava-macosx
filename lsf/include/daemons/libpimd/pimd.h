@@ -121,20 +121,19 @@ enum
 } pimStatus;
 
 
-int      gothup;
-char     *pimInfoBuf =                    NULL;
-int       argOptions =                    0;
-int       numprocs   =                    0;
-pid_t    *pgidList   =                    NULL;
-pid_t     npgidList  =                    0;
-pid_t     npidList   =                    0;
-unsigned int         hitPGid             = 0;
-unsigned int         npinfoList          = 0;
-unsigned long        pimInfoLen          = 0;
-unsigned short      *pimPortNo           = NULL;
-struct   lsPidInfo  *pinfoList           = NULL;
-struct   pidInfo    *pidList             = NULL;
-struct   lsPidInfo   pbase[MAX_PROC_ENT];  // FIXME FIXME FIXME FIXME MAX_PROC_ENT, 
+int       gothup;
+char     *pimInfoBuf         = NULL;
+int       argOptions         = 0;
+int       numprocs           = 0;
+pid_t    *pgidList           = NULL;
+pid_t     npgidList          = 0;
+pid_t     npidList           = 0;
+unsigned int npinfoList      = 0;
+unsigned long pimInfoLen     = 0;
+unsigned short *pimPortNo    = NULL;
+struct lsPidInfo  *pinfoList = NULL;
+struct pidInfo    *pidList   = NULL;
+struct lsPidInfo   pbase[MAX_PROC_ENT];  // FIXME FIXME FIXME FIXME MAX_PROC_ENT, 
                                            // what is it depended on? 
                                            // Can this declaration be turned into a pointer?
 
@@ -143,7 +142,7 @@ int sleepTime = PIM_SLEEP_TIME;
 int updInterval = PIM_UPDATE_INTERVAL;
 
 
-/*   pim.c  */
+/*   pdaemons/pimd/pim.c  */
 int  doServ         ( void   );
 void logProcessInfo ( void   );
 int  scan_procs     ( void   );

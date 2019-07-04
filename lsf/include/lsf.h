@@ -718,7 +718,7 @@ struct pidInfo
     size_t jobid;
     pid_t pid;
     pid_t ppid;
-    gid_t pgid;
+    pid_t pgid;
     char padding[4];
 };
 
@@ -728,9 +728,9 @@ struct jRusage
     size_t swap;
     time_t utime;
     time_t stime;
-    unsigned int npids;
-    unsigned int npgids;
-    gid_t *pgid; // FIXME FIXME FIXME FIXME maybe wrong
+    pid_t npids;
+    pid_t npgids;
+    pid_t *pgid; // FIXME FIXME FIXME FIXME maybe wrong
     struct pidInfo *pidInfo;
 };
 

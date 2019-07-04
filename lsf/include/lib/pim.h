@@ -2,10 +2,11 @@
 
 #pragma once
 
-size_t inNPGids;
+size_t inNPGids = 0; // FIXME FIXME FIXME FIXME accessor and mutator fuction, don't leave it like this.
+pid_t  hitPGid  = 0; // FIXME FIXME FIXME FIXME accessor and mutator fuction, don't leave it like this.
 
 /* pim.c */
-struct jRusage *getJInfo_ (pid_t npgid, pid_t *pgid, unsigned short options, gid_t cpgid);
+struct jRusage *getJInfo_ (pid_t npgid, pid_t *pgid, unsigned short options, pid_t cpgid);
 char *readPIMBuf( const char *pfile);
 char *getNextString( const char *buf, char *string);
 int readPIMFile( const char *pfile);
