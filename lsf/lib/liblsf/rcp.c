@@ -790,7 +790,15 @@ createSpoolSubDir (const char *spoolFileFullPath)
                 pEnd2 = strdup( spoolFileFullPath );
         }
 
-        len = (pEnd2 > pEnd1) ? pEnd2 - spoolFileFullPath : pEnd1 - spoolFileFullPath;
+        assert( pEnd2 - spoolFileFullPath > 0 );
+        assert( pEnd1 - spoolFileFullPath > 0 );
+        // len = (size_t)(pEnd2 > pEnd1) ? (size_t)(pEnd2 - spoolFileFullPath) : (size_t)(pEnd1 - spoolFileFullPath);
+        if( pEnd2 > pEnd1 ) {
+            len = (size_t)(pEnd2 - spoolFileFullPath);
+        }
+        else {
+            len = (size_t)(pEnd1 - spoolFileFullPath);
+        }
         previousUmask = umask (000); // FIXME FIXME FIXME replace numerical with appropriate label
 
         if (len <= 0) {
@@ -813,8 +821,16 @@ createSpoolSubDir (const char *spoolFileFullPath)
             if ((pEnd2 = strrchr (pBegin, '\\')) == NULL) {
                 pEnd2 = pBegin;
             }
-
-            len = (pEnd2 > pEnd1) ? pEnd2 - pBegin : pEnd1 - pBegin;
+         
+            assert( pEnd2 - pBegin > 0 );
+            assert( pEnd1 - pBegin > 0 );
+            // len = (pEnd2 > pEnd1) ? pEnd2 - pBegin : pEnd1 - pBegin;
+            if( pEnd2 > pEnd1 ) {
+                len = (size_t)(pEnd2 - pBegin);
+            }
+            else {
+                len = (size_t)(pEnd1 - pBegin);
+            }
 
             if ( 0 == len ) {
 
