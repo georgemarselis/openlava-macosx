@@ -773,7 +773,8 @@ createSpoolSubDir (const char *spoolFileFullPath)
     char subDirectory2[MAX_FILENAME_LEN];
     size_t len = 0;
     int returnValue = 0;
-    mode_t previousUmask = 0;
+    mode_t initialMask   = 0x000;
+    mode_t previousUmask = 0x000;
 
     if (spoolFileFullPath == NULL) {
         returnValue = -1;
@@ -799,7 +800,7 @@ createSpoolSubDir (const char *spoolFileFullPath)
         else {
             len = (size_t)(pEnd1 - spoolFileFullPath);
         }
-        previousUmask = umask (000); // FIXME FIXME FIXME replace numerical with appropriate label
+        previousUmask = umask ( initialMask ); // FIXME FIXME FIXME replace numerical with appropriate label
 
         if (len <= 0) {
                 umask (previousUmask);

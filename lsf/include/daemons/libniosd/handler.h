@@ -111,7 +111,7 @@ int doAcceptResCallback_( int s, struct niosConnect * );
 
 int requeued = 0;
 // #define MAXLOOP 10000
-const unsigned int MAXLOOP = 10000;
+// const unsigned int MAXLOOP = 10000;
 // #define CHECK_PERIOD     4
 const unsigned short = 4;
 // #define MAX_READ_RETRY         5
