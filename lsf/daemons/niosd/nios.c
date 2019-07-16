@@ -1684,9 +1684,9 @@ acceptCallBack (int asock)
       exit (-1);
     }
 
-  if (do_rstty_ (sock, iofd, redirect) == -1)
+  if (do_rstty2_ (sock, iofd, redirect, FALSE ) == -1)
     {
-      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "do_rstty_()");
+      ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, "do_rstty2_()");
       exit (-1);
     }
 
