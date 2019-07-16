@@ -49,7 +49,7 @@ initIdLib ( struct IDLIB_INFO_T *idLib)
 
     idLib->initialized = TRUE;
 
-    serverDir = genParams_[LSF_SERVERDIR].paramValue;
+    serverDir = strdup( genParams_[ LSF_SERVERDIR ].paramValue );
     if (serverDir == NULL) {
         if (logclass & LC_TRACE) {
             ls_syslog (LOG_DEBUG, "%s: No id library found, using defaults", __func__);

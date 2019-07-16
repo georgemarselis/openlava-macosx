@@ -24,18 +24,17 @@
 #define L_MAX_LINE_LEN_4ENV (8*MAX_LINE_LEN) // FIXME FIXME FIXME FIXME this seems awfuly specific
 
 // const unsigned int L_MAX_LINE_LEN_4ENV = 8 * MAX_LINE_LEN;
-
 // static size_t errLineNum_ = 0; // FIXME FIXME FIXME turn into accessor and mutator
-
-char *stripDomains_ = NULL;
+// char *stripDomains_ = NULL;
 // char *LSTMPDIR = NULL;
 
 
+/* initenv.c */
+int doEnvParams_(struct config_param *plp);
 char *getTempDir_(void);
 int initenv_(struct config_param *userEnv, const char *pathname);
-// int ls_readconfenv(struct config_param *paramList, const char *confPath);
 int readconfenv_(struct config_param *pList1, struct config_param *pList2, const char *confPath);
-int parseLine( char *line, char **keyPtr, char **valuePtr);
-int matchEnv( const char *name, struct config_param *paramList);
-int setConfEnv( const char *name, char *value, struct config_param *paramList);
+int parseLine(const char *line, char **keyPtr, char **valuePtr);
+int matchEnv(const char *name, struct config_param *paramList);
+int setConfEnv(const char *name, char *value, struct config_param *paramList);
 

@@ -76,13 +76,14 @@ getJInfo_ (pid_t npgid, pid_t *pgid, unsigned short options, pid_t cpgid)
 
     if (lastTime == 0) {
         struct hostent *hp = NULL;
-        struct config_param *plp = NULL;
+        // struct config_param *plp = NULL;
 
-        for (plp = pimParams; plp->paramName != NULL; plp++) {
-            if (plp->paramValue != NULL) {
-                FREEUP (plp->paramValue);
-            }
-        }
+        // REMOVE NOFIX? Don't worry about freeing up initial params, they are constant 
+        // for (plp = pimParams; plp->paramName != NULL; plp++) {
+        //     if (plp->paramValue != NULL) {
+        //         FREEUP (plp->paramValue);
+        //     }
+        // }
 
         if (initenv_ (pimParams, NULL) < 0) { // init the pimd environment
             if (logclass & LC_PIM) {

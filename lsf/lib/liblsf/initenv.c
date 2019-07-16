@@ -35,22 +35,23 @@ doEnvParams_ (struct config_param *plp)
     char *sp  = NULL;
     char *spp = NULL;
 
-    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
+    // assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
 
     if (!plp) {
         return 0;
     }
 
-    for (; plp->paramName != NULL; plp++) // FIXME FIXME fix initial condition
-    {
-        if ((sp = getenv (plp->paramName)) != NULL)
-        {
-            if (NULL == (spp = putstr_ (sp)))
-            {
+    for (; plp->paramName != NULL; plp++) { // FIXME FIXME fix initial condition
+
+        if ((sp = getenv (plp->paramName)) != NULL) {
+
+            if (NULL == (spp = putstr_ (sp))) {
+
                 lserrno = LSE_MALLOC;
-                return -1;
+                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
-            FREEUP (plp->paramValue);
+            // plp->paramValue is a const, so we don't need to 
+            // FREEUP (plp->paramValue);
             plp->paramValue = spp;
         }
     }
@@ -68,7 +69,7 @@ getTempDir_ (void)
     //     return sp;
     // }
 
-    tmpSp = genParams_[LSF_TMPDIR].paramValue;
+    tmpSp = strdup( genParams_[LSF_TMPDIR].paramValue );
     if ((tmpSp != NULL) && (stat (tmpSp, &stb) == 0) && (S_ISDIR (stb.st_mode))) {
         sp = tmpSp;
     }
@@ -100,7 +101,7 @@ initenv_ (struct config_param *userEnv, const char *pathname)
     static int lsfenvset = FALSE;
 
     if (osInit_ () < 0) {
-        return -1; // FIXME FIXME FIXME FIXME replace return value by appropriate *positive* return value
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value // FIXME FIXME FIXME FIXME replace return value by appropriate *positive* return value
     }
 
     if ((envdir = getenv ("LSF_ENVDIR")) != NULL) {  // FIXME FIXME FIXME FIXME move "TMPDIR" to configure.ac
@@ -115,20 +116,20 @@ initenv_ (struct config_param *userEnv, const char *pathname)
             return 0;
         }
         if (readconfenv_ (NULL, userEnv, pathname) < 0) {
-            return -1; // FIXME FIXME FIXME FIXME replace return value by appropriate *positive* return value
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value // FIXME FIXME FIXME FIXME replace return value by appropriate *positive* return value
         }
         else if (doEnvParams_ (userEnv) < 0) {
-            return -1; // FIXME FIXME FIXME FIXME replace return value by appropriate *positive* return value
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value // FIXME FIXME FIXME FIXME replace return value by appropriate *positive* return value
         }
         return 0;
     }
 
     if (readconfenv_ (genParams_, userEnv, pathname) < 0) {
-        return -1; // FIXME FIXME FIXME FIXME replace return value by appropriate *positive* return value
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value // FIXME FIXME FIXME FIXME replace return value by appropriate *positive* return value
     }
     else {
         if (doEnvParams_ (genParams_) < 0) {
-            return -1; // FIXME FIXME FIXME FIXME replace return value by appropriate *positive* return value
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value // FIXME FIXME FIXME FIXME replace return value by appropriate *positive* return value
         }
         lsfenvset = TRUE;
         if (doEnvParams_ (userEnv) < 0) {
@@ -138,13 +139,14 @@ initenv_ (struct config_param *userEnv, const char *pathname)
 
     if (!genParams_[LSF_CONFDIR].paramValue || !genParams_[LSF_SERVERDIR].paramValue) {
         lserrno = LSE_BAD_ENV;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (genParams_[LSF_SERVER_HOSTS].paramValue != NULL) {
         char *sp = NULL;
-        for (sp = genParams_[LSF_SERVER_HOSTS].paramValue; *sp != '\0'; sp++) {
-            if (*sp == '\"') {
+        for (sp = strdup(genParams_[LSF_SERVER_HOSTS].paramValue); *sp != '\0'; sp++) {
+            // man 3 strchr
+            if (*sp == '\"') { // FIXME FIXME FIXME FIXME https://stackoverflow.com/questions/32496497/standard-function-to-replace-character-or-substring-in-a-char-array
                 *sp = ' ';
             }
         }
@@ -153,7 +155,7 @@ initenv_ (struct config_param *userEnv, const char *pathname)
     LSTMPDIR = getTempDir_ ();
 
     if (Error) {
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     return 0;
@@ -184,7 +186,7 @@ readconfenv_ (struct config_param *pList1, struct config_param *pList2, const ch
         for (plp = pList1; plp->paramName != NULL; plp++) {
             if (plp->paramValue != NULL) {
                 lserrno = LSE_BAD_ARGS;
-                return -1; // FIXME FIXME FIXME FIXME replace return value by appropriate *positive* return value
+                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value // FIXME FIXME FIXME FIXME replace return value by appropriate *positive* return value
             }
         }
     }
@@ -193,7 +195,7 @@ readconfenv_ (struct config_param *pList1, struct config_param *pList2, const ch
         for (plp = pList2; plp->paramName != NULL; plp++) {
             if (plp->paramValue != NULL) {
                 lserrno = LSE_BAD_ARGS;
-                return -1; // FIXME FIXME FIXME FIXME replace return value by appropriate *positive* return value
+                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value // FIXME FIXME FIXME FIXME replace return value by appropriate *positive* return value
             }
         }
     }
@@ -221,7 +223,7 @@ readconfenv_ (struct config_param *pList1, struct config_param *pList2, const ch
 
     if (!fp) {
         lserrno = LSE_LSFCONF;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     while ((line = getNextLineC_ (fp, &lineNum, TRUE)) != NULL) {
@@ -240,14 +242,14 @@ readconfenv_ (struct config_param *pList1, struct config_param *pList2, const ch
 
         if (!setConfEnv (key, value, pList1) || !setConfEnv (key, value, pList2)) {
             fclose (fp);
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
     }
     fclose (fp);
     if (errLineNum_ != 0) {
         assert( saveErrNo <= INT_MAX );
         lserrno = (int) saveErrNo;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     return 0;
@@ -255,11 +257,11 @@ readconfenv_ (struct config_param *pList1, struct config_param *pList2, const ch
 
 
 int
-parseLine (char *line, char **keyPtr, char **valuePtr)
+parseLine ( const char *line, char **keyPtr, char **valuePtr)
 {
 
     char       *cp   = NULL;
-    const char *sp   = line;
+    const char *sp   = strdup( line );
     const char *word = NULL;
    
     static char key[L_MAX_LINE_LEN_4ENV];
@@ -267,7 +269,7 @@ parseLine (char *line, char **keyPtr, char **valuePtr)
 
     if (strlen (sp) >= L_MAX_LINE_LEN_4ENV - 1) {
         lserrno = LSE_BAD_ENV;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     *keyPtr = key;
@@ -278,41 +280,38 @@ parseLine (char *line, char **keyPtr, char **valuePtr)
     strcpy (key, word);
     cp = strchr (key, '=');
 
-    if (cp == NULL)
-        {
-            lserrno = LSE_CONF_SYNTAX;
-            return -1;
-        }
+    if (cp == NULL) {
+        lserrno = LSE_CONF_SYNTAX;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+    }
 
     *cp = '\0';
 
     sp = strchr (line, '=');
 
-    if (sp[1] == ' ' || sp[1] == '\t')
-        {
-            lserrno = LSE_CONF_SYNTAX;
-            return -1;
-        }
+    if (sp[1] == ' ' || sp[1] == '\t') { // FIXME FIXME FIXME replace [1] with label
+        lserrno = LSE_CONF_SYNTAX;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+    }
 
-    if (sp[1] == '\0')
-        {
-            value[0] = '\0';
-            return 0;
-        }
+    if (sp[1] == '\0') { // FIXME FIXME FIXME replace [1] with label
+        value[0] = '\0';  // FIXME FIXME FIXME replace [0] with label
+        return 0;
+    }
 
     sp++;
     word = getNextValueQ_ (&sp, '\"', '\"');
-    if (!word)
-        return -1;
+    if (!word) {
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+    }
 
     strcpy (value, word);
 
     word = getNextValueQ_ (&sp, '\"', '\"');
-    if (word != NULL || lserrno != LSE_NO_ERR)
-        {
-            lserrno = LSE_CONF_SYNTAX;
-            return -1;
-        }
+    if (word != NULL || lserrno != LSE_NO_ERR) {
+        lserrno = LSE_CONF_SYNTAX;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+    }
 
     return 0;
 
@@ -341,22 +340,20 @@ setConfEnv ( const char *name, char *value, struct config_param *paramList)
         return 1;
     }
 
-    if (value == NULL) {
-        *value = '\0';
+    if( !value ) {
+        return 255; // FIXME FIXME replace 255 with error "value was null"
     }
 
-    for (; paramList->paramName; paramList++)
-        {
-            if (strcmp (paramList->paramName, name) == 0)
-    {
-        FREEUP (paramList->paramValue);
-        paramList->paramValue = putstr_ (value);
-        if (paramList->paramValue == NULL)
-            {
+    for (; paramList->paramName; paramList++) {
+        if (strcmp (paramList->paramName, name) == 0) {
+            // FREEUP (paramList->paramValue);
+            paramList->paramValue = putstr_ (value);
+            if (paramList->paramValue == NULL) {
                 lserrno = LSE_MALLOC;
                 return 0;
             }
-    }
         }
+    }
+
     return 1;
 }
