@@ -254,7 +254,7 @@ ls_startserver (const char *host, char **server, int options)
     cmdmsg.retport = sin.sin_port;
 
     cmdmsg.options = options & ~REXF_TASKPORT;
-    cmdmsg.rpid = 0;
+    cmdmsg.rpid = -1;
     cmdmsg.argv = server;
 
     timeout.tv_usec = 0;
