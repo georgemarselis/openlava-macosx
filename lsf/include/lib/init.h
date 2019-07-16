@@ -22,7 +22,7 @@
 // #define NL_SETN 23
 
 unsigned int totsockets_     = 0;
-unsigned int currentsocket_  =  0;
+unsigned int currentsocket_  = 0;
 int mlsSbdMode               = 0;
 static char rootuid_         = '\0';
 
