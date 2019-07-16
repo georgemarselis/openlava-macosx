@@ -5,6 +5,6 @@
 struct config_param
 {
 	const char *paramName;
-	char *paramValue;
+	const char *paramValue;
 };
 

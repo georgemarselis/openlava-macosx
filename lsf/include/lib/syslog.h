@@ -17,13 +17,13 @@
 #pragma once
 
 char *argvmsg_( int argc, char **argv);
-void  ls_openlog( const char *ident, const char *path, int use_stderr, char *logMask);
+void  ls_openlog( const char *ident, const char *path, int use_stderr, const char *logMask);
 int   openLogFile( const char *ident, char *myname );
 void  ls_syslog( int level, const char *fmt, ... );
 void  ls_closelog( void);
 int   ls_setlogmask( int maskpri );
-int   getLogMask (char **msg, char *logMask);
-int   getLogClass_ (char *lsp, char *tsp);
+int   getLogMask ( const char **msg, const char *logMask);
+int   getLogClass_ ( const char *lsp, const char *tsp);
 void  ls_closelog_ext (void);
 
 // int logclass = 0; // also defined in lsf.h

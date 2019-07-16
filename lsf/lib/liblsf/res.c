@@ -33,7 +33,8 @@
 #include "lib/res.h" 
 #include "lib/conn.h"
 #include "lib/host.h"
-#include "struct-config_param.h"
+#include "lib/resd_globals.h"
+
 
 unsigned int  getCurrentSN( void ) {
     return globCurrentSN;
@@ -97,8 +98,8 @@ ls_connect (char *host)
         }
     }
 
-  putEauthClientEnvVar ("user");
-  putEauthServerEnvVar ("res");
+    putEauthClientEnvVar ("user"); // FIXME FIXME FIXME
+    putEauthServerEnvVar ("res");  // FIXME FIXME FIXME 
 
 #ifdef INTER_DAEMON_AUTH
     putEnv ("LSF_EAUTH_AUX_PASS", "yes");
@@ -112,8 +113,7 @@ ls_connect (char *host)
 
     runEsub_ (&connReq.eexec, NULL);
 
-    size =  sizeof (struct LSFHeader) + sizeof (connReq) + 
-            sizeof (struct lsfAuth) + (size_t)ALIGNWORD_ (connReq.eexec.len);
+    size =  sizeof (struct LSFHeader) + sizeof (connReq) + sizeof (struct lsfAuth) + (size_t)ALIGNWORD_ (connReq.eexec.len);
 
     reqBuf = malloc(5 * size * sizeof (reqBuf) );  // FIXME FIXME why 5?
     if (NULL == reqBuf && ENOMEM == errno ) {
@@ -182,7 +182,7 @@ lsConnWait_ (char *host)
         }
     }
 
-  return 0;
+    return 0;
 }
 
 int
