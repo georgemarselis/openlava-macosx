@@ -54,7 +54,7 @@ ls_rexecve (char *host, char **argv, int options, char **envp)
   if (_isconnected_ (host, descriptor))
     s = descriptor[0];
   else if ((s = ls_connect (host)) < 0)
-    return (-1);
+    return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
 
   if (!FD_ISSET (s, &connection_ok_))
     {
@@ -63,7 +63,7 @@ ls_rexecve (char *host, char **argv, int options, char **envp)
 	{
 	  close (s);
 	  _lostconnection_ (host);
-	  return (-1);
+	  return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
 	}
     }
 
@@ -75,11 +75,11 @@ ls_rexecve (char *host, char **argv, int options, char **envp)
     cmdmsg.options &= ~REXF_USEPTY;
   else if (cmdmsg.options & REXF_USEPTY)
     {
-      if (rstty_ (host) < 0)
+      if (do_rstty1_ (host, FALSE ) < 0) // FALSE turns async off
 	{
 
 	  _lostconnection_ (host);
-	  return (-1);
+	  return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
 	}
     }
 
@@ -96,7 +96,7 @@ ls_rexecve (char *host, char **argv, int options, char **envp)
       close (s);
       _lostconnection_ (host);
       lserrno = LSE_WDIR;
-      return (-1);
+      return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
   if (envp)
@@ -104,7 +104,7 @@ ls_rexecve (char *host, char **argv, int options, char **envp)
       if (ls_rsetenv (host, envp) < 0)
 	{
 	  _lostconnection_ (host);
-	  return (-1);
+	  return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
 	}
     }
 
@@ -112,7 +112,7 @@ ls_rexecve (char *host, char **argv, int options, char **envp)
     {
       close (s);
       _lostconnection_ (host);
-      return (-1);
+      return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
   len = sizeof (sin);
@@ -122,7 +122,7 @@ ls_rexecve (char *host, char **argv, int options, char **envp)
       close (s);
       _lostconnection_ (host);
       lserrno = LSE_SOCK_SYS;
-      return (-1);
+      return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
   cmdmsg.retport = sin.sin_port;
@@ -138,14 +138,14 @@ ls_rexecve (char *host, char **argv, int options, char **envp)
       close (retsock);
       close (s);
       _lostconnection_ (host);
-      return (-1);
+      return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
 
   (void) sprintf (sock_buf, "%d", retsock);
 
   if (initenv_ (NULL, NULL) < 0)
-    return (-1);
+    return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
   strcpy (pathbuf, genParams_[LSF_SERVERDIR].paramValue);
   strcat (pathbuf, "/nios");
   new_argv[0] = pathbuf;
@@ -174,14 +174,14 @@ ls_rexecve (char *host, char **argv, int options, char **envp)
   lserrno = LSE_EXECV_SYS;
   close (retsock);
   close (s);
-  return (-1);
+  return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
 }
 
 int
 ls_rexecv (char *host, char **argv, int options)
 {
   ls_rexecve (host, argv, options, environ);
-  return (-1);
+  return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
 }
 
 /* ls_startserver()
@@ -207,7 +207,7 @@ ls_startserver (char *host, char **server, int options)
   if (_isconnected_ (host, descriptor))
     s = descriptor[0];
   else if ((s = ls_connect (host)) < 0)
-    return (-1);
+    return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
 
   if (!FD_ISSET (s, &connection_ok_))
     {
@@ -216,7 +216,7 @@ ls_startserver (char *host, char **server, int options)
 	{
 	  close (s);
 	  _lostconnection_ (host);
-	  return (-1);
+	  return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
 	}
     }
 
@@ -224,10 +224,10 @@ ls_startserver (char *host, char **server, int options)
     options &= ~REXF_USEPTY;
   else if (options & REXF_USEPTY)
     {
-      if (rstty_ (host) < 0)
+      if (do_rstty1_ (host, FALSE) < 0) // FALSE turns async off
 	{
 	  _lostconnection_ (host);
-	  return (-1);
+	  return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
 	}
     }
 
@@ -236,14 +236,14 @@ ls_startserver (char *host, char **server, int options)
       close (s);
       _lostconnection_ (host);
       lserrno = LSE_WDIR;
-      return (-1);
+      return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
   if ((retsock = TcpCreate_ (TRUE, 0)) < 0)
     {
       close (s);
       _lostconnection_ (host);
-      return (-1);
+      return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
   len = sizeof (sin);
@@ -253,7 +253,7 @@ ls_startserver (char *host, char **server, int options)
       close (s);
       _lostconnection_ (host);
       lserrno = LSE_SOCK_SYS;
-      return (-1);
+      return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
   cmdmsg.retport = sin.sin_port;
@@ -271,7 +271,7 @@ ls_startserver (char *host, char **server, int options)
       close (retsock);
       close (s);
       _lostconnection_ (host);
-      return (-1);
+      return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
   if (ackReturnCode_ (s) < 0)
@@ -279,7 +279,7 @@ ls_startserver (char *host, char **server, int options)
       close (retsock);
       close (s);
       _lostconnection_ (host);
-      return (-1);
+      return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
   if (retsock <= 2 && (retsock = get_nonstd_desc_ (retsock)) < 0)
@@ -287,12 +287,12 @@ ls_startserver (char *host, char **server, int options)
       close (s);
       _lostconnection_ (host);
       lserrno = LSE_SOCK_SYS;
-      return (-1);
+      return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
   gethostbysock_ (s, official);
   (void) connected_ (official, -1, retsock, currentSN);
 
-  return (retsock);
+  return retsock;
 
 }				/* ls_startserver() */

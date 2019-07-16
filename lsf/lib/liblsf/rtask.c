@@ -109,7 +109,7 @@ ls_rtaske (const char *host, char **argv, int options, char **envp)
             }
         }
         else {
-            if (rstty_ (host) < 0) {
+            if (do_rstty1_ (host, FALSE ) < 0) { // FALSE turns async off
                 sigprocmask (SIG_SETMASK, &oldMask, NULL);
                 return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
