@@ -6,18 +6,21 @@
 
 /* #define SIGEMT SIGBUS */
 
-static int short nios_ok_;
+char rexcwd_[1024] 
+
+// static int short nios_ok_;
+int short nios_ok_;
 // extern int currentSN;
 
 
 /* rtask.c */
-int ls_rtaske(char *host, char **argv, int options, char **envp);
+int ls_rtask(const char *host, char **argv, int options);
+int ls_rtaske(const char *host, char **argv, int options, char **envp);
 int rgetpidCompletionHandler_(struct lsRequest *request);
-void *lsRGetpidAsync_(int taskid, int *pid);
-int lsRGetpid_(int taskid, int options);
-int lsRGetpgrp_(int sock, int taskid, pid_t pid);
+void *lsRGetpidAsync_(pid_t taskid, pid_t *pid);
+pid_t lsRGetpid_(pid_t taskid, int options);
+int lsRGetpgrp_(int socket, pid_t taskid, pid_t pid);
 void initSigHandler(int sig);
-int ls_rtask(char *host, char **argv, int options);
 void default_tstp_(int signo);
-unsigned short getTaskPort(int s);
-void setRexWd_(char *wd);
+unsigned short getTaskPort(int socket);
+// void setRexWd_(const char *wd);
