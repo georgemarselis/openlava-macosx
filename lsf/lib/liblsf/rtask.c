@@ -34,7 +34,7 @@
 
 
 int
-ls_rtaske (char *host, char **argv, int options, char **envp)
+ls_rtaske (const char *host, char **argv, int options, char **envp)
 {
     static unsigned short retport;
     static pid_t rpid;
@@ -103,7 +103,7 @@ ls_rtaske (char *host, char **argv, int options, char **envp)
     else if (cmdmsg.options & REXF_USEPTY)
     {
         if (options & REXF_TTYASYNC) {
-            if (rstty_async_ (host) < 0) {
+            if (do_rstty1_ (host, TRUE ) < 0) { // TRUE turns async on
                 sigprocmask (SIG_SETMASK, &oldMask, NULL);
                 return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
@@ -223,8 +223,9 @@ ls_rtaske (char *host, char **argv, int options, char **envp)
         }
         }
 
-    if (rexcwd_[0] != '\0')
+    if (rexcwd_[0] != '\0') {
         strcpy (cmdmsg.cwd, rexcwd_);
+    }
     else if (mygetwd_ (cmdmsg.cwd) == 0)
         {
             close (s);
