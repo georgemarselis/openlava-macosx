@@ -50,17 +50,19 @@ unsigned int  setCurrentSN( unsigned int currentSN ) {
 }
 
 int
-ls_connect (char *host)
+ls_connect (const char *host)
 {
     int s = 0;
-    int descriptor[2] = { 0, 0 };
-    int resTimeout;
+    int descriptor[2] = { 0, 0 }; // FIXME FIXME FIXME replace [2] with labels
+    time_t resTimeout;
     size_t size = 0;
     char *reqBuf = NULL;
     struct lsfAuth auth;
     struct resConnect connReq;
     struct hostent *hp = NULL;
     char official[MAXHOSTNAMELEN] = "";
+
+    memset( official, '\0', strlen( official ) );
  
     if (resDaemonParams[RES_TIMEOUT].paramValue) {
         resTimeout = atoi (resDaemonParams[ RES_TIMEOUT ].paramValue);
@@ -75,17 +77,17 @@ ls_connect (char *host)
 
     if ((hp = Gethostbyname_ (host)) == NULL) {
         lserrno = LSE_BAD_HOST;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     strcpy (official, hp->h_name);
     memcpy ((char *) &res_addr_.sin_addr, (char *) hp->h_addr_list[0], (size_t) hp->h_length); // all casts are OK here.
-    if ((rootuid_) && (genParams_[LSF_AUTH].paramValue == NULL))
-    {
-        if (currentsocket_ > (int)(FIRST_RES_SOCK + (unsigned int)totsockets_ - 1))
-        {
+    if ((rootuid_) && (genParams_[LSF_AUTH].paramValue == NULL)) {
+
+        if (currentsocket_ > (int)(FIRST_RES_SOCK + (unsigned int)totsockets_ - 1)) {
+
             lserrno = LSE_NOMORE_SOCK;
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
         
         s = currentsocket_;
@@ -94,26 +96,26 @@ ls_connect (char *host)
     else {
 
         if ((s = CreateSockEauth_ (SOCK_STREAM)) < 0) {
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
     }
 
-    putEauthClientEnvVar ("user"); // FIXME FIXME FIXME
-    putEauthServerEnvVar ("res");  // FIXME FIXME FIXME 
+    putEauthClientEnvVar ("user"); // FIXME FIXME FIXME DOCUMENT! wtf does this env do?
+    putEauthServerEnvVar ("res");  // FIXME FIXME FIXME DOCUMENT! wtf does this env do?
 
 #ifdef INTER_DAEMON_AUTH
-    putEnv ("LSF_EAUTH_AUX_PASS", "yes");
+    putEnv ("LSF_EAUTH_AUX_PASS", "yes"); // FIXME FIXME FIXME DOCUMENT! wtf does this env do?
 #endif
 
 
     if (getAuth_ (&auth, official) == -1){
         close (s);
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     runEsub_ (&connReq.eexec, NULL);
 
-    size =  sizeof (struct LSFHeader) + sizeof (connReq) + sizeof (struct lsfAuth) + (size_t)ALIGNWORD_ (connReq.eexec.len);
+    size =  sizeof (struct LSFHeader) + sizeof (connReq) + sizeof (struct lsfAuth) + ALIGNWORD_ (connReq.eexec.len);
 
     reqBuf = malloc(5 * size * sizeof (reqBuf) );  // FIXME FIXME why 5?
     if (NULL == reqBuf && ENOMEM == errno ) {
@@ -124,27 +126,27 @@ ls_connect (char *host)
             free (connReq.eexec.data);
         }
         free (reqBuf);
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     assert( resTimeout >= 0 );
-    if (b_connect_ (s, (struct sockaddr *) &res_addr_, sizeof (res_addr_), (unsigned int)resTimeout) < 0) {
+    if (b_connect_ (s, (struct sockaddr *) &res_addr_, sizeof (res_addr_), resTimeout) < 0) {
         lserrno = LSE_CONN_SYS;
           
         if (connReq.eexec.len > 0) {
             free (connReq.eexec.data);
         }
         free (reqBuf);
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    if (callRes_ (s, RES_CONNECT, (char *) &connReq, reqBuf, size, xdr_resConnect, 0, 0, &auth) == -1) {
+    if (callRes_ (s, RES_CONNECT, (char *) &connReq, reqBuf, size, xdr_resConnect, 0, 0, &auth) == -1) { // 
         
         if (connReq.eexec.len > 0) {
             free (connReq.eexec.data);
         }
         free (reqBuf);
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (connReq.eexec.len > 0) {
@@ -158,7 +160,7 @@ ls_connect (char *host)
 }
 
 int
-lsConnWait_ (char *host)
+lsConnWait_ ( const char *host)
 {
     int s = 0;
     int descriptor[2] = { 0, 0 };
@@ -168,7 +170,7 @@ lsConnWait_ (char *host)
         s = descriptor[0];
     }
     else {
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (!FD_ISSET (s, &connection_ok_)) {
@@ -178,7 +180,7 @@ lsConnWait_ (char *host)
         {
             close (s);
             _lostconnection_ (host);
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
     }
 
@@ -188,8 +190,9 @@ lsConnWait_ (char *host)
 int
 sendCmdBill_ (int s, enum resCmd cmd, struct resCmdBill *cmdmsg, int *retsock, struct timeval *timeout)
 {
-    char *buf;
+
     int cc = 0;
+    char *buf = NULL;
     size_t bufsize = 1024;
 
     bufsize += ( ALIGNWORD_ (strlen (cmdmsg->cwd)) + sizeof (int) );
@@ -197,10 +200,10 @@ sendCmdBill_ (int s, enum resCmd cmd, struct resCmdBill *cmdmsg, int *retsock, s
         bufsize += ( ALIGNWORD_ (strlen (cmdmsg->argv[i])) + sizeof (int) );
     }
 
-    buf = (char *) malloc (bufsize);
+    buf = malloc (bufsize);
     if ( NULL == buf && ENOMEM == errno ) {
       lserrno = LSE_MALLOC;
-      return -1;
+      return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     umask (cmdmsg->filemask = (mode_t) umask (0));
@@ -208,7 +211,7 @@ sendCmdBill_ (int s, enum resCmd cmd, struct resCmdBill *cmdmsg, int *retsock, s
     if (getLimits (cmdmsg->lsfLimits) < 0) {
         lserrno = LSE_LIMIT_SYS;
         free (buf);
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     cc = callRes_ (s, cmd, (char *) cmdmsg, buf, bufsize, xdr_resCmdBill, retsock, timeout, NULL);
@@ -216,38 +219,38 @@ sendCmdBill_ (int s, enum resCmd cmd, struct resCmdBill *cmdmsg, int *retsock, s
     return cc;
 }
 
-FILE *
-ls_popen (int s, char *command, char *type)
-{
+// NOFIX Nothing references this 
+// FILE *
+// ls_popen (int s, const char *command, const char *type)
+// {
+//     assert( s );
+//     assert( *command );
+//     assert( *type );
+//     return (FILE *) 0;    // FIXME FIXME FIXME what the heck?! 
+//                             //      put it under the debugger and eliminate
+//                             //      code that reaches here
+// }
 
-    assert( s );
-    assert( *command );
-    assert( *type );
-    return (FILE *) 0;    // FIXME FIXME FIXME what the heck?! 
-                            //      put it under the debugger and eliminate
-                            //      code that reaches here
-}
+
+// NOFIX Nothing references this 
+// int
+// ls_pclose (FILE * stream)
+// {
+//     stream = NULL;
+//     assert( stream == NULL );
+//     return 0;     // FIXME FIXME FIXME what the heck?! 
+//                     //      put it under the debugger and eliminate
+//                     //      code that reaches here
+// }
+
 
 int
-ls_pclose (FILE * stream)
+rsetenv_ ( const char *host, char **envp, int option )
 {
-    stream = NULL;
-
-    assert( stream == NULL );
-    return 0;     // FIXME FIXME FIXME what the heck?! 
-                    //      put it under the debugger and eliminate
-                    //      code that reaches here
-}
-
-#define RSETENV_SYNCH   1
-#define RSETENV_ASYNC   2
-int
-rsetenv_ (char *host, char **envp, int option )
-{
-    int i = 0;
+    // int i = 0;
     int s = 0;
-    int descriptor[2];
-    char *sendBuf;
+    int descriptor[2] = { 0, 0 }; // FIXME FIXME FIXME  describe [2]
+    char *sendBuf = NULL;
     enum resCmd resCmdOption = RES_FAIL;
     struct resSetenv envMsg;
     
@@ -261,15 +264,15 @@ rsetenv_ (char *host, char **envp, int option )
         return 0;
     }
 
-    for (i = 0; envp[i] != NULL; i++) {
+    for ( size_t i = 0; envp[i] != NULL; i++) {
         bufferSize += ALIGNWORD_ (strlen (envp[i])) + sizeof (int);
     }
 
 
-    sendBuf = (char *) malloc( bufferSize );
+    sendBuf = malloc( bufferSize );
     if ( NULL == sendBuf && ENOMEM == errno ) {
         lserrno = LSE_MALLOC;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (_isconnected_ (host, descriptor)) {
@@ -277,10 +280,10 @@ rsetenv_ (char *host, char **envp, int option )
     }
     else if ((s = ls_connect (host)) < 0) {
         free(sendBuf); 
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
     else {
-        printf( "oops, i made a first booboo: rsetenv_()\n");
+        printf( "oops, I made a first booboo: rsetenv_()\n");
     }
 
     if (!FD_ISSET (s, &connection_ok_)) {
@@ -290,7 +293,7 @@ rsetenv_ (char *host, char **envp, int option )
             close (s);
             _lostconnection_ (host);
             free (sendBuf);
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
     }
 
@@ -302,7 +305,7 @@ rsetenv_ (char *host, char **envp, int option )
         resCmdOption = RES_SETENV_ASYNC;
     }
     else {
-        printf( "oops, i made a second booboo: rsetenv_()\n");
+        printf( "oops, I made a second booboo: rsetenv_()\n");
     }
     
     if (callRes_ (s, resCmdOption, (char *) &envMsg, sendBuf, bufferSize,
@@ -311,7 +314,7 @@ rsetenv_ (char *host, char **envp, int option )
       close (s);
       _lostconnection_ (host);
       free (sendBuf);
-      return -1;
+      return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     free (sendBuf);
@@ -320,30 +323,32 @@ rsetenv_ (char *host, char **envp, int option )
         if (ackReturnCode_ (s) < 0) {
             close (s);
             _lostconnection_ (host);
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
     }
 
     return 0;
 }
 
-int
-ls_rsetenv_async (char *host, char **envp)
-{
-    return rsetenv_ (host, envp, RSETENV_ASYNC);
-}
+// NOFIX Nothing references this 
+// int
+// ls_rsetenv_async ( const char *host, char **envp)
+// {
+//     return rsetenv_ (host, envp, RSETENV_ASYNC);
+// }
+
+// NOFIX Nothing references this 
+// int
+// ls_rsetenv ( const char *host, char **envp)
+// {
+//     return rsetenv_ (host, envp, RSETENV_SYNCH);
+// }
 
 int
-ls_rsetenv (char *host, char **envp)
-{
-    return rsetenv_ (host, envp, RSETENV_SYNCH);
-}
-
-int
-ls_chdir (char *host, char *dir)
+ls_chdir ( const char *host, const char *dir)
 {
     int s = 0;
-    int descriptor[2] = { 0, 0 };
+    int descriptor[2] = { 0, 0 }; // FIXME FIXME FIXME  describe [2]
     struct {
         struct LSFHeader hdr;
         struct resChdir ch;
@@ -351,10 +356,10 @@ ls_chdir (char *host, char *dir)
     struct resChdir chReq;
 
     if (_isconnected_ (host, descriptor)) {
-        s = descriptor[0];
+        s = descriptor[0]; // FIXME FIXME FIXME  describe [0]
     }
     else if ((s = ls_connect (host)) < 0) {
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
     else {
         printf( "I done goofed up! ls_chdir()\n");
@@ -366,57 +371,53 @@ ls_chdir (char *host, char *dir)
         if (ackReturnCode_ (s) < 0) {
             close (s);
             _lostconnection_ (host);
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
     }
 
-  if (dir[0] != '/' && dir[1] != ':' && (dir[0] != '\\' || dir[1] != '\\'))
-    {
+    if (dir[0] != '/' && dir[1] != ':' && (dir[0] != '\\' || dir[1] != '\\')) {// FIXME FIXME FIXME  describe [0], [1], [2]
       lserrno = LSE_BAD_ARGS;
-      return -1;
+      return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-  strcpy (chReq.dir, dir);
+    strcpy (chReq.dir, dir);
 
-  if (callRes_ (s, RES_CHDIR, (char *) &chReq, (char *) &buf,
-    sizeof (buf), xdr_resChdir, 0, 0, NULL) == -1)
-    {
-      close (s);
-      _lostconnection_ (host);
-      return -1;
+    if (callRes_ (s, RES_CHDIR, (char *) &chReq, (char *) &buf, sizeof (buf), xdr_resChdir, 0, 0, NULL) == -1) { // FIXME FIXME (char *). why?
+        close (s);
+        _lostconnection_ (host);
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-  if (ackReturnCode_ (s) < 0)
-    {
-      if (lserrno == LSE_RES_DIRW)
-  return -2;
-      else
-  return -1;
+    if (ackReturnCode_ (s) < 0) {
+        if (lserrno == LSE_RES_DIRW) {
+            return -2; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        }
+        else {
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        }
     }
 
-  return 0;
+    return 0;
 }
 
 struct lsRequest *
 lsReqHandCreate_ ( pid_t tid, int seqno, int connfd, void *extra, requestCompletionHandler replyHandler,  appCompletionHandler appHandler, void *appExtra)
 {
-    struct lsRequest *request;
-    
-    request = (struct lsRequest *) malloc (sizeof (struct lsRequest));
+    struct lsRequest *request = malloc (sizeof (struct lsRequest));
     if (!request) {
         lserrno = LSE_MALLOC;
         return NULL;
     }
 
-    request->tid = tid;
+    request->tid          = tid;
     assert( seqno >= 0 );
-    request->seqno =  seqno;
-    request->connfd = connfd;
-    request->completed = FALSE;
-    request->extra = extra;
+    request->seqno        =  seqno;
+    request->connfd       = connfd;
+    request->completed    = FALSE;
+    request->extra        = extra;
     request->replyHandler = replyHandler;
-    request->appHandler = appHandler;
-    request->appExtra = appExtra;
+    request->appHandler   = appHandler;
+    request->appExtra     = appExtra;
 
     return request;
 }
@@ -424,52 +425,47 @@ lsReqHandCreate_ ( pid_t tid, int seqno, int connfd, void *extra, requestComplet
 int
 ackAsyncReturnCode_ (int s, struct LSFHeader *replyHdr)
 {
-    char cseqno;
-    int seqno;
-
-
     int rc   = 0;
+    char cseqno = 0;
+    int seqno   = 0;
     ssize_t len = 0;
-    struct lsQueueEntry *reqEntry;
-    struct lsRequest *reqHandle;
+    struct lsQueueEntry *reqEntry = NULL;
+    struct lsRequest *reqHandle   = NULL;
 
     seqno = replyHdr->refCode;
     assert( seqno <= CHAR_MAX && seqno >= 0);
-    cseqno = seqno;     // FIXME FIXME FIXME FIXME FIXME DA FAQ 
-                        // GARBAGE GARBAGE GARBAGE
+    cseqno = seqno;     // FIXME FIXME FIXME FIXME FIXME DA FAQ GARBAGE GARBAGE GARBAGE
     reqEntry = lsQueueSearch_ (0, &cseqno, requestQ);
-    if (reqEntry == NULL)
-    {
+    if (reqEntry == NULL) {
         lserrno = LSE_PROTOC_RES;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     lsQueueEntryRemove_ (reqEntry);
-    reqHandle = (struct lsRequest *) reqEntry->data;    //  FIXME FIXME FIXME FIXME FIXME
-                                                        //      member-by-member assignment!
+    reqHandle = (struct lsRequest *) reqEntry->data;    //  FIXME FIXME FIXME FIXME FIXME member-by-member assignment!
 
-    reqEntry->data = NULL;
-
-    reqHandle->rc = replyHdr->opCode;
+    reqEntry->data       = NULL;
+    reqHandle->rc        = replyHdr->opCode;
     reqHandle->completed = TRUE;
+
     if (replyHdr->length > 0) {
 
         reqHandle->replyBuf = malloc (replyHdr->length);
         if ( NULL == reqHandle->replyBuf && ENOMEM == errno ) {
             lserrno = LSE_MALLOC;
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
 
         len = b_read_fix (s, reqHandle->replyBuf, replyHdr->length);
         assert( replyHdr->length <= LONG_MAX );
-        if (len != (ssize_t) replyHdr->length) {
+        if (len != (ssize_t) replyHdr->length) { // FIXME FIXME FIXME after fixing the return type of b_read_fix() remove this cast
             free (reqHandle->replyBuf);
             lserrno = LSE_MSG_SYS;
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
 
         assert( len >= 0);
-        reqHandle->replyBufLen = (unsigned long)len;
+        reqHandle->replyBufLen = (size_t) len;
     }
 
     if (reqHandle->replyHandler) {
@@ -505,13 +501,13 @@ enqueueTaskMsg_ (int s, pid_t taskID, struct LSFHeader *msgHdr)
 
     tEnt = tid_find (taskID);
     if (tEnt == NULL) {
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     header = (struct lsTMsgHdr *) malloc (sizeof (struct lsTMsgHdr));
     if (!header) {
         lserrno = LSE_MALLOC;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     header->len = 0;
@@ -539,14 +535,14 @@ enqueueTaskMsg_ (int s, pid_t taskID, struct LSFHeader *msgHdr)
 
     if( NULL == msgBuf && ENOMEM == errno ) {
         lserrno = LSE_MALLOC;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     assert( msgHdr->length <= LONG_MAX );
     if (b_read_fix (s, (char *) msgBuf, msgHdr->length) != (ssize_t) msgHdr->length) {
         free (msgBuf);
         lserrno = LSE_MSG_SYS;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     header->type = LSTMSG_DATA;
@@ -561,47 +557,46 @@ enqueueTaskMsg_ (int s, pid_t taskID, struct LSFHeader *msgHdr)
 int
 expectReturnCode_ (int s, pid_t seqno, struct LSFHeader *repHdr)
 {
-  struct LSFHeader buf;
-  XDR xdrs;
-  int rc = 0;
 
-  xdrmem_create (&xdrs, (char *) &buf, sizeof (struct LSFHeader), XDR_DECODE);
-  for (;;)
-    {
-      if (logclass & LC_TRACE)
-  ls_syslog (LOG_DEBUG, "%s: calling readDecodeHdr_...", __func__);
-      xdr_setpos (&xdrs, 0);
-      if (readDecodeHdr_ (s, (char *) &buf, &b_read_fix, &xdrs, repHdr) < 0)
-  {
-    xdr_destroy (&xdrs);
-    return -1;
-  }
+    int rc = 0;
+    struct LSFHeader buf;
+    XDR xdrs;
 
-      if (repHdr->opCode == RES_NONRES)
-  {
-    rc = enqueueTaskMsg_ (s, repHdr->refCode, repHdr);
-    if (rc < 0)
-      {
-        xdr_destroy (&xdrs);
-        return rc;
-      }
-  }
-      else
-  {
-    if (repHdr->refCode == seqno)
-      break;
+    xdrmem_create (&xdrs, (char *) &buf, sizeof (struct LSFHeader), XDR_DECODE);
 
-    rc = ackAsyncReturnCode_ (s, repHdr);
-    if (rc < 0)
-      {
-        xdr_destroy (&xdrs);
-        return rc;
-      }
-  }
+    for (;;) { // FIXME FIXME FIXME FIXME re-write infinite loop
+        if (logclass & LC_TRACE) {
+            ls_syslog (LOG_DEBUG, "%s: calling readDecodeHdr_...", __func__);
+        }
+        xdr_setpos (&xdrs, 0);
+        if (readDecodeHdr_ (s, (char *) &buf, &b_read_fix, &xdrs, repHdr) < 0) {
+            xdr_destroy (&xdrs);
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        }
+
+        if (repHdr->opCode == RES_NONRES) {
+            rc = enqueueTaskMsg_ (s, repHdr->refCode, repHdr);
+            if (rc < 0) {
+                xdr_destroy (&xdrs);
+                return rc;
+            }
+        }
+        else {
+            if (repHdr->refCode == seqno) {
+                break;
+            }
+
+            rc = ackAsyncReturnCode_ (s, repHdr);
+            if (rc < 0) {
+                xdr_destroy (&xdrs);
+                return rc;
+            }
+        }
     }
-  xdr_destroy (&xdrs);
-  return 0;
 
+    xdr_destroy (&xdrs);
+
+    return 0;
 }
 
 int
@@ -637,7 +632,7 @@ resRC2LSErr_ (int resRC)
             break;
         case RESE_CWD:
             lserrno = LSE_RES_DIR;
-        break;
+            break;
         
         case RESE_PTYMASTER:
         case RESE_PTYSLAVE:
@@ -648,8 +643,8 @@ resRC2LSErr_ (int resRC)
             break;
         case RESE_FORK:
             lserrno = LSE_RES_FORK;
-        break;
-            case RESE_INVCHILD:
+            break;
+        case RESE_INVCHILD:
             lserrno = LSE_RES_INVCHILD;
             break;
         case RESE_KILLFAIL:
@@ -684,9 +679,10 @@ resRC2LSErr_ (int resRC)
             break;
         default:
             lserrno = NOCODE + resRC;
+            break;
     }
 
- return lserrno;
+    return lserrno;
 }
 
 int
@@ -696,6 +692,8 @@ ackReturnCode_ (int s)
     int getcurseqnoReturnValue = 0;
     struct LSFHeader repHdr;
     char hostname[MAXHOSTNAMELEN];
+
+    memset( hostname, '\0', strlen( hostname ) );
 
     if (logclass & (LC_TRACE)) {
         ls_syslog (LOG_DEBUG, "%s: Entering this routine...", __func__);
@@ -717,7 +715,7 @@ ackReturnCode_ (int s)
         return 0;
     }
     else {
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
 }
@@ -725,102 +723,99 @@ ackReturnCode_ (int s)
 int
 getLimits (struct lsfLimit *limits)
 {
-  int i;
-  struct rlimit rlimit;
 
-  for (i = 0; i < LSF_RLIM_NLIMITS; i++)
-    {
-      rlimit.rlim_cur = RLIM_INFINITY;
-      rlimit.rlim_max = RLIM_INFINITY;
-      rlimitEncode_ (&limits[i], &rlimit, i);
+    struct rlimit rlimit;
+
+    for( size_t i = 0; i < LSF_RLIM_NLIMITS; i++) {
+        rlimit.rlim_cur = RLIM_INFINITY;
+        rlimit.rlim_max = RLIM_INFINITY;
+        rlimitEncode_ (&limits[i], &rlimit, i);
     }
 
-#ifdef  RLIMIT_CPU
-  if (getrlimit (RLIMIT_CPU, &rlimit) < 0) {
-    return -1;
-  }
-  rlimitEncode_ (&limits[LSF_RLIMIT_CPU], &rlimit, LSF_RLIMIT_CPU);
+#ifdef  RLIMIT_CPU // FIXME FIXME FIXME DOCUMENT!
+    if (getrlimit (RLIMIT_CPU, &rlimit) < 0) {
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+    }
+    rlimitEncode_ (&limits[LSF_RLIMIT_CPU], &rlimit, LSF_RLIMIT_CPU);
 #endif
 
-#ifdef  RLIMIT_FSIZE
-  if (getrlimit (RLIMIT_FSIZE, &rlimit) < 0) {
-    return -1;
-  }
-  rlimitEncode_ (&limits[LSF_RLIMIT_FSIZE], &rlimit, LSF_RLIMIT_FSIZE);
+#ifdef  RLIMIT_FSIZE // FIXME FIXME FIXME DOCUMENT!
+    if (getrlimit (RLIMIT_FSIZE, &rlimit) < 0) {
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+    }
+    rlimitEncode_ (&limits[LSF_RLIMIT_FSIZE], &rlimit, LSF_RLIMIT_FSIZE);
+    #endif
+
+#ifdef RLIMIT_DATA // FIXME FIXME FIXME DOCUMENT!
+    if (getrlimit (RLIMIT_DATA, &rlimit) < 0) {
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+    }
+    rlimitEncode_ (&limits[LSF_RLIMIT_DATA], &rlimit, LSF_RLIMIT_DATA);
 #endif
 
-#ifdef RLIMIT_DATA
-  if (getrlimit (RLIMIT_DATA, &rlimit) < 0) {
-    return -1;
-  }
-  rlimitEncode_ (&limits[LSF_RLIMIT_DATA], &rlimit, LSF_RLIMIT_DATA);
+#ifdef  // FIXME FIXME FIXME DOCUMENT!
+    if (getrlimit (RLIMIT_STACK, &rlimit) < 0) {
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+    }
+    rlimitEncode_ (&limits[LSF_RLIMIT_STACK], &rlimit, LSF_RLIMIT_STACK);
 #endif
 
-#ifdef RLIMIT_STACK
-  if (getrlimit (RLIMIT_STACK, &rlimit) < 0) {
-    return -1;
-  }
-  rlimitEncode_ (&limits[LSF_RLIMIT_STACK], &rlimit, LSF_RLIMIT_STACK);
-#endif
-
-#ifdef RLIMIT_CORE
+#ifdef  // FIXME FIXME FIXME DOCUMENT!
   if (getrlimit (RLIMIT_CORE, &rlimit) < 0) {
-    return -1;
+    return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
   }
   rlimitEncode_ (&limits[LSF_RLIMIT_CORE], &rlimit, LSF_RLIMIT_CORE);
 #endif
 
-#ifdef RLIMIT_NOFILE
-  if (getrlimit (RLIMIT_NOFILE, &rlimit) < 0) {
-    return -1;
-  }
-  rlimitEncode_ (&limits[LSF_RLIMIT_NOFILE], &rlimit, LSF_RLIMIT_NOFILE);
+#ifdef RLIMIT_NOFILE // FIXME FIXME FIXME DOCUMENT!
+    if (getrlimit (RLIMIT_NOFILE, &rlimit) < 0) {
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+    }
+    rlimitEncode_ (&limits[LSF_RLIMIT_NOFILE], &rlimit, LSF_RLIMIT_NOFILE);
 #endif
 
-#ifdef RLIMIT_OPEN_MAX
-  if (getrlimit (RLIMIT_OPEN_MAX, &rlimit) < 0) {
-    return -1;
-  }
-  rlimitEncode_ (&limits[LSF_RLIMIT_OPEN_MAX], &rlimit, LSF_RLIMIT_OPEN_MAX);
+#ifdef RLIMIT_OPEN_MAX // FIXME FIXME FIXME DOCUMENT!
+    if (getrlimit (RLIMIT_OPEN_MAX, &rlimit) < 0) {
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+    }
+    rlimitEncode_ (&limits[LSF_RLIMIT_OPEN_MAX], &rlimit, LSF_RLIMIT_OPEN_MAX);
 #endif
 
-#ifdef RLIMIT_VMEM
-  if (getrlimit (RLIMIT_VMEM, &rlimit) < 0) {
-    return -1;
-  }
-  rlimitEncode_ (&limits[LSF_RLIMIT_VMEM], &rlimit, LSF_RLIMIT_VMEM);
+#ifdef RLIMIT_VMEM // FIXME FIXME FIXME DOCUMENT!
+    if (getrlimit (RLIMIT_VMEM, &rlimit) < 0) {
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+    }
+    rlimitEncode_ (&limits[LSF_RLIMIT_VMEM], &rlimit, LSF_RLIMIT_VMEM);
 #endif
 
-#ifdef RLIMIT_RSS
-  if (getrlimit (RLIMIT_RSS, &rlimit) < 0){
-    return -1;
-  }
-  rlimitEncode_ (&limits[LSF_RLIMIT_RSS], &rlimit, LSF_RLIMIT_RSS);
+#ifdef RLIMIT_RSS // FIXME FIXME FIXME DOCUMENT!
+    if (getrlimit (RLIMIT_RSS, &rlimit) < 0){
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+    }
+    rlimitEncode_ (&limits[LSF_RLIMIT_RSS], &rlimit, LSF_RLIMIT_RSS);
 #endif
 
-  return 0;
+    return 0;
 }
 
 int
-callRes_ (int s, enum resCmd cmd, char *data, char *reqBuf, size_t reqLen, bool_t (*xdrFunc) (), int *rd, 
-    struct timeval *timeout, struct lsfAuth *auth)
+callRes_ (int s, enum resCmd cmd, const char *data, const char *reqBuf, size_t reqLen, bool_t (*xdrFunc) (), int *rd, struct timeval *timeout, struct lsfAuth *auth)
 {
-    ssize_t cc = 0;
     int t  = 0;
     int nready = 0;
+    ssize_t cc = 0;
     char hostname[MAXHOSTNAMELEN];
     socklen_t fromsize;
     sigset_t oldMask;
     sigset_t newMask;
     struct sockaddr_in from;
+
+    memset (hostname, '\0', strlen( hostname ) );
     
     blockALL_SIGS_ (&newMask, &oldMask);
-
-    memset (hostname, 0, sizeof (hostname));
-
     setCurrentSN( REQUESTSN );
-
     gethostbysock_ (s, hostname);
+
     if (strcmp (hostname, "LSF_HOST_NULL")) {
         _setcurseqno_ (hostname, getCurrentSN( ) );
     }
@@ -828,7 +823,7 @@ callRes_ (int s, enum resCmd cmd, char *data, char *reqBuf, size_t reqLen, bool_
     cc = lsSendMsg_ (s, cmd, 0, data, reqBuf, reqLen, xdrFunc, b_write_fix, auth);
     if (cc < 0) {
         sigprocmask (SIG_SETMASK, &oldMask, NULL);
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (!rd) {
@@ -837,8 +832,7 @@ callRes_ (int s, enum resCmd cmd, char *data, char *reqBuf, size_t reqLen, bool_
     }
 
     nready = rd_select_ (*rd, timeout);
-    if (nready <= 0)
-    {
+    if (nready <= 0) {
         if (nready == 0) {
             lserrno = LSE_TIME_OUT;
         }
@@ -846,122 +840,124 @@ callRes_ (int s, enum resCmd cmd, char *data, char *reqBuf, size_t reqLen, bool_
             lserrno = LSE_SELECT_SYS;
         }
       sigprocmask (SIG_SETMASK, &oldMask, NULL);
-      return -1;
+      return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-  fromsize = sizeof (from);
-  t = b_accept_ (*rd, (struct sockaddr *) &from, &fromsize);
-  if (t < 0)
-    {
-      lserrno = LSE_ACCEPT_SYS;
-      sigprocmask (SIG_SETMASK, &oldMask, NULL);
-      return -1;
+    fromsize = sizeof (from);
+    t = b_accept_ (*rd, (struct sockaddr *) &from, &fromsize);
+    if (t < 0) {
+        lserrno = LSE_ACCEPT_SYS;
+        sigprocmask (SIG_SETMASK, &oldMask, NULL);
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-  close (*rd);
-  *rd = t;
+    close (*rd);
+    *rd = t;
 
-  sigprocmask (SIG_SETMASK, &oldMask, NULL);
+    sigprocmask (SIG_SETMASK, &oldMask, NULL);
 
-  return 0;
-
-}       /* callRes_() */
-
-int
-ls_rstty (char *host)
-{
-    assert ( *host );
     return 0;
 }
 
-int
-rstty_ (char *host)
-{
-  return do_rstty1_ (host, FALSE);
-}
+// NOFIX DELETE! no body calls this function
+// int
+// ls_rstty ( const char *host)
+// {
+//     assert ( *host );
+//     return 0;
+// }
+
+// NOFIX DELETE! function called, but there is no point of having a function with just a differentiating argument
+// int
+// rstty_ ( const char *host)
+// {
+//   return do_rstty1_ (host, FALSE);
+// }
+
+// NOFIX DELETE! function called, but there is no point of having a function with just a differentiating argument
+// int
+// rstty_async_ ( const char *host)
+// {
+
+//   return do_rstty1_ (host, TRUE);
+// }
+
+// NOFIX DELETE! function called, but there is no point of having a function with just a differentiating argument
+// int
+// do_rstty_ (int s, int io_fd, int redirect) // FIXME FIXME FIXME FIXME FIXME  you got to be fucking kiding me.
+// {
+//     return do_rstty2_ (s, io_fd, redirect, FALSE);
+// }
+
 
 int
-rstty_async_ (char *host)
+do_rstty1_ ( const char *host, int async)
 {
+    int socket = 0;
+    int io_fd = 0;
+    int redirect = 0;
+    int descriptor[2] = { 0, 0 }; // FIXME FIXME FIXME describe [2]
 
-  return do_rstty1_ (host, TRUE);
-}
-
-int
-do_rstty1_ (char *host, int async)
-{
-  int s, descriptor[2];
-  int redirect, io_fd;
-
-  redirect = 0;
-  if (isatty (0))
-    {
-      if (!isatty (1))
-  redirect = 1;
-      io_fd = 0;
+    if (isatty (0)) { // FIXME FIXME FIXME describe 0
+    
+        if (!isatty (1)) { // FIXME FIXME FIXME describe 1
+            redirect = 1;
+        }
+        io_fd = 0;
     }
-  else if (isatty (1))
-    {
-      redirect = 1;
-      io_fd = 1;
+    else if (isatty (1)) { // FIXME FIXME FIXME describe 1
+        redirect = 1;
+        io_fd = 1;
     }
     else {
         return 0;
     }
 
-  if (_isconnected_ (host, descriptor))
-    s = descriptor[0];
-  else if ((s = ls_connect (host)) < 0)
-    return -1;
-
-  if (!FD_ISSET (s, &connection_ok_))
-    {
-      FD_SET (s, &connection_ok_);
-      if (ackReturnCode_ (s) < 0)
-  {
-    close (s);
-    _lostconnection_ (host);
-    return -1;
-  }
+    if (_isconnected_ (host, descriptor)) {
+        socket = descriptor[0]; // FIXME FIXME FIXME describe [0]
+    }
+    else if ((socket = ls_connect (host)) < 0) {
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-  if (do_rstty2_ (s, io_fd, redirect, async) == -1)
-    {
-      close (s);
-      _lostconnection_ (host);
-      return -1;
+    if (!FD_ISSET (socket, &connection_ok_)) {
+        FD_SET (socket, &connection_ok_);
+        if (ackReturnCode_ (socket) < 0) {
+            close (socket);
+            _lostconnection_ (host);
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        }
     }
 
-  if (!async)
-    {
-      if (ackReturnCode_ (s) < 0)
-  {
-    close (s);
-    _lostconnection_ (host);
-    return -1;
-  }
+    if (do_rstty2_ (socket, io_fd, redirect, async) == -1) {
+        close (socket);
+        _lostconnection_ (host);
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-  return 0;
+    if (!async) {
+        if (ackReturnCode_ (socket) < 0) {
+            close (socket);
+            _lostconnection_ (host);
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        }
+    }
+
+    return 0;
 }
 
 
 int
-do_rstty_ (int s, int io_fd, int redirect)
+do_rstty2_ (int socket, int io_fd, int redirect, int async)
 {
-    return do_rstty2_ (s, io_fd, redirect, FALSE);
-}
+    static int termFlag = FALSE;
+    static struct resStty tty;
 
-int
-do_rstty2_ (int s, int io_fd, int redirect, int async)
-{
-  static int termFlag = FALSE;
-  static struct resStty tty;
-  char *buf = malloc( sizeof( char ) * MSGSIZE + 1);
-  char *cp  = NULL;
+    char *buf = malloc( sizeof( char ) * MSGSIZE + 1);
+    char *cp  = NULL;
 
 
-  if (!termFlag) {
+    if (!termFlag) {
         termFlag = TRUE;
         tcgetattr (io_fd, &tty.termattr);
 
@@ -976,7 +972,7 @@ do_rstty2_ (int s, int io_fd, int redirect, int async)
             tty.termattr.c_lflag &= ~ECHO; // FIXME check that this expresion will never assign negative (it won't, but still)
         }
 
-        if ((cp = getenv ("LINES")) != NULL) {
+        if ((cp = getenv ("LINES")) != NULL) { // FIXME FIXME FIXME DOCUMENT! whatis env LINES?
             assert( atoi(cp) >= 0 && atoi(cp) <= SHRT_MAX );
             tty.ws.ws_row = (unsigned short) atoi (cp);
         }
@@ -984,7 +980,7 @@ do_rstty2_ (int s, int io_fd, int redirect, int async)
             tty.ws.ws_row = 24;
         }
         
-        if ((cp = getenv ("COLUMNS")) != NULL) {
+        if ((cp = getenv ("COLUMNS")) != NULL) { // FIXME FIXME FIXME DOCUMENT! whatis env COLUMNS?
             assert( atoi(cp) >= 0 && atoi(cp) <= SHRT_MAX );
             tty.ws.ws_col = (unsigned short) atoi (cp);
         }
@@ -994,20 +990,20 @@ do_rstty2_ (int s, int io_fd, int redirect, int async)
         }
 
         if (!async) {
-            int callResResult = callRes_ (s, RES_INITTTY, (char *) &tty, buf, MSGSIZE, xdr_resStty, 0, 0, NULL);
+            int callResResult = callRes_ (socket, RES_INITTTY, (char *) &tty, buf, MSGSIZE, xdr_resStty, 0, 0, NULL);
             if ( -1 == callResResult ) {
-                return -1;
+                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
         }
         else {
-            int callResResult = callRes_ (s, RES_INITTTY_ASYNC, (char *) &tty, buf, MSGSIZE, xdr_resStty, 0, 0, NULL);
+            int callResResult = callRes_ (socket, RES_INITTTY_ASYNC, (char *) &tty, buf, MSGSIZE, xdr_resStty, 0, 0, NULL);
             if ( -1 == callResResult) {
-                return -1;
+                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
         }
     }
 
-  return 0;
+    return 0;
 }
 
 int
@@ -1018,7 +1014,7 @@ rgetRusageCompletionHandler_ (struct lsRequest *request)
 
     rc = resRC2LSErr_ (request->rc);
     if (rc != 0) {
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     assert( request->replyBufLen <= INT_MAX); //FIXME FIXME must go over struct lsRequest
@@ -1026,7 +1022,7 @@ rgetRusageCompletionHandler_ (struct lsRequest *request)
     if( !xdr_jRusage (&xdrs, (struct jRusage *) request->extra, NULL) ) {
         lserrno = LSE_BAD_XDR;
         xdr_destroy (&xdrs);
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     xdr_destroy (&xdrs);
@@ -1037,7 +1033,7 @@ rgetRusageCompletionHandler_ (struct lsRequest *request)
 struct lsRequest *
 lsIRGetRusage_ (pid_t rpid, struct jRusage * ru, appCompletionHandler appHandler, void *appExtra, int options)
 {
-    int s;
+    int socket = 0;
   
     struct requestbuf {
         struct resRusage rusageReq;
@@ -1045,24 +1041,26 @@ lsIRGetRusage_ (pid_t rpid, struct jRusage * ru, appCompletionHandler appHandler
         struct LSFHeader hdr;
     } requestBuf;
 
-    struct lsRequest *request; 
-    struct resRusage rusageReq;
-    struct tid *tid;
+    struct tid *tid = NULL;
+    struct lsRequest *request = NULL; 
+    struct resRusage rusageReq = NULL;
     char host[MAXHOSTNAMELEN];
+
+    memset( host, '\0', strlen( host ) );
 
     tid = tid_find (rpid);
     if ( NULL == tid ) {
         return NULL;
     }
 
-    s = tid->sock;
-    gethostbysock_ (s, host);
+    socket = tid->sock;
+    gethostbysock_ (socket, host);
 
-    if (!FD_ISSET (s, &connection_ok_)) {
-        FD_SET (s, &connection_ok_);
+    if (!FD_ISSET (socket, &connection_ok_)) {
+        FD_SET (socket, &connection_ok_);
         
-        if (ackReturnCode_ (s) < 0) {
-            close (s);
+        if (ackReturnCode_ (socket) < 0) {
+            close (socket);
             _lostconnection_ (host);
             return NULL;
         }
@@ -1076,15 +1074,15 @@ lsIRGetRusage_ (pid_t rpid, struct jRusage * ru, appCompletionHandler appHandler
         rusageReq.whatid = RES_RID_ISPID;
     }
 
-    if (callRes_ (s, RES_RUSAGE, (char *) &rusageReq, (char *) &requestBuf, sizeof (requestBuf), xdr_resGetRusage, 0, 0, NULL) == -1) // FIXME FIXME FIXME char for data? really?
+    if (callRes_ (socket, RES_RUSAGE, (char *) &rusageReq, (char *) &requestBuf, sizeof (requestBuf), xdr_resGetRusage, 0, 0, NULL) == -1) // FIXME FIXME FIXME char for data? really?
     {
-        close (s);
+        close (socket);
         _lostconnection_ (host);
         
         return NULL;
     }
 
-    request = lsReqHandCreate_ (rpid, getCurrentSN( ), s, ru, rgetRusageCompletionHandler_, appHandler, appExtra); // FIXME FIXME FIXME char for data? really?
+    request = lsReqHandCreate_ (rpid, getCurrentSN( ), socket, ru, rgetRusageCompletionHandler_, appHandler, appExtra); // FIXME FIXME FIXME char for data? really?
 
     if (request == NULL) {
         return NULL;
@@ -1099,7 +1097,7 @@ lsIRGetRusage_ (pid_t rpid, struct jRusage * ru, appCompletionHandler appHandler
 }
 
 int
-lsGetRProcRusage (char *host, int pid, struct jRusage *ru, int options)
+lsGetRProcRusage ( const char *host, int pid, struct jRusage *ru, int options)
 {
     struct requestbuf {
         struct resRusage rusageReq;
@@ -1107,27 +1105,27 @@ lsGetRProcRusage (char *host, int pid, struct jRusage *ru, int options)
         struct LSFHeader hdr;
     } requestBuf;
 
-    struct lsRequest *request;
+    int socket = 0;
+    struct lsRequest *request = NULL;
     struct resRusage rusageReq;
-    int s;
-    int descriptor[2];
+    int descriptor[2] = { 0, 0 };
     int callResResult = 0;
 
     if (_isconnected_ (host, descriptor)) {
-        s = descriptor[0];
+        socket = descriptor[0]; 
     }
     else {
         lserrno = LSE_LOSTCON;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    if (!FD_ISSET (s, &connection_ok_)) {
-        FD_SET (s, &connection_ok_);
+    if (!FD_ISSET (socket, &connection_ok_)) {
+        FD_SET (socket, &connection_ok_);
         
-        if (ackReturnCode_ (s) < 0) {
-            close (s);
+        if (ackReturnCode_ (socket) < 0) {
+            close (socket);
             _lostconnection_ (host);
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
     }
 
@@ -1140,39 +1138,38 @@ lsGetRProcRusage (char *host, int pid, struct jRusage *ru, int options)
     else {
         rusageReq.options = 0;
     }
-    callResResult = callRes_ (s, RES_RUSAGE, (char *) &rusageReq, (char *) &requestBuf, sizeof (requestBuf), xdr_resGetRusage, 0, 0, NULL); // FIXME FIXME FIXME char for data? really?
+    callResResult = callRes_ (socket, RES_RUSAGE, (char *) &rusageReq, (char *) &requestBuf, sizeof (requestBuf), xdr_resGetRusage, 0, 0, NULL); // FIXME FIXME FIXME char for data? really?
     if ( -1 == callResResult )  {
-      close (s);
-      _lostconnection_ (host);
-      return -1;
+        close (socket);
+        _lostconnection_ (host);
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    request = lsReqHandCreate_ (pid, getCurrentSN( ), s, ru, rgetRusageCompletionHandler_, NULL, NULL);
+    request = lsReqHandCreate_ (pid, getCurrentSN( ), socket, ru, rgetRusageCompletionHandler_, NULL, NULL);
 
     if (request == NULL) {
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (lsQueueDataAppend_ ( (char *) request, requestQ)) { // FIXME FIXME FIXME char for data? really?
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (!request) {
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (lsReqWait_ (request, 0) < 0) {
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     lsReqFree_ (request);
 
     return 0;
-
 }
 
 struct lsRequest *
-lsGetIRProcRusage_ (char *host, int tid, pid_t pid, struct jRusage * ru, appCompletionHandler appHandler, void *appExtra)
+lsGetIRProcRusage_ ( const char *host, int tid, pid_t pid, struct jRusage *ru, appCompletionHandler appHandler, void *appExtra)
 {
     struct requestbuf {
         struct resRusage rusageReq;
@@ -1180,54 +1177,51 @@ lsGetIRProcRusage_ (char *host, int tid, pid_t pid, struct jRusage * ru, appComp
         struct LSFHeader hdr;
     } requestBuf;
 
-    struct lsRequest *request;
+    int socket = 0;
+    struct lsRequest *request = NULL;
     struct resRusage rusageReq;
-    int s = 0;
     int descriptor[2]= {0, 0};
 
-  if (_isconnected_ (host, descriptor))
-    s = descriptor[0];
-  else
-    {
-      lserrno = LSE_LOSTCON;
-      return NULL;
+    if (_isconnected_ (host, descriptor)) {
+        socket = descriptor[0];
+    }
+    else {
+        lserrno = LSE_LOSTCON;
+        return NULL;
     }
 
-  if (!FD_ISSET (s, &connection_ok_))
-    {
-      FD_SET (s, &connection_ok_);
-      if (ackReturnCode_ (s) < 0)
-  {
-    close (s);
-    _lostconnection_ (host);
-    return NULL;
-  }
+    if (!FD_ISSET (socket, &connection_ok_)) {
+
+        FD_SET (socket, &connection_ok_);
+
+        if (ackReturnCode_ (socket) < 0) {
+            close (socket);
+            _lostconnection_ (host);
+            return NULL;
+        }
     }
 
-  rusageReq.rid = pid;
-  rusageReq.whatid = RES_RID_ISPID;
+    rusageReq.pid = pid; // FIXME FIXME FIXME FIXME FIXME 
+    rusageReq.whatid = RES_RID_ISPID;
 
-  if (callRes_ (s, RES_RUSAGE, (char *)&rusageReq, (char *)&requestBuf, // FIXME FIXME FIXME this is wrong, yo. data as char?
-    sizeof (requestBuf), xdr_resGetRusage, 0, 0, NULL) == -1)
-    {
-      close (s);
-      _lostconnection_ (host);
-      return NULL;
+    if (callRes_ (socket, RES_RUSAGE, (char *)&rusageReq, (char *)&requestBuf, sizeof (requestBuf), xdr_resGetRusage, 0, 0, NULL) == -1) { // FIXME FIXME FIXME this is wrong, yo. data as char?
+        close (socket);
+        _lostconnection_ (host);
+        return NULL;
     }
-    request = lsReqHandCreate_ (tid, getCurrentSN( ), s, ru, rgetRusageCompletionHandler_, appHandler, appExtra);
+
+    request = lsReqHandCreate_ (tid, getCurrentSN( ), socket, ru, rgetRusageCompletionHandler_, appHandler, appExtra);
 
     if (request == NULL) {
         return NULL;
     }
 
-  if (lsQueueDataAppend_ ((char *) request, requestQ))
-    {
-      lsReqFree_ (request);
-      return NULL;
+    if (lsQueueDataAppend_ ((char *) request, requestQ)) {
+        lsReqFree_ (request);
+        return NULL;
     }
 
-  return request;
-
+    return request;
 }
 
 int
@@ -1238,11 +1232,11 @@ lsRGetRusage (int rpid, struct jRusage *ru, int options)
     request = lsIRGetRusage_ (rpid, ru, NULL, NULL, options);
 
     if( !request ) {
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if( lsReqWait_( request, 0 ) < 0 ) {
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
     lsReqFree_ (request);
 
@@ -1250,7 +1244,7 @@ lsRGetRusage (int rpid, struct jRusage *ru, int options)
 }
 
 int
-sendSig_ (char *host, pid_t rid, int sig, int options)
+sendSig_ (char *host, pid_t rpid, int sig, int options)
 {
     struct Buff {
         struct resRKill rk;
@@ -1258,34 +1252,34 @@ sendSig_ (char *host, pid_t rid, int sig, int options)
         struct LSFHeader hdr;
     } buf;
     
-    struct resRKill killReq;
+    int socket = 0;
+    int descriptor[2]      = { 0,0 }; // FIXME FIXME FIXME describe [2]
     int resCallReturnValue = 0;
-    int descriptor[2] = { 0,0 };
-    int s = 0;
+    struct resRKill killReq;
 
     if (_isconnected_ (host, descriptor)) {
-        s = descriptor[0];
+        socket = descriptor[0]; // FIXME FIXME FIXME describe [0]
     }
     else {
         lserrno = LSE_LOSTCON;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    if (!FD_ISSET (s, &connection_ok_)) {
-        FD_SET (s, &connection_ok_);
-        if (ackReturnCode_ (s) < 0) {
-            close (s);
+    if (!FD_ISSET (socket, &connection_ok_)) {
+        FD_SET (socket, &connection_ok_);
+        if (ackReturnCode_ (socket) < 0) {
+            close (socket);
             _lostconnection_ (host);
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
     }
     
     if (sig >= SIGRTMAX || sig < 0) {  // NSIG is in <signal.h>
         lserrno = LSE_BAD_ARGS;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    killReq.rid = rid;
+    killReq.rpid = rpid;
 
     if (options & RSIG_ID_ISTID) {
         killReq.whatid = RES_RID_ISTID;
@@ -1295,38 +1289,38 @@ sendSig_ (char *host, pid_t rid, int sig, int options)
     }
     else {
         lserrno = LSE_BAD_ARGS;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     killReq.signal = sig_encode (sig);
 
-    resCallReturnValue = callRes_ (s, RES_RKILL, (char *) &killReq, (char *) &buf, sizeof (buf), xdr_resRKill, 0, 0, NULL);
+    resCallReturnValue = callRes_ (socket, RES_RKILL, (char *) &killReq, (char *) &buf, sizeof (buf), xdr_resRKill, 0, 0, NULL);
     if ( -1 == resCallReturnValue ) {
-        close (s);
+        close (socket);
         _lostconnection_ (host);
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    if (ackReturnCode_ (s) < 0)
-    {
+    if (ackReturnCode_ (socket) < 0) {
+
         if (options & RSIG_KEEP_CONN) {
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
 
-        close (s);
+        close (socket);
         _lostconnection_ (host);
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     return 0;
 }
 
 int
-lsRSig_ (char *host, pid_t rid, int sig, int options)
+lsRSig_ ( const char *host, pid_t rpid, int sig, int options)
 {
-    struct connectEnt *conns;
-    int nconns  = 0;
-    int rc      = 0;
+    int rc                   = 0;
+    size_t nconns            = 0;
+    struct connectEnt *conns = NULL;
     
     if (!options) {
         options = RSIG_ID_ISTID;
@@ -1334,25 +1328,25 @@ lsRSig_ (char *host, pid_t rid, int sig, int options)
 
     if ((!(options & (RSIG_ID_ISTID | RSIG_ID_ISPID))) ) {
         lserrno = LSE_BAD_ARGS;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (NULL == host) {
-        nconns = _findmyconnections_ (&conns);
-        if (nconns == 0) {
+        nconns = _findmyconnections_ (&conns); // FIXME FIXME FIXME FIXME _findmyconnections_ the fuck kind of name is this?
+        if (nconns == 0) { // _findmyconnections_ returns 0 or non-zero
             return 0;
         }
 
-        for ( int i = 0; i < nconns; i++) {
+        for ( size_t i = 0; i < nconns; i++) {
             host = conns[i].hostname;
-            rc = sendSig_ (host, 0, sig, options);
+            rc = sendSig_ (host, 0, sig, options); // FIXME FIXME what is value , here?
             if( rc < 0) {
                 return rc; 
             }
         }
     }
     else {
-      return sendSig_ (host, rid, sig, options);
+        return sendSig_ (host, rpid, sig, options);
     }
     
     return 0;
@@ -1363,8 +1357,10 @@ ls_rkill (pid_t rtid, int sig)
 {
     int s = 0;
     int rc = 0;
-    struct tid *tid;
-    char *host = (char *) malloc( sizeof(MAXHOSTNAMELEN) + 1 );
+    struct tid *tid = NULL;
+    char *host = malloc( sizeof(MAXHOSTNAMELEN) + 1 );
+
+    memset( host, '\0', strlen( host ) );
 
     if ( 0 == rtid ) {
         rc = lsRSig_ (NULL, rtid, sig, RSIG_ID_ISTID);
@@ -1373,7 +1369,7 @@ ls_rkill (pid_t rtid, int sig)
 
     tid = tid_find (rtid);
     if( NULL == tid ) {
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     s = tid->sock;
@@ -1388,13 +1384,13 @@ ls_rkill (pid_t rtid, int sig)
 int
 lsMsgRdy_ (pid_t taskid, size_t *msgLen)
 {
-    struct tid *tEnt;
-    struct lsQueueEntry *qEnt;
-    struct lsTMsgHdr *header;
+    struct tid *tEnt = NULL;
+    struct lsQueueEntry *qEnt = NULL;
+    struct lsTMsgHdr *header = NULL;
 
     tEnt = tidFindIgnoreConn_ (taskid);
     if (tEnt == NULL) {
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if( !LS_QUEUE_EMPTY (tEnt->tMsgQ) ) {
@@ -1410,38 +1406,42 @@ lsMsgRdy_ (pid_t taskid, size_t *msgLen)
         return 0;
     }
 
+    return 0;
 }
 
 void
 tMsgDestroy_ (void *extra)
 {
-  struct lsTMsgHdr *header = (struct lsTMsgHdr *) extra;
+    struct lsTMsgHdr *header = (struct lsTMsgHdr *) extra;
 
-  if (!header)
+    if (!header) {
+        return;
+    }
+
+    if (header->msgPtr) {
+        free (header->msgPtr);
+    }
+
+    free (header);
+
     return;
-
-  if (header->msgPtr)
-    free (header->msgPtr);
-
-  free (header);
-
 }
 
 
 
 int
-lsMsgRcv_ (pid_t taskid, char *buffer, size_t len, int options)
+lsMsgRcv_ (pid_t taskid, const char *buffer, size_t len, int options)
 {
-    struct tid *tEnt;
-    struct lsQueueEntry *qEnt;
-    int rc = 0;
-    int nrdy = 0;
+    int rc                    = 0;
+    int nrdy                  = 0;
+    struct tid *tEnt          = NULL;
+    struct lsQueueEntry *qEnt = NULL;
 
     assert( options ); // FIXME find out if any calls actually 
 
     tEnt = tidFindIgnoreConn_ (taskid);
     if ( NULL == tEnt ) {
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
 // Second Again label was here. replaced by while loop 
@@ -1449,7 +1449,7 @@ lsMsgRcv_ (pid_t taskid, char *buffer, size_t len, int options)
 
         if (tEnt->isEOF) {
             lserrno = LSE_RES_INVCHILD;
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
 
         if (lsMsgRdy_ (taskid, NULL)) {
@@ -1459,21 +1459,20 @@ lsMsgRcv_ (pid_t taskid, char *buffer, size_t len, int options)
 
             if (qEnt == NULL) {
                 lserrno = LSE_MSG_SYS;
-                return -1;
+                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
 
-            header = (struct lsTMsgHdr *) qEnt->data;   // FIXME FIXME FIXME FIXME
-                                                        //      member-for-member assignment
+            header = (struct lsTMsgHdr *) qEnt->data;   // FIXME FIXME FIXME FIXME member-for-member assignment
             if (header->len > len) {
                 lserrno = LSE_MSG_SYS;
                 lsQueueEntryDestroy_ (qEnt, tEnt->tMsgQ);
-                return -1;
+                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
 
             if (header->type == LSTMSG_IOERR) {
                 lserrno = LSE_LOSTCON;
                 lsQueueEntryDestroy_ (qEnt, tEnt->tMsgQ);
-                return -1;
+                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
             else if (header->type == LSTMSG_EOF) {
                 tEnt->isEOF = TRUE;
@@ -1493,7 +1492,7 @@ lsMsgRcv_ (pid_t taskid, char *buffer, size_t len, int options)
             if (tEnt->sock < 0) {
                 lserrno = LSE_LOSTCON;
                 tid_remove (taskid);
-                return -1;
+                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
             
             rc = lsMsgWait_ (1, &taskid, &nrdy, 0, NULL, NULL, NULL, NULL, 0);
@@ -1504,7 +1503,7 @@ lsMsgRcv_ (pid_t taskid, char *buffer, size_t len, int options)
             if (nrdy > 0)
                 return rc;
             else
-                return -1;
+                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
 
     } // end while( nrdy <= 0 )
@@ -1513,18 +1512,21 @@ lsMsgRcv_ (pid_t taskid, char *buffer, size_t len, int options)
 }
 
 int
-lsMsgSnd2_ (int *sock, unsigned short opcode, char *buffer, size_t len, int options)
+lsMsgSnd2_ (int *sock, unsigned short opcode, constchar *buffer, size_t len, int options)
 {
-    struct LSFHeader header;
     XDR xdrs;
+    struct LSFHeader header;
     long rc = 0;
     char *headerBuf = malloc( sizeof( char )*sizeof( struct LSFHeader ) + 1 );
     char *hostname  = malloc( sizeof( char )*MAXHOSTNAMELEN + 1 );
 
+    memset( headerBuf, '\0', strlen( headerBuf ) );
+    memset( hostname, '\0',  strlen( hostname ) );
+
     assert( options ); // FIXME either the assert or int options has to go
 
     if (*sock < 0) {
-      return -1;
+      return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
 #ifdef OS_HAS_PTHREAD
@@ -1538,7 +1540,7 @@ lsMsgSnd2_ (int *sock, unsigned short opcode, char *buffer, size_t len, int opti
     header.reserved = 0;
 
     gethostbysock_ (*sock, hostname);
-    if (strcmp (hostname, "LSF_HOST_NULL")) {
+    if (strcmp (hostname, "LSF_HOST_NULL")) { // FIXME FIXME FIXME FIXME this needs to go in an enum for LSF_
         _setcurseqno_ (hostname, getCurrentSN( ) );
     }
 
@@ -1581,25 +1583,27 @@ lsMsgSnd2_ (int *sock, unsigned short opcode, char *buffer, size_t len, int opti
 }
 
 int
-lsMsgSnd_ (pid_t taskid, char *buffer, size_t len, int options)
+lsMsgSnd_ (pid_t taskid, const char *buffer, size_t len, int options)
 {
     struct LSFHeader header;
     char headerBuf[sizeof (struct LSFHeader)];
     XDR xdrs;
-    struct tid *tEnt;
+    struct tid *tEnt = NULL;
     long rc = 0;
     char hostname[MAXHOSTNAMELEN];
+
+    memset( hostname, '\0', strlen( hostname ) );
 
     assert( options ); // FiXME; either the assert or int options has to go
 
     tEnt = tid_find (taskid);
     if (!tEnt) {
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (tEnt->sock < 0) {
         lserrno = LSE_LOSTCON;
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
 #ifdef OS_HAS_PTHREAD
@@ -1614,7 +1618,7 @@ lsMsgSnd_ (pid_t taskid, char *buffer, size_t len, int options)
     header.reserved = taskid;
 
     gethostbysock_ (tEnt->sock, hostname);
-    if (strcmp (hostname, "LSF_HOST_NULL")) {
+    if (strcmp (hostname, "LSF_HOST_NULL")) { // FIXME FIXME FIXME FIXME this needs to go in an enum for LSF_
         _setcurseqno_ (hostname, getCurrentSN( ) );
     }
 
@@ -1763,8 +1767,7 @@ lsMsgWait_ (int inTidCnt, pid_t *tidArray, int *rdyTidCnt, int inFdCnt, int *fdA
 
             maxfd = sysconf (_SC_OPEN_MAX);
             if (maxfd > 1024) {
-                maxfd = 1024 - 1;           // FIXME FIXME FIXME probably a bug here
-                                            //      investigate why is there a 1024 - 1 assignment
+                maxfd = 1024 - 1;           // FIXME FIXME FIXME probably a bug here investigate why is there a 1024 - 1 assignment
             }
             
             assert( maxfd <= INT_MAX && maxfd >= INT_MIN );
@@ -1902,24 +1905,24 @@ lsMsgWait_ (int inTidCnt, pid_t *tidArray, int *rdyTidCnt, int inFdCnt, int *fdA
 }
 
 int
-lsReqCmp_ (char *val, char *reqEnt, int hint)
+lsReqCmp_ ( const char *val, struct lsRequest *reqEnt, int hint)
 {
     pid_t seqno = 0;
-    struct lsRequest *req;
+    // struct lsRequest *req;
 
     assert(hint);
 
-    req = (struct lsRequest *) reqEnt;  // FIXME FIXME FIXME FIXME
-                                        //      got to take a look at the data in reqEnt and then
-                                        //      make a propper piece by piece assignment to the 
-                                        //      struct
-    seqno = (pid_t) *val;       // FIXME FIXME FIXME is cast applicable?
+    // req = (struct lsRequest *) reqEnt;  // FIXME FIXME FIXME FIXME
+    //                                     //      got to take a look at the data in reqEnt and then
+    //                                     //      make a propper piece by piece assignment to the 
+    //                                     //      struct
+    seqno = atoi( val );       // FIXME FIXME FIXME is cast applicable?
 
-    if (seqno == req->seqno) {
+    if (seqno == reqEnt->seqno) {
         return 0;
     }
-    else if (seqno > req->seqno) {
-        return -1;
+    else if (seqno > reqEnt->seqno) {
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
     else {
         return 1;
@@ -1942,7 +1945,7 @@ lsReqTest_ (struct lsRequest * request)
 }
 
 int
-lsReqWait_ (struct lsRequest * request, int options)
+lsReqWait_ (struct lsRequest *request, int options)
 {
     int rc = 0;
     struct LSFHeader header;
@@ -1950,7 +1953,7 @@ lsReqWait_ (struct lsRequest * request, int options)
     assert( options );  // FIXME has to go, or options has to go
 
     if (!request) {
-        return -1;
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (lsReqTest_ (request)) {
@@ -1969,22 +1972,27 @@ lsReqWait_ (struct lsRequest * request, int options)
 
 
 void
-lsReqFree_ (struct lsRequest * request)
+lsReqFree_ (struct lsRequest *request)
 {
-  if (request)
-    free ((void *) request);
+    if (request) {
+        free ( request ); // FIXME FIXME FIXME FIXME release member by member
+    }
+
+    return;
 }
 
 void
-_lostconnection_ (char *hostName)
+_lostconnection_ ( const char *hostName)
 {
-  int connSockNum;
+    int connSockNum;
 
-  connSockNum = getConnectionNum_ (hostName);
-  if (connSockNum < 0)
+    connSockNum = getConnectionNum_ (hostName);
+    if (connSockNum < 0) {
+        return;
+    }
+
+    tid_lostconnection (connSockNum);
+    FD_CLR (connSockNum, &connection_ok_);
+
     return;
-
-  tid_lostconnection (connSockNum);
-  FD_CLR (connSockNum, &connection_ok_);
-
 }

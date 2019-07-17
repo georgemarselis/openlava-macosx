@@ -26,9 +26,16 @@
  *
  */
 
+// #define RSETENV_SYNCH   1
+// #define RSETENV_ASYNC   2
+enum RSETENV {
+	RSETENV_SYNCH = 1,
+	RSETENV_ASYNC = 2
+};
+
 // globals 
 int lsf_res_version               = -1;
-// int currentsocket_                =  0;
+unsigned int currentsocket_       =  0;
 unsigned int requestSN            =  0;
 unsigned int requestHighWaterMark =  0;
 unsigned int globCurrentSN        =  0;
@@ -42,49 +49,41 @@ struct lsQueue *requestQ;
 #define REQUESTSN ((requestSN < USHRT_MAX) ? requestSN++ : (requestSN=11 , 10))
 
 
+unsigned int getCurrentSN(void);
+unsigned int setCurrentSN(unsigned int currentSN);
+int ls_connect(const char *host);
+int lsConnWait_(const char *host);
+int sendCmdBill_(int s, enum resCmd cmd, struct resCmdBill *cmdmsg, int *retsock, struct timeval *timeout);
+int rsetenv_(const char *host, char **envp, int option);
+int ls_chdir(const char *host, const char *dir);
+struct lsRequest *lsReqHandCreate_(pid_t tid, int seqno, int connfd, void *extra, requestCompletionHandler replyHandler, appCompletionHandler appHandler, void *appExtra);
+int ackAsyncReturnCode_(int s, struct LSFHeader *replyHdr);
+int enqueueTaskMsg_(int s, pid_t taskID, struct LSFHeader *msgHdr);
+int expectReturnCode_(int s, pid_t seqno, struct LSFHeader *repHdr);
+int resRC2LSErr_(int resRC);
+int ackReturnCode_(int s);
+int getLimits(struct lsfLimit *limits);
+int callRes_(int s, enum resCmd cmd, const char *data, const char *reqBuf, size_t reqLen, bool_t (*xdrFunc )(), int *rd, struct timeval *timeout, struct lsfAuth *auth);
+int do_rstty1_(const char *host, int async);
+int do_rstty2_(int s, int io_fd, int redirect, int async);
+int rgetRusageCompletionHandler_(struct lsRequest *request);
+struct lsRequest *lsIRGetRusage_(pid_t rpid, struct jRusage *ru, appCompletionHandler appHandler, void *appExtra, int options);
+int lsGetRProcRusage(const char *host, int pid, struct jRusage *ru, int options);
+struct lsRequest *lsGetIRProcRusage_(const char *host, int tid, pid_t pid, struct jRusage *ru, appCompletionHandler appHandler, void *appExtra);
+int lsRGetRusage(int rpid, struct jRusage *ru, int options);
+int sendSig_(char *host, pid_t rpid, int sig, int options);
+int lsRSig_(const char *host, pid_t rpid, int sig, int options);
+int ls_rkill(pid_t rtid, int sig);
+int lsMsgRdy_(pid_t taskid, size_t *msgLen);
+void tMsgDestroy_(void *extra);
+int lsMsgRcv_(pid_t taskid, const char *buffer, size_t len, int options);
 
+int lsMsgSnd2_( int *socket,  unsigned short opcode, const char *buffer, size_t len, int options);
+int lsMsgSnd_ ( pid_t taskid,                        const char *buffer, size_t len, int options);
 
-FILE      *ls_popen(int s, char *command, char *type);
-int        ackAsyncReturnCode_(int s, struct LSFHeader *replyHdr);
-int        ackReturnCode_(int s);
-int        callRes_(int s, enum resCmd cmd, char *data, char *reqBuf, size_t reqLen, bool_t (*xdrFunc )(), int *rd, struct timeval *timeout, struct lsfAuth *auth);
-int        do_rstty1_(char *host, int async);
-int        do_rstty2_(int s, int io_fd, int redirect, int async);
-int        do_rstty_(int s, int io_fd, int redirect);
-int        enqueueTaskMsg_(int s, pid_t taskID, struct LSFHeader *msgHdr);
-int        expectReturnCode_(int s, pid_t seqno, struct LSFHeader *repHdr);
-int        getLimits (struct lsfLimit *);
-int        ls_chdir(char *host, char *dir);
-int        ls_connect(char *host);
-int        ls_pclose(FILE *stream);
-int        ls_rkill(pid_t rtid, int sig);
-int        ls_rsetenv(char *host, char **envp);
-int        ls_rsetenv_async(char *host, char **envp);
-int        ls_rstty(char *host);
-int        lsConnWait_(char *host);
-int        lsGetRProcRusage(char *host, int pid, struct jRusage *ru, int options);
-int        lsMsgRcv_(pid_t taskid, char *buffer, size_t len, int options);
-int        lsMsgRdy_(pid_t taskid, size_t *msgLen);
-int        lsMsgSnd2_(int *sock, unsigned short opcode, char *buffer, size_t len, int options);
-int        lsMsgSnd_(pid_t taskid, char *buffer, size_t len, int options);
-int        lsMsgWait_(int inTidCnt, pid_t *tidArray, int *rdyTidCnt, int inFdCnt, int *fdArray, int *rdyFdCnt, int *outFdArray, struct timeval *timeout, int options);
-int        lsReqCmp_(char *val, char *reqEnt, int hint);
-int        lsReqTest_(struct lsRequest *request);
-int        lsReqWait_(struct lsRequest *request, int options);
-int        lsRGetRusage(int rpid, struct jRusage *ru, int options);
-int        lsRSig_(char *host, pid_t rid, int sig, int options);
-int        resRC2LSErr_(int resRC);
-int        rgetRusageCompletionHandler_(struct lsRequest *request);
-int        rsetenv_(char *host, char **envp, int option);
-int        rstty_(char *host);
-int        rstty_async_(char *host);
-int        sendCmdBill_(int s, enum resCmd cmd, struct resCmdBill *cmdmsg, int *retsock, struct timeval *timeout);
-int        sendSig_(char *host, pid_t rid, int sig, int options);
-struct lsRequest        *lsGetIRProcRusage_(char *host, int tid, pid_t pid, struct jRusage *ru, appCompletionHandler appHandler, void *appExtra);
-struct lsRequest        *lsIRGetRusage_(pid_t rpid, struct jRusage *ru, appCompletionHandler appHandler, void *appExtra, int options);
-struct lsRequest    *lsReqHandCreate_(pid_t tid, int seqno, int connfd, void *extra, requestCompletionHandler replyHandler, appCompletionHandler appHandler, void *appExtra);
-unsigned int         getCurrentSN(void);
-unsigned int         setCurrentSN(unsigned int currentSN);
-void        _lostconnection_(char *hostName);
-void        lsReqFree_(struct lsRequest *request);
-void        tMsgDestroy_(void *extra);
+int lsMsgWait_(int inTidCnt, pid_t *tidArray, int *rdyTidCnt, int inFdCnt, int *fdArray, int *rdyFdCnt, int *outFdArray, struct timeval *timeout, int options);
+int lsReqCmp_ ( const char *val, struct lsRequest *reqEnt, int hint);
+int lsReqTest_(struct lsRequest *request);
+int lsReqWait_(struct lsRequest *request, int options);
+void lsReqFree_(struct lsRequest *request);
+void _lostconnection_(const char *hostName);

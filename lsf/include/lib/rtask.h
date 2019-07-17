@@ -6,7 +6,7 @@
 
 /* #define SIGEMT SIGBUS */
 
-char rexcwd_[1024] 
+char rexcwd_[1024]; // FIXME FIXME FIXME FIXME FIXME I have no idea what rxexcwd does
 
 // static int short nios_ok_;
 int short nios_ok_;

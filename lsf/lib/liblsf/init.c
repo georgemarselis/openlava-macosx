@@ -41,15 +41,6 @@
 #include "lib/conn.h"
 #include "lib/id.h"
 
-
-void bullshit( void )
-{
-    assert(chanMaxSize );
-    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain    
-
-    return;
-}
-
 unsigned int
 ls_initrex ( unsigned int num, int options)
 {
@@ -70,16 +61,15 @@ ls_initrex ( unsigned int num, int options)
     inithostsock_ ();
     lsQueueInit_ (&requestQ, lsReqCmp_, NULL);
     if (requestQ == NULL) {
-            lserrno = LSE_MALLOC;
-            return UINT_MAX; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        lserrno = LSE_MALLOC;
+        return UINT_MAX; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     res_addr_.sin_family = AF_INET;
 
     if (genParams_[LSF_RES_PORT].paramValue) {
 
-        // FIXME cast. res_addr_ is of type sockaddres_in, which is a system struct.
-        in_port_t envport = (in_port_t) atoi( genParams_[LSF_RES_PORT].paramValue );
+        in_port_t envport = (in_port_t) atoi( genParams_[LSF_RES_PORT].paramValue );  // FIXME cast. res_addr_ is of type sockaddres_in, which is a system struct.
         assert( envport > 0 );
         res_addr_.sin_port = envport;
         if ( res_addr_.sin_port ) {
@@ -126,7 +116,7 @@ ls_initrex ( unsigned int num, int options)
             return i;
     }
     else {
-            return num;
+        return num;
     }
 }
 

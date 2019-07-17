@@ -133,7 +133,7 @@ enum CHANE {
 };
 
 
-static size_t chanMaxSize = 0;
+size_t chanMaxSize = 0;
 
 // #define chanSend_  chanEnqueue_
 // #define chanRecv_  chanDequeue_

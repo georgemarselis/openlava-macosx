@@ -87,7 +87,7 @@ chanInit_ (void)
         fprintf( stderr, "%s: you are not supposed to be here\n", __func__ );
     }
 
-    channels = calloc ( chanMaxSize, sizeof (struct chanData)); // channels is global, located in <channel.h>
+    channels = calloc ( chanMaxSize, sizeof (struct chanData)); // channels is global, located in "lib/channel.h"
     if (channels == NULL) {
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
