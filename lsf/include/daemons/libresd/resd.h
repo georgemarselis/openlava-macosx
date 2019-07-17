@@ -341,7 +341,7 @@ struct resSetenv
 
 struct resRKill
 {
-  pid_t rid;
+  pid_t rpid;
   int whatid;
   int signal;
 };
@@ -354,7 +354,7 @@ struct resPid
 
 struct resRusage
 {
-  pid_t rid;
+  pid_t ripid;
   int whatid;
   int options;
 };
