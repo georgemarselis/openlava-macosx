@@ -32,10 +32,8 @@
 #include "lib/mls.h"
 #include "lib/lib.h"
 #include "lib/lproto.h"
-#include "daemons/libresd/init.c"
+#include "daemons/libresd/init.h"
 #include "daemons/libresd/resd.h"
-
-enum RES_TIMEOUT_DEFAULT RES_TIMEOUT_DEFAULT;
 
 void
 initConn2NIOS (void)
