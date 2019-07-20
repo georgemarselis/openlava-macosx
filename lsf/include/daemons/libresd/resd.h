@@ -324,7 +324,7 @@ struct resCmdBill
 	unsigned short retport;
 	char padding1[2];
 	pid_t rpid;
-	int filemask;
+	mode_t filemask;
 	int priority;
 	int options;
 	char cwd[MAX_PATH_LEN]; // FIXME FIXME FIXME FIXME turn into dynamic allocation
