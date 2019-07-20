@@ -33,15 +33,8 @@
 #include "lib/structs/genParams.h"
 #include "daemons/libresd/init.h"
 #include "daemons/libresd/rescom.h"
+#include "lib/resd_globals.h"
 
-
-void nioback_c_bullshit( ) 
-{
-    assert ( lserrno );      // NOFIX bullshit call so the compiler will not complain
-    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
-
-    return;
-}
 
 /* FIXME macro is not in use */
 // #define NL_SETN 23
