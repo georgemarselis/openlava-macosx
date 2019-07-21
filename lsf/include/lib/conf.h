@@ -127,7 +127,7 @@ char addHostModel (char *model, char *arch, double factor);
 // 
 char setIndex    (struct keymap *keyList, const char *fname, size_t lineNum);
 
-unsigned int resNameDefined (char *);
+// unsigned int resNameDefined (char *);
 
 void initClusterInfo (struct clusterInfo *);
 void freeClusterInfo (struct clusterInfo *);

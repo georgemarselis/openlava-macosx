@@ -36,6 +36,7 @@
 #include "libint/lsi18n.h"
 #include "lib/getnextline.h"
 #include "lib/syslog.h"
+#include "lib/resnameDefined.h"
 
 // #define NL_SETN 42
 
