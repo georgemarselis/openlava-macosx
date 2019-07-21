@@ -35,7 +35,7 @@ mygetwd_ ( char *path)
         if (getcwd (temp_buff, sizeof (temp_buff)))
         {
             strncpy (path, temp_buff, MAX_FILENAME_LEN);
-            return (path);
+            return path;
         }
         else {
             return NULL;
@@ -54,7 +54,7 @@ mygetwd_ ( char *path)
     if (getcwd (temp_buff, sizeof (temp_buff)))
     {
         strncpy (path, temp_buff, MAX_FILENAME_LEN);
-        return (path);
+        return path;
     }
     else {
         return NULL;

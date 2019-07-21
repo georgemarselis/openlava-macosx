@@ -21,28 +21,39 @@
 #include <strings.h>
 #include <unistd.h>
 
+#include "lib/cwd.h"
 #include "lib/lib.h"
 #include "lib/lproto.h"
 #include "lib/mls.h"
+#include "lib/res.h"
+#include "lib/sock.h"
+#include "lib/structs/genParams.h"
+#include "lib/resd_globals.h"
+#include "lib/initenv.h"
+#include "lib/init.h"
 
 // extern int currentSN;
 
 int
 ls_rexecve ( const char *host, char **argv, int options, char **envp)
 {
+    int s = 0;
     int d = 0;
     int retsock = 0;
-    struct timeval timeout;
-    socklen_t len;
-    struct sockaddr_in sin;
+    int resTimeout = 0;
     long max = 0;
     char sock_buf[20];
     char *new_argv[5];
     char pathbuf[MAX_PATH_LEN];
-    int s = 0;
-    int descriptor[2];
+    int descriptor[2] = { -1, -1 };
+    struct sockaddr_in sin;
     struct resCmdBill cmdmsg;
-    int resTimeout;
+    struct timeval timeout;
+    socklen_t len = 0;
+
+    memset( pathbuf, '\0', strlen( pathbuf ) );
+
+    assert( rootuid_ );
 
     if (genParams_[RES_TIMEOUT].paramValue) {
         resTimeout = atoi (genParams_[RES_TIMEOUT].paramValue);
@@ -52,7 +63,7 @@ ls_rexecve ( const char *host, char **argv, int options, char **envp)
     }
 
     if (_isconnected_ (host, descriptor)) {
-        s = descriptor[0];
+        s = descriptor[0]; // FIXME FIXME FIXME describe [0]
     }
     else if ((s = ls_connect (host)) < 0) {
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
@@ -60,7 +71,7 @@ ls_rexecve ( const char *host, char **argv, int options, char **envp)
 
     if (!FD_ISSET (s, &connection_ok_)) {
         FD_SET (s, &connection_ok_);
-        if (ackReturnCode_ (s) < 0) {
+        if (ackReturnCode_ (s) == 255 ) {
             close (s);
             _lostconnection_ (host);
             return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
@@ -94,7 +105,7 @@ ls_rexecve ( const char *host, char **argv, int options, char **envp)
     }
 
     if (envp) {
-        if (ls_rsetenv (host, envp) < 0) {
+        if ( rsetenv_ (host, envp, RSETENV_SYNCH) < 0) {
             _lostconnection_ (host);
             return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
@@ -140,20 +151,23 @@ ls_rexecve ( const char *host, char **argv, int options, char **envp)
     strcpy (pathbuf, genParams_[LSF_SERVERDIR].paramValue);
     strcat (pathbuf, "/nios"); // FIXME FIXME FIXME set in configure.ac
     new_argv[0] = pathbuf;  // FIXME FIXME FIXME what is [0]
-    new_argv[1] = "-n";     // FIXME FIXME FIXME what is [1] and "-n"?
+    strcpy( new_argv[1], "-n") ;     // FIXME FIXME FIXME what is [1] and "-n"?
     new_argv[2] = sock_buf; // FIXME FIXME FIXME what is [2]
 
     if (cmdmsg.options & REXF_USEPTY) {
         if (cmdmsg.options & REXF_SHMODE) {
-            new_argv[3] = "2"; // FIXME FIXME FIXME what is [3] and "2"?
+            // new_argv[3] = "2";       // FIXME FIXME FIXME what is [3] and "2"?
+            strcpy( new_argv[3], "2" ); // FIXME FIXME FIXME what is [3] and "2"?
         }
         else {
-            new_argv[3] = "1"; // FIXME FIXME FIXME what is [3] and "1"?
+            // new_argv[3] = "1";         // FIXME FIXME FIXME what is [3] and "1"?
+            strcpy( new_argv[3], "1" );  // FIXME FIXME FIXME what is [3] and "1"?        }
         }
     }
     else {
-        new_argv[3] = "0"; // FIXME FIXME FIXME what is [3] and "0"?
-    }
+        // new_argv[3] = "0";       // FIXME FIXME FIXME what is [3] and "0"?
+            strcpy( new_argv[3], "0" ); // FIXME FIXME FIXME what is [3] and "0"?
+    } 
     new_argv[4] = 0; // FIXME FIXME FIXME what is [4] and why is it 0?
 
     max = sysconf (_SC_OPEN_MAX);
@@ -212,7 +226,7 @@ ls_startserver (const char *host, char **server, int options)
 
     if (!FD_ISSET (s, &connection_ok_)) {
         FD_SET (s, &connection_ok_);
-        if (ackReturnCode_ (s) < 0) {
+        if (ackReturnCode_ (s) == 255 ) {
             close (s);
             _lostconnection_ (host);
             return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
@@ -267,7 +281,7 @@ ls_startserver (const char *host, char **server, int options)
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    if (ackReturnCode_ (s) < 0) {
+    if (ackReturnCode_ (s) == 255 ) {
         close (retsock);
         close (s);
         _lostconnection_ (host);
@@ -283,7 +297,7 @@ ls_startserver (const char *host, char **server, int options)
 
     gethostbysock_ (s, official);
     //  WAS (void) connected_ (official, -1, retsock, currentSN);
-    connected_ (official, -1, retsock, currentSN);
+    connected_ (official, -1, retsock, globCurrentSN);
 
     return retsock;
 }

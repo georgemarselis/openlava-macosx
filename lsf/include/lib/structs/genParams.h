@@ -33,6 +33,7 @@ enum LSF_PARAMS {
     LSF_LIBDIR                  = 40,
     LSF_MLS_LOG                 = 46,
     LSF_SERVER_HOSTS            = 48, // N + 2
+    LSF_INTERACTIVE_STDERR      = 49,
     // LSF_LIM_DEBUG               = 2
     LSF_NO_HOSTS_FILE           = 124,
     LSF_RES_ACCTDIR             = 9,
