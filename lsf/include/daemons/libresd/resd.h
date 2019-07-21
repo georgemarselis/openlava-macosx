@@ -354,7 +354,7 @@ struct resPid
 
 struct resRusage
 {
-  pid_t ripid;
+  pid_t rpid;
   int whatid;
   int options;
 };

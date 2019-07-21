@@ -24,7 +24,7 @@
 #include "lib/xdrrf.h"
 #include "daemons/libresd/resd.h"
 
-int lsRecvMsg_ (int sock, char *buf, size_t bufLen, struct LSFHeader *hdr, char *data, bool_t (*xdrFunc) (), long (*readFunc) ())
+int lsRecvMsg_ (int sock, char *buf, size_t bufLen, struct LSFHeader *hdr, const char *data, bool_t (*xdrFunc) (), long (*readFunc) ())
 {
     XDR xdrs;
     int cc = 0;
@@ -51,7 +51,7 @@ int lsRecvMsg_ (int sock, char *buf, size_t bufLen, struct LSFHeader *hdr, char 
 
 // FIXME FIXME FIXME FIXME replace long (*writeFunc) with size_t (*writeFunc)
 int
-lsSendMsg_ (int s, unsigned short opCode, size_t hdrLength, char *data, char *reqBuf, size_t reqLen, bool_t (*xdrFunc) (), long (*writeFunc) (),  struct lsfAuth *auth)
+lsSendMsg_ (int s, unsigned short opCode, size_t hdrLength, const char *data, const char *reqBuf, size_t reqLen, bool_t (*xdrFunc) (), long (*writeFunc) (),  struct lsfAuth *auth)
 {
     struct LSFHeader hdr;
     XDR xdrs;

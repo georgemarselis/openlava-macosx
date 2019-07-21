@@ -2279,7 +2279,8 @@ int addResourceMap ( const char *resName, const char *location, const char *lsfi
 
         if( NULL == location ) {
             // lsferrno |=  lsferr | ENOLOCATION; // original, but lsferr does not really exist
-            lsferrno |= ENOLOCATION;
+            // lsferrno |= ENOLOCATION;
+            lsferrno = ENOLOCATION;
         }
 
         /* catgets 5203 */

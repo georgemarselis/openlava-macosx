@@ -29,147 +29,132 @@
 /* #define NL_SETN   23 */
 static int SHIFT_32 = 32;
 
-void limits_c_bullshit( ) 
+
+void
+rlimitEncode_ (struct lsfLimit *lsflimit, struct rlimit *rlimit, size_t limit)
 {
-    assert( lserrno );
-    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
+    int softok = FALSE;
+    int hardok = FALSE;
+
+    if (rlimit->rlim_cur == RLIM_INFINITY) {
+        lsflimit->rlim_curl = 0xffffffff;
+        lsflimit->rlim_curh = 0x7fffffff;
+        softok = TRUE;
+    }
+
+    if (rlimit->rlim_max == RLIM_INFINITY) {
+        lsflimit->rlim_maxl = 0xffffffff;
+        lsflimit->rlim_maxh = 0x7fffffff;
+        hardok = TRUE;
+    }
+
+    if (sizeof (rlimit->rlim_cur) == 8) {
+        if (!softok) {
+            lsflimit->rlim_curl = 0xffffffff & rlimit->rlim_cur;
+            lsflimit->rlim_curh = rlimit->rlim_cur >> SHIFT_32;
+        }
+        if (!hardok) {
+            lsflimit->rlim_maxl = 0xffffffff & rlimit->rlim_max;
+            lsflimit->rlim_maxh = rlimit->rlim_max >> SHIFT_32;
+        }
+    }
+    else {
+        if (!softok) {
+            lsflimit->rlim_curl = rlimit->rlim_cur;
+            lsflimit->rlim_curh = 0;
+        }
+        if (!hardok) {
+            lsflimit->rlim_maxl = rlimit->rlim_max;
+            lsflimit->rlim_maxh = 0;
+        }
+    }
+
+    if (logclass & LC_TRACE) {
+        ls_syslog (LOG_DEBUG3,
+                 "rlimitEncode_: limit %d rlim_cur %ld %x rlim_max %ld %x curl %d %x curh %d %x maxl %d %x maxh %d %x rlim_inf %d %x\r",
+                 limit, rlimit->rlim_cur, rlimit->rlim_cur,
+                 rlimit->rlim_max, rlimit->rlim_max,
+                 lsflimit->rlim_curl, lsflimit->rlim_curl, lsflimit->rlim_curh,
+                 lsflimit->rlim_curh, lsflimit->rlim_maxl, lsflimit->rlim_maxl,
+                 lsflimit->rlim_maxh, lsflimit->rlim_maxh, RLIM_INFINITY,
+                 RLIM_INFINITY);
+    }
 
     return;
 }
 
 void
-rlimitEncode_ (struct lsfLimit *lsflimit, struct rlimit *rlimit, int limit)
+rlimitDecode_ (struct lsfLimit *lsflimit, struct rlimit *rlimit, size_t limit)
 {
     int softok = FALSE;
     int hardok = FALSE;
 
-    if (rlimit->rlim_cur == RLIM_INFINITY)
-        {
-            lsflimit->rlim_curl = 0xffffffff;
-            lsflimit->rlim_curh = 0x7fffffff;
-            softok = TRUE;
-        }
-
-    if (rlimit->rlim_max == RLIM_INFINITY)
-        {
-            lsflimit->rlim_maxl = 0xffffffff;
-            lsflimit->rlim_maxh = 0x7fffffff;
-            hardok = TRUE;
-        }
-
-    if (sizeof (rlimit->rlim_cur) == 8)
-        {
-            if (!softok)
-    {
-        lsflimit->rlim_curl = 0xffffffff & rlimit->rlim_cur;
-        lsflimit->rlim_curh = rlimit->rlim_cur >> SHIFT_32;
-    }
-            if (!hardok)
-    {
-        lsflimit->rlim_maxl = 0xffffffff & rlimit->rlim_max;
-        lsflimit->rlim_maxh = rlimit->rlim_max >> SHIFT_32;
-    }
-        }
-    else
-        {
-            if (!softok)
-    {
-        lsflimit->rlim_curl = rlimit->rlim_cur;
-        lsflimit->rlim_curh = 0;
-    }
-            if (!hardok)
-    {
-        lsflimit->rlim_maxl = rlimit->rlim_max;
-        lsflimit->rlim_maxh = 0;
-    }
-        }
-
-    if (logclass & LC_TRACE)
-        ls_syslog (LOG_DEBUG3,
-                 "rlimitEncode_: limit %d rlim_cur %ld %x rlim_max %ld %x curl %d %x curh %d %x maxl %d %x maxh %d %x rlim_inf %d %x\r",
-                 limit, rlimit->rlim_cur, (unsigned int) rlimit->rlim_cur,
-                 rlimit->rlim_max, (unsigned int) rlimit->rlim_max,
-                 lsflimit->rlim_curl, lsflimit->rlim_curl, lsflimit->rlim_curh,
-                 lsflimit->rlim_curh, lsflimit->rlim_maxl, lsflimit->rlim_maxl,
-                 lsflimit->rlim_maxh, lsflimit->rlim_maxh, RLIM_INFINITY,
-                 RLIM_INFINITY);
-
-}
-
-void
-rlimitDecode_ (struct lsfLimit *lsflimit, struct rlimit *rlimit, int limit)
-{
-    int softok = FALSE;
-    int hardok = FALSE;
-
-    if (lsflimit->rlim_curl == 0xffffffff && lsflimit->rlim_curh == 0x7fffffff)
-        {
-            rlimit->rlim_cur = RLIM_INFINITY;
-            softok = TRUE;
-        }
-
-    if (lsflimit->rlim_maxl == 0xffffffff && lsflimit->rlim_maxh == 0x7fffffff)
-        {
-            rlimit->rlim_max = RLIM_INFINITY;
-            hardok = TRUE;
-        }
-    if (sizeof (rlimit->rlim_cur) == 8)
-        {
-            if (!softok)
-    {
-        rlimit->rlim_cur = lsflimit->rlim_curh;
-        rlimit->rlim_cur = rlimit->rlim_cur << SHIFT_32;
-        rlimit->rlim_cur |= (lsflimit->rlim_curl & 0xffffffff);
+    if (lsflimit->rlim_curl == 0xffffffff && lsflimit->rlim_curh == 0x7fffffff) {
+        rlimit->rlim_cur = RLIM_INFINITY;
+        softok = TRUE;
     }
 
-            if (!hardok)
-    {
-        rlimit->rlim_max = lsflimit->rlim_maxh;
-        rlimit->rlim_max = rlimit->rlim_max << SHIFT_32;
-        rlimit->rlim_max |= (lsflimit->rlim_maxl & 0xffffffff);
+    if (lsflimit->rlim_maxl == 0xffffffff && lsflimit->rlim_maxh == 0x7fffffff) {
+        rlimit->rlim_max = RLIM_INFINITY;
+        hardok = TRUE;
     }
-        }
-    else
-        {
-            if (!softok)
-    {
-        if ((lsflimit->rlim_curh > 0) || (lsflimit->rlim_curl & 0x80000000))
-            rlimit->rlim_cur = RLIM_INFINITY;
-        else
-            rlimit->rlim_cur = lsflimit->rlim_curl;
-    }
-
-            if (!hardok)
-    {
-        if ((lsflimit->rlim_maxh > 0) || (lsflimit->rlim_maxl & 0x80000000))
-            rlimit->rlim_max = RLIM_INFINITY;
-        else
-            rlimit->rlim_max = lsflimit->rlim_maxl;
-    }
+    if (sizeof (rlimit->rlim_cur) == 8) {
+        if (!softok) {
+            rlimit->rlim_cur = lsflimit->rlim_curh;
+            rlimit->rlim_cur = rlimit->rlim_cur << SHIFT_32;
+            rlimit->rlim_cur |= (lsflimit->rlim_curl & 0xffffffff);
         }
 
-    if (logclass & LC_TRACE)
+        if (!hardok) {
+            rlimit->rlim_max = lsflimit->rlim_maxh;
+            rlimit->rlim_max = rlimit->rlim_max << SHIFT_32;
+            rlimit->rlim_max |= (lsflimit->rlim_maxl & 0xffffffff);
+        }
+    }
+    else {
+         if (!softok) {
+            if ((lsflimit->rlim_curh > 0) || (lsflimit->rlim_curl & 0x80000000)) {
+                rlimit->rlim_cur = RLIM_INFINITY;
+            }
+            else {
+                rlimit->rlim_cur = lsflimit->rlim_curl;
+            }
+        }
+
+        if (!hardok) {
+            if ((lsflimit->rlim_maxh > 0) || (lsflimit->rlim_maxl & 0x80000000)) {
+                rlimit->rlim_max = RLIM_INFINITY;
+            }
+            else {
+                rlimit->rlim_max = lsflimit->rlim_maxl;
+            }
+        }
+    }
+
+    if (logclass & LC_TRACE) {
         ls_syslog (LOG_DEBUG3,
                  "rlimitDecode_: limit %d rlim_cur %ld %x rlim_max %ld %x curl %d %x curh %d %x maxl %d %x maxh %d %x rlim_inf %d %x\r",
-                 limit, rlimit->rlim_cur, (unsigned int) rlimit->rlim_cur,
-                 rlimit->rlim_max, (unsigned int) rlimit->rlim_max,
+                 limit, rlimit->rlim_cur, rlimit->rlim_cur,
+                 rlimit->rlim_max,    rlimit->rlim_max,
                  lsflimit->rlim_curl, lsflimit->rlim_curl, lsflimit->rlim_curh,
                  lsflimit->rlim_curh, lsflimit->rlim_maxl, lsflimit->rlim_maxl,
                  lsflimit->rlim_maxh, lsflimit->rlim_maxh, RLIM_INFINITY,
                  RLIM_INFINITY);
+    }
 
 #if defined (RLIMIT_NOFILE) || defined (RLIMIT_OPEN_MAX)
  
-        if (limit == LSF_RLIMIT_NOFILE || limit == LSF_RLIMIT_OPEN_MAX) {
-                assert( sysconf (_SC_OPEN_MAX) >= 0) ;
-                rlim_t sys_max = (rlim_t) sysconf (_SC_OPEN_MAX);
-                if (rlimit->rlim_cur > sys_max) {
-                        rlimit->rlim_cur = sys_max;
-                }
-                if (rlimit->rlim_max > sys_max) {
-                        rlimit->rlim_max = sys_max;
-                }
+    if (limit == LSF_RLIMIT_NOFILE || limit == LSF_RLIMIT_OPEN_MAX) {
+        assert( sysconf (_SC_OPEN_MAX) >= 0) ;
+        rlim_t sys_max = (rlim_t) sysconf (_SC_OPEN_MAX);
+        if (rlimit->rlim_cur > sys_max) {
+            rlimit->rlim_cur = sys_max;
         }
+        if (rlimit->rlim_max > sys_max) {
+            rlimit->rlim_max = sys_max;
+        }
+    }
 
 #endif
+    return;
 }

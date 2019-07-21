@@ -45,9 +45,9 @@ struct LSFHeader { // FIXME FIXME FIXME FIXME FIXME ensure compatibility with Pl
     pid_t reserved; // was gid_t 2019-07-03
     // char paddin1[4];
     size_t length;
-    gid_t  opCode;
+    unsigned int opCode;
     // char   padding2[2];
-    pid_t  refCode; 
+    unsigned int  refCode; 
 };
 
 /* always use this macro to size up memory buffers

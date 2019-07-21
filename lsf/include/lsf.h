@@ -101,8 +101,8 @@ const unsigned short OPENLAVA_VERSION = 20;
 // #define MAX_TYPES_31             25
 // #define MAX_MODELS_31            30
 
-int lsferrno = 0; // defined, not used? 
-const int ENOLOCATION = 0x0FFF; // defined, not used
+unsigned int lsferrno = 0; // defined, not used? 
+const unsigned int ENOLOCATION = 0x0FFF; // defined, not used
 
 enum LINE_BUFSIZ {
     LINE_BUFSIZ = 4096
@@ -1055,7 +1055,7 @@ int opterr;
 int optopt;
 #endif
 
-int lserrno;
+unsigned int lserrno;
 int masterLimDown;
 // int ls_nerr;           // FIXME FIXME FIXME FIXME FIXME too many different types of lserrno
 // char *ls_errmsg[];  // FIXME FIXME FIXME FIXME FIXME put in specific header

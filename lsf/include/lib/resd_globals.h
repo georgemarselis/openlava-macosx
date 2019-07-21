@@ -8,10 +8,11 @@
 
 
 enum RES_PARAMS {
-    RES_DEBUG                     = 0,
-    RES_PORT                      = 6,    // default port: 36002
-    RES_TIMEOUT                   = 20,   // default timeout: 
-    RES_TIMING                    = 666,  // made up value
+    RES_DEBUG           = 0,
+    RES_PORT            = 6,    // default port: 36002
+    RES_TIMEOUT         = 20,   // default timeout: 
+    RES_TIMING          = 666,  // made up value
+    RES_TIMEOUT_DEFAULT = 60,
     RES_NULL
 };
 

@@ -48,7 +48,7 @@ initconntbl_ (void)
 
 // FIXME FIXME FIXME FIXME is this function useless?
 int
-connected_ ( const char *hostname, int sock1, int sock2, int seqno)
+connected_ ( const char *hostname, int sock1, int sock2, unsigned int seqno)
 {
     struct hEnt *hEntPtr = NULL;
     int *sp = NULL;
@@ -71,17 +71,18 @@ connected_ ( const char *hostname, int sock1, int sock2, int seqno)
 
     if (sock1 >= 0)
     {
-        sp[0] = sock1;
+        sp[0] = sock1; // FIXME FIXME FIXME put label in sp[0]
         hostIndex_ (hEntPtr->keyname, sock1);
     }
 
     if (sock2 >= 0) {
-        sp[1] = sock2;
+        sp[1] = sock2; // FIXME FIXME FIXME put label in sp[1]
     }
 
-    if (seqno >= 0) {
-        sp[2] = seqno;
-    }
+    // if (seqno >= 0) {
+        assert( seqno <= INT_MAX );
+        sp[2] = (int) seqno; // FIXME FIXME FIXME put label in sp[2] // FIXME FIXME FIXME remove cast
+    // }
 
     hEntPtr->hData = sp;
 
@@ -275,10 +276,10 @@ getConnectionNum_ ( const char *hostname)
     return connNum[0];
 }
 
-int
+unsigned int
 _findmyconnections_ (struct connectEnt **connPtr)
 {
-    int n = 0;
+    unsigned int n = 0;
     struct sTab sTab;
     struct hEnt *ent = NULL;
 

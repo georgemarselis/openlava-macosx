@@ -77,15 +77,15 @@ int
 ls_getrpid (void)
 {
     if (amSlave_ == TRUE) {
-        return (myrpid_);
+        return myrpid_;
     }
 
-    return (0);
+    return 0;
 
 }
 
 long
-ls_sndmsg (int tid, char *buf, size_t count)
+ls_sndmsg (unsigned int tid, const char *buf, size_t length)
 {
     int sock;
     struct tid *tid_;
@@ -98,18 +98,18 @@ ls_sndmsg (int tid, char *buf, size_t count)
     {
         if ((tid_ = tid_find (tid)) == NULL)
         {
-            return (-1);
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
         sock = tid_->sock;
     }
 
     //FIXME fix this function to not return -1?
-    return (long) b_write_fix (sock, buf, count);
+    return (long) b_write_fix (sock, buf, length);
 }
 
 
 long
-ls_rcvmsg (int tid, char *buf, size_t count)
+ls_rcvmsg (unsigned int tid, const char *buf, size_t length)
 {
     int sock;
 
@@ -124,10 +124,10 @@ ls_rcvmsg (int tid, char *buf, size_t count)
         if( sock < 0)
         {
             lserrno = LSE_RES_INVCHILD;
-            return (-1);
+            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
     }
 
     // FIXME fix this function to not return -1?
-    return (long) b_read_fix (sock, buf, count);
+    return (long) b_read_fix (sock, strdup(buf), length);
 }

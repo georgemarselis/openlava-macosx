@@ -8,17 +8,15 @@
 struct ttyStruct defaultTty;
 
 
-enum RES_TIMEOUT {
-    RES_TIMEOUT = 60,
-} RES_TIMEOUT;
+// enum RESTIMEOUT {
+//     // RES_TIMEOUT = 60,
+//     RES_TIMEOUT_DEFAULT = 60
+// };
 
-enum LOOP_ADDR {
+enum LOOP_ADDR { // FIXME FIXME FIXME FIXME this might actually be justified to be in lsf.h
     LOOP_ADDR = 0x7F000001
 };
 
-enum RES_TIMEOUT_DEFAULT {
-    RES_TIMEOUT_DEFAULT = 60
-} RES_TIMEOUT_DEFAULT;
 
 /* daemons/resd/init.c */
 void initConn2NIOS(void);

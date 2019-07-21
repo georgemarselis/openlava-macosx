@@ -167,7 +167,7 @@ char *
 ls_sysmsg (void)
 {
     int save_errno = errno;
-    static int ls_nerr = LSE_NERR;
+    static unsigned int ls_nerr = LSE_NERR;
     char *buf = NULL;
     char *please_do_not_smash_me = NULL;
 
@@ -176,8 +176,8 @@ ls_sysmsg (void)
     memset( buf, '\0', strlen( buf ) );
     memset( please_do_not_smash_me, '\0', strlen( please_do_not_smash_me ) );
 
-    if (lserrno >= ls_nerr || lserrno < 0) {
-        sprintf (buf, "Error %d", lserrno);
+    if (lserrno >= ls_nerr  ) { //|| lserrno < 0) {
+        sprintf (buf, "Error %u", lserrno);
         return buf;
     }
 

@@ -30,7 +30,7 @@ char *connnamelist[MAXCONNECT + 1]; // FIXME FIXME FIXME FIXME FIXME this is stu
 
 void   inithostsock_        ( void );
 void   initconntbl_         ( void );
-int    connected_           ( const char *hostname, int sock1, int sock2, int seqno );
+int    connected_           ( const char *hostname, int sock1, int sock2, unsigned int seqno );
 void   hostIndex_           ( const char *hostname, int sock );
 int   *_gethostdata_        ( const char *hostname );
 int    _isconnected_        ( const char *hostname, int *sock );
@@ -38,7 +38,7 @@ int    _getcurseqno_        ( const char *hostname );
 void   _setcurseqno_        ( const char *hostname, unsigned int seqno);
 int    ls_isconnected       ( const char *hostname );
 int    getConnectionNum_    ( const char *hostname );
-int    _findmyconnections_  ( struct connectEnt **connPtr );
+u_int   _findmyconnections_  ( struct connectEnt **connPtr );
 char **ls_findmyconnections ( void );
 int    delhostbysock_       ( int sock );
 int    gethostbysock_       ( int sock, const char *hostname ); // from include/lib/res.h

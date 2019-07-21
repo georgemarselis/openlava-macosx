@@ -248,7 +248,7 @@ readconfenv_ (struct config_param *pList1, struct config_param *pList2, const ch
     fclose (fp);
     if (errLineNum_ != 0) {
         assert( saveErrNo <= INT_MAX );
-        lserrno = (int) saveErrNo;
+        lserrno =  saveErrNo;
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 

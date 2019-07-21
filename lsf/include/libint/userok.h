@@ -8,7 +8,7 @@
 #define LSF_USE_HOSTEQUIV   10    //    FIXME FIXME but also re-adjust the entries from resdh.
 #define LSF_ID_PORT         11    //        with the numbers from here
 #define _USE_TCP_           0x04
-#define LOOP_ADDR           0x7F000001
+//#define LOOP_ADDR           0x7F000001
 
 
 int userok (int s, struct sockaddr_in *from, char *hostname, struct sockaddr_in *localAddr, struct lsfAuth *auth, int debug);

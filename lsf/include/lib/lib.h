@@ -50,19 +50,19 @@
 // #define MIN_REF_NUM          1000
 // #define MAX_REF_NUM          32760
 enum MINMAX_REF {
-	MIN_REF_NUM          = 1000,
-	MAX_REF_NUM          = 32760,
-	MINMAX_REF_NULL
+    MIN_REF_NUM          = 1000,
+    MAX_REF_NUM          = 32760,
+    MINMAX_REF_NULL
 };
 
 // #define PGID_LIST_SIZE  16
 // #define PID_LIST_SIZE   64
 // #define MAX_NUM_PID     300
 enum LIST_SIZES {
-	PGID_LIST_SIZE       = 16,
-	PID_LIST_SIZE        = 64,
-	MAX_NUM_PID          = 300,
-	LIST_SIZES_NULL
+    PGID_LIST_SIZE       = 16,
+    PID_LIST_SIZE        = 64,
+    MAX_NUM_PID          = 300,
+    LIST_SIZES_NULL
 };
 
 ///////////////////////////////////////////////////////
@@ -87,44 +87,44 @@ enum LIST_SIZES {
 // #define _USE_PRIMARY_       0x10
 // #define _USE_PPORT_         0x20
 enum PORTS {
-	_NON_BLOCK_ = 0x01,
-	_LOCAL_ = 0x02,
-	_USE_TCP_ = 0x04,
-	_KEEP_CONNECT_ = 0x08,
-	_USE_PRIMARY_ = 0x10,
-	_USE_PPORT_ = 0x20,
+    _NON_BLOCK_ = 0x01,
+    _LOCAL_ = 0x02,
+    _USE_TCP_ = 0x04,
+    _KEEP_CONNECT_ = 0x08,
+    _USE_PRIMARY_ = 0x10,
+    _USE_PPORT_ = 0x20,
 };
 /* openlava call LSF_SERVER_HOSTS regardless of local lim.
  */
 enum _SERVER_HOSTS_ONLY_ {
-	_SERVER_HOSTS_ONLY_ = 0x40
+    _SERVER_HOSTS_ONLY_ = 0x40
 };
 
 enum PMUT {
-	PRIMARY = 0,
-	MASTER  = 1,
-	UNBOUND = 2,
-	TCP     = 3
+    PRIMARY = 0,
+    MASTER  = 1,
+    UNBOUND = 2,
+    TCP     = 3
 };
 
 enum RESNIOS_TIMEOUT {
-	// RES_TIMEOUT  = 120,
-	NIOS_TIMEOUT = 120
+    // RES_TIMEOUT  = 120,
+    NIOS_TIMEOUT = 120
 };
 
 enum NOCODE {
-	NOCODE = 10000
+    NOCODE = 10000
 };
 
 enum RSIG {
-	RSIG_ID_ISTID = 0x01,
-	RSIG_ID_ISPID = 0x02,
-	RSIG_KEEP_CONN = 0x04
+    RSIG_ID_ISTID = 0x01,
+    RSIG_ID_ISPID = 0x02,
+    RSIG_KEEP_CONN = 0x04
 };
 
 enum RID {
-	RID_ISTID = 0x01,
-	RID_ISPID = 0x02
+    RID_ISTID = 0x01,
+    RID_ISPID = 0x02
 };
 
 #define NO_SIGS (~(sigmask(SIGTRAP) | sigmask(SIGEMT)))
@@ -141,64 +141,64 @@ typedef int (*appCompletionHandler) (struct lsRequest *requestType, void *);
 
 struct lsRequest
 {
-	int tid;
-	pid_t seqno;
-	int connfd;
-	int rc;
-	int completed;
-	char padding[4];
-	unsigned long replyBufLen;
-	requestCompletionHandler replyHandler;
-	appCompletionHandler appHandler;
-	void *extra;
-	void *replyBuf;
-	void *appExtra;
+    int tid; // FIXME tid stands for "task id". Should be pid_t or even better something else.
+    unsigned int seqno;
+    int connfd;
+    unsigned int rc;
+    int completed;
+    char padding[4];
+    unsigned long replyBufLen;
+    requestCompletionHandler replyHandler;
+    appCompletionHandler appHandler;
+    void *extra;
+    void *replyBuf;
+    void *appExtra;
 };
 
 
 struct taskMsg
 {
-	char *inBuf;
-	char *outBuf;
-	size_t len;
+    char *inBuf;
+    char *outBuf;
+    size_t len;
 };
 
 enum lsTMsgType
 {
-	LSTMSG_DATA,
-	LSTMSG_IOERR,
-	LSTMSG_EOF
+    LSTMSG_DATA,
+    LSTMSG_IOERR,
+    LSTMSG_EOF
 };
 
 struct lsTMsgHdr
 {
-	enum lsTMsgType type;
-	char padding[4];
-	char *msgPtr;
-	size_t len;
+    enum lsTMsgType type;
+    char padding[4];
+    char *msgPtr;
+    size_t len;
 };
 
 struct tid
 {
-	bool_t isEOF;
-	unsigned short taskPort;
-	char padding[2];
-	int rtid;
-	int sock;
-	int refCount;
-	int pid;
-	char *host;
-	struct lsQueue *tMsgQ;
-	struct tid *link;
+    bool_t isEOF;
+    unsigned short taskPort;
+    char padding[2];
+    int rtid;
+    int sock;
+    int refCount;
+    int pid;
+    char *host;
+    struct lsQueue *tMsgQ;
+    struct tid *link;
 };
 
 struct svrsock
 {
-	int sockfd;
-	int port;
-	struct sockaddr_in *localAddr;
-	int backlog;
-	int options;
+    int sockfd;
+    int port;
+    struct sockaddr_in *localAddr;
+    int backlog;
+    int options;
 };
 
 
@@ -211,6 +211,6 @@ void lsReqHandDestroy_ (struct lsRequest *);
 
 // void ls_errlog (FILE * fd, const char *fmt, ...)
 #if defined(__GNUC__) && defined(CHECK_PRINTF)
-	__attribute__ ((format (printf, 2, 3)))
+    __attribute__ ((format (printf, 2, 3)))
 #endif
 

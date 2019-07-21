@@ -34,7 +34,7 @@
 //      ensure with the debugger/test case that this function
 //      cannot return negative values
 long
-nb_write_fix (int fildes, char *buf,  size_t len)
+nb_write_fix (int fildes, const char *buf,  size_t len)
 {
     ssize_t cc = 0;
     size_t length = 0;
@@ -185,7 +185,7 @@ b_read_fix (int fildes, char *buf, size_t len)
 //      ensure with the debugger/test case that this function
 //      cannot return negative values
 long
-b_write_fix (int fildes, char *buf, size_t len)
+b_write_fix (int fildes, const char *buf, size_t len)
 {
 
     ssize_t cc           = 0;
@@ -227,7 +227,7 @@ unblocksig (int sig)
 }
 
 int
-b_connect_ (int s, struct sockaddr *name, socklen_t namelen, unsigned int timeout)
+b_connect_ (int s, struct sockaddr *name, socklen_t namelen, time_t timeout)
 {
 
     unsigned int oldTimer = 0;
@@ -253,7 +253,8 @@ b_connect_ (int s, struct sockaddr *name, socklen_t namelen, unsigned int timeou
 
     blockSigs_ (SIGALRM, &newMask, &oldMask);
 
-    oldTimer = alarm (timeout);
+    assert( timeout <= UINT_MAX  && timeout >= 0);
+    oldTimer = alarm ( (unsigned int) timeout);
 
     if (connect (s, name, namelen) < 0) {
         if (errno == EINTR) {
@@ -282,7 +283,7 @@ rd_select_ (long rd, struct timeval *timeout)
 {
     int cc   = 0;
     assert( rd <= INT_MAX );
-    int ndfs = (int) rd;
+    int ndfs = (int) rd; // FIXME FIXME FIXME remove cast
     fd_set rmask;
 
     do {
@@ -303,7 +304,7 @@ rd_select_ (long rd, struct timeval *timeout)
 /* b_accept_()
  */
 int
-b_accept_ (int s, struct sockaddr *addr, socklen_t * addrlen)
+b_accept_ (int s, struct sockaddr *addr, socklen_t *addrlen)
 {
     sigset_t oldMask;
     sigset_t newMask;
@@ -352,7 +353,7 @@ alarmer_ (void)
 
 
 int
-blockSigs_ (int sig, sigset_t * blockMask, sigset_t * oldMask)
+blockSigs_ (int sig, sigset_t *blockMask, sigset_t *oldMask)
 {
     sigfillset (blockMask);
 

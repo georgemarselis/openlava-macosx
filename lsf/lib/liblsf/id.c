@@ -262,13 +262,13 @@ checkInit ( struct IDLIB_INFO_T *idLib)
 int
 getLSFUser_ (const char *lsfUserName, unsigned int lsfUserNameSize)
 {
-    int rc = 0;
+    unsigned int rc = 0;
 
     if (!checkInit (&idLib_)) {
         return -1;
     }
 
-    rc = idLib_.getLSFUser_ (lsfUserName, lsfUserNameSize);
+    rc = (unsigned int)idLib_.getLSFUser_ (lsfUserName, lsfUserNameSize);
     if (rc != LSE_NO_ERR) {
         lserrno = rc;
         return -1;
@@ -276,6 +276,8 @@ getLSFUser_ (const char *lsfUserName, unsigned int lsfUserNameSize)
     else {
         return 0;
     }
+
+    return 0;
 }
 
 int
@@ -289,7 +291,7 @@ getLSFUserByName_ (const char *osUserName, const char *lsfUserName, unsigned int
 
     rc = idLib_.getLSFUserByName_ (osUserName, lsfUserName, lsfUserNameSize);
     if (rc != LSE_NO_ERR) {
-        lserrno = rc;
+        lserrno = (unsigned int)rc;
         return -1;
     }
     else {
@@ -308,7 +310,7 @@ getLSFUserByUid_( const uid_t uid, const char *lsfUserName, unsigned int lsfUser
 
     rc = idLib_.getLSFUserByUid_ (uid, lsfUserName, lsfUserNameSize);
     if (rc != LSE_NO_ERR) {
-        lserrno = rc;
+        lserrno = (unsigned int) rc;
         return -1;
     }
     else {
@@ -327,7 +329,7 @@ getOSUserName_ (const char *lsfUserName, const char *osUserName, unsigned int os
 
     rc = idLib_.getOSUserName_ (lsfUserName, osUserName, osUserNameSize);
     if (rc != LSE_NO_ERR) {
-        lserrno = rc;
+        lserrno = (unsigned int) rc;
         return -1;
     }
     else {
@@ -347,7 +349,7 @@ getOSUid_ (const char *lsfUserName, const uid_t *uid)
 
     rc = idLib_.getOSUid_ (lsfUserName, uid);
     if (rc != LSE_NO_ERR) {
-        lserrno = rc;
+        lserrno = (unsigned int) rc;
         return -1;
     }
 

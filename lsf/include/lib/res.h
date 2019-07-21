@@ -46,7 +46,7 @@ struct sockaddr_in res_addr_;
 struct lsQueue *requestQ;
 
 
-#define REQUESTSN ((requestSN < USHRT_MAX) ? requestSN++ : (requestSN=11 , 10))
+// #define REQUESTSN ((requestSN < USHRT_MAX) ? requestSN++ : (requestSN=11 , 10))
 
 
 unsigned int getCurrentSN(void);
@@ -56,12 +56,12 @@ int lsConnWait_(const char *host);
 int sendCmdBill_(int s, enum resCmd cmd, struct resCmdBill *cmdmsg, int *retsock, struct timeval *timeout);
 int rsetenv_(const char *host, char **envp, int option);
 int ls_chdir(const char *host, const char *dir);
-struct lsRequest *lsReqHandCreate_(pid_t tid, int seqno, int connfd, void *extra, requestCompletionHandler replyHandler, appCompletionHandler appHandler, void *appExtra);
+struct lsRequest *lsReqHandCreate_(pid_t taskID, unsigned int seqno, int connfd, void *extra, requestCompletionHandler replyHandler, appCompletionHandler appHandler, void *appExtra);
 int ackAsyncReturnCode_(int s, struct LSFHeader *replyHdr);
-int enqueueTaskMsg_(int s, pid_t taskID, struct LSFHeader *msgHdr);
-int expectReturnCode_(int s, pid_t seqno, struct LSFHeader *repHdr);
-int resRC2LSErr_(int resRC);
-int ackReturnCode_(int s);
+int enqueueTaskMsg_(int s, unsigned int taskID, struct LSFHeader *msgHdr);
+unsigned int expectReturnCode_(int s, unsigned int seqno, struct LSFHeader *repHdr);
+unsigned int resRC2LSErr_(unsigned int resRC);
+unsigned int ackReturnCode_(int s);
 int getLimits(struct lsfLimit *limits);
 int callRes_(int s, enum resCmd cmd, const char *data, const char *reqBuf, size_t reqLen, bool_t (*xdrFunc )(), int *rd, struct timeval *timeout, struct lsfAuth *auth);
 int do_rstty1_(const char *host, int async);
@@ -71,17 +71,17 @@ struct lsRequest *lsIRGetRusage_(pid_t rpid, struct jRusage *ru, appCompletionHa
 int lsGetRProcRusage(const char *host, int pid, struct jRusage *ru, int options);
 struct lsRequest *lsGetIRProcRusage_(const char *host, int tid, pid_t pid, struct jRusage *ru, appCompletionHandler appHandler, void *appExtra);
 int lsRGetRusage(int rpid, struct jRusage *ru, int options);
-int sendSig_(char *host, pid_t rpid, int sig, int options);
-int lsRSig_(const char *host, pid_t rpid, int sig, int options);
+int sendSig_(const char *host, pid_t rpid, int sig, int options);
+int lsRSig_ (const char *host, pid_t rpid, int sig, int options);
 int ls_rkill(pid_t rtid, int sig);
-int lsMsgRdy_(pid_t taskid, size_t *msgLen);
+int lsMsgRdy_(unsigned int taskid, size_t *msgLen);
 void tMsgDestroy_(void *extra);
-int lsMsgRcv_(pid_t taskid, const char *buffer, size_t len, int options);
+int lsMsgRcv_(unsigned int taskid, const char *buffer, size_t len, int options);
 
 int lsMsgSnd2_( int *socket,  unsigned short opcode, const char *buffer, size_t len, int options);
-int lsMsgSnd_ ( pid_t taskid,                        const char *buffer, size_t len, int options);
+int lsMsgSnd_ ( unsigned int taskid,                 const char *buffer, size_t len, int options);
 
-int lsMsgWait_(int inTidCnt, pid_t *tidArray, int *rdyTidCnt, int inFdCnt, int *fdArray, int *rdyFdCnt, int *outFdArray, struct timeval *timeout, int options);
+int lsMsgWait_(int inTidCnt, unsigned int *tidArray, unsigned int *rdyTidCnt, unsigned int inFdCnt, int *fdArray, unsigned int *rdyFdCnt, int *outFdArray, struct timeval *timeout, int options);
 int lsReqCmp_ ( const char *val, struct lsRequest *reqEnt, int hint);
 int lsReqTest_(struct lsRequest *request);
 int lsReqWait_(struct lsRequest *request, int options);

@@ -19,8 +19,11 @@
  
  #pragma once
 
-struct tid *tid_find (pid_t taskid);
-struct tid *tidFindIgnoreConn_ (pid_t taskid);
-int tid_remove (pid_t taskid);
-int tid_register (pid_t taskid, int socknum, u_short taskPort, char *host, bool_t doTaskInfo);
+/* tid.c */
+int tid_register(pid_t taskid, int socknum, u_short taskPort, char *host, bool_t doTaskInfo);
+int tid_remove(unsigned int taskid);
+struct tid *tid_find(unsigned int taskid);
+struct tid *tidFindIgnoreConn_(unsigned int taskid);
+void tid_lostconnection(int socknum);
+int tidSameConnection_(int socknum, unsigned int *ntids, unsigned int **tidArray);
 
