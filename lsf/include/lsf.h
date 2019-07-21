@@ -569,12 +569,12 @@ struct lsfRusage
     long   ru_nsignals;
     long   ru_nvcsw;
     long   ru_nivcsw;
-    double ru_exutime;
+    time_t ru_exutime;
 };
 
 struct lsfAcctRec
 {
-    int pid;
+    pid_t pid;
     int exitStatus;
     time_t dispTime;
     time_t termTime;

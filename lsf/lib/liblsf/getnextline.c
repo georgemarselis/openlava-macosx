@@ -6,14 +6,14 @@
 #include "lib/syslog.h"
 #include "lib/getnextline.h"
 
-char *
-getNextLine_conf ( const struct lsConf *conf, int confFormat) // FIXME FIXME FIXME FIXME this wrapper function has to go
-{
-    size_t *dummy = 0;
+// char *
+// getNextLine_conf ( const struct lsConf *conf, int confFormat) // FIXME FIXME FIXME FIXME this wrapper function has to go
+// {
+//     size_t *dummy = 0;
 
-    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain    
-    return getNextLineC_conf (conf, dummy, confFormat);
-}
+//     assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain    
+//     return getNextLineC_conf (conf, dummy, confFormat);
+// }
 
 char *
 getNextLineD_ (FILE * fp, size_t *LineCount, int confFormat)
@@ -170,12 +170,12 @@ getNextLineC_ (FILE *fp, size_t *lineCount, int confFormat)
 }
 
 
-char *
-getNextLine_ (FILE * fp, int confFormat)
-{
-    size_t *zeroLineCount = 0;
-    return getNextLineC_ (fp, zeroLineCount, confFormat);
-}
+// char *
+// getNextLine_ (FILE * fp, int confFormat)
+// {
+//     size_t *zeroLineCount = 0;
+//     return getNextLineC_ (fp, zeroLineCount, confFormat);
+// }
 
 // FIXME FIXME FIXME delete after cleanup 
 //

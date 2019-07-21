@@ -16,20 +16,23 @@
  *
  */
 
+#include <stdio.h>
 #include <unistd.h>
 
-#include "lib/lib.h"
-#include "lib/lproto.h"
-
+#include "lsf.h"
+#include "lib/rusage.h"
+#include "lib/words.h"
+#include "lib/reslog.h"
+#include "lib/getnextline.h"
 
 int
 ls_putacctrec (FILE * log_fp, struct lsfAcctRec *acctRec)
 {
   if (fprintf (log_fp, "%d", acctRec->pid) < 0
       || addQStr (log_fp, acctRec->username) < 0
-      || fprintf (log_fp, " %d", acctRec->exitStatus) < 0
-      || fprintf (log_fp, " %d", acctRec->dispTime) < 0
-      || fprintf (log_fp, " %d", acctRec->termTime) < 0
+      || fprintf (log_fp, " %d",  acctRec->exitStatus) < 0
+      || fprintf (log_fp, " %ld", acctRec->dispTime) < 0
+      || fprintf (log_fp, " %ld", acctRec->termTime) < 0
       || addQStr (log_fp, acctRec->fromHost) < 0
       || addQStr (log_fp, acctRec->execHost) < 0
       || addQStr (log_fp, acctRec->cwd) < 0
@@ -56,17 +59,18 @@ ls_getacctrec (FILE * log_fp, size_t *lineNum)
     size_t len = 0;
     size_t sar = sizeof (struct lsfAcctRec);
     char *line = NULL;
+    size_t *zeroLineCount = 0;
 
-    static struct lsfAcctRec *acctRec = NULL;
+    struct lsfAcctRec *acctRec = NULL;
 
-    if (acctRec != NULL) {
-        free (acctRec);
-        acctRec = NULL;
-    }
+    // if (acctRec != NULL) {
+    //     free (acctRec);
+    //     acctRec = NULL;
+    // }
 
     (*lineNum)++;
 
-    if ((line = getNextLine_ (log_fp, FALSE)) == NULL) {
+    if ((line = getNextLineC_ (log_fp, zeroLineCount, FALSE) ) == NULL) {
         lserrno = LSE_EOF;
         return NULL;
     }
@@ -79,11 +83,11 @@ ls_getacctrec (FILE * log_fp, size_t *lineNum)
         return NULL;
     }
 
-    acctRec->username = acctRec + sar;
-    acctRec->fromHost = acctRec->username + len;
-    acctRec->execHost = acctRec->fromHost + len;
-    acctRec->cwd      = acctRec->execHost + len;
-    acctRec->cmdln    = acctRec->cwd + len;
+    acctRec->username = malloc( ( sizeof( acctRec )           + sar ) * sizeof( char ) );
+    acctRec->fromHost = malloc( ( strlen( acctRec->username ) + len ) * sizeof( char ) );
+    acctRec->execHost = malloc( ( strlen( acctRec->fromHost ) + len ) * sizeof( char ) );
+    acctRec->cwd      = malloc( ( strlen( acctRec->execHost ) + len ) * sizeof( char ) );
+    acctRec->cmdln    = malloc( ( strlen( acctRec->cwd      ) + len ) * sizeof( char ) );
 
     if ((cc = sscanf (line, "%d%n", &acctRec->pid, &ccount)) != 1) {
         lserrno = LSE_ACCT_FORMAT;

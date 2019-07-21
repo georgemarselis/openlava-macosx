@@ -25,7 +25,7 @@
 #include <time.h>
 
 #include "lib/lib.h"
-#include "lsf.h"
+#include "lib/lsf.h"
 
 // #ifndef MIN
 // #define MIN(a,b) ((a) < (b) ? (a) : (b))
@@ -45,14 +45,6 @@
 //     } 
 // }
 // #endif
-
-
-void lsf_c_bullshit( ) 
-{
-    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
-
-    return;
-}
 
 long int 
 tosec( long int tv_usec )
@@ -153,8 +145,8 @@ lsfRu2Str (FILE * log_fp, struct lsfRusage *lsfRu)
         cc += fprintf (log_fp, "%1.0ld %1.0ld %1.0ld %1.0ld %1.0ld ", lsfRu->ru_idrss,        lsfRu->ru_isrss,        lsfRu->ru_minflt, lsfRu->ru_majflt, lsfRu->ru_nswap  );
         cc += fprintf (log_fp, "%1.0ld %1.0ld %1.0f  %1.0ld %1.0ld ", lsfRu->ru_inblock,      lsfRu->ru_oublock,      lsfRu->ru_ioch,   lsfRu->ru_msgsnd, lsfRu->ru_msgrcv );
         cc += fprintf (log_fp, "%1.0ld %1.0ld %1.0ld %1.0f\n",        lsfRu->ru_nsignals,     lsfRu->ru_nvcsw,        lsfRu->ru_nivcsw, lsfRu->ru_exutime );
-    return cc;
 
+    return cc;
 }
 
 int
@@ -264,4 +256,5 @@ cleanRusage (struct rusage *rusage)
     rusage->ru_nvcsw    = -1;
     rusage->ru_nivcsw   = -1;
 
+    return;
 }

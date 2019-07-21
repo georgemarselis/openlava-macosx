@@ -31,7 +31,6 @@ limd_globals.c \
 limits.c \
 load.c \
 lsb_globals.c \
-lsf.c \
 mbd_globals.c \
 misc.c \
 nioback.c \
@@ -55,6 +54,7 @@ resnameDefined.c \
 rex.c \
 rf.c \
 rtask.c \
+rusage.c \
 rwait.c \
 sbd_globals.c \
 sig.c \
