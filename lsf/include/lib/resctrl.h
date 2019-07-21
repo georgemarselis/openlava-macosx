@@ -18,4 +18,5 @@
 
 #pragma once
 
-int oneResDebug (struct debugReq *pdebug, char *hostname);
+int ls_rescontrol ( const char *host, int opCode, int data);
+int oneResDebug (struct debugReq *pdebug, const char *hostname);

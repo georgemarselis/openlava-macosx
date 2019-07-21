@@ -1021,12 +1021,12 @@ do_rstty2_ (int socket, int io_fd, int redirect, int async)
         }
         
         if (redirect) {
-            tty.termattr.c_lflag &= (unsigned int)~ECHO; // FIXME check that this expression will never assign negative (it won't, but still)
+            tty.termattr.c_lflag &= (unsigned int)~ECHO;  // FIXME FIXME FIXME remove the cast
         }
 
-        if ((cp = getenv ("LINES")) != NULL) { // FIXME FIXME FIXME DOCUMENT! whatis env LINES?
+        if ((cp = getenv ("LINES")) != NULL) { // FIXME FIXME FIXME DOCUMENT! what env LINES?
             assert( atoi(cp) >= 0 && atoi(cp) <= SHRT_MAX );
-            tty.ws.ws_row = (unsigned short) atoi (cp);
+            tty.ws.ws_row = (unsigned short) atoi (cp); // FIXME FIXME FIXME remove the cast
         }
         else {
             tty.ws.ws_row = 24;
@@ -1034,7 +1034,7 @@ do_rstty2_ (int socket, int io_fd, int redirect, int async)
         
         if ((cp = getenv ("COLUMNS")) != NULL) { // FIXME FIXME FIXME DOCUMENT! whatis env COLUMNS?
             assert( atoi(cp) >= 0 && atoi(cp) <= SHRT_MAX );
-            tty.ws.ws_col = (unsigned short) atoi (cp);
+            tty.ws.ws_col = (unsigned short) atoi (cp); // FIXME FIXME FIXME remove the cast
         }
         else {
             tty.ws.ws_col = 80;
