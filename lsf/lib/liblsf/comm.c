@@ -96,7 +96,7 @@ ls_sndmsg (unsigned int tid, const char *buf, size_t length)
     }
     else
     {
-        if ((tid_ = tid_find (tid)) == NULL)
+        if ((tid_ = tid_find ( (pid_t) tid)) == NULL)
         {
             return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
@@ -119,7 +119,7 @@ ls_rcvmsg (unsigned int tid, const char *buf, size_t length)
     }
     else
     {
-        struct tid *tid_ = tid_find( tid );
+        struct tid *tid_ = tid_find( (pid_t) tid );
         sock = tid_->sock;
         if( sock < 0)
         {

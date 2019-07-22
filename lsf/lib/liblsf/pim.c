@@ -34,6 +34,7 @@
 #include "lib/host.h"
 #include "lib/sock.h"
 #include "lib/usleep.h"
+#include "lib/structs/genParams.h"
 #include "lib/misc.h" // FIXME FIXME FIXME initLSFHeader_() is here must move to init.h or new file initlsf.h
 #include "lsf.h"
 

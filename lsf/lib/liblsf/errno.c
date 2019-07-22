@@ -24,13 +24,13 @@
 #include "lib/err.h"
 
 
-int
-errnoEncode_ (int eno)
+unsigned int
+errnoEncode_ ( unsigned int errnumber)
 {
-    int NERRNO_MAP  = ELASTVALUE - 1; // ignore 0th value
+    unsigned int NERRNO_MAP  = ELASTVALUE - 1; // ignore 0th value
 
-    if (eno < 0) {
-        return eno;
+    if (errnumber == 255) {
+        return errnumber;
     }
     assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
     // for ( int i = 0; i < NERRNO_MAP; i++) // FIXME FIXME FIXME FIXME this has to be revisted
@@ -43,8 +43,8 @@ errnoEncode_ (int eno)
     //     }
     // }
 
-    if (eno >= NERRNO_MAP) {
-        return eno;
+    if (errnumber >= NERRNO_MAP) {
+        return errnumber;
     }
     else {
         return 0;
@@ -53,20 +53,19 @@ errnoEncode_ (int eno)
     return INT_MAX;
 }
 
-int
-errnoDecode_ (int eno)
+unsigned int
+errnoDecode_ ( unsigned int errnumber )
 {
-    int NERRNO_MAP  = ELASTVALUE - 1;
+    unsigned int NERRNO_MAP  = ELASTVALUE - 1;
 
-    assert( lserrno ); // BULLSHIT CODE so the compiler will not generate a warning.
-
-    if (eno < 0) {
-        return eno;
+    if (errnumber == 255 ) {
+        return errnumber;
     }
 
-    if (eno >= NERRNO_MAP) {
-        if (strerror (eno) != NULL) {
-            return eno;
+    if (errnumber >= NERRNO_MAP) {
+        assert( errnumber < INT_MAX );
+        if (strerror( (int) errnumber) != NULL) {
+            return errnumber;
         }
         else {
             return 0;

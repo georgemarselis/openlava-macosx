@@ -24,9 +24,23 @@
 #include "lib/lib.h"
 #include "lib/lproto.h"
 #include "lib/rf.h"
+#include "lib/host.h"
+#include "lib/misc.h"
 #include "lib/xdrres.h"
+#include "lib/rtask.h"
+#include "lib/xdrrf.h"
+#include "lib/rdwr.h"
+#include "lib/err.h"
+#include "lib/sock.h"
+#include "lib/xdrmisc.h"
+#include "lib/resd_globals.h"
+#include "lib/tid.h"
+#include "lib/structs/genParams.h"
 #include "daemons/libresd/resout.h"
 #include "daemons/libpimd/pimd.h"
+
+struct rfTab *ft      = NULL; // NOFIX
+struct rHosts *rHosts = NULL; // NOFIX
 
 struct rHosts *
 rhConnect ( const char *host)
@@ -37,10 +51,9 @@ rhConnect ( const char *host)
     char  *hname       = NULL;
     int    tid         = 0;
     int    sock        = 0;
-    unsigned int maxOpen = NOFILE;
 
-    if (ft == NULL)
-    {
+
+    if (ft == NULL) {
         ft = calloc ( maxOpen, sizeof (struct rfTab));
         if ( NULL == ft ) {
             lserrno = LSE_MALLOC;
@@ -62,7 +75,7 @@ rhConnect ( const char *host)
         return rh;
     }
 
-    argv[0] = RF_SERVERD;
+    strcpy( argv[0], RF_SERVERD);
     argv[1] = NULL;
     if ((tid = ls_rtask (host, argv, REXF_TASKPORT | rxFlags)) < 0) {
         return NULL;
@@ -151,68 +164,68 @@ rhFind ( const char *host)
 }
 
 
-int
+unsigned int
 ls_ropen (const char *host, const char *fn, int flags, mode_t mode)
 {
     char buf[MSGSIZE]; // FIXME FIXME FIXME FIXME dynamic message allocation
     struct ropenReq req;
     struct LSFHeader hdr;
     struct rHosts *rh = NULL;
-    int fd = 0;
-    int i = 0;
+    unsigned int fd = 0;
 
 
     if ((rh = rhConnect (host)) == NULL) {
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        return 255;
     }
 
-    for (fd = 0; fd < maxOpen && ft[fd].host; fd++){
+    for (fd = 0; fd < maxOpen && ft[fd].host; fd++) { // NOTE maxOpen is global in rf.h
         ;
     } // FIXME EMTPY BODY
 
     if (fd == maxOpen)
     {
-        struct rfTab *tmpft;
+        struct rfTab *tmpft = NULL;
 
-        assert( maxOpen >= 0 );
+        // assert( maxOpen >= 0 );
         tmpft = realloc( ft, ( maxOpen + NOFILE) *  sizeof (struct rfTab));
         if ( NULL == tmpft ) {
             lserrno = LSE_MALLOC;
-            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+            return 255;
         }
 
         ft = tmpft;
-        for (i = maxOpen; i < maxOpen + NOFILE; i++) {
+        for ( unsigned int i = maxOpen; i < maxOpen + NOFILE; i++) {
             ft[i].host = NULL;
         }
 
         maxOpen += NOFILE;
     }
 
-    req.fn = fn;
+    req.fn = strdup(fn);
 
     req.flags = flags;
     req.mode = mode;
 
     if (lsSendMsg_ (rh->sock, RF_OPEN, 0, (char *) &req, buf, sizeof (struct LSFHeader) + MAX_FILENAME_LEN + sizeof (req), xdr_ropenReq, b_write_fix, NULL) < 0)
     {
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        return 255;
     }
 
     if (lsRecvMsg_(rh->sock, buf, sizeof (hdr), &hdr, NULL, NULL, b_read_fix) < 0)
     {
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        return 255; 
     }
 
-    if (hdr.opCode < 0)
+    if (hdr.opCode == 255 ) // FIXME FIXME FIXME FIXME hdr.opCode must be uint and sett to 255
     {
-        errno = errnoDecode_ (ABS (hdr.opCode));
+        // errno = errnoDecode_ (ABS (hdr.opCode));
+        errno = (int) errnoDecode_( hdr.opCode ); // NOFIX
         lserrno = LSE_FILE_SYS;
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        return 255;
     }
 
     ft[fd].host = rh;
-    ft[fd].fd = hdr.opCode;
+    ft[fd].fd = (int) hdr.opCode; // FIX FIX FIX opCode is used as a file descriptor? what? (remove cast when done)
     rh->nopen++;
 
     return fd;
@@ -229,7 +242,8 @@ ls_rclose (int fd)
 
     memset( buf, '\0', MSGSIZE );
 
-    if (fd < 0 || fd >= maxOpen || ft[fd].host == NULL) {
+    assert( maxOpen <= INT_MAX );
+    if (fd < 0 || fd >= (int) maxOpen || ft[fd].host == NULL) {
         lserrno = LSE_BAD_ARGS;
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
@@ -252,8 +266,9 @@ ls_rclose (int fd)
         rhTerminate (rh->hname);
     }
 
-    if (hdr.opCode < 0) {
-        errno = errnoDecode_ (ABS (hdr.opCode));
+    if (hdr.opCode == 255 ) {
+        // errno = errnoDecode_ (ABS (hdr.opCode));
+        errno = (int) errnoDecode_ ( hdr.opCode);
         lserrno = LSE_FILE_SYS;
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
@@ -262,8 +277,8 @@ ls_rclose (int fd)
 }
 
 
-int
-ls_rwrite (int fd, char *buf, size_t len)
+unsigned int
+ls_rwrite (int fd, const char *buf, size_t len)
 {
     struct {
         struct LSFHeader _;
@@ -273,9 +288,10 @@ ls_rwrite (int fd, char *buf, size_t len)
     struct LSFHeader hdr;
     struct rHosts *rh  = NULL;
 
-    if (fd < 0 || fd >= maxOpen || ft[fd].host == NULL) {
+    assert( maxOpen <= INT_MAX );
+    if (fd < 0 || fd >= (int) maxOpen || ft[fd].host == NULL) {
         lserrno = LSE_BAD_ARGS;
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        return INT_MAX; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     rh = ft[fd].host;
@@ -284,31 +300,32 @@ ls_rwrite (int fd, char *buf, size_t len)
     req.len = len;
 
     if (lsSendMsg_ (rh->sock, RF_WRITE, 0, (char *) &req, (char *) &msgBuf, sizeof (struct LSFHeader) + sizeof (req),  xdr_rrdwrReq, b_write_fix, NULL) < 0) {
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        return INT_MAX; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     assert( len <= LONG_MAX );
-    if (b_read_fix (rh->sock, buf, len) != (long) len) {
+    if (b_read_fix (rh->sock, strdup( buf ), len) != (long) len) {
         lserrno = LSE_MSG_SYS;
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        return INT_MAX; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     if (lsRecvMsg_ (rh->sock, (char *) &msgBuf, sizeof (hdr), &hdr, NULL, NULL, b_read_fix) < 0) {
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        return INT_MAX; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-        if (hdr.opCode < 0) {
-            errno = errnoDecode_ (ABS (hdr.opCode));  // FIXME FIXME FIXME FIXME opCode has to be signed, not usigned :(
+        if (hdr.opCode == 255) {
+            // errno = errnoDecode_ (ABS (hdr.opCode));  // FIXME FIXME FIXME FIXME opCode has to be signed, not usigned :(
+            errno = (int) errnoDecode_ ( hdr.opCode );  // FIXME FIXME FIXME FIXME opCode has to be signed, not usigned :(
             lserrno = LSE_FILE_SYS;
-            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+            return INT_MAX; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
 
-    assert( hdr.length <= INT_MAX ); // FIXME FIXME FIXME return type must be corrected
-    return (int) hdr.length;
+    assert( hdr.length <= UINT_MAX ); // FIXME FIXME FIXME return type must be corrected
+    return (unsigned int) hdr.length;
 }
 
 
-int
+unsigned int
 ls_rread (int fd, const char *buf, size_t len)
 {
     struct rrdwrReq req;
@@ -319,9 +336,9 @@ ls_rread (int fd, const char *buf, size_t len)
     } msgBuf;
     struct rHosts *rh = NULL;
 
-    if (fd < 0 || fd >= maxOpen || ft[fd].host == NULL) {
+    if (fd < 0 || fd >= (int) maxOpen || ft[fd].host == NULL) {
         lserrno = LSE_BAD_ARGS;
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        return 255;
     }
 
   rh = ft[fd].host;
@@ -330,28 +347,30 @@ ls_rread (int fd, const char *buf, size_t len)
   req.len = len;
 
     if (lsSendMsg_ (rh->sock, RF_READ, 0, (char *) &req, (char *) &msgBuf, sizeof (struct LSFHeader) + sizeof (req), xdr_rrdwrReq, b_write_fix, NULL) < 0) {
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        return 255;
     }
 
     if (lsRecvMsg_ (rh->sock, (char *) &msgBuf, sizeof (hdr), &hdr, NULL, NULL, b_read_fix) < 0) {
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        return 255;
     }
 
-    if (hdr.opCode < 0)
+    if (hdr.opCode == 255 )
     {
-        errno = errnoDecode_ (ABS (hdr.opCode));
+        // errno = errnoDecode_ (ABS (hdr.opCode));
+        errno = (int) errnoDecode_ ( hdr.opCode );
         lserrno = LSE_FILE_SYS;
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        return 255;
     }
 
     assert( hdr.length <= LONG_MAX );
-    if ( b_read_fix(rh->sock, buf, hdr.length) != (long) hdr.length) {
+    if ( b_read_fix(rh->sock, strdup( buf ), hdr.length) != (long) hdr.length) {
         lserrno = LSE_MSG_SYS;
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        return 255;
     }
 
     // return (int) hdr.length;
-    return hdr.length;
+    assert( hdr.length <= UINT_MAX );
+    return (u_int) hdr.length;
 }
 
 
@@ -366,7 +385,7 @@ ls_rlseek (int fd, off_t offset, int whence)
     struct LSFHeader hdr;
     struct rHosts *rh = NULL;
 
-    if (fd < 0 || fd >= maxOpen || ft[fd].host == NULL) {
+    if (fd < 0 || fd >= (int) maxOpen || ft[fd].host == NULL) {
         lserrno = LSE_BAD_ARGS;
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
@@ -385,14 +404,15 @@ ls_rlseek (int fd, off_t offset, int whence)
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    if (hdr.opCode < 0) {
-        errno = errnoDecode_ (ABS (hdr.opCode));
+    if (hdr.opCode == 255 ) {
+        // errno = errnoDecode_ (ABS (hdr.opCode));
+        errno = (int) errnoDecode_ ( hdr.opCode );
         lserrno = LSE_FILE_SYS;
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
   // return (off_t) hdr.length;
-  return hdr.length;
+  return (off_t) hdr.length;
 }
 
 
@@ -404,9 +424,9 @@ ls_rfstat (int fd, struct stat *st)
     struct LSFHeader hdr;
     struct rHosts *rh = NULL;
 
-    memset( buf, '\0', MSGSIZE );
+    memset( buf, '\0', strlen( buf ) );
 
-    if (fd < 0 || fd >= maxOpen || ft[fd].host == NULL)
+    if (fd < 0 || fd >= (int) maxOpen || ft[fd].host == NULL)
     {
         lserrno = LSE_BAD_ARGS;
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
@@ -423,8 +443,8 @@ ls_rfstat (int fd, struct stat *st)
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    if (hdr.opCode < 0) {
-        errno = errnoDecode_ (ABS (hdr.opCode));
+    if (hdr.opCode== 255 ) {
+        errno = (int) errnoDecode_ ( hdr.opCode );
         lserrno = LSE_FILE_SYS;
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
@@ -442,7 +462,8 @@ ls_rfcontrol (int command, int arg)
                 lserrno = LSE_BAD_ARGS;
                 return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
-            maxnrh = arg;
+            assert( arg > 0);
+            maxnrh = (unsigned int) arg;
             return 0;
         }
         break;
@@ -462,17 +483,17 @@ ls_rfcontrol (int command, int arg)
     return 0;
 }
 
-int
-ls_rfterminate ( const char *host)
-{
-    return rhTerminate (host);
-}
+// int
+// ls_rfterminate ( const char *host)
+// {
+//     return rhTerminate (host);
+// }
 
 int
-rhTerminate (char *host)
+rhTerminate ( const char *host)
 {
-  struct hostent *hp = NULL;
-  struct rHosts *rh = NULL;
+  struct hostent *hp  = NULL;
+  struct rHosts *rh   = NULL;
   struct rHosts *prev = NULL;
   struct LSFHeader buf;
   // int i;
@@ -520,7 +541,7 @@ ls_rstat (const char *host, const char *fn, struct stat *st)
     struct rHosts *rh = NULL;
     struct stringLen fnStr;
 
-    memset( buf, '\0', MSGSIZE );
+    memset( buf, '\0', strlen( buf ) );
 
     if ((rh = rhConnect (host)) == NULL) {
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
@@ -537,8 +558,9 @@ ls_rstat (const char *host, const char *fn, struct stat *st)
     }
 
 
-    if (hdr.opCode < 0) {
-        errno = errnoDecode_ (ABS (hdr.opCode));
+    if (hdr.opCode == 255 ) {
+        // errno = errnoDecode_ (ABS (hdr.opCode));
+        errno = (int) errnoDecode_ ( hdr.opCode );
         lserrno = LSE_FILE_SYS;
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
@@ -550,14 +572,14 @@ char *
 ls_rgetmnthost ( const char *host, const char *fn)
 {
     char buf[MSGSIZE];
-    char hostname[MAXHOSTNAMELEN];
+    char *hostname = malloc( MAXHOSTNAMELEN * sizeof (char) );
     struct LSFHeader hdr;
     struct stringLen fnStr;
     struct stringLen hostStr;
     struct rHosts *rh = NULL;
 
-    memset( buf,      '\0', MSGSIZE );
-    memset( hostname, '\0', MAXHOSTNAMELEN );    
+    memset( buf,      '\0', strlen( buf ) );
+    memset( hostname, '\0', strlen( hostname ) );    
 
     if ((rh = rhConnect (host)) == NULL) {
         return NULL;
@@ -576,8 +598,9 @@ ls_rgetmnthost ( const char *host, const char *fn)
         return NULL;
     }
 
-    if (hdr.opCode < 0) {
-        errno = errnoDecode_ (ABS (hdr.opCode));
+    if (hdr.opCode == 255 ) {
+        // errno = errnoDecode_ (ABS (hdr.opCode));
+        errno = (int) errnoDecode_( hdr.opCode );
         lserrno = LSE_FILE_SYS;
         return NULL;
     }
@@ -597,9 +620,9 @@ ls_conntaskport (pid_t rpid)
     struct tid *tid = NULL;
     struct sockaddr_in sin;
 
-    if (*genParams_[RES_TIMEOUT].paramValue) {
-        assert( *genParams_[RES_TIMEOUT].paramValue >= 0 ); // paranoia
-        resTimeout = atoi (genParams_[RES_TIMEOUT].paramValue);
+    if ( genParams_[RES_TIMEOUT].paramValue) {
+        // assert( genParams_[RES_TIMEOUT].paramValue >= 0 ); // paranoia
+        resTimeout = (unsigned int) atoi (genParams_[RES_TIMEOUT].paramValue);
     }
     else {
         resTimeout = RES_TIMEOUT;
@@ -615,7 +638,7 @@ ls_conntaskport (pid_t rpid)
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    if ((sock = CreateSock_ (SOCK_STREAM)) < 0) {
+    if ((sock = (int) CreateSock_ (SOCK_STREAM)) < 0) {
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
@@ -663,8 +686,9 @@ ls_runlink (const char *host, const char *fn)
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    if (hdr.opCode < 0) {
-        errno = errnoDecode_ (ABS (hdr.opCode));
+    if (hdr.opCode == 255 ) {
+        // errno = errnoDecode_ (ABS (hdr.opCode));
+        errno = (int) errnoDecode_(  hdr.opCode );
         lserrno = LSE_FILE_SYS;
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }

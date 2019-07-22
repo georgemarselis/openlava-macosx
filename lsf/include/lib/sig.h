@@ -109,7 +109,7 @@ static int sig_map[] = { 0,
     SIGUSR2
 };
 
-static const char *sigSymbol[] = { 
+const char *sigSymbol[] = { 
     "",
     "HUP",
     "INT",
@@ -145,7 +145,7 @@ static const char *sigSymbol[] = {
     "USR2"
 };
 
-static unsigned int NSIG_MAP = (sizeof (sig_map) / sizeof ( unsigned int)); // FIXME FIXME FIXME move this out to appropriate header
+unsigned int NSIG_MAP = (sizeof (sig_map) / sizeof ( unsigned int)); // FIXME FIXME FIXME move this out to appropriate header
 
 /* sig.c */
 int sig_encode(int sig);

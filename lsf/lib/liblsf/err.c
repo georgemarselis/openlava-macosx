@@ -182,7 +182,8 @@ ls_sysmsg (void)
     }
 
     if (LSE_SYSCALL (lserrno)) {
-        if (strerror (save_errno) != NULL && save_errno > 0) {
+        assert( save_errno < INT_MAX );
+        if (strerror ( (int) save_errno) != NULL && save_errno > 0) {
             sprintf (buf, "%s: %s", ls_errmsg[lserrno], strerror (save_errno));
         }
         else {
@@ -198,7 +199,7 @@ ls_sysmsg (void)
 }
 
 void
-ls_perror( char *usrMsg )
+ls_perror( const char *usrMsg )
 {
     if (usrMsg) {
         fputs (usrMsg, stderr);

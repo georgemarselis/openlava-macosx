@@ -19,7 +19,8 @@
 #pragma once
 
 #ifndef __XDR_HEADER__
-#include <rpc/xdr.h>
+// #include <rpc/xdr.h>
+#include "tirpc/rpc/xdr.h"
 #endif
 
 #include "daemons/libresd/resd.h"

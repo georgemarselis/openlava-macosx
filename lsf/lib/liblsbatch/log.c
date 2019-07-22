@@ -24,9 +24,8 @@
 
 #define   NL_SETN     13
 
-extern int errno;
-
-static double version = 0;
+// extern int errno;
+// static double version = 0;
 
 struct eventLogHandle *
 lsb_openelog (struct eventLogFile *ePtr, size_t *lineNum)

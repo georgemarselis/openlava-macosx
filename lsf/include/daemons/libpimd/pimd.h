@@ -29,7 +29,7 @@
 
 // PIMD
 
-static enum PIM_API {
+enum PIM_API {
     PIM_API_TREAT_JID_AS_PGID = 0x1,
     PIM_API_UPDATE_NOW        = 0x2,
     PIM_API_NULL
@@ -37,7 +37,7 @@ static enum PIM_API {
 
 // #define PIM_SLEEP_TIME 3
 // #define PIM_UPDATE_INTERVAL 30
-static enum PIM_PARAMS {
+enum PIM_PARAMS {
     PIM_DEBUG             = -1,
     PIM_INFODIR           =  0,
     PIM_SLEEP_TIME        =  1, // or 3
@@ -47,7 +47,7 @@ static enum PIM_PARAMS {
     PIM_NULL
 } PIM_PARAMS;
 
-static struct config_param pimDaemonParams[ ] = {
+struct config_param pimDaemonParams[ ] = {
     { "PIM_DEBUG",                NULL }, // -1
     { "PIM_INFODIR",              NULL }, //  0
     { "PIM_SLEEP_TIME",           NULL }, //  1
@@ -108,9 +108,9 @@ struct config_param pimParams[ ] = {
 enum
 {
     LSF_LIM_DEBUG,
-    LSF_LOGDIR,
+    // LSF_LOGDIR,
     LSF_DEBUG_PIM,
-    LSF_LOG_MASK,
+    // LSF_LOG_MASK,
     LSF_TIME_PIM,
     LSF_PIM_SLEEP_TIME, // FIXME FIME FIXME FIXME must reconsile and move out of here
     LSF_PIM_INFODIR,

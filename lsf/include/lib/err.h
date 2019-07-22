@@ -294,11 +294,11 @@ enum    ENO {
 
 // const 
 // char *err_str_(int errnum, const char *fmt, char *buf);
-int errnoEncode_ (int eno);
-int errnoDecode_ (int eno);
+unsigned int errnoEncode_ ( unsigned int errnumber );
+unsigned int errnoDecode_ ( unsigned int errnumber );
 /* lib/liblsf/err.c */
 void ls_errlog(FILE *fp, const char *fmt, ...);
 char *err_str_(unsigned int errnum, const char *fmt, char *buf);
 void verrlog_(int level, FILE *fp, const char *fmt, va_list ap);
 char *ls_sysmsg(void);
-void ls_perror(char *usrMsg);
+void ls_perror( const char *usrMsg);

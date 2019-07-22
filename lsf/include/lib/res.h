@@ -58,7 +58,7 @@ int rsetenv_(const char *host, char **envp, int option);
 int ls_chdir(const char *host, const char *dir);
 struct lsRequest *lsReqHandCreate_(pid_t taskID, unsigned int seqno, int connfd, void *extra, requestCompletionHandler replyHandler, appCompletionHandler appHandler, void *appExtra);
 int ackAsyncReturnCode_(int s, struct LSFHeader *replyHdr);
-int enqueueTaskMsg_(int s, unsigned int taskID, struct LSFHeader *msgHdr);
+int enqueueTaskMsg_(int s, pid_t taskID, struct LSFHeader *msgHdr);
 unsigned int expectReturnCode_(int s, unsigned int seqno, struct LSFHeader *repHdr);
 unsigned int resRC2LSErr_(unsigned int resRC);
 unsigned int ackReturnCode_(int s);

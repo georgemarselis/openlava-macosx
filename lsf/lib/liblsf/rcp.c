@@ -569,8 +569,8 @@ copyFile (struct rcpXfer *lsXfer, const char *buf, int option)
 
     if (option & SPOOL_BY_LSRCP) {
         
-        rfd = ls_ropen (lsXfer->szDest, lsXfer->ppszDestFnames[0], O_CREAT | O_RDWR | O_EXCL | LSF_O_CREAT_DIR, mode); // FIXME FIXME replace 0 with appropriate label
-        if ( -1 == rfd ) {
+        rfd = (int) ls_ropen (lsXfer->szDest, lsXfer->ppszDestFnames[0], O_CREAT | O_RDWR | O_EXCL | LSF_O_CREAT_DIR, mode); // FIXME FIXME replace 0 with appropriate label // FIXME FIXME remove cast
+        if ( 255 == rfd ) {
             close (lfd);
             ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "ls_ropen");
             return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
@@ -579,8 +579,8 @@ copyFile (struct rcpXfer *lsXfer, const char *buf, int option)
     }
     else {
 
-        rfd = ls_ropen (lsXfer->szDest, lsXfer->ppszDestFnames[0], O_CREAT | O_WRONLY | (lsXfer->iOptions & O_APPEND ? O_APPEND : O_TRUNC), mode); // FIXME FIXME replace 0 with appropriate label
-        if( -1 == rfd ) {
+        rfd = (int) ls_ropen (lsXfer->szDest, lsXfer->ppszDestFnames[0], O_CREAT | O_WRONLY | (lsXfer->iOptions & O_APPEND ? O_APPEND : O_TRUNC), mode); // FIXME FIXME replace 0 with appropriate label // FIXME FIXME remove cast
+        if( 255 == rfd ) {
             close (lfd);
             ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "ls_ropen");
             return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
@@ -654,7 +654,7 @@ copyFile (struct rcpXfer *lsXfer, const char *buf, int option)
             ls_syslog (LOG_DEBUG, "%s: ls_ropen() for file '%s' on '%s'", __func__, lsXfer->ppszHostFnames[0], lsXfer->szHost); // FIXME FIXME replace 0 with appropriate label
         }
 
-        if ((lfd = ls_ropen (lsXfer->szHost, lsXfer->ppszHostFnames[0], O_RDONLY, 0)) == -1) { // FIXME FIXME replace 0 with appropriate label
+        if ((lfd = (int) ls_ropen (lsXfer->szHost, lsXfer->ppszHostFnames[0], O_RDONLY, 0)) == -1) { // FIXME FIXME replace 0 with appropriate label // FIXME FIXME remove cast
             ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "ls_ropen");
             return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
