@@ -23,8 +23,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "lib/res.c"
-#include "lib/lproto.h"
+#include "lib/res.h"
+// #include "lib/lproto.h"
 #include "lib/mls.h"
 #include "lib/queue.h"
 #include "lib/xdrres.h"
@@ -73,15 +73,17 @@ ls_rtaske (const char *host, char **argv, int options, char **envp) // FIXME FIX
     int d = 0;
     int niosOptions = 0;
     char *new_argv[5]; // FIXME FIXME FIXME FIXME why 5?
-    pid_t pid = 0;
+    pid_t pid = -1;
     int socket = 0;
     int descriptor[2] = { 0, 0 };
     struct resCmdBill cmdmsg;
     struct lslibNiosRTask taskReq;
     unsigned short taskPort = 0;
-    sigset_t newMask;
-    sigset_t oldMask;
-    socklen_t len;
+    sigset_t newMask = 0;
+    sigset_t oldMask = 0;
+    socklen_t len    = 0;
+
+    memset( pathbuf, '\0', strlen( pathbuf ) );
 
     if (!reg_ls_donerex) {
         atexit ((void (*)()) ls_donerex);

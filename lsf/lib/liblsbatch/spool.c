@@ -33,12 +33,12 @@
 #include "lsb/spool.h"
 #include "lsf.h"
 
-extern char **environ;
+// extern char **environ;
 const char *defaultSpoolDir = NULL;
 
-#define NL_SETN     13
+// #define NL_SETN     13
 
-listHeaderPtr_t okHostsListPtr_ = NULL;
+// listHeaderPtr_t okHostsListPtr_ = NULL;
 
 char *
 getLocalHostOfficialName (void)

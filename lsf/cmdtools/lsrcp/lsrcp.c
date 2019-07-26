@@ -40,11 +40,13 @@
 // extern int mystat_ (char *, struct stat *, struct hostent *);
 // extern int myopen_ (char *, int, int, struct hostent *);
 
-extern char **environ;
+// extern char **environ;
 
 // #define NL_SETN 27
 
-#define LSRCP_MSGSIZE   1048576
+// #define LSRCP_MSGSIZE    1048576; // FIXME FIXME why is 1048576 so specific?
+
+const size_t LSRCP_MSGSIZE = 1048576; // FIXME FIXME why is 1048576 so specific?
 
 // void displayXfer (struct rcpXfer * lsXfer);
 // void doXferUsage (void);
@@ -78,7 +80,7 @@ main (int argc, char *argv[])
   if (ls_initrex (1, 0) == -1)
     {
       ls_perror ("lsrcp: ls_initrex");
-      return (-1);
+      return -1;
     }
 
 
@@ -101,15 +103,15 @@ main (int argc, char *argv[])
 
 
 
-  buf = (char *) malloc (LSRCP_MSGSIZE);
+  buf = malloc (LSRCP_MSGSIZE);
   if (!buf)
     {
 
       ls_donerex ();
       ls_syslog (LOG_ERR, I18N_FUNC_FAIL_S, "lsrcp", "main", _i18n_msg_get (ls_catd, NL_SETN, 2301, "try rcp..."));	/* catgets 2301 */
       if (doXferRcp (&lsXfer, 0) < 0)
-	return (-1);
-      return (0);
+	return -1;
+      return 0;
     }
   for (iCount = 0; iCount < lsXfer.iNumFiles; iCount++)
     {
@@ -120,8 +122,8 @@ main (int argc, char *argv[])
 	  ls_syslog (LOG_ERR, I18N_FUNC_FAIL_S, "lsrcp", "main",
 		     _i18n_msg_get (ls_catd, NL_SETN, 2301, "try rcp..."));
 	  if (doXferRcp (&lsXfer, 0) < 0)
-	    return (-1);
-	  return (0);
+	    return -1;
+	  return 0;
 	}
       if (logclass & (LC_FILE))
 	ls_syslog (LOG_DEBUG, "main(), copy file succeeded.");
@@ -133,17 +135,17 @@ main (int argc, char *argv[])
   if (destroyXfer (&lsXfer))
     {
       perror ("lsrcp");
-      return (-1);
+      return -1;
     }
 
 
   _i18n_end (ls_catd);
 
-  return (0);
+  return 0;
 
 handle_error:
   ls_donerex ();
-  return (-1);
+  return -1;
 
 }
 
@@ -264,6 +266,6 @@ doXferOptions (struct rcpXfer * lsXfer, int argc, char *argv[])
       doXferUsage ();
       exit (-1);
     }
-  return (0);
+  return 0;
 
 }
