@@ -1,0 +1,29 @@
+
+== Missing /usr/include/netconfig.h, Sun RPC implementation removal from glibc ==
+
+Redhat thought it was a good idea to remove the Sun RPC calls within glibc sometime in late 2017. 
+
+Read for more details: https://fedoraproject.org/wiki/Changes/SunRPCRemoval
+
+The gist of the thing is that Sun RPC was not quite working for IPv6, so the glibc team had to bump the ABI version (for some reason) to make it work. So they decided to move the Sun RPC inmplementation to a separate library, that broke a bunch of things for a boatload of applications.
+
+For Openlava, the brokerage includes missing /usr/include/netconfig.h (moved to /usr/include/tirpc/netconfig ) and misconfigured RPC system types, even if /usr/include/tirpc/netconfig.h is symlinked to the correct location.[1]
+
+
+[1] On that note, do not symlink. It is a bad idea and it will just lead to forward system breakage. What should be done, is autoconf picking the correct locations, depending on system detected
+
+=== Symptoms ===
+
+ /usr/include/tirpc/rpc/types.h:71:23: fatal error: netconfig.h: No such file or directory
+ #include <netconfig.h>
+
+=== What to do ===
+
+In RHEL/Fedora
+ 
+ yum install -y libtircp*
+
+
+In Debian
+
+ apt-get install -y libtircp*
