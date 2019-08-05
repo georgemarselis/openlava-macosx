@@ -1,3 +1,36 @@
+== Things you  need to install == 
+
+Fedora 
+ dnf install -y git* wget curl meld autoconf automake --skip-broken --exclude=git-pull-request
+
+Debian
+ apt-get install -y git* wget curl meld autoconf automake
+
+=== for NIS/YP functions ===
+
+Fedora: 
+ dnf install -y libnsl2-devel
+
+Debian:
+ apt-get install -y libnis-dev
+
+=== for Tcl/Tk ===
+
+Fedora:
+ dnf install -y tcl-devel
+
+Debian:
+ apt-get install -y tcl-dev
+ ln -s /usr/include/tcl* /usr/include/tcl (so we can reference tcl/tcl.h generically)
+
+
+=== /usr/bin/autopoint ===
+Fedora:
+ dnf install -y gettext{,-devel}
+
+Debian:
+ apt-get install -y gettext{,-dev}
+
 
 == Missing /usr/include/netconfig.h, Sun RPC implementation removal from glibc ==
 
@@ -19,11 +52,47 @@ For Openlava, the brokerage includes missing /usr/include/netconfig.h (moved to 
 
 === What to do ===
 
+==== Install software ==== 
+
 In RHEL/Fedora
  
- yum install -y libtircp*
+ yum install -y libtircp* 
 
 
 In Debian
 
  apt-get install -y libtircp*
+
+==== Edit system headers ==== 
+
+Yeah, seriously. The replacement library, libtircp, has issues references.
+
+===== All OS =====
+
+* /usr/include/tirpc/rpc/types.h still has a reference to 
+
+#include <netconfig.h>
+
+meaning, a header under /usr/include .
+
+Edit that header to point to 
+
+#include <tirpc/netconfig.h> 
+
+Same for the following:
+
+* /usr/include/tirpc/rpc/xdr.h
+
+ #include <rpc/types.h>
+ #include <tirpc/rpc/types.h>
+
+
+====== Debian ======
+
+======= Stretch =======
+
+In Debian Strech there are extra steps:
+
+you have to run configure again but add -D_DEFAULT_SOURCE
+
+======= Buster and above =======

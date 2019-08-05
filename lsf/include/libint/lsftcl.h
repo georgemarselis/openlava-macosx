@@ -18,8 +18,13 @@
 
 #pragma once
 
-
-#include <tcl.h> // FIXME FIXME FIXME FIXME tcl/tcl.h must be moved to a variable in configure.ac
+#ifndef __GNU_DEBIAN__
+#include <tcl/tcl.h> // FIXME FIXME FIXME FIXME tcl/tcl.h must be moved to a variable in configure.ac
+#elif defined __FEFORA__
+#include <tcl.h>
+#else
+#include <tcl.h> // catch-all
+#endif
 #include <sys/types.h>
 
 // static struct tclHostData *hPtr;
