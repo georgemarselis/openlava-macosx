@@ -472,15 +472,10 @@ struct lsInfo
     char paddin1[4];
     double cpuFactor[MAX_MODELS];               // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
     struct resItem **resTable;
-} __attribute__((packed));
-
-//#define CLUST_STAT_OK             0x01
-//#define CLUST_STAT_UNAVAIL        0x02
-
-enum CLUST_STAT {
-    CLUST_STAT_OK      = 0x01,
-    CLUST_STAT_UNAVAIL = 0x02
 };
+
+#define CLUST_STAT_OK             0x01
+#define CLUST_STAT_UNAVAIL        0x02
 
 struct clusterInfo
 {
@@ -523,7 +518,7 @@ struct hostInfo
     char **resources;
     // char hostName[MAXHOSTNAMELEN];
     char *hostName;
-} __attribute__((packed));
+};
 
     
 
@@ -575,7 +570,7 @@ struct lsfRusage
     long   ru_nvcsw;
     long   ru_nivcsw;
     time_t ru_exutime;
-} __attribute__((packed));
+};
 
 struct lsfAcctRec
 {

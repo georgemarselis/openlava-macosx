@@ -1048,7 +1048,7 @@ struct jobInfoEnt
 	struct jRusage runRusage;
 	unsigned long jobId;
 	double cpuFactor;
-};
+} __attribute__((packed));
 
 struct userInfoEnt
 {
