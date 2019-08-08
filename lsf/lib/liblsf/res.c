@@ -597,6 +597,8 @@ expectReturnCode_ (int s, unsigned int seqno, struct LSFHeader *repHdr)
     struct LSFHeader buf;
     XDR xdrs;
 
+    assert (s > 0 ); // just in case
+
     xdrmem_create (&xdrs, (char *) &buf, sizeof (struct LSFHeader), XDR_DECODE);
 
     for (;;) { // FIXME FIXME FIXME FIXME re-write infinite loop
@@ -604,7 +606,7 @@ expectReturnCode_ (int s, unsigned int seqno, struct LSFHeader *repHdr)
             ls_syslog (LOG_DEBUG, "%s: calling readDecodeHdr_...", __func__);
         }
         xdr_setpos (&xdrs, 0);
-        if (readDecodeHdr_ (s, (char *) &buf, &b_read_fix, &xdrs, repHdr) < 0) {
+        if (readDecodeHdr_ ( (unsigned int) s, (char *) &buf, &b_read_fix, &xdrs, repHdr) < 0) { // NOFIX cast is probably fine
             xdr_destroy (&xdrs);
             return 255; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
@@ -1883,7 +1885,7 @@ lsMsgWait_ (int inTidCnt, unsigned int *tidArray, unsigned int *rdyTidCnt, unsig
                 }
 
                 xdr_setpos (&xdrs, 0);
-                rc = readDecodeHdr_ (taskEnt->sock, hdrBuf, b_read_fix, &xdrs, &msgHdr);
+                rc = readDecodeHdr_ ( (unsigned int) taskEnt->sock, hdrBuf, b_read_fix, &xdrs, &msgHdr); // FIXME FIXME FIXME this has to go through checking during debugging
 
                 if (rc < 0) {
 

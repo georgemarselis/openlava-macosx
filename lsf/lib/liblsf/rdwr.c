@@ -378,7 +378,7 @@ blockSigs_ (int sig, sigset_t *blockMask, sigset_t *oldMask)
 
 // FIXME timeout should be of type unsigned timeu_t or something
 long
-nb_read_timeout (int s, char *buf, size_t len, int timeout)
+nb_read_timeout (int s, char *buf, size_t len, time_t timeout)
 {
     ssize_t cc      = 0;
     int nReady      = 0;

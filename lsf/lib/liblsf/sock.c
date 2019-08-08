@@ -27,7 +27,7 @@
 
 
 
-unsigned int
+int
 CreateSock_ (int protocol)
 {
 	struct sockaddr_in cliaddr;
@@ -36,16 +36,13 @@ CreateSock_ (int protocol)
 	static unsigned short i = 0;
 	static char isroot = FALSE;
 
-	if (geteuid () == 0)
-	{
-		if (!isroot)
-		{
+	if (geteuid () == 0) {
+		if (!isroot) {
 			port = IPPORT_RESERVED - 1;
 		}
 		isroot = TRUE;
 	}
-	else
-	{
+	else {
 		isroot = FALSE;
 		port = 0;
 	}
@@ -65,8 +62,7 @@ CreateSock_ (int protocol)
 	memset ((char *) &cliaddr, 0, sizeof (cliaddr));
 	cliaddr.sin_family = AF_INET;
 	cliaddr.sin_addr.s_addr = htonl (INADDR_ANY);
-	for ( unsigned i = 0; i < IPPORT_RESERVED / 2; i++)
-	{
+	for ( unsigned i = 0; i < IPPORT_RESERVED / 2; i++)	{
 		cliaddr.sin_port = htons (port);
 
 		if (isroot) {
@@ -100,8 +96,7 @@ CreateSock_ (int protocol)
 	}
 
 
-	if (isroot && i == IPPORT_RESERVED / 2)
-	{
+	if (isroot && i == IPPORT_RESERVED / 2)	{
 		if (logclass & LC_COMM) {
 			ls_syslog (LOG_DEBUG, "%s: went through all , %s", __func__, strerror (errno));
 		}
@@ -120,7 +115,6 @@ CreateSock_ (int protocol)
 # endif
 
 	return s;
-
 }
 
 int

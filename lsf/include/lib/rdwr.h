@@ -38,5 +38,5 @@ int  b_accept_      ( int s, struct sockaddr *addr, socklen_t *addrlen);
 int  detectTimeout_ ( int s, int recv_timeout);
 void alarmer_       ( void);
 int  blockSigs_     ( int sig, sigset_t *blockMask, sigset_t *oldMask);
-long nb_read_timeout( int s, char *buf, size_t len, int timeout);
+long nb_read_timeout( int s, char *buf, size_t len, time_t timeout);
 

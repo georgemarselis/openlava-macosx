@@ -134,18 +134,16 @@ opensocks_ (unsigned int num)
 
     nextdescr = FIRST_RES_SOCK; // NOFIX : cast is perfectly fine here, FIRST_RES_SOCK has a const value of 20, from lsf.h
     for( unsigned int i = 0; i < totsockets_; i++) {
-        unsigned int s = CreateSock_ (SOCK_STREAM);        
+        unsigned int s = (unsigned int) CreateSock_ (SOCK_STREAM); // FIXME FIXME FIXME the cast is probably fine, but might as well take a look later       
         if( UINT_MAX == s ) {
             if (logclass & LC_COMM) {
                 ls_syslog (LOG_DEBUG, "%s: CreateSock_ failed, iter:<%d> %s",  __func__, i, strerror (errno));
             }
             totsockets_ = i;
-            if (i > 0)
-            {
+            if (i > 0) {
                 break;
             }
-            else
-            {
+            else {
                 return UINT_MAX; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
             }
         }
@@ -178,7 +176,7 @@ opensocks_ (unsigned int num)
 #endif
 #endif
 
-            close ((int)s);
+            close ((int)s); // NOFIX cast is fine here
         }
         nextdescr++;
     }
@@ -198,22 +196,18 @@ int
 ls_fdbusy (int fd)
 {
     struct sTab hashSearchPtr;
-    struct hEnt *hEntPtr      = 0;
-    unsigned long foo  = 0;
+    struct hEnt *hEntPtr = 0;
+    int foo    = 0;
 
     assert (fd > 0 );
 
     foo = ( unsigned long )fd;
 
-    if (    foo == chanSock_ (limchans_[PRIMARY]) ||
-            foo == chanSock_ (limchans_[MASTER])  ||
-            foo == chanSock_ (limchans_[UNBOUND])
-        )
-    {
+    if ( foo == chanSock_ (limchans_[PRIMARY]) || foo == chanSock_ (limchans_[MASTER])  || foo == chanSock_ (limchans_[UNBOUND])) {
         return TRUE;
     }
 
-    if ( fd == cli_nios_fd[0]) {
+    if ( fd == cli_nios_fd[0]) { // FIXME FIXME FIXME find out what [0] represents and label it.
         return TRUE;
     }
 
@@ -269,16 +263,13 @@ lsfExecLog (const char *cmd)
 {
     char *lsfUserName   = malloc( sizeof( char ) * MAX_LSF_NAME_LEN + 1 );
 
-    if (genParams_[LSF_MLS_LOG].paramValue &&
-            ((genParams_[LSF_MLS_LOG].paramValue[0] == 'y') ||
-             (genParams_[LSF_MLS_LOG].paramValue[0] == 'Y')))
-        {
+    if (genParams_[LSF_MLS_LOG].paramValue && ((genParams_[LSF_MLS_LOG].paramValue[0] == 'y') || (genParams_[LSF_MLS_LOG].paramValue[0] == 'Y'))) {  // FIXME FIXME FIXME find out what [0] represents and label it.
 
             getLSFUser_ (lsfUserName, sizeof (lsfUserName));
             /* catgets 6259 */
             syslog (LOG_INFO, "catgets 6259: %s: user - %s cmd - '%s'", __func__, lsfUserName, cmd);
 
-        }
+    }
     free(  lsfUserName );
     return;
 }

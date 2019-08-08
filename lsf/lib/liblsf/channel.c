@@ -148,8 +148,7 @@ chanServSocket_ (int type, unsigned short port, int backlog, int options)
         }
     }
 
-    assert( s >= 0 );
-    channels[ch].handle = (unsigned int)s;
+    channels[ch].handle = s;
     channels[ch].state = CH_WAIT;
     if (type == SOCK_DGRAM) {
         channels[ch].type = CH_TYPE_UDP;
@@ -201,16 +200,14 @@ chanClientSocket_( int domain, int type, int options )
     }
 
     channels[ch].state = CH_DISC;
-    assert( s0 >= 0 );
-    channels[ch].handle = (unsigned int) s0;
+    channels[ch].handle = s0;
     if (s0 < 3)
     {
         s1 = get_nonstd_desc_ (s0);
         if (s1 < 0){
             close (s0);
         }
-        assert( s1 >= 0 );
-        channels[ch].handle = (unsigned int)s1;
+        channels[ch].handle = s1;
     }
 
     if (options & CHAN_OP_PPORT)
@@ -299,7 +296,7 @@ chanClientSocket_( int domain, int type, int options )
 }
 
 int
-chanAccept_ (int chfd, struct sockaddr_in *from)
+chanAccept_ (unsigned int chfd, struct sockaddr_in *from)
 {
     int s = 0;
     socklen_t len;
@@ -312,7 +309,7 @@ chanAccept_ (int chfd, struct sockaddr_in *from)
 
     len = sizeof (struct sockaddr);
     assert( channels[chfd].handle <= INT_MAX );
-    s = accept ((int)channels[chfd].handle, (struct sockaddr *) from, &len);
+    s = accept ( channels[chfd].handle, (struct sockaddr *) from, &len);
     if (SOCK_INVALID (s))
     {
         lserrno = LSE_SOCK_SYS;
@@ -351,7 +348,7 @@ chanActivate_ (unsigned int chfd)
 }
 
 int
-chanConnect_ (int chfd, struct sockaddr_in *peer, int timeout)
+chanConnect_ ( unsigned int chfd, struct sockaddr_in *peer, time_t timeout)
 {
     int cc = 0;
 
@@ -381,7 +378,7 @@ chanConnect_ (int chfd, struct sockaddr_in *peer, int timeout)
     if (timeout >= 0)
     {
         assert( channels[chfd].handle <= INT_MAX );
-        if (b_connect_ ((int)channels[chfd].handle, (struct sockaddr *) peer, sizeof (struct sockaddr_in), (unsigned int)timeout / 1000) < 0)
+        if (b_connect_ ( channels[chfd].handle, (struct sockaddr *) peer, sizeof (struct sockaddr_in), timeout / 1000) < 0)
         {
             if (errno == ETIMEDOUT) {
                 lserrno = LSE_TIME_OUT;
@@ -400,44 +397,35 @@ chanConnect_ (int chfd, struct sockaddr_in *peer, int timeout)
 }
 
 int
-chanSendDgram_ (int chfd, char *buf, int len, struct sockaddr_in *peer)
+chanSendDgram_ ( unsigned int chfd, char *buf, size_t len, struct sockaddr_in *peer)
 {
-    int s = 0;
     ssize_t cc = 0;
-
-    assert( channels[chfd].handle <= INT_MAX );
-    s = (int) channels[chfd].handle;
-
 
     if (logclass & (LC_COMM | LC_TRACE)) {
         ls_syslog (LOG_DEBUG3, "chanSendDgram_: Sending message size=%d peer=%s chan=%d", len, sockAdd2Str_ (peer), chfd);
     }
 
-    if (channels[chfd].type != CH_TYPE_UDP)
-    {
+    if (channels[chfd].type != CH_TYPE_UDP) {
         lserrno = LSE_INTERNAL;
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    if( len < 0 ) {
-        lserrno = LSE_INTERNAL;
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+    // if( len < 0 ) {
+    //     lserrno = LSE_INTERNAL;
+    //     return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+    // }
+
+    if (channels[chfd].state == CH_CONN) {
+        cc = send (channels[chfd].handle, buf, len, 0);
+    }
+    // else if ( len >= 0 ) {
+    else {
+        // FIXME FIXME  the conversion of len from int to size_t here is problematic. on error len == -1, but the check should be sufficient.
+        cc = sendto (channels[chfd].handle, buf, len, 0, (struct sockaddr *) peer, sizeof (struct sockaddr_in) );
+
     }
 
-    if (channels[chfd].state == CH_CONN)
-        cc = send (s, buf, (size_t) len, 0);
-    else if ( len >= 0 )
-    {
-        /* FIXME FIXME 
-            the conversion of len from int to size_t here is problematic. on error len == -1,
-            but the check above should be sufficient.
-        */
-        cc = sendto (s, buf, (size_t) len, 0, (struct sockaddr *) peer, sizeof (struct sockaddr_in) );
-
-    }
-
-    if (SOCK_CALL_FAIL (cc))
-    {
+    if (SOCK_CALL_FAIL (cc)) {
         lserrno = LSE_MSG_SYS;
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
@@ -448,9 +436,8 @@ chanSendDgram_ (int chfd, char *buf, int len, struct sockaddr_in *peer)
 /* chanRcvDgram_()
 */
 int
-chanRcvDgram_ (int chfd, char *buf, int len, struct sockaddr_in *peer, int timeout)
+chanRcvDgram_ (unsigned int chfd, char *buf, size_t len, struct sockaddr_in *peer, time_t timeout)
 {
-    int sock = 0;
     struct timeval timeval;
     struct timeval *timep = NULL;
     int nReady = 0;
@@ -458,8 +445,6 @@ chanRcvDgram_ (int chfd, char *buf, int len, struct sockaddr_in *peer, int timeo
     socklen_t peersize;
 
     peersize = sizeof (struct sockaddr_in);
-    assert( channels[chfd].handle <= INT_MAX );
-    sock = (int)channels[chfd].handle;
 
     if (channels[chfd].type != CH_TYPE_UDP)
     {
@@ -475,21 +460,21 @@ chanRcvDgram_ (int chfd, char *buf, int len, struct sockaddr_in *peer, int timeo
     {
         if ( channels[chfd].state == CH_CONN) 
         {
-            if( len < 0 ) {
-                lserrno = LSE_INTERNAL;
-                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
-            }
+            // if( len < 0 ) {
+            //     lserrno = LSE_INTERNAL;
+            //     return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+            // }
 
-            cc = recv (sock, buf, (size_t) len, 0);
+            cc = recv( channels[chfd].handle, buf, len, 0);
 
         }
         else {
-            if( len < 0 ) {
-                lserrno = LSE_INTERNAL;
-                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
-            }
+            // if( len < 0 ) {
+            //     lserrno = LSE_INTERNAL;
+            //     return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+            // }
 
-            cc = recvfrom (sock, buf, (size_t) len, 0, (struct sockaddr *) peer, &peersize);
+            cc = recvfrom (channels[chfd].handle, buf, len, 0, (struct sockaddr *) peer, &peersize);
         }
         if (SOCK_CALL_FAIL (cc))
         {
@@ -510,7 +495,8 @@ chanRcvDgram_ (int chfd, char *buf, int len, struct sockaddr_in *peer, int timeo
         */
 
         timeval.tv_sec = timeout / 1000;
-        timeval.tv_usec = (int) (timeout - timeval.tv_sec * 1000);
+        // timeval.tv_usec = (int) (timeout - timeval.tv_sec * 1000);
+        timeval.tv_usec = (timeout - timeval.tv_sec * 1000);
         /* timeval.tv_usec *= 1000 maybe here? */
         timep = &timeval;
     }
@@ -518,7 +504,7 @@ chanRcvDgram_ (int chfd, char *buf, int len, struct sockaddr_in *peer, int timeo
     for (;;) /* FIXME FIXME FIXME all infinite loops must go */
     {
 
-        nReady = rd_select_ (sock, timep);
+        nReady = rd_select_ (channels[chfd].handle, timep);
         if (nReady < 0)
         {
             lserrno = LSE_SELECT_SYS;
@@ -531,19 +517,19 @@ chanRcvDgram_ (int chfd, char *buf, int len, struct sockaddr_in *peer, int timeo
         }
         if (channels[chfd].state == CH_CONN) {
 
-            if( len < 0 ) { /* FIXME FIXME all these checks should be turned into n assert */
-                lserrno = LSE_INTERNAL;
-                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
-            }
-            cc = recv (sock, buf, (size_t) len, 0);
+            // if( len < 0 ) { /* FIXME FIXME all these checks should be turned into n assert */
+            //     lserrno = LSE_INTERNAL;
+            //     return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+            // }
+            cc = recv (channels[chfd].handle, buf, len, 0);
         }
-        else {
-            if( len < 0 ) {
-                lserrno = LSE_INTERNAL;
-                return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
-            }
-            cc = recvfrom (sock, buf, (size_t) len, 0, (struct sockaddr *) peer, &peersize);
-        }
+        // else {
+        //     if( len < 0 ) {
+        //         lserrno = LSE_INTERNAL;
+        //         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        //     }
+        //     cc = recvfrom (channels[chfd].handle, buf, len, 0, (struct sockaddr *) peer, &peersize);
+        // }
 
         if (SOCK_CALL_FAIL (cc))
         {
@@ -570,8 +556,8 @@ chanOpen_ (unsigned int iaddr, unsigned short port, int options)
     int cc     = 0;
     int oldOpt = 0;
     int newOpt = 0;
-    unsigned int i           = 0;
-    unsigned int returnValue = 0;
+    int returnValue = 0;
+    unsigned int i  = 0;
     struct sockaddr_in addr;
 
     i = findAFreeChannel( );
@@ -589,8 +575,7 @@ chanOpen_ (unsigned int iaddr, unsigned short port, int options)
     addr.sin_port = port;
 
     newOpt = 0;
-    if (options & CHAN_OP_PPORT)
-    {
+    if (options & CHAN_OP_PPORT) {
         newOpt |= LS_CSO_PRIVILEGE_PORT;
     }
 
@@ -598,15 +583,13 @@ chanOpen_ (unsigned int iaddr, unsigned short port, int options)
     returnValue = CreateSock_ (SOCK_STREAM);
     channels[i].handle = returnValue;
     setLSFChanSockOpt_ (oldOpt);
-    if (returnValue == UINT_MAX )
-    {
+    if (returnValue == INT_MAX ) {
         chanerr = CHANE_SYSCALL;
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    if (io_nonblock_ ((int)channels[i].handle) < 0)
-    {
-        close((int)channels[i].handle);
+    if (io_nonblock_ ( channels[i].handle) < 0) {
+        close( channels[i].handle);
         channels[i].state = CH_DISC;
         channels[i].handle = INVALID_HANDLE;
         chanerr = CHANE_SYSCALL;
@@ -614,7 +597,7 @@ chanOpen_ (unsigned int iaddr, unsigned short port, int options)
     }
 
     // channels[i].handle is unsigned int
-    cc = connect( (int)channels[i].handle, (struct sockaddr *) &addr, sizeof (addr)); // FIXME cast here is correct
+    cc = connect( channels[i].handle, (struct sockaddr *) &addr, sizeof (addr)); // FIXME cast here is correct
     if (cc < 0)
     {
 
@@ -687,18 +670,19 @@ chanOpenSock_ (int s, int options)
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
     channels[i].type = CH_TYPE_TCP;
-    channels[i].handle = (unsigned int)s;
+    channels[i].handle = s;
     channels[i].state = CH_CONN;
 
     if (options & CHAN_OP_RAW) {
-        return (int) i;
+        assert( i > 0 );
+        return (int)i;
     }
 
     channels[i].send = newBuf ();
     channels[i].recv = newBuf ();
     if (!channels[i].send || !channels[i].recv)
     {
-        close((int)channels[i].handle);
+        close( channels[i].handle);
         channels[i].state = CH_DISC;
         channels[i].handle = INVALID_HANDLE;
         if ( channels[i].send != NULL) {
@@ -712,6 +696,8 @@ chanOpenSock_ (int s, int options)
         lserrno = LSE_MALLOC;
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
+
+    assert( i > 0 );
     return (int)i;
 }
 
@@ -799,7 +785,7 @@ chanCloseAll_ (void)
 }
 
 void
-chanCloseAllBut_ (int chfd)
+chanCloseAllBut_ ( unsigned int chfd)
 {
     for (unsigned int i = 0; i < chanIndex; i++) {
         if ((channels[i].state != CH_FREE) && (i != (unsigned int)chfd)) {
@@ -819,8 +805,8 @@ chanSelect_ (struct Masks *sockmask, struct Masks *chanmask, struct timeval *tim
     FD_ZERO (&sockmask->wmask);
     FD_ZERO (&sockmask->emask);
 
-    for ( unsigned int i = 0; i < chanIndex; i++) // FIXME FIXME FIXME FIXME FIXME FIXME what is chanIndex and where is it defined?
-    {
+    for ( unsigned int i = 0; i < chanIndex; i++) { // FIXME FIXME FIXME FIXME FIXME FIXME what is chanIndex and where is it defined?
+
         if (channels[i].state == CH_INACTIVE) {
             continue;
         }
@@ -828,14 +814,14 @@ chanSelect_ (struct Masks *sockmask, struct Masks *chanmask, struct timeval *tim
         if (channels[i].handle == INVALID_HANDLE) {
             continue;
         }
-        if (channels[i].state == CH_FREE)
-        {
+        if (channels[i].state == CH_FREE) {
             ls_syslog (LOG_ERR, "%s: channel %d has socket %d but in %s state", __func__, i, channels[i].handle, "CH_FREE");
             continue;
         }
 
-        if (channels[i].type == CH_TYPE_UDP && channels[i].state != CH_WAIT)
+        if (channels[i].type == CH_TYPE_UDP && channels[i].state != CH_WAIT) {
             continue;
+        }
 
         if (logclass & LC_COMM) {
             ls_syslog (LOG_DEBUG3, "%s: Considering channel %d handle %d state %d type %d", __func__, i, channels[i].handle, (int) channels[i].state, (int) channels[i].type);
@@ -845,8 +831,7 @@ chanSelect_ (struct Masks *sockmask, struct Masks *chanmask, struct timeval *tim
             continue;
         }
 
-        if (channels[i].state == CH_PRECONN)
-        {
+        if (channels[i].state == CH_PRECONN) {
             FD_SET (channels[i].handle, &(sockmask->wmask));
             continue;
         }
@@ -854,6 +839,7 @@ chanSelect_ (struct Masks *sockmask, struct Masks *chanmask, struct timeval *tim
         if (logclass & LC_COMM) {
             ls_syslog (LOG_DEBUG3, "%s: Adding channel %d handle %d ", __func__, i, channels[i].handle);
         }
+
         FD_SET (channels[i].handle, &(sockmask->rmask));
 
         if (channels[i].type != CH_TYPE_UDP) {
@@ -876,22 +862,19 @@ chanSelect_ (struct Masks *sockmask, struct Masks *chanmask, struct timeval *tim
     FD_ZERO (&(chanmask->wmask));
     FD_ZERO (&(chanmask->emask));
 
-    for ( unsigned int i = 0; i < chanIndex; i++)
-    {
+    for ( unsigned int i = 0; i < chanIndex; i++) {
 
         if (channels[i].handle == INVALID_HANDLE) {
             continue;
         }
 
-        if (FD_ISSET (channels[i].handle, &(sockmask->emask)))
-        {
+        if (FD_ISSET (channels[i].handle, &(sockmask->emask))) {
             ls_syslog (LOG_DEBUG, "%s: setting error mask for channel %d", __func__, channels[i].handle);
             FD_SET (i, &(chanmask->emask));
             continue;
         }
 
-        if ((!channels[i].send || !channels[i].recv) && (channels[i].state != CH_PRECONN))
-        {
+        if ((!channels[i].send || !channels[i].recv) && (channels[i].state != CH_PRECONN)) {
             if (FD_ISSET (channels[i].handle, &(sockmask->rmask))) {
                 FD_SET (i, &(chanmask->rmask));
             }
@@ -902,12 +885,9 @@ chanSelect_ (struct Masks *sockmask, struct Masks *chanmask, struct timeval *tim
             continue;
         }
 
+        if (channels[i].state == CH_PRECONN) {
 
-        if (channels[i].state == CH_PRECONN)
-        {
-
-            if (FD_ISSET (channels[i].handle, &(sockmask->wmask)))
-            {
+            if (FD_ISSET (channels[i].handle, &(sockmask->wmask))) {
                 channels[i].state = CH_CONN;
                 channels[i].send = newBuf ();
                 channels[i].recv = newBuf ();
@@ -915,20 +895,17 @@ chanSelect_ (struct Masks *sockmask, struct Masks *chanmask, struct timeval *tim
             }
 
         }
-        else
-        {
+        else {
 
-            if (FD_ISSET (channels[i].handle, &(sockmask->rmask)))
-            {
-                doread ((int)i, chanmask);
-                if (!FD_ISSET (i, &(chanmask->rmask))
-                    && !FD_ISSET (i, &(chanmask->emask)))
+            if (FD_ISSET (channels[i].handle, &(sockmask->rmask))) {
+                doread ( i, chanmask);
+                if (!FD_ISSET (i, &(chanmask->rmask)) && !FD_ISSET (i, &(chanmask->emask))) {
                     nReady--;
+                }
             }
 
-            if ((channels[i].send->forw != channels[i].send) && FD_ISSET (channels[i].handle, &(sockmask->wmask)))
-            {
-                dowrite ((int)i, chanmask);
+            if ((channels[i].send->forw != channels[i].send) && FD_ISSET (channels[i].handle, &(sockmask->wmask))) {
+                dowrite ( i, chanmask);
             }
             FD_SET (i, &(chanmask->wmask));
         }
@@ -942,14 +919,15 @@ chanSelect_ (struct Masks *sockmask, struct Masks *chanmask, struct timeval *tim
 }
 
 int
-chanEnqueue_ (int chfd, struct Buffer *msg)
+chanEnqueue_ (unsigned int chfd, struct Buffer *msg)
 {
-    long maxfds;
+    long maxfds = 0;
 
     maxfds = sysconf (_SC_OPEN_MAX);
-    maxfds = sysconf (_SC_OPEN_MAX);
+    // maxfds = sysconf (_SC_OPEN_MAX);
 
-    if (chfd < 0 || chfd > maxfds)
+    // if (chfd < 0 || chfd > maxfds)
+    if (  chfd > maxfds)
     {
         chanerr = CHANE_BADCHAN;
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
@@ -966,25 +944,24 @@ chanEnqueue_ (int chfd, struct Buffer *msg)
 }
 
 int
-chanDequeue_ (int chfd, struct Buffer **buf)
+chanDequeue_ ( unsigned int chfd, struct Buffer **buf)
 {
-    long maxfds;
+    long maxfds = 0;
 
     maxfds = sysconf (_SC_OPEN_MAX);
 
-    if (chfd < 0 || chfd > maxfds)
-    {
+    // if (chfd < 0 || chfd > maxfds)
+    if ( chfd > maxfds ) {
         chanerr = CHANE_BADCHAN;
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
-    if (channels[chfd].handle == INVALID_HANDLE || channels[chfd].state == CH_PRECONN)
-    {
+
+    if (channels[chfd].handle == INVALID_HANDLE || channels[chfd].state == CH_PRECONN) {
         chanerr = CHANE_NOTCONN;
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    if (channels[chfd].recv->forw == channels[chfd].recv)
-    {
+    if (channels[chfd].recv->forw == channels[chfd].recv) {
         chanerr = CHANE_NOMSG;
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
@@ -994,34 +971,34 @@ chanDequeue_ (int chfd, struct Buffer **buf)
 }
 
 long
-chanReadNonBlock_ (int chfd, char *buf, size_t len, int timeout)
+chanReadNonBlock_ (unsigned int chfd, char *buf, size_t len, time_t timeout)
 {
-    if (io_nonblock_ ((int)channels[chfd].handle) < 0)
+    if (io_nonblock_ ( channels[chfd].handle) < 0)
     {
         lserrno = LSE_FILE_SYS;
         ls_syslog (LOG_ERR, "%s: %s failed, %m", __func__, "io_nonblock_", 2); // FIXME the 2 is from a leftover from the macro expansion
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    return nb_read_timeout( (int)channels[chfd].handle, buf, len, timeout);
+    return nb_read_timeout( channels[chfd].handle, buf, len, timeout);
 }
 
 long 
-chanRead_ (int chfd, char *buf, size_t len)
+chanRead_ (unsigned int chfd, char *buf, size_t len)
 {
-    return b_read_fix ((int)channels[chfd].handle, buf, len);
+    return b_read_fix ( channels[chfd].handle, buf, len );
 }
     
 
 // FIXME function should return size_t. after fixing, remove cast
 long
-chanWrite_ (int chfd, char *buf, size_t len)
+chanWrite_ (unsigned int chfd, char *buf, size_t len)
 {
-    return (long) b_write_fix ((int)channels[chfd].handle, buf, len) ; // FIXME FIXME FIXME function should return int. after fixing, remove cast 
+    return (long) b_write_fix ( channels[chfd].handle, buf, len) ; // FIXME FIXME FIXME function should return int. after fixing, remove cast 
 }
 
 int
-chanRpc_ (int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *outhdr, int timeout)
+chanRpc_  ( unsigned int  chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *outhdr, time_t timeout)
 {
     
     long cc;
@@ -1161,7 +1138,8 @@ chanRpc_ (int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *out
     return 0;
 }
 
-unsigned long chanSock_ (unsigned int chfd)
+// unsigned long chanSock_ (unsigned int chfd)
+int chanSock_ (unsigned int chfd)
 {
     if ( chfd > chanMaxSize)
     {
@@ -1173,7 +1151,7 @@ unsigned long chanSock_ (unsigned int chfd)
 }
 
 int
-chanSetMode_ (unsigned int chfd, int mode)
+chanSetMode_ (unsigned int chfd, mode_t mode)
 {
     if ( chfd > chanMaxSize)
     {
@@ -1191,7 +1169,7 @@ chanSetMode_ (unsigned int chfd, int mode)
     if (mode == CHAN_MODE_NONBLOCK)
     {
 
-        if (io_nonblock_ ((int)channels[chfd].handle) < 0)
+        if (io_nonblock_ ( channels[chfd].handle) < 0)
         {
             lserrno = LSE_SOCK_SYS;
             return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
@@ -1211,7 +1189,7 @@ chanSetMode_ (unsigned int chfd, int mode)
         return 0;
     }
 
-    if (io_block_ ((int)channels[chfd].handle) < 0)
+    if (io_block_ ( channels[chfd].handle ) < 0)
     {
         lserrno = LSE_SOCK_SYS;
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
@@ -1221,10 +1199,10 @@ chanSetMode_ (unsigned int chfd, int mode)
 }
 
 void
-doread (int chfd, struct Masks *chanmask)
+doread ( unsigned int chfd, struct Masks *chanmask)
 {
-    long cc;
-    struct Buffer *rcvbuf;
+    long cc = 0;
+    struct Buffer *rcvbuf = NULL;
 
     if (channels[chfd].recv->forw == channels[chfd].recv)
     {
@@ -1327,7 +1305,7 @@ doread (int chfd, struct Masks *chanmask)
 }
 
 void
-dowrite (int chfd, struct Masks *chanmask)
+dowrite (unsigned int chfd, struct Masks *chanmask)
 {
     long cc = 0;
     struct Buffer *sendbuf = NULL;
@@ -1343,7 +1321,8 @@ dowrite (int chfd, struct Masks *chanmask)
     assert( sendbuf->pos >= 0 );
     // assert( sendbuf->len - sendbuf->pos >= 0 );
     assert( channels[chfd].handle <= INT_MAX );
-    cc = write ( (int)channels[chfd].handle, sendbuf->data + sendbuf->pos, (sendbuf->len - (size_t) sendbuf->pos) ) ;
+    assert( sendbuf->pos >= 0);
+    cc = write ( channels[chfd].handle, sendbuf->data + sendbuf->pos, (sendbuf->len - (size_t) sendbuf->pos) ) ;
     if (cc < 0 && BAD_IO_ERR (errno))
     {
         FD_SET (chfd, &(chanmask->emask));
@@ -1371,17 +1350,18 @@ newBuf (void)
         return NULL;
     }
 
-    newbuf->forw = newbuf->back = newbuf;
-    newbuf->len = 0;
-    newbuf->pos = 0;
-    newbuf->data = NULL;
+    newbuf->forw    = newbuf;
+    newbuf->back    = newbuf;
+    newbuf->len     = 0;
+    newbuf->pos     = 0;
+    newbuf->data    = NULL;
     newbuf->stashed = FALSE;
 
     return newbuf;
 }
 
 int
-chanAllocBuf_ (struct Buffer **buf, int size)
+chanAllocBuf_ (struct Buffer **buf, size_t size)
 {
     *buf = newBuf ();
     if (!*buf) {
