@@ -25,7 +25,7 @@
 #include <time.h>
 
 #include "lib/lib.h"
-#include "lib/lsf.h"
+// #include "lib/lsf.h"
 
 // #ifndef MIN
 // #define MIN(a,b) ((a) < (b) ? (a) : (b))
@@ -144,7 +144,7 @@ lsfRu2Str (FILE * log_fp, struct lsfRusage *lsfRu)
     int cc =  fprintf (log_fp, "%1.0ld %1.0ld %1.0ld %1.0ld %1.0f  ", lsfRu->ru_utime.tv_sec, lsfRu->ru_stime.tv_sec, lsfRu->ru_maxrss, lsfRu->ru_ixrss,  lsfRu->ru_ismrss );
         cc += fprintf (log_fp, "%1.0ld %1.0ld %1.0ld %1.0ld %1.0ld ", lsfRu->ru_idrss,        lsfRu->ru_isrss,        lsfRu->ru_minflt, lsfRu->ru_majflt, lsfRu->ru_nswap  );
         cc += fprintf (log_fp, "%1.0ld %1.0ld %1.0f  %1.0ld %1.0ld ", lsfRu->ru_inblock,      lsfRu->ru_oublock,      lsfRu->ru_ioch,   lsfRu->ru_msgsnd, lsfRu->ru_msgrcv );
-        cc += fprintf (log_fp, "%1.0ld %1.0ld %1.0ld %1.0f\n",        lsfRu->ru_nsignals,     lsfRu->ru_nvcsw,        lsfRu->ru_nivcsw, lsfRu->ru_exutime );
+        cc += fprintf (log_fp, "%1.0ld %1.0ld %1.0ld %1.0ld\n",        lsfRu->ru_nsignals,     lsfRu->ru_nvcsw,        lsfRu->ru_nivcsw, lsfRu->ru_exutime );
 
     return cc;
 }
@@ -167,7 +167,7 @@ str2lsfRu (char *line, struct lsfRusage *lsfRu, int *ccount)
 
 //  int cc = sscanf (line, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf%n", 
     int cc = sscanf (line, 
-"%ld %ld  %ld %ld %lf %ld %ld %ld %ld %ld %ld %ld %lf %ld %ld %ld %ld %ld %lf %d", 
+"%ld %ld  %ld %ld %lf %ld %ld %ld %ld %ld %ld %ld %lf %ld %ld %ld %ld %ld %ld %d", 
                 &(lsfRu->ru_utime.tv_sec),    &(lsfRu->ru_stime.tv_sec), &(lsfRu->ru_maxrss),
                 &(lsfRu->ru_ixrss),           &(lsfRu->ru_ismrss),       &(lsfRu->ru_idrss),   &(lsfRu->ru_isrss),   &(lsfRu->ru_minflt), &(lsfRu->ru_majflt),
                 &(lsfRu->ru_nswap),           &(lsfRu->ru_inblock),      &(lsfRu->ru_oublock), &(lsfRu->ru_ioch),    &(lsfRu->ru_msgsnd), &(lsfRu->ru_msgrcv),
