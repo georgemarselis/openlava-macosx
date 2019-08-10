@@ -23,8 +23,8 @@
 
 unsigned int totsockets_     = 0;
 // unsigned int currentsocket_  = 0; // NOFIX there is a similarly named function in lib/res.h 
-int mlsSbdMode               = 0;
-static char rootuid_         = '\0';
+int mlsSbdMode        = 0;
+char rootuid_         = '\0';
 
 // FIXME investigate if the third argument to lsfSetXUid can be set to the appropriate
 // [s]uid_t type. if yes, try to see if there is an alternative to passing -1

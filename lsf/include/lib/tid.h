@@ -20,7 +20,7 @@
  #pragma once
 
 /* tid.c */
-int tid_register(pid_t taskid, int socknum, u_short taskPort, char *host, bool_t doTaskInfo);
+int tid_register(pid_t taskid, int socknum, u_short taskPort, const char *host, bool_t doTaskInfo);
 int tid_remove(unsigned int taskid);
 struct tid *tid_find( pid_t taskid);
 struct tid *tidFindIgnoreConn_( pid_t taskid);

@@ -24,31 +24,46 @@
 #include <unistd.h>
 
 #include "lib/res.h"
-// #include "lib/lproto.h"
 #include "lib/mls.h"
 #include "lib/queue.h"
 #include "lib/xdrres.h"
-#include "lsf.h"
+#include "lib/rtask.h"
+#include "lib/nios.h"
+#include "lib/sig.h"
+#include "lib/rdwr.h"
+#include "lib/initenv.h"
+#include "lib/init.h"
+#include "lib/cwd.h"
+#include "lib/tid.h"
+#include "lib/res.h"
+#include "lib/structs/genParams.h"
 #include "daemons/libniosd/niosd.h"
 #include "daemons/libresd/resout.h"
 
+extern char **environ; // man 7 environ: The  variable environ points to an array of pointers to strings called the "environment".
 
+// what does this function do?
+// This is a wrapper function that copies the current environment?
+//    and then passes the copied environment to the real function.
+//
+// On return, frees up the copied environment and returns the returned pid.
+//
 int
 ls_rtask ( const char *host, char **argv, int options) // FIXME FIXME FIXME FIXME what is the diff between ls_rtask and ls_rtaske
 {
-    // int ret = 0; // disabled on puprose, so i can understand the diff of the two later
+    pid_t rpid = 0; // store the returned pid
     char **envp = NULL;
     unsigned long numEnv = 0;
 
-    for ( numEnv = 0; environ[numEnv]; numEnv++) // FIXME FIXME there has to be a better way to get the length of the array
+    for ( numEnv = 0; environ[numEnv]; numEnv++) // FIXME FIXME there has to be a better way to get the length of the array // FIXME FIXME FIXME FIXME where do we get environ[] from?
         ;
-    envp = calloc (numEnv + 1, sizeof (char *));
-    for (numEnv = 0; environ[numEnv]; numEnv++) {
+    envp = malloc( numEnv * sizeof (char *) + 1 );
+    for (numEnv = 0; environ[numEnv]; numEnv++) { // FIXME FIXME since we know how many elements there are, see if you can replace the loop with a memcpy
         envp[numEnv] = strdup (environ[numEnv]);
     }
     envp[numEnv] = NULL;
 
-    ret = ls_rtaske (host, argv, options, envp);
+    rpid = ls_rtaske (host, argv, options, envp);
 
     if (envp) {
         for (numEnv = 0; envp[numEnv]; numEnv++) {
@@ -57,14 +72,14 @@ ls_rtask ( const char *host, char **argv, int options) // FIXME FIXME FIXME FIXM
         FREEUP (envp);
     }
 
-    return ret;
+    return rpid;
 }
 
 int
 ls_rtaske (const char *host, char **argv, int options, char **envp) // FIXME FIXME FIXME FIXME what is the diff between ls_rtask and ls_rtaske
 {
-    static unsigned short retport;
-    static pid_t rpid;
+    static unsigned short retport = 0;
+    static pid_t rpid = -1;
     static int reg_ls_donerex = FALSE;
     struct sockaddr_in sin;
     long max = 0;
@@ -75,39 +90,51 @@ ls_rtaske (const char *host, char **argv, int options, char **envp) // FIXME FIX
     char *new_argv[5]; // FIXME FIXME FIXME FIXME why 5?
     pid_t pid = -1;
     int socket = 0;
-    int descriptor[2] = { 0, 0 };
+    int descriptor[2] = { 0, 0 }; // FIXME FIXME describe the two items of this array
     struct resCmdBill cmdmsg;
     struct lslibNiosRTask taskReq;
     unsigned short taskPort = 0;
-    sigset_t newMask = 0;
-    sigset_t oldMask = 0;
-    socklen_t len    = 0;
+    sigset_t newMask;
+    sigset_t oldMask;
+    socklen_t len = 0;
+    enum filedescriptor {
+        SOCKET = 0
+    };
 
+    // set memory
     memset( pathbuf, '\0', strlen( pathbuf ) );
+    sigemptyset( &newMask );
+    sigemptyset( &oldMask );
 
+    // start setup, before fork
     if (!reg_ls_donerex) {
-        atexit ((void (*)()) ls_donerex);
+        atexit ((void (*)(void)) ls_donerex);
         reg_ls_donerex = TRUE;
     }
 
+    // see if a specified host is connected
+    //      get the socket which connects to it
+    // else
+    //      try to connect to the host again
+    //          else return to caller
     if (_isconnected_ (host, descriptor)) { 
-        socket = descriptor[0];
+        socket = descriptor[SOCKET];
     }
     else if ((socket = ls_connect (host)) < 0) {
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
     else {
-            fprintf( stderr, "ls_rtaske init : you are not supposed to be here" );
+        fprintf( stderr, "ls_rtaske init : you are not supposed to be here" );
     }
 
+    // FIXME FIXME block all incoming signals from caller ( why?)
     if (blockALL_SIGS_ (&newMask, &oldMask) < 0) {
-            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    if (!FD_ISSET (socket, &connection_ok_))
-    {
+    if (!FD_ISSET (socket, &connection_ok_)) {
         FD_SET (socket, &connection_ok_);
-        if (ackReturnCode_ (socket) < 0) {
+        if (ackReturnCode_ (socket) == UINT_MAX ) {
             close (socket);
             _lostconnection_ (host);
             sigprocmask (SIG_SETMASK, &oldMask, NULL);
@@ -125,7 +152,7 @@ ls_rtaske (const char *host, char **argv, int options, char **envp) // FIXME FIX
         cmdmsg.options |= REXF_USEPTY;
     }
 
-    if (!isatty (0) && !isatty (1)) {
+    if (!isatty (0) && !isatty (1)) { // FIXME FIXME FIXME explain (0) and (1)
         cmdmsg.options &= ~REXF_USEPTY;
     }
     else if (cmdmsg.options & REXF_USEPTY) {
@@ -160,12 +187,12 @@ ls_rtaske (const char *host, char **argv, int options, char **envp) // FIXME FIX
             return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
 
-        if ((pid = fork ()) != 0)
-        {
-            pid_t mypid = 0;
+        if ((pid = fork ()) != 0) {
+            pid_t mypid = -1;
 
             close (cli_nios_fd[1]); // FIXME FIXME FIXME FIXME what is cli_nios_fd[0] ? replace with LABEL
             mypid = getpid ();
+
             if (b_write_fix (cli_nios_fd[0], (char *) &mypid, sizeof (mypid)) != sizeof (mypid)) { // FIXME FIXME FIXME FIXME what is cli_nios_fd[0] ? replace with LABEL
                 close (cli_nios_fd[0]); // FIXME FIXME FIXME FIXME what is cli_nios_fd[0] ? replace with LABEL
                 sigprocmask (SIG_SETMASK, &oldMask, NULL);
@@ -198,37 +225,36 @@ ls_rtaske (const char *host, char **argv, int options, char **envp) // FIXME FIX
                 for (d = 3; d < max; ++d) {
                     close (d);
                 }
-                exit (0);
+                exit (0); // FIXME FIXME FIXME exit call in a library function
             }
 
             if (initenv_ (NULL, NULL) < 0) {
-                    exit (-1);
+                exit (-1); // FIXME FIXME FIXME exit call in a library function
             }
             strcpy (pathbuf, genParams_[LSF_SERVERDIR].paramValue);
             strcat (pathbuf, "/nios"); // FIXME FIXME FIXME FIXME replace /nios with constant from configure.ac
             sprintf (c_chfd, "%d", cli_nios_fd[1]);  // FIXME FIXME FIXME FIXME what is cli_nios_fd[1] ? replace with LABEL
             new_argv[0] = pathbuf; // FIXME FIXME FIXME FIXME what is new_argv[0] ? replace with LABEL
             new_argv[1] = c_chfd; // FIXME FIXME FIXME FIXME what is new_argv[1] ? replace with LABEL
-                if (cmdmsg.options & REXF_USEPTY)
-                {
-                        if (cmdmsg.options & REXF_SHMODE) {
-                                new_argv[2] = "2"; // FIXME FIXME FIXME FIXME what is new_argv[1] ? replace with LABEL
-                        }
-                        else {
-                                new_argv[2] = "1"; // FIXME FIXME FIXME FIXME what is new_argv[1] ? replace with LABEL
-                        }
+            if (cmdmsg.options & REXF_USEPTY) {
+                if (cmdmsg.options & REXF_SHMODE) {
+                        strcpy( new_argv[2], "2" ); // FIXME FIXME FIXME FIXME what is new_argv[1] ? replace with LABEL
                 }
                 else {
-                        new_argv[2] = "0"; // FIXME FIXME FIXME FIXME what is new_argv[1] ? replace with LABEL
+                        strcpy( new_argv[2], "1" ); // FIXME FIXME FIXME FIXME what is new_argv[1] ? replace with LABEL
                 }
-                new_argv[3] = NULL; // FIXME FIXME FIXME FIXME what is new_argv[1] ? replace with LABEL
+            }
+            else {
+                strcpy( new_argv[2], "0" ); // FIXME FIXME FIXME FIXME what is new_argv[1] ? replace with LABEL
+            }
+            new_argv[3] = NULL; // FIXME FIXME FIXME FIXME what is new_argv[1] ? replace with LABEL
 
-                max = sysconf (_SC_OPEN_MAX);
-                for (d = 3; d < max; ++d) {
-                        if (d != cli_nios_fd[1]) {
-                                close (d);
-                        }
+            max = sysconf (_SC_OPEN_MAX);
+            for (d = 3; d < max; ++d) {
+                if (d != cli_nios_fd[1]) {
+                    close (d);
                 }
+            }
 
             for (d = 1; d < SIGRTMAX; d++) { // SIGRTMAX is in <signal.h>
                 Signal_ (d, SIG_DFL);
@@ -236,20 +262,19 @@ ls_rtaske (const char *host, char **argv, int options, char **envp) // FIXME FIX
 
 
             sigprocmask (SIG_SETMASK, &oldMask, NULL);
-            (void) lsfExecX (new_argv[0], new_argv, execvp);
-            exit (-1);
+            // (void) lsfExecX (new_argv[0], new_argv, execvp);
+            lsfExecX (new_argv[0], new_argv, execvp);
+            exit (-1); // FIXME FIXME FIXME exit call in a library function
         }
-        }
+    }
 
-    if (envp)
-        {
-            // if (ls_rsetenv_async (host, envp) < 0)
-            if (rsetenv_ (host, envp, RSETENV_ASYNC) < 0)
-        {
-            sigprocmask (SIG_SETMASK, &oldMask, NULL);
+    if (envp) {
+        // if (ls_rsetenv_async (host, envp) < 0)
+        if (rsetenv_ (host, envp, RSETENV_ASYNC) < 0) {
+        sigprocmask (SIG_SETMASK, &oldMask, NULL);
             return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
-        }
+    }
 
     if (rexcwd_[0] != '\0') {
         strcpy (cmdmsg.cwd, rexcwd_);
@@ -327,7 +352,7 @@ ls_rtaske (const char *host, char **argv, int options, char **envp) // FIXME FIX
 int
 rgetpidCompletionHandler_ (struct lsRequest *request)
 {
-    int rc = 0;
+    unsigned int rc = 0;
     XDR xdrs;
     struct resPid pidReply;
 
@@ -351,8 +376,9 @@ rgetpidCompletionHandler_ (struct lsRequest *request)
 
 }
 
-void *
-lsRGetpidAsync_ (pid_t taskid, pid_t *pid)
+// void * // was
+struct lsRequest *
+lsRGetpidAsync_ (pid_t taskid, pid_t *pid) // FIXME FIXME FIXME nothing is using this function.
 {
     struct _buf_
     {
@@ -377,7 +403,7 @@ lsRGetpidAsync_ (pid_t taskid, pid_t *pid)
 
     if (!FD_ISSET (socket, &connection_ok_)) {
         FD_SET (socket, &connection_ok_);
-        if (ackReturnCode_ (socket) < 0) {
+        if (ackReturnCode_ (socket) == UINT_MAX ) {
             close (socket);
             _lostconnection_ (host);
             return NULL;
@@ -392,7 +418,7 @@ lsRGetpidAsync_ (pid_t taskid, pid_t *pid)
         _lostconnection_ (host);
         return NULL;
     }
-    request = lsReqHandCreate_ (taskid, currentSN, socket, (void *) pid, rgetpidCompletionHandler_, (appCompletionHandler) NULL, NULL); // FIXME FIXME what is up with all these casts?
+    request = lsReqHandCreate_ (taskid, globCurrentSN, socket, (void *) pid, rgetpidCompletionHandler_, (appCompletionHandler) NULL, NULL); // FIXME FIXME what is up with all these casts?
 
     if (request != NULL) {
         if (lsQueueDataAppend_ ((char *) request, requestQ)) {
@@ -400,7 +426,7 @@ lsRGetpidAsync_ (pid_t taskid, pid_t *pid)
         }
     }
 
-    return void * request;
+    return request;
 }
 
 pid_t
@@ -431,7 +457,7 @@ lsRGetpid_ ( pid_t taskid, int options)
 
     if (!FD_ISSET (socket, &connection_ok_)) {
         FD_SET (socket, &connection_ok_);
-        if (ackReturnCode_ (socket) < 0) {
+        if (ackReturnCode_ (socket) == UINT_MAX ) {
             close (socket);
             _lostconnection_ (host);
             return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
@@ -447,7 +473,7 @@ lsRGetpid_ ( pid_t taskid, int options)
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    request = lsReqHandCreate_ (taskid, currentSN, socket, (void *) &pid, rgetpidCompletionHandler_, (appCompletionHandler) NULL, NULL); // FIXME FIXME what is up with all these casts?
+    request = lsReqHandCreate_ (taskid, globCurrentSN, socket, (void *) &pid, rgetpidCompletionHandler_, (appCompletionHandler) NULL, NULL); // FIXME FIXME what is up with all these casts?
 
     if (request == NULL) {
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
@@ -465,7 +491,7 @@ lsRGetpid_ ( pid_t taskid, int options)
     return pid;
 }
 
-int
+unsigned int
 lsRGetpgrp_ (int socket, pid_t taskid, pid_t pid)
 {
     struct _buf_
@@ -486,10 +512,10 @@ lsRGetpgrp_ (int socket, pid_t taskid, pid_t pid)
 
     if (!FD_ISSET (socket, &connection_ok_)) {
         FD_SET (socket, &connection_ok_);
-        if (ackReturnCode_ (socket) < 0) {
+        if (ackReturnCode_ (socket) == UINT_MAX ) {
             close (socket);
             _lostconnection_ (host);
-            return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+            return UINT_MAX;
         }
     }
 
@@ -499,21 +525,21 @@ lsRGetpgrp_ (int socket, pid_t taskid, pid_t pid)
     if (callRes_ (socket, RES_GETPID, (char *) &pidReq, (char *) &buf, sizeof (buf), xdr_resGetpid, 0, 0, NULL) == -1) {
         close (socket);
         _lostconnection_ (host);
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        return UINT_MAX;
     }
 
-    request = lsReqHandCreate_ (taskid, currentSN, socket, (void *) &pgid, rgetpidCompletionHandler_, (appCompletionHandler) NULL, NULL);
+    request = lsReqHandCreate_ (taskid, globCurrentSN, socket, (void *) &pgid, rgetpidCompletionHandler_, (appCompletionHandler) NULL, NULL);
 
     if (request == NULL) {
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        return UINT_MAX;
     }
 
     if (lsQueueDataAppend_ ((char *) request, requestQ)) {
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        return UINT_MAX;
     }
 
     if (lsReqWait_ (request, 0) < 0) {
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        return UINT_MAX;
     }
 
     lsReqFree_ (request);
@@ -553,11 +579,11 @@ default_tstp_ ( int signo )
 unsigned short
 getTaskPort (int socket)
 {
-    int rc = 0;
+    unsigned int rc = 0;
     struct LSFHeader hdr;
 
-    rc = expectReturnCode_ (socket, currentSN, &hdr);
-    if (rc < 0) {
+    rc = expectReturnCode_ (socket, globCurrentSN, &hdr);
+    if (rc == USHRT_MAX ) {
         return 0;
     }
 

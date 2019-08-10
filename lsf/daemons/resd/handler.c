@@ -37,7 +37,7 @@
 #include <sys/ptyvar.h>
 #endif
 
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/mls.h"
 #include "daemons/libresd/resd.h" // FIXME FIXME one header, not multiple
 #include "daemons/libresd/resout.h"
@@ -77,8 +77,8 @@ doacceptconn (void)
     // int i;
     int crossPlatform;
     char *authKind = NULL;
-    char   pwDir[MAX_FILENAME_LEN];
-    char pwShell[MAX_FILENAME_LEN];
+    char  pwDir[MAX_FILENAME_LEN];
+    char  pwShell[MAX_FILENAME_LEN];
     char  pwName[MAX_LSF_NAME_LEN];
 
     if (logclass & LC_TRACE) {

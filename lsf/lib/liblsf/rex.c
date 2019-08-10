@@ -202,11 +202,11 @@ ls_startserver (const char *host, char **server, int options)
     char official[MAXHOSTNAMELEN];
     struct timeval timeout;
     struct sockaddr_in sin;
-    int s;
-    int descriptor[2];
+    int s = 0;
+    int descriptor[2] = {0, 0};
     struct resCmdBill cmdmsg;
-    int resTimeout;
-    socklen_t len;
+    int resTimeout = 0; // FIXME FIXME FIXME FIXME time_t
+    socklen_t len =0;
 
     memset( official, '\0', strlen( official ) );
 

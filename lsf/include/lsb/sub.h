@@ -73,7 +73,7 @@ typedef struct bException
     bException_handler_t handler;
 } bException_t;
 
-char **environ;
+// char **environ;
 char *yyerr;
 //int _lsb_conntimeout;
 //int lsbMode_;

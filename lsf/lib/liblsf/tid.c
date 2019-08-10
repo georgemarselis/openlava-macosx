@@ -30,7 +30,7 @@
 static struct tid *tid_buckets[TID_BNUM];
 
 int
-tid_register (pid_t taskid, int socknum, u_short taskPort, char *host, bool_t doTaskInfo)
+tid_register (pid_t taskid, int socknum, u_short taskPort, const char *host, bool_t doTaskInfo)
 {
     int i = 0;
     struct tid *tidp = NULL;
@@ -161,16 +161,17 @@ tid_lostconnection (int socknum)
 {
     struct tid *p1 = NULL;
 
-    for ( unsigned int i = 0; i < TID_BNUM; i++)
-        {
-            p1 = tid_buckets[i];
-            while (p1 != (struct tid *) NULL)
-    {
-        if (p1->sock == socknum)
-            p1->sock = -1;
-        p1 = p1->link;
-    }
+    for ( unsigned int i = 0; i < TID_BNUM; i++) {
+        p1 = tid_buckets[i];
+        while ( NULL != p1 ) {
+            if (p1->sock == socknum) {
+                p1->sock = -1;
+            }
+            p1 = p1->link;
         }
+    }
+
+    return;
 }
 
 int
@@ -205,5 +206,4 @@ tidSameConnection_ (int socknum, unsigned int *ntids, unsigned int **tidArray)
     }
 
     return 0;
-
 }
