@@ -1,6 +1,9 @@
 // Added by George Marselis <george@marsel.is>
 
 // SDB
+#include <stddef.h>
+
+#include "struct-config_param.h"
 
 enum SDB_PARAMS {
 	SBD_DEBUG                         = 0,
@@ -10,7 +13,7 @@ enum SDB_PARAMS {
 	SBD_NULL
 };
 
-static struct config_param sbdDaemonParams[ ] = {
+struct config_param sbdDaemonParams[ ] = {
 	{ "SBD_DEBUG",                    NULL }, // 0
 	{ NULL,                           NULL },
 	{ NULL,                           NULL },
