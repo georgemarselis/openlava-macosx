@@ -257,7 +257,7 @@ ls_rtaske (const char *host, char **argv, int options, char **envp) // FIXME FIX
             }
 
             for (d = 1; d < SIGRTMAX; d++) { // SIGRTMAX is in <signal.h>
-                Signal_ (d, SIG_DFL);
+                Signal_ ((unsigned int)d, SIG_DFL);
             }
 
 

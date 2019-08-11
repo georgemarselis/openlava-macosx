@@ -274,7 +274,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
             }
 
             for ( int i = 1; i < SIGRTMAX; i++) {  // SIGRTMAX is in a linux thing. SIGRTMAX is POSIX compliant // FIXME FIXME FIXME FIXME see if this works in other opearting systems
-                Signal_ (i, SIG_DFL);               // IF you get stuck here and try to throw the kitchen sink on it in order to compile, disregard -D__SIGNAL_H if you see it in <signal.h>
+                Signal_ ( (unsigned int) i, SIG_DFL);               // IF you get stuck here and try to throw the kitchen sink on it in order to compile, disregard -D__SIGNAL_H if you see it in <signal.h>
             }
 
             alarm (0);
@@ -384,7 +384,7 @@ getLSFAdmin (void)
     const char *lsfUserName = NULL;
     char *mycluster = NULL;
 
-    if (admin[0] != '\0') {
+    if (admin[0] != '\0') { // FIXME FIXME FIXME clean up, after managing to compile everything.
         return admin;
     }
 

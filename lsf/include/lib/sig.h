@@ -33,33 +33,63 @@
 // #define  SIG_ARRAY_REQUEUE       -23
 
 
-const int SIG_NULL              = -65535;
-const int SIG_CHKPNT            = -1;
-const int SIG_CHKPNT_COPY       = -2;
-const int SIG_DELETE_JOB        = -3;
+// const int SIG_NULL              = -65535;
+// const int SIG_CHKPNT            = -1;
+// const int SIG_CHKPNT_COPY       = -2;
+// const int SIG_DELETE_JOB        = -3;
 
-const int SIG_SUSP_USER         = -4;
-const int SIG_SUSP_LOAD         = -5;
-const int SIG_SUSP_WINDOW       = -6;
-const int SIG_SUSP_OTHER        = -7;
+// const int SIG_SUSP_USER         = -4;
+// const int SIG_SUSP_LOAD         = -5;
+// const int SIG_SUSP_WINDOW       = -6;
+// const int SIG_SUSP_OTHER        = -7;
 
-const int SIG_RESUME_USER       = -8;
-const int SIG_RESUME_LOAD       = -9;
-const int SIG_RESUME_WINDOW     = -10;
-const int SIG_RESUME_OTHER      = -11;
+// const int SIG_RESUME_USER       = -8;
+// const int SIG_RESUME_LOAD       = -9;
+// const int SIG_RESUME_WINDOW     = -10;
+// const int SIG_RESUME_OTHER      = -11;
 
-const int SIG_TERM_USER         = -12;
-const int SIG_TERM_LOAD         = -13;
-const int SIG_TERM_WINDOW       = -14;
-const int SIG_TERM_OTHER        = -15;
-const int SIG_TERM_RUNLIMIT     = -16;
-const int SIG_TERM_DEADLINE     = -17;
-const int SIG_TERM_PROCESSLIMIT = -18;
-const int SIG_TERM_FORCE        = -19;
-const int SIG_KILL_REQUEUE      = -20;
-const int SIG_TERM_CPULIMIT     = -21;
-const int SIG_TERM_MEMLIMIT     = -22;
-const int SIG_ARRAY_REQUEUE     = -23;
+// const int SIG_TERM_USER         = -12;
+// const int SIG_TERM_LOAD         = -13;
+// const int SIG_TERM_WINDOW       = -14;
+// const int SIG_TERM_OTHER        = -15;
+// const int SIG_TERM_RUNLIMIT     = -16;
+// const int SIG_TERM_DEADLINE     = -17;
+// const int SIG_TERM_PROCESSLIMIT = -18;
+// const int SIG_TERM_FORCE        = -19;
+// const int SIG_KILL_REQUEUE      = -20;
+// const int SIG_TERM_CPULIMIT     = -21;
+// const int SIG_TERM_MEMLIMIT     = -22;
+// const int SIG_ARRAY_REQUEUE     = -23;
+
+enum SIG_LSF {
+    SIG_NULL              = 0,
+    SIG_CHKPNT            = 1,
+    SIG_CHKPNT_COPY       = 2,
+    SIG_DELETE_JOB        = 3,
+
+    SIG_SUSP_USER         = 4,
+    SIG_SUSP_LOAD         = 5,
+    SIG_SUSP_WINDOW       = 6,
+    SIG_SUSP_OTHER        = 7,
+
+    SIG_RESUME_USER       = 8,
+    SIG_RESUME_LOAD       = 9,
+    SIG_RESUME_WINDOW     = 10,
+    SIG_RESUME_OTHER      = 11,
+
+    SIG_TERM_USER         = 12,
+    SIG_TERM_LOAD         = 13,
+    SIG_TERM_WINDOW       = 14,
+    SIG_TERM_OTHER        = 15,
+    SIG_TERM_RUNLIMIT     = 16,
+    SIG_TERM_DEADLINE     = 17,
+    SIG_TERM_PROCESSLIMIT = 18,
+    SIG_TERM_FORCE        = 19,
+    SIG_KILL_REQUEUE      = 20,
+    SIG_TERM_CPULIMIT     = 21,
+    SIG_TERM_MEMLIMIT     = 22,
+    SIG_ARRAY_REQUEUE     = 23
+};
 
 
 // #define SIGEMT  SIGBUS
@@ -72,7 +102,7 @@ const int SIG_ARRAY_REQUEUE     = -23;
 
 #undef SIGSYS // https://www.ibiblio.org/oswg/oswg-nightly/oswg/en_GB.ISO_8859-1/books/linux-c-programming/GCC-HOWTO.html#INDEX.34
 
-static int sig_map[] = { 0,
+static unsigned int sig_map[] = { 0,
     SIGHUP,
     SIGINT,
     SIGQUIT,
@@ -148,10 +178,10 @@ const char *sigSymbol[] = {
 unsigned int NSIG_MAP = (sizeof (sig_map) / sizeof ( unsigned int)); // FIXME FIXME FIXME move this out to appropriate header
 
 /* sig.c */
-int sig_encode(int sig);
-int sig_decode(int sig);
-int getSigVal(char *sigString);
+unsigned int sig_encode(unsigned int sig);
+unsigned int sig_decode(unsigned int sig);
+unsigned int getSigVal( const char *sigString);
 char *getSigSymbolList(void);
-SIGFUNCTYPE Signal_(int sig, void (*handler )(int ));
-char *getSigSymbol(int sig);
+SIGFUNCTYPE Signal_(unsigned int sig, void (*handler )(int ));
+char *getSigSymbol(unsigned int sig);
 int blockALL_SIGS_(sigset_t *newMask, sigset_t *oldMask);

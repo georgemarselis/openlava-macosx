@@ -371,7 +371,7 @@ runEexec_ (char *option, unsigned int job, struct lenData *eexec, const char *pa
         }
 
         for ( int i = 1; i < SIGRTMAX; i++) { // NSIG is in <signal.h>
-            Signal_ (i, SIG_DFL); 
+            Signal_ ( (unsigned int)i, SIG_DFL); 
         }
 
         alarm (0);

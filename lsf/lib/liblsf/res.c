@@ -1339,7 +1339,7 @@ sendSig_ (const char *host, pid_t rpid, int sig, int options)
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    killReq.signal = sig_encode (sig);
+    killReq.signal = (int)sig_encode ((unsigned int)sig); // FIXME FIXME FIXME casts have to go
 
     resCallReturnValue = callRes_ (socket, RES_RKILL, (char *) &killReq, (char *) &buf, sizeof (buf), xdr_resRKill, 0, 0, NULL);
     if ( -1 == resCallReturnValue ) {
