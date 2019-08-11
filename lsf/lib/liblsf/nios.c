@@ -458,7 +458,7 @@ ls_setstdin (int on_, int *rpidlist, size_t len)
 }
 
 size_t
-ls_getstdin (int on_, pid_t *rpidlist, long maxlen)
+ls_getstdin (int on_, unsigned long *rtaskidlist, long maxlen)
 {
     fd_set rmask;
     struct timeval timeout;
@@ -519,9 +519,9 @@ ls_getstdin (int on_, pid_t *rpidlist, long maxlen)
     }
 
     if (reply.hdr.len) {
-        assert( b_read_fix (cli_nios_fd[0], (char *) reply.rpidlist, reply.hdr.len) >= 0 ); // FIXME FIXME FIXME FIXME find out what cli_nios_fd[0] represents, replace 0 with label
+        assert( b_read_fix (cli_nios_fd[0], (char *) reply.rtaskidlist, reply.hdr.len) >= 0 ); // FIXME FIXME FIXME FIXME find out what cli_nios_fd[0] represents, replace 0 with label
         assert( reply.hdr.len <= LONG_MAX );
-        if (b_read_fix (cli_nios_fd[0], (char *) reply.rpidlist, reply.hdr.len) != (long) reply.hdr.len) { // FIXME FIXME FIXME FIXME remove the cast
+        if (b_read_fix (cli_nios_fd[0], (char *) reply.rtaskidlist, reply.hdr.len) != (long) reply.hdr.len) { // FIXME FIXME FIXME FIXME remove the cast
             lserrno = LSE_MSG_SYS;
             sigprocmask (SIG_SETMASK, &oldMask, NULL);
             return UINT_MAX; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value;
@@ -531,7 +531,7 @@ ls_getstdin (int on_, pid_t *rpidlist, long maxlen)
     assert( maxlen >= 0);
     maxlen_new = (size_t) maxlen;
     if (reply.hdr.len <=  maxlen_new * sizeof (size_t)) { // FIXME FIXME FIXME FIXME what?
-        memcpy ((char *) rpidlist, (char *) reply.rpidlist, reply.hdr.len);
+        memcpy ((char *) rtaskidlist, (char *) reply.rtaskidlist, reply.hdr.len);
         sigprocmask (SIG_SETMASK, &oldMask, NULL);
         assert( reply.hdr.len <= INT_MAX);
         return reply.hdr.len / sizeof (size_t);

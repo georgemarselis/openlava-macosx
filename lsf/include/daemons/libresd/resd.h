@@ -72,10 +72,10 @@ const char UTMP_CHECK_CODE[ ] = "sbdRes";
 // #define DOSTDERR    3
 
 enum DO {
-	DOREAD      = 0,
-	DOWRITE     = 1,
-	DOEXCEPTION = 2,
-	DOSTDERR    = 3
+    DOREAD      = 0,
+    DOWRITE     = 1,
+    DOEXCEPTION = 2,
+    DOSTDERR    = 3
 } DO;
 
 // #define PTY_TEMPLATE     "/dev/ptyXX"
@@ -99,7 +99,7 @@ const char PTY_LAST_ALPHA  = 'v';
 
 // #define INVALID_FD      (-1)
 enum FD {
-	INVALID_FD = -1
+    INVALID_FD = -1
 } FD;
 
 #define FD_IS_VALID(x)  ((x) >= 0 && (x) < sysconf(_SC_OPEN_MAX) )
@@ -108,74 +108,74 @@ enum FD {
 #define CLOSE_IT(fd)     if (fd>=0) {close(fd); fd = INVALID_FD;}
 
 enum SBD_FLAG {
-	SBD_FLAG_STDIN  = 0x1,
-	SBD_FLAG_STDOUT = 0x2,
-	SBD_FLAG_STDERR = 0x4,
-	SBD_FLAG_TERM   = 0x8
+    SBD_FLAG_STDIN  = 0x1,
+    SBD_FLAG_STDOUT = 0x2,
+    SBD_FLAG_STDERR = 0x4,
+    SBD_FLAG_TERM   = 0x8
 } SBD_FLAG;
 
 enum RES_RPID_KEEPPID {
-	RES_RPID_KEEPPID = 0x01
+    RES_RPID_KEEPPID = 0x01
 };
 
 enum RES_RID {
-	RES_RID_ISTID = 0x01,
-	RES_RID_ISPID = 0x02
+    RES_RID_ISTID = 0x01,
+    RES_RID_ISPID = 0x02
 } RES_RID;
 
 struct relaylinebuf// FIXME FIXME FIXME FIXME struct relaylinebuf and struct relaybuf are identical; should be consolidated
 {
-	char *bp;
-	// char buf[ LINE_BUFSIZ + sizeof (struct LSFHeader)];
-	char buf[ LINE_BUFSIZ * sizeof (struct LSFHeader) ]; // FIXME FIXME FIXME FIXME must create a pseudo-constructor which allocates the correct size
-	int bcount;
-	char padding1[4];
+    char *bp;
+    // char buf[ LINE_BUFSIZ + sizeof (struct LSFHeader)];
+    char buf[ LINE_BUFSIZ * sizeof (struct LSFHeader) ]; // FIXME FIXME FIXME FIXME must create a pseudo-constructor which allocates the correct size
+    int bcount;
+    char padding1[4];
 };
 
 // typedef struct relaylinebuf RelayLineBuf;
 
 struct relaybuf // FIXME FIXME FIXME FIXME struct relaylinebuf and struct relaybuf are identical; should be consolidated
 {
-	char *bp;
-	// char buf[ LINE_BUFSIZ + sizeof (struct LSFHeader)];
-	char buf[ LINE_BUFSIZ * sizeof (struct LSFHeader)]; // FIXME FIXME FIXME FIXME must create a pseudo-constructor which allocates the correct size
-	int bcount;
-	char padding1[4];
+    char *bp;
+    // char buf[ LINE_BUFSIZ + sizeof (struct LSFHeader)];
+    char buf[ LINE_BUFSIZ * sizeof (struct LSFHeader)]; // FIXME FIXME FIXME FIXME must create a pseudo-constructor which allocates the correct size
+    int bcount;
+    char padding1[4];
 };
 
 // typedef struct relaybuf RelayBuf;
 
 struct channel
 {
-	int fd;
-	int rcount;
-	int wcount;
-	char padding1[ 4 ];
-	struct relaybuf *rbuf;
-	struct relaybuf *wbuf;
+    int fd;
+    int rcount;
+    int wcount;
+    char padding1[ 4 ];
+    struct relaybuf *rbuf;
+    struct relaybuf *wbuf;
 };
 
 // typedef struct channel Channel;
 
 struct outputchannel
 {
-	int fd;
-	int endFlag;
-	int retry;
-	int bytes;
-	struct relaylinebuf buffer;
+    int fd;
+    int endFlag;
+    int retry;
+    int bytes;
+    struct relaylinebuf buffer;
 };
 
 //typedef struct outputchannel outputChannel;
 
 struct niosChannel
 {
-	int fd;
-	int rcount;
-	int wcount;
-	int opCode;
-	struct relaybuf *rbuf;
-	struct relaylinebuf *wbuf;
+    int fd;
+    int rcount;
+    int wcount;
+    int opCode;
+    struct relaybuf *rbuf;
+    struct relaylinebuf *wbuf;
 };
 
 // struct nioschannel niosChannel;  // FIXME FIXME FIXME remove typedef from struct
@@ -183,73 +183,73 @@ struct niosChannel
 //typedef 
 struct ttyStruct
 {
-	struct termios attr;
-	struct winsize ws;
+    struct termios attr;
+    struct winsize ws;
 #    if defined(hpux) || defined(__hpux)
-	struct ltchars hp_ltchars;
+    struct ltchars hp_ltchars;
 #    endif
 }; // ttyStruct;
 
 struct client
 {
-	pid_t ruid;
-	gid_t gid;
-	int client_sock;
-	int ngroups;
-	char *username;
-	char *clntdir;
-	char *homedir;
-	char **env;
-	struct tty_struct *tty;
-	GETGROUPS_T groups[NGROUPS_MAX];
-	char padding1[8];
-	struct hostent hostent;
-	struct lenData eexec;
+    pid_t ruid;
+    gid_t gid;
+    int client_sock;
+    int ngroups;
+    char *username;
+    char *clntdir;
+    char *homedir;
+    char **env;
+    struct tty_struct *tty;
+    GETGROUPS_T groups[NGROUPS_MAX];
+    char padding1[8];
+    struct hostent hostent;
+    struct lenData eexec;
 };
 
 struct child
 {
-	char username[MAX_LSF_NAME_LEN];
-	char fromhost[MAXHOSTNAMELEN];
-	char slavepty[sizeof (PTY_TEMPLATE)];
-	char padding1[5];
-	pid_t rpid;
-	pid_t pid;
-	int refcnt;
-	int info;
-	int stdio;
-	int rexflag;
-	int endstdin;
-	int sent_eof;
-	int sent_status;
-	char server;
-	char c_eof;
-	char running;
-	char sigchild;
-	LS_WAIT_T wait;
-	int stdin_up;
-	char *cwd;
-	char **cmdln;
-	time_t dpTime;
-	struct relaybuf *i_buf;
-	struct client *backClnPtr;
-	struct sigStatusUsage *sigStatRu;
-	struct outputchannel *std_out;
-	struct outputchannel *std_err;
-	struct niosChannel *remsock;
+    char username[MAX_LSF_NAME_LEN];
+    char fromhost[MAXHOSTNAMELEN];
+    char slavepty[sizeof (PTY_TEMPLATE)];
+    char padding1[5];
+    pid_t rpid;
+    pid_t pid;
+    int refcnt;
+    int info;
+    int stdio;
+    int rexflag;
+    int endstdin;
+    int sent_eof;
+    int sent_status;
+    char server;
+    char c_eof;
+    char running;
+    char sigchild;
+    LS_WAIT_T wait;
+    int stdin_up;
+    char *cwd;
+    char **cmdln;
+    time_t dpTime;
+    struct relaybuf *i_buf;
+    struct client *backClnPtr;
+    struct sigStatusUsage *sigStatRu;
+    struct outputchannel *std_out;
+    struct outputchannel *std_err;
+    struct niosChannel *remsock;
 };
 
 struct resChildInfo
 {
-	unsigned short parentPort;
-	char padding1[2];
-	int currentRESSN;
-	int res_status;
-	char padding[4];
-	struct resConnect *resConnect;
-	struct lsfAuth *lsfAuth;
-	struct passwd *pw;
-	struct hostent *host;
+    unsigned short parentPort;
+    char padding1[2];
+    int currentRESSN;
+    int res_status;
+    char padding[4];
+    struct resConnect *resConnect;
+    struct lsfAuth *lsfAuth;
+    struct passwd *pw;
+    struct hostent *host;
 };
 
 
@@ -257,144 +257,145 @@ struct resChildInfo
 // typedef 
 struct taggedConn
 {
-	int rtag;
-	int wtag;
-	int num_duped;
-	char padding1[4];
-	int *task_duped;
-	struct niosChannel *sock;
+    int rtag;
+    int wtag;
+    int num_duped;
+    char padding1[4];
+    int *task_duped;
+    struct niosChannel *sock;
 }; //taggedConn_t;
 
 typedef struct resNotice
 {
-	struct resNotice *forw;
-	struct resNotice *back;
-	pid_t rpid;
-	int retsock;
-	int opCode;
-	enum resAck {
+    struct resNotice *forw;
+    struct resNotice *back;
+    pid_t rpid;
+    int retsock;
+    int opCode;
+    enum resAck {
 
-		RESE_OK,
-		RESE_SIGCHLD,
-		RESE_NOMORECONN,
-		RESE_BADUSER,
-		RESE_ROOTSECURE,
-		RESE_DENIED,
-		RESE_REQUEST,
-		RESE_CALLBACK,
-		RESE_NOMEM,
-		RESE_FATAL,
-		RESE_PTYMASTER,
-		RESE_PTYSLAVE,
-		RESE_SOCKETPAIR,
-		RESE_FORK,
-		RESE_REUID,
-		RESE_CWD,
-		RESE_INVCHILD,
-		RESE_KILLFAIL,
-		RESE_VERSION,
-		RESE_DIRW,
-		RESE_NOLSF_HOST,
-		RESE_NOCLIENT,
-		RESE_RUSAGEFAIL,
-		RESE_RES_PARENT,
-		RESE_FILE,
-		RESE_NOVCL,
-		RESE_NOSYM,
-		RESE_VCL_INIT,
-		RESE_VCL_SPAWN,
-		RESE_EXEC,
-		RESE_ERROR_LAST,
-		RESE_MLS_INVALID,
-		RESE_MLS_CLEARANCE,
-		RESE_MLS_DOMINATE,
-		RESE_MLS_RHOST
-		} ack;
-	struct sigStatusUsage *sigStatRu;
+        RESE_OK,
+        RESE_SIGCHLD,
+        RESE_NOMORECONN,
+        RESE_BADUSER,
+        RESE_ROOTSECURE,
+        RESE_DENIED,
+        RESE_REQUEST,
+        RESE_CALLBACK,
+        RESE_NOMEM,
+        RESE_FATAL,
+        RESE_PTYMASTER,
+        RESE_PTYSLAVE,
+        RESE_SOCKETPAIR,
+        RESE_FORK,
+        RESE_REUID,
+        RESE_CWD,
+        RESE_INVCHILD,
+        RESE_KILLFAIL,
+        RESE_VERSION,
+        RESE_DIRW,
+        RESE_NOLSF_HOST,
+        RESE_NOCLIENT,
+        RESE_RUSAGEFAIL,
+        RESE_RES_PARENT,
+        RESE_FILE,
+        RESE_NOVCL,
+        RESE_NOSYM,
+        RESE_VCL_INIT,
+        RESE_VCL_SPAWN,
+        RESE_EXEC,
+        RESE_ERROR_LAST,
+        RESE_MLS_INVALID,
+        RESE_MLS_CLEARANCE,
+        RESE_MLS_DOMINATE,
+        RESE_MLS_RHOST
+        } ack;
+    struct sigStatusUsage *sigStatRu;
 } resNotice_t;
 
 struct resSignal
 {
-	pid_t pid;
-	int sigval;
+    pid_t pid;
+    int sigval;
 };
 
 struct resCmdBill
 {
-	unsigned short retport;
-	char padding1[2];
-	pid_t rpid;
-	mode_t filemask;
-	int priority;
-	int options;
-	char cwd[MAX_PATH_LEN]; // FIXME FIXME FIXME FIXME turn into dynamic allocation
-	// char *cwd;
-	char padding2[4];
-	char **argv;
-	struct lsfLimit lsfLimits[LSF_RLIM_NLIMITS];  // this should be changed to a pointer
+    unsigned short retport;
+    char padding1[2];
+    pid_t rpid;
+    mode_t filemask;
+    int priority;
+    int options;
+    char cwd[MAX_PATH_LEN]; // FIXME FIXME FIXME FIXME turn into dynamic allocation
+    // char *cwd;
+    char padding2[4];
+    char **argv;
+    struct lsfLimit lsfLimits[LSF_RLIM_NLIMITS];  // this should be changed to a pointer
 };
 
 struct resSetenv
 {
-	char **env;
+    char **env;
 };
 
 struct resRKill
 {
-  pid_t rpid;
-  int whatid;
-  int signal;
+    unsigned long rtaskid;
+    int whatid;
+    int signal;
 };
 
 struct resPid
 {
-  pid_t rpid;
-  pid_t pid;
+    pid_t pid;
+    char padding[4];
+    unsigned long rtaskid;
 };
 
 struct resRusage
 {
-  pid_t rpid;
-  int whatid;
-  int options;
+    pid_t rtaskid; // FIXME FIXME FIXME FIXME nto sure what this member is.
+    int whatid;
+    int options;
 };
 
 struct resChdir
 {
-  char dir[MAX_FILENAME_LEN];
+    char dir[MAX_FILENAME_LEN];
 };
 
 struct resControl
 {
-  int opCode;
-  int data;
+    int opCode;
+    int data;
 };
 
 
 struct resStty
 {
-  struct termios termattr;
-  struct winsize ws;
+    struct termios termattr;
+    struct winsize ws;
 };
 
 struct niosConnect
 {
-  pid_t rpid;
-  int exitStatus;
-  int terWhiPendStatus;
+    unsigned long rtaskid;
+    int exitStatus;
+    int terWhiPendStatus;
 };
 
 struct niosStatus
 {
-	enum resAck ack;
-	char padding[4];
+    enum resAck ack;
+    char padding[4];
 
-	struct sigStatusUsage
-	{
-		int ss;
-		char padding[4];
-		struct rusage *ru;
-	} s;
+    struct sigStatusUsage
+    {
+        int ss;
+        char padding[4];
+        struct rusage *ru;
+    } s;
 };
 
 /*********************************************/
@@ -490,8 +491,8 @@ const unsigned short RES_REPLYBUF_LEN = 4096;
 const int RESS_LOGBIT = 0x00000001;
 
 // struct  config_param resConfParams[] = {
-// 	{"LSB_UTMP", NULL},
-// 	{NULL,       NULL}
+//  {"LSB_UTMP", NULL},
+//  {NULL,       NULL}
 // };
 
 /* daemons/resd/getproc.c */

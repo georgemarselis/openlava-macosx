@@ -34,7 +34,7 @@
 #include "lib/sock.h"
 #include "lib/xdrmisc.h"
 #include "lib/resd_globals.h"
-#include "lib/tid.h"
+#include "lib/taskid.h"
 #include "lib/structs/genParams.h"
 #include "daemons/libresd/resout.h"
 #include "daemons/libpimd/pimd.h"
@@ -45,12 +45,12 @@ struct rHosts *rHosts = NULL; // NOFIX
 struct rHosts *
 rhConnect ( const char *host)
 {
-    struct hostent *hp = NULL;
-    struct rHosts  *rh = NULL;
-    char  *argv[2]     = { NULL, NULL };
-    char  *hname       = NULL;
-    int    tid         = 0;
-    int    sock        = 0;
+    struct hostent *hp   = NULL;
+    struct rHosts  *rh   = NULL;
+    char  *argv[2]       = { NULL, NULL }; // FIXME FIXME FIXME label the two elements of the array
+    char  *hname         = NULL;
+    unsigned long taskid = 0;
+    int    sock          = 0;
 
 
     if (ft == NULL) {
@@ -75,15 +75,17 @@ rhConnect ( const char *host)
         return rh;
     }
 
-    strcpy( argv[0], RF_SERVERD);
+    strcpy( argv[0], RF_SERVERD); // FIXME FIXME FIXME label argv[0]
     argv[1] = NULL;
-    if ((tid = ls_rtask (host, argv, REXF_TASKPORT | rxFlags)) < 0) {
-        return NULL;
-    }
+    taskid = (unsigned long)ls_rtask (host, argv, REXF_TASKPORT | rxFlags); // FIXME FIXME FIXME return type
+    // if ((taskid = (unsigned long)ls_rtask (host, argv, REXF_TASKPORT | rxFlags)) < 0) { // FIXME FIXME FIXME FIXME fix return type ls_rtask
+    //     return NULL;
+    // }
 
-    if ((sock = ls_conntaskport (tid)) < 0) {
-        return NULL;
-    }
+    sock = ls_conntaskport (taskid); // FIXME FIXME FIXME return type
+    // if ((sock = ls_conntaskport (taskid)) < 0) {
+    //     return NULL;
+    // }
 
     if ((hname = putstr_ (hp->h_name)) == NULL) {
         close (sock);
@@ -611,24 +613,24 @@ ls_rgetmnthost ( const char *host, const char *fn)
 /* ls_conntaskport()
  */
 int
-ls_conntaskport (pid_t rpid)
+ls_conntaskport (unsigned long taskid )
 { 
     int sock        = 0;
     int cc          = 0;
-    unsigned int resTimeout = 0;
+    time_t resTimeout = 0;
     socklen_t sinLen = 0;
     struct tid *tid = NULL;
     struct sockaddr_in sin;
 
     if ( genParams_[RES_TIMEOUT].paramValue) {
         // assert( genParams_[RES_TIMEOUT].paramValue >= 0 ); // paranoia
-        resTimeout = (unsigned int) atoi (genParams_[RES_TIMEOUT].paramValue);
+        resTimeout = atoi (genParams_[RES_TIMEOUT].paramValue);
     }
     else {
         resTimeout = RES_TIMEOUT;
     }
 
-    if ((tid = tid_find (rpid)) == NULL) {
+    if ((tid = tid_find (taskid)) == NULL) {
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 

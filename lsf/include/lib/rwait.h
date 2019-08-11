@@ -15,9 +15,9 @@ enum LS_CSO {
 int isPamBlockWait; // defined in lib/liblsf/rwait.c
 
 /* rwait.c */
-int  ls_rwait     ( LS_WAIT_T *status, int options, struct rusage *ru );
-int  ls_rwaittid  ( int tid, LS_WAIT_T *status, int options, struct rusage *ru );
-int  rwait_       ( int tid, LS_WAIT_T *status, int options, struct rusage *ru );
-int  readWaitReply( LS_WAIT_T *status, struct rusage *ru );
+// int  ls_rwait     ( LS_WAIT_T *status, int options, struct rusage *ru );
+// int  ls_rwaittid  ( int tid, LS_WAIT_T *status, int options, struct rusage *ru );
+int  rwait_       ( unsigned long taskid, LS_WAIT_T *status, mode_t options, struct rusage *ru );
+unsigned long   readWaitReply( LS_WAIT_T *status, struct rusage *ru );
 void restartRWait ( sigset_t oldMask );
 void usr1Handler  ( int sig );

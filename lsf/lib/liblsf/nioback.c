@@ -40,13 +40,13 @@
 // #define NL_SETN 23
 
 int
-niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus, int terWhiPendStatus)
+niosCallback_ (struct sockaddr_in *from, u_short port, unsigned long rtaskid, int exitStatus, int terWhiPendStatus)
 {
     int s = 0;
     struct niosConnect conn;
     struct {
         struct niosConnect conn;
-        char padding[4];
+        // char padding[4];
         struct LSFHeader hdr;
     } reqBuf;
     struct LSFHeader reqHdr;
@@ -86,7 +86,7 @@ niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus,
     fcntl (s, F_SETFD, fcntl (s, F_GETFD) | FD_CLOEXEC);
     setsockopt (s, SOL_SOCKET, SO_LINGER, (char *) &linstr, sizeof (linstr));
 
-    if (rpid == 0) {
+    if (rtaskid == 0) {
         return s;
     }
 
@@ -96,7 +96,7 @@ niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus,
 
     initLSFHeader_ (&reqHdr);
     reqHdr.opCode = RES2NIOS_CONNECT;
-    conn.rpid = rpid;
+    conn.rtaskid = rtaskid;
     
     if (terWhiPendStatus == 1) {
         conn.exitStatus = 126;
@@ -111,7 +111,7 @@ niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus,
     if (writeEncodeMsg_ (s, (char *) &reqBuf, sizeof (reqBuf), &reqHdr, (char *) &conn, nb_write_fix, xdr_niosConnect, 0) < 0) {
         if (logclass & LC_EXEC) {
             /* catgets 6201 */
-            ls_syslog( LOG_ERR, "catgets 6201: %s: writeEncodeMsg_(%d,%d) RES2NIOS_connect failed: %M", __func__, s, rpid );
+            ls_syslog( LOG_ERR, "catgets 6201: %s: writeEncodeMsg_(%d,%d) RES2NIOS_connect failed: %M", __func__, s, rtaskid );
         }
       
         close (s);

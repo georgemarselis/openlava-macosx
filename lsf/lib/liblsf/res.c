@@ -29,7 +29,7 @@
 #include "lib/queue.h"
 #include "lib/xdrnio.h"
 #include "lib/xdrrf.h"
-#include "lib/tid.h"
+#include "lib/taskid.h"
 #include "lib/res.h" 
 #include "lib/conn.h"
 #include "lib/host.h"
@@ -45,7 +45,6 @@
 #include "lib/xdrmisc.h"
 #include "lib/sig.h"
 #include "lib/limits.h"
-#include "lib/tid.h"
 
 unsigned int  getCurrentSN( void ) 
 {
@@ -413,7 +412,7 @@ ls_chdir ( const char *host, const char *dir)
 }
 
 struct lsRequest *
-lsReqHandCreate_ ( pid_t tid, unsigned int seqno, int connfd, void *extra, requestCompletionHandler replyHandler,  appCompletionHandler appHandler, void *appExtra)
+lsReqHandCreate_ ( unsigned long taskid, unsigned int seqno, int connfd, void *extra, requestCompletionHandler replyHandler,  appCompletionHandler appHandler, void *appExtra)
 {
     struct lsRequest *request = malloc (sizeof (struct lsRequest));
     if (!request) {
@@ -421,7 +420,7 @@ lsReqHandCreate_ ( pid_t tid, unsigned int seqno, int connfd, void *extra, reque
         return NULL;
     }
 
-    request->tid          = tid;
+    request->taskid       = taskid;
     // assert( seqno >= 0 );
     request->seqno        = seqno;
     request->connfd       = connfd;
@@ -528,7 +527,7 @@ ackAsyncReturnCode_ (int s, struct LSFHeader *replyHdr)
 }
 
 int
-enqueueTaskMsg_ (int s, pid_t taskID, struct LSFHeader *msgHdr)
+enqueueTaskMsg_ (int s, unsigned long taskID, struct LSFHeader *msgHdr)
 {
     char *msgBuf = NULL;
     struct tid *tEnt = NULL;
@@ -545,7 +544,7 @@ enqueueTaskMsg_ (int s, pid_t taskID, struct LSFHeader *msgHdr)
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    header->len = 0;
+    header->length = 0;
     header->msgPtr = NULL;
     if (s < 0) {
         header->type = LSTMSG_IOERR;
@@ -580,8 +579,8 @@ enqueueTaskMsg_ (int s, pid_t taskID, struct LSFHeader *msgHdr)
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    header->type = LSTMSG_DATA;
-    header->len = msgHdr->length;
+    header->type   = LSTMSG_DATA;
+    header->length = msgHdr->length;
     header->msgPtr = msgBuf;
 
     lsQueueDataAppend_ ((char *) header, tEnt->tMsgQ);
@@ -606,13 +605,13 @@ expectReturnCode_ (int s, unsigned int seqno, struct LSFHeader *repHdr)
             ls_syslog (LOG_DEBUG, "%s: calling readDecodeHdr_...", __func__);
         }
         xdr_setpos (&xdrs, 0);
-        if (readDecodeHdr_ ( (unsigned int) s, (char *) &buf, &b_read_fix, &xdrs, repHdr) < 0) { // NOFIX cast is probably fine
+        if (readDecodeHdr_ ( s, (char *) &buf, &b_read_fix, &xdrs, repHdr) < 0) {
             xdr_destroy (&xdrs);
             return 255; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
 
         if (repHdr->opCode == RES_NONRES) {
-            rc = enqueueTaskMsg_ (s, (pid_t)repHdr->refCode, repHdr); // FIXME FIXME remove cast
+            rc = enqueueTaskMsg_ (s, repHdr->refCode, repHdr); // FIXME FIXME remove cast
             if (rc < 0) {
                 xdr_destroy (&xdrs);
                 return 255;
@@ -1079,10 +1078,9 @@ rgetRusageCompletionHandler_ (struct lsRequest *request)
 }
 
 struct lsRequest *
-lsIRGetRusage_ (pid_t rpid, struct jRusage * ru, appCompletionHandler appHandler, void *appExtra, int options)
+lsIRGetRusage_ ( pid_t rtaskid, struct jRusage * ru, appCompletionHandler appHandler, void *appExtra, int options)
 {
     int socket = 0;
-    unsigned int rpid_to_pass = (unsigned int) rpid;
   
     struct requestbuf {
         struct resRusage rusageReq;
@@ -1097,7 +1095,7 @@ lsIRGetRusage_ (pid_t rpid, struct jRusage * ru, appCompletionHandler appHandler
 
     memset( host, '\0', strlen( host ) );
 
-    tid = tid_find ((pid_t)rpid_to_pass); // FIXME FIXME remove cast
+    tid = tid_find ( (unsigned long ) rtaskid ); // FIXME FIXME FIXME find if rtaskid is pid_t or unsigned long
     if ( NULL == tid ) {
         return NULL;
     }
@@ -1115,7 +1113,7 @@ lsIRGetRusage_ (pid_t rpid, struct jRusage * ru, appCompletionHandler appHandler
         }
     }
 
-    rusageReq.rpid = rpid;
+    rusageReq.rtaskid = rtaskid;
     if (options == 0 || (options & RID_ISTID)) {
         rusageReq.whatid = RES_RID_ISTID;
     }
@@ -1131,7 +1129,7 @@ lsIRGetRusage_ (pid_t rpid, struct jRusage * ru, appCompletionHandler appHandler
         return NULL;
     }
 
-    request = lsReqHandCreate_ (rpid, getCurrentSN( ), socket, ru, rgetRusageCompletionHandler_, appHandler, appExtra); // FIXME FIXME FIXME char for data? really?
+    request = lsReqHandCreate_ ( (unsigned long) rtaskid, getCurrentSN( ), socket, ru, rgetRusageCompletionHandler_, appHandler, appExtra); // FIXME FIXME FIXME char for data? really? // FIXME FIXME FIXME find if rtaskid is pid_t or unsigned long
 
     if (request == NULL) {
         return NULL;
@@ -1146,7 +1144,7 @@ lsIRGetRusage_ (pid_t rpid, struct jRusage * ru, appCompletionHandler appHandler
 }
 
 int
-lsGetRProcRusage ( const char *host, int pid, struct jRusage *ru, int options)
+lsGetRProcRusage ( const char *host, unsigned long rtaskid, struct jRusage *ru, int options)
 {
     struct requestbuf {
         struct resRusage rusageReq;
@@ -1157,11 +1155,11 @@ lsGetRProcRusage ( const char *host, int pid, struct jRusage *ru, int options)
     int socket = 0;
     struct lsRequest *request = NULL;
     struct resRusage rusageReq;
-    int descriptor[2] = { 0, 0 };
+    int descriptor[2] = { 0, 0 }; // FIXME FIXME label the two elements
     int callResResult = 0;
 
     if (_isconnected_ (host, descriptor)) {
-        socket = descriptor[0]; 
+        socket = descriptor[0];  // FIXME FIXME label [0]
     }
     else {
         lserrno = LSE_LOSTCON;
@@ -1178,7 +1176,7 @@ lsGetRProcRusage ( const char *host, int pid, struct jRusage *ru, int options)
         }
     }
 
-    rusageReq.rpid = pid;
+    rusageReq.rtaskid   = (pid_t) rtaskid; // FIXME FIXME FIXME see if rtaskid is pid_t or unsigned long
     rusageReq.whatid = RES_RID_ISPID;
 
     if (options & RES_RPID_KEEPPID) {
@@ -1194,7 +1192,7 @@ lsGetRProcRusage ( const char *host, int pid, struct jRusage *ru, int options)
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    request = lsReqHandCreate_ (pid, getCurrentSN( ), socket, ru, rgetRusageCompletionHandler_, NULL, NULL);
+    request = lsReqHandCreate_ (rtaskid, getCurrentSN( ), socket, ru, rgetRusageCompletionHandler_, NULL, NULL);
 
     if (request == NULL) {
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
@@ -1218,7 +1216,7 @@ lsGetRProcRusage ( const char *host, int pid, struct jRusage *ru, int options)
 }
 
 struct lsRequest *
-lsGetIRProcRusage_ ( const char *host, int tid, pid_t pid, struct jRusage *ru, appCompletionHandler appHandler, void *appExtra)
+lsGetIRProcRusage_ ( const char *host, unsigned long taskid, pid_t pid, struct jRusage *ru, appCompletionHandler appHandler, void *appExtra)
 {
     struct requestbuf {
         struct resRusage rusageReq;
@@ -1250,7 +1248,7 @@ lsGetIRProcRusage_ ( const char *host, int tid, pid_t pid, struct jRusage *ru, a
         }
     }
 
-    rusageReq.rpid = pid; // FIXME FIXME FIXME FIXME FIXME 
+    rusageReq.rtaskid = (pid_t) pid; // FIXME FIXME FIXME FIXME FIXME 
     rusageReq.whatid = RES_RID_ISPID;
 
     if (callRes_ (socket, RES_RUSAGE, (char *)&rusageReq, (char *)&requestBuf, sizeof (requestBuf), xdr_resGetRusage, 0, 0, NULL) == -1) { // FIXME FIXME FIXME this is wrong, yo. data as char?
@@ -1259,7 +1257,7 @@ lsGetIRProcRusage_ ( const char *host, int tid, pid_t pid, struct jRusage *ru, a
         return NULL;
     }
 
-    request = lsReqHandCreate_ (tid, getCurrentSN( ), socket, ru, rgetRusageCompletionHandler_, appHandler, appExtra);
+    request = lsReqHandCreate_ (taskid, getCurrentSN( ), socket, ru, rgetRusageCompletionHandler_, appHandler, appExtra);
 
     if (request == NULL) {
         return NULL;
@@ -1297,7 +1295,7 @@ sendSig_ (const char *host, pid_t rpid, int sig, int options)
 {
     struct Buff {
         struct resRKill rk;
-        char padding[4];
+        // char padding[4];
         struct LSFHeader hdr;
     } buf;
     
@@ -1328,7 +1326,7 @@ sendSig_ (const char *host, pid_t rpid, int sig, int options)
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    killReq.rpid = rpid;
+    killReq.rtaskid = (unsigned long) rpid; // FIXME FIXME FIXME see if rpid is unsigned long or rpid
 
     if (options & RSIG_ID_ISTID) {
         killReq.whatid = RES_RID_ISTID;
@@ -1402,22 +1400,21 @@ lsRSig_ ( const char *host, pid_t rpid, int sig, int options)
 }
 
 int
-ls_rkill (pid_t rtid, int sig)
+ls_rkill ( unsigned long rtaskid, int sig)
 {
     int s = 0;
     int rc = 0;
     struct tid *tid = NULL;
     char *host = malloc( sizeof(MAXHOSTNAMELEN) + 1 );
-    unsigned int rpid_to_find = (unsigned int) rtid;
 
     memset( host, '\0', strlen( host ) );
 
-    if ( 0 == rtid ) {
-        rc = lsRSig_ (NULL, rtid, sig, RSIG_ID_ISTID);
+    if ( 0 == rtaskid ) {
+        rc = lsRSig_ (NULL, (pid_t) rtaskid, sig, RSIG_ID_ISTID); // FIXME FIXME FIXME see if rtaskid should be unsigned long or pid_t
         return rc;
     }
 
-    tid = tid_find ((pid_t)rpid_to_find); // FIXME FIXME remove cast
+    tid = tid_find ( rtaskid ); // FIXME FIXME remove cast
     if( NULL == tid ) {
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
@@ -1425,30 +1422,29 @@ ls_rkill (pid_t rtid, int sig)
     s = tid->sock;
     gethostbysock_ (s, host);
 
-    rc = lsRSig_ (host, rtid, sig, RSIG_ID_ISTID);
+    rc = lsRSig_ (host, (pid_t) rtaskid, sig, RSIG_ID_ISTID); // FIXME FIXME FIXME see if rtaskid should be unsigned long or pid_t
     return rc;
 
 }
 
 
 int
-lsMsgRdy_ (unsigned int taskid, size_t *msgLen) // NOTE taskid is really of pid_t
+lsMsgRdy_ (unsigned long taskid, size_t *msgLen) // FIXME FIXME FIXME see if rtaskid should be unsigned long or pid_t
 {
     struct tid *tEnt = NULL;
     struct lsQueueEntry *qEnt = NULL;
     struct lsTMsgHdr *header = NULL;
 
-    tEnt = tidFindIgnoreConn_ ((pid_t)taskid); // FIXME FIXME remove cast
+    tEnt = tidFindIgnoreConn_ ( taskid); // FIXME FIXME remove cast
     if (tEnt == NULL) {
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        return INT_MAX;
     }
 
     if( !LS_QUEUE_EMPTY (tEnt->tMsgQ) ) {
         qEnt = tEnt->tMsgQ->start->forw;
-        header = (struct lsTMsgHdr *) strdup(qEnt->data);   // FIXME FIXME FIXME FIXME
-                                                    //      member-for-member assignment
+        header = (struct lsTMsgHdr *) strdup(qEnt->data);   // FIXME FIXME FIXME FIXME member-for-member assignment
         if (msgLen != NULL) {
-            *msgLen = header->len;
+            *msgLen = header->length;
         }
         return 1;
     }
@@ -1479,18 +1475,18 @@ tMsgDestroy_ (void *extra)
 
 
 
-int
-lsMsgRcv_ (unsigned int taskid, const char *buffer, size_t len, int options) // NOTE taskid is really of type pid_t
+long
+lsMsgRcv_ (unsigned long taskid, const char *buffer, size_t length, int options) // NOTE taskid is really of type pid_t
 {
-    int rc                    = 0;
-    unsigned int nrdy         = 0;
+    long rc                   = 0;
+    unsigned long nrdy        = 0;
     struct tid *tEnt          = NULL;
     struct lsQueueEntry *qEnt = NULL;
     char *buffer2 = strdup( buffer );
 
     assert( options ); // FIXME find out if any calls actually 
 
-    tEnt = tidFindIgnoreConn_ ((pid_t)taskid); // FIXME FIXME remove cast
+    tEnt = tidFindIgnoreConn_ ( taskid ); // FIXME FIXME remove cast
     if ( NULL == tEnt ) {
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
@@ -1514,7 +1510,7 @@ lsMsgRcv_ (unsigned int taskid, const char *buffer, size_t len, int options) // 
             }
 
             header = (struct lsTMsgHdr *) strdup( qEnt->data );   // FIXME FIXME FIXME FIXME member-for-member assignment
-            if (header->len > len) {
+            if (header->length > length) {
                 lserrno = LSE_MSG_SYS;
                 lsQueueEntryDestroy_ (qEnt, tEnt->tMsgQ);
                 return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
@@ -1531,10 +1527,10 @@ lsMsgRcv_ (unsigned int taskid, const char *buffer, size_t len, int options) // 
                 return 0;
             }
 
-            memcpy ( buffer2, header->msgPtr, header->len);
+            memcpy ( buffer2, header->msgPtr, header->length);
 
-            assert( header->len <= INT_MAX );
-            rc = (int) header->len;             //FIXME FIXME horrible shoehorning. must revistit function return types
+            assert( header->length <= LONG_MAX );
+            rc = (long) header->length;             //FIXME FIXME horrible shoehorning. must revistit function return types
             lsQueueEntryDestroy_ (qEnt, tEnt->tMsgQ);
             return rc;
         }
@@ -1639,10 +1635,10 @@ lsMsgSnd2_ (int *sock, unsigned short opcode, const char *buffer, size_t len, in
 }
 
 int
-lsMsgSnd_ (unsigned int taskid, const char *buffer, size_t len, int options) // NOTE taskid is really of pid_t type
+lsMsgSnd_ (unsigned long taskid, const char *buffer, size_t len, int options)
 {
     struct LSFHeader header;
-    char headerBuf[sizeof (struct LSFHeader)];
+    char headerBuf[sizeof (struct LSFHeader)]; // FIXME FIXME this needs debugging
     XDR xdrs;
     struct tid *tEnt = NULL;
     long rc = 0;
@@ -1653,7 +1649,7 @@ lsMsgSnd_ (unsigned int taskid, const char *buffer, size_t len, int options) // 
 
     assert( options ); // FiXME; either the assert or int options has to go
 
-    tEnt = tid_find ( (pid_t)taskid); // FIXME FIXME remove cast
+    tEnt = tid_find ( taskid); // FIXME FIXME remove cast
     if (!tEnt) {
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
@@ -1720,14 +1716,14 @@ lsMsgSnd_ (unsigned int taskid, const char *buffer, size_t len, int options) // 
 }
 
 int
-lsMsgWait_ (int inTidCnt, unsigned int *tidArray, unsigned int *rdyTidCnt, unsigned int inFdCnt, int *fdArray, unsigned int *rdyFdCnt, int *outFdArray, struct timeval *timeout, int options)
+lsMsgWait_ (unsigned long inTidCnt, unsigned long *tidArray, unsigned long *rdyTidCnt, unsigned int inFdCnt, int *fdArray, unsigned long *rdyFdCnt, int *outFdArray, struct timeval *timeout, int options)
 {
     long maxfd      = 0;
     int nready      = 0;
     int rc          = 0;
     int nBitsSet    = 0;
-    unsigned int rdycnt = 0;
-    struct tid *taskEnt = NULL;
+    unsigned long rdycnt = 0;
+    struct tid *taskEnt  = NULL;
     struct LSFHeader msgHdr;
 
     int goAgain = 0;
@@ -1745,7 +1741,7 @@ lsMsgWait_ (int inTidCnt, unsigned int *tidArray, unsigned int *rdyTidCnt, unsig
         return 0;
     }
 
-    for ( unsigned int i = 0; i < inFdCnt; i++) {
+    for ( unsigned long i = 0; i < inFdCnt; i++) {
         outFdArray[i] = -1;
     }
 
@@ -1765,7 +1761,7 @@ lsMsgWait_ (int inTidCnt, unsigned int *tidArray, unsigned int *rdyTidCnt, unsig
         }
 
         if (inFdCnt > 0 && fdArray) {
-            for ( unsigned int i = 0; i < inFdCnt; i++)
+            for ( unsigned long i = 0; i < inFdCnt; i++)
             {
                 if (FD_NOT_VALID (fdArray[i]))
                 {
@@ -1780,7 +1776,7 @@ lsMsgWait_ (int inTidCnt, unsigned int *tidArray, unsigned int *rdyTidCnt, unsig
             rdycnt = 0;
             if (inTidCnt && tidArray)
             {
-                for ( int i = 0; i < inTidCnt; i++)
+                for ( unsigned long i = 0; i < inTidCnt; i++)
                 {
                     rc = lsMsgRdy_ (tidArray[i], NULL);
                     if (rc > 0)
@@ -1791,7 +1787,7 @@ lsMsgWait_ (int inTidCnt, unsigned int *tidArray, unsigned int *rdyTidCnt, unsig
                         continue;
                     }
 
-                    taskEnt = tid_find ((pid_t)tidArray[i]); // FIXME FIXME remove cast
+                    taskEnt = tid_find ( tidArray[i] ); // FIXME FIXME remove cast
 
                     if (taskEnt == NULL)
                     {
@@ -1828,7 +1824,7 @@ lsMsgWait_ (int inTidCnt, unsigned int *tidArray, unsigned int *rdyTidCnt, unsig
             }
             
             assert( maxfd <= INT_MAX && maxfd >= INT_MIN );
-            nready = select( (int)maxfd, &rm, NULL, NULL, timeout);
+            nready = select( (int) maxfd, &rm, NULL, NULL, timeout);
 
             if (nready < 0) {
                 if (errno == EINTR) {
@@ -1867,8 +1863,8 @@ lsMsgWait_ (int inTidCnt, unsigned int *tidArray, unsigned int *rdyTidCnt, unsig
             rdycnt = 0;
             xdrmem_create (&xdrs, hdrBuf, sizeof (struct LSFHeader), XDR_DECODE);
 
-            for ( int i = 0; i < inTidCnt; i++) {
-                taskEnt = tidFindIgnoreConn_ ((pid_t)tidArray[i]); // FIXME FIXME remove cast
+            for ( unsigned int i = 0; i < inTidCnt; i++) {
+                taskEnt = tidFindIgnoreConn_ ( tidArray[i] );
 
                 if (taskEnt == NULL) {
                     rc = -1;
@@ -1885,19 +1881,19 @@ lsMsgWait_ (int inTidCnt, unsigned int *tidArray, unsigned int *rdyTidCnt, unsig
                 }
 
                 xdr_setpos (&xdrs, 0);
-                rc = readDecodeHdr_ ( (unsigned int) taskEnt->sock, hdrBuf, b_read_fix, &xdrs, &msgHdr); // FIXME FIXME FIXME this has to go through checking during debugging
+                rc = readDecodeHdr_ ( taskEnt->sock, hdrBuf, b_read_fix, &xdrs, &msgHdr); // FIXME FIXME FIXME this has to go through checking during debugging
 
                 if (rc < 0) {
 
-                    unsigned int nTids = 0;
-                    unsigned int *tidSameConns = 0;
+                    unsigned long nTids = 0;
+                    unsigned long *tidSameConns = NULL;
                     // unsigned int tidIDx = 0;
 
                     rc = tidSameConnection_ (taskEnt->sock, &nTids, &tidSameConns);
                     for ( unsigned tidIDx = 0; tidIDx < nTids; tidIDx++) {
 
                         // assert( tidSameConns[tidIDx] >= 0 );
-                        rc = enqueueTaskMsg_ (-1, (pid_t) tidSameConns[tidIDx], NULL);// FIXME FIXME remove cast 
+                        rc = enqueueTaskMsg_ (-1, tidSameConns[tidIDx], NULL);
                         if (rc < 0) {
 
                             free (tidSameConns);
@@ -1920,7 +1916,7 @@ lsMsgWait_ (int inTidCnt, unsigned int *tidArray, unsigned int *rdyTidCnt, unsig
                 }
                 else {
 
-                    rc = enqueueTaskMsg_ (taskEnt->sock, (pid_t) msgHdr.refCode, &msgHdr); // FIXME FIXME remove cast WHY THE FRACK IS .refCode HERE?????
+                    rc = enqueueTaskMsg_ (taskEnt->sock, msgHdr.refCode, &msgHdr);
                     if (rc < 0) {
                         xdr_destroy (&xdrs);
                         return rc;

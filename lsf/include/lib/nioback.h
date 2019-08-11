@@ -2,4 +2,4 @@
 
 #pragma once
 
-int niosCallback_ (struct sockaddr_in *from, u_short port, int rpid, int exitStatus, int terWhiPendStatus);
+int niosCallback_ (struct sockaddr_in *from, u_short port, unsigned long rtaskid, int exitStatus, int terWhiPendStatus);

@@ -32,22 +32,23 @@
 
 struct lsrunParams
 {
-  char **hlist;
-  char **cmd;
-  char *resReq;
-  char *hosts;
-  int verbose;
-  int parallel;
-  int pty;
+    char **hlist;
+    char **cmd;
+    char *resReq;
+    char *hosts;
+    int verbose;
+    int parallel;
+    int pty;
 };
 
 static struct lsrunParams *P;
 
-static void
+void
 usage (void)
 {
-  fprintf (stderr, "\
-lsrun: [-h] [-V] [-P] [-v] [-p] [-R] [-m hosts...]\n");
+    fprintf (stderr, "lsrun: [-h] [-V] [-P] [-v] [-p] [-R] [-m hosts...]\n");
+
+    return;
 }
 
 static int gethostsbyname (const char *, char **);
@@ -57,149 +58,148 @@ static char **gethostsbyresreq (int *);
 int
 main (int argc, char **argv, char **environ)
 {
-  int cc;
-  int num;
-  int tid;
-  char **hlist;
+    int cc = 0;
+    int num = 0;
+    unsigned long taskid = 0;
+    char **hlist = NULL;
 
-  putenv ("POSIXLY_CORRECT=y");
+    putenv ("POSIXLY_CORRECT=y");
 
-  P = calloc (1, sizeof (struct lsrunParams));
+    P = calloc (1, sizeof (struct lsrunParams));
 
-  while ((cc = getopt (argc, argv, "hVPvpR:m:")) != EOF)
+    while ((cc = getopt (argc, argv, "hVPvpR:m:")) != EOF)
+        {
+
+            switch (cc)
     {
+        char *err;
+    case 'V':
+        fprintf (stderr, "%s\n", _OPENLAVA_PROJECT_);
+        return 0;
+    case 'p':
+        P->parallel = 1;
+        break;
+    case 'v':
+        P->verbose = 1;
+        break;
+    case 'R':
+        P->resReq = optarg;
+        break;
+    case 'P':
+        P->pty = 1;
+        break;
+    case 'm':
+        P->hosts = optarg;
+        if (gethostsbyname (P->hosts, &err) < 0) {
+                fprintf (stderr, "lsrun: cannot resolve %s hostname", err);
+                free (err);
+                return -1;
+            }
+        break;
+    case 'h':
+    case '?':
+        usage ();
+        return -1;
+    }
+        }
 
-      switch (cc)
-	{
-	  char *err;
-	case 'V':
-	  fprintf (stderr, "%s\n", _OPENLAVA_PROJECT_);
-	  return 0;
-	case 'p':
-	  P->parallel = 1;
-	  break;
-	case 'v':
-	  P->verbose = 1;
-	  break;
-	case 'R':
-	  P->resReq = optarg;
-	  break;
-	case 'P':
-	  P->pty = 1;
-	  break;
-	case 'm':
-	  P->hosts = optarg;
-	  if (gethostsbyname (P->hosts, &err) < 0)
-	    {
-	      fprintf (stderr, "\
-lsrun: cannot resolve %s hostname", err);
-	      free (err);
-	      return -1;
-	    }
-	  break;
-	case 'h':
-	case '?':
-	  usage ();
-	  return -1;
-	}
+    P->cmd = &argv[optind];
+    if (P->cmd[0] == NULL)
+        {
+            usage ();
+            free (P);
+            return -1;
+        }
+
+    /* Ignore SIGUSR1 and use ls_rwait()
+     * to poll for done tasks.
+     */
+    signal (SIGUSR1, SIG_IGN);
+
+    if (P->hosts)
+        hlist = gethostsbylist (&num);
+    else
+        hlist = gethostsbyresreq (&num);
+
+    if (hlist == NULL)
+        {
+            free (P);
+            return -1;
+        }
+
+    /* initialize the remote execution
+     * library
+     */
+    cc = ls_initrex (1, 0);
+    if (cc < 0)
+        {
+            ls_perror ("ls_initrex()");
+            return -1;
+        }
+
+    for (cc = 0; cc < num; cc++)
+        {
+
+            if (P->verbose)
+    {
+        printf ("Running task on host %s\n", hlist[cc]);
     }
 
-  P->cmd = &argv[optind];
-  if (P->cmd[0] == NULL)
+            taskid = ls_rtaske (hlist[cc], P->cmd, P->pty ? REXF_USEPTY : 0, environ);
+            if (taskid < 0)
     {
-      usage ();
-      free (P);
-      return -1;
-    }
-
-  /* Ignore SIGUSR1 and use ls_rwait()
-   * to poll for done tasks.
-   */
-  signal (SIGUSR1, SIG_IGN);
-
-  if (P->hosts)
-    hlist = gethostsbylist (&num);
-  else
-    hlist = gethostsbyresreq (&num);
-
-  if (hlist == NULL)
-    {
-      free (P);
-      return -1;
-    }
-
-  /* initialize the remote execution
-   * library
-   */
-  cc = ls_initrex (1, 0);
-  if (cc < 0)
-    {
-      ls_perror ("ls_initrex()");
-      return -1;
-    }
-
-  for (cc = 0; cc < num; cc++)
-    {
-
-      if (P->verbose)
-	{
-	  printf ("Running task on host %s\n", hlist[cc]);
-	}
-
-      tid = ls_rtaske (hlist[cc], P->cmd, P->pty ? REXF_USEPTY : 0, environ);
-      if (tid < 0)
-	{
-	  fprintf (stderr, "\
+        fprintf (stderr, "\
 lsrun: ls_rtaske() failed on host %s: %s\n", hlist[cc], ls_sysmsg ());
-	}
-
-      if (P->verbose)
-	printf ("Task %d on host %s started\n", tid, hlist[cc]);
-
-      /* the host was manually selected
-       * so let's tell li to jackup the
-       * load so this host won't be
-       * selected again
-       */
-      if (P->hosts)
-	{
-	  struct placeInfo place;
-
-	  strcpy (place.hostName, hlist[cc]);
-	  place.numtask = 1;
-
-	  ls_loadadj (P->resReq, &place, 1);
-	}
     }
 
-  if (P->verbose)
-    printf ("Going to ls_rwait() for %d tasks\n", num);
+            if (P->verbose)
+    printf ("Task %d on host %s started\n", taskid, hlist[cc]);
 
-  while (num > 0)
+            /* the host was manually selected
+             * so let's tell li to jackup the
+             * load so this host won't be
+             * selected again
+             */
+            if (P->hosts)
     {
-      LS_WAIT_T stat;
-      struct rusage ru;
+        struct placeInfo place;
 
-      tid = ls_rwait (&stat, 0, &ru);
-      if (tid < 0)
-	{
-	  ls_perror ("ls_rwait()");
-	  break;
-	}
+        strcpy (place.hostName, hlist[cc]);
+        place.numtask = 1;
 
-      if (P->verbose)
-	printf ("Task %d done\n", tid);
+        ls_loadadj (P->resReq, &place, 1);
+    }
+        }
 
-      --num;
+    if (P->verbose)
+        printf ("Going to ls_rwait() for %d tasks\n", num);
+
+    while (num > 0)
+        {
+            LS_WAIT_T stat;
+            struct rusage ru;
+
+            // taskid = ls_rwait (&stat, 0, &ru);
+            taskid = rwait_ (0, &stat, 0, &ru);
+            if (taskid < 0)
+    {
+        ls_perror ("ls_rwait()");
+        break;
     }
 
-  /* the openlava library keeps memory to
-   * this array inside, but since we are not
-   * calling it again this should be safe.
-   */
-  free (P);
+            if (P->verbose)
+    printf ("Task %d done\n", taskid);
 
-  return 0;
+            --num;
+        }
+
+    /* the openlava library keeps memory to
+     * this array inside, but since we are not
+     * calling it again this should be safe.
+     */
+    free (P);
+
+    return 0;
 }
 
 /* gethostbylist()
@@ -209,38 +209,38 @@ lsrun: ls_rtaske() failed on host %s: %s\n", hlist[cc], ls_sysmsg ());
 static char **
 gethostsbylist (int *num)
 {
-  int cc;
-  char *p;
-  char *p0;
-  char *word;
-  char **hlist;
+    int cc;
+    char *p;
+    char *p0;
+    char *word;
+    char **hlist;
 
-  p0 = p = strdup (P->hosts);
+    p0 = p = strdup (P->hosts);
 
-  cc = 0;
-  while ((word = getNextWord_ (&p)))
-    ++cc;
-  free (p0);
-  *num = cc;
+    cc = 0;
+    while ((word = getNextWord_ (&p)))
+        ++cc;
+    free (p0);
+    *num = cc;
 
-  if (cc == 0)
-    {
-      fprintf (stderr, "\
+    if (cc == 0)
+        {
+            fprintf (stderr, "\
 %s: Not enough host(s) currently eligible\n", __FUNCTION__);
-      return NULL;
-    }
+            return NULL;
+        }
 
-  hlist = calloc (cc, sizeof (char *));
-  cc = 0;
-  p0 = p = strdup (P->hosts);
-  while ((word = getNextWord_ (&p)))
-    {
-      hlist[cc] = strdup (word);
-      ++cc;
-    }
-  free (p0);
+    hlist = calloc (cc, sizeof (char *));
+    cc = 0;
+    p0 = p = strdup (P->hosts);
+    while ((word = getNextWord_ (&p)))
+        {
+            hlist[cc] = strdup (word);
+            ++cc;
+        }
+    free (p0);
 
-  return hlist;
+    return hlist;
 
 }
 
@@ -249,26 +249,26 @@ gethostsbylist (int *num)
 static char **
 gethostsbyresreq (int *num)
 {
-  char **hlist;
+    char **hlist;
 
-  /* ask lim for only one host if not
-   * parallel request, in this case lim
-   * will schedule different host all
-   * the time avoid to overload on
-   * host.
-   */
-  *num = 0;
-  if (P->parallel == 0)
-    *num = 1;
+    /* ask lim for only one host if not
+     * parallel request, in this case lim
+     * will schedule different host all
+     * the time avoid to overload on
+     * host.
+     */
+    *num = 0;
+    if (P->parallel == 0)
+        *num = 1;
 
-  hlist = ls_placereq (P->resReq, num, 0, NULL);
-  if (hlist == NULL)
-    {
-      ls_perror ("ls_placereq()");
-      return NULL;
-    }
+    hlist = ls_placereq (P->resReq, num, 0, NULL);
+    if (hlist == NULL)
+        {
+            ls_perror ("ls_placereq()");
+            return NULL;
+        }
 
-  return hlist;
+    return hlist;
 }
 
 /* gethostsbyname()
@@ -278,5 +278,5 @@ gethostsbyresreq (int *num)
 static int
 gethostsbyname (const char *list, char **err)
 {
-  return 0;
+    return 0;
 }

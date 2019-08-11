@@ -87,12 +87,12 @@ enum LIST_SIZES {
 // #define _USE_PRIMARY_       0x10
 // #define _USE_PPORT_         0x20
 enum PORTS {
-    _NON_BLOCK_ = 0x01,
-    _LOCAL_ = 0x02,
-    _USE_TCP_ = 0x04,
+    _NON_BLOCK_    = 0x01,
+    _LOCAL_        = 0x02,
+    _USE_TCP_      = 0x04,
     _KEEP_CONNECT_ = 0x08,
-    _USE_PRIMARY_ = 0x10,
-    _USE_PPORT_ = 0x20,
+    _USE_PRIMARY_  = 0x10,
+    _USE_PPORT_    = 0x20,
 };
 /* openlava call LSF_SERVER_HOSTS regardless of local lim.
  */
@@ -117,8 +117,8 @@ enum NOCODE {
 };
 
 enum RSIG {
-    RSIG_ID_ISTID = 0x01,
-    RSIG_ID_ISPID = 0x02,
+    RSIG_ID_ISTID  = 0x01,
+    RSIG_ID_ISPID  = 0x02,
     RSIG_KEEP_CONN = 0x04
 };
 
@@ -141,12 +141,12 @@ typedef int (*appCompletionHandler) (struct lsRequest *requestType, void *);
 
 struct lsRequest
 {
-    int tid; // FIXME tid stands for "task id". Should be pid_t or even better something else.
+    unsigned long taskid; // FIXME tid stands for "task id". Should be pid_t or even better something else.
     unsigned int seqno;
     int connfd;
     unsigned int rc;
     int completed;
-    char padding[4];
+    // char padding[4];
     unsigned long replyBufLen;
     requestCompletionHandler replyHandler;
     appCompletionHandler appHandler;
@@ -160,7 +160,7 @@ struct taskMsg
 {
     char *inBuf;
     char *outBuf;
-    size_t len;
+    size_t length;
 };
 
 enum lsTMsgType
@@ -175,7 +175,7 @@ struct lsTMsgHdr
     enum lsTMsgType type;
     char padding[4];
     char *msgPtr;
-    size_t len;
+    size_t length;
 };
 
 struct tid
@@ -183,11 +183,12 @@ struct tid
     bool_t isEOF;
     unsigned short taskPort;
     char padding[2];
-    int rtid;
+    unsigned long rtaskid;
     int sock;
     int refCount;
-    int pid;
-    char *host;
+    // int pid;
+    unsigned long taskid;
+    const char *host;
     struct lsQueue *tMsgQ;
     struct tid *link;
 };

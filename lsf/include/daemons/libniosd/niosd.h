@@ -19,7 +19,7 @@
 #pragma once
 
 #include "struct-config_param.h"
-#include "lsf.h"
+// #include "lsf.h"
 #include "lsb/lsbatch.h" // FIXME FIXME FIXME FIXME move this to lib/
 
 // #define NL_SETN         29
@@ -44,23 +44,23 @@ enum NIOS_PARAMS {
 };
 
 struct config_param niosParams[] = {
-	{ "LSF_NIOS_DEBUG",              NULL },
-	{ "LSF_ENABLE_PTY",              NULL },
-	{ "LSB_INTERACT_MSG_ENH",        NULL },
-	{ "LSB_INTERACT_MSG_INTVAL",     NULL },
-	{ "LSF_NIOS_RES_HEARTBEAT",      NULL },
-	{ "LSF_NIOS_JOBSTATUS_INTERVAL", NULL },
-	{ "LSB_INTERACT_MSG_EXITTIME",   NULL },
-	{ NULL,                          NULL }
+    { "LSF_NIOS_DEBUG",              NULL },
+    { "LSF_ENABLE_PTY",              NULL },
+    { "LSB_INTERACT_MSG_ENH",        NULL },
+    { "LSB_INTERACT_MSG_INTVAL",     NULL },
+    { "LSF_NIOS_RES_HEARTBEAT",      NULL },
+    { "LSF_NIOS_JOBSTATUS_INTERVAL", NULL },
+    { "LSB_INTERACT_MSG_EXITTIME",   NULL },
+    { NULL,                          NULL }
 };
 
 // #define STDIN_FD  0
 // #define STDOUT_FD 1
 // #define STDERR_FD 2
 enum filedescriptors { // FIXME FIXME FIXME eliminate need for this enum
-	STDIN_FD = 0,
-	STDOUT_FD,
-	STDERR_FD
+    STDIN_FD = 0,
+    STDOUT_FD,
+    STDERR_FD
 };
 
 // extern void checkJobStatus (int numTries);
@@ -83,7 +83,7 @@ const unsigned short WIDTH = 80;
 // extern size_t atoi64_ (char *ptr);
 // extern int requeued;
 
-pid_t niosPid;
+pid_t niosPid = -1;
 
 int cursor = 0;
 int chfd;
@@ -128,7 +128,7 @@ int standaloneTaskDone = 0;
 
 int forwardTSTP = 0;
 
-int cli_nios_fd[2] = {-1, -1 };
+int cli_nios_fd[2] = {-1, -1 }; // FIXME FIXME FIXME describe waht the two fd are
 // int standalone;
 // int niosSbdMode;
 // int heartbeatInterval;
@@ -138,118 +138,121 @@ int cli_nios_fd[2] = {-1, -1 };
 // unsigned long jobId;
 
 
-typedef enum
+enum libNiosRequest
 {
-	LIB_NIOS_RTASK,
-	LIB_NIOS_RWAIT,
-	LIB_NIOS_REM_ON,
-	LIB_NIOS_REM_OFF,
-	LIB_NIOS_SETSTDIN,
-	LIB_NIOS_GETSTDIN,
-	LIB_NIOS_EXIT,
-	LIB_NIOS_SUSPEND,
-	LIB_NIOS_SETSTDOUT,
-	LIB_NIOS_SYNC
-} libNiosRequest;
+    LIB_NIOS_RTASK,
+    LIB_NIOS_RWAIT,
+    LIB_NIOS_REM_ON,
+    LIB_NIOS_REM_OFF,
+    LIB_NIOS_SETSTDIN,
+    LIB_NIOS_GETSTDIN,
+    LIB_NIOS_EXIT,
+    LIB_NIOS_SUSPEND,
+    LIB_NIOS_SETSTDOUT,
+    LIB_NIOS_SYNC
+} ;
 
-typedef enum
+enum JOB_STATUS
 {
-	JOB_STATUS_ERR,
-	JOB_STATUS_UNKNOWN,
-	JOB_STATUS_FINISH,
-	JOB_STATUS_KNOWN
-} JOB_STATUS;
+    JOB_STATUS_ERR,
+    JOB_STATUS_UNKNOWN,
+    JOB_STATUS_FINISH,
+    JOB_STATUS_KNOWN
+};
 
-typedef enum
+enum libNiosReply
 {
-	CHILD_OK,
-	NONB_RETRY,
-	CHILD_FAIL,
-	REM_ONOFF,
-	STDIN_FAIL,
-	STDIN_OK,
-	NIOS_OK,
-	STDOUT_FAIL,
-	STDOUT_OK,
-	SYNC_FAIL,
-	SYNC_OK
-} libNiosReply;
+    CHILD_OK,
+    NONB_RETRY,
+    CHILD_FAIL,
+    REM_ONOFF,
+    STDIN_FAIL,
+    STDIN_OK,
+    NIOS_OK,
+    STDOUT_FAIL,
+    STDOUT_OK,
+    SYNC_FAIL,
+    SYNC_OK
+};
 
 
 struct lslibNiosHdr
 {
-	int opCode;
-	char padding[4];
-	size_t len;
+    int opCode;
+    char padding[4];
+    size_t len;
 };
 
 
 struct lslibNiosWaitReq
 {
-	struct lslibNiosHdr hdr;
-	struct
-	{
-		int options;
-		int tid;
-	} r;
+    struct lslibNiosHdr hdr;
+    struct
+    {
+        mode_t options;
+        char padding[4];
+        unsigned long taskid;
+    } r;
 };
 
 struct lslibNiosWaitReply
 {
-	struct lslibNiosHdr hdr;
-	struct
-	{
-		int pid;
-		int status;
-		struct rusage ru;
-	} r;
+    struct lslibNiosHdr hdr;
+    struct
+    {
+        unsigned long taskid;
+        mode_t status;
+        char padding[4];
+        struct rusage ru;
+    } r;
 };
 
 struct lslibNiosRTask
 {
-	struct lslibNiosHdr hdr;
-	struct
-	{
-		int pid;
-		struct in_addr peer;
-	} r;
+    struct lslibNiosHdr hdr;
+    struct
+    {
+        unsigned long taskid;
+        struct in_addr peer;
+        char padding[4];
+    } r;
 };
 
 struct lslibNiosStdout
 {
-	struct lslibNiosHdr hdr;
-	struct
-	{
-		int set_on;
-		char padding[4];
-		size_t len;
-	} r;
-	char *format;
+    struct lslibNiosHdr hdr;
+    struct
+    {
+        int set_on;
+        char padding[4];
+        size_t len;
+    } r;
+    char *format;
 };
 
 struct lslibNiosStdin
 {
-	struct lslibNiosHdr hdr;
-	struct
-	{
-		int set_on;
-		char padding[4];
-		size_t len;
-	} r;
-	int *rpidlist;
+    struct lslibNiosHdr hdr;
+    struct
+    {
+        int set_on;
+        char padding[4];
+        size_t len;
+    } r;
+    int *rtaskidlist;
 };
 
 struct lslibNiosGetStdinReply
 {
-	struct lslibNiosHdr hdr;
-	int *rpidlist;
+    struct lslibNiosHdr hdr;
+    int *rtaskidlist;
 };
 
 struct finishStatus
 {
-	int got_eof;
-	int got_status;
-	int sendSignal;
+    int got_eof;
+    int got_status;
+    int sendSignal;
 };
 
 void serv (char **, int);
@@ -279,7 +282,7 @@ struct loadIndexLog *initLoadIndex (void);
 void prtLine (char *);
 void JobExitInfo (void);
 void checkPendingJobStatus (int s);
-JOB_STATUS getJobStatus ( unsigned long jobId, struct jobInfoEnt **job, struct jobInfoHead **jobHead);
+enum JOB_STATUS getJobStatus ( unsigned long jobId, struct jobInfoEnt **job, struct jobInfoHead **jobHead);
 int JobStateInfo ( unsigned long jobId );
 int ls_niosetdebug (int);
 void kill_self (int, int);

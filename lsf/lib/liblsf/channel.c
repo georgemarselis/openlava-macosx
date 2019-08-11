@@ -998,15 +998,16 @@ chanWrite_ (unsigned int chfd, char *buf, size_t len)
 }
 
 int
-chanRpc_  ( unsigned int  chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *outhdr, time_t timeout)
+chanRpc_  ( unsigned int chfd, struct Buffer *in, struct Buffer *out, struct LSFHeader *outhdr, time_t timeout)
 {
     
-    long cc;
+    long cc = 0;
     
     XDR xdrs;
     
     struct LSFHeader hdrBuf;
-    struct timeval timeval, *timep = NULL;
+    struct timeval timeval;
+    struct timeval *timep = NULL;
 
     if (logclass & LC_COMM) {
         ls_syslog (LOG_DEBUG1, "%s: Entering ... chfd=%d", __func__, chfd);
@@ -1083,7 +1084,9 @@ chanRpc_  ( unsigned int  chfd, struct Buffer *in, struct Buffer *out, struct LS
     }
 
     xdrmem_create (&xdrs, (char *) &hdrBuf, sizeof (struct LSFHeader), XDR_DECODE);      // FIXME FIXME FIXME FIXME FIXME (char *) &hdrBuf ; does the char need to be there?
-    cc = readDecodeHdr_( chfd, (char *) &hdrBuf, (ssize_t (*)()) chanRead_, &xdrs, outhdr); // FIXME FIXME FIXME FIXME FIXME (char *) &hdrBuf ; does the char need to be there?
+    assert( chfd <= INT_MAX );
+
+    cc = readDecodeHdr_( (int)chfd, (char *) &hdrBuf, (ssize_t (*)()) chanRead_, &xdrs, outhdr); // FIXME FIXME FIXME FIXME FIXME (char *) &hdrBuf ; does the char need to be there?
     
     if (cc < 0)
     {

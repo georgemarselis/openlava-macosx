@@ -21,5 +21,5 @@
 
 void ls_minit( void );
 int  ls_getrpid( void );
-long ls_sndmsg ( unsigned int tid, const char *buf, size_t length);
-long ls_rcvmsg ( unsigned int tid, const char *buf, size_t length);
+long ls_sndmsg ( unsigned long taskid, const char *buf, size_t length);
+long ls_rcvmsg ( unsigned long taskid, const char *buf, size_t length);

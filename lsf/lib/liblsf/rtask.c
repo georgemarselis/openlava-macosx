@@ -34,7 +34,7 @@
 #include "lib/initenv.h"
 #include "lib/init.h"
 #include "lib/cwd.h"
-#include "lib/tid.h"
+#include "lib/taskid.h"
 #include "lib/res.h"
 #include "lib/structs/genParams.h"
 #include "daemons/libniosd/niosd.h"
@@ -323,10 +323,11 @@ ls_rtaske (const char *host, char **argv, int options, char **envp) // FIXME FIX
     }
 
     SET_LSLIB_NIOS_HDR (taskReq.hdr, LIB_NIOS_RTASK, sizeof (taskReq.r));
-    taskReq.r.pid = rpid;
+    taskReq.r.taskid = (unsigned long) rpid; // FIXME FIXME FIXME figure out of taskid/rpid should be unsigned long or pid_t
     taskReq.r.peer = sin.sin_addr;
 
-    taskReq.r.pid = (niosOptions & REXF_SYNCNIOS) ? -rpid : rpid;
+    // taskReq.r.taskid = (niosOptions & REXF_SYNCNIOS) ? -rpid : rpid;
+    taskReq.r.taskid = (niosOptions & REXF_SYNCNIOS) ? 0 : (unsigned long) rpid;
 
     if (b_write_fix (cli_nios_fd[0], (char *) &taskReq, sizeof (taskReq)) != sizeof (taskReq)) {
         close (socket);
@@ -336,7 +337,7 @@ ls_rtaske (const char *host, char **argv, int options, char **envp) // FIXME FIX
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    if (tid_register (rpid, socket, taskPort, host, options & REXF_TASKINFO) == -1) {
+    if (tid_register ((unsigned long)rpid, socket, taskPort, host, options & REXF_TASKINFO) == -1) { // FIXME FIXME FIXME figure out if rpid should be pid_t or unsigned long
         close (socket);
         _lostconnection_ (host);
         lserrno = LSE_MALLOC;
@@ -378,7 +379,7 @@ rgetpidCompletionHandler_ (struct lsRequest *request)
 
 // void * // was
 struct lsRequest *
-lsRGetpidAsync_ (pid_t taskid, pid_t *pid) // FIXME FIXME FIXME nothing is using this function.
+lsRGetpidAsync_ (unsigned long taskid, pid_t *pid) // FIXME FIXME FIXME nothing is using this function.
 {
     struct _buf_
     {
@@ -410,7 +411,7 @@ lsRGetpidAsync_ (pid_t taskid, pid_t *pid) // FIXME FIXME FIXME nothing is using
         }
     }
 
-    pidReq.rpid = taskid;
+    pidReq.rtaskid = taskid;
     pidReq.pid = -1;
 
     if (callRes_ (socket, RES_GETPID, (char *) &pidReq, (char *) &buf, sizeof (buf), xdr_resGetpid, 0, 0, NULL) == -1) {
@@ -430,7 +431,7 @@ lsRGetpidAsync_ (pid_t taskid, pid_t *pid) // FIXME FIXME FIXME nothing is using
 }
 
 pid_t
-lsRGetpid_ ( pid_t taskid, int options)
+lsRGetpid_ ( unsigned long taskid, int options)
 {
     struct _buf_
     {
@@ -464,7 +465,7 @@ lsRGetpid_ ( pid_t taskid, int options)
         }
     }
 
-    pidReq.rpid = taskid;
+    pidReq.rtaskid = taskid;
     pidReq.pid = -1;
 
     if (callRes_ (socket, RES_GETPID, (char *) &pidReq, (char *) &buf, sizeof (buf), xdr_resGetpid, 0, 0, NULL) == -1) {
@@ -492,7 +493,7 @@ lsRGetpid_ ( pid_t taskid, int options)
 }
 
 unsigned int
-lsRGetpgrp_ (int socket, pid_t taskid, pid_t pid)
+lsRGetpgrp_ (int socket, unsigned long taskid, pid_t pid)
 {
     struct _buf_
     {
@@ -519,7 +520,7 @@ lsRGetpgrp_ (int socket, pid_t taskid, pid_t pid)
         }
     }
 
-    pidReq.rpid = taskid;
+    pidReq.rtaskid = taskid;
     pidReq.pid = pid;
 
     if (callRes_ (socket, RES_GETPID, (char *) &pidReq, (char *) &buf, sizeof (buf), xdr_resGetpid, 0, 0, NULL) == -1) {

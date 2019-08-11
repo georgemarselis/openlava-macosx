@@ -26,7 +26,7 @@
 #include "lib/lib.h"
 #include "lib/comm.h"
 #include "lib/rdwr.h"
-#include "lib/tid.h"
+#include "lib/taskid.h"
 
 
 static char amSlave_ = FALSE;
@@ -45,28 +45,21 @@ ls_minit ( void )
 {
     char *c = NULL;
 
-    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
-
-    if ((c = getenv ("LSF_RPID")) == NULL)
-    {
+    if ((c = getenv ("LSF_RPID")) == NULL) {
         fprintf (stderr, "ls_minit: Internal error- don't know my rpid\n");
         exit (-1);
     }
-    else
-    {
-
+    else {
         const char env_name[] = "LSF_RPID";
         myrpid_ = atoi (c);
         unsetenv( env_name );
     }
 
-    if ((c = getenv ("LSF_CALLBACK_SOCK")) == NULL)
-    {
+    if ((c = getenv ("LSF_CALLBACK_SOCK")) == NULL) {
         fprintf (stderr, "ls_minit: Internal error-no connection to master\n");
         exit (-1);
     }
-    else
-    {
+    else{
         msock_ = atoi (c);
         amSlave_ = TRUE;
         unsetenv ("LSF_CALLBACK_SOCK");
@@ -85,22 +78,19 @@ ls_getrpid (void)
 }
 
 long
-ls_sndmsg (unsigned int tid, const char *buf, size_t length)
+ls_sndmsg (unsigned long taskid, const char *buf, size_t length)
 {
-    int sock;
-    struct tid *tid_;
+    int sock = 0;
+    struct tid *taskid_ = NULL;
 
-    if (amSlave_ == TRUE)
-    {
+    if (amSlave_ == TRUE) {
         sock = msock_;
     }
-    else
-    {
-        if ((tid_ = tid_find ( (pid_t) tid)) == NULL)
-        {
+    else {
+        if ((taskid_ = tid_find ( taskid ))  == NULL) {
             return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
-        sock = tid_->sock;
+        sock = taskid_->sock;
     }
 
     //FIXME fix this function to not return -1?
@@ -109,20 +99,17 @@ ls_sndmsg (unsigned int tid, const char *buf, size_t length)
 
 
 long
-ls_rcvmsg (unsigned int tid, const char *buf, size_t length)
+ls_rcvmsg (unsigned long taskid, const char *buf, size_t length)
 {
-    int sock;
+    int sock = -1;
 
-    if (amSlave_ == TRUE)
-    {
+    if (amSlave_ == TRUE) {
         sock = msock_;
     }
-    else
-    {
-        struct tid *tid_ = tid_find( (pid_t) tid );
-        sock = tid_->sock;
-        if( sock < 0)
-        {
+    else {
+        struct tid *taskid_ = tid_find( taskid );
+        sock = taskid_->sock;
+        if( sock < 0) {
             lserrno = LSE_RES_INVCHILD;
             return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }

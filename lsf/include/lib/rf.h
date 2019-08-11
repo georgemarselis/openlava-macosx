@@ -111,6 +111,6 @@ int ls_rfterminate(const char *host);
 int rhTerminate( const char *host);
 int ls_rstat(const char *host, const char *fn, struct stat *st);
 char *ls_rgetmnthost(const char *host, const char *fn);
-int ls_conntaskport(pid_t rpid);
+int ls_conntaskport(unsigned long rtaskid);
 int ls_runlink(const char *host, const char *fn);
 
