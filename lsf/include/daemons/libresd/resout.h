@@ -21,7 +21,7 @@
 #include <sys/ioctl.h>
 #include <termios.h>
 
-#include "lib/hdr.h"
+#include "lib/header.h"
 #include "daemons/libresd/resd.h"
 
 #ifndef TIOCGWINSZ

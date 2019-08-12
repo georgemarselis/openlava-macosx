@@ -19,15 +19,15 @@
 #pragma once
 
 //
-#include <tirpc/rpc/types.h>
-#ifndef __XDR_HEADER__
-#include <tirpc/rpc/xdr.h>
-#endif
-#include <stdio.h>
+// #include <tirpc/rpc/types.h>
+// #ifndef __XDR_HEADER__
+// #include <tirpc/rpc/xdr.h>
+// #endif
+// #include <stdio.h>
 
 // #include "daemons/daemonout.h"
 #include "lib/common_structs.h"
-#include "lib/hdr.h"
+#include "lib/header.h"
 // #include "lsb/lsbatch.h"
 
 int lsbSharedResConfigured_ = FALSE;

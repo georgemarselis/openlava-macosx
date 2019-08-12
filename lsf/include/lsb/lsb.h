@@ -25,8 +25,8 @@
 #include <unistd.h>
 
 #include "daemons/daemonout.h"
-#include "lib/hdr.h"
-#include "lib/lproto.h"
+#include "lib/header.h"
+// #include "lib/lproto.h"
 #include "lsb/lsbatch.h"
 #include "lsf.h"
 

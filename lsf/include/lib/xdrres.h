@@ -24,8 +24,8 @@
 #endif
 
 #include "daemons/libresd/resd.h"
-#include "lib/lproto.h"
-#include "lib/hdr.h"
+// #include "lib/lproto.h"
+#include "lib/header.h"
 #include "lib/rf.h"
 
 bool_t xdr_resConnect (XDR *, struct resConnect *, struct LSFHeader *);

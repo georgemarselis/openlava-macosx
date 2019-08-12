@@ -20,7 +20,7 @@
 
 #include <sys/types.h>
 
-#include "lib/hdr.h"
+#include "lib/header.h"
 
 #define CLOSECD(c) { chanClose_((c)); (c) = -1; }
 #define CHAN_INIT_BUF(b)  memset((b), 0, sizeof(struct Buffer));

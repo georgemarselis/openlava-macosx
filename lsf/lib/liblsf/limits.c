@@ -23,7 +23,7 @@
 
 #include "lib/lib.h"
 // #include "lib/lproto.h"
-#include "lib/hdr.h"
+#include "lib/header.h"
 #include "lib/syslog.h"
 
 /* #define NL_SETN   23 */

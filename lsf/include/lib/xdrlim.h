@@ -18,8 +18,8 @@
 
 #pragma once
  
-#include "lib/hdr.h"
-#include "lib/lproto.h"
+#include "lib/header.h"
+// #include "lib/lproto.h"
 #include "lib/xdrlim.h"
 #include "daemons/liblimd/limout.h"
 
