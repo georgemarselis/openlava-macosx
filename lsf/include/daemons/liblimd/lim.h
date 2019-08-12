@@ -6,6 +6,8 @@
 // #define CONNECT_TIMEOUT 3
 // #define RECV_TIMEOUT    3
 
+#include "daemons/liblimd/limout.h"
+
 const size_t MAXMSGLEN             = 32 * MSGSIZE; // FIXME FIXME FIXME FIXME why 32 times?
 const unsigned int CONNECT_TIMEOUT = 3;
 const unsigned int RECV_TIMEOUT    = 3;

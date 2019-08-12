@@ -3,5 +3,5 @@
 #pragma once 
 
 /* syntax.c */
-int expSyntax_(char *resReq);
+int expSyntax_( const char *resReq);
 

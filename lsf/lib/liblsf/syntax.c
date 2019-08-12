@@ -20,27 +20,31 @@
 
 // #include "lib/lib.h"
 #include "lib/xdr.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/syntax.h"
+#include "lib/initenv.h"
+#include "daemons/liblimd/lim.h"
+#include "daemons/liblimd/limout.h"
 
 int
-expSyntax_ (char *resReq)
+expSyntax_ ( const char *resReq)
 {
     struct stringLen str;
 
     if (initenv_ (NULL, NULL) < 0) {
-        return -1; // FIXME FIXME FIXME FIXME replace with sensible, meaningful *positive* return value
+        return INT_MAX;
     }
 
     if (!resReq) {
-        resReq = " ";
+        // resReq = " ";
+        return INT_MAX;
     }
 
-    str.name = resReq;
+    str.name = strdup( resReq) ;
     str.len = MAX_LINE_LEN;
 
     if (callLim_ (LIM_CHK_RESREQ, &str, xdr_stringLen, NULL, NULL, NULL, 0, NULL) < 0) {
-        return -1; // FIXME FIXME FIXME FIXME replace with sensible, meaningful *positive* return value
+        return INT_MAX;
     }
 
     return 0;
