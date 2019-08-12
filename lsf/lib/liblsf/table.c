@@ -21,8 +21,8 @@
 
 
 #include "lib/lib.h"
-#include "lib/lproto.h"
 #include "lib/table.h"
+#include "lib/misc.h"
 
 /* insList_()
  * Add the elemPtr in the list at destPtr address.
@@ -30,24 +30,24 @@
 void
 insList_ (struct hLinks *elemPtr, struct hLinks *destPtr)
 {
-    elemPtr->bwPtr = destPtr->bwPtr;
-    elemPtr->fwPtr = destPtr;
+    elemPtr->bwPtr        = destPtr->bwPtr;
+    elemPtr->fwPtr        = destPtr;
     destPtr->bwPtr->fwPtr = elemPtr;
-    destPtr->bwPtr = elemPtr;
+    destPtr->bwPtr        = elemPtr;
 }
 
 void
 remList_ (struct hLinks *elemPtr)
 {
 
-    if (elemPtr == NULL || elemPtr == elemPtr->bwPtr || !elemPtr)
-        {
-            return;
-        }
+    if (elemPtr == NULL || elemPtr == elemPtr->bwPtr || !elemPtr) {
+        return;
+    }
 
     elemPtr->fwPtr->bwPtr = elemPtr->bwPtr;
     elemPtr->bwPtr->fwPtr = elemPtr->fwPtr;
 
+    return;
 }
 
 void
@@ -56,10 +56,11 @@ initList_ (struct hLinks *headPtr)
     headPtr->bwPtr = headPtr;
     headPtr->fwPtr = headPtr;
 
+    return;
 }
 
 void
-h_initTab_ (hTab * tabPtr, unsigned long numSlots)
+h_initTab_ (struct hTab *tabPtr, size_t numSlots)
 {
     struct hLinks *slotPtr = tabPtr->slotPtr;
     unsigned long getClosestPrimeResult = 0;
@@ -70,6 +71,7 @@ h_initTab_ (hTab * tabPtr, unsigned long numSlots)
      * as prime number.
      */
     // FIXME FIXME generate highest-needed prime number?
+    assert( numSlots > 1 );
     getClosestPrimeResult = getClosestPrime (numSlots);
     tabPtr->size = getClosestPrimeResult;
     tabPtr->slotPtr = malloc (sizeof (struct hLinks) * tabPtr->size);
@@ -77,56 +79,56 @@ h_initTab_ (hTab * tabPtr, unsigned long numSlots)
         initList_ (slotPtr);
     }
 
+    return;
 }
 
 void
-h_freeTab_ (hTab * tabPtr, void (*freeFunc) (void *))
+h_freeTab_ (struct hTab *tabPtr, void (*freeFunc) (void *))
 {
     struct hLinks *hTabEnd = NULL;
     struct hLinks *slotPtr = NULL;
-    struct hEnt *hEntPtr = NULL;
+    struct hEnt *hEntPtr   = NULL;
 
     slotPtr = tabPtr->slotPtr;
     hTabEnd = &(slotPtr[tabPtr->size]);
 
-    for (; slotPtr < hTabEnd; slotPtr++)
-        {
+    for (; slotPtr < hTabEnd; slotPtr++) {
 
-            while (slotPtr != slotPtr->bwPtr)
-    {
+        while (slotPtr != slotPtr->bwPtr) {
 
-        hEntPtr = (hEnt *) slotPtr->bwPtr;
-        remList_ ((struct hLinks *) hEntPtr);
-        FREEUP (hEntPtr->keyname);
+            hEntPtr = (struct hEnt *) slotPtr->bwPtr;
+            remList_ ((struct hLinks *) hEntPtr);
+            // FREEUP (hEntPtr->keyname);
 
-        if (hEntPtr->hData != NULL)
-            {
-                if (freeFunc != NULL)
-        (*freeFunc) ((void *) hEntPtr->hData);
-                else
-        {
-            free (hEntPtr->hData);
-            hEntPtr->hData = NULL;
-        }
+            if (hEntPtr->hData != NULL) {
+                if (freeFunc != NULL) {
+                    (*freeFunc) ((void *) hEntPtr->hData);
+                }
+                else {
+                    free (hEntPtr->hData);
+                    hEntPtr->hData = NULL;
+                }
             }
 
-        free (hEntPtr);
-    }
+            free (hEntPtr);
         }
+    }
 
-    free ((char *) tabPtr->slotPtr);
-    tabPtr->slotPtr = (struct hLinks *) NULL;
+    free ( tabPtr->slotPtr);
+    tabPtr->slotPtr = NULL;
     tabPtr->numEnts = 0;
+
+    return;
 }
 
 int
-h_TabEmpty_ (hTab *tabPtr)
+h_TabEmpty_ (struct hTab *tabPtr)
 {
     return tabPtr->numEnts == 0;
 }
 
 void
-h_delTab_ (hTab *tabPtr)
+h_delTab_ (struct hTab *tabPtr)
 {
     h_freeTab_ (tabPtr, (HTAB_DATA_DESTROY_FUNC_T) NULL);
 }
@@ -136,7 +138,7 @@ h_delTab_ (hTab *tabPtr)
  * a given key.
  */
 struct hEnt *
-h_getEnt_ (hTab *tabPtr, const char *key)
+h_getEnt_ (struct hTab *tabPtr, const char *key)
 {
     if (tabPtr->numEnts == 0) {
         return NULL;
@@ -150,10 +152,10 @@ h_getEnt_ (hTab *tabPtr, const char *key)
  * Add an entry to a previously created hash table.
  */
 struct hEnt *
-h_addEnt_ (hTab *tabPtr, const char *key, int *newPtr)
+h_addEnt_ (struct hTab *tabPtr, const char *key, int *newPtr)
 {
+    char *keyPtr         = strdup( key );
     struct hEnt *hEntPtr = NULL;
-    char *keyPtr = key;
     struct hLinks *hList = NULL;
 
     hList = &(tabPtr->slotPtr[getAddr (tabPtr, keyPtr)]);
@@ -164,7 +166,7 @@ h_addEnt_ (hTab *tabPtr, const char *key, int *newPtr)
         return hEntPtr;
     }
 
-    if (tabPtr->numEnts >= RESETLIMIT * tabPtr->size) {
+    if (tabPtr->numEnts >= (RESETLIMIT/2) * tabPtr->size) {
         resetTab (tabPtr);
         hList = &(tabPtr->slotPtr[getAddr (tabPtr, (char *) keyPtr)]);
     }
@@ -172,12 +174,13 @@ h_addEnt_ (hTab *tabPtr, const char *key, int *newPtr)
     /* Create a new entry and increase the counter
      * of entries.
      */
-    hEntPtr = malloc (sizeof (hEnt));
+    hEntPtr = malloc (sizeof (struct hEnt));
     hEntPtr->keyname = putstr_ ((char *) keyPtr);
     hEntPtr->hData = NULL;
     insList_ ((struct hLinks *) hEntPtr, hList);
-    if (newPtr != NULL)
+    if (newPtr != NULL) {
         *newPtr = TRUE;
+    }
     tabPtr->numEnts++;
 
     return hEntPtr;
@@ -187,36 +190,36 @@ h_addEnt_ (hTab *tabPtr, const char *key, int *newPtr)
 /* h_delEnt_()
  */
 void
-h_delEnt_ (hTab * tabPtr, hEnt * hEntPtr)
+h_delEnt_ (struct hTab *tabPtr, struct hEnt *hEntPtr)
 {
 
-    if (hEntPtr != NULL)
-        {
-
-            remList_ ((struct hLinks *) hEntPtr);
-            free (hEntPtr->keyname);
-            if (hEntPtr->hData != NULL)
-    free ((char *) hEntPtr->hData);
-            free ((char *) hEntPtr);
-            tabPtr->numEnts--;
+    if (hEntPtr != NULL) {
+        remList_ ((struct hLinks *) hEntPtr);
+        // free (hEntPtr->keyname);
+        if (hEntPtr->hData != NULL) {
+            free ( hEntPtr->hData);
         }
+        free ( hEntPtr );
+        tabPtr->numEnts--;
+    }
 
+    return;
 }
 
 /* h_rmEnt_()
  */
 void
-h_rmEnt_ (hTab * tabPtr, hEnt * hEntPtr)
+h_rmEnt_ (struct hTab *tabPtr, struct hEnt *hEntPtr)
 {
 
-    if (hEntPtr != (hEnt *) NULL)
-        {
-            remList_ ((struct hLinks *) hEntPtr);
-            free (hEntPtr->keyname);
-            free ((char *) hEntPtr);
-            tabPtr->numEnts--;
-        }
+    if (hEntPtr != NULL) {
+        remList_ ((struct hLinks *) hEntPtr);
+        // free (hEntPtr->keyname);
+        free ( hEntPtr );
+        tabPtr->numEnts--;
+    }
 
+    return;
 }
 
 
@@ -225,23 +228,21 @@ h_rmEnt_ (hTab * tabPtr, hEnt * hEntPtr)
  * Starting the iteration on the table itself.
  */
 struct hEnt *
-h_firstEnt_ (hTab * tabPtr, sTab * sPtr)
+h_firstEnt_ (struct hTab *tabPtr, struct sTab *sPtr)
 {
 
-    sPtr->tabPtr = tabPtr;
-    sPtr->nIndex = 0;
+    sPtr->tabPtr  = tabPtr;
+    sPtr->nIndex  = 0;
     sPtr->hEntPtr = NULL;
 
-    if (tabPtr->slotPtr)
-        {
-            return h_nextEnt_ (sPtr);
-        }
-    else
-        {
+    if (tabPtr->slotPtr) {
+        return h_nextEnt_ (sPtr);
+    }
+    else {
+        return NULL;
+    }
 
-            return (NULL);
-        }
-
+    return NULL;
 }
 
 /* h_nextEnt_()
@@ -249,31 +250,31 @@ h_firstEnt_ (hTab * tabPtr, sTab * sPtr)
  * empty.
  */
 struct hEnt *
-h_nextEnt_ (sTab * sPtr)
+h_nextEnt_ ( struct sTab *sPtr)
 {
     struct hLinks *hList = NULL;
     struct hEnt *hEntPtr = NULL;
 
     hEntPtr = sPtr->hEntPtr;
 
-    while (hEntPtr == NULL || (struct hLinks *) hEntPtr == sPtr->hList)
-    {
+    while (hEntPtr == NULL || (struct hLinks *) hEntPtr == sPtr->hList) {
+
         if (sPtr->nIndex >= sPtr->tabPtr->size) {
-            return ((hEnt *) NULL);
+            return NULL;
         }
 
         hList = &(sPtr->tabPtr->slotPtr[sPtr->nIndex]);
         sPtr->nIndex++;
-        if (hList != hList->bwPtr)
-        {
-            hEntPtr = (hEnt *) hList->bwPtr;
+        if (hList != hList->bwPtr) {
+
+            hEntPtr = (struct hEnt *) hList->bwPtr;
             sPtr->hList = hList;
             break;
         }
 
     }
 
-    sPtr->hEntPtr = (hEnt *) ((struct hLinks *) hEntPtr)->bwPtr;
+    sPtr->hEntPtr = (struct hEnt *) ((struct hLinks *) hEntPtr)->bwPtr;
 
     return hEntPtr;
 
@@ -282,104 +283,100 @@ h_nextEnt_ (sTab * sPtr)
 /* getAddr()
  * Compute a hash index, almost right from K&R
  */
-static unsigned int
-getAddr (hTab * tabPtr, const char *key)
+unsigned long
+getAddr (struct hTab *tabPtr, const char *key)
 {
-    unsigned int hashIndex= 0;
+    unsigned long hashIndex = 0;
+    unsigned long hashKey   = (unsigned long) atol( key );
 
     while (*key) {
-        hashIndex = (hashIndex * 128 + (unsigned int)(*key++) ) % tabPtr->size;
+        hashIndex = ( hashIndex * 128 +  hashKey ) % tabPtr->size; // NOFIX cast is probably fine
+        key++;
+        hashKey++;
     }
 
     return hashIndex;
 
 }
 
-static hEnt *
+struct hEnt *
 h_findEnt (const char *key, struct hLinks *hList)
 {
     struct hEnt *hEntPtr = NULL;
 
-    for (hEntPtr = (hEnt *) hList->bwPtr;
-             hEntPtr != (hEnt *) hList;
-             hEntPtr = (hEnt *) ((struct hLinks *) hEntPtr)->bwPtr)
-        {
-            if (strcmp (hEntPtr->keyname, key) == 0) {
-                return hEntPtr;
-            }
+    for (hEntPtr = (struct hEnt *) hList->bwPtr; hEntPtr != (struct hEnt *) hList; hEntPtr = (struct hEnt *) ((struct hLinks *) hEntPtr)->bwPtr) {
+        if (strcmp (hEntPtr->keyname, key) == 0) {
+            return hEntPtr;
         }
+    }
 
     return NULL;
-
 }
 
 /* resetTab()
  */
-static void
-resetTab (hTab * tabPtr)
+void
+resetTab (struct hTab *tabPtr)
 {
-    size_t lastSize = 0;
-    unsigned int slot = 0;
-    struct hLinks *lastSlotPtr;
-    struct hLinks *lastList;
-    struct hEnt *hEntPtr = NULL;
+    size_t lastSize    = 0;
+    unsigned long slot = 0;
+    struct hLinks *lastSlotPtr = NULL;
+    struct hLinks *lastList    = NULL;
+    struct hEnt *hEntPtr       = NULL;
 
     lastSlotPtr = tabPtr->slotPtr;
-    lastSize = tabPtr->size;
+    lastSize    = tabPtr->size;
 
     h_initTab_ (tabPtr, tabPtr->size * RESETFACTOR);
 
-    for (lastList = lastSlotPtr; lastSize > 0; lastSize--, lastList++)
-        {
-            while (lastList != lastList->bwPtr)
-    {
-        hEntPtr = (hEnt *) lastList->bwPtr;
-        remList_ ((struct hLinks *) hEntPtr);
-        slot = getAddr (tabPtr, (char *) hEntPtr->keyname);
-        insList_ ((struct hLinks *) hEntPtr,
-                (struct hLinks *) (&(tabPtr->slotPtr[slot])));
-        tabPtr->numEnts++;
-    }
+    for (lastList = lastSlotPtr; lastSize > 0; lastSize--, lastList++) {
+        while (lastList != lastList->bwPtr) {
+            hEntPtr = (struct hEnt *) lastList->bwPtr;
+            remList_ ((struct hLinks *) hEntPtr);
+            slot = getAddr (tabPtr, hEntPtr->keyname);
+            insList_ ((struct hLinks *) hEntPtr, (struct hLinks *) (&(tabPtr->slotPtr[slot])));
+            tabPtr->numEnts++;
         }
+    }
 
     free (lastSlotPtr);
 
+    return;
 }
 
 void
-h_delRef_ (hTab * tabPtr, hEnt * hEntPtr)
+h_delRef_ (struct hTab *tabPtr, struct hEnt *hEntPtr)
 {
-    if (hEntPtr != (hEnt *) NULL)
-        {
-            remList_ ((struct hLinks *) hEntPtr);
-            free (hEntPtr->keyname);
-            free (hEntPtr);
-            tabPtr->numEnts--;
-        }
+    if (hEntPtr != NULL) {
+        remList_ ((struct hLinks *) hEntPtr);
+        // free (hEntPtr->keyname);
+        free (hEntPtr);
+        tabPtr->numEnts--;
+    }
 
+    return;
 }
 
 void
-h_freeRefTab_ (hTab * tabPtr)
+h_freeRefTab_ (struct hTab *tabPtr)
 {
-    struct hLinks *hTabEnd, *slotPtr;
-    struct hEnt *hEntPtr = NULL;
+    struct hLinks *hTabEnd = NULL; 
+    struct hLinks *slotPtr = NULL;
+    struct hEnt *hEntPtr   = NULL;
 
     slotPtr = tabPtr->slotPtr;
     hTabEnd = &(slotPtr[tabPtr->size]);
 
-    for (; slotPtr < hTabEnd; slotPtr++)
-        {
+    for (; slotPtr < hTabEnd; slotPtr++) {
 
-            while (slotPtr != slotPtr->bwPtr)
-    {
+        while (slotPtr != slotPtr->bwPtr) {
 
-        hEntPtr = (hEnt *) slotPtr->bwPtr;
-        remList_ ((struct hLinks *) hEntPtr);
-        FREEUP (hEntPtr->keyname);
-        free (hEntPtr);
-    }
+            hEntPtr = ( struct hEnt *) slotPtr->bwPtr;
+            remList_ ((struct hLinks *) hEntPtr);
+            // FREEUP (hEntPtr->keyname);
+            free (hEntPtr);
         }
+    }
 
     free (tabPtr->slotPtr);
     tabPtr->slotPtr = NULL;
@@ -389,7 +386,7 @@ h_freeRefTab_ (hTab * tabPtr)
 /* getClosestPrime()
  * Get the nearest prime >= x.
  */
-static size_t
+size_t
 getClosestPrime (unsigned long x)
 {
     size_t n = sizeof (primes) / sizeof (primes[0]);

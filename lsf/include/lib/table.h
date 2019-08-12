@@ -20,8 +20,8 @@
 
 #define HTAB_ZERO_OUT(HashTab) \
 { \
-    (HashTab)->numEnts = 0; \
-    (HashTab)->size = 0; \
+        (HashTab)->numEnts = 0; \
+        (HashTab)->size = 0; \
 }
 
 #define HTAB_NUM_ELEMENTS(HashTab) (HashTab)->numEnts
@@ -29,22 +29,22 @@
 #define FOR_EACH_HTAB_ENTRY(Key, Entry, HashTab) \
 { \
 struct sTab __searchPtr__; \
-    (Entry) = h_firstEnt_((HashTab), &__searchPtr__); \
-    for ((Entry) = h_firstEnt_((HashTab), &__searchPtr__); \
-         (Entry); (Entry) = h_nextEnt_(&__searchPtr__)) { \
-   (Key)   = (char *) (Entry)->keyname;
+        (Entry) = h_firstEnt_((HashTab), &__searchPtr__); \
+        for ((Entry) = h_firstEnt_((HashTab), &__searchPtr__); \
+                 (Entry); (Entry) = h_nextEnt_(&__searchPtr__)) { \
+     (Key)   = (char *) (Entry)->keyname;
 
 #define END_FOR_EACH_HTAB_ENTRY  }}
 
 #define FOR_EACH_HTAB_DATA(Type, Key, Data, HashTab) \
 { \
 struct sTab __searchPtr__; \
-    struct hEnt *__hashEnt__; \
-    __hashEnt__ = h_firstEnt_((HashTab), &__searchPtr__); \
-    for (__hashEnt__ = h_firstEnt_((HashTab), &__searchPtr__); \
-         __hashEnt__; __hashEnt__ = h_nextEnt_(&__searchPtr__)) { \
-        (Data) = (Type *) __hashEnt__->hData; \
-  (Key)   = (char *) __hashEnt__->keyname;
+        struct hEnt *__hashEnt__; \
+        __hashEnt__ = h_firstEnt_((HashTab), &__searchPtr__); \
+        for (__hashEnt__ = h_firstEnt_((HashTab), &__searchPtr__); \
+                 __hashEnt__; __hashEnt__ = h_nextEnt_(&__searchPtr__)) { \
+                (Data) = (Type *) __hashEnt__->hData; \
+    (Key)   = (char *) __hashEnt__->keyname;
 
 #define END_FOR_EACH_HTAB_DATA  }}
 
@@ -53,15 +53,15 @@ struct sTab __searchPtr__; \
 // #define DEFAULT_SLOTS   11
 const unsigned int DEFAULT_SLOTS = 11;
 const unsigned int RESETFACTOR   = 2;
-const float        RESETLIMIT    = 1.500f;
+const unsigned int RESETLIMIT    = 15;
 
 /* Double linked list addressed by each
  * hash table slot.
  */
 struct hLinks
 {
-  struct hLinks *fwPtr;
-  struct hLinks *bwPtr;
+    struct hLinks *fwPtr;
+    struct hLinks *bwPtr;
 };// hLinks;
 
 /* This is a slot entry the table
@@ -69,10 +69,10 @@ struct hLinks
 // typedef 
 struct hEnt
 {
-  struct hLinks *fwPtr;
-  struct hLinks *bwPtr;
-  void *hData;
-  const char *keyname;
+    struct hLinks *fwPtr;
+    struct hLinks *bwPtr;
+    void *hData;
+    const char *keyname;
 };// hEnt;
 
 /* This is the hash table itself.
@@ -80,48 +80,47 @@ struct hEnt
 // typedef 
 struct hTab
 {
-  struct hLinks *slotPtr;
-  // long numEnts;
-  size_t numEnts;
-  size_t size;
+    struct hLinks *slotPtr;
+    // long numEnts;
+    size_t numEnts;
+    size_t size;
 }; // hTab;
 
 
 //typedef 
 struct sTab
 {
-  size_t nIndex;
-  struct hEnt *hEntPtr;
-  struct hTab *tabPtr;
-  struct hLinks *hList;
+    size_t nIndex;
+    struct hEnt *hEntPtr;
+    struct hTab *tabPtr;
+    struct hLinks *hList;
 }; // sTab;
 
 
 typedef void (*HTAB_DATA_DESTROY_FUNC_T) (void *);
 
-// unsigned long primes[] = {       // FIXME FIXME why the fuck are these primes here?
-//                                         // and why the fuck don't we just generate them?
-//     101, 1009, 5009, 10007, 20011, 50021, 100003,
-//     200003, 500009, 1030637
-// }; // defined but not used
+unsigned long primes[] = { 
+    101, 1009, 5009, 10007, 20011, 50021, 100003, 200003, 500009, 1030637
+}; // FIXME FIXME primes are used for slot generation. // FIXME FIXME find another more dynamic way
 
-struct hEnt *h_findEnt (const char *, struct hLinks *);
-unsigned int getAddr (struct hTab *, const char *);
-void resetTab ( struct hTab *);
-size_t getClosestPrime (unsigned long x);
+/* table.c */
+void insList_(struct hLinks *elemPtr, struct hLinks *destPtr);
+void remList_(struct hLinks *elemPtr);
+void initList_(struct hLinks *headPtr);
+void h_initTab_(struct hTab *tabPtr, size_t numSlots);
+void h_freeTab_(struct hTab *tabPtr, void (*freeFunc )(void *));
+int h_TabEmpty_(struct hTab *tabPtr);
+void h_delTab_(struct hTab *tabPtr);
+struct hEnt *h_getEnt_(struct hTab *tabPtr, const char *key);
+struct hEnt *h_addEnt_(struct hTab *tabPtr, const char *key, int *newPtr);
+void h_delEnt_(struct hTab *tabPtr, struct hEnt *hEntPtr);
+void h_rmEnt_(struct hTab *tabPtr, struct hEnt *hEntPtr);
+struct hEnt *h_firstEnt_(struct hTab *tabPtr, struct sTab *sPtr);
+struct hEnt *h_nextEnt_(struct sTab *sPtr);
+unsigned long getAddr(struct hTab *tabPtr, const char *key);
+struct hEnt *h_findEnt(const char *key, struct hLinks *hList);
+void resetTab(struct hTab *tabPtr);
+void h_delRef_(struct hTab *tabPtr, struct hEnt *hEntPtr);
+void h_freeRefTab_(struct hTab *tabPtr);
+size_t getClosestPrime(unsigned long x);
 
-void insList_ (struct hLinks *, struct hLinks *);
-void remList_ (struct hLinks *);
-void initList_ (struct hLinks *);
-void h_initTab_ ( struct hTab *tabPtr, unsigned long numSlots);
-void h_freeTab_ ( struct hTab *, void (*destroy) (void *));
-int h_TabEmpty_ ( struct hTab *);
-void h_delTab_ ( struct hTab *);
-struct hEnt *h_getEnt_ ( struct hTab *tabPtr, const char *key);
-struct hEnt *h_addEnt_ ( struct hTab *, const char *, int *);
-void h_delEnt_ ( struct hTab *, struct hEnt *);
-void h_rmEnt_ ( struct hTab *, struct hEnt *);
-struct hEnt *h_firstEnt_ ( struct hTab *, struct sTab *);
-struct hEnt *h_nextEnt_ ( struct sTab *);
-void h_freeRefTab_ ( struct hTab *);
-void h_delRef_ ( struct hTab *, struct hEnt *);
