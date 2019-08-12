@@ -1064,8 +1064,8 @@ unsigned int lserrno;
 int masterLimDown;
 // int ls_nerr;           // FIXME FIXME FIXME FIXME FIXME too many different types of lserrno
 // char *ls_errmsg[];  // FIXME FIXME FIXME FIXME FIXME put in specific header
-int logclass;
-int timinglevel;
+// int logclass;
+// int timinglevel;
 
 // int lsf_lim_version; // FIXME FIXME FIXME FIXME FIXME set in configure.ac
 // int lsf_res_version; // FIXME FIXME FIXME FIXME FIXME set in configure.ac

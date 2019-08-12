@@ -27,19 +27,12 @@
 #include <fcntl.h>
 
 #include "lib/syslog.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/osal.h"
 #include "lib/lib.h"
 #include "lib/err.h"
-
-// #define LSF_LOG_MASK   7
-#define DEF_LOG_MASK   LOG_INFO
-#define DEF_LOG_MASK_NAME   "LOG_WARNING"
-
-/*#ifndef HAS_VSNPRINTF FIXME FIXME
-#define HAS_VSNPRINTF
-#endif
-*/
+#include "lib/host.h"
+#include "lsf.h"
 
 
 char *
@@ -71,13 +64,13 @@ argvmsg_ (int argc, char **argv)
 }
 
 void
-ls_openlog (const char *ident, const char *path, int use_stderr, char *logMask)
+ls_openlog (const char *ident, const char *path, int use_stderr, const char *logMask)
 {
     char *msg = NULL;
 
-    strncpy (logident, ident, 9);
-    logident[9] = '\0';
-
+    // strncpy (logident, ident, 9); // FIXME FIXME FIXME why only 9 characters?
+    // logident[9] = '\0';    
+    logident = strdup( ident ); // FIXME FIXME FIXME why only 9 characters?
     logmask = getLogMask (&msg, logMask);
 
     if (use_stderr) {
@@ -91,7 +84,18 @@ ls_openlog (const char *ident, const char *path, int use_stderr, char *logMask)
         struct stat st;
 
         if ((myname = ls_getmyhostname ()) == NULL) {
-            goto syslog;
+            // goto syslog;
+            log_dest = LOGTO_SYS;
+            logfile[0] = '\0';
+
+            openlog ( ident, LOG_PID, LOG_DAEMON);
+            setlogmask (logmask);
+
+            if (msg != NULL) {
+                ls_syslog (LOG_ERR, "%s", msg);
+            }
+
+            return;
         }
 
         sprintf (logfile, "%s/%s.log.%s", path, ident, myname);
@@ -155,7 +159,7 @@ ls_openlog (const char *ident, const char *path, int use_stderr, char *logMask)
         }
     }
 
-syslog:     // FIXME FIXME FIXME FIXME substitute where appropriate and get rid of it
+// syslog:     // FIXME FIXME FIXME FIXME substitute where appropriate and get rid of it
 
     log_dest = LOGTO_SYS;
     logfile[0] = '\0';
@@ -166,12 +170,14 @@ syslog:     // FIXME FIXME FIXME FIXME substitute where appropriate and get rid 
     if (msg != NULL) {
         ls_syslog (LOG_ERR, "%s", msg);
     }
+
+    return;
 }
 
 int
-openLogFile (const char *ident, char *myname)
+openLogFile (const char *ident, const char *myname)
 {
-    FILE *lfp;
+    FILE *lfp = NULL;
     struct stat st;
     const char APPEND_AT_END[] = "a";
 
@@ -377,7 +383,7 @@ ls_closelog (void)
 }
 
 int
-ls_setlogmask (int maskpri)
+ls_setlogmask ( const int maskpri)
 {
     int oldmask = logmask;
 

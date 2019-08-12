@@ -5,11 +5,11 @@
 
 #if defined(DEBUG)
 FILE *logfp;
-char logfile[100]; // FIXME FIXME FIXME oddly specific
+// char logfile[100]; // FIXME FIXME FIXME oddly specific
 #endif
 
 /* daemons/eauthd/eauth.c */
 int main(int argc, char **argv);
-int getAuth_lsb( char *inst );
+int getAuth_lsb( const char *inst );
 int printUserName(void);
-int vauth(char *lsfUserName, char *datBuf, int datLen)
+int vauth( const char *lsfUserName, const char *datBuf, size_t dataLength);
