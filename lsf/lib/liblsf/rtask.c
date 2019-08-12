@@ -337,7 +337,7 @@ ls_rtaske (const char *host, char **argv, int options, char **envp) // FIXME FIX
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    if (tid_register ((unsigned long)rpid, socket, taskPort, host, options & REXF_TASKINFO) == -1) { // FIXME FIXME FIXME figure out if rpid should be pid_t or unsigned long
+    if (tid_register ((unsigned long)rpid, socket, taskPort, host, options & REXF_TASKINFO) == ULONG_MAX ) { // FIXME FIXME FIXME figure out if rpid should be pid_t or unsigned long
         close (socket);
         _lostconnection_ (host);
         lserrno = LSE_MALLOC;

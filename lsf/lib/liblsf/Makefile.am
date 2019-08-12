@@ -64,7 +64,7 @@ syntax.c \
 syslog.c \
 table.c \
 term.c \
-tid.c \
+taskid.c \
 tty.c \
 usleep.c \
 utmp.c \

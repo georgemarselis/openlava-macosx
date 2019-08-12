@@ -22,31 +22,29 @@
 
 #include "lib/lib.h"
 #include "lib/queue.h"
-#include "lib/tid.h"
+#include "lib/taskid.h"
+#include "lib/misc.h"
+#include "lib/res.h"
 
-#define TID_BNUM   23
-#define tid_index(x)   (x%TID_BNUM)
-
-static struct tid *tid_buckets[TID_BNUM];
 
 unsigned long
-tid_register (unsigned long taskid, int socknum, u_short taskPort, const char *host, bool_t doTaskInfo)
+tid_register (unsigned long taskid, int socknum, uint16_t taskPort, const char *host, bool_t doTaskInfo)
 {
     struct tid *tidp = NULL;
-    usngigned long i = tid_index (taskid);
+    unsigned long i = tid_index (taskid);
 
     if ((tidp = malloc (sizeof (struct tid))) == NULL) {
         lserrno = LSE_MALLOC;
         return ULONG_MAX;
     }
-    tidp->rtid     = taskid;
+    tidp->rtaskid  = taskid;
     tidp->sock     = socknum;
     tidp->taskPort = taskPort;
 
     tidp->host = putstr_ (host);
 
-    i = 
-    tidp->link = tid_buckets[i];
+    // i =  // FIXME FIXME what was here?
+    tidp->link     = tid_buckets[i];
     tid_buckets[i] = tidp;
 
 
@@ -71,13 +69,13 @@ unsigned long
 tid_remove (unsigned long taskid)
 {
     unsigned long i = tid_index (taskid);
-    struct tid *p1 = NULL;
-    struct tid *p2 = NULL;
+    struct tid *p1  = NULL;
+    struct tid *p2  = NULL;
 
     p1 = tid_buckets[i];
 
     while (p1 != NULL) {
-        if (p1->rtid == taskid) {
+        if (p1->rtaskid == taskid) {
             break;
         }
         p2 = p1;
@@ -85,7 +83,7 @@ tid_remove (unsigned long taskid)
     }
 
     if (p1 == NULL) {
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        return ULONG_MAX;
     }
 
     p1->refCount--;
@@ -114,12 +112,12 @@ struct tid *
 tid_find (unsigned long taskid)
 {
     unsigned long i = tid_index (taskid);
-    struct tid *p1 = NULL;
+    struct tid *p1  = NULL;
 
     p1 = tid_buckets[i];
     while ( NULL != p1 ) {
         
-        if (p1->rtid == taskid) {
+        if (p1->rtaskid == taskid) {
 
             if (-1 == p1->sock ) {
                 lserrno = LSE_LOSTCON;
@@ -143,7 +141,7 @@ tidFindIgnoreConn_ ( unsigned long taskid)
 
     p1 = tid_buckets[i];
     while (p1 != NULL) {
-        if (p1->rtid == taskid) {
+        if (p1->rtaskid == taskid) {
             return p1;
         }
 
@@ -174,34 +172,34 @@ tid_lostconnection (int socknum)
 }
 
 int
-tidSameConnection_ (int socknum, unsigned long *ntids, unsigned long **tidArray)
+tidSameConnection_ (int socknum, unsigned long *ntaskids, unsigned long **taskidArray)
 {
-    int *intp = 0;
-    int tidCnt = 0;
-    struct tid *p1 = NULL;
+    unsigned long *intp       = 0;
+    unsigned long taskidCount = 0;
+    struct tid *p1            = NULL;
     // int i = 0;
 
-    *tidArray = malloc (TID_BNUM * sizeof (int));
+    *taskidArray = malloc (TID_BNUM * sizeof (int));
 
-    if (!*tidArray) {
+    if (!*taskidArray) {
         lserrno = LSE_MALLOC;
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
-    intp = *tidArray;
+    intp = *taskidArray;
     for ( size_t i = 0; i < TID_BNUM; i++) {
         p1 = tid_buckets[i];
         while (p1 != NULL) {
             if (p1->sock == socknum) {
-                *intp = p1->rtid;
+                *intp = p1->rtaskid;
                 intp++;
-                tidCnt++;
+                taskidCount++;
             }
             p1 = p1->link;
         }
     }
 
-    if (ntids) {
-        *ntids = tidCnt;
+    if (ntaskids) {
+        *ntaskids = taskidCount;
     }
 
     return 0;
