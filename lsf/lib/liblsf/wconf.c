@@ -752,7 +752,7 @@ addCond( struct lsConf *conf, char *cond )
 }
 
 char
-checkCond (struct lsConf *conf, char *cond)
+checkCond ( const struct lsConf *conf, char *cond)
 {
     size_t i = 0;
 
@@ -883,7 +883,7 @@ freeNode (struct confNode *node)
 // }
 
 char *
-readNextLine ( struct lsConf *conf, size_t *lineNum)
+readNextLine ( const struct lsConf *conf, size_t *lineNum)
 {
     struct confNode *node = NULL;
     struct confNode *prev = NULL;

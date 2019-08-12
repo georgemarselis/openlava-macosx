@@ -31,13 +31,13 @@ ls_putacctrec (FILE * log_fp, struct lsfAcctRec *acctRec)
   if (fprintf (log_fp, "%d", acctRec->pid) < 0
       || addQStr (log_fp, acctRec->username) < 0
       || fprintf (log_fp, " %d",  acctRec->exitStatus) < 0
-      || fprintf (log_fp, " %ld", acctRec->dispTime) < 0
-      || fprintf (log_fp, " %ld", acctRec->termTime) < 0
-      || addQStr (log_fp, acctRec->fromHost) < 0
-      || addQStr (log_fp, acctRec->execHost) < 0
-      || addQStr (log_fp, acctRec->cwd) < 0
-      || addQStr (log_fp, acctRec->cmdln) < 0
-      || lsfRu2Str (log_fp, &acctRec->lsfRu) < 0
+      || fprintf (log_fp, " %ld", acctRec->dispTime  ) < 0
+      || fprintf (log_fp, " %ld", acctRec->termTime  ) < 0
+      || addQStr (log_fp,         acctRec->fromHost  ) < 0
+      || addQStr (log_fp,         acctRec->execHost  ) < 0
+      || addQStr (log_fp,         acctRec->cwd       ) < 0
+      || addQStr (log_fp,         acctRec->cmdln     ) < 0
+      || lsfRu2Str (log_fp,      &acctRec->lsfRu     ) < 0
       || fprintf (log_fp, "\n") < 0)
     {
       lserrno = LSE_FILE_SYS;
@@ -95,7 +95,7 @@ ls_getacctrec (FILE * log_fp, size_t *lineNum)
     }
     line += ccount + 1;
 
-    if ((ccount = stripQStr (line, acctRec->username)) < 0) {
+    if ((ccount = stripQStr (line, acctRec->username)) == INT_MAX ) {
         lserrno = LSE_ACCT_FORMAT;
         return NULL;
     }
@@ -111,25 +111,25 @@ ls_getacctrec (FILE * log_fp, size_t *lineNum)
     }
     line += ccount + 1;
 
-    if ((ccount = stripQStr (line, acctRec->fromHost)) < 0) {
+    if ((ccount = stripQStr (line, acctRec->fromHost)) == INT_MAX ) {
         lserrno = LSE_ACCT_FORMAT;
         return NULL;
     }
     line += ccount + 1;
 
-    if ((ccount = stripQStr (line, acctRec->execHost)) < 0) {
+    if ((ccount = stripQStr (line, acctRec->execHost)) == INT_MAX ) {
         lserrno = LSE_ACCT_FORMAT;
         return NULL;
     }
     line += ccount + 1;
 
-    if ((ccount = stripQStr (line, acctRec->cwd)) < 0) {
+    if ((ccount = stripQStr (line, acctRec->cwd)) == INT_MAX ) {
         lserrno = LSE_ACCT_FORMAT;
         return NULL;
     }
     line += ccount + 1;
 
-    if ((ccount = stripQStr (line, acctRec->cmdln)) < 0) {
+    if ((ccount = stripQStr (line, acctRec->cmdln)) == INT_MAX ) {
         lserrno = LSE_ACCT_FORMAT;
         return NULL;
     }

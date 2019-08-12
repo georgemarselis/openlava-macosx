@@ -16,8 +16,9 @@
  *
  */
 
-#include "lib/lib.h"
-#include "lib/lproto.h"
+// #include "lib/lib.h"
+// #include "lib/lproto.h"
+#include "lib/misc.h"
 #include "lib/words.h"
 #include  "lib/getnextline.h"
 
@@ -35,18 +36,17 @@ getNextWord_ ( const char **line)
         *wordp++ = *(*line)++;
     }
 
-    if (wordp == word) {
+    if ( !strcmp( wordp, word ) ) {
         return NULL;
     }
 
-    *wordp = '\0';
-    return word;
+    return wordp;
 }
 
 char *
-getNextWord1_( char **line)
+getNextWord1_( const char **line)
 {
-     char word[4 * MAX_LINE_LEN];
+    char word[4 * MAX_LINE_LEN];
     char *wordp = word;
 
     while (isspace (**line)) {
@@ -58,16 +58,15 @@ getNextWord1_( char **line)
         *wordp++ = *(*line)++;
     }
 
-    if (wordp == word) {
+   if ( !strcmp( wordp, word ) ) {
         return NULL;
     }
 
-    *wordp = '\0';
-    return word;
+    return wordp;
 }
 
 char *
-a_getNextWord_ (char **line)
+a_getNextWord_ ( const char **line)
 {
     char *wordp = NULL;
     char *word  = NULL;
@@ -79,20 +78,20 @@ a_getNextWord_ (char **line)
             (*line)--;
         }
         (*line)++;
-        }
-    else if (word && (wordp = strchr (word, ')')))
-        {
-        if (wordp != word)
-            {
+    }
+    else if (word && (wordp = strchr (word, ')'))) {
+        if (wordp != word) {
             wordp--;
             while (isspace (*wordp)) {
                 wordp--;
             }
             *(wordp + 1) = '\0';
-            while (**line != ')')
+            while (**line != ')') {
                 (*line)--;
             }
         }
+    }
+
     return word;
 }
 
@@ -111,10 +110,12 @@ getNextWordSet (char **line, const char *set)
         *wordp++ = *(*line)++;
     }
 
-    if (wordp == word) {
+    // if (wordp == word) {
+    //     return NULL;
+    // }
+    if ( !strcmp( wordp, word ) ) {
         return NULL;
     }
-
     *wordp = '\0';
 
     return word;
@@ -135,7 +136,7 @@ charInSet (char c, const char *set)
 
 
 char *
-getNextValueQ_ (char **line, char ch1, char ch2)
+getNextValueQ_ ( const char **line, char ch1, char ch2)
 {
     char *sp = NULL;
     char str[4] = { "aaaa" };
@@ -239,7 +240,7 @@ stripQStr (char *q, char *str)
     }
     
     if (*q == '\0') {
-        return -1;
+        return INT_MAX;
     }
 
     for (q++; *q != '\0'; q++, str++) {
@@ -258,10 +259,10 @@ stripQStr (char *q, char *str)
     }
 
     if (*q == '\0') {
-        return -1;
+        return INT_MAX;
     }
 
-    return q - fr + 1; // FIXME FIXME FIXME ascii gymnastics must go
+    return atoi(q) - atoi(fr) + 1; // FIXME FIXME FIXME ascii gymnastics must go
 }
 
 int
@@ -300,7 +301,9 @@ subNewLine_ (char *instr)
 {
     size_t strlength = strlen( instr );
     if (instr && strlength > 0) {
-        for ( ssize_t i = (ssize_t) strlength - 1; i > -1; i--) {
+        size_t i = strlength - 1; 
+        while( i-- != 0 ) {
+        // for ( size_t i = strlength - 1; i >= 0; i--) {
             if (instr[i] == '\n') {
                 for ( size_t k = i; k < strlength; k++) {
                     instr[k] = instr[k + 1];
