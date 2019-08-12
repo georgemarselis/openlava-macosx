@@ -18,7 +18,7 @@
 
 
 #include "intlib/intlibout.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/table.h"
 #include "lsf.h"
 

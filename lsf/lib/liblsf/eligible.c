@@ -23,7 +23,7 @@
 
 #include "lsb/sub.h"
 #include "lib/lib.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/misc.h"
 #include "lib/table.h"
 #include "lib/eligible.h"

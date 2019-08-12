@@ -17,7 +17,7 @@
  */
 
 #include "libint/intlibout.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 
 // #define NL_SETN      22
 

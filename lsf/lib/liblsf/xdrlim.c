@@ -23,7 +23,7 @@
 #include <limits.h>
 
 #include "lib/lib.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/xdrlim.h"
 
 #ifndef MIN

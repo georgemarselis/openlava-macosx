@@ -23,7 +23,7 @@
 
 #include "lib/cwd.h"
 #include "lib/lib.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/mls.h"
 #include "lib/res.h"
 #include "lib/sock.h"

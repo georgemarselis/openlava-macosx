@@ -19,7 +19,7 @@
 
 #include "libint/intlibout.h"
 #include "libint/window.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 
 // FIXME FIXME FIXME might want to use the GNU datetime library here
 

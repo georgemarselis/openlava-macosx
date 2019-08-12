@@ -22,7 +22,7 @@
 #include <limits.h>
 #include <unistd.h>
 
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "daemons/liblimd/lim.h"
 
 

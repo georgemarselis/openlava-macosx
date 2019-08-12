@@ -27,7 +27,7 @@
 
 #include "lib/lib.h"
 #include "lib/id.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/init.h"
 #include "lib/eauth.h"
 #include "lib/rdwr.h"

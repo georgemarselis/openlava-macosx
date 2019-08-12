@@ -22,7 +22,7 @@
 
 #include "libint/intlibout.h"
 #include "lib/lib.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lsf.h"
 #include "daemons/libeauth/eauth.h"
 

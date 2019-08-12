@@ -29,7 +29,7 @@
 #include "lib/osal.h"
 #include "lsb/lsbatch.h"
 #include "libint/list.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "daemons/libresd/resd.h"
 #include "daemons/libresd/rescom.h"
 #include "daemons/libniosd/niosd.h"

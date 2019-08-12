@@ -25,7 +25,7 @@
 
 #include "lib/init.h"
 #include "lib/lib.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/queue.h"
 #include "lib/xdrnio.h"
 #include "lib/xdrrf.h"

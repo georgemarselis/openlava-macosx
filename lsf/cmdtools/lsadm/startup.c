@@ -20,7 +20,7 @@
 #include <sys/wait.h>
 
 #include "intlib/intlibout.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/mls.h"
 #include "lsadmin/lsadmin.h"
 #include "lsf.h"

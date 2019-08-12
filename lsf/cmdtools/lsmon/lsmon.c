@@ -22,7 +22,7 @@
 #include <curses.h>
 #endif
 
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/lsi18n.h"
 #include "lib/syntax.h"
 #include "lsf.h"

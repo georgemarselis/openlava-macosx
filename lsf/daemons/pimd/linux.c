@@ -18,7 +18,7 @@
  */
 
 #include "lsf.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "intlib/intlibout.h"
 
 static char buffer[1024];

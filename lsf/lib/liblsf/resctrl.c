@@ -19,7 +19,7 @@
 #include <unistd.h>
 
 #include "lib/lib.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/xdr.h"
 #include "lib/xdrnio.h"
 #include "lib/resctrl.h"

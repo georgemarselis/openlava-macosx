@@ -25,7 +25,7 @@
 #include <unistd.h>
 
 #include "daemons.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/rcp.h"
 #include "lsb/spool.h"
 #include "mls.h"

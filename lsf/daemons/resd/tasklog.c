@@ -22,7 +22,7 @@
 #include <fcntl.h>
 
 #include "daemons/libresd/resd.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/xdr.h"
 #include "lib/lib.h"
 extern int flock (int, int);

@@ -37,7 +37,7 @@
 #include "daemons/liblimd/rload.h"
 #include "daemons/liblimd/limd.h"
 #include "daemons/liblimd/conf.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/lib.h"
 #include "lib/mls.h"
 #include "lsf.h"

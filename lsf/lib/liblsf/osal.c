@@ -19,7 +19,7 @@
 #include <fcntl.h>
 
 #include "lib/lib.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/osal.h"
 #include "lib/channel.h"
 

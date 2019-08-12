@@ -25,7 +25,7 @@
 #include "lsf.h"
 #include "lib/conf.h"
 #include "lib/confmisc.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/words.h"
 #include "lib/putInLists.h"
 #include "lib/misc.h"

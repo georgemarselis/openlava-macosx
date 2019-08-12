@@ -30,7 +30,7 @@
 #include <sys/wait.h>
 #include <setjmp.h>
 
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/mls.h"
 #include "lsbatch/lsbatch.h"
 #include "lsf.h"

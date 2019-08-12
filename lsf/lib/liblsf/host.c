@@ -25,7 +25,7 @@
 #include <unistd.h>
 
 #include "lib/lib.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/table.h"
 #include "lib/host.h"
 #include "lib/initenv.h"

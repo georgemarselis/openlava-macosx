@@ -19,7 +19,7 @@
 #include <sys/types.h>
 
 #include "lib/lib.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "daemons/libresd/resout.h"
 #include "lib/xdrnio.h"
 

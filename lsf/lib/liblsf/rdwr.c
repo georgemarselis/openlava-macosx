@@ -22,7 +22,7 @@
 
 #include "lsf.h"
 #include "lib/lib.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/rdwr.h"
 #include "lib/usleep.h"
 #include "lib/syslog.h"

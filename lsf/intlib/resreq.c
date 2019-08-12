@@ -16,7 +16,7 @@
  *
  */
 
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/table.h"
 #include "libint/intlibout.h"
 #include "libint/resreq.h"

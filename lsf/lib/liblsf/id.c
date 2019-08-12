@@ -23,7 +23,7 @@
 #include "lib/structs/genParams.h"
 #include "libint/lsi18n.h"
 #include "lsf.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/so.h"
 
 void

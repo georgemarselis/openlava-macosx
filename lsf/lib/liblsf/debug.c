@@ -20,7 +20,7 @@
 #include <unistd.h>
 
 #include "lib/lib.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/initenv.h"
 #include "lib/syslog.h"
 #include "lib/debug.h"

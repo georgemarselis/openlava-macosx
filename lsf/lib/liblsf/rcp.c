@@ -41,7 +41,7 @@
 #include "lib/syslog.h"
 #include "lib/misc.h"
 #include "lib/lib.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/rcp.h"
 #include "lib/id.h"
 #include "lsf.h"

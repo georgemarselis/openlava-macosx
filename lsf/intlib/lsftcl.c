@@ -19,7 +19,7 @@
 
 #include "libint/lsftcl.h"
 #include "libint/resreq.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "assert.h"
 #include "lsf.h"
 

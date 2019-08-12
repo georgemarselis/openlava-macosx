@@ -24,7 +24,7 @@
 
 #include "lib/control.h"
 #include "lib/lib.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/initenv.h"
 #include "lib/xdr.h"
 #include "lib/eauth.h"

@@ -21,7 +21,7 @@
 #include <limits.h>
 
 #include "lib/lib.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/dir.h"
 #include "lib/misc.h"
 #include "lib/init.h"

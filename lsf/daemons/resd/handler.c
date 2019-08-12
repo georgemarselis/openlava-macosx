@@ -37,7 +37,7 @@
 #include <sys/ptyvar.h>
 #endif
 
-// #include "lib/lproto.h"
+// // #include "lib/lproto.h"
 #include "lib/mls.h"
 #include "daemons/libresd/resd.h" // FIXME FIXME one header, not multiple
 #include "daemons/libresd/resout.h"

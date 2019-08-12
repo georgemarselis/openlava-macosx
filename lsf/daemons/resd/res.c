@@ -34,7 +34,7 @@
 #include "daemons/libresd/resd.h" // FIXME FIXME one header, not multiple
 #include "daemons/libresd/resout.h"
 #include "lib/res.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/lib.h"
 
 // #define NL_SETN     29

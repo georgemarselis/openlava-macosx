@@ -22,7 +22,7 @@
 #include <strings.h>
 
 #include "lib/lib.h"
-// #include "lib/lproto.h"
+// // #include "lib/lproto.h"
 #include "lib/confmisc.h"
 #include "lib/words.h"
 #include "lib/conf.h"

@@ -7,7 +7,7 @@
 #include <sys/types.h>
 
 #include "intlib/intlibout.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lsf.h"
 
 char *stripSpaces (char *);

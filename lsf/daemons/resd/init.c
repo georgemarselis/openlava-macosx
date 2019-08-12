@@ -31,7 +31,7 @@
 
 #include "lib/mls.h"
 #include "lib/lib.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "daemons/libresd/init.h"
 #include "daemons/libresd/resd.h"
 

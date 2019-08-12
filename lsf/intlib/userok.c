@@ -29,7 +29,7 @@
 	#error stop compilation if other operating systems found
 #endif
 
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "libint/intlibout.h"
 #include "libint/userok.h"
 

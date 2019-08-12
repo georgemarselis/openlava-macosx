@@ -18,7 +18,7 @@
 
 #include "daemons/liblimd/limd.h"
 #include "daemons/liblimd/info.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/xdrlim.h"
 #include "lib/xdr.h"
 

@@ -22,7 +22,7 @@
 #include <fcntl.h>
 
 #include "lib/lib.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/rf.h"
 #include "lib/host.h"
 #include "lib/misc.h"

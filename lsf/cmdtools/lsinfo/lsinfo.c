@@ -21,7 +21,7 @@
 #include <string.h>
 #include <pwd.h>
 
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/lsi18n.h"
 #include "lsf.h"
 

@@ -22,7 +22,7 @@
 #include <unistd.h>
 
 #include "lib/lib.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/rf.h"
 #include "lib/xdrres.h"
 #include "lib/term.h"

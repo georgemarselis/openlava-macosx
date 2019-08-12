@@ -27,7 +27,7 @@
 #include <unistd.h>
 
 #include "intlib/lsi18n.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lsf.h"
 
 struct interval

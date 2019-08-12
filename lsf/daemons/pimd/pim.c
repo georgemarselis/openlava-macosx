@@ -18,7 +18,7 @@
  */
 
 #include "lsf.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "libint/intlibout.h"
 #include "daemons/libpimd/pimd.h"
 

@@ -20,7 +20,7 @@
 
 #include "lib/lib.h"
 #include "lib/xdr.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/xdrrf.h"
 #include "daemons/libresd/resd.h"
 

@@ -26,7 +26,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/mls.h"
 #include "lib/rcp.h"
 #include "lsb/lsb.h"

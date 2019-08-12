@@ -28,7 +28,7 @@
 #include <unistd.h>
 
 #include "lib/lib.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
 #include "lib/term.h"
 #include "daemons/libresd/resout.h"
 
