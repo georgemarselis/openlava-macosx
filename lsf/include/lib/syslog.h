@@ -16,10 +16,14 @@
 
 #pragma once
 
-static char logfile[ MAXPATHLEN * sizeof(char) + 1];
-static char *logident;
-static int logmask;
-static enum { LOGTO_SYS, LOGTO_FILE, LOGTO_STDERR } log_dest;
+#include <syslog.h>
+
+#include "lsf.h"
+
+char logfile[ MAX_PATH_LEN * sizeof(char) + 1];
+char *logident;
+int logmask;
+enum { LOGTO_SYS, LOGTO_FILE, LOGTO_STDERR } log_dest;
 
 int logclass = 0; // also defined in lsf.h
 int timinglevel = 0;
@@ -28,7 +32,7 @@ int timinglevel = 0;
 // #define DEF_LOG_MASK   LOG_INFO
 // #define DEF_LOG_MASK_NAME   "LOG_WARNING"
 
-const char DEF_LOG_MASK[ ]      = "LOG_INFO";
+const int DEF_LOG_MASK          =  LOG_INFO;
 const char DEF_LOG_MASK_NAME[ ] = "LOG_WARNING";
 /*#ifndef HAS_VSNPRINTF FIXME FIXME
 #define HAS_VSNPRINTF
@@ -42,7 +46,7 @@ int   openLogFile( const char *ident, const char *myname );
 void  ls_syslog( int level, const char *fmt, ... );
 void  ls_closelog( void);
 int   ls_setlogmask( int maskpri );
-int   getLogMask ( char **msg, const char *logMask);
+int   getLogMask ( const char **msg, const char *logMask);
 int   getLogClass_ ( const char *lsp, const char *tsp);
 void  ls_closelog_ext (void);
 

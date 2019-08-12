@@ -32,6 +32,8 @@
 #include "lib/lib.h"
 #include "lib/err.h"
 #include "lib/host.h"
+#include "lib/misc.h"
+#include "lib/words.h"
 #include "lsf.h"
 
 
@@ -66,7 +68,7 @@ argvmsg_ (int argc, char **argv)
 void
 ls_openlog (const char *ident, const char *path, int use_stderr, const char *logMask)
 {
-    char *msg = NULL;
+    const char *msg = NULL;
 
     // strncpy (logident, ident, 9); // FIXME FIXME FIXME why only 9 characters?
     // logident[9] = '\0';    
@@ -224,7 +226,7 @@ openLogFile (const char *ident, const char *myname)
 void
 ls_syslog (int level, const char *fmt, ...) // FIXME FIXME convert variable argument list to static
 {
-    int save_errno = errno;
+    unsigned int save_errno = (unsigned int) errno;
     va_list ap; // FIXME FIXME full initilization
     // static char lastMsg[16384];
     // static int counter = 0;
@@ -235,7 +237,8 @@ ls_syslog (int level, const char *fmt, ...) // FIXME FIXME convert variable argu
     if (log_dest == LOGTO_STDERR) {
 
         if ((logmask & LOG_MASK (level)) != 0) {
-            errno = save_errno;
+            assert( save_errno <= INT_MAX );
+            errno = (int) save_errno;
             verrlog_ (level, stderr, fmt, ap);
         }
 
@@ -274,8 +277,8 @@ ls_syslog (int level, const char *fmt, ...) // FIXME FIXME convert variable argu
                         free( kot );
                     }
                 }
-                else
-                {
+                else {
+
                     err_str_ (save_errno, fmt, buf);
                     char *kot = malloc( sizeof( char ) * strlen( buf ) + 1 );
                     if (log_dest == LOGTO_FILE) {
@@ -351,7 +354,8 @@ ls_syslog (int level, const char *fmt, ...) // FIXME FIXME convert variable argu
                 log_dest = LOGTO_FILE;
             }
 
-            errno = save_errno;
+            assert( save_errno <= INT_MAX );
+            errno = (int) save_errno;
             verrlog_ (level, lfp, fmt, ap);
             fclose (lfp);
         }
@@ -394,7 +398,7 @@ ls_setlogmask ( const int maskpri)
 }
 
 int
-getLogMask ( const char **msg, char *logMask)
+getLogMask ( const char **msg, const char *logMask)
 {
     static char msgbuf[MAX_LINE_LEN];
 
@@ -402,7 +406,8 @@ getLogMask ( const char **msg, char *logMask)
     assert( *msg );
 
     if (logMask == NULL) {
-        return LOG_UPTO (DEF_LOG_MASK); 
+        // return LOG_UPTO (DEF_LOG_MASK);
+        return ( 1 << (( DEF_LOG_MASK + 1 ) - 1));
     }
 #ifdef LOG_ALERT
     if (strcmp (logMask, "LOG_ALERT") == 0) {
@@ -464,11 +469,11 @@ getLogMask ( const char **msg, char *logMask)
 
     *msg = msgbuf;
 
-    return LOG_UPTO (DEF_LOG_MASK);
+    return ( 1 << ( ( DEF_LOG_MASK + 1 ) - 1 ) );
 }
 
 int
-getLogClass_ (char *lsp, char *tsp)
+getLogClass_ ( const char *lsp, const char *tsp)
 {
     char *word = NULL;
     int class = 0;
@@ -553,5 +558,7 @@ getLogClass_ (char *lsp, char *tsp)
 void
 ls_closelog_ext (void)
 {
-    logfile[0] = '\0'; // FIXME FIXME FIXME label what logfile[0] is
+    // logfile[0] = '\0'; // FIXME FIXME FIXME label what logfile[0] is
+    memset( logfile, '\0', strlen( logfile ) );
+    return;
 }
