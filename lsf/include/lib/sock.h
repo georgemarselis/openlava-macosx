@@ -7,14 +7,14 @@
 // extern int totsockets_;
 // extern int currentsocket_;
 
-// static int mLSFChanSockOpt = 0; // defined, but not used
+int mLSFChanSockOpt = 0;
 
 
 /* sock.c */
 int             CreateSock_(int protocol);
 int             CreateSockEauth_(int protocol);
 int             get_nonstd_desc_(int desc);
-int             TcpCreate_(int service, int port);
+int             TcpCreate_(int service, uint16_t port);
 int             io_nonblock_      ( int s );
 int             io_block_         ( int s );
 int             setLSFChanSockOpt_( int newOpt );

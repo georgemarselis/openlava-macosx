@@ -29,7 +29,7 @@ soOpen_ ( const char *libFileName )
 	int strcmp_rvalue = 0;
     strcmp_rvalue = strcmp( libFileName, "");
  
-    return 0;
+    return strcmp_rvalue;
 }
 
 
@@ -42,12 +42,13 @@ soClose_( int handle )
 
 
 void *
-soSym_( SO_HANDLE_T handle, const char *entryName )
+soSym_( int handle, const char *entryName )
 {
-	int strcmp_rvalue = 0;
+	// int strcmp_rvalue = 0;
     // SO_HANDLE_T is int, typedef'ed
     assert( handle );
-    strcmp_rvalue = strcmp( entryName, "");
+    assert( entryName );
+    // strcmp_rvalue = strcmp( entryName, "");
  
     return NULL;
 }
