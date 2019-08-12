@@ -23,10 +23,15 @@
 #include <strings.h>
 
 #include "lib/lib.h"
-#include "lib/lproto.h"
+// #include "lib/lproto.h"
+#include "lib/syslog.h"
 #include "lib/wconf.h"
 #include "lib/words.h"
 #include "lsf.h"
+#include "lib/misc.h"
+#include "libint/lsi18n.h"
+#include "lib/i18n.h"
+#include "lib/getnextline.h"
 
  /*
   *     Yup. Someone coded their own recursive decent parser...
@@ -45,7 +50,7 @@ ls_getconf ( const char *filename)
     size_t lineNum      = 0;
     size_t len          = 0;
     long offset         = 0;
-    char flag           = 'a';
+    char flag           = '\0';
     char *linep         = NULL;
     char *sp            = NULL;
     char *word          = NULL;
@@ -58,7 +63,7 @@ ls_getconf ( const char *filename)
     char **defConds     = NULL;
     struct lsConf *conf = NULL;
     struct confNode *temp = NULL;
-    struct confNode *node = NULL,;
+    struct confNode *node = NULL;
     struct confNode *prev = NULL;
     struct confNode *rootNode = NULL;
     FILE *fp = NULL;
@@ -66,8 +71,9 @@ ls_getconf ( const char *filename)
     lserrno = LSE_NO_ERR;
     if (filename == NULL)
     {
+        char message[ ] = "Null filename";
         /* catgets 6000 */
-        ls_syslog (LOG_ERR, "%s: %s.", __func__, I18N (6000, "Null filename"));
+        ls_syslog (LOG_ERR, "%s: %s.", __func__, _i18n_msg_get (ls_catd, NL_SETN, 6000, message));
         lserrno = LSE_NO_FILE;
         return NULL;
     }
@@ -117,9 +123,9 @@ ls_getconf ( const char *filename)
     fp = fopen (filename, "r");
     if (fp == NULL)
     {
-
+        char message [ ] = "Can't open configuration file";
         /* catgets 6001 */
-        ls_syslog (LOG_ERR, "%s: %s <%s>.", __func__, I18N (6001, "Can't open configuration file"), filename);
+        ls_syslog (LOG_ERR, "%s: %s <%s>.", __func__, _i18n_msg_get (ls_catd, NL_SETN, 6001, message), filename );
         lserrno = LSE_NO_FILE;
         goto Error;
     }
@@ -127,8 +133,11 @@ ls_getconf ( const char *filename)
     while ((linep = getNextLineD_ (fp, &lineNum, FALSE)) != NULL)
     {
 
+        const char **topass = NULL;
         sp = linep;
-        word = getNextWord_ (&linep);
+
+        memcpy(topass, &linep, strlen( linep ) );
+        word = getNextWord_ (topass);
         if (word && word[0] == '#')
         {
 
@@ -137,14 +146,15 @@ ls_getconf ( const char *filename)
 
             if (strcasecmp (cp, "define") == 0)
             {
-                unsigned int i = 0;
+                unsigned long i = 0;
 
-                word = getNextWord_ (&linep);
+                word = getNextWord_ (topass);
 
                 if (word == NULL)
                 {
+                    char message[ ] = "Both macro and condition name expected after #define";
                     /* catgets 6002 */
-                    ls_syslog (LOG_ERR, "%s: %s(%d): %s.", __func__, filename, lineNum, I18N (6002, "Both macro and condition name expected after #define"));
+                    ls_syslog (LOG_ERR, "%s: %s(%d): %s.", __func__, filename, lineNum, _i18n_msg_get (ls_catd, NL_SETN, 6002, message)) ;
                     goto Error;
                 }
 
@@ -175,9 +185,9 @@ ls_getconf ( const char *filename)
                 }
 
                 if (*word == '\0')
-                {
+                {   char message[ ] = "Both macro and condition name expected after #define";
                     /* catgets 6003 */
-                    ls_syslog (LOG_ERR, "%s: %s(%d): %s", __func__, filename, lineNum, I18N (6003, "Both macro and condition name expected after #define."));
+                    ls_syslog (LOG_ERR, "%s: %s(%d): %s.", __func__, filename, lineNum, _i18n_msg_get (ls_catd, NL_SETN, 6003, message ) );
                     FREEUP (word1);
                     goto Error;
                 }
@@ -244,7 +254,7 @@ ls_getconf ( const char *filename)
             }
             else if (strcasecmp (cp, "if") == 0)
             {
-                unsigned int i = 0;
+                unsigned long i = 0;
 
                 while (isspace (*linep)) {
                     linep++;
@@ -266,8 +276,9 @@ ls_getconf ( const char *filename)
 
                 if (*word == '\0')
                 {
+                    char message[ ] = "Condition name expected after #if.";
                     /* catgets 6004 */
-                    ls_syslog (LOG_ERR, "%s: %s(%d): %s.", __func__, filename, lineNum, I18N (6004, "Condition name expected after #if."));    
+                    ls_syslog (LOG_ERR, "%s: %s(%d): %s.", __func__, filename, lineNum, _i18n_msg_get (ls_catd, NL_SETN, 6003, message) );    
                     goto Error;
                 }
 
@@ -296,7 +307,7 @@ ls_getconf ( const char *filename)
                     flag = addCond (conf, word);
                     node->cond = putstr_ (word);
                 }
-                if (!flag || node->cond == NULL)
+                if ( '\0' == flag || node->cond == NULL)
                 {
                     const char malloc[ ] = "malloc";
                     ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL, __func__, malloc, sizeof (word));
@@ -320,22 +331,25 @@ ls_getconf ( const char *filename)
             else if (strcasecmp (cp, "elif") == 0)
             {
 
+                unsigned long i = 0;
                 temp = popStack (blockStack);
                 if (temp == NULL)
                 {
-                    /*catgets 6007 */
-                    ls_syslog (LOG_ERR, I18N (6007, "%s: %s(%d): If-less elif."), __func__, filename, lineNum);
+                    char message[ ] = "If-less elif";
+                    /* catgets 6007 */
+                    ls_syslog (LOG_ERR, "%s: %s(%d): %s.", __func__, filename, lineNum, _i18n_msg_get (ls_catd, NL_SETN, 6007, message) );    
                     goto Error;
                 }
                 PUSH_STACK (blockStack, temp);
 
-                while (isspace (*linep))
+                while (isspace (*linep)) {
                     linep++;
+                }
                 word = linep;
 
                 if (*word != '\0')
                 {
-                    const char pount = '#';
+                    const char pound = '#';
                     if ((ptr = strchr (word, pound )) != NULL) {
                         *ptr = '\0';
                     }
@@ -349,8 +363,9 @@ ls_getconf ( const char *filename)
 
                 if (*word == '\0')
                 {
+                    char message[ ] = "ICondition name expected after #elif";
                     /* catgets 6005 */
-                    ls_syslog (LOG_ERR, "%s: %s(%d): %s.", __func__, filename, lineNum, I18N (6005, "Condition name expected after #elif."));  
+                    ls_syslog (LOG_ERR, "%s: %s(%d): %s.", __func__, filename, lineNum, _i18n_msg_get (ls_catd, NL_SETN, 6005, message) );
                     goto Error;
                 }
 
@@ -379,7 +394,7 @@ ls_getconf ( const char *filename)
                     flag = addCond (conf, word);
                     node->cond = putstr_ (word);
                 }
-                if (!flag || node->cond == NULL)
+                if ( '\0' == flag || node->cond == NULL)
                 {
                     ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "malloc");
                     lserrno = LSE_MALLOC;
@@ -402,8 +417,9 @@ ls_getconf ( const char *filename)
                 temp = popStack (blockStack);
                 if (temp == NULL)
                 {
-                    /*catgets 6008 */
-                    ls_syslog (LOG_ERR, I18N (6008, "%s: %s(%d): If-less else."), __func__, filename, lineNum);
+                    char message[ ] = "If-less else";
+                    /* catgets 6008 */
+                    ls_syslog (LOG_ERR, "%s: %s(%d): %s.", __func__, filename, lineNum, _i18n_msg_get (ls_catd, NL_SETN, 6008, message) );
                     goto Error;
                 }
                 PUSH_STACK (blockStack, temp);
@@ -420,8 +436,9 @@ ls_getconf ( const char *filename)
                 temp = popStack (blockStack);
                 if (temp == NULL)
                 {
+                    char message[ ] = "If-less endif";
                     /* catgets 6009 */
-                    ls_syslog (LOG_ERR, I18N (6009, "%s: %s(%d): If-less endif."), __func__, filename, lineNum);
+                    ls_syslog (LOG_ERR, "%s: %s(%d): %s.", __func__, filename, lineNum, _i18n_msg_get (ls_catd, NL_SETN, 6009, message) );
                     goto Error;
                 }
                 PUSH_STACK (blockStack, temp);
@@ -439,6 +456,9 @@ ls_getconf ( const char *filename)
         numLines = 0;
         lines = NULL;
         for (;;) {  // FIXME FIXME FIXME FIXME FIXME put terminating conditions instead of infinite loop
+
+            const char **topass = NULL;
+
             lines = myrealloc (lines, (numLines + 1) * sizeof (char *));
             if (lines == NULL)
             {
@@ -469,8 +489,10 @@ ls_getconf ( const char *filename)
                 break;
             }
 
+            memcpy(topass, &linep, strlen( linep ) );
+
             sp = linep;
-            word = getNextWord_ (&linep);
+            word = getNextWord_ (topass);
 
             if (word && word[0] == '#')
             {
@@ -517,12 +539,13 @@ ls_getconf ( const char *filename)
     temp = popStack (blockStack);
     if (temp != NULL)
     {
+        char message[ ] = "Missing endif";
         /* catgets 6006 */
-        ls_syslog (LOG_ERR, "%s: %s(%d): %s endif.", __func__, filename, lineNum, I18N (6006, "Missing")); 
+        ls_syslog (LOG_ERR, "%s: %s(%d): %s.", __func__, filename, lineNum, _i18n_msg_get (ls_catd, NL_SETN, 6006, message) );
         goto Error;
     }
 
-    for (i = 0; i < numDefs; i++)
+    for ( unsigned long i = 0; i < numDefs; i++)
     {
         FREEUP (defNames[i]);
         FREEUP (defConds[i]);
@@ -558,10 +581,10 @@ ls_getconf ( const char *filename)
 
 Error: // FIXME FIXME FIXME remove goto label
 
-    for( i = 0; i < numDefs; i++)
+    for( unsigned long k = 0; k < numDefs; k++)
     {
-        FREEUP (defNames[i]);
-        FREEUP (defConds[i]);
+        FREEUP (defNames[k]);
+        FREEUP (defConds[k]);
     }
     FREEUP (defNames);
     FREEUP (defConds);
@@ -678,7 +701,7 @@ freeStack (struct pStack *stack)
     }
 }
 
-static char
+char
 addCond( struct lsConf *conf, char *cond )
 {
     size_t i = 0;
@@ -728,7 +751,7 @@ addCond( struct lsConf *conf, char *cond )
     return TRUE;
 }
 
-static char
+char
 checkCond (struct lsConf *conf, char *cond)
 {
     size_t i = 0;
@@ -757,7 +780,7 @@ checkCond (struct lsConf *conf, char *cond)
     return FALSE;
 }
 
-static char
+char
 linkNode (struct confNode *prev, struct confNode *node)
 {
     if (prev == NULL || node == NULL) {
@@ -860,7 +883,7 @@ freeNode (struct confNode *node)
 // }
 
 char *
-readNextLine ( const struct lsConf *conf, size_t *lineNum)
+readNextLine ( struct lsConf *conf, size_t *lineNum)
 {
     struct confNode *node = NULL;
     struct confNode *prev = NULL;

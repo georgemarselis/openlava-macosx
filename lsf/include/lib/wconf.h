@@ -19,6 +19,10 @@
 #pragma once
 
 // #define NL_SETN   23
+int  NL_SETN = 23;
+
+struct pStack *blockStack;
+struct pStack *ptrStack;
 
 /* wconf.c */
 struct lsConf *ls_getconf(const char *filename);
@@ -32,4 +36,4 @@ char checkCond(struct lsConf *conf, char *cond);
 char linkNode(struct confNode *prev, struct confNode *node);
 void ls_freeconf(struct lsConf *conf);
 void freeNode(struct confNode *node);
-char *readNextLine( const struct lsConf *conf, size_t *lineNum);
+char *readNextLine( struct lsConf *conf, size_t *lineNum);

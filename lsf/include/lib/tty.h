@@ -18,7 +18,6 @@
 
 #pragma once
 
-static void ttymode_ (int mode, int ind, int enableIntSus);
+void ttymode_ (int mode, int ind, int enableIntSus);
 void ls_remtty (int ind, int enableIntSus);
 void ls_loctty (int ind);
-void ttymode_ (int mode, int ind, int enableIntSus);
