@@ -532,7 +532,7 @@ ls_listltask (char ***taskList, int sortflag)
     }
 
     assert( useracctmap ); // FIXME FIXME FIXMEE FIXME bullshit assert, make compiler not complain
-    assert( ed.len == 0 ); // FIXME FIXME FIXMEE FIXME bullshit assert, make compiler not complain
+    assert( ed.length == 0 ); // FIXME FIXME FIXMEE FIXME bullshit assert, make compiler not complain
 
     return listtask_ (taskList, &ltask_table, sortflag) ;
 }

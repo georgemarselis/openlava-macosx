@@ -47,12 +47,7 @@ runEsub_ (struct lenData *ed, const char *path)
     struct stat sbuf;
     char ESUB[] = "esub";
 
-    assert( rootuid_ ); // NOTE bullshit op to hush up the compiler
-    assert( NSIG_MAP );  // bullshit OP, make the compiler stop complaining
-    assert( sigSymbol ); // bullshit OP, make the compiler stop complaining
-    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
-
-    ed->len = 0;
+    ed->length = 0;
     ed->data = NULL;
 
     myargv[0] = esub; // FIXME FIXME FIXME figure out what myargv[0] is and replace the 0 with a label
@@ -157,7 +152,7 @@ getEData (struct lenData *ed, char **argv, const char *lsfUserName)
 
     close (ePorts[1]);
 
-    ed->len = 0;
+    ed->length = 0;
     ed->data = NULL;
 
     buf = (char *) malloc (MSGSIZE + 1);
@@ -177,12 +172,12 @@ getEData (struct lenData *ed, char **argv, const char *lsfUserName)
             ;
         }
 
-        ed->len = 0;
+        ed->length = 0;
         ed->data = NULL;
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful *positive* return value
     }
 
-    for( size = MSGSIZE, ed->len = 0, sp = buf; (cc = read (ePorts[0], sp, size)); ) {
+    for( size = MSGSIZE, ed->length = 0, sp = buf; (cc = read (ePorts[0], sp, size)); ) {
         if ( -1 == cc ) {
 
             if (logclass & (LC_TRACE | LC_AUTH)) {
@@ -200,13 +195,13 @@ getEData (struct lenData *ed, char **argv, const char *lsfUserName)
     }
 
     assert( cc >= 0);
-    ed->len += (unsigned long) cc;
+    ed->length += (unsigned long) cc;
     sp += cc;
     assert( cc >= 0);
     size -= (unsigned long) cc;
     if ( 0 == size ) {
 
-        sp = (char *) realloc (buf, ed->len + MSGSIZE + 1);
+        sp = (char *) realloc (buf, ed->length + MSGSIZE + 1);
         if ( NULL == sp ) {
             
             if (logclass & (LC_TRACE | LC_AUTH)) {
@@ -225,20 +220,20 @@ getEData (struct lenData *ed, char **argv, const char *lsfUserName)
                 ;
             }
 
-            ed->len = 0;
+            ed->length = 0;
             ed->data = NULL;
             return -1; // FIXME FIXME FIXME FIXME replace with meaningful *positive* return value
         }
 
         buf = sp;
-        sp = buf + ed->len;
+        sp = buf + ed->length;
         size = MSGSIZE;
     }
 
     close (ePorts[0]);
     ed->data = buf;
 
-    ed->data[ed->len] = '\0';
+    ed->data[ed->length] = '\0';
 
     while (waitpid (pid, &status, 0) == -1 && errno == EINTR) {
         ;
@@ -250,13 +245,13 @@ getEData (struct lenData *ed, char **argv, const char *lsfUserName)
             FREEUP (ed->data);
         }
 
-        ed->len = 0;
+        ed->length = 0;
   
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful *positive* return value
     }
     
 
-    if (ed->len == 0) {
+    if (ed->length == 0) {
         FREEUP (ed->data);
     }
 
@@ -270,7 +265,7 @@ getEData (struct lenData *ed, char **argv, const char *lsfUserName)
 //         ;
 //     }
 
-//     ed->len = 0;
+//     ed->length = 0;
 //     ed->data = NULL;
 //     return -1; // FIXME FIXME FIXME FIXME replace with meaningful *positive* return value
 
@@ -308,7 +303,7 @@ runEexec_ (char *option, unsigned int job, struct lenData *eexec, const char *pa
     }
 
     if (logclass & LC_TRACE) {
-        ls_syslog (LOG_DEBUG, "%s: eexec path, option and data length of job/task <%d> are <%s>, <%s> and <%d>", __func__, job, eexecPath, option, eexec->len); 
+        ls_syslog (LOG_DEBUG, "%s: eexec path, option and data length of job/task <%d> are <%s>, <%s> and <%d>", __func__, job, eexecPath, option, eexec->length); 
     }
 
     if (stat (eexecPath, &sbuf) < 0) {
@@ -399,12 +394,12 @@ runEexec_ (char *option, unsigned int job, struct lenData *eexec, const char *pa
 
     close (p[0]);
 
-    if (eexec->len > 0) {
+    if (eexec->length > 0) {
 
-        cc = b_write_fix (p[1], eexec->data, eexec->len);
-        assert( eexec->len <= LONG_MAX );
-        if ( cc != (ssize_t) eexec->len && strcmp (option, "-p")) {  // FIXME FIXME FIXME FIXME add to configure.ac
-            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "b_write_fix", eexec->len);
+        cc = b_write_fix (p[1], eexec->data, eexec->length);
+        assert( eexec->length <= LONG_MAX );
+        if ( cc != (ssize_t) eexec->length && strcmp (option, "-p")) {  // FIXME FIXME FIXME FIXME add to configure.ac
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "b_write_fix", eexec->length);
         }
     }
 
@@ -465,8 +460,8 @@ runEGroup_ (char *type, char *gname)
         return NULL;
     }
 
-    if (ed.len > 0) {
-        ed.data[ed.len] = '\0';
+    if (ed.length > 0) {
+        ed.data[ed.length] = '\0';
         return ed.data;
     }
 

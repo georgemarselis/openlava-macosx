@@ -58,8 +58,6 @@ channels[i].handle = INVALID_HANDLE; }
 // extern int errno;
 // extern int CreateSock_ (int);
 
-
-static unsigned int NET_INTSIZE_  = 4;
 // static int lserrno;
 
 int

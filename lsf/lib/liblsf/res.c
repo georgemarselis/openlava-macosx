@@ -127,14 +127,14 @@ ls_connect (const char *host)
 
     runEsub_ (&connReq.eexec, NULL);
 
-    size =  sizeof (struct LSFHeader) + sizeof (connReq) + sizeof (struct lsfAuth) + ALIGNWORD_ (connReq.eexec.len);
+    size =  sizeof (struct LSFHeader) + sizeof (connReq) + sizeof (struct lsfAuth) + ALIGNWORD_ (connReq.eexec.length);
 
     reqBuf = malloc(5 * size * sizeof (reqBuf) );  // FIXME FIXME why 5?
     if (NULL == reqBuf && ENOMEM == errno ) {
         lserrno = LSE_MALLOC;
           close (s);
 
-        if (connReq.eexec.len > 0) {
+        if (connReq.eexec.length > 0) {
             free (connReq.eexec.data);
         }
         free (reqBuf);
@@ -145,7 +145,7 @@ ls_connect (const char *host)
     if (b_connect_ (s, (struct sockaddr *) &res_addr_, sizeof (res_addr_), resTimeout) < 0) {
         lserrno = LSE_CONN_SYS;
           
-        if (connReq.eexec.len > 0) {
+        if (connReq.eexec.length > 0) {
             free (connReq.eexec.data);
         }
         free (reqBuf);
@@ -154,14 +154,14 @@ ls_connect (const char *host)
 
     if (callRes_ (s, RES_CONNECT, (char *) &connReq, reqBuf, size, xdr_resConnect, 0, 0, &auth) == -1) { // 
         
-        if (connReq.eexec.len > 0) {
+        if (connReq.eexec.length > 0) {
             free (connReq.eexec.data);
         }
         free (reqBuf);
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    if (connReq.eexec.len > 0) {
+    if (connReq.eexec.length > 0) {
         free (connReq.eexec.data);
     }
 
@@ -439,7 +439,7 @@ ackAsyncReturnCode_ (int s, struct LSFHeader *replyHdr)
     int rc   = 0;
     const char cseqno = (char) replyHdr->refCode;
     // int seqno   = 0;
-    ssize_t len = 0;
+    ssize_t length = 0;
     struct lsQueueEntry *reqEntry = NULL;
     struct lsRequest *reqHandle   = NULL;
 
@@ -490,16 +490,16 @@ ackAsyncReturnCode_ (int s, struct LSFHeader *replyHdr)
             return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
 
-        len = b_read_fix (s, reqHandle->replyBuf, replyHdr->length);
+        length = b_read_fix (s, reqHandle->replyBuf, replyHdr->length);
         assert( replyHdr->length <= LONG_MAX );
-        if (len != (ssize_t) replyHdr->length) { // FIXME FIXME FIXME after fixing the return type of b_read_fix() remove this cast
+        if (length != (ssize_t) replyHdr->length) { // FIXME FIXME FIXME after fixing the return type of b_read_fix() remove this cast
             free (reqHandle->replyBuf);
             lserrno = LSE_MSG_SYS;
             return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
         }
 
-        assert( len >= 0);
-        reqHandle->replyBufLen = (size_t) len;
+        assert( length >= 0);
+        reqHandle->replyBufLen = (size_t) length;
     }
 
     if (reqHandle->replyHandler) {
@@ -1561,7 +1561,7 @@ lsMsgRcv_ (unsigned long taskid, const char *buffer, size_t length, int options)
 }
 
 int
-lsMsgSnd2_ (int *sock, unsigned short opcode, const char *buffer, size_t len, int options)
+lsMsgSnd2_ (int *sock, unsigned short opcode, const char *buffer, size_t length, int options)
 {
     XDR xdrs;
     struct LSFHeader header;
@@ -1588,7 +1588,7 @@ lsMsgSnd2_ (int *sock, unsigned short opcode, const char *buffer, size_t len, in
 
     setCurrentSN( REQUESTSN );
     header.refCode = REQUESTSN;
-    header.length = len;
+    header.length = length;
     header.reserved = 0;
 
     gethostbysock_ (*sock, hostname);
@@ -1613,7 +1613,7 @@ lsMsgSnd2_ (int *sock, unsigned short opcode, const char *buffer, size_t len, in
         rc = -1;
     }
 
-    rc = b_write_fix (*sock, buffer, len);
+    rc = b_write_fix (*sock, buffer, length);
     if (rc < 0 && errno == EPIPE ) {
         close (*sock);
         *sock = -1;
@@ -1635,7 +1635,7 @@ lsMsgSnd2_ (int *sock, unsigned short opcode, const char *buffer, size_t len, in
 }
 
 int
-lsMsgSnd_ (unsigned long taskid, const char *buffer, size_t len, int options)
+lsMsgSnd_ (unsigned long taskid, const char *buffer, size_t length, int options)
 {
     struct LSFHeader header;
     char headerBuf[sizeof (struct LSFHeader)]; // FIXME FIXME this needs debugging
@@ -1666,7 +1666,7 @@ lsMsgSnd_ (unsigned long taskid, const char *buffer, size_t len, int options)
     header.opCode   = RES_NONRES;
     setCurrentSN( REQUESTSN );
     header.refCode  = getCurrentSN();
-    header.length   = len;
+    header.length   = length;
     // assert( taskid >= 0 );
     header.reserved = (pid_t) taskid; // NOFIX cast is fine
 
@@ -1693,7 +1693,7 @@ lsMsgSnd_ (unsigned long taskid, const char *buffer, size_t len, int options)
         rc = -1;
     }
 
-    rc = b_write_fix (tEnt->sock, buffer, len);
+    rc = b_write_fix (tEnt->sock, buffer, length);
     if ( 0 > rc && EPIPE == errno) {
         close (tEnt->sock);
         tEnt->sock = -1;

@@ -73,7 +73,7 @@ bool_t xdr_address                   ( XDR *xdrs, unsigned int    *             
 /* xdr.c */
 void encodeHdr(pid_t *word1, size_t *word2, unsigned int *word3, unsigned int *word4, struct LSFHeader *header);
 bool_t xdr_LSFHeader(XDR *xdrs, struct LSFHeader *header);
-bool_t xdr_packLSFHeader( const char *buf, struct LSFHeader *header);
+bool_t xdr_packLSFHeader( char *buf, struct LSFHeader *header);
 bool_t xdr_encodeMsg   (XDR *xdrs, const char *data, struct LSFHeader *hdr, bool_t (*xdr_func )(), int options, struct lsfAuth *auth);
 bool_t xdr_arrayElement(XDR *xdrs, const char *data, struct LSFHeader *hdr, bool_t (*xdr_func )(), ...);// FIXME FIXME FIXME const buf,  const data
 int readDecodeHdr_     (int s,     const char *buf,  long (*readFunc )(), XDR *xdrs, struct LSFHeader *hdr); // FIXME FIXME FIXME const buf,  const data

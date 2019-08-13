@@ -64,7 +64,7 @@ struct rrdwrReq
 {
 	int fd;
 	char padding[4];
-	size_t len;
+	size_t length;
 };
 
 struct rlseekReq
@@ -102,8 +102,8 @@ struct rHosts *allocRH(void);
 struct rHosts *rhFind(const char *host);
 unsigned int ls_ropen(const char *host, const char *fn, int flags, mode_t mode);
 int ls_rclose(int fd);
-unsigned int ls_rwrite(int fd, const char *buf, size_t len);
-unsigned int ls_rread (int fd, const char *buf, size_t len);
+unsigned int ls_rwrite(int fd, const char *buf, size_t length);
+unsigned int ls_rread (int fd, const char *buf, size_t length);
 off_t ls_rlseek(int fd, off_t offset, int whence);
 int ls_rfstat(int fd, struct stat *st);
 int ls_rfcontrol(int command, int arg);

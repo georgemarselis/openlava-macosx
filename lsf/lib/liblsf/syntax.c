@@ -27,7 +27,7 @@
 #include "daemons/liblimd/limout.h"
 
 int
-expSyntax_ ( const char *resReq)
+expSyntax_ ( const char *resReq )
 {
     struct stringLen str;
 
@@ -40,8 +40,8 @@ expSyntax_ ( const char *resReq)
         return INT_MAX;
     }
 
-    str.name = strdup( resReq) ;
-    str.len = MAX_LINE_LEN;
+    str.name   = strdup( resReq);
+    str.length = MAX_LINE_LEN;
 
     if (callLim_ (LIM_CHK_RESREQ, &str, xdr_stringLen, NULL, NULL, NULL, 0, NULL) < 0) {
         return INT_MAX;

@@ -24,22 +24,28 @@
 #include "daemons/liblimd/limout.h"
 
 
-
-bool_t xdr_decisionReq( 	XDR *, struct decisionReq *, 		struct LSFHeader *);
-bool_t xdr_placeReply( 		XDR *, struct placeReply *, 		struct LSFHeader *);
-bool_t xdr_loadReply( 		XDR *, struct loadReply *, 			struct LSFHeader *);
-bool_t xdr_jobXfer( 		XDR *, struct jobXfer *, 			struct LSFHeader *);
-bool_t xdr_hostInfo( 		XDR *, struct shortHInfo *, 		struct LSFHeader *);
-bool_t xdr_limLock( 		XDR *, struct limLock *, 			struct LSFHeader *);
-bool_t xdr_lsInfo( 			XDR *, struct lsInfo *, 			struct LSFHeader *);
-bool_t xdr_hostInfoReply( 	XDR *, struct hostInfoReply *, 		struct LSFHeader *);
-bool_t xdr_masterInfo( 		XDR *, struct masterInfo *, 		struct LSFHeader *);
-bool_t xdr_clusterInfoReq( 	XDR *, struct clusterInfoReq *, 	struct LSFHeader *);
-bool_t xdr_clusterInfoReply(XDR *, struct clusterInfoReply *, 	struct LSFHeader *);
-bool_t xdr_shortHInfo( 		XDR *, struct shortHInfo *, 		struct LSFHeader *, char *);
-bool_t xdr_shortCInfo( 		XDR *, struct shortCInfo *, 		struct LSFHeader *);
-bool_t xdr_cInfo( 			XDR *, struct cInfo *,  			struct LSFHeader *);
-bool_t xdr_resourceInfoReq( XDR *, struct resourceInfoReq *, 	struct LSFHeader *);
-bool_t xdr_resourceInfoReply(XDR *, struct resourceInfoReply *, struct LSFHeader *);
-bool_t xdr_hostEntry( 		XDR *, struct hostEntry *, 			struct LSFHeader *);
-bool_t xdr_hostName( 		XDR *, char *, 						struct LSFHeader *);
+/* xdrlim.c */ // FIXME FIXME FIXME FIXME use column aligner from sublime text to align these function definition
+bool_t xdr_placeInfo(XDR *xdrs, struct placeInfo *placeInfo, struct LSFHeader *hdr);
+bool_t xdr_hostLoad(XDR *xdrs, struct hostLoad *loadVec, struct LSFHeader *hdr, const char *cp);
+bool_t xdr_decisionReq(XDR *xdrs, struct decisionReq *decisionReqPtr, struct LSFHeader *hdr);
+bool_t xdr_placeReply(XDR *xdrs, struct placeReply *placeRepPtr, struct LSFHeader *hdr);
+bool_t xdr_loadReply(XDR *xdrs, struct loadReply *loadReplyPtr, struct LSFHeader *hdr);
+bool_t xdr_jobXfer(XDR *xdrs, struct jobXfer *jobXferPtr, struct LSFHeader *hdr);
+bool_t xdr_hostInfoReply(XDR *xdrs, struct hostInfoReply *hostInfoReply, struct LSFHeader *hdr);
+bool_t xdr_shortHInfo(XDR *xdrs, struct shortHInfo *shortHInfo, struct LSFHeader *hdr, char *nIndex);
+bool_t xdr_shortLsInfo(XDR *xdrs, struct shortLsInfo *shortLInfo, struct LSFHeader *hdr);
+bool_t xdr_limLock(XDR *xdrs, struct limLock *limLockPtr, struct LSFHeader *hdr);
+bool_t xdr_resItem(XDR *xdrs, struct resItem *resItem, struct LSFHeader *hdr);
+bool_t xdr_lsInfo(XDR *xdrs, struct lsInfo *lsInfoPtr, struct LSFHeader *hdr);
+bool_t xdr_masterInfo(XDR *xdrs, struct masterInfo *mInfoPtr, struct LSFHeader *hdr);
+bool_t xdr_clusterInfoReq(XDR *xdrs, struct clusterInfoReq *clusterInfoReq, struct LSFHeader *hdr);
+bool_t xdr_clusterInfoReply(XDR *xdrs, struct clusterInfoReply *clusterInfoReply, struct LSFHeader *hdr);
+void freeUpMemp(void *memp, unsigned int nClus);
+bool_t xdr_shortCInfo(XDR *xdrs, struct shortCInfo *clustInfoPtr, struct LSFHeader *hdr);
+bool_t xdr_cInfo(XDR *xdrs, struct cInfo *cInfo, struct LSFHeader *hdr);
+bool_t xdr_resourceInfoReq(XDR *xdrs, struct resourceInfoReq *resourceInfoReq, struct LSFHeader *hdr);
+bool_t xdr_resourceInfoReply(XDR *xdrs, struct resourceInfoReply *resourceInfoReply, struct LSFHeader *hdr);
+bool_t xdr_lsResourceInfo(XDR *xdrs, struct lsSharedResourceInfo *lsResourceInfo, struct LSFHeader *hdr);
+bool_t xdr_lsResourceInstance(XDR *xdrs, struct lsSharedResourceInstance *instance, struct LSFHeader *hdr);
+bool_t xdr_hostEntry(XDR *xdrs, struct hostEntry *hPtr, struct LSFHeader *hdr);
+bool_t xdr_hostName(XDR *xdrs, char *hostname, struct LSFHeader *hdr);

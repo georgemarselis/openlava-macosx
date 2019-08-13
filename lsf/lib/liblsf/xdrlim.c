@@ -25,62 +25,59 @@
 #include "lib/lib.h"
 // #include "lib/lproto.h"
 #include "lib/xdrlim.h"
+#include "lib/xdrmisc.h"
+#include "lib/misc.h"
+#include "lib/syslog.h"
 
-#ifndef MIN
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
-#endif
 
-static bool_t xdr_hostLoad(             XDR  *, struct hostLoad *,   struct LSFHeader *, char *);
-static bool_t xdr_placeInfo(            XDR  *, struct placeInfo *,  struct LSFHeader *);
-static bool_t xdr_shortLsInfo(          XDR  *, struct shortLsInfo *, struct LSFHeader *);
-static bool_t xdr_resItem(              XDR  *, struct resItem *,    struct LSFHeader *);
-static void freeUpMemp(                 char *, int);
-static bool_t xdr_lsResourceInfo(       XDR  *, struct lsSharedResourceInfo *, struct LSFHeader *);
-static bool_t xdr_lsResourceInstance(   XDR  *, struct lsSharedResourceInstance *, struct LSFHeader *);
+// #ifndef MIN
+// #define MIN(a,b) ((a) < (b) ? (a) : (b))
+// #endif
+
 int sharedResConfigured_ = FALSE;
 
-static bool_t
+bool_t
 xdr_placeInfo (XDR * xdrs, struct placeInfo *placeInfo, struct LSFHeader *hdr)
 {
-    char *sp;
+    char *sp = strdup(placeInfo->hostName);
     
     assert( hdr->length );
     
-    sp = placeInfo->hostName;
     if (xdrs->x_op == XDR_DECODE) {
-        sp[0] = '\0';
+        sp = NULL;
     }
-    if (!(xdr_string (xdrs, &sp, MAXHOSTNAMELEN) && xdr_int (xdrs, &placeInfo->numtask))) {
+    assert( placeInfo->numtask <= INT_MAX );
+    if (!(xdr_string (xdrs, &sp, MAXHOSTNAMELEN) && xdr_int (xdrs, (int *)&placeInfo->numtask))) {
         return FALSE;
     }
 
     return TRUE;
 }
 
-static bool_t
-xdr_hostLoad (XDR * xdrs, struct hostLoad *loadVec, struct LSFHeader *hdr,  char *cp)
+bool_t
+xdr_hostLoad (XDR * xdrs, struct hostLoad *loadVec, struct LSFHeader *hdr, const char *cp)
 {
-    char *sp;
-    int nIndicies = atoi(cp);
+    char *sp = NULL;
+    unsigned int nIndicies = (unsigned int) atoi(cp); // FIXME FIXME FIXME is the cast correct?
     
     assert( hdr->length );
     
-    sp = loadVec->hostName;
+    sp = strdup( loadVec->hostName );
     if (xdrs->x_op == XDR_DECODE) {
-        sp[0] = '\0';
+        sp = NULL;
     }
     
     if (!xdr_string (xdrs, &sp, MAXHOSTNAMELEN)) {
         return FALSE;
     }
 
-    for ( int i = 0; i < 1 + GET_INTNUM (nIndicies); i++) {
-        if (!xdr_int (xdrs, (int *) &loadVec->status[i])) {
+    for ( unsigned int i = 0; i < 1 + GET_INTNUM (nIndicies); i++) {
+        if (!xdr_float (xdrs, &loadVec->status[i])) {
             return FALSE;
         }
     }
 
-    for (int i = 0; i < nIndicies; i++) {
+    for ( unsigned int i = 0; i < nIndicies; i++) {
         if (!xdr_float (xdrs, &loadVec->loadIndex[i])) {
             return FALSE;
         }
@@ -104,19 +101,19 @@ xdr_decisionReq (XDR * xdrs, struct decisionReq * decisionReqPtr, struct LSFHead
     
     assert( decisionReqPtr->numHosts <= INT_MAX );
     assert( decisionReqPtr->numPrefs <= INT_MAX );
-    if (    !xdr_enum   (xdrs, (enum_t *)&decisionReqPtr->ofWhat)    ||
-            !xdr_int    (xdrs, &decisionReqPtr->options)   ||
-            !xdr_string (xdrs, &sp1, MAX_LSF_NAME_LEN)        ||
-            !xdr_u_long (xdrs, (unsigned int *)&decisionReqPtr->numHosts)  ||   // FIXME FIXME FIXME FIXME we got to revisit this
-            !xdr_string (xdrs, &sp2, MAX_LINE_LEN)           ||
-            !xdr_u_long (xdrs, (unsigned int *)&decisionReqPtr->numPrefs))
+    if (    !xdr_enum   (xdrs, (enum_t *)&decisionReqPtr->ofWhat) ||
+            !xdr_int    (xdrs, &decisionReqPtr->options)          ||
+            !xdr_string (xdrs, &sp1, MAX_LSF_NAME_LEN)            ||
+            !xdr_u_long (xdrs, &decisionReqPtr->numHosts)         ||
+            !xdr_string (xdrs, &sp2, MAX_LINE_LEN)                ||
+            !xdr_u_long (xdrs, &decisionReqPtr->numPrefs)
+       )
         {
         return FALSE;
         }
     
     
     if (xdrs->x_op == XDR_DECODE) {
-        assert( decisionReqPtr->numPrefs >= 0);
         decisionReqPtr->preferredHosts = calloc ( decisionReqPtr->numPrefs, sizeof (decisionReqPtr->preferredHosts));
         
         if ( NULL == decisionReqPtr->preferredHosts && ENOMEM == errno ) {
@@ -125,7 +122,7 @@ xdr_decisionReq (XDR * xdrs, struct decisionReq * decisionReqPtr, struct LSFHead
     }
     
     assert( decisionReqPtr->numPrefs <= UINT_MAX );
-    if (!xdr_array_string (xdrs, decisionReqPtr->preferredHosts, MAXHOSTNAMELEN, decisionReqPtr->numPrefs)) {
+    if (!xdr_array_string (xdrs, decisionReqPtr->preferredHosts, MAXHOSTNAMELEN, (unsigned int) decisionReqPtr->numPrefs)) {
         if (xdrs->x_op == XDR_DECODE) {
             FREEUP (decisionReqPtr->preferredHosts);
         }
@@ -139,10 +136,10 @@ bool_t
 xdr_placeReply (XDR * xdrs, struct placeReply *placeRepPtr,struct LSFHeader * hdr)
 {
     int status = FALSE;
-    static char *memp;
+    void *memp = malloc( sizeof( placeRepPtr->placeInfo )*sizeof(char) + 1024 );
     
-    assert( placeRepPtr->numHosts <= INT_MAX );            // leave it in case we ever pass over 32,600 hosts :D
-    if (!xdr_u_long (xdrs, (unsigned int *) &placeRepPtr->numHosts)) { // FIXME FIXME FIXME FIXME we got to revisit this
+    assert( placeRepPtr->numHosts <= INT_MAX );  // in case we ever pass over 32,600 hosts :D
+    if (!xdr_u_long (xdrs, &placeRepPtr->numHosts)) {
         return FALSE;
     }
     
@@ -151,12 +148,11 @@ xdr_placeReply (XDR * xdrs, struct placeReply *placeRepPtr,struct LSFHeader * hd
             FREEUP (memp);
         }
         
-        assert(placeRepPtr->numHosts >= 0);
         placeRepPtr->placeInfo = malloc ( placeRepPtr->numHosts * sizeof (struct placeInfo));
         if (!placeRepPtr->placeInfo) {
             return FALSE;
         }
-        memp = (char *) placeRepPtr->placeInfo;
+        memcpy( memp, placeRepPtr->placeInfo, (sizeof( placeRepPtr->placeInfo )*sizeof(char) + 1024) );
     }
     
     
@@ -167,13 +163,14 @@ xdr_placeReply (XDR * xdrs, struct placeReply *placeRepPtr,struct LSFHeader * hd
             return FALSE;
             }
     }
+    free( memp );
     return TRUE;
 }
 
 bool_t
 xdr_loadReply (XDR * xdrs, struct loadReply *loadReplyPtr, struct LSFHeader *hdr)
 {
-    char *sp;
+    char *sp = NULL;
     int status = TRUE;
     static float *memp;
     
@@ -184,16 +181,15 @@ xdr_loadReply (XDR * xdrs, struct loadReply *loadReplyPtr, struct LSFHeader *hdr
     
     if (xdrs->x_op == XDR_DECODE) {
         
-        u_long matSize  = 0;
-        u_long nameSize = 0;
-        u_long staSize  = 0;;
-        u_long vecSize  = 0;
-        u_long hlSize   = 0;
-        float *currp;
+        unsigned long matSize  = 0;
+        unsigned long nameSize = 0;
+        unsigned long staSize  = 0;;
+        unsigned long vecSize  = 0;
+        unsigned long hlSize   = 0;
+        float *currp           = 0;
         
         FREEUP (memp);
         if (loadReplyPtr->indicies == NULL) {
-            assert(loadReplyPtr->nIndex  >= 0 );
             loadReplyPtr->indicies = malloc (sizeof (char *) * (loadReplyPtr->nIndex + 1 ) ); // FIXME FIXME FIXME what parenthesis should the + 1 be located
         }
         
@@ -213,22 +209,22 @@ xdr_loadReply (XDR * xdrs, struct loadReply *loadReplyPtr, struct LSFHeader *hdr
         memp = loadReplyPtr->loadMatrix->loadIndex;
         
         currp = memp + hlSize;
-        for (u_long i = 0; i < loadReplyPtr->nEntry; i++, currp += vecSize) {
+        for (unsigned long i = 0; i < loadReplyPtr->nEntry; i++, currp += vecSize) {
             loadReplyPtr->loadMatrix[i].loadIndex = currp;
         }
         currp = memp + hlSize + matSize;
-        for (u_long i = 0; i < loadReplyPtr->nIndex; i++, currp += MAX_LSF_NAME_LEN) {
+        for (unsigned long i = 0; i < loadReplyPtr->nIndex; i++, currp += MAX_LSF_NAME_LEN) {
             char *buf = malloc( sizeof( char ) * sizeof( float ) + 1 );
-            sprintf( buf, "%f", *currp );
+            sprintf( buf, "%f", (double) *currp ); // NOFIX there is no way for sprintf to avoid  variadic parameter promotion to double
             loadReplyPtr->indicies[i] = buf;
             free( buf ); // this probably makes things go wonky
         }
-        for (u_long i = 0; i < loadReplyPtr->nEntry; i++, currp += staSize) {
+        for (unsigned long i = 0; i < loadReplyPtr->nEntry; i++, currp += staSize) {
             loadReplyPtr->loadMatrix[i].status = currp;
         }
     }
     
-    for (u_long i = 0; i < loadReplyPtr->nIndex; i++) {
+    for (unsigned long i = 0; i < loadReplyPtr->nIndex; i++) {
         sp = loadReplyPtr->indicies[i];
         if (xdrs->x_op == XDR_DECODE) {
             sp = NULL; // FIME FIXME FIXME FIXME not quite sure if this is correct
@@ -240,7 +236,7 @@ xdr_loadReply (XDR * xdrs, struct loadReply *loadReplyPtr, struct LSFHeader *hdr
     
     loadReplyPtr->indicies[loadReplyPtr->nIndex - 1] = NULL;
     
-    for (u_long i = 0; i < loadReplyPtr->nEntry; i++) {
+    for (unsigned long i = 0; i < loadReplyPtr->nEntry; i++) {
         status = xdr_arrayElement (xdrs, (char *) &loadReplyPtr->loadMatrix[i], hdr, xdr_hostLoad, (char *) &loadReplyPtr->nIndex);
         
         if (!status) {
@@ -261,16 +257,15 @@ xdr_loadReply (XDR * xdrs, struct loadReply *loadReplyPtr, struct LSFHeader *hdr
 bool_t
 xdr_jobXfer (XDR * xdrs, struct jobXfer * jobXferPtr, struct LSFHeader * hdr)
 {
-    char *sp;
-    static char *memp;
+    char *sp = NULL;
+    static void *memp = NULL;
     
     sp = jobXferPtr->resReq;
     if (xdrs->x_op == XDR_DECODE) {
-        sp[0] = '\0';
+        sp = NULL;
     }
     
-    assert( jobXferPtr->numHosts <= INT_MAX );
-    if (!(xdr_int (xdrs, (int *) &jobXferPtr->numHosts) && xdr_string (xdrs, &sp, MAX_LINE_LEN))) {
+    if (!(xdr_u_long (xdrs, &jobXferPtr->numHosts) && xdr_string (xdrs, &sp, MAX_LINE_LEN))) {
         return FALSE;
     }
     
@@ -279,12 +274,12 @@ xdr_jobXfer (XDR * xdrs, struct jobXfer * jobXferPtr, struct LSFHeader * hdr)
         if( memp ) {
             FREEUP (memp);
         }
-        jobXferPtr->placeInfo = (struct placeInfo *) malloc( jobXferPtr->numHosts * sizeof (struct placeInfo));
+        jobXferPtr->placeInfo = malloc( jobXferPtr->numHosts * sizeof (struct placeInfo));
         if ( NULL == jobXferPtr->placeInfo && ENOMEM == errno ) {
             lserrno = LSE_MALLOC;
             return FALSE;
         }
-        memp = (char *) jobXferPtr->placeInfo;
+        memp = jobXferPtr->placeInfo;
     }
     
     
@@ -310,6 +305,7 @@ xdr_hostInfoReply (XDR *xdrs, struct hostInfoReply *hostInfoReply, struct LSFHea
     
     assert( hostInfoReply->nHost  <= INT_MAX );
     assert( hostInfoReply->nIndex <= INT_MAX );
+
     if (!(xdr_int (xdrs, (int *) &hostInfoReply->nHost) && xdr_int (xdrs, (int *)&hostInfoReply->nIndex))) {
         return FALSE;
     }
@@ -320,41 +316,40 @@ xdr_hostInfoReply (XDR *xdrs, struct hostInfoReply *hostInfoReply, struct LSFHea
     
     if (xdrs->x_op == XDR_DECODE) {
         
-        u_long shISize = 0;
-        u_long matSize = 0;
-        u_long vecSize = 0;
-        u_long resSize = 0;
-        float *currp  = 0;
+        unsigned long shISize = 0;
+        unsigned long matSize = 0;
+        unsigned long vecSize = 0;
+        unsigned long resSize = 0;
+        double *currp  = NULL;
         
         if (memp) {
             FREEUP (memp);
         }
         
         shISize = ALIGNWORD_ (hostInfoReply->nHost * sizeof (struct shortHInfo));
-        assert( hostInfoReply->nIndex >= 0 );
-        vecSize = ALIGNWORD_ ( (u_long)hostInfoReply->nIndex * sizeof (float));
-        resSize = (u_long)(GET_INTNUM (hostInfoReply->shortLsInfo->nRes) + GET_INTNUM (hostInfoReply->nIndex)) * sizeof (int);
+        vecSize = ALIGNWORD_ ( hostInfoReply->nIndex * sizeof (double));
+        resSize = (GET_INTNUM (hostInfoReply->shortLsInfo->nRes) + GET_INTNUM (hostInfoReply->nIndex)) * sizeof (int);
         matSize = ALIGNWORD_ (hostInfoReply->nHost * (vecSize + resSize + MAX_LINE_LEN + 100));
         
-        hostInfoReply->hostMatrix = (struct shortHInfo *) malloc (shISize + matSize);
+        hostInfoReply->hostMatrix = malloc (shISize + matSize);
         if ( NULL == hostInfoReply->hostMatrix && ENOMEM == errno ) {
             return FALSE;
         }
         
-        memp = hostInfoReply->hostMatrix;
+        memp = (struct shortHInfo *) hostInfoReply->hostMatrix;
         currp = memp->busyThreshold + shISize;                          // FIXME FIXME FIXME the fuck is a float = struct shortHInfo + ulong ?
-        for ( u_long i = 0; i < hostInfoReply->nHost; i++) {     //          it makes more sense if float = memp->busyThreshold + ulong
+        for ( unsigned long i = 0; i < hostInfoReply->nHost; i++) {     //          it makes more sense if float = memp->busyThreshold + ulong
             
             hostInfoReply->hostMatrix[i].busyThreshold = currp;         // FIXME FIXME FIXME FIXME  is this where currps should be assigned to?
             currp += vecSize;
-            hostInfoReply->hostMatrix[i].resBitMaps    = (unsigned int *) currp; // FIXME FIXME FIXME FIXME   why is the same value assinged to three different members of the structure?
+            hostInfoReply->hostMatrix[i].resBitMaps    = (unsigned int *)currp; // FIXME FIXME FIXME FIXME   why is the same value assinged to three different members of the structure?
             currp += resSize;
             hostInfoReply->hostMatrix[i].windows       = (char *)currp; // FIXME FIXME FIXME FIXME   why is the same value assinged to three different members of the structure?
             currp += MAX_LINE_LEN;
         }
     }
     
-    for ( u_long i = 0; i < hostInfoReply->nHost; i++) {
+    for ( unsigned long i = 0; i < hostInfoReply->nHost; i++) {
         
         status = xdr_arrayElement (xdrs, (char *) &hostInfoReply->hostMatrix[i], hdr, xdr_shortHInfo, (char *) &hostInfoReply->nIndex);
         if (XDR_DECODE == xdrs->x_op && !status) {
@@ -363,7 +358,7 @@ xdr_hostInfoReply (XDR *xdrs, struct hostInfoReply *hostInfoReply, struct LSFHea
         }
     }
 
-    for ( u_long i = 0; i < hostInfoReply->nHost; i++) {
+    for ( unsigned long i = 0; i < hostInfoReply->nHost; i++) {
         if (!xdr_int (xdrs, (int *) &(hostInfoReply->hostMatrix[i].maxMem))) {
 
             if (xdrs->x_op == XDR_DECODE) {
@@ -387,10 +382,10 @@ xdr_shortHInfo (XDR *xdrs, struct shortHInfo *shortHInfo, struct LSFHeader *hdr,
     unsigned int mIndx = 0;
     unsigned int mem   = 0;
     unsigned int cpus  = 0;
-    unsigned int a = 0;
-    unsigned int    b = 0;
+    unsigned int a     = 0;
+    unsigned int b     = 0;
     //    int     i = 0;
-    long *nIndicies = 0;
+    long *nIndicies    = 0;
     *nIndicies = atol( nIndex );
     
     assert( hdr->length );
@@ -478,26 +473,27 @@ xdr_shortHInfo (XDR *xdrs, struct shortHInfo *shortHInfo, struct LSFHeader *hdr,
         shortHInfo->maxCpus = (b >> 16);
     }
     
-    for (int i = 0; i < *nIndicies; i++)  {
-        if (!xdr_float (xdrs, &shortHInfo->busyThreshold[i])) {
+    for ( unsigned int i = 0; i < *nIndicies; i++)  {
+        if (!xdr_double( xdrs, &shortHInfo->busyThreshold[i] ) ) {
             return FALSE;
         }
     }
     
-    if (!xdr_int (xdrs, (int *)&shortHInfo->flags) ||
-        !xdr_int (xdrs, (int *)&shortHInfo->rexPriority) ||
-        !xdr_int (xdrs, (int *)&shortHInfo->nDisks) ||
-        !xdr_int (xdrs, (int *)&shortHInfo->maxSwap) ||
-        !xdr_int (xdrs, (int *)&shortHInfo->maxTmp))
+    if ( !xdr_int (xdrs, &shortHInfo->flags)       ||
+         !xdr_int (xdrs, &shortHInfo->rexPriority) ||
+         !xdr_u_int (xdrs, &shortHInfo->nDisks)      ||
+         !xdr_u_int (xdrs, &shortHInfo->maxSwap)     ||
+         !xdr_u_int (xdrs, &shortHInfo->maxTmp)
+       )
     {
         return FALSE;
     }
     
-    if (!xdr_int (xdrs, &shortHInfo->nRInt)) {
+    if (!xdr_u_int (xdrs, &shortHInfo->nRInt)) {
         return FALSE;
     }
     
-    for (int i = 0; i < shortHInfo->nRInt; i++) {
+    for ( unsigned int i = 0; i < shortHInfo->nRInt; i++) {
         if (!xdr_u_int (xdrs, &shortHInfo->resBitMaps[i])) {
             return FALSE;
         }
@@ -510,21 +506,19 @@ xdr_shortHInfo (XDR *xdrs, struct shortHInfo *shortHInfo, struct LSFHeader *hdr,
     return TRUE;
 }
 
-static bool_t
+bool_t
 xdr_shortLsInfo (XDR * xdrs, struct shortLsInfo *shortLInfo, struct LSFHeader *hdr)
 {
-    char *sp;
-    static float *currp;
-    static char *memp;
+    char *sp = NULL;
+    static float *currp = 0;
+    static char *memp = NULL;
+
+    assert( hdr ); // NOFIX hdr is not used anywhere in this function.
     
-    assert( hdr->length );
-    
-    assert( shortLInfo->nRes    >= 0 );
-    assert( shortLInfo->nTypes  >= 0 );
-    assert( shortLInfo->nModels >= 0 );
-    if (!xdr_int (xdrs, (int *)&shortLInfo->nRes) ||
-        !xdr_int (xdrs, (int *)&shortLInfo->nTypes) ||
-        !xdr_int (xdrs, (int *)&shortLInfo->nModels))
+    if ( !xdr_int (xdrs, (int *)&shortLInfo->nRes    ) ||
+         !xdr_int (xdrs, (int *)&shortLInfo->nTypes  ) ||
+         !xdr_int (xdrs, (int *)&shortLInfo->nModels )
+       )
     {
         return FALSE;
     }
@@ -534,7 +528,7 @@ xdr_shortLsInfo (XDR * xdrs, struct shortLsInfo *shortLInfo, struct LSFHeader *h
             free (memp);
         }
         
-        memp = (char *) malloc ((shortLInfo->nRes + shortLInfo->nTypes + shortLInfo->nModels) * MAX_LSF_NAME_LEN + shortLInfo->nRes * sizeof (char *));
+        memp = malloc ((shortLInfo->nRes + shortLInfo->nTypes + shortLInfo->nModels) * MAX_LSF_NAME_LEN + shortLInfo->nRes * sizeof (char *));
         if ( NULL == memp && ENOMEM == errno ) {
             return FALSE;
         }
@@ -543,24 +537,24 @@ xdr_shortLsInfo (XDR * xdrs, struct shortLsInfo *shortLInfo, struct LSFHeader *h
         shortLInfo->resName = (char **) currp;  // FIXME FIXME FIXME FIXME FIXME lookup in debugger
         currp += shortLInfo->nRes * sizeof (char *);
         
-        for ( u_long i = 0; i < shortLInfo->nRes; i++, currp += MAX_LSF_NAME_LEN) {
+        for ( unsigned long i = 0; i < shortLInfo->nRes; i++, currp += MAX_LSF_NAME_LEN) {
             shortLInfo->resName[i] = (char *)currp;     // FIXME FIXME FIXME FIXME FIXME lookup in debugger
         }
         
-        for ( u_long i = 0; i < shortLInfo->nTypes; i++, currp += MAX_LSF_NAME_LEN) {
+        for ( unsigned long i = 0; i < shortLInfo->nTypes; i++, currp += MAX_LSF_NAME_LEN) {
             shortLInfo->hostTypes[i] = (char *)currp;   // FIXME FIXME FIXME FIXME FIXME lookup in debugger
         }
         
-        for ( u_long i = 0; i < shortLInfo->nModels; i++, currp += MAX_LSF_NAME_LEN) {
+        for ( unsigned long i = 0; i < shortLInfo->nModels; i++, currp += MAX_LSF_NAME_LEN) {
             shortLInfo->hostModels[i] = (char *)currp;  // FIXME FIXME FIXME FIXME FIXME lookup in debugger
         }
     }
     
-    for ( u_long i = 0; i < shortLInfo->nRes; i++) {
+    for ( unsigned long i = 0; i < shortLInfo->nRes; i++) {
 
         sp = shortLInfo->resName[i];
         if (xdrs->x_op == XDR_DECODE) {
-            sp[0] = '\0';
+            sp = NULL;
         }
     
         if (!xdr_string (xdrs, &sp, MAX_LSF_NAME_LEN)) {
@@ -568,11 +562,11 @@ xdr_shortLsInfo (XDR * xdrs, struct shortLsInfo *shortLInfo, struct LSFHeader *h
         }
     }
     
-    for ( u_long i = 0; i < shortLInfo->nTypes; i++) {
+    for ( unsigned long i = 0; i < shortLInfo->nTypes; i++) {
 
         sp = shortLInfo->hostTypes[i];
         if (xdrs->x_op == XDR_DECODE) {
-            sp[0] = '\0';
+            sp = NULL;
         }
         
         if (!xdr_string (xdrs, &sp, MAX_LSF_NAME_LEN)) {
@@ -580,11 +574,11 @@ xdr_shortLsInfo (XDR * xdrs, struct shortLsInfo *shortLInfo, struct LSFHeader *h
         }
     }
     
-    for (u_long i = 0; i < shortLInfo->nModels; i++) {
+    for (unsigned long i = 0; i < shortLInfo->nModels; i++) {
 
         sp = shortLInfo->hostModels[i];
         if (xdrs->x_op == XDR_DECODE) {
-            sp[0] = '\0';
+            sp = NULL;
         }
         
         if (!xdr_string (xdrs, &sp, MAX_LSF_NAME_LEN)) {
@@ -592,7 +586,7 @@ xdr_shortLsInfo (XDR * xdrs, struct shortLsInfo *shortLInfo, struct LSFHeader *h
         }
     }
     
-    for (u_long i = 0; i < shortLInfo->nModels; i++) {
+    for (unsigned long i = 0; i < shortLInfo->nModels; i++) {
         if (!xdr_double( xdrs, &shortLInfo->cpuFactors[i] ) ) {
             return FALSE;
         }
@@ -604,20 +598,18 @@ xdr_shortLsInfo (XDR * xdrs, struct shortLsInfo *shortLInfo, struct LSFHeader *h
 bool_t
 xdr_limLock (XDR *xdrs, struct limLock *limLockPtr, struct LSFHeader *hdr)
 {
-    char *sp;
+    char *sp = NULL;
     
     assert( hdr->length );
     
     sp = limLockPtr->lsfUserName;
-    if (xdrs->x_op == XDR_DECODE)
-        {
-        sp[0] = '\0';
-        }
-    
-    assert( limLockPtr->uid >= 0 );
+    if (xdrs->x_op == XDR_DECODE) {
+        sp = NULL;
+    }
     if (!xdr_int (xdrs, &limLockPtr->on)
         || !xdr_time_t (xdrs, &limLockPtr->time)
-        || !xdr_int (xdrs, (int *)&limLockPtr->uid))
+        || !xdr_int (xdrs, (int *)&limLockPtr->uid)
+       )
     {
         return FALSE;
     }
@@ -629,25 +621,25 @@ xdr_limLock (XDR *xdrs, struct limLock *limLockPtr, struct LSFHeader *hdr)
     return TRUE;
 }
 
-static bool_t
+bool_t
 xdr_resItem (XDR * xdrs, struct resItem *resItem, struct LSFHeader *hdr)
 {
-    char *sp, *sp1;
+    char *sp  = NULL;
+    char *sp1 = NULL;
     
     assert( hdr->length );
     
-    sp = resItem->des;
-    sp1 = resItem->name;
-    if (xdrs->x_op == XDR_DECODE)
-        {
-        sp[0] = '\0';
-        sp1[0] = '\0';
-        }
+    sp  = strdup( resItem->des );
+    sp1 = strdup( resItem->name );
+    if (xdrs->x_op == XDR_DECODE) {
+        sp  = NULL;
+        sp1 = NULL;
+    }
     if (!xdr_string (xdrs, &sp1, MAX_LSF_NAME_LEN) ||
-        !xdr_string (xdrs, &sp, MAXRESDESLEN) ||
-        !xdr_enum (xdrs, (int *) &resItem->valueType) ||
-        !xdr_enum (xdrs, (int *) &resItem->orderType) ||
-        !xdr_int (xdrs, &resItem->flags) || !xdr_int (xdrs, &resItem->interval))
+        !xdr_string (xdrs, &sp,  MAX_RESDES_LEN)   ||
+        !xdr_enum (xdrs,(enum_t *) &resItem->valueType) ||
+        !xdr_enum (xdrs,(enum_t *) &resItem->orderType) ||
+        !xdr_int (xdrs, &resItem->flags) || !xdr_u_int (xdrs, &resItem->interval))
         return FALSE;
     return TRUE;
     
@@ -665,7 +657,6 @@ xdr_lsInfo (XDR * xdrs, struct lsInfo * lsInfoPtr, struct LSFHeader *hdr)
     
     if (xdrs->x_op == XDR_DECODE) {
         FREEUP (memp);
-        assert( lsInfoPtr->nRes >= 0);
         lsInfoPtr->resTable = malloc ( lsInfoPtr->nRes * sizeof (struct resItem) );
         if ( NULL == lsInfoPtr->resTable && ENOMEM == errno ) {
             return FALSE;
@@ -692,7 +683,7 @@ xdr_lsInfo (XDR * xdrs, struct lsInfo * lsInfoPtr, struct LSFHeader *hdr)
     for ( unsigned int i = 0; i < lsInfoPtr->nTypes; i++) {
         sp = lsInfoPtr->hostTypes[i];
         if (xdrs->x_op == XDR_DECODE) {
-            sp[0] = '\0';
+            sp = NULL;
         }
         if (!xdr_string (xdrs, &sp, MAX_LSF_NAME_LEN)) {
             if (xdrs->x_op == XDR_DECODE) {
@@ -712,7 +703,7 @@ xdr_lsInfo (XDR * xdrs, struct lsInfo * lsInfoPtr, struct LSFHeader *hdr)
     for ( unsigned int i = 0; i < lsInfoPtr->nModels; i++) {
         sp = lsInfoPtr->hostModels[i];
         if (xdrs->x_op == XDR_DECODE) {
-            sp[0] = '\0';
+            sp = NULL;
         }
         if (!xdr_string (xdrs, &sp, MAX_LSF_NAME_LEN)) {
             if (xdrs->x_op == XDR_DECODE) {
@@ -741,7 +732,7 @@ xdr_lsInfo (XDR * xdrs, struct lsInfo * lsInfoPtr, struct LSFHeader *hdr)
     for ( unsigned int i = 0; i < lsInfoPtr->nModels; ++i) {
         sp = lsInfoPtr->hostArchs[i];
         if (xdrs->x_op == XDR_DECODE) {
-            sp[0] = '\0';
+            sp = NULL;
         }
         if (!xdr_string (xdrs, &sp, MAX_LSF_NAME_LEN)) {
             if (xdrs->x_op == XDR_DECODE) {
@@ -767,13 +758,13 @@ xdr_lsInfo (XDR * xdrs, struct lsInfo * lsInfoPtr, struct LSFHeader *hdr)
 bool_t
 xdr_masterInfo (XDR * xdrs, struct masterInfo * mInfoPtr, struct LSFHeader * hdr)
 {
-    char *sp;
+    char *sp = NULL;
     
     assert( hdr->length);
     
     sp = mInfoPtr->hostName;
     if (xdrs->x_op == XDR_DECODE) {
-        sp[0] = '\0';
+        sp = NULL;
     }
     
     if (!xdr_string (xdrs, &sp, MAXHOSTNAMELEN)) {
@@ -796,8 +787,10 @@ xdr_clusterInfoReq (XDR *xdrs, struct clusterInfoReq *clusterInfoReq, struct LSF
 {
     char line[MAX_LINE_LEN];
     char *sp = line;
+
+    memset( line, '\0', strlen ( line ) );
     
-    assert( hdr->length);
+    assert( hdr->length );
     
     if (xdrs->x_op == XDR_DECODE) {
         if (!xdr_string (xdrs, &sp, MAX_LINE_LEN)) {
@@ -808,34 +801,31 @@ xdr_clusterInfoReq (XDR *xdrs, struct clusterInfoReq *clusterInfoReq, struct LSF
             return FALSE;
         }
     }
-    else
-    {
+    else {
         if (!xdr_string (xdrs, &clusterInfoReq->resReq, MAX_LINE_LEN)) {
             return FALSE;
         }
     }
     
-    if (!xdr_int (xdrs, &clusterInfoReq->listsize) || !xdr_int (xdrs, &clusterInfoReq->options))
-    {
+    if (!xdr_u_int (xdrs, &clusterInfoReq->listsize) || !xdr_int (xdrs, &clusterInfoReq->options)) {
         if (xdrs->x_op == XDR_DECODE) {
             free (clusterInfoReq->resReq);
         }
         return FALSE;
     }
     
-    if (clusterInfoReq->listsize && xdrs->x_op == XDR_DECODE)
-    {
-    assert( clusterInfoReq->listsize <= INT_MAX );
-        clusterInfoReq->clusters = (char **) calloc ( (u_long) clusterInfoReq->listsize, sizeof (char *));
+    if (clusterInfoReq->listsize && xdrs->x_op == XDR_DECODE) {
+
+        assert( clusterInfoReq->listsize <= INT_MAX );
+        clusterInfoReq->clusters = calloc ( clusterInfoReq->listsize, sizeof (char *));
         if( NULL == clusterInfoReq->clusters && ENOMEM == errno ) {
             free (clusterInfoReq->resReq);
             return FALSE;
         }
     }
     
-    assert( clusterInfoReq->listsize >= 0);
-    if (!xdr_array_string (xdrs, clusterInfoReq->clusters, MAX_LSF_NAME_LEN, clusterInfoReq->listsize))
-    {
+    assert( clusterInfoReq->listsize <= INT_MAX );
+    if (!xdr_array_string (xdrs, clusterInfoReq->clusters, MAX_LSF_NAME_LEN, clusterInfoReq->listsize)) { // FIXME FIXME NOFIX unless you can find an xdr_array call that takes unsigned int
         if (xdrs->x_op == XDR_DECODE) {
             FREEUP (clusterInfoReq->resReq);
             FREEUP (clusterInfoReq->clusters);
@@ -876,7 +866,7 @@ xdr_clusterInfoReply (XDR * xdrs, struct clusterInfoReply * clusterInfoReply, st
         clusterInfoReply->clusterMatrix = (struct shortCInfo *) memp; // FIXME FIXME FIXME FIXME FIXME member-for-member assignment!
     }
 
-    for ( u_long i = 0; i < clusterInfoReply->nClusters; i++) {
+    for ( unsigned long i = 0; i < clusterInfoReply->nClusters; i++) {
 
         bool_t status = 0;
         status = xdr_arrayElement (xdrs, (char *) &clusterInfoReply->clusterMatrix[i], hdr, xdr_shortCInfo);
@@ -886,7 +876,8 @@ xdr_clusterInfoReply (XDR * xdrs, struct clusterInfoReply * clusterInfoReply, st
             if (xdrs->x_op == XDR_DECODE) {
                 nClusters = 0;
                 assert( i <= INT_MAX) ;
-                freeUpMemp (memp, (int) i - 1);
+                assert( i > 1 ) ;
+                freeUpMemp (memp, (unsigned int) i - 1); // FIXME FIXME FIXME 
             }
             
             return FALSE;
@@ -900,20 +891,20 @@ xdr_clusterInfoReply (XDR * xdrs, struct clusterInfoReply * clusterInfoReply, st
     return TRUE;
 }
 
-static void
-freeUpMemp (char *memp, int nClus)
+void
+freeUpMemp (void *memp, unsigned int nClus)
 {
-    struct shortCInfo *clusterMatrix;
+    struct shortCInfo *clusterMatrix = NULL;
 
     clusterMatrix = (struct shortCInfo *) memp; // FIXME FIXME FIXME FIXME FIXME member-for-member assignment!
-    for (int i = 0; i < nClus; i++) {
+    for ( unsigned int i = 0; i < nClus; i++) {
 
         FREEUP (clusterMatrix[i].resBitMaps);
         FREEUP (clusterMatrix[i].hostTypeBitMaps);
         FREEUP (clusterMatrix[i].hostModelBitMaps);
 
         if (clusterMatrix[i].nAdmins > 0) {
-            for (u_long j = 0; j < clusterMatrix[i].nAdmins; j++) {
+            for (unsigned long j = 0; j < clusterMatrix[i].nAdmins; j++) {
                 FREEUP (clusterMatrix[i].admins[j]);
             }
             
@@ -928,7 +919,9 @@ freeUpMemp (char *memp, int nClus)
 bool_t
 xdr_shortCInfo (XDR * xdrs, struct shortCInfo *clustInfoPtr, struct LSFHeader *hdr)
 {
-    char *sp1, *sp2, *sp3;
+    char *sp1 = NULL;
+    char *sp2 = NULL;
+    char *sp3 = NULL;
     
     assert( hdr->length );
     
@@ -962,7 +955,6 @@ xdr_shortCInfo (XDR * xdrs, struct shortCInfo *clustInfoPtr, struct LSFHeader *h
         return FALSE;
     }
     
-    assert( clustInfoPtr->nAdmins >= 0 );
     if (!xdr_u_int (xdrs, &clustInfoPtr->nAdmins)) {
         return FALSE;
     }
@@ -986,7 +978,7 @@ xdr_shortCInfo (XDR * xdrs, struct shortCInfo *clustInfoPtr, struct LSFHeader *h
         }
     }
     
-    for ( u_long i = 0; i < clustInfoPtr->nAdmins; i++) {
+    for ( unsigned long i = 0; i < clustInfoPtr->nAdmins; i++) {
         if (!(xdr_var_string (xdrs, &clustInfoPtr->admins[i]) && xdr_u_int (xdrs, &clustInfoPtr->adminIds[i]))) {
             return FALSE;
         }
@@ -1036,7 +1028,6 @@ xdr_shortCInfo (XDR * xdrs, struct shortCInfo *clustInfoPtr, struct LSFHeader *h
     
     if (xdrs->x_op == XDR_DECODE && clustInfoPtr->nModels) {
         
-        assert(clustInfoPtr->nModels >= 0);
         clustInfoPtr->hostModelBitMaps = malloc ( GET_INTNUM( clustInfoPtr->nModels ) * sizeof( unsigned int ) );
         if ( NULL == clustInfoPtr->hostModelBitMaps && ENOMEM == errno ) {
             clustInfoPtr->nModels = 0;
@@ -1116,7 +1107,7 @@ xdr_cInfo (XDR *xdrs, struct cInfo *cInfo, struct LSFHeader *hdr)
         }
     }
     
-    for (u_long i = 0; i < cInfo->nAdmins; i++) {
+    for (unsigned long i = 0; i < cInfo->nAdmins; i++) {
         if (!(xdr_var_string (xdrs, &cInfo->admins[i]) && xdr_int (xdrs, &cInfo->adminIds[i])))  {
             return FALSE;
         }
@@ -1142,8 +1133,7 @@ xdr_cInfo (XDR *xdrs, struct cInfo *cInfo, struct LSFHeader *hdr)
     
     if (cInfo->numIndx > 0 && xdrs->x_op == XDR_DECODE) {
         
-        assert( cInfo->numIndx >= 0);
-        cInfo->loadIndxNames = (char **) calloc ( (u_long)cInfo->numIndx, sizeof (char *));
+        cInfo->loadIndxNames = calloc ( cInfo->numIndx, sizeof (char *));
         if (NULL == cInfo->loadIndxNames && ENOMEM == errno ) {
             return FALSE;
         }
@@ -1165,7 +1155,6 @@ xdr_cInfo (XDR *xdrs, struct cInfo *cInfo, struct LSFHeader *hdr)
     }
     
     if (xdrs->x_op == XDR_DECODE && cInfo->nTypes) {
-        assert( cInfo->nTypes >=0 );
         cInfo->hostTypeBitMaps = malloc( GET_INTNUM( cInfo->nTypes ) * sizeof( unsigned int ) );
         if ( NULL == cInfo->hostTypeBitMaps && ENOMEM == errno ) {
             cInfo->nTypes = 0;
@@ -1208,9 +1197,11 @@ xdr_resourceInfoReq (XDR * xdrs, struct resourceInfoReq * resourceInfoReq, struc
 {
 
     assert( hdr->length );
+
+    char *kot =  strdup(resourceInfoReq->hostname); // FIXME FIXME FIXME FIXME throw this in the debugger
     
     if (xdrs->x_op == XDR_DECODE) {
-        resourceInfoReq->hostName         = NULL;
+        resourceInfoReq->hostname         = NULL;
         resourceInfoReq->resourceNames    = NULL;
         resourceInfoReq->numResourceNames = 0;
     }
@@ -1219,9 +1210,8 @@ xdr_resourceInfoReq (XDR * xdrs, struct resourceInfoReq * resourceInfoReq, struc
         return FALSE;
     }
     
-    if (xdrs->x_op == XDR_DECODE && resourceInfoReq->numResourceNames > 0)
-        {
-        assert( resourceInfoReq->numResourceNames >= 0);
+    if (xdrs->x_op == XDR_DECODE && resourceInfoReq->numResourceNames > 0) {
+
         resourceInfoReq->resourceNames = malloc( resourceInfoReq->numResourceNames * sizeof( resourceInfoReq->resourceNames ) + 1 );
         if( NULL == resourceInfoReq->resourceNames  && ENOMEM == errno ) {
             lserrno = LSE_MALLOC;
@@ -1237,7 +1227,8 @@ xdr_resourceInfoReq (XDR * xdrs, struct resourceInfoReq * resourceInfoReq, struc
         }
     }
     
-    if (!xdr_var_string (xdrs, &resourceInfoReq->hostName)) {
+    // if (!xdr_var_string (xdrs, &resourceInfoReq->hostname)) {
+    if (!xdr_var_string (xdrs, &kot)) {
         return FALSE;
     }
     
@@ -1247,7 +1238,6 @@ xdr_resourceInfoReq (XDR * xdrs, struct resourceInfoReq * resourceInfoReq, struc
     }
 
     return TRUE;
-    
 }
 
 bool_t
@@ -1266,7 +1256,6 @@ xdr_resourceInfoReply (XDR * xdrs, struct resourceInfoReply * resourceInfoReply,
     
     if (xdrs->x_op == XDR_DECODE && resourceInfoReply->numResources > 0) {
         
-        assert( resourceInfoReply->numResources >= 0);
         resourceInfoReply->resources = malloc( resourceInfoReply->numResources * sizeof( struct lsSharedResourceInfo ) );
         if ( NULL == resourceInfoReply->resources && resourceInfoReply->resources && ENOMEM == errno ) {
             lserrno = LSE_MALLOC;
@@ -1289,7 +1278,7 @@ xdr_resourceInfoReply (XDR * xdrs, struct resourceInfoReply * resourceInfoReply,
     return TRUE;
 }
 
-static bool_t
+bool_t
 xdr_lsResourceInfo (XDR * xdrs, struct lsSharedResourceInfo *lsResourceInfo, struct LSFHeader *hdr)
 {
     int status = 0;
@@ -1306,7 +1295,6 @@ xdr_lsResourceInfo (XDR * xdrs, struct lsSharedResourceInfo *lsResourceInfo, str
     
     if (xdrs->x_op == XDR_DECODE && lsResourceInfo->nInstances > 0) {
 
-        assert( lsResourceInfo->nInstances >= 0 );
         lsResourceInfo->instances = malloc( lsResourceInfo->nInstances * sizeof (struct lsSharedResourceInstance));
         if ( NULL == lsResourceInfo->instances && ENOMEM == errno ) {
             lserrno = LSE_MALLOC;
@@ -1329,7 +1317,7 @@ xdr_lsResourceInfo (XDR * xdrs, struct lsSharedResourceInfo *lsResourceInfo, str
     return TRUE;
 }
 
-static bool_t
+bool_t
 xdr_lsResourceInstance (XDR * xdrs, struct lsSharedResourceInstance *instance, struct LSFHeader *hdr)
 {
     assert( hdr->length );
@@ -1340,22 +1328,21 @@ xdr_lsResourceInstance (XDR * xdrs, struct lsSharedResourceInstance *instance, s
         instance->nHosts = 0;
     }
     
-    if (!(xdr_var_string (xdrs, &instance->value) && xdr_u_int (xdrs, &instance->nHosts))) {
+    if (!(xdr_var_string (xdrs, &instance->value) && xdr_u_int (xdrs, (unsigned int *)&instance->nHosts))) {
         return FALSE;
     }
     
     if (xdrs->x_op == XDR_DECODE && instance->nHosts > 0) {
         
-        assert( instance->nHosts >= 0 );
-        instance->hostList = (char **) malloc ( (u_long)instance->nHosts * sizeof (char *));
+        instance->hostList = malloc ( instance->nHosts * sizeof (char *));
         if ( NULL == instance->hostList && ENOMEM == errno ) {
             lserrno = LSE_MALLOC;
             return FALSE;
         }
     }
     
-    assert( instance->nHosts >= 0 );
-    if (!xdr_array_string (xdrs, instance->hostList, MAXHOSTNAMELEN, instance->nHosts)) {
+    assert( instance->nHosts <= INT_MAX );
+    if (!xdr_array_string (xdrs, instance->hostList, MAXHOSTNAMELEN, (unsigned int)instance->nHosts)) {
         if (xdrs->x_op == XDR_DECODE) {
             FREEUP (instance->hostList);
             instance->nHosts = 0;
@@ -1377,27 +1364,29 @@ xdr_lsResourceInstance (XDR * xdrs, struct lsSharedResourceInstance *instance, s
 bool_t
 xdr_hostEntry (XDR * xdrs, struct hostEntry *hPtr, struct LSFHeader *hdr)
 {
-    char *s;
+    char *s = NULL;
     
     assert( hdr->length );
     
-    s = hPtr->hostName;
+    s = strdup(hPtr->hostName);
     if (!xdr_string (xdrs, &s, MAXHOSTNAMELEN)) {
         return FALSE;
     }
     
-    s = hPtr->hostModel;
-    if (!xdr_string (xdrs, &s, MAX_LSF_NAME_LEN))
-        return FALSE;
-    
-    s = hPtr->hostType;
+    s = strdup(hPtr->hostModel);
     if (!xdr_string (xdrs, &s, MAX_LSF_NAME_LEN)) {
         return FALSE;
     }
     
-    if( !xdr_int(   xdrs, &hPtr->rcv )       ||
-        !xdr_int(   xdrs, &hPtr->nDisks )    ||
-        !xdr_float( xdrs, &hPtr->cpuFactor ) )
+    s = strdup(hPtr->hostType);
+    if (!xdr_string (xdrs, &s, MAX_LSF_NAME_LEN)) {
+        return FALSE;
+    }
+    
+    if( !xdr_int(    xdrs, &hPtr->rcv )     ||
+        !xdr_u_int(  xdrs, &hPtr->nDisks )  ||
+        !xdr_double( xdrs, &hPtr->cpuFactor ) 
+    )
     {
         return FALSE;
     }
@@ -1405,39 +1394,37 @@ xdr_hostEntry (XDR * xdrs, struct hostEntry *hPtr, struct LSFHeader *hdr)
     /* this must not be zero... somehow the caller
      * must make sure it is at least 11...
      */
-    if (!xdr_int (xdrs, &hPtr->numIndx)) {
+    if (!xdr_u_int (xdrs, &hPtr->numIndx)) {
         return FALSE;
     }
     
     if (xdrs->x_op == XDR_DECODE && hPtr->numIndx > 0) {
 
-        assert( hPtr->numIndx >= 0);
-        hPtr->busyThreshold = (float *)calloc ((u_long)hPtr->numIndx, sizeof (float));
+        hPtr->busyThreshold = calloc ( hPtr->numIndx, sizeof (float));
         if (NULL == hPtr->busyThreshold && ENOMEM == errno ) {
             return FALSE;
         }
     }
     
-    for (int cc = 0; cc < hPtr->numIndx; cc++) {
-        if (!xdr_float (xdrs, &hPtr->busyThreshold[cc])) {
+    for ( unsigned int cc = 0; cc < hPtr->numIndx; cc++) {
+        if (!xdr_double (xdrs, &hPtr->busyThreshold[cc])) {
             return FALSE;
         }
     }
         
     
-    if (!xdr_int (xdrs, &hPtr->nRes)) {
+    if (!xdr_u_int (xdrs, &hPtr->nRes)) {
         return FALSE;
     }
     
     if (xdrs->x_op == XDR_DECODE && hPtr->nRes > 0) {
-        assert( hPtr->nRes >= 0);
-        hPtr->resList = (char **)calloc( (u_long)hPtr->nRes, sizeof (char *));
+        hPtr->resList = calloc( hPtr->nRes, sizeof (char *));
         if( NULL == hPtr->resList && ENOMEM == errno) {
             return FALSE;
         }
     }
     
-    for ( int cc = 0; cc < hPtr->nRes; cc++) {
+    for ( unsigned int cc = 0; cc < hPtr->nRes; cc++) {
         if (!xdr_var_string (xdrs, &hPtr->resList[cc])) {
             return FALSE;
         }

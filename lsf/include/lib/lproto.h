@@ -59,7 +59,7 @@
 
 #define XDR_DECODE_SIZE_(a) (a)
 
-#define GET_INTNUM(i) ((i)/INTEGER_BITS + 1)
+// #define GET_INTNUM(i) ((i)/INTEGER_BITS + 1)
 #define SET_BIT(bitNo, integers)   integers[(bitNo)/INTEGER_BITS] |= (1<< (bitNo)%INTEGER_BITS);
 #define CLEAR_BIT(bitNo, integers) integers[(bitNo)/INTEGER_BITS] &= ~(1<< (bitNo)%INTEGER_BITS);
 #define TEST_BIT(bitNo, integers, isSet)  {  \
@@ -158,11 +158,11 @@ const char LSF_LIM_ERESOURCE_LOCATION[] = "lim_vcl_get_eres_loc";
 const char LSF_LIM_ERESOURCE_VALUE[]    = "lim_vcl_get_eres_val";
 const char LSF_LIM_ERES_TYPE[]          = "!";
 
-
-
 const char LS_EXEC_T[] = "LS_EXEC_T";
 
 char *LSTMPDIR = NULL;
 
 const unsigned short BIND_RETRY_TIMES = 100;
+const unsigned int   NET_INTSIZE_     = 4;
+
 int sharedResConfigured_;

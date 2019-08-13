@@ -112,7 +112,7 @@ getEAuth (struct eauth *eauth, const char *host)
       return -1; // FIXME FIXME FIXME FIXME ALTER THIS FROM NEGATIVE TO APPROPRIATELLY POSITIVE
     }
 
-    if (ld.len == 0) {
+    if (ld.length == 0) {
 
       if (logclass & (LC_AUTH | LC_TRACE)) {
             ls_syslog (LOG_DEBUG, "runEAuth: <%s> got no data", path);
@@ -122,10 +122,10 @@ getEAuth (struct eauth *eauth, const char *host)
         return -1; // FIXME FIXME FIXME FIXME ALTER THIS FROM NEGATIVE TO APPROPRIATELLY POSITIVE
     }
 
-    if (ld.len > EAUTH_SIZE) {
+    if (ld.length > EAUTH_SIZE) {
 
         if (logclass & (LC_AUTH | LC_TRACE)) {
-            ls_syslog (LOG_DEBUG, "runEAuth: <%s> got too much data, size=%d", path, ld.len);
+            ls_syslog (LOG_DEBUG, "runEAuth: <%s> got too much data, size=%d", path, ld.length);
         }
 
         FREEUP (ld.data);
@@ -133,18 +133,18 @@ getEAuth (struct eauth *eauth, const char *host)
         return -1; // FIXME FIXME FIXME FIXME ALTER THIS FROM NEGATIVE TO APPROPRIATELLY POSITIVE
     }
 
-    memcpy (eauth->data, ld.data, ld.len);
-    eauth->data[ld.len] = '\0';
+    memcpy (eauth->data, ld.data, ld.length);
+    eauth->data[ld.length] = '\0';
     if (logclass & (LC_AUTH | LC_TRACE)) {
         ls_syslog (LOG_DEBUG, "runEAuth: <%s> got data=%s", path, ld.data);
     }
     
-    eauth->len = ld.len;
+    eauth->length = ld.length;
 
     FREEUP (ld.data);
     
     if (logclass & (LC_AUTH | LC_TRACE)) {
-        ls_syslog (LOG_DEBUG, "runEAuth: <%s> got len=%d", path, ld.len);
+        ls_syslog (LOG_DEBUG, "runEAuth: <%s> got length=%d", path, ld.length);
     }
 
   return 0;
@@ -187,10 +187,10 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
     eauth_aux_data   = getenv ("LSF_EAUTH_AUX_DATA");    // FIXME FIXME FIXME FIXME FIXME LSF_EAUTH_AUX_DATA must go to configure.ac
     eauth_aux_status = getenv ("LSF_EAUTH_AUX_STATUS");  // FIXME FIXME FIXME FIXME FIXME LSF_EAUTH_AUX_STATUS must go to configure.ac
 
-    assert( auth->k.eauth.len <= INT_MAX ); // FIXME FIXME why does it need to be less than INT_MAX?S
+    assert( auth->k.eauth.length <= INT_MAX ); // FIXME FIXME why does it need to be less than INT_MAX?S
     sprintf (uData, "%ud %ud %s %s %u %lu %s %s %s %s\n", auth->uid, auth->gid,
         auth->lsfUserName, inet_ntoa (from->sin_addr),
-            ntohs (from->sin_port), auth->k.eauth.len,
+            ntohs (from->sin_port), auth->k.eauth.length,
             (eauth_client ? eauth_client : "NULL"),
             (eauth_server ? eauth_server : "NULL"),
             (eauth_aux_data ? eauth_aux_data : "NULL"),
@@ -341,11 +341,11 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
         ls_syslog (LOG_DEBUG, "5514: %s: b_write_fix <%s> ok, cc=%ld, i=%d", __func__, uData, b_write_fix_returnvalue, uData_length);
     }
 
-    b_write_fix_returnvalue = b_write_fix (in[1], auth->k.eauth.data, (size_t) auth->k.eauth.len); // FIXME FIXME FIXME FIXME investigate the type of auth->k.eauth.len and figure out if len should be a size_t type. remove cast after you are done
-    if ( cc != auth->k.eauth.len)
+    b_write_fix_returnvalue = b_write_fix (in[1], auth->k.eauth.data, (size_t) auth->k.eauth.length); // FIXME FIXME FIXME FIXME investigate the type of auth->k.eauth.length and figure out if length should be a size_t type. remove cast after you are done
+    if ( cc != auth->k.eauth.length)
     {
          /* catgets 5515 */
-        ls_syslog (LOG_ERR, "5515: %s: b_write_fix <%s> failed, eauth.len=%d, cc=%ld", __func__, uData, auth->k.eauth.len, b_write_fix_returnvalue);
+        ls_syslog (LOG_ERR, "5515: %s: b_write_fix <%s> failed, eauth.length=%d, cc=%ld", __func__, uData, auth->k.eauth.length, b_write_fix_returnvalue);
         close (in[1]);
         close (out[0]);
         connected = FALSE;
@@ -353,7 +353,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
     }
 
     if (logclass & (LC_AUTH | LC_TRACE)) {
-        ls_syslog (LOG_DEBUG, "5516: %s: b_write_fix <%s> ok, eauth.len=%d, eauth.data=%.*s cc=%ld:", __func__, uData, auth->k.eauth.len, auth->k.eauth.len, auth->k.eauth.data, b_write_fix_returnvalue);
+        ls_syslog (LOG_DEBUG, "5516: %s: b_write_fix <%s> ok, eauth.length=%d, eauth.data=%.*s cc=%ld:", __func__, uData, auth->k.eauth.length, auth->k.eauth.length, auth->k.eauth.data, b_write_fix_returnvalue);
     }
 
     b_write_fix_returnvalue = b_read_fix (out[0], &ok, 1);
@@ -368,7 +368,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
 
     if (ok != '1') {
         /* catgets 5518 */
-        ls_syslog (LOG_ERR, "5518: %s: eauth <%s> len=%d failed, rc=%c", __func__, uData, auth->k.eauth.len, ok);
+        ls_syslog (LOG_ERR, "5518: %s: eauth <%s> length=%d failed, rc=%c", __func__, uData, auth->k.eauth.length, ok);
         return -1;  // FIXME FIXME FIXME FIXME ALTER THIS FROM NEGATIVE TO APPROPRIATELLY POSITIVE
     }
 

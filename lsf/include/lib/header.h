@@ -40,10 +40,10 @@
 //     pid_t  refCode; 
 // };
 struct LSFHeader { // FIXME FIXME FIXME FIXME FIXME ensure compatibility with Platform LSF
-    unsigned short version;
-    unsigned short reserved0;
+    unsigned int version;
+    unsigned int reserved0;
     pid_t reserved; // was gid_t 2019-07-03
-    // char paddin1[4];
+    char paddin1[4];
     size_t length;
     uint16_t opCode;
     // char   padding2[2];
@@ -55,16 +55,21 @@ struct LSFHeader { // FIXME FIXME FIXME FIXME FIXME ensure compatibility with Pl
 /* always use this macro to size up memory buffers
  * for protocol header.
  */
-// #define LSF_HEADER_LEN (sizeof(struct LSFHeader))
-const unsigned int LSF_HEADER_LEN = sizeof( struct LSFHeader ) ;
+#define LSF_HEADER_LEN (sizeof(struct LSFHeader))
+// const unsigned int LSF_HEADER_LEN = sizeof( struct LSFHeader ) ;
+// const unsigned int LSF_HEADER_LENGTH = sizeof( struct LSFHeader ) ;
+
+// enum {
+//     LSF_HEADER_LEN = LSF_HEADER_LENGTH
+// } kotkot;
 
 struct stringLen {
     const char *name;
-    size_t len;
+    size_t length;
 };
 
 struct lenData {
-    size_t len;
+    size_t length;
     char *data;
 };
 
@@ -87,7 +92,7 @@ struct lsfAuth
 
     union authBody {
         struct eauth {
-            size_t len;
+            size_t length;
             char data[EAUTH_SIZE];
         } eauth;
         int filler;

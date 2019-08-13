@@ -250,8 +250,7 @@ placement_ (char *resReq, struct decisionReq *placeReqPtr, char *fromhost, size_
 
     // numnames = 0;
     for (unsigned long i = 0; i < *numhosts; i++) {
-        assert( placeReply.placeInfo[i].numtask >= 0);
-        numnames += (unsigned long) placeReply.placeInfo[i].numtask;
+        numnames += placeReply.placeInfo[i].numtask;
     }
 
     if (hostnames) {
@@ -265,8 +264,10 @@ placement_ (char *resReq, struct decisionReq *placeReqPtr, char *fromhost, size_
     }
 
     for (unsigned long i = 0, j = 0; i < *numhosts; i++) {
-        for (int k = 0; k < placeReply.placeInfo[i].numtask; k++) {
-            hostnames[j++] = placeReply.placeInfo[i].hostName;
+        for (unsigned long k = 0; k < placeReply.placeInfo[i].numtask; k++) {
+            // hostnames[j++] = placeReply.placeInfo[i].hostName;
+            strcpy(hostnames[j], placeReply.placeInfo[i].hostName );
+            j++;
         }
     }
 

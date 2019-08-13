@@ -16,7 +16,7 @@ unsigned int expandList1_(char ***tolist, int num, int *bitmMaps, char **keys);
 unsigned int expandList_(char ***tolist, int mask, char **keys);
 int copyAdmins_(struct clusterInfo *clusPtr, struct shortCInfo *clusShort);
 struct clusterInfo *expandSCinfo(struct clusterInfoReply *clusterInfoReply);
-struct clusterInfo *ls_clusterinfo(char *resReq, unsigned int *numclusters, char **clusterList, int listsize, int options);
+struct clusterInfo *ls_clusterinfo(char *resReq, unsigned int *numclusters, char **clusterList, unsigned int listsize, int options);
 char               *ls_getmastername(void);
 char               *ls_getmastername2(void);
 int                 getname_(enum limReqCode limReqCode, char *name, size_t namesize);

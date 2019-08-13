@@ -287,12 +287,11 @@ expandSCinfo (struct clusterInfoReply *clusterInfoReply)
 }
 
 struct clusterInfo *
-ls_clusterinfo (char *resReq, unsigned int *numclusters, char **clusterList, int listsize, int options)
+ls_clusterinfo (char *resReq, unsigned int *numclusters, char **clusterList, unsigned int listsize, int options)
 {
     struct clusterInfoReq clusterInfoReq;
     static struct clusterInfoReply clusterInfoReply;
     struct shortLsInfo shortlsInfo;
-    int count = 0;
     int ret_val = 0;
 
     if (listsize != 0 && clusterList == NULL)
@@ -305,7 +304,7 @@ ls_clusterinfo (char *resReq, unsigned int *numclusters, char **clusterList, int
         return NULL;
     }
 
-    for (count = 0; count < listsize; count++) {
+    for ( unsigned int count = 0; count < listsize; count++) {
         ret_val = ls_isclustername (clusterList[count]);
         
         if (ret_val <= 0) {
@@ -327,7 +326,7 @@ ls_clusterinfo (char *resReq, unsigned int *numclusters, char **clusterList, int
 
     clusterInfoReq.clusters = clusterList;
     clusterInfoReq.listsize = listsize;
-    clusterInfoReq.options = options;
+    clusterInfoReq.options  = options;
 
     clusterInfoReply.shortLsInfo = &shortlsInfo;
     if (callLim_ (LIM_GET_CLUSINFO, &clusterInfoReq, xdr_clusterInfoReq, &clusterInfoReply, xdr_clusterInfoReply, NULL, 0, NULL) < 0) { 
@@ -383,7 +382,7 @@ getname_ (enum limReqCode limReqCode, char *name, size_t namesize)
     {
         struct stringLen str;
         str.name = name;
-        str.len = namesize;
+        str.length = namesize;
         if (callLim_ (limReqCode, NULL, NULL, &str, xdr_stringLen, NULL, _LOCAL_, NULL) < 0) {
             return -1;
         }
@@ -520,7 +519,7 @@ ls_getmodelfactor( const char *modelname )
     }
 
     str.name = strdup( modelname );
-    str.len = MAX_LSF_NAME_LEN;
+    str.length = MAX_LSF_NAME_LEN;
     if (callLim_ (LIM_GET_CPUF, &str, xdr_stringLen, cpuf, xdr_float, NULL, 0, NULL) < 0) {
         return NULL;
     }

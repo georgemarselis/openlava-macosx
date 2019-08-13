@@ -369,9 +369,9 @@ ls_loadadj (char *resreq, struct placeInfo *placeinfo, size_t listsize)
         
         // strcpy (placeinfo[i].hostName, placeinfo[i].hostName); // f
 
-        if (placeinfo[i].numtask < 0) {
-            placeinfo[i].numtask = 0;
-        }
+        // if (placeinfo[i].numtask < 0) {
+        //     placeinfo[i].numtask = 0;
+        // }
     }
 
     if (resreq != NULL) {

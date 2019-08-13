@@ -280,7 +280,7 @@ ls_rclose (int fd)
 
 
 unsigned int
-ls_rwrite (int fd, const char *buf, size_t len)
+ls_rwrite (int fd, const char *buf, size_t length)
 {
     struct {
         struct LSFHeader _;
@@ -299,14 +299,14 @@ ls_rwrite (int fd, const char *buf, size_t len)
     rh = ft[fd].host;
 
     req.fd = ft[fd].fd;
-    req.len = len;
+    req.length = length;
 
     if (lsSendMsg_ (rh->sock, RF_WRITE, 0, (char *) &req, (char *) &msgBuf, sizeof (struct LSFHeader) + sizeof (req),  xdr_rrdwrReq, b_write_fix, NULL) < 0) {
         return INT_MAX; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    assert( len <= LONG_MAX );
-    if (b_read_fix (rh->sock, strdup( buf ), len) != (long) len) {
+    assert( length <= LONG_MAX );
+    if (b_read_fix (rh->sock, strdup( buf ), length) != (long) length) {
         lserrno = LSE_MSG_SYS;
         return INT_MAX; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
@@ -328,7 +328,7 @@ ls_rwrite (int fd, const char *buf, size_t len)
 
 
 unsigned int
-ls_rread (int fd, const char *buf, size_t len)
+ls_rread (int fd, const char *buf, size_t length)
 {
     struct rrdwrReq req;
     struct LSFHeader hdr;
@@ -346,7 +346,7 @@ ls_rread (int fd, const char *buf, size_t len)
   rh = ft[fd].host;
 
   req.fd = ft[fd].fd;
-  req.len = len;
+  req.length = length;
 
     if (lsSendMsg_ (rh->sock, RF_READ, 0, (char *) &req, (char *) &msgBuf, sizeof (struct LSFHeader) + sizeof (req), xdr_rrdwrReq, b_write_fix, NULL) < 0) {
         return 255;
@@ -549,7 +549,7 @@ ls_rstat (const char *host, const char *fn, struct stat *st)
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    fnStr.len = MAX_FILENAME_LEN;
+    fnStr.length = MAX_FILENAME_LEN;
     fnStr.name = strdup( fn );
     if (lsSendMsg_ (rh->sock, RF_STAT, 0, (char *) &fnStr, buf, sizeof (struct LSFHeader) + MAX_FILENAME_LEN, xdr_stringLen, b_write_fix, NULL) < 0) { // FIXME FIXME suspicious cast
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
@@ -587,9 +587,9 @@ ls_rgetmnthost ( const char *host, const char *fn)
         return NULL;
     }
 
-    hostStr.len  = MAXHOSTNAMELEN;
+    hostStr.length  = MAXHOSTNAMELEN;
     hostStr.name = hostname;
-    fnStr.len    = MAX_FILENAME_LEN;
+    fnStr.length    = MAX_FILENAME_LEN;
     fnStr.name   = strdup( fn );
 
     if (lsSendMsg_ (rh->sock, RF_GETMNTHOST, 0, (char *) &fnStr, buf, sizeof (struct LSFHeader) + MAX_FILENAME_LEN, xdr_stringLen, b_write_fix, NULL) < 0) { // FIXME FIXME suspicious cast
@@ -674,9 +674,9 @@ ls_runlink (const char *host, const char *fn)
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
-    hostStr.len  = MAXHOSTNAMELEN;
+    hostStr.length  = MAXHOSTNAMELEN;
     hostStr.name = hostname;
-    fnStr.len    = MAX_FILENAME_LEN;
+    fnStr.length    = MAX_FILENAME_LEN;
     fnStr.name   = strdup( fn );
 
     if (lsSendMsg_ (rh->sock, RF_UNLINK, 0, (char *) &fnStr, buf, sizeof (struct LSFHeader) + MAX_FILENAME_LEN, xdr_stringLen, b_write_fix, NULL) < 0) { // FIXME FIXME suspicious cast

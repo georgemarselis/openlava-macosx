@@ -34,7 +34,7 @@ enum RSETENV {
 };
 
 // globals 
-int lsf_res_version               = -1;
+unsigned int lsf_res_version      =  0; // FIXME this was just int and init to -1 and i did that. why?
 unsigned int currentsocket_       =  0;
 unsigned int requestSN            =  0;
 unsigned int requestHighWaterMark =  0;

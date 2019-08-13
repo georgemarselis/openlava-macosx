@@ -392,14 +392,14 @@ enum LIM_ENUM {
 
 struct placeInfo
 {
-    int numtask;
-    char padding[4];
-    char *hostName;
+    unsigned long numtask;
+    // char padding[4];
+    const char *hostName;
 };
 
 struct hostLoad
 {
-    char *hostName;
+    const char *hostName;
     float *status;
     float *loadIndex;
 };
@@ -544,7 +544,7 @@ struct hostEntry
     const char *hostName; // [MAXHOSTNAMELEN];
     const char *hostModel; // [MAX_LSF_NAME_LEN];
     const char *hostType;  // [MAX_LSF_NAME_LEN];
-    const char *window;
+    char *window;
     char **resList;
 };
 

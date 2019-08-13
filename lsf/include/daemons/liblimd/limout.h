@@ -22,6 +22,48 @@
 #include "lsf.h"
 #include "lib/header.h"
 
+// #define   LIM_UNLOCK_USER      0
+// #define   LIM_LOCK_USER        1
+// #define   LIM_UNLOCK_MASTER    2
+// #define   LIM_LOCK_MASTER      3
+
+enum {
+    LIM_UNLOCK_USER   = 0,
+    LIM_LOCK_USER     = 1,
+    LIM_UNLOCK_MASTER = 2,
+    LIM_LOCK_MASTER   = 3
+} LIM_LOCK;
+
+// #define   LIM_LOCK_STAT_USER      0x1
+// #define   LIM_LOCK_STAT_MASTER    0x2
+
+enum {
+    LIM_LOCK_STAT_USER    = 0x1,
+    LIM_LOCK_STAT_MASTER = 0x2
+} LIM_LOCK_STAT;
+
+#define   LOCK_BY_USER(stat)     (((stat) & LIM_LOCK_STAT_USER) != 0)
+#define   LOCK_BY_MASTER(stat)   (((stat) & LIM_LOCK_STAT_MASTER) != 0)
+
+// #define   WINDOW_RETRY         0
+// #define   WINDOW_OPEN          1
+// #define   WINDOW_CLOSE         2
+// #define   WINDOW_FAIL          3
+
+enum {
+   WINDOW_RETRY = 0,
+   WINDOW_OPEN  = 1,
+   WINDOW_CLOSE = 2,
+   WINDOW_FAIL  = 3
+} WINDOW;
+
+// #define HINFO_SERVER    0x01
+// #define HINFO_SHARED_RESOURCE   0x02
+
+enum {
+    HINFO_SERVER          = 0x01,
+    HINFO_SHARED_RESOURCE = 0x02
+};
 
 enum ofWhat { 
     OF_ANY,
@@ -29,34 +71,8 @@ enum ofWhat {
     OF_TYPE
 };
 
-typedef enum ofWhat ofWhat_t;
+// typedef enum ofWhat ofWhat_t;
 
-struct decisionReq {
-    int options;
-    char hostType[MAX_LSF_NAME_LEN];
-    char resReq[MAX_LINE_LEN];
-    ofWhat_t ofWhat;
-    unsigned long numPrefs;
-    unsigned long numHosts;
-    char **preferredHosts;
-};
-
-struct placeReply
-{
-    size_t numHosts;
-    struct placeInfo *placeInfo;
-};
-
-struct jobXfer
-{
-    char resReq[MAX_LINE_LEN];
-    size_t numHosts;
-    struct placeInfo *placeInfo;
-};
-
-#define FIRST_LIM_PRIV      LIM_REBOOT
-#define FIRST_LIM_LIM       LIM_LOAD_UPD
-#define FIRST_INTER_CLUS    LIM_CLUST_INFO
 enum limReqCode
 {
     LIM_PLACEMENT       = 1,
@@ -118,6 +134,42 @@ enum limReplyCode
     LIME_KWN_MIGRANT    = 25
 };
 
+
+struct decisionReq {
+    int options;
+    char hostType[MAX_LSF_NAME_LEN];
+    char resReq[MAX_LINE_LEN];
+    enum ofWhat ofWhat;
+    unsigned long numPrefs;
+    unsigned long numHosts;
+    char **preferredHosts;
+};
+
+struct placeReply
+{
+    size_t numHosts;
+    struct placeInfo *placeInfo;
+};
+
+struct jobXfer
+{
+    char resReq[MAX_LINE_LEN];
+    size_t numHosts;
+    struct placeInfo *placeInfo;
+};
+
+
+// #define FIRST_LIM_PRIV      LIM_REBOOT
+// #define FIRST_LIM_LIM       LIM_LOAD_UPD
+// #define FIRST_INTER_CLUS    LIM_CLUST_INFO
+
+enum { 
+    FIRST_LIM_PRIV   = LIM_REBOOT,
+    FIRST_LIM_LIM    = LIM_LOAD_UPD,
+    FIRST_INTER_CLUS = LIM_CLUST_INFO 
+} FIRST;
+
+
 // #define LOAD_REPLY_SHARED_RESOURCE 0x1 // duplicate
 
 struct loadReply
@@ -129,9 +181,6 @@ struct loadReply
     char **indicies;
     struct hostLoad *loadMatrix;
 };
-
-#define HINFO_SERVER    0x01
-#define HINFO_SHARED_RESOURCE   0x02
 
 struct shortHInfo
 {
@@ -146,7 +195,7 @@ struct shortHInfo
     unsigned int resClass;
     int flags;
     int rexPriority;
-    int nRInt;
+    unsigned int nRInt;
     char padding[4];
     char *windows;
     unsigned int *resBitMaps;
@@ -179,7 +228,7 @@ struct hostInfoReply
 
 struct clusterInfoReq
 {
-    int listsize;
+    unsigned int listsize;
     int options;
     char *resReq;
     char **clusters;
@@ -263,22 +312,6 @@ struct clusterList
     unsigned int nClusters;
     char padding[4];
 };
-
-#define   LIM_UNLOCK_USER      0
-#define   LIM_LOCK_USER        1
-#define   LIM_UNLOCK_MASTER    2
-#define   LIM_LOCK_MASTER      3
-
-#define   LIM_LOCK_STAT_USER      0x1
-#define   LIM_LOCK_STAT_MASTER    0x2
-
-#define   LOCK_BY_USER(stat)     (((stat) & LIM_LOCK_STAT_USER) != 0)
-#define   LOCK_BY_MASTER(stat)   (((stat) & LIM_LOCK_STAT_MASTER) != 0)
-
-#define   WINDOW_RETRY         0
-#define   WINDOW_OPEN          1
-#define   WINDOW_CLOSE         2
-#define   WINDOW_FAIL          3
 
 struct limLock
 {
