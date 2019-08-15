@@ -48,7 +48,7 @@ xdr_LSFlong (XDR * xdrs, long *l)
 
     assert( longNum.high <= INT_MAX);
     assert ( longNum.low <= INT_MAX);
-    if (!(xdr_long (xdrs, (int *)&longNum.high) && xdr_long (xdrs, (int *)&longNum.low))) { // FIXME FIXME FIXME FIXME we got to revisit this
+    if (!(xdr_long (xdrs, &longNum.high) && xdr_long (xdrs, &longNum.low))) { // FIXME FIXME FIXME FIXME we got to revisit this
         return FALSE;
     }
     
@@ -77,143 +77,152 @@ xdr_LSFlong (XDR * xdrs, long *l)
 bool_t
 xdr_stat (XDR *xdrs, struct stat *st, struct LSFHeader *hdr)
 {
-    int i = 0;
+    size_t       st_dev   = 0;
+    size_t       st_ino   = 0;
+    unsigned int st_mode  = 0;
+    size_t       st_nlink = 0;
+    unsigned int st_uid   = 0;
+    unsigned int st_gid   = 0;
+    size_t       st_rdev  = 0;
+    ssize_t      st_size  = 0;
+    ssize_t         atime = 0;
+    ssize_t         mtime = 0;
+    ssize_t         ctime = 0;
+    // int i = 0;
 
-    assert( hdr->length );
+    assert( hdr->length ); // NOFIX struct LSFHeader *hdr is not used in this function.
 
     if (xdrs->x_op == XDR_ENCODE) {
-        i = st->st_dev;
+        st_dev = st->st_dev;
     }
-    if (!xdr_int (xdrs, &i)) {
+    if (!xdr_u_long (xdrs, &st_dev)) {
         return FALSE;
     }
     if (xdrs->x_op == XDR_DECODE) {
-        st->st_dev = i;
+        st->st_dev = st_dev;
     }
     if (xdrs->x_op == XDR_ENCODE) {
-        assert( st->st_ino <= INT_MAX );
-        i = st->st_ino;
+        st_ino = st->st_ino;
     }
-    if (!xdr_int (xdrs, &i)) {
+    if (!xdr_u_long (xdrs, &st_ino)) {
+        return FALSE;
+    }
+    if (xdrs->x_op == st_ino) {
+        st->st_ino = st_ino;
+    }
+    if (xdrs->x_op == XDR_ENCODE) {
+        st_mode = st->st_mode;
+    }
+    if (!xdr_u_int (xdrs, &st_mode)) {
         return FALSE;
     }
     if (xdrs->x_op == XDR_DECODE) {
-        assert( i >= 0 );
-        st->st_ino = i;
+        st->st_mode = st_mode;
     }
     if (xdrs->x_op == XDR_ENCODE) {
-        assert( i >= 0 );
-        i = st->st_mode;
-    }
-    if (!xdr_int (xdrs, &i)) {
-        return FALSE;
-    }
-    if (xdrs->x_op == XDR_DECODE) {
-        assert( i >= 0);
-        st->st_mode = i;
-    }
-    if (xdrs->x_op == XDR_ENCODE) {
-        i = st->st_nlink;
+        st_nlink = st->st_nlink;
     }
 
-    if (!xdr_int (xdrs, &i)) {
+    if (!xdr_u_long (xdrs, &st_nlink)) {
         return FALSE;
     }
     if (xdrs->x_op == XDR_DECODE) {
-        st->st_nlink = i;
+        st->st_nlink = st_nlink;
     }
     if (xdrs->x_op == XDR_ENCODE) {
-        i = st->st_uid;
+        st_uid = st->st_uid;
     }
-    if (!xdr_int (xdrs, &i)) {
+    if (!xdr_u_int (xdrs, &st_uid)) {
         return FALSE;
     }
     if (xdrs->x_op == XDR_DECODE) {
-        st->st_uid = i;
+        st->st_uid = st_uid;
     }
     if (xdrs->x_op == XDR_ENCODE) {
-        i = st->st_gid;
+        st_gid = st->st_gid;
     }
-    if (!xdr_int (xdrs, &i)) {
+    if (!xdr_u_int (xdrs, &st_gid)) {
         return FALSE;
     }
     if (xdrs->x_op == XDR_DECODE) {
-        st->st_gid = i;
+        st->st_gid = st_gid;
     }
     if (xdrs->x_op == XDR_ENCODE) {
-        i = st->st_rdev;
+        st_rdev = st->st_rdev;
     }
-    if (!xdr_int (xdrs, &i)) {
+    if (!xdr_u_long (xdrs, &st_rdev)) {
         return FALSE;
     }
     if (xdrs->x_op == XDR_DECODE) {
-        st->st_rdev = i;
+        st->st_rdev = st_rdev;
     }
     if (xdrs->x_op == XDR_ENCODE) {
-        i = st->st_size;
+        st_size = st->st_size;
     }
-    if (!xdr_int (xdrs, &i)) {
+    if (!xdr_long (xdrs, &st_size)) {
         return FALSE;
     }
     if (xdrs->x_op == XDR_DECODE) {
-        st->st_size = i;
+        st->st_size = st_size;
     }
     if (xdrs->x_op == XDR_ENCODE) {
-        i = st->st_atime;
+        atime = st->st_atime;
     }
-    if (!xdr_int (xdrs, &i)) {
+    if (!xdr_long (xdrs, &atime)) {
         return FALSE;
     }
     if (xdrs->x_op == XDR_DECODE) {
-        st->st_atime = i;
+        st->st_atime = atime;
     }
     
     if (xdrs->x_op == XDR_ENCODE) {
-        i = st->st_mtime;
+        mtime = st->st_mtime;
     }
-    if (!xdr_int (xdrs, &i)) {
+    if (!xdr_long (xdrs, &mtime)) {
         return FALSE;
     }
     if (xdrs->x_op == XDR_DECODE) {
-        st->st_mtime = i;
+        st->st_mtime = mtime;
     }
 
     if (xdrs->x_op == XDR_ENCODE) {
-        i = st->st_ctime;
+        ctime = st->st_ctime;
     }
-    if (!xdr_int (xdrs, &i)) {
+    if (!xdr_long (xdrs, &ctime)) {
         return FALSE;
     }
     if (xdrs->x_op == XDR_DECODE) {
-        st->st_ctime = i;
+        st->st_ctime = ctime;
     }
 
     return TRUE;
  }
  
 bool_t
-xdr_lsfRusage (XDR *xdrs, struct lsfRusage *lsfRu)
+xdr_lsfRusage (XDR *xdrs, struct lsfRusage *lsfRusage )
 {
-    assert( lsfRu->ru_utime <= __DBL_MAX__ && lsfRu->ru_utime >= __DBL_MIN__ );
-    if( !(xdr_long   (xdrs, &lsfRu->ru_utime)     && // FIXME FIXME FIXME FIXME we got to revisit this
-          xdr_long   (xdrs, &lsfRu->ru_stime)     && // FIXME FIXME FIXME FIXME we got to revisit this
-          xdr_long   (xdrs, &lsfRu->ru_maxrss)    && // FIXME FIXME FIXME FIXME we got to revisit this
-          xdr_long   (xdrs, &lsfRu->ru_ixrss)     && // FIXME FIXME FIXME FIXME we got to revisit this
-          xdr_double (xdrs, &lsfRu->ru_ismrss)    &&
-          xdr_long   (xdrs, &lsfRu->ru_idrss)     && // FIXME FIXME FIXME FIXME we got to revisit this
-          xdr_long   (xdrs, &lsfRu->ru_isrss)     && // FIXME FIXME FIXME FIXME we got to revisit this
-          xdr_long   (xdrs, &lsfRu->ru_minflt)    && // FIXME FIXME FIXME FIXME we got to revisit this
-          xdr_long   (xdrs, &lsfRu->ru_majflt)    && // FIXME FIXME FIXME FIXME we got to revisit this
-          xdr_long   (xdrs, &lsfRu->ru_nswap)     && // FIXME FIXME FIXME FIXME we got to revisit this
-          xdr_long   (xdrs, &lsfRu->ru_inblock)   && // FIXME FIXME FIXME FIXME we got to revisit this
-          xdr_long   (xdrs, &lsfRu->ru_oublock)   && // FIXME FIXME FIXME FIXME we got to revisit this
-          xdr_double (xdrs, &lsfRu->ru_ioch)      &&
-          xdr_long   (xdrs, &lsfRu->ru_msgsnd)    && // FIXME FIXME FIXME FIXME we got to revisit this
-          xdr_long   (xdrs, &lsfRu->ru_msgrcv)    && // FIXME FIXME FIXME FIXME we got to revisit this
-          xdr_long   (xdrs, &lsfRu->ru_nsignals)  && // FIXME FIXME FIXME FIXME we got to revisit this
-          xdr_long   (xdrs, &lsfRu->ru_nvcsw)     && // FIXME FIXME FIXME FIXME we got to revisit this
-          xdr_long   (xdrs, &lsfRu->ru_nivcsw)    && // FIXME FIXME FIXME FIXME we got to revisit this
-          xdr_double (xdrs, &lsfRu->ru_exutime)))
+
+    if( !(xdr_time_t (xdrs, &lsfRusage->ru_utime    ) && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_time_t (xdrs, &lsfRusage->ru_stime    ) && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, &lsfRusage->ru_maxrss   ) && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, &lsfRusage->ru_ixrss    ) && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_double (xdrs, &lsfRusage->ru_ismrss   ) &&
+          xdr_long   (xdrs, &lsfRusage->ru_idrss    ) && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, &lsfRusage->ru_isrss    ) && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, &lsfRusage->ru_minflt   ) && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, &lsfRusage->ru_majflt   ) && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, &lsfRusage->ru_nswap    ) && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, &lsfRusage->ru_inblock  ) && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, &lsfRusage->ru_oublock  ) && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_double (xdrs, &lsfRusage->ru_ioch     ) &&
+          xdr_long   (xdrs, &lsfRusage->ru_msgsnd   ) && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, &lsfRusage->ru_msgrcv   ) && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, &lsfRusage->ru_nsignals ) && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, &lsfRusage->ru_nvcsw    ) && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, &lsfRusage->ru_nivcsw   ) && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_long   (xdrs, &lsfRusage->ru_exutime  )
+         )
+      )
     {
         return FALSE;
     }
@@ -266,8 +275,7 @@ xdr_lenData (XDR *xdrs, struct lenData *ld)
 {
     char *sp = NULL;
 
-    assert( ld->length <= INT_MAX );
-    if (!xdr_int (xdrs, (int *) &ld->length)) {
+    if (!xdr_u_long (xdrs, &ld->length)) {
         return FALSE;
     }
 
@@ -290,7 +298,7 @@ xdr_lenData (XDR *xdrs, struct lenData *ld)
     
     sp = ld->data;
     assert( ld->length <= UINT_MAX );
-    if (!xdr_bytes (xdrs, &sp, (u_int *) & ld->length, (unsigned int)ld->length)) {
+    if (!xdr_bytes (xdrs, &sp, (unsigned int) & ld->length, (unsigned int)ld->length)) {
         if (xdrs->x_op == XDR_DECODE) {
             FREEUP (ld->data);
         }
@@ -313,7 +321,7 @@ xdr_lsfAuth (XDR *xdrs, struct lsfAuth *auth, struct LSFHeader *hdr)
     }
 
     assert( auth->uid <= INT_MAX );
-    if (!(xdr_int (xdrs, &auth->uid) && xdr_int (xdrs, &auth->gid) && xdr_string (xdrs, &sp, MAX_LSF_NAME_LEN))) {
+    if (!(xdr_u_int (xdrs, &auth->uid) && xdr_u_int (xdrs, &auth->gid) && xdr_string (xdrs, &sp, MAX_LSF_NAME_LEN))) {
         return FALSE;
     }
 
@@ -344,8 +352,7 @@ xdr_lsfAuth (XDR *xdrs, struct lsfAuth *auth, struct LSFHeader *hdr)
             break;
         
         case CLIENT_EAUTH:
-            assert( auth->k.authToken.length <= INT_MAX );
-            if (!xdr_int (xdrs, &auth->k.eauth.length)) {
+            if (!xdr_u_long (xdrs, &auth->k.eauth.length)) {
                 return FALSE;
             }
             
@@ -410,6 +417,9 @@ xdr_lsfAuthSize (struct lsfAuth *auth)
         // default:
             sz += ALIGNWORD_ (sizeof (auth->k.filler));
             break;
+        default:
+            fprintf( stderr, "%s( ): default: you are not supposed to be here. auth->kind: %s\n", __func__, auth->kind );
+        break;
     }
     sz += ALIGNWORD_ (sizeof (auth->options));
     
@@ -419,20 +429,20 @@ xdr_lsfAuthSize (struct lsfAuth *auth)
 bool_t
 xdr_pidInfo (XDR *xdrs, struct pidInfo *pidInfo, struct LSFHeader *hdr)
 {
-    assert( hdr->length >= 0 );
+    assert( hdr->length );
     
-     if (!xdr_int (xdrs, &pidInfo->pid)) {
-            return FALSE;
-     }
-     if (!xdr_int (xdrs, &pidInfo->ppid)) {
-            return FALSE;
-     }
-     if (!xdr_int (xdrs, &pidInfo->pgid)) {
-            return FALSE;
-     }
-     if (!xdr_int (xdrs, &pidInfo->jobid)) {
-            return FALSE;
-     }
+    if (!xdr_int (xdrs, &pidInfo->pid)) {
+        return FALSE;
+    }
+    if (!xdr_int (xdrs, &pidInfo->ppid)) {
+        return FALSE;
+    }
+    if (!xdr_int (xdrs, &pidInfo->pgid)) {
+        return FALSE;
+    }
+    if (!xdr_u_long (xdrs, &pidInfo->jobid)) {
+        return FALSE;
+    }
 
     return TRUE;
  }
@@ -453,10 +463,10 @@ xdr_jRusage (XDR *xdrs, struct jRusage *runRusage, struct LSFHeader *hdr)
         runRusage->pgid = NULL;
     }
     
-    if (!(xdr_int (xdrs, &runRusage->mem)    &&
-          xdr_int (xdrs, &runRusage->swap)   &&
-          xdr_int (xdrs, &runRusage->utime)  &&
-          xdr_int (xdrs, &runRusage->stime))
+    if (!(xdr_u_long (xdrs, &runRusage->mem)    &&
+          xdr_u_long (xdrs, &runRusage->swap)   &&
+          xdr_long   (xdrs, &runRusage->utime)  &&
+          xdr_long   (xdrs, &runRusage->stime))
        )
     {
         return FALSE;
@@ -471,14 +481,14 @@ xdr_jRusage (XDR *xdrs, struct jRusage *runRusage, struct LSFHeader *hdr)
     if (xdrs->x_op == XDR_DECODE && runRusage->npids) {
 
         assert( runRusage->npids >= 0 );
-        runRusage->pidInfo = calloc( runRusage->npids, sizeof (struct pidInfo) );
+        runRusage->pidInfo = calloc( (size_t) runRusage->npids, sizeof (struct pidInfo) );
         if ( NULL == runRusage->pidInfo && ENOMEM == errno) {
             runRusage->npids = 0;
             return FALSE;
         }
     }
     
-    for ( unsigned int i = 0; i < runRusage->npids; i++) {
+    for ( pid_t i = 0; i < runRusage->npids; i++) {
 
         if (!xdr_arrayElement(xdrs, (char *) &(runRusage->pidInfo[i]), hdr, xdr_pidInfo)) {
 
@@ -499,14 +509,14 @@ xdr_jRusage (XDR *xdrs, struct jRusage *runRusage, struct LSFHeader *hdr)
     if (xdrs->x_op == XDR_DECODE && runRusage->npgids) {
 
         assert( runRusage->npgids >= 0 );
-        runRusage->pgid = (pid_t *) calloc ( (unsigned long)runRusage->npgids, sizeof (int));
+        runRusage->pgid = calloc ( (unsigned long)runRusage->npgids, sizeof (int));
         if ( NULL == runRusage->pgid && ENOMEM == errno ) {
             runRusage->npgids = 0;
             return FALSE;
         }
     }
     
-    for ( unsigned int i = 0; i < runRusage->npgids; i++) {
+    for ( pid_t i = 0; i < runRusage->npgids; i++) {
         
         if (!xdr_arrayElement (xdrs, (char *) &(runRusage->pgid[i]), hdr, xdr_int)) {
 
