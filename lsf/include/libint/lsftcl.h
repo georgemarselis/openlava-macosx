@@ -18,7 +18,7 @@
 
 #pragma once
 
-#ifndef __GNU_DEBIAN__
+#ifdef __GNU_DEBIAN__
 #include <tcl/tcl.h> // FIXME FIXME FIXME FIXME tcl/tcl.h must be moved to a variable in configure.ac
 #elif defined __FEFORA__
 #include <tcl.h>
