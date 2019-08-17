@@ -25,6 +25,7 @@
 #include <time.h>
 
 #include "lib/lib.h"
+#include "lib/syslog.h"
 #include "lib/xdr.h"
 #include "lib/xdrmisc.h"
 
@@ -298,7 +299,7 @@ xdr_lenData (XDR *xdrs, struct lenData *ld)
     
     sp = ld->data;
     assert( ld->length <= UINT_MAX );
-    if (!xdr_bytes (xdrs, &sp, (unsigned int) & ld->length, (unsigned int)ld->length)) {
+    if (!xdr_bytes (xdrs, &sp, (unsigned int *) & ld->length, (unsigned int)ld->length)) {
         if (xdrs->x_op == XDR_DECODE) {
             FREEUP (ld->data);
         }
@@ -334,7 +335,7 @@ xdr_lsfAuth (XDR *xdrs, struct lsfAuth *auth, struct LSFHeader *hdr)
         case CLIENT_DCE:
 
             assert( auth->k.authToken.length <= INT_MAX );
-            if (!xdr_int (xdrs, &auth->k.authToken.length)) {
+            if (!xdr_u_long (xdrs, &auth->k.authToken.length)) {
                 return FALSE;
             }
             
@@ -345,11 +346,11 @@ xdr_lsfAuth (XDR *xdrs, struct lsfAuth *auth, struct LSFHeader *hdr)
             }
 
             assert( auth->k.authToken.length <= INT_MAX );
-            if (!xdr_bytes (xdrs, (char **) &auth->k.authToken.data, &auth->k.authToken.length, auth->k.authToken.length)) {
+            if (!xdr_bytes (xdrs, (char **) &auth->k.authToken.data, (unsigned int * ) &auth->k.authToken.length, (unsigned int) auth->k.authToken.length)) { // FIXME FIXME FIXME change the auth token length type, maybe?
                 return FALSE;
             }
             
-            break;
+        break;
         
         case CLIENT_EAUTH:
             if (!xdr_u_long (xdrs, &auth->k.eauth.length)) {
@@ -358,17 +359,25 @@ xdr_lsfAuth (XDR *xdrs, struct lsfAuth *auth, struct LSFHeader *hdr)
             
             sp = auth->k.eauth.data;
             assert( auth->k.authToken.length <= INT_MAX );
-            if (!xdr_bytes (xdrs, &sp, &auth->k.eauth.length, auth->k.eauth.length ) ) {
+            if (!xdr_bytes (xdrs, &sp, (unsigned int *) &auth->k.eauth.length, (unsigned int) auth->k.eauth.length ) ) {
                 return FALSE;
             }
-            break;
+        break;
+
         case CLIENT_SETUID:
         case CLIENT_IDENT:
         // default:
         
-            if (!xdr_arrayElement (xdrs, &auth->k.filler, hdr, xdr_int)) {
+            // if (!xdr_arrayElement (xdrs, &auth->k.filler, hdr, xdr_int)) {
+            if (!xdr_arrayElement (xdrs, &auth->k.eauth.data, hdr, xdr_int)) {
                 return FALSE;
             }
+        break;
+
+        case CLIENT_NULL:
+        default:
+            fprintf( stderr,    "%s( ): default: you are not supposed to be here. auth->kind: %s\n", __func__, clientAuthDescription[ auth->kind ] );
+            ls_syslog( LOG_ERR, "%s( ): default: you are not supposed to be here. auth->kind: %s\n", __func__, clientAuthDescription[ auth->kind ] );
         break;
     }
 
@@ -376,7 +385,7 @@ xdr_lsfAuth (XDR *xdrs, struct lsfAuth *auth, struct LSFHeader *hdr)
         auth->options = AUTH_HOST_UX;
     }
     
-    if (!xdr_int (xdrs, &auth->options)) {
+    if (!xdr_u_int (xdrs, &auth->options)) {
         return FALSE;
     }
     
@@ -399,26 +408,29 @@ xdr_lsfAuthSize (struct lsfAuth *auth)
         return (sz);
     }
 
-    sz +=   ALIGNWORD_ (sizeof (auth->uid)) + ALIGNWORD_ (sizeof (auth->gid)) +
-            ALIGNWORD_ (strlen (auth->lsfUserName)) + ALIGNWORD_ (sizeof (auth->kind));
+    sz +=   ALIGNWORD_( sizeof( auth->uid ) )         + ALIGNWORD_( sizeof ( auth->gid ) ) +
+            ALIGNWORD_( strlen( auth->lsfUserName ) ) + ALIGNWORD_( sizeof ( auth->kind ) );
     
     switch (auth->kind)
     {
         case CLIENT_DCE:
             sz += ALIGNWORD_ (sizeof (auth->k.authToken.length)) + ALIGNWORD_ (auth->k.authToken.length);
-            break;
+        break;
         
         case CLIENT_EAUTH:
             sz += ALIGNWORD_ (sizeof (auth->k.eauth.length)) + ALIGNWORD_ (auth->k.eauth.length);
-            break;
+        break;
 
         case CLIENT_SETUID:
         case CLIENT_IDENT:
         // default:
             sz += ALIGNWORD_ (sizeof (auth->k.filler));
-            break;
+        break;
+
+        case CLIENT_NULL:
         default:
-            fprintf( stderr, "%s( ): default: you are not supposed to be here. auth->kind: %s\n", __func__, auth->kind );
+            fprintf( stderr,    "%s( ): default: you are not supposed to be here. auth->kind: %s\n", __func__, clientAuthDescription[ auth->kind ] );
+            ls_syslog( LOG_ERR, "%s( ): default: you are not supposed to be here. auth->kind: %s\n", __func__, clientAuthDescription[ auth->kind ] );
         break;
     }
     sz += ALIGNWORD_ (sizeof (auth->options));

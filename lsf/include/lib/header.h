@@ -27,6 +27,7 @@
 #include <sys/stat.h>
 
 #include "lsf.h"
+// #include "lib/xdrmisc.h"
 
 // openlava 2.0 header breaks compatibility with 1.0 but offers more flexibility and room for growth
 // struct LSFHeader { // FIXME FIXME FIXME FIXME FIXME ensure compatibility with Platform LSF
@@ -80,15 +81,36 @@ enum AUTH_HOST {
     AUTH_HOST_UX = 0x02 
 } ;
 
-#define EAUTH_SIZE 4096 // FIXME FIXME FIXME FIXME FIXME set value from configure.ac
+// #define EAUTH_SIZE 4096 // FIXME FIXME FIXME FIXME FIXME set value from configure.ac
 // const unsigned int EAUTH_SIZE = 4096;
+enum EAUTH_SIZE_ENUM {
+    EAUTH_SIZE = 4096,
+    EAUTH_NULL,
+};
+
+enum CLIENT_AUTH {
+    CLIENT_SETUID = 0,
+    CLIENT_IDENT  = 1,
+    CLIENT_DCE    = 2,
+    CLIENT_EAUTH  = 3,
+    CLIENT_NULL
+};
+
+const char *clientAuthDescription[ ] = {
+    "CLIENT_SETUID",
+    "CLIENT_IDENT",
+    "CLIENT_DCE",
+    "CLIENT_EAUTH",
+    NULL
+};
+
 struct lsfAuth
 {
     uid_t uid;
-    uid_t gid;
+    gid_t gid;
     char lsfUserName[MAX_LSF_NAME_LEN]; // FIXME FIXME FIXME change to pointer
-    enum { CLIENT_SETUID, CLIENT_IDENT, CLIENT_DCE, CLIENT_EAUTH } kind;
-    int options;
+    enum CLIENT_AUTH kind; // FIXME FIXME FIXME FIXME use enum AUTH_KIND from xdrmisc.h
+    mode_t options;
 
     union authBody {
         struct eauth {
