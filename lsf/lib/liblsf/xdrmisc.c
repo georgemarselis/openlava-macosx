@@ -203,8 +203,8 @@ bool_t
 xdr_lsfRusage (XDR *xdrs, struct lsfRusage *lsfRusage )
 {
 
-    if( !(xdr_time_t (xdrs, &lsfRusage->ru_utime    ) && // FIXME FIXME FIXME FIXME we got to revisit this
-          xdr_time_t (xdrs, &lsfRusage->ru_stime    ) && // FIXME FIXME FIXME FIXME we got to revisit this
+    if( !(xdr_struct_timeval (xdrs, &lsfRusage->ru_utime    ) && // FIXME FIXME FIXME FIXME we got to revisit this
+          xdr_struct_timeval (xdrs, &lsfRusage->ru_stime    ) && // FIXME FIXME FIXME FIXME we got to revisit this
           xdr_long   (xdrs, &lsfRusage->ru_maxrss   ) && // FIXME FIXME FIXME FIXME we got to revisit this
           xdr_long   (xdrs, &lsfRusage->ru_ixrss    ) && // FIXME FIXME FIXME FIXME we got to revisit this
           xdr_double (xdrs, &lsfRusage->ru_ismrss   ) &&
@@ -326,7 +326,7 @@ xdr_lsfAuth (XDR *xdrs, struct lsfAuth *auth, struct LSFHeader *hdr)
         return FALSE;
     }
 
-    if (!xdr_enum (xdrs, &auth->kind)) {
+    if (!xdr_enum_kind (xdrs, &auth->kind)) {
         return FALSE;
     }
 
@@ -365,13 +365,15 @@ xdr_lsfAuth (XDR *xdrs, struct lsfAuth *auth, struct LSFHeader *hdr)
         break;
 
         case CLIENT_SETUID:
-        case CLIENT_IDENT:
+        case CLIENT_IDENT: {
         // default:
         
+            const char *data_array = auth->k.eauth.data;
             // if (!xdr_arrayElement (xdrs, &auth->k.filler, hdr, xdr_int)) {
-            if (!xdr_arrayElement (xdrs, &auth->k.eauth.data, hdr, xdr_int)) {
+            if (!xdr_arrayElement (xdrs, data_array, hdr, xdr_int)) {
                 return FALSE;
             }
+        }
         break;
 
         case CLIENT_NULL:
@@ -399,32 +401,32 @@ xdr_lsfAuth (XDR *xdrs, struct lsfAuth *auth, struct LSFHeader *hdr)
     // return (xdr_float (xdrs, fp));
 // }
  
-int
+size_t
 xdr_lsfAuthSize (struct lsfAuth *auth)
 {
-    int sz = 0;
+    size_t size = 0;
     
     if (auth == NULL) {
-        return (sz);
+        return size;
     }
 
-    sz +=   ALIGNWORD_( sizeof( auth->uid ) )         + ALIGNWORD_( sizeof ( auth->gid ) ) +
+    size +=   ALIGNWORD_( sizeof( auth->uid ) )         + ALIGNWORD_( sizeof ( auth->gid ) ) +
             ALIGNWORD_( strlen( auth->lsfUserName ) ) + ALIGNWORD_( sizeof ( auth->kind ) );
     
     switch (auth->kind)
     {
         case CLIENT_DCE:
-            sz += ALIGNWORD_ (sizeof (auth->k.authToken.length)) + ALIGNWORD_ (auth->k.authToken.length);
+            size += ALIGNWORD_ (sizeof (auth->k.authToken.length)) + ALIGNWORD_ (auth->k.authToken.length);
         break;
         
         case CLIENT_EAUTH:
-            sz += ALIGNWORD_ (sizeof (auth->k.eauth.length)) + ALIGNWORD_ (auth->k.eauth.length);
+            size += ALIGNWORD_ (sizeof (auth->k.eauth.length)) + ALIGNWORD_ (auth->k.eauth.length);
         break;
 
         case CLIENT_SETUID:
         case CLIENT_IDENT:
         // default:
-            sz += ALIGNWORD_ (sizeof (auth->k.filler));
+            size += ALIGNWORD_ (sizeof (auth->k.filler));
         break;
 
         case CLIENT_NULL:
@@ -433,9 +435,9 @@ xdr_lsfAuthSize (struct lsfAuth *auth)
             ls_syslog( LOG_ERR, "%s( ): default: you are not supposed to be here. auth->kind: %s\n", __func__, clientAuthDescription[ auth->kind ] );
         break;
     }
-    sz += ALIGNWORD_ (sizeof (auth->options));
+    size += ALIGNWORD_ (sizeof (auth->options));
     
-    return (sz);
+    return size;
  }
  
 bool_t
@@ -542,4 +544,16 @@ xdr_jRusage (XDR *xdrs, struct jRusage *runRusage, struct LSFHeader *hdr)
         }
     }
     return TRUE;
+}
+
+bool_t
+xdr_enum_kind( XDR *xdrs, enum CLIENT_AUTH *auth )
+{
+    return xdr_enum( xdrs, (enum_t *) auth ); // FIXME FIXME FIXME FIXME FIXME i don't think I am doing this right. The error is expected ‘enum_t *’ {aka ‘int *’} but argument is of type ‘enum CLIENT_AUTH *’
+}
+
+bool_t 
+xdr_struct_timeval( XDR *xdrs, struct timeval *timeval )
+{
+    return xdr_time_t( xdrs, &timeval->tv_sec ) && xdr_long( xdrs, &timeval->tv_usec );
 }
