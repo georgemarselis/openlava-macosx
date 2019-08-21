@@ -22,6 +22,8 @@
 // #include "lib/lproto.h"
 #include "daemons/libresd/resout.h"
 #include "lib/xdrnio.h"
+#include "lib/xdrmisc.h"
+#include "lib/rusage.h"
 
 
 
@@ -33,10 +35,10 @@ xdr_resConnect (XDR * xdrs, struct resConnect *connectPtr, struct LSFHeader *hdr
     assert( hdr->length );
 
     if (!xdr_lenData (xdrs, &connectPtr->eexec)) {
-        return (FALSE);
+        return FALSE;
     }
 
-    return (TRUE);
+    return TRUE;
 }
 
 bool_t
@@ -44,46 +46,47 @@ xdr_niosConnect (XDR * xdrs, struct niosConnect *conn, struct LSFHeader *hdr)
 {
     assert( hdr->length );
 
-    if (!(xdr_int (xdrs, &conn->rpid))) {
-      return (FALSE);
+    if (!(xdr_u_long (xdrs, &conn->rtaskid))) {
+      return FALSE;
     }
 
-    return (xdr_int (xdrs, &conn->exitStatus) && xdr_int (xdrs, &conn->terWhiPendStatus));
+    return xdr_int (xdrs, &conn->exitStatus) && xdr_int (xdrs, &conn->terWhiPendStatus);
 }
 
 bool_t
 xdr_niosStatus (XDR * xdrs, struct niosStatus *st, struct LSFHeader *hdr)
 {
-    struct lsfRusage lsfRu;
+    struct lsfRusage *lsfRu = malloc( sizeof ( struct lsfRusage ));
 
-    memset ((char *) &lsfRu, 0, sizeof (lsfRu));
-    if (!xdr_int (xdrs, (int *) &st->ack)) {
-        return (FALSE);
+    memset( lsfRu, '\0', sizeof( struct lsfRusage )*sizeof(char) );
+
+    if (!xdr_enum (xdrs, (enum_t *) &st->ack)) { // FIXME FIXME FIXME FIXME FIXME has to be another way
+        return FALSE;
     }
 
     if ( st->ack != RESE_SIGCHLD) {
-        return (TRUE);
+        return TRUE;
     }
 
     if (!xdr_int (xdrs, &st->s.ss)) {
-        return (FALSE);
+        return FALSE;
     }
 
     if (xdrs->x_op == XDR_ENCODE) {
-        ls_ruunix2lsf ((st->s.ru), &lsfRu);
+        ls_ruunix2lsf ((st->s.ru), lsfRu);
     };
 
-    if (!xdr_arrayElement (xdrs, (char *) &lsfRu, hdr, xdr_lsfRusage)) {
-        return (FALSE);
+    if (!xdr_arrayElement (xdrs, (char *) lsfRu, hdr, xdr_lsfRusage)) {
+        return FALSE;
     }
 
     if (xdrs->x_op == XDR_ENCODE) {
-        return (TRUE);
+        return TRUE;
     }
 
-    ls_rulsf2unix (&lsfRu, (st->s.ru));
+    ls_rulsf2unix ( lsfRu, (st->s.ru));
 
-    return (TRUE);
+    return TRUE;
 }
 
 
@@ -92,5 +95,5 @@ xdr_resSignal (XDR * xdrs, struct resSignal *sig, struct LSFHeader *hdr)
 {
     assert( hdr->length );
 
-    return (xdr_int (xdrs, &sig->pid) && xdr_int (xdrs, &sig->sigval));
+    return xdr_int (xdrs, &sig->pid) && xdr_int (xdrs, &sig->sigval);
 }

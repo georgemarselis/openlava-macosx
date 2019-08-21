@@ -355,7 +355,7 @@ struct resPid
 
 struct resRusage
 {
-    pid_t rtaskid; // FIXME FIXME FIXME FIXME nto sure what this member is.
+    pid_t rtaskid; // FIXME FIXME FIXME FIXME not sure what this member is.
     int whatid;
     int options;
 };
