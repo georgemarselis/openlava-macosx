@@ -32,7 +32,7 @@ const unsigned int DEF_REXPRIORITY = 0;
 struct lsInfo lsinfo; // FIXME FIXME FIXME there is a second decleration in lfh.h . Not sure if dup or not
 struct clusterInfo clinfo;
 struct sharedConf sConf_;
-struct clusterConf cConf_;
+// struct clusterConf cConf_;
 struct sharedConf  *sConf = NULL;
 struct clusterConf *cConf = NULL;
 

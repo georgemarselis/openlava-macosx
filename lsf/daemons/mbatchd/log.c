@@ -29,7 +29,7 @@ time_t eventTime;
 
 static bool_t logMapFileEnable = TRUE;
 
-extern int sigNameToValue_ (char *sigString);
+// extern int sigNameToValue_ (char *sigString);
 extern char *getLsbSigSymbol (int);
 extern char *getSigSymbol (int);
 extern void chanFreeStashedBuf (struct Buffer *);
@@ -98,7 +98,7 @@ static struct eventRec *logPtr;
 static int logLoadIndex = TRUE;
 
 
-extern int sigNameToValue_ (char *);
+// extern int sigNameToValue_ (char *);
 
 extern float version;
 

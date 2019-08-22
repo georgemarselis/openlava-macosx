@@ -21,7 +21,9 @@
 #include "lib/lib.h"
 #include "lib/xdr.h"
 // #include "lib/lproto.h"
+#include "lib/res.h"
 #include "lib/xdrrf.h"
+#include "lib/misc.h"
 #include "daemons/libresd/resd.h"
 
 int lsRecvMsg_ (int sock, char *buf, size_t bufLen, struct LSFHeader *hdr, const char *data, bool_t (*xdrFunc) (), long (*readFunc) ())
@@ -29,7 +31,8 @@ int lsRecvMsg_ (int sock, char *buf, size_t bufLen, struct LSFHeader *hdr, const
     XDR xdrs;
     int cc = 0;
 
-    xdrmem_create (&xdrs, buf, bufLen, XDR_DECODE);
+    assert( bufLen <= UINT_MAX );
+    xdrmem_create (&xdrs, buf, (unsigned int)bufLen, XDR_DECODE); // NOFIX xdr does not like to allocate large amount of memory remotely just in case the remote machine runs out of memory
     if ((cc = readDecodeHdr_ (sock, buf, readFunc, &xdrs, hdr)) < 0) {
         xdr_destroy (&xdrs);
         return cc;
@@ -51,7 +54,7 @@ int lsRecvMsg_ (int sock, char *buf, size_t bufLen, struct LSFHeader *hdr, const
 
 // FIXME FIXME FIXME FIXME replace long (*writeFunc) with size_t (*writeFunc)
 int
-lsSendMsg_ (int s, unsigned short opCode, size_t hdrLength, const char *data, const char *reqBuf, size_t reqLen, bool_t (*xdrFunc) (), long (*writeFunc) (),  struct lsfAuth *auth)
+lsSendMsg_ (int s, unsigned short opCode, size_t hdrLength, const char *data, char *reqBuf, size_t reqLen, bool_t (*xdrFunc) (), long (*writeFunc) (),  struct lsfAuth *auth)
 {
     struct LSFHeader hdr;
     XDR xdrs;
@@ -65,14 +68,14 @@ lsSendMsg_ (int s, unsigned short opCode, size_t hdrLength, const char *data, co
     }
 
     assert( reqLen <= UINT_MAX );
-    xdrmem_create (&xdrs, reqBuf, reqLen, XDR_ENCODE);
+    xdrmem_create (&xdrs, reqBuf, (unsigned int)reqLen, XDR_ENCODE); // NOFIX xdr does not like to allocate large amount of memory remotely just in case the remote machine runs out of memory
     if (!xdr_encodeMsg (&xdrs, data, &hdr, xdrFunc, 0, auth)) {
         xdr_destroy (&xdrs);
         lserrno = LSE_BAD_XDR;
         return -1;
     }
 
-    if ((*writeFunc) (s, (char *) reqBuf, XDR_GETPOS (&xdrs)) != XDR_GETPOS (&xdrs)) {
+    if ((*writeFunc) (s, reqBuf, XDR_GETPOS (&xdrs)) != XDR_GETPOS (&xdrs)) {
         xdr_destroy (&xdrs);
         lserrno = LSE_MSG_SYS;
         return -2;

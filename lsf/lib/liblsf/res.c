@@ -854,6 +854,7 @@ callRes_ (int s, enum resCmd cmd, const char *data, const char *reqBuf, size_t r
     sigset_t oldMask;
     sigset_t newMask;
     struct sockaddr_in from;
+    char *requestBuffer = strdup( reqBuf ); // FIXME FIXME FIXME the original data does not need to change, so ,we can duplicate the request and send it down the pipe. might not work
 
     memset (hostname, '\0', strlen( hostname ) );
     
@@ -867,7 +868,7 @@ callRes_ (int s, enum resCmd cmd, const char *data, const char *reqBuf, size_t r
         _setcurseqno_ (hostname, getCurrentSN( ) );
     }
     
-    cc = lsSendMsg_ (s, cmd, 0, data, reqBuf, reqLen, xdrFunc, b_write_fix, auth);
+    cc = lsSendMsg_ (s, cmd, 0, data, requestBuffer, reqLen, xdrFunc, b_write_fix, auth);
     if (cc < 0) {
         sigprocmask (SIG_SETMASK, &oldMask, NULL);
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value

@@ -533,7 +533,7 @@ char **_i18n_msgArray_get( int, int, int *, char ** );
 #define I18N_unreach                ("catgets 5015: unreach")                                       /* catgets5015 */
 #define I18N_User_Priority          ("catgets 5016: User Priority")                                 /* catgets5016 */
 
-#define LSB_NULL_POINTER_STR        ("%s: %s is Null")                                              /* catgets 5050 */
+#define LSB_NULL_POINTER_STR        ("%s: %s is NULL")                                              /* catgets 5050 */
 #define LSB_FILE_PREMATUR_STR       ("%s: File %s at line %d, premature EOF")                       /* catgets 5051 */
 #define LSB_EMPTY_SECTION_STR       ("%s: File %s at line %d: Empty %s section")                    /* catgets 5052 */
 #define LSB_IN_QUEUE_ADMIN_STR      ("in queue's administrator list")                               /* catgets 5053 */
