@@ -23,7 +23,7 @@
 #include "lib/nios.h"
 #include "lib/rtask.h"
 #include "lib/rdwr.h"
-#include "lib/sig.h"
+#include "lib/signal.h"
 #include "daemons/libniosd/niosd.h"
 // #include "daemons/libresd/resout.h"
 
@@ -60,11 +60,11 @@ ls_stdinmode( int onoff )
     SET_LSLIB_NIOS_HDR (reqHdr, (onoff ? LIB_NIOS_REM_ON : LIB_NIOS_REM_OFF), 0);
 
     FD_ZERO (&rmask);
-    FD_SET (cli_nios_fd[0], &rmask);
+    FD_SET (cli_nios_fd[0], &rmask); // FIXME FIXME FIXME label [0]
     timeout.tv_sec = NIOS_TIMEOUT;
     timeout.tv_usec = 0;
 
-    if (b_write_fix (cli_nios_fd[0], (char *) &reqHdr, sizeof (reqHdr)) != sizeof (reqHdr)) {
+    if (b_write_fix (cli_nios_fd[0], (char *) &reqHdr, sizeof (reqHdr)) != sizeof (reqHdr)) { // FIXME FIXME FIXME label [0]
         lserrno = LSE_MSG_SYS;
         sigprocmask (SIG_SETMASK, &oldMask, NULL);
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value;

@@ -20,113 +20,26 @@
 #include <string.h>
 #include <pwd.h>
 
+#include "lib/syslog.h"
 #include "lsb/lsb.h"
-
-static int lsbSig_map[] = {
-    SIG_NULL,
-    SIG_CHKPNT,
-    SIG_CHKPNT_COPY,
-    SIG_DELETE_JOB,
-
-    SIG_SUSP_USER,
-    SIG_SUSP_LOAD,
-    SIG_SUSP_WINDOW,
-    SIG_SUSP_OTHER,
-
-    SIG_RESUME_USER,
-    SIG_RESUME_LOAD,
-    SIG_RESUME_WINDOW,
-    SIG_RESUME_OTHER,
-
-    SIG_TERM_USER,
-    SIG_TERM_LOAD,
-    SIG_TERM_WINDOW,
-    SIG_TERM_OTHER,
-    SIG_TERM_RUNLIMIT,
-    SIG_TERM_DEADLINE,
-    SIG_TERM_PROCESSLIMIT,
-    SIG_TERM_FORCE,
-    SIG_KILL_REQUEUE,
-    SIG_TERM_CPULIMIT,
-    SIG_TERM_MEMLIMIT
-};
-
-static char *lsbSigSymbol[] = {
-    "SIG_NULL",
-    "SIG_CHKPNT",
-    "SIG_CHKPNT_COPY",
-    "SIG_DELETE_JOB",
-
-    "SIG_SUSP_USER",
-    "SIG_SUSP_LOAD",
-    "SIG_SUSP_WINDOW",
-    "SIG_SUSP_OTHER",
-
-    "SIG_RESUME_USER",
-    "SIG_RESUME_LOAD",
-    "SIG_RESUME_WINDOW",
-    "SIG_RESUME_OTHER",
-
-    "SIG_TERM_USER",
-    "SIG_TERM_LOAD",
-    "SIG_TERM_WINDOW",
-    "SIG_TERM_OTHER",
-    "SIG_TERM_RUNLIMIT",
-    "SIG_TERM_DEADLINE",
-    "SIG_TERM_PROCESSLIMIT",
-    "SIG_TERM_FORCE",
-    "SIG_KILL_REQUEUE",
-    "SIG_TERM_CPULIMIT",
-    "SIG_TERM_MEMLIMIT"
-};
-
-
-static int defaultSigValue[] = {
-    SIG_NULL,
-    SIG_CHKPNT,
-    SIG_CHKPNT_COPY,
-    SIG_DELETE_JOB,
-
-    SIGSTOP,
-    SIGSTOP,
-    SIGSTOP,
-    SIGSTOP,
-
-    SIGCONT,
-    SIGCONT,
-    SIGCONT,
-    SIGCONT,
-
-    SIGKILL,
-    SIGKILL,
-    SIGKILL,
-    SIGKILL,
-    SIGKILL,
-    SIGKILL,
-    SIGKILL,
-    SIGKILL,
-    SIGKILL,
-    SIGKILL,
-    SIGKILL,
-};
-
+#include "lsb/signals.h"
 
 int
-sigNameToValue_ (char *sigString)
+sigNameToValue_ ( const char *sigString)
 {
     int sigValue = 0;
 
     if ((sigString == NULL) || (sigString[0] == '\0')) {
-        return (INFINIT_INT);
+        return INFINIT_INT;
     }
 
     if ((sigValue = getSigVal (sigString)) > 0) {
-        return (sigValue);
+        return sigValue;
     }
 
     for ( unsigned int i = 0; i < LSB_SIG_NUM; i++) {
         if (strcmp (lsbSigSymbol[i], sigString) == 0) {
-            return (lsbSig_map[i]);
+            return lsbSig_map[i];
         }
     }
 
@@ -134,42 +47,52 @@ sigNameToValue_ (char *sigString)
 }
 
 
-char *
+const char *
 getLsbSigSymbol (int sigValue)
 {
-    static char symbol[30];
+    static char symbol[30]; // FIXME FIXME FIXME FIXME why 30 chars only?
 
-    symbol[0] = '\0';
+    // symbol[0] = '\0';
 
-    if (sigValue >= 0)
-        {
-            return ((char *) getSigSymbol (sigValue));
+    if (sigValue >= 0) {
+        return getSigSymbol (sigValue);
+    }
+    // else { // change the sig value from negative to positive // FIXME FIXME FIXME FIXME turn sigValue to unsigned int
+    //     if (-sigValue < LSB_SIG_NUM)
+    //         strcpy (symbol, lsbSigSymbol[-sigValue]);
+    //     else
+    //         strcpy (symbol, "UNKNOWN");
+    //     return symbol;
+    // }
+    else { 
+        if (-sigValue < LSB_SIG_NUM ) {
+            strcpy (symbol, lsbSigSymbol[-sigValue]);
         }
-    else
-        {
-            if (-sigValue < LSB_SIG_NUM)
-    strcpy (symbol, lsbSigSymbol[-sigValue]);
-            else
-    strcpy (symbol, "UNKNOWN");
-            return (symbol);
+        else {
+            strcpy (symbol, "UNKNOWN");
         }
+        return symbol;
+    }
+
+    return NULL;
 }
 
 int
-getDefSigValue_ (int sigValue, char *actCmd)
+getDefSigValue_ (int sigValue, const char *actCmd)
 {
     int defSigValue;
 
-    if (sigValue >= 0)
-        return (sigValue);
+    if (sigValue >= 0) {
+        return sigValue;
+    }
 
-    switch (sigValue)
-        {
+    switch (sigValue) { // NOTE NOTE NOTE NOTE chaeck out all the signal names 
         case SIG_CHKPNT:
         case SIG_CHKPNT_COPY:
         case SIG_DELETE_JOB:
-            return (sigValue);
+            return sigValue;
 
+        break;
         case SIG_SUSP_USER:
         case SIG_SUSP_LOAD:
         case SIG_SUSP_WINDOW:
@@ -190,28 +113,34 @@ getDefSigValue_ (int sigValue, char *actCmd)
         case SIG_TERM_CPULIMIT:
         case SIG_TERM_MEMLIMIT:
         case SIG_TERM_FORCE:
-            if ((actCmd == NULL) || (actCmd[0] == '\0'))
-
-    return (defaultSigValue[-sigValue]);
-            else if ((defSigValue = sigNameToValue_ (actCmd)) == INFINIT_INT)
-    return (sigValue);
-            else
-    {
-        if ((defSigValue == SIG_CHKPNT) || (defSigValue == SIG_CHKPNT_COPY))
-            return (sigValue);
-        else
-            return (defSigValue);
+            // if ((actCmd == NULL) || (actCmd[0] == '\0')) {
+            if( NULL == actCmd )  {
+                return defaultSigValue[-sigValue];
+            }
+            else if ((defSigValue = sigNameToValue_ (actCmd)) == INFINIT_INT) {
+                return sigValue;
+            }
+            else {
+                if ((defSigValue == SIG_CHKPNT) || (defSigValue == SIG_CHKPNT_COPY)) {
+                    return sigValue;
+                }
+                else {
+                    return defSigValue;
+                }
+            }
+        break;
+        default:
+            ls_syslog( LOG_ERR, "I don't think we are supposed to be at the default for %s(): sigvalue: %d", __func__, sigValue );
+        break;
     }
-        }
-    return (sigValue);
 
+    return sigValue;
 }
 
-int
+bool
 isSigTerm (int sigValue)
 {
-    switch (sigValue)
-        {
+    switch (sigValue) {
         case SIG_DELETE_JOB:
         case SIG_TERM_USER:
         case SIG_TERM_LOAD:
@@ -223,53 +152,65 @@ isSigTerm (int sigValue)
         case SIG_TERM_CPULIMIT:
         case SIG_TERM_MEMLIMIT:
         case SIG_TERM_FORCE:
-        case SIG_KILL_REQUEUE:
-            return (TRUE);
+        case SIG_KILL_REQUEUE: 
+            return true;
+        break;
         default:
-            return (FALSE);
-        }
+            return false;
+        break;
+    }
+
+    return false;
 }
 
-int
+bool
 isSigSusp (int sigValue)
 {
-    switch (sigValue)
-        {
+    switch (sigValue) {
         case SIG_SUSP_USER:
         case SIG_SUSP_LOAD:
         case SIG_SUSP_WINDOW:
         case SIG_SUSP_OTHER:
-            return (TRUE);
+            return true;
+        break;
         default:
-            return (FALSE);
-        }
+            return false;
+        break;
+    }
+
+    return false;
 }
 
 int
-terminateWhen_ (int *sigMap, char *name)
+terminateWhen_ (int *sigMap, const char *name)
 {
-    if (strcmp (name, "WINDOW") == 0)
-        {
-            if (sigMap[-SIG_SUSP_WINDOW] != 0)
-    return (TRUE);
-            else
-    return (FALSE);
+    if (strcmp (name, "WINDOW") == 0) {
+        if (sigMap[-SIG_SUSP_WINDOW] != 0) {
+            return true;
         }
-    else if (strcmp (name, "USER") == 0)
-        {
-            if (sigMap[-SIG_SUSP_USER] != 0)
-    return (TRUE);
-            else
-    return (FALSE);
+        else {
+            return false;
         }
-    else if (strcmp (name, "LOAD") == 0)
-        {
-            if (sigMap[-SIG_SUSP_LOAD] != 0)
-    return (TRUE);
-            else
-    return (FALSE);
+    }
+    else if (strcmp (name, "USER") == 0) {
+        if (sigMap[-SIG_SUSP_USER] != 0) {
+            return true;
         }
-    else
-        return (FALSE);
+        else {
+            return false;
+        }
+    }
+    else if (strcmp (name, "LOAD") == 0) {
+        if (sigMap[-SIG_SUSP_LOAD] != 0) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        return false;
+    }
 
+    return false;
 }

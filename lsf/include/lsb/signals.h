@@ -53,3 +53,133 @@
 // int isSigTerm (int sigValue);
 // int isSigSusp (int sigValue);
 // int terminateWhen_ (int *sigMap, char *name);
+
+
+
+// int lsbSig_map[] = {
+// enum lsbSig_map {
+//     SIG_NULL,
+//     SIG_CHKPNT,
+//     SIG_CHKPNT_COPY,
+//     SIG_DELETE_JOB,
+
+//     SIG_SUSP_USER,
+//     SIG_SUSP_LOAD,
+//     SIG_SUSP_WINDOW,
+//     SIG_SUSP_OTHER,
+
+//     SIG_RESUME_USER,
+//     SIG_RESUME_LOAD,
+//     SIG_RESUME_WINDOW,
+//     SIG_RESUME_OTHER,
+
+//     SIG_TERM_USER,
+//     SIG_TERM_LOAD,
+//     SIG_TERM_WINDOW,
+//     SIG_TERM_OTHER,
+//     SIG_TERM_RUNLIMIT,
+//     SIG_TERM_DEADLINE,
+//     SIG_TERM_PROCESSLIMIT,
+//     SIG_TERM_FORCE,
+//     SIG_KILL_REQUEUE,
+//     SIG_TERM_CPULIMIT,
+//     SIG_TERM_MEMLIMIT
+// };
+
+enum SIG_LSF {
+    SIG_NULL              = 0,
+    SIG_CHKPNT            = 1,
+    SIG_CHKPNT_COPY       = 2,
+    SIG_DELETE_JOB        = 3,
+
+    SIG_SUSP_USER         = 4,
+    SIG_SUSP_LOAD         = 5,
+    SIG_SUSP_WINDOW       = 6,
+    SIG_SUSP_OTHER        = 7,
+
+    SIG_RESUME_USER       = 8,
+    SIG_RESUME_LOAD       = 9,
+    SIG_RESUME_WINDOW     = 10,
+    SIG_RESUME_OTHER      = 11,
+
+    SIG_TERM_USER         = 12,
+    SIG_TERM_LOAD         = 13,
+    SIG_TERM_WINDOW       = 14,
+    SIG_TERM_OTHER        = 15,
+    SIG_TERM_RUNLIMIT     = 16,
+    SIG_TERM_DEADLINE     = 17,
+    SIG_TERM_PROCESSLIMIT = 18,
+    SIG_TERM_FORCE        = 19,
+    SIG_KILL_REQUEUE      = 20,
+    SIG_TERM_CPULIMIT     = 21,
+    SIG_TERM_MEMLIMIT     = 22,
+    SIG_ARRAY_REQUEUE     = 23
+};
+
+
+const char *lsbSigSymbol[] = {
+    "SIG_NULL",
+    "SIG_CHKPNT",
+    "SIG_CHKPNT_COPY",
+    "SIG_DELETE_JOB",
+
+    "SIG_SUSP_USER",
+    "SIG_SUSP_LOAD",
+    "SIG_SUSP_WINDOW",
+    "SIG_SUSP_OTHER",
+
+    "SIG_RESUME_USER",
+    "SIG_RESUME_LOAD",
+    "SIG_RESUME_WINDOW",
+    "SIG_RESUME_OTHER",
+
+    "SIG_TERM_USER",
+    "SIG_TERM_LOAD",
+    "SIG_TERM_WINDOW",
+    "SIG_TERM_OTHER",
+    "SIG_TERM_RUNLIMIT",
+    "SIG_TERM_DEADLINE",
+    "SIG_TERM_PROCESSLIMIT",
+    "SIG_TERM_FORCE",
+    "SIG_KILL_REQUEUE",
+    "SIG_TERM_CPULIMIT",
+    "SIG_TERM_MEMLIMIT"
+};
+
+
+int defaultSigValue[] = {
+    SIG_NULL,
+    SIG_CHKPNT,
+    SIG_CHKPNT_COPY,
+    SIG_DELETE_JOB,
+
+    SIGSTOP,
+    SIGSTOP,
+    SIGSTOP,
+    SIGSTOP,
+
+    SIGCONT,
+    SIGCONT,
+    SIGCONT,
+    SIGCONT,
+
+    SIGKILL,
+    SIGKILL,
+    SIGKILL,
+    SIGKILL,
+    SIGKILL,
+    SIGKILL,
+    SIGKILL,
+    SIGKILL,
+    SIGKILL,
+    SIGKILL,
+    SIGKILL,
+};
+
+/* lib/liblsbatch/signals.c */
+int sigNameToValue_( const char *sigString);
+const char *getLsbSigSymbol(int sigValue);
+int getDefSigValue_(int sigValue, const char *actCmd);
+int isSigTerm(int sigValue);
+int isSigSusp(int sigValue);
+int terminateWhen_(int *sigMap, const char *name);

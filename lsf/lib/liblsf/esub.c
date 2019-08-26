@@ -30,7 +30,7 @@
 #include "lib/esub.h"
 #include "lib/id.h"
 #include "lib/init.h"
-#include "lib/sig.h"
+#include "lib/signal.h"
 #include "lib/rdwr.h"
 #include "libint/lsi18n.h"
 #include "lib/structs/genParams.h"
@@ -43,7 +43,7 @@ int
 runEsub_ (struct lenData *ed, const char *path)
 {
     char esub[MAX_PATH_LEN];
-    char *myargv[6];
+    char *myargv[6]; // FIXME FIXME FIXME label [6]
     struct stat sbuf;
     char ESUB[] = "esub";
 

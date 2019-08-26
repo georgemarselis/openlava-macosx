@@ -90,7 +90,7 @@ fillCell_ (struct inNames **table, const char *name, const char *level)
         *(table[0]->prf_level - 1) = 0; // FIXME FIXME FIXME find what table[0] is and replace it with enum label
     }
     else {
-        table[0]->prf_level = NULL;
+        table[0]->prf_level = NULL; // FIXME FIXME FIXME find what table[0] is and replace it with enum label
     }
 
     return size;
@@ -180,7 +180,7 @@ readHvalues_conf (struct keymap *keyList, const char *linep, struct lsConf *conf
         return -1;
     }
 
-    sp = linep;
+    sp = strdup( linep ); // FIXME FIXME FIXME FIXME this needs to go to the debugger, cuz it might just be a pointer, not a copy of the string.
     key = getNextWord_ (&linep);
     if ((sp1 = strchr (key, '=')) != NULL) {
         sp1 = NULL;
@@ -263,8 +263,9 @@ lsb_readparam (struct lsConf *conf)
     char *section  = NULL;
     char paramok   = 'a';
 
-    const char parameters[] = "parameters";
-    const char unknown[]    = "unknown";
+    const char sectionName[]    = "parameters";
+    const char unknownSection[] = "unknown";
+
 
     lsberrno = LSBE_NO_ERROR;
 
@@ -324,11 +325,11 @@ lsb_readparam (struct lsConf *conf)
             /* catgets 5057 */
             ls_syslog (LOG_ERR, "catgets 5057: %s: File %s at line %d: Section name expected after Begin; ignoring section", __func__, filename, lineNum);
             lsberrno = LSBE_CONF_WARNING;
-            doSkipSection_conf (conf, &lineNum, filename, unknown);
+            doSkipSection_conf (conf, &lineNum, filename, unknownSection);
             continue;
         }
         else {
-            if (strcasecmp (section, parameters) == 0)  {
+            if (strcasecmp (section, sectionName) == 0)  {
                 if (do_Param (conf, filename, &lineNum)) {
                     paramok = true;
                 }
@@ -353,7 +354,7 @@ lsb_readparam (struct lsConf *conf)
 
 
 char
-do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
+do_Param (struct lsConf *conf, const char *filename, size_t *lineNum) // this function is basically split from the one above it, lsb_readparam (struct lsConf *conf)) because lsb_readparam (struct lsConf *conf() was fucking chaotic
 {
     char *linep = NULL;
 
@@ -476,10 +477,15 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
         { UINT_MAX,                      "    ", NULL,                                   NULL }
     };
 
+    const char sectionName[] = "parameters";
+
     if (conf == NULL) {
         return false;
     }
 
+    //
+    // set up the local buffer with the current line
+    //
     linep = getNextLineC_conf (conf, lineNum, true);
     if (logclass & LC_EXEC)  {
         ls_syslog (LOG_DEBUG, "%s: file %s: the linep is %s, and %d \n", __func__, filename, linep, strlen (linep));
@@ -491,8 +497,8 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
         return false;
     }
 
-    if (isSectionEnd (linep, filename, lineNum, parameters )) {
-        ls_syslog (LOG_WARNING, "%s: File %s at line %d: Empty %s section\n", __func__, filename, *lineNum, parameters );
+    if (isSectionEnd (linep, filename, lineNum, sectionName )) {
+        ls_syslog (LOG_WARNING, "%s: File %s at line %d: Empty %s section\n", __func__, filename, *lineNum, sectionName );
         lsberrno = LSBE_CONF_WARNING;
         return false;
     }
@@ -501,11 +507,15 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
         /* catgets 5059 */
         ls_syslog (LOG_ERR, "catgets 5059: %s: File %s at line %d: Vertical parameters section is not implemented yet; use horizontal format; ignoring section", __func__, filename, *lineNum);
         lsberrno = LSBE_CONF_WARNING;
-        doSkipSection_conf (conf, lineNum, filename, parameters );
+        doSkipSection_conf (conf, lineNum, filename, sectionName );
         return false;
     }
 
-    if (readHvalues_conf (keyList, linep, conf, filename, lineNum, false, parameters ) < 0) {
+
+    //
+    // Extract the (somewhat generic) key values from current line FIXME FIXME FIXME FIXME why do we pass the damn file name?
+    //
+    if (readHvalues_conf (keyList, linep, conf, filename, lineNum, false, sectionName ) < 0) {
         /* catgets 5060 */
         ls_syslog (LOG_ERR, "catgets 5060: %s: File %s at line %d: Incorrect section; ignored", __func__, filename, *lineNum);
         lsberrno = LSBE_CONF_WARNING;
@@ -513,19 +523,25 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
         return false;
     }
 
+
+    //
+    // assign the (somewhat generic) key values to specific values to pConf->param
+    //
+    //      not quite sure if this is the most efficient way, but i will go along for now.
+    //
     for ( unsigned int i = 0; keyList[i].key != NULL; i++) {
 
         unsigned int value   = 0;
 
         if (keyList[i].val != NULL && strcmp (keyList[i].val, "")) {
-            if (i == LSB_MANAGER) { // i == 0
+            if (i == LSB_MANAGER) { // i == 0 // IGNORRED
                 /* catgets 5061 */
                 ls_syslog (LOG_WARNING, "catgets 5061: %s: Ignore LSB_MANAGER value <%s>; use MANAGERS  defined in cluster file instead", filename, keyList[i].val ); 
                 lsberrno = LSBE_CONF_WARNING;
             }
-            else if (i == DEFAULT_QUEUE) { // i == 1
-                pConf->param->defaultQueues = putstr_ (keyList[i].val); // struct paramConf *pConf in lib/conf_lsb.h
-                if (pConf->param->defaultQueues == NULL) {
+            else if (i == DEFAULT_QUEUE) { // i == 1 // char *defaultQueues; The default queues where jobs are submitted
+                pConf->param->defaultQueues = putstr_ (keyList[i].val); // struct paramConf *pConf in lib/conf_lsb.h 
+                if (pConf->param->defaultQueues == NULL) { //
                     const char malloc[] = "malloc";
                     ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, malloc, strlen (keyList[i].val) + 1);
                     lsberrno = LSBE_NO_MEM;
@@ -533,7 +549,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
                     return false;
                 }
             }
-            else if (i == DEFAULT_HOST_SPEC ) { // i == 2
+            else if (i == DEFAULT_HOST_SPEC ) { // i == 2 // char *defaultHostSpec;
                 pConf->param->defaultHostSpec = putstr_ (keyList[i].val);  // struct paramConf *pConf in lib/conf_lsb.h
                 if (pConf->param->defaultHostSpec == NULL) {
                     const char malloc[] = "malloc";
@@ -543,10 +559,12 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
                     return false;
                 }
             }
-            else if (i == JOB_SPOOL_DIR ) {// i == 24
-
-                if (checkSpoolDir (keyList[i].val) == 0) {
+            else if (i == JOB_SPOOL_DIR ) { // i == 24 // char *pjobSpoolDir;
+                if (checkSpoolDir (keyList[i].val) == 0) { 
                     pConf->param->pjobSpoolDir = putstr_ (keyList[i].val); // struct paramConf *pConf in lib/conf_lsb.h
+                    //
+                    // Check to see if the current value was assigned to pConf->param->pjobSpoolDir
+                    //      throw an error if it does not
                     if (pConf->param->pjobSpoolDir == NULL) {
                         const char malloc[] = "malloc";
                         ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, malloc, strlen (keyList[i].val) + 1);
@@ -556,7 +574,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
                     }
                 }
                 else {
-                    pConf->param->pjobSpoolDir = NULL;
+                    pConf->param->pjobSpoolDir = NULL; // struct paramConf *pConf in lib/conf_lsb.h
                     /* catgets 5095 */
                     ls_syslog (LOG_ERR, "catgets 5095: %s: Invalid JOB_SPOOL_DIR!", __func__);
                     lsberrno = LSBE_CONF_WARNING;
@@ -667,7 +685,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum)
                 }
 
                 pConf->param->jobPriorityValue = value_; // struct paramConf *pConf in lib/conf_lsb.h
-                pConf->param->jobPriorityTime = mytime; // struct paramConf *pConf in lib/conf_lsb.h
+                pConf->param->jobPriorityTime  = mytime; // struct paramConf *pConf in lib/conf_lsb.h
 
             }
             else if (i == SHARED_RESOURCE_UPDATE_FACTOR ) { // i == 27
@@ -916,6 +934,8 @@ freeParameterInfo (struct parameterInfo *param)
         FREEUP (param->defaultProject);
         FREEUP (param->pjobSpoolDir);
     }
+
+    return;
 }
 
 int
@@ -934,7 +954,7 @@ checkSpoolDir ( const char *pSpoolDir)
         ls_syslog (LOG_DEBUG, "%s: JOB_SPOOL_DIR is set to %s, and  is of length %d \n", __func__, pSpoolDir, strlen (pSpoolDir));
     }
     if (strlen (pSpoolDir) >= MAX_PATH_LEN) {
-        return -1;
+        return -1; // FIXME FIXME FIXME return an appropriate *non-negative* n umber
     }
 
     if (strlen (pSpoolDir) < 1) {
@@ -942,7 +962,7 @@ checkSpoolDir ( const char *pSpoolDir)
     }
 
     if (strchr (pSpoolDir, '|') != strrchr (pSpoolDir, '|')) {
-        return -1;
+        return -1; // FIXME FIXME FIXME return an appropriate *non-negative* n umber
     }
 
     strcpy (TempPath, pSpoolDir);
@@ -957,7 +977,7 @@ checkSpoolDir ( const char *pSpoolDir)
         if (strlen (TempUnix) > 1) {
 
             if (TempUnix[0] != '/') {
-                return -1;
+                return -1; // FIXME FIXME FIXME return an appropriate *non-negative* n umber
             }
         }
 
@@ -988,11 +1008,11 @@ checkSpoolDir ( const char *pSpoolDir)
             if (TempNT[0] != '\\' || TempNT[1] != '\\') {
 
                 if (TempNT[1] != ':') {
-                    return -1;
+                    return -1; // FIXME FIXME FIXME return an appropriate *non-negative* n umber
                 }
                 else {
                     if (!isalpha (TempNT[0])) {
-                        return -1;
+                        return -1; // FIXME FIXME FIXME return an appropriate *non-negative* n umber
                     }
                 }
             }
@@ -1013,7 +1033,7 @@ checkSpoolDir ( const char *pSpoolDir)
             if ((pSpoolDir[0] != '\\') || (pSpoolDir[1] != '\\')) {
 
                 if (!(isalpha (pSpoolDir[0]) && (pSpoolDir[1] == ':'))) {
-                    return -1;
+                    return -1; // FIXME FIXME FIXME return an appropriate *non-negative* n umber
                 }
             }
         }
@@ -1156,9 +1176,11 @@ lsb_readuser_ex (struct lsConf *conf, int options, struct clusterConf *clusterCo
             continue;
         }
     }
+
+    return NULL;
 }
 
-char
+bool
 do_Users (struct lsConf *conf, const char *filename, size_t *lineNum, int options)
 {
     int new                          = 0;
@@ -1182,13 +1204,13 @@ do_Users (struct lsConf *conf, const char *filename, size_t *lineNum, int option
         "MAX_JOBS",
         "JL_P",
         NULL
-    }
+    };
 
     struct keymap keyList[] = {
         { USER_NAME, "    ", keylist[ USER_NAME ], NULL },
         { MAX_JOBS,  "    ", keylist[ MAX_JOBS  ], NULL },
         { JL_P,      "    ", keylist[ JL_P ],      NULL },
-        { -1,        "    ", NULL, NULL }
+        { UINT_MAX,  "    ", NULL,                 NULL }
     };
 
     const char user[ ] = "user";
@@ -1444,7 +1466,7 @@ do_Users (struct lsConf *conf, const char *filename, size_t *lineNum, int option
 }
 
 
-char
+bool
 do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filename, size_t *lineNum, unsigned int *ngroups, int options)
 {
     enum state { 
@@ -1456,12 +1478,12 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filena
         "GROUP_NAME",
         "GROUP_MEMBER",
         NULL
-    }
+    };
 
     struct keymap keyList[] = {
         {GROUP_NAME,   "    ", keylist[GROUP_NAME],   NULL },
         {GROUP_MEMBER, "    ", keylist[GROUP_MEMBER], NULL },
-        {-1,           "    ", NULL, NULL }
+        {UINT_MAX,     "    ", NULL,                  NULL }
     };
 
     char *wp                = NULL;
@@ -1617,16 +1639,16 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filena
                 if (numHosts > 0) {
                     ls_syslog (LOG_DEBUG, "%s: resolveBatchNegHosts( ): \'%s\' the string is replaced with \'%s\'", __func__, keyList[GROUP_NAME].val, outHosts);
                 }
-                else if (numHosts == 0) {
+                else if (numHosts == 0) { // FIXME FIXME FIXME non-positive values
                     /* catgets 5460 */
                     ls_syslog (LOG_WARNING, "catgets 5460: %s: File %s at line %d: there are no hosts found to exclude, replaced with \'%s\'", __func__, filename, *lineNum, outHosts);
                 }
-                else if (numHosts == -1) {
+                else if (numHosts == -1) { // FIXME FIXME FIXME non-positive values
                     lsberrno = LSBE_NO_MEM;
                     return false;
                 }
                 else {
-                    if (numHosts == -3) {
+                    if (numHosts == -3) { // FIXME FIXME FIXME non-positive values
                         /* catgets 5461 */
                         ls_syslog (LOG_WARNING, "catgets 5461: %s: \'%s\': \'%s\' The result is that all the hosts are to be excluded.", __func__, keyList[GROUP_NAME].val, keyList[GROUP_MEMBER].val);
                     }
@@ -1691,13 +1713,13 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filena
         return false;
     }
 
-    fprintf(   stdout,  "%s: you are not supposed to be here, esse!\n", __func__ );
-    ls_syslog( LOG_ERR, "%s: you are not supposed to be here, esse!", __func__ );
-    return 255;
+    fprintf(   stdout,  "%s: you are not supposed to be here!\n", __func__ );
+    ls_syslog( LOG_ERR, "%s: you are not supposed to be here", __func__ );
+    return false;
 }
 
 
-int
+bool
 isHostName ( const char *grpName)
 {
     if (Gethostbyname_ (grpName) != NULL) {
@@ -1762,12 +1784,15 @@ addGroup (struct groupInfoEnt **groups, const char *gname, unsigned int *ngroups
         *ngroups += 1;
         return groups[*ngroups - 2];
     }
+
+    return NULL;
 }
 
 struct groupInfoEnt *
 addUnixGrp (struct group *unixGrp, const char *gname, const char *filename, unsigned int lineNum, const char *section, int type)
 {
-    int i                   = -1;
+    // int i                   = -1;
+    unsigned int            = 0;
     struct groupInfoEnt *gp = NULL;
     struct passwd *pw       = NULL;
 
@@ -1775,7 +1800,7 @@ addUnixGrp (struct group *unixGrp, const char *gname, const char *filename, unsi
         return NULL;
     }
 
-    if (numofugroups >= MAX_GROUPS) {
+    if (numofugroups >= MAX_GROUPS) { // unsigned int numofugroups in lib/conf_lsb.h
         /* catgets 5131 */
         ls_syslog (LOG_ERR, "catgets 5131: %s: File %s at line %d: numofugroups <%d> is equal to or greater than MAX_GROUPS <%d>; ignoring the group <%s>", __func__, filename, lineNum, numofugroups, MAX_GROUPS, unixGrp->gr_name);
         return NULL;
@@ -1810,6 +1835,7 @@ addUnixGrp (struct group *unixGrp, const char *gname, const char *filename, unsi
 
     if (gp->memberList == NULL) {
         freeGroupInfo (gp);
+        assert( numofugroups > 0 ); // CHECK for overflow
         numofugroups -= 1;
         return NULL;
     }
@@ -1817,7 +1843,7 @@ addUnixGrp (struct group *unixGrp, const char *gname, const char *filename, unsi
     return gp;
 }
 
-char
+bool
 addMember (struct groupInfoEnt *gp, const char *word, int grouptype, const char *filename, unsigned int lineNum, const char *section, int options, int checkAll)
 {
     // 
@@ -2066,14 +2092,14 @@ addMember (struct groupInfoEnt *gp, const char *word, int grouptype, const char 
 // }
 
 struct groupInfoEnt *
-getGrpData (struct groupInfoEnt **groups, const char *name, unsigned int num)
+getGrpData (struct groupInfoEnt **groups, const char *groupname, unsigned int num)
 {
-    if (name == NULL || groups == NULL) {
+    if (groupname == NULL || groups == NULL) {
         return NULL;
     }
 
     for ( unsigned int i = 0; i < num; i++) {
-        if (groups[i] && groups[i]->group && (strcmp (name, groups[i]->group) == 0) ) {
+        if (groups[i] && groups[i]->group && (strcmp (groupname, groups[i]->group) == 0) ) {
             return groups[i];
         }
     }
@@ -2082,14 +2108,14 @@ getGrpData (struct groupInfoEnt **groups, const char *name, unsigned int num)
 }
 
 struct userInfoEnt *
-getUserData ( const char *name)
+getUserData ( const char *username)
 {
-    if (name == NULL) {
+    if (username == NULL) {
         return NULL;
     }
 
     for ( unsigned int i = 0; i < numofusers; i++) {
-        if (strcmp (name, users[i]->user) == 0) {
+        if (strcmp (username, users[i]->user) == 0) {
             return users[i];
         }
     }
@@ -2099,14 +2125,14 @@ getUserData ( const char *name)
 
 
 struct hostInfoEnt *
-getHostData ( const char *name)
+getHostData ( const char *hostname)
 {
-    if (name == NULL) {
+    if (hostname == NULL) {
         return NULL;
     }
 
     for ( unsigned int i = 0; i < numofhosts; i++) {
-        if (equalHost_ (name, hosts[i]->host)) {
+        if (equalHost_ (hostname, hosts[i]->host)) {
             return hosts[i];
         }
     }
@@ -2115,14 +2141,14 @@ getHostData ( const char *name)
 }
 
 struct queueInfoEnt *
-getQueueData (const char *name)
+getQueueData (const char *queuename)
 {
-    if (name == NULL) {
+    if (queuename == NULL) {
         return NULL;
     }
 
     for ( unsigned int i = 0; i < numofqueues; i++) {
-        if (strcmp (name, queues[i]->queue) == 0) {
+        if (strcmp (queuename, queues[i]->queue) == 0) {
             return queues[i];
         }
     }
@@ -2130,7 +2156,7 @@ getQueueData (const char *name)
     return NULL;
 }
 
-char
+bool
 searchAll (char *const word)
 {
     char *sp = NULL;
@@ -2202,7 +2228,7 @@ freeGroupInfo (struct groupInfoEnt *gp)
     return;
 }
 
-char
+bool
 addUser ( const char *username, size_t maxjobs, float pJobLimit, const char *filename, int override)
 {
     struct userInfoEnt *up        = NULL;
@@ -2283,7 +2309,7 @@ addUser ( const char *username, size_t maxjobs, float pJobLimit, const char *fil
     return NULL;
 }
 
-char
+bool
 isInGrp (char *word, struct groupInfoEnt *gp, int grouptype, int checkAll)
 {
     char *tmp = NULL;
@@ -2327,7 +2353,6 @@ isInGrp (char *word, struct groupInfoEnt *gp, int grouptype, int checkAll)
     }
 
     return false;
-
 }
 
 char **
@@ -2747,9 +2772,9 @@ getThresh (struct lsInfo *info, struct keymap *keylist, float loadSched[], float
 int
 addHostEnt (struct hostInfoEnt *hp, struct hostInfo *hostInfo, size_t *override)
 {
+    unsigned int ihost       = 0;
+    bool bExists             = false;
     struct hostInfoEnt *host = NULL;
-    bool_t bExists = false;
-    unsigned int ihost = 0;
 
     if (hp == NULL) {
         return false;
@@ -2827,7 +2852,7 @@ copyHostInfo (struct hostInfoEnt *toHost, struct hostInfoEnt *fromHost)
     if ((toHost->host = putstr_ (fromHost->host)) == NULL) {
         ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (fromHost->host) + 1);
         lsberrno = LSBE_NO_MEM;
-        return -1;
+        return -1; // FIXME FIXME FIXME replace -1 with relative, non-negative integer.
     }
 
     if( fromHost->nIdx ) {
@@ -2844,7 +2869,7 @@ copyHostInfo (struct hostInfoEnt *toHost, struct hostInfoEnt *fromHost)
             FREEUP (toHost->loadSched);
             FREEUP (toHost->loadStop);
             FREEUP (toHost->windows);
-            return -1;
+            return -1; // FIXME FIXME FIXME replace -1 with relative, non-negative integer.
         }
     }
     if (fromHost->loadSched != NULL) {
@@ -3136,10 +3161,12 @@ parseGroups (char *linep, const char *filename, size_t *lineNum, const char *sec
                     myWord[length - 2] = '\0';
                 }
                 else if ((sp = strchr (myWord, '+')) != NULL && sp > myWord) {
-                    char *cp_;
-                    int number = false;
-                    badPref = false;
-                    cp_ = sp;
+
+                    char *cp_      = NULL;
+                    bool is_number = false;
+                    badPref        = false;
+                    cp_            = sp;
+
                     while (*cp_ != '\0') {
                         if (*cp_ == '+' && !number) {
                             cp_++;
@@ -3161,7 +3188,7 @@ parseGroups (char *linep, const char *filename, size_t *lineNum, const char *sec
                     if (badPref == true) {
                         continue;
                     }
-                    *sp = '\0';
+                    sp = NULL;
                 }
                 else {
                     char *function_name = malloc( strlen(filename)  + 1);
@@ -3181,13 +3208,15 @@ parseGroups (char *linep, const char *filename, size_t *lineNum, const char *sec
                         if (cpWord[length - 3] == '+') {
                             continue;
                         }
-                        cpWord[length - 2] = '\0';
+                        cpWord[length - 2] = '\0'; // FIXME FIXME FIXME such ascii gymnastics bullshit is bad for one's health.
                     }
                     else if ((sp = strchr (cpWord, '+')) != NULL && sp > cpWord) {
-                        char *cp_;
+ 
+                        char *cp_  = NULL;
                         int number = false;
-                        badPref = false;
-                        cp_ = sp;
+                        badPref    = false;
+                        cp_        = sp;
+
                         while (*cp_ != '\0') {
                             if (*cp_ == '+' && !number) {
                                 cp_++;
@@ -3455,8 +3484,8 @@ lsb_readqueue (struct lsConf *conf, struct lsInfo *info, int options, struct sha
         return NULL;
     }
 
-    j = 0;
-    for ( unsigned int i = 0; i < info->nRes; i++) {
+    // j = 0;
+    for ( unsigned int i = 0, unsigned int j = 0; i < info->nRes; i++, j++) {
 
         if (info->resTable[i].flags & RESF_DYNAMIC) {
             memcpy (&myinfo.resTable[j], &info->resTable[i], sizeof (struct resItem));
@@ -3464,7 +3493,8 @@ lsb_readqueue (struct lsConf *conf, struct lsInfo *info, int options, struct sha
         }
     }
 
-    for ( unsigned int i = 0; i < info->nRes; i++) {
+    // for ( unsigned int i = 0; i < info->nRes; i++) {
+    for ( unsigned int i = 0, unsigned int j = 0; i < info->nRes; i++, j++) {
         if (!(info->resTable[i].flags & RESF_DYNAMIC)) {
             memcpy (&myinfo.resTable[j], &info->resTable[i], sizeof (struct resItem));
             j++;
@@ -3571,121 +3601,8 @@ lsb_readqueue (struct lsConf *conf, struct lsInfo *info, int options, struct sha
 
 // char
 bool 
-do_Queues (struct lsConf *conf, char *filename, size_t *lineNum, struct lsInfo *info, int options)
+do_Queues (struct lsConf *conf, const char *filename, size_t *lineNum, struct lsInfo *info, int options)
 {
-
-// #define QKEY_NAME                   info->numIndx + 0
-// #define QKEY_PRIORITY               info->numIndx + 1
-// #define QKEY_NICE                   info->numIndx + 2
-// #define QKEY_UJOB_LIMIT             info->numIndx + 3
-// #define QKEY_PJOB_LIMIT             info->numIndx + 4
-// #define QKEY_RUN_WINDOW             info->numIndx + 5
-// #define QKEY_CPULIMIT               info->numIndx + 6
-// #define QKEY_FILELIMIT              info->numIndx + 7
-// #define QKEY_DATALIMIT              info->numIndx + 8
-// #define QKEY_STACKLIMIT             info->numIndx + 9
-// #define QKEY_CORELIMIT              info->numIndx + 10
-// #define QKEY_MEMLIMIT               info->numIndx + 11
-// #define QKEY_RUNLIMIT               info->numIndx + 12
-// #define QKEY_USERS                  info->numIndx + 13
-// #define QKEY_HOSTS                  info->numIndx + 14
-// #define QKEY_EXCLUSIVE              info->numIndx + 15
-// #define QKEY_DESCRIPTION            info->numIndx + 16
-// #define QKEY_MIG                    info->numIndx + 17
-// #define QKEY_QJOB_LIMIT             info->numIndx + 18
-// #define QKEY_POLICIES               info->numIndx + 19
-// #define QKEY_DISPATCH_WINDOW        info->numIndx + 20
-// #define QKEY_USER_SHARES            info->numIndx + 21
-// #define QKEY_DEFAULT_HOST_SPEC      info->numIndx + 22
-// #define QKEY_PROCLIMIT              info->numIndx + 23
-// #define QKEY_ADMINISTRATORS         info->numIndx + 24
-// #define QKEY_PRE_EXEC               info->numIndx + 25
-// #define QKEY_POST_EXEC              info->numIndx + 26
-// #define QKEY_REQUEUE_EXIT_VALUES    info->numIndx + 27
-// #define QKEY_HJOB_LIMIT             info->numIndx + 28
-// #define QKEY_RES_REQ                info->numIndx + 29
-// #define QKEY_SLOT_RESERVE           info->numIndx + 30
-// #define QKEY_RESUME_COND            info->numIndx + 31
-// #define QKEY_STOP_COND              info->numIndx + 32
-// #define QKEY_JOB_STARTER            info->numIndx + 33
-// #define QKEY_SWAPLIMIT              info->numIndx + 34
-// #define QKEY_PROCESSLIMIT           info->numIndx + 35
-// #define QKEY_JOB_CONTROLS           info->numIndx + 36
-// #define QKEY_TERMINATE_WHEN         info->numIndx + 37
-// #define QKEY_NEW_JOB_SCHED_DELAY    info->numIndx + 38
-// #define QKEY_INTERACTIVE            info->numIndx + 39
-// #define QKEY_JOB_ACCEPT_INTERVAL    info->numIndx + 40
-// #define QKEY_BACKFILL               info->numIndx + 41
-// #define QKEY_IGNORE_DEADLINE        info->numIndx + 42
-// #define QKEY_CHKPNT                 info->numIndx + 43
-// #define QKEY_RERUNNABLE             info->numIndx + 44
-// #define QKEY_ENQUE_INTERACTIVE_AHEAD info->numIndx +45
-// #define QKEY_ROUND_ROBIN_POLICY     info->numIndx + 46
-// #define QKEY_PRE_POST_EXEC_USER     info->numIndx + 47
-// #define KEYMAP_SIZE                 info->numIndx + 49
-
-
-    // FREEUP (keyList);
-    // assert( KEYMAP_SIZE >= 0 );
-    // keyList = calloc( KEYMAP_SIZE, sizeof (struct keymap));
-    // if( NULL == keyList && ENOMEM == errno ) {
-    //  return false;
-    // }
-
-    // assert( QKEY_NAME + 1 <= INT_MAX );
-    // assert( KEYMAP_SIZE <= INT_MAX );
-    // initkeyList (keyList, (int)(QKEY_NAME + 1), (int)KEYMAP_SIZE, info);
-
-    // keyList[QKEY_NAME].key                    = "QUEUE_NAME";
-    // keyList[QKEY_PRIORITY].key                = "PRIORITY";
-    // keyList[QKEY_NICE].key                    = "NICE";
-    // keyList[QKEY_UJOB_LIMIT].key              = "UJOB_LIMIT";
-    // keyList[QKEY_PJOB_LIMIT].key              = "PJOB_LIMIT";
-    // keyList[QKEY_RUN_WINDOW].key              = "RUN_WINDOW";
-    // keyList[QKEY_CPULIMIT].key                = "CPULIMIT";
-    // keyList[QKEY_FILELIMIT].key               = "FILELIMIT";
-    // keyList[QKEY_DATALIMIT].key               = "DATALIMIT";
-    // keyList[QKEY_STACKLIMIT].key              = "STACKLIMIT";
-    // keyList[QKEY_CORELIMIT].key               = "CORELIMIT";
-    // keyList[QKEY_MEMLIMIT].key                = "MEMLIMIT";
-    // keyList[QKEY_RUNLIMIT].key                = "RUNLIMIT";
-    // keyList[QKEY_USERS].key                   = "USERS";
-    // keyList[QKEY_HOSTS].key                   = "HOSTS";
-    // keyList[QKEY_EXCLUSIVE].key               = "EXCLUSIVE";
-    // keyList[QKEY_DESCRIPTION].key             = "DESCRIPTION";
-    // keyList[QKEY_MIG].key                     = "MIG";
-    // keyList[QKEY_QJOB_LIMIT].key              = "QJOB_LIMIT";
-    // keyList[QKEY_POLICIES].key                = "POLICIES";
-    // keyList[QKEY_DISPATCH_WINDOW].key         = "DISPATCH_WINDOW";
-    // keyList[QKEY_USER_SHARES].key             = "USER_SHARES";
-    // keyList[QKEY_DEFAULT_HOST_SPEC].key       = "DEFAULT_HOST_SPEC";
-    // keyList[QKEY_PROCLIMIT].key               = "PROCLIMIT";
-    // keyList[QKEY_ADMINISTRATORS].key          = "ADMINISTRATORS";
-    // keyList[QKEY_PRE_EXEC].key                = "PRE_EXEC";
-    // keyList[QKEY_POST_EXEC].key               = "POST_EXEC";
-    // keyList[QKEY_REQUEUE_EXIT_VALUES].key     = "REQUEUE_EXIT_VALUES";
-    // keyList[QKEY_HJOB_LIMIT].key              = "HJOB_LIMIT";
-    // keyList[QKEY_RES_REQ].key                 = "RES_REQ";
-    // keyList[QKEY_SLOT_RESERVE].key            = "SLOT_RESERVE";
-    // keyList[QKEY_RESUME_COND].key             = "RESUME_COND";
-    // keyList[QKEY_STOP_COND].key               = "STOP_COND";
-    // keyList[QKEY_JOB_STARTER].key             = "JOB_STARTER";
-    // keyList[QKEY_SWAPLIMIT].key               = "SWAPLIMIT";
-    // keyList[QKEY_PROCESSLIMIT].key            = "PROCESSLIMIT";
-    // keyList[QKEY_JOB_CONTROLS].key            = "JOB_CONTROLS";
-    // keyList[QKEY_TERMINATE_WHEN].key          = "TERMINATE_WHEN";
-    // keyList[QKEY_NEW_JOB_SCHED_DELAY].key     = "NEW_JOB_SCHED_DELAY";
-    // keyList[QKEY_INTERACTIVE].key             = "INTERACTIVE";
-    // keyList[QKEY_JOB_ACCEPT_INTERVAL].key     = "JOB_ACCEPT_INTERVAL";
-    // keyList[QKEY_BACKFILL].key                = "BACKFILL";
-    // keyList[QKEY_IGNORE_DEADLINE].key         = "IGNORE_DEADLINE";
-    // keyList[QKEY_CHKPNT].key                  = "CHKPNT";
-    // keyList[QKEY_RERUNNABLE].key              = "RERUNNABLE";
-    // keyList[QKEY_ENQUE_INTERACTIVE_AHEAD].key = "ENQUE_INTERACTIVE_AHEAD";
-    // keyList[QKEY_ROUND_ROBIN_POLICY].key      = "ROUND_ROBIN_POLICY";
-    // keyList[QKEY_PRE_POST_EXEC_USER].key      = "PRE_POST_EXEC_USER";
-    // keyList[KEYMAP_SIZE - 1].key              = NULL;
-
     
     char *linep = NULL;
     char *sp    = NULL;
@@ -3884,8 +3801,8 @@ do_Queues (struct lsConf *conf, char *filename, size_t *lineNum, struct lsInfo *
         char *function_name = malloc( strlen(filename )  + 1 );
         strcpy( function_name, filename );
         retval = readHvalues_conf (keyList, linep, conf, filename, lineNum, false, queueLabel);
-        if (retval < 0) {
-            if (retval == -2) {
+        if (retval < 0) { // FIXME FIXME FIXME FIXME replace with meaningful, non-negative number
+            if (retval == -2) { // FIXME FIXME FIXME FIXME replace with meaningful, non-negative number
                 lsberrno = LSBE_CONF_WARNING;
                 /* catgets 5463 */
                 ls_syslog (LOG_ERR, "catgets 5463: %s: Parameter error in %s(%d); remaining parameters in this section will be either ignored or set to default values.", __func__, filename, *lineNum);
@@ -4601,7 +4518,7 @@ freeQueueInfo (struct queueInfoEnt *qp)
     return;
 }
 
-char
+bool
 checkRequeEValues (struct queueInfoEnt *qp, char *word, const char *filename, size_t *lineNum)
 {
 // #define NORMAL_EXIT 0
@@ -4618,10 +4535,10 @@ checkRequeEValues (struct queueInfoEnt *qp, char *word, const char *filename, si
     int mode       = NORMAL_EXIT;
     char *sp       = NULL;
     char *cp       = NULL;
-    int exitInts[400];
+    int exitInts[400];  // FIXME FIXME IFME FIXME wtf why 400 exit statuses?
     char exitValues[MAX_LINE_LEN];
 
-    memset( exitInts,   '\0', strlen( exitInts ) );
+    memset( exitInts,   0, sizeof( exitInts ) );
     memset( exitValues, '\0', strlen( exitValues ) );
 
     cp = word;
@@ -4684,7 +4601,7 @@ checkRequeEValues (struct queueInfoEnt *qp, char *word, const char *filename, si
     return true;
 }
 
-char
+bool
 addQueue (struct queueInfoEnt *qp, const char *filename, unsigned int lineNum)
 {
     
@@ -4877,7 +4794,7 @@ resetHConf (struct hostConf *hConf1)
 }
 
 void
-checkCpuLimit (char **hostSpec, double **cpuFactor, int useSysDefault, const char *filename, size_t *lineNum, char *pname, struct lsInfo *info, int options)
+checkCpuLimit (char **hostSpec, double **cpuFactor, int useSysDefault, const char *filename, size_t *lineNum, const char *pname, struct lsInfo *info, int options)
 {
     if( ( *hostSpec ) && ( *cpuFactor == NULL ) && ( options != CONF_NO_CHECK ) && ( (*cpuFactor = getModelFactor (*hostSpec, info)) == NULL) && ( (*cpuFactor = getHostFactor (*hostSpec)) == NULL) ) {
         if (useSysDefault == true) {
@@ -4895,13 +4812,15 @@ checkCpuLimit (char **hostSpec, double **cpuFactor, int useSysDefault, const cha
             FREEUP (*hostSpec);
         }
     }
+
+    return;
 }
 
-int
-parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char *filename, size_t *lineNum, char *pname, struct lsInfo *info, int options)
+bool
+parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char *filename, size_t *lineNum, const char *pname, struct lsInfo *info, int options)
 {
     int limit            = 0; 
-    int retValue         = 0;
+    bool retValue        = false;
     int useSysDefault    = false;
     double *cpuFactor    = NULL;
     char   *spec         = NULL;
@@ -4923,9 +4842,8 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char
 
     if (maxLimit != NULL) {
         
-        retValue = parseLimitAndSpec (defaultLimit, &limit, &spec, hostSpec, key.key, qp, filename, lineNum, pname);
-        
-        if (retValue == 0) {
+        retValue = parseLimitAndSpec (defaultLimit, &limit, &spec, hostSpec, key.key, qp, filename, lineNum, pname);  
+        if (retValue == true) {
             if (limit >= 0) {
                 qp->defLimits[LSF_RLIMIT_CPU] = limit;
             }
@@ -4968,7 +4886,7 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char
     if (maxLimit != NULL) {
 
         retValue = parseLimitAndSpec (defaultLimit, &limit, &spec, hostSpec, key.key, qp, filename, lineNum, pname);
-        if (retValue == 0) {
+        if (retValue == true) {
             if (limit >= 0) {
                 qp->defLimits[LSF_RLIMIT_RUN] = limit;
             }
@@ -4982,7 +4900,7 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char
     }
 
     retValue = parseLimitAndSpec (maxLimit, &limit, &spec, hostSpec, key.key, qp, filename, lineNum, pname);
-    if (retValue == 0) {
+    if (retValue == true) {
         if (limit >= 0) {
             qp->rLimits[LSF_RLIMIT_RUN] = limit;
         }
@@ -5018,22 +4936,22 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char
         if (qp->defaultHostSpec != NULL && qp->defaultHostSpec[0]) {
             
             hostSpec = putstr_ (qp->defaultHostSpec);
-            if (hostSpec && hostSpec[0]) {
+            if (hostSpec && hostSpec[0]) { // FIXME FIXME FIXME label [0]
                 checkCpuLimit (&hostSpec, &cpuFactor, useSysDefault, filename, lineNum, pname, info, options);
-                }
             }
         }
+    }
 
     if (cpuFactor == NULL && options & CONF_RETURN_HOSTSPEC) {
         if (pConf && pConf->param && pConf->param->defaultHostSpec != NULL && pConf->param->defaultHostSpec[0]) {
             
             hostSpec = putstr_ (pConf->param->defaultHostSpec);
             useSysDefault = true;
-            if (hostSpec && hostSpec[0]) {
+            if (hostSpec && hostSpec[0]) { // FIXME FIXME FIXME label [0]
                 checkCpuLimit (&hostSpec, &cpuFactor, useSysDefault, filename, lineNum, pname, info, options);
-                }
             }
         }
+    }
 
     if (hostSpec == NULL && (options & CONF_RETURN_HOSTSPEC) && (options & CONF_CHECK)) {
         if (maxHName == NULL && maxFactor <= 0.0) {
@@ -5065,25 +4983,25 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char
             if (qp->rLimits[LSF_RLIMIT_CPU] > 0 && qp->rLimits[LSF_RLIMIT_CPU] != INFINIT_INT && (options & CONF_RETURN_HOSTSPEC)) {
                 limit_ = qp->rLimits[LSF_RLIMIT_CPU] * (*cpuFactor);
                 limit_ = limit_ < 1 ? 1 : limit_ + 0.5;
-                qp->rLimits[LSF_RLIMIT_CPU] = (int) limit_;
+                qp->rLimits[LSF_RLIMIT_CPU] = limit_;
             }
 
             if (qp->defLimits[LSF_RLIMIT_CPU] > 0 && qp->defLimits[LSF_RLIMIT_CPU] != INFINIT_INT && (options & CONF_RETURN_HOSTSPEC)) {
                 limit_ = qp->defLimits[LSF_RLIMIT_CPU] * (*cpuFactor);
                 limit_ = limit_ < 1 ? 1 : limit_ + 0.5;
-                qp->defLimits[LSF_RLIMIT_CPU] = (int) limit_;
+                qp->defLimits[LSF_RLIMIT_CPU] = limit_;
             }
 
             if (qp->rLimits[LSF_RLIMIT_RUN] > 0 && qp->rLimits[LSF_RLIMIT_RUN] != INFINIT_INT && (options & CONF_RETURN_HOSTSPEC)) {
                 limit_ = qp->rLimits[LSF_RLIMIT_RUN] * (*cpuFactor);
                 limit_ = limit_ < 1 ? 1 : limit_ + 0.5;
-                qp->rLimits[LSF_RLIMIT_RUN] = (int) limit_;
+                qp->rLimits[LSF_RLIMIT_RUN] = limit_;
             }
 
             if (qp->defLimits[LSF_RLIMIT_RUN] > 0 && qp->defLimits[LSF_RLIMIT_RUN] != INFINIT_INT && (options & CONF_RETURN_HOSTSPEC)) {
                 limit_ = qp->defLimits[LSF_RLIMIT_RUN] * (*cpuFactor);
                 limit_ = limit_ < 1 ? 1 : limit_ + 0.5;
-                qp->defLimits[LSF_RLIMIT_RUN] = (int) limit_;
+                qp->defLimits[LSF_RLIMIT_RUN] = limit_;
             }
         }
         else {
@@ -5100,8 +5018,8 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char
     return true;
 }
 
-int
-parseProcLimit (char *word, struct queueInfoEnt *qp, const char *filename, size_t *lineNum, char *pname )
+bool
+parseProcLimit (char *word, struct queueInfoEnt *qp, const char *filename, size_t *lineNum, const char *pname )
 {
     int values[ ] = { 0, 0, 0 }; // FIXME FIXME FIXME label each value
     char *sp      = NULL;
@@ -5117,7 +5035,8 @@ parseProcLimit (char *word, struct queueInfoEnt *qp, const char *filename, size_
 
     sp = word;
     if (sp == NULL) {
-        return -1;
+        // FIXME FIXME FIXME FIXME set lsferr or something here to notify caller
+        return false;
     }
     else {
 
@@ -5187,19 +5106,19 @@ parseProcLimit (char *word, struct queueInfoEnt *qp, const char *filename, size_
     return true;
 }
 
-int
+bool
 parseLimitAndSpec (char *word, int *limit, char **spec, char *hostSpec, char *param, struct queueInfoEnt *qp, const char *filename, size_t *lineNum, const char *pname )
 {
     int limitVal = -1;
-    char *sp = NULL;
+    char *sp     = NULL;
 
     assert( pname ); // FIXME FIXME where was this supposed to go?
 
-    *limit = -1;
+    // *limit = -1; // FIXME FIXME FIXME FIXME nani? why set an incoming variable?
     FREEUP (*spec);
     assert( qp->nice );
     if (word == NULL) {
-        return -1;
+        return false;
     }
 
     if (word && (sp = strchr (word, '/')) != NULL) {
@@ -5215,7 +5134,7 @@ parseLimitAndSpec (char *word, int *limit, char **spec, char *hostSpec, char *pa
     }
 
     if ((sp = strchr (word, ':')) != NULL) {
-        *sp = '\0';
+        sp = NULL;
     }
 
     limitVal = my_atoi (word, INFINIT_INT / 60 + 1, -1);
@@ -5245,11 +5164,11 @@ parseLimitAndSpec (char *word, int *limit, char **spec, char *hostSpec, char *pa
         }
     }
 
-    return 0;    
+    return true;    
 }
 
 double *
-getModelFactor (char *hostModel, struct lsInfo *info)
+getModelFactor ( const char *hostModel, struct lsInfo *info)
 {
     double *cpuFactor = 0.0;
     
@@ -5267,25 +5186,25 @@ getModelFactor (char *hostModel, struct lsInfo *info)
 }
 
 double *
-getHostFactor (char *host)
+getHostFactor ( const char *hostname)
 {
     double *cpuFactor  = 0;
     struct hostent *hp = NULL;
 
-    if (NULL == host) {
+    if (NULL == hostname) {
         return NULL;
     }
     if (hConf == NULL || hConf->numHosts == 0 || hConf->hosts == NULL) {
         return NULL;
     }
 
-    hp = Gethostbyname_ (host);
+    hp = Gethostbyname_ (hostname);
     if (NULL == hp ) {
         return NULL;
     }
 
     for ( unsigned int i = 0; i < hConf->numHosts; i++) {
-        if (equalHost_ (hp->h_name, hConf->hosts[i].host)) {
+        if (equalHost_ (hp->h_name, hConf->hosts[i].hostname)) {
             *cpuFactor = hConf->hosts[i].cpuFactor;
             return cpuFactor;
         }
@@ -5295,7 +5214,7 @@ getHostFactor (char *host)
 }
 
 char *
-parseAdmins (char *admins, int options, char *filename, size_t *lineNum)
+parseAdmins ( const char *admins, int options, const char *filename, size_t *lineNum)
 {
     
     char *sp                  = NULL;
@@ -5419,6 +5338,7 @@ parseAdmins (char *admins, int options, char *filename, size_t *lineNum)
             continue;
         }
     }
+
     return expandAds;
 }
 
@@ -5496,7 +5416,7 @@ setDefaultHost (struct lsInfo *info)
     return 0;
 }
 
-int
+unsigned int
 setDefaultUser (void)
 {
     char *functionName = malloc( strlen(  __func__ ) + 1);
@@ -5504,11 +5424,11 @@ setDefaultUser (void)
     strcpy( functionName, __func__ ); 
 
     if (handleUserMem ()) {
-        return -1;
+        return UINT_MAX;
     }
 
     if (!addUser( defaultLabel, INFINIT_INT, INFINIT_FLOAT, functionName, true)) { // FIXME FIXME FIXME the fuck is functionName present here?
-        return false;
+        return 0;
     }
 
     assert( numofusers > 0 );
@@ -5531,7 +5451,7 @@ setDefaultUser (void)
     return 0;
 }
 
-int
+bool
 handleUserMem (void)
 {
     if (uConf == NULL) {
@@ -5539,7 +5459,7 @@ handleUserMem (void)
         if (NULL == uConf && ENOMEM == errno ) {
             ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", sizeof (struct userConf));
             lsberrno = LSBE_CONF_FATAL;
-            return -1;
+            return false;
         }
         resetUConf (uConf);
     }
@@ -5552,7 +5472,7 @@ handleUserMem (void)
     }
     usersize = 0;
     
-    return 0;
+    return true;
 }
 
 int
@@ -5728,7 +5648,7 @@ terminateWhen (struct queueInfoEnt *qp, char *linep, const char *filename, size_
 }
 
 int
-checkAllOthers (char *word, int *hasAllOthers)
+checkAllOthers ( const char *word, int *hasAllOthers)
 {
     int returnCode        = 0;
     unsigned int numHosts = 0;
@@ -5739,7 +5659,7 @@ checkAllOthers (char *word, int *hasAllOthers)
         return returnCode;
     }
  
-    if (numHosts && !strcmp (grpHosts[0], "all")) {
+    if (numHosts && !strcmp (grpHosts[0], "all")) { // FIXME FIXME FIXME label [0]
         if (*hasAllOthers == true) {
             returnCode = -1;
         }
@@ -5752,8 +5672,8 @@ checkAllOthers (char *word, int *hasAllOthers)
     return returnCode;
 }
 
-int
-getReserve (char *reserve, struct queueInfoEnt *qp, const char *filename, unsigned int lineNum)
+bool
+getReserve ( const char *reserve, struct queueInfoEnt *qp, const char *filename, unsigned int lineNum)
 {
     char *sp = NULL;
     char *cp = NULL;
@@ -5767,12 +5687,12 @@ getReserve (char *reserve, struct queueInfoEnt *qp, const char *filename, unsign
         if ( sp == NULL ) {
             ls_syslog (LOG_ERR, "catgets 5431: %s: File %s in section Queue ending at line %d: MAX_RESERVE_TIME is specified without period time; ignoring SLOT_RESERVE", __func__, filename, lineNum);  /* catgets 5431 */
             lsberrno = LSBE_CONF_WARNING;
-            return -1;
+            return false;
         }
         if (*sp != '[') {
             ls_syslog (LOG_ERR, "catgets 5432: %s: File %s in section Queue ending at line %d: MAX_RESERVE_TIME <%s> is specified without '['; ignoring SLOT_RESERVE", __func__, filename, lineNum, reserve);    /* catgets 5432 */
             lsberrno = LSBE_CONF_WARNING;
-            return -1;
+            return false;
         }
         cp = ++sp;
         while (*sp != ']' && *sp != '\0' && isdigit (*sp) && *sp != ' ') {
@@ -5781,7 +5701,7 @@ getReserve (char *reserve, struct queueInfoEnt *qp, const char *filename, unsign
         if (*sp == '\0' || (*sp != ']' && *sp != ' ')) {
             ls_syslog (LOG_ERR, "catgets 5433: %s: File %s in section Queue ending at line %d: MAX_RESERVE_TIME is specified without ']'; ignoring SLOT_RESERVE", __func__, filename, lineNum);  /* catgets 5433 */
             lsberrno = LSBE_CONF_WARNING;
-            return -1;
+            return false;
         }
         if (*sp == ' ') {
             while (*sp == ' ') {
@@ -5790,7 +5710,7 @@ getReserve (char *reserve, struct queueInfoEnt *qp, const char *filename, unsign
             if (*sp != ']') {
                 ls_syslog (LOG_ERR, "catgets 5434: %s: File %s in section Queue ending at line %d: MAX_RESERV_TIME is specified without ']';ignoring SLOT_RESERVE", __func__, filename, lineNum);    /* catgets 5434 */
                 lsberrno = LSBE_CONF_WARNING;
-                return -1;
+                return false;
             }
         }
         sp = NULL;
@@ -5799,7 +5719,7 @@ getReserve (char *reserve, struct queueInfoEnt *qp, const char *filename, unsign
             ls_syslog (LOG_ERR, "catgets 5435: %s: File %s in section Queue ending at line %d: Value <%s> of MAX_RESERV_TIME for queue <%s> isn't an integer between 1 and %d; ignored.", __func__, filename, lineNum, cp, qp->queue, INFINIT_INT);  /* catgets 5435 */
             lsberrno = LSBE_CONF_WARNING;
             *sp = ']';
-            return -1;
+            return false;
         }
         *sp = ']';
     }
@@ -5807,15 +5727,15 @@ getReserve (char *reserve, struct queueInfoEnt *qp, const char *filename, unsign
         if (qp->slotHoldTime == INFINIT_INT) {
             ls_syslog (LOG_ERR, "catgets 5436: %s: File %s in section Queue ending at line %d: BACKFILL is specified without MAX_RESERV_TIME for SLOT_RESERVE; ignoring", __func__, filename, lineNum);  /* catgets 5436 */
             lsberrno = LSBE_CONF_WARNING;
-            return -1;
+            return false;
         }
         qp->qAttrib |= QUEUE_ATTRIB_BACKFILL;
     }
 
-    return 0;
+    return true;
 }
 
-int
+bool
 isServerHost ( const char *hostName)
 {
     if( hostName == NULL ) {
@@ -6250,7 +6170,7 @@ resolveBatchNegHosts ( const char *inHosts, char **outHosts, int isQueue)
         if (neg_num == 0) {
             FREEUP (outTable);
         }
-        FREEUP (outHosts[0]);
+        FREEUP (outHosts[0]); // FIXME FIXME FIXME label [0]
         FREEUP (save_buf);
         FREEUP (ptr_level);
 
@@ -6262,9 +6182,9 @@ resolveBatchNegHosts ( const char *inHosts, char **outHosts, int isQueue)
     }
     
     if (!buffer || !inTable || !outTable) {
-        if (result > -2) {
+        if (result > -2) { // FIXME FIXME FIXME change to non-negative return value
             ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
-            result = -1;
+            result = -1; // FIXME FIXME FIXME change to non-negative return value
         }
 
         for ( unsigned int j = 0; j < in_num; j++) {
@@ -6288,8 +6208,8 @@ resolveBatchNegHosts ( const char *inHosts, char **outHosts, int isQueue)
     }
     
     while ((word = getNextWord_ (&buffer))) {
-        if (word[0] == '~') {
-            if (word[1] == '\0') {
+        if (word[0] == '~') { // FIXME FIXME FIXME label [0]
+            if (word[1] == '\0') { // FIXME FIXME FIXME label [1]
                 result = -2;
                 if (result > -2) {
                     ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
@@ -6346,10 +6266,11 @@ resolveBatchNegHosts ( const char *inHosts, char **outHosts, int isQueue)
                     return result;
                 }
                 
-                if ((strcmp (word, grpMembers[0]) == 0)
-                    && (strcmp (word, "all") != 0)
-                    && (strcmp (word, "others") != 0)
-                    && (strcmp (word, "none") != 0))
+                if (    ( strcmp( word, grpMembers[0]) == 0 )
+                     && ( strcmp( word, "all")         != 0 )
+                     && ( strcmp( word, "others")      != 0 )
+                     && ( strcmp( word, "none")        != 0 )
+                    )
                 {
                     
                     word--;
@@ -7008,7 +6929,7 @@ resolveBatchNegHosts ( const char *inHosts, char **outHosts, int isQueue)
 }
 
 
-int
+bool
 checkJobAttaDir ( const char *path)
 {
     struct stat statBuf;
@@ -7078,7 +6999,7 @@ parseDefAndMaxLimits (struct keymap *key, unsigned int *defaultVal, unsigned int
 
 
 bool
-parseQFirstHost (char *myWord, bool *haveFirst, const char *pname, size_t *lineNum, const char *filename, const char *section)
+parseQFirstHost ( const char *myWord, bool *haveFirst, const char *pname, size_t *lineNum, const char *filename, const char *section)
 {
     bool needCheck = true;
     struct groupInfoEnt *gp = NULL;

@@ -43,7 +43,7 @@
 #include "lib/rdwr.h"
 #include "lib/syslog.h"
 #include "lib/xdrmisc.h"
-#include "lib/sig.h"
+#include "lib/signal.h"
 #include "lib/limits.h"
 
 unsigned int  getCurrentSN( void ) 

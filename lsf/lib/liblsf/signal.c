@@ -17,7 +17,7 @@
  */
  
 #include "lib/lib.h"
-#include "lib/sig.h"
+#include "lib/signal.h"
 #include "lib/misc.h"
 // #include "lsb/sig.h" // deprecated
 

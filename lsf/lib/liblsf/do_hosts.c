@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <strings.h> // required for strcasecmp();
+#include <stdbool.h> // required for bool type
 
 #include "lsf.h"
 #include "lib/confmisc.h"

@@ -21,7 +21,7 @@
 #include "lib/header.h"
 #include "lib/xdr.h"
 // #include "lib/lproto.h"
-#include "lsb/sig.h"
+#include "lsb/signals.h"
 #include "lsb/lsbatch.h"
 #include "lsf.h"
 #include "lib/common_structs.h"

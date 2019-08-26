@@ -61,35 +61,35 @@
 // const int SIG_TERM_MEMLIMIT     = -22;
 // const int SIG_ARRAY_REQUEUE     = -23;
 
-enum SIG_LSF {
-    SIG_NULL              = 0,
-    SIG_CHKPNT            = 1,
-    SIG_CHKPNT_COPY       = 2,
-    SIG_DELETE_JOB        = 3,
+// enum SIG_LSF {
+//     SIG_NULL              = 0,
+//     SIG_CHKPNT            = 1,
+//     SIG_CHKPNT_COPY       = 2,
+//     SIG_DELETE_JOB        = 3,
 
-    SIG_SUSP_USER         = 4,
-    SIG_SUSP_LOAD         = 5,
-    SIG_SUSP_WINDOW       = 6,
-    SIG_SUSP_OTHER        = 7,
+//     SIG_SUSP_USER         = 4,
+//     SIG_SUSP_LOAD         = 5,
+//     SIG_SUSP_WINDOW       = 6,
+//     SIG_SUSP_OTHER        = 7,
 
-    SIG_RESUME_USER       = 8,
-    SIG_RESUME_LOAD       = 9,
-    SIG_RESUME_WINDOW     = 10,
-    SIG_RESUME_OTHER      = 11,
+//     SIG_RESUME_USER       = 8,
+//     SIG_RESUME_LOAD       = 9,
+//     SIG_RESUME_WINDOW     = 10,
+//     SIG_RESUME_OTHER      = 11,
 
-    SIG_TERM_USER         = 12,
-    SIG_TERM_LOAD         = 13,
-    SIG_TERM_WINDOW       = 14,
-    SIG_TERM_OTHER        = 15,
-    SIG_TERM_RUNLIMIT     = 16,
-    SIG_TERM_DEADLINE     = 17,
-    SIG_TERM_PROCESSLIMIT = 18,
-    SIG_TERM_FORCE        = 19,
-    SIG_KILL_REQUEUE      = 20,
-    SIG_TERM_CPULIMIT     = 21,
-    SIG_TERM_MEMLIMIT     = 22,
-    SIG_ARRAY_REQUEUE     = 23
-};
+//     SIG_TERM_USER         = 12,
+//     SIG_TERM_LOAD         = 13,
+//     SIG_TERM_WINDOW       = 14,
+//     SIG_TERM_OTHER        = 15,
+//     SIG_TERM_RUNLIMIT     = 16,
+//     SIG_TERM_DEADLINE     = 17,
+//     SIG_TERM_PROCESSLIMIT = 18,
+//     SIG_TERM_FORCE        = 19,
+//     SIG_KILL_REQUEUE      = 20,
+//     SIG_TERM_CPULIMIT     = 21,
+//     SIG_TERM_MEMLIMIT     = 22,
+//     SIG_ARRAY_REQUEUE     = 23
+// };
 
 
 // #define SIGEMT  SIGBUS

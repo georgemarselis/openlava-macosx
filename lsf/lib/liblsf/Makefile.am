@@ -57,7 +57,7 @@ rtask.c \
 rusage.c \
 rwait.c \
 sbd_globals.c \
-sig.c \
+signal.c \
 so.c \
 sock.c \
 syntax.c \

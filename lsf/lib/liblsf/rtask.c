@@ -29,7 +29,7 @@
 #include "lib/xdrres.h"
 #include "lib/rtask.h"
 #include "lib/nios.h"
-#include "lib/sig.h"
+#include "lib/signal.h"
 #include "lib/rdwr.h"
 #include "lib/initenv.h"
 #include "lib/init.h"
