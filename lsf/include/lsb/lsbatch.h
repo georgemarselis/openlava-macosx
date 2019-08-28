@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <stdbool.h>
+
 #include "lsf.h"
 #include "lsb/misc.h"
 
@@ -1150,44 +1152,85 @@ struct hostInfoEnt
     double cpuFactor;
 };
 
-struct parameterInfo
+// struct parameterInfo // V.1
+// {
+//     int jobAcceptInterval;
+//     int maxDispRetries;
+//     int maxSbdRetries;
+//     int cleanPeriod;
+//     int maxNumJobs;
+//     int pgSuspendIt;
+//     int retryIntvl;
+//     int rusageUpdateRate;
+//     int rusageUpdatePercent;
+//     int condCheckTime;
+//     int maxSbdConnections;
+//     int maxSchedStay;
+//     int freshPeriod;
+//     int maxJobArraySize;
+//     int jobTerminateInterval;
+//     int maxUserPriority;
+//     int jobPriorityValue;
+//     int jobPriorityTime;
+//     int sharedResourceUpdFactor;
+//     int scheRawLoad;
+//     int slotResourceReserve;
+//     // char padding1[4];
+//     int maxAcctArchiveNum;
+//     int acctArchiveInSize;
+//     int acctArchiveInDays;
+//     unsigned int disableUAcctMap;
+//     unsigned int jobRunTimes;
+//     unsigned int jobDepLastSub;
+//     unsigned int maxJobId;
+//     char *defaultQueues;
+//     char *defaultHostSpec;
+//     char *defaultProject;
+//     char *pjobSpoolDir;
+//     time_t mbatchdInterval;
+//     time_t sbatchdInterval;
+//     time_t preExecDelay;
+// };
+
+struct parameterInfo // V.2
 {
-    int jobAcceptInterval;
-    int maxDispRetries;
-    int maxSbdRetries;
-    int cleanPeriod;
-    int maxNumJobs;
-    int pgSuspendIt;
-    int retryIntvl;
-    int rusageUpdateRate;
-    int rusageUpdatePercent;
-    int condCheckTime;
-    int maxSbdConnections;
-    int maxSchedStay;
-    int freshPeriod;
-    int maxJobArraySize;
-    int jobTerminateInterval;
-    int maxUserPriority;
-    int jobPriorityValue;
-    int jobPriorityTime;
-    int sharedResourceUpdFactor;
-    int scheRawLoad;
-    int slotResourceReserve;
-    int maxAcctArchiveNum;
-    int acctArchiveInSize;
-    int acctArchiveInDays;
-    unsigned int disableUAcctMap;
-    unsigned int jobRunTimes;
-    unsigned int jobDepLastSub;
-    unsigned int maxJobId;
-    char *defaultQueues;
-    char *defaultHostSpec;
-    char *defaultProject;
-    char *pjobSpoolDir;
+    bool disableUAcctMap;
+    unsigned long jobAcceptInterval;
+    unsigned long maxDispRetries;
+    unsigned long maxSbdRetries;
+    unsigned long cleanPeriod;
+    unsigned long maxNumJobs;
+    unsigned long pgSuspendIt;
+    unsigned long retryIntvl;
+    unsigned long rusageUpdateRate;
+    unsigned long rusageUpdatePercent;
+    unsigned long condCheckTime;
+    unsigned long maxSbdConnections;
+    unsigned long maxSchedStay;
+    unsigned long freshPeriod;
+    unsigned long maxJobArraySize;
+    unsigned long jobTerminateInterval;
+    unsigned long maxUserPriority;
+    unsigned long jobPriorityValue;
+    unsigned long jobPriorityTime;
+    unsigned long sharedResourceUpdFactor;
+    unsigned long scheRawLoad;
+    unsigned long slotResourceReserve;
+    unsigned long maxAcctArchiveNum;
+    unsigned long acctArchiveInSize;
+    unsigned long acctArchiveInDays;
+    unsigned long jobRunTimes;
+    unsigned long jobDepLastSub;
+    unsigned long maxJobId;
+    const char *defaultQueues;
+    const char *defaultHostSpec;
+    const char *defaultProject;
+    const char *pjobSpoolDir;
     time_t mbatchdInterval;
     time_t sbatchdInterval;
     time_t preExecDelay;
-};
+} __attribute__((packed)) ;
+
 
 
 struct loadInfoEnt
@@ -1843,10 +1886,10 @@ struct lsbMsg
     struct lsbMsgHdr *header;
     char *msg;
 };
-struct paramConf
-{
-    struct parameterInfo *param;
-};
+// struct paramConf
+// {
+//     struct parameterInfo *param;
+// };
 
 struct userConf
 {

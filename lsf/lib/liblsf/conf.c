@@ -21,6 +21,7 @@
 #include <pwd.h>
 #include <stdio.h>
 #include <strings.h>
+#include <stdbool.h>
 
 #include "lsf.h"
 #include "lib/conf.h"
@@ -1582,12 +1583,12 @@ liblsf_putThreshold (unsigned int indx, const struct hostInfo *host, const size_
 
 }
 
-char addHost (struct hostInfo *host, const char *filename, size_t *lineNum)
+bool addHost (struct hostInfo *host, const char *filename, size_t *lineNum)
 {
     struct hostInfo *newlist = NULL;
 
     if (NULL == host ) {
-        return FALSE;
+        return false;
     }
 
     for ( unsigned int i = 0; i < cConf->numHosts; i++) {
@@ -1600,7 +1601,7 @@ char addHost (struct hostInfo *host, const char *filename, size_t *lineNum)
         ls_syslog (LOG_WARNING, "catgets 5163: %s: %s(%d): host <%s> redefined, using previous definition", __func__, filename, *lineNum, host->hostName);
         freeHostInfo (host);
 
-        return FALSE;
+        return false;
     }
 
     cConf->numHosts++;
@@ -1621,7 +1622,7 @@ char addHost (struct hostInfo *host, const char *filename, size_t *lineNum)
         ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", cConf->numHosts * sizeof (struct hostInfo));
         cConf->numHosts--;
         lserrno = LSE_MALLOC;
-        return FALSE;
+        return false;
     }
 
     for (unsigned int i = 0; i < cConf->numHosts - 1; i++) {
@@ -1632,7 +1633,7 @@ char addHost (struct hostInfo *host, const char *filename, size_t *lineNum)
     FREEUP (cConf->hosts);
     cConf->hosts = newlist;
 
-    return TRUE;
+    return true;
 }
 
 void 
@@ -1671,6 +1672,8 @@ initkeylist (struct keymap keyList[], unsigned int m, unsigned int n, struct lsI
             }
         }
     }
+
+    return;
 }
 
 void freekeyval (struct keymap keylist[])
@@ -1680,6 +1683,8 @@ void freekeyval (struct keymap keylist[])
             FREEUP (keylist[cc].val);
         }
     }
+
+    return;
 }
 
 char *parsewindow ( const char *linep, const char *filename, const size_t *lineNum, const char *section)

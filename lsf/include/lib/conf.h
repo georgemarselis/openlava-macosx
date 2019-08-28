@@ -17,6 +17,8 @@
  */
 
 #pragma once
+
+#include <stdbool.h>
  
 #include "lsf.h"
 // #include "lproto.h"
@@ -121,7 +123,7 @@ char do_Hosts       (FILE *fp, const char *fname, size_t *lineNum, struct lsInfo
 char do_Clparams    (FILE *fp, const char *fname, size_t *lineNum);
 
 // 
-char addHostType (char *);
+char  addHostType (char *);
 // 
 char addHostModel (char *model, char *arch, double factor);
 // 
@@ -172,7 +174,7 @@ struct lsSharedResourceInfo *addResource ( const char *resName, unsigned long nH
 int addHostInstance(struct lsSharedResourceInfo *sharedResource, unsigned long nHosts, char **hostNames, const char *value);
 // 
 // int addHostInstance (struct sharedResource *sharedResource, unsigned int nHosts, char **hostNames, char *value, int resourceMap);
-char addHost (struct hostInfo *host, const char *filename, size_t *lineNum);
+bool  addHost (struct hostInfo *host, const char *filename, size_t *lineNum);
 
 int convertNegNotation_ (char **, struct HostsArray *);
 // int resolveBaseNegHosts (char *, char **, struct HostsArray *);

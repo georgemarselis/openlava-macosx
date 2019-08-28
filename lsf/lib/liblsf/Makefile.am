@@ -77,4 +77,4 @@ xdrmisc.c \
 xdrnio.c \
 xdrres.c \
 xdrrf.c \
-conf_lsb.c
+lsb_params.c
