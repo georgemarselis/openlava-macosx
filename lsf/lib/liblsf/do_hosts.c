@@ -13,8 +13,7 @@
 #include "lib/misc.h"
 #include "lib/host.h"
 #include "libint/lsi18n.h"
-
-#include "lib/conf_lsb.h"
+#include "lib/lsb_params.h"
 
 /*************************************************************************************************************************
  * FIXME FIXME FIXME FIXME FIXME explain the difference between the two

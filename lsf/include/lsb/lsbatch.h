@@ -740,11 +740,22 @@ enum SUB2 {
 // #define LOST_AND_FOUND  "lost_and_found"
 const char LOST_AND_FOUND[ ] = "lost_and_found";
 
-#define DELETE_NUMBER     -2
-#define DEL_NUMPRO        INFINIT_INT
-#define DEFAULT_NUMPRO    INFINIT_INT -1
+// #define DELETE_NUMBER     -2
+// #define DEL_NUMPRO        INFINIT_INT
+// #define DEFAULT_NUMPRO    INFINIT_INT -1
 
-#define LSB_CHKPERIOD_NOCHNG -1
+
+enum DELETE_N {
+    DELETE_NUMBER  = -2,
+    DEFAULT_NUMPRO = INFINIT_INT,
+    DEL_NUMPRO     = INFINIT_INT - 1,
+};
+
+// #define LSB_CHKPERIOD_NOCHNG -1
+
+enum LSB_CHKPERIOD {
+    LSB_CHKPERIOD_NOCHNG = -1
+};
 
 enum LSF_CHKPNT {
     LSB_CHKPNT_KILL  = 0x1,
@@ -781,13 +792,18 @@ enum JGRP_NODE {
 #define LSB_MAX_ARRAY_IDX   0x0FFFF 
 #define LSB_MAX_SEDJOB_RUNID    (0x0F)
 // enum LSB_MAX {
-//  LSB_MAX_ARRAY_JOBID = 0x0FFFFFFFF // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with,
-//  LSB_MAX_ARRAY_IDX = 0x0FFFF  // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with,
+//  LSB_MAX_ARRAY_JOBID  = 0x0FFFFFFFF // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with,
+//  LSB_MAX_ARRAY_IDX    = 0x0FFFF     // FIXME FIXME FIXME FIXME FIXME this needs to be converted to appropriate CPU type to roll with,
 //  LSB_MAX_SEDJOB_RUNID = 0x0F
 // };
 
-#define JGRP_ACTIVE        1
-#define JGRP_UNDEFINED     -1
+// #define JGRP_ACTIVE        1
+// #define JGRP_UNDEFINED    -1
+
+enum JGRP {
+    JGRP_UNDEFINED = -1,
+    JGRP_ACTIVE    =  1
+};
 
 enum JGRP_COUNT {
     JGRP_COUNT_NJOBS  = 0,
@@ -801,13 +817,25 @@ enum JGRP_COUNT {
     NUM_JGRP_COUNTERS = 8,
 };
 
-#define ALL_QUEUE       0x01
-#define DFT_QUEUE       0x02
-#define CHECK_HOST      0x80
-#define CHECK_USER      0x100
-#define SORT_HOST       0x200
+// #define ALL_QUEUE       0x01
+// #define DFT_QUEUE       0x02
+// #define CHECK_HOST      0x80
+// #define CHECK_USER      0x100
+// #define SORT_HOST       0x200
 
-#define LSB_SIG_NUM     23
+enum REJEHKHEH {
+    ALL_QUEUE  = 0x01,
+    DFT_QUEUE  = 0x02,
+    CHECK_HOST = 0x80,
+    CHECK_USER = 0x100,
+    SORT_HOST  = 0x200
+};
+
+
+// #define LSB_SIG_NUM     23
+enum LSB_SIG {
+    LSB_SIG_NUM = 23
+};
 
 enum ACT {
     ACT_NO    = 0,
@@ -816,12 +844,16 @@ enum ACT {
     ACT_FAIL  = 4
 };
 
-#define H_ATTR_CHKPNTABLE  0x1
+// #define H_ATTR_CHKPNTABLE  0x1
+
+enum H_ATTR {
+    H_ATTR_CHKPNTABLE = 0x1
+};
 
 
-#define DEF_MAX_JOBID   999999
-#define MAX_JOBID_LOW   999999
-#define MAX_JOBID_HIGH 9999999
+// #define DEF_MAX_JOBID   999999
+// #define MAX_JOBID_LOW   999999
+// #define MAX_JOBID_HIGH 9999999
 
 enum GRP {
     USER_GRP      = 0x1,
@@ -1058,6 +1090,7 @@ struct jobInfoEnt
     double cpuFactor;
 } __attribute__((packed));
 
+
 struct userInfoEnt
 {
     char *user;                 // FIXME FIXME FIXME this oughta get larger
@@ -1195,6 +1228,9 @@ struct hostInfoEnt
 struct parameterInfo // V.2
 {
     bool disableUAcctMap;
+    bool scheRawLoad;
+    bool slotResourceReserve;
+    bool jobDepLastSub;
     unsigned long jobAcceptInterval;
     unsigned long maxDispRetries;
     unsigned long maxSbdRetries;
@@ -1214,13 +1250,10 @@ struct parameterInfo // V.2
     unsigned long jobPriorityValue;
     unsigned long jobPriorityTime;
     unsigned long sharedResourceUpdFactor;
-    unsigned long scheRawLoad;
-    unsigned long slotResourceReserve;
     unsigned long maxAcctArchiveNum;
     unsigned long acctArchiveInSize;
     unsigned long acctArchiveInDays;
     unsigned long jobRunTimes;
-    unsigned long jobDepLastSub;
     unsigned long maxJobId;
     const char *defaultQueues;
     const char *defaultHostSpec;
@@ -1907,7 +1940,8 @@ struct hostConf
     struct groupInfoEnt *hgroups;
 };
 
-typedef struct lsbSharedResourceInstance // FIXME FIXME typedef has to go
+// typedef struct lsbSharedResourceInstance // FIXME FIXME typedef has to go
+struct lsbSharedResourceInstance // FIXME FIXME typedef has to go
 {
     unsigned int nHosts;
     const char padding[4];
@@ -1915,15 +1949,18 @@ typedef struct lsbSharedResourceInstance // FIXME FIXME typedef has to go
     char *rsvValue;
     char **hostList;
 
-} LSB_SHARED_RESOURCE_INST_T;
+// } LSB_SHARED_RESOURCE_INST_T;
+};
 
-typedef struct lsbSharedResourceInfo // FIXME FIXME typedef has to go
+// typedef struct lsbSharedResourceInfo // FIXME FIXME typedef has to go
+struct lsbSharedResourceInfo // FIXME FIXME typedef has to go
 {
     char *resourceName;
     unsigned int nInstances;
     const char padding[4];
-    LSB_SHARED_RESOURCE_INST_T *instances;
-} LSB_SHARED_RESOURCE_INFO_T;
+    struct lsbSharedResourceInstance *instances;
+// } LSB_SHARED_RESOURCE_INFO_T;
+};
 
 struct queueConf
 {
@@ -1934,92 +1971,5 @@ struct queueConf
 
 
 int lsberrno;
-
 int lsb_mbd_version;
 
-
-// Ice Age Relic
-// #if defined(__STDC__)
-// #define P_(s) s
-// #else
-// #define P_(s) ()
-// #endif
-
-/**************************************************************************
- *
- * FIXME FIXME FIXME FIXME FIXME: each function belongs to a separate file
- * 
- */
-
-// struct paramConf *lsb_readparam (struct lsConf *);
-// struct userConf *lsb_readuser (struct lsConf *, int, struct clusterConf *);
-// struct userConf *lsb_readuser_ex (struct lsConf *, int, struct clusterConf *, struct sharedConf *);
-// struct hostConf *lsb_readhost (struct lsConf *, struct lsInfo *, int, struct clusterConf *);
-// struct queueConf *lsb_readqueue (struct lsConf *, struct lsInfo *, int, struct sharedConf *);
-// void updateClusterConf (struct clusterConf *);
-
-
-// int lsb_init (char *appName);
-// int lsb_openjobinfo (unsigned long jobId, char *, char *, char *, char *, int);
-// struct jobInfoHead *lsb_openjobinfo_a (unsigned long, char *, char *, char *, char *, int);
-// struct jobInfoEnt *lsb_readjobinfo (int *);
-// unsigned long lsb_submit (struct submit *, struct submitReply *);
-
-
-// void lsb_closejobinfo (void);
-
-// int lsb_hostcontrol (char *, int);
-// struct queueInfoEnt *lsb_queueinfo (char **queues, unsigned int *numQueues, char *host, char *userName, int options);
-// int lsb_reconfig (int);
-// int lsb_signaljob (unsigned long jobId, int signal);
-// int lsb_msgjob (unsigned long jobId, char *message);
-// int lsb_chkpntjob (unsigned long jobId, time_t, int);
-// int lsb_deletejob (unsigned long jobId, int, int);
-// int lsb_forcekilljob (unsigned long jobId);
-// int lsb_requeuejob (struct jobrequeue *newQueue);
-// char *lsb_sysmsg (void);
-// void lsb_perror (char *);
-// char *lsb_sperror (char *);
-// char *lsb_peekjob (unsigned long jobId);
-
-// int lsb_mig (struct submig *, int *badHostIdx);
-
-// struct hostInfoEnt *lsb_hostinfo (char **, unsigned int *);
-// struct hostInfoEnt *lsb_hostinfo_ex (char **, unsigned int *, char *, int);
-// int lsb_movejob (unsigned long jobId, int *, int);
-// int lsb_switchjob (unsigned long jobId, char *queue);
-// int lsb_queuecontrol (char *, int);
-// struct userInfoEnt *lsb_userinfo (char **, unsigned int *);
-// struct groupInfoEnt *lsb_hostgrpinfo (char **groups, unsigned int *numGroups, int options);
-// struct groupInfoEnt *lsb_usergrpinfo (char **groups, unsigned int *numGroups, int options);
-// struct parameterInfo *lsb_parameterinfo (char **, unsigned int *, int);
-// unsigned long lsb_modify (struct submit *, struct submitReply *, unsigned long);
-// float *getCpuFactor (char *, int);
-// // char *lsb_suspreason (int, int, struct loadIndexLog *);
-// // char *lsb_pendreason (int, int *, struct jobInfoHead *, struct loadIndexLog *);
-
-// int lsb_puteventrec (FILE *, struct eventRec *);
-// // struct eventRec *lsb_geteventrec (FILE *log_fp, size_t *lineNum);
-// struct lsbSharedResourceInfo *lsb_sharedresourceinfo (char **, unsigned int *, char *, int);
-
-// int lsb_runjob (struct runJobRequest *);
-
-// char *lsb_jobid2str  ( unsigned long ) ;
-// char *lsb_jobidinstr  ( unsigned long ) ;
-// void jobId32To64 (unsigned long *, unsigned long jobId, unsigned int jobArrElemId ) ; // FIXME FIXME FIXME FIXME unsigned int to unsigned long or u_int64_t
-// void jobId64To32 (unsigned long, unsigned int *jobId, unsigned int *jobArrElemId ) ; // FIXME FIXME FIXME FIXME unsigned int to unsigned long or u_int64_t
-// int lsb_setjobattr (int, struct jobAttrInfoEnt *);
-
-// unsigned long lsb_rexecv (int, char **, char **, int *, int);
-// int lsb_catch (const char *, int (*)(void *));
-// void lsb_throw (const char *, void *);
-
-// struct sortIntList *initSortIntList (int);
-// int insertSortIntList (struct sortIntList *, int);
-// struct sortIntList *getNextSortIntList (struct sortIntList *, struct sortIntList *, int *);
-// void freeSortIntList (struct sortIntList *);
-// int getMinSortIntList (struct sortIntList *, int *);
-// int getMaxSortIntList (struct sortIntList *, int *);
-// int getTotalSortIntList (struct sortIntList *);
-
-// int updateJobIdIndexFile (char *, char *, int);

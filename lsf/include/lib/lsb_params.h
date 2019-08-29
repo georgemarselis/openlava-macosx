@@ -28,8 +28,8 @@ enum MAX_SELECTED {
 };
 
  struct inNames {
-    char *name;
-    char *prf_level;
+    char *name;      // FIXME FIXME FIXME learn how to init and set double indirection
+    char *prf_level; // FIXME FIXME FIXME learn how to init and set double indirection
 };
 
 struct parameterInfo *pConf  = NULL;
@@ -55,8 +55,8 @@ unsigned int usersize     = 0;
 unsigned int hostsize     = 0;
 unsigned int queuesize    = 0;
 unsigned int numofusers   = 0;
-double maxFactor  = 0.0F;
-char *maxHostName    = NULL;
+double maxFactor          = 0.0F;
+char *maxHostName         = NULL;
 
 bool_t initUnknownUsers = FALSE;
 

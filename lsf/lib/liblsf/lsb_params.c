@@ -31,7 +31,7 @@
 #include "lsb/conf.h"
 #include "lib/syslog.h"
 #include "lib/do_hosts.h"
-#include "lib/conf_lsb.h"
+#include "lib/lsb_params.h"
 #include "lib/confmisc.h"    // putValue( )
 #include "lib/words.h"       // getNextWord_( )
 #include "lib/getnextline.h" // getNextLineC_conf( )
@@ -550,7 +550,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum) // this fu
                 // DEFAULT_PROJECT=project_name (string)
                 //
                 // Description; The name of the default project. Project names can be up to 59 characters long. When you submit a job without specifying any project name, and the environment variable LSB_DEFAULTPROJECT is not set, LSF automatically assigns the job to this project.
-                pConf->defaultQueues = putstr_ (keyList[i].val); // struct paramConf *pConf in lib/conf_lsb.h 
+                pConf->defaultQueues = putstr_ (keyList[i].val); // struct parameterInfo *pConf in lib/lsbatch.h 
                 if (pConf->defaultQueues == NULL) { //
                     const char malloc[] = "malloc";
                     ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, malloc, strlen (keyList[i].val) + 1);
@@ -568,7 +568,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum) // this fu
                 //
                 // The CPU factor of the specified host or host model will be used to normalize the CPU time limit of all jobs in the cluster, unless the CPU time normalization host is specified at the queue or job level.
                 //
-                pConf->defaultHostSpec = putstr_ (keyList[i].val);  // struct paramConf *pConf in lib/conf_lsb.h
+                pConf->defaultHostSpec = putstr_ (keyList[i].val);  // struct parameterInfo *pConf in lib/lsbatch.h
                 if (pConf->defaultHostSpec == NULL) {
                     const char malloc[] = "malloc";
                     ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, malloc, strlen (keyList[i].val) + 1);
@@ -603,7 +603,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum) // this fu
                     // 
                     // Throw an error if it does not
                     // 
-                    pConf->pjobSpoolDir = NULL; // struct paramConf *pConf in lib/conf_lsb.h
+                    pConf->pjobSpoolDir = NULL; // struct parameterInfo *pConf in lib/lsbatch.h
                     /* catgets 5095 */
                     ls_syslog (LOG_ERR, "catgets 5095: %s: Invalid JOB_SPOOL_DIR!", __func__);
                     lsberrno = LSBE_CONF_WARNING;
@@ -621,7 +621,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum) // this fu
                 if (maxAcctArchiveNum == ULONG_MAX && errno ==  ERANGE ) {
                     /* catgets 5459 */
                     ls_syslog (LOG_ERR, "catgets 5459: %s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored" , __func__, filename, *lineNum, keyList[i].val, keyList[i].key, INFINIT_INT - 1);
-                    // pConf->maxAcctArchiveNum = ULONG_MAX; // struct paramConf *pConf in lib/conf_lsb.h
+                    // pConf->maxAcctArchiveNum = ULONG_MAX; // struct parameterInfo *pConf in lib/lsbatch.h
                     lsberrno = LSBE_CONF_WARNING;
                 }
                 else {
@@ -678,7 +678,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum) // this fu
                 //
                 // Description: The name of the default project. Specify any string up to 59 chars long. When you submit a job without specifying any project name, and the environment variable LSB_DEFAULTPROJECT is not set, LSF automatically assigns the job to this project.
                 //
-                pConf->defaultProject = putstr_ (keyList[i].val); // struct paramConf *pConf in lib/conf_lsb.h
+                pConf->defaultProject = putstr_ (keyList[i].val); // struct parameterInfo *pConf in lib/lsbatch.h
                 if (pConf->defaultProject == NULL) {
                     const char malloc[] = "malloc";
                     ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, malloc, strlen (keyList[i].val) + 1);
@@ -697,31 +697,46 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum) // this fu
                 //
                 // Default: Set to 0 at time of installation. If otherwise undefined, then set to 1.
                 //
-                unsigned long jobAcceptInterval = strtoul( keyList[i].val, NULL, -10 );
+                time_t jobAcceptIntervalAtInstallation = 10; // value at installation time, set here for documentation puproses.
+                time_t jobAcceptIntervalDefault        = 60;
+                time_t jobAcceptInterval               =  0;
+
+                assert( jobAcceptIntervalAtInstallation );   // NOFIX
+
+                if( NULL == keyList[i].val ) {
+                    /* catgets 5067 */ // FIXME FIXME FIXME FIXME FIXME new catgets number, please
+                    ls_syslog (LOG_ERR, "catgets 5067: %s: File %s in section Parameters ending at line %d: %s option is not defined, setting to default (%lu)", __func__, filename, *lineNum, keyList[i].val, keyList[i].key, jobAcceptIntervalDefault );
+                    lsberrno = LSBE_CONF_WARNING;
+                    pConf->jobAcceptInterval = jobAcceptIntervalDefault;
+                    continue;         
+                }
+
+                jobAcceptInterval = strtoul( keyList[i].val, NULL, 10 );
                 if ( jobAcceptInterval == ULONG_MAX && errno ==  ERANGE ) {
                     /* catgets 5067 */
                     ls_syslog (LOG_ERR, "catgets 5067: %s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a non-negative integer between 0 and %d; ignored", __func__, filename, *lineNum, keyList[i].val, keyList[i].key, ULONG_MAX);
                     lsberrno = LSBE_CONF_WARNING;
                 }
                 else if (i == JOB_ACCEPT_INTERVAL) { // i == 4
-                    pConf->jobAcceptInterval = jobAcceptInterval; // struct paramConf *pConf in lib/conf_lsb.h
+                    pConf->jobAcceptInterval = jobAcceptInterval; // struct parameterInfo *pConf in lib/lsbatch.h
                 }
             }
-            else if ( i == PG_SUSP_IT ) { // PG_SUSP_IT , i == 5
+            else if ( i == PG_SUSP_IT ) { // PG_SUSP_IT , i == 5 ?
                 // 
                 // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.3/lsf_config_ref/lsb.params.pg_susp_it.5.html
                 //
                 // PG_SUSP_IT=seconds (time_t/non-integer)
                 //
-                // The time interval that a host should be interactively idle (it > 0) before jobs suspended because of a threshold on the pg load index can be resumed.This parameter is used to prevent the case in which a batch job is suspended and resumed too often as it raises the paging rate while running and lowers it while suspended. If you are not concerned with the interference with interactive jobs caused by paging, the value of this parameter may be set to 0.
+                // The time interval that a host should be interactively idle (it > 0) before jobs suspended because of a threshold on the pg load index can be resumed. This parameter is used to prevent the case in which a batch job is suspended and resumed too often as it raises the paging rate while running and lowers it while suspended. If you are not concerned with the interference with interactive jobs caused by paging, the value of this parameter may be set to 0.
                 //
                 unsigned long pgSuspendIt = strtoul( keyList[i].val, NULL, -10 );
+                if( NULL == )
                 if ( pgSuspendIt == ULONG_MAX && errno ==  ERANGE ) {
                     /* catgets 5067 */
                     ls_syslog (LOG_ERR, "catgets 5067: %s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a non-negative integer between 0 and %d; ignored", __func__, filename, *lineNum, keyList[i].val, keyList[i].key, ULONG_MAX);
                     lsberrno = LSBE_CONF_WARNING;
                 }
-                pConf->pgSuspendIt = pgSuspendIt; // struct paramConf *pConf in lib/conf_lsb.h
+                pConf->pgSuspendIt = pgSuspendIt; // struct parameterInfo *pConf in lib/lsbatch.h
             }
             else if (i == DISABLE_UACCT_MAP ) { // i == 20
                 // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_config_ref/lsb.params.disable_uacct_map.5.html
@@ -735,15 +750,15 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum) // this fu
                 const char N[] = "N";
 
                 if (strcasecmp (keyList[i].val, Y) == 0) {
-                    pConf->disableUAcctMap = true; // struct paramConf *pConf in lib/conf_lsb.h
+                    pConf->disableUAcctMap = true; // struct parameterInfo *pConf in lib/lsbatch.h
                 }
                 else if (strcasecmp (keyList[i].val, N ) == 0) {
-                    pConf->disableUAcctMap = false; // struct paramConf *pConf in lib/conf_lsb.h
+                    pConf->disableUAcctMap = false; // struct parameterInfo *pConf in lib/lsbatch.h
                 }
                 else {
                     /* catgets 5068 */
                     ls_syslog (LOG_ERR, "catgets 5068: %s: File %s in section Parameters ending at line %d: unrecognizable value <%s> for the keyword DISABLE_UACCT_MAP; assume user level account mapping is allowed", __func__, filename, *lineNum, keyList[i].val);
-                    pConf->disableUAcctMap = false; // struct paramConf *pConf in lib/conf_lsb.h
+                    pConf->disableUAcctMap = false; // struct parameterInfo *pConf in lib/lsbatch.h
                 }
             }
             else if (i == JOB_PRIORITY_OVER_TIME ) { // i == 26
@@ -776,38 +791,39 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum) // this fu
                     continue;
                 }
 
-                pConf->jobPriorityValue = jobPriorityValue; // struct paramConf *pConf in lib/conf_lsb.h
-                pConf->jobPriorityTime  = jobPriorityTime; // struct paramConf *pConf in lib/conf_lsb.h
+                pConf->jobPriorityValue = jobPriorityValue; // struct parameterInfo in lib/lsbatch.h
+                pConf->jobPriorityTime  = jobPriorityTime; // struct parameterInfo  in lib/lsbatch.h
 
             }
             else if (i == SHARED_RESOURCE_UPDATE_FACTOR ) { // i == 27
-                value = my_atoi (keyList[i].val, INFINIT_INT, 0);
-                if (value == INFINIT_INT) {
+                unsigned long sharedResourceUpdFactor = strtoul(keyList[i].val, NULL, 10);
+                if( sharedResourceUpdFactor == ULONG_MAX && errno == ERANGE ) {
                     /* catgets 5459 */
                     ls_syslog (LOG_ERR, "catgets 5459: %s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored", __func__, filename, *lineNum, keyList[i].val, keyList[i].key, INFINIT_INT - 1); 
                     lsberrno = LSBE_CONF_WARNING;
-                    pConf->sharedResourceUpdFactor = INFINIT_INT; // struct paramConf *pConf in lib/conf_lsb.h
+                    pConf->sharedResourceUpdFactor = 0; // 0 is a special case: "turn off" // struct parameterInfo in lib/lsbatch.h
                 }
                 else {
-                    pConf->sharedResourceUpdFactor = value; // struct paramConf *pConf in lib/conf_lsb.h
+                    pConf->sharedResourceUpdFactor = sharedResourceUpdFactor; // struct parameterInfo in lib/lsbatch.h
                 }
             }
-            else if (i == MAX_JOBID ) { // i == 31
-                unsigned int value_ = my_atoi (keyList[i].val, INFINIT_INT, 0);
-
-                if ((value_ < MAX_JOBID_LOW) || (value_ > MAX_JOBID_HIGH)) {
+            else if( i == MAX_JOBID ) { // i == 31
+                unsigned long maxJobId = my_atoi (keyList[i].val, INFINIT_INT, 0);
+                unsigned long MAX_JOBID_LOW  = 1;                   // FIXME FIXME FIXME FIXME set in configure.ac according to architecture
+                unsigned long MAX_JOBID_HIGH = ULONG_MAX;           // FIXME FIXME FIXME FIXME set in configure.ac according to architecture
+                if( maxJobId == ULONG_MAX  && errno ==  ERANGE ) {
                     /*catgets 5062 */
-                    ls_syslog (LOG_ERR, "catgets 5062: %s: File %s in section Parameters ending at line %d: maxJobId value %s not in [%d, %d], use default value %d;", __func__, filename, *lineNum, keyList[i].key, MAX_JOBID_LOW, MAX_JOBID_HIGH, DEF_MAX_JOBID);
+                    ls_syslog (LOG_ERR, "catgets 5062: %s: File %s in section Parameters ending at line %d: maxJobId value %s not in [%lu, %lu], use default value ULONG_MAX (%lu);", __func__, filename, *lineNum, keyList[i].key, MAX_JOBID_LOW, MAX_JOBID_HIGH, ULONG_MAX);
                     lsberrno = LSBE_CONF_WARNING;
-                    pConf->maxJobId = DEF_MAX_JOBID; // struct paramConf *pConf in lib/conf_lsb.h
+                    pConf->maxJobId = ULONG_MAX; // struct parameterInfo in lib/lsbatch.h
                 }
                 else {
-                    pConf->maxJobId = value_;
+                    pConf->maxJobId = maxJobId;
                 }
             }
             else if (i == SCHE_RAW_LOAD )  { // i == 28
                 const char Y[] = "Y";
-                if (strcasecmp (keyList[i].val, Y ) == 0) {
+                if (strcasecmp (keyList[i].val, Y ) == 0) { // default
                     pConf->scheRawLoad = true;
                 }
                 else {
@@ -816,67 +832,97 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum) // this fu
             }
             else if (i == SLOT_RESOURCE_RESERVE ) { // i == 30
                 const char Y[] = "Y";
-                if (strcasecmp (keyList[i].val, Y ) == 0)  {
+                if (strcasecmp (keyList[i].val, Y ) == 0)  { // default
                     pConf->slotResourceReserve = true;
                 }
                 else {
                     pConf->slotResourceReserve = false;
                 }
             }
-            else if (i > PG_SUSP_IT ) { // i > 5
-                if (i < JOB_DEP_LAST_SUB ) { // i < 23 
-                    value = my_atoi (keyList[i].val, INFINIT_INT, 0);
+            // else if (i > PG_SUSP_IT ) { // i > 5
+            else if (i < JOB_DEP_LAST_SUB ) { // i < 23 
+                // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_config_ref/lsb.params.job_dep_last_sub.5.html
+                // 
+                // Description: Used only with job dependency scheduling. If set to 1, whenever dependency conditions use a job name that belongs to multiple jobs, LSF evaluates only the most recently submitted job.
+                //
+                // Default: Set to 1 at time of installation for the DEFAULT and PARALLEL configuration templates. If otherwise undefined, then 0 (turned off).
+                bool jobDepLastSub  = false;
+                unsigned long value = strtoul( keyList[i].val, NULL, 10 );
+                if( value == 1 ) {
+                    jobDepLastSub = true;
+                }
+                else if( value == 0 ) {
+                    ; // already false
                 }
                 else {
-                    value = atoi (keyList[i].val);
-                }
-
-                if (value == INFINIT_INT) {
                     /* catgets 5071 */
-                    ls_syslog (LOG_ERR, "catgets 5071: %s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored", __func__, filename, *lineNum, keyList[i].val, keyList[i].key, INFINIT_INT - 1);
+                    ls_syslog (LOG_ERR, "catgets 5071: %s: File %s in section Parameters ending at line %lu: Value <%s> of %s isn't 1 or 0; ignored", __func__, filename, *lineNum, keyList[i].val, keyList[i].key );
                     lsberrno = LSBE_CONF_WARNING;
                 }
-                else {
-                    switch( i ) {
-                        case MBD_SLEEP_TIME: // i == 6
-                            pConf->mbatchdInterval = value;
-                        break;
+                pConf->jobDepLastSub = jobDepLastSub
+            }
+            else if ( MBD_SLEEP_TIME == i ) { // case MBD_SLEEP_TIME: // i == 6
+                // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_config_ref/lsb.params.mbd_sleep_time.5.html
+                //
+                // MBD_SLEEP_TIME=seconds
+                //
+                // Description: Amount of time in seconds used for calculating parameter values. Used in conjunction with the parameters SLOT_RESERVE, MAX_SBD_FAIL, and JOB_ACCEPT_INTERVAL
+
+                time_t mbatchdInterval = strtoul( keyList[i].val, NULL, 10 );
+                if ( ULONG_MAX == mbatchdInterval && errno == ERANGE ) {
+                    ls_syslog (LOG_ERR, "catgets 5071: %s: File %s in section Parameters ending at line %lu: Value <%s> of %s isn't 1 or ; ignored", __func__, filename, *lineNum, keyList[i].val, keyList[i].key );
+                }
+                pConf->mbatchdInterval = mbatchdInterval;
+            }
+            else if ( ) {}
                         case CLEAN_PERIOD: // i == 7
                             pConf->cleanPeriod = value;
                         break;
+            else if ( ) {}
                         case MAX_RETRY: // i == 8 // u
                             pConf->maxDispRetries = value;
                         break;
+            else if ( ) {}
                         case SBD_SLEEP_TIME: // i == 9
                             pConf->sbatchdInterval = value;
                         break;
+            else if ( ) {}
                         case MAX_JOB_NUM: // i == 10
                             pConf->maxNumJobs = value;
                         break;
+            else if ( ) {}
                         case RETRY_INTERVAL: // i == 11
                             pConf->retryIntvl = value;
                         break;
+            else if ( ) {}
                         case MAX_SBD_FAIL: // i == 12
                             pConf->maxSbdRetries = value;
                         break;
+            else if ( ) {}
                         case RUSAGE_UPDATE_RATE: // i == 13
                             pConf->rusageUpdateRate = value;
                         break;
+            else if ( ) {}
                         case RUSAGE_UPDATE_PERCENT: // i == 14
                             pConf->rusageUpdatePercent = value;
                         break;
+            else if ( ) {}
                         case COND_CHECK_TIME: // i == 15
                             pConf->condCheckTime = value;
                         break;
+            else if ( ) {}
                         case MAX_SBD_CONNS: // i == 16
                             pConf->maxSbdConnections = value;
                         break;
+            else if ( ) {}
                         case MAX_SCHED_STAY: // i == 17
                             pConf->maxSchedStay = value;
                         break;
+            else if ( ) {}
                         case FRESH_PERIOD: // i == 18
                             pConf->freshPeriod = value;
                         break;
+            else if ( ) {}
                         case MAX_JOB_ARRAY_SIZE: // i == 19
                             if (value < 1 || value >= LSB_MAX_ARRAY_IDX) {
                                 /* catgets 5073 */
@@ -887,17 +933,21 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum) // this fu
                                 pConf->maxJobArraySize = value;
                             }
                         break;
+            else if ( ) {}
                         case JOB_TERMINATE_INTERVAL: // i == 21
                             pConf->jobTerminateInterval = value;
                         break;
+            else if ( ) {}
                         case JOB_RUN_TIMES: // i == 22
                             assert( value >= 0);
                             pConf->jobRunTimes = (unsigned int )value;  // FIXME FIXME FIXME see the cast can be done away
                         break;
+            else if ( ) {}
                         case JOB_DEP_LAST_SUB: // i == 23
                             assert( value >= 0);
                             pConf->jobDepLastSub = (unsigned int) value; // FIXME FIXME FIXME see the cast can be done away
                         break;
+            else if ( ) {}
                         case MAX_USER_PRIORITY: // i == 25
                             value = my_atoi (keyList[i].val, INFINIT_INT, -1);
                             if (value != INFINIT_INT) {
@@ -910,9 +960,11 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNum) // this fu
                                 ls_syslog (LOG_ERR, "catgets 5452: %s: File %s in section Parameters ending at line %d: invalid value <%s> of <%s> : ignored;", __func__, filename, *lineNum, keyList[i].val, keyList[i].key);
                             }
                         break;
+            else if ( ) {}
                         case PRE_EXEC_DELAY: // i == 29
                             pConf->preExecDelay = value;
                         break;
+            else if ( ) {}
                         default:
                             /* catgets 5074 */
                             ls_syslog (LOG_ERR, "catgets 5074: %s: File %s in section Parameters ending at line %d: Impossible cases <%d>.", __func__, filename, *lineNum, i);
@@ -1889,7 +1941,7 @@ addUnixGrp (struct group *unixGrp, const char *gname, const char *filename, unsi
         return NULL;
     }
 
-    if (numofugroups >= MAX_GROUPS) { // unsigned int numofugroups in lib/conf_lsb.h
+    if (numofugroups >= MAX_GROUPS) { // unsigned int numofugroups in lib/lsbatch.h
         /* catgets 5131 */
         ls_syslog (LOG_ERR, "catgets 5131: %s: File %s at line %d: numofugroups <%d> is equal to or greater than MAX_GROUPS <%d>; ignoring the group <%s>", __func__, filename, lineNum, numofugroups, MAX_GROUPS, unixGrp->gr_name);
         return NULL;
