@@ -345,11 +345,12 @@ char do_Index (FILE * fp, size_t *lineNum, const char *filename)
     return TRUE;
 }
 
-char lsf_setIndex (struct keymap *keyList, const char *filename, size_t lineNum)
+bool lsf_setIndex (struct keymap *keyList, const char *filename, size_t lineNum)
 {
+    int BASE10          = 10;
+    char **endptr       = NULL;
     unsigned int resIdx = 0;
-    char **endptr = NULL;
-    int BASE10 = 10;
+    unsigned long value = 0;
 
     const int NEGATIVERESULT = 1;
 
@@ -362,47 +363,54 @@ char lsf_setIndex (struct keymap *keyList, const char *filename, size_t lineNum)
     };
 
     if (keyList == NULL) {
-        return FALSE;
+        return false;
     }
 
-    if (strlen (keyList[NAME].val) >= MAX_LSF_NAME_LEN) {
+    if (strlen (keyList[NAME].value) >= MAX_LSF_NAME_LEN) {
         /* catgets 5065 */
-        ls_syslog (LOG_ERR, "catgets 5065: %s: %s(%d): Name %s is too long (maximum is %d chars); ignoring index", __func__, filename, lineNum, keyList[NAME].val, MAX_LSF_NAME_LEN - 1);
-        return FALSE;
+        ls_syslog (LOG_ERR, "catgets 5065: %s: %s(%d): Name %s is too long (maximum is %d chars); ignoring index", __func__, filename, lineNum, keyList[NAME].value, MAX_LSF_NAME_LEN - 1);
+        return false;
     }
 
-    if (strpbrk (keyList[NAME].val, ILLEGAL_CHARS) != NULL) {
+    if (strpbrk (keyList[NAME].value, ILLEGAL_CHARS) != NULL) {
         /* catgets 5066 */
-        ls_syslog (LOG_ERR, "catgets 5066 %s: %s(%d): illegal character (one of %s), ignoring index %s", __func__, filename, lineNum, ILLEGAL_CHARS, keyList[NAME].val); // keyList[3]
-        return FALSE;
+        ls_syslog (LOG_ERR, "catgets 5066 %s: %s(%d): illegal character (one of %s), ignoring index %s", __func__, filename, lineNum, ILLEGAL_CHARS, keyList[NAME].value); // keyList[3]
+        return false;
     }
 
-    // assert( resNameDefined (keyList[3].val) > 0 ); // FIXME FIXME FIXME 3? change that to a enum
-    // resIdx = (unsigned int) resNameDefined (keyList[3].val); // FIXME FIXME FIXME check if there is a reason for the cast here
+    // assert( resNameDefined (keyList[3].value) > 0 ); // FIXME FIXME FIXME 3? change that to a enum
+    // resIdx = (unsigned int) resNameDefined (keyList[3].value); // FIXME FIXME FIXME check if there is a reason for the cast here
     errno = 0;
-    resIdx = resNameDefined (keyList[NAME].val); // FIXME FIXME FIXME check if there is a reason for the cast here
+    resIdx = resNameDefined (keyList[NAME].value); // FIXME FIXME FIXME check if there is a reason for the cast here
     if( NEGATIVERESULT == errno ) {
         ls_syslog( LOG_ERR, "nocatgets: %s: resNameDefined() returned negative result", __func__ );
-        errno = 0;
-        return FALSE;
+        // errno = 0;
+        return false;
     } 
 
     if (!(lsinfo.resTable[resIdx]->flags & RESF_DYNAMIC)) {
         /* catgets 5067 */
-        ls_syslog (LOG_ERR, "catgets 5067: %s: %s(%d): Name %s is not a dynamic resource; ignored", __func__, filename, lineNum, keyList[NAME].val); // keyList[NAME]
-        return FALSE;
+        ls_syslog (LOG_ERR, "catgets 5067: %s: %s at line %lu: Name %s is not a dynamic resource; ignored", __func__, filename, lineNum, keyList[NAME].value); // keyList[NAME]
+        return false;
     }
     else {
         resIdx = lsinfo.nRes;
     }
 
-    lsinfo.resTable[resIdx]->interval = (unsigned int) strtoul( keyList[INTERVAL].val, endptr, BASE10 );
-    lsinfo.resTable[resIdx]->orderType =(strcasecmp (keyList[INCREASING].val, "y") == 0) ? INCR : DECR; // FIXME FIXME FIXME change 1 to appropriate label in enum
+    value = strtoul( keyList[INTERVAL].value, endptr, BASE10 );
+    if ( value == ULONG_MAX && errno ==  ERANGE ) {
+        /* catgets 5067 */ // FIXME FIXME FIXME FIXME get new catgets number
+        ls_syslog (LOG_ERR, "catgets 5067: %s at line %lu: value of %s for keyList[INTERVAL] is overflowed.", __func__, filename, lineNum, keyList[INTERVAL].key );
+        return false;
+    }
 
-    lsinfo.resTable[resIdx]->des = keyList[DESCRIPTION].val;
-    lsinfo.resTable[resIdx]->name = keyList[NAME].val;
+    lsinfo.resTable[resIdx]->interval = (unsigned int) value;
+    lsinfo.resTable[resIdx]->orderType =(strcasecmp (keyList[INCREASING].value, "y") == 0) ? INCR : DECR; // FIXME FIXME FIXME change 1 to appropriate label in enum
+
+    lsinfo.resTable[resIdx]->des       = keyList[DESCRIPTION].value;
+    lsinfo.resTable[resIdx]->name      = keyList[NAME].value;
     lsinfo.resTable[resIdx]->valueType = LS_NUMERIC;
-    lsinfo.resTable[resIdx]->flags = RESF_DYNAMIC | RESF_GLOBAL;
+    lsinfo.resTable[resIdx]->flags     = RESF_DYNAMIC | RESF_GLOBAL;
 
     if (resIdx == lsinfo.nRes) {
         lsinfo.numUsrIndx++;
@@ -410,12 +418,12 @@ char lsf_setIndex (struct keymap *keyList, const char *filename, size_t lineNum)
         lsinfo.nRes++;
     }
 
-    FREEUP (keyList[INTERVAL].val);
-    FREEUP (keyList[INCREASING].val);
-    FREEUP (keyList[DESCRIPTION].val);
-    FREEUP (keyList[NAME].val);
+    FREEUP (keyList[INTERVAL].value);
+    FREEUP (keyList[INCREASING].value);
+    FREEUP (keyList[DESCRIPTION].value);
+    FREEUP (keyList[NAME].value);
 
-    return TRUE;
+    return true;
 }
 
 char do_HostTypes (FILE * fp, size_t *lineNum, const char *filename)
@@ -473,16 +481,16 @@ char do_HostTypes (FILE * fp, size_t *lineNum, const char *filename)
                 continue;
             }
 
-            if (strpbrk (keyList[TYPENAME].val, ILLEGAL_CHARS) != NULL ) 
+            if (strpbrk (keyList[TYPENAME].value, ILLEGAL_CHARS) != NULL ) 
             {
                 /* catgets 5072 */
-                ls_syslog (LOG_ERR, "catgets 5072: %s: %s(%d): illegal character (one of %s), ignoring type %s", __func__, filename, *lineNum, ILLEGAL_CHARS, keyList[0].val); // FIXME FIXME FIME replace [0] with enum LABEL
-                FREEUP (keyList[TYPENAME].val);
+                ls_syslog (LOG_ERR, "catgets 5072: %s: %s(%d): illegal character (one of %s), ignoring type %s", __func__, filename, *lineNum, ILLEGAL_CHARS, keyList[0].value); // FIXME FIXME FIME replace [0] with enum LABEL
+                FREEUP (keyList[TYPENAME].value);
                 continue;
             }
 
-            addHostType (keyList[TYPENAME].val); // FIXME FIXME FIXME replace [0] wtih enum label
-            FREEUP (keyList[TYPENAME].val);
+            addHostType (keyList[TYPENAME].value); // FIXME FIXME FIXME replace [0] wtih enum label
+            FREEUP (keyList[TYPENAME].value);
         }
     }
     else
@@ -587,36 +595,36 @@ char do_HostModels (FILE * fp, size_t *lineNum, const char *filename)
                 continue;
             }
 
-            if (!isanumber_ (keyList[CPUFACTOR].val) || atof (keyList[CPUFACTOR].val) <= 0) {
+            if (!isanumber_ (keyList[CPUFACTOR].value) || atof (keyList[CPUFACTOR].value) <= 0) {
                 /* catgets 5080 */
-                ls_syslog (LOG_ERR, "catgets 5080: %s: %s(%d): Bad cpuFactor for host model %s, ignoring line", __func__, filename, *lineNum, keyList[MODELNAME].val);
-                FREEUP (keyList[MODELNAME].val);
-                FREEUP (keyList[CPUFACTOR].val);
-                FREEUP (keyList[ARCHITECTURE].val);
+                ls_syslog (LOG_ERR, "catgets 5080: %s: %s(%d): Bad cpuFactor for host model %s, ignoring line", __func__, filename, *lineNum, keyList[MODELNAME].value);
+                FREEUP (keyList[MODELNAME].value);
+                FREEUP (keyList[CPUFACTOR].value);
+                FREEUP (keyList[ARCHITECTURE].value);
                 continue;
             }
 
-            if (strpbrk (keyList[MODELNAME].val, ILLEGAL_CHARS) != NULL) {
+            if (strpbrk (keyList[MODELNAME].value, ILLEGAL_CHARS) != NULL) {
                 /* catgets 5081 */
-                ls_syslog (LOG_ERR, "catgets 5081: %s: %s(%d): illegal character (one of %s), ignoring model %s", __func__, filename, *lineNum, ILLEGAL_CHARS, keyList[MODELNAME].val);
-                FREEUP (keyList[MODELNAME].val);
-                FREEUP (keyList[CPUFACTOR].val);
-                FREEUP (keyList[ARCHITECTURE].val);
+                ls_syslog (LOG_ERR, "catgets 5081: %s: %s(%d): illegal character (one of %s), ignoring model %s", __func__, filename, *lineNum, ILLEGAL_CHARS, keyList[MODELNAME].value);
+                FREEUP (keyList[MODELNAME].value);
+                FREEUP (keyList[CPUFACTOR].value);
+                FREEUP (keyList[ARCHITECTURE].value);
                 continue;
             }
 
-            sp = keyList[ARCHITECTURE].val;
+            sp = keyList[ARCHITECTURE].value;
             if (sp && sp[0]) {
                 const char *pointer = sp;
                 while ((word = getNextWord_ (&pointer)) != NULL) {
-                    addHostModel (keyList[MODELNAME].val, word, atof (keyList[CPUFACTOR].val)); // FIXME FIXME FIXME replace 1 with uname label
+                    addHostModel (keyList[MODELNAME].value, word, atof (keyList[CPUFACTOR].value)); // FIXME FIXME FIXME replace 1 with uname label
                 }
             }
             else {
-                addHostModel (keyList[MODELNAME].val, NULL, atof (keyList[CPUFACTOR].val)); // FIXME FIXME FIXME replace 1 with uname label
-                FREEUP (keyList[MODELNAME].val);
-                FREEUP (keyList[CPUFACTOR].val);
-                FREEUP (keyList[ARCHITECTURE].val);
+                addHostModel (keyList[MODELNAME].value, NULL, atof (keyList[CPUFACTOR].value)); // FIXME FIXME FIXME replace 1 with uname label
+                FREEUP (keyList[MODELNAME].value);
+                FREEUP (keyList[CPUFACTOR].value);
+                FREEUP (keyList[ARCHITECTURE].value);
             }
         }
     }
@@ -799,33 +807,33 @@ char do_Resources (FILE * fp, size_t *lineNum, const char *filename)
                 continue;
             }
 
-            if (strlen (keyList[RESOURCENAME].val) >= MAX_LSF_NAME_LEN - 1) {
+            if (strlen (keyList[RESOURCENAME].value) >= MAX_LSF_NAME_LEN - 1) {
                 /* catgets 5088 */
-                ls_syslog (LOG_ERR, "catgets 5088: %s: %s(%d): Resource name %s too long in section resource. Should be less than %d characters,  ignoring line", __func__, filename, *lineNum, keyList[RESOURCENAME].val, MAX_LSF_NAME_LEN - 1);
+                ls_syslog (LOG_ERR, "catgets 5088: %s: %s(%d): Resource name %s too long in section resource. Should be less than %d characters,  ignoring line", __func__, filename, *lineNum, keyList[RESOURCENAME].value, MAX_LSF_NAME_LEN - 1);
                 freeKeyList (keyList);
                 continue;
             }
 
             lserrno = ENOERROR; // FIXME FIXME FIXME FIXME save old value, restore after if condition
-            resNameDefined (keyList[RESOURCENAME].val);
+            resNameDefined (keyList[RESOURCENAME].value);
             if ( ENEGATIVERESULT == lserrno) {
                 lserrno = ENOERROR;
                 /* catgets 5089 */
-                ls_syslog (LOG_ERR, "catgets 5089: %s: %s(%d): Resource name %s reserved or previously defined. Ignoring line", __func__, filename, *lineNum, keyList[RESOURCENAME].val);
+                ls_syslog (LOG_ERR, "catgets 5089: %s: %s(%d): Resource name %s reserved or previously defined. Ignoring line", __func__, filename, *lineNum, keyList[RESOURCENAME].value);
                 freeKeyList (keyList);
                 continue;
             }
 
-            if (strpbrk (keyList[RESOURCENAME].val, ILLEGAL_CHARS) != NULL) {
+            if (strpbrk (keyList[RESOURCENAME].value, ILLEGAL_CHARS) != NULL) {
                 /* catgets 5090 */
-                ls_syslog (LOG_ERR, "catgets 5090: %s: %s(%d): illegal character (one of %s): in resource name:%s, section resource, ignoring line", __func__, filename, *lineNum, ILLEGAL_CHARS, keyList[RESOURCENAME].val);
+                ls_syslog (LOG_ERR, "catgets 5090: %s: %s(%d): illegal character (one of %s): in resource name:%s, section resource, ignoring line", __func__, filename, *lineNum, ILLEGAL_CHARS, keyList[RESOURCENAME].value);
                 freeKeyList (keyList);
                 continue;
             }
 
-            if (isdigit (keyList[RESOURCENAME].val[0])) {
+            if (isdigit (keyList[RESOURCENAME].value[0])) {
                 /* catgets 5091 */
-                ls_syslog (LOG_ERR, "catgets 5091: %s: %s(%d): Resource name <%s> begun with a digit is illegal; ignored", __func__, filename, *lineNum, keyList[RESOURCENAME].val);
+                ls_syslog (LOG_ERR, "catgets 5091: %s: %s(%d): Resource name <%s> begun with a digit is illegal; ignored", __func__, filename, *lineNum, keyList[RESOURCENAME].value);
                 freeKeyList (keyList);
                 continue;
             }
@@ -838,33 +846,33 @@ char do_Resources (FILE * fp, size_t *lineNum, const char *filename)
             lsinfo.resTable[lsinfo.nRes]->interval = 0;
 
             // FIXME FIXME FIXME FIXME FIXME must institute a global check to see if a value is in valid range
-            lsinfo.resTable[lsinfo.nRes]->name = keyList[RESOURCENAME].val;
+            lsinfo.resTable[lsinfo.nRes]->name = keyList[RESOURCENAME].value;
 
 
-            if (keyList[TYPE].val != NULL && keyList[TYPE].val[RESOURCENAME] != '\0') {
+            if (keyList[TYPE].value != NULL && keyList[TYPE].value[RESOURCENAME] != '\0') {
                 int type = 0;
 
                 /* FIXME
                  following line needs to go; be assigned to declaration of type and
                  use the assert() to check if it is greater or equal to zero
                  */
-                if ((type = validType (keyList[TYPE].val)) >= 0) {
+                if ((type = validType (keyList[TYPE].value)) >= 0) {
                     assert( type >= 0 );
                     lsinfo.resTable[lsinfo.nRes]->valueType = (enum valueType) type; // FIXME FIXME FIXME FIXME cast is correct
                 }
                 else {
                     /* catgets 5092 */
-                    ls_syslog (LOG_ERR, "catgets 5092: %s: %s(%d): resource type <%s> for resource <%s> is not valid; ignoring resource <%s> in section resource", __func__, filename, *lineNum, keyList[TYPE].val, keyList[RESOURCENAME].val, keyList[RESOURCENAME].val);
+                    ls_syslog (LOG_ERR, "catgets 5092: %s: %s(%d): resource type <%s> for resource <%s> is not valid; ignoring resource <%s> in section resource", __func__, filename, *lineNum, keyList[TYPE].value, keyList[RESOURCENAME].value, keyList[RESOURCENAME].value);
                     freeKeyList (keyList);
                     continue;
                 }
             }
 
-            if ( keyList[INTERVAL].val != NULL ) {
+            if ( keyList[INTERVAL].value != NULL ) {
 
                 unsigned int interval = 0 ;
 
-                if ((interval = (unsigned int)atoi( keyList[INTERVAL].val ) ) > 0) { // FIXME FIXME FIXME FIXME add check for legit range of value // cast is OK here
+                if ((interval = (unsigned int)atoi( keyList[INTERVAL].value ) ) > 0) { // FIXME FIXME FIXME FIXME add check for legit range of value // cast is OK here
 
                     lsinfo.resTable[lsinfo.nRes]->interval = interval;
                     if (lsinfo.resTable[lsinfo.nRes]->valueType == LS_NUMERIC) {
@@ -872,26 +880,26 @@ char do_Resources (FILE * fp, size_t *lineNum, const char *filename)
                     }
                     else {
                         /* catgets 5093 */
-                        ls_syslog (LOG_ERR, "catgets 5093: %s: %s(%d): INTERVAL <%s> for resource <%s> should be a integer greater than 0; ignoring resource <%s> in section resource", __func__, filename, *lineNum, keyList[INTERVAL].val, keyList[RESOURCENAME].val, keyList[RESOURCENAME].val);
+                        ls_syslog (LOG_ERR, "catgets 5093: %s: %s(%d): INTERVAL <%s> for resource <%s> should be a integer greater than 0; ignoring resource <%s> in section resource", __func__, filename, *lineNum, keyList[INTERVAL].value, keyList[RESOURCENAME].value, keyList[RESOURCENAME].value);
                         freeKeyList (keyList);
                         continue;
                     }
                 }
             }
 
-            if (keyList[INCREASING].val != NULL && keyList[INCREASING].val[0] != '\0') {
+            if (keyList[INCREASING].value != NULL && keyList[INCREASING].value[0] != '\0') {
 
                 if (lsinfo.resTable[lsinfo.nRes]->valueType == LS_NUMERIC) {
-                    if (!strcasecmp (keyList[INCREASING].val, N)) { // FIXME FIXME FIXME FIXME change N to variable
+                    if (!strcasecmp (keyList[INCREASING].value, N)) { // FIXME FIXME FIXME FIXME change N to variable
                         lsinfo.resTable[lsinfo.nRes]->orderType = DECR;
 
                     }
-                    else if (!strcasecmp (keyList[INCREASING].val, Y)) {
+                    else if (!strcasecmp (keyList[INCREASING].value, Y)) {
                         lsinfo.resTable[lsinfo.nRes]->orderType = INCR;
                     }
                     else {
                         /* catgets 5094 */
-                        ls_syslog (LOG_ERR, "catgets 5094: %s: %s(%d): INCREASING <%s> for resource <%s> is not valid; ignoring resource <%s> in section resource", __func__, filename, *lineNum, keyList[INCREASING].val, keyList[RESOURCENAME].val, keyList[RESOURCENAME].val);
+                        ls_syslog (LOG_ERR, "catgets 5094: %s: %s(%d): INCREASING <%s> for resource <%s> is not valid; ignoring resource <%s> in section resource", __func__, filename, *lineNum, keyList[INCREASING].value, keyList[RESOURCENAME].value, keyList[RESOURCENAME].value);
                         freeKeyList (keyList);
                         continue;
                     }
@@ -909,13 +917,13 @@ char do_Resources (FILE * fp, size_t *lineNum, const char *filename)
                     };
 
                     /* catgets 5095 */
-                    ls_syslog (LOG_ERR, "%s: %s(%d): INCREASING <%s> is not used by the resource <%s> with type <%s>; ignoring INCREASING", __func__, filename, *lineNum, keyList[INCREASING].val, keyList[RESOURCENAME].val, syslog_result );
+                    ls_syslog (LOG_ERR, "%s: %s(%d): INCREASING <%s> is not used by the resource <%s> with type <%s>; ignoring INCREASING", __func__, filename, *lineNum, keyList[INCREASING].value, keyList[RESOURCENAME].value, syslog_result );
                     free( syslog_result );
                 }
             }
             else if (lsinfo.resTable[lsinfo.nRes]->valueType == LS_NUMERIC) {
                 /* catgets 5096 */
-                ls_syslog (LOG_ERR, "catgets 5096: %s: %s(%d): No INCREASING specified for a numeric resource <%s>; ignoring resource <%s> in section resource", __func__, filename, *lineNum, keyList[RESOURCENAME].val, keyList[RESOURCENAME].val);
+                ls_syslog (LOG_ERR, "catgets 5096: %s: %s(%d): No INCREASING specified for a numeric resource <%s>; ignoring resource <%s> in section resource", __func__, filename, *lineNum, keyList[RESOURCENAME].value, keyList[RESOURCENAME].value);
                 freeKeyList (keyList);
                 continue;
             }
@@ -930,16 +938,16 @@ char do_Resources (FILE * fp, size_t *lineNum, const char *filename)
              this shit will need the debugger to make sense
              (or a boatload of test cases)
              */
-            if (keyList[RELEASE].val != NULL && keyList[RELEASE].val[0] != '\0') {
+            if (keyList[RELEASE].value != NULL && keyList[RELEASE].value[0] != '\0') {
 
                 if (lsinfo.resTable[lsinfo.nRes]->valueType == LS_NUMERIC) {
 
-                    if (!strcasecmp (keyList[RELEASE].val, Y)) {
+                    if (!strcasecmp (keyList[RELEASE].value, Y)) {
                         lsinfo.resTable[lsinfo.nRes]->flags |= RESF_RELEASE;
                     }
-                    else if (strcasecmp (keyList[RELEASE].val, N)) {
+                    else if (strcasecmp (keyList[RELEASE].value, N)) {
                         /*catgets 5212 */
-                        ls_syslog (LOG_ERR, "catgets 5212: %s:%s:%s(%d): RELEASE defined for resource <%s> should be 'Y', 'y', 'N' or 'n' not <%s>; ignoring resource <%s> in section resource", __func__, filename, *lineNum, keyList[RESOURCENAME].val, keyList[RELEASE].val, keyList[RESOURCENAME].val);
+                        ls_syslog (LOG_ERR, "catgets 5212: %s:%s:%s(%d): RELEASE defined for resource <%s> should be 'Y', 'y', 'N' or 'n' not <%s>; ignoring resource <%s> in section resource", __func__, filename, *lineNum, keyList[RESOURCENAME].value, keyList[RELEASE].value, keyList[RESOURCENAME].value);
                         freeKeyList (keyList);
                         continue;
                     }
@@ -949,7 +957,7 @@ char do_Resources (FILE * fp, size_t *lineNum, const char *filename)
                 }
                 else {
                     /*catgets 5213 */
-                    ls_syslog (LOG_ERR, "catgets 5213: %s:%s:%s(%d): RELEASE cannot be defined for resource <%s> which isn't a numeric resource; ignoring resource <%s> in section resource", __func__, filename, *lineNum, keyList[RESOURCENAME].val, keyList[RESOURCENAME].val);
+                    ls_syslog (LOG_ERR, "catgets 5213: %s:%s:%s(%d): RELEASE cannot be defined for resource <%s> which isn't a numeric resource; ignoring resource <%s> in section resource", __func__, filename, *lineNum, keyList[RESOURCENAME].value, keyList[RESOURCENAME].value);
                     freeKeyList (keyList);
                     continue;
                 }
@@ -968,7 +976,7 @@ char do_Resources (FILE * fp, size_t *lineNum, const char *filename)
      if bellow, might be part of the else block above
      */
 
-        lsinfo.resTable[lsinfo.nRes]->des = keyList[DESCRIPTION].val;
+        lsinfo.resTable[lsinfo.nRes]->des = keyList[DESCRIPTION].value;
         if (lsinfo.resTable[lsinfo.nRes]->interval > 0 && (lsinfo.resTable[lsinfo.nRes]->valueType == LS_NUMERIC)) {
             lsinfo.numUsrIndx++;
             lsinfo.numIndx++;
@@ -1561,18 +1569,18 @@ ls_setAdmins (struct admins *admins, int mOrA)
 
 
 void
-liblsf_putThreshold (unsigned int indx, const struct hostInfo *host, const size_t position, const char *val, double def)
+liblsf_putThreshold (unsigned int indx, const struct hostInfo *host, const size_t position, const char *value, double def)
 {
     if ( NULL == host ) {
         return;
     }
 
     if (position != UINT_MAX) {
-        if (strcmp (val, "") == 0) {
+        if (strcmp (value, "") == 0) {
             host->busyThreshold[indx] = def;
         }
         else {
-            host->busyThreshold[indx] = (float) atof( val ); // FIXME FIXME must investigate upper and lower limits of host->busyThreshold and set the type appropriately
+            host->busyThreshold[indx] = (float) atof( value ); // FIXME FIXME must investigate upper and lower limits of host->busyThreshold and set the type appropriately
         }
     }
     else {
@@ -1647,7 +1655,7 @@ initkeylist (struct keymap keyList[], unsigned int m, unsigned int n, struct lsI
     }
 
     for ( unsigned int i = 0; i < n; i++) {
-        keyList[i].val = NULL;
+        keyList[i].value = NULL;
         keyList[i].position = 0;
     }
 
@@ -1679,8 +1687,8 @@ initkeylist (struct keymap keyList[], unsigned int m, unsigned int n, struct lsI
 void freekeyval (struct keymap keylist[])
 {
     for ( int cc = 0; NULL != keylist[cc].key; cc++) {
-        if ( NULL != keylist[cc].val ) {
-            FREEUP (keylist[cc].val);
+        if ( NULL != keylist[cc].value ) {
+            FREEUP (keylist[cc].value);
         }
     }
 
@@ -1942,16 +1950,16 @@ char do_Cluster (FILE * fp, size_t *lineNum, const char *filename)
             }
 
             if (keyList[SERVERS].position != 255 ) // FIXME FIXME FIXME FIXME turn into label, global
-                servers = keyList[SERVERS].val;
+                servers = keyList[SERVERS].value;
             else
                 servers = NULL;
 
-            if ((sConf->clusterName = putstr_ (keyList[CLUSTERNAME].val)) == NULL)
+            if ((sConf->clusterName = putstr_ (keyList[CLUSTERNAME].value)) == NULL)
             {
                 ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, mallocString);
-                FREEUP (keyList[CLUSTERNAME].val);
+                FREEUP (keyList[CLUSTERNAME].value);
                 if (keyList[SERVERS].position != 255) { // FIXME FIXME FIXME FIXME turn into label, global
-                    FREEUP (keyList[SERVERS].val);
+                    FREEUP (keyList[SERVERS].value);
                 }
                 return FALSE;
             }
@@ -1959,17 +1967,17 @@ char do_Cluster (FILE * fp, size_t *lineNum, const char *filename)
             if ((sConf->servers = putstr_ (servers)) == NULL)
             {
                 ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, mallocString);
-                FREEUP (keyList[CLUSTERNAME].val);
+                FREEUP (keyList[CLUSTERNAME].value);
                 if (keyList[SERVERS].position != 255 ) { // FIXME FIXME FIXME FIXME turn into label, global
-                    FREEUP (keyList[SERVERS].val);
+                    FREEUP (keyList[SERVERS].value);
                 }
                 return FALSE;
             }
 
             found = TRUE;
-            FREEUP (keyList[CLUSTERNAME].val);
+            FREEUP (keyList[CLUSTERNAME].value);
             if (keyList[SERVERS].position != 255 ) { // FIXME FIXME FIXME FIXME turn into label, global
-                FREEUP (keyList[SERVERS].val);
+                FREEUP (keyList[SERVERS].value);
             }
         }
     }
@@ -2077,7 +2085,7 @@ void freeKeyList (struct keymap *keyList)
 {
     for ( unsigned int i = 0; keyList[i].key != NULL; i++) {
         if ( keyList[i].position != 255 ) { // FIXME FIXME FIXME FIXME turn into label, global
-            FREEUP ( keyList[i].val );
+            FREEUP ( keyList[i].value );
         }
     }
 }
@@ -2168,19 +2176,19 @@ int doResourceMap (FILE * fp, const char *lsfile, size_t *lineNum)
                 continue;
             }
 
-            resNo = resNameDefined (keyList[RESOURCENAME].val);
+            resNo = resNameDefined (keyList[RESOURCENAME].value);
             if ( !resNo ) {
                 char buffer[MAX_FILENAME_LEN];
                 memset( buffer, '\0', MAX_FILENAME_LEN );
-                sprintf( buffer, "catgets 5199: %s: %s(%lu): Resource name <%s> is not defined; ignoring line", __func__, lsfile, *lineNum, keyList[RESOURCENAME].val );
+                sprintf( buffer, "catgets 5199: %s: %s(%lu): Resource name <%s> is not defined; ignoring line", __func__, lsfile, *lineNum, keyList[RESOURCENAME].value );
                 ls_syslog (LOG_ERR, buffer);
                 freeKeyList (keyList);
                 continue;
             }
-            if (keyList[LOCATION].val != NULL )
+            if (keyList[LOCATION].value != NULL )
             {
 
-                if (strstr (keyList[LOCATION].val, "all ") && strchr (keyList[LOCATION].val, '~')) // FIXME FIXME "all " ? what's with the extra space
+                if (strstr (keyList[LOCATION].value, "all ") && strchr (keyList[LOCATION].value, '~')) // FIXME FIXME "all " ? what's with the extra space
                 {
 
                     struct HostsArray array;
@@ -2210,24 +2218,24 @@ int doResourceMap (FILE * fp, const char *lsfile, size_t *lineNum)
                         array.size++;
                     }
 
-                    result = convertNegNotation_( &( keyList[ LOCATION ].val ), &array );
+                    result = convertNegNotation_( &( keyList[ LOCATION ].value ), &array );
                     if (result == 0)
                     {
                         /* catgets 5397 */
-                        ls_syslog (LOG_WARNING, "catgets 5397: %s:%s: %s(%d): convertNegNotation_: all the hosts are to be excluded %s !", __func__, lsfile, *lineNum, keyList[LOCATION].val);
+                        ls_syslog (LOG_WARNING, "catgets 5397: %s:%s: %s(%d): convertNegNotation_: all the hosts are to be excluded %s !", __func__, lsfile, *lineNum, keyList[LOCATION].value);
                     }
                     else if (result < 0)
                     {
                         /* catgets 5398 */
-                        ls_syslog (LOG_WARNING, "catgets 5398: %s:%s: %s(%d): convertNegNotation_: Wrong syntax \'%s\'", __func__, lsfile, *lineNum, keyList[LOCATION].val);
+                        ls_syslog (LOG_WARNING, "catgets 5398: %s:%s: %s(%d): convertNegNotation_: Wrong syntax \'%s\'", __func__, lsfile, *lineNum, keyList[LOCATION].value);
                     }
                     freeSA_ (array.hosts, array.size);
                 }
 
-                if ( addResourceMap (keyList[RESOURCENAME].val, keyList[LOCATION].val, lsfile, *lineNum) < 0)
+                if ( addResourceMap (keyList[RESOURCENAME].value, keyList[LOCATION].value, lsfile, *lineNum) < 0)
                 {
                     /* catgets 5200 */
-                    ls_syslog (LOG_ERR, "catgets 5200: %s:%s: %s(%d): addResourceMap() failed for resource <%s>; ignoring line", __func__, lsfile, *lineNum, keyList[RESOURCENAME].val);
+                    ls_syslog (LOG_ERR, "catgets 5200: %s:%s: %s(%d): addResourceMap() failed for resource <%s>; ignoring line", __func__, lsfile, *lineNum, keyList[RESOURCENAME].value);
                     freeKeyList (keyList);
                     continue;
                 
@@ -2239,7 +2247,7 @@ int doResourceMap (FILE * fp, const char *lsfile, size_t *lineNum)
             else
             {
                 /* catgets 5201 */
-                ls_syslog (LOG_ERR, "catgets 5201: %s: %s(%d): No LOCATION specified for resource <%s>; ignoring the line", __func__, lsfile, *lineNum, keyList[RESOURCENAME].val);
+                ls_syslog (LOG_ERR, "catgets 5201: %s: %s(%d): No LOCATION specified for resource <%s>; ignoring the line", __func__, lsfile, *lineNum, keyList[RESOURCENAME].value);
                 freeKeyList (keyList);
                 continue;
             }

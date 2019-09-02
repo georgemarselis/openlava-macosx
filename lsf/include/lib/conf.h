@@ -100,7 +100,7 @@ struct keymap {
     size_t position;
     char padding[8];
     const char *key;
-    char *val;
+    char *value;
 };
 
 const int builtInRes_ID[] = { // FIXME FIXME FIXME FIXME careful when compiling with the -Wkitchen-sink
@@ -197,7 +197,7 @@ struct clusterConf *ls_readcluster_ex ( const char *filename, struct lsInfo *inf
 int ls_setAdmins (struct admins *admins, int mOrA);
 void freekeyval (struct keymap keylist[]);
 char *parsewindow ( const char *linep, const char *filename, const size_t *lineNum, const char *section);
-char lsf_setIndex (struct keymap *keyList, const char *filename, size_t lineNum);
+bool lsf_setIndex (struct keymap *keyList, const char *filename, size_t lineNum);
 struct sharedConf *ls_readshared ( const char *filename);
 int initResTable_ (void);
 void initkeylist (struct keymap keyList[], unsigned int m, unsigned int n, struct lsInfo *info);

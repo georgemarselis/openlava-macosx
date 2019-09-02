@@ -130,7 +130,7 @@ do_Hosts_lsf (FILE *fp, const char *filename, size_t *lineNum, struct lsInfo *in
                 for( unsigned int j = 0; keyList[j].key != NULL; j++) {
                         // if (keyList[j].position != -1) {
                     if (keyList[j].position != 255 ) {
-                        FREEUP (keyList[j].val);
+                        FREEUP (keyList[j].value);
                     }
                 }
 
@@ -162,21 +162,21 @@ do_Hosts_lsf (FILE *fp, const char *filename, size_t *lineNum, struct lsInfo *in
             continue;
         }
 
-        if (strlen (keyList[HOSTNAME].val) > MAXHOSTNAMELEN) {
+        if (strlen (keyList[HOSTNAME].value) > MAXHOSTNAMELEN) {
             /* catgets 5140 */
             ls_syslog (LOG_ERR, "catgets 5140: %s: %s(%d): too long host name, ignored.", __func__, filename, *lineNum);
             continue;
         }
 
-        if (Gethostbyname_ (keyList[HOSTNAME].val) == NULL) {
+        if (Gethostbyname_ (keyList[HOSTNAME].value) == NULL) {
             /* catgets 5141 */
-            ls_syslog (LOG_ERR, "catgets 5141: %s: %s(%d): Invalid hostname %s in section host. Ignoring host", __func__, filename, *lineNum, keyList[HOSTNAME].val);
+            ls_syslog (LOG_ERR, "catgets 5141: %s: %s(%d): Invalid hostname %s in section host. Ignoring host", __func__, filename, *lineNum, keyList[HOSTNAME].value);
             continue;
         }
 
-        strcpy (host.hostName, keyList[HOSTNAME].val);
+        strcpy (host.hostName, keyList[HOSTNAME].value);
 
-        if ((host.hostModel = putstr_ (keyList[MODEL].val)) == NULL) {
+        if ((host.hostModel = putstr_ (keyList[MODEL].value)) == NULL) {
             ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, mallocString);
             lserrno = LSE_MALLOC;
             freeHostInfo (&host);
@@ -185,7 +185,7 @@ do_Hosts_lsf (FILE *fp, const char *filename, size_t *lineNum, struct lsInfo *in
             return FALSE;
         }
 
-        if ((host.hostType = putstr_ (keyList[TYPE].val)) == NULL) {
+        if ((host.hostType = putstr_ (keyList[TYPE].value)) == NULL) {
             ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, mallocString);
             lserrno = LSE_MALLOC;
             freeHostInfo (&host);
@@ -198,13 +198,13 @@ do_Hosts_lsf (FILE *fp, const char *filename, size_t *lineNum, struct lsInfo *in
         if (keyList[ND].position != 255) {
             const unsigned short BASEZERO = 0;
             errno = 0;
-            assert( strtoul( keyList[ND].val, NULL , BASEZERO ) );
+            assert( strtoul( keyList[ND].value, NULL , BASEZERO ) );
             if( !errno ) {
-                    host.nDisks = (unsigned int) strtoul( keyList[ND].val, NULL , BASEZERO ); // FIXME FIXME FIXME i'm sure nobody will get a couple of billion of disks in a single system any time soon, but please take care of this and change nDisks to size_t or devise a plan to have a proper conversion to int.
+                    host.nDisks = (unsigned int) strtoul( keyList[ND].value, NULL , BASEZERO ); // FIXME FIXME FIXME i'm sure nobody will get a couple of billion of disks in a single system any time soon, but please take care of this and change nDisks to size_t or devise a plan to have a proper conversion to int.
             }
             else {
-                fprintf( stdout, "%s: errno was: %d; the value of keyList[ND].val was %s; too big for strtoul(); ignoring, no disks set\n", __func__, errno, keyList[ND].val );
-                ls_syslog( LOG_ERR, "%s: errno was: %d; the value of keyList[ND].val was %s; too big for strtoul(); ignoring, no disks set", __func__, errno, keyList[ND].val );
+                fprintf( stdout, "%s: errno was: %d; the value of keyList[ND].value was %s; too big for strtoul(); ignoring, no disks set\n", __func__, errno, keyList[ND].value );
+                ls_syslog( LOG_ERR, "%s: errno was: %d; the value of keyList[ND].value was %s; too big for strtoul(); ignoring, no disks set", __func__, errno, keyList[ND].value );
                 errno = 0;
                 continue;
             }
@@ -230,31 +230,31 @@ do_Hosts_lsf (FILE *fp, const char *filename, size_t *lineNum, struct lsInfo *in
             return FALSE;
         }
 
-        liblsf_putThreshold( R15S, &host, keyList[R15S].position, keyList[R15S].val, INFINIT_LOAD );
-        liblsf_putThreshold( R1M,  &host, keyList[R1M].position,  keyList[R1M].val,  INFINIT_LOAD );
-        liblsf_putThreshold( R15M, &host, keyList[R15M].position, keyList[R15M].val, INFINIT_LOAD );
-        liblsf_putThreshold( UT,   &host, keyList[UT].position,   keyList[UT].val,   INFINIT_LOAD );
+        liblsf_putThreshold( R15S, &host, keyList[R15S].position, keyList[R15S].value, INFINIT_LOAD );
+        liblsf_putThreshold( R1M,  &host, keyList[R1M].position,  keyList[R1M].value,  INFINIT_LOAD );
+        liblsf_putThreshold( R15M, &host, keyList[R15M].position, keyList[R15M].value, INFINIT_LOAD );
+        liblsf_putThreshold( UT,   &host, keyList[UT].position,   keyList[UT].value,   INFINIT_LOAD );
 
         if (host.busyThreshold[UT] > 1.0l  && host.busyThreshold[UT] < INFINIT_LOAD) {
             ls_syslog (LOG_INFO, "catgets 5145: %s: %s(%d): value for threshold ut <%2.2e> is greater than 1, assumming <%5.1e%%>", __func__, filename, *lineNum, (double) host.busyThreshold[UT], (double) host.busyThreshold[UT]); // FIXME FIXME the (double) cast s probably correct
             host.busyThreshold[UT] /= 100;
         }
-        liblsf_putThreshold( PG,   &host, keyList[PG].position,  keyList[PG].val,   INFINIT_LOAD );
-        liblsf_putThreshold( IO,   &host, keyList[IO].position,  keyList[IO].val,   INFINIT_LOAD );
-        liblsf_putThreshold( LS,   &host, keyList[LS].position,  keyList[LS].val,   INFINIT_LOAD );
-        liblsf_putThreshold( IT,   &host, keyList[IT].position,  keyList[IT].val,  -INFINIT_LOAD );
-        liblsf_putThreshold( TMP,  &host, keyList[TMP].position, keyList[TMP].val, -INFINIT_LOAD );
-        liblsf_putThreshold( SWP,  &host, keyList[SWP].position, keyList[SWP].val, -INFINIT_LOAD );
-        liblsf_putThreshold( MEM,  &host, keyList[MEM].position, keyList[MEM].val, -INFINIT_LOAD );
+        liblsf_putThreshold( PG,   &host, keyList[PG].position,  keyList[PG].value,   INFINIT_LOAD );
+        liblsf_putThreshold( IO,   &host, keyList[IO].position,  keyList[IO].value,   INFINIT_LOAD );
+        liblsf_putThreshold( LS,   &host, keyList[LS].position,  keyList[LS].value,   INFINIT_LOAD );
+        liblsf_putThreshold( IT,   &host, keyList[IT].position,  keyList[IT].value,  -INFINIT_LOAD );
+        liblsf_putThreshold( TMP,  &host, keyList[TMP].position, keyList[TMP].value, -INFINIT_LOAD );
+        liblsf_putThreshold( SWP,  &host, keyList[SWP].position, keyList[SWP].value, -INFINIT_LOAD );
+        liblsf_putThreshold( MEM,  &host, keyList[MEM].position, keyList[MEM].value, -INFINIT_LOAD );
 
         for (unsigned int i = NBUILTINDEX; i < NBUILTINDEX + info->numUsrIndx; i++) {
             if (info->resTable[i]->orderType == INCR) {
                 assert( i <= INT_MAX );
-                liblsf_putThreshold ( i, &host, keyList[i].position, keyList[i].val, INFINIT_LOAD);
+                liblsf_putThreshold ( i, &host, keyList[i].position, keyList[i].value, INFINIT_LOAD);
             }
             else {
                 assert( i <= INT_MAX );
-                liblsf_putThreshold ( i, &host, keyList[i].position, keyList[i].val, -INFINIT_LOAD);
+                liblsf_putThreshold ( i, &host, keyList[i].position, keyList[i].value, -INFINIT_LOAD);
             }
         }
 
@@ -271,7 +271,7 @@ do_Hosts_lsf (FILE *fp, const char *filename, size_t *lineNum, struct lsInfo *in
             }
 
             n = 0;
-            sp = keyList[RESOURCES].val;
+            sp = keyList[RESOURCES].value;
             while ((word = getNextWord_ (&sp)) != NULL) {
 
                 // FIXME FIXME FIXME
@@ -410,31 +410,31 @@ do_Hosts_lsf (FILE *fp, const char *filename, size_t *lineNum, struct lsInfo *in
 
         host.rexPriority = (int) DEF_REXPRIORITY; // Cast is fine here: we want DEF_REXPRIORITY to be a constand and rexPriority to be renice-abled
         if ( keyList[REXPRI0].position != 255 ) { // FIXME FIXME FIXME FIXME 255 must be set to a label and set global
-            host.rexPriority = atoi( keyList[REXPRI0].val );
+            host.rexPriority = atoi( keyList[REXPRI0].value );
         }
 
         host.isServer = 1;
         if ( keyList[R].position != 255 ) { // FIXME FIXME FIXME FIXME 255 must be set to a label and set global
-            if (!ignoreR) {     // FIXME shitty code. isServer and val should be the same type
-                // host.isServer = (char) atoi (keyList[R].val);
-                host.isServer = *keyList[R].val;
+            if (!ignoreR) {     // FIXME shitty code. isServer and value should be the same type
+                // host.isServer = (char) atoi (keyList[R].value);
+                host.isServer = *keyList[R].value;
             }
         }
 
         if ( keyList[SERVER0].position != 255 ) { // FIXME FIXME FIXME FIXME 255 must be set to a label and set global
-            // FIXME shitty code. isServer and val should be the same type
-            // host.isServer = (char) atoi (keyList[SERVER0].val); // FIXME FIXME is cast here justified?
-            host.isServer = *keyList[SERVER0].val; // FIXME FIXME is cast here justified?
+            // FIXME shitty code. isServer and value should be the same type
+            // host.isServer = (char) atoi (keyList[SERVER0].value); // FIXME FIXME is cast here justified?
+            host.isServer = *keyList[SERVER0].value; // FIXME FIXME is cast here justified?
         }
 
         host.windows = NULL;
         if (keyList[RUNWINDOW].position != 255) { // FIXME FIXME FIXME FIXME 255 must be set to a label and set global
 
-            if (strcmp (keyList[RUNWINDOW].val, "") == 0) {
+            if (strcmp (keyList[RUNWINDOW].value, "") == 0) {
                 host.windows = NULL;
             }
             else {
-                host.windows = parsewindow (keyList[RUNWINDOW].val, filename, lineNum, hostString); // FIXME FIXME FIXME FIXME make conf case-insensitive
+                host.windows = parsewindow (keyList[RUNWINDOW].value, filename, lineNum, hostString); // FIXME FIXME FIXME FIXME make conf case-insensitive
 
                 if (host.windows == NULL) {
 
@@ -632,15 +632,15 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
             continue;
         }
 
-        if (strcmp (keyList[HKEY_HNAME].val, default_ ) != 0) {
+        if (strcmp (keyList[HKEY_HNAME].value, default_ ) != 0) {
 
-            hp = Gethostbyname_ (keyList[HKEY_HNAME].val);
+            hp = Gethostbyname_ (keyList[HKEY_HNAME].value);
             if (!hp && options != CONF_NO_CHECK) {
 
                 unsigned int total1 = 0;
                 for ( unsigned int i = 0; i < info->nModels; i++) {
                     total1 = i;
-                    if (strcmp (keyList[HKEY_HNAME].val, info->hostModels[i]) == 0) {
+                    if (strcmp (keyList[HKEY_HNAME].value, info->hostModels[i]) == 0) {
                         break;
                     }
                 }
@@ -651,14 +651,14 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
                     for ( unsigned int i = 0; i < info->nTypes; i++) {
 
                         total2 = i;
-                        if( strcmp( keyList[HKEY_HNAME].val, info->hostTypes[i]) == 0 ) {
+                        if( strcmp( keyList[HKEY_HNAME].value, info->hostTypes[i]) == 0 ) {
                             break;
                         }
                     }
 
                     if( total2 == (unsigned int) info->nTypes ) {
                         /* catgets 5178 */
-                        ls_syslog (LOG_ERR, "catgets 5178: %s: File %s at line %d: Invalid host/type/model name <%s>; ignoring line", __func__, filename, *lineNum, keyList[HKEY_HNAME].val);
+                        ls_syslog (LOG_ERR, "catgets 5178: %s: File %s at line %d: Invalid host/type/model name <%s>; ignoring line", __func__, filename, *lineNum, keyList[HKEY_HNAME].value);
                         lsberrno = LSBE_CONF_WARNING;
                         continue;
                     }
@@ -667,8 +667,8 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
                 numSelectedHosts = 0;
                 for ( unsigned int i = 0; i < cConf->numHosts; i++) {
                     hostInfo = &(cConf->hosts[i]);
-                    if( ( strcmp (hostInfo->hostType,  keyList[HKEY_HNAME].val) == 0 || 
-                          strcmp (hostInfo->hostModel, keyList[HKEY_HNAME].val) == 0
+                    if( ( strcmp (hostInfo->hostType,  keyList[HKEY_HNAME].value) == 0 || 
+                          strcmp (hostInfo->hostModel, keyList[HKEY_HNAME].value) == 0
                         ) && hostInfo->isServer == TRUE) 
                     {
                         hostList[numSelectedHosts] = cConf->hosts[i];
@@ -678,11 +678,11 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
 
                 if (!numSelectedHosts) {
                     /* catgets 5179 */
-                    ls_syslog (LOG_ERR, "catgets 5179: %s: File %s at line %d: no server hosts of type/model <%s> are known by LSF; ignoring line", __func__, filename, *lineNum, keyList[HKEY_HNAME].val);
+                    ls_syslog (LOG_ERR, "catgets 5179: %s: File %s at line %d: no server hosts of type/model <%s> are known by LSF; ignoring line", __func__, filename, *lineNum, keyList[HKEY_HNAME].value);
                     lsberrno = LSBE_CONF_WARNING;
                     continue;
                 }
-                strcpy (hostname, keyList[HKEY_HNAME].val);
+                strcpy (hostname, keyList[HKEY_HNAME].value);
                 isTypeOrModel = TRUE;
             }
             else {
@@ -690,7 +690,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
                     strcpy (hostname, hp->h_name);
                 }
                 else if (options == CONF_NO_CHECK) {
-                    strcpy (hostname, keyList[HKEY_HNAME].val);
+                    strcpy (hostname, keyList[HKEY_HNAME].value);
                 }
             }
         }
@@ -700,45 +700,45 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
         h_addEnt_ (tmpHosts, hostname, &new);
         if (!new) {
             /* catgets 5180 */
-            ls_syslog (LOG_ERR, "catgets 5180: %s: File %s at line %d: Host name <%s> multiply specified; ignoring line", __func__, filename, *lineNum, keyList[HKEY_HNAME].val );
+            ls_syslog (LOG_ERR, "catgets 5180: %s: File %s at line %d: Host name <%s> multiply specified; ignoring line", __func__, filename, *lineNum, keyList[HKEY_HNAME].value );
             lsberrno = LSBE_CONF_WARNING;
             continue;
         }
 
-        if (keyList[HKEY_MXJ].val != NULL && strcmp (keyList[HKEY_MXJ].val, "!") == 0) {
+        if (keyList[HKEY_MXJ].value != NULL && strcmp (keyList[HKEY_MXJ].value, "!") == 0) {
             host.maxJobs = 0;
         }
         // else if( keyList[HKEY_MXJ].position >= 0 && 
-        else if( keyList[HKEY_MXJ].val != NULL   && 
-                 strcmp (keyList[HKEY_MXJ].val, "") ) 
+        else if( keyList[HKEY_MXJ].value != NULL   && 
+                 strcmp (keyList[HKEY_MXJ].value, "") ) 
         {
-            // assert( my_atoi (keyList[HKEY_MXJ].val, INFINIT_INT, -1) >= 0);
-            host.maxJobs = my_atoi (keyList[HKEY_MXJ].val, INFINIT_INT, -1);
+            // assert( my_atoi (keyList[HKEY_MXJ].value, INFINIT_INT, -1) >= 0);
+            host.maxJobs = my_atoi (keyList[HKEY_MXJ].value, INFINIT_INT, -1);
             // if ( fabs( INFINIT_INT - host.maxJobs) < 0.00001 ) {
             if ( ( INFINIT_INT - host.maxJobs) < 0.00001F ) {
                 /* catgets 5183 */
-                ls_syslog (LOG_ERR, "catgets 5183: %s: File %s at line %d: Invalid value <%s> for key <%s>; %d is assumed", __func__, filename, *lineNum, keyList[HKEY_MXJ].val, keyList[HKEY_MXJ].key, INFINIT_INT);
+                ls_syslog (LOG_ERR, "catgets 5183: %s: File %s at line %d: Invalid value <%s> for key <%s>; %d is assumed", __func__, filename, *lineNum, keyList[HKEY_MXJ].value, keyList[HKEY_MXJ].key, INFINIT_INT);
                 lsberrno = LSBE_CONF_WARNING;
             }
         }
 
-        // if( keyList[HKEY_UJOB_LIMIT].position >= 0 && keyList[HKEY_UJOB_LIMIT].val != NULL && strcmp (keyList[HKEY_UJOB_LIMIT].val, "")) {
-        if( keyList[HKEY_UJOB_LIMIT].val != NULL && strcmp (keyList[HKEY_UJOB_LIMIT].val, "" ) ) {
+        // if( keyList[HKEY_UJOB_LIMIT].position >= 0 && keyList[HKEY_UJOB_LIMIT].value != NULL && strcmp (keyList[HKEY_UJOB_LIMIT].value, "")) {
+        if( keyList[HKEY_UJOB_LIMIT].value != NULL && strcmp (keyList[HKEY_UJOB_LIMIT].value, "" ) ) {
 
-            // assert( my_atoi( keyList[HKEY_UJOB_LIMIT].val, INFINIT_INT, -1 ) >=0 );
-            host.userJobLimit = my_atoi( keyList[HKEY_UJOB_LIMIT].val, INFINIT_INT, -1 );
+            // assert( my_atoi( keyList[HKEY_UJOB_LIMIT].value, INFINIT_INT, -1 ) >=0 );
+            host.userJobLimit = my_atoi( keyList[HKEY_UJOB_LIMIT].value, INFINIT_INT, -1 );
             // if ( fabs( INFINIT_INT - host.userJobLimit ) < 0.00001 ) {
             if ( ( INFINIT_INT - host.userJobLimit ) < 0.00001F ) {
                 /* catgets 5183 */
-                ls_syslog (LOG_ERR, "catgets 5183: %s: File %s at line %d: Invalid value <%s> for key <%s>; %d is assumed", __func__, filename, *lineNum, keyList[HKEY_UJOB_LIMIT].val, keyList[HKEY_UJOB_LIMIT].key, INFINIT_INT);
+                ls_syslog (LOG_ERR, "catgets 5183: %s: File %s at line %d: Invalid value <%s> for key <%s>; %d is assumed", __func__, filename, *lineNum, keyList[HKEY_UJOB_LIMIT].value, keyList[HKEY_UJOB_LIMIT].key, INFINIT_INT);
                 lsberrno = LSBE_CONF_WARNING;
             }
         }
 
         // if (keyList[HKEY_RUN_WINDOW].position >= 0) {
 
-        if (strcmp (keyList[HKEY_RUN_WINDOW].val, "")) {
-            host.windows = parsewindow (keyList[HKEY_RUN_WINDOW].val, filename, lineNum, "Host");
+        if (strcmp (keyList[HKEY_RUN_WINDOW].value, "")) {
+            host.windows = parsewindow (keyList[HKEY_RUN_WINDOW].value, filename, lineNum, "Host");
 
             if(  lserrno == LSE_CONF_SYNTAX) {
                  lserrno  = LSE_NO_ERR;
@@ -749,9 +749,9 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
 
         // if (keyList[HKEY_DISPATCH_WINDOW].position >= 0) {
 
-        if (strcmp (keyList[HKEY_DISPATCH_WINDOW].val, "")) {
+        if (strcmp (keyList[HKEY_DISPATCH_WINDOW].value, "")) {
             FREEUP (host.windows);
-            host.windows = parsewindow (keyList[HKEY_DISPATCH_WINDOW].val, filename, lineNum, "Host");
+            host.windows = parsewindow (keyList[HKEY_DISPATCH_WINDOW].value, filename, lineNum, "Host");
 
             if (lserrno == LSE_CONF_SYNTAX) {
                 lserrno = LSE_NO_ERR;
@@ -760,15 +760,14 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
         }
         // }
 
-        // if (keyList[HKEY_MIG].position >= 0 keyList[HKEY_MIG].val != NULL && strcmp (keyList[HKEY_MIG].val, "")) {
-        if( keyList[HKEY_MIG].val != NULL && strcmp (keyList[HKEY_MIG].val, "" ) ) {
+        // if (keyList[HKEY_MIG].position >= 0 keyList[HKEY_MIG].value != NULL && strcmp (keyList[HKEY_MIG].value, "")) {
+        if( keyList[HKEY_MIG].value != NULL && strcmp (keyList[HKEY_MIG].value, "" ) ) {
 
-            assert( my_atoi (keyList[HKEY_MIG].val, INFINIT_INT / 60, -1) < INT_MAX );
-            host.mig = (int) my_atoi (keyList[HKEY_MIG].val, INFINIT_INT / 60, -1);
+            host.mig = strtoul( keyList[HKEY_MIG].value, NULL, 10 ); // FIXME FIXME FIXME check the strtoul() call was successful
             // if ( fabs( INFINIT_INT - host.mig ) < 0.00001 ) {
             if ( ( INFINIT_INT - host.mig ) < 0.00001F ) {
                 /* catgets 5186 */
-                ls_syslog (LOG_ERR, "catgets 5186: %s: File %s at line %d: Invalid value <%s> for key <%s>; no MIG threshold is assumed", __func__, filename, *lineNum, keyList[HKEY_MIG].val, keyList[HKEY_MIG].key);
+                ls_syslog (LOG_ERR, "catgets 5186: %s: File %s at line %d: Invalid value <%s> for key <%s>; no MIG threshold is assumed", __func__, filename, *lineNum, keyList[HKEY_MIG].value, keyList[HKEY_MIG].key);
                 lsberrno = LSBE_CONF_WARNING;
             }
         }

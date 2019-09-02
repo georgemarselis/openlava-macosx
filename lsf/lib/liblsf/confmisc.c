@@ -291,7 +291,7 @@ isSectionEnd ( const char *linep, const char *lsfile, const size_t *lineNum, con
 //             i = 0;
 //             while (keyList[i].key != NULL)
 //             {
-//                 if (keyList[i].val == NULL)
+//                 if (keyList[i].value == NULL)
 //                 {
 //                     char buff[MAX_LINE_LEN];
 //                     memset ( buff, 0, strlen( buff ) );
@@ -308,8 +308,8 @@ isSectionEnd ( const char *linep, const char *lsfile, const size_t *lineNum, con
 //                 i = 0;
 //                 while (keyList[i].key != NULL)
 //                 {
-//                     if (keyList[i].val != NULL) {
-//                         free (keyList[i].val);
+//                     if (keyList[i].value != NULL) {
+//                         free (keyList[i].value);
 //                     }
 //                     i++;
 //                 }
@@ -416,7 +416,7 @@ readHvalues (struct keymap *keyList, const char *linep, FILE * fp, const char *l
 
             i = 0;
             while (keyList[i].key != NULL) {
-                if (keyList[i].val == NULL) {
+                if (keyList[i].value == NULL) {
                     /* catgets 5405 */
                     ls_syslog (LOG_ERR, "5405: %s: %s(%d): required keyword %s is missing in section %s, ignoring the section", __func__, lsfile, *lineNum, keyList[i].key, section);  
                     error = TRUE;
@@ -426,7 +426,7 @@ readHvalues (struct keymap *keyList, const char *linep, FILE * fp, const char *l
             if (error) {
                 i = 0;
                 while (keyList[i].key != NULL) {
-                    FREEUP (keyList[i].val);
+                    FREEUP (keyList[i].value);
                     i++;
                 }
                 return -1;
@@ -451,15 +451,15 @@ putValue (struct keymap *keyList, const char *key, const char *value)
     {
         if (strcasecmp (keyList[i].key, key) == 0)
         {
-            if (keyList[i].val != NULL) {
-                free (keyList[i].val);
+            if (keyList[i].value != NULL) {
+                free (keyList[i].value);
             }
 
             if (strcmp (value, "-") == 0) {
-                keyList[i].val = putstr_ ("");
+                keyList[i].value = putstr_ ("");
             }
             else {
-                keyList[i].val = putstr_ (value);
+                keyList[i].value = putstr_ (value);
             }
 
             return 0;
@@ -481,12 +481,12 @@ putValue (struct keymap *keyList, const char *key, const char *value)
 //     while (keyList[i].key != NULL) {
 
 //         if (strcasecmp (keyList[i].key, key) == 0) {
-//             FREEUP (keyList[i].val);
+//             FREEUP (keyList[i].value);
 //             if (strcmp (value, "-") == 0) {
-//                 keyList[i].val = putstr_ ("");
+//                 keyList[i].value = putstr_ ("");
 //             }
 //             else {
-//                 keyList[i].val = putstr_ (value);
+//                 keyList[i].value = putstr_ (value);
 //             }
 //             return 0;
 //         }
@@ -579,7 +579,7 @@ mapValues (struct keymap *keyList, const char *line) // FIXME FIXME should char 
 
     while (keyList[i].key != NULL) {
 
-        FREEUP (keyList[i].val);
+        FREEUP (keyList[i].value);
         if (keyList[i].position != strlen( keyList[i].key ) + 10 ) {
             numv++;
         }
@@ -599,14 +599,14 @@ mapValues (struct keymap *keyList, const char *line) // FIXME FIXME should char 
                 continue;
             }
             if (strcmp (value, "-") == 0) {
-                keyList[i].val = putstr_ ("");
+                keyList[i].value = putstr_ ("");
             }
             else
             {
-                if (keyList[i].val != NULL) {
-                    FREEUP (keyList[i].val);
+                if (keyList[i].value != NULL) {
+                    FREEUP (keyList[i].value);
                 }
-                keyList[i].val = putstr_ (value);
+                keyList[i].value = putstr_ (value);
             }
             found = TRUE;
             break;
@@ -614,9 +614,9 @@ mapValues (struct keymap *keyList, const char *line) // FIXME FIXME should char 
         if (!found) {
             i = 0;
             while (keyList[i].key != NULL) {
-                if (keyList[i].val != NULL) {
-                    free (keyList[i].val);
-                    keyList[i].val = NULL;
+                if (keyList[i].value != NULL) {
+                    free (keyList[i].value);
+                    keyList[i].value = NULL;
                 }
 
                 i++;
@@ -630,9 +630,9 @@ mapValues (struct keymap *keyList, const char *line) // FIXME FIXME should char 
     if (pos != numv) {
         i = 0;
         while (keyList[i].key != NULL) {
-            if (keyList[i].val != NULL) {
-                free (keyList[i].val);
-                keyList[i].val = NULL;
+            if (keyList[i].value != NULL) {
+                free (keyList[i].value);
+                keyList[i].value = NULL;
             }
 
             i++;
@@ -647,10 +647,10 @@ mapValues (struct keymap *keyList, const char *line) // FIXME FIXME should char 
 //   i = 0;
 //   while (keyList[i].key != NULL)
 //  {
-//    if (keyList[i].val != NULL)
+//    if (keyList[i].value != NULL)
 //  {
-//    free (keyList[i].val);
-//    keyList[i].val = NULL;
+//    free (keyList[i].value);
+//    keyList[i].value = NULL;
 //  }
 
 //    i++;
@@ -672,7 +672,7 @@ mapValues (struct keymap *keyList, const char *line) // FIXME FIXME should char 
 
 //     while( keyList[ i ].key != NULL )
 //     {
-//         keyList[i].val = NULL;
+//         keyList[i].value = NULL;
 //         if (keyList[i].position != -1) {
 //             numv++;
 //         }
@@ -693,10 +693,10 @@ mapValues (struct keymap *keyList, const char *line) // FIXME FIXME should char 
 //             }
 
 //             if (strcmp (value, "-") == 0) {
-//                 keyList[i].val = putstr_ ("");
+//                 keyList[i].value = putstr_ ("");
 //             }
 //             else {
-//                 keyList[i].val = putstr_ (value);
+//                 keyList[i].value = putstr_ (value);
 //             }
 //             found = TRUE;
 //             break;
@@ -706,10 +706,10 @@ mapValues (struct keymap *keyList, const char *line) // FIXME FIXME should char 
 //             i = 0;
 //             while (keyList[i].key != NULL)
 //             {
-//                 if (keyList[i].val != NULL)
+//                 if (keyList[i].value != NULL)
 //                 {
-//                     free (keyList[i].val);
-//                     // keyList[i].val = NULL;
+//                     free (keyList[i].value);
+//                     // keyList[i].value = NULL;
 //                 }
 
 //                 i++;
@@ -724,10 +724,10 @@ mapValues (struct keymap *keyList, const char *line) // FIXME FIXME should char 
 //         unsigned int i = 0;
 //         while (keyList[i].key != NULL)
 //         {
-//             if (keyList[i].val != NULL)
+//             if (keyList[i].value != NULL)
 //             {
-//                 free (keyList[i].val);
-//                 keyList[i].val = NULL;
+//                 free (keyList[i].value);
+//                 keyList[i].value = NULL;
 //             }
 
 //             i++;
@@ -741,10 +741,10 @@ mapValues (struct keymap *keyList, const char *line) // FIXME FIXME should char 
 // //  i = 0;
 // //  while (keyList[i].key != NULL)
 // //  {
-// //      if (keyList[i].val != NULL)
+// //      if (keyList[i].value != NULL)
 // //      {
-// //          free (keyList[i].val);
-// //          keyList[i].val = NULL;
+// //          free (keyList[i].value);
+// //          keyList[i].value = NULL;
 // //      }
 
 // //      i++;
