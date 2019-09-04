@@ -1162,20 +1162,20 @@ struct queueInfoEnt
 
 struct hostInfoEnt
 {
-    int hStatus;
-    int mig;
-    int attr;
-    int numRESERVE;
-    int chkSig;
-    unsigned int nIdx;
-    int *busySched;
-    int *busyStop;
-    unsigned long userJobLimit;
-    unsigned long maxJobs;
-    unsigned long numJobs;
-    unsigned long numRUN;
-    unsigned long numSSUSP;
-    unsigned long numUSUSP;
+    unsigned long  hStatus;
+    unsigned long  mig;
+    unsigned long  attr;
+    unsigned long  numRESERVE;
+    unsigned long  chkSig;
+    unsigned long  nIdx;
+    unsigned long *busySched;
+    unsigned long *busyStop;
+    unsigned long  userJobLimit;
+    unsigned long  maxJobs;
+    unsigned long  numJobs;
+    unsigned long  numRUN;
+    unsigned long  numSSUSP;
+    unsigned long  numUSUSP;
     float *load;
     float *loadSched;
     float *loadStop;
@@ -1231,12 +1231,11 @@ struct parameterInfo // V.2
     bool scheRawLoad;
     bool slotResourceReserve;
     bool jobDepLastSub;
-    unsigned long jobAcceptInterval;
+    time_t jobAcceptInterval;
     unsigned long maxDispRetries;
     unsigned long maxSbdRetries;
     unsigned long cleanPeriod;
     unsigned long maxNumJobs;
-    unsigned long pgSuspendIt;
     unsigned long retryIntvl;
     unsigned long rusageUpdateRate;
     unsigned long rusageUpdatePercent;
@@ -1259,6 +1258,7 @@ struct parameterInfo // V.2
     const char *defaultHostSpec;
     const char *defaultProject;
     const char *pjobSpoolDir;
+    time_t pgSuspendIt;
     time_t mbatchdInterval;
     time_t sbatchdInterval;
     time_t preExecDelay;

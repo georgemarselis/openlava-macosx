@@ -74,6 +74,7 @@ unsigned int my_atoi( const char *arg, int upBound, int botBound);
 float my_atof(char *arg, float upBound, float botBound);
 void initParameterInfo(struct parameterInfo *param);
 void freeParameterInfo(struct parameterInfo *param);
+size_t trimwhitespace(char *out, const char *str);
 int checkSpoolDir(const char *pSpoolDir);
 struct userConf *lsb_readuser(struct lsConf *conf, int options, struct clusterConf *clusterConf);
 struct userConf *lsb_readuser_ex(struct lsConf *conf, int options, struct clusterConf *clusterConf, struct sharedConf *sharedConf);

@@ -26,25 +26,29 @@
 #include "lib/xdr.h"
 
 
+// struct parameterInfo *lsb_parameterinfo (char **names, unsigned int *numUsers, int options)
+// Description: Get the parameters under which each mbd will run with
+
+
 struct parameterInfo *
 lsb_parameterinfo (char **names, unsigned int *numUsers, int options)
 {
-    static struct parameterInfo paramInfo;
-    static struct infoReq infoReq;
-    static int alloc = FALSE;
+    struct parameterInfo paramInfo;
+    struct infoReq infoReq;
+    // static bool alloc = false;
     mbdReqType mbdReqtype;
     XDR xdrs;
-    struct parameterInfo *reply;
+    struct parameterInfo *reply = NULL;
     struct LSFHeader hdr;
-    char *request_buf;
-    char *reply_buf;
-    int cc = 0;
+    char *request_buf = NULL;
+    char *reply_buf   = NULL;
+    unsigned int cc = 0;
 
     infoReq.options = options;
-    if (alloc == TRUE) {
-        alloc = FALSE;
-        FREEUP (infoReq.names);
-    }
+    // if (alloc == true) {
+    //     alloc = false;
+    //     FREEUP (infoReq.names);
+    // }
 
     if (numUsers) {
         infoReq.numNames = *numUsers;
@@ -53,43 +57,42 @@ lsb_parameterinfo (char **names, unsigned int *numUsers, int options)
         infoReq.numNames = 0;
     }
     
-    if (names) {
+    if( names) {
         infoReq.names = names;
     }
     else {
-        infoReq.names =  malloc (sizeof ( infoReq.names ) );
+        infoReq.names =  malloc ( strlen ( names ) );
         if ( NULL == infoReq.names && ENOMEM == errno ) {
-	       lsberrno = LSBE_NO_MEM;
-	       return (NULL);
-	    }
+           lsberrno = LSBE_NO_MEM;
+           return NULL;
+        }
 
-        alloc = TRUE;
-        infoReq.names[0] = "";
+        // alloc = true;
+        memset( infoReq.names, '\0', strlen( infoReq.names ) );
         cc = 1;
     }
 
-    infoReq.resReq = "";
-    mbdReqtype = BATCH_PARAM_INFO;
+    // infoReq.resReq = NULL;
+    infoReq->resReq = NULL;
+    mbdReqtype      = BATCH_PARAM_INFO;
     assert( cc >= 0 );
-    assert( ( sizeof (struct infoReq) + (unsigned long)cc * MAXHOSTNAMELEN + (unsigned long)cc + 100 ) < INT_MAX );
-    cc =  (int)( sizeof (struct infoReq) + (unsigned long)cc * MAXHOSTNAMELEN + (unsigned long)cc + 100 );
-    request_buf = (char *)malloc( (unsigned long)cc);
-    if ( NULL == request_buf && ENOMEM == errno )
-    {
-      lsberrno = LSBE_NO_MEM;
-      return (NULL);
+    assert( ( sizeof (struct infoReq) + cc * MAXHOSTNAMELEN + cc + 100 ) < INT_MAX );
+    cc =    ( sizeof (struct infoReq) + cc * MAXHOSTNAMELEN + cc + 100 );
+    request_buf = malloc( cc * sizeof( request_buf ) );
+    if ( NULL == request_buf && ENOMEM == errno ) {
+        lsberrno = LSBE_NO_MEM;
+        return NULL;
     }
 
     assert( cc >= 0 );
-    xdrmem_create (&xdrs, request_buf, (unsigned int) cc, XDR_ENCODE);
+    xdrmem_create (&xdrs, request_buf,  cc, XDR_ENCODE);
 
     hdr.opCode = mbdReqtype;
-    if (!xdr_encodeMsg (&xdrs, (char *) &infoReq, &hdr, xdr_infoReq, 0, NULL))
-    {
+    if (!xdr_encodeMsg (&xdrs, (char *) &infoReq, &hdr, xdr_infoReq, 0, NULL) ) {
         xdr_destroy (&xdrs);
         free (request_buf);
         lsberrno = LSBE_XDR;
-        return (NULL);
+        return NULL;
     }
 
     assert( XDR_GETPOS (&xdrs) <= INT_MAX );
@@ -97,35 +100,35 @@ lsb_parameterinfo (char **names, unsigned int *numUsers, int options)
     if ( -1 == cc ) {
         xdr_destroy (&xdrs);
         free (request_buf);
-        return (NULL);
+        return NULL;
     }
 
     xdr_destroy (&xdrs);
     free (request_buf);
 
     lsberrno = hdr.opCode;
-    if (lsberrno == LSBE_NO_ERROR || lsberrno == LSBE_BAD_USER)
-    {
-      assert( XDR_DECODE_SIZE_ (cc) >= 0);
-      xdrmem_create (&xdrs, reply_buf, (unsigned int)XDR_DECODE_SIZE_ (cc), XDR_DECODE);
-      reply = &paramInfo;
-      if (!xdr_parameterInfo (&xdrs, reply, &hdr))
-	{
-	  lsberrno = LSBE_XDR;
-	  xdr_destroy (&xdrs);
-	  if (cc)
-	    free (reply_buf);
-	  return (NULL);
-	}
-      xdr_destroy (&xdrs);
-      if (cc)
-	free (reply_buf);
-      return (reply);
+    if (lsberrno == LSBE_NO_ERROR || lsberrno == LSBE_BAD_USER) {
+        assert( XDR_DECODE_SIZE_ (cc) >= 0);
+        xdrmem_create (&xdrs, reply_buf, (unsigned int)XDR_DECODE_SIZE_ (cc), XDR_DECODE);
+        reply = &paramInfo;
+        if( !xdr_parameterInfo( &xdrs, reply, &hdr ) ) {
+           lsberrno = LSBE_XDR;
+           xdr_destroy (&xdrs);
+           if (cc) {
+               free (reply_buf);
+           }
+           return NULL;
+        }
+        xdr_destroy (&xdrs);
+        if (cc) {
+            free (reply_buf);
+        }
+        return reply;
     }
 
     if (cc)  {
         free (reply_buf);
     }
 
-    return (NULL);
+    return NULL;
 }

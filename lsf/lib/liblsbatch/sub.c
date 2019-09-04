@@ -172,15 +172,13 @@ lsb_submit (struct submit *jobSubReq, struct submitReply *submitRep)
 		return -1;
 	}
 
-	if (!(jobSubReq->options & SUB_QUEUE))
-		{
+	if (!(jobSubReq->options & SUB_QUEUE)) {
 
-		if ((queue = getenv ("LSB_DEFAULTQUEUE")) != NULL && queue[0] != '\0')
-			{
+		if ((queue = getenv ("LSB_DEFAULTQUEUE")) != NULL && NULL == queue ) { // FIXME FIXME FIXME FIXME FIXME LSB_DEFAULTQUEUE env parameter
 			submitReq.queue = queue;
 			submitReq.options |= SUB_QUEUE;
-			}
 		}
+	}
 
 	submitReq.cwd = cwd;
 
