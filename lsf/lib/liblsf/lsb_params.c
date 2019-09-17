@@ -24,6 +24,7 @@
 #include <netdb.h>
 #include <ctype.h>
 #include <strings.h>
+#include <time.h>  // char *strptime( )
 
 #include "lsb/lsbatch.h"     // struct parameterInfo
 #include "libint/intlibout.h"
@@ -354,6 +355,94 @@ lsb_readparam (struct lsConf *conf)
     return NULL;
 }
 
+// enableAccounting: records and reports if all accounting variables are set
+// INPUT enum MAX_ARCHIVE
+// OUTPUT: true   if all accounting variables are set or if all are turned off
+//         false  if only some accounting variables are set
+//
+// The documentation says that if one of the accounting variables is set, then the other two must be set as well. In this version of $LSF, we have delegated log management to rsyslogd/ngsyslogd/systemd, 
+// cuz they can do a better job at it.
+//
+// The matter of the fact, though, is, that there is code and installations out there that use these settings and might have a problem migrating to this version.
+//
+// So, the idea is to add the code here, even if surperflus and not only make it workable, but make it that it emits warnings/errors for all combinations of errors for the above conf options.
+//
+// So, that means we will iterrate through 10 + 1 different options, starting with the more complex and moving to the less complex, because I want to give a detailed error, especially with
+//  logical operators and sort-circuiting.
+//
+bool  
+enableAccounting( enum MAX_ARCHIVE max_archive_var  )
+{
+    static bool MAX_ACCT_ARCHIVE_FILE = false;
+    static bool ACCT_ARCHIVE_SIZE     = false;
+    static bool ACCT_ARCHIVE_AGE      = false; 
+
+    switch( max_archive_var ) {
+
+        case  MAX_ACCT_ARCHIVE_FILE_ENUM:
+            MAX_ACCT_ARCHIVE_FILE = true;
+        break;
+        case  ACCT_ARCHIVE_SIZE_ENUM:
+            ACCT_ARCHIVE_SIZE = true;
+        break;
+        case  ACCT_ARCHIVE_AGE_ENUM:
+            ACCT_ARCHIVE_AGE = true;
+        break;
+        default:
+            ls_syslog( "%s: switch( %d ): you have reached default and you are not supposed to be here.", __func__, max_archive_var );
+        break;
+    }
+
+    if( !pConf->maxAcctArchiveNum || !pConf->acctArchiveInSize || !pConf->acctArchiveInDays ) {
+        //
+        // The documentation says that if one of the above is set, then the other two must be set as well. In this version of $LSF, we have delegated log management to rsyslogd/ngsyslogd/systemd, 
+        // cuz they can do a better job at it.
+        //
+        // The matter of the fact, though, is, that there is code and installations out there that use these settings and might have a problem migrating to this version.
+        //
+        // So, the idea is to add the code here, even if surperflus and not only make it workable, but make it that it emits warnings/errors for all combinations of errors for the above conf options.
+        //
+        // So, that means we will iterrate through 10 + 1 different options, starting with the more complex and moving to the less complex, because I want to give a detailed error, especially with
+        //  logical operators and sort-circuiting.
+        //
+        if( !pConf->maxAcctArchiveNum && !pConf->acctArchiveInSize && !pConf->acctArchiveInDays ) { // all three not set 
+
+        }
+        else if( !pConf->maxAcctArchiveNum && !pConf->acctArchiveInSize ) { // first and second not set 
+            
+        }
+        else if( !pConf->maxAcctArchiveNum && !pConf->acctArchiveInDays ) { // first and third not set 
+            
+        }
+        else if( !pConf->acctArchiveInSize && !pConf->acctArchiveInDays ) { // second and third not set 
+            
+        }
+        else if( !pConf->acctArchiveInSize && !pConf->maxAcctArchiveNum ) { // second and first not set
+
+        }
+        else if( !pConf->acctArchiveInSize && !pConf->maxAcctArchiveNum ) { // third and first not set
+
+        }
+        else if( !pConf->acctArchiveInSize && !pConf->maxAcctArchiveNum ) { // third and second not set
+
+        }
+        else if( !pConf->maxAcctArchiveNum ) { // first not set 
+            
+        }
+        else if( !pConf->acctArchiveInSize ) { // second not set 
+            
+        }
+        else if( !pConf->acctArchiveInDays ) { // third not set 
+            
+        }
+        else { // catchal, just in case
+            
+        }
+
+    ls_syslog( "%s: This is a stub function.", __func__ );
+
+    return;
+}
 
 char
 do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this function is basically split from the one above it, lsb_readparam (struct lsConf *conf)) because lsb_readparam (struct lsConf *conf() was fucking chaotic
@@ -829,7 +918,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
     //  MAIN BODY OF FUNCTION
 
     //
-    // Extract the (somewhat generic) key values from current line FIXME FIXME FIXME FIXME why do we pass the damn file name?
+    // Extract the key values from current line FIXME FIXME FIXME FIXME why do we pass the damn file name to readHvalues_conf()?
     //
     if (readHvalues_conf (lsb_params, linep, conf, filename, lineNum, false, sectionName ) < 0) {
         /* catgets 5060 */
@@ -851,23 +940,31 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
 
         // if (lsb_params[i].value != NULL && strcmp (lsb_params[i].value, "")) { // FIXME FIXME FIXME this actually may not be wanted, cuz we want the NULL value for "not defined" defaults.
         if( strncmp( lsb_params[i].key, keylist[LSB_MANAGER], strlen( keylist[LSB_MANAGER] ) ) ) { // LSB_MANAGER // i == 0 // IGNORRED
+            //
+            // no google references
+            //
+            // lsf_version: older than noah, probably. Error below was found writen as such
+            //
             /* catgets 5061 */
-            ls_syslog (LOG_WARNING, "catgets 5061: File %s: Parameter %s not supported in this LSF version. Parameter ignored; Please use the MANAGERS parameter in lsf.cluster to define the scheduler manager. Alternatively, you can run the upgrade utility", filename ); // FIXME FIXME FIXME FIXME FIXME set name_of_upgrade_utility in configure.ac or similar
+            ls_syslog (LOG_WARNING, "catgets 5061: File %s at line %lu: Parameter %s not supported in this LSF version. Parameter ignored; Please use the MANAGERS parameter in lsf.cluster to define the scheduler manager. Alternatively, you can run the upgrade utility",  filename, lineNumber, lsb_params[i].key ); // FIXME FIXME FIXME FIXME FIXME set name_of_upgrade_utility in configure.ac or similar
             lsberrno = LSBE_CONF_WARNING;
             freekeyval (lsb_params);
             return false; // better to exit and be sure that the admin removes the LSB_MANAGER parameter in favor of MANAGERS in lsf.cluster
         }
         else if( strncmp( lsb_params[i].key, keylist[DEFAULT_QUEUE], strlen( keylist[DEFAULT_QUEUE] ) ) ) { // DEFAULT_QUEUE // i == 1 
+            //
             // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_config_ref/lsb.params.default_queue.5.html
             //
-            // DEFAULT_QUEUE=queue_name ...(string)
+            // lsf_version: all
+            //
+            // Syntax: DEFAULT_QUEUE=queue_name ...(string, space separator)
             //
             // Description; Space-separated list of candidate default queues (candidates must already be defined in lsb.queues). When you submit a job to LSF without explicitly specifying a queue, and the environment variable LSB_DEFAULTQUEUE is not set, LSF puts the job in the first queue in this list that satisfies the job’s specifications subject to other restrictions, such as requested hosts, queue status, etc.
             //
             // Default: This parameter is set at installation to DEFAULT_QUEUE=normal interactive. When a user submits a job to LSF without explicitly specifying a queue, and there are no candidate default queues defined (by this parameter or by the user’s environment variable LSB_DEFAULTQUEUE), LSF automatically creates a new queue named default, using the default configuration, and submits the job to that queue.
-            const size_t MAX_QUEUE_STRING_LENGTH    = UINT_MAX; // FIXME FIXME FIXME FIXME FIXME move to configure.ac // 2^16, kinda semi-arbitrary chosen.
+            const size_t MAX_QUEUE_STRING_LENGTH    = UINT_MAX;             // FIXME FIXME FIXME FIXME FIXME move to configure.ac // 2^16, kinda semi-arbitrary chosen.
             const char *defaultQueuesAtInstallation = "normal interactive"; // FIXME FIXME FIXME FIXME FIXME this must be moved in configure.ac or config.h
-            const char *defaultQueuesDefault        = "default"; // FIXME FIXME FIXME FIXME FIXME this must be moved in configure.ac or config.h
+            const char *defaultQueuesDefault        = "default";            // FIXME FIXME FIXME FIXME FIXME this must be moved in configure.ac or config.h
             const char *defaultQueues               = NULL;
 
             if( lsb_params[i].value > MAX_QUEUE_STRING_LENGTH ) { // Smash Capitalism, not the stack.
@@ -890,9 +987,12 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
             pConf->defaultQueues = strdup( defaultQueues );
         }
         else if( strncmp( lsb_params[i].key, keylist[DEFAULT_HOST_SPEC], strlen( keylist[DEFAULT_HOST_SPEC] ) ) ) { // DEFAULT_HOST_SPEC // i == 2 
+            //
             // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_config_ref/lsb.params.default_host_spec.5.html
             //
-            // DEFAULT_HOST_SPEC=host_name | host_model
+            // lsf_version: all
+            //
+            // Syntax: DEFAULT_HOST_SPEC=host_name | host_model
             //
             // Description: The default CPU time normalization host for the cluster. The CPU factor of the specified host or host model will be used to normalize the CPU time limit of all jobs in the cluster, unless the CPU time normalization host is specified at the queue or job level.
             //
@@ -901,7 +1001,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
             const char *defaultHostSpec = NULL;
 
             if( NULL == lsb_params[i].value ) {
-                ls_syslog (LOG_WARNING, "catgets 5069: File %s, line number %lu: Parameter %s is defined but has no value and no default installation value; ignored", __func__, filename, lineNum, lsb_params[i].key );
+                ls_syslog (LOG_WARNING, "catgets 5069: File %s, line number %lu: Parameter %s is defined but has no value and no default installation value exists; ignored", __func__, filename, lineNum, lsb_params[i].key );
                 lsberrno = LSBE_CONF_WARNING;
                 continue;
             }
@@ -919,8 +1019,11 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
             pConf->defaultHostSpec = strdup( defaultHostSpec );
         }
         else if( strncmp( lsb_params[i].key, keylist[JOB_SPOOL_DIR], strlen( keylist[JOB_SPOOL_DIR] ) ) ) { // i == 24
+            //
             // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_config_ref/lsb.params.job_spool_dir.5.html
-            // 
+            //
+            // lsf_version: all
+            //
             // JOB_SPOOL_DIR=dir (string) 
             //      JOB_SPOOL_DIR= host:dir (string), future expansion (including localhost or other special notation for the current host)
             //
@@ -949,111 +1052,283 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
             //
             // NOTES
             //  NFS: what happens when JOB_SPOOL_DIR or $HOME/.lsbatch is on NFS and NFS becomes either congested or crashes? what happens to stdout and stderr? is it lost or is it possible to buffer to memory till recovery?
-            if( checkSpoolDir( lsb_params[i].value ) == true ) {
-
-                pConf->pjobSpoolDir = strdup(lsb_params[i].value);
-
-                if (pConf->pjobSpoolDir == NULL ) {
-                    ls_syslog (LOG_ERR, "%s: ENOMEM in malloc for %s: strlen (lsb_params[i].value): %u", __func__, lsb_params[i].key, strlen (lsb_params[i].value) + 1 ); // +1 for the terminating NULL
-                    lsberrno = LSBE_NO_MEM;
-                    freekeyval (lsb_params);
-                    return false;
-                }
-            }
-            else {
+            if( NULL == lsb_params[i].value  ) {
                 // 
-                // Throw an error if checkSpoolDir() does not return true
+                // Throw an error if the spool dir  is not defined.
                 // 
                 pConf->pjobSpoolDir = NULL; // struct parameterInfo *pConf in lib/lsbatch.h
                 /* catgets 5095 */
-                ls_syslog (LOG_ERR, "catgets 5095: %s: Invalid JOB_SPOOL_DIR!", __func__);
+                ls_syslog (LOG_ERR, "catgets 5095: File %s at line %lu: %s is set, but has no value. Aborting.", filename, lineNumber, lsb_params[i].key ); // FIXME FIXME FIXME FIXME FIXME set to reasonable default
                 lsberrno = LSBE_CONF_WARNING;
+                freekeyval (lsb_params);
                 return false;
             }
+            else {
+                if( checkSpoolDir( lsb_params[i].value ) == true ) {
+
+                    pConf->pjobSpoolDir = strdup(lsb_params[i].value);
+
+                    if (pConf->pjobSpoolDir == NULL ) {
+                        ls_syslog (LOG_ERR, "%s: ENOMEM in malloc for %s: strlen (lsb_params[i].value): %u", __func__, lsb_params[i].key, strlen (lsb_params[i].value) + 1 ); // +1 for the terminating NULL
+                        lsberrno = LSBE_NO_MEM;
+                        freekeyval (lsb_params);
+                        return false;
+                    }
+                }
+            }
+ 
         }
 
         else if( strncmp( lsb_params[i].key, keylist[MAX_ACCT_ARCHIVE_FILE], strlen( keylist[MAX_ACCT_ARCHIVE_FILE] ) ) ) { // i == 32
-        //     //
-        //     // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_config_ref/lsb.params.max_acct_archive_file.5.html
-        //     //
-        //     // MAX_ACCT_ARCHIVE_FILE=integer  // WARNING COMPATIBILITY
-        //     //
-        //     // Description: Enables automatic deletion of archived LSF accounting log files and specifies the archive limit.
-        //     //
-        //     unsigned long  maxAcctArchiveNum = strtoul( lsb_params[i].value, NULL , 10 ); // FIXME FIXME FIXME might want to include char **endptr, as it might end up making the code smaller. Also, what happens when someone enters a string that starts with a '+' or a '-' // 10 is for decimal base.
-        //     if (maxAcctArchiveNum == ULONG_MAX && errno ==  ERANGE ) {
-        //         /* catgets 5459 */
-        //         ls_syslog (LOG_ERR, "catgets 5459: %s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored" , __func__, filename, lineNum, lsb_params[i].value, lsb_params[i].key, ULONG_MAX - 1);
-        //         // pConf->maxAcctArchiveNum = ULONG_MAX; // struct parameterInfo *pConf in lib/lsbatch.h
-        //         lsberrno = LSBE_CONF_WARNING;
-        //     }
-        //     else {
-        //         pConf->maxAcctArchiveNum = maxAcctArchiveNum;
-        //     }
+#ifdef ENABLE_LSF_ACCOUNTING // FIXME FIXME FIXME FIXME FIXME set in configure.ac
+            //
+            // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_config_ref/lsb.params.max_acct_archive_file.5.html
+            //
+            // lsf_version: all
+            //
+            // MAX_ACCT_ARCHIVE_FILE=integer  // WARNING COMPATIBILITY
+            //
+            // Description: Enables automatic deletion of archived LSF accounting log files and specifies the archive limit.
+            //
+            // Compatibility: ACCT_ARCHIVE_SIZE or ACCT_ARCHIVE_AGE should also be defined
+            // 
+            // Example: MAX_ACCT_ARCHIVE_FILE=10 // use that as default
+            //
+            // LSF maintains the current lsb.acct and up to 10 archives. Every time the old lsb.acct.9 becomes lsb.acct.10, the old lsb.acct.10 gets deleted.
+            //
+            // Default: Not defined. No deletion of lsb.acct.n files.
+            //
+            // * ACCT_ARCHIVE_AGE  also enables automatic archiving
+            // * ACCT_ARCHIVE_SIZE also enables automatic archiving
+            // * ACCT_ARCHIVE_TIME also enables automatic archiving
+            //
+            unsigned long maxAcctArchiveNum        =  0;
+            unsigned long maxAcctArchiveNumDefault = 10; // taken from the example // FIXME FIXME FIXME FIXME FIXME set in configure.ac
+            unsigned long value                    =  0;
+            
+            if( NULL == lsb_params[i].value ) {
+                /* catgets 5097 */ // FIXME FIXME FIXME FIXME FIXME new catgets value
+                ls_syslog (LOG_ERR, "catgets 5097: File %s at line %lu: %s is set, but has no value. Using default %lu instead.", filename, lineNumber, lsb_params[i].key, maxAcctArchiveNumDefault ); // FIXME FIXME FIXME FIXME FIXME set to reasonable default
+                lsberrno = LSBE_CONF_WARNING;
+                maxAcctArchiveNum = maxAcctArchiveNumDefault;
+            }
+            else { 
+
+                enableAccounting( MAX_ACCT_ARCHIVE_FILE ); // since we are here, we should enable accounting
+
+                value = strtoul( lsb_params[i].value, NULL , 10 ); // FIXME FIXME FIXME might want to include char **endptr, as it might end up making the code smaller. Also, what happens when someone enters a string that starts with a '+' or a '-' // 10 is for decimal base.
+                if ( value == ULONG_MAX && errno ==  ERANGE ) {
+                    /* catgets 5459 */
+                    ls_syslog (LOG_ERR, "catgets 5459: %s: File %s at line %d: %s overflowed; using default %lu, instead" , __func__, filename, lineNum, lsb_params[i].key, maxAcctArchiveNumDefault );
+                    lsberrno = LSBE_CONF_WARNING;
+                    maxAcctArchiveNum = maxAcctArchiveNumDefault;
+                }
+                else {
+                    maxAcctArchiveNum = value;
+                    /* catgets 5459 */ // FIXME FIXME FIXME FIXME FIXME get new catgets, please
+                    ls_syslog (LOG_ERR, "catgets 5459: %s: File %s at line %d: Enabling LSF accounting: %s has value %lu, with default %lu" , __func__, filename, lineNum, lsb_params[i].key, lsb_params[i].value, maxAcctArchiveNumDefault );
+                }
+            }
+
+            pConf->maxAcctArchiveNum  = maxAcctArchiveNum;
+#else
             /* catgets 5061 */ // FIXME FIXME FIXME FIXME get new catgets!
-            ls_syslog (LOG_WARNING, "catgets 5061: File %s: Parameter %s not supported in this LSF version. Please use syslog/systemd to define the maximum log files you want to keep", filename ); // FIXME FIXME FIXME FIXME FIXME set name_of_upgrade_utility in configure.ac or similar
+            ls_syslog (LOG_WARNING, "catgets 5061: File %s at line %lu: Parameter %s not supported in this LSF version. Please use syslog/systemd to define the max file size for the logs", filename, lineNumber, lsb_params[i].key ); // FIXME FIXME FIXME FIXME FIXME set name_of_upgrade_utility in configure.ac or similar
             lsberrno = LSBE_CONF_WARNING;
             freekeyval (lsb_params);
             return false; // better to exit and be sure that the admin sets up logging correctly
+#endif
         }
 
         else if( strncmp( lsb_params[i].key, keylist[ACCT_ARCHIVE_SIZE], strlen( keylist[ACCT_ARCHIVE_SIZE] ) ) ) { // i == 33
+#ifdef ENABLE_LSF_ACCOUNTING // FIXME FIXME FIXME FIXME FIXME set in configure.ac
             //
             //  https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_config_ref/lsb.params.acct_archive_size.5.html
             //
-            // ACCT_ARCHIVE_SIZE=kilobytes // WARNING Get rid of this: LSF should not manage logs, that's what syslog is for.
+            // lsf_version: all
+            //
+            // ACCT_ARCHIVE_SIZE=kilobytes // FIXME FIXME FIXME FIXME FIXME Get rid of this: LSF should not manage logs, that's what syslog is for.
             //
             // Description: Enables automatic archiving of LSF accounting log files, and specifies the archive threshold. LSF archives the current log file if its size exceeds the specified number of kilobytes.
             //
-            // WARNING Must go, syslog can take care of these things better than LSF.
+            // See also: 
+            // * ACCT_ARCHIVE_SIZE     also enables automatic archiving
+            // * ACCT_ARCHIVE_TIME     also enables automatic archiving
+            // * MAX_ACCT_ARCHIVE_FILE      enables automatic deletion of the archives
             //
-        //     unsigned long acctArchiveInSize = strtoul( lsb_params[i].value, NULL, 10 );
-        //     if (acctArchiveInSize == ULONG_MAX && errno ==  ERANGE ) {
-        //         /* catgets 5459 */
-        //         ls_syslog (LOG_ERR, "catgets 5459: %s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored", __func__, filename, lineNum, lsb_params[i].value, lsb_params[i].key, ULONG_MAX - 1);
-        //         pConf->acctArchiveInSize = 0; // 0 will be a special value meaning "none"
-        //         lsberrno = LSBE_CONF_WARNING;
-        //     }
-        //     else {
-        //         pConf->acctArchiveInSize = acctArchiveInSize;
-        //     }
+            // Default: not defined; no limit to the size of lsb.acct
+            //
+            unsigned long acctArchiveInSize        = 0;
+            unsigned long acctArchiveInSizeDefault = 0; // FIXME FIXME FIXME FIXME FIXME set in configure.ac
+            unsigned long value                    = 0;
+            
+            if( NULL == lsb_params[i].value ) {
+                /* catgets 5097 */ // FIXME FIXME FIXME FIXME FIXME new catgets value
+                ls_syslog (LOG_ERR, "catgets 5097: File %s at line %lu: %s is set, but has no value. Using default %lu instead.", filename, lineNumber, lsb_params[i].key, acctArchiveInSizeDefault ); // FIXME FIXME FIXME FIXME FIXME set to reasonable default
+                lsberrno = LSBE_CONF_WARNING;
+                acctArchiveInSize = acctArchiveInSizeDefault;
+            }
+            else { 
+
+                enableAccounting( ACCT_ARCHIVE_SIZE ); // since we are here, we should enable accounting
+
+                value = strtoul( lsb_params[i].value, NULL , 10 ); // FIXME FIXME FIXME might want to include char **endptr, as it might end up making the code smaller. Also, what happens when someone enters a string that starts with a '+' or a '-' // 10 is for decimal base.
+                if ( value == ULONG_MAX && errno ==  ERANGE ) {
+                    /* catgets 5459 */
+                    ls_syslog (LOG_ERR, "catgets 5459: %s: File %s at line %d: %s overflowed; using default %lu, instead" , __func__, filename, lineNum, lsb_params[i].key, acctArchiveInSizeDefault );
+                    lsberrno = LSBE_CONF_WARNING;
+                    acctArchiveInSize = acctArchiveInSizeDefault;
+                }
+                else {
+                    acctArchiveInSize = value;
+                    /* catgets 5459 */ // FIXME FIXME FIXME FIXME FIXME get new catgets, please
+                    ls_syslog (LOG_ERR, "catgets 5459: %s: File %s at line %d: Enabling LSF accounting: %s has value %lu, with default %lu" , __func__, filename, lineNum, lsb_params[i].key, lsb_params[i].value, maxAcctArchiveNumDefault );
+                }
+            }
+
+            pConf->acctArchiveInSize  = acctArchiveInSize;
+#else
             /* catgets 5061 */ // FIXME FIXME FIXME FIXME get new catgets!
-            ls_syslog (LOG_WARNING, "catgets 5061: File %s: Parameter %s not supported in this LSF version. Please use syslog/systemd to define the max file size for the logs", filename ); // FIXME FIXME FIXME FIXME FIXME set name_of_upgrade_utility in configure.ac or similar
+            ls_syslog (LOG_WARNING, "catgets 5061: File %s at line %lu: Parameter %s not supported in this LSF version. Please use syslog/systemd to define the max file size for the logs", filename, lineNumber, lsb_params[i].key ); // FIXME FIXME FIXME FIXME FIXME set name_of_upgrade_utility in configure.ac or similar
             lsberrno = LSBE_CONF_WARNING;
             freekeyval (lsb_params);
-            return false; // better to exit and be sure that the admin sets up logging correctly        }
+            return false; // better to exit and be sure that the admin sets up logging correctly
+#endif
+        }
 
         else if( strncmp( lsb_params[i].key, keylist[ACCT_ARCHIVE_AGE], strlen( keylist[ACCT_ARCHIVE_AGE] ) ) ) { // i == 34
-        //     //
-        //     // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_config_ref/lsb.params.acct_archive_age.5.html
-        //     // 
-        //     // ACCT_ARCHIVE_AGE=non-negative_integer (representing days)
-        //     //
-        //     // Description: Enables automatic archiving of LSF accounting log files, and specifies the archive interval. LSF archives the current log file if the length of time from its creation date exceeds the specified number of days.
-        //     //
-        //     // WARNING Must go, syslog can take of these things better than LSF.
-        //     //
-        //     unsigned long acctArchiveinDaysDefault = 0;
-        //     unsigned long acctArchiveInDays        = strtoul( lsb_params[i].value, NULL , 10 );
-        //     if( acctArchiveInDays == ULONG_MAX && errno ==  ERANGE ) {
-        //         /* catgets 5459 */
-        //         ls_syslog (LOG_ERR, "catgets 5459: %s: File %s in section Parameters ending at line %d: %s set to default value, %lu", __func__, filename, lineNum, lsb_params[i].key, acctArchiveinDaysDefault );
-        //         pConf->acctArchiveInDays = 0; // 0 will be a special value meaning "inactive"
-        //         lsberrno = LSBE_CONF_WARNING;
-        //     }
-        //     else {
-        //         pConf->acctArchiveInDays = acctArchiveInDays;
-        //     }
+#ifdef ENABLE_LSF_ACCOUNTING // FIXME FIXME FIXME FIXME FIXME set in configure.ac
+            //
+            // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_config_ref/lsb.params.acct_archive_age.5.html
+            // 
+            // lsf_version: all
+            //
+            // ACCT_ARCHIVE_AGE=days ( possitive integer representing days) // FIXME FIXME FIXME FIXME FIXME Get rid of this: LSF should not manage logs, that's what syslog is for.
+            //
+            // Description: Enables automatic archiving of LSF accounting log files, and specifies the archive interval. LSF archives the current log file if the length of time from its creation date exceeds the specified number of days.
+            //
+            // See also: 
+            // * ACCT_ARCHIVE_SIZE     also enables automatic archiving
+            // * ACCT_ARCHIVE_TIME     also enables automatic archiving
+            // * MAX_ACCT_ARCHIVE_FILE      enables automatic deletion of the archives
+            // 
+            // Default: Not defined; no limit to the age of lsb.acct.
+            //
+
+            unsigned long acctArchiveInDays        =  0;
+            unsigned long acctArchiveinDaysDefault = 10; // taken from the example // FIXME FIXME FIXME FIXME FIXME set in configure.ac
+            unsigned long value                    =  0;
+            
+            if( NULL == lsb_params[i].value ) {
+                /* catgets 5097 */ // FIXME FIXME FIXME FIXME FIXME new catgets value
+                ls_syslog (LOG_ERR, "catgets 5097: File %s at line %lu: %s is set, but has no value. Using default %lu instead.", filename, lineNumber, lsb_params[i].key, acctArchiveinDaysDefault ); // FIXME FIXME FIXME FIXME FIXME set to reasonable default
+                lsberrno = LSBE_CONF_WARNING;
+                acctArchiveInDays = acctArchiveinDaysDefault;
+            }
+            else { 
+
+                enableAccounting( ACCT_ARCHIVE_AGE ); // since we are here, we should enable accounting
+
+                value = strtoul( lsb_params[i].value, NULL , 10 ); // FIXME FIXME FIXME might want to include char **endptr, as it might end up making the code smaller. Also, what happens when someone enters a string that starts with a '+' or a '-' // 10 is for decimal base.
+                if ( value == ULONG_MAX && errno ==  ERANGE ) {
+                    /* catgets 5459 */
+                    ls_syslog (LOG_ERR, "catgets 5459: %s: File %s at line %d: %s overflowed; using default %lu, instead" , __func__, filename, lineNum, lsb_params[i].key, acctArchiveinDaysDefault );
+                    lsberrno = LSBE_CONF_WARNING;
+                    acctArchiveInDays = acctArchiveinDaysDefault;
+                }
+                else {
+                    acctArchiveInDays = value;
+                    /* catgets 5459 */ // FIXME FIXME FIXME FIXME FIXME get new catgets, please
+                    ls_syslog (LOG_ERR, "catgets 5459: %s: File %s at line %d: Enabling LSF accounting: %s has value %lu, with default %lu" , __func__, filename, lineNum, lsb_params[i].key, lsb_params[i].value, maxAcctArchiveNumDefault );
+                }
+            }
+
+            pConf->acctArchiveInDays  = acctArchiveInDays;
+#else
             /* catgets 5061 */ // FIXME FIXME FIXME FIXME get new catgets!
-            ls_syslog (LOG_WARNING, "catgets 5061: File %s: Parameter %s not supported in this LSF version. Please use syslog/systemd to define the max file age for logs", filename ); // FIXME FIXME FIXME FIXME FIXME set name_of_upgrade_utility in configure.ac or similar
+            ls_syslog (LOG_WARNING, "catgets 5061: File %s at line %lu: Parameter %s not supported in this LSF version. Please use syslog/systemd to define the max file age for logs", filename, lineNumber, lsb_params[i].key ); // FIXME FIXME FIXME FIXME FIXME set name_of_upgrade_utility in configure.ac or similar
             lsberrno = LSBE_CONF_WARNING;
             freekeyval (lsb_params);
-            return false; // better to exit and be sure that the admin sets up logging correctly        }
+            return false; // better to exit and be sure that the admin sets up logging correctly
+#endif
+        }
+
+        else if( strncmp( lsb_params[i].key, keylist[ACCT_ARCHIVE_TIME], strlen( keylist[ACCT_ARCHIVE_TIME] ) ) ) { // i == 34
+#ifdef ENABLE_LSF_ACCOUNTING // FIXME FIXME FIXME FIXME FIXME set in configure.ac
+            //
+            // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_config_ref/lsb.params.acct_archive_age.5.html
+            // 
+            // lsf_version: 9.0.1
+            //
+            // ACCT_ARCHIVE_TIME=hh:mm // FIXME FIXME FIXME FIXME FIXME Get rid of this: LSF should not manage logs, that's what syslog is for.
+            //
+            // Description: Enables automatic archiving of LSF accounting log file lsb.acct, and specifies the time of day to archive the current log file.
+            //
+            // See also:
+            // * ACCT_ARCHIVE_SIZE     also enables automatic archiving
+            // * ACCT_ARCHIVE_TIME     also enables automatic archiving
+            // * MAX_ACCT_ARCHIVE_FILE      enables automatic deletion of the archives
+            //
+            // Default: Not defined (no time set for archiving lsb.acct)
+            // 
+            struct tm acctArchiveTime;
+            struct tm acctArchiveTimeDefault;        // FIXME FIXME FIXME FIXME FIXME set in configure.ac
+            const char acctArchiveTimeDefaultSting[ ] = "23:00"
+            char  *value                             = NULL;
+
+            memset(&acctArchiveTime,        '\0', sizeof(struct tm));
+            memset(&acctArchiveTimeDefault, '\0', sizeof(struct tm));
+            
+            if( NULL == lsb_params[i].value ) {
+                /* catgets 5097 */ // FIXME FIXME FIXME FIXME FIXME new catgets value
+                ls_syslog (LOG_ERR, "catgets 5097: File %s at line %lu: %s is set, but has no value. Using default %lu instead.", filename, lineNumber, lsb_params[i].key, acctArchiveinDaysDefault ); // FIXME FIXME FIXME FIXME FIXME set to reasonable default
+                lsberrno = LSBE_CONF_WARNING;
+                acctArchiveInDays = acctArchiveinDaysDefault;
+            }
+            else { 
+
+                enableAccounting( ACCT_ARCHIVE_AGE ); // since we are here, we should enable accounting
+
+                value = strdup( lsb_params[i].value );
+
+                if( strptime( value, "%I:%M %p", &tm ) ) { // parse 11:00 // NOFIX man strptime(): whitespace matches zero of more whitespace
+                    acctArchiveTime.tm_min  = tm.tm_min;
+                    acctArchiveTime.tm_hour = tm.tm_hour;
+                }
+                else if ( strptime( value, "%H:%M", &tm ) ) { // parse 23:00
+                    acctArchiveTime.tm_min  = tm.tm_min;
+                    acctArchiveTime.tm_hour = tm.tm_hour;
+                }
+                else {
+                    /* catgets 5459 */
+                    ls_syslog (LOG_ERR, "catgets 5459: %s: File %s at line %d: %s has illegally formatted value; using default value \"%s\", instead. Please refer to the manual if you want to set a custom value" , __func__, filename, lineNum, lsb_params[i].key, acctArchiveTimeDefaultSting );
+                    strptime( acctArchiveTimeDefaultSting, "%H:%M", &tm );
+                    acctArchiveTime.tm_min  = tm.tm_min;
+                    acctArchiveTime.tm_hour = tm.tm_hour;
+                    lsberrno                = LSBE_CONF_WARNING;
+                    // return false; // fix your shit                    
+                }
+
+                ls_syslog (LOG_ERR, "catgets 5459: %s: File %s at line %d: Enabling LSF accounting: %s has value %s, with default %s" , __func__, filename, lineNum, lsb_params[i].key, lsb_params[i].value, acctArchiveTimeDefaultSting );
+            }
+
+            pConf->acctArchiveTime.tm_min  = tm.tm_min;
+            pConf->acctArchiveTime.tm_hour = tm.tm_hour;
+
+#else
+            /* catgets 5061 */ // FIXME FIXME FIXME FIXME get new catgets!
+            ls_syslog (LOG_WARNING, "catgets 5061: File %s at line %lu: Parameter %s not supported in this LSF version. Please use syslog/systemd to define the max file age for logs", filename, lineNumber, lsb_params[i].key ); // FIXME FIXME FIXME FIXME FIXME set name_of_upgrade_utility in configure.ac or similar
+            lsberrno = LSBE_CONF_WARNING;
+            freekeyval (lsb_params);
+            return false; // better to exit and be sure that the admin sets up logging correctly
+#endif
         }
 
         else if( strncmp( lsb_params[i].key, keylist[DEFAULT_PROJECT], strlen( keylist[DEFAULT_PROJECT] ) ) ) { // i == 3
             //
             // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_config_ref/lsb.params.default_project.5.html
+            //
+            // lsf_version: all
             //
             // DEFAULT_PROJECT=project_name (string)
             //
@@ -1062,14 +1337,23 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
             // Default: default (string)
             //
             const char defaultProject[ ] = "default";
+            const unsigned long defaultProjectStingLength = 59; // FIXME FIXME FIXME FIXME FIXME set at configure.ac
     
             if( NULL == lsb_params[i].value ) {
-                ls_syslog (LOG_ERR, "catgets 5459: %s: File %s in section Parameters ending at line %d: %s set to default value, %s", __func__, filename, lineNum, lsb_params[i].key, defaultProject);
-                pConf->defaultProject = defaultProject;
+                /* catgets 5459 */ // FIXME FIXME FIXME FIXME FIXME get new catgets
+                ls_syslog( LOG_ERR, "catgets 5459: %s: File %s at line %d: %s set to default value, %s", __func__, filename, lineNum, lsb_params[i].key, defaultProject );
+                strcpyn( pConf->defaultProject, defaultProject, strlen( defaultProject ) );
                 continue;
             }
             else {
-                pConf->defaultProject = putstr_ (lsb_params[i].value);
+                // pConf->defaultProject = putstr_ (lsb_params[i].value);
+                if( strlen( lsb_params.[i].value ) > 59 ) {
+                    ls_syslog (LOG_ERR, "catgets 5459: %s: File %s at line %d: Value of %s is gretater than the spec of %lu chars, truncating", __func__, filename, lineNum, lsb_params[i].key, defaultProjectStingLength );
+                    strcpyn( pConf->defaultProject, lsb_params[i].value, defaultProjectStingLength );
+                }
+                else {
+                    strcpyn( pConf->defaultProject, lsb_params[i].value, strlen( lsb_params[i].value ) );
+                }
             }
 
             if (pConf->defaultProject == NULL) {
@@ -1085,6 +1369,8 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
             //
             // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_config_ref/lsb.params.job_accept_interval.5.html
             //
+            // lsf_version: all
+            //
             // JOB_ACCEPT_INTERVAL=non-negative_integer
             //
             // Description: The number you specify is multiplied by the value of lsb.params MBD_SLEEP_TIME (60 seconds by default). The result of the calculation is the number of seconds to wait after dispatching a job to a host, before dispatching a second job to the same host. If 0 (zero), a host may accept more than one job. By default, there is no limit to the total number of jobs that can run on a host, so if this parameter is set to 0, a very large number of jobs might be dispatched to a host all at once. // FIXME FIXME FIXME FIXME automate the calculation of this parameter according to load and ability of the host
@@ -1099,7 +1385,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
 
             if( NULL == lsb_params[i].value ) { // value not defined, set default
                 /* catgets 5067 */ // FIXME FIXME FIXME FIXME FIXME new catgets number, please
-                ls_syslog (LOG_ERR, "catgets 5067: %s: File %s in section Parameters ending at line %d: %s option is not defined, setting to default,. %lu", __func__, filename, lineNum, lsb_params[i].value, lsb_params[i].key, jobAcceptIntervalAtInstallation );
+                ls_syslog (LOG_ERR, "catgets 5067: %s: File %s at line %d: %s option is not defined, setting to default,. %lu", __func__, filename, lineNum, lsb_params[i].value, lsb_params[i].key, jobAcceptIntervalAtInstallation );
                 lsberrno = LSBE_CONF_WARNING;
                 jobAcceptInterval = jobAcceptIntervalUndefined;
             }
@@ -1108,7 +1394,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
                 value  = strtoul( lsb_params[i].value, NULL, 10 );
                 if ( value == ULONG_MAX && errno ==  ERANGE ) {
                     /* catgets 5067 */
-                    ls_syslog (LOG_ERR, "catgets 5067: %s: File %s in section Parameters ending at line %lu: Value <%s> of %s isn't a non-negative integer; ignored, set to default: %lu", __func__, filename, lineNum, lsb_params[i].value, lsb_params[i].key, jobAcceptIntervalUndefined);
+                    ls_syslog (LOG_ERR, "catgets 5067: %s: File %s at line %lu: Value <%s> of %s isn't a non-negative integer; ignored, set to default: %lu", __func__, filename, lineNum, lsb_params[i].value, lsb_params[i].key, jobAcceptIntervalUndefined);
                     lsberrno = LSBE_CONF_WARNING;
                     return false;
                 }
@@ -1119,7 +1405,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
 
                     if( jobAcceptInterval == jobAcceptIntervalAtInstallation ) {
                         /* catgets 5067 */ // FIXME FIXME FIXME FIXME new catgets number, please
-                        ls_syslog (LOG_ERR, "catgets 5067: %s: File %s in section Parameters ending at line %lu: Warning: Value <%s> of %s  is set to installation default", __func__, filename, lineNum, lsb_params[i].value, lsb_params[i].key );
+                        ls_syslog (LOG_ERR, "catgets 5067: %s: File %s at line %lu: Warning: Value <%s> of %s  is set to installation default", __func__, filename, lineNum, lsb_params[i].value, lsb_params[i].key );
                     }
                 }
             }
@@ -1130,6 +1416,8 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
         else if( strncmp( lsb_params[i].key, keylist[PG_SUSP_IT], strlen( keylist[PG_SUSP_IT] ) ) ) { // i == 5
             // 
             // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.3/lsf_config_ref/lsb.params.pg_susp_it.5.html
+            //
+            // lsf_version: all
             //
             // PG_SUSP_IT=seconds (time_t/non-integer)
             //
@@ -1143,7 +1431,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
 
             if( NULL == lsb_params[i].value ) { // value not defined, set default
                 /* catgets 5067 */ // FIXME FIXME FIXME FIXME FIXME new catgets number, please
-                ls_syslog (LOG_ERR, "catgets 5067: %s: File %s in section Parameters ending at line %d: %s option is not defined, setting to default,. %lu", __func__, filename, lineNum, lsb_params[i].value, lsb_params[i].key, jobAcceptIntervalAtInstallation );
+                ls_syslog (LOG_ERR, "catgets 5067: %s: File %sat line %d: %s option is not defined, setting to default, %lu", __func__, filename, lineNum, lsb_params[i].value, lsb_params[i].key, jobAcceptIntervalAtInstallation );
                 lsberrno = LSBE_CONF_WARNING;
                 pgSuspendIt = pgSuspendItDefault;
             }
@@ -1153,7 +1441,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
 
                 if( value == ULONG_MAX && errno ==  ERANGE ) {
                     /* catgets 5067 */ // FIXME FIXME FIXME FIXME FIXME new catgets, please.
-                    ls_syslog (LOG_ERR, "catgets 5067: %s: File %s in section Parameters ending at line %lu: Value <%s> of %s isn't a non-negative integer; ignored, set to default: %lu", __func__, filename, lineNum, lsb_params[i].value, lsb_params[i].key, value);
+                    ls_syslog (LOG_ERR, "catgets 5067: %s: File %s at line %lu: Value <%s> of %s isn't a non-negative integer; ignored, set to default: %lu", __func__, filename, lineNum, lsb_params[i].value, lsb_params[i].key, value);
                     lsberrno = LSBE_CONF_WARNING;
                     pgSuspendIt = pgSuspendItDefault;
                 }
@@ -1163,7 +1451,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
                     pgSuspendIt = (time_t) value;
 
                     if( pgSuspendIt == 0  ) {
-                        ls_syslog (LOG_ERR, "catgets 5067: %s: File %s in section Parameters ending at line %lu: Warning: Value of %s is set to zero: a batch job can be suspended and resumed too often and that will trash paging/swap", __func__, filename, lineNum, lsb_params[i].key );
+                        ls_syslog (LOG_ERR, "catgets 5067: %s: File %s at line %lu: Warning: Value of %s is set to zero: a batch job can be suspended and resumed too often and that will trash paging/swap", __func__, filename, lineNum, lsb_params[i].key );
                     }
                 }
             }
@@ -1172,7 +1460,10 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
         }
 
         else if( strncmp( lsb_params[i].key, keylist[DISABLE_UACCT_MAP], strlen( keylist[DISABLE_UACCT_MAP] ) ) ) { // i == 20
+            //
             // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_config_ref/lsb.params.disable_uacct_map.5.html
+            //
+            // lsf_version: all
             //
             // DISABLE_UACCT_MAP=y | Y
             //
@@ -1193,13 +1484,16 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
             }
             else {
                 /* catgets 5068 */
-                ls_syslog (LOG_ERR, "catgets 5068: %s: File %s in section Parameters ending at line %d: unrecognizable value <%s> for the keyword DISABLE_UACCT_MAP; assumming user level account mapping is allowed", __func__, filename, lineNum, lsb_params[i].value);
+                ls_syslog (LOG_ERR, "catgets 5068: %s: File %sat line %d: unrecognizable value \"%s\" for %s; assumming user level account mapping is allowed", __func__, filename, lineNum, lsb_params[i].value, lsb_params[i].key );
                 pConf->disableUAcctMap = false;
             }
         }
 
         else if( strncmp( lsb_params[i].key, keylist[JOB_PRIORITY_OVER_TIME], strlen( keylist[JOB_PRIORITY_OVER_TIME] ) ) ) { // i == 26
+            //
             // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_config_ref/lsb.params.job_priority_over_time.5.html
+            //
+            // lsf_version: all
             //
             // JOB_PRIORITY_OVER_TIME=increment/interval
             //
@@ -1222,6 +1516,11 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
                 JOBPRIORITYTIME  = 1
             };
 
+
+            // if( NULL == lsb_params[i].value ) { 
+            //  For this parameter5, you should not check if the entire value is NULL. One of the two values may be set. Errors should be specific, so they can be easily located and fixed.
+            // }
+
             // tokenize just twice. // FIXME FIXME FIXME FIXME add test to check what happens when you got a string 
             // strcpy (str, lsb_params[i].value);
             token[JOBPRIORITYVALUE] = strtok( lsb_params[i].value, "/"); // jobPriorityValue
@@ -1237,7 +1536,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
             jobPriorityValue = strtoul( token[JOBPRIORITYVALUE], NULL, 10 ); // base 10
             if(  jobPriorityValue == ULONG_MAX && errno ==  ERANGE ) {
                 /* catgets 5451 */
-                ls_syslog (LOG_ERR, "catgets 5451: %s: File %s, line  %lu: jobPriorityValue overflowed; set to default value of %lu", __func__, filename, lineNum, jobPriorityValueDefault  );
+                ls_syslog (LOG_ERR, "catgets 5451: %s: File %s, line  %lu: %s valuoverflowed; set to default value of %lu", __func__, filename, lineNum, jobPriorityValueDefault  );
                 lsberrno = LSBE_CONF_WARNING;
                 jobPriorityValue = jobPriorityValueDefault;
             }
@@ -1245,7 +1544,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
             jobPriorityTime  = strtoul( token[JOBPRIORITYTIME], NULL, 10 );
             if(  jobPriorityTime == ULONG_MAX  && errno ==  ERANGE ) {
                 /* catgets 5451 */
-                ls_syslog (LOG_ERR, "catgets 5451: %s: File %s, line  %lu: jobPriorityTimeDefault overflowed; set to default value of %lu", __func__, filename, lineNum, jobPriorityTimeDefault );
+                ls_syslog (LOG_ERR, "catgets 5451: %s: File %s, line  %lu: %s value overflowed; set to default value of %lu", __func__, filename, lineNum, jobPriorityTimeDefault );
                 lsberrno = LSBE_CONF_WARNING;
                 jobPriorityTime = jobPriorityTimeDefault;
             }
@@ -1254,38 +1553,47 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
             pConf->jobPriorityTime  = jobPriorityTime;
 
         }
-        //********************************************************************************************
-        //  Moved to lsf.shared
-        //
-        // else if( strncmp( lsb_params[i].key, keylist[SHARED_RESOURCE_UPDATE_FACTOR], strlen( keylist[SHARED_RESOURCE_UPDATE_FACTOR] ) ) ) { // i == 27 
-        //
-        // https://www.slac.stanford.edu/comp/unix/package/lsf/LSF4.0_doc/ref_4.0.1/lsb.params.html
-        //
-        // lsf_version 4.0.1 
-        //
-        // SHARED_RESOURCE_UPDATE_FACTOR = integer 
-        // 
-        // Description = Determines the static shared resource update interval for the cluster. Specify approximately how many times to update static shared resources during one MBD sleep time period. The formula is: interval = MBD_SLEEP_TIME / SHARED_RESOURCE_UPDATE_FACTOR. where the result of the calculation is truncated to an integer. The static shared resource update interval is in seconds.
-        //
-        // Default: Undefined (all resources are updated only once, at the start of each dispatch turn).
-        //
-        //     unsigned long sharedResourceUpdFactor = 0; // default
-        //     if (strtoul(lsb_params[i].value == NULL ) {
-        //         ls_syslog (LOG_ERR, "catgets 5459: %s: File %s in section Parameters ending at line %d: %s is not defined, set to default (%lu) ", __func__, filename, lineNum, lsb_params[i].key, sharedResourceUpdFactor );
-        //         pConf->sharedResourceUpdFactor = sharedResourceUpdFactor;
-        //     }
 
-        //     sharedResourceUpdFactor = strtoul(lsb_params[i].value, NULL, 10);
-        //     if( sharedResourceUpdFactor == ULONG_MAX && errno == ERANGE ) {
-        //         /* catgets 5459 */
-        //         ls_syslog (LOG_ERR, "catgets 5459: %s: File %s in section Parameters ending at line %d: Value <%s> of %s isn't a positive integer between 1 and %d; ignored", __func__, filename, lineNum, lsb_params[i].value, lsb_params[i].key, ULONG_MAX - 1); 
-        //         lsberrno = LSBE_CONF_WARNING;
-        //         pConf->sharedResourceUpdFactor = 0; // 0 is a special case: "turn off" // struct parameterInfo in lib/lsbatch.h
-        //     }
-        //     else {
-        //         pConf->sharedResourceUpdFactor = sharedResourceUpdFactor; // struct parameterInfo in lib/lsbatch.h
-        //     }
-        // }
+        else if( strncmp( lsb_params[i].key, keylist[SHARED_RESOURCE_UPDATE_FACTOR], strlen( keylist[SHARED_RESOURCE_UPDATE_FACTOR] ) ) ) { // i == 27 
+            //********************************************************************************************
+            //  Moved to lsf.shared
+            //
+            // https://www.slac.stanford.edu/comp/unix/package/lsf/LSF4.0_doc/ref_4.0.1/lsb.params.html
+            //
+            // lsf_version: all
+            //
+            // SHARED_RESOURCE_UPDATE_FACTOR=integer 
+            // 
+            // Description = Determines the static shared resource update interval for the cluster. Specify approximately how many times to update static shared resources during one MBD sleep time period. The formula is: interval = MBD_SLEEP_TIME / SHARED_RESOURCE_UPDATE_FACTOR. where the result of the calculation is truncated to an integer. The static shared resource update interval is in seconds.
+            //
+            // Default: Undefined (all resources are updated only once, at the start of each dispatch turn).
+            //
+            //     unsigned long sharedResourceUpdFactor        = 0;
+            //     unsigned long sharedResourceUpdFactorDefault = 0; // default
+            //     unsigned long value                          = 0;
+            // 
+            //     if( NULL == lsb_params[i].value ) {
+            //         ls_syslog (LOG_ERR, "catgets 5459: %s: File %s at line %d: %s is not defined, set to default (%lu) ", __func__, filename, lineNum, lsb_params[i].key, sharedResourceUpdFactor );
+            //         pConf->sharedResourceUpdFactor = sharedResourceUpdFactor;
+            //     }
+
+            //     value = strtoul(lsb_params[i].value, NULL, 10);
+            //     if( value == ULONG_MAX && errno == ERANGE ) {
+            //         /* catgets 5459 */
+            //         ls_syslog (LOG_ERR, "catgets 5459: %s: File %s, line %d: Value of %s isn't a positive integer between 1 and %d; Using default value %lu, instead", __func__, filename, lineNum, lsb_params[i].key, sharedResourceUpdFactorDefault ); 
+            //         lsberrno = LSBE_CONF_WARNING;
+            //         pConf->sharedResourceUpdFactor = 0; // 0 is a special case: "turn off" // struct parameterInfo in lib/lsbatch.h
+            //     }
+            //     else {
+            //         pConf->sharedResourceUpdFactor = sharedResourceUpdFactor; // struct parameterInfo in lib/lsbatch.h
+            //     }
+            /* catgets 5061 */ // FIXME FIXME FIXME FIXME get new catgets!
+            const char lsb_shared[ ] = "lsf.shared"; // FIXME FIXME FIXME FIXME FIXME move to configure.ac
+            ls_syslog (LOG_WARNING, "catgets 5061: File %s: Parameter %s has moved to the %s file in this LSF version.", filename, lsb_shared, lsb_params[i].key ); // FIXME FIXME FIXME FIXME FIXME set name_of_upgrade_utility in configure.ac or similar
+            lsberrno = LSBE_CONF_WARNING;
+            freekeyval (lsb_params);
+            return false; // better to exit and be sure that the admin sets up lsf.shared
+        }
 
         else if( strncmp( lsb_params[i].key, keylist[MAX_JOBID], strlen( keylist[MAX_JOBID] ) ) ) { // i == 31
             // 
@@ -1315,14 +1623,14 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
                 /* catgets 5451 */
                 ls_syslog (LOG_ERR, "catgets 5451: %s: File %s, line %lu: %s is defined but has no value; Set to default value of %lu ", __func__, filename, lineNum, lsb_params[i].key, maxJobIdDefault );
                 lsberrno = LSBE_CONF_WARNING;
-                continue; // FIXME FIXME FIXME FIXME FIXME
+                maxJobId = maxJobIdDefault;
             }
             else {
 
                 value = strtoul (lsb_params[i].value, NULL, 10 );
                 if( value == ULONG_MAX  && errno ==  ERANGE ) {
                     /*catgets 5062 */
-                    ls_syslog (LOG_ERR, "catgets 5062: %s: File %s in section Parameters ending at line %d: maxJobId value %s not in [%lu, %lu], use default value ULONG_MAX (%lu);", __func__, filename, lineNum, lsb_params[i].key, MAX_JOBID_LOW, MAX_JOBID_HIGH, ULONG_MAX);
+                    ls_syslog (LOG_ERR, "catgets 5062: %s: File %s at line %d: %s value %s not in [%lu, %lu], use default value ULONG_MAX (%lu);", __func__, filename, lineNum, lsb_params[i].key, MAX_JOBID_LOW, MAX_JOBID_HIGH, ULONG_MAX);
                     lsberrno = LSBE_CONF_WARNING;
                     maxJobId = MAX_JOBID_HIGH; // struct parameterInfo in lib/lsbatch.h
                 }
@@ -1334,52 +1642,108 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
 
         }
 
-        // NOFIX older version of LSF, removed
-        //
-        // else if (i == SCHE_RAW_LOAD )  { // i == 28
-        //     const char Y[] = "Y";
-        //     if (strcasecmp (lsb_params[i].value, Y ) == 0) { // default
-        //         pConf->scheRawLoad = true;
-        //     }
-        //     else {
-        //         pConf->scheRawLoad = false;
-        //     }
-        // }
+        else if( strncmp( lsb_params[i].key, keylist[SCHE_RAW_LOAD], strlen( keylist[SCHE_RAW_LOAD] ) ) ) { // i == 23
+            //
+            // NOFIX older version of LSF, removed
+            //
+            // lsf_version: not even the slightest idea which versionf of LSF this parameter is
+            //
+            // unsigned long scheRawLoad        = 0;
+            // unsigned long scheRawLoadDefault = 10; // random default
+            // unsigned long value              = 0;
+            //
+            // if( NULL == lsb_params[i].value  ) {
+            //     /* catgets 5451 */
+            //     ls_syslog (LOG_ERR, "catgets 5451: %s: File %s, line %lu: %s is defined but has no value; Set to default value of %lu ", __func__, filename, lineNum, lsb_params[i].key, scheRawLoadDefault );
+            //     lsberrno = LSBE_CONF_WARNING;
+            //     scheRawLoad = scheRawLoadDefault;
+            // }
+            // else {
+            //     value = strtoul (lsb_params[i].value, NULL, 10 );
+            //     if( value == ULONG_MAX  && errno ==  ERANGE ) {
+            //         /* catgets 5062 */
+            //         ls_syslog (LOG_ERR, "catgets 5062: %s: File %s at line %d: %s value %s not in [%lu, %lu], use default value ULONG_MAX (%lu);", __func__, filename, lineNum, lsb_params[i].key, MAX_JOBID_LOW, MAX_JOBID_HIGH, ULONG_MAX);
+            //         lsberrno = LSBE_CONF_WARNING;
+            //         maxJobId = MAX_JOBID_HIGH; // struct parameterInfo in lib/lsbatch.h
+            //     }
+            //     else {
+            //         maxJobId = value;
+            //     }
+            // }
+            // pConf->maxJobId = maxJobId;
+            // else if (i == SCHE_RAW_LOAD )  { // i == 28
+            //     const char Y[] = "Y";
+            //     if (strcasecmp (lsb_params[i].value, Y ) == 0) { // default
+            //         pConf->scheRawLoad = true;
+            //     }
+            //     else {
+            //         pConf->scheRawLoad = false;
+            //     }
+            ls_syslog (LOG_WARNING, "catgets 5061: File %s: Parameter %s is not supported int his LSF version.", filename, lsb_params[i].key ); // FIXME FIXME FIXME FIXME FIXME set name_of_upgrade_utility in configure.ac or similar
+            lsberrno = LSBE_CONF_WARNING;
+            freekeyval (lsb_params);
+            return false; // better to exit and be sure that the admin deletes it from the file
+        }
 
-        // NOFIX older version of LSF, removed
-        // else if (i == SLOT_RESOURCE_RESERVE ) { // i == 30
-        //     const char Y[] = "Y";
-        //     if (strcasecmp (lsb_params[i].value, Y ) == 0)  { // default
-        //         pConf->slotResourceReserve = true;
-        //     }
-        //     else {
-        //         pConf->slotResourceReserve = false;
-        //     }
-        // }
+        else if( strncmp( lsb_params[i].key, keylist[SLOT_RESOURCE_RESERVE], strlen( keylist[SLOT_RESOURCE_RESERVE] ) ) ) { // i == 23
+            //
+            // NOFIX older version of LSF, removed
+            //
+            // lsf_version: not even the slightest idea which versionf of LSF this parameter is
+            //
+            //     const char Y[] = "Y";
+            //     if (strcasecmp (lsb_params[i].value, Y ) == 0)  { // default
+            //         pConf->slotResourceReserve = true;
+            //     }
+            //     else {
+            //         pConf->slotResourceReserve = false;
+            //     }
+            ls_syslog (LOG_WARNING, "catgets 5061: File %s: Parameter %s is not supported in this LSF version.", filename, lsb_params[i].key ); // FIXME FIXME FIXME FIXME FIXME set name_of_upgrade_utility in configure.ac or similar
+            lsberrno = LSBE_CONF_WARNING;
+            freekeyval (lsb_params);
+            return false; // better to exit and be sure that the admin deletes it from the file
+        }
 
         else if( strncmp( lsb_params[i].key, keylist[JOB_DEP_LAST_SUB], strlen( keylist[JOB_DEP_LAST_SUB] ) ) ) { // i == 23
+            //
             // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_config_ref/lsb.params.job_dep_last_sub.5.html
             // 
+            // lsf_version: all
+            //
             // Description: Used only with job dependency scheduling. If set to 1, whenever dependency conditions use a job name that belongs to multiple jobs, LSF evaluates only the most recently submitted job.
             //
-            // Default: Set to 1 at time of installation for the DEFAULT and PARALLEL configuration templates. If otherwise undefined, then 0 (turned off).
-            bool jobDepLastSub  = false;
-            unsigned long value = strtoul( lsb_params[i].value, NULL, 10 );
-            if( value == 1 ) {
-                jobDepLastSub = true;
-            }
-            else if( value == 0 ) {
-                jobDepLastSub  = false; // already false
-            }
+            // Default: Set to 1 at time of installation for the DEFAULT and PARALLEL configuration templates. If otherwise undefined, then 0 (turned off)
+            //
+            bool jobDepLastSub                       = false;
+            bool jobDepLastSubDefaultAtInstallation  = true;
+            unsigned long value                      = 0;
+
+            if( NULL == lsb_params[i].value ) {
+                ls_syslog (LOG_ERR, "catgets 5071: %s: File %s at line %lu: %s is defined but not given a value. Going with %d( turning off job dependency scheduling)", __func__, filename, lineNum, lsb_params[i].key, jobDepLastSub );
+                lsberrno      = LSBE_CONF_WARNING;
+                jobDepLastSub = jobDepLastSubDefaultAtInstallation
+;            }
             else {
-                /* catgets 5071 */
-                ls_syslog (LOG_ERR, "catgets 5071: %s: File %s in section Parameters ending at line %lu: Value <%s> of %s isn't 1 or 0; ignored", __func__, filename, lineNum, lsb_params[i].value, lsb_params[i].key );
-                lsberrno = LSBE_CONF_WARNING;
+
+                value = strtoul( lsb_params[i].value, NULL, 10 );
+                if( value == 1 ) {
+                    jobDepLastSub = true;
+                }
+                else if( value == 0 ) {
+                    jobDepLastSub  = false; // already false, but...
+                }
+                else {
+                    /* catgets 5071 */
+                    ls_syslog (LOG_ERR, "catgets 5071: %s: File %s at line %lu: Value %s isn't 1 or 0; ignored", __func__, filename, lineNum, lsb_params[i].value, lsb_params[i].key );
+                    lsberrno = LSBE_CONF_WARNING;
+                }
             }
             pConf->jobDepLastSub = jobDepLastSub;
         }
         else if( strncmp( lsb_params[i].key, keylist[MBD_SLEEP_TIME], strlen( keylist[MBD_SLEEP_TIME] ) ) ) { // i == 6
             // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_config_ref/lsb.params.mbd_sleep_time.5.html
+            //
+            // lsf_version: all
             //
             // MBD_SLEEP_TIME=seconds
             //
@@ -1394,11 +1758,11 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
 
             if( NULL == lsb_params[i].value ) {
                 /* catget 5071 */
-                ls_syslog (LOG_ERR, "catgets 5071: %s: File %s in section Parameters ending at line %lu: %s has no value, set to default value instead: %d", __func__, filename, lineNum, lsb_params[i].key, mbatchdIntervalDefault );
+                ls_syslog (LOG_ERR, "catgets 5071: %s: File %s at line %lu: %s has no value, set to default value instead: %d", __func__, filename, lineNum, lsb_params[i].key, mbatchdIntervalDefault );
                 mbatchdInterval = mbatchdIntervalDefault;
             }
             else {
-                ls_syslog (LOG_ERR, "catgets 5071: %s: File %s in section Parameters ending at line %lu: %s: setting value to %lu, with installation default %d", __func__, filename, lineNum, lsb_params[i].key, value, mbatchdIntervalatInstallation );
+                ls_syslog (LOG_ERR, "catgets 5071: %s: File %s at line %lu: %s: setting value to %lu, with installation default %d", __func__, filename, lineNum, lsb_params[i].key, value, mbatchdIntervalatInstallation );
                 assert( value <= LONG_MAX );
                 mbatchdInterval = (time_t) value;
             }
@@ -1407,6 +1771,8 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
         }
         else if( strncmp( lsb_params[i].key, keylist[CLEAN_PERIOD], strlen( keylist[CLEAN_PERIOD] ) ) ) { // i == 7
             // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_config_ref/lsb.params.clean_period.5.html
+            //
+            // lsf_version: all
             //
             // Syntax: CLEAN_PERIOD=second
             //
@@ -1420,30 +1786,38 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
 
             if( NULL == lsb_params[i].value ) {
                 /* catget 5071 */
-                ls_syslog (LOG_ERR, "catgets 5071: %s: File %s in section Parameters ending at line %lu: %s has no value, set to default value instead: %d", __func__, filename, lineNum, lsb_params[i].key, cleanPeriodDefault );
+                ls_syslog (LOG_ERR, "catgets 5071: %s: File %s at line %lu: %s has no value, set to default value instead: %d", __func__, filename, lineNum, lsb_params[i].key, cleanPeriodDefault );
                 cleanPediod = cleanPeriodDefault;
             }
             else {
-                ls_syslog (LOG_ERR, "catgets 5071: %s: File %s in section Parameters ending at line %lu: %s: setting value to %lu, with installation default %d seconds", __func__, filename, lineNum, lsb_params[i].key, value, cleanPeriodDefault );
+                ls_syslog (LOG_ERR, "catgets 5071: %s: File %s at line %lu: %s: setting value to %lu, with installation default %d seconds", __func__, filename, lineNum, lsb_params[i].key, value, cleanPeriodDefault );
                 assert( value <= LONG_MAX );
                 mbatchdInterval = (time_t) value;
             }
             pConf->cleanPeriod = cleanPediod;
         }
-        else if( strncmp( lsb_params[i].key, keylist[MAX_RETRY], strlen( keylist[MAX_RETRY] ) ) ) { // i == 8
+i        else if( strncmp( lsb_params[i].key, keylist[MAX_RETRY], strlen( keylist[MAX_RETRY] ) ) ) { // i == 8
+            // 
+            // http://www.ccs.miami.edu/hpc/lsf/9.1.1/api_ref/group__gpd__control__flag.html
+            //
+            // MAX_RETRY=integer
+            //
+            // Description: The maximum number of retries for dispatching a job.
+            //  guessing that 0 is a special value to turn off retrying
+            //
+            // Default: 5 (as per https://www.penguincomputing.com/wp-content/uploads/2015/01/UsersGuide.5112g1.pdf)
+            //
             // unsigned long maxDispRetries        = 0;
-            // unsigned long maxDispRetriesDefault = 10; // 3600 seconds, one hour
-            // unsigned long value                 = strtoul( lsb_params[i].value, NULL, 10 );
-
+            // unsigned long maxDispRetriesDefault = 5;
+            //
             // if( NULL == lsb_params[i].value ) {
             //     /* catget 5071 */
-            //     ls_syslog (LOG_ERR, "catgets 5071: %s: File %s in section Parameters ending at line %lu: %s has no value, set to default value instead: %d", __func__, filename, lineNum, lsb_params[i].key, maxDispRetriesDefault );
+            //     ls_syslog (LOG_ERR, "catgets 5071: %s: File %s at line %lu: %s is set but has no value, set to default value instead: %d", __func__, filename, lineNum, lsb_params[i].key, maxDispRetriesDefault );
             //     maxDispRetries = maxDispRetriesDefault;
             // }
             // else {
-            //     ls_syslog (LOG_ERR, "catgets 5071: %s: File %s in section Parameters ending at line %lu: %s: setting value to %lu, with installation default %d seconds", __func__, filename, lineNum, lsb_params[i].key, value, maxDispRetriesDefault );
-            //     assert( value <= LONG_MAX );
-            //     maxDispRetries = (time_t) value;
+            //     ls_syslog (LOG_ERR, "catgets 5071: %s: File %s at line %lu: %s: setting value to %lu, with installation default %d seconds", __func__, filename, lineNum, lsb_params[i].key, value, maxDispRetriesDefault );
+            //     maxDispRetries = strtoul( lsb_params[i].value, NULL, 10 );
             // }
             // pConf->maxDispRetries = maxDispRetries;
             /* catgets 5195 */
@@ -1464,11 +1838,11 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
 
             if( NULL == lsb_params[i].value ) {
                 /* catget 5071 */
-                ls_syslog (LOG_ERR, "catgets 5071: %s: File %s in section Parameters ending at line %lu: %s has no value, set to default value instead: %d", __func__, filename, lineNum, lsb_params[i].key, sbatchdIntervalDefault );
+                ls_syslog (LOG_ERR, "catgets 5071: %s: File %s at line %lu: %s has no value, set to default value instead: %d", __func__, filename, lineNum, lsb_params[i].key, sbatchdIntervalDefault );
                 maxDispRetries = sbatchdIntervalDefault;
             }
             else {
-                ls_syslog (LOG_ERR, "catgets 5071: %s: File %s in section Parameters ending at line %lu: %s: setting value to %lu, with installation default %d seconds", __func__, filename, lineNum, lsb_params[i].key, value, sbatchdIntervalDefault );
+                ls_syslog (LOG_ERR, "catgets 5071: %s: File %s at line %lu: %s: setting value to %lu, with installation default %d seconds", __func__, filename, lineNum, lsb_params[i].key, value, sbatchdIntervalDefault );
                 assert( value <= LONG_MAX );
                 sbatchdInterval = (time_t) value;
             }
@@ -1492,11 +1866,11 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
 
             // if( NULL == lsb_params[i].value ) {
             //     /* catget 5071 */
-            //     ls_syslog (LOG_ERR, "catgets 5071: %s: File %s in section Parameters ending at line %lu: %s has no value, set to default value instead: %d", __func__, filename, lineNum, lsb_params[i].key, maxNumJobsDefault );
+            //     ls_syslog (LOG_ERR, "catgets 5071: %s: File %s at line %lu: %s has no value, set to default value instead: %d", __func__, filename, lineNum, lsb_params[i].key, maxNumJobsDefault );
             //     maxDispRetries = maxNumJobsDefault;
             // }
             // else {
-            //     ls_syslog (LOG_ERR, "catgets 5071: %s: File %s in section Parameters ending at line %lu: %s: setting value to %lu, with installation default %d seconds", __func__, filename, lineNum, lsb_params[i].key, value, maxNumJobsDefault );
+            //     ls_syslog (LOG_ERR, "catgets 5071: %s: File %s at line %lu: %s: setting value to %lu, with installation default %d seconds", __func__, filename, lineNum, lsb_params[i].key, value, maxNumJobsDefault );
             //     assert( value <= LONG_MAX );
             //     maxDispRetries = (time_t) value;
             // }
@@ -1533,7 +1907,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
         else if( strncmp( lsb_params[i].key, keylist[MAX_JOB_ARRAY_SIZE], strlen( keylist[MAX_JOB_ARRAY_SIZE] ) ) ) { // i == 19
             if (value < 1 || value >= LSB_MAX_ARRAY_IDX) {
                 /* catgets 5073 */
-                ls_syslog (LOG_ERR, "catgets 5073: %s: File %s in section Parameters ending at line %d: Value <%s> of %s is out of range[1-65534]); ignored", __func__, filename, lineNum, lsb_params[i].value, lsb_params[i].key);
+                ls_syslog (LOG_ERR, "catgets 5073: %s: File %s at line %d: Value <%s> of %s is out of range[1-65534]); ignored", __func__, filename, lineNum, lsb_params[i].value, lsb_params[i].key);
                 lsberrno = LSBE_CONF_WARNING;
             }
             else { 
@@ -1567,7 +1941,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
  
             if( lsb_params[i].value == NULL ) {
                 /* catgets 5452 */
-                ls_syslog (LOG_ERR, "catgets 5452: %s: File %s in section Parameters ending at line %d: Option <%s> is not defined. Setting to reasonable default of %lu;", __func__, filename, lineNum, lsb_params[i].key, maxUserPriority );
+                ls_syslog (LOG_ERR, "catgets 5452: %s: File %s at line %d: Option <%s> is not defined. Setting to reasonable default of %lu;", __func__, filename, lineNum, lsb_params[i].key, maxUserPriority );
                 pConf->maxUserPriority = maxUserPriority;
                 continue;
             }
@@ -1575,7 +1949,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
                 maxUserPriority = strtoul( lsb_params[i].value, NULL, 10 );
                 if( maxUserPriority == ULONG_MAX  && errno ==  ERANGE ) {
                     /* catgets 5073 */ // FIXME FISXME FIXME FIXME FIXME
-                    ls_syslog (LOG_ERR, "catgets 5073: %s: File %s in section Parameters ending at line %d: Value of %s overflowed, setting to reasonable default of %lu", __func__, filename, lineNum, lsb_params[i].key ); // FIXME FIXME FIXME FIXME implement parameters
+                    ls_syslog (LOG_ERR, "catgets 5073: %s: File %s at line %d: Value of %s overflowed, setting to reasonable default of %lu", __func__, filename, lineNum, lsb_params[i].key ); // FIXME FIXME FIXME FIXME implement parameters
                     lsberrno = LSBE_CONF_WARNING;
                 }
                 pConf->maxUserPriority = maxUserPriority;
@@ -2047,7 +2421,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
 */      
         else {
             /* catgets 5074 */
-            ls_syslog (LOG_ERR, "catgets 5074: %s: File %s in section Parameters ending at line %lu: Non-implimented option %s with value %s.", __func__, filename, lineNum, lsb_params[i].key, lsb_params[i].value );
+            ls_syslog (LOG_ERR, "catgets 5074: %s: File %s at line %lu: Non-implimented option %s with value %s.", __func__, filename, lineNum, lsb_params[i].key, lsb_params[i].value );
             lsberrno = LSBE_CONF_WARNING;
         }
 
@@ -2055,14 +2429,28 @@ do_Param (struct lsConf *conf, const char *filename, size_t lineNum) // this fun
     } // END for( unsigned int i = 0; lsb_params[i].key != NULL; i++ ) {
     // }
 
+    //
+    // The documentation says that if one of the accounting variables is set, then the other two must be set as well. In this version of $LSF, we have delegated log management to rsyslogd/ngsyslogd/systemd, 
+    // cuz they can do a better job at it. The matter of the fact, though, is, that there is code and installations out there that use these settings and might have a problem migrating to this version.
+    //
+    // while we don't return false here, this is a warning to check the configuration: even if we are setting some defaults, admins of this software should not depend on them.
+    if( !enableAccounting( ACCT_CHECK ) ) {
+        /* catgets 5453 */ // FIXME FIXME FIXME FIXME FIXME get a new catgets
+        ls_syslog (LOG_ERR, "catgets 5453: %s: File %s: Warning: Log file accounting is misconfigured.", __func__, filename );
+        lsberrno = LSBE_CONF_WARNING;
+        // return false; // future use
+    }
+
     if (pConf->maxUserPriority <= 0 && pConf->jobPriorityValue > 0 && pConf->jobPriorityTime > 0) {
         /* catgets 5453 */
-        ls_syslog (LOG_ERR, "catgets 5453: %s: File %s in section Parameters : MAX_USER_PRIORITY should be defined first so that JOB_PRIORITY_OVER_TIME can be used: job priority control disabled", __func__, filename);
+        ls_syslog (LOG_ERR, "catgets 5453: %s: File %s: MAX_USER_PRIORITY should be defined first so that JOB_PRIORITY_OVER_TIME can be used: job priority control disabled", __func__, filename );
         pConf->jobPriorityValue = ULONG_MAX;
         pConf->jobPriorityTime  = ULONG_MAX;
         lsberrno = LSBE_CONF_WARNING;
     }
+
     freekeyval (lsb_params);
+
     return true;
 }
 
@@ -2275,6 +2663,7 @@ checkSpoolDir ( const char *pSpoolDir )
         ls_syslog (LOG_DEBUG, "%s: JOB_SPOOL_DIR in UNIX and GNU/Linux is %s", __func__, TempUnix);
     }
 
+// FIXME FIXME FIXME FIXME FIXME checkSpoolDir() should also check to see if the path provided is writeable and if not report where on the path is the inability to write. Bit of recurstive lstaf/fstat should do the trick.
 
     return true;
 }

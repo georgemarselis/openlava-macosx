@@ -1225,6 +1225,8 @@ struct hostInfoEnt
 //     time_t preExecDelay;
 // };
 
+// #ifdef LSF_VERSION_4_0_1 // FIXME FIXME FIXME FIXME alternative? or versioned? lsf structures
+
 struct parameterInfo // V.2
 {
     bool disableUAcctMap;
@@ -1262,8 +1264,53 @@ struct parameterInfo // V.2
     time_t mbatchdInterval;
     time_t sbatchdInterval;
     time_t preExecDelay;
+    // const char version[ ] = "4.0.1";
 } __attribute__((packed)) ;
 
+// else if LSF_VERSION_9_0_1
+
+// struct parameterInfo // V.2
+// {
+//     bool disableUAcctMap;
+//     bool scheRawLoad;
+//     bool slotResourceReserve;
+//     bool jobDepLastSub;
+//     time_t jobAcceptInterval;
+//     unsigned long maxDispRetries;
+//     unsigned long maxSbdRetries;
+//     unsigned long cleanPeriod;
+//     unsigned long maxNumJobs;
+//     unsigned long retryIntvl;
+//     unsigned long rusageUpdateRate;
+//     unsigned long rusageUpdatePercent;
+//     unsigned long condCheckTime;
+//     unsigned long maxSbdConnections;
+//     unsigned long maxSchedStay;
+//     unsigned long freshPeriod;
+//     unsigned long maxJobArraySize;
+//     unsigned long jobTerminateInterval;
+//     unsigned long maxUserPriority;
+//     unsigned long jobPriorityValue;
+//     unsigned long jobPriorityTime;
+//     unsigned long sharedResourceUpdFactor;
+//     unsigned long maxAcctArchiveNum;
+//     unsigned long acctArchiveInSize;
+//     unsigned long acctArchiveInDays;
+//     unsigned long jobRunTimes;
+//     unsigned long maxJobId;
+//     const char *defaultQueues;
+//     const char *defaultHostSpec;
+//     const char *defaultProject;
+//     const char *pjobSpoolDir;
+//     time_t pgSuspendIt;
+//     time_t mbatchdInterval;
+//     time_t sbatchdInterval;
+//     time_t preExecDelay;
+//     const char version[ ] = "9.0.1";
+//     struct tm acctArchiveTime;
+// } __attribute__((packed)) ;
+
+// #endif
 
 
 struct loadInfoEnt

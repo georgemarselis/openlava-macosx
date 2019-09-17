@@ -27,6 +27,15 @@ enum MAX_SELECTED {
 	MAX_SELECTED_LOADS = 4
 };
 
+enum MAX_ARCHIVE {
+	ACCT_CHECK            = 0,
+	MAX_ACCT_ARCHIVE_FILE = 1,
+	ACCT_ARCHIVE_SIZE     = 2,
+	ACCT_ARCHIVE_AGE      = 3,
+	ACCT_NONE_SET         = 4,
+	ACC_ALL_SET           = 5
+};
+
  struct inNames {
     char *name;      // FIXME FIXME FIXME learn how to init and set double indirection
     char *prf_level; // FIXME FIXME FIXME learn how to init and set double indirection
@@ -145,3 +154,4 @@ int parseDefAndMaxLimits(struct keymap *key, unsigned int *defaultVal, unsigned 
 bool parseQFirstHost(char *myWord, bool *haveFirst, const char *pname, size_t *lineNum, const char *filename, const char *section);
 bool chkFirstHost(const char *host, bool *needChk);
 void updateClusterConf(struct clusterConf *clusterConf);
+bool enableAccounting( enum MAX_ARCHIVE max_archive_var  );

@@ -28,7 +28,7 @@
 // #include "daemons/daemonout.h"
 #include "lib/common_structs.h"
 #include "lib/header.h"
-// #include "lsb/lsbatch.h"
+#include "lsb/lsbatch.h"
 
 int lsbSharedResConfigured_ = FALSE;
 
