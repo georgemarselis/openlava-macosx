@@ -530,10 +530,10 @@ ls_getmodelfactor( const char *modelname )
 struct hostInfo *
 expandSHinfo (struct hostInfoReply *hostInfoReply)
 {
-    unsigned long nHost  = 0;
-    struct hostInfo *hostInfoPtr = NULL;
-    unsigned long final_counter = 0;
-    struct shortLsInfo *lsInfoPtr = NULL;
+    unsigned long nHost            = 0;
+    unsigned long final_counter    = 0;
+    struct hostInfo    *hostInfoPtr  = NULL;
+    struct shortLsInfo *lsInfoPtr    = NULL;
 
     if (hostInfoPtr)
     {
@@ -554,8 +554,8 @@ expandSHinfo (struct hostInfoReply *hostInfoReply)
     nHost = hostInfoReply->nHost;
     lsInfoPtr = hostInfoReply->shortLsInfo;
 
-    for (unsigned long i = 0; i < hostInfoReply->nHost; i++)
-    {
+    for (unsigned long i = 0; i < hostInfoReply->nHost; i++) {
+
         unsigned int indx = 0;
         const char unknown[ ] = "unknown";
         strcpy (hostInfoPtr[i].hostName, hostInfoReply->hostMatrix[i].hostName);

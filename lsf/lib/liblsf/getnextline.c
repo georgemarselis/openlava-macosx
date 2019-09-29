@@ -16,7 +16,7 @@
 // }
 
 char *
-getNextLineD_ (FILE * fp, size_t *LineCount, int confFormat)
+getNextLineD_ (FILE * fp, size_t *lineCount, int confFormat)
 {
     int cin           = 0;
     int oneChar       = 0;
@@ -44,7 +44,7 @@ getNextLineD_ (FILE * fp, size_t *LineCount, int confFormat)
     while ((cin = getc (fp)) != EOF) {
 
         if (cin == '\n') {
-            *LineCount += 1;
+            *lineCount += 1;
             break;
         }
         
@@ -64,7 +64,7 @@ getNextLineD_ (FILE * fp, size_t *LineCount, int confFormat)
             while ((cin = getc (fp)) != EOF)  {
                 
                 if (cin == '\n') {
-                    *LineCount += 1;
+                    *lineCount += 1;
                     break;
                 }
             }
@@ -80,7 +80,7 @@ getNextLineD_ (FILE * fp, size_t *LineCount, int confFormat)
             }
 
             if (cin == '\n') {
-                *LineCount += 1;
+                *lineCount += 1;
             }
             else if (!isspace (cin))
             {
@@ -180,7 +180,7 @@ getNextLineC_ (FILE *fp, size_t *lineCount, int confFormat)
 // FIXME FIXME FIXME delete after cleanup 
 //
 // char *
-// getNextLineC_conf( const struct lsConf *conf, size_t *LineCount, int confFormat)
+// getNextLineC_conf( const struct lsConf *conf, size_t *lineCount, int confFormat)
 // {
 //     char *sp               = NULL;
 //     char *cp               = NULL;
@@ -201,7 +201,7 @@ getNextLineC_ (FILE *fp, size_t *lineCount, int confFormat)
 
 //     if (confFormat) {
 //         do {
-//             line = readNextLine (conf, LineCount);
+//             line = readNextLine (conf, lineCount);
 //             if (line == NULL) {
 //                 return NULL;
 //             }
@@ -311,7 +311,7 @@ getNextLineC_ (FILE *fp, size_t *lineCount, int confFormat)
 //     {
 //         do
 //         {
-//             line = readNextLine (conf, LineCount);
+//             line = readNextLine (conf, lineCount);
 //             if (line == NULL) {
 //                 return NULL;
 //             }
@@ -328,7 +328,7 @@ getNextLineC_ (FILE *fp, size_t *lineCount, int confFormat)
 
 
 char *
-getNextLineC_conf ( const struct lsConf *conf, size_t *LineCount, int confFormat)
+getNextLineC_conf ( const struct lsConf *conf, size_t *lineCount, int confFormat)
 {
     char *sp               = NULL;
     char *cp               = NULL;
@@ -350,7 +350,7 @@ getNextLineC_conf ( const struct lsConf *conf, size_t *LineCount, int confFormat
 
     if (confFormat) {
         do {
-            line = readNextLine (conf, LineCount);
+            line = readNextLine (conf, lineCount);
             if (line == NULL) {
                 return NULL;
             }
@@ -442,7 +442,7 @@ getNextLineC_conf ( const struct lsConf *conf, size_t *LineCount, int confFormat
     }
     else {
         do {
-            line = readNextLine (conf, LineCount);
+            line = readNextLine (conf, lineCount);
             if (line == NULL) {
                 return NULL;
             }

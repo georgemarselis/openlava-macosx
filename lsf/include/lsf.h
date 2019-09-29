@@ -472,7 +472,7 @@ struct lsInfo
     char paddin1[4];
     double cpuFactor[MAX_MODELS];               // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
     struct resItem **resTable;
-} __attribute__((packed));
+} __attribute__((aligned));
 
 //#define CLUST_STAT_OK             0x01
 //#define CLUST_STAT_UNAVAIL        0x02
@@ -523,7 +523,7 @@ struct hostInfo
     char **resources;
     // char hostName[MAXHOSTNAMELEN];
     char *hostName;
-} __attribute__((packed));
+} __attribute__((aligned));
 
     
 
@@ -553,14 +553,11 @@ struct hostEntry
 //      with time
 struct lsfRusage
 {
-    struct timeval ru_utime; /* user CPU time used */
-    struct timeval ru_stime; /* system CPU time used */
     // time_t ru_utime;
     // suseconds_t ru_stime;
-    char   padding[8];
-    long   ru_maxrss;
     time_t ru_ixrss;
-    double ru_ismrss;
+    time_t ru_exutime;
+    long   ru_maxrss;
     long   ru_idrss;
     long   ru_isrss;
     long   ru_minflt;
@@ -568,14 +565,18 @@ struct lsfRusage
     long   ru_nswap;
     long   ru_inblock;
     long   ru_oublock;
-    double ru_ioch;
     long   ru_msgsnd;
     long   ru_msgrcv;
     long   ru_nsignals;
     long   ru_nvcsw;
     long   ru_nivcsw;
-    time_t ru_exutime;
-} __attribute__((packed));
+    double ru_ismrss;
+    double ru_ioch;
+    struct timeval ru_utime; /* user CPU time used */
+    struct timeval ru_stime; /* system CPU time used */
+    // char   padding[4];
+    // } __attribute__((aligned));
+};
 
 struct lsfAcctRec
 {
@@ -780,6 +781,10 @@ struct hostEntryLog
     double *busyThreshold;
     char  **resList;
 };
+
+struct lsfConf {
+    unsigned long maxJobDispatchPerSession;
+} *lsfConf; 
 
 /*
  * openlava error numbers
@@ -1058,6 +1063,18 @@ int optind;
 char *optarg;
 int opterr;
 int optopt;
+#endif
+
+#ifdef HIGH_THROUPUT // FIXME FIXME FIXME FIXME FIXME set in configure.ac
+const bool highthroughput = true;
+#else
+const bool highthroughput = false;
+#endif
+
+#ifdef ENABLE_JOBARRAYS
+const bool jobArraysEnable = true;
+#else
+const bool jobArraysEnable = false;
 #endif
 
 unsigned int lserrno;

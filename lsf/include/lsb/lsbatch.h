@@ -1198,8 +1198,8 @@ struct hostInfoEnt
 //     int rusageUpdatePercent;
 //     int condCheckTime;
 //     int maxSbdConnections;
-//     int maxSchedStay;
-//     int freshPeriod;
+//     time_t maxSchedStay;
+//     time_t freshPeriod;
 //     int maxJobArraySize;
 //     int jobTerminateInterval;
 //     int maxUserPriority;
@@ -1236,15 +1236,12 @@ struct parameterInfo // V.2
     time_t jobAcceptInterval;
     unsigned long maxDispRetries;
     unsigned long maxSbdRetries;
-    unsigned long cleanPeriod;
     unsigned long maxNumJobs;
     unsigned long retryIntvl;
     unsigned long rusageUpdateRate;
     unsigned long rusageUpdatePercent;
     unsigned long condCheckTime;
     unsigned long maxSbdConnections;
-    unsigned long maxSchedStay;
-    unsigned long freshPeriod;
     unsigned long maxJobArraySize;
     unsigned long jobTerminateInterval;
     unsigned long maxUserPriority;
@@ -1260,10 +1257,13 @@ struct parameterInfo // V.2
     const char *defaultHostSpec;
     const char *defaultProject;
     const char *pjobSpoolDir;
+    time_t freshPeriod;
+    time_t maxSchedStay;
     time_t pgSuspendIt;
     time_t mbatchdInterval;
     time_t sbatchdInterval;
     time_t preExecDelay;
+    time_t cleanPeriod;
     // const char version[ ] = "4.0.1";
 } __attribute__((packed)) ;
 
@@ -1286,7 +1286,6 @@ struct parameterInfo // V.2
 //     unsigned long condCheckTime;
 //     unsigned long maxSbdConnections;
 //     unsigned long maxSchedStay;
-//     unsigned long freshPeriod;
 //     unsigned long maxJobArraySize;
 //     unsigned long jobTerminateInterval;
 //     unsigned long maxUserPriority;
@@ -1306,6 +1305,7 @@ struct parameterInfo // V.2
 //     time_t mbatchdInterval;
 //     time_t sbatchdInterval;
 //     time_t preExecDelay;
+//     time_t freshPeriod;
 //     const char version[ ] = "9.0.1";
 //     struct tm acctArchiveTime;
 // } __attribute__((packed)) ;
@@ -1504,11 +1504,11 @@ struct jobStatusLog
     int exitStatus;
     int idx;
     float cpuTime;
-    const char padding[8];
+    // const char padding[8];
     time_t endTime;
     unsigned long jobId;
     struct lsfRusage lsfRusage;
-};
+} ;
 
 
 struct sbdJobStatusLog
