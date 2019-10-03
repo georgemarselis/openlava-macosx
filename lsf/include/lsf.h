@@ -53,6 +53,7 @@
 #include <termios.h>
 #include <time.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 #if !defined(__CYGWIN__)
 #include <rpcsvc/ypclnt.h>
@@ -1066,7 +1067,7 @@ int optopt;
 #endif
 
 #ifdef HIGH_THROUPUT // FIXME FIXME FIXME FIXME FIXME set in configure.ac
-const bool highthroughput = true;
+const boolen highthroughput = true;
 #else
 const bool highthroughput = false;
 #endif

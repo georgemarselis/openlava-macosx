@@ -16,6 +16,14 @@
  *
  */
 
+
+//**************************************************************************************
+// DOCUMENTATION HERE:
+//
+//      https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_welcome.html
+//
+//**************************************************************************************
+
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
@@ -489,7 +497,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNumber) // this
         MAX_JOB_ARRAY_SIZE               = 19,
         DISABLE_UACCT_MAP                = 20,
         JOB_TERMINATE_INTERVAL           = 21,
-        JOB_RUN_TIMES                    = 22,
+        JOB_RUN_TIME                     = 22,
         JOB_DEP_LAST_SUB                 = 23,
         JOB_SPOOL_DIR                    = 24,
         MAX_USER_PRIORITY                = 25,
@@ -505,7 +513,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNumber) // this
 
         // compatibility to 9.1.2
         //
-        // ABS_RUNLIMIT,
+        ABS_RUNLIMIT,
         ACCT_ARCHIVE_AGE,
         ACCT_ARCHIVE_SIZE,
         ACCT_ARCHIVE_TIME,
@@ -683,7 +691,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNumber) // this
         "MAX_JOB_ARRAY_SIZE",               // 19
         "DISABLE_UACCT_MAP",                // 20
         "JOB_TERMINATE_INTERVAL",           // 21
-        "JOB_RUN_TIMES",                    // 22
+        "JOB_RUN_TIME",                     // 22
         "JOB_DEP_LAST_SUB",                 // 23
         "JOB_SPOOL_DIR",                    // 24
         "MAX_USER_PRIORITY",                // 25
@@ -697,8 +705,8 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNumber) // this
         "ACCT_ARCHIVE_SIZE",                // 33
         "ACCT_ARCHIVE_AGE",                 // 34
         "ACCT_ARCHIVE_TIME",
-/*******************************************************
-    Future combatibility to 9.1.2
+///******************************************************
+//    Future combatibility to 9.1.2
         "ABS_RUNLIMIT",
         "ACCT_ARCHIVE_AGE",
         "ACCT_ARCHIVE_SIZE",
@@ -851,9 +859,8 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNumber) // this
         "SUB_TRY_INTERVAL",
         "SYSTEM_MAPPING_ACCOUNT",
         "USE_SUSP_SLOTS",
-************************************************************************************************************
-*/
-        NULL
+// ************************************************************************************************************
+         NULL
     };
 
     struct keymap lsb_params[ ] = { // 36
@@ -881,19 +888,19 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNumber) // this
         { MAX_JOB_ARRAY_SIZE,            "    ", keylist[MAX_JOB_ARRAY_SIZE],            NULL },
         { DISABLE_UACCT_MAP,             "    ", keylist[DISABLE_UACCT_MAP],             NULL },
         { JOB_TERMINATE_INTERVAL,        "    ", keylist[JOB_TERMINATE_INTERVAL],        NULL },
-        { JOB_RUN_TIMES,                 "    ", keylist[JOB_RUN_TIMES],                 NULL },
+        { JOB_RUN_TIME,                 "    ",  keylist[JOB_RUN_TIME],                  NULL },
         { JOB_DEP_LAST_SUB,              "    ", keylist[JOB_DEP_LAST_SUB],              NULL },
         { JOB_SPOOL_DIR,                 "    ", keylist[JOB_SPOOL_DIR],                 NULL },
         { MAX_USER_PRIORITY,             "    ", keylist[MAX_USER_PRIORITY],             NULL },
         { JOB_PRIORITY_OVER_TIME,        "    ", keylist[JOB_PRIORITY_OVER_TIME],        NULL },
-        // { SHARED_RESOURCE_UPDATE_FACTOR, "    ", keylist[SHARED_RESOURCE_UPDATE_FACTOR], NULL },
-        // { SCHE_RAW_LOAD,                 "    ", keylist[SCHE_RAW_LOAD],                 NULL },
+        { SHARED_RESOURCE_UPDATE_FACTOR, "    ", keylist[SHARED_RESOURCE_UPDATE_FACTOR], NULL },
+        { SCHE_RAW_LOAD,                 "    ", keylist[SCHE_RAW_LOAD],                 NULL },
         { PRE_EXEC_DELAY,                "    ", keylist[PRE_EXEC_DELAY],                NULL },
-        // { SLOT_RESOURCE_RESERVE,         "    ", keylist[SLOT_RESOURCE_RESERVE],         NULL },
+        { SLOT_RESOURCE_RESERVE,         "    ", keylist[SLOT_RESOURCE_RESERVE],         NULL },
         { MAX_JOBID,                     "    ", keylist[MAX_JOBID],                     NULL },
-        // { MAX_ACCT_ARCHIVE_FILE,         "    ", keylist[MAX_ACCT_ARCHIVE_FILE],         NULL },
-        // { ACCT_ARCHIVE_SIZE,             "    ", keylist[ACCT_ARCHIVE_SIZE],             NULL },
-        // { ACCT_ARCHIVE_AGE,              "    ", keylist[ACCT_ARCHIVE_AGE],              NULL },
+        { MAX_ACCT_ARCHIVE_FILE,         "    ", keylist[MAX_ACCT_ARCHIVE_FILE],         NULL },
+        { ACCT_ARCHIVE_SIZE,             "    ", keylist[ACCT_ARCHIVE_SIZE],             NULL },
+        { ACCT_ARCHIVE_AGE,              "    ", keylist[ACCT_ARCHIVE_AGE],              NULL },
         { UINT_MAX,                      "    ", NULL,                                   NULL }
     };
 
@@ -986,7 +993,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNumber) // this
 
             if( strlen( lsb_params[i].value ) > MAX_QUEUE_STRING_LENGTH ) { // Smash Capitalism, not the stack.
                 /* catget 5071 */ // FIXME FIXME FIXME FIXME FIXME get new catgets number
-                ls_syslog (LOG_ERR, "catgets 5071: %s: File %s, line number %lu: Parameter %s has value %s with string length of %lu, which is greater than the current limit of %lu. Please trim and rerun", __func__, filename, lineNumber, lsb_params[i].key, lsb_params[i].value, strlen( lsb_params[i].value ), MAX_QUEUE_STRING_LENGTH );
+                ls_syslog (LOG_ERR, "catgets 5071: %s: File %s, line number %lu: Parameter %s has value %s with string length of %lu, which is greater than the current limit of %lu. Please trim value in conf", __func__, filename, lineNumber, lsb_params[i].key, lsb_params[i].value, strlen( lsb_params[i].value ), MAX_QUEUE_STRING_LENGTH );
                 return false;
             }
 
@@ -2382,21 +2389,165 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNumber) // this
             }
 
             pConf->maxJobArraySize = maxJobArraySize;            
-
         }
         else if( strncmp( lsb_params[i].key, keylist[JOB_TERMINATE_INTERVAL], strlen( keylist[JOB_TERMINATE_INTERVAL] ) ) ) { // i == 21
+            // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_config_ref/lsb.params.job_terminate_interval.5.html
+            //
+            // lsf_version: all
+            //
+            // Syntax: JOB_TERMINATE_INTERVAL=seconds
+            //
+            // Description: UNIX only. Specifies the time interval in seconds between sending SIGINT, SIGTERM, and SIGKILL when terminating a job. When a job is terminated, the job is sent SIGINT, SIGTERM, and SIGKILL in sequence with a sleep time of JOB_TERMINATE_INTERVAL between sending the signals. This allows the job to clean up if necessary.
+            //
+            // Default: 10 seconds
+            //
+            // Example: N/A
+            time_t jobTerminateInterval        =  0;
+            time_t jobTerminateIntervalDefault = 10;
+            unsigned long value                =  0;
+
+            if( NULL == lsb_params[i].value ) { 
+                /* catget 5071 */ // FIXME FIXME FIXME FIXME FIXME get new catgets
+                ls_syslog (LOG_ERR, "catgets 5071: %s: File %s at line %lu: %s has no value, set to default value instead: %lu", __func__, filename, lineNumber, lsb_params[i].key, jobTerminateIntervalDefault );
+                jobTerminateInterval = jobTerminateIntervalDefault;
+            }
+            else {
+                value = strtoul( lsb_params[i].value, NULL, 10 );
+
+                if ( value == ULONG_MAX && errno ==  ERANGE ) {
+                    /* catgets 5067 */ // FIXME FIXME FIXME FIXME FIXME get new catgets
+                    ls_syslog (LOG_ERR, "catgets 5067: %s: File %s at line %lu: Value <%s> of %s is not a non-negative integer; ignored, set to default: %lu", __func__, filename, lineNumber, lsb_params[i].value, lsb_params[i].key, jobTerminateIntervalDefault);
+                    lsberrno = LSBE_CONF_WARNING;
+                    jobTerminateInterval = jobTerminateIntervalDefault;
+                }
+                else {
+                    assert( value <= INT_MAX );
+                    jobTerminateInterval = (time_t) value;
+                    /* catgets 5067 */ // FIXME FIXME FIXME FIXME FIXME get new catgets
+                    ls_syslog (LOG_ERR, "catgets 5071: %s: File %s at line %lu: %s: setting value to %lu, with default %lu seconds", __func__, filename, lineNumber, lsb_params[i].key, value, jobTerminateIntervalDefault );
+                }
+            }
+
             pConf->jobTerminateInterval = jobTerminateInterval;
         }
-        else if( strncmp( lsb_params[i].key, keylist[JOB_RUN_TIMES], strlen( keylist[JOB_RUN_TIMES] ) ) ) { // i == 22
-            pConf->jobRunTimes =  jobRunTimes;
+        else if( strncmp( lsb_params[i].key, keylist[JOB_RUN_TIME], strlen( keylist[JOB_RUN_TIME] ) ) ) { // i == 22
+#ifdef JOB_RUN_TIME // FIXME FIXME FIXME FIXME add option to configure.ac
+            // https://www.ibm.com/support/knowledgecenter/en/SS8U32_9.1.4/admin/rpttable.html
+            //
+            // JOB_RUN_TIME NUMBER(19,4)        Calculated run time for the job. The result is in seconds.
+            //
+            // This seems to be an analytics option, disabling until more information is found.
+            time_t jobRunTime        =  0;
+            time_t jobRunTimeDefault = 10;
+            unsigned long value      =  0;
+
+            if( NULL == lsb_params[i].value ) { 
+                /* catget 5071 */ // FIXME FIXME FIXME FIXME FIXME get new catgets
+                ls_syslog (LOG_ERR, "catgets 5071: %s: File %s at line %lu: %s has no value, set to default value instead: %lu", __func__, filename, lineNumber, lsb_params[i].key, jobRunTimeDefault );
+                jobRunTime = jobRunTimeDefault;
+            }
+            else {
+                value = strtoul( lsb_params[i].value, NULL, 10 );
+
+                if ( value == ULONG_MAX && errno ==  ERANGE ) {
+                    /* catgets 5067 */ // FIXME FIXME FIXME FIXME FIXME get new catgets
+                    ls_syslog (LOG_ERR, "catgets 5067: %s: File %s at line %lu: Value <%s> of %s is not a non-negative integer; ignored, set to default: %lu", __func__, filename, lineNumber, lsb_params[i].value, lsb_params[i].key, jobRunTimeDefault);
+                    lsberrno = LSBE_CONF_WARNING;
+                    jobRunTime = jobRunTimeDefault;
+                }
+                else {
+                    assert( value <= INT_MAX );
+                    jobTerminateInterval = (time_t) value;
+                    /* catgets 5067 */ // FIXME FIXME FIXME FIXME FIXME get new catgets
+                    ls_syslog (LOG_ERR, "catgets 5071: %s: File %s at line %lu: %s: setting value to %lu, with default %lu seconds", __func__, filename, lineNumber, lsb_params[i].key, value, jobRunTimeDefault );
+                }
+            }
+
+            pConf->jobRunTime =  jobRunTime;
+#else
+            /* catgets 5195 */ // FIXME FIXME FIXME FIXME FIXME get new catgets
+            ls_syslog (LOG_ERR, "catgets 5195: %s: %s at line %lu: %s option is no longer supported, ignoring; please use upgrade tool to migrate", __func__, filename, lineNumber, lsb_params[i].key );
+#endif
         }
         else if( strncmp( lsb_params[i].key, keylist[JOB_DEP_LAST_SUB], strlen( keylist[JOB_DEP_LAST_SUB] ) ) ) { // i == 23
+            // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_config_ref/lsb.params.job_dep_last_sub.5.html
+            //
+            // lsf_version: all
+            //
+            // Syntax: JOB_DEP_LAST_SUB=bool
+            //
+            // Description: Used only with job dependency scheduling. If set to 1, whenever dependency conditions use a job name that belongs to multiple jobs, LSF evaluates only the most recently submitted job. Otherwise, all the jobs with the specified name must satisfy the dependency condition. Running jobs are not affected when JOB_DEP_LAST_SUB is changed. To reevaluate job dependencies after changing JOB_DEP_LAST_SUB, run badmin mbdrestart.
+            //
+            // Default: 1/true
+            //
+            // Example: N/A
+            bool jobDepLastSub          = false;
+            bool jobDepLastSubDefault   = true;
+            unsigned long value         = 0;
+            const char true_string[ ]   = "true";
+            const char false_string[ ]  = "false";
+
+            if( NULL == lsb_params[i].value ) { 
+                /* catget 5071 */ // FIXME FIXME FIXME FIXME FIXME get new catgets
+                ls_syslog (LOG_ERR, "catgets 5071: %s: File %s at line %lu: %s has no value, set to default value instead: %s", __func__, filename, lineNumber, lsb_params[i].key, false_string );
+                jobDepLastSub = jobDepLastSubDefault;
+            }
+            else {
+
+                value = strtoul( lsb_params[i].value, NULL, 10 );
+                if ( value == ULONG_MAX && errno ==  ERANGE ) {
+
+                    char jobDepLastSubDefaultString[ 10 ];
+                    memset( jobDepLastSubDefaultString, '\0', strlen( jobDepLastSubDefaultString ) );
+
+                    strncpy( jobDepLastSubDefaultString , jobDepLastSubDefault ? true_string : false_string , strlen( jobDepLastSubDefault ? true_string : false_string ) );
+
+                    /* catgets 5067 */ // FIXME FIXME FIXME FIXME FIXME get new catgets
+                    ls_syslog (LOG_ERR, "catgets 5067: %s: File %s at line %lu: %s does not take the values 0/1 or true false; value supplied is ignored, set to default: %s", __func__, filename, lineNumber, lsb_params[i].value, lsb_params[i].key, jobDepLastSubDefaultString );
+                    lsberrno = LSBE_CONF_WARNING;
+                    jobDepLastSub = jobDepLastSubDefault;
+                }
+                else if( 0 == value ) { // set to 0
+                    /* catgets 5067 */ // FIXME FIXME FIXME FIXME FIXME get new catgets
+                    ls_syslog (LOG_ERR, "catgets 5067: %s: File %s at line %lu: %s has value 0, setting value to %s", __func__, filename, lineNumber, lsb_params[i].value, lsb_params[i].key, false_string );
+                    jobDepLastSub = false;
+                }
+                else if( 1 == value ) { // set to 1
+                    /* catgets 5067 */ // FIXME FIXME FIXME FIXME FIXME get new catgets
+                    ls_syslog (LOG_ERR, "catgets 5067: %s: File %s at line %lu: %s has value 1, setting value to %s", __func__, filename, lineNumber, lsb_params[i].value, lsb_params[i].key, true_string );
+                    jobDepLastSub = true;
+                }
+                else if( strncmp( lsb_params[i].value, false_string, strlen(false_string ) ) ) { // set to "false"
+                    /* catgets 5067 */ // FIXME FIXME FIXME FIXME FIXME get new catgets
+                    ls_syslog (LOG_ERR, "catgets 5067: %s: File %s at line %lu: %s has value \"false\", setting value to %s", __func__, filename, lineNumber, lsb_params[i].value, lsb_params[i].key, false_string );
+                    jobDepLastSub = false;
+                }
+                else if( strncmp( lsb_params[i].value, true_string, strlen(true_string ) ) ) { // set to "true"
+                    /* catgets 5067 */ // FIXME FIXME FIXME FIXME FIXME get new catgets
+                    ls_syslog (LOG_ERR, "catgets 5067: %s: File %s at line %lu: %s has value \"true\", setting value to %s", __func__, filename, lineNumber, lsb_params[i].value, lsb_params[i].key, true_string );
+                    jobDepLastSub = true;
+                }
+                else { // no map for these territories
+
+                    char jobDepLastSubDefaultString[ 10 ];
+                    memset( jobDepLastSubDefaultString, '\0', strlen( jobDepLastSubDefaultString ) );
+
+                    strncpy( jobDepLastSubDefaultString , jobDepLastSubDefault ? true_string : false_string , strlen( jobDepLastSubDefault ? true_string : false_string ) );
+                    /* catgets 5067 */ // FIXME FIXME FIXME FIXME FIXME get new catgets
+                    ls_syslog (LOG_ERR, "catgets 5067: %s: File %s at line %lu: %s does not take the values 0/1 or true false; value supplied is ignored, set to default: %s", __func__, filename, lineNumber, lsb_params[i].value, lsb_params[i].key, jobDepLastSubDefaultString );
+                    lsberrno = LSBE_CONF_WARNING;
+                    jobDepLastSub = jobDepLastSubDefault;
+                }
+            }
+
             pConf->jobDepLastSub = jobDepLastSub;
         }
 
         else if( strncmp( lsb_params[i].key, keylist[MAX_USER_PRIORITY], strlen( keylist[MAX_USER_PRIORITY] ) ) ) { // i == 25
         // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_config_ref/lsb.params.max_user_priority.5.html
         // 
+        // lsf_versions: all
+        //
         // MAX_USER_PRIORITY=integer
         //
         // Description: Enables user-assigned job priority and specifies the maximum job priority a user can assign to a job. LSF and queue administrators can assign a job priority higher than the specified value for jobs they own.
@@ -2407,484 +2558,546 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNumber) // this
         //
         // Specifies that 100 is the maximum job priority that can be specified by a user.
 
-            unsigned long maxUserPriority = 100; // not default, but example sets a resonable value
- 
-            if( lsb_params[i].value == NULL ) {
-                /* catgets 5452 */
-                ls_syslog (LOG_ERR, "catgets 5452: %s: File %s at line %lu: Option <%s> is not defined. Setting to reasonable default of %lu;", __func__, filename, lineNumber, lsb_params[i].key, maxUserPriority );
-                pConf->maxUserPriority = maxUserPriority;
-                continue;
+            unsigned long maxUserPriority        =   0;
+            unsigned long maxUserPriorityDefault = 100; // not default, but example sets a reasonable value
+            unsigned long value                  =   0;
+
+            if( NULL == lsb_params[i].value ) {
+                /* catget 5071 */ // FIXME FIXME FIXME FIXME FIXME get new catgets
+                ls_syslog (LOG_ERR, "catgets 5071: %s: File %s at line %lu: %s has no value, set to default value instead: %lu", __func__, filename, lineNumber, lsb_params[i].key, maxUserPriorityDefault );
+                maxUserPriority = maxUserPriorityDefault;
             }
             else {
-                maxUserPriority = strtoul( lsb_params[i].value, NULL, 10 );
-                if( maxUserPriority == ULONG_MAX  && errno ==  ERANGE ) {
-                    /* catgets 5073 */ // FIXME FISXME FIXME FIXME FIXME
-                    ls_syslog (LOG_ERR, "catgets 5073: %s: File %s at line %lu: Value of %s overflowed, setting to reasonable default of %lu", __func__, filename, lineNumber, lsb_params[i].key ); // FIXME FIXME FIXME FIXME implement parameters
+                value = strtoul( lsb_params[i].value, NULL, 10 );
+
+                if ( value == ULONG_MAX && errno ==  ERANGE ) {
+                    /* catgets 5067 */
+                    ls_syslog (LOG_ERR, "catgets 5067: %s: File %s at line %lu: Value <%s> of %s is not a non-negative integer; ignored, set to default: %lu", __func__, filename, lineNumber, lsb_params[i].value, lsb_params[i].key, maxUserPriorityDefault);
                     lsberrno = LSBE_CONF_WARNING;
+                    maxUserPriority = maxUserPriorityDefault;
                 }
-                pConf->maxUserPriority = maxUserPriority;
+                else {
+                    ls_syslog (LOG_ERR, "catgets 5071: %s: File %s at line %lu: %s: setting value to %lu, with default %lu", __func__, filename, lineNumber, lsb_params[i].key, value, maxUserPriorityDefault );
+                    maxUserPriority = value;
+                }
             }
+            pConf->maxUserPriority = maxUserPriority;
         }
         else if( strncmp( lsb_params[i].key, keylist[PRE_EXEC_DELAY], strlen( keylist[PRE_EXEC_DELAY] ) ) ) { // i == 29
-            pConf->preExecDelay = value;
+#ifdef PRE_EXEC_DELAY // FIXME FIXME FIXME FIXME FIXME 
+            // https://www.ibm.com/support/pages/preexec-%E3%81%8C%E7%95%B0%E5%B8%B8%E7%B5%82%E4%BA%86%E5%BE%8C%E3%80%81%E5%86%8D%E5%BA%A6%E3%83%87%E3%82%A3%E3%82%B9%E3%83%91%E3%83%83%E3%83%81%E3%81%95%E3%82%8C%E3%82%8B%E3%81%BE%E3%81%A7%E3%81%AE%E9%96%93%E9%9A%94
+            //
+            // page in Chinese, looks like a bug report. Putting this on conditionals till I find more info.
+            //
+            // https://www.bsc.es/support/LSF/9.1.2/api_ref/group__gpd__control__flag.html#g374810053d9f77b5410db89365f9d3da
+            // says:
+            // int parameterInfo::preExecDelay [inherited]
+            //          Dispatch delay internal.
+            // setting up a time_t demplate
+            time_t preExecDelay        =  0;
+            time_t preExecDelayDefault = 10;
+            unsigned long value        =  0;
+
+            if( NULL == lsb_params[i].value ) { 
+                /* catget 5071 */ // FIXME FIXME FIXME FIXME FIXME get new catgets
+                ls_syslog (LOG_ERR, "catgets 5071: %s: File %s at line %lu: %s has no value, set to default value instead: %lu", __func__, filename, lineNumber, lsb_params[i].key, preExecDelayDefault );
+                preExecDelay = preExecDelayDefault;
+            }
+            else {
+                value = strtoul( lsb_params[i].value, NULL, 10 );
+
+                if ( value == ULONG_MAX && errno ==  ERANGE ) {
+                    /* catgets 5067 */ // FIXME FIXME FIXME FIXME FIXME get new catgets
+                    ls_syslog (LOG_ERR, "catgets 5067: %s: File %s at line %lu: Value <%s> of %s is not a non-negative integer; ignored, set to default: %lu", __func__, filename, lineNumber, lsb_params[i].value, lsb_params[i].key, preExecDelayDefault);
+                    lsberrno = LSBE_CONF_WARNING;
+                    preExecDelay = preExecDelayDefault;
+                }
+                else {
+                    assert( value <= INT_MAX );
+                    jobTerminateInterval = (time_t) value;
+                    /* catgets 5067 */ // FIXME FIXME FIXME FIXME FIXME get new catgets
+                    ls_syslog (LOG_ERR, "catgets 5071: %s: File %s at line %lu: %s: setting value to %lu, with default %lu seconds", __func__, filename, lineNumber, lsb_params[i].key, value, preExecDelayDefault );
+                }
+            }
+
+            pConf->preExecDelay = preExecDelay;
+#else
+            /* catgets 5195 */ // FIXME FIXME FIXME FIXME FIXME get new catgets
+            ls_syslog (LOG_ERR, "catgets 5195: %s: %s at line %lu: %s option is no longer supported, ignoring; please use upgrade tool to migrate", __func__, filename, lineNumber, lsb_params[i].key );
+#endif
         }
-/****************************************************************************************************************************************************************888
+/****************************************************************************************************************************************************************
  * future expansion, compatibility with lsf 9.1.2 
  *
-        else if { strncmp( lsb_params[i].key, keylist[ABS_RUNLIMIT], strlen( keylist[ABS_RUNLIMIT] ) ) ) { 
-            pConf->ABS_RUNLIMIT = value
+        else if ( strncmp( lsb_params[i].key, keylist[ABS_RUNLIMIT], strlen( keylist[ABS_RUNLIMIT] ) ) ) { 
+            // https://www.ibm.com/support/knowledgecenter/en/SSETD4_9.1.2/lsf_config_ref/lsb.params.abs_runlimit.5.html
+            //
+            // lsf_versions: all
+            // 
+            // ABS_RUNLIMIT=y | Y
+            // 
+            // Description: If set, absolute (wall-clock) run time is used instead of normalized run time for all jobs submitted with the following values: 
+            //  * Run time limit or run time estimate specified by the -W or -We option of bsub
+            //  * RUNLIMIT queue-level parameter in lsb.queues
+            //  * RUNLIMIT application-level parameter in lsb.applications
+            //  * RUNTIME parameter in lsb.applications
+            //  * The run time estimates and limits are not normalized by the host CPU factor.
+            //
+            // Default: Set to Y at time of installation. If otherwise undefined, then N.
+
+            pConf->absoluteRunLimit = absoluteRunLimit;
         }
-        else if { strncmp( lsb_params[i].key, keylist[ACCT_ARCHIVE_AGE], strlen( keylist[ACCT_ARCHIVE_AGE] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[ACCT_ARCHIVE_AGE], strlen( keylist[ACCT_ARCHIVE_AGE] ) ) ) { 
             pConf->ACCT_ARCHIVE_AGE = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[ACCT_ARCHIVE_SIZE], strlen( keylist[ACCT_ARCHIVE_SIZE] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[ACCT_ARCHIVE_SIZE], strlen( keylist[ACCT_ARCHIVE_SIZE] ) ) ) { 
             pConf->ACCT_ARCHIVE_SIZE = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[ACCT_ARCHIVE_TIME], strlen( keylist[ACCT_ARCHIVE_TIME] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[ACCT_ARCHIVE_TIME], strlen( keylist[ACCT_ARCHIVE_TIME] ) ) ) { 
             pConf->ACCT_ARCHIVE_TIME = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[ADVRSV_USER_LIMIT], strlen( keylist[ADVRSV_USER_LIMIT] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[ADVRSV_USER_LIMIT], strlen( keylist[ADVRSV_USER_LIMIT] ) ) ) { 
             pConf->ADVRSV_USER_LIMIT = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[BJOBS_RES_REQ_DISPLAY], strlen( keylist[BJOBS_RES_REQ_DISPLAY] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[BJOBS_RES_REQ_DISPLAY], strlen( keylist[BJOBS_RES_REQ_DISPLAY] ) ) ) { 
             pConf->BJOBS_RES_REQ_DISPLAY = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[BSWITCH_MODIFY_RUSAGE], strlen( keylist[BSWITCH_MODIFY_RUSAGE] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[BSWITCH_MODIFY_RUSAGE], strlen( keylist[BSWITCH_MODIFY_RUSAGE] ) ) ) { 
             pConf->BSWITCH_MODIFY_RUSAGE = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[CHUNK_JOB_DURATION], strlen( keylist[CHUNK_JOB_DURATION] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[CHUNK_JOB_DURATION], strlen( keylist[CHUNK_JOB_DURATION] ) ) ) { 
             pConf->CHUNK_JOB_DURATION = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[CLEAN_PERIOD], strlen( keylist[CLEAN_PERIOD] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[CLEAN_PERIOD], strlen( keylist[CLEAN_PERIOD] ) ) ) { 
             pConf->CLEAN_PERIOD = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[CLEAN_PERIOD_DONE], strlen( keylist[CLEAN_PERIOD_DONE] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[CLEAN_PERIOD_DONE], strlen( keylist[CLEAN_PERIOD_DONE] ) ) ) { 
             pConf->CLEAN_PERIOD_DONE = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[COMMITTED_RUN_TIME_FACTOR], strlen( keylist[COMMITTED_RUN_TIME_FACTOR] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[COMMITTED_RUN_TIME_FACTOR], strlen( keylist[COMMITTED_RUN_TIME_FACTOR] ) ) ) { 
             pConf->COMMITTED_RUN_TIME_FACTOR = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[COMPUTE_UNIT_TYPES], strlen( keylist[COMPUTE_UNIT_TYPES] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[COMPUTE_UNIT_TYPES], strlen( keylist[COMPUTE_UNIT_TYPES] ) ) ) { 
             pConf->COMPUTE_UNIT_TYPES = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[CONDENSE_PENDING_REASONS], strlen( keylist[CONDENSE_PENDING_REASONS] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[CONDENSE_PENDING_REASONS], strlen( keylist[CONDENSE_PENDING_REASONS] ) ) ) { 
             pConf->CONDENSE_PENDING_REASONS = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[CPU_TIME_FACTOR], strlen( keylist[CPU_TIME_FACTOR] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[CPU_TIME_FACTOR], strlen( keylist[CPU_TIME_FACTOR] ) ) ) { 
             pConf->CPU_TIME_FACTOR = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[DEFAULT_APPLICATION], strlen( keylist[DEFAULT_APPLICATION] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[DEFAULT_APPLICATION], strlen( keylist[DEFAULT_APPLICATION] ) ) ) { 
             pConf->DEFAULT_APPLICATION = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[DEFAULT_HOST_SPEC], strlen( keylist[DEFAULT_HOST_SPEC] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[DEFAULT_HOST_SPEC], strlen( keylist[DEFAULT_HOST_SPEC] ) ) ) { 
             pConf->DEFAULT_HOST_SPEC = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[DEFAULT_JOB_CWD], strlen( keylist[DEFAULT_JOB_CWD] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[DEFAULT_JOB_CWD], strlen( keylist[DEFAULT_JOB_CWD] ) ) ) { 
             pConf->DEFAULT_JOB_CWD = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[DEFAULT_JOB_OUTDIR], strlen( keylist[DEFAULT_JOB_OUTDIR] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[DEFAULT_JOB_OUTDIR], strlen( keylist[DEFAULT_JOB_OUTDIR] ) ) ) { 
             pConf->DEFAULT_JOB_OUTDIR = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[DEFAULT_JOBGROUP], strlen( keylist[DEFAULT_JOBGROUP] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[DEFAULT_JOBGROUP], strlen( keylist[DEFAULT_JOBGROUP] ) ) ) { 
             pConf->DEFAULT_JOBGROUP = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[DEFAULT_PROJECT], strlen( keylist[DEFAULT_PROJECT] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[DEFAULT_PROJECT], strlen( keylist[DEFAULT_PROJECT] ) ) ) { 
             pConf->DEFAULT_PROJECT = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[DEFAULT_QUEUE], strlen( keylist[DEFAULT_QUEUE] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[DEFAULT_QUEUE], strlen( keylist[DEFAULT_QUEUE] ) ) ) { 
             pConf->DEFAULT_QUEUE = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[DEFAULT_RESREQ_ORDER], strlen( keylist[DEFAULT_RESREQ_ORDER] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[DEFAULT_RESREQ_ORDER], strlen( keylist[DEFAULT_RESREQ_ORDER] ) ) ) { 
             pConf->DEFAULT_RESREQ_ORDER = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[DEFAULT_SLA_VELOCITY], strlen( keylist[DEFAULT_SLA_VELOCITY] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[DEFAULT_SLA_VELOCITY], strlen( keylist[DEFAULT_SLA_VELOCITY] ) ) ) { 
             pConf->DEFAULT_SLA_VELOCITY = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[DEFAULT_USER_GROUP], strlen( keylist[DEFAULT_USER_GROUP] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[DEFAULT_USER_GROUP], strlen( keylist[DEFAULT_USER_GROUP] ) ) ) { 
             pConf->DEFAULT_USER_GROUP = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[DETECT_IDLE_JOB_AFTER], strlen( keylist[DETECT_IDLE_JOB_AFTER] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[DETECT_IDLE_JOB_AFTER], strlen( keylist[DETECT_IDLE_JOB_AFTER] ) ) ) { 
             pConf->DETECT_IDLE_JOB_AFTER = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[DIAGNOSE_LOGDIR], strlen( keylist[DIAGNOSE_LOGDIR] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[DIAGNOSE_LOGDIR], strlen( keylist[DIAGNOSE_LOGDIR] ) ) ) { 
             pConf->DIAGNOSE_LOGDIR = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[DISABLE_UACCT_MAP], strlen( keylist[DISABLE_UACCT_MAP] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[DISABLE_UACCT_MAP], strlen( keylist[DISABLE_UACCT_MAP] ) ) ) { 
             pConf->DISABLE_UACCT_MAP = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[EADMIN_TRIGGER_DURATION], strlen( keylist[EADMIN_TRIGGER_DURATION] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[EADMIN_TRIGGER_DURATION], strlen( keylist[EADMIN_TRIGGER_DURATION] ) ) ) { 
             pConf->EADMIN_TRIGGER_DURATION = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[EGO_SLOTBASED_VELOCITY_SLA], strlen( keylist[EGO_SLOTBASED_VELOCITY_SLA] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[EGO_SLOTBASED_VELOCITY_SLA], strlen( keylist[EGO_SLOTBASED_VELOCITY_SLA] ) ) ) { 
             pConf->EGO_SLOTBASED_VELOCITY_SLA = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[ENABLE_DEFAULT_EGO_SLA], strlen( keylist[ENABLE_DEFAULT_EGO_SLA] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[ENABLE_DEFAULT_EGO_SLA], strlen( keylist[ENABLE_DEFAULT_EGO_SLA] ) ) ) { 
             pConf->ENABLE_DEFAULT_EGO_SLA = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[ENABLE_DIAGNOSE], strlen( keylist[ENABLE_DIAGNOSE] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[ENABLE_DIAGNOSE], strlen( keylist[ENABLE_DIAGNOSE] ) ) ) { 
             pConf->ENABLE_DIAGNOSE = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[ENABLE_EVENT_STREAM], strlen( keylist[ENABLE_EVENT_STREAM] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[ENABLE_EVENT_STREAM], strlen( keylist[ENABLE_EVENT_STREAM] ) ) ) { 
             pConf->ENABLE_EVENT_STREAM = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[ENABLE_EXIT_RATE_PER_SLOT], strlen( keylist[ENABLE_EXIT_RATE_PER_SLOT] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[ENABLE_EXIT_RATE_PER_SLOT], strlen( keylist[ENABLE_EXIT_RATE_PER_SLOT] ) ) ) { 
             pConf->ENABLE_EXIT_RATE_PER_SLOT = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[ENABLE_HIST_RUN_TIME], strlen( keylist[ENABLE_HIST_RUN_TIME] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[ENABLE_HIST_RUN_TIME], strlen( keylist[ENABLE_HIST_RUN_TIME] ) ) ) { 
             pConf->ENABLE_HIST_RUN_TIME = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[ENABLE_HOST_INTERSECTION], strlen( keylist[ENABLE_HOST_INTERSECTION] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[ENABLE_HOST_INTERSECTION], strlen( keylist[ENABLE_HOST_INTERSECTION] ) ) ) { 
             pConf->ENABLE_HOST_INTERSECTION = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[ENABLE_JOB_INFO_BY_ADMIN_ROLE], strlen( keylist[ENABLE_JOB_INFO_BY_ADMIN_ROLE] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[ENABLE_JOB_INFO_BY_ADMIN_ROLE], strlen( keylist[ENABLE_JOB_INFO_BY_ADMIN_ROLE] ) ) ) { 
             pConf->ENABLE_JOB_INFO_BY_ADMIN_ROLE = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[ENABLE_USER_RESUME], strlen( keylist[ENABLE_USER_RESUME] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[ENABLE_USER_RESUME], strlen( keylist[ENABLE_USER_RESUME] ) ) ) { 
             pConf->ENABLE_USER_RESUME = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[ENFORCE_ONE_UG_LIMITS], strlen( keylist[ENFORCE_ONE_UG_LIMITS] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[ENFORCE_ONE_UG_LIMITS], strlen( keylist[ENFORCE_ONE_UG_LIMITS] ) ) ) { 
             pConf->ENFORCE_ONE_UG_LIMITS = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[ENFORCE_UG_TREE], strlen( keylist[ENFORCE_UG_TREE] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[ENFORCE_UG_TREE], strlen( keylist[ENFORCE_UG_TREE] ) ) ) { 
             pConf->ENFORCE_UG_TREE = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[EVALUATE_JOB_DEPENDENCY], strlen( keylist[EVALUATE_JOB_DEPENDENCY] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[EVALUATE_JOB_DEPENDENCY], strlen( keylist[EVALUATE_JOB_DEPENDENCY] ) ) ) { 
             pConf->EVALUATE_JOB_DEPENDENCY = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[EVENT_STREAM_FILE], strlen( keylist[EVENT_STREAM_FILE] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[EVENT_STREAM_FILE], strlen( keylist[EVENT_STREAM_FILE] ) ) ) { 
             pConf->EVENT_STREAM_FILE = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[EVENT_UPDATE_INTERVAL], strlen( keylist[EVENT_UPDATE_INTERVAL] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[EVENT_UPDATE_INTERVAL], strlen( keylist[EVENT_UPDATE_INTERVAL] ) ) ) { 
             pConf->EVENT_UPDATE_INTERVAL = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[EXIT_RATE_TYPE], strlen( keylist[EXIT_RATE_TYPE] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[EXIT_RATE_TYPE], strlen( keylist[EXIT_RATE_TYPE] ) ) ) { 
             pConf->EXIT_RATE_TYPE = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[EXTEND_JOB_EXCEPTION_NOTIFY], strlen( keylist[EXTEND_JOB_EXCEPTION_NOTIFY] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[EXTEND_JOB_EXCEPTION_NOTIFY], strlen( keylist[EXTEND_JOB_EXCEPTION_NOTIFY] ) ) ) { 
             pConf->EXTEND_JOB_EXCEPTION_NOTIFY = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[FAIRSHARE_ADJUSTMENT_FACTOR], strlen( keylist[FAIRSHARE_ADJUSTMENT_FACTOR] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[FAIRSHARE_ADJUSTMENT_FACTOR], strlen( keylist[FAIRSHARE_ADJUSTMENT_FACTOR] ) ) ) { 
             pConf->FAIRSHARE_ADJUSTMENT_FACTOR = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[GLOBAL_EXIT_RATE], strlen( keylist[GLOBAL_EXIT_RATE] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[GLOBAL_EXIT_RATE], strlen( keylist[GLOBAL_EXIT_RATE] ) ) ) { 
             pConf->GLOBAL_EXIT_RATE = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[HIST_HOURS], strlen( keylist[HIST_HOURS] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[HIST_HOURS], strlen( keylist[HIST_HOURS] ) ) ) { 
             pConf->HIST_HOURS = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[JOB_ATTA_DIR], strlen( keylist[JOB_ATTA_DIR] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[JOB_ATTA_DIR], strlen( keylist[JOB_ATTA_DIR] ) ) ) { 
             pConf->JOB_ATTA_DIR = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[JOB_CONTROLS_FAIL_DEFAULT_ACTION], strlen( keylist[JOB_CONTROLS_FAIL_DEFAULT_ACTION] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[JOB_CONTROLS_FAIL_DEFAULT_ACTION], strlen( keylist[JOB_CONTROLS_FAIL_DEFAULT_ACTION] ) ) ) { 
             pConf->JOB_CONTROLS_FAIL_DEFAULT_ACTION = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[JOB_CWD_TTL], strlen( keylist[JOB_CWD_TTL] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[JOB_CWD_TTL], strlen( keylist[JOB_CWD_TTL] ) ) ) { 
             pConf->JOB_CWD_TTL = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[JOB_DEP_LAST_SUB], strlen( keylist[JOB_DEP_LAST_SUB] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[JOB_DEP_LAST_SUB], strlen( keylist[JOB_DEP_LAST_SUB] ) ) ) { 
             pConf->JOB_DEP_LAST_SUB = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[JOB_DISTRIBUTE_ON_HOST], strlen( keylist[JOB_DISTRIBUTE_ON_HOST] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[JOB_DISTRIBUTE_ON_HOST], strlen( keylist[JOB_DISTRIBUTE_ON_HOST] ) ) ) { 
             pConf->JOB_DISTRIBUTE_ON_HOST = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[JOB_EXIT_RATE_DURATION], strlen( keylist[JOB_EXIT_RATE_DURATION] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[JOB_EXIT_RATE_DURATION], strlen( keylist[JOB_EXIT_RATE_DURATION] ) ) ) { 
             pConf->JOB_EXIT_RATE_DURATION = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[JOB_GROUP_CLEAN], strlen( keylist[JOB_GROUP_CLEAN] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[JOB_GROUP_CLEAN], strlen( keylist[JOB_GROUP_CLEAN] ) ) ) { 
             pConf->JOB_GROUP_CLEAN = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[JOB_INCLUDE_POSTPROC], strlen( keylist[JOB_INCLUDE_POSTPROC] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[JOB_INCLUDE_POSTPROC], strlen( keylist[JOB_INCLUDE_POSTPROC] ) ) ) { 
             pConf->JOB_INCLUDE_POSTPROC = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[JOB_POSITION_CONTROL_BY_ADMIN], strlen( keylist[JOB_POSITION_CONTROL_BY_ADMIN] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[JOB_POSITION_CONTROL_BY_ADMIN], strlen( keylist[JOB_POSITION_CONTROL_BY_ADMIN] ) ) ) { 
             pConf->JOB_POSITION_CONTROL_BY_ADMIN = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[JOB_POSTPROC_TIMEOUT], strlen( keylist[JOB_POSTPROC_TIMEOUT] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[JOB_POSTPROC_TIMEOUT], strlen( keylist[JOB_POSTPROC_TIMEOUT] ) ) ) { 
             pConf->JOB_POSTPROC_TIMEOUT = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[JOB_PREPROC_TIMEOUT], strlen( keylist[JOB_PREPROC_TIMEOUT] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[JOB_PREPROC_TIMEOUT], strlen( keylist[JOB_PREPROC_TIMEOUT] ) ) ) { 
             pConf->JOB_PREPROC_TIMEOUT = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[JOB_PRIORITY_OVER_TIME], strlen( keylist[JOB_PRIORITY_OVER_TIME] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[JOB_PRIORITY_OVER_TIME], strlen( keylist[JOB_PRIORITY_OVER_TIME] ) ) ) { 
             pConf->JOB_PRIORITY_OVER_TIME = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[JOB_RUNLIMIT_RATIO], strlen( keylist[JOB_RUNLIMIT_RATIO] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[JOB_RUNLIMIT_RATIO], strlen( keylist[JOB_RUNLIMIT_RATIO] ) ) ) { 
             pConf->JOB_RUNLIMIT_RATIO = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[JOB_SCHEDULING_INTERVAL], strlen( keylist[JOB_SCHEDULING_INTERVAL] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[JOB_SCHEDULING_INTERVAL], strlen( keylist[JOB_SCHEDULING_INTERVAL] ) ) ) { 
             pConf->JOB_SCHEDULING_INTERVAL = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[JOB_SPOOL_DIR], strlen( keylist[JOB_SPOOL_DIR] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[JOB_SPOOL_DIR], strlen( keylist[JOB_SPOOL_DIR] ) ) ) { 
             pConf->JOB_SPOOL_DIR = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[JOB_SWITCH2_EVENT], strlen( keylist[JOB_SWITCH2_EVENT] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[JOB_SWITCH2_EVENT], strlen( keylist[JOB_SWITCH2_EVENT] ) ) ) { 
             pConf->JOB_SWITCH2_EVENT = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[JOB_TERMINATE_INTERVAL], strlen( keylist[JOB_TERMINATE_INTERVAL] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[JOB_TERMINATE_INTERVAL], strlen( keylist[JOB_TERMINATE_INTERVAL] ) ) ) { 
             pConf->JOB_TERMINATE_INTERVAL = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[LOCAL_MAX_PREEXEC_RETRY], strlen( keylist[LOCAL_MAX_PREEXEC_RETRY] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[LOCAL_MAX_PREEXEC_RETRY], strlen( keylist[LOCAL_MAX_PREEXEC_RETRY] ) ) ) { 
             pConf->LOCAL_MAX_PREEXEC_RETRY = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[EGROUP_UPDATE_INTERVAL], strlen( keylist[EGROUP_UPDATE_INTERVAL] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[EGROUP_UPDATE_INTERVAL], strlen( keylist[EGROUP_UPDATE_INTERVAL] ) ) ) { 
             pConf->EGROUP_UPDATE_INTERVAL = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[LSB_SYNC_HOST_STAT_LIM], strlen( keylist[LSB_SYNC_HOST_STAT_LIM] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[LSB_SYNC_HOST_STAT_LIM], strlen( keylist[LSB_SYNC_HOST_STAT_LIM] ) ) ) { 
             pConf->LSB_SYNC_HOST_STAT_LIM = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MAX_ACCT_ARCHIVE_FILE], strlen( keylist[MAX_ACCT_ARCHIVE_FILE] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MAX_ACCT_ARCHIVE_FILE], strlen( keylist[MAX_ACCT_ARCHIVE_FILE] ) ) ) { 
             pConf->MAX_ACCT_ARCHIVE_FILE = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MAX_CONCURRENT_QUERY], strlen( keylist[MAX_CONCURRENT_QUERY] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MAX_CONCURRENT_QUERY], strlen( keylist[MAX_CONCURRENT_QUERY] ) ) ) { 
             pConf->MAX_CONCURRENT_QUERY = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MAX_EVENT_STREAM_FILE_NUMBER], strlen( keylist[MAX_EVENT_STREAM_FILE_NUMBER] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MAX_EVENT_STREAM_FILE_NUMBER], strlen( keylist[MAX_EVENT_STREAM_FILE_NUMBER] ) ) ) { 
             pConf->MAX_EVENT_STREAM_FILE_NUMBER = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MAX_EVENT_STREAM_SIZE], strlen( keylist[MAX_EVENT_STREAM_SIZE] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MAX_EVENT_STREAM_SIZE], strlen( keylist[MAX_EVENT_STREAM_SIZE] ) ) ) { 
             pConf->MAX_EVENT_STREAM_SIZE = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MAX_INFO_DIRS], strlen( keylist[MAX_INFO_DIRS] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MAX_INFO_DIRS], strlen( keylist[MAX_INFO_DIRS] ) ) ) { 
             pConf->MAX_INFO_DIRS = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MAX_JOB_ARRAY_SIZE], strlen( keylist[MAX_JOB_ARRAY_SIZE] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MAX_JOB_ARRAY_SIZE], strlen( keylist[MAX_JOB_ARRAY_SIZE] ) ) ) { 
             pConf->MAX_JOB_ARRAY_SIZE = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MAX_JOB_ATTA_SIZE], strlen( keylist[MAX_JOB_ATTA_SIZE] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MAX_JOB_ATTA_SIZE], strlen( keylist[MAX_JOB_ATTA_SIZE] ) ) ) { 
             pConf->MAX_JOB_ATTA_SIZE = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MAX_JOB_NUM], strlen( keylist[MAX_JOB_NUM] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MAX_JOB_NUM], strlen( keylist[MAX_JOB_NUM] ) ) ) { 
             pConf->MAX_JOB_NUM = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MAX_JOB_PREEMPT], strlen( keylist[MAX_JOB_PREEMPT] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MAX_JOB_PREEMPT], strlen( keylist[MAX_JOB_PREEMPT] ) ) ) { 
             pConf->MAX_JOB_PREEMPT = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MAX_JOB_PREEMPT_RESET], strlen( keylist[MAX_JOB_PREEMPT_RESET] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MAX_JOB_PREEMPT_RESET], strlen( keylist[MAX_JOB_PREEMPT_RESET] ) ) ) { 
             pConf->MAX_JOB_PREEMPT_RESET = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MAX_JOB_REQUEUE], strlen( keylist[MAX_JOB_REQUEUE] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MAX_JOB_REQUEUE], strlen( keylist[MAX_JOB_REQUEUE] ) ) ) { 
             pConf->MAX_JOB_REQUEUE = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MAX_JOBID], strlen( keylist[MAX_JOBID] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MAX_JOBID], strlen( keylist[MAX_JOBID] ) ) ) { 
             pConf->MAX_JOBID = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MAX_JOBINFO_QUERY_PERIOD], strlen( keylist[MAX_JOBINFO_QUERY_PERIOD] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MAX_JOBINFO_QUERY_PERIOD], strlen( keylist[MAX_JOBINFO_QUERY_PERIOD] ) ) ) { 
             pConf->MAX_JOBINFO_QUERY_PERIOD = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MAX_PEND_JOBS], strlen( keylist[MAX_PEND_JOBS] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MAX_PEND_JOBS], strlen( keylist[MAX_PEND_JOBS] ) ) ) { 
             pConf->MAX_PEND_JOBS = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MAX_PREEXEC_RETRY], strlen( keylist[MAX_PREEXEC_RETRY] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MAX_PREEXEC_RETRY], strlen( keylist[MAX_PREEXEC_RETRY] ) ) ) { 
             pConf->MAX_PREEXEC_RETRY = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MAX_PROTOCOL_INSTANCES], strlen( keylist[MAX_PROTOCOL_INSTANCES] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MAX_PROTOCOL_INSTANCES], strlen( keylist[MAX_PROTOCOL_INSTANCES] ) ) ) { 
             pConf->MAX_PROTOCOL_INSTANCES = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MAX_SBD_CONNS], strlen( keylist[MAX_SBD_CONNS] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MAX_SBD_CONNS], strlen( keylist[MAX_SBD_CONNS] ) ) ) { 
             pConf->MAX_SBD_CONNS = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MAX_SBD_FAIL], strlen( keylist[MAX_SBD_FAIL] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MAX_SBD_FAIL], strlen( keylist[MAX_SBD_FAIL] ) ) ) { 
             pConf->MAX_SBD_FAIL = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MAX_TOTAL_TIME_PREEMPT], strlen( keylist[MAX_TOTAL_TIME_PREEMPT] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MAX_TOTAL_TIME_PREEMPT], strlen( keylist[MAX_TOTAL_TIME_PREEMPT] ) ) ) { 
             pConf->MAX_TOTAL_TIME_PREEMPT = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MAX_USER_PRIORITY], strlen( keylist[MAX_USER_PRIORITY] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MAX_USER_PRIORITY], strlen( keylist[MAX_USER_PRIORITY] ) ) ) { 
             pConf->MAX_USER_PRIORITY = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MBD_EGO_CONNECT_TIMEOUT], strlen( keylist[MBD_EGO_CONNECT_TIMEOUT] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MBD_EGO_CONNECT_TIMEOUT], strlen( keylist[MBD_EGO_CONNECT_TIMEOUT] ) ) ) { 
             pConf->MBD_EGO_CONNECT_TIMEOUT = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MBD_EGO_READ_TIMEOUT], strlen( keylist[MBD_EGO_READ_TIMEOUT] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MBD_EGO_READ_TIMEOUT], strlen( keylist[MBD_EGO_READ_TIMEOUT] ) ) ) { 
             pConf->MBD_EGO_READ_TIMEOUT = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MBD_EGO_TIME2LIVE], strlen( keylist[MBD_EGO_TIME2LIVE] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MBD_EGO_TIME2LIVE], strlen( keylist[MBD_EGO_TIME2LIVE] ) ) ) { 
             pConf->MBD_EGO_TIME2LIVE = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MBD_QUERY_CPUS], strlen( keylist[MBD_QUERY_CPUS] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MBD_QUERY_CPUS], strlen( keylist[MBD_QUERY_CPUS] ) ) ) { 
             pConf->MBD_QUERY_CPUS = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MBD_REFRESH_TIME], strlen( keylist[MBD_REFRESH_TIME] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MBD_REFRESH_TIME], strlen( keylist[MBD_REFRESH_TIME] ) ) ) { 
             pConf->MBD_REFRESH_TIME = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MBD_SLEEP_TIME], strlen( keylist[MBD_SLEEP_TIME] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MBD_SLEEP_TIME], strlen( keylist[MBD_SLEEP_TIME] ) ) ) { 
             pConf->MBD_SLEEP_TIME = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MBD_USE_EGO_MXJ], strlen( keylist[MBD_USE_EGO_MXJ] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MBD_USE_EGO_MXJ], strlen( keylist[MBD_USE_EGO_MXJ] ) ) ) { 
             pConf->MBD_USE_EGO_MXJ = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MC_PENDING_REASON_PKG_SIZE], strlen( keylist[MC_PENDING_REASON_PKG_SIZE] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MC_PENDING_REASON_PKG_SIZE], strlen( keylist[MC_PENDING_REASON_PKG_SIZE] ) ) ) { 
             pConf->MC_PENDING_REASON_PKG_SIZE = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MC_PENDING_REASON_UPDATE_INTERVAL], strlen( keylist[MC_PENDING_REASON_UPDATE_INTERVAL] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MC_PENDING_REASON_UPDATE_INTERVAL], strlen( keylist[MC_PENDING_REASON_UPDATE_INTERVAL] ) ) ) { 
             pConf->MC_PENDING_REASON_UPDATE_INTERVAL = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MC_PLUGIN_SCHEDULE_ENHANCE], strlen( keylist[MC_PLUGIN_SCHEDULE_ENHANCE] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MC_PLUGIN_SCHEDULE_ENHANCE], strlen( keylist[MC_PLUGIN_SCHEDULE_ENHANCE] ) ) ) { 
             pConf->MC_PLUGIN_SCHEDULE_ENHANCE = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MC_PLUGIN_UPDATE_INTERVAL], strlen( keylist[MC_PLUGIN_UPDATE_INTERVAL] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MC_PLUGIN_UPDATE_INTERVAL], strlen( keylist[MC_PLUGIN_UPDATE_INTERVAL] ) ) ) { 
             pConf->MC_PLUGIN_UPDATE_INTERVAL = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MC_RECLAIM_DELAY], strlen( keylist[MC_RECLAIM_DELAY] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MC_RECLAIM_DELAY], strlen( keylist[MC_RECLAIM_DELAY] ) ) ) { 
             pConf->MC_RECLAIM_DELAY = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MC_RESOURCE_MATCHING_CRITERIA], strlen( keylist[MC_RESOURCE_MATCHING_CRITERIA] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MC_RESOURCE_MATCHING_CRITERIA], strlen( keylist[MC_RESOURCE_MATCHING_CRITERIA] ) ) ) { 
             pConf->MC_RESOURCE_MATCHING_CRITERIA = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MC_RUSAGE_UPDATE_INTERVAL], strlen( keylist[MC_RUSAGE_UPDATE_INTERVAL] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MC_RUSAGE_UPDATE_INTERVAL], strlen( keylist[MC_RUSAGE_UPDATE_INTERVAL] ) ) ) { 
             pConf->MC_RUSAGE_UPDATE_INTERVAL = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MIN_SWITCH_PERIOD], strlen( keylist[MIN_SWITCH_PERIOD] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MIN_SWITCH_PERIOD], strlen( keylist[MIN_SWITCH_PERIOD] ) ) ) { 
             pConf->MIN_SWITCH_PERIOD = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[NEWJOB_REFRESH], strlen( keylist[NEWJOB_REFRESH] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[NEWJOB_REFRESH], strlen( keylist[NEWJOB_REFRESH] ) ) ) { 
             pConf->NEWJOB_REFRESH = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[NO_PREEMPT_FINISH_TIME], strlen( keylist[NO_PREEMPT_FINISH_TIME] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[NO_PREEMPT_FINISH_TIME], strlen( keylist[NO_PREEMPT_FINISH_TIME] ) ) ) { 
             pConf->NO_PREEMPT_FINISH_TIME = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[NO_PREEMPT_INTERVAL], strlen( keylist[NO_PREEMPT_INTERVAL] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[NO_PREEMPT_INTERVAL], strlen( keylist[NO_PREEMPT_INTERVAL] ) ) ) { 
             pConf->NO_PREEMPT_INTERVAL = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[NO_PREEMPT_RUN_TIME], strlen( keylist[NO_PREEMPT_RUN_TIME] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[NO_PREEMPT_RUN_TIME], strlen( keylist[NO_PREEMPT_RUN_TIME] ) ) ) { 
             pConf->NO_PREEMPT_RUN_TIME = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[MAX_JOB_MSG_NUM], strlen( keylist[MAX_JOB_MSG_NUM] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[MAX_JOB_MSG_NUM], strlen( keylist[MAX_JOB_MSG_NUM] ) ) ) { 
             pConf->MAX_JOB_MSG_NUM = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[ORPHAN_JOB_TERM_GRACE_PERIOD], strlen( keylist[ORPHAN_JOB_TERM_GRACE_PERIOD] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[ORPHAN_JOB_TERM_GRACE_PERIOD], strlen( keylist[ORPHAN_JOB_TERM_GRACE_PERIOD] ) ) ) { 
             pConf->ORPHAN_JOB_TERM_GRACE_PERIOD = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[PARALLEL_SCHED_BY_SLOT], strlen( keylist[PARALLEL_SCHED_BY_SLOT] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[PARALLEL_SCHED_BY_SLOT], strlen( keylist[PARALLEL_SCHED_BY_SLOT] ) ) ) { 
             pConf->PARALLEL_SCHED_BY_SLOT = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[PEND_REASON_MAX_JOBS], strlen( keylist[PEND_REASON_MAX_JOBS] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[PEND_REASON_MAX_JOBS], strlen( keylist[PEND_REASON_MAX_JOBS] ) ) ) { 
             pConf->PEND_REASON_MAX_JOBS = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[PEND_REASON_UPDATE_INTERVAL], strlen( keylist[PEND_REASON_UPDATE_INTERVAL] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[PEND_REASON_UPDATE_INTERVAL], strlen( keylist[PEND_REASON_UPDATE_INTERVAL] ) ) ) { 
             pConf->PEND_REASON_UPDATE_INTERVAL = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[PERFORMANCE_THRESHOLD_FILE], strlen( keylist[PERFORMANCE_THRESHOLD_FILE] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[PERFORMANCE_THRESHOLD_FILE], strlen( keylist[PERFORMANCE_THRESHOLD_FILE] ) ) ) { 
             pConf->PERFORMANCE_THRESHOLD_FILE = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[PG_SUSP_IT], strlen( keylist[PG_SUSP_IT] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[PG_SUSP_IT], strlen( keylist[PG_SUSP_IT] ) ) ) { 
             pConf->PG_SUSP_IT = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[POWER_ON_WAIT], strlen( keylist[POWER_ON_WAIT] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[POWER_ON_WAIT], strlen( keylist[POWER_ON_WAIT] ) ) ) { 
             pConf->POWER_ON_WAIT = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[POWER_RESET_CMD], strlen( keylist[POWER_RESET_CMD] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[POWER_RESET_CMD], strlen( keylist[POWER_RESET_CMD] ) ) ) { 
             pConf->POWER_RESET_CMD = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[POWER_RESUME_CMD], strlen( keylist[POWER_RESUME_CMD] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[POWER_RESUME_CMD], strlen( keylist[POWER_RESUME_CMD] ) ) ) { 
             pConf->POWER_RESUME_CMD = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[POWER_STATUS_LOG_MAX], strlen( keylist[POWER_STATUS_LOG_MAX] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[POWER_STATUS_LOG_MAX], strlen( keylist[POWER_STATUS_LOG_MAX] ) ) ) { 
             pConf->POWER_STATUS_LOG_MAX = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[POWER_SUSPEND_CMD], strlen( keylist[POWER_SUSPEND_CMD] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[POWER_SUSPEND_CMD], strlen( keylist[POWER_SUSPEND_CMD] ) ) ) { 
             pConf->POWER_SUSPEND_CMD = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[POWER_SUSPEND_TIMEOUT], strlen( keylist[POWER_SUSPEND_TIMEOUT] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[POWER_SUSPEND_TIMEOUT], strlen( keylist[POWER_SUSPEND_TIMEOUT] ) ) ) { 
             pConf->POWER_SUSPEND_TIMEOUT = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[PREEMPT_DELAY], strlen( keylist[PREEMPT_DELAY] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[PREEMPT_DELAY], strlen( keylist[PREEMPT_DELAY] ) ) ) { 
             pConf->PREEMPT_DELAY = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[PREEMPT_FOR], strlen( keylist[PREEMPT_FOR] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[PREEMPT_FOR], strlen( keylist[PREEMPT_FOR] ) ) ) { 
             pConf->PREEMPT_FOR = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[PREEMPT_JOBTYPE], strlen( keylist[PREEMPT_JOBTYPE] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[PREEMPT_JOBTYPE], strlen( keylist[PREEMPT_JOBTYPE] ) ) ) { 
             pConf->PREEMPT_JOBTYPE = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[PREEMPTABLE_RESOURCES], strlen( keylist[PREEMPTABLE_RESOURCES] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[PREEMPTABLE_RESOURCES], strlen( keylist[PREEMPTABLE_RESOURCES] ) ) ) { 
             pConf->PREEMPTABLE_RESOURCES = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[PREEMPTION_WAIT_TIME], strlen( keylist[PREEMPTION_WAIT_TIME] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[PREEMPTION_WAIT_TIME], strlen( keylist[PREEMPTION_WAIT_TIME] ) ) ) { 
             pConf->PREEMPTION_WAIT_TIME = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[PREEXEC_EXCLUDE_HOST_EXIT_VALUES], strlen( keylist[PREEXEC_EXCLUDE_HOST_EXIT_VALUES] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[PREEXEC_EXCLUDE_HOST_EXIT_VALUES], strlen( keylist[PREEXEC_EXCLUDE_HOST_EXIT_VALUES] ) ) ) { 
             pConf->PREEXEC_EXCLUDE_HOST_EXIT_VALUES = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[PRIVILEGED_USER_FORCE_BKILL], strlen( keylist[PRIVILEGED_USER_FORCE_BKILL] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[PRIVILEGED_USER_FORCE_BKILL], strlen( keylist[PRIVILEGED_USER_FORCE_BKILL] ) ) ) { 
             pConf->PRIVILEGED_USER_FORCE_BKILL = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[REMOVE_HUNG_JOBS_FOR], strlen( keylist[REMOVE_HUNG_JOBS_FOR] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[REMOVE_HUNG_JOBS_FOR], strlen( keylist[REMOVE_HUNG_JOBS_FOR] ) ) ) { 
             pConf->REMOVE_HUNG_JOBS_FOR = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[REMOTE_MAX_PREEXEC_RETRY], strlen( keylist[REMOTE_MAX_PREEXEC_RETRY] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[REMOTE_MAX_PREEXEC_RETRY], strlen( keylist[REMOTE_MAX_PREEXEC_RETRY] ) ) ) { 
             pConf->REMOTE_MAX_PREEXEC_RETRY = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[RUN_JOB_FACTOR], strlen( keylist[RUN_JOB_FACTOR] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[RUN_JOB_FACTOR], strlen( keylist[RUN_JOB_FACTOR] ) ) ) { 
             pConf->RUN_JOB_FACTOR = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[RUN_TIME_DECAY], strlen( keylist[RUN_TIME_DECAY] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[RUN_TIME_DECAY], strlen( keylist[RUN_TIME_DECAY] ) ) ) { 
             pConf->RUN_TIME_DECAY = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[RUN_TIME_FACTOR], strlen( keylist[RUN_TIME_FACTOR] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[RUN_TIME_FACTOR], strlen( keylist[RUN_TIME_FACTOR] ) ) ) { 
             pConf->RUN_TIME_FACTOR = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[SBD_SLEEP_TIME], strlen( keylist[SBD_SLEEP_TIME] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[SBD_SLEEP_TIME], strlen( keylist[SBD_SLEEP_TIME] ) ) ) { 
             pConf->SBD_SLEEP_TIME = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[SCHED_METRIC_ENABLE], strlen( keylist[SCHED_METRIC_ENABLE] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[SCHED_METRIC_ENABLE], strlen( keylist[SCHED_METRIC_ENABLE] ) ) ) { 
             pConf->SCHED_METRIC_ENABLE = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[SCHED_METRIC_SAMPLE_PERIOD], strlen( keylist[SCHED_METRIC_SAMPLE_PERIOD] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[SCHED_METRIC_SAMPLE_PERIOD], strlen( keylist[SCHED_METRIC_SAMPLE_PERIOD] ) ) ) { 
             pConf->SCHED_METRIC_SAMPLE_PERIOD = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[SCHED_PER_JOB_SORT], strlen( keylist[SCHED_PER_JOB_SORT] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[SCHED_PER_JOB_SORT], strlen( keylist[SCHED_PER_JOB_SORT] ) ) ) { 
             pConf->SCHED_PER_JOB_SORT = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[SCHEDULER_THREADS], strlen( keylist[SCHEDULER_THREADS] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[SCHEDULER_THREADS], strlen( keylist[SCHEDULER_THREADS] ) ) ) { 
             pConf->SCHEDULER_THREADS = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[SECURE_INFODIR_USER_ACCESS], strlen( keylist[SECURE_INFODIR_USER_ACCESS] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[SECURE_INFODIR_USER_ACCESS], strlen( keylist[SECURE_INFODIR_USER_ACCESS] ) ) ) { 
             pConf->SECURE_INFODIR_USER_ACCESS = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[SECURE_JOB_INFO_LEVEL], strlen( keylist[SECURE_JOB_INFO_LEVEL] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[SECURE_JOB_INFO_LEVEL], strlen( keylist[SECURE_JOB_INFO_LEVEL] ) ) ) { 
             pConf->SECURE_JOB_INFO_LEVEL = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[SLA_TIMER], strlen( keylist[SLA_TIMER] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[SLA_TIMER], strlen( keylist[SLA_TIMER] ) ) ) { 
             pConf->SLA_TIMER = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[SSCHED_ACCT_DIR], strlen( keylist[SSCHED_ACCT_DIR] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[SSCHED_ACCT_DIR], strlen( keylist[SSCHED_ACCT_DIR] ) ) ) { 
             pConf->SSCHED_ACCT_DIR = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[SSCHED_MAX_RUNLIMIT], strlen( keylist[SSCHED_MAX_RUNLIMIT] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[SSCHED_MAX_RUNLIMIT], strlen( keylist[SSCHED_MAX_RUNLIMIT] ) ) ) { 
             pConf->SSCHED_MAX_RUNLIMIT = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[SSCHED_MAX_TASKS], strlen( keylist[SSCHED_MAX_TASKS] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[SSCHED_MAX_TASKS], strlen( keylist[SSCHED_MAX_TASKS] ) ) ) { 
             pConf->SSCHED_MAX_TASKS = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[SSCHED_REQUEUE_LIMIT], strlen( keylist[SSCHED_REQUEUE_LIMIT] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[SSCHED_REQUEUE_LIMIT], strlen( keylist[SSCHED_REQUEUE_LIMIT] ) ) ) { 
             pConf->SSCHED_REQUEUE_LIMIT = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[SSCHED_RETRY_LIMIT], strlen( keylist[SSCHED_RETRY_LIMIT] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[SSCHED_RETRY_LIMIT], strlen( keylist[SSCHED_RETRY_LIMIT] ) ) ) { 
             pConf->SSCHED_RETRY_LIMIT = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[SSCHED_UPDATE_SUMMARY_BY_TASK], strlen( keylist[SSCHED_UPDATE_SUMMARY_BY_TASK] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[SSCHED_UPDATE_SUMMARY_BY_TASK], strlen( keylist[SSCHED_UPDATE_SUMMARY_BY_TASK] ) ) ) { 
             pConf->SSCHED_UPDATE_SUMMARY_BY_TASK = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[SSCHED_UPDATE_SUMMARY_INTERVAL], strlen( keylist[SSCHED_UPDATE_SUMMARY_INTERVAL] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[SSCHED_UPDATE_SUMMARY_INTERVAL], strlen( keylist[SSCHED_UPDATE_SUMMARY_INTERVAL] ) ) ) { 
             pConf->SSCHED_UPDATE_SUMMARY_INTERVAL = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[STRICT_UG_CONTROL], strlen( keylist[STRICT_UG_CONTROL] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[STRICT_UG_CONTROL], strlen( keylist[STRICT_UG_CONTROL] ) ) ) { 
             pConf->STRICT_UG_CONTROL = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[STRIPING_WITH_MINIMUM_NETWORK], strlen( keylist[STRIPING_WITH_MINIMUM_NETWORK] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[STRIPING_WITH_MINIMUM_NETWORK], strlen( keylist[STRIPING_WITH_MINIMUM_NETWORK] ) ) ) { 
             pConf->STRIPING_WITH_MINIMUM_NETWORK = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[SUB_TRY_INTERVAL], strlen( keylist[SUB_TRY_INTERVAL] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[SUB_TRY_INTERVAL], strlen( keylist[SUB_TRY_INTERVAL] ) ) ) { 
             pConf->SUB_TRY_INTERVAL = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[SYSTEM_MAPPING_ACCOUNT], strlen( keylist[SYSTEM_MAPPING_ACCOUNT] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[SYSTEM_MAPPING_ACCOUNT], strlen( keylist[SYSTEM_MAPPING_ACCOUNT] ) ) ) { 
             pConf->SYSTEM_MAPPING_ACCOUNT = value
         }
-        else if { strncmp( lsb_params[i].key, keylist[USE_SUSP_SLOTS], strlen( keylist[USE_SUSP_SLOTS] ) ) ) { 
+        else if ( strncmp( lsb_params[i].key, keylist[USE_SUSP_SLOTS], strlen( keylist[USE_SUSP_SLOTS] ) ) ) { 
             pConf->USE_SUSP_SLOTS = value
         }
-****************************************************************************************************************************************************************************************************************
+ ****************************************************************************************************************************************************************************************************************
 */      
         else {
             /* catgets 5074 */
@@ -2993,9 +3206,9 @@ initParameterInfo (struct parameterInfo *pConf)
         pConf->maxSchedStay            = LONG_MAX;
         pConf->freshPeriod             = LONG_MAX;
         pConf->maxJobArraySize         = ULONG_MAX;
-        pConf->jobTerminateInterval    = ULONG_MAX;
+        pConf->jobTerminateInterval    = LONG_MAX;
         pConf->disableUAcctMap         = false;
-        pConf->jobRunTimes             = ULONG_MAX;
+        pConf->jobRunTime              = LONG_MAX;
         pConf->jobDepLastSub           = ULONG_MAX;
         pConf->pjobSpoolDir            = NULL;
         pConf->maxUserPriority         = ULONG_MAX;
@@ -3046,7 +3259,7 @@ size_t trimwhitespace(char *out, const char *str)
     }
 
     if( str == NULL ) { // All spaces?
-        out == NULL;
+        out = NULL;
         return 0;
     }
 

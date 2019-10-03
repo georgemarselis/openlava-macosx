@@ -1213,7 +1213,7 @@ struct hostInfoEnt
 //     int acctArchiveInSize;
 //     int acctArchiveInDays;
 //     unsigned int disableUAcctMap;
-//     unsigned int jobRunTimes;
+//     unsigned int jobRunTime;
 //     unsigned int jobDepLastSub;
 //     unsigned int maxJobId;
 //     char *defaultQueues;
@@ -1243,7 +1243,6 @@ struct parameterInfo // V.2
     unsigned long condCheckTime;
     unsigned long maxSbdConnections;
     unsigned long maxJobArraySize;
-    unsigned long jobTerminateInterval;
     unsigned long maxUserPriority;
     unsigned long jobPriorityValue;
     unsigned long jobPriorityTime;
@@ -1251,12 +1250,13 @@ struct parameterInfo // V.2
     unsigned long maxAcctArchiveNum;
     unsigned long acctArchiveInSize;
     unsigned long acctArchiveInDays;
-    unsigned long jobRunTimes;
     unsigned long maxJobId;
     const char *defaultQueues;
     const char *defaultHostSpec;
     const char *defaultProject;
     const char *pjobSpoolDir;
+    time_t jobRunTime;
+    time_t jobTerminateInterval;
     time_t freshPeriod;
     time_t maxSchedStay;
     time_t pgSuspendIt;
@@ -1287,7 +1287,6 @@ struct parameterInfo // V.2
 //     unsigned long maxSbdConnections;
 //     unsigned long maxSchedStay;
 //     unsigned long maxJobArraySize;
-//     unsigned long jobTerminateInterval;
 //     unsigned long maxUserPriority;
 //     unsigned long jobPriorityValue;
 //     unsigned long jobPriorityTime;
@@ -1295,12 +1294,13 @@ struct parameterInfo // V.2
 //     unsigned long maxAcctArchiveNum;
 //     unsigned long acctArchiveInSize;
 //     unsigned long acctArchiveInDays;
-//     unsigned long jobRunTimes;
+//     unsigned long jobRunTims;
 //     unsigned long maxJobId;
 //     const char *defaultQueues;
 //     const char *defaultHostSpec;
 //     const char *defaultProject;
 //     const char *pjobSpoolDir;
+//     time_t jobTerminateInterval;
 //     time_t pgSuspendIt;
 //     time_t mbatchdInterval;
 //     time_t sbatchdInterval;
