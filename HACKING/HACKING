@@ -56,16 +56,16 @@ For Openlava, the brokerage includes missing /usr/include/netconfig.h (moved to 
 
 In RHEL/Fedora
  
- yum install -y libtircp* 
+ yum install -y libtirpc*
 
 
 In Debian
 
- apt-get install -y libtircp*
+ apt-get install -y libtirpc*
 
 ==== Edit system headers ==== 
 
-Yeah, seriously. The replacement library, libtircp, has issues references.
+Yeah, seriously. The replacement library, libtircp, has reference issues.
 
 ===== All OS =====
 
@@ -83,7 +83,9 @@ Same for the following:
 
 * /usr/include/tirpc/rpc/xdr.h
 
+orig:
  #include <rpc/types.h>
+change to:
  #include <tirpc/rpc/types.h>
 
 
