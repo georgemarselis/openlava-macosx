@@ -132,7 +132,7 @@ isint_ ( const char *word)
     eptr = &tempword;
     number = strtol (word, eptr, 10);
     if (**eptr == '\0' && errno != ERANGE) {
-        if (number <= INFINIT_INT && number > -INFINIT_INT) {
+        if (number <= INT_MAX && number > INT_MIN ) {
             return TRUE;
         }
     }
@@ -260,8 +260,8 @@ getValPair (char **resReq, int *val1, int *val2)
     char *wd2   = NULL;
     size_t len  = 0;
 
-    *val1 = INFINIT_INT;
-    *val2 = INFINIT_INT;
+    *val1 = INT_MAX;
+    *val2 = INT_MAX;
 
     token = getNextToken (resReq);
     if (!token) {

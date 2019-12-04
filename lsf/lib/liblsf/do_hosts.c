@@ -212,7 +212,7 @@ do_Hosts_lsf (FILE *fp, const char *filename, size_t *lineNum, struct lsInfo *in
 
         }
         else {
-            host.nDisks = INFINIT_INT;
+            host.nDisks = UINT_MAX;
         }
 
         host.busyThreshold = malloc( info->numIndx * sizeof ( host.busyThreshold ) );
@@ -717,11 +717,11 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
                  strcmp (keyList[HKEY_MXJ].value, "") ) 
         {
             // assert( my_atoi (keyList[HKEY_MXJ].value, INFINIT_INT, -1) >= 0);
-            host.maxJobs = my_atoi (keyList[HKEY_MXJ].value, INFINIT_INT, -1);
+            host.maxJobs = my_atoi (keyList[HKEY_MXJ].value, INT_MAX, -1);
             // if ( fabs( INFINIT_INT - host.maxJobs) < 0.00001 ) {
-            if ( ( INFINIT_INT - host.maxJobs) < 0.00001F ) {
+            if ( ( UINT_MAX - host.maxJobs) < 0.00001F ) {
                 /* catgets 5183 */
-                ls_syslog (LOG_ERR, "catgets 5183: %s: File %s at line %d: Invalid value <%s> for key <%s>; %d is assumed", __func__, filename, *lineNum, keyList[HKEY_MXJ].value, keyList[HKEY_MXJ].key, INFINIT_INT);
+                ls_syslog (LOG_ERR, "catgets 5183: %s: File %s at line %d: Invalid value <%s> for key <%s>; %d is assumed", __func__, filename, *lineNum, keyList[HKEY_MXJ].value, keyList[HKEY_MXJ].key, UINT_MAX);
                 lsberrno = LSBE_CONF_WARNING;
             }
         }
@@ -730,11 +730,11 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
         if( keyList[HKEY_UJOB_LIMIT].value != NULL && strcmp (keyList[HKEY_UJOB_LIMIT].value, "" ) ) {
 
             // assert( my_atoi( keyList[HKEY_UJOB_LIMIT].value, INFINIT_INT, -1 ) >=0 );
-            host.userJobLimit = my_atoi( keyList[HKEY_UJOB_LIMIT].value, INFINIT_INT, -1 );
+            host.userJobLimit = my_atoi( keyList[HKEY_UJOB_LIMIT].value, INT_MAX, -1 );
             // if ( fabs( INFINIT_INT - host.userJobLimit ) < 0.00001 ) {
-            if ( ( INFINIT_INT - host.userJobLimit ) < 0.00001F ) {
+            if ( ( UINT_MAX - host.userJobLimit ) < 0.00001F ) {
                 /* catgets 5183 */
-                ls_syslog (LOG_ERR, "catgets 5183: %s: File %s at line %d: Invalid value <%s> for key <%s>; %d is assumed", __func__, filename, *lineNum, keyList[HKEY_UJOB_LIMIT].value, keyList[HKEY_UJOB_LIMIT].key, INFINIT_INT);
+                ls_syslog (LOG_ERR, "catgets 5183: %s: File %s at line %d: Invalid value <%s> for key <%s>; %d is assumed", __func__, filename, *lineNum, keyList[HKEY_UJOB_LIMIT].value, keyList[HKEY_UJOB_LIMIT].key, UINT_MAX);
                 lsberrno = LSBE_CONF_WARNING;
             }
         }
@@ -769,7 +769,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
 
             host.mig = strtoul( keyList[HKEY_MIG].value, NULL, 10 ); // FIXME FIXME FIXME check the strtoul() call was successful
             // if ( fabs( INFINIT_INT - host.mig ) < 0.00001 ) {
-            if ( ( INFINIT_INT - host.mig ) < 0.00001F ) {
+            if ( ( UINT_MAX - host.mig ) < 0.00001F ) {
                 /* catgets 5186 */
                 ls_syslog (LOG_ERR, "catgets 5186: %s: File %s at line %d: Invalid value <%s> for key <%s>; no MIG threshold is assumed", __func__, filename, *lineNum, keyList[HKEY_MIG].value, keyList[HKEY_MIG].key);
                 lsberrno = LSBE_CONF_WARNING;

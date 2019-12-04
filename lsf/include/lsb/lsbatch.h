@@ -747,8 +747,8 @@ const char LOST_AND_FOUND[ ] = "lost_and_found";
 
 enum DELETE_N {
     DELETE_NUMBER  = -2,
-    DEFAULT_NUMPRO = INFINIT_INT,
-    DEL_NUMPRO     = INFINIT_INT - 1,
+    DEFAULT_NUMPRO = LONG_MAX,
+    DEL_NUMPRO     = LONG_MAX - 1,
 };
 
 // #define LSB_CHKPERIOD_NOCHNG -1
