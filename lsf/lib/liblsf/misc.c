@@ -67,7 +67,7 @@ islongint_ ( const char *word)
 
     sscanf (word, "%ld", &number);
     if (errno != ERANGE) {
-        if (number <= INFINIT_LONG_INT && number > -INFINIT_LONG_INT) {
+        if (number <= LONG_MAX && number > LONG_MIN ) {
             return TRUE;
         }
     }
@@ -105,7 +105,8 @@ atoi64_( const char *word )
     tempword = strdup( word );
     sscanf (tempword, "%ld", &number);
     if (errno != ERANGE) {
-        if (number <= INFINIT_LONG_INT && number > -INFINIT_LONG_INT) {
+        // if (number <= INFINIT_LONG_INT && number > -INFINIT_LONG_INT) {
+        if (number <= LONG_MAX && number > LONG_MIN ) {
             return number;
         }
     }
