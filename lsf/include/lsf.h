@@ -177,7 +177,7 @@ typedef enum {
 // #define INFINIT_INT         0x7fffffff // FIXME FIXME FIXME FIXME turn into constant
 // #define INFINIT_LONG_INT    0x7fffffff // FIXME FIXME FIXME FIXME turn into constant
 
-#define INFINIT_SHORT  0x7fff // FIXME FIXME FIXME FIXME  turn into constant
+// #define INFINIT_SHORT  0x7fff // FIXME FIXME FIXME FIXME  turn into constant
 
 // #define DEFAULT_RLIMIT     -1
 const short DEFAULT_RLIMIT = -1;
