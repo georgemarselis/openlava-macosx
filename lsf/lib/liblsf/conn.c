@@ -54,8 +54,6 @@ connected_ ( const char *hostname, int sock1, int sock2, unsigned int seqno)
     int *sp = NULL;
     int new = 0;
 
-    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
-
     hEntPtr = h_addEnt_ (&conn_table, hostname, &new);
     if (!new)
     {

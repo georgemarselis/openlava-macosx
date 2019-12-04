@@ -45,7 +45,6 @@ initIdLib ( struct IDLIB_INFO_T *idLib)
     char *libPath = NULL;
 // #define LIB_FORMAT_STR "%s/%s"
     const char IDLIB_SO_NAME[] = "liblsfid.so"; // FIXME FIXME FIXME FIXME put name of library in autoconf conf
-    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
 
     idLib->initialized = TRUE;
 

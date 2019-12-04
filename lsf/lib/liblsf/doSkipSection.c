@@ -18,8 +18,6 @@ doSkipSection_ (FILE *fp, size_t *lineNum, const char *lsfFileName, const char *
     char end[] = "end";
     char buffer[MAX_LINE_LEN];
 
-    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
-
     memset( buffer, '\0', strlen( buffer) );
 
     while( ( cp = getNextLineC_( fp, lineNum, TRUE ) ) != NULL ) {  // ONLY diff so far

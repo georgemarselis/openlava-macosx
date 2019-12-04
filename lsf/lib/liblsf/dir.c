@@ -31,7 +31,6 @@
 char *
 usePath( const char *path)
 {
-    assert( rootuid_ ); // NOTE bullshit op to hush up the compiler
     strcpy( chosenPath, path );
     return chosenPath;
 }
@@ -45,8 +44,6 @@ mychdir_(  const char *path, struct hostent *hp )
     char *goodpath = strdup( path );
     char *sp = NULL;
     char *filename = malloc( sizeof( char ) * MAX_PATH_LEN + 1);
-
-    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
 
     if (goodpath == NULL || strlen (goodpath) == 0 || goodpath[0] != '/' || AM_NEVER) {
         return chdir (usePath (goodpath));

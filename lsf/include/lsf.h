@@ -165,14 +165,14 @@ typedef enum {
         USR2
 } lsindx_t;
 
-#ifndef MAXFLOAT
-    #define MAXFLOAT        3.40282347e+38F // FIXME FIXME FIXME FIXME turn into constant
-#endif
+// #ifndef MAXFLOAT
+//     #define MAXFLOAT        3.40282347e+38F // FIXME FIXME FIXME FIXME turn into constant
+// #endif
 
 // #define INFINIT_LOAD    (float) (0x7fffffff) // FIXME FIXME FIXME FIXME turn into constant
 
-const double INFINIT_LOAD = 0x7fffffff;
-#define INFINIT_FLOAT   (float) (0x7fffffff) // FIXME FIXME FIXME FIXME turn into constant
+// const double INFINIT_LOAD = 0x7fffffff;
+// #define INFINIT_FLOAT   (float) (0x7fffffff) // FIXME FIXME FIXME FIXME turn into constant
 
 #define INFINIT_INT         0x7fffffff // FIXME FIXME FIXME FIXME turn into constant
 #define INFINIT_LONG_INT    0x7fffffff // FIXME FIXME FIXME FIXME turn into constant

@@ -26,29 +26,26 @@
 #include "lib/i18n.h"
 // #include "libint/lsi18n.h"
 
-int _i18n_init (int modId)
-{
-    assert( modId );
-    static int I18nInitFlag = 1;
+// int _i18n_init (int modId)
+// {
+//     assert( modId );
+//     static int I18nInitFlag = 1;
 
-    assert( I18nInitFlag < 0 );
+//     assert( I18nInitFlag == 1 );
 
-    return 0;
-}
+//     return 0;
+// }
 
-int _i18n_end ( void )
-{
-    return 0;
-}
+// int _i18n_end ( void )
+// {
+//     return 0;
+// }
 
 
 void
 _i18n_ctime_init (int catID)
 {
     assert( catID ); // not used
-
-    assert( lserrno ); // BULLSHIT OP, so the compiler will not complain
-    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
 
     for ( int i = 0; i <= MAX_CTIME_FORMATID; i++) {
         i18nCTFormatStr[i] = i18n_ct_format[i];

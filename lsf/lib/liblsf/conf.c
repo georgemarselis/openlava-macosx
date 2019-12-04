@@ -52,8 +52,6 @@ initResTable_ (void)
     unsigned int i             = 0;
     struct resItem  **resTable = NULL;
 
-    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
-
     resTable = malloc (1000 * sizeof (struct resItem) + 1 * sizeof( struct resItem ) ); // FIXME FIXME FIXME FIXME '1000' is awfuly partifular
     if (!resTable) {
         ls_syslog (LOG_ERR, "%s: %s() failed", __func__, "malloc");

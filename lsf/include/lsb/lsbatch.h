@@ -1103,8 +1103,7 @@ struct userInfoEnt
     unsigned int numSSUSP;
     unsigned int numUSUSP;
     unsigned int numRESERVE;
-    const char padding[4];
-};
+} __attribute__((packed));
 
 
 struct queueInfoEnt

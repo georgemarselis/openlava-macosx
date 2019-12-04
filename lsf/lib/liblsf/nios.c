@@ -27,16 +27,6 @@
 #include "daemons/libniosd/niosd.h"
 // #include "daemons/libresd/resout.h"
 
-void nios_c_bullshit( void ) {
-
-    assert( INFINIT_LOAD );
-    assert( sigSymbol );
-    assert( NSIG_MAP );
-
-    return;
-}
-
-
 int
 ls_stdinmode( int onoff )
 {

@@ -33,8 +33,6 @@ ls_initdebug ( const char *appName)
     char *logMask = malloc( sizeof( char ) * MAX_LSF_NAME_LEN + 1);
     // struct config_param *pPtr = NULL;
 
-    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
-
     if (initenv_ (debParams, NULL) < 0) {
         return -1; // FIXME FIXME FIXME FIXME return meaningful *positive* return value
     }

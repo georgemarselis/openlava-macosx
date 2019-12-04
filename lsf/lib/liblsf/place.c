@@ -27,13 +27,6 @@
 #include "daemons/liblimd/lim.h"
 
 
-void place_c_bullshit( )
-{
-    assert( INFINIT_LOAD );
-    return;
-}
-
-
 char **
 ls_placereq (char *resreq, size_t *numhosts, int options, char *fromhost)
 {

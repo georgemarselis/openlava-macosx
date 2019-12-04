@@ -32,7 +32,6 @@ errnoEncode_ ( unsigned int errnumber)
     if (errnumber == 255) {
         return errnumber;
     }
-    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
     // for ( int i = 0; i < NERRNO_MAP; i++) // FIXME FIXME FIXME FIXME this has to be revisted
     /* they are trying to encode the error into a number?
      * 

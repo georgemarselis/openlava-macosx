@@ -66,8 +66,6 @@ chanInit_ (void)
     static char first = TRUE;
     long result = 0;
 
-    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
-
     if (!first) {
         return 0;
     }

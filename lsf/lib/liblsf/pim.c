@@ -38,16 +38,6 @@
 #include "lib/misc.h" // FIXME FIXME FIXME initLSFHeader_() is here must move to init.h or new file initlsf.h
 #include "lsf.h"
 
-void pim_c_bullshit( void )
-{
-    assert( pimDaemonParams );
-    assert( PIM_PARAMS );
-    assert( PIM_API );
-    assert( INFINIT_LOAD );
-    return;
-}
-
-
 struct jRusage *
 getJInfo_ (pid_t npgid, pid_t *pgid, unsigned short options, pid_t cpgid)
 {

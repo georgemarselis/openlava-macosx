@@ -23,14 +23,6 @@
 #include "lib/info.h"
 #include "libint/lsi18n.h"
 
-void misc_c_bullshit( ) 
-{
-    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
-
-    return;
-}
-
-
 char
 isanumber_ ( char *word )
 {

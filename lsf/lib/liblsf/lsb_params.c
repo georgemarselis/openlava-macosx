@@ -32,11 +32,14 @@
 #include <netdb.h>
 #include <ctype.h>
 #include <strings.h>
+#include <string.h>
+#include <float.h>
 #include <time.h>  // char *strptime( )
 
 #include "lsb/lsbatch.h"     // struct parameterInfo
 #include "libint/intlibout.h"
 #include "lsb/conf.h"
+#include "lib/id.h"
 #include "lib/syslog.h"
 #include "lib/do_hosts.h"
 #include "lib/lsb_params.h"
@@ -118,7 +121,7 @@ initHostInfoEnt (struct hostInfoEnt *hp)
         hp->hStatus      = ULONG_MAX;
         hp->busySched    = NULL;
         hp->busyStop     = NULL;
-        hp->cpuFactor    = INFINIT_FLOAT;
+        hp->cpuFactor    = FLT_MAX;
         hp->nIdx         = 0;
         hp->userJobLimit = ULONG_MAX;
         hp->maxJobs      = ULONG_MAX;
@@ -3228,13 +3231,13 @@ initParameterInfo (struct parameterInfo *pConf)
 }
 
 void
-freeParameterInfo (struct parameterInfo *param)
+freeParameterInfo (struct parameterInfo *pConf)
 {
-    if (param != NULL) {
-        FREEUP (defaultQueues);
-        FREEUP (defaultHostSpec);
-        FREEUP (defaultProject);
-        FREEUP (pjobSpoolDir);
+    if (pConf != NULL) {
+        // FREEUP (pConf->defaultQueues);
+        // FREEUP (pConf->defaultHostSpec);
+        // FREEUP (pConf->defaultProject);
+        // FREEUP (pConf->pjobSpoolDir);
     }
 
     return;
@@ -3243,41 +3246,38 @@ freeParameterInfo (struct parameterInfo *param)
 // Stores the trimmed input string into the given output buffer, which must be
 // large enough to store the result.  If it is too small, the output is
 // truncated.
-size_t trimwhitespace(char *out, const char *str)
+size_t trimwhitespace( char *str )
 {
-    const char *end = NULL;
-    size_t out_size = 0;
-    size_t length   = strlen( str );
+    char *start = str;
+    char *end   = start + strlen( start )*sizeof( char ) - 1; // FIXME FIXME FIXME not sure about the sizeof()
+    ssize_t out_size   = 0;
+    ssize_t length     = ( ssize_t ) strlen( start ); // NOFIX unless we find a way to get the length otherwise
 
-    if( length == 0) {
+    if( 0 == length) {
         return 0;
     }
 
     // Trim leading space
-    while( isspace( (unsigned char) *str ) ) {
-        str++;
+    while( isblank( *start ) ) {
+        start++;
     }
 
-    if( str == NULL ) { // All spaces?
-        out = NULL;
+    if( start == NULL ) { // All spaces?
         return 0;
     }
 
     // Trim trailing space
-    end = str + strlen(str) - 1;
-    while(end > str && isspace((unsigned char)*end)) {
+    while( end > start && isblank( *end ) ) {
         end--;
     }
     end++;
 
     // Set output size to minimum of trimmed string length and buffer size minus 1
-    out_size = (end - str) < length - 1 ? (end - str) : length - 1;
+    out_size = (end - start) < length - 1 ? (end - start) : length - 1;
 
-    // Copy trimmed string and add null terminator
-    memcpy(out, str, out_size);
-    out[out_size] = 0;
+    assert( out_size > 0 );
 
-    return out_size;
+    return (size_t) out_size;
 }
 
 // bool checkSpoolDir( const char * pSpoolDir)
@@ -3297,6 +3297,7 @@ checkSpoolDir ( const char *pSpoolDir )
     char *pTemp   = NULL;
     char TempNT   [MAX_PATH_LEN];
     char TempUnix [MAX_PATH_LEN];
+    char *pSpoolDirDup = strdup( pSpoolDir );
 
     memset( TempNT,   '\0', strlen( TempNT ) );
     memset( TempUnix, '\0', strlen( TempUnix ) );
@@ -3305,27 +3306,27 @@ checkSpoolDir ( const char *pSpoolDir )
         ls_syslog (LOG_DEBUG, "%s: JOB_SPOOL_DIR is set to %s, and  is of length %lu \n", __func__, pSpoolDir, strlen( pSpoolDir ) );
     }
 
-    if( strlen (pSpoolDir) >= MAX_PATH_LEN ) {
+    if( strlen (pSpoolDirDup) >= MAX_PATH_LEN ) {
         return false;
     }
 
-    if( strlen (pSpoolDir) == 0 ) {
+    if( strlen (pSpoolDirDup) == 0 ) {
         return false;
     }
 
-    pTemp = strtok( pSpoolDir, "|" ); // separate *nix path from general whole string
+    pTemp = strtok( pSpoolDirDup, "|" ); // separate *nix path from general whole string
     trimwhitespace( pTemp );          // trip any extra whitespace tot the string
 
     if( pTemp[0] == '/' ) { // *nix absolute paths always start with a '/'
         linux = true;
-        strncpy( TempUnix, pTemp,  strnlen( pTemp  ) );
-        strncpy( TempNT,   "NULL", strnlen( "NULL" ) );
+        strncpy( TempUnix, pTemp,  strnlen( pTemp, MAX_PATH_LEN ) );
+        strncpy( TempNT,   "NULL", strnlen( "NULL", MAX_PATH_LEN ) );
 
     }
-    else if( pTemp[0] == '\\' || ( !isalpha( TempNT[0] ) && ptTemp[1] == ':' ) ) { // windows UNCs start with \ and drive paths always have a ':' as their second character
+    else if( pTemp[0] == '\\' || ( !isalpha( TempNT[0] ) && pTemp[1] == ':' ) ) { // windows UNCs start with \ and drive paths always have a ':' as their second character
         linux = false;
-        strncpy( TempNT, pTemp, strnlen( pTemp ) );
-        strncpy( TempUnix, "NULL", strnlen( "NULL" ) );
+        strncpy( TempNT, pTemp, strnlen( pTemp, MAX_PATH_LEN ) );
+        strncpy( TempUnix, "NULL", strnlen( "NULL", MAX_PATH_LEN ) );
     }
     else {
         ls_syslog( LOG_DEBUG, "%s: Error: pTemp value (%s) is applicable to neitehr *nix nor Windows", __func__, pTemp );
@@ -3336,10 +3337,10 @@ checkSpoolDir ( const char *pSpoolDir )
     trimwhitespace( pTemp );
 
     if( linux ) {
-        strncpy( TempNT, pTemp, strnlen( pTemp ) );
+        strncpy( TempNT, pTemp, strnlen( pTemp, MAX_PATH_LEN ) );
     }
     else {
-        strncpy( TempUnix, pTemp, strnlen( pTemp ) );
+        strncpy( TempUnix, pTemp, strnlen( pTemp, MAX_PATH_LEN ) );
     }
 
     // final verification check: see if lenghts are greater than 0 and have characters specific to their OS environment
@@ -3372,7 +3373,7 @@ struct userConf *
 lsb_readuser_ex (struct lsConf *conf, int options, struct clusterConf *clusterConf, struct sharedConf *sharedConf)
 {
     char *filename  = NULL;
-    char *cp        = NULL;
+    const char *cp  = NULL;
     char *section   = NULL;
     size_t lineNumber  = 0;
 
@@ -3380,7 +3381,8 @@ lsb_readuser_ex (struct lsConf *conf, int options, struct clusterConf *clusterCo
 
     if (conf == NULL) {
         const char conf[] = "conf";
-        ls_syslog (LOG_ERR, I18N_NULL_POINTER, __func__, conf);
+        // catgets 5050
+        ls_syslog (LOG_ERR, "catgets 5050: %s: struct lsConf *conf is NULL: %x", __func__, conf);
         lsberrno = LSBE_CONF_FATAL;
         return NULL;
     }
@@ -3390,8 +3392,9 @@ lsb_readuser_ex (struct lsConf *conf, int options, struct clusterConf *clusterCo
     }
 
     if (conf && conf->confhandle == NULL) {
-        const char conf[] = "confhandle";
-        ls_syslog (LOG_ERR, I18N_NULL_POINTER, __func__, confhandle );
+        const char confhandle[] = "confhandle";
+        // catgets 5050
+        ls_syslog (LOG_ERR, "catgets 5050: %s: struct lsConf *conf is not NULL, but struct member %s is", __func__, confhandle );
         lsberrno = LSBE_CONF_FATAL;
         return NULL;
     }
@@ -3409,7 +3412,7 @@ lsb_readuser_ex (struct lsConf *conf, int options, struct clusterConf *clusterCo
     cConf = clusterConf;
     cp = getBeginLine_conf( conf, &lineNumber ) ;
     // for (;;) { // FIXME FIXME FIXME FIXME replace infinite loop with a ccertain-to-terminate condition
-    do { // FIXME FIXME FIXME FIXME replace infinite loop with a ccertain-to-terminate condition
+    do { // FIXME FIXME FIXME FIXME replace infinite loop with a certain-to-terminate condition
         if ( NULL == cp ) {
 
             if (numofugroups) {
@@ -3443,7 +3446,8 @@ lsb_readuser_ex (struct lsConf *conf, int options, struct clusterConf *clusterCo
 
                 for( unsigned int i = 0; i < numofusers; i++) {
                     initUserInfo (&uConf->users[i]);
-                    uConf->users[i] = *users[i];
+                    // strncpy( uConf->users[i], users[i], strnlen( users[i], MAXHOSTNAMELEN ) );
+                    memcpy( &uConf->users[i], users[i], sizeof( *users[i] ) );
                 }
                 uConf->numUsers = numofusers;
             }
@@ -3461,8 +3465,8 @@ lsb_readuser_ex (struct lsConf *conf, int options, struct clusterConf *clusterCo
             continue;
         }
         else {
-            const char user[]    = "user";
-            const char usergroup = "usergroup";
+            const char user[]      = "user";
+            const char usergroup[] = "usergroup";
 
             if (strcasecmp (section, user) == 0) {
                 if (do_Users (conf, filename, &lineNumber, options) == false) {
@@ -3498,8 +3502,8 @@ lsb_readuser_ex (struct lsConf *conf, int options, struct clusterConf *clusterCo
     return NULL;
 }
 
-bool
-do_Users (struct lsConf *conf, const char *filename, size_t lineNumber, int options)
+char 
+do_Users(struct lsConf *conf, const char *filename, size_t *lineNumber, int options)
 {
     int new                          = 0;
     int isGroupAt                    = false;
@@ -3510,14 +3514,17 @@ do_Users (struct lsConf *conf, const char *filename, size_t lineNumber, int opti
     struct passwd *pw                = NULL;
     struct hTab *tmpUsers            = NULL;
     struct hTab *nonOverridableUsers = NULL;
+
+    int base10 = 10; // base counting system for strtoul()
     
     enum state {
         USER_NAME,
         MAX_JOBS,
-        JL_P
+        JL_P,
+        STATENULL
     };
 
-    const char keylist[ ] = {
+    const char *keylist[ ] = {
         "USER_NAME",
         "MAX_JOBS",
         "JL_P",
@@ -3539,13 +3546,16 @@ do_Users (struct lsConf *conf, const char *filename, size_t lineNumber, int opti
 
     linep = getNextLineC_conf (conf, lineNumber, true);
     if (!linep) {
-        ls_syslog (LOG_ERR, I18N_FILE_PREMATURE, __func__, filename, lineNumber);
+        // ls_syslog (LOG_ERR, I18N_FILE_PREMATURE, __func__, filename, lineNumber);
+        // catgets 5051
+        ls_syslog (LOG_ERR, "catgets 5051: %s: File %s at line %d, premature EOF", __func__, filename, lineNumber);
         lsberrno = LSBE_CONF_WARNING;
         return false;
     }
 
     if (isSectionEnd (linep, filename, lineNumber, user)) {
-        ls_syslog (LOG_WARNING, I18N_EMPTY_SECTION, __func__, filename, lineNumber, user );
+        // catgets 5052
+        ls_syslog (LOG_WARNING, "%s: File %s at line %d: Empty %s section", __func__, filename, lineNumber, user );
         lsberrno = LSBE_CONF_WARNING;
         return false;
     }
@@ -3559,7 +3569,7 @@ do_Users (struct lsConf *conf, const char *filename, size_t lineNumber, int opti
             return false;
         }
 
-        if (keyList[USER_NAME].position < 0) {
+        if( keyList[USER_NAME].position == 0) {
             /* catgets 5087 */
             ls_syslog (LOG_ERR, "catgets 5087: %s: File %s at line %lu: User name required for User section; ignoring section", __func__, filename, lineNumber);
             lsberrno = LSBE_CONF_WARNING;
@@ -3598,23 +3608,23 @@ do_Users (struct lsConf *conf, const char *filename, size_t lineNumber, int opti
                 lsberrno = LSBE_CONF_WARNING;
                 continue;
             }
-            h_addEnt_ (tmpUsers, keylist[USER_NAME].value, &new);
+            h_addEnt_ (tmpUsers, keyList[USER_NAME].value, &new);
             if (!new) {
                 /* catgets 5090 */
-                ls_syslog (LOG_ERR, "catgets 5090: %s: File %s at line %lu: User name <%s> multiply specified; ignoring line", __func__, filename, lineNumber, keylist[USER_NAME].value);
+                ls_syslog (LOG_ERR, "catgets 5090: %s: File %s at line %lu: User name <%s> multiply specified; ignoring line", __func__, filename, lineNumber, keyList[USER_NAME].value);
                 lsberrno = LSBE_CONF_WARNING;
                 continue;
             }
             hasAt = false;
-            lastChar = strlen (keylist[USER_NAME].value) - 1;
-            if (lastChar > 0 && keylist[USER_NAME].value[lastChar] == '@') {
+            lastChar = strlen (keyList[USER_NAME].value) - 1;
+            if (lastChar > 0 && keyList[USER_NAME].value[lastChar] == '@') {
                 hasAt = true;
-                keylist[USER_NAME].value[lastChar] = '\0';
+                keyList[USER_NAME].value[lastChar] = '\0';
             }
 
-            lastChar = strlen (keylist[USER_NAME].value) - 1;
-            if (lastChar > 0 && keylist[USER_NAME].value[lastChar] == '/') {
-                grpSl = putstr_ (keylist[USER_NAME].value);
+            lastChar = strlen (keyList[USER_NAME].value) - 1;
+            if (lastChar > 0 && keyList[USER_NAME].value[lastChar] == '/') {
+                grpSl = putstr_ (keyList[USER_NAME].value);
                 if (grpSl == NULL) {
                     lsberrno = LSBE_NO_MEM;
                     h_delTab_ (tmpUsers);
@@ -3627,76 +3637,72 @@ do_Users (struct lsConf *conf, const char *filename, size_t lineNumber, int opti
 
                 grpSl[lastChar] = '\0';
             }
-            gp = getUGrpData (keylist[USER_NAME].value);
-            pw = getpwlsfuser_ (keylist[USER_NAME].value);
+            gp = getUGrpData (keyList[USER_NAME].value);
+            pw = getpwlsfuser_ (keyList[USER_NAME].value);
 
-            if ((options != CONF_NO_CHECK) && !gp && (grpSl || (strcmp (keylist[USER_NAME].value, defaultLabel) && !pw))) {
-                if (grpSl) {
-                    unixGrp = mygetgrnam (grpSl);
+            const char defaultLabel[]        = "default";
+            if( ( options != CONF_NO_CHECK ) && !gp && (grpSl || ( strcmp( keyList[ USER_NAME ].value, defaultLabel ) && !pw ) ) ) { // FIXME FIXME FIXME FIXME options: set in configure.ac
+                if( grpSl ) {
+                    unixGrp = mygetgrnam( grpSl );
                     grpSl[lastChar] = '/';
                 }
                 else {
-                    unixGrp = mygetgrnam (keylist[USER_NAME].value);
+                    unixGrp = mygetgrnam( keyList[USER_NAME].value );
                 }
 
                 if (unixGrp != NULL) {
-                    if (options & (CONF_EXPAND | CONF_NO_EXPAND | CONF_CHECK)) {
+                    if (options & (CONF_EXPAND | CONF_NO_EXPAND | CONF_CHECK)) { // FIXME FIXME FIXME FIXME options: set in configure.ac
 
-                        gp = addUnixGrp (unixGrp, keylist[USER_NAME].value, filename, lineNumber, " in User section", 0);
+                        gp = addUnixGrp (unixGrp, keyList[USER_NAME].value, filename, *lineNumber, " in User section", 0);
 
-                        if (gp == NULL)
-                            {
+                        if (gp == NULL) {
                             if (lsberrno == LSBE_NO_MEM) {
                                 return false;
                             }
                             /* catgets 5091 */
-                            ls_syslog (LOG_WARNING, "catgets 5091: %s: File %s at line %lu: No valid users defined in Unix group <%s>; ignored", __func__, filename, lineNumber, keylist[USER_NAME].value);
+                            ls_syslog (LOG_WARNING, "catgets 5091: %s: File %s at line %lu: No valid users defined in Unix group <%s>; ignored", __func__, filename, lineNumber, keyList[USER_NAME].value);
                             lsberrno = LSBE_CONF_WARNING;
                             continue;
-                            }
                         }
                     }
-                else
-                    {
-                    /* catgets 5092 */
-                    ls_syslog (LOG_WARNING, "catgets 5092: %s: File %s at line %lu: Unknown user <%s>; Maybe a windows user or of another domain.", __func__, filename, lineNumber, keylist[USER_NAME].value);  
-                    lsberrno = LSBE_CONF_WARNING;
-                    }
                 }
+                else {
+                    /* catgets 5092 */
+                    ls_syslog (LOG_WARNING, "catgets 5092: %s: File %s at line %lu: Unknown user <%s>; Maybe a windows user or of another domain.", __func__, filename, lineNumber, keyList[USER_NAME].value);  
+                    lsberrno = LSBE_CONF_WARNING;
+                }
+            }
             if (hasAt && gp) {
                 isGroupAt = true;
             }
-            if (hasAt && (!(options & (CONF_EXPAND | CONF_NO_EXPAND)) ||  options == CONF_NO_CHECK)) {
-                keylist[USER_NAME].value[lastChar + 1] = '@';
+            if( hasAt && ( !(options & (CONF_EXPAND | CONF_NO_EXPAND)) ||  options == CONF_NO_CHECK)) { // FIXME FIXME FIXME FIXME options: set in configure.ac
+                keyList[USER_NAME].value[lastChar + 1] = '@';
             }
 
             maxjobs = ULONG_MAX;
-            if (keyList[MAX_JOBS].position >= 0 && keylist[MAX_JOBS].value != NULL && strcmp (keylist[MAX_JOBS].value, ""))
-                {
+            // if (keyList[MAX_JOBS].position >= 0 && keyList[MAX_JOBS].value != NULL && strcmp( keyList[MAX_JOBS].value, "" ) ) {
+            if( keyList[MAX_JOBS].value != NULL && strcmp( keyList[MAX_JOBS].value, "" ) ) {
 
-
-                if ((maxjobs = my_atoi (keylist[MAX_JOBS].value, ULONG_MAX, -1)) == ULONG_MAX)
-                    {
+                if ((maxjobs = strtoul (keyList[MAX_JOBS].value, NULL, base10 ) ) == ULONG_MAX) {
                     /* catgets 5093 */
-                    ls_syslog (LOG_ERR, "catgets 5093: %s: File %s at line %lu: Invalid value <%s> for key <%s>; %lu is assumed", __func__, filename, lineNumber, keylist[MAX_JOBS].value, keyList[MAX_JOBS].key, ULONG_MAX);
-                    lsberrno = LSBE_CONF_WARNING;
-                    }
-                }
-            pJobLimit = INFINIT_FLOAT;
-            if (keyList[JL_P].position >= 0 && keylist[JL_P].value != NULL
-                && strcmp (keylist[JL_P].value, ""))
-                {
-
-                pJobLimit = my_atof( keylist[JL_P].value, INFINIT_FLOAT, -1.0 );
-                if ( fabs( INFINIT_FLOAT - pJobLimit) < 0.00001 ) {
-                    /* catgets 5094 */
-                    ls_syslog (LOG_ERR, "catgets 5094: %s: File %s at line %lu: Invalid value <%s> for key %s; %f is assumed", __func__, filename, lineNumber, keylist[JL_P].value, keyList[JL_P].key, INFINIT_FLOAT);
+                    ls_syslog (LOG_ERR, "catgets 5093: %s: File %s at line %lu: Invalid value <%s> for key <%s>; %lu is assumed", __func__, filename, lineNumber, keyList[MAX_JOBS].value, keyList[MAX_JOBS].key, ULONG_MAX);
                     lsberrno = LSBE_CONF_WARNING;
                 }
             }
-            if (!isGroupAt && (!(options & (CONF_EXPAND | CONF_NO_EXPAND)) || options == CONF_NO_CHECK)) {
-                h_addEnt_ (nonOverridableUsers, keylist[USER_NAME].value, 0);
-                if (!addUser (keylist[USER_NAME].value, maxjobs, pJobLimit, filename, true) && lsberrno == LSBE_NO_MEM) {
+            pJobLimit = FLT_MAX; // pJobLimit is "processing job limit"
+            // if( keyList[JL_P].position >= 0 && keyList[JL_P].value != NULL && strcmp (keyList[JL_P].value, "" ) ) {
+            if( keyList[JL_P].value != NULL && strcmp (keyList[JL_P].value, "" ) ) {
+
+                pJobLimit = strtof( keyList[JL_P].value, NULL );
+                if ( fabs( FLT_MAX - pJobLimit) < 0.00001f ) {
+                    /* catgets 5094 */
+                    ls_syslog (LOG_ERR, "catgets 5094: %s: File %s at line %lu: Invalid value <%s> for key %s; %f is assumed", __func__, filename, lineNumber, keyList[JL_P]->value, keyList[JL_P]->key, INFINIT_FLOAT);
+                    lsberrno = LSBE_CONF_WARNING;
+                }
+            }
+            if (!isGroupAt && (!(options & (CONF_EXPAND | CONF_NO_EXPAND)) || options == CONF_NO_CHECK)) { // FIXME FIXME FIXME FIXME options: set in configure.ac
+                h_addEnt_ (nonOverridableUsers, keyList[USER_NAME].value, 0);
+                if (!addUser (keyList[USER_NAME]->value, maxjobs, pJobLimit, filename, true) && lsberrno == LSBE_NO_MEM) {
                     FREEUP (grpSl);
                     lsberrno = LSBE_NO_MEM;
                     h_delTab_ (tmpUsers);
@@ -3712,14 +3718,14 @@ do_Users (struct lsConf *conf, const char *filename, size_t lineNumber, int opti
                 char **groupMembers = NULL;
                 unsigned int *numMembers = 0;
                 char gr__func__[MAX_LSB_NAME_LEN];
-                STRNCPY (gr__func__, keylist[USER_NAME].value, MAX_LSB_NAME_LEN);
+                // STRNCPY (gr__func__, keylist[USER_NAME].value, MAX_LSB_NAME_LEN);
 
 
-                if (isGroupAt)
-                    {
-                    if (gr__func__[strlen (keylist[USER_NAME].value) - 1] == '@')
-                        gr__func__[strlen (keylist[USER_NAME].value) - 1] = '\0';
+                if (isGroupAt) {
+                    if (gr__func__[strlen (keyList[USER_NAME]->value) - 1] == '@') {
+                        gr__func__[strlen (keyList[USER_NAME]->value) - 1] = '\0';
                     }
+                }
 
                 if ((groupMembers = expandGrp (gr__func__, numMembers, USER_GRP)) == NULL) {
                     ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, __func__);
@@ -3732,10 +3738,10 @@ do_Users (struct lsConf *conf, const char *filename, size_t lineNumber, int opti
                     return false;
                 }
 
-                if (strcmp (groupMembers[0], "all") == 0) {
+                if (strcmp (groupMembers[0], "all") == 0) { // FIXME FIXME FIXME FIXME dubstitue [0] with label
                     ls_syslog (LOG_ERR, "catgets 5096: %s: File %s at line %lu: user group <%s> with no members is ignored", __func__, filename, lineNumber, keylist[USER_NAME].value); /* catgets 5096 */
                 }
-                else if (!(options & CONF_NO_EXPAND)) {
+                else if (!(options & CONF_NO_EXPAND)) { // FIXME FIXME FIXME FIXME options: set in configure.ac
                     for ( unsigned int i = 0; i < *numMembers; i++) {
                         if (h_getEnt_ (nonOverridableUsers, groupMembers[i])) {
                             continue;
@@ -4107,7 +4113,7 @@ addGroup (struct groupInfoEnt **groups, const char *gname, unsigned int *ngroups
 }
 
 struct groupInfoEnt *
-addUnixGrp (struct group *unixGrp, const char *gname, const char *filename, unsigned int lineNumber, const char *section, int type)
+addUnixGrp (struct group *unixGrp, const char *gname, const char *filename, const size_t lineNumber, const char *section, int type)
 {
     // int i                   = -1;
     unsigned int            = 0;

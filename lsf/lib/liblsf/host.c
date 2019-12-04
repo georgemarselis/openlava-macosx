@@ -52,8 +52,6 @@ ls_getmyhostname (void)
     char hostname[MAXHOSTNAMELEN];
     struct hostent *hp = NULL;
 
-    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
-    
     memset( hostname, '\0', MAXHOSTNAMELEN );
 
 // YOUR CACHING MECHANISM IS BAD AND YOU SHOULD FEEL BAD

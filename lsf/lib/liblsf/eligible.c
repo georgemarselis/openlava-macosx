@@ -62,9 +62,7 @@ ls_eligible ( const char *task, char *resreqstr, const unsigned int mode)
     struct hEnt *mykey = NULL;
     char *p = NULL;
 
-    assert ( INFINIT_LOAD ); // NOFIX bullshit call so the compiler will not complain
-
-    assert( strlen( resreqstr ) > 0 ); // initiall
+    assert( strlen( resreqstr ) > 0 ); // init wtf
 
     if (!listok) {
         if (inittasklists_ () < 0) {

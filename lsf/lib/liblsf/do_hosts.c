@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <strings.h> // required for strcasecmp();
 #include <stdbool.h> // required for bool type
+#include <float.h>
 
 #include "lsf.h"
 #include "lib/confmisc.h"
@@ -230,37 +231,40 @@ do_Hosts_lsf (FILE *fp, const char *filename, size_t *lineNum, struct lsInfo *in
             return FALSE;
         }
 
-        liblsf_putThreshold( R15S, &host, keyList[R15S].position, keyList[R15S].value, INFINIT_LOAD );
-        liblsf_putThreshold( R1M,  &host, keyList[R1M].position,  keyList[R1M].value,  INFINIT_LOAD );
-        liblsf_putThreshold( R15M, &host, keyList[R15M].position, keyList[R15M].value, INFINIT_LOAD );
-        liblsf_putThreshold( UT,   &host, keyList[UT].position,   keyList[UT].value,   INFINIT_LOAD );
+        liblsf_putThreshold( R15S, &host, keyList[R15S].position, keyList[R15S].value, FLT_MAX );
+        liblsf_putThreshold( R1M,  &host, keyList[R1M].position,  keyList[R1M].value,  FLT_MAX );
+        liblsf_putThreshold( R15M, &host, keyList[R15M].position, keyList[R15M].value, FLT_MAX );
+        liblsf_putThreshold( UT,   &host, keyList[UT].position,   keyList[UT].value,   FLT_MAX );
 
-        if (host.busyThreshold[UT] > 1.0l  && host.busyThreshold[UT] < INFINIT_LOAD) {
+        if (host.busyThreshold[UT] > 1.0l  && host.busyThreshold[UT] < DBL_MAX ) {
             ls_syslog (LOG_INFO, "catgets 5145: %s: %s(%d): value for threshold ut <%2.2e> is greater than 1, assumming <%5.1e%%>", __func__, filename, *lineNum, (double) host.busyThreshold[UT], (double) host.busyThreshold[UT]); // FIXME FIXME the (double) cast s probably correct
             host.busyThreshold[UT] /= 100;
         }
-        liblsf_putThreshold( PG,   &host, keyList[PG].position,  keyList[PG].value,   INFINIT_LOAD );
-        liblsf_putThreshold( IO,   &host, keyList[IO].position,  keyList[IO].value,   INFINIT_LOAD );
-        liblsf_putThreshold( LS,   &host, keyList[LS].position,  keyList[LS].value,   INFINIT_LOAD );
-        liblsf_putThreshold( IT,   &host, keyList[IT].position,  keyList[IT].value,  -INFINIT_LOAD );
-        liblsf_putThreshold( TMP,  &host, keyList[TMP].position, keyList[TMP].value, -INFINIT_LOAD );
-        liblsf_putThreshold( SWP,  &host, keyList[SWP].position, keyList[SWP].value, -INFINIT_LOAD );
-        liblsf_putThreshold( MEM,  &host, keyList[MEM].position, keyList[MEM].value, -INFINIT_LOAD );
+        liblsf_putThreshold( PG,   &host, keyList[PG].position,  keyList[PG].value,  FLT_MAX );
+        liblsf_putThreshold( IO,   &host, keyList[IO].position,  keyList[IO].value,  FLT_MAX );
+        liblsf_putThreshold( LS,   &host, keyList[LS].position,  keyList[LS].value,  FLT_MAX );
+        liblsf_putThreshold( IT,   &host, keyList[IT].position,  keyList[IT].value,  FLT_MAX );
+        // liblsf_putThreshold( TMP,  &host, keyList[TMP].position, keyList[TMP].value, -INFINIT_LOAD );
+        liblsf_putThreshold( TMP,  &host, keyList[TMP].position, keyList[TMP].value, FLT_MAX );
+        // liblsf_putThreshold( SWP,  &host, keyList[SWP].position, keyList[SWP].value, -INFINIT_LOAD );
+        liblsf_putThreshold( SWP,  &host, keyList[SWP].position, keyList[SWP].value, FLT_MAX );
+        // liblsf_putThreshold( MEM,  &host, keyList[MEM].position, keyList[MEM].value, -INFINIT_LOAD );
+        liblsf_putThreshold( MEM,  &host, keyList[MEM].position, keyList[MEM].value, FLT_MAX );
 
         for (unsigned int i = NBUILTINDEX; i < NBUILTINDEX + info->numUsrIndx; i++) {
             if (info->resTable[i]->orderType == INCR) {
                 assert( i <= INT_MAX );
-                liblsf_putThreshold ( i, &host, keyList[i].position, keyList[i].value, INFINIT_LOAD);
+                liblsf_putThreshold ( i, &host, keyList[i].position, keyList[i].value, FLT_MAX);
             }
             else {
                 assert( i <= INT_MAX );
-                liblsf_putThreshold ( i, &host, keyList[i].position, keyList[i].value, -INFINIT_LOAD);
+                liblsf_putThreshold ( i, &host, keyList[i].position, keyList[i].value, FLT_MAX);
             }
         }
 
         for (unsigned int i = NBUILTINDEX + info->numUsrIndx; i < info->numIndx; i++) {
 
-            host.busyThreshold[i] = INFINIT_LOAD;
+            host.busyThreshold[i] = FLT_MAX;
             host.numIndx = info->numIndx;
             numAllocatedResources = NUM_ALLOCATED_RESOURCES;
             resList = calloc (numAllocatedResources, sizeof( *resList ) );

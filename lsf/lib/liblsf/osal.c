@@ -23,16 +23,6 @@
 #include "lib/osal.h"
 #include "lib/channel.h"
 
-
-void osal_c_bullshit( void )
-{
-    assert( chanMaxSize );
-    assert( lserrno );
-    assert( INFINIT_LOAD );
-    return;
-}
-
-
 int
 osInit_( void )
 {
@@ -45,17 +35,17 @@ osInit_( void )
     return 0;
 }
 
-char *
-osPathName_ (char *pathname) // FIXME FIXME FIXME FIXME where are you going with this? investigate and delete if not used
-{
-    return pathname;
-}
+// char *
+// osPathName_ (char *pathname) // FIXME FIXME FIXME FIXME where are you going with this? investigate and delete if not used
+// {
+//     return pathname;
+// }
 
-char *
-osHomeEnvVar_ (void)
-{
-    return getenv ("HOME"); // FIXME FIXME FIXME FIXME put this in configure.ac
-}
+// char *
+// osHomeEnvVar_ (void)
+// {
+//     return getenv ("HOME"); // FIXME FIXME FIXME FIXME put this in configure.ac
+// }
 
 void
 osConvertPath_ (char *pathname) // FIXME FIXME FIXME FIXME FIXME use strsubstitute function
