@@ -19,6 +19,8 @@
  *
  */
 
+
+#include <stdbool.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -121,7 +123,7 @@ setLockOnOff_ (int on_, time_t duration, const char *hname)
 
     lockReq.uid = getuid ();
 
-    if (getLSFUser_ (lockReq.lsfUserName, sizeof (lockReq.lsfUserName)) < 0) {
+    if (getLSFUser_ (lockReq.lsfUserName, sizeof (lockReq.lsfUserName)) == false ) {
       return -1;
     }
 

@@ -2,7 +2,7 @@
 
 #pragma once
 
-
+#include "lib/header.h"
 
 // #define ESUBNAME "esub"
 // #define EEXECNAME "eexec"
@@ -11,8 +11,9 @@
 // #define NL_SETN   23 
 
 /* esub.c */
-int   runEsub_   ( struct lenData *ed, const char *path );
-int   runEClient_( struct lenData *ed, char **argv );
-int   getEData   ( struct lenData *ed, char **argv, const char *lsfUserName );
-int   runEexec_  ( char *option, unsigned int job, struct lenData *eexec, const char *path );
-char *runEGroup_ ( char *type, char *gname );
+unsigned int runEsub_(struct lenData *ed, const char *path);
+unsigned int runEClient_(struct lenData *ed, char **argv);
+bool getEData(struct lenData *ed, char **argv, const char *lsfUserName);
+int runEexec_(char *option, unsigned int job, struct lenData *eexec, const char *path);
+char *runEGroup_(const char *type, const char *gname);
+

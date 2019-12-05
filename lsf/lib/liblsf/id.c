@@ -17,6 +17,8 @@
  */
 
 #include <assert.h>
+#include <stdbool.h>
+
 
 #include "lib/id.h"
 #include "lib/syslog.h"
@@ -117,7 +119,7 @@ initIdLib ( struct IDLIB_INFO_T *idLib)
         return retcode;
     }
 
-    int (*koko) ( const char *lsfUserName,  unsigned int lsfUserNameSize ); // FIXME This must be thrown in the debugger
+    int (*koko) ( const char *lsfUserName,  size_t lsfUserNameSize ); // FIXME This must be thrown in the debugger
     *(int **)(&koko) = soSym_ (idLib->handle, "getLSFUser_");
     // idLib->getLSFUser_ = (GET_LSF_USER_FN_T) soSym_ (idLib->handle, "getLSFUser_"); // https://stackoverflow.com/questions/14134245/iso-c-void-and-function-pointers
     idLib->getLSFUser_ = koko;
@@ -139,7 +141,7 @@ initIdLib ( struct IDLIB_INFO_T *idLib)
 
         return retcode;
     }
-    int (*lala) ( const char *osUserName,  const char  *lsfUserName, unsigned int lsfUserNameSize ); // FIXME This must be thrown in the debugger
+    int (*lala) ( const char *osUserName,  const char  *lsfUserName, size_t lsfUserNameSize ); // FIXME This must be thrown in the debugger
     *( int **)(& lala ) = soSym_ (idLib->handle, "getLSFUserByName_");
     // idLib->getLSFUserByName_ = (GET_LSF_USER_BY_NAME_FN_T) soSym_ (idLib->handle, "getLSFUserByName_"); // https://stackoverflow.com/questions/14134245/iso-c-void-and-function-pointers?
     idLib->getLSFUserByName_ = lala;
@@ -160,7 +162,7 @@ initIdLib ( struct IDLIB_INFO_T *idLib)
 
         return retcode;
     }
-    int (*foo) ( const uid_t uid, const char  *lsfUserName, unsigned int lsfUserNameSize ); // FIXME This must be thrown in the debugger
+    int (*foo) ( const uid_t uid, const char  *lsfUserName, size_t lsfUserNameSize ); // FIXME This must be thrown in the debugger
     *( int **)( & foo ) = soSym_ (idLib->handle, "getLSFUserByUid_");
     // idLib->getLSFUserByUid_ = (GET_LSF_USER_BY_UID_FN_T) soSym_ (idLib->handle, "getLSFUserByUid_"); // https://stackoverflow.com/questions/14134245/iso-c-void-and-function-pointers?
     idLib->getLSFUserByUid_  = foo;
@@ -181,7 +183,7 @@ initIdLib ( struct IDLIB_INFO_T *idLib)
 
         return retcode;
     }
-    int (*bar) ( const char *lsfUserName, const char  *osUserName,  unsigned int osUserNameSize  ); // FIXME This must be thrown in the debugger
+    int (*bar) ( const char *lsfUserName, const char  *osUserName,  size_t osUserNameSize  ); // FIXME This must be thrown in the debugger
     *( int ** )( &bar ) = soSym_ (idLib->handle, "getOSUserName_");
     // idLib->getOSUserName_ = (GET_OS_USER_NAME_FN_T) soSym_ (idLib->handle, "getOSUserName_"); // https://stackoverflow.com/questions/14134245/iso-c-void-and-function-pointers?
     idLib->getOSUserName_ = bar;
@@ -245,7 +247,7 @@ initIdLib ( struct IDLIB_INFO_T *idLib)
     return retcode;
 }
 
-unsigned short
+bool
 checkInit ( struct IDLIB_INFO_T *idLib)
 {
     if (!idLib->initialized) {
@@ -253,53 +255,53 @@ checkInit ( struct IDLIB_INFO_T *idLib)
     }
     if (idLib->initFailed) {
         lserrno = LSE_INTERNAL;
-        return FALSE;
+        return false;
     }
-    return TRUE;
+    return true;
 }
 
-int
-getLSFUser_ (const char *lsfUserName, unsigned int lsfUserNameSize)
+bool
+getLSFUser_ (const char *lsfUserName, size_t lsfUserNameSize)
 {
     unsigned int rc = 0;
 
     if (!checkInit (&idLib_)) {
-        return -1;
+        return false;
     }
 
     rc = (unsigned int)idLib_.getLSFUser_ (lsfUserName, lsfUserNameSize);
     if (rc != LSE_NO_ERR) {
         lserrno = rc;
-        return -1;
+        return false;
     }
     else {
-        return 0;
+        return true;
     }
 
-    return 0;
+    return true;
 }
 
-int
-getLSFUserByName_ (const char *osUserName, const char *lsfUserName, unsigned int lsfUserNameSize)
+bool
+getLSFUserByName_ (const char *osUserName, const char *lsfUserName, size_t lsfUserNameSize)
 {
     int rc = 0;
 
     if (!checkInit (&idLib_)) {
-        return -1;
+        return false;
     }
 
     rc = idLib_.getLSFUserByName_ (osUserName, lsfUserName, lsfUserNameSize);
     if (rc != LSE_NO_ERR) {
         lserrno = (unsigned int)rc;
-        return -1;
+        return false;
     }
     else {
-        return 0;
+        return true;
     }
 }
 
-int
-getLSFUserByUid_( const uid_t uid, const char *lsfUserName, unsigned int lsfUserNameSize)
+bool
+getLSFUserByUid_( const uid_t uid, const char *lsfUserName, size_t lsfUserNameSize)
 {
     int rc = 0;
 
@@ -310,49 +312,49 @@ getLSFUserByUid_( const uid_t uid, const char *lsfUserName, unsigned int lsfUser
     rc = idLib_.getLSFUserByUid_ (uid, lsfUserName, lsfUserNameSize);
     if (rc != LSE_NO_ERR) {
         lserrno = (unsigned int) rc;
-        return -1;
+        return false;
     }
     else {
-        return 0;
+        return true;
     }
 }
 
-int
-getOSUserName_ (const char *lsfUserName, const char *osUserName, unsigned int osUserNameSize)
+bool
+getOSUserName_ (const char *lsfUserName, const char *osUserName, size_t osUserNameSize)
 {
     int rc;
 
     if (!checkInit (&idLib_)) {
-        return -1;
+        return false;
     }
 
     rc = idLib_.getOSUserName_ (lsfUserName, osUserName, osUserNameSize);
     if (rc != LSE_NO_ERR) {
         lserrno = (unsigned int) rc;
-        return -1;
+        return false;
     }
     else {
-        return 0;
+        return true;
     }
 }
 
 
-int
+bool
 getOSUid_ (const char *lsfUserName, const uid_t *uid)
 {
     int rc = 0;
 
     if (!checkInit (&idLib_)) {
-        return -1;
+        return false;
     }
 
     rc = idLib_.getOSUid_ (lsfUserName, uid);
     if (rc != LSE_NO_ERR) {
         lserrno = (unsigned int) rc;
-        return -1;
+        return true;
     }
 
-    return 0;
+    return true;
 }
 
 struct passwd *getpwlsfuser_( const char *lsfUserName ) 
@@ -362,7 +364,7 @@ struct passwd *getpwlsfuser_( const char *lsfUserName )
 
     memset ( osUserName, '\0', strlen( osUserName ) );
 
-    if (getOSUserName_ (lsfUserName, osUserName, sizeof (osUserName)) < 0) {
+    if( getOSUserName_( lsfUserName, osUserName, strlen( osUserName ) ) == false ) {
         lserrno = LSE_INTERNAL;
         return NULL;
     }
@@ -381,9 +383,9 @@ getpwdirlsfuser_ (const char *lsfUserName)
     struct passwd *pw = NULL;
     char osUserName[MAX_LSF_NAME_LEN];
 
-    memset ( osUserName, 0, strlen( osUserName ) );
+    memset( osUserName, '\0', strlen( osUserName ) );
 
-    if (getOSUserName_ (lsfUserName, osUserName, sizeof (osUserName)) < 0) {
+    if ( getOSUserName_( lsfUserName, osUserName, strlen( osUserName ) ) == false ) {
         lserrno = LSE_INTERNAL;
         return NULL;
     }
@@ -397,7 +399,7 @@ getpwdirlsfuser_ (const char *lsfUserName)
 }
 
 int
-defGetLSFUser( const char *lsfUserName, unsigned int lsfUserNameSize)
+defGetLSFUser( const char *lsfUserName, size_t lsfUserNameSize)
 {
     struct passwd *pw = NULL;
 
@@ -418,7 +420,7 @@ defGetLSFUser( const char *lsfUserName, unsigned int lsfUserNameSize)
 }
 
 int
-defGetLSFUserByName (const char *osUserName, const char *lsfUserName, unsigned int lsfUserNameSize)
+defGetLSFUserByName (const char *osUserName, const char *lsfUserName, size_t lsfUserNameSize)
 {
     // lsfUserName[0] = '\0';
 
@@ -432,7 +434,7 @@ defGetLSFUserByName (const char *osUserName, const char *lsfUserName, unsigned i
 }
 
 int
-defGetLSFUserByUid( const uid_t uid, const char *lsfUserName, unsigned int lsfUserNameSize)
+defGetLSFUserByUid( const uid_t uid, const char *lsfUserName, size_t lsfUserNameSize)
 {
     struct passwd *pw = NULL;
 
@@ -453,7 +455,7 @@ defGetLSFUserByUid( const uid_t uid, const char *lsfUserName, unsigned int lsfUs
 }
 
 int
-defGetOSUserName (const char *lsfUserName, const char *osUserName, unsigned int osUserNameSize)
+defGetOSUserName (const char *lsfUserName, const char *osUserName, size_t osUserNameSize)
 {
     // osUserName[0] = '\0';
 

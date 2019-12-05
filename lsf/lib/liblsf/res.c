@@ -72,6 +72,7 @@ ls_connect (const char *host)
     struct resConnect connReq;
     struct hostent *hp = NULL;
     char official[MAXHOSTNAMELEN] = "";
+    size_t hp_h_length = 0;
 
     memset( official, '\0', strlen( official ) );
  
@@ -83,16 +84,18 @@ ls_connect (const char *host)
     }
 
     if (_isconnected_ (host, descriptor)) {
-        return descriptor[0];
+        return descriptor[0]; // FIXME FIXME FIXME replace [0] with label 
     }
 
     if ((hp = Gethostbyname_ (host)) == NULL) {
         lserrno = LSE_BAD_HOST;
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        return false; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     strcpy (official, hp->h_name);
-    memcpy ((char *) &res_addr_.sin_addr, (char *) hp->h_addr_list[0], (size_t) hp->h_length); // all casts are OK here.
+    assert( hp->h_length >= 0 );
+    hp_h_length = ( size_t ) hp->h_length;
+    memcpy ( &res_addr_.sin_addr, hp->h_addr_list[0], hp_h_length ); // all casts are OK here.
     if ((rootuid_) && (genParams_[LSF_AUTH].paramValue == NULL)) {
 
         if (currentsocket_ > (FIRST_RES_SOCK + totsockets_ - 1 ) ) {
@@ -120,9 +123,9 @@ ls_connect (const char *host)
 #endif
 
 
-    if (getAuth_lsf(&auth, official) == -1){ //getAuth_lsf in include/lib/eauth.h
+    if( getAuth_lsf(&auth, official) == false ){ //getAuth_lsf in include/lib/eauth.h
         close (s);
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
+        return false; // FIXME FIXME FIXME FIXME replace with meaningful, *positive* return value
     }
 
     runEsub_ (&connReq.eexec, NULL);

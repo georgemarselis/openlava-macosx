@@ -40,6 +40,7 @@
 #include "libint/intlibout.h"
 #include "lsb/conf.h"
 #include "lib/id.h"
+#include "lib/esub.h"
 #include "lib/syslog.h"
 #include "lib/do_hosts.h"
 #include "lib/lsb_params.h"
@@ -148,7 +149,7 @@ freeHostInfoEnt (struct hostInfoEnt *hp)
 }
 
 
-unsigned int
+bool
 expandWordAll (size_t *size, unsigned int *num, struct inNames **inTable, const char *ptr_level)
 {
     size_t cur_size = 0;
@@ -179,7 +180,7 @@ expandWordAll (size_t *size, unsigned int *num, struct inNames **inTable, const 
 }
 
 
-int
+bool
 readHvalues_conf (struct keymap *keyList, const char *linep, struct lsConf *conf, const char *lsfile, size_t *lineNumber, int exact, const char *section)
 {
     char *key   = NULL;
@@ -189,7 +190,7 @@ readHvalues_conf (struct keymap *keyList, const char *linep, struct lsConf *conf
     char error  = false;
 
     if (linep == NULL || conf == NULL) {
-        return -1;
+        return false;
     }
 
     sp = strdup( linep ); // FIXME FIXME FIXME FIXME this needs to go to the debugger, cuz it might just be a pointer, not a copy of the string.
@@ -235,7 +236,7 @@ readHvalues_conf (struct keymap *keyList, const char *linep, struct lsConf *conf
 
             unsigned int i = 0;
             if (!exact) {
-                return 0;
+                return true;
             }
 
             while (keyList[i].key != NULL) {
@@ -252,10 +253,10 @@ readHvalues_conf (struct keymap *keyList, const char *linep, struct lsConf *conf
                     FREEUP (keyList[i].value);
                     i++;
                 }
-                return -1;
+                return false;
             }
 
-            return 0;
+            return true;
         }
 
         return readHvalues_conf (keyList, linep, conf, lsfile, lineNumber, exact, section);
@@ -263,7 +264,7 @@ readHvalues_conf (struct keymap *keyList, const char *linep, struct lsConf *conf
 
     /* catgets 33 */
     ls_syslog (LOG_ERR, "catgets 33: %s: %s(%lu): Premature EOF in section %s", __func__, lsfile, lineNumber, section);
-    return -1;
+    return false;
 }
 
 
@@ -947,7 +948,7 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNumber) // this
     //
     // Extract the key values from current line FIXME FIXME FIXME FIXME why do we pass the damn file name to readHvalues_conf()?
     //
-    if (readHvalues_conf (lsb_params, linep, conf, filename, lineNumber, false, sectionName ) < 0) {
+    if (readHvalues_conf (lsb_params, linep, conf, filename, lineNumber, false, sectionName ) == false ) {
         /* catgets 5060 */
         ls_syslog (LOG_ERR, "catgets 5060: %s: File %s at line %lu: Incorrect section; ignored", __func__, filename, lineNumber);
         lsberrno = LSBE_CONF_WARNING;
@@ -3685,7 +3686,7 @@ do_Users(struct lsConf *conf, const char *filename, size_t *lineNumber, int opti
 
                 if ((maxjobs = strtoul (keyList[MAX_JOBS].value, NULL, base10 ) ) == ULONG_MAX) {
                     /* catgets 5093 */
-                    ls_syslog (LOG_ERR, "catgets 5093: %s: File %s at line %lu: Invalid value <%s> for key <%s>; %lu is assumed", __func__, filename, lineNumber, keyList[MAX_JOBS].value, keyList[MAX_JOBS].key, ULONG_MAX);
+                    ls_syslog (LOG_ERR, "catgets 5093: %s: File %s at line %lu: Invalid value <%s> for key <%s>; %s is assumed", __func__, filename, lineNumber, keyList[MAX_JOBS].value, keyList[MAX_JOBS].key, "ULONG_MAX");
                     lsberrno = LSBE_CONF_WARNING;
                 }
             }
@@ -3694,15 +3695,15 @@ do_Users(struct lsConf *conf, const char *filename, size_t *lineNumber, int opti
             if( keyList[JL_P].value != NULL && strcmp (keyList[JL_P].value, "" ) ) {
 
                 pJobLimit = strtof( keyList[JL_P].value, NULL );
-                if ( fabs( FLT_MAX - pJobLimit) < 0.00001f ) {
+                if ( fabsf( FLT_MAX - pJobLimit) < 0.00001F ) {
                     /* catgets 5094 */
-                    ls_syslog (LOG_ERR, "catgets 5094: %s: File %s at line %lu: Invalid value <%s> for key %s; %f is assumed", __func__, filename, lineNumber, keyList[JL_P]->value, keyList[JL_P]->key, INFINIT_FLOAT);
+                    ls_syslog (LOG_ERR, "catgets 5094: %s: File %s at line %lu: Invalid value <%s> for key %s; %s is assumed", __func__, filename, lineNumber, keyList[JL_P].value, keyList[JL_P].  key, "FLT_MAX" );
                     lsberrno = LSBE_CONF_WARNING;
                 }
             }
             if (!isGroupAt && (!(options & (CONF_EXPAND | CONF_NO_EXPAND)) || options == CONF_NO_CHECK)) { // FIXME FIXME FIXME FIXME options: set in configure.ac
                 h_addEnt_ (nonOverridableUsers, keyList[USER_NAME].value, 0);
-                if (!addUser (keyList[USER_NAME]->value, maxjobs, pJobLimit, filename, true) && lsberrno == LSBE_NO_MEM) {
+                if (!addUser( keyList[USER_NAME].value, maxjobs, pJobLimit, filename, true) && lsberrno == LSBE_NO_MEM) {
                     FREEUP (grpSl);
                     lsberrno = LSBE_NO_MEM;
                     h_delTab_ (tmpUsers);
@@ -3722,8 +3723,8 @@ do_Users(struct lsConf *conf, const char *filename, size_t *lineNumber, int opti
 
 
                 if (isGroupAt) {
-                    if (gr__func__[strlen (keyList[USER_NAME]->value) - 1] == '@') {
-                        gr__func__[strlen (keyList[USER_NAME]->value) - 1] = '\0';
+                    if (gr__func__[strlen (keyList[USER_NAME].value) - 1] == '@') {
+                        gr__func__[strlen (keyList[USER_NAME].value) - 1] = '\0';
                     }
                 }
 
@@ -3739,7 +3740,7 @@ do_Users(struct lsConf *conf, const char *filename, size_t *lineNumber, int opti
                 }
 
                 if (strcmp (groupMembers[0], "all") == 0) { // FIXME FIXME FIXME FIXME dubstitue [0] with label
-                    ls_syslog (LOG_ERR, "catgets 5096: %s: File %s at line %lu: user group <%s> with no members is ignored", __func__, filename, lineNumber, keylist[USER_NAME].value); /* catgets 5096 */
+                    ls_syslog (LOG_ERR, "catgets 5096: %s: File %s at line %lu: user group <%s> with no members is ignored", __func__, filename, lineNumber, keyList[USER_NAME].value); /* catgets 5096 */
                 }
                 else if (!(options & CONF_NO_EXPAND)) { // FIXME FIXME FIXME FIXME options: set in configure.ac
                     for ( unsigned int i = 0; i < *numMembers; i++) {
@@ -3761,7 +3762,8 @@ do_Users(struct lsConf *conf, const char *filename, size_t *lineNumber, int opti
             FREEUP (grpSl);
         }
 
-        ls_syslog (LOG_ERR, I18N_FILE_PREMATURE, __func__, filename, lineNumber);
+        // catgets 5051
+        ls_syslog (LOG_ERR, "catgets 5051:  %s: File %s at line %d, premature EOF", __func__, filename, lineNumber);
         lsberrno = LSBE_CONF_WARNING;
         FREEUP (grpSl);
         h_delTab_ (tmpUsers);
@@ -3791,14 +3793,14 @@ do_Users(struct lsConf *conf, const char *filename, size_t *lineNumber, int opti
 
 
 bool
-do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filename, size_t lineNumber, unsigned int *ngroups, int options)
+do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filename, size_t *lineNumber, unsigned int *ngroups, int options)
 {
     enum state { 
         GROUP_NAME, 
         GROUP_MEMBER 
     };
 
-    const char *keylist[] {
+    const char *keylist[] = {
         "GROUP_NAME",
         "GROUP_MEMBER",
         NULL
@@ -3820,8 +3822,8 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filena
     struct passwd *pw       = NULL;
     struct groupInfoEnt *gp = NULL;
 
-    const char ALL[] = "all";
-    const cahr OTHERS[] = "others";
+    const char ALL[]    = "all";
+    const char OTHERS[] = "others";
 
     if (groups == NULL || conf == NULL || ngroups == NULL) {
         return false;
@@ -3840,13 +3842,15 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filena
 
     linep = getNextLineC_conf (conf, lineNumber, true);
     if (!linep) {
-        ls_syslog (LOG_ERR, I18N_FILE_PREMATURE, __func__, filename, lineNumber);
+        // catgets 5051
+        ls_syslog (LOG_ERR, "catgets 5051: %s: File %s at line %d, premature EOF", __func__, filename, lineNumber);
         lsberrno = LSBE_CONF_WARNING;
         return false;
     }
 
     if (isSectionEnd (linep, filename, lineNumber, HUgroups)) {
-        ls_syslog (LOG_WARNING, I18N_EMPTY_SECTION, __func__, filename, lineNumber, HUgroups);
+        // catgets 5052
+        ls_syslog (LOG_WARNING, "catgets 5052: %s: File %s at line %d: Empty %s section", __func__, filename, lineNumber, HUgroups);
         lsberrno = LSBE_CONF_WARNING;
         return false;
     }
@@ -3861,6 +3865,10 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filena
             return false;
         }
         while ((linep = getNextLineC_conf (conf, lineNumber, true)) != NULL) {
+
+            int base10   = 10;
+            size_t index = 0;
+            const char defaultLabel[ ] = "default";
 
             freekeyval (keyList);
 
@@ -3886,21 +3894,27 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filena
                 continue;
             }
 
+            index = strtoul( keyList[GROUP_MEMBER].value, NULL, base10 );
+            if( ( type == USER_GRP || type == HOST_GRP ) && ( keyList[GROUP_NAME].value != NULL ) && ( strcmp( keyList[index].value, "!" ) == 0 ) ) {
 
-            if ((type == USER_GRP || type == HOST_GRP) && (keyList[GROUP_NAME].value != NULL) && (strcmp (keyList[keyList[GROUP_MEMBER].value].value, "!") == 0)) {
-                char *members;
+                int type = 0;
+                char *members = NULL;
 
-                if ((members = runEGroup_ (type == USER_GRP ? "-u" : "-m", keyList[GROUP_NAME].value)) != NULL) {
-                    FREEUP (keyList[GROUP_MEMBER].value);
+                type == USER_GRP ? "-u" : "-m", keyList[GROUP_NAME].value
+
+                 members = runEGroup_ (  ) 
+
+                if( NULL != members ) {
+                    FREEUP( keyList[GROUP_MEMBER].value );
                     keyList[GROUP_MEMBER].value = members;
                 }
                 else {
-                    memset( keyList[GROUP_MEMBER].value, 0, strlen( keyList[GROUP_MEMBER].value ) );
-                    keyList[GROUP_MEMBER].value = NULL
+                    memset( keyList[GROUP_MEMBER].value, '\0', strlen( keyList[GROUP_MEMBER].value ) );
+                    keyList[GROUP_MEMBER].value = NULL;
                 }
             }
 
-            if (options != CONF_NO_CHECK && type == USER_GRP) {
+            if (options != CONF_NO_CHECK && type == USER_GRP) { // FIXME FIXME FIXME FIXME add options to configure.ac
 
                 pw = getpwlsfuser_ (keyList[GROUP_NAME].value);
                 if (!initUnknownUsers) {
@@ -3941,7 +3955,7 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filena
                 continue;
             }
 
-            if ((type == HOST_GRP) && *ngroups >= MAX_GROUPS) {
+            if( ( type == HOST_GRP ) && *ngroups >= MAX_GROUPS ) {
                 /* catgets 5113 */
                 ls_syslog (LOG_ERR, "catgets 5113: %s: File %s at line %lu: The number of configured host groups reaches the limit <%lu>; ignoring the rest of groups defined", __func__, filename, lineNumber, MAX_GROUPS);
                 lsberrno = LSBE_CONF_WARNING;

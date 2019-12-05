@@ -19,6 +19,7 @@
 // #include "lib/lib.h"
 // #include "lib/so.h"
 
+#include <stdbool.h>
 #include <sys/types.h>
 #include <stddef.h>
 
@@ -39,11 +40,11 @@
 
 // https://stackoverflow.com/questions/14134245/iso-c-void-and-function-pointers
 
-typedef int (*GET_LSF_USER_BY_NAME_FN_T) ( const char *osUserName,  const char  *lsfUserName,       unsigned int lsfUserNameSize );
-typedef int (*GET_LSF_USER_BY_UID_FN_T)  ( const uid_t uid,         const char  *lsfUserName,       unsigned int lsfUserNameSize );
-typedef int (*GET_OS_USER_NAME_FN_T)     ( const char *lsfUserName, const char  *osUserName,        unsigned int osUserNameSize  );
+typedef int (*GET_LSF_USER_BY_NAME_FN_T) ( const char *osUserName,  const char  *lsfUserName,       size_t lsfUserNameSize );
+typedef int (*GET_LSF_USER_BY_UID_FN_T)  ( const uid_t uid,         const char  *lsfUserName,       size_t lsfUserNameSize );
+typedef int (*GET_OS_USER_NAME_FN_T)     ( const char *lsfUserName, const char  *osUserName,        size_t osUserNameSize  );
 typedef int (*GET_OS_UID_FN_T)           ( const char *lsfUserName,                           const uid_t *uid );
-typedef int (*GET_LSF_USER_FN_T)         ( const char *lsfUserName,                                 unsigned int lsfUserNameSize );
+typedef int (*GET_LSF_USER_FN_T)         ( const char *lsfUserName,                                 size_t lsfUserNameSize );
 
 // typedef
 struct IDLIB_INFO_T
@@ -71,19 +72,20 @@ struct IDLIB_INFO_T idLib_ = {
 };
 
 /* id.c */
-void initIdLibDefaults         ( struct IDLIB_INFO_T *idLib );
-int initIdLib                  ( struct IDLIB_INFO_T *idLib );
-unsigned short checkInit       ( struct IDLIB_INFO_T *idLib );
-int getLSFUser_                ( const char *lsfUserName, unsigned int lsfUserNameSize );
-int getLSFUserByName_          ( const char *osUserName, const char *lsfUserName, unsigned int lsfUserNameSize );
-int getLSFUserByUid_           ( const uid_t uid, const char *lsfUserName, unsigned int lsfUserNameSize);
-int getOSUserName_             ( const char *lsfUserName, const char *osUserName, unsigned int osUserNameSize );
-int getOSUid_                  ( const char *lsfUserName, const uid_t *uid);
-struct passwd *getpwlsfuser_   ( const char *lsfUserName );
+void initIdLibDefaults( struct IDLIB_INFO_T *idLib );
+int  initIdLib(         struct IDLIB_INFO_T *idLib );
+bool checkInit(         struct IDLIB_INFO_T *idLib );
+bool getLSFUser_(             const char *lsfUserName,                          size_t lsfUserNameSize );
+bool getLSFUserByName_(       const char *osUserName,  const char *lsfUserName, size_t lsfUserNameSize );
+bool getLSFUserByUid_(        const uid_t uid,         const char *lsfUserName, size_t lsfUserNameSize );
+bool getOSUserName_(          const char *lsfUserName, const char *osUserName,  size_t osUserNameSize  );
+bool getOSUid_(               const char *lsfUserName, const uid_t *uid);
+struct passwd *getpwlsfuser_( const char *lsfUserName    );
 struct passwd *getpwdirlsfuser_( const char *lsfUserName );
-int defGetLSFUser              ( const char *lsfUserName, unsigned int lsfUserNameSize );
-int defGetLSFUserByName        ( const char *osUserName, const char *lsfUserName, unsigned int lsfUserNameSize );
-int defGetLSFUserByUid         ( const uid_t uid, const char *lsfUserName, unsigned int lsfUserNameSize);
-int defGetOSUserName           ( const char *lsfUserName, const char *osUserName, unsigned int osUserNameSize);
-int defGetOSUid                ( const char *lsfUserName, const uid_t *uid);
+int defGetLSFUser(                                         const char *lsfUserName, size_t lsfUserNameSize );
+int defGetLSFUserByName(         const char *osUserName,   const char *lsfUserName, size_t lsfUserNameSize );
+int defGetLSFUserByUid(          const uid_t uid,          const char *lsfUserName, size_t lsfUserNameSize );
+int defGetOSUserName(            const char *lsfUserName,  const char *osUserName,  size_t osUserNameSize  );
+int defGetOSUid(                 const char *lsfUserName,  const uid_t *uid);
+
 

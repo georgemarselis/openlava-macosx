@@ -19,6 +19,7 @@
 #include <termios.h>
 #include <limits.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <signal.h>
 #include <sys/wait.h>
 #include <pwd.h>
@@ -39,13 +40,19 @@
 
 /* #define exit(a)         _exit(a) */
 
-int
+unsigned int
 runEsub_ (struct lenData *ed, const char *path)
 {
     char esub[MAX_PATH_LEN];
     char *myargv[6]; // FIXME FIXME FIXME label [6]
     struct stat sbuf;
     char ESUB[] = "esub";
+
+    enum runEsub_returnResult {
+        CLEAR,
+        ESTATFAILED,
+        ERUNECLIENTFAILED
+    };
 
     ed->length = 0;
     ed->data = NULL;
@@ -56,12 +63,12 @@ runEsub_ (struct lenData *ed, const char *path)
         myargv[1] = NULL;  // FIXME FIXME FIXME figure out what myargv[1] is and replace the 1 with a label
     }
     else {
-        if (*path == '\0') {
+        // if ( path == NULL ) {
             strcpy (esub, ESUB);
-        }
-        else {
-            sprintf (esub, "%s/%s", path, ESUB);
-        }
+        // }
+        // else {
+        //     sprintf (esub, "%s/%s", path, ESUB);
+        // }
         strcpy( myargv[1], "-r"); // FIXME FIXME FIXME FIXME FIXME someone sure loves his default arguments
         myargv[2] = NULL;
     }
@@ -76,29 +83,31 @@ runEsub_ (struct lenData *ed, const char *path)
             ls_syslog (LOG_DEBUG, "%s: stat(%s) failed: %m", __func__, esub);
         }
         lserrno = LSE_ESUB;
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful *positive* return value
+        return ESTATFAILED; // FIXME FIXME FIXME FIXME replace with meaningful *positive* return value
     }
 
-    if (runEClient_ (ed, myargv) == -1) {
-        return -2; // FIXME FIXME FIXME FIXME replace with meaningful *positive* return value
+    if( runEClient_( ed, myargv ) == false ) {
+        return ERUNECLIENTFAILED; // FIXME FIXME FIXME FIXME replace with meaningful *positive* return value
     }
 
-    return 0;
+    return CLEAR;
 }
 
-int
+unsigned int
 runEClient_ (struct lenData *ed, char **argv)
 {
-  char lsfUserName[MAX_LSF_NAME_LEN];
+    char lsfUserName[MAX_LSF_NAME_LEN];
 
-    if (getLSFUser_ (lsfUserName, sizeof (lsfUserName)) < 0) {
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful *positive* return value //
+    memset( lsfUserName, '\0', strlen( lsfUserName ) );
+
+    if ( false == getLSFUser_ (lsfUserName, sizeof (lsfUserName)) ) {
+        return false; // FIXME FIXME FIXME FIXME replace with meaningful *positive* return value //
     }
 
     return getEData (ed, argv, lsfUserName);
 }
 
-int
+bool
 getEData (struct lenData *ed, char **argv, const char *lsfUserName)
 {
     int ePorts[2]  = { 0, 0 };
@@ -113,7 +122,7 @@ getEData (struct lenData *ed, char **argv, const char *lsfUserName)
   
 
   
-    if (getOSUid_ (lsfUserName, &uid) < 0) {
+    if (getOSUid_ (lsfUserName, &uid) == false ) {
         ls_syslog (LOG_DEBUG, I18N_FUNC_S_FAIL_MM, __func__, "getOSUid_", lsfUserName);
         return -1; // FIXME FIXME FIXME FIXME replace with meaningful *positive* return value
     }
@@ -147,7 +156,7 @@ getEData (struct lenData *ed, char **argv, const char *lsfUserName)
         close (ePorts[1]);
         lserrno = LSE_FORK;
 
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful *positive* return value
+        return false; // FIXME FIXME FIXME FIXME replace with meaningful *positive* return value
     }
 
     close (ePorts[1]);
@@ -174,7 +183,7 @@ getEData (struct lenData *ed, char **argv, const char *lsfUserName)
 
         ed->length = 0;
         ed->data = NULL;
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful *positive* return value
+        return false; // FIXME FIXME FIXME FIXME replace with meaningful *positive* return value
     }
 
     for( size = MSGSIZE, ed->length = 0, sp = buf; (cc = read (ePorts[0], sp, size)); ) {
@@ -222,7 +231,7 @@ getEData (struct lenData *ed, char **argv, const char *lsfUserName)
 
             ed->length = 0;
             ed->data = NULL;
-            return -1; // FIXME FIXME FIXME FIXME replace with meaningful *positive* return value
+            return false; // FIXME FIXME FIXME FIXME replace with meaningful *positive* return value
         }
 
         buf = sp;
@@ -247,7 +256,7 @@ getEData (struct lenData *ed, char **argv, const char *lsfUserName)
 
         ed->length = 0;
   
-        return -1; // FIXME FIXME FIXME FIXME replace with meaningful *positive* return value
+        return false; // FIXME FIXME FIXME FIXME replace with meaningful *positive* return value
     }
     
 
@@ -255,7 +264,7 @@ getEData (struct lenData *ed, char **argv, const char *lsfUserName)
         FREEUP (ed->data);
     }
 
-    return 0;
+    return true;
 
 // errorReturn: // FIXME FIXME FIXME get rid of goto label
 
@@ -335,7 +344,7 @@ runEexec_ (char *option, unsigned int job, struct lenData *eexec, const char *pa
     
         if ((user = getenv ("LSFUSER")) != NULL) { // FIXME FIXME FIXME FIXME add to configure.ac
         
-            if (getOSUid_ (user, &uid) < 0) {
+            if (getOSUid_ (user, &uid) == false ) {
                 ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_MM, __func__, "getOSUid_", user);
                 exit (-1);
             }
@@ -413,7 +422,7 @@ runEexec_ (char *option, unsigned int job, struct lenData *eexec, const char *pa
 }
 
 char *
-runEGroup_ (char *type, char *gname)
+runEGroup_ ( const char *type, const char *gname)
 {
     struct lenData ed;
     char lsfUserName[MAX_LSF_NAME_LEN];
@@ -423,39 +432,39 @@ runEGroup_ (char *type, char *gname)
     uid_t uid = INT_MAX;
     struct stat sbuf;
     char EGROUPNAME[ ] = "egroup";
+    int base10 = 10;
+
+    memset( egroupPath, '\0', strlen( egroupPath ) );
 
     sprintf (egroupPath, "%s/%s", genParams_[LSF_SERVERDIR].paramValue, EGROUPNAME);
 
     argv[0] = egroupPath;
-    argv[1] = type;
-    argv[2] = gname;
+    argv[1] = strdup( type );
+    argv[2] = strdup( gname );
     argv[3] = NULL;
 
     uid = getuid ();
-    if (uid == 0 && (managerIdStr = getenv ("LSB_MANAGERID")) != NULL)  // FIXME FIXME FIXME FIXME add to configure.ac
-    {
-        uid = (uid_t) atoi (managerIdStr);
-        if (getLSFUserByUid_ (uid, lsfUserName, sizeof (lsfUserName)) < 0) {
+    if (uid == 0 && (managerIdStr = getenv ("LSB_MANAGERID")) != NULL) { // FIXME FIXME FIXME FIXME add to configure.ac
+
+        uid = (unsigned int ) strtoul( managerIdStr, NULL, base10 ); // FIXME FIXME FIXME strtoui() ?
+        if ( getLSFUserByUid_( uid, lsfUserName, strlen ( lsfUserName ) ) == false ) {
             ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_MM, __func__, "getLSFUserByUid_", uid);  // FIXME FIXME FIXME FIXME add to configure.ac
             return NULL;
         }
     }
-    else
-    {
-        if (getLSFUser_ (lsfUserName, sizeof (lsfUserName)) < 0) {
+    else {
+        if (getLSFUser_ (lsfUserName, strlen (lsfUserName)) == false ) {
             ls_syslog (LOG_ERR, I18N_FUNC_FAIL_MM, __func__, "getLSFUser_");  // FIXME FIXME FIXME FIXME add to configure.ac
             return NULL;
         }
     }
 
-    if (stat (egroupPath, &sbuf) < 0)
-    {
+    if (stat (egroupPath, &sbuf) < 0) {
         ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "stat", egroupPath);  // FIXME FIXME FIXME FIXME add to configure.ac
         return NULL;
     }
 
-    if (getEData (&ed, argv, lsfUserName) < 0)
-    {
+    if (getEData (&ed, argv, lsfUserName) == false ) {
         ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "getEData", egroupPath);  // FIXME FIXME FIXME FIXME add to configure.ac
         return NULL;
     }

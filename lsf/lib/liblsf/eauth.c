@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <termios.h>
+#include <stdbool.h>
 
 #include "lib/lib.h"
 #include "lib/id.h"
@@ -46,16 +47,15 @@
 
 // #define _DARWIN_C_SOURCE
 
-int
+bool 
 getAuth_lsf( struct lsfAuth *auth, const char *host )
 {
-    assert( rootuid_ ); // NOTE bullshit op to hush up the compiler
     auth->uid = getuid ();
 
-    if (getLSFUser_ (auth->lsfUserName, sizeof (auth->lsfUserName)) < 0) {
+    if (getLSFUser_ (auth->lsfUserName, sizeof (auth->lsfUserName)) == false ) {
         ls_syslog (LOG_DEBUG, I18N_FUNC_FAIL_MM, __func__, "getLSFUser_");
         lserrno = LSE_BADUSER;
-        return -1; // FIXME FIXME FIXME FIXME ALTER THIS FROM NEGATIVE TO APPROPRIATELLY POSITIVE
+        return false;
     }
 
     auth->gid = getgid ();
@@ -74,11 +74,11 @@ getAuth_lsf( struct lsfAuth *auth, const char *host )
         auth->kind = CLIENT_SETUID;
     }
 
-  return 0;
+  return true;
 }
 
 
-int
+bool 
 getEAuth (struct eauth *eauth, const char *host)
 {
     char *argv[4];
@@ -97,18 +97,18 @@ getEAuth (struct eauth *eauth, const char *host)
     // argv[2] = host; // FIXME FIXME FIXME FIXME FIXME  frack
     // argv[3] = NULL; // FIXME FIXME FIXME FIXME FIXME    ?
 
-    if (logclass & LC_TRACE) {
+    if( logclass & LC_TRACE ) {
         ls_syslog (LOG_DEBUG, "runEAuth(): path=<%s>", path);
     }
 
-    if (runEClient_ (&ld, argv) == -1) {
+    if ( runEClient_( &ld, argv) == false ) {
 
       if (logclass & (LC_AUTH | LC_TRACE)) {
         ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL, "runEAuth", "runEClient", path);
       }
 
       lserrno = LSE_EAUTH;
-      return -1; // FIXME FIXME FIXME FIXME ALTER THIS FROM NEGATIVE TO APPROPRIATELLY POSITIVE
+      return false;
     }
 
     if (ld.length == 0) {
@@ -118,7 +118,7 @@ getEAuth (struct eauth *eauth, const char *host)
         }
         FREEUP (ld.data);
         lserrno = LSE_EAUTH;
-        return -1; // FIXME FIXME FIXME FIXME ALTER THIS FROM NEGATIVE TO APPROPRIATELLY POSITIVE
+        return false;
     }
 
     if (ld.length > EAUTH_SIZE) {
@@ -129,7 +129,7 @@ getEAuth (struct eauth *eauth, const char *host)
 
         FREEUP (ld.data);
         lserrno = LSE_EAUTH;
-        return -1; // FIXME FIXME FIXME FIXME ALTER THIS FROM NEGATIVE TO APPROPRIATELLY POSITIVE
+        return false;
     }
 
     memcpy (eauth->data, ld.data, ld.length);
@@ -146,11 +146,11 @@ getEAuth (struct eauth *eauth, const char *host)
         ls_syslog (LOG_DEBUG, "runEAuth: <%s> got length=%d", path, ld.length);
     }
 
-  return 0;
+  return true;
 
 }
 
-int
+bool 
 verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
 {
 
@@ -175,7 +175,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
     }
 
     if (!(genParams_[LSF_AUTH].paramValue && !strcmp (genParams_[LSF_AUTH].paramValue, AUTH_PARAM_EAUTH))) {
-        return -1;  // FIXME FIXME FIXME FIXME ALTER THIS FROM NEGATIVE TO APPROPRIATELLY POSITIVE
+        return false;
     }
 
     // 
@@ -189,16 +189,17 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
     assert( auth->k.eauth.length <= INT_MAX ); // FIXME FIXME why does it need to be less than INT_MAX?S
     sprintf (uData, "%ud %ud %s %s %u %lu %s %s %s %s\n", auth->uid, auth->gid,
         auth->lsfUserName, inet_ntoa (from->sin_addr),
-            ntohs (from->sin_port), auth->k.eauth.length,
-            (eauth_client ? eauth_client : "NULL"),
-            (eauth_server ? eauth_server : "NULL"),
-            (eauth_aux_data ? eauth_aux_data : "NULL"),
-            (eauth_aux_status ? eauth_aux_status : "NULL"));
+        ntohs (from->sin_port), auth->k.eauth.length,
+        ( eauth_client     ? eauth_client     : "NULL" ),
+        ( eauth_server     ? eauth_server     : "NULL" ),
+        ( eauth_aux_data   ? eauth_aux_data   : "NULL" ),
+        ( eauth_aux_status ? eauth_aux_status : "NULL" )
+    );
 
-    memset (path, 0, sizeof (path));
-    ls_strcat (path, sizeof (path), genParams_[LSF_SERVERDIR].paramValue);
-    ls_strcat (path, sizeof (path), "/");
-    ls_strcat (path, sizeof (path), EAUTHNAME); // FIXME FIXME FIXME fix function call, pointer to *
+    memset (path, '\0', strlen (path));
+    ls_strcat (path, strlen (path), genParams_[LSF_SERVERDIR].paramValue);
+    ls_strcat (path, strlen (path), "/");
+    ls_strcat (path, strlen (path), EAUTHNAME); // FIXME FIXME FIXME fix function call, pointer to *
 
     if (logclass & (LC_AUTH | LC_TRACE)) {
         ls_syslog (LOG_DEBUG, "%s: <%s> path <%s> connected=%d", __func__, uData, path, connected);
@@ -240,19 +241,19 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
         char *user = NULL;
 
         if ((user = getLSFAdmin ()) == NULL) {
-           return -1;
+           return false;
         }
     
         if (pipe (in) < 0) {
           ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "pipe(in)", uData);
           lserrno = LSE_SOCK_SYS;
-          return -1;
+          return false;
         }
 
         if (pipe (out) < 0) {
             ls_syslog (LOG_ERR, I18N_FUNC_S_FAIL_M, __func__, "pipe(out)", uData);
             lserrno = LSE_SOCK_SYS;
-            return -1;
+            return false;
         }
 
 
@@ -310,7 +311,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
             close (in[1]);
             close (out[0]);
             lserrno = LSE_FORK;
-            return -1;  // FIXME FIXME FIXME FIXME ALTER THIS FROM NEGATIVE TO APPROPRIATELLY POSITIVE
+            return false;  // FIXME FIXME FIXME FIXME ALTER THIS FROM NEGATIVE TO APPROPRIATELLY POSITIVE
         }
 
         connected = TRUE;
@@ -333,7 +334,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
         close (in[1]);
         close (out[0]);
         connected = FALSE;
-        return -1;  // FIXME FIXME FIXME FIXME ALTER THIS FROM NEGATIVE TO APPROPRIATELLY POSITIVE
+        return false;  // FIXME FIXME FIXME FIXME ALTER THIS FROM NEGATIVE TO APPROPRIATELLY POSITIVE
     }
     
     if (logclass & (LC_AUTH | LC_TRACE)) {
@@ -348,7 +349,7 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
         close (in[1]);
         close (out[0]);
         connected = FALSE;
-        return -1;  // FIXME FIXME FIXME FIXME ALTER THIS FROM NEGATIVE TO APPROPRIATELLY POSITIVE
+        return false;  // FIXME FIXME FIXME FIXME ALTER THIS FROM NEGATIVE TO APPROPRIATELLY POSITIVE
     }
 
     if (logclass & (LC_AUTH | LC_TRACE)) {
@@ -362,16 +363,16 @@ verifyEAuth_ (struct lsfAuth *auth, struct sockaddr_in *from)
         close (in[1]);
         close (out[0]);
         connected = FALSE;
-        return -1;  // FIXME FIXME FIXME FIXME ALTER THIS FROM NEGATIVE TO APPROPRIATELLY POSITIVE
+        return false;
     }
 
-    if (ok != '1') {
+    if ( strtol( &ok, NULL, 10 ) != 1 ) {
         /* catgets 5518 */
         ls_syslog (LOG_ERR, "5518: %s: eauth <%s> length=%d failed, rc=%c", __func__, uData, auth->k.eauth.length, ok);
-        return -1;  // FIXME FIXME FIXME FIXME ALTER THIS FROM NEGATIVE TO APPROPRIATELLY POSITIVE
+        return false;
     }
 
-    return 0; 
+    return true; 
 }
 
 char *
