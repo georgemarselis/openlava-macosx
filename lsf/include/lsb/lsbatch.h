@@ -343,7 +343,7 @@ struct msgMap
     int number;
     const char padding[4];
     const char *message;
-};
+}__attribute__((packed));
 
 struct msgMap pendMsg[] = {
 // sorted by catgets number
@@ -963,8 +963,7 @@ struct xFile {
     char *subFn;
     char *execFn;
     int options;
-    const char padding[4];
-};
+}__attribute__((packed));
 
 struct submit {
     int options;
@@ -978,7 +977,6 @@ struct submit {
     unsigned int maxNumProcessors;
     int userPriority;
     int rLimits[LSF_RLIM_NLIMITS];
-    const char padding[4];
     char *jobName;
     char *queue;
     char *resReq;
@@ -999,16 +997,15 @@ struct submit {
     time_t termTime;
     time_t chkpntPeriod;
     struct xFile *xf;
-};
+}__attribute__((packed));
 
 struct submitReply
 {
     char *queue;
     char *badJobName;
     int badReqIndx;
-    const char padding[4];
     unsigned long badJobId;
-};
+}__attribute__((packed));
 
 struct submig
 {
@@ -1023,9 +1020,8 @@ struct jobAttrInfoEnt
 {
     unsigned short port;
     char hostname[MAX_HOSTNAME_LEN];
-    const char padding[6];
     unsigned long jobId;
-};
+}__attribute__((packed));
 
 struct jobAttrSetLog
 {
@@ -1033,23 +1029,20 @@ struct jobAttrSetLog
     int idx;
     int uid;
     int port;
-    const char padding[4];
     char *hostname;
-};
+}__attribute__((packed));
 
 struct jobInfoHead
 {
     unsigned int numHosts;
-    const char padding[4];
     unsigned long *jobIds;
     unsigned long numJobs;
     char **hostNames;
-};
+}__attribute__((packed));
 
 struct jobInfoEnt
 {
     unsigned short port;
-    char padding1[2];
     int status;
     int reasons;
     int subreasons;
@@ -1076,7 +1069,6 @@ struct jobInfoEnt
     float *loadStop;
     unsigned long jobPid;
     float cpuTime;
-    char padding2[4];
     time_t submitTime;
     time_t reserveTime;
     time_t startTime;
@@ -1207,7 +1199,6 @@ struct hostInfoEnt
 //     int sharedResourceUpdFactor;
 //     int scheRawLoad;
 //     int slotResourceReserve;
-//     // char padding1[4];
 //     int maxAcctArchiveNum;
 //     int acctArchiveInSize;
 //     int acctArchiveInDays;
@@ -1316,16 +1307,15 @@ struct loadInfoEnt
 {
     const char *hostName;
     int status;
-    const char padding[4];
     float *load;
-};
+}__attribute__((packed));
 
 
-struct groupInfoEnt
-{
-    const char *group;
-    const char *memberList;
-};
+// struct groupInfoEnt
+// {
+//     const char *group;
+//     const char *memberList;
+// };
 
 struct runJobRequest
 {
@@ -1363,16 +1353,13 @@ struct jobNewLog
     unsigned int numProcessors;
     unsigned int numAskedHosts;
     unsigned int maxNumProcessors;
-    const char padding1[4];
     time_t chkpntPeriod;
     time_t submitTime;
     time_t beginTime;
     time_t termTime;
     uid_t userId;
-    const char padding2[4];
     unsigned long jobId;
     float hostFactor;
-    const char padding3[4];
     char *queue;
     char *fromHost;
     char *cwd;
@@ -1398,7 +1385,7 @@ struct jobNewLog
     char *schedHostType;
     char *loginShell;
     struct xFile *xf;
-};
+}__attribute__((packed));
 
 struct jobModLog
 {
@@ -1449,9 +1436,8 @@ struct jobModLog
     char **askedHosts;
 
     int rLimits[LSF_RLIM_NLIMITS];
-    const char padding[4];
     struct xFile *xf;
-};
+}__attribute__((packed));
 
 
 struct jobStartLog
@@ -1463,21 +1449,19 @@ struct jobStartLog
     pid_t jobPid;
     pid_t jobPGid;
     float hostFactor;
-    const char padding1[4];
     unsigned long jobId;
     char *queuePreCmd;
     char *queuePostCmd;
     char **execHosts;
-};
+}__attribute__((packed));
 
 struct jobStartAcceptLog
 {
     int idx;
     pid_t jobPid;
     pid_t jobPGid;
-    const char padding1[4];
     unsigned long jobId;
-};
+}__attribute__((packed));
 
 
 struct jobExecuteLog
@@ -1503,7 +1487,6 @@ struct jobStatusLog
     int exitStatus;
     int idx;
     float cpuTime;
-    // const char padding[8];
     time_t endTime;
     unsigned long jobId;
     struct lsfRusage lsfRusage;
@@ -1552,24 +1535,21 @@ struct chkpntLog
     int flags;
     int idx;
     pid_t pid;
-    const char padding[4];
     time_t period;
     unsigned long jobId;
-};
+}__attribute__((packed));
 
 struct jobRequeueLog
 {
     int idx;
-    const char padding[4];
     unsigned long jobId;
-};
+}__attribute__((packed));
 
 struct jobCleanLog
 {
     int idx;
-    const char padding[4];
     unsigned long jobId;
-};
+}__attribute__((packed));
 
 struct sigactLog
 {
@@ -1580,7 +1560,6 @@ struct sigactLog
     int idx;
     pid_t pid;
     time_t period;
-    // const char padding[6] ;
     char *signalSymbol;
     unsigned long jobId;
 };
@@ -1590,11 +1569,10 @@ struct migLog
     int idx;
     int numAskedHosts;
     uid_t userId;
-    const char padding[4];
     char *userName; // [MAX_LSB_NAME_LEN];
     unsigned long jobId;
     char **askedHosts;
-};
+}__attribute__((packed));
 
 struct signalLog
 {
@@ -1620,9 +1598,8 @@ struct newDebugLog
     int logclass;
     int turnOff;
     uid_t userId;
-    const char padding[4];
     char *logFileName; //[MAX_LSF_NAME_LEN];
-};
+}__attribute__((packed));
 
 struct hostCtrlLog
 {
@@ -1680,7 +1657,6 @@ struct jobFinishLog
     char jobFile     [MAX_FILENAME_LEN];
     char jobName     [MAX_LINE_LEN];
     char command     [MAX_LINE_LEN];
-    const char padding[4];
     char *resReq;
     char *dependCond;
     char *preExecCmd;
@@ -1702,14 +1678,13 @@ struct jobFinishLog
     time_t startTime;
     time_t endTime;
     struct lsfRusage lsfRusage;
-};
+}__attribute__((packed));
 
 struct loadIndexLog
 {
     int nIdx;
-    const char padding[4];
     char **name;
-};
+}__attribute__((packed));
 
 struct jobMsgLog
 {
@@ -1744,8 +1719,7 @@ struct jobForceRequestLog
     unsigned long jobId;
     char **execHosts;
     char userName[MAX_LSB_NAME_LEN];
-    const char padding[4];
-};
+}__attribute__((packed));
 
 // from union eventLog @ include/lsb/log.h
 struct newJobLog
@@ -1771,14 +1745,13 @@ struct newJobLog
     char *command;
     int limits[MAX_NRLIMITS]; // these subscribts got to go
     uid_t userId;
-    const char padding[4];
     time_t submitTime;
     time_t startTime;
     time_t termTime;
     unsigned long jobId;
     unsigned long rjobId;
     char **usHosts;
-};
+}__attribute__((packed));
 
 struct startJobLog
 {
@@ -1796,10 +1769,9 @@ struct newStatusLog
     int reasons;
     unsigned long jobId;
     float cpuTime;
-    const char padding[4];
     time_t doneTime;
     time_t delayTime;
-};
+}__attribute__((packed));
 
 struct qControlLog
 {
@@ -1810,19 +1782,17 @@ struct qControlLog
 struct switchJobLog
 {
     uid_t userId;
-    const char padding[4];
     unsigned long jobId;
     char queue[MAX_QUEUENAME_LEN];
-};
+}__attribute__((packed));
 
 struct moveJobLog
 {
     uid_t userId;
     int pos;
     int top;
-    const char padding[4];
     unsigned long jobId;
-};
+}__attribute__((packed));
 
 struct paramsLog
 {
@@ -1900,7 +1870,7 @@ union eventLog
     struct paramsLog paramsLog;
     struct finishJobLog finishJobLog;
 // end
-};
+}__attribute__((packed));
 
 struct eventRec
 {
@@ -1908,7 +1878,7 @@ struct eventRec
     int type;
     time_t eventTime;
     union eventLog eventLog;
-};
+}__attribute__((packed));
 
 struct eventLogFile
 {
@@ -1944,21 +1914,19 @@ struct jobIdIndexS
 struct sortIntList
 {
     int value;
-    const char padding[4];
     struct sortIntList *forw;
     struct sortIntList *back;
-};
+}__attribute__((packed));
 
 struct lsbMsgHdr
 {
     uid_t usrId;
     unsigned int   msgId;
     int   type;
-    const char padding[4];
     char  *src;
     char  *dest;
     unsigned long jobId;
-};
+}__attribute__((packed));
 
 struct lsbMsg
 {
@@ -1972,16 +1940,16 @@ struct lsbMsg
 
 struct userConf
 {
-    unsigned int numUgroups;
-    unsigned int numUsers;
+    size_t numUgroups;
+    size_t numUsers;
     struct groupInfoEnt *ugroups;
     struct userInfoEnt *users;
 };
 
 struct hostConf
 {
-    unsigned int numHosts;
-    unsigned int numHgroups;
+    size_t numHosts;
+    size_t numHgroups;
     struct hostInfoEnt *hosts;
     struct groupInfoEnt *hgroups;
 };
@@ -1989,31 +1957,28 @@ struct hostConf
 // typedef struct lsbSharedResourceInstance // FIXME FIXME typedef has to go
 struct lsbSharedResourceInstance // FIXME FIXME typedef has to go
 {
-    unsigned int nHosts;
-    const char padding[4];
+    size_t nHosts;
     char *totalValue;
     char *rsvValue;
     char **hostList;
 
 // } LSB_SHARED_RESOURCE_INST_T;
-};
+} __attribute__((packed));
 
 // typedef struct lsbSharedResourceInfo // FIXME FIXME typedef has to go
 struct lsbSharedResourceInfo // FIXME FIXME typedef has to go
 {
     char *resourceName;
     unsigned int nInstances;
-    const char padding[4];
     struct lsbSharedResourceInstance *instances;
 // } LSB_SHARED_RESOURCE_INFO_T;
-};
+}__attribute__((packed));
 
 struct queueConf
 {
     unsigned int numQueues;
-    const char padding[4];
     struct queueInfoEnt *queues;
-};
+}__attribute__((packed));
 
 
 int lsberrno;

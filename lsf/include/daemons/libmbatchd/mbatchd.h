@@ -34,7 +34,7 @@
 #define DEF_NICE             0
 #define DEF_SCHED_DELAY      10
 #define DEF_QUEUE_SCHED_DELAY    0
-#define MAX_INTERNAL_JOBID   299999999999999LL // FIXME FIXME FIXME FIXME what's that LL at the end there?
+#define MAX_INTERNAL_JOBID   299999999999999LL // FIXME FIXME FIXME FIXME what's that LL at the end there? (long long, 64 bit i guess?)
 #define DEF_MAX_JOB_NUM      1000
 #define DEF_EXCLUSIVE        FALSE
 #define DEF_EVENT_WATCH_TIME 60
@@ -1224,7 +1224,7 @@ char gDirectMember (char *, struct gData *);
 int countEntries (struct gData *, char);
 struct gData *getUGrpData (char *);
 struct gData *getHGrpData (char *);
-struct gData *getGrpData (struct gData **, char *, int);
+struct groupInfoEnt *getGrpData (struct groupInfoEnt **groups, const char *groupname, size_t ngroups);
 int sumMembers (struct gData *, char r, int first);
 void createGroupuData ();
 void createGroupTbPtr ();

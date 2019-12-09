@@ -23,8 +23,8 @@
 #include "lsb/lsb.h"
 #include "lib/xdr.h"
 
-static struct groupInfoEnt *getGrpInfo (char **groups, unsigned int *numGroups, int options);
-static int sendGrpReq (char *clusterName, int options, struct infoReq *groupInfo, struct groupInfoReply *reply);
+struct groupInfoEnt *getGrpInfo (char **groups, unsigned int *numGroups, int options);
+int sendGrpReq (char *clusterName, int options, struct infoReq *groupInfo, struct groupInfoReply *reply);
 
 struct groupInfoEnt *
 lsb_usergrpinfo (char **groups, unsigned int *numGroups, int options)
@@ -42,7 +42,7 @@ lsb_hostgrpinfo (char **groups, unsigned int *numGroups, int options)
 
 }
 
-static struct groupInfoEnt *
+struct groupInfoEnt *
 getGrpInfo (char **groups, unsigned int *numGroups, int options)
 {
 
@@ -121,7 +121,7 @@ getGrpInfo (char **groups, unsigned int *numGroups, int options)
 
 }
 
-static int
+int
 sendGrpReq (char *clusterName, int options, struct infoReq *groupInfo, struct groupInfoReply *reply)
 {
   XDR xdrs;

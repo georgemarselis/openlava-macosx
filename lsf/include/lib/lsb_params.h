@@ -8,6 +8,8 @@
 #include "lib/table.h"
 // #include "lsb/lsbatch.h"
 #include "libint/lsi18n.h"
+#include "lib/getGrpData.h"  // struct groupInfoEnt
+
 
 // #define USEREQUIVALENT "userequivalent"
 // #define USERMAPPING    "usermap"
@@ -57,16 +59,16 @@ struct hTab unknownUsers;
 // static struct clusterConf cConf_;
 // static struct sharedConf sConf_;
 
-unsigned int numofugroups = 0;
-unsigned int numofhosts   = 0;
-unsigned int numofhgroups = 0;
-unsigned int numofqueues  = 0;
-unsigned int usersize     = 0;
-unsigned int hostsize     = 0;
-unsigned int queuesize    = 0;
-unsigned int numofusers   = 0;
-double maxFactor          = 0.0F;
-char *maxHostName         = NULL;
+size_t numofugroups = 0;
+size_t numofhosts   = 0;
+size_t numofhgroups = 0;
+size_t numofqueues  = 0;
+size_t usersize     = 0;
+size_t hostsize     = 0;
+size_t queuesize    = 0;
+size_t numofusers   = 0;
+double maxFactor    = 0.0F;
+char *maxHostName   = NULL; 
 
 bool_t initUnknownUsers = FALSE;
 
@@ -90,18 +92,18 @@ struct userConf *lsb_readuser(struct lsConf *conf, int options, struct clusterCo
 struct userConf *lsb_readuser_ex(struct lsConf *conf, int options, struct clusterConf *clusterConf, struct sharedConf *sharedConf);
 // char do_Users(struct lsConf *conf, const char *filename, size_t *lineNum, int options);
 char do_Users(struct lsConf *conf, const char *filename, size_t *lineNum, int options);
-bool do_Groups(struct groupInfoEnt **groups, struct lsConf *conf, const char *filename, size_t *lineNum, unsigned int *ngroups, int options);
-int isHostName(const char *grpName);
+bool do_Groups(struct groupInfoEnt **groups, struct lsConf *conf, const char *filename, size_t *lineNum, size_t *ngroups, int options);
+bool isHostName(const char *grpName);
 struct groupInfoEnt *addGroup(struct groupInfoEnt **groups, const char *gname, size_t *ngroups, int type);
 struct groupInfoEnt *addUnixGrp(struct group *unixGrp, const char *gname, const char *filename, const size_t lineNum, const char *section, int type);
-char addMember(struct groupInfoEnt *gp, const char *word, int grouptype, const char *filename, const size_t lineNum, const char *section, int options, int checkAll);
+bool addMember(struct groupInfoEnt *gp, const char *word, int grouptype, const char *filename, const size_t lineNum, const char *section, int options, int checkAll);
 struct groupInfoEnt *getUGrpData(const char *gname);
 struct groupInfoEnt *getHGrpData(const char *gname);
-struct groupInfoEnt *getGrpData(struct groupInfoEnt **groups, const char *name, unsigned int num);
+struct groupInfoEnt *getGrpData (struct groupInfoEnt **groups, const char *groupname, size_t ngroups);
 struct userInfoEnt *getUserData(const char *name);
 struct hostInfoEnt *getHostData(const char *name);
 struct queueInfoEnt *getQueueData(const char *name);
-char searchAll(char *const word);
+bool searchAll(char *const word);
 void initUserInfo(struct userInfoEnt *up);
 void freeUserInfo(struct userInfoEnt *up);
 void initGroupInfo(struct groupInfoEnt *gp);

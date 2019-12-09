@@ -88,31 +88,31 @@ isdigitstr_ (  const char *string)
     return TRUE;
 }
 
-ssize_t
-atoi64_( const char *word )
-{
-    ssize_t number = 0;
-    char *tempword = NULL;
+// ssize_t
+// atoi64_( const char *word )
+// {
+//     ssize_t number = 0;
+//     char *tempword = NULL;
 
-    if (!word || *word == '\0') {
-        return 0;
-    }
+//     if (!word || *word == '\0') {
+//         return 0;
+//     }
 
-    if (errno == ERANGE) {
-        errno = 0;
-    }
+//     if (errno == ERANGE) {
+//         errno = 0;
+//     }
 
-    tempword = strdup( word );
-    sscanf (tempword, "%ld", &number);
-    if (errno != ERANGE) {
-        // if (number <= INFINIT_LONG_INT && number > -INFINIT_LONG_INT) {
-        if (number <= LONG_MAX && number > LONG_MIN ) {
-            return number;
-        }
-    }
+//     tempword = strdup( word );
+//     sscanf (tempword, "%ld", &number);
+//     if (errno != ERANGE) {
+//         // if (number <= INFINIT_LONG_INT && number > -INFINIT_LONG_INT) {
+//         if (number <= LONG_MAX && number > LONG_MIN ) {
+//             return number;
+//         }
+//     }
 
-    return 0;
-}
+//     return 0;
+// }
 
 unsigned int
 isint_ ( const char *word)
@@ -1081,4 +1081,14 @@ freeHostEntryLog (struct hostEntryLog **hPtr)
     FREEUP (*hPtr);
 
     return 0;
+}
+
+struct hEnt *
+chekMembStr (struct hTab *tabPtr, char *memberStr) // came from liblsb/misc.c
+{
+    if (tabPtr && memberStr) {
+        return h_getEnt_ (tabPtr, memberStr);
+    }
+
+    return NULL;
 }

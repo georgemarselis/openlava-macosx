@@ -36,8 +36,9 @@
 #include <float.h>
 #include <time.h>  // char *strptime( )
 
-#include "lsb/lsbatch.h"     // struct parameterInfo
-#include "libint/intlibout.h"
+#include "lsb/lsbatch.h"      // struct parameterInfo
+#include "lsb/misc.h"        // addMembStr (struct hTab * tabPtr, char *memberStr)
+#include "libint/intlibout.h" //
 #include "lsb/conf.h"
 #include "lib/id.h"
 #include "lib/esub.h"
@@ -48,7 +49,8 @@
 #include "lib/words.h"       // getNextWord_( )
 #include "lib/getnextline.h" // getNextLineC_conf( )
 #include "lib/misc.h"        // putstr_( )
-
+#include "lib/getGrpData.h"  // struct groupInfoEnt
+#include "lib/host.h"        // struct hostent *Gethostbyname_( const char *hostname )
 #include "config.h"          // name_of_upgrade_utility
 
 void
@@ -3416,8 +3418,8 @@ lsb_readuser_ex (struct lsConf *conf, int options, struct clusterConf *clusterCo
     do { // FIXME FIXME FIXME FIXME replace infinite loop with a certain-to-terminate condition
         if ( NULL == cp ) {
 
-            if (numofugroups) {
-                uConf->ugroups = calloc (numofugroups, sizeof (struct groupInfoEnt));
+            if (numofugroups) { // include/lib/lsb_params.h
+                uConf->ugroups = calloc (numofugroups, sizeof (struct groupInfoEnt)); // struct usercConf in include/lib/lsb_params.h
                 if( NULL == uConf->ugroups && ENOMEM == errno ) {
                     const char malloc[] = "malloc";
                     ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, malloc, numofugroups * sizeof (struct groupInfoEnt));
@@ -3793,7 +3795,7 @@ do_Users(struct lsConf *conf, const char *filename, size_t *lineNumber, int opti
 
 
 bool
-do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filename, size_t *lineNumber, unsigned int *ngroups, int options)
+do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filename, size_t *lineNumber, size_t *ngroups, int options)
 {
     enum state { 
         GROUP_NAME, 
@@ -3824,6 +3826,8 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filena
 
     const char ALL[]    = "all";
     const char OTHERS[] = "others";
+
+    memset( HUgroups, '\0', strlen( HUgroups ) );
 
     if (groups == NULL || conf == NULL || ngroups == NULL) {
         return false;
@@ -3897,12 +3901,15 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filena
             index = strtoul( keyList[GROUP_MEMBER].value, NULL, base10 );
             if( ( type == USER_GRP || type == HOST_GRP ) && ( keyList[GROUP_NAME].value != NULL ) && ( strcmp( keyList[index].value, "!" ) == 0 ) ) {
 
-                int type = 0;
+                // int *type = 0;
                 char *members = NULL;
 
-                type == USER_GRP ? "-u" : "-m", keyList[GROUP_NAME].value
-
-                 members = runEGroup_ (  ) 
+                if( type == USER_GRP ) {
+                    members = runEGroup_ ( "-u", keyList[GROUP_NAME].value ); // FIXME FIXME FIXME FIXME remove the const char
+                }
+                else {
+                    members = runEGroup_ ( "-m", keyList[GROUP_NAME].value ); // FIXME FIXME FIXME FIXME remove the const char
+                }                 
 
                 if( NULL != members ) {
                     FREEUP( keyList[GROUP_MEMBER].value );
@@ -3918,7 +3925,7 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filena
 
                 pw = getpwlsfuser_ (keyList[GROUP_NAME].value);
                 if (!initUnknownUsers) {
-                    initTab (&unknownUsers);
+                    h_initTab_ ( &unknownUsers, 50 ); // FIXME FIXME FIXME  why 50?
                     initUnknownUsers = true;
                 }
 
@@ -3998,7 +4005,7 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filena
                 }
 
                 memset( keyList[GROUP_MEMBER].value, 0, strlen( keyList[GROUP_MEMBER].value ));
-                assume( strlen( keyList[GROUP_MEMBER].value ) >= strlen( outHosts ) + 1 );
+                assert( strlen( keyList[GROUP_MEMBER].value ) >= strlen( outHosts ) + 1 );
                 strcpy( keyList[GROUP_MEMBER].value, outHosts );
             }
 
@@ -4009,18 +4016,19 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filena
 
             sp = keyList[GROUP_MEMBER].value;
             allFlag = false;
-            if (searchAll (keyList[GROUP_MEMBER].value) && (strchr (sp, '~') == NULL)) {
+            if (searchAll (keyList[GROUP_MEMBER].value) && (strchr ( sp, '~') == NULL)) {
                 allFlag = true;
             }
 
-            while (!allFlag && (wp = getNextWord_ (&sp)) != NULL) {
-                if (!addMember(gp, wp, type, filename, lineNumber, "", options, true) && lsberrno == LSBE_NO_MEM) {
+            const char *wtf = strdup( sp ); // FIXME FIXME FIXME FIXME this is def wrong and needs to be fixed 
+            while (!allFlag && (wp = getNextWord_( &wtf ) ) != NULL) {
+                if (!addMember(gp, wp, type, filename, *lineNumber, "", options, true) && lsberrno == LSBE_NO_MEM) {
                     return false;
                 }
             }
 
             if (allFlag) {
-                if (!addMember (gp, "all", type, filename, lineNumber, "", options, true) && lsberrno == LSBE_NO_MEM) {
+                if (!addMember (gp, "all", type, filename, *lineNumber, "", options, true) && lsberrno == LSBE_NO_MEM) {
                     return false;
                 }
             }
@@ -4029,14 +4037,15 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filena
                 /* catgets 5108 */
                 ls_syslog (LOG_WARNING, "catgets 5108: %s: File %s at line %lu: No valid member in group <%s>; ignoring line", __func__, filename, lineNumber, gp->group);
                 lsberrno = LSBE_CONF_WARNING;
-                FREEUP (gp->group);
+                // FREEUP (gp->group);
                 FREEUP (gp);
                 *ngroups -= 1;
             }
 
         }
 
-        ls_syslog (LOG_WARNING, I18N_FILE_PREMATURE, __func__, filename, lineNumber);
+        // catgets 5052
+        ls_syslog (LOG_WARNING, "catgets 5052: %s: File %s at line %d: Empty %s section", __func__, filename, lineNumber);
         lsberrno = LSBE_CONF_WARNING;
 
         return true;
@@ -4058,7 +4067,7 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filena
 
 
 bool
-isHostName ( const char *grpName)
+isHostName ( const char *grpName )
 {
     if (Gethostbyname_ (grpName) != NULL) {
         return true;
@@ -4074,18 +4083,18 @@ isHostName ( const char *grpName)
 }
 
 struct groupInfoEnt *
-addGroup (struct groupInfoEnt **groups, const char *gname, unsigned int *ngroups, int type)
+addGroup (struct groupInfoEnt **groups, const char *gname, size_t *ngroups, int type)
 {
     if (groups == NULL || ngroups == NULL) {
         return NULL;
     }
 
-    if (type == 0) {
+    if( type == 0 ) {
 
-        groups[*ngroups] = malloc(sizeof (struct groupInfoEnt));
+        groups[*ngroups] = malloc( sizeof( struct groupInfoEnt ) );
         if ( NULL == groups[*ngroups] && ENOMEM == errno ) {
             const char malloc[ ] = "malloc";
-            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, malloc, sizeof (struct groupInfoEnt));
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, malloc, sizeof( struct groupInfoEnt ) );
             lsberrno = LSBE_NO_MEM;
             return NULL;
         }
@@ -4129,8 +4138,7 @@ addGroup (struct groupInfoEnt **groups, const char *gname, unsigned int *ngroups
 struct groupInfoEnt *
 addUnixGrp (struct group *unixGrp, const char *gname, const char *filename, const size_t lineNumber, const char *section, int type)
 {
-    // int i                   = -1;
-    unsigned int            = 0;
+    unsigned int i          = 0;
     struct groupInfoEnt *gp = NULL;
     struct passwd *pw       = NULL;
 
@@ -4154,7 +4162,8 @@ addUnixGrp (struct group *unixGrp, const char *gname, const char *filename, cons
         return NULL;
     }
 
-    while (unixGrp->gr_mem[++i] != NULL){
+    i = 0;
+    while (unixGrp->gr_mem[i] != NULL){ // FIXME FIXME FIXME FIXME originally, it was ++i
         if ((pw = getpwlsfuser_ (unixGrp->gr_mem[i]))) {
             if (!addMember (gp, unixGrp->gr_mem[i], USER_GRP, filename, lineNumber, section, CONF_EXPAND, true)  && lsberrno == LSBE_NO_MEM) {
                 return NULL;
@@ -4169,6 +4178,8 @@ addUnixGrp (struct group *unixGrp, const char *gname, const char *filename, cons
             lsberrno = LSBE_CONF_WARNING;
             continue;
         }
+
+        ++i;
     }
 
     if (gp->memberList == NULL) {
@@ -4182,7 +4193,8 @@ addUnixGrp (struct group *unixGrp, const char *gname, const char *filename, cons
 }
 
 bool
-addMember (struct groupInfoEnt *gp, const char *word, int grouptype, const char *filename, unsigned int lineNumber, const char *section, int options, int checkAll)
+addMember (
+struct groupInfoEnt *gp, const char *word, int grouptype, const char *filename, size_t lineNumber, const char *section, int options, int checkAll)
 {
     // 
     size_t len                     = 0; 
@@ -4204,7 +4216,7 @@ addMember (struct groupInfoEnt *gp, const char *word, int grouptype, const char 
         return false;
     }
 
-    cp = word;
+    cp = strdup( word );
     if (cp[0] == '~') {
         cp++;
     }
@@ -4244,8 +4256,8 @@ addMember (struct groupInfoEnt *gp, const char *word, int grouptype, const char 
         }
 
         if (!initUnknownUsers) {
-            initTab (&unknownUsers);
-            initUnknownUsers = true;
+            h_initTab_( &unknownUsers, 50 ); // include/lib/lsb_params.h: struct hTab unknownUsers; global. // FIXME FIXME FIXME FIXME why 50?
+            // initUnknownUsers = true;
         }
 
         isgrp = true;
@@ -4398,7 +4410,7 @@ addMember (struct groupInfoEnt *gp, const char *word, int grouptype, const char 
         gp->memberList = myrealloc( gp->memberList, len * sizeof (char));
         if ( NULL == gp->memberList && ENOMEM == errno ) {
             const char malloc[ ] = "myrealloc";
-            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, myrealloc, len * sizeof (char));
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, malloc, len * sizeof (char));
             lsberrno = LSBE_NO_MEM;
             FREEUP (myWord);
             return false;
@@ -4428,22 +4440,6 @@ addMember (struct groupInfoEnt *gp, const char *word, int grouptype, const char 
 // {
 //     return getGrpData (hostgroups, gname, numofhgroups);
 // }
-
-struct groupInfoEnt *
-getGrpData (struct groupInfoEnt **groups, const char *groupname, unsigned int num)
-{
-    if (groupname == NULL || groups == NULL) {
-        return NULL;
-    }
-
-    for ( unsigned int i = 0; i < num; i++) {
-        if (groups[i] && groups[i]->group && (strcmp (groupname, groups[i]->group) == 0) ) {
-            return groups[i];
-        }
-    }
-
-    return NULL;
-}
 
 struct userInfoEnt *
 getUserData ( const char *username)
@@ -4498,15 +4494,14 @@ bool
 searchAll (char *const word)
 {
     char *sp = NULL;
-    char *cp = NULL;
 
     if (word == NULL) {
         return false;
     }
-    cp = word;
-    while ((sp = getNextWord_ (&cp))) {
-        const char all[] = "all"
-        if (strcmp (sp, all ) == 0) {
+
+    const char *cp = strdup( word );
+    while( ( sp = getNextWord_( &cp ) ) ) {
+        if (strcmp (sp, "all" ) == 0) {
             return true;
         }
     }

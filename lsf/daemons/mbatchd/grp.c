@@ -244,7 +244,7 @@ getGroupInfoEntFromUdata (struct uData *u, char recursive)
 {
   struct groupInfoEnt group;
 
-  memset ((struct groupInfoEnt *) &group, 0, sizeof (struct groupInfoEnt));
+  memset ( &group, '\0', sizeof (struct groupInfoEnt));
 
   group.group = u->user;
   group.memberList = getGroupMembers (u->gData, recursive);
@@ -255,8 +255,8 @@ getGroupInfoEntFromUdata (struct uData *u, char recursive)
 char *
 getGroupMembers (struct gData *gp, char r)
 {
-  char *members;
-  int numMembers;
+  char *members = NULL;
+  int numMembers = 0;
 
   numMembers = sumMembers (gp, r, 1);
   if (numMembers == 0)
@@ -483,35 +483,35 @@ countEntries (struct gData *gp, char first)
 
 }
 
-struct gData *
-getUGrpData (char *gname)
-{
-  return (getGrpData (usergroups, gname, numofugroups));
-}
+// struct gData *
+// getUGrpData (char *gname)
+// {
+//   return (getGrpData (usergroups, gname, numofugroups));
+// }
 
-struct gData *
-getHGrpData (char *gname)
-{
-  return (getGrpData (hostgroups, gname, numofhgroups));
-}
+// struct gData *
+// getHGrpData (char *gname)
+// {
+//   return (getGrpData (hostgroups, gname, numofhgroups));
+// }
 
-struct gData *
-getGrpData (struct gData *groups[], char *name, int num)
-{
-  int i;
+// struct gData *
+// getGrpData (struct gData *groups[], char *name, int num)
+// {
+//   int i;
 
-  if (name == NULL)
-	return NULL;
+//   if (name == NULL)
+// 	return NULL;
 
-  for (i = 0; i < num; i++)
-	{
-	  if (strcmp (name, groups[i]->group) == 0)
-	return (groups[i]);
-	}
+//   for (i = 0; i < num; i++)
+// 	{
+// 	  if (strcmp (name, groups[i]->group) == 0)
+// 	return (groups[i]);
+// 	}
 
-  return NULL;
+//   return NULL;
 
-}
+// }
 
 void
 uDataGroupCreate ()

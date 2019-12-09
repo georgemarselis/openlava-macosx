@@ -77,4 +77,5 @@ xdrmisc.c \
 xdrnio.c \
 xdrres.c \
 xdrrf.c \
-lsb_params.c
+lsb_params.c \
+getGrpData.c
