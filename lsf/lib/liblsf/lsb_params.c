@@ -4515,7 +4515,7 @@ initUserInfo (struct userInfoEnt *up)
 {
     if (up != NULL) {
         up->user         = NULL;
-        up->procJobLimit = INFINIT_FLOAT;
+        up->procJobLimit = FLT_MAX;
         up->maxJobs      = ULONG_MAX;
         up->numStartJobs = ULONG_MAX;
         up->numJobs      = ULONG_MAX;
@@ -4603,9 +4603,9 @@ addUser ( const char *username, size_t maxjobs, float pJobLimit, const char *fil
             else {
                 usersize *= 2;
             }
-            tmpUsers = myrealloc(users, usersize * sizeof (struct userInfoEnt *));
+            tmpUsers = myrealloc(users, usersize * sizeof( struct userInfoEnt ) );
             if ( NULL == tmpUsers && ENOMEM == errno ) {
-                const char malloc[ ] = "myrealloc";
+                const char myrealloc[ ] = "myrealloc";
                 ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, myrealloc, usersize * sizeof (struct userInfoEnt *));
                 lsberrno = LSBE_NO_MEM;
                 return false;
@@ -4643,9 +4643,9 @@ addUser ( const char *username, size_t maxjobs, float pJobLimit, const char *fil
 }
 
 bool
-isInGrp (char *word, struct groupInfoEnt *gp, int grouptype, int checkAll)
+isInGrp( const char *word, struct groupInfoEnt *gp, int grouptype, int checkAll)
 {
-    char *tmp = NULL;
+    const char **tmp = NULL;
     char *str = NULL;
     struct groupInfoEnt *sub_gp = NULL;
 
@@ -4657,13 +4657,13 @@ isInGrp (char *word, struct groupInfoEnt *gp, int grouptype, int checkAll)
         return false;
     }
 
-    tmp = gp->memberList;
+    *tmp = strdup( gp->memberList );
 
-    if (!strcmp (tmp, "all") && checkAll == true) {
+    if (!strcmp (*tmp, "all") && checkAll == true) {
         return true;
     }
 
-    while ((str = getNextWord_ (&tmp)) != NULL) {
+    while ((str = getNextWord_ (tmp)) != NULL) {
         if (grouptype == USER_GRP) {
             if (!strcmp (str, word))
                 return true;
@@ -4689,12 +4689,12 @@ isInGrp (char *word, struct groupInfoEnt *gp, int grouptype, int checkAll)
 }
 
 char **
-expandGrp (char *word, unsigned int *num, int grouptype)
+expandGrp (const char *word, unsigned int *num, int grouptype)
 {
     unsigned int sub_num        = 0;
     unsigned int n              = 0;
-    char *tmp                   = NULL;
     char *str                   = NULL;
+    char **tmp                  = NULL;
     char **sub_list             = NULL;
     char **list                 = NULL;
     char **tempList             = NULL;
@@ -4713,10 +4713,10 @@ expandGrp (char *word, unsigned int *num, int grouptype)
     }
 
     if (gp == NULL) {
-        list = malloc (sizeof (char *));
+        list = malloc( sizeof( char ) );
         if ( NULL == list && ENOMEM == errno ) {
             const char malloc[ ] = "malloc";
-            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, malloc, sizeof (char *));
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, malloc, sizeof (char) );
             lsberrno = LSBE_NO_MEM;
             return NULL;
         }
@@ -4730,12 +4730,12 @@ expandGrp (char *word, unsigned int *num, int grouptype)
         n = 1;
     }
     else {
-        tmp = gp->memberList;
-        if (!strcmp (tmp, "all")){
+        *tmp = strdup( gp->memberList );
+        if (!strcmp ( *tmp, "all" ) ) {
             tempList = myrealloc (list, sizeof (char *));
             if ( NULL == tempList && ENOMEM == errno ) {
                 const char myrealloc[ ] = "myrealloc";
-                ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, myrealloc, sizeof (char *));
+                ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, myrealloc, sizeof( char ) );
                 lsberrno = LSBE_NO_MEM;
                 return NULL;
             }
@@ -4752,7 +4752,8 @@ expandGrp (char *word, unsigned int *num, int grouptype)
             return list;
         }
 
-        while ((str = getNextWord_ (&tmp)) != NULL) {
+        const char *kot = strdup( *tmp ) ;
+        while ((str = getNextWord_( &kot )) != NULL) {
 
             if (grouptype == USER_GRP) {
                 sub_gp = getUGrpData (str);
@@ -4764,14 +4765,16 @@ expandGrp (char *word, unsigned int *num, int grouptype)
             if (sub_gp == NULL) {
                 tempList = myrealloc(list, (n + 1) * sizeof (char *));
                 if ( NULL == tempList && ENOMEM == errno ) {
-                    ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "myrealloc", (n + 1) * sizeof (char *));
+                    // catgets 5080
+                    ls_syslog (LOG_ERR, "catgets 5050: %s: %s is NULL", __func__, "myrealloc" );
                     lsberrno = LSBE_NO_MEM;
                     return NULL;
                 }
 
                 list = tempList;
                 if ((list[n] = putstr_ (str)) == NULL) {
-                    ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (str) + 1);
+                    // catgets 5080
+                    ls_syslog (LOG_ERR, "catgets 5050: %s: %s is NULL", __func__, "malloc" );
                     lsberrno = LSBE_NO_MEM;
                     return NULL;
                 }
@@ -4788,14 +4791,14 @@ expandGrp (char *word, unsigned int *num, int grouptype)
                 if (sub_num) {
                     if (!strcmp (sub_list[0], "all")) {
 
-                        tempList = myrealloc(list, sizeof (char *));
+                        tempList = myrealloc( list, sizeof( char ) );
                         if ( NULL == tempList && ENOMEM == errno ) {
-                            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "myrealloc", sizeof (char *));
+                            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "myrealloc", sizeof( char ) );
                             lsberrno = LSBE_NO_MEM;
                             return NULL;
                         }
                         list = tempList;
-                        if ((list[0] = putstr_ ("all")) == NULL) {
+                        if ((list[0] = putstr_ ("all")) == NULL) { // FIXME FIXME FIXMME FIXME replace [0] wih label.
                             ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen ("all") + 1);
                             lsberrno = LSBE_NO_MEM;
                             return NULL;
@@ -4806,9 +4809,9 @@ expandGrp (char *word, unsigned int *num, int grouptype)
                         return list;
                     }
 
-                    list = (char **) myrealloc(list, (n + sub_num) * sizeof (char *));
+                    list = myrealloc(list, (n + sub_num) * sizeof (char ));
                     if ( NULL == list && ENOMEM == errno ) {
-                        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M,  __func__, "realloc", (n + sub_num) * sizeof (char *));
+                        ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M,  __func__, "realloc", (n + sub_num) * sizeof( char ) );
                         lsberrno = LSBE_NO_MEM;
                         return NULL;
                     }
@@ -4829,15 +4832,15 @@ expandGrp (char *word, unsigned int *num, int grouptype)
 struct hostConf *
 lsb_readhost (struct lsConf *conf, struct lsInfo *info, int options, struct clusterConf *clusterConf)
 {
-    char hostok     = false;
-    char hgroupok   = false;
-    char hpartok    = false;
-    size_t lineNumber = 0;
-    char *filename  = NULL;
-    char *cp        = NULL;
-    char *section   = NULL;
+    char hostok       = false;
+    // char hpartok      = false;
+    size_t *lineNumber = 0;
+    char *filename    = NULL;
+    char *section     = NULL;
+    char **cp         = NULL;
     struct lsInfo myinfo;
 
+    // static bool hgroupok     = false;
     // assert( hostok );
     // assert( hpartok );
     // assert( hgroupok );
@@ -4845,13 +4848,15 @@ lsb_readhost (struct lsConf *conf, struct lsInfo *info, int options, struct clus
     lsberrno = LSBE_NO_ERROR;
 
     if (info == NULL) {
-        ls_syslog (LOG_ERR, I18N_NULL_POINTER, __func__, "lsinfo");
+        // catgets 5080
+        ls_syslog (LOG_ERR, "catgets 5050: %s: %s is NULL", __func__, "lsinfo" );
         lsberrno = LSBE_CONF_FATAL;
         return NULL;
     }
 
     if ((options != CONF_NO_CHECK) && clusterConf == NULL)  {
-        ls_syslog (LOG_ERR, I18N_NULL_POINTER, __func__, "clusterConf");
+        // catgets 5080
+        ls_syslog (LOG_ERR, "catgets 5050: %s: %s is NULL", __func__, "clusterConf" );
         return NULL;
     }
 
@@ -4866,7 +4871,6 @@ lsb_readhost (struct lsConf *conf, struct lsInfo *info, int options, struct clus
     myinfo = *info;
     cConf = clusterConf; // cConf: struct clusterConf *cConf in lib/conf.h
 
-    assert( info->nRes >= 0 );
     myinfo.resTable = malloc( info->nRes * sizeof (struct resItem));
     if (info->nRes && NULL == myinfo.resTable && ENOMEM == errno ) {
         assert( info->nRes );
@@ -4875,13 +4879,13 @@ lsb_readhost (struct lsConf *conf, struct lsInfo *info, int options, struct clus
         return NULL;
     }
     for ( unsigned int k = 0, l = 0; k < info->nRes; k++) {
-        if (info->resTable[k].flags & RESF_DYNAMIC) {
+        if (info->resTable[k]->flags & RESF_DYNAMIC) {
             memcpy (&myinfo.resTable[l], &info->resTable[k], sizeof (struct resItem));
             l++;
         }
     }
     for ( unsigned int i = 0, j = 0; i < info->nRes; i++) {
-        if (!(info->resTable[i].flags & RESF_DYNAMIC)) {
+        if (!(info->resTable[i]->flags & RESF_DYNAMIC)) {
             memcpy (&myinfo.resTable[j], &info->resTable[i], sizeof (struct resItem));
             j++;
         }
@@ -4889,14 +4893,16 @@ lsb_readhost (struct lsConf *conf, struct lsInfo *info, int options, struct clus
 
     if (!conf) {
         FREEUP (myinfo.resTable);
-        ls_syslog (LOG_ERR, I18N_NULL_POINTER, __func__, "conf");
+        // catgets 5080
+        ls_syslog (LOG_ERR, "catgets 5050: %s: %s is NULL", __func__, "conf" );
         lsberrno = LSBE_CONF_FATAL;
         return NULL;
     }
 
     if (!conf->confhandle) {
         FREEUP (myinfo.resTable);
-        ls_syslog (LOG_ERR, I18N_NULL_POINTER, __func__, "confhandle");
+        // catgets 5080
+        ls_syslog (LOG_ERR, "catgets 5050: %s: %s is NULL", __func__, "confhandle" );
         lsberrno = LSBE_CONF_FATAL;
         return NULL;
     }
@@ -4910,7 +4916,8 @@ lsb_readhost (struct lsConf *conf, struct lsInfo *info, int options, struct clus
     conf->confhandle->lineCount = 0;
 
     for (;;) { // FIXME FIXME FIXME FIXME replace infinite loop with a ccertain-to-terminate condition
-        if ((cp = getBeginLine_conf (conf, lineNumber)) == NULL) {
+        *cp = strdup( getBeginLine_conf (conf, lineNumber) );
+        if ( cp == NULL) {
             if (!hostok) {
                 /* catgets 5165 */
                 ls_syslog (LOG_ERR, "catgets 5165: %s: Host section missing or invalid.", filename);
@@ -4955,7 +4962,8 @@ lsb_readhost (struct lsConf *conf, struct lsInfo *info, int options, struct clus
             FREEUP (myinfo.resTable);
             return hConf;
         }
-        section = getNextWord_ (&cp);
+        const char *kot = strdup( *cp );
+        section = getNextWord_( &kot );
         if (!section) {
             /* catgets 5169 */
             ls_syslog (LOG_ERR, "catgets 5169: %s: File %s at line %lu: Section name expected after Begin; ignoring section", __func__, filename, &lineNumber);
@@ -4979,10 +4987,12 @@ lsb_readhost (struct lsConf *conf, struct lsInfo *info, int options, struct clus
             }
             else if (strcasecmp (section, "hostgroup") == 0) {
 
-                if (do_Groups(hostgroups, conf, filename, lineNumber, &numofhgroups, options)) {
-                    hgroupok = true;
-                }
-                else if (lsberrno == LSBE_NO_MEM) {
+                do_Groups(hostgroups, conf, filename, lineNumber, &numofhgroups, options);
+                // if (do_Groups(hostgroups, conf, filename, lineNumber, &numofhgroups, options)) {
+                //     hgroupok = true;
+                // }
+                // else 
+                if (lsberrno == LSBE_NO_MEM) {
                     lsberrno = LSBE_CONF_FATAL;
                     freeWorkHost (true);
                     FREEUP (myinfo.resTable);
@@ -5007,18 +5017,24 @@ lsb_readhost (struct lsConf *conf, struct lsInfo *info, int options, struct clus
 
 
 void
-getThresh (struct lsInfo *info, struct keymap *keylist, float loadSched[], float loadStop[], const char *filename, size_t lineNumber, const char *section)
+getThresh (struct lsInfo *info, struct keymap *keylist, float loadSched[], float loadStop[], const char *filename, size_t *lineNumber, const char *section)
 {
 
     char *stop = NULL;
     float swap = 0;
 
+    // What would happen in the pound.c program if you used this form of declaration instead of a prototype? The first function call, pound (times), would work because times is type int. 
+    // The second call, pound (ch) would also work because, in the absence of a prototype, C automatically promotes char and short arguments to int. The third call, pound (f), would fail, 
+    // however, because, in the absence of a prototype, float is automatically promoted to double, which doesn't really help much.
+
+    // https://www.linuxquestions.org/questions/programming-9/c-implicit-type-conversion-with-printf-4175649105/
+
     initThresholds (info, loadSched, loadStop);
 
     for ( unsigned int i = 0; i < info->numIndx; i++) {
-        if (keylist[i].position < 0) {
-            continue;
-        }
+        // if (keylist[i].position < 0) {
+        //     continue;
+        // }
         if (keylist[i].value == NULL) {
             continue;
         }
@@ -5027,72 +5043,72 @@ getThresh (struct lsInfo *info, struct keymap *keylist, float loadSched[], float
         }
 
         if ((stop = strchr (keylist[i].value, '/')) != NULL) {
-            *stop = '\0';
+            // *stop = '\0';
             stop++;
-            if (stop[0] == '\0'){
+            if (stop[0] == '\0'){ // FIXME FIXME FIXME replace [0] with label.
                 stop = NULL;
             }
         }
-        if (*keylist[i].value != '\0' && (loadSched[i] = my_atof (keylist[i].value, INFINIT_LOAD, -INFINIT_LOAD)) >= INFINIT_LOAD) {
+        if (*keylist[i].value != '\0' && (loadSched[i] = strtof( keylist[i].value, NULL ) ) >= FLT_MAX ) {
             /* catgets 5192 */
-            ls_syslog (LOG_ERR, "catgets 5192: %s: File %s%s at line %lu: Value <%s> of loadSched <%s> is not a float number between %1.1f and %1.1f; ignored", __func__, filename, section, lineNumber, keylist[i].value, keylist[i].key, -INFINIT_LOAD, INFINIT_LOAD);
+            ls_syslog (LOG_ERR, "catgets 5192: %s: File %s, section %s, at line %lu: Value <%s> of loadSched <%s> is not a float number between %f and %f; ignored", __func__, filename, section, lineNumber, keylist[i].value, keylist[i].key, (double) FLT_MIN, (double) FLT_MAX); // FIXME FIXME FIXME remove casts or justify their existence. 
             lsberrno = LSBE_CONF_WARNING;
-            if (info->resTable[i].orderType == DECR)
-                loadSched[i] = -INFINIT_LOAD;
+            if (info->resTable[i]->orderType == DECR)
+                loadSched[i] = FLT_MAX;
             }
-        if (*keylist[i].value != '\0' && loadSched[i] < 0 && loadSched[i] > -INFINIT_LOAD) {
+        if (*keylist[i].value != '\0' && loadSched[i] < 0 && loadSched[i] > FLT_MIN) {
             /* catgets 5193 */
-            ls_syslog (LOG_WARNING, "catgets 5193: %s: File %s%s at line %lu: Warning: Value <%s> of loadSched <%s> is not a non-negative number", __func__, filename, section, lineNumber, keylist[i].value, keylist[i].key);
+            ls_syslog (LOG_WARNING, "catgets 5193: %s: File %s%s at line %lu: Warning: Value <%s> of loadSched <%s> is not a non-negative number", __func__, filename, section, lineNumber, keylist[i].value, keylist[i].key, (double) loadSched[i]);
             lsberrno = LSBE_CONF_WARNING;
         }
 
-        if (i == UT && loadSched[i] > 1.0 && loadSched[i] < INFINIT_LOAD ) {
+        if (i == UT && loadSched[i] > 1.0f && loadSched[i] < FLT_MIN ) {
             /* catgets 5447 */
-            ls_syslog (LOG_INFO, ("catgets 5447: %s: File %s %s at line %lu: For load index <%s>, loadSched <%2.2f> is greater than 1; assumming <%5.1f%%>"), __func__, filename, section, lineNumber, keylist[i].key, loadSched[i], loadSched[i]);
+            ls_syslog (LOG_INFO, ("catgets 5447: %s: File %s, section %s, at line %lu: For load index <%s>, loadSched <%2.2f> is greater than 1; assuming <%5.1f%> as default"), __func__, filename, section, lineNumber, keylist[i].key, keylist[i].value, (double) loadSched[i]);
             lsberrno = LSBE_CONF_WARNING;
-            loadSched[i] /= 100.0;
+            loadSched[i] /= 100.0f;
         }
 
         if (!stop) {
             continue;
         }
 
-        loadStop[i] = my_atof (stop, INFINIT_LOAD, -INFINIT_LOAD);
-        if ( fabs(INFINIT_LOAD - loadStop[i]) < 0.000001 ) {
+        loadStop[i] = strtof( stop, NULL );
+        if ( fabsf(FLT_MAX - loadStop[i]) < 0.000001f ) {
             /* catgets 5194 */
-            ls_syslog (LOG_ERR, "catgets 5194: %s: File %s%s at line %lu: Value <%s> of loadStop <%s> is not a float number between %1.1f and %1.1f; ignored", __func__, filename, section, lineNumber, stop, keylist[i].key, -INFINIT_LOAD, INFINIT_LOAD);
+            ls_syslog (LOG_ERR, "catgets 5194: %s: File %s, section %s, at line %lu: Value <%s> of loadStop <%s> is not a float number between %1.1f and %1.1f; ignored", __func__, filename, section, lineNumber, stop, keylist[i].key, (double) FLT_MIN, (double) FLT_MAX);
             lsberrno = LSBE_CONF_WARNING;
-            if (info->resTable[i].orderType == DECR) {
-                loadStop[i] = -INFINIT_LOAD;
+            if (info->resTable[i]->orderType == DECR) {
+                loadStop[i] = FLT_MIN;
             }
             continue;
         }
 
-        if (loadStop[i] < 0 && loadStop[i] > -INFINIT_LOAD) {
+        if (loadStop[i] < 0 && loadStop[i] > FLT_MIN) {
             /* catgets 5195 */
             ls_syslog (LOG_WARNING, "catgets 5195: %s: File %s%s at line %lu: Warning: Value <%s> of loadStop <%s> is not a non-negative number", __func__, filename, section, lineNumber, stop, keylist[i].key);
             lsberrno = LSBE_CONF_WARNING;
         }
 
-        if (i == UT && loadStop[i] > 1.0 && loadSched[i] < INFINIT_LOAD) {
+        if (i == UT && loadStop[i] > 1.0f && loadSched[i] < FLT_MAX ) {
             /* catgets 5440 */
-            ls_syslog (LOG_INFO, ("catgets 5440: %s: File %s%s at line %lu: For load index <%s>, loadStop <%2.2f> is greater than 1; assumming <%5.1f%%>"), __func__, filename, section, lineNumber, keylist[i].key, loadStop[i], loadStop[i]);
+            ls_syslog (LOG_INFO, ("catgets 5440: %s: File %s%s at line %lu: For load index <%s>, loadStop <%2.2f> is greater than 1; assumming <%5.1f%%>"), __func__, filename, section, lineNumber, keylist[i].key, (double) loadStop[i], (double) loadStop[i]);
             lsberrno = LSBE_CONF_WARNING;
-            loadStop[i] /= 100.0;
+            loadStop[i] /= 100.0f;
         }
 
-        if ((loadSched[i] > loadStop[i]) && info->resTable[i].orderType == INCR) {
+        if ((loadSched[i] > loadStop[i]) && info->resTable[i]->orderType == INCR) {
             /* catgets 5196 */
-            ls_syslog (LOG_ERR, "catgets 5196: %s: File %s%s at line %lu: For load index <%s>, loadStop <%2.2f> is lower than loadSched <%2.2f>; swapped", __func__, filename, section, lineNumber, keylist[i].key, loadStop[i], loadSched[i]);
+            ls_syslog (LOG_ERR, "catgets 5196: %s: File %s%s at line %lu: For load index <%s>, loadStop <%2.2f> is lower than loadSched <%2.2f>; swapped", __func__, filename, section, lineNumber, keylist[i].key, (double) loadStop[i], (double) loadSched[i]);
             lsberrno = LSBE_CONF_WARNING;
             swap = loadSched[i];
             loadSched[i] = loadStop[i];
             loadStop[i] = swap;
         }
 
-        if ((loadStop[i] > loadSched[i]) && info->resTable[i].orderType == DECR) {
+        if ((loadStop[i] > loadSched[i]) && info->resTable[i]->orderType == DECR) {
             /* catgets 5197 */
-            ls_syslog (LOG_ERR, "catgets 5197: %s: File %s%s at line %lu: For load index <%s>, loadStop <%2.2f> is higher than loadSched <%2.2f>; swapped", __func__, filename, section, lineNumber, keylist[i].key, loadStop[i], loadSched[i]);
+            ls_syslog (LOG_ERR, "catgets 5197: %s: File %s%s at line %lu: For load index <%s>, loadStop <%2.2f> is higher than loadSched <%2.2f>; swapped", __func__, filename, section, lineNumber, keylist[i].key, (double) loadStop[i], (double) loadSched[i]);
             lsberrno = LSBE_CONF_WARNING;
             swap = loadSched[i];
             loadSched[i] = loadStop[i];
@@ -5162,7 +5178,8 @@ addHostEnt (struct hostInfoEnt *hp, struct hostInfo *hostInfo, size_t *override)
     }
     initHostInfoEnt( host );
     if (copyHostInfo (host, hp) < 0) {
-        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, hp->host, hp->hostName );
+        // ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, hp->host, hp->hostName );
+        ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, hp->host );
         FREEUP (host);
         return false;
     }
@@ -5189,11 +5206,10 @@ copyHostInfo (struct hostInfoEnt *toHost, struct hostInfoEnt *fromHost)
     }
 
     if( fromHost->nIdx ) {
-        assert( fromHost->nIdx >= 0 );
-        toHost->loadSched = malloc( (unsigned long)(fromHost->nIdx) * sizeof (float *) );
-        toHost->loadStop  = malloc( (unsigned long)(fromHost->nIdx) * sizeof (float *) );
+        toHost->loadSched = malloc( fromHost->nIdx * sizeof ( float) );
+        toHost->loadStop  = malloc( fromHost->nIdx * sizeof ( float ) );
         if(  ( NULL == toHost->loadSched && ENOMEM == errno )  ||
-             ( NULL == toHost->loadStop  && ENOMEM == errno ) ||
+             ( NULL == toHost->loadStop  && ENOMEM == errno )  ||
              ( fromHost->windows && (toHost->windows = putstr_ (fromHost->windows)) == NULL)
         ) {
             ls_syslog (LOG_ERR, I18N_FUNC_FAIL_M, __func__, "malloc");
@@ -5227,13 +5243,13 @@ initThresholds (struct lsInfo *info, float loadSched[], float loadStop[])
     }
 
     for ( unsigned int i = 0; i < info->numIndx; i++) {
-        if (info->resTable[i].orderType == INCR) {
-            loadSched[i] = INFINIT_LOAD;
-            loadStop[i] = INFINIT_LOAD;
+        if (info->resTable[i]->orderType == INCR) {
+            loadSched[i] = FLT_MAX;
+            loadStop[i]  = FLT_MAX;
         }
         else {
-            loadSched[i] = -INFINIT_LOAD;
-            loadStop[i] = -INFINIT_LOAD;
+            loadSched[i] = FLT_MIN;
+            loadStop[i]  = FLT_MIN;
         }
     }
 
@@ -5242,13 +5258,13 @@ initThresholds (struct lsInfo *info, float loadSched[], float loadStop[])
 
 
 char *
-parseGroups (char *linep, const char *filename, size_t lineNumber, const char *section, int groupType, int options)
+parseGroups ( const char *linep, const char *filename, size_t *lineNumber, const char *section, int groupType, int options)
 {
     
     char *str                    = NULL;
     char *word                   = NULL;
     char *myWord                 = NULL;
-    char *groupName              = NULL;
+    char *groupName              = malloc( 20 * sizeof( char ) ); // FIXME FIXME FIXME change 20 (the length of the group below), to a label
     char *grpSl                  = NULL;
     char *hostGroup              = NULL;
     struct group        *unixGrp = NULL;
@@ -5259,24 +5275,23 @@ parseGroups (char *linep, const char *filename, size_t lineNumber, const char *s
     unsigned int len = 0;
     int hasAllOthers = false;
     int checkAll     = true;
-    int haveFirst    = false;
     bool_t hasNone   = false;
     char returnVal   = false;
     char hostName[MAXHOSTNAMELEN];
 
-// #define failReturn(mygp, size)  {                                       \
-// ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, "malloc", size); \
-// freeGroupInfo (mygp);                                           \
-// FREEUP (mygp);                                                  \
-// FREEUP (hostGroup);                                             \
-// lsberrno = LSBE_NO_MEM;                                         \
+// #define failReturn(mygp, size)  {                                   
+// ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, "malloc", size);
+// freeGroupInfo (mygp);                                           
+// FREEUP (mygp);                                                  
+// FREEUP (hostGroup);                                             
+// lsberrno = LSBE_NO_MEM;                                         
 // return NULL;}
 
     if (groupType == USER_GRP) {
-        groupName = "User/User";
+        strncpy( groupName, "User/User", strlen( "User/User" ) );
     }
     else {
-        groupName = "Host/Host";
+        strncpy( groupName, "User/User", strlen( "Host/Host" ) );
     }
 
     if (groupType == USER_GRP && numofugroups >= MAX_GROUPS) {
@@ -5289,7 +5304,7 @@ parseGroups (char *linep, const char *filename, size_t lineNumber, const char *s
     if( NULL == mygp && ENOMEM == errno ) {
         // failReturn (mygp, sizeof (struct groupInfoEnt));
         const char malloc[] = "malloc";
-        ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, "malloc", sizeof (struct groupInfoEnt));
+        ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, malloc, sizeof (struct groupInfoEnt));
         freeGroupInfo (mygp);
         FREEUP (mygp);
         FREEUP (hostGroup);
@@ -5304,7 +5319,7 @@ parseGroups (char *linep, const char *filename, size_t lineNumber, const char *s
         if (NULL == hostGroup && ENOMEM == errno ) {
             // failReturn (mygp, MAX_LINE_LEN);
             const char malloc[] = "malloc";
-            ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, "malloc", MAX_LINE_LEN );
+            ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, malloc, MAX_LINE_LEN );
             freeGroupInfo (mygp);
             FREEUP (mygp);
             FREEUP (hostGroup);
@@ -5314,16 +5329,16 @@ parseGroups (char *linep, const char *filename, size_t lineNumber, const char *s
         }
         len = MAX_LINE_LEN;
         checkAll = false;
-        hostGroup[0] = '\0';
+        hostGroup[0] = '\0'; // FIXME FIXMME FIXME FIXMME change[0] to label
     }
 
     while ((word = getNextWord_ (&linep)) != NULL) {
         char *cp = NULL;
-        char cpWord[MAXHOSTNAMELEN]
-        memset( cpWord, 0, MAXHOSTNAMELEN );
+        char cpWord[MAXHOSTNAMELEN];
+        memset( cpWord, '\0', MAXHOSTNAMELEN );
 
         cp = word;
-        if (cp[0] == '~') {
+        if (cp[0] == '~') { // FIXME FIXMME FIXME FIXMME change[0] to label
             cp++;
         }
 
@@ -5339,7 +5354,7 @@ parseGroups (char *linep, const char *filename, size_t lineNumber, const char *s
         if (myWord == NULL) {
             //failReturn (mygp, strlen (word) + 1);
             const char malloc[] = "malloc";
-            ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (word) + 1 );
+            ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, malloc, strlen (word) + 1 );
             freeGroupInfo (mygp);
             FREEUP (mygp);
             FREEUP (hostGroup);
@@ -5367,11 +5382,11 @@ parseGroups (char *linep, const char *filename, size_t lineNumber, const char *s
             size_t lastChar = 0;
 
             if (options == CONF_NO_CHECK) {
-                if (!addMember (mygp, myWord, USER_GRP, filename, lineNumber, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
+                if (!addMember (mygp, myWord, USER_GRP, filename, *lineNumber, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
 
                     // failReturn (mygp, strlen (myWord) + 1);
                     const char malloc[] = "malloc";
-                    ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (myWord) + 1 );
+                    ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, malloc, strlen (myWord) + 1 );
                     freeGroupInfo (mygp);
                     FREEUP (mygp);
                     FREEUP (hostGroup);
@@ -5384,7 +5399,7 @@ parseGroups (char *linep, const char *filename, size_t lineNumber, const char *s
             }
             pw = getpwlsfuser_ (myWord);
             if (pw != NULL) {
-                if (!addMember (mygp, myWord, USER_GRP, filename, lineNumber, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
+                if (!addMember (mygp, myWord, USER_GRP, filename, *lineNumber, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
                     freeGroupInfo (mygp);
                     FREEUP (mygp);
                     FREEUP (myWord);
@@ -5400,7 +5415,7 @@ parseGroups (char *linep, const char *filename, size_t lineNumber, const char *s
                 if (grpSl == NULL) {
                     // failReturn (mygp, strlen (myWord) + 1);
                     const char malloc[] = "malloc";
-                    ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (myWord) + 1 );
+                    ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, malloc, strlen (myWord) + 1 );
                     freeGroupInfo (mygp);
                     FREEUP (mygp);
                     FREEUP (hostGroup);
@@ -5413,7 +5428,7 @@ parseGroups (char *linep, const char *filename, size_t lineNumber, const char *s
 
             gp = getUGrpData (myWord);
             if (gp != NULL) {
-                if (!addMember (mygp, myWord, USER_GRP, filename, lineNumber, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
+                if (!addMember (mygp, myWord, USER_GRP, filename, *lineNumber, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
                     freeGroupInfo (mygp);
                     FREEUP (mygp);
                     FREEUP (myWord);
@@ -5433,8 +5448,8 @@ parseGroups (char *linep, const char *filename, size_t lineNumber, const char *s
             }
             if (unixGrp != NULL) {
                 if (options & CONF_EXPAND) {
-                    assert( lineNumber <= INT_MAX );
-                    gp = addUnixGrp (unixGrp, grpSl, filename, lineNumber, section, 0);
+                    // assert( lineNumber <= INT_MAX );
+                    gp = addUnixGrp (unixGrp, grpSl, filename, *lineNumber, section, 0);
                     if (gp == NULL) {
                         /* catgets 5247 */
                         ls_syslog (LOG_WARNING, "catgets 5247: %s: File %s at line %lu: No valid users defined in Unix group <%s>; ignoring", __func__, filename, lineNumber, myWord);
@@ -5444,7 +5459,7 @@ parseGroups (char *linep, const char *filename, size_t lineNumber, const char *s
                     }
                 }
 
-                if (!addMember (mygp, myWord, USER_GRP, filename, lineNumber, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
+                if (!addMember (mygp, myWord, USER_GRP, filename, *lineNumber, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
                     freeGroupInfo (mygp);
                     FREEUP (mygp);
                     FREEUP (myWord);
@@ -5452,7 +5467,7 @@ parseGroups (char *linep, const char *filename, size_t lineNumber, const char *s
                 }
             }
             else if (strcmp (myWord, "all") == 0) {
-                if (!addMember (mygp, myWord, USER_GRP, filename, lineNumber, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
+                if (!addMember (mygp, myWord, USER_GRP, filename, *lineNumber, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
                     freeGroupInfo (mygp);
                     FREEUP (mygp);
                     FREEUP (myWord);
@@ -5463,7 +5478,7 @@ parseGroups (char *linep, const char *filename, size_t lineNumber, const char *s
                 /* catgets 5248 */
                 ls_syslog (LOG_WARNING, "catgets 5248: %s: File %s, section %s at line %lu: Unknown user or user group <%s>; Maybe a windows user or of another domain", __func__, filename, section, lineNumber, myWord);
                 lsberrno = LSBE_CONF_WARNING;
-                if (!addMember (mygp, myWord, USER_GRP, filename, lineNumber, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
+                if (!addMember (mygp, myWord, USER_GRP, filename, *lineNumber, section, options, checkAll) && lsberrno == LSBE_NO_MEM) {
                     freeGroupInfo (mygp);
                     FREEUP (mygp);
                     FREEUP (myWord);
@@ -5475,6 +5490,9 @@ parseGroups (char *linep, const char *filename, size_t lineNumber, const char *s
             continue;
         }
         else {
+
+            bool haveFirst    = false;
+
             if (groupType == HOST_GRP) {
                 size_t length = 0;
                 int badPref = false;
@@ -5501,13 +5519,13 @@ parseGroups (char *linep, const char *filename, size_t lineNumber, const char *s
                     cp_            = sp;
 
                     while (*cp_ != '\0') {
-                        if (*cp_ == '+' && !number) {
+                        if (*cp_ == '+' && !is_number) {
                             cp_++;
                             continue;
                         }
                         else if ((*cp_ >= '0') && (*cp_ <= '9')) {
                             cp_++;
-                            number = true;
+                            is_number = true;
                             continue;
                         }
                         else {
@@ -5585,10 +5603,12 @@ parseGroups (char *linep, const char *filename, size_t lineNumber, const char *s
                         continue;
                     }
 
-                    if (putIntoList (&hostGroup, &len, hostName, I18N_IN_QUEUE_HOST) == NULL) {
+                    const char *kot = strdup( hostGroup );
+                    // catgets 5054
+                    if (putIntoList ( &kot, &len, hostName, "in queue's HOSTS list . catgets 5054" ) == NULL) {
                         // failReturn (mygp, strlen (myWord) + 1);
                         const char malloc[] = "malloc";
-                        ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (myWord) + 1 );
+                        ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, malloc, strlen (myWord) + 1 );
                         freeGroupInfo (mygp);
                         FREEUP (mygp);
                         FREEUP (hostGroup);
@@ -5613,10 +5633,10 @@ parseGroups (char *linep, const char *filename, size_t lineNumber, const char *s
                     continue;
                 }
                 if ((options & CONF_NO_EXPAND) == 0) {
-                    returnVal = addMember (mygp, myWord, HOST_GRP, filename, lineNumber, section, options, checkAll);
+                    returnVal = addMember (mygp, myWord, HOST_GRP, filename, *lineNumber, section, options, checkAll);
                 }
                 else {
-                    returnVal = addMember (mygp, cpWord, HOST_GRP, filename, lineNumber, section, options, checkAll);
+                    returnVal = addMember (mygp, cpWord, HOST_GRP, filename, *lineNumber, section, options, checkAll);
                 }
                 if (!returnVal) {
                     FREEUP (myWord);
@@ -5632,7 +5652,7 @@ parseGroups (char *linep, const char *filename, size_t lineNumber, const char *s
                 if (groupType == HOST_GRP && putIntoList (&hostGroup, &len, hostName, I18N_IN_QUEUE_HOST) == NULL) {
                     // failReturn (mygp, strlen (hostName) + 1);
                     const char malloc[] = "malloc";
-                    ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (myWord) + 1 );
+                    ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, malloc, strlen (myWord) + 1 );
                     freeGroupInfo (mygp);
                     FREEUP (mygp);
                     FREEUP (hostGroup);
@@ -5679,14 +5699,14 @@ parseGroups (char *linep, const char *filename, size_t lineNumber, const char *s
                     continue;
                 }
                 if ((options & CONF_NO_EXPAND) == 0) {
-                    returnVal = addMember (mygp, myWord, HOST_GRP, filename, lineNumber, section, options, checkAll);
+                    returnVal = addMember (mygp, myWord, HOST_GRP, filename, *lineNumber, section, options, checkAll);
                 }
                 else {
                     if( strchr (cpWord, '+')) {
-                        returnVal = addMember (mygp, myWord, HOST_GRP, filename, lineNumber, section, options, checkAll);
+                        returnVal = addMember (mygp, myWord, HOST_GRP, filename, *lineNumber, section, options, checkAll);
                     }
                     else {
-                        returnVal = addMember (mygp, cpWord, HOST_GRP, filename, lineNumber, section, options, checkAll);
+                        returnVal = addMember (mygp, cpWord, HOST_GRP, filename, *lineNumber, section, options, checkAll);
                     }
                 }
 
@@ -5703,7 +5723,7 @@ parseGroups (char *linep, const char *filename, size_t lineNumber, const char *s
                 if (groupType == HOST_GRP && putIntoList (&hostGroup, &len, hostName, I18N_IN_QUEUE_HOST) == NULL) {
                     // failReturn (mygp, strlen (myWord) + 1);
                     const char malloc[] = "malloc";
-                    ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (myWord) + 1 );
+                    ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, malloc, strlen (myWord) + 1 );
                     freeGroupInfo (mygp);
                     FREEUP (mygp);
                     FREEUP (hostGroup);
@@ -5731,7 +5751,7 @@ parseGroups (char *linep, const char *filename, size_t lineNumber, const char *s
         if ((str = putstr_ (mygp->memberList)) == NULL) {
             // failReturn (mygp, strlen (mygp->memberList) + 1);
             const char malloc[] = "malloc";
-            ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (mygp->memberList) + 1 );
+            ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, malloc, strlen (mygp->memberList) + 1 );
             freeGroupInfo (mygp);
             FREEUP (mygp);
             FREEUP (hostGroup);

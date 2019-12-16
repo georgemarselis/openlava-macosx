@@ -1087,44 +1087,44 @@ struct userInfoEnt
 {
     char *user;                 // FIXME FIXME FIXME this oughta get larger
     float procJobLimit;
-    unsigned int maxJobs;
-    unsigned int numStartJobs;
-    unsigned int numJobs;
-    unsigned int numPEND;
-    unsigned int numRUN;
-    unsigned int numSSUSP;
-    unsigned int numUSUSP;
-    unsigned int numRESERVE;
+    size_t maxJobs;
+    size_t numStartJobs;
+    size_t numJobs;
+    size_t numPEND;
+    size_t numRUN;
+    size_t numSSUSP;
+    size_t numUSUSP;
+    size_t numRESERVE;
 } __attribute__((packed));
 
 
-struct queueInfoEnt
+struct queueInfoEnt // V2
 {
     int nice;
-    int priority;
-    int userJobLimit;
-    int qAttrib;
-    int qStatus;
-    int maxJobs;
-    int numJobs;
-    int numPEND;
-    int numRUN;
-    int numSSUSP;
-    int numUSUSP;
-    int mig;
-    int schedDelay;
-    int acceptIntvl;
-    int procLimit;
-    int hostJobLimit;
-    int numRESERVE;
-    int slotHoldTime;
-    int chkpntPeriod;
-    int minProcLimit;
-    int defProcLimit;
-    unsigned int nIdx;
-    int rLimits[LSF_RLIM_NLIMITS];
-    int sigMap[LSB_SIG_NUM];
-    int defLimits[LSF_RLIM_NLIMITS];
+    size_t priority;
+    size_t userJobLimit;
+    size_t qAttrib;
+    size_t qStatus;
+    size_t maxJobs;
+    size_t numJobs;
+    size_t numPEND;
+    size_t numRUN;
+    size_t numSSUSP;
+    size_t numUSUSP;
+    size_t mig;
+    size_t schedDelay;
+    size_t acceptsize_tvl;
+    size_t procLimit;
+    size_t hostJobLimit;
+    size_t numRESERVE;
+    size_t slotHoldTime;
+    size_t chkpntPeriod;
+    size_t minProcLimit;
+    size_t defProcLimit;
+    size_t nIdx;
+    size_t rLimits[LSF_RLIM_NLIMITS];
+    size_t sigMap[LSB_SIG_NUM];
+    size_t defLimits[LSF_RLIM_NLIMITS];
     float procJobLimit;
     char *queue;
     char *description;
@@ -1149,7 +1149,7 @@ struct queueInfoEnt
     float *loadSched;
     float *loadStop;
     char *chkpntDir;
-};
+}__attribute__((packed));
 
 struct hostInfoEnt
 {
