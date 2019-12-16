@@ -870,44 +870,44 @@ do_Param (struct lsConf *conf, const char *filename, size_t *lineNumber) // this
     };
 
     struct keymap lsb_params[ ] = { // 36
-        { LSB_MANAGER,                   "    ", keylist[LSB_MANAGER],                   NULL },
-        { DEFAULT_QUEUE,                 "    ", keylist[DEFAULT_QUEUE],                 NULL },
-        { DEFAULT_HOST_SPEC,             "    ", keylist[DEFAULT_HOST_SPEC],             NULL },
-        { DEFAULT_PROJECT,               "    ", keylist[DEFAULT_PROJECT],               NULL },
-        { JOB_ACCEPT_INTERVAL,           "    ", keylist[JOB_ACCEPT_INTERVAL],           NULL },
-        { PG_SUSP_IT,                    "    ", keylist[PG_SUSP_IT],                    NULL },
-        { MBD_SLEEP_TIME,                "    ", keylist[MBD_SLEEP_TIME],                NULL },
-        { CLEAN_PERIOD,                  "    ", keylist[CLEAN_PERIOD],                  NULL },
-        { MAX_RETRY,                     "    ", keylist[MAX_RETRY],                     NULL },
-        { SBD_SLEEP_TIME,                "    ", keylist[SBD_SLEEP_TIME],                NULL },
-        { MAX_JOB_NUM,                   "    ", keylist[MAX_JOB_NUM],                   NULL },
-        { RETRY_INTERVAL,                "    ", keylist[RETRY_INTERVAL],                NULL },
-        { MAX_SBD_FAIL,                  "    ", keylist[MAX_SBD_FAIL],                  NULL },
-        { RUSAGE_UPDATE_RATE,            "    ", keylist[RUSAGE_UPDATE_RATE],            NULL }, //* control how often sbatchd
-        { RUSAGE_UPDATE_PERCENT,         "    ", keylist[RUSAGE_UPDATE_PERCENT],         NULL }, //* report job rusage to mbd
-        { COND_CHECK_TIME,               "    ", keylist[COND_CHECK_TIME],               NULL }, //* time to check conditions
-        { MAX_SBD_CONNS,                 "    ", keylist[MAX_SBD_CONNS],                 NULL }, //* Undocumented parameter for
-                                                                                                 //* specifying how many sbd
-                                                                                                 //* connections to keep around
-        { MAX_SCHED_STAY,                "    ", keylist[MAX_SCHED_STAY],                NULL },
-        { FRESH_PERIOD,                  "    ", keylist[FRESH_PERIOD],                  NULL },
-        { MAX_JOB_ARRAY_SIZE,            "    ", keylist[MAX_JOB_ARRAY_SIZE],            NULL },
-        { DISABLE_UACCT_MAP,             "    ", keylist[DISABLE_UACCT_MAP],             NULL },
-        { JOB_TERMINATE_INTERVAL,        "    ", keylist[JOB_TERMINATE_INTERVAL],        NULL },
-        { JOB_RUN_TIME,                 "    ",  keylist[JOB_RUN_TIME],                  NULL },
-        { JOB_DEP_LAST_SUB,              "    ", keylist[JOB_DEP_LAST_SUB],              NULL },
-        { JOB_SPOOL_DIR,                 "    ", keylist[JOB_SPOOL_DIR],                 NULL },
-        { MAX_USER_PRIORITY,             "    ", keylist[MAX_USER_PRIORITY],             NULL },
-        { JOB_PRIORITY_OVER_TIME,        "    ", keylist[JOB_PRIORITY_OVER_TIME],        NULL },
-        { SHARED_RESOURCE_UPDATE_FACTOR, "    ", keylist[SHARED_RESOURCE_UPDATE_FACTOR], NULL },
-        { SCHE_RAW_LOAD,                 "    ", keylist[SCHE_RAW_LOAD],                 NULL },
-        { PRE_EXEC_DELAY,                "    ", keylist[PRE_EXEC_DELAY],                NULL },
-        { SLOT_RESOURCE_RESERVE,         "    ", keylist[SLOT_RESOURCE_RESERVE],         NULL },
-        { MAX_JOBID,                     "    ", keylist[MAX_JOBID],                     NULL },
-        { MAX_ACCT_ARCHIVE_FILE,         "    ", keylist[MAX_ACCT_ARCHIVE_FILE],         NULL },
-        { ACCT_ARCHIVE_SIZE,             "    ", keylist[ACCT_ARCHIVE_SIZE],             NULL },
-        { ACCT_ARCHIVE_AGE,              "    ", keylist[ACCT_ARCHIVE_AGE],              NULL },
-        { UINT_MAX,                      "    ", NULL,                                   NULL }
+        { LSB_MANAGER,                   keylist[LSB_MANAGER],                   NULL },
+        { DEFAULT_QUEUE,                 keylist[DEFAULT_QUEUE],                 NULL },
+        { DEFAULT_HOST_SPEC,             keylist[DEFAULT_HOST_SPEC],             NULL },
+        { DEFAULT_PROJECT,               keylist[DEFAULT_PROJECT],               NULL },
+        { JOB_ACCEPT_INTERVAL,           keylist[JOB_ACCEPT_INTERVAL],           NULL },
+        { PG_SUSP_IT,                    keylist[PG_SUSP_IT],                    NULL },
+        { MBD_SLEEP_TIME,                keylist[MBD_SLEEP_TIME],                NULL },
+        { CLEAN_PERIOD,                  keylist[CLEAN_PERIOD],                  NULL },
+        { MAX_RETRY,                     keylist[MAX_RETRY],                     NULL },
+        { SBD_SLEEP_TIME,                keylist[SBD_SLEEP_TIME],                NULL },
+        { MAX_JOB_NUM,                   keylist[MAX_JOB_NUM],                   NULL },
+        { RETRY_INTERVAL,                keylist[RETRY_INTERVAL],                NULL },
+        { MAX_SBD_FAIL,                  keylist[MAX_SBD_FAIL],                  NULL },
+        { RUSAGE_UPDATE_RATE,            keylist[RUSAGE_UPDATE_RATE],            NULL }, //* control how often sbatchd
+        { RUSAGE_UPDATE_PERCENT,         keylist[RUSAGE_UPDATE_PERCENT],         NULL }, //* report job rusage to mbd
+        { COND_CHECK_TIME,               keylist[COND_CHECK_TIME],               NULL }, //* time to check conditions
+        { MAX_SBD_CONNS,                 keylist[MAX_SBD_CONNS],                 NULL }, //* Undocumented parameter for
+                                                                                         //* specifying how many sbd
+                                                                                         //* connections to keep around
+        { MAX_SCHED_STAY,                keylist[MAX_SCHED_STAY],                NULL },
+        { FRESH_PERIOD,                  keylist[FRESH_PERIOD],                  NULL },
+        { MAX_JOB_ARRAY_SIZE,            keylist[MAX_JOB_ARRAY_SIZE],            NULL },
+        { DISABLE_UACCT_MAP,             keylist[DISABLE_UACCT_MAP],             NULL },
+        { JOB_TERMINATE_INTERVAL,        keylist[JOB_TERMINATE_INTERVAL],        NULL },
+        { JOB_RUN_TIME,                  keylist[JOB_RUN_TIME],                  NULL },
+        { JOB_DEP_LAST_SUB,              keylist[JOB_DEP_LAST_SUB],              NULL },
+        { JOB_SPOOL_DIR,                 keylist[JOB_SPOOL_DIR],                 NULL },
+        { MAX_USER_PRIORITY,             keylist[MAX_USER_PRIORITY],             NULL },
+        { JOB_PRIORITY_OVER_TIME,        keylist[JOB_PRIORITY_OVER_TIME],        NULL },
+        { SHARED_RESOURCE_UPDATE_FACTOR, keylist[SHARED_RESOURCE_UPDATE_FACTOR], NULL },
+        { SCHE_RAW_LOAD,                 keylist[SCHE_RAW_LOAD],                 NULL },
+        { PRE_EXEC_DELAY,                keylist[PRE_EXEC_DELAY],                NULL },
+        { SLOT_RESOURCE_RESERVE,         keylist[SLOT_RESOURCE_RESERVE],         NULL },
+        { MAX_JOBID,                     keylist[MAX_JOBID],                     NULL },
+        { MAX_ACCT_ARCHIVE_FILE,         keylist[MAX_ACCT_ARCHIVE_FILE],         NULL },
+        { ACCT_ARCHIVE_SIZE,             keylist[ACCT_ARCHIVE_SIZE],             NULL },
+        { ACCT_ARCHIVE_AGE,              keylist[ACCT_ARCHIVE_AGE],              NULL },
+        { UINT_MAX,                      NULL,                                   NULL }
     };
 
     if (conf == NULL) {
@@ -3535,10 +3535,10 @@ do_Users(struct lsConf *conf, const char *filename, size_t *lineNumber, int opti
     };
 
     struct keymap keyList[] = {
-        { USER_NAME, "    ", keylist[ USER_NAME ], NULL },
-        { MAX_JOBS,  "    ", keylist[ MAX_JOBS  ], NULL },
-        { JL_P,      "    ", keylist[ JL_P ],      NULL },
-        { UINT_MAX,  "    ", NULL,                 NULL }
+        { USER_NAME, keylist[ USER_NAME ], NULL },
+        { MAX_JOBS,  keylist[ MAX_JOBS  ], NULL },
+        { JL_P,      keylist[ JL_P ],      NULL },
+        { UINT_MAX,  NULL,                 NULL }
     };
 
     const char user[ ] = "user";
@@ -3809,9 +3809,9 @@ do_Groups (struct groupInfoEnt **groups, struct lsConf *conf, const char *filena
     };
 
     struct keymap keyList[] = {
-        { GROUP_NAME,   "    ", keylist[GROUP_NAME],   NULL },
-        { GROUP_MEMBER, "    ", keylist[GROUP_MEMBER], NULL },
-        { UINT_MAX,     "    ", NULL,                  NULL }
+        { GROUP_NAME,   keylist[GROUP_NAME],   NULL },
+        { GROUP_MEMBER, keylist[GROUP_MEMBER], NULL },
+        { UINT_MAX,     NULL,                  NULL }
     };
 
     char *wp                = NULL;
@@ -5649,7 +5649,8 @@ parseGroups ( const char *linep, const char *filename, size_t *lineNumber, const
                     continue;
                 }
 
-                if (groupType == HOST_GRP && putIntoList (&hostGroup, &len, hostName, I18N_IN_QUEUE_HOST) == NULL) {
+                const char *kot = strdup( hostGroup );
+                if (groupType == HOST_GRP && putIntoList (&kot, &len, hostName, "in queue's HOSTS list: catgets 5054") == NULL) {
                     // failReturn (mygp, strlen (hostName) + 1);
                     const char malloc[] = "malloc";
                     ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, malloc, strlen (myWord) + 1 );
@@ -5720,7 +5721,8 @@ parseGroups ( const char *linep, const char *filename, size_t *lineNumber, const
                     continue;
                 }
 
-                if (groupType == HOST_GRP && putIntoList (&hostGroup, &len, hostName, I18N_IN_QUEUE_HOST) == NULL) {
+                const char *kot = strdup( hostGroup );
+                if (groupType == HOST_GRP && putIntoList (&kot, &len, hostName, "in queue's HOSTS list: catgets 5054" ) == NULL) {
                     // failReturn (mygp, strlen (myWord) + 1);
                     const char malloc[] = "malloc";
                     ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, malloc, strlen (myWord) + 1 );
@@ -5780,7 +5782,7 @@ parseGroups ( const char *linep, const char *filename, size_t *lineNumber, const
 
     fprintf( stderr, "%s: you are not supposed to be here!\n", __func__ );
     ls_syslog( LOG_ERR, "%s: you are not supposed to be here", __func__ );
-    lsberrno = EROCKBOTTOM;
+    // lsberrno = EROCKBOTTOM;
     return NULL;
 }
 
@@ -5792,26 +5794,27 @@ lsb_readqueue (struct lsConf *conf, struct lsInfo *info, int options, struct sha
     char *section   = NULL;
     char *filename  = NULL;
     size_t lineNumber = 0;
-    int j           = 0;
+    // int j           = 0;
     char queueok    = 'a';
     struct lsInfo myinfo;
 
     lsberrno = LSBE_NO_ERROR;
 
     if (info == NULL) {
-        ls_syslog (LOG_ERR, I18N_NULL_POINTER, __func__, "lsinfo");
+        ls_syslog (LOG_ERR, "catgets 5054: %s: %s is NULL", __func__, "lsinfo");
         lsberrno = LSBE_CONF_FATAL;
         return NULL;
     }
 
     if ((options != CONF_NO_CHECK) && sharedConf == NULL) {
-        ls_syslog (LOG_ERR, I18N_NULL_POINTER, __func__, "sharedConf");
+        // catgets 5054
+        ls_syslog (LOG_ERR, "catgets 5054: %s: %s is NULL", __func__, "sharedConf");
         lsberrno = LSBE_CONF_FATAL;
         return NULL;
     }
 
     if ((options != CONF_NO_CHECK) && uConf == NULL) {
-        ls_syslog (LOG_ERR, I18N_NULL_POINTER, __func__, "uConf");
+        ls_syslog (LOG_ERR, "catgets 5054: %s: %s is NULL", __func__, "uConf");
         if (setDefaultUser ()) {
             ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "setDefaultUser");
             lsberrno = LSBE_CONF_FATAL;
@@ -5820,7 +5823,7 @@ lsb_readqueue (struct lsConf *conf, struct lsInfo *info, int options, struct sha
     }
 
     if ((options != CONF_NO_CHECK) && hConf == NULL) {
-        ls_syslog (LOG_ERR, I18N_NULL_POINTER, __func__, "hConf");
+        ls_syslog (LOG_ERR, "catgets 5054: %s: %s is NULL", __func__, "hConf");
         if (setDefaultHost (info)) {
             ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, "setDefaultHost");
             lsberrno = LSBE_CONF_FATAL;
@@ -5830,7 +5833,7 @@ lsb_readqueue (struct lsConf *conf, struct lsInfo *info, int options, struct sha
 
     myinfo = *info;
     sConf = sharedConf;
-    assert( info->nRes >= 0);
+    // assert( info->nRes >= 0);
     myinfo.resTable = calloc( info->nRes, sizeof (struct resItem) );
     if (info->nRes && NULL == myinfo.resTable && ENOMEM == errno ) {
         lsberrno = LSBE_CONF_FATAL;
@@ -5838,17 +5841,17 @@ lsb_readqueue (struct lsConf *conf, struct lsInfo *info, int options, struct sha
     }
 
     // j = 0;
-    for ( unsigned int i = 0, unsigned int j = 0; i < info->nRes; i++, j++) {
+    for ( unsigned int i = 0, j = 0; i < info->nRes; i++, j++) {
 
-        if (info->resTable[i].flags & RESF_DYNAMIC) {
+        if (info->resTable[i]->flags & RESF_DYNAMIC) {
             memcpy (&myinfo.resTable[j], &info->resTable[i], sizeof (struct resItem));
             j++;
         }
     }
 
     // for ( unsigned int i = 0; i < info->nRes; i++) {
-    for ( unsigned int i = 0, unsigned int j = 0; i < info->nRes; i++, j++) {
-        if (!(info->resTable[i].flags & RESF_DYNAMIC)) {
+    for ( unsigned int i = 0, j = 0; i < info->nRes; i++, j++) {
+        if (!(info->resTable[i]->flags & RESF_DYNAMIC)) {
             memcpy (&myinfo.resTable[j], &info->resTable[i], sizeof (struct resItem));
             j++;
         }
@@ -5880,8 +5883,8 @@ lsb_readqueue (struct lsConf *conf, struct lsInfo *info, int options, struct sha
 
     freeWorkQueue (false);
     queuesize = 0;
-    maxFactor = 0.0;
-    maxHName = NULL;
+    maxFactor = 0.0f;
+    maxHostName = NULL;
     filename = conf->confhandle->fname;
     conf->confhandle->curNode = conf->confhandle->rootNode;
     conf->confhandle->lineCount = 0;
@@ -5889,7 +5892,7 @@ lsb_readqueue (struct lsConf *conf, struct lsInfo *info, int options, struct sha
 
     for (;;) { // FIXME FIXME FIXME FIXME replace infinite loop with a ccertain-to-terminate condition
 
-        if ((cp = getBeginLine_conf (conf, lineNumber)) == NULL) {
+        if ((cp = strdup( getBeginLine_conf (conf, &lineNumber))) == NULL) {
             if (!queueok) {
                 ls_syslog (LOG_ERR, "catgets 5271: %s: Queue section missing or invalid.", filename);    /* catgets 5271 */
                 lsberrno = LSBE_CONF_WARNING;
@@ -5917,16 +5920,17 @@ lsb_readqueue (struct lsConf *conf, struct lsInfo *info, int options, struct sha
             return qConf;
         }
 
-        section = getNextWord_ (&cp);
+        const char *kot = strdup( cp );
+        section = getNextWord_( &kot );
         if (!section) {
             ls_syslog (LOG_ERR, "catgets 5273: %s: File %s at line %lu: Section name expected after Begin; ignoring section", __func__, filename, lineNumber);  /* catgets 5273 */
             lsberrno = LSBE_CONF_WARNING;
-            doSkipSection_conf (conf, lineNumber, filename, "unknown");
+            doSkipSection_conf (conf, &lineNumber, filename, "unknown");
         }
         else {
 
             if (strcasecmp (section, "Queue") == 0) {
-                if (do_Queues (conf, filename, lineNumber, &myinfo, options)) {
+                if (do_Queues (conf, filename, &lineNumber, &myinfo, options)) {
                     queueok = true;
                 }
                 else if (lsberrno == LSBE_NO_MEM) {
@@ -5944,7 +5948,7 @@ lsb_readqueue (struct lsConf *conf, struct lsInfo *info, int options, struct sha
             else {
                 ls_syslog (LOG_ERR, "catgets 5274: %s: File %s at line %lu: Invalid section name <%s>; ignoring section", __func__, filename, lineNumber, section);    /* catgets 5274 */
                 lsberrno = LSBE_CONF_WARNING;
-                doSkipSection_conf (conf, lineNumber, filename, section);
+                doSkipSection_conf (conf, &lineNumber, filename, section);
             }
         }
     }
@@ -5954,7 +5958,7 @@ lsb_readqueue (struct lsConf *conf, struct lsInfo *info, int options, struct sha
 
 // char
 bool 
-do_Queues (struct lsConf *conf, const char *filename, size_t lineNumber, struct lsInfo *info, int options)
+do_Queues (struct lsConf *conf, const char *filename, size_t *lineNumber, struct lsInfo *info, int options)
 {
     
     char *linep = NULL;
@@ -5965,7 +5969,8 @@ do_Queues (struct lsConf *conf, const char *filename, size_t lineNumber, struct 
     char *subString      = NULL;
 
     enum {
-        QKEY_NAME = info->numIndx,
+        // QKEY_NAME = info->numIndx,
+        QKEY_NAME = 0,
         QKEY_PRIORITY,
         QKEY_NICE,
         QKEY_UJOB_LIMIT,
@@ -6067,56 +6072,56 @@ do_Queues (struct lsConf *conf, const char *filename, size_t lineNumber, struct 
         NULL
     };
 
-    struct keymap *keyList = {
-        { QKEY_NAME,                    "    ", keylist[QKEY_NAME],                    NULL },
-        { QKEY_PRIORITY,                "    ", keylist[QKEY_PRIORITY],                NULL },
-        { QKEY_NICE,                    "    ", keylist[QKEY_NICE],                    NULL },
-        { QKEY_UJOB_LIMIT,              "    ", keylist[QKEY_UJOB_LIMIT],              NULL },
-        { QKEY_PJOB_LIMIT,              "    ", keylist[QKEY_PJOB_LIMIT],              NULL },
-        { QKEY_RUN_WINDOW,              "    ", keylist[QKEY_RUN_WINDOW],              NULL },
-        { QKEY_CPULIMIT,                "    ", keylist[QKEY_CPULIMIT],                NULL },
-        { QKEY_FILELIMIT,               "    ", keylist[QKEY_FILELIMIT],               NULL },
-        { QKEY_DATALIMIT,               "    ", keylist[QKEY_DATALIMIT],               NULL },
-        { QKEY_STACKLIMIT,              "    ", keylist[QKEY_STACKLIMIT],              NULL },
-        { QKEY_CORELIMIT,               "    ", keylist[QKEY_CORELIMIT],               NULL },
-        { QKEY_MEMLIMIT,                "    ", keylist[QKEY_MEMLIMIT],                NULL },
-        { QKEY_RUNLIMIT,                "    ", keylist[QKEY_RUNLIMIT],                NULL },
-        { QKEY_USERS,                   "    ", keylist[QKEY_USERS],                   NULL },
-        { QKEY_HOSTS,                   "    ", keylist[QKEY_HOSTS],                   NULL },
-        { QKEY_EXCLUSIVE,               "    ", keylist[QKEY_EXCLUSIVE],               NULL },
-        { QKEY_DESCRIPTION,             "    ", keylist[QKEY_DESCRIPTION],             NULL },
-        { QKEY_MIG,                     "    ", keylist[QKEY_MIG],                     NULL },
-        { QKEY_QJOB_LIMIT,              "    ", keylist[QKEY_QJOB_LIMIT],              NULL },
-        { QKEY_POLICIES,                "    ", keylist[QKEY_POLICIES],                NULL },
-        { QKEY_DISPATCH_WINDOW,         "    ", keylist[QKEY_DISPATCH_WINDOW],         NULL },
-        { QKEY_USER_SHARES,             "    ", keylist[QKEY_USER_SHARES],             NULL },
-        { QKEY_DEFAULT_HOST_SPEC,       "    ", keylist[QKEY_DEFAULT_HOST_SPEC],       NULL },
-        { QKEY_PROCLIMIT,               "    ", keylist[QKEY_PROCLIMIT],               NULL },
-        { QKEY_ADMINISTRATORS,          "    ", keylist[QKEY_ADMINISTRATORS],          NULL },
-        { QKEY_PRE_EXEC,                "    ", keylist[QKEY_PRE_EXEC],                NULL },
-        { QKEY_POST_EXEC,               "    ", keylist[QKEY_POST_EXEC],               NULL },
-        { QKEY_REQUEUE_EXIT_VALUES,     "    ", keylist[QKEY_REQUEUE_EXIT_VALUES],     NULL },
-        { QKEY_HJOB_LIMIT,              "    ", keylist[QKEY_HJOB_LIMIT],              NULL },
-        { QKEY_RES_REQ,                 "    ", keylist[QKEY_RES_REQ],                 NULL },
-        { QKEY_SLOT_RESERVE,            "    ", keylist[QKEY_SLOT_RESERVE],            NULL },
-        { QKEY_RESUME_COND,             "    ", keylist[QKEY_RESUME_COND],             NULL },
-        { QKEY_STOP_COND,               "    ", keylist[QKEY_STOP_COND],               NULL },
-        { QKEY_JOB_STARTER,             "    ", keylist[QKEY_JOB_STARTER],             NULL },
-        { QKEY_SWAPLIMIT,               "    ", keylist[QKEY_SWAPLIMIT],               NULL },
-        { QKEY_PROCESSLIMIT,            "    ", keylist[QKEY_PROCESSLIMIT],            NULL },
-        { QKEY_JOB_CONTROLS,            "    ", keylist[QKEY_JOB_CONTROLS],            NULL },
-        { QKEY_TERMINATE_WHEN,          "    ", keylist[QKEY_TERMINATE_WHEN],          NULL },
-        { QKEY_NEW_JOB_SCHED_DELAY,     "    ", keylist[QKEY_NEW_JOB_SCHED_DELAY],     NULL },
-        { QKEY_INTERACTIVE,             "    ", keylist[QKEY_INTERACTIVE],             NULL },
-        { QKEY_JOB_ACCEPT_INTERVAL,     "    ", keylist[QKEY_JOB_ACCEPT_INTERVAL],     NULL },
-        { QKEY_BACKFILL,                "    ", keylist[QKEY_BACKFILL],                NULL },
-        { QKEY_IGNORE_DEADLINE,         "    ", keylist[QKEY_IGNORE_DEADLINE],         NULL },
-        { QKEY_CHKPNT,                  "    ", keylist[QKEY_CHKPNT],                  NULL },
-        { QKEY_RERUNNABLE,              "    ", keylist[QKEY_RERUNNABLE],              NULL },
-        { QKEY_ENQUE_INTERACTIVE_AHEAD, "    ", keylist[QKEY_ENQUE_INTERACTIVE_AHEAD], NULL },
-        { QKEY_ROUND_ROBIN_POLICY,      "    ", keylist[QKEY_ROUND_ROBIN_POLICY],      NULL },
-        { QKEY_PRE_POST_EXEC_USER,      "    ", keylist[QKEY_PRE_POST_EXEC_USER],      NULL },
-        { -1,                           "    ", NULL, NULL }
+    struct keymap keyList[] = {
+        { QKEY_NAME,                    keylist[QKEY_NAME],                    NULL },
+        { QKEY_PRIORITY,                keylist[QKEY_PRIORITY],                NULL },
+        { QKEY_NICE,                    keylist[QKEY_NICE],                    NULL },
+        { QKEY_UJOB_LIMIT,              keylist[QKEY_UJOB_LIMIT],              NULL },
+        { QKEY_PJOB_LIMIT,              keylist[QKEY_PJOB_LIMIT],              NULL },
+        { QKEY_RUN_WINDOW,              keylist[QKEY_RUN_WINDOW],              NULL },
+        { QKEY_CPULIMIT,                keylist[QKEY_CPULIMIT],                NULL },
+        { QKEY_FILELIMIT,               keylist[QKEY_FILELIMIT],               NULL },
+        { QKEY_DATALIMIT,               keylist[QKEY_DATALIMIT],               NULL },
+        { QKEY_STACKLIMIT,              keylist[QKEY_STACKLIMIT],              NULL },
+        { QKEY_CORELIMIT,               keylist[QKEY_CORELIMIT],               NULL },
+        { QKEY_MEMLIMIT,                keylist[QKEY_MEMLIMIT],                NULL },
+        { QKEY_RUNLIMIT,                keylist[QKEY_RUNLIMIT],                NULL },
+        { QKEY_USERS,                   keylist[QKEY_USERS],                   NULL },
+        { QKEY_HOSTS,                   keylist[QKEY_HOSTS],                   NULL },
+        { QKEY_EXCLUSIVE,               keylist[QKEY_EXCLUSIVE],               NULL },
+        { QKEY_DESCRIPTION,             keylist[QKEY_DESCRIPTION],             NULL },
+        { QKEY_MIG,                     keylist[QKEY_MIG],                     NULL },
+        { QKEY_QJOB_LIMIT,              keylist[QKEY_QJOB_LIMIT],              NULL },
+        { QKEY_POLICIES,                keylist[QKEY_POLICIES],                NULL },
+        { QKEY_DISPATCH_WINDOW,         keylist[QKEY_DISPATCH_WINDOW],         NULL },
+        { QKEY_USER_SHARES,             keylist[QKEY_USER_SHARES],             NULL },
+        { QKEY_DEFAULT_HOST_SPEC,       keylist[QKEY_DEFAULT_HOST_SPEC],       NULL },
+        { QKEY_PROCLIMIT,               keylist[QKEY_PROCLIMIT],               NULL },
+        { QKEY_ADMINISTRATORS,          keylist[QKEY_ADMINISTRATORS],          NULL },
+        { QKEY_PRE_EXEC,                keylist[QKEY_PRE_EXEC],                NULL },
+        { QKEY_POST_EXEC,               keylist[QKEY_POST_EXEC],               NULL },
+        { QKEY_REQUEUE_EXIT_VALUES,     keylist[QKEY_REQUEUE_EXIT_VALUES],     NULL },
+        { QKEY_HJOB_LIMIT,              keylist[QKEY_HJOB_LIMIT],              NULL },
+        { QKEY_RES_REQ,                 keylist[QKEY_RES_REQ],                 NULL },
+        { QKEY_SLOT_RESERVE,            keylist[QKEY_SLOT_RESERVE],            NULL },
+        { QKEY_RESUME_COND,             keylist[QKEY_RESUME_COND],             NULL },
+        { QKEY_STOP_COND,               keylist[QKEY_STOP_COND],               NULL },
+        { QKEY_JOB_STARTER,             keylist[QKEY_JOB_STARTER],             NULL },
+        { QKEY_SWAPLIMIT,               keylist[QKEY_SWAPLIMIT],               NULL },
+        { QKEY_PROCESSLIMIT,            keylist[QKEY_PROCESSLIMIT],            NULL },
+        { QKEY_JOB_CONTROLS,            keylist[QKEY_JOB_CONTROLS],            NULL },
+        { QKEY_TERMINATE_WHEN,          keylist[QKEY_TERMINATE_WHEN],          NULL },
+        { QKEY_NEW_JOB_SCHED_DELAY,     keylist[QKEY_NEW_JOB_SCHED_DELAY],     NULL },
+        { QKEY_INTERACTIVE,             keylist[QKEY_INTERACTIVE],             NULL },
+        { QKEY_JOB_ACCEPT_INTERVAL,     keylist[QKEY_JOB_ACCEPT_INTERVAL],     NULL },
+        { QKEY_BACKFILL,                keylist[QKEY_BACKFILL],                NULL },
+        { QKEY_IGNORE_DEADLINE,         keylist[QKEY_IGNORE_DEADLINE],         NULL },
+        { QKEY_CHKPNT,                  keylist[QKEY_CHKPNT],                  NULL },
+        { QKEY_RERUNNABLE,              keylist[QKEY_RERUNNABLE],              NULL },
+        { QKEY_ENQUE_INTERACTIVE_AHEAD, keylist[QKEY_ENQUE_INTERACTIVE_AHEAD], NULL },
+        { QKEY_ROUND_ROBIN_POLICY,      keylist[QKEY_ROUND_ROBIN_POLICY],      NULL },
+        { QKEY_PRE_POST_EXEC_USER,      keylist[QKEY_PRE_POST_EXEC_USER],      NULL },
+        { ULONG_MAX,                    NULL, NULL }
     };
 
     const char queueLabel[]   = "Queue";
@@ -6132,13 +6137,15 @@ do_Queues (struct lsConf *conf, const char *filename, size_t lineNumber, struct 
 
     linep = getNextLineC_conf (conf, lineNumber, true);
     if (!linep) {
-        ls_syslog (LOG_ERR, I18N_FILE_PREMATURE, __func__, filename, lineNumber);
+        // catgets 5051
+        ls_syslog (LOG_ERR, "catgets 5051: %s: File %s at line %d, premature EOF", __func__, filename, lineNumber );
         lsberrno = LSBE_CONF_WARNING;
         return false;
     }
 
     if (isSectionEnd (linep, filename, lineNumber, queueLabel)) {
-        ls_syslog (LOG_WARNING, I18N_EMPTY_SECTION, __func__, filename, lineNumber, queueLabel);
+        // catgets 5052
+        ls_syslog( LOG_WARNING, "catgets 5052: %s: File %s at line %d: Empty %s section", __func__, filename, lineNumber, queueLabel );
         lsberrno = LSBE_CONF_WARNING;
         return false;
     }
@@ -6202,8 +6209,8 @@ do_Queues (struct lsConf *conf, const char *filename, size_t lineNumber, struct 
         }
 
         if (keyList[QKEY_PRIORITY].value != NULL && strcmp (keyList[QKEY_PRIORITY].value, "")) {
-            queue.priority = my_atoi (keyList[QKEY_PRIORITY].value, ULONG_MAX, 0);
-            if (ULONG_MAX == queue.priority ) {
+            queue.priority = strtol( keyList[QKEY_PRIORITY].value, NULL, 10  ); // base 10
+            if (LONG_MAX == queue.priority ) {
                 /* catgets 5284 */
                 ls_syslog (LOG_ERR, "catgets 5284: %s: File %s in section Queue ending at line %lu: Priority value <%s> is not a positive integer between 1 and %lu; ignored", __func__, filename, lineNumber, keyList[QKEY_PRIORITY].value, ULONG_MAX - 1);
                 lsberrno = LSBE_CONF_WARNING;
@@ -6214,18 +6221,18 @@ do_Queues (struct lsConf *conf, const char *filename, size_t lineNumber, struct 
         }
 
         if (keyList[QKEY_NICE].value != NULL && strcmp (keyList[QKEY_NICE].value, "")) {
-            if (my_atoi (keyList[QKEY_NICE].value, INFINIT_SHORT, -INFINIT_SHORT) == ULONG_MAX) {
+            if( strtoul(keyList[QKEY_NICE].value, NULL, 10 ) == ULONG_MAX) { // base 10
                 /* catgets 5285 */
                 ls_syslog (LOG_ERR, "catgets 5285: %s: File %s in section Queue ending at line %lu: Nice value <%s> must be an integer; ignored", __func__, filename, lineNumber, keyList[QKEY_NICE].value);
                 lsberrno = LSBE_CONF_WARNING;
             }
             else
-                queue.nice = my_atoi (keyList[QKEY_NICE].value, INFINIT_SHORT, -INFINIT_SHORT);
+                queue.nice = atoi (keyList[QKEY_NICE].value );
             }
 
 
         if (keyList[QKEY_UJOB_LIMIT].value != NULL && strcmp (keyList[QKEY_UJOB_LIMIT].value, "")) {
-            queue.userJobLimit = my_atoi (keyList[QKEY_UJOB_LIMIT].value, ULONG_MAX, -1);
+            queue.userJobLimit = strtoul (keyList[QKEY_UJOB_LIMIT].value, NULL, 10 ); // base 10
             if ( ULONG_MAX == queue.userJobLimit ) {
                 /* catgets 5286 */
                 ls_syslog (LOG_ERR, "catgets 5286: %s: File %s in section Queue ending at line %lu: UJOB_LIMIT value <%s> is not a non-negative integer between 0 and %lu; ignored", __func__, filename, lineNumber, keyList[QKEY_UJOB_LIMIT].value, ULONG_MAX - 1);
@@ -6235,28 +6242,25 @@ do_Queues (struct lsConf *conf, const char *filename, size_t lineNumber, struct 
 
 
         if (keyList[QKEY_PJOB_LIMIT].value != NULL && strcmp (keyList[QKEY_PJOB_LIMIT].value, "")) {
-            queue.procJobLimit = my_atof (keyList[QKEY_PJOB_LIMIT].value, INFINIT_FLOAT, -1.0);
-            if( fabs (INFINIT_FLOAT - queue.procJobLimit ) < 0.0000001 ) {
+            queue.procJobLimit = strtof( keyList[QKEY_PJOB_LIMIT].value, NULL );
+            if( fabsf (FLT_MAX - queue.procJobLimit ) < 0.0000001f ) {
                 /* catgets 5287 */
-                ls_syslog (LOG_ERR, "catgets 5287: %s: File %s in section Queue ending at line %lu: PJOB_LIMIT value <%s> is not a non-negative integer between 0 and %f; ignored", __func__, filename, lineNumber, keyList[QKEY_PJOB_LIMIT].value, INFINIT_FLOAT - 1);
+                ls_syslog (LOG_ERR, "catgets 5287: %s: File %s in section Queue ending at line %lu: PJOB_LIMIT value <%s> is not a non-negative integer between 0 and %f; ignored", __func__, filename, lineNumber, keyList[QKEY_PJOB_LIMIT].value, (double) (FLT_MAX - 1.0f) );
                 lsberrno = LSBE_CONF_WARNING;
             }
         }
 
 
-        if (keyList[QKEY_QJOB_LIMIT].value != NULL
-            && strcmp (keyList[QKEY_QJOB_LIMIT].value, ""))
-            {
-            if ((queue.maxJobs = my_atoi (keyList[QKEY_QJOB_LIMIT].value, ULONG_MAX, -1)) == ULONG_MAX)
-                {
+        if (keyList[QKEY_QJOB_LIMIT].value != NULL && strcmp (keyList[QKEY_QJOB_LIMIT].value, "")) {
+            if ((queue.maxJobs = strtoul( keyList[QKEY_QJOB_LIMIT].value, NULL, 10 ) ) == ULONG_MAX) { // base10
                 /* catgets 5289 */
                 ls_syslog (LOG_ERR, "catgets 5289: %s: File %s in section Queue ending at line %lu: QJOB_LIMIT value <%s> is not a non-negative integer between 0 and %lu; ignored", __func__, filename, lineNumber, keyList[QKEY_QJOB_LIMIT].value, ULONG_MAX - 1);
                 lsberrno = LSBE_CONF_WARNING;
-                }
             }
+        }
 
         if (keyList[QKEY_HJOB_LIMIT].value != NULL && strcmp (keyList[QKEY_HJOB_LIMIT].value, "")) {
-            if ((queue.hostJobLimit = my_atoi (keyList[QKEY_HJOB_LIMIT].value, ULONG_MAX, -1)) == ULONG_MAX) {
+            if ((queue.hostJobLimit = strtoul( keyList[QKEY_HJOB_LIMIT].value, NULL, 10 ) ) == ULONG_MAX) {
                 /* catgets 5290 */
                 ls_syslog (LOG_ERR, "catgets 5290: %s: File %s in section Queue ending at line %lu: HJOB_LIMIT value <%s> is not a non-negative integer between 0 and %lu; ignored", __func__, filename, lineNumber, keyList[QKEY_HJOB_LIMIT].value, ULONG_MAX - 1);
                 lsberrno = LSBE_CONF_WARNING;
@@ -6281,37 +6285,28 @@ do_Queues (struct lsConf *conf, const char *filename, size_t lineNumber, struct 
             }
         }
 
-        if (keyList[QKEY_DEFAULT_HOST_SPEC].value != NULL
-            && strcmp (keyList[QKEY_DEFAULT_HOST_SPEC].value, ""))
-            {
+        if (keyList[QKEY_DEFAULT_HOST_SPEC].value != NULL && strcmp (keyList[QKEY_DEFAULT_HOST_SPEC].value, "")) {
             double *cpuFactor = NULL;
 
-            if (options != CONF_NO_CHECK)
-                {
-                if ((cpuFactor = getModelFactor
-                     (keyList[QKEY_DEFAULT_HOST_SPEC].value, info)) == NULL &&
-                    (cpuFactor = getHostFactor
-                     (keyList[QKEY_DEFAULT_HOST_SPEC].value)) == NULL)
-                    {
+            if (options != CONF_NO_CHECK) {
+                if ((cpuFactor = getModelFactor(keyList[QKEY_DEFAULT_HOST_SPEC].value, info)) == NULL && (cpuFactor = getHostFactor(keyList[QKEY_DEFAULT_HOST_SPEC].value)) == NULL) {
                     /* catgets 5292 */
                     ls_syslog (LOG_ERR, "catgets 5292: %s: File %s in section Queue ending at line %lu: Invalid value <%s> for %s; ignored", __func__, filename, lineNumber, keyList[QKEY_DEFAULT_HOST_SPEC].value, keyList[QKEY_DEFAULT_HOST_SPEC].key);
                     lsberrno = LSBE_CONF_WARNING;
-                    }
                 }
-            if (cpuFactor != NULL || options == CONF_NO_CHECK)
-                {
+            }
+            if (cpuFactor != NULL || options == CONF_NO_CHECK) {
                 queue.defaultHostSpec =
                 putstr_ (keyList[QKEY_DEFAULT_HOST_SPEC].value);
-                if (queue.defaultHostSpec == NULL)
-                    {
+                if (queue.defaultHostSpec == NULL) {
                     ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", strlen (keyList[QKEY_DEFAULT_HOST_SPEC].value) + 1);
                     lsberrno = LSBE_NO_MEM;
                     freekeyval (keyList);
                     freeQueueInfo (&queue);
                     return false;
-                    }
                 }
             }
+        }
 
         if (parseCpuAndRunLimit (keyList, &queue, filename, lineNumber, function_name, info, options) == false && lsberrno == LSBE_NO_MEM) {
             freekeyval (keyList);
@@ -6320,7 +6315,7 @@ do_Queues (struct lsConf *conf, const char *filename, size_t lineNumber, struct 
         }
 
         if (keyList[QKEY_FILELIMIT].value != NULL && strcmp (keyList[QKEY_FILELIMIT].value, "")) {
-            if ((queue.rLimits[LSF_RLIMIT_FSIZE] = my_atoi (keyList[QKEY_FILELIMIT].value, ULONG_MAX, 0)) == ULONG_MAX) {
+            if ((queue.rLimits[LSF_RLIMIT_FSIZE] = strtoul( keyList[QKEY_FILELIMIT].value, NULL, 10 ) ) == ULONG_MAX) {
                 /* catgets 5295 */
                 ls_syslog (LOG_ERR, "catgets 5295: %s: File %s in section Queue ending at line %lu: FILELIMIT value <%s> is not a positive integer between 0 and %lu; ignored", __func__, filename, lineNumber, keyList[QKEY_FILELIMIT].value, ULONG_MAX);
                 lsberrno = LSBE_CONF_WARNING;
@@ -6328,11 +6323,13 @@ do_Queues (struct lsConf *conf, const char *filename, size_t lineNumber, struct 
         }
 
         if (keyList[QKEY_DATALIMIT].value != NULL && strcmp (keyList[QKEY_DATALIMIT].value, "")) {
-            parseDefAndMaxLimits (keyList[QKEY_DATALIMIT], &queue.defLimits[LSF_RLIMIT_DATA], &queue.rLimits[LSF_RLIMIT_DATA], filename, lineNumber, function_name );
+            size_t *defLimits = 0; *defLimits = queue.defLimits[LSF_RLIMIT_DATA];
+            size_t *rLimits   = 0; *rLimits   = queue.rLimits[LSF_RLIMIT_DATA];
+            parseDefAndMaxLimits ( &keyList[QKEY_DATALIMIT], defLimits, rLimits, filename, lineNumber, function_name );
         }
 
         if (keyList[QKEY_STACKLIMIT].value != NULL && strcmp (keyList[QKEY_STACKLIMIT].value, "")) {
-            if ((queue.rLimits[LSF_RLIMIT_STACK] = my_atoi (keyList[QKEY_STACKLIMIT].value,ULONG_MAX, 0)) == ULONG_MAX) {
+            if ((queue.rLimits[LSF_RLIMIT_STACK] = strtoul( keyList[QKEY_STACKLIMIT].value, NULL, 10 ) ) == ULONG_MAX) { // BASE 10
                 /* catgets 5297 */
                 ls_syslog (LOG_ERR, "catgets 5297: %s: File %s in section Queue ending at line %lu: STACKLIMIT value <%s> is not a positive integer between 0 and %lu; ignored", __func__, filename, lineNumber, keyList[QKEY_STACKLIMIT].value, ULONG_MAX);
                 lsberrno = LSBE_CONF_WARNING;
@@ -6340,7 +6337,7 @@ do_Queues (struct lsConf *conf, const char *filename, size_t lineNumber, struct 
         }
 
         if (keyList[QKEY_CORELIMIT].value != NULL && strcmp (keyList[QKEY_CORELIMIT].value, "")) {
-            if ((queue.rLimits[LSF_RLIMIT_CORE] = my_atoi (keyList[QKEY_CORELIMIT].value, ULONG_MAX, -1)) == ULONG_MAX) {
+            if ((queue.rLimits[LSF_RLIMIT_CORE] = strtoul( keyList[QKEY_CORELIMIT].value, NULL, 10 ) ) == ULONG_MAX) { // BASE 10
                 /* catgets 5298 */
                 ls_syslog (LOG_ERR, "catgets 5298: %s: File %s in section Queue ending at line %lu: CORELIMIT value <%s> is not a non-negative integer between -1 and %lu; ignored", __func__, filename, lineNumber, keyList[QKEY_CORELIMIT].value, ULONG_MAX);
                 lsberrno = LSBE_CONF_WARNING;
@@ -6348,12 +6345,14 @@ do_Queues (struct lsConf *conf, const char *filename, size_t lineNumber, struct 
         }
 
         if (keyList[QKEY_MEMLIMIT].value != NULL && strcmp (keyList[QKEY_MEMLIMIT].value, "")) {
-            parseDefAndMaxLimits (keyList[QKEY_MEMLIMIT], &queue.defLimits[LSF_RLIMIT_RSS], &queue.rLimits[LSF_RLIMIT_RSS], filename, lineNumber, function_name);
+            size_t *defLimits = 0; *defLimits = queue.defLimits[LSF_RLIMIT_RSS];
+            size_t *rLimits   = 0; *rLimits   = queue.rLimits[LSF_RLIMIT_RSS];
+            parseDefAndMaxLimits ( &keyList[QKEY_MEMLIMIT], defLimits, rLimits, filename, lineNumber, function_name);
         }
 
 
         if (keyList[QKEY_SWAPLIMIT].value != NULL && strcmp (keyList[QKEY_SWAPLIMIT].value, "")) {
-            if ((queue.rLimits[LSF_RLIMIT_SWAP] = my_atoi (keyList[QKEY_SWAPLIMIT].value, ULONG_MAX, 0)) == ULONG_MAX) {
+            if ((queue.rLimits[LSF_RLIMIT_SWAP] = strtoul( keyList[QKEY_SWAPLIMIT].value, NULL, 10 ) ) == ULONG_MAX) { // BASE 10
                 /* catgets 5300 */
                 ls_syslog (LOG_ERR, "catgets 5300: %s: File %s in section Queue ending at line %lu: SWAPLIMIT value <%s> is not a positive integer between 0 and %lu; ignored", __func__, filename, lineNumber, keyList[QKEY_SWAPLIMIT].value, ULONG_MAX);
                 lsberrno = LSBE_CONF_WARNING;
@@ -6361,7 +6360,9 @@ do_Queues (struct lsConf *conf, const char *filename, size_t lineNumber, struct 
         }
 
         if (keyList[QKEY_PROCESSLIMIT].value != NULL && strcmp (keyList[QKEY_PROCESSLIMIT].value, "")) {
-            parseDefAndMaxLimits (keyList[QKEY_PROCESSLIMIT], &queue.defLimits[LSF_RLIMIT_PROCESS], &queue.rLimits[LSF_RLIMIT_PROCESS], filename, lineNumber, function_name);
+            size_t *defLimits = 0; *defLimits = queue.defLimits[LSF_RLIMIT_PROCESS];
+            size_t *rLimits   = 0; *rLimits   = queue.rLimits[LSF_RLIMIT_PROCESS];
+            parseDefAndMaxLimits( &keyList[QKEY_PROCESSLIMIT], defLimits, rLimits, filename, lineNumber, function_name);
         }
 
 
@@ -6373,7 +6374,7 @@ do_Queues (struct lsConf *conf, const char *filename, size_t lineNumber, struct 
 
         if (keyList[QKEY_USERS].value != NULL && !searchAll (keyList[QKEY_USERS].value)) {
 
-            assert( lineNumber <= UINT_MAX );
+            // assert( lineNumber <= UINT_MAX );
             queue.userList = parseGroups (keyList[QKEY_USERS].value, filename, lineNumber, " in section  Queue ending", USER_GRP, options);
             if (queue.userList == NULL) {
                 if (lsberrno == LSBE_NO_MEM) {
@@ -6396,8 +6397,10 @@ do_Queues (struct lsConf *conf, const char *filename, size_t lineNumber, struct 
         if (keyList[QKEY_HOSTS].value != NULL) {
 
             originalString = keyList[QKEY_HOSTS].value;
-            subString = getNextWord_ (&originalString);
-            while (subString != NULL) {
+            const char *kot = strdup( originalString );
+            char *kokostring = getNextWord_ (&kot);
+            while (kokostring != NULL) {
+                const char *originalkot = strdup( originalString );
                 if (strcmp (keyList[QKEY_HOSTS].value, "none") == 0) {
                     /* catgets 5307 */
                     ls_syslog (LOG_ERR, "catgets 5307: %s: File %s in section Queue at line %lu: \"none\" specified , queue ignored", __func__, filename, lineNumber);
@@ -6406,7 +6409,7 @@ do_Queues (struct lsConf *conf, const char *filename, size_t lineNumber, struct 
                     freeQueueInfo (&queue);
                     return false;
                 }
-                subString = getNextWord_ (&originalString);
+                kokostring = getNextWord_ (&originalkot);
             }
 
             if (strchr (keyList[QKEY_HOSTS].value, '~') != NULL  && ((options & CONF_NO_EXPAND) == 0)) {
@@ -6438,7 +6441,7 @@ do_Queues (struct lsConf *conf, const char *filename, size_t lineNumber, struct 
                 keyList[QKEY_HOSTS].value = outHosts;
             }
 
-            assert( lineNumber < UINT_MAX );
+            // assert( lineNumber < UINT_MAX );
             queue.hostList = parseGroups (keyList[QKEY_HOSTS].value, filename, lineNumber, " in section Queue ending", HOST_GRP, options);
             if (queue.hostList == NULL) {
                 if (lsberrno == LSBE_NO_MEM) {
@@ -6462,7 +6465,7 @@ do_Queues (struct lsConf *conf, const char *filename, size_t lineNumber, struct 
             }
             else {
 
-                int chkpntPrd = 0;
+                time_t chkpntPrd = 0;
                 char dir[MAX_CMD_DESC_LEN];
                 char prdstr[10];            // FIXME FIXME FIXME FIXME 10 is awfully particular
 
@@ -6531,16 +6534,19 @@ do_Queues (struct lsConf *conf, const char *filename, size_t lineNumber, struct 
             }
         }
 
-        if (keyList[QKEY_JOB_ACCEPT_INTERVAL].value != NULL && keyList[QKEY_JOB_ACCEPT_INTERVAL].position >= 0 && strcmp (keyList[QKEY_JOB_ACCEPT_INTERVAL].value, "")) {
-            if ((queue.acceptIntvl = my_atoi (keyList[QKEY_JOB_ACCEPT_INTERVAL].value, ULONG_MAX, -1)) == ULONG_MAX) {
+        // if (keyList[QKEY_JOB_ACCEPT_INTERVAL].value != NULL && keyList[QKEY_JOB_ACCEPT_INTERVAL].position >= 0 && strcmp (keyList[QKEY_JOB_ACCEPT_INTERVAL].value, "")) {
+        if (keyList[QKEY_JOB_ACCEPT_INTERVAL].value != NULL && strcmp (keyList[QKEY_JOB_ACCEPT_INTERVAL].value, "")) {
+            // if ((queue.acceptIntvl = my_atoi (keyList[QKEY_JOB_ACCEPT_INTERVAL].value, ULONG_MAX, -1)) == ULONG_MAX) {
+            if( ( queue.acceptIntvl = strtol (keyList[QKEY_JOB_ACCEPT_INTERVAL].value, NULL, 10 ) ) == LONG_MAX) { // base10
                 /* catgets 5313 */
                 ls_syslog (LOG_ERR, "catgets 5313: %s: File %s in section Queue ending at line %lu: JOB_ACCEPT_INTERVAL value <%s> is not an integer greater than -1; ignored", __func__, filename, lineNumber, keyList[QKEY_JOB_ACCEPT_INTERVAL].value);    
                 lsberrno = LSBE_CONF_WARNING;
             }
         }
 
-        if (keyList[QKEY_NEW_JOB_SCHED_DELAY].value != NULL && keyList[QKEY_NEW_JOB_SCHED_DELAY].position >= 0 && strcmp (keyList[QKEY_NEW_JOB_SCHED_DELAY].value, "")) {
-            if ((queue.schedDelay = my_atoi (keyList[QKEY_NEW_JOB_SCHED_DELAY].value, ULONG_MAX, -1)) == ULONG_MAX) {
+        // if (keyList[QKEY_NEW_JOB_SCHED_DELAY].value != NULL && keyList[QKEY_NEW_JOB_SCHED_DELAY].position >= 0 && strcmp (keyList[QKEY_NEW_JOB_SCHED_DELAY].value, "")) {
+        if (keyList[QKEY_NEW_JOB_SCHED_DELAY].value != NULL && strcmp (keyList[QKEY_NEW_JOB_SCHED_DELAY].value, "")) {
+            if ((queue.schedDelay = strtol( keyList[QKEY_NEW_JOB_SCHED_DELAY].value, NULL, 10 ) ) == LONG_MAX ) {
                 /* catgets 5315 */
                 ls_syslog (LOG_ERR, "catgets 5315: %s: File %s in section Queue ending at line %lu: NEW_JOB_SCHED_DELAY value <%s> is not an integer greater than -1; ignored", __func__, filename, lineNumber, keyList[QKEY_NEW_JOB_SCHED_DELAY].value);
                 lsberrno = LSBE_CONF_WARNING;
@@ -6548,8 +6554,8 @@ do_Queues (struct lsConf *conf, const char *filename, size_t lineNumber, struct 
         }
 
         if (keyList[QKEY_POLICIES].value != NULL) {
-            sp = keyList[QKEY_POLICIES].value;
-            while ((word = getNextWord_ (&sp)) != NULL) {
+            const char *kot = strdup( keyList[QKEY_POLICIES].value );
+            while ((word = getNextWord_(&kot)) != NULL) {
                 if (strcasecmp (word, "EXCLUSIVE") == 0) {
                     queue.qAttrib |= QUEUE_ATTRIB_EXCLUSIVE;
                 }
@@ -6578,7 +6584,7 @@ do_Queues (struct lsConf *conf, const char *filename, size_t lineNumber, struct 
 
         if (keyList[QKEY_MIG].value != NULL && strcmp (keyList[QKEY_MIG].value, "")) {
 
-            if ((queue.mig = my_atoi (keyList[QKEY_MIG].value, ULONG_MAX / 60, -1)) == ULONG_MAX) {
+            if ((queue.mig = strtol (keyList[QKEY_MIG].value, ULONG_MAX / 60, -1)) == ULONG_MAX) {
                 /* catgets 5340 */
                 ls_syslog (LOG_ERR, "catgets 5340: %s: File %s in section Queue ending at line %lu: Invalid value <%s> for MIG; no MIG threshold is assumed", __func__, filename, lineNumber, keyList[QKEY_MIG].value);
                 lsberrno = LSBE_CONF_WARNING;
@@ -9307,7 +9313,7 @@ checkJobAttaDir ( const char *path)
 
 
 int
-parseDefAndMaxLimits (struct keymap *key, unsigned int *defaultVal, unsigned int *maxVal, const char *filename, size_t lineNumber, const char *pname)
+parseDefAndMaxLimits (struct keymap *key, size_t *defaultVal, size_t *maxVal, const char *filename, size_t lineNumber, const char *pname)
 {
     
     const char *sp     = strdup(key->value);

@@ -98,10 +98,11 @@ struct HostsArray
 
 struct keymap {
     size_t position;
-    char padding[8];
+    // char padding[8];
     const char *key;
     char *value;
-};
+} __attribute__((packed))__;
+
 
 const int builtInRes_ID[] = { // FIXME FIXME FIXME FIXME careful when compiling with the -Wkitchen-sink
     1300, 1301, 1302, 1303, 1304, 1305, 1306, 1307, 1308, 1309,

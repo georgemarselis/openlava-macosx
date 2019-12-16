@@ -1101,9 +1101,10 @@ struct userInfoEnt
 struct queueInfoEnt // V2
 {
     int nice;
-    size_t priority;
+    long priority;
     size_t userJobLimit;
-    size_t qAttrib;
+    time_t acceptIntvl;
+    int qAttrib;
     size_t qStatus;
     size_t maxJobs;
     size_t numJobs;
@@ -1112,13 +1113,13 @@ struct queueInfoEnt // V2
     size_t numSSUSP;
     size_t numUSUSP;
     size_t mig;
-    size_t schedDelay;
+    time_t schedDelay;
     size_t acceptsize_tvl;
     size_t procLimit;
     size_t hostJobLimit;
     size_t numRESERVE;
     size_t slotHoldTime;
-    size_t chkpntPeriod;
+    time_t chkpntPeriod;
     size_t minProcLimit;
     size_t defProcLimit;
     size_t nIdx;
@@ -1976,7 +1977,7 @@ struct lsbSharedResourceInfo // FIXME FIXME typedef has to go
 
 struct queueConf
 {
-    unsigned int numQueues;
+    size_t numQueues;
     struct queueInfoEnt *queues;
 }__attribute__((packed));
 
