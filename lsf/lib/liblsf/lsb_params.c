@@ -5962,11 +5962,11 @@ do_Queues (struct lsConf *conf, const char *filename, size_t *lineNumber, struct
 {
     
     char *linep = NULL;
-    char *sp    = NULL;
+    // char *sp    = NULL;
     char *word  = NULL;
     int retval  = 0;
     char *originalString = NULL;
-    char *subString      = NULL;
+    // char *subString      = NULL;
 
     enum {
         // QKEY_NAME = info->numIndx,
@@ -6584,7 +6584,7 @@ do_Queues (struct lsConf *conf, const char *filename, size_t *lineNumber, struct
 
         if (keyList[QKEY_MIG].value != NULL && strcmp (keyList[QKEY_MIG].value, "")) {
 
-            if ((queue.mig = strtol (keyList[QKEY_MIG].value, ULONG_MAX / 60, -1)) == ULONG_MAX) {
+            if ((queue.mig = strtoul (keyList[QKEY_MIG].value, NULL, 10 )) == ULONG_MAX) { // base 10
                 /* catgets 5340 */
                 ls_syslog (LOG_ERR, "catgets 5340: %s: File %s in section Queue ending at line %lu: Invalid value <%s> for MIG; no MIG threshold is assumed", __func__, filename, lineNumber, keyList[QKEY_MIG].value);
                 lsberrno = LSBE_CONF_WARNING;
@@ -6691,7 +6691,7 @@ do_Queues (struct lsConf *conf, const char *filename, size_t *lineNumber, struct
         }
 
         if (keyList[QKEY_SLOT_RESERVE].value != NULL && strcmp (keyList[QKEY_SLOT_RESERVE].value, "")) {
-            getReserve (keyList[QKEY_SLOT_RESERVE].value, &queue, filename, lineNumber);
+            getReserve (keyList[QKEY_SLOT_RESERVE].value, &queue, filename, *lineNumber);
         }
 
         if (keyList[QKEY_RESUME_COND].value != NULL && strcmp (keyList[QKEY_RESUME_COND].value, "")) {
@@ -6745,16 +6745,16 @@ do_Queues (struct lsConf *conf, const char *filename, size_t *lineNumber, struct
             return false;
         }
 
-        assert( info->numIndx >= 0 );
-        queue.loadSched = calloc( info->numIndx, sizeof (float *));
+        // assert( info->numIndx >= 0 );
+        queue.loadSched = calloc( info->numIndx, sizeof( float ) );
         if (info->numIndx && NULL == queue.loadSched && ENOMEM == errno) {
             lsberrno = LSBE_NO_MEM;
             freekeyval (keyList);
             freeQueueInfo (&queue);
             return false;
         }
-        assert( info->numIndx >=0 );
-        queue.loadStop = calloc( info->numIndx, sizeof (float *));
+        // assert( info->numIndx >=0 );
+        queue.loadStop = calloc( info->numIndx, sizeof( float ));
         if (info->numIndx && NULL == queue.loadStop && ENOMEM == errno ) {
             lsberrno = LSBE_NO_MEM;
             freekeyval (keyList);
@@ -6764,7 +6764,7 @@ do_Queues (struct lsConf *conf, const char *filename, size_t *lineNumber, struct
 
         getThresh (info, keyList, queue.loadSched, queue.loadStop, filename, lineNumber, " in section Queue ending");
         queue.nIdx = info->numIndx;
-        if (!addQueue (&queue, filename, lineNumber) && lsberrno == LSBE_NO_MEM) {
+        if (!addQueue (&queue, filename, *lineNumber) && lsberrno == LSBE_NO_MEM) {
             freekeyval (keyList);
             freeQueueInfo (&queue);
             return false;
@@ -6797,11 +6797,11 @@ initQueueInfo (struct queueInfoEnt *qp)
     qp->prepostUsername = NULL;
     qp->requeueEValues  = NULL;
     qp->resReq          = NULL;
-    qp->priority        = ULONG_MAX;
-    qp->nice            = INFINIT_SHORT;
+    qp->priority        = LONG_MAX;
+    qp->nice            = SHRT_MAX;
     qp->nIdx            = 0;
     qp->userJobLimit    = ULONG_MAX;
-    qp->procJobLimit    = INFINIT_FLOAT;
+    qp->procJobLimit    = FLT_MAX;
     qp->qAttrib         = 0;
     qp->qStatus         = ULONG_MAX;
     qp->maxJobs         = ULONG_MAX;
@@ -6811,8 +6811,8 @@ initQueueInfo (struct queueInfoEnt *qp)
     qp->numSSUSP        = ULONG_MAX;
     qp->numUSUSP        = ULONG_MAX;
     qp->mig             = ULONG_MAX;
-    qp->schedDelay      = ULONG_MAX;
-    qp->acceptIntvl     = ULONG_MAX;
+    qp->schedDelay      = INT_MAX;
+    qp->acceptIntvl     = INT_MAX;
     qp->procLimit       = ULONG_MAX;
     qp->minProcLimit    = ULONG_MAX;
     qp->defProcLimit    = ULONG_MAX;
@@ -6837,7 +6837,7 @@ initQueueInfo (struct queueInfoEnt *qp)
         qp->sigMap[i] = 0;
     }
 
-    qp->chkpntPeriod = -1;
+    qp->chkpntPeriod = INT_MAX;
     qp->chkpntDir    = NULL;
 
     return;
@@ -6878,7 +6878,7 @@ freeQueueInfo (struct queueInfoEnt *qp)
 }
 
 bool
-checkRequeEValues (struct queueInfoEnt *qp, char *word, const char *filename, size_t lineNumber)
+checkRequeEValues (struct queueInfoEnt *qp, const char *word, const char *filename, size_t *lineNumber)
 {
 // #define NORMAL_EXIT 0
 // #define EXCLUDE_EXIT 1
@@ -6887,7 +6887,7 @@ checkRequeEValues (struct queueInfoEnt *qp, char *word, const char *filename, si
         EXCLUDE_EXIT
     };
     
-    int numEValues = 0;
+    unsigned int numEValues = 0;
     int exitV      = 0;
     // int i          = 0;
     int found      = 0; // false
@@ -6900,10 +6900,10 @@ checkRequeEValues (struct queueInfoEnt *qp, char *word, const char *filename, si
     memset( exitInts,   0, sizeof( exitInts ) );
     memset( exitValues, '\0', strlen( exitValues ) );
 
-    cp = word;
+    cp = strdup( word );
 
     while ((sp = a_getNextWord_ (&word)) != NULL) {
-        if (isint_ (sp) && (exitV = my_atoi (sp, 256, -1)) != ULONG_MAX) {
+        if (isint_ (sp) && (exitV = atoi( sp ) ) != INT_MAX) {
             found = false;
             for ( unsigned int i = 0; i < numEValues; i++) {
                 if (exitInts[i] == exitV) {
@@ -6961,7 +6961,7 @@ checkRequeEValues (struct queueInfoEnt *qp, char *word, const char *filename, si
 }
 
 bool
-addQueue (struct queueInfoEnt *qp, const char *filename, unsigned int lineNumber)
+addQueue (struct queueInfoEnt *qp, const char *filename, size_t lineNumber)
 {
     
     struct queueInfoEnt **tmpQueues = NULL;
@@ -6981,9 +6981,9 @@ addQueue (struct queueInfoEnt *qp, const char *filename, unsigned int lineNumber
             queuesize *= 2;
         }
         //assert( queuesize >= 0 );
-        tmpQueues = myrealloc(queues, queuesize * sizeof (struct queueInfoEnt *));
+        tmpQueues = myrealloc(queues, queuesize * sizeof (struct queueInfoEnt));
         if( NULL == tmpQueues && ENOMEM == errno ) {
-            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "myrealloc", queuesize * sizeof (struct queueInfoEnt *));
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "myrealloc", queuesize * sizeof (struct queueInfoEnt));
             lsberrno = LSBE_NO_MEM;
             freeQueueInfo (qp);
             return false;
@@ -7152,8 +7152,8 @@ resetHConf (struct hostConf *hConf1)
     return;   
 }
 
-void
-checkCpuLimit (char **hostSpec, double **cpuFactor, int useSysDefault, const char *filename, size_t lineNumber, const char *pname, struct lsInfo *info, int options)
+bool
+checkCpuLimit( char **hostSpec, double **cpuFactor, int useSysDefault, const char *filename, size_t *lineNumber, const char *pname, struct lsInfo *info, int options)
 {
     if( ( *hostSpec ) && ( *cpuFactor == NULL ) && ( options != CONF_NO_CHECK ) && ( (*cpuFactor = getModelFactor (*hostSpec, info)) == NULL) && ( (*cpuFactor = getHostFactor (*hostSpec)) == NULL) ) {
         if (useSysDefault == true) {
@@ -7161,24 +7161,26 @@ checkCpuLimit (char **hostSpec, double **cpuFactor, int useSysDefault, const cha
             ls_syslog (LOG_ERR, "catgets 5383: [%s] %s: File %s in section Queue end at line %ld: Invalid DEFAULT_HOST_SPEC <%s>; ignored", __func__, pname, filename, lineNumber, pConf->defaultHostSpec);
 
             lsberrno = LSBE_CONF_WARNING;
-            FREEUP (pConf->defaultHostSpec);
+            // FREEUP (pConf->defaultHostSpec);
             FREEUP (*hostSpec);
+            return false;
         }
         else {
             /* catgets 5384 */
             ls_syslog (LOG_ERR, "catgets 5384: [%s] %s: File %s in section Queue end at line %ld: Invalid host_spec <%s>; ignored", __func__, pname, filename, lineNumber, *hostSpec);
             lsberrno = LSBE_CONF_WARNING;
             FREEUP (*hostSpec);
+            return false;
         }
     }
 
-    return;
+    return true;
 }
 
 bool
-parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char *filename, size_t lineNumber, const char *pname, struct lsInfo *info, int options)
+parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char *filename, size_t *lineNumber, const char *pname, struct lsInfo *info, int options)
 {
-    int limit            = 0; 
+    size_t limit         = 0; 
     bool retValue        = false;
     int useSysDefault    = false;
     double *cpuFactor    = NULL;
@@ -7187,6 +7189,9 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char
     char   *hostSpec     = NULL;
     char   *defaultLimit = NULL;
     char   *maxLimit     = NULL;
+    static char   *maxHostName  = NULL;
+    const unsigned int QKEY_CPULIMIT = 5; // from Do_Queues() above
+    const unsigned int QKEY_RUNLIMIT = 12;
 
     struct keymap key = keylist[QKEY_CPULIMIT]; // FIXME FIXME FIXME FIXME wtf is this reference from?
 
@@ -7195,17 +7200,18 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char
 
     sp = key.value;
     if (sp != NULL) {
-        defaultLimit = putstr_ (getNextWord_ (&sp));
-        maxLimit = getNextWord_ (&sp);
+        const char *kot = strdup( sp );
+        defaultLimit = putstr_( getNextWord_( &kot ) );
+        maxLimit = getNextWord_( &kot );
     }
 
     if (maxLimit != NULL) {
         
         retValue = parseLimitAndSpec (defaultLimit, &limit, &spec, hostSpec, key.key, qp, filename, lineNumber, pname);  
         if (retValue == true) {
-            if (limit >= 0) {
+            // if (limit >= 0) {
                 qp->defLimits[LSF_RLIMIT_CPU] = limit;
-            }
+            // }
             if ((spec) && !(hostSpec)) {
                 hostSpec = putstr_ (spec);
             }
@@ -7217,9 +7223,9 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char
 
     retValue = parseLimitAndSpec (maxLimit, &limit, &spec, hostSpec, key.key, qp, filename, lineNumber, pname);
     if (retValue == 0) {
-        if (limit >= 0) {
+        // if (limit >= 0) {
             qp->rLimits[LSF_RLIMIT_CPU] = limit;
-        }
+        // }
         if ((spec) && !(hostSpec)) {
             hostSpec = putstr_ (spec);
         }
@@ -7238,17 +7244,18 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char
     maxLimit = NULL;
     sp = key.value;
     if (sp != NULL) {
-        defaultLimit = putstr_ (getNextWord_ (&sp));
-        maxLimit = getNextWord_ (&sp);
+        const char *kot = strdup( sp );
+        defaultLimit = putstr_( getNextWord_( &kot ) );
+        maxLimit = getNextWord_( &kot );
     }
 
     if (maxLimit != NULL) {
 
         retValue = parseLimitAndSpec (defaultLimit, &limit, &spec, hostSpec, key.key, qp, filename, lineNumber, pname);
         if (retValue == true) {
-            if (limit >= 0) {
+            // if (limit >= 0) {
                 qp->defLimits[LSF_RLIMIT_RUN] = limit;
-            }
+            // }
             if ((spec) && !(hostSpec)) {
                 hostSpec = putstr_ (spec);
             }
@@ -7260,9 +7267,9 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char
 
     retValue = parseLimitAndSpec (maxLimit, &limit, &spec, hostSpec, key.key, qp, filename, lineNumber, pname);
     if (retValue == true) {
-        if (limit >= 0) {
+        // if (limit >= 0) {
             qp->rLimits[LSF_RLIMIT_RUN] = limit;
-        }
+        // }
         if ((spec) && !(hostSpec)) {
             hostSpec = putstr_ (spec);
         }
@@ -7302,7 +7309,8 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char
     }
 
     if (cpuFactor == NULL && options & CONF_RETURN_HOSTSPEC) {
-        if (pConf && pConf->param && pConf->defaultHostSpec != NULL && pConf->defaultHostSpec[0]) {
+        // if (pConf && pConf->param && pConf->defaultHostSpec != NULL && pConf->defaultHostSpec[0]) {
+        if (pConf && pConf->defaultHostSpec != NULL && pConf->defaultHostSpec[0]) { // FIXME FIXME FIXME label [0]
             
             hostSpec = putstr_ (pConf->defaultHostSpec);
             useSysDefault = true;
@@ -7313,18 +7321,18 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char
     }
 
     if (hostSpec == NULL && (options & CONF_RETURN_HOSTSPEC) && (options & CONF_CHECK)) {
-        if (maxHName == NULL && maxFactor <= 0.0) {
-            struct hostInfoEnt *hostPtr;
+        if ( maxHostName == NULL && maxFactor <= 0.0f) {
+            struct hostInfoEnt *hostPtr = NULL;
             for ( unsigned int i = 0; i < hConf->numHosts; i++) {
                 hostPtr = &(hConf->hosts[i]);
-                if (maxFactor < hostPtr->cpuFactor) {
-                    maxFactor = hostPtr->cpuFactor;
-                    maxHName = hostPtr->host;
+                if (maxFactor < hostPtr->cpuFactor) { // float masFactor in lsb-params.h
+                    maxFactor   = hostPtr->cpuFactor;
+                    maxHostName = hostPtr->host;
                 }
             }
         }
         cpuFactor = &maxFactor;
-        hostSpec = putstr_ (maxHName);
+        hostSpec  = putstr_ (maxHostName);
     }
 
     if (hostSpec && ((qp->hostSpec = putstr_ (hostSpec)) == NULL)) {
@@ -7338,7 +7346,7 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char
 
         if (cpuFactor != NULL) {
 
-            double limit_ = 0.0;
+            double limit_ = 0.0f;
             if (qp->rLimits[LSF_RLIMIT_CPU] > 0 && qp->rLimits[LSF_RLIMIT_CPU] != ULONG_MAX && (options & CONF_RETURN_HOSTSPEC)) {
                 limit_ = qp->rLimits[LSF_RLIMIT_CPU] * (*cpuFactor);
                 limit_ = limit_ < 1 ? 1 : limit_ + 0.5;
@@ -7466,7 +7474,7 @@ parseProcLimit (char *word, struct queueInfoEnt *qp, const char *filename, size_
 }
 
 bool
-parseLimitAndSpec (char *word, int *limit, char **spec, char *hostSpec, char *param, struct queueInfoEnt *qp, const char *filename, size_t lineNumber, const char *pname )
+parseLimitAndSpec (char *word, size_t *limit, char **spec, char *hostSpec, char *param, struct queueInfoEnt *qp, const char *filename, size_t lineNumber, const char *pname )
 {
     int limitVal = -1;
     char *sp     = NULL;
@@ -8032,7 +8040,7 @@ checkAllOthers ( const char *word, int *hasAllOthers)
 }
 
 bool
-getReserve ( const char *reserve, struct queueInfoEnt *qp, const char *filename, unsigned int lineNumber)
+getReserve ( const char *reserve, struct queueInfoEnt *qp, const char *filename, size_t lineNumber)
 {
     char *sp = NULL;
     char *cp = NULL;

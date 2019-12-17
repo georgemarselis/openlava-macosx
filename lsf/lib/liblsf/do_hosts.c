@@ -75,18 +75,18 @@ do_Hosts_lsf (FILE *fp, const char *filename, size_t *lineNum, struct lsInfo *in
     };
 
     struct keymap keyList[] = {
-        { HOSTNAME,                "    ", keylist[HOSTNAME],                NULL },
-        { MODEL,                   "    ", keylist[MODEL],                   NULL },
-        { TYPE,                    "    ", keylist[TYPE],                    NULL },
-        { ND,                      "    ", keylist[ND],                      NULL },
-        { RESOURCES,               "    ", keylist[RESOURCES],               NULL },
-        { RUNWINDOW,               "    ", keylist[RUNWINDOW],               NULL },
-        { REXPRI0,                 "    ", keylist[REXPRI0],                 NULL },
-        { SERVER0,                 "    ", keylist[SERVER0],                 NULL },
-        { R,                       "    ", keylist[R],                       NULL },
-        { S,                       "    ", keylist[S],                       NULL },
-        { NUM_ALLOCATED_RESOURCES, "    ", keylist[NUM_ALLOCATED_RESOURCES], NULL },
-        { 255,                     "    ", NULL,                             NULL }  // FIXME FIXME FIXME replace all similar 255 with label
+        { HOSTNAME,                keylist[HOSTNAME],                NULL },
+        { MODEL,                   keylist[MODEL],                   NULL },
+        { TYPE,                    keylist[TYPE],                    NULL },
+        { ND,                      keylist[ND],                      NULL },
+        { RESOURCES,               keylist[RESOURCES],               NULL },
+        { RUNWINDOW,               keylist[RUNWINDOW],               NULL },
+        { REXPRI0,                 keylist[REXPRI0],                 NULL },
+        { SERVER0,                 keylist[SERVER0],                 NULL },
+        { R,                       keylist[R],                       NULL },
+        { S,                       keylist[S],                       NULL },
+        { NUM_ALLOCATED_RESOURCES, keylist[NUM_ALLOCATED_RESOURCES], NULL },
+        { 255,                     NULL,                             NULL }  // FIXME FIXME FIXME replace all similar 255 with label
     };
 
     const char hostString[ ]   = "host";
@@ -470,7 +470,7 @@ do_Hosts_lsf (FILE *fp, const char *filename, size_t *lineNum, struct lsInfo *in
 }
 
 
-char
+bool
 do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct lsInfo *info, int options)
 {
 
@@ -484,9 +484,9 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
     int num                 = 0;
     int new                 = 0;
     int numSelectedHosts    = 0;
-    int isTypeOrModel       = FALSE;
-    int returnCode          = FALSE;
-    int copyCPUFactor       = FALSE;
+    bool isTypeOrModel      = false;
+    bool returnCode         = false;
+    bool copyCPUFactor      = false;
     size_t *override        = 0;
     char   *linep           = NULL;
     char hostname[MAXHOSTNAMELEN];
@@ -517,21 +517,22 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
     };
 
     struct keymap keyList[] = {
-        { HKEY_HNAME,           "    ", keylist[ HKEY_HNAME ],           NULL },
-        { HKEY_MXJ,             "    ", keylist[ HKEY_MXJ ],             NULL },
-        { HKEY_RUN_WINDOW,      "    ", keylist[ HKEY_RUN_WINDOW ],      NULL },
-        { HKEY_MIG,             "    ", keylist[ HKEY_MIG ],             NULL },
-        { HKEY_UJOB_LIMIT,      "    ", keylist[ HKEY_UJOB_LIMIT ],      NULL },
-        { HKEY_DISPATCH_WINDOW, "    ", keylist[ HKEY_DISPATCH_WINDOW ], NULL },
-        { UINT_MAX,                   "    ", NULL, NULL }
+        { HKEY_HNAME,           keylist[ HKEY_HNAME ],           NULL },
+        { HKEY_MXJ,             keylist[ HKEY_MXJ ],             NULL },
+        { HKEY_RUN_WINDOW,      keylist[ HKEY_RUN_WINDOW ],      NULL },
+        { HKEY_MIG,             keylist[ HKEY_MIG ],             NULL },
+        { HKEY_UJOB_LIMIT,      keylist[ HKEY_UJOB_LIMIT ],      NULL },
+        { HKEY_DISPATCH_WINDOW, keylist[ HKEY_DISPATCH_WINDOW ], NULL },
+        { UINT_MAX,             NULL, NULL }
     };
 
     const char host_string[] = "host";
     const char default_[] = "default"; // FIXME FIXME FIXME default could actually be defaultLabel or something else, look it up 
 
+    memset( hostname,'\0', strlen( hostname ) );
 
     if (conf == NULL) {
-        return FALSE;
+        return false;
     }
 
     // FREEUP (keyList);
@@ -554,34 +555,34 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
 
     // initHostInfoEnt ((struct hostInfoEnt *)&host);
     initHostInfoEnt ( &host);
-    linep = getNextLineC_conf (conf, lineNum, TRUE);
+    linep = getNextLineC_conf (conf, lineNum, true);
     if (!linep) {
         // ls_syslog (LOG_ERR, I18N_FILE_PREMATURE, __func__, filename, *lineNum);
         ls_syslog (LOG_ERR, LSB_FILE_PREMATUR_STR, __func__, filename, *lineNum); /*catgets 5051 */
         lsberrno = LSBE_CONF_WARNING;
-        return FALSE;
+        return false;
     }
 
     if (isSectionEnd (linep, filename, lineNum, host_string)) {
         // ls_syslog (LOG_WARNING, I18N_EMPTY_SECTION, __func__, filename, *lineNum, host_string);
         ls_syslog (LOG_WARNING, LSB_EMPTY_SECTION_STR, __func__, filename, *lineNum, host_string); /*catgets 5052 */
         lsberrno = LSBE_CONF_WARNING;
-        return FALSE;
+        return false;
     }
 
     if (strchr (linep, '=') != NULL) {
         ls_syslog (LOG_ERR, I18N_HORI_NOT_IMPLE, __func__, filename, *lineNum, host_string);
         lsberrno = LSBE_CONF_WARNING;
         doSkipSection_conf (conf, lineNum, filename, host_string);
-        return FALSE;
+        return false;
     }
 
-    if (!keyMatch (keyList, linep, FALSE)) {
+    if (!keyMatch (keyList, linep, false ) ) {
         /* catgets 5174 */
         ls_syslog (LOG_ERR, "catgets 5174: %s: File %s at line %d: Keyword line format error for Host section; ignoring section", __func__, filename, *lineNum);
         lsberrno = LSBE_CONF_WARNING;
         doSkipSection_conf (conf, lineNum, filename, host_string);
-        return FALSE;
+        return false;
     }
 
     if ( UINT_MAX == keyList[HKEY_HNAME].position ) {
@@ -589,7 +590,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
         ls_syslog (LOG_ERR, "catgets 5175: %s: File %s at line %d: Hostname required for Host section; ignoring section", __func__, filename, *lineNum);
         lsberrno = LSBE_CONF_WARNING;
         doSkipSection_conf (conf, lineNum, filename, host_string);
-        return FALSE;
+        return false;
     }
 
     nonOverridableHosts = malloc( sizeof( struct hTab ) );
@@ -606,7 +607,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
         FREEUP (nonOverridableHosts);
         FREEUP (tmpHosts);
         FREEUP (hostList);
-        return FALSE;
+        return false;
     }
     h_initTab_ (tmpHosts, 32);                      // FIXME FIXME 32 seems awfully specific
     // h_initTab_ ((hTab *)nonOverridableHosts, 32);   // FIXME FIXME 32 seems awfully specific
@@ -614,8 +615,8 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
     while ((linep = getNextLineC_conf (conf, lineNum, TRUE)) != NULL) {
 
         freekeyval (keyList);
-        initHostInfoEnt( (struct hostInfoEnt *)&host );
-        isTypeOrModel    = FALSE;
+        initHostInfoEnt( host );
+        isTypeOrModel    = false;
         numSelectedHosts = 0;
 
         if (isSectionEnd (linep, filename, lineNum, host_string)) {
@@ -624,8 +625,9 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
             FREEUP (nonOverridableHosts);
             h_delTab_ (tmpHosts);
             FREEUP (tmpHosts);
-            freeHostInfoEnt ((struct hostInfoEnt *)&host);
-            assert( returnCode <= CHAR_MAX && returnCode >= CHAR_MIN );
+            // freeHostInfoEnt ((struct hostInfoEnt *)&host);
+            freeHostInfoEnt ( &host );
+            // assert( returnCode <= CHAR_MAX && returnCode >= CHAR_MIN );
             return (char)returnCode;
         }
 
@@ -673,7 +675,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
                     hostInfo = &(cConf->hosts[i]);
                     if( ( strcmp (hostInfo->hostType,  keyList[HKEY_HNAME].value) == 0 || 
                           strcmp (hostInfo->hostModel, keyList[HKEY_HNAME].value) == 0
-                        ) && hostInfo->isServer == TRUE) 
+                        ) && hostInfo->isServer) 
                     {
                         hostList[numSelectedHosts] = cConf->hosts[i];
                         numSelectedHosts++;
@@ -687,7 +689,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
                     continue;
                 }
                 strcpy (hostname, keyList[HKEY_HNAME].value);
-                isTypeOrModel = TRUE;
+                isTypeOrModel = true;
             }
             else {
                 if (hp) {
@@ -790,7 +792,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
             FREEUP (host.loadSched);
             FREEUP (host.loadStop);
             assert( returnCode <= CHAR_MAX && returnCode >= CHAR_MIN );
-            return (char)returnCode;
+            return returnCode;
         }
 
         host.loadStop = malloc( info->numIndx * sizeof ( host.loadStop ));
@@ -807,7 +809,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
             FREEUP (host.loadSched);
             FREEUP (host.loadStop);
             assert( returnCode <= CHAR_MAX && returnCode >= CHAR_MIN );
-            return (char)returnCode;
+            return returnCode;
         }
 
         getThresh (info, keyList, host.loadSched, host.loadStop, filename, lineNum, " in section Host ending");
@@ -815,32 +817,32 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
         if (options == CONF_NO_CHECK) {
             host.host = hostname;
             num = 1;
-            *override = (size_t)TRUE;
-            copyCPUFactor = FALSE;
+            *override = true;
+            copyCPUFactor = false;
             h_addEnt_( ( struct hTab * )nonOverridableHosts, hostname, &new );
         }
         else if (strcmp (hostname, default_ ) == 0) {
             num = 0;
             for ( unsigned int i = 0; i < cConf->numHosts; i++) {
-                if (cConf->hosts[i].isServer != TRUE) {
+                if (cConf->hosts[i].isServer != true) {
                     continue;
                 }
                 hostList[num++] = cConf->hosts[i];
             }
 
-            override = FALSE;
-            copyCPUFactor = TRUE;
+            override = false;
+            copyCPUFactor = true;
         }
         else if (isTypeOrModel) {
             num           = numSelectedHosts;
-            *override     = (size_t) TRUE;  // FIXME cast here is probably correct
-            copyCPUFactor = TRUE;
+            *override     = true;  // FIXME cast here is probably correct
+            copyCPUFactor = true;
         }
         else {
             unsigned int total = 0;
             for ( unsigned int i = 0; i < cConf->numHosts; i++) {
                 if (equalHost_ (hostname, cConf->hosts[i].hostName)) {
-                    hostList[0] = cConf->hosts[i];
+                    hostList[0] = cConf->hosts[i]; // FIXME FIXME FIXME label [0]
                     break;
                 }
                 total = i;
@@ -852,7 +854,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
                 lsberrno = LSBE_CONF_WARNING;
                 freeHostInfoEnt (&host);
             }
-            else if (cConf->hosts[total].isServer != TRUE) {
+            else if (cConf->hosts[total].isServer != true ) {
                 num = 0;
                 /* catgets 5190 */
                 ls_syslog (LOG_ERR, "catgets 5190: %s: File %s at line %d: Host <%s> is not a server;ignoring", __func__, filename, *lineNum, hostname);
@@ -861,10 +863,10 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
             }
             else {
                 num = 1;
-                *override = (size_t) TRUE;
+                *override = true ;
                 // h_addEnt_( (hTab *)nonOverridableHosts, hostList[0].hostName, &new);
                 h_addEnt_( nonOverridableHosts, hostList[0].hostName, &new);
-                copyCPUFactor = TRUE;
+                copyCPUFactor = true;
             }
         }
         for( int i = 0; i < num; i++) {
@@ -873,7 +875,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
                 continue;
             }
 
-            if (copyCPUFactor == TRUE) {
+            if (copyCPUFactor == true) {
                 host.host = hostList[i].hostName;
 
                 for( unsigned int j = 0; j < info->nModels; j++) {
@@ -884,10 +886,11 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
                 }
             }
 
-            if (addHostEnt (&host, &hostList[i], override) == FALSE) {
+            if (addHostEnt (&host, &hostList[i], override) == false) {
                     freekeyval (keyList);
                     FREEUP (hostList);
-                    h_delTab_ ( (struct hTab *) nonOverridableHosts );
+                    // h_delTab_ ( (struct hTab *) nonOverridableHosts );
+                    h_delTab_ ( nonOverridableHosts );
                     FREEUP (nonOverridableHosts);
                     h_delTab_ (tmpHosts);
                     FREEUP (tmpHosts);
@@ -895,7 +898,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
                     FREEUP (host.loadSched);
                     FREEUP (host.loadStop);
                     assert( returnCode <= CHAR_MAX && returnCode >= CHAR_MIN );
-                    return (char)returnCode;
+                    return returnCode;
 
             }
         }
@@ -907,8 +910,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
 
     ls_syslog (LOG_ERR, LSB_FILE_PREMATUR_STR, __func__, filename, *lineNum);
     lsberrno = LSBE_CONF_WARNING;
-    returnCode = TRUE;
+    returnCode = true;
 
-    assert( returnCode <= CHAR_MAX && returnCode >= CHAR_MIN );
-    return (char)returnCode; // FIXME FIXME FIXME why a cast here?
+    return returnCode; // FIXME FIXME FIXME why a cast here?
 }

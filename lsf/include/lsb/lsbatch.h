@@ -1168,14 +1168,14 @@ struct hostInfoEnt
     unsigned long  numRUN;
     unsigned long  numSSUSP;
     unsigned long  numUSUSP;
+    float cpuFactor;
     float *load;
     float *loadSched;
     float *loadStop;
     char *host;
     char *windows;
     float *realLoad;
-    double cpuFactor;
-};
+}__attribute__((packed));
 
 // struct parameterInfo // V.1
 // {

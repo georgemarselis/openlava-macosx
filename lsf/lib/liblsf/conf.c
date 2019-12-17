@@ -283,11 +283,11 @@ char do_Index (FILE * fp, size_t *lineNum, const char *filename)
     };
 
     struct keymap keyList[ ] = {
-        { INTERVAL,    "    " , keyValues[INTERVAL],    NULL },
-        { INCREASING,  "    " , keyValues[INCREASING],  NULL },
-        { DESCRIPTION, "    " , keyValues[DESCRIPTION], NULL },
-        { NAME,        "    " , keyValues[NAME],        NULL },
-        { KEYNULL,     "    " , NULL, NULL }
+        { INTERVAL,    keyValues[INTERVAL],    NULL },
+        { INCREASING,  keyValues[INCREASING],  NULL },
+        { DESCRIPTION, keyValues[DESCRIPTION], NULL },
+        { NAME,        keyValues[NAME],        NULL },
+        { KEYNULL,     NULL, NULL }
     };
 
     const char newindex[ ] = "newindex";
@@ -439,8 +439,8 @@ char do_HostTypes (FILE * fp, size_t *lineNum, const char *filename)
     };
 
     struct keymap keyList[] = {
-        { TYPENAME, "    " , keylist[TYPENAME], NULL },
-        { KEYNULL,  "    " , NULL, NULL }
+        { TYPENAME, keylist[TYPENAME], NULL },
+        { KEYNULL,  NULL, NULL }
     };
 
     const char hosttype[] = "HostType";
@@ -554,10 +554,10 @@ char do_HostModels (FILE * fp, size_t *lineNum, const char *filename)
     };
 
     struct keymap keyList[]  = {
-        { MODELNAME,    "    " , keyvalues[MODELNAME],    NULL },
-        { CPUFACTOR,    "    " , keyvalues[CPUFACTOR],    NULL },
-        { ARCHITECTURE, "    " , keyvalues[ARCHITECTURE], NULL },
-        { KEYNULL,      "    " , NULL, NULL }
+        { MODELNAME,    keyvalues[MODELNAME],    NULL },
+        { CPUFACTOR,    keyvalues[CPUFACTOR],    NULL },
+        { ARCHITECTURE, keyvalues[ARCHITECTURE], NULL },
+        { KEYNULL,      NULL, NULL }
     };
 
     const char hostModel[] = "HostModel";
@@ -764,13 +764,13 @@ char do_Resources (FILE * fp, size_t *lineNum, const char *filename)
     };
 
     struct keymap keyList[] = {
-        { RESOURCENAME, "    ", keylist[RESOURCENAME], NULL },
-        { TYPE,         "    ", keylist[TYPE],         NULL },
-        { INTERVAL,     "    ", keylist[INTERVAL],     NULL },
-        { INCREASING,   "    ", keylist[INCREASING],   NULL },
-        { RELEASE,      "    ", keylist[RELEASE],      NULL },
-        { DESCRIPTION,  "    ", keylist[DESCRIPTION],  NULL },
-        { KEYNULL,      "    ", NULL, NULL }
+        { RESOURCENAME, keylist[RESOURCENAME], NULL },
+        { TYPE,         keylist[TYPE],         NULL },
+        { INTERVAL,     keylist[INTERVAL],     NULL },
+        { INCREASING,   keylist[INCREASING],   NULL },
+        { RELEASE,      keylist[RELEASE],      NULL },
+        { DESCRIPTION,  keylist[DESCRIPTION],  NULL },
+        { KEYNULL,      NULL, NULL }
     };
 
     const char resource[] = "resource";
@@ -1895,9 +1895,9 @@ char do_Cluster (FILE * fp, size_t *lineNum, const char *filename)
     };
 
     struct keymap keyList[] = {
-        { CLUSTERNAME, "    ", keylist[ CLUSTERNAME ], NULL },
-        { SERVERS,     "    ", keylist[ SERVERS ],     NULL },
-        { KEYNULL,     "    ", NULL, NULL }
+        { CLUSTERNAME, keylist[ CLUSTERNAME ], NULL },
+        { SERVERS,     keylist[ SERVERS ],     NULL },
+        { KEYNULL,     NULL, NULL }
     };
 
     const char cluster[]       = "cluster";
@@ -2039,18 +2039,18 @@ char do_Clparams (FILE * clfp, const char *lsfile, size_t *lineNum)
     };
 
     struct keymap keyList[ ] = {
-        { EXINTERVAL,              "    ", keylist[ EXINTERVAL ],              NULL },
-        { ELIMARGS,                "    ", keylist[ ELIMARGS ],                NULL },
-        { PROBE_TIMEOUT,           "    ", keylist[ PROBE_TIMEOUT ],           NULL },
-        { ELIM_POLL_INTERVAL,      "    ", keylist[ ELIM_POLL_INTERVAL ],      NULL },
-        { HOST_INACTIVITY_LIMIT,   "    ", keylist[ HOST_INACTIVITY_LIMIT ],   NULL },
-        { MASTER_INACTIVITY_LIMIT, "    ", keylist[ MASTER_INACTIVITY_LIMIT ], NULL },
-        { RETRY_LIMIT,             "    ", keylist[ RETRY_LIMIT ],             NULL },
-        { ADJUST_DURATION,         "    ", keylist[ ADJUST_DURATION ],         NULL },
-        { LSF_ELIM_DEBUG,          "    ", keylist[ LSF_ELIM_DEBUG ],          NULL },
-        { LSF_ELIM_BLOCKTIME,      "    ", keylist[ LSF_ELIM_BLOCKTIME ],      NULL },
-        { LSF_ELIM_RESTARTS,       "    ", keylist[ LSF_ELIM_RESTARTS ],       NULL },
-        { KEYNULL,                 "    ", NULL, NULL }
+        { EXINTERVAL,              keylist[ EXINTERVAL ],              NULL },
+        { ELIMARGS,                keylist[ ELIMARGS ],                NULL },
+        { PROBE_TIMEOUT,           keylist[ PROBE_TIMEOUT ],           NULL },
+        { ELIM_POLL_INTERVAL,      keylist[ ELIM_POLL_INTERVAL ],      NULL },
+        { HOST_INACTIVITY_LIMIT,   keylist[ HOST_INACTIVITY_LIMIT ],   NULL },
+        { MASTER_INACTIVITY_LIMIT, keylist[ MASTER_INACTIVITY_LIMIT ], NULL },
+        { RETRY_LIMIT,             keylist[ RETRY_LIMIT ],             NULL },
+        { ADJUST_DURATION,         keylist[ ADJUST_DURATION ],         NULL },
+        { LSF_ELIM_DEBUG,          keylist[ LSF_ELIM_DEBUG ],          NULL },
+        { LSF_ELIM_BLOCKTIME,      keylist[ LSF_ELIM_BLOCKTIME ],      NULL },
+        { LSF_ELIM_RESTARTS,       keylist[ LSF_ELIM_RESTARTS ],       NULL },
+        { KEYNULL,                 NULL, NULL }
     };
 
     const char parameters[] = "parameters";
@@ -2133,9 +2133,9 @@ int doResourceMap (FILE * fp, const char *lsfile, size_t *lineNum)
     };
 
     struct keymap keyList[] = {
-        { RESOURCENAME, "    ", keylist[ RESOURCENAME ], NULL },
-        { LOCATION,     "    ", keylist[ LOCATION ],     NULL },
-        { KEYNULL,      "    ", NULL, NULL }
+        { RESOURCENAME, keylist[ RESOURCENAME ], NULL },
+        { LOCATION,     keylist[ LOCATION ],     NULL },
+        { KEYNULL,      NULL, NULL }
     };
 
     const char resourceMapString[] = "resourceMap";
@@ -2216,14 +2216,13 @@ int doResourceMap (FILE * fp, const char *lsfile, size_t *lineNum)
                         array.size++;
                     }
 
-                    result = convertNegNotation_( &( keyList[ LOCATION ].value ), &array );
-                    if (result == 0)
-                    {
+                    char *kot = strdup( keyList[ LOCATION ].value );
+                    result = convertNegNotation_( &kot, &array );
+                    if (result == 0) {
                         /* catgets 5397 */
                         ls_syslog (LOG_WARNING, "catgets 5397: %s:%s: %s(%d): convertNegNotation_: all the hosts are to be excluded %s !", __func__, lsfile, *lineNum, keyList[LOCATION].value);
                     }
-                    else if (result < 0)
-                    {
+                    else if (result < 0) {
                         /* catgets 5398 */
                         ls_syslog (LOG_WARNING, "catgets 5398: %s:%s: %s(%d): convertNegNotation_: Wrong syntax \'%s\'", __func__, lsfile, *lineNum, keyList[LOCATION].value);
                     }
