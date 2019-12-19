@@ -205,5 +205,5 @@ void initkeylist (struct keymap keyList[], unsigned int m, unsigned int n, struc
 int ls_getClusAdmins (char *line, const char *filename, size_t *lineNum, const char *secName, int lookupAdmins);
 struct clusterConf *ls_readcluster ( const char *filename, struct lsInfo *info, bool_t ALWAYS_TRUE );
 unsigned int parseHostList (const char *hostList, const char *lsfile, const size_t lineNum, char ***hosts);
-char ls_addHostModel ( const char *model, const char *arch, double factor);
+char ls_addHostModel ( const char *model, const char *arch, float factor);
 char ls_addHostType (char *type);

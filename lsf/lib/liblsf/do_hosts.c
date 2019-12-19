@@ -490,12 +490,13 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
     size_t *override        = 0;
     char   *linep           = NULL;
     char hostname[MAXHOSTNAMELEN];
-    struct hostInfoEnt host;
-    struct hostent  *hp                  = NULL;
-    struct hTab     *tmpHosts            = NULL;
-    struct hostInfo *hostInfo            = NULL;
-    struct hostInfo *hostList            = NULL;
-    struct hTab     *nonOverridableHosts = NULL;
+ 
+    struct hostInfoEnt *host                = NULL;
+    struct hostent     *hp                  = NULL;
+    struct hTab        *tmpHosts            = NULL;
+    struct hostInfo    *hostInfo            = NULL;
+    struct hostInfo    *hostList            = NULL;
+    struct hTab        *nonOverridableHosts = NULL;
 
     enum state { 
         HKEY_HNAME, 
@@ -554,7 +555,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
     // keyList[HKEY_DISPATCH_WINDOW + 1].key = NULL;
 
     // initHostInfoEnt ((struct hostInfoEnt *)&host);
-    initHostInfoEnt ( &host);
+    initHostInfoEnt ( host );
     linep = getNextLineC_conf (conf, lineNum, true);
     if (!linep) {
         // ls_syslog (LOG_ERR, I18N_FILE_PREMATURE, __func__, filename, *lineNum);
@@ -626,9 +627,9 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
             h_delTab_ (tmpHosts);
             FREEUP (tmpHosts);
             // freeHostInfoEnt ((struct hostInfoEnt *)&host);
-            freeHostInfoEnt ( &host );
+            freeHostInfoEnt ( host );
             // assert( returnCode <= CHAR_MAX && returnCode >= CHAR_MIN );
-            return (char)returnCode;
+            return returnCode;
         }
 
         if (mapValues (keyList, linep) < 0) {
@@ -712,16 +713,16 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
         }
 
         if (keyList[HKEY_MXJ].value != NULL && strcmp (keyList[HKEY_MXJ].value, "!") == 0) {
-            host.maxJobs = 0;
+            host->maxJobs = 0;
         }
         // else if( keyList[HKEY_MXJ].position >= 0 && 
         else if( keyList[HKEY_MXJ].value != NULL   && 
                  strcmp (keyList[HKEY_MXJ].value, "") ) 
         {
             // assert( my_atoi (keyList[HKEY_MXJ].value, INFINIT_INT, -1) >= 0);
-            host.maxJobs = my_atoi (keyList[HKEY_MXJ].value, INT_MAX, -1);
+            host->maxJobs = my_atoi (keyList[HKEY_MXJ].value, INT_MAX, -1);
             // if ( fabs( INFINIT_INT - host.maxJobs) < 0.00001 ) {
-            if ( ( UINT_MAX - host.maxJobs) < 0.00001F ) {
+            if ( host->maxJobs > UINT_MAX ) {
                 /* catgets 5183 */
                 ls_syslog (LOG_ERR, "catgets 5183: %s: File %s at line %d: Invalid value <%s> for key <%s>; %d is assumed", __func__, filename, *lineNum, keyList[HKEY_MXJ].value, keyList[HKEY_MXJ].key, UINT_MAX);
                 lsberrno = LSBE_CONF_WARNING;
@@ -732,9 +733,9 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
         if( keyList[HKEY_UJOB_LIMIT].value != NULL && strcmp (keyList[HKEY_UJOB_LIMIT].value, "" ) ) {
 
             // assert( my_atoi( keyList[HKEY_UJOB_LIMIT].value, INFINIT_INT, -1 ) >=0 );
-            host.userJobLimit = my_atoi( keyList[HKEY_UJOB_LIMIT].value, INT_MAX, -1 );
+            host->userJobLimit = my_atoi( keyList[HKEY_UJOB_LIMIT].value, INT_MAX, -1 );
             // if ( fabs( INFINIT_INT - host.userJobLimit ) < 0.00001 ) {
-            if ( ( UINT_MAX - host.userJobLimit ) < 0.00001F ) {
+            if ( host->userJobLimit > UINT_MAX ) {
                 /* catgets 5183 */
                 ls_syslog (LOG_ERR, "catgets 5183: %s: File %s at line %d: Invalid value <%s> for key <%s>; %d is assumed", __func__, filename, *lineNum, keyList[HKEY_UJOB_LIMIT].value, keyList[HKEY_UJOB_LIMIT].key, UINT_MAX);
                 lsberrno = LSBE_CONF_WARNING;
@@ -744,7 +745,7 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
         // if (keyList[HKEY_RUN_WINDOW].position >= 0) {
 
         if (strcmp (keyList[HKEY_RUN_WINDOW].value, "")) {
-            host.windows = parsewindow (keyList[HKEY_RUN_WINDOW].value, filename, lineNum, "Host");
+            host->windows = parsewindow (keyList[HKEY_RUN_WINDOW].value, filename, lineNum, "Host");
 
             if(  lserrno == LSE_CONF_SYNTAX) {
                  lserrno  = LSE_NO_ERR;
@@ -756,11 +757,11 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
         // if (keyList[HKEY_DISPATCH_WINDOW].position >= 0) {
 
         if (strcmp (keyList[HKEY_DISPATCH_WINDOW].value, "")) {
-            FREEUP (host.windows);
-            host.windows = parsewindow (keyList[HKEY_DISPATCH_WINDOW].value, filename, lineNum, "Host");
+            FREEUP (host->windows);
+            host->windows = parsewindow (keyList[HKEY_DISPATCH_WINDOW].value, filename, lineNum, "Host");
 
             if (lserrno == LSE_CONF_SYNTAX) {
-                lserrno = LSE_NO_ERR;
+                lserrno  = LSE_NO_ERR;
                 lsberrno = LSBE_CONF_WARNING;
             }
         }
@@ -769,17 +770,35 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
         // if (keyList[HKEY_MIG].position >= 0 keyList[HKEY_MIG].value != NULL && strcmp (keyList[HKEY_MIG].value, "")) {
         if( keyList[HKEY_MIG].value != NULL && strcmp (keyList[HKEY_MIG].value, "" ) ) {
 
-            host.mig = strtoul( keyList[HKEY_MIG].value, NULL, 10 ); // FIXME FIXME FIXME check the strtoul() call was successful
+            host->mig = strtoul( keyList[HKEY_MIG].value, NULL, 10 ); // FIXME FIXME FIXME check the strtoul() call was successful
             // if ( fabs( INFINIT_INT - host.mig ) < 0.00001 ) {
-            if ( ( UINT_MAX - host.mig ) < 0.00001F ) {
+            if ( host->mig > UINT_MAX ) {
                 /* catgets 5186 */
                 ls_syslog (LOG_ERR, "catgets 5186: %s: File %s at line %d: Invalid value <%s> for key <%s>; no MIG threshold is assumed", __func__, filename, *lineNum, keyList[HKEY_MIG].value, keyList[HKEY_MIG].key);
                 lsberrno = LSBE_CONF_WARNING;
             }
         }
 
-        host.loadSched = malloc( info->numIndx * sizeof ( host.loadSched ));
-        if (info->numIndx && ( NULL == host.loadSched && ENOMEM == errno ) ) {
+        host->loadSched = malloc( info->numIndx * sizeof ( host->loadSched ));
+        if (info->numIndx && ( NULL == host->loadSched && ENOMEM == errno ) ) {
+            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", info->numIndx * sizeof (float *));
+            lsberrno = LSBE_NO_MEM;
+            freekeyval (keyList);
+            FREEUP (hostList);
+            // h_delTab_ ( ( struct hTab *)nonOverridableHosts);
+            h_delTab_ ( nonOverridableHosts );
+            FREEUP (nonOverridableHosts);
+            h_delTab_ (tmpHosts);
+            FREEUP (tmpHosts);
+            FREEUP (host->windows);
+            FREEUP (host->loadSched);
+            FREEUP (host->loadStop);
+            // assert( returnCode <= CHAR_MAX && returnCode >= CHAR_MIN );
+            return returnCode;
+        }
+
+        host->loadStop = malloc( info->numIndx * sizeof ( host->loadStop ));
+        if (info->numIndx && ( NULL == host->loadStop && ENOMEM == errno ) ) {
             ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", info->numIndx * sizeof (float *));
             lsberrno = LSBE_NO_MEM;
             freekeyval (keyList);
@@ -788,34 +807,16 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
             FREEUP (nonOverridableHosts);
             h_delTab_ (tmpHosts);
             FREEUP (tmpHosts);
-            FREEUP (host.windows);
-            FREEUP (host.loadSched);
-            FREEUP (host.loadStop);
-            assert( returnCode <= CHAR_MAX && returnCode >= CHAR_MIN );
+            FREEUP (host->windows);
+            FREEUP (host->loadSched);
+            FREEUP (host->loadStop);
             return returnCode;
         }
 
-        host.loadStop = malloc( info->numIndx * sizeof ( host.loadStop ));
-        if (info->numIndx && ( NULL == host.loadStop && ENOMEM == errno ) ) {
-            ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", info->numIndx * sizeof (float *));
-            lsberrno = LSBE_NO_MEM;
-            freekeyval (keyList);
-            FREEUP (hostList);
-            h_delTab_ ( ( struct hTab *)nonOverridableHosts);
-            FREEUP (nonOverridableHosts);
-            h_delTab_ (tmpHosts);
-            FREEUP (tmpHosts);
-            FREEUP (host.windows);
-            FREEUP (host.loadSched);
-            FREEUP (host.loadStop);
-            assert( returnCode <= CHAR_MAX && returnCode >= CHAR_MIN );
-            return returnCode;
-        }
-
-        getThresh (info, keyList, host.loadSched, host.loadStop, filename, lineNum, " in section Host ending");
-        host.nIdx = info->numIndx;
+        getThresh (info, keyList, host->loadSched, host->loadStop, filename, lineNum, " in section Host ending");
+        host->nIdx = info->numIndx;
         if (options == CONF_NO_CHECK) {
-            host.host = hostname;
+            host->host = strdup( hostname );
             num = 1;
             *override = true;
             copyCPUFactor = false;
@@ -852,14 +853,14 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
                 /* catgets 5189 */
                 ls_syslog (LOG_ERR, "catgets 5189: %s: File %s at line %d: Can't find the information of host <%s>", __func__, filename, *lineNum, hostname);
                 lsberrno = LSBE_CONF_WARNING;
-                freeHostInfoEnt (&host);
+                freeHostInfoEnt ( host );
             }
             else if (cConf->hosts[total].isServer != true ) {
                 num = 0;
                 /* catgets 5190 */
                 ls_syslog (LOG_ERR, "catgets 5190: %s: File %s at line %d: Host <%s> is not a server;ignoring", __func__, filename, *lineNum, hostname);
                 lsberrno = LSBE_CONF_WARNING;
-                freeHostInfoEnt ( &host);
+                freeHostInfoEnt ( host );
             }
             else {
                 num = 1;
@@ -876,17 +877,17 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
             }
 
             if (copyCPUFactor == true) {
-                host.host = hostList[i].hostName;
+                host->host = strdup( hostList[i].hostName );
 
                 for( unsigned int j = 0; j < info->nModels; j++) {
                     if (strcmp (hostList[i].hostModel, info->hostModels[j]) == 0) {
-                        host.cpuFactor = info->cpuFactor[j];
+                        host->cpuFactor = info->cpuFactor[j];
                         break;
                     }
                 }
             }
 
-            if (addHostEnt (&host, &hostList[i], override) == false) {
+            if (addHostEnt ( host, &hostList[i], override) == false) {
                     freekeyval (keyList);
                     FREEUP (hostList);
                     // h_delTab_ ( (struct hTab *) nonOverridableHosts );
@@ -894,17 +895,17 @@ do_Hosts_lsb (struct lsConf *conf, const char *filename, size_t *lineNum, struct
                     FREEUP (nonOverridableHosts);
                     h_delTab_ (tmpHosts);
                     FREEUP (tmpHosts);
-                    FREEUP (host.windows);
-                    FREEUP (host.loadSched);
-                    FREEUP (host.loadStop);
-                    assert( returnCode <= CHAR_MAX && returnCode >= CHAR_MIN );
+                    FREEUP (host->windows);
+                    FREEUP (host->loadSched);
+                    FREEUP (host->loadStop);
+                    // assert( returnCode <= CHAR_MAX && returnCode >= CHAR_MIN );
                     return returnCode;
 
             }
         }
-        FREEUP (host.windows);
-        FREEUP (host.loadSched);
-        FREEUP (host.loadStop);
+        FREEUP (host->windows);
+        FREEUP (host->loadSched);
+        FREEUP (host->loadStop);
 
     }
 

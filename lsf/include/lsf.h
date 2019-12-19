@@ -461,6 +461,7 @@ struct resItem
 
 struct lsInfo
 {
+    struct resItem **resTable;
     unsigned int nTypes;
     unsigned int nModels;
     unsigned int modelRefs[MAX_MODELS];         // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
@@ -470,9 +471,8 @@ struct lsInfo
     char hostTypes[MAX_TYPES][MAX_LSF_NAME_LEN];   // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
     char hostModels[MAX_MODELS][MAX_LSF_NAME_LEN]; // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
     char hostArchs[MAX_MODELS][MAX_LSF_NAME_LEN];  // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
-    char paddin1[4];
-    double cpuFactor[MAX_MODELS];               // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
-    struct resItem **resTable;
+    float cpuFactor[MAX_MODELS];                   // FIXME FIXME FIXME FIXME fix sizes; add union that describes each type
+    char padding[4];
 } __attribute__((aligned));
 
 //#define CLUST_STAT_OK             0x01

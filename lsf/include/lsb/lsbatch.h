@@ -1123,9 +1123,9 @@ struct queueInfoEnt // V2
     size_t minProcLimit;
     size_t defProcLimit;
     size_t nIdx;
-    size_t rLimits[LSF_RLIM_NLIMITS];
     size_t sigMap[LSB_SIG_NUM];
-    size_t defLimits[LSF_RLIM_NLIMITS];
+    float rLimits[LSF_RLIM_NLIMITS];
+    float defLimits[LSF_RLIM_NLIMITS];
     float procJobLimit;
     char *queue;
     char *description;

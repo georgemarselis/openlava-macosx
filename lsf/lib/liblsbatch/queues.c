@@ -153,8 +153,8 @@ lsb_queueinfo (char **queues, unsigned int *numQueues, char *hosts, char *users,
 
   mbdReqtype = BATCH_QUEUE_INFO;
   assert( cc >= 0);
-  cc = (int)(sizeof (struct infoReq) + (unsigned long)cc * MAXHOSTNAMELEN + (unsigned long)cc + 100);
-  request_buf = (char *)malloc ( (unsigned long)cc);
+  cc = (sizeof (struct infoReq) + (unsigned long)cc * MAXHOSTNAMELEN + (unsigned long)cc + 100);
+  request_buf = malloc ( (unsigned long)cc);
   if ( NULL == request_buf && ENOMEM == errno )
     {
       lsberrno = LSBE_NO_MEM;
@@ -207,7 +207,7 @@ lsb_queueinfo (char **queues, unsigned int *numQueues, char *hosts, char *users,
 	  return (NULL);
 	}
       assert( reply.numQueues >= 0 );
-      qTmp = (struct queueInfoEnt **) myrealloc (qInfo, (unsigned long)reply.numQueues * sizeof (struct queueInfoEnt *));
+      qTmp = myrealloc (qInfo, reply.numQueues * sizeof (struct queueInfoEnt ));
       if ( NULL == qTmp && ENOMEM == errno )
 	{
 	  lsberrno = LSBE_NO_MEM;

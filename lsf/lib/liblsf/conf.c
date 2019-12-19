@@ -636,7 +636,7 @@ char do_HostModels (FILE * fp, size_t *lineNum, const char *filename)
     return TRUE;
 }
 
-char ls_addHostModel ( const char *model, const char *arch, double factor) // FIXME FIXME FIXME FIXME duplicate function name from lim: lim_addHostModel
+char ls_addHostModel ( const char *model, const char *arch, float factor) // FIXME FIXME FIXME FIXME duplicate function name from lim: lim_addHostModel
 {
     if ( NULL == model || NULL == arch) {
         ls_syslog (LOG_ERR, "%s: model (%s) or arch (%s) is NULL", __func__, model, arch );

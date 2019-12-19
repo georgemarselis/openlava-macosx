@@ -379,42 +379,45 @@ getHostData2 (char *host)
   return hData;
 }
 
-float *
-getHostFactor (char *host)
-{
-  struct hData *hD;
-  static double cpuFactor;
-  struct hostInfo *hInfo;
-  struct hostent *hp;
 
-  if (host == NULL || strlen (host) == 0)
-    {
-      if ((hD = getHostData (ls_getmyhostname ())) == NULL)
-    return NULL;
-    }
-  else
-    {
-      if ((hD = getHostData (host)) == NULL)
-    {
+// use the one from lsb_params.c
 
-      if ((hp = Gethostbyname_ (host)) == NULL)
-        return NULL;
+// float *
+// getHostFactor (char *host)
+// {
+//   struct hData *hD;
+//   static double cpuFactor;
+//   struct hostInfo *hInfo;
+//   struct hostent *hp;
 
-      if ((hD = getHostData (hp->h_name)) == NULL)
-        {
-          if ((hInfo = getLsfHostData (hp->h_name)) != NULL)
-        return &hInfo->cpuFactor;
-          return NULL;
-        }
-    }
-    }
+//   if (host == NULL || strlen (host) == 0)
+//     {
+//       if ((hD = getHostData (ls_getmyhostname ())) == NULL)
+//     return NULL;
+//     }
+//   else
+//     {
+//       if ((hD = getHostData (host)) == NULL)
+//     {
 
-  if (hD->hStatus & HOST_STAT_REMOTE)
-    return NULL;
+//       if ((hp = Gethostbyname_ (host)) == NULL)
+//         return NULL;
 
-  cpuFactor = hD->cpuFactor;
-  return &cpuFactor;
-}
+//       if ((hD = getHostData (hp->h_name)) == NULL)
+//         {
+//           if ((hInfo = getLsfHostData (hp->h_name)) != NULL)
+//         return &hInfo->cpuFactor;
+//           return NULL;
+//         }
+//     }
+//     }
+
+//   if (hD->hStatus & HOST_STAT_REMOTE)
+//     return NULL;
+
+//   cpuFactor = hD->cpuFactor;
+//   return &cpuFactor;
+// }
 
 float *
 getModelFactor (char *hostModel)

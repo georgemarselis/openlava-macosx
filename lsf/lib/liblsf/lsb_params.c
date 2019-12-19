@@ -6286,7 +6286,7 @@ do_Queues (struct lsConf *conf, const char *filename, size_t *lineNumber, struct
         }
 
         if (keyList[QKEY_DEFAULT_HOST_SPEC].value != NULL && strcmp (keyList[QKEY_DEFAULT_HOST_SPEC].value, "")) {
-            double *cpuFactor = NULL;
+            float *cpuFactor = NULL;
 
             if (options != CONF_NO_CHECK) {
                 if ((cpuFactor = getModelFactor(keyList[QKEY_DEFAULT_HOST_SPEC].value, info)) == NULL && (cpuFactor = getHostFactor(keyList[QKEY_DEFAULT_HOST_SPEC].value)) == NULL) {
@@ -6315,7 +6315,8 @@ do_Queues (struct lsConf *conf, const char *filename, size_t *lineNumber, struct
         }
 
         if (keyList[QKEY_FILELIMIT].value != NULL && strcmp (keyList[QKEY_FILELIMIT].value, "")) {
-            if ((queue.rLimits[LSF_RLIMIT_FSIZE] = strtoul( keyList[QKEY_FILELIMIT].value, NULL, 10 ) ) == ULONG_MAX) {
+            queue.rLimits[LSF_RLIMIT_FSIZE] = strtof( keyList[QKEY_FILELIMIT].value, NULL );
+            if( fabsf( queue.rLimits[LSF_RLIMIT_FSIZE] - FLT_MAX ) < 0.0000000001f ) {
                 /* catgets 5295 */
                 ls_syslog (LOG_ERR, "catgets 5295: %s: File %s in section Queue ending at line %lu: FILELIMIT value <%s> is not a positive integer between 0 and %lu; ignored", __func__, filename, lineNumber, keyList[QKEY_FILELIMIT].value, ULONG_MAX);
                 lsberrno = LSBE_CONF_WARNING;
@@ -6323,13 +6324,14 @@ do_Queues (struct lsConf *conf, const char *filename, size_t *lineNumber, struct
         }
 
         if (keyList[QKEY_DATALIMIT].value != NULL && strcmp (keyList[QKEY_DATALIMIT].value, "")) {
-            size_t *defLimits = 0; *defLimits = queue.defLimits[LSF_RLIMIT_DATA];
-            size_t *rLimits   = 0; *rLimits   = queue.rLimits[LSF_RLIMIT_DATA];
+            float *defLimits = 0; *defLimits = queue.defLimits[LSF_RLIMIT_DATA];
+            float *rLimits   = 0; *rLimits   = queue.rLimits[LSF_RLIMIT_DATA];
             parseDefAndMaxLimits ( &keyList[QKEY_DATALIMIT], defLimits, rLimits, filename, lineNumber, function_name );
         }
 
         if (keyList[QKEY_STACKLIMIT].value != NULL && strcmp (keyList[QKEY_STACKLIMIT].value, "")) {
-            if ((queue.rLimits[LSF_RLIMIT_STACK] = strtoul( keyList[QKEY_STACKLIMIT].value, NULL, 10 ) ) == ULONG_MAX) { // BASE 10
+            queue.rLimits[LSF_RLIMIT_STACK] = strtof( keyList[QKEY_STACKLIMIT].value, NULL);
+            if (  fabsf(queue.rLimits[LSF_RLIMIT_STACK] - FLT_MIN ) < 0.0000000001f ) {
                 /* catgets 5297 */
                 ls_syslog (LOG_ERR, "catgets 5297: %s: File %s in section Queue ending at line %lu: STACKLIMIT value <%s> is not a positive integer between 0 and %lu; ignored", __func__, filename, lineNumber, keyList[QKEY_STACKLIMIT].value, ULONG_MAX);
                 lsberrno = LSBE_CONF_WARNING;
@@ -6337,7 +6339,8 @@ do_Queues (struct lsConf *conf, const char *filename, size_t *lineNumber, struct
         }
 
         if (keyList[QKEY_CORELIMIT].value != NULL && strcmp (keyList[QKEY_CORELIMIT].value, "")) {
-            if ((queue.rLimits[LSF_RLIMIT_CORE] = strtoul( keyList[QKEY_CORELIMIT].value, NULL, 10 ) ) == ULONG_MAX) { // BASE 10
+            queue.rLimits[LSF_RLIMIT_CORE] = strtof( keyList[QKEY_CORELIMIT].value, NULL );
+            if ( fabsf( queue.rLimits[LSF_RLIMIT_CORE] - FLT_MIN ) < 0.0000000001f ) { // BASE 10
                 /* catgets 5298 */
                 ls_syslog (LOG_ERR, "catgets 5298: %s: File %s in section Queue ending at line %lu: CORELIMIT value <%s> is not a non-negative integer between -1 and %lu; ignored", __func__, filename, lineNumber, keyList[QKEY_CORELIMIT].value, ULONG_MAX);
                 lsberrno = LSBE_CONF_WARNING;
@@ -6345,14 +6348,15 @@ do_Queues (struct lsConf *conf, const char *filename, size_t *lineNumber, struct
         }
 
         if (keyList[QKEY_MEMLIMIT].value != NULL && strcmp (keyList[QKEY_MEMLIMIT].value, "")) {
-            size_t *defLimits = 0; *defLimits = queue.defLimits[LSF_RLIMIT_RSS];
-            size_t *rLimits   = 0; *rLimits   = queue.rLimits[LSF_RLIMIT_RSS];
+            float *defLimits = 0; *defLimits = queue.defLimits[LSF_RLIMIT_RSS];
+            float *rLimits   = 0; *rLimits   = queue.rLimits[LSF_RLIMIT_RSS];
             parseDefAndMaxLimits ( &keyList[QKEY_MEMLIMIT], defLimits, rLimits, filename, lineNumber, function_name);
         }
 
 
         if (keyList[QKEY_SWAPLIMIT].value != NULL && strcmp (keyList[QKEY_SWAPLIMIT].value, "")) {
-            if ((queue.rLimits[LSF_RLIMIT_SWAP] = strtoul( keyList[QKEY_SWAPLIMIT].value, NULL, 10 ) ) == ULONG_MAX) { // BASE 10
+            queue.rLimits[LSF_RLIMIT_SWAP] = strtof( keyList[QKEY_SWAPLIMIT].value, NULL );
+            if( fabsf( queue.rLimits[LSF_RLIMIT_SWAP] - FLT_MIN ) < 0.0000000001f ) {
                 /* catgets 5300 */
                 ls_syslog (LOG_ERR, "catgets 5300: %s: File %s in section Queue ending at line %lu: SWAPLIMIT value <%s> is not a positive integer between 0 and %lu; ignored", __func__, filename, lineNumber, keyList[QKEY_SWAPLIMIT].value, ULONG_MAX);
                 lsberrno = LSBE_CONF_WARNING;
@@ -6360,8 +6364,8 @@ do_Queues (struct lsConf *conf, const char *filename, size_t *lineNumber, struct
         }
 
         if (keyList[QKEY_PROCESSLIMIT].value != NULL && strcmp (keyList[QKEY_PROCESSLIMIT].value, "")) {
-            size_t *defLimits = 0; *defLimits = queue.defLimits[LSF_RLIMIT_PROCESS];
-            size_t *rLimits   = 0; *rLimits   = queue.rLimits[LSF_RLIMIT_PROCESS];
+            float *defLimits = 0; *defLimits = queue.defLimits[LSF_RLIMIT_PROCESS];
+            float *rLimits   = 0; *rLimits   = queue.rLimits[LSF_RLIMIT_PROCESS];
             parseDefAndMaxLimits( &keyList[QKEY_PROCESSLIMIT], defLimits, rLimits, filename, lineNumber, function_name);
         }
 
@@ -6819,8 +6823,8 @@ initQueueInfo (struct queueInfoEnt *qp)
     qp->hostJobLimit    = ULONG_MAX;
 
     for ( unsigned int i = 0; i < LSF_RLIM_NLIMITS; i++) {
-        qp->rLimits[i]   = ULONG_MAX;
-        qp->defLimits[i] = ULONG_MAX;
+        qp->rLimits[i]   = FLT_MAX;
+        qp->defLimits[i] = FLT_MAX;
     }
 
     qp->numRESERVE      = ULONG_MAX;
@@ -7153,7 +7157,7 @@ resetHConf (struct hostConf *hConf1)
 }
 
 bool
-checkCpuLimit( char **hostSpec, double **cpuFactor, int useSysDefault, const char *filename, size_t *lineNumber, const char *pname, struct lsInfo *info, int options)
+checkCpuLimit( char **hostSpec, float **cpuFactor, int useSysDefault, const char *filename, size_t *lineNumber, const char *pname, struct lsInfo *info, int options)
 {
     if( ( *hostSpec ) && ( *cpuFactor == NULL ) && ( options != CONF_NO_CHECK ) && ( (*cpuFactor = getModelFactor (*hostSpec, info)) == NULL) && ( (*cpuFactor = getHostFactor (*hostSpec)) == NULL) ) {
         if (useSysDefault == true) {
@@ -7180,10 +7184,10 @@ checkCpuLimit( char **hostSpec, double **cpuFactor, int useSysDefault, const cha
 bool
 parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char *filename, size_t *lineNumber, const char *pname, struct lsInfo *info, int options)
 {
-    size_t limit         = 0; 
+    float limit          = 0; 
     bool retValue        = false;
     int useSysDefault    = false;
-    double *cpuFactor    = NULL;
+    float  *cpuFactor    = NULL;
     char   *spec         = NULL;
     char   *sp           = NULL;
     char   *hostSpec     = NULL;
@@ -7207,7 +7211,7 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char
 
     if (maxLimit != NULL) {
         
-        retValue = parseLimitAndSpec (defaultLimit, &limit, &spec, hostSpec, key.key, qp, filename, lineNumber, pname);  
+        retValue = parseLimitAndSpec (defaultLimit, &limit, &spec, hostSpec, key.key, qp, filename, lineNumber, pname);  // FIXME FIXME FIXME
         if (retValue == true) {
             // if (limit >= 0) {
                 qp->defLimits[LSF_RLIMIT_CPU] = limit;
@@ -7234,7 +7238,7 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char
     if (sp && strlen (sp) != 0) {
         lsberrno = LSBE_CONF_WARNING;
         /* catgets 5464 */
-        ls_syslog (LOG_ERR, "catgets 5464: %s: File %s in section Queue ending at line %lu: CPULIMIT for queue has extra parameters: %s; These parameters will be ignored.", pname, filename, lineNumber, sp); 
+        ls_syslog (LOG_ERR, "catgets 5464: %s: File %s in section Queue ending at line %lu: CPULIMIT for queue has extra parameters: %s; These parameters will be ignored.", __func__, filename, lineNumber, sp); 
         lsberrno = LSBE_CONF_WARNING;
     }
 
@@ -7278,19 +7282,41 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char
     if (sp && strlen (sp) != 0) {
         lsberrno = LSBE_CONF_WARNING;
         /* catgets 5464 */
-        ls_syslog (LOG_ERR, "catgets 5464: %s: File %s in section Queue ending at line %lu: RUNLIMIT for queue has extra parameters: %s; These parameters will be ignored.", pname, filename, lineNumber, sp); 
+        ls_syslog (LOG_ERR, "catgets 5464: %s: File %s in section Queue ending at line %lu: RUNLIMIT for queue has extra parameters: %s; These parameters will be ignored.", __func__, filename, lineNumber, sp); 
         lsberrno = LSBE_CONF_WARNING;
     }
 
-    if (qp->defLimits[LSF_RLIMIT_CPU] != ULONG_MAX && qp->rLimits[LSF_RLIMIT_CPU] != ULONG_MAX && qp->defLimits[LSF_RLIMIT_CPU] > qp->rLimits[LSF_RLIMIT_CPU]) {
+    bool isDefLimits = false;
+    bool isrLimits   = false;
+    bool isRunLimits = false;
+    bool isCPULimits = false;
+
+    if( qp->defLimits[LSF_RLIMIT_CPU] < FLT_MAX ) {
+        isDefLimits = true;
+    }
+
+    if( qp->rLimits[LSF_RLIMIT_CPU] < FLT_MAX ) {
+        isrLimits = true;
+    } 
+
+    // if (qp->defLimits[LSF_RLIMIT_CPU] != ULONG_MAX && qp->rLimits[LSF_RLIMIT_CPU] != ULONG_MAX && qp->defLimits[LSF_RLIMIT_CPU] > qp->rLimits[LSF_RLIMIT_CPU]) {
+    if ( isDefLimits && isrLimits && qp->defLimits[LSF_RLIMIT_CPU] > qp->rLimits[LSF_RLIMIT_CPU]) {
         /* catgets 5111 */
-        ls_syslog (LOG_ERR, "catgets 5111: %s: File %s in section Queue at line %lu: The default CPULIMIT %lu should not be greater than the max CPULIMIT %lu; ignoring the default CPULIMIT and using max CPULIMIT also as default CPULIMIT", pname, filename, lineNumber, qp->defLimits[LSF_RLIMIT_CPU], qp->rLimits[LSF_RLIMIT_CPU]);
+        ls_syslog (LOG_ERR, "catgets 5111: %s: File %s in section Queue at line %lu: The default CPULIMIT %f should not be greater than the max CPULIMIT %f; ignoring the default CPULIMIT and using max CPULIMIT also as default CPULIMIT", __func__, filename, lineNumber, (double) qp->defLimits[LSF_RLIMIT_CPU], (double) qp->rLimits[LSF_RLIMIT_CPU]);
         qp->defLimits[LSF_RLIMIT_CPU] = qp->rLimits[LSF_RLIMIT_CPU];
     }
 
-    if (qp->defLimits[LSF_RLIMIT_RUN] != ULONG_MAX && qp->rLimits[LSF_RLIMIT_RUN] != ULONG_MAX && qp->defLimits[LSF_RLIMIT_RUN] > qp->rLimits[LSF_RLIMIT_RUN]) {
+    if( qp->defLimits[LSF_RLIMIT_RUN] < FLT_MAX ) {
+        isRunLimits = true;
+    }
+
+    if( qp->rLimits[LSF_RLIMIT_CPU] < FLT_MAX ) {
+        isCPULimits = true;
+    } 
+
+    if ( isRunLimits && isCPULimits && qp->defLimits[LSF_RLIMIT_RUN] > qp->rLimits[LSF_RLIMIT_RUN]) {
         /* catgets 5110 */
-        ls_syslog (LOG_ERR, "catgets 5110: %s: File %s in section Queue at line %lu: The default RUNLIMIT %lu should not be greater than the max RUNLIMIT %lu; ignoring the default RUNLIMIT and using max RUNLIMIT also as default RUNLIMIT", pname, filename, lineNumber, qp->defLimits[LSF_RLIMIT_RUN], qp->rLimits[LSF_RLIMIT_RUN]);
+        ls_syslog (LOG_ERR, "catgets 5110: %s: File %s in section Queue at line %lu: The default RUNLIMIT %f should not be greater than the max RUNLIMIT %f; ignoring the default RUNLIMIT and using max RUNLIMIT also as default RUNLIMIT", __func__, filename, lineNumber, (double) qp->defLimits[LSF_RLIMIT_RUN], (double) qp->rLimits[LSF_RLIMIT_RUN]);
         qp->defLimits[LSF_RLIMIT_RUN] = qp->rLimits[LSF_RLIMIT_RUN];
     }
 
@@ -7346,36 +7372,37 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char
 
         if (cpuFactor != NULL) {
 
-            double limit_ = 0.0f;
-            if (qp->rLimits[LSF_RLIMIT_CPU] > 0 && qp->rLimits[LSF_RLIMIT_CPU] != ULONG_MAX && (options & CONF_RETURN_HOSTSPEC)) {
-                limit_ = qp->rLimits[LSF_RLIMIT_CPU] * (*cpuFactor);
-                limit_ = limit_ < 1 ? 1 : limit_ + 0.5;
+            float limit_ = 0.0f;
+
+            if (qp->rLimits[LSF_RLIMIT_CPU] > 0 && fabsf( qp->rLimits[LSF_RLIMIT_CPU] - FLT_MAX ) > 0.00000001f && (options & CONF_RETURN_HOSTSPEC)) {
+                limit_ = qp->rLimits[LSF_RLIMIT_CPU]  * (*cpuFactor);
+                limit_ = limit_ < 1 ? 1 : limit_ + 0.5f;
                 qp->rLimits[LSF_RLIMIT_CPU] = limit_;
             }
 
-            if (qp->defLimits[LSF_RLIMIT_CPU] > 0 && qp->defLimits[LSF_RLIMIT_CPU] != ULONG_MAX && (options & CONF_RETURN_HOSTSPEC)) {
+            if (qp->defLimits[LSF_RLIMIT_CPU] > 0 && fabsf( qp->defLimits[LSF_RLIMIT_CPU] - FLT_MAX) > 0.00000001f && (options & CONF_RETURN_HOSTSPEC)) {
                 limit_ = qp->defLimits[LSF_RLIMIT_CPU] * (*cpuFactor);
-                limit_ = limit_ < 1 ? 1 : limit_ + 0.5;
+                limit_ = limit_ < 1 ? 1 : limit_ + 0.5f;
                 qp->defLimits[LSF_RLIMIT_CPU] = limit_;
             }
 
             if (qp->rLimits[LSF_RLIMIT_RUN] > 0 && qp->rLimits[LSF_RLIMIT_RUN] != ULONG_MAX && (options & CONF_RETURN_HOSTSPEC)) {
                 limit_ = qp->rLimits[LSF_RLIMIT_RUN] * (*cpuFactor);
-                limit_ = limit_ < 1 ? 1 : limit_ + 0.5;
+                limit_ = limit_ < 1 ? 1 : limit_ + 0.5f;
                 qp->rLimits[LSF_RLIMIT_RUN] = limit_;
             }
 
             if (qp->defLimits[LSF_RLIMIT_RUN] > 0 && qp->defLimits[LSF_RLIMIT_RUN] != ULONG_MAX && (options & CONF_RETURN_HOSTSPEC)) {
                 limit_ = qp->defLimits[LSF_RLIMIT_RUN] * (*cpuFactor);
-                limit_ = limit_ < 1 ? 1 : limit_ + 0.5;
+                limit_ = limit_ < 1 ? 1 : limit_ + 0.5f;
                 qp->defLimits[LSF_RLIMIT_RUN] = limit_;
             }
         }
         else {
-            qp->rLimits[LSF_RLIMIT_CPU] = ULONG_MAX;
-            qp->rLimits[LSF_RLIMIT_RUN] = ULONG_MAX;
-            qp->defLimits[LSF_RLIMIT_CPU] = ULONG_MAX;
-            qp->defLimits[LSF_RLIMIT_RUN] = ULONG_MAX;
+            qp->rLimits[LSF_RLIMIT_CPU] = FLT_MAX;
+            qp->rLimits[LSF_RLIMIT_RUN] = FLT_MAX;
+            qp->defLimits[LSF_RLIMIT_CPU] = FLT_MAX;
+            qp->defLimits[LSF_RLIMIT_RUN] = FLT_MAX;
         }
     }
     
@@ -7386,11 +7413,11 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char
 }
 
 bool
-parseProcLimit (char *word, struct queueInfoEnt *qp, const char *filename, size_t lineNumber, const char *pname )
+parseProcLimit ( const char *word, struct queueInfoEnt *qp, const char *filename, size_t *lineNumber, const char *pname )
 {
     int values[ ] = { 0, 0, 0 }; // FIXME FIXME FIXME label each value
-    char *sp      = NULL;
-    char *curWord = NULL;
+    const char *sp = strdup( word );;
+    char *curWord  = NULL;
 
     assert( pname ); // FIXME FIXME where was this supposed to go?
 
@@ -7400,7 +7427,6 @@ parseProcLimit (char *word, struct queueInfoEnt *qp, const char *filename, size_
         PROCLIMIT
     };
 
-    sp = word;
     if (sp == NULL) {
         // FIXME FIXME FIXME FIXME set lsferr or something here to notify caller
         return false;
@@ -7413,7 +7439,7 @@ parseProcLimit (char *word, struct queueInfoEnt *qp, const char *filename, size_
         }
 
         if (*sp == '#') {
-            *sp = '\0';
+            sp = NULL;
         }
 
         sp = word;
@@ -7424,13 +7450,13 @@ parseProcLimit (char *word, struct queueInfoEnt *qp, const char *filename, size_
             }
             if ((values[i] = my_atoi (curWord, ULONG_MAX, 0)) == ULONG_MAX) {
                 /* catgets 5302 */
-                ls_syslog (LOG_ERR, "catgets 5302: %s: File %s in section Queue ending at line %lu: PROCLIMIT value <%s> is not a positive integer; ignored", pname, filename, lineNumber, curWord);
+                ls_syslog (LOG_ERR, "catgets 5302: %s: File %s in section Queue ending at line %lu: PROCLIMIT value <%s> is not a positive integer; ignored", __func__, filename, lineNumber, curWord);
                 return false;
             }
         }
         if (getNextWord_ (&sp) != NULL) {
             /* catgets 5371 */
-            ls_syslog (LOG_ERR, "catgets 5371: %s: File %s in section Queue ending at line %lu: PROCLIMIT has too many parameters; ignored. PROCLIMIT=[minimum [default]] maximum", pname, filename, lineNumber);
+            ls_syslog (LOG_ERR, "catgets 5371: %s: File %s in section Queue ending at line %lu: PROCLIMIT has too many parameters; ignored. PROCLIMIT=[minimum [default]] maximum", __func__, filename, lineNumber);
             return false;
         }
         
@@ -7443,7 +7469,7 @@ parseProcLimit (char *word, struct queueInfoEnt *qp, const char *filename, size_
             case 2:
                 if (values[MINPROCLIMIT] > values[DEFAULTPROCLIMIT]) {
                     /* catgets 5370 */
-                    ls_syslog (LOG_ERR, "catgets 5370: %s: File %s in section Queue ending at line %lu: PROCLIMIT values <%lu %lu> are not valid; ignored. PROCLIMIT values must satisfy the following condition: 1 <= minimum <= maximum", pname, filename, lineNumber, values[MINPROCLIMIT], values[DEFAULTPROCLIMIT]);
+                    ls_syslog (LOG_ERR, "catgets 5370: %s: File %s in section Queue ending at line %lu: PROCLIMIT values <%lu %lu> are not valid; ignored. PROCLIMIT values must satisfy the following condition: 1 <= minimum <= maximum", __func__, filename, lineNumber, values[MINPROCLIMIT], values[DEFAULTPROCLIMIT]);
                     return false;
                 }
                 else {
@@ -7455,7 +7481,7 @@ parseProcLimit (char *word, struct queueInfoEnt *qp, const char *filename, size_
             case 3:
                 if (!(values[MINPROCLIMIT] <= values[DEFAULTPROCLIMIT] && values[DEFAULTPROCLIMIT] <= values[PROCLIMIT])) {
                     /* catgets 5374 */
-                    ls_syslog (LOG_ERR, "catgets 5374: %s: File %s in section Queue ending at line %lu: PROCLIMIT value <%lu %lu %lu> is not valid; ignored. PROCLIMIT values must satisfy the following condition: 1 <= minimum <= default <= maximum", filename, filename, lineNumber, values[MINPROCLIMIT], values[DEFAULTPROCLIMIT], values[PROCLIMIT]);
+                    ls_syslog (LOG_ERR, "catgets 5374: %s: File %s in section Queue ending at line %lu: PROCLIMIT value <%lu %lu %lu> is not valid; ignored. PROCLIMIT values must satisfy the following condition: 1 <= minimum <= default <= maximum", __func__, filename, lineNumber, values[MINPROCLIMIT], values[DEFAULTPROCLIMIT], values[PROCLIMIT]);
                     return false;
                 }
                 else {
@@ -7474,7 +7500,7 @@ parseProcLimit (char *word, struct queueInfoEnt *qp, const char *filename, size_
 }
 
 bool
-parseLimitAndSpec (char *word, size_t *limit, char **spec, char *hostSpec, char *param, struct queueInfoEnt *qp, const char *filename, size_t lineNumber, const char *pname )
+parseLimitAndSpec (char *word, float *limit, char **spec, char *hostSpec, char *param, struct queueInfoEnt *qp, const char *filename, size_t lineNumber, const char *pname )
 {
     int limitVal = -1;
     char *sp     = NULL;
@@ -7534,10 +7560,10 @@ parseLimitAndSpec (char *word, size_t *limit, char **spec, char *hostSpec, char 
     return true;    
 }
 
-double *
+float *
 getModelFactor ( const char *hostModel, struct lsInfo *info)
 {
-    double *cpuFactor = 0.0;
+    float *cpuFactor = 0.0;
     
     if ( NULL == hostModel ) {
         return NULL;
@@ -7552,10 +7578,10 @@ getModelFactor ( const char *hostModel, struct lsInfo *info)
     return NULL;
 }
 
-double *
-getHostFactor ( const char *hostname)
+float *
+getHostFactor ( const char *hostname ) // FIXME FIXME FIXME decide what do with dupe
 {
-    double *cpuFactor  = 0;
+    float *cpuFactor  = 0;
     struct hostent *hp = NULL;
 
     if (NULL == hostname) {
@@ -7579,6 +7605,45 @@ getHostFactor ( const char *hostname)
 
     return NULL;
 }
+
+// from daemons/mbatchd/host.c
+
+// float *
+// getHostFactor (char *host)
+// {
+//   struct hData *hD;
+//   static double cpuFactor;
+//   struct hostInfo *hInfo;
+//   struct hostent *hp;
+
+//   if (host == NULL || strlen (host) == 0)
+//     {
+//       if ((hD = getHostData (ls_getmyhostname ())) == NULL)
+//     return NULL;
+//     }
+//   else
+//     {
+//       if ((hD = getHostData (host)) == NULL)
+//     {
+
+//       if ((hp = Gethostbyname_ (host)) == NULL)
+//         return NULL;
+
+//       if ((hD = getHostData (hp->h_name)) == NULL)
+//         {
+//           if ((hInfo = getLsfHostData (hp->h_name)) != NULL)
+//         return &hInfo->cpuFactor;
+//           return NULL;
+//         }
+//     }
+//     }
+
+//   if (hD->hStatus & HOST_STAT_REMOTE)
+//     return NULL;
+
+//   cpuFactor = hD->cpuFactor;
+//   return &cpuFactor;
+// }
 
 char *
 parseAdmins ( const char *admins, int options, const char *filename, size_t lineNumber)
@@ -9321,7 +9386,7 @@ checkJobAttaDir ( const char *path)
 
 
 int
-parseDefAndMaxLimits (struct keymap *key, size_t *defaultVal, size_t *maxVal, const char *filename, size_t lineNumber, const char *pname)
+ (struct keymap *key, float *defaultVal, float *maxVal, const char *filename, size_t lineNumber, const char *pname)
 {
     
     const char *sp     = strdup(key->value);
