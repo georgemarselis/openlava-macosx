@@ -52,6 +52,8 @@
 #include "lib/getGrpData.h"  // struct groupInfoEnt
 #include "lib/host.h"        // struct hostent *Gethostbyname_( const char *hostname )
 #include "config.h"          // name_of_upgrade_utility
+#include "lib/confmisc.h"    // isInList1, isInList2
+#include "lsb/signals.h"     // int sigNameToValue_( const char *sigString);
 
 void
 freeSA ( char **list, unsigned int num)
@@ -5603,9 +5605,8 @@ parseGroups ( const char *linep, const char *filename, size_t *lineNumber, const
                         continue;
                     }
 
-                    const char *kot = strdup( hostGroup );
                     // catgets 5054
-                    if (putIntoList ( &kot, &len, hostName, "in queue's HOSTS list . catgets 5054" ) == NULL) {
+                    if (putIntoList ( &hostGroup, &len, hostName, "in queue's HOSTS list . catgets 5054" ) == NULL) {
                         // failReturn (mygp, strlen (myWord) + 1);
                         const char malloc[] = "malloc";
                         ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, malloc, strlen (myWord) + 1 );
@@ -5649,8 +5650,7 @@ parseGroups ( const char *linep, const char *filename, size_t *lineNumber, const
                     continue;
                 }
 
-                const char *kot = strdup( hostGroup );
-                if (groupType == HOST_GRP && putIntoList (&kot, &len, hostName, "in queue's HOSTS list: catgets 5054") == NULL) {
+                if (groupType == HOST_GRP && putIntoList (&hostGroup, &len, hostName, "in queue's HOSTS list: catgets 5054") == NULL) {
                     // failReturn (mygp, strlen (hostName) + 1);
                     const char malloc[] = "malloc";
                     ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, malloc, strlen (myWord) + 1 );
@@ -5721,8 +5721,7 @@ parseGroups ( const char *linep, const char *filename, size_t *lineNumber, const
                     continue;
                 }
 
-                const char *kot = strdup( hostGroup );
-                if (groupType == HOST_GRP && putIntoList (&kot, &len, hostName, "in queue's HOSTS list: catgets 5054" ) == NULL) {
+                if (groupType == HOST_GRP && putIntoList (&hostGroup, &len, hostName, "in queue's HOSTS list: catgets 5054" ) == NULL) {
                     // failReturn (mygp, strlen (myWord) + 1);
                     const char malloc[] = "malloc";
                     ls_syslog(LOG_ERR,  I18N_FUNC_D_FAIL_M, __func__, malloc, strlen (myWord) + 1 );
@@ -6742,7 +6741,7 @@ do_Queues (struct lsConf *conf, const char *filename, size_t *lineNumber, struct
         }
 
         if (keyList[QKEY_TERMINATE_WHEN].value != NULL && strcmp (keyList[QKEY_TERMINATE_WHEN].value, "") && 
-                terminateWhen (&queue, keyList[QKEY_TERMINATE_WHEN].value, filename, lineNumber, "in section Queue ending") < 0 ) {
+                !terminateWhen (&queue, keyList[QKEY_TERMINATE_WHEN].value, filename, lineNumber, "in section Queue ending") ) {
             lsberrno = LSBE_CONF_WARNING;
             freekeyval (keyList);
             freeQueueInfo (&queue);
@@ -7386,13 +7385,13 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char
                 qp->defLimits[LSF_RLIMIT_CPU] = limit_;
             }
 
-            if (qp->rLimits[LSF_RLIMIT_RUN] > 0 && qp->rLimits[LSF_RLIMIT_RUN] != ULONG_MAX && (options & CONF_RETURN_HOSTSPEC)) {
+            if (qp->rLimits[LSF_RLIMIT_RUN] > 0 && fabsf( qp->rLimits[LSF_RLIMIT_RUN] - FLT_MAX) > 0.00000001f && (options & CONF_RETURN_HOSTSPEC)) {
                 limit_ = qp->rLimits[LSF_RLIMIT_RUN] * (*cpuFactor);
                 limit_ = limit_ < 1 ? 1 : limit_ + 0.5f;
                 qp->rLimits[LSF_RLIMIT_RUN] = limit_;
             }
 
-            if (qp->defLimits[LSF_RLIMIT_RUN] > 0 && qp->defLimits[LSF_RLIMIT_RUN] != ULONG_MAX && (options & CONF_RETURN_HOSTSPEC)) {
+            if (qp->defLimits[LSF_RLIMIT_RUN] > 0 && fabsf( qp->defLimits[LSF_RLIMIT_RUN] - FLT_MAX) > 0.00000001f && (options & CONF_RETURN_HOSTSPEC)) {
                 limit_ = qp->defLimits[LSF_RLIMIT_RUN] * (*cpuFactor);
                 limit_ = limit_ < 1 ? 1 : limit_ + 0.5f;
                 qp->defLimits[LSF_RLIMIT_RUN] = limit_;
@@ -7415,7 +7414,7 @@ parseCpuAndRunLimit (struct keymap *keylist, struct queueInfoEnt *qp, const char
 bool
 parseProcLimit ( const char *word, struct queueInfoEnt *qp, const char *filename, size_t *lineNumber, const char *pname )
 {
-    int values[ ] = { 0, 0, 0 }; // FIXME FIXME FIXME label each value
+    size_t values[ ] = { 0, 0, 0 }; // FIXME FIXME FIXME label each value
     const char *sp = strdup( word );;
     char *curWord  = NULL;
 
@@ -7448,7 +7447,7 @@ parseProcLimit ( const char *word, struct queueInfoEnt *qp, const char *filename
             if (curWord == NULL) {
                 break;
             }
-            if ((values[i] = my_atoi (curWord, ULONG_MAX, 0)) == ULONG_MAX) {
+            if ((values[i] = strtoul(curWord, NULL, 10 )) == ULONG_MAX) { // base 10
                 /* catgets 5302 */
                 ls_syslog (LOG_ERR, "catgets 5302: %s: File %s in section Queue ending at line %lu: PROCLIMIT value <%s> is not a positive integer; ignored", __func__, filename, lineNumber, curWord);
                 return false;
@@ -7461,12 +7460,12 @@ parseProcLimit ( const char *word, struct queueInfoEnt *qp, const char *filename
         }
         
         switch (i) {
-            case 1:
+            case 1: // FIXME FIXME FIXME swich to label
                 qp->procLimit = values[MINPROCLIMIT];
                 qp->minProcLimit = 1;
                 qp->defProcLimit = 1;
             break;
-            case 2:
+            case 2: // FIXME FIXME FIXME swich to label
                 if (values[MINPROCLIMIT] > values[DEFAULTPROCLIMIT]) {
                     /* catgets 5370 */
                     ls_syslog (LOG_ERR, "catgets 5370: %s: File %s in section Queue ending at line %lu: PROCLIMIT values <%lu %lu> are not valid; ignored. PROCLIMIT values must satisfy the following condition: 1 <= minimum <= maximum", __func__, filename, lineNumber, values[MINPROCLIMIT], values[DEFAULTPROCLIMIT]);
@@ -7478,7 +7477,7 @@ parseProcLimit ( const char *word, struct queueInfoEnt *qp, const char *filename
                     qp->procLimit    = values[DEFAULTPROCLIMIT];
                 }
             break;
-            case 3:
+            case 3: // FIXME FIXME FIXME swich to label
                 if (!(values[MINPROCLIMIT] <= values[DEFAULTPROCLIMIT] && values[DEFAULTPROCLIMIT] <= values[PROCLIMIT])) {
                     /* catgets 5374 */
                     ls_syslog (LOG_ERR, "catgets 5374: %s: File %s in section Queue ending at line %lu: PROCLIMIT value <%lu %lu %lu> is not valid; ignored. PROCLIMIT values must satisfy the following condition: 1 <= minimum <= default <= maximum", __func__, filename, lineNumber, values[MINPROCLIMIT], values[DEFAULTPROCLIMIT], values[PROCLIMIT]);
@@ -7500,10 +7499,10 @@ parseProcLimit ( const char *word, struct queueInfoEnt *qp, const char *filename
 }
 
 bool
-parseLimitAndSpec (char *word, float *limit, char **spec, char *hostSpec, char *param, struct queueInfoEnt *qp, const char *filename, size_t lineNumber, const char *pname )
+parseLimitAndSpec ( const char *word, float *limit, char **spec, const char *hostSpec, const char *param, struct queueInfoEnt *qp, const char *filename, size_t *lineNumber, const char *pname )
 {
-    int limitVal = -1;
-    char *sp     = NULL;
+    long limitVal = -1;
+    char *sp      = NULL;
 
     assert( pname ); // FIXME FIXME where was this supposed to go?
 
@@ -7530,29 +7529,29 @@ parseLimitAndSpec (char *word, float *limit, char **spec, char *hostSpec, char *
         sp = NULL;
     }
 
-    limitVal = my_atoi (word, ULONG_MAX / 60 + 1, -1);
-    if (limitVal == ULONG_MAX) {
+    limitVal = strtol(word, NULL, 10 ); // interpret the string in base 10
+    if (limitVal == LONG_MAX) {
         /* catgets 5386 */
         ls_syslog (LOG_ERR, "catgets 5386: %s: File %s in section Queue at line %lu: Value <%s> of %s is not a positive integer between 0 and %lu; ignored.", __func__, filename, lineNumber, word, param, ULONG_MAX / 60);
         lsberrno = LSBE_CONF_WARNING;
         sp = NULL;
     }
     else {
-        *limit = limitVal * 60;
+        *limit = (float) (limitVal * 60 );
     }
 
     if (sp != NULL) {
         word = sp + 1;
-        limitVal = my_atoi (word, ULONG_MAX / 60 + 1, -1);
+        limitVal = strtol( word, NULL, 10 ); // interpet the string in base 10.
 
-        if (limitVal == ULONG_MAX) {
+        if (limitVal == LONG_MAX) {
             /* catgets 5386 */
             ls_syslog (LOG_ERR, "catgets 5386: %s: File %s in section Queue at line %lu: Value <%s> of %s is not a positive integer between 0 and %lu; ignored.", __func__, filename, lineNumber, word, param, ULONG_MAX / 60);
             lsberrno = LSBE_CONF_WARNING;
             *limit = -1;
         }
         else {
-            *limit += limitVal;
+            *limit += (float) (limitVal);
             *limit *= 60;
         }
     }
@@ -7563,7 +7562,7 @@ parseLimitAndSpec (char *word, float *limit, char **spec, char *hostSpec, char *
 float *
 getModelFactor ( const char *hostModel, struct lsInfo *info)
 {
-    float *cpuFactor = 0.0;
+    float *cpuFactor = NULL;
     
     if ( NULL == hostModel ) {
         return NULL;
@@ -7581,7 +7580,7 @@ getModelFactor ( const char *hostModel, struct lsInfo *info)
 float *
 getHostFactor ( const char *hostname ) // FIXME FIXME FIXME decide what do with dupe
 {
-    float *cpuFactor  = 0;
+    float *cpuFactor   = NULL;
     struct hostent *hp = NULL;
 
     if (NULL == hostname) {
@@ -7646,42 +7645,44 @@ getHostFactor ( const char *hostname ) // FIXME FIXME FIXME decide what do with 
 // }
 
 char *
-parseAdmins ( const char *admins, int options, const char *filename, size_t lineNumber)
+parseAdmins ( const char *admins, int options, const char *filename, size_t *lineNumber)
 {
     
-    char *sp                  = NULL;
     char *word                = NULL;
-    char *expandAds           = NULL;
+    char *expandAds           = malloc( MAX_LINE_LEN );
     struct passwd *pw         = NULL;
     struct group *unixGrp     = NULL;
     struct groupInfoEnt *uGrp = NULL;
     unsigned int len          = 0;
 
+    const char admins_[ ]      = "admins";
+
     if (admins == NULL) {
-        ls_syslog (LOG_ERR, I18N_NULL_POINTER, filename, "admins");
+        ls_syslog (LOG_ERR, "catgets: 5050: function %s %s: %s is NULL", __func__, filename, admins_ );
         return NULL;
     }
 
-    expandAds = malloc( MAX_LINE_LEN );
     if ( NULL == expandAds && ENOMEM == errno ) {
         ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, filename, "malloc", MAX_LINE_LEN);
         lsberrno = LSBE_NO_MEM;
         return NULL;
     }
 
-    expandAds = "";
+    memset( expandAds, '\0', strlen( expandAds ) );
     len = MAX_LINE_LEN;
-    sp = admins;
+    const char *sp = strdup( admins );
+
     while ((word = getNextWord_ (&sp)) != NULL) {
         if (strcmp (word, "all") == 0) {
 
             if (options & CONF_EXPAND) {
-                expandAds = "";
-                putIntoList (&expandAds, &len, "all", I18N_IN_QUEUE_ADMIN);
+                memset( expandAds, '\0', strlen( expandAds ) );
+                putIntoList (&expandAds, &len, "all", "in queue's administrator list");
                 return expandAds;
             }
             else {
-                if ((putIntoList (&expandAds, &len, "all", I18N_IN_QUEUE_ADMIN)) == NULL) {
+
+                if ((putIntoList (&expandAds, &len, "all", "in queue's administrator list")) == NULL) {
                         ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, filename);
                         FREEUP (expandAds);
                         lsberrno = LSBE_NO_MEM;
@@ -7691,7 +7692,8 @@ parseAdmins ( const char *admins, int options, const char *filename, size_t line
             }
         }
         else if ((pw = getpwlsfuser_ (word))) {
-            if ((putIntoList(&expandAds, &len, pw->pw_name, I18N_IN_QUEUE_ADMIN)) == NULL) {
+
+            if ((putIntoList(&expandAds, &len, pw->pw_name, "in queue's administrator list")) == NULL) {
                     ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, filename);
                     FREEUP (expandAds);
                     lsberrno = LSBE_NO_MEM;
@@ -7711,7 +7713,7 @@ parseAdmins ( const char *admins, int options, const char *filename, size_t line
                 }
                 else {
                     for ( unsigned int i = 0; i < numMembers; i++) {
-                        if (putIntoList (&expandAds, &len, groupMembers[i], I18N_IN_QUEUE_ADMIN) == NULL) {
+                        if (putIntoList (&expandAds, &len, groupMembers[i], "in queue's administrator list") == NULL) {
                             FREEUP (groupMembers);
                             ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, filename);
                             FREEUP (expandAds);
@@ -7724,7 +7726,8 @@ parseAdmins ( const char *admins, int options, const char *filename, size_t line
                 continue;
             }
             else {
-                if (putIntoList(&expandAds, &len, uGrp->group, I18N_IN_QUEUE_ADMIN) == NULL) {
+
+                if (putIntoList(&expandAds, &len, uGrp->group, "in queue's administrator list") == NULL) {
                         ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, filename);
                         FREEUP (expandAds);
                         lsberrno = LSBE_NO_MEM;
@@ -7738,7 +7741,7 @@ parseAdmins ( const char *admins, int options, const char *filename, size_t line
             if (options & CONF_EXPAND) {
                 int i = 0;
                 while (unixGrp->gr_mem[i] != NULL) {
-                    if (putIntoList (&expandAds, &len, unixGrp->gr_mem[i++], I18N_IN_QUEUE_ADMIN) == NULL) {
+                    if (putIntoList (&expandAds, &len, unixGrp->gr_mem[i++], "in queue's administrator list") == NULL) {
                             ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, filename);
                             FREEUP (expandAds);
                             lsberrno = LSBE_NO_MEM;
@@ -7748,7 +7751,7 @@ parseAdmins ( const char *admins, int options, const char *filename, size_t line
                 }
             }
             else {
-                if (putIntoList (&expandAds, &len, word, I18N_IN_QUEUE_ADMIN) == NULL) {
+                if (putIntoList (&expandAds, &len, word, "in queue's administrator list") == NULL) {
                         ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, filename);
                         FREEUP (expandAds);
                         lsberrno = LSBE_NO_MEM;
@@ -7760,8 +7763,7 @@ parseAdmins ( const char *admins, int options, const char *filename, size_t line
         else {
             /* catgets 5390 */
             ls_syslog (LOG_WARNING, "catgets 5390: %s: File %s at line %lu: Unknown user or user group name <%s>; Maybe a windows user or of another domain.", __func__, filename, lineNumber, word); 
-            
-            if ((putIntoList (&expandAds, &len, word, I18N_IN_QUEUE_ADMIN)) == NULL) {
+            if ((putIntoList (&expandAds, &len, word, "in queue's administrator list")) == NULL) {
                     ls_syslog (LOG_ERR, I18N_FUNC_FAIL, __func__, filename);
                     FREEUP (expandAds);
                     lsberrno = LSBE_NO_MEM;
@@ -7775,7 +7777,7 @@ parseAdmins ( const char *admins, int options, const char *filename, size_t line
 }
 
 char *
-putIntoList (char **list, unsigned int *len, const char *string, const char *listName)
+putIntoList ( char **list, unsigned int *len, const char *string, const char *listName)
 {
     char *sp             = NULL;
     unsigned long length = *len;
@@ -7783,12 +7785,14 @@ putIntoList (char **list, unsigned int *len, const char *string, const char *lis
     if ( NULL == string) {
         return *list;
     }
-    if ( (char **) NULL == list ) {
+    if ( NULL == list ) {
         return NULL;
     }
 
     sp = putstr_ (listName);
-    if (isInList (*list, string) == true) {
+
+    const char *kot = strdup( *list );
+    if (isInList1 ( &kot, string ) == true) {
         /* catgets 5392 */
         ls_syslog (LOG_ERR, "catgets 5392: %s: %s is repeatedly specified %s; ignoring", __func__, string, sp);  
         FREEUP (sp);
@@ -7852,14 +7856,16 @@ unsigned int
 setDefaultUser (void)
 {
     char *functionName = malloc( strlen(  __func__ ) + 1);
+    const char defaultLabel[] = "default";
 
-    strcpy( functionName, __func__ ); 
+    memset( functionName, '\0', strlen( functionName )  );
+    strncpy( functionName, __func__, strlen( __func__ ) ); 
 
     if (handleUserMem ()) {
         return UINT_MAX;
     }
 
-    if (!addUser( defaultLabel, ULONG_MAX, INFINIT_FLOAT, functionName, true)) { // FIXME FIXME FIXME the fuck is functionName present here?
+    if (!addUser( defaultLabel, ULONG_MAX, FLT_MAX, functionName, true)) { // FIXME FIXME FIXME the fuck is functionName present here?
         return 0;
     }
 
@@ -7869,9 +7875,9 @@ setDefaultUser (void)
         //assert( numofusers >= 0 );
         ls_syslog (LOG_ERR, I18N_FUNC_D_FAIL_M, __func__, "malloc", numofusers * sizeof (struct userInfoEnt));
         lsberrno = LSBE_CONF_FATAL;
-        freeWorkUser (true);
+        freeWorkUser( true );
         freeUConf (uConf, false);
-        return -1;
+        return 1;
     }
 
     for ( unsigned int i = 0; i < numofusers; i++) {
@@ -7933,7 +7939,7 @@ handleHostMem (void)
 }
 
 int
-parseSigActCmd (struct queueInfoEnt *qp, char *linep, const char *filename, size_t lineNumber, const char *section)
+parseSigActCmd (struct queueInfoEnt *qp, const char *linep, const char *filename, size_t *lineNumber, const char *section)
 {
     
     char *actClass    = NULL;
@@ -7944,30 +7950,30 @@ parseSigActCmd (struct queueInfoEnt *qp, char *linep, const char *filename, size
         linep++;
     }
 
-    while (linep != NULL && linep[0] != '\0') {
+    while (linep != NULL && linep[0] != '\0') { // FIXME FIXME FIXME replace [0] with label
         if ((actClass = getNextWord1_ (&linep)) == NULL) {
             if (filename) {
                 /* catgets 5408 */
                 ls_syslog (LOG_ERR, "catgets 5408: %s:File %s %s at line %lu: SUSPEND, RESUME or TERMINATE is missing", __func__, filename, section, lineNumber);
             }
             lsberrno = LSBE_CONF_WARNING;
-            return -1;
+            return -1; // FIXME FIXME FIXME FIXME replace with enum label
         }
         if (strcmp (actClass, "SUSPEND") == 0) {
-            actClassValue = 0;
+            actClassValue = 0; // FIXME FIXME FIXME FIXME replace with enum label
         }
         else if (strcmp (actClass, "RESUME") == 0) {
-            actClassValue = 1;
+            actClassValue = 1; // FIXME FIXME FIXME FIXME replace with enum label
         }
         else if (strcmp (actClass, "TERMINATE") == 0) {
-            actClassValue = 2;
+            actClassValue = 2; // FIXME FIXME FIXME FIXME replace with enum label
         }
         else {
             if (filename) {
                 ls_syslog (LOG_ERR, "catgets 5409: %s:File %s %s at line %lu: wrong KEYWORD", __func__, filename, section, lineNumber);    /* catgets 5409 */
             }
             lsberrno = LSBE_CONF_WARNING;
-            return -2;
+            return -2; // FIXME FIXME FIXME FIXME replace with enum label
         }
 
         while (isspace (*linep)) {
@@ -7979,14 +7985,14 @@ parseSigActCmd (struct queueInfoEnt *qp, char *linep, const char *filename, size
                 ls_syslog (LOG_ERR, "catgets 5410: %s:File %s %s at line %lu: '[' is missing", __func__, filename, section, lineNumber);   /* catgets 5410 */
             }
             lsberrno = LSBE_CONF_WARNING;
-            return -3;
+            return -3; // FIXME FIXME FIXME FIXME replace with enum label
         }
         linep++;
 
         while (isspace (*linep)) {
             linep++;
         }
-        sigActCmd = linep;
+        sigActCmd = strdup( linep );
 
         while ((linep == NULL || linep[0] == '\0') || (*linep != ']')) {
             linep++;
@@ -7997,9 +8003,9 @@ parseSigActCmd (struct queueInfoEnt *qp, char *linep, const char *filename, size
                 ls_syslog (LOG_ERR, "catgets 5411: %s:File %s %s at line %lu: ']' is missing", __func__, filename, section, lineNumber);
             }
             lsberrno = LSBE_CONF_WARNING;
-            return -5;
+            return -5; // FIXME FIXME FIXME FIXME replace with enum label
         }
-        *linep++ = '\0';
+        // *linep++ = '\0';
 
         if (actClassValue == 0) {
             if (strcmp (sigActCmd, "CHKPNT") == 0) {
@@ -8015,7 +8021,7 @@ parseSigActCmd (struct queueInfoEnt *qp, char *linep, const char *filename, size
                     /* catgets 5412 */
                     ls_syslog (LOG_ERR, "catgets 5412: %s: File %s %s at line %lu: 'CHKPNT' is not valid in RESUME", __func__, filename, section, lineNumber);
                 }
-                return -7;
+                return -7; // FIXME FIXME FIXME FIXME replace with enum label
             }
             else {
                 qp->resumeActCmd = putstr_ (sigActCmd);
@@ -8041,8 +8047,8 @@ parseSigActCmd (struct queueInfoEnt *qp, char *linep, const char *filename, size
 
 
 
-int
-terminateWhen (struct queueInfoEnt *qp, char *linep, const char *filename, size_t lineNumber, const char *section)
+bool
+terminateWhen (struct queueInfoEnt *qp, const char *linep, const char *filename, size_t *lineNumber, const char *section)
 {
     char *sigName = NULL;
 
@@ -8050,17 +8056,17 @@ terminateWhen (struct queueInfoEnt *qp, char *linep, const char *filename, size_
         linep++;
     }
 
-    while (linep != NULL && linep[0] != '\0') {
+    while (linep != NULL && linep[0] != '\0') { //  // FIXME FIXME FIXME  label[0]
         if ((sigName = getNextWord_ (&linep)) != NULL)
             {
-            if (strcmp (sigName, "USER") == 0) {
-                qp->sigMap[-sigNameToValue_ ("SIG_SUSP_USER")] = -10;
+            if (strcmp (sigName, "USER") == 0) { // FIXME FIXME FIXME FIXME set in configure.ac
+                qp->sigMap[-sigNameToValue_ ("SIG_SUSP_USER")] = -10; // FIXME FIXME FIXME FIXME set in configure.ac
             }
-            else if (strcmp (sigName, "LOAD") == 0) {
-                qp->sigMap[-sigNameToValue_ ("SIG_SUSP_LOAD")] = -10;
+            else if (strcmp (sigName, "LOAD") == 0) { // FIXME FIXME FIXME FIXME set in configure.ac
+                qp->sigMap[-sigNameToValue_ ("SIG_SUSP_LOAD")] = -10; // FIXME FIXME FIXME FIXME set in configure.ac
             }
-            else if (strcmp (sigName, "WINDOW") == 0) {
-                qp->sigMap[-sigNameToValue_ ("SIG_SUSP_WINDOW")] = -10;
+            else if (strcmp (sigName, "WINDOW") == 0) { // FIXME FIXME FIXME FIXME set in configure.ac
+                qp->sigMap[-sigNameToValue_ ("SIG_SUSP_WINDOW")] = -10; // FIXME FIXME FIXME FIXME set in configure.ac
             }
             else {
                 if (filename) {
@@ -8068,7 +8074,7 @@ terminateWhen (struct queueInfoEnt *qp, char *linep, const char *filename, size_
                     ls_syslog (LOG_ERR, "catgets 5413: %s:File %s %s at line %lu: LOAD or WINDOW is missing", __func__, filename, section, lineNumber);
                 }
                 lsberrno = LSBE_CONF_WARNING;
-                return -1;
+                return false;
             }
         }
         while (isspace (*linep)) {
@@ -8076,7 +8082,7 @@ terminateWhen (struct queueInfoEnt *qp, char *linep, const char *filename, size_
         }
     }
 
-    return 0;
+    return true;
 }
 
 int

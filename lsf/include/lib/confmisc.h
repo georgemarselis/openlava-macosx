@@ -34,7 +34,7 @@ const char *getBeginLine_conf  ( const struct lsConf   *conf      ,       size_t
       void  doSkipSection_conf ( const struct lsConf   *conf      ,       size_t   *lineNum,    const char    *lsfile,     const char *sectionName );
       int   putValue           (       struct keymap   *keyList   , const char *key, const char *value );
 
-int  isInlist1          ( char           **adminNames, char     *userName );
-int  isInlist2          ( char           **adminNames, char     *userName,         unsigned  int actAds );
+int  isInList1          ( const char           **adminNames, const char     *userName );
+int  isInList2          ( const char           **adminNames, const char     *userName,         unsigned  int actAds );
 // int  isInlist3          ( const  char           **adminNames, const char     *userName,         unsigned  int actAds ); // FIXME FIXME FIXME FIXME FIXME useless delete
 

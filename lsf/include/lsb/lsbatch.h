@@ -1154,6 +1154,7 @@ struct queueInfoEnt // V2
 
 struct hostInfoEnt
 {
+    char *hostname;
     unsigned long  hStatus;
     unsigned long  mig;
     unsigned long  attr;

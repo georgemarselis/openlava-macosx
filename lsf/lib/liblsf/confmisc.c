@@ -844,21 +844,21 @@ doSkipSection_conf (const struct lsConf *conf, size_t *lineNum, const char *lsfi
  *  Compares the two input strings for equality
  * 
  */
-int
-isInList1 ( const char *list, const char *string)
+bool
+isInList1 ( const char **list, const char *string)
 {
     char *word = NULL;
     
     if (list == NULL || string == NULL || list[0] == '\0' || string[0] == '\0') {
-        return FALSE;
+        return false;
     }
     
     while( ( word = getNextWord_( &list ) ) != NULL) {
         if (strcmp( word, string ) == 0) {
-            return TRUE;
+            return true;
         }
     }
-    return FALSE;
+    return false;
     
 }
 
@@ -869,22 +869,22 @@ isInList1 ( const char *list, const char *string)
  * INPUT : list of admin names, username strings, max size of admin names array
  * OUTPUT: TRUE/FALSE, depending if userName is in adminNames 
  */
-int
-isInlist2 ( char **adminNames, char *userName, unsigned int actAds) // FIXME FIXME FIXME FIXME FIXME turn this into const char references, since nothing gets altered in the function
+bool
+isInList2 ( const char **adminNames, const char *userName, unsigned int actAds) // FIXME FIXME FIXME FIXME FIXME turn this into const char references, since nothing gets altered in the function
 {
 
     if ( 0 == actAds) {
-        return FALSE;
+        return false;
     }
     
     for ( unsigned int i = 0; i < actAds; i++) {
     
         if (strcmp (adminNames[i], userName) == 0) {
-            return TRUE;
+            return true;
         }
     }
         
-        return FALSE;
+        return false;
 
 }
 
