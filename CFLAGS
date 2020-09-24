@@ -1,2 +1,2 @@
-CFLAGS="$CFLAGS -Wall -Wextra -Wfatal-errors -Werror -Wformat=2 -Wno-format-extra-args -Wno-format-zero-length -Winit-self -Wimplicit-int -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wunused-parameter "
+CFLAGS="$CFLAGS -Wall -Wmisleading-indentation -Wextra -Wfatal-errors -Werror -Wformat=2 -Wno-format-extra-args -Wno-format-zero-length -Winit-self -Wimplicit-int -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wunused-parameter "
 CFLAGS=+"-pedantic-errors -ansi"
