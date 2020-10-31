@@ -1,7 +1,7 @@
 == Things you  need to install == 
 
 Fedora 
- dnf install -y git* wget curl meld autoconf automake --skip-broken --exclude=git-pull-request
+ dnf install -y git* wget curl meld autoconf.noarch autoconf-archive.noarch automake.noarch gcc.x86_64 tk.x86_64 tcl.x86_64 tcl-devel.x86_64 --skip-broken --exclude=git-pull-request 
 
 Debian
  apt-get install -y git* wget curl meld autoconf automake
