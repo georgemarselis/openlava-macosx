@@ -103,7 +103,7 @@ you have to run configure again but add -D_DEFAULT_SOURCE
 
 === Fedora 33 ===
 
-dnf install vim* etckeeper* sublime* ncftp* git* wget curl automake* cmake* autoconf* google-chrome-stable libnsl2-devel tcl-devel gettext{,-devel} libtirpc*  --skip-broken --exclude=vimiv-0.9.1-16.fc33.x86_64,git-pull-request*
+dnf install vim* etckeeper* sublime* ncftp* git* wget curl automake* cmake* autoconf* google-chrome-stable libnsl2-devel tcl-devel gettext{,-devel} libtirpc* ncftp* screen tmux wget curl automake* autoconf --skip-broken --exclude=vimiv-0.9.1-16.fc33.x86_64,git-pull-request*
 
 
 
